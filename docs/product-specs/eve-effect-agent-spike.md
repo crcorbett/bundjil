@@ -58,6 +58,7 @@ Local reference files inspected:
 - `.local/references/personal-agent-template/agent/tools/save_memory.ts`
 - `.local/references/eve/docs/tools/overview.mdx`
 - `.local/references/eve/packages/eve/src/public/definitions/tool.ts`
+- `.local/references/eve/packages/eve/src/shared/json-schema.ts`
 - `.local/references/eve/packages/eve/src/shared/tool-definition.ts`
 - `.local/references/effect-v4/packages/effect/src/Schema.ts`
 - `.local/references/effect-v4/packages/effect/src/Context.ts`
@@ -96,8 +97,9 @@ packages/eve-effect
 
 `apps/agent` owns Eve runtime shape and deployment concerns. Eve supports
 Standard Schema for tool `inputSchema` and `outputSchema`, so the first
-implementation should pass Effect Schema through `Schema.toStandardSchemaV1`
-instead of mirroring contracts in zod.
+implementation should pass Effect Schema through a small helper that adds both
+Standard Schema validation and Standard JSON Schema metadata instead of
+mirroring contracts in zod.
 
 `@bundjil/eve-effect` owns typed operation contracts, Effect Schema decoding and
 encoding, tagged errors, layers, and testable operations. It must not own Eve
@@ -118,10 +120,13 @@ provider secrets.
 - Use Effect Schema as the source of truth for:
   `WorkspaceStatusInput`, `WorkspaceStatusSuccess`, and
   `WorkspaceStatusError`.
-- Use `Schema.toStandardSchemaV1(...)` for Eve's
-  `defineTool({ inputSchema, outputSchema })` boundary. This lets Eve infer the
-  `execute` input and output types from the canonical Effect Schema contracts.
-  Do not add zod mirrors unless a concrete Eve API requires them.
+- Use a local `toEveSchema(schema)` helper for Eve's
+  `defineTool({ inputSchema, outputSchema })` boundary:
+  `Schema.toStandardSchemaV1(Schema.toStandardJSONSchemaV1(schema))`. Eve's
+  public tool types accept `StandardJSONSchemaV1`, and its runtime normalizes
+  schemas through the `~standard.jsonSchema` hook. This lets Eve infer the
+  `execute` input and output types from the canonical Effect Schema contracts
+  without zod mirrors.
 - Configure the first model through `agent/agent.ts` with an environment
   override and a cheap default candidate such as `google/gemini-2.5-flash`.
   Confirm the exact available model ID during implementation using Eve docs or
@@ -287,9 +292,10 @@ which files are committed, and which secrets are intentionally excluded.
 
 ## Risks And Tradeoffs
 
-- Eve docs still use zod examples, but current Eve tool types support any
-  Standard Schema. The first implementation should use
-  `Schema.toStandardSchemaV1(...)` directly and avoid maintaining zod mirrors.
+- Eve docs still use zod examples, but current Eve tool types support Standard
+  JSON Schema. The first implementation should use
+  `Schema.toStandardSchemaV1(Schema.toStandardJSONSchemaV1(schema))` through a
+  local helper and avoid maintaining zod mirrors.
 - Eve's model IDs and Gateway behavior can change. The implementation must
   verify the chosen cheap model against current Eve/Vercel docs before relying
   on it.

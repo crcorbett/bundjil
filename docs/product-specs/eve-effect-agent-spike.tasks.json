@@ -6,7 +6,7 @@
     "Ship one end-to-end Eve agent slice before adding Sendblue, email, Notion, or memory.",
     "Keep Eve filesystem runtime code in apps/agent.",
     "Keep Effect Schema contracts, named operations, errors, and layers in @bundjil/eve-effect.",
-    "Use Effect Schema as the source of truth; pass it to Eve through Schema.toStandardSchemaV1 unless a concrete Eve API requires another edge contract.",
+    "Use Effect Schema as the source of truth; pass it to Eve through a helper that combines Schema.toStandardJSONSchemaV1 and Schema.toStandardSchemaV1 unless a concrete Eve API requires another edge contract.",
     "Never commit AI Gateway or provider secrets."
   ],
   "globalVerification": [
@@ -22,7 +22,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require additional passes if code ownership, Effect flow, Standard Schema usage, or verification evidence is weak."
+    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require additional passes if code ownership, Effect flow, Standard JSON Schema usage, or verification evidence is weak."
   },
   "tasks": [
     {
@@ -32,7 +32,7 @@
       "description": "Add Eve to the workspace in the smallest Bun-compatible way, inspect node_modules/eve/docs, and record the exact tool/channel/schema APIs available to the implementation.",
       "implementationNotes": [
         "Use the local .local/references/eve and .local/references/personal-agent-template checkouts plus node_modules/eve/docs after install.",
-        "Confirm installed Eve defineTool types still accept Standard Schema for inputSchema and outputSchema.",
+        "Confirm installed Eve defineTool types still accept StandardJSONSchemaV1 for inputSchema and outputSchema.",
         "Confirm the exact local dev command and HTTP port behavior for apps/agent."
       ],
       "mandatoryVerification": [
@@ -77,7 +77,7 @@
       "description": "Create the Eve filesystem app with instructions, model config, and a workspace_status tool that delegates into @bundjil/eve-effect.",
       "mandatoryVerification": [
         "Eve tool execute path delegates to the Effect named operation",
-        "Tool edge validates input and output using Effect Schema via Schema.toStandardSchemaV1",
+        "Tool edge validates input and output using Effect Schema via a toEveSchema helper that combines Schema.toStandardJSONSchemaV1 and Schema.toStandardSchemaV1",
         "No zod mirror schemas are introduced unless a concrete Eve API requires them",
         "No provider secret is committed",
         "bun run --filter @bundjil/agent test",
