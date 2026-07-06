@@ -8,8 +8,8 @@ import {
   makeStartOptionalResponseMiddleware,
   startOptionalWebResponseProgram,
   startPassThroughProgram,
-} from "../src";
-import { testRuntime } from "./runtime";
+} from "../src/index.js";
+import { testRuntime } from "./runtime.js";
 
 const handledProgram = Effect.gen(function* handledProgram() {
   const request = yield* HttpServerRequest.HttpServerRequest;

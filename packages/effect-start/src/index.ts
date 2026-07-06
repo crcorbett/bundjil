@@ -6,12 +6,12 @@ import { HttpServerRequest, HttpServerResponse } from "effect/unstable/http";
 import {
   StartMiddlewareNextError,
   StartMiddlewareOptionalResponseError,
-} from "./errors";
+} from "./errors.js";
 
 export {
   StartMiddlewareNextError,
   StartMiddlewareOptionalResponseError,
-} from "./errors";
+} from "./errors.js";
 
 export interface StartOptionalResponseMiddlewareOptions<R, ER, E> {
   readonly onPassThroughResponse?:

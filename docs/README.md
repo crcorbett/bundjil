@@ -9,6 +9,8 @@ README.
   packages, setup, and roadmap.
 - [Architecture](../ARCHITECTURE.md) explains the planned agent runtime shape,
   package boundaries, and quality gates.
+- [Reference repositories](./reference-repositories.md) explains the local
+  `.local/references` setup for Vercel and Effect source lookup.
 - [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral
   package for domain primitives and Effect programs.
 - [`@bundjil/effect-start`](../packages/effect-start/README.md) documents the

@@ -1,7 +1,10 @@
 import { assert, it } from "@effect/vitest";
 import { Effect } from "effect";
 
-import { defaultWorkspacePackages, makeWorkspaceSummary } from "../src/index";
+import {
+  defaultWorkspacePackages,
+  makeWorkspaceSummary,
+} from "../src/index.js";
 
 it.effect("creates the default Bundjil workspace summary", () =>
   Effect.gen(function* testDefaultSummary() {

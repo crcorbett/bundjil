@@ -1,2 +1,2 @@
-export { StartMiddlewareNextError } from "./next-error";
-export { StartMiddlewareOptionalResponseError } from "./optional-response-error";
+export { StartMiddlewareNextError } from "./next-error.js";
+export { StartMiddlewareOptionalResponseError } from "./optional-response-error.js";

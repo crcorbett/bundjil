@@ -27,3 +27,16 @@ Start here for repo conventions.
   code in app-owned boundaries until a shared contract is proven stable.
 - Run the smallest useful check during iteration, then `bun run verification`
   before handing work back.
+
+## Local Reference Repositories
+
+These references are local-only and ignored by git:
+
+- `.local/references/personal-agent-template` is a shallow clone of
+  `vercel-labs/personal-agent-template` for Vercel personal-agent app patterns.
+- `.local/references/effect-v4` points to
+  `~/.local/share/effect-solutions/effect`, the Effect v4 source clone
+  recommended by the Effect project setup guide.
+
+Use these repositories to inspect real implementation patterns, type
+definitions, and examples before inventing local abstractions.

@@ -68,6 +68,9 @@ playwright/.cache/
 # Temporary files
 tmp
 
+# Local reference repositories
+.local/
+
 # Context
 .context/
 .chief/
