@@ -1,4 +1,5 @@
 .eve/
+.workflow-data/
 .output/
 .turbo/
 dist/
