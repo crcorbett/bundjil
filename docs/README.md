@@ -9,6 +9,9 @@ README.
   packages, setup, and roadmap.
 - [Architecture](../ARCHITECTURE.md) explains the planned agent runtime shape,
   package boundaries, and quality gates.
+- [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
+  describes the first planned Eve agent implementation and Effect wrapper
+  boundary.
 - [Reference repositories](./reference-repositories.md) explains the local
   `.local/references` setup for Vercel and Effect source lookup.
 - [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral

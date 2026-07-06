@@ -1,0 +1,163 @@
+{
+  "title": "Eve + Effect Agent Spike Tasks",
+  "status": "draft",
+  "spec": "docs/product-specs/eve-effect-agent-spike.md",
+  "principles": [
+    "Ship one end-to-end Eve agent slice before adding Sendblue, email, Notion, or memory.",
+    "Keep Eve filesystem runtime code in apps/agent.",
+    "Keep Effect Schema contracts, named operations, errors, and layers in @bundjil/eve-effect.",
+    "Use Effect Schema as the source of truth; treat zod as an Eve edge adapter unless Eve supports a better schema bridge.",
+    "Never commit AI Gateway or provider secrets."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "bun run check",
+    "bun run knip",
+    "bun run check-types",
+    "bun run test",
+    "bun run verification",
+    "GET /eve/v1/info against the local Eve dev server",
+    "POST /eve/v1/session against the local Eve dev server",
+    "AI Gateway-backed response with a confirmed cheap model, or documented missing-credential blocker"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require additional passes if code ownership, Effect flow, schema drift, or verification evidence is weak."
+  },
+  "tasks": [
+    {
+      "id": "research-eve-installation",
+      "title": "Install and inspect Eve locally",
+      "status": "pending",
+      "description": "Add Eve to the workspace in the smallest Bun-compatible way, inspect node_modules/eve/docs, and record the exact tool/channel/schema APIs available to the implementation.",
+      "implementationNotes": [
+        "Use the local .local/references/personal-agent-template checkout and node_modules/eve/docs after install.",
+        "Confirm whether Eve defineTool accepts zod only, Standard Schema, or another schema contract.",
+        "Confirm the exact local dev command and HTTP port behavior for apps/agent."
+      ],
+      "mandatoryVerification": [
+        "bun install --frozen-lockfile",
+        "bun run check-types",
+        "Record inspected Eve docs/types in the implementation notes"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "create-eve-effect-package",
+      "title": "Create @bundjil/eve-effect contracts and named operations",
+      "status": "pending",
+      "description": "Create packages/eve-effect with Effect Schema contracts, tagged errors, Context.Service or service tag, live/memory layers, and the first named operation getWorkspaceStatus.",
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for primary operations",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError where relevant",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/eve-effect",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers",
+        "bun run --filter @bundjil/eve-effect test",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "WorkspaceStatusInput, WorkspaceStatusSuccess, and tagged error schemas exist",
+        "BundjilAgentOperations.getWorkspaceStatus is testable without Eve or model access",
+        "Layer.memory or equivalent mock layer exists for tests"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "create-eve-agent-app",
+      "title": "Create apps/agent with a minimal Eve agent",
+      "status": "pending",
+      "description": "Create the Eve filesystem app with instructions, model config, and a workspace_status tool that delegates into @bundjil/eve-effect.",
+      "mandatoryVerification": [
+        "Eve tool execute path delegates to the Effect named operation",
+        "Tool edge validates input and output using Effect Schema plus an Eve-compatible schema edge",
+        "Schema drift test exists if zod mirrors are required",
+        "No provider secret is committed",
+        "bun run --filter @bundjil/agent test",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "apps/agent/agent/instructions.md exists",
+        "apps/agent/agent/agent.ts uses an environment-overridable cheap model string",
+        "apps/agent/agent/tools/workspace_status.ts exists",
+        "App package scripts fit Bun/Turbo"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "verify-local-eve-agent",
+      "title": "Verify the local Eve agent through HTTP and AI Gateway",
+      "status": "pending",
+      "description": "Run the Eve dev server, prove /eve/v1/info works, then POST a prompt to /eve/v1/session and capture a response that uses the workspace_status tool.",
+      "mandatoryVerification": [
+        "GET /eve/v1/info returns the configured agent metadata",
+        "POST /eve/v1/session starts a session and returns usable Eve session details",
+        "At least one prompt receives a model response through AI Gateway with a confirmed cheap model",
+        "If AI Gateway credentials are missing, record the exact missing env var and stop before faking success"
+      ],
+      "completionCriteria": [
+        "Local verification commands and outputs are recorded in the active evidence",
+        "No secret values are printed or committed",
+        "The agent response proves the tool path can run"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "document-eve-effect-agent",
+      "title": "Write comprehensive Eve + Effect documentation",
+      "status": "pending",
+      "description": "Document the final app/package shape, local commands, schema boundary, AI Gateway setup, and verification proof.",
+      "mandatoryVerification": [
+        "Root README updated",
+        "ARCHITECTURE.md updated",
+        "docs/architecture/eve-agent.md created",
+        "docs/reference-repositories.md updated with node_modules/eve/docs lookup",
+        "apps/agent README created",
+        "packages/eve-effect README created",
+        "bun run check"
+      ],
+      "completionCriteria": [
+        "Docs explain the production and test call graphs",
+        "Docs distinguish committed source from local-only references and secrets",
+        "Docs include exact local verification commands"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "final-verification",
+      "title": "Run final verification and prepare handoff",
+      "status": "pending",
+      "description": "Run the full repository verification and summarize the implementation evidence.",
+      "mandatoryVerification": [
+        "bun install --frozen-lockfile",
+        "bun run verification",
+        "git status --short",
+        "All task evidence is recorded"
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}
