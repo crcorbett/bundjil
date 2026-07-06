@@ -1,4 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    "apps/agent": {
+      "entry": ["agent/agent.ts", "agent/tools/**/*.ts", "test/**/*.test.ts"],
+      "project": ["agent/**/*.ts", "test/**/*.ts"]
+    }
+  }
 }

@@ -1,0 +1,5 @@
+.eve/
+.output/
+.turbo/
+dist/
+node_modules/

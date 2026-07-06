@@ -102,8 +102,18 @@
     {
       "id": "create-eve-agent-app",
       "title": "Create apps/agent with a minimal Eve agent",
-      "status": "pending",
+      "status": "completed",
       "description": "Create the Eve filesystem app with instructions, model config, and a workspace_status tool that delegates into @bundjil/eve-effect.",
+      "implementationNotes": [
+        "Created the Bun workspace app package `@bundjil/agent` under `apps/agent` with Eve runtime scripts (`dev`, `dev:no-ui`, `build`), TypeScript checking, and Vitest tests.",
+        "Added `agent/instructions.md` with concise operational instructions for the minimal Bundjil personal agent and explicit non-claims for Sendblue, Cloudflare email, Notion, Vercel Connect, memory, and live channel surfaces.",
+        "Added `agent/agent.ts` using Eve `defineAgent` without an authored `name` field. The model is environment-overridable through `process.env[\"BUNDJIL_AGENT_MODEL\"]` with the confirmed Vercel AI Gateway default `google/gemini-2.5-flash`; no provider secret or gateway key is committed.",
+        "Added `agent/tools/workspace_status.ts` as the Eve filename-slug tool. It uses `defineTool` from `eve/tools`, `toEveSchema(WorkspaceStatusInput)`, `toEveSchema(WorkspaceStatusSuccess)`, and delegates execution to `getWorkspaceStatus(input).pipe(Effect.provide(BundjilAgentOperationsLive))`.",
+        "The current `@bundjil/eve-effect` package exports canonical schemas and operations from the package root and `toEveSchema` from `@bundjil/eve-effect/eve/tool-adapter`; the app imports from those existing canonical exports instead of changing the already-completed Task 2 package surface.",
+        "Added `test/workspace-status-tool.test.ts` proving the Eve tool executor runs without Eve server or model access, returns deterministic workspace status including `@bundjil/eve-effect`, and wires the exported input/output schemas to Effect Standard Schema validation plus Standard JSON Schema metadata.",
+        "Added an app-local `.gitignore` for Eve/Nitro/build artifacts and an app-local Oxlint tools-directory exception so Eve's required underscore tool slug `workspace_status.ts` can coexist with the repo filename-case rule.",
+        "Updated `knip.json` so dependency hygiene treats Eve filesystem app files (`agent/agent.ts`, `agent/tools/**/*.ts`, and tests) as workspace entrypoints."
+      ],
       "mandatoryVerification": [
         "Eve tool execute path delegates to the Effect named operation",
         "Tool edge validates input and output using Effect Schema via a toEveSchema helper that combines Schema.toStandardJSONSchemaV1 and Schema.toStandardSchemaV1",
@@ -120,7 +130,15 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: Kept Eve filesystem runtime, model config, tool file, app tests, and app artifact ignores in `apps/agent`; the tool delegates to the existing `@bundjil/eve-effect` named operation and live layer, which delegates deterministic workspace data to `@bundjil/core`. No Task 4 HTTP/Gateway proof, Sendblue, Cloudflare email, Notion, Vercel Connect, memory, or UI surface was added.",
+          "Pass 2 - implementation quality: The app reuses canonical `WorkspaceStatusInput`, `WorkspaceStatusSuccess`, `BundjilAgentOperationsLive`, `getWorkspaceStatus`, and `toEveSchema`; tool execution is a small inline Effect boundary via `Effect.runPromise`, no zod mirror schemas, unsafe casts, DTO copies, switch branches, or provider-secret config were introduced, and the only lint exception is app-local for Eve's required underscore filename slug.",
+          "Pass 3 - verification coverage: Passed `bun install`, `bun install --frozen-lockfile`, `bun run --filter @bundjil/agent test`, `bun run check-types`, `bun run check`, `bun run knip`, `bun run --filter @bundjil/agent build`, stale-pattern scans for zod and provider secrets under `apps/agent`, and full `bun run verification`. Live `/eve/v1/info`, `/eve/v1/session`, and AI Gateway proof remain intentionally deferred to Task 4.",
+          "Parent audit 1 - ownership/call graph: Reviewed commit 3240ee7 and confirmed `apps/agent` owns Eve filesystem runtime, model config, and tool wiring while `@bundjil/eve-effect` remains the shared Effect operation boundary.",
+          "Parent audit 2 - implementation quality: Confirmed `defineAgent` has no authored name, the `workspace_status` Eve tool reuses canonical schemas and `toEveSchema`, execution delegates through `getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))`, and scans found no zod import or committed provider secret.",
+          "Parent audit 3 - verification coverage: Parent ran `bun run --filter @bundjil/agent test`, `bun run --filter @bundjil/agent build`, `bun run check-types`, `bun run verification`, `git diff --check HEAD~1 HEAD`, confirmed the default `google/gemini-2.5-flash` model string on the official Vercel AI Gateway model page, then added explicit Node 24 setup to GitHub CI/Release after the remote Eve build proved the runner's default Node 22 was incompatible."
+        ]
       },
       "commitAfterPassing": true
     },
