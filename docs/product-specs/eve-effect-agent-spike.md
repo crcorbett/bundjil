@@ -65,6 +65,35 @@ Local reference files inspected:
 - `.local/references/effect-v4/packages/effect/src/Layer.ts`
 - `.local/references/effect-v4/packages/effect/src/Data.ts`
 
+### Implementation Evidence: `research-eve-installation`
+
+Completed on 2026-07-06 against installed `eve@0.20.0`.
+
+- Eve was added as a root Bun workspace dev dependency with a root `bun run eve`
+  CLI passthrough. No `apps/agent` or `packages/eve-effect` files were created.
+- Packaged installed docs and declarations were inspected under
+  `node_modules/eve`. The installed `defineTool` overloads accept
+  `StandardJSONSchemaV1` for both `inputSchema` and `outputSchema`; public tool
+  schemas accept `StandardJSONSchemaV1` or plain `JsonObject`.
+- Installed Eve normalizes Standard Schema / JSON Schema definitions through
+  `normalizeJsonSchemaDefinition(...)`, and the bundled Standard JSON Schema
+  type exposes `~standard.jsonSchema.input(...)` and
+  `~standard.jsonSchema.output(...)`.
+- Installed Effect `4.0.0-beta.74` exposes both
+  `Schema.toStandardSchemaV1(...)` and `Schema.toStandardJSONSchemaV1(...)`.
+  The source assigns missing `validate` and `jsonSchema` fields into an existing
+  `~standard`, so the later Eve helper can combine both adapters without a Zod
+  mirror.
+- Installed CLI behavior for local app development is `eve dev --no-ui` from
+  the app root. The CLI help and runtime constant show `$PORT`, then `2000`; a
+  temporary smoke app listened at `http://127.0.0.1:2000/` and
+  `GET /eve/v1/health` returned ready. The installed
+  `node_modules/eve/docs/reference/cli.md` table still says `3000`, so use the
+  CLI help/runtime/live probe as authoritative for `eve@0.20.0`.
+- The local personal-agent template checkout is useful for app shape and channel
+  ownership, but it uses older `eve` `^0.13.8` and Zod examples. Use installed
+  `eve@0.20.0` docs/types for Bundjil implementation details.
+
 ## Target Shape
 
 Add two new workspace surfaces:

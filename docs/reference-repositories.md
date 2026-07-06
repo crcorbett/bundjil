@@ -14,6 +14,27 @@ not project source.
   `~/.local/share/effect-solutions/effect`, the guide-recommended shallow clone
   of `Effect-TS/effect-smol`.
 
+## Installed Package References
+
+After `bun install`, inspect the installed Eve package at `node_modules/eve`.
+For the `research-eve-installation` task, `eve@0.20.0` was installed as a root
+workspace dev dependency so its packaged docs, CLI, and TypeScript declarations
+can be inspected without creating `apps/agent` early.
+
+Useful installed paths:
+
+- `node_modules/eve/docs/`: packaged Eve docs matching the installed version.
+- `node_modules/eve/dist/src/public/definitions/tool.d.ts`: installed
+  `defineTool` overloads.
+- `node_modules/eve/dist/src/shared/tool-definition.d.ts`: public tool schema
+  input/output contract.
+- `node_modules/eve/dist/src/internal/nitro/host/ports.d.ts`: local dev port
+  constants used by `eve dev`.
+
+The local `.local/references/personal-agent-template` checkout currently uses an
+older Eve range and Zod examples. Treat `node_modules/eve` as authoritative for
+installed API behavior.
+
 ## Refresh
 
 ```bash

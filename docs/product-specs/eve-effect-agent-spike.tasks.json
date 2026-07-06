@@ -28,12 +28,18 @@
     {
       "id": "research-eve-installation",
       "title": "Install and inspect Eve locally",
-      "status": "pending",
+      "status": "completed",
       "description": "Add Eve to the workspace in the smallest Bun-compatible way, inspect node_modules/eve/docs, and record the exact tool/channel/schema APIs available to the implementation.",
       "implementationNotes": [
         "Use the local .local/references/eve and .local/references/personal-agent-template checkouts plus node_modules/eve/docs after install.",
         "Confirm installed Eve defineTool types still accept StandardJSONSchemaV1 for inputSchema and outputSchema.",
-        "Confirm the exact local dev command and HTTP port behavior for apps/agent."
+        "Confirm the exact local dev command and HTTP port behavior for apps/agent.",
+        "Installed eve@0.20.0 as a root devDependency and added the root script `bun run eve -- ...` so the Bun workspace exposes the Eve CLI before `apps/agent` exists.",
+        "Installed docs inspected: node_modules/eve/README.md:40-78 and 119-150; node_modules/eve/docs/tools/overview.mdx:14-35; node_modules/eve/docs/channels/eve.mdx:6-27; node_modules/eve/docs/reference/project-layout.md:6-19 and 45-63; node_modules/eve/docs/agent-config.md:20-24; node_modules/eve/docs/reference/cli.md:87-125.",
+        "Installed types inspected: node_modules/eve/dist/src/public/definitions/tool.d.ts:113-145, node_modules/eve/dist/src/shared/tool-definition.d.ts:25-37, node_modules/eve/dist/src/shared/json-schema.d.ts:4-8, and node_modules/eve/dist/src/compiled/@standard-schema/spec/index.d.ts:77-116. `defineTool` accepts StandardJSONSchemaV1 for both `inputSchema` and `outputSchema`, and public tool schemas accept StandardJSONSchemaV1 or plain JsonObject.",
+        "Effect v4 conversion APIs inspected in node_modules/.bun/effect@4.0.0-beta.74/node_modules/effect/dist/Schema.d.ts:884-899 and source node_modules/.bun/effect@4.0.0-beta.74/node_modules/effect/src/Schema.ts:1045-1147. `Schema.toStandardJSONSchemaV1(schema)` adds `~standard.jsonSchema`; `Schema.toStandardSchemaV1(...)` adds `~standard.validate` to an existing `~standard`, so the later Eve helper can combine both.",
+        "Local references inspected: .local/references/eve@79e9959 packages/eve/src/public/definitions/tool.ts:138-173 and packages/eve/src/shared/tool-definition.ts:33-54; .local/references/personal-agent-template@b521281 package.json:22-50, agent/agent.ts:1-15, agent/channels/eve.ts:1-34, agent/tools/weather.ts:58-130, and scripts/ensure-eve-dev.mjs:1-31. The template is on older `eve` ^0.13.8 and uses Zod examples, so installed eve@0.20.0 docs/types are authoritative for Bundjil.",
+        "Local dev behavior confirmed with installed Eve: `eve dev --help` reports `--port` defaults to `$PORT`, then 2000; node_modules/eve/dist/src/internal/nitro/host/ports.d.ts:5-8 defines DEFAULT_DEVELOPMENT_SERVER_PORT = 2000; a temporary smoke app run with `/Users/cooper/Projects/bundjil/node_modules/.bin/eve dev --no-ui` listened at http://127.0.0.1:2000/ and GET /eve/v1/health returned `{ \"ok\": true, \"status\": \"ready\", \"workflowId\": \"workflow//eve//workflowEntry\" }`. node_modules/eve/docs/reference/cli.md:96-100 still says 3000 and is treated as stale for eve@0.20.0."
       ],
       "mandatoryVerification": [
         "bun install --frozen-lockfile",
@@ -42,7 +48,15 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: Kept the change to root package/lock plus evidence docs. Did not create `apps/agent` or `packages/eve-effect`; later tasks still own those boundaries.",
+          "Pass 2 - Effect/Eve schema boundary: Confirmed installed `defineTool` overloads and public tool schema contracts accept StandardJSONSchemaV1, and confirmed Effect v4 exposes both Standard Schema and Standard JSON Schema adapters needed for the later helper.",
+          "Pass 3 - verification coverage: Ran dependency hygiene after install, live-probed a temporary Eve app on port 2000, and passed `bun install --frozen-lockfile`, `bun run check-types`, and `bun run verification`.",
+          "Parent audit 1 - ownership/call graph: Reviewed commit b85584e and confirmed only root Eve install/CLI access plus docs/task evidence changed; app and package creation remain deferred to later tasks.",
+          "Parent audit 2 - implementation quality: Confirmed the root `eve` script keeps the research dependency visible to dependency hygiene, the task records installed `StandardJSONSchemaV1` behavior, and no zod mirror or premature framework package was introduced.",
+          "Parent audit 3 - verification coverage: Parent reran `bun install --frozen-lockfile`, `bun run check-types`, `bun run verification`, `git diff --check HEAD~1 HEAD`, and a temp-artifact scan before accepting the task."
+        ]
       },
       "commitAfterPassing": true
     },
