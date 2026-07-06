@@ -63,8 +63,15 @@
     {
       "id": "create-eve-effect-package",
       "title": "Create @bundjil/eve-effect contracts and named operations",
-      "status": "pending",
+      "status": "completed",
       "description": "Create packages/eve-effect with Effect Schema contracts, tagged errors, Context.Service or service tag, live/memory layers, and the first named operation getWorkspaceStatus.",
+      "implementationNotes": [
+        "Created the compiled Bun workspace package `@bundjil/eve-effect` under `packages/eve-effect` with package exports, tsconfig, vitest config, README, source, and tests following the existing `@bundjil/core` and `@bundjil/effect-start` package shape.",
+        "Added canonical Effect Schema contracts `WorkspaceStatusInput` and `WorkspaceStatusSuccess`, schema-derived tool type aliases, tagged error classes for `BundjilAgentOperationError`, `BundjilAgentSchemaError`, and `BundjilAgentGatewayConfigError`, and the `WorkspaceStatusFailure` tagged-union schema.",
+        "Added `BundjilAgentOperations` as a `Context.Service` boundary with `BundjilAgentOperationsLive`, `BundjilAgentOperationsMemory`, and the named `getWorkspaceStatus` operation. The live implementation delegates deterministic workspace data to `@bundjil/core` and encodes output through `Schema.encodeEffect` with schema errors mapped to `BundjilAgentSchemaError`.",
+        "Added the Eve boundary helper `toEveSchema(schema)` in `src/eve/tool-adapter.ts`, combining Effect's `Schema.toStandardSchemaV1` and `Schema.toStandardJSONSchemaV1` adapters and naming the public Standard Schema contract through direct `@standard-schema/spec` types.",
+        "No `apps/agent` files, zod schemas, provider secrets, local DTO mirrors, unsafe casts, or app-owned Eve runtime files were introduced in this task."
+      ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for primary operations",
         "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError where relevant",
@@ -80,7 +87,15 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: Kept Task 2 scoped to `packages/eve-effect`, `bun.lock`, and this task evidence. The named operation delegates to `@bundjil/core`; no Eve app boundary, channels, model config, Sendblue, Notion, or provider-secret code was added.",
+          "Pass 2 - Effect implementation quality: Primary operations use flat `Effect.gen`, `Context.Service`, `Layer.effect`, `Layer.succeed`, `Effect.fn`, `Effect.withSpan`, Effect Schema contracts, schema-backed tagged errors, and `Effect.mapError` for schema failures. The Eve adapter uses Effect's Standard Schema and Standard JSON Schema primitives instead of zod or manual DTO adapters.",
+          "Pass 3 - verification coverage: Passed `bun run --filter @bundjil/eve-effect test`, `bun run check-types`, and full `bun run verification` after formatter, knip, typecheck, and repo test gates.",
+          "Parent audit 1 - ownership/call graph: Reviewed commit 2f764df and confirmed the new package owns Effect/Eve contracts while `apps/agent` remains untouched; parent updated `@bundjil/core` package summary so the live operation reports the newly introduced `@bundjil/eve-effect` package.",
+          "Parent audit 2 - implementation quality: Confirmed `BundjilAgentOperations` is a named `Context.Service`, live and memory layers are testable without Eve/model access, `toEveSchema` is the only real-boundary helper, and scans found no zod import, unsafe cast, DTO mirror, or stringly branch in the new package.",
+          "Parent audit 3 - verification coverage: Parent ran `bun run --filter @bundjil/eve-effect test`, `bun --filter @bundjil/eve-effect build`, `bun run check-types`, `bun run verification`, and `git diff --check HEAD~1 HEAD` before accepting the task."
+        ]
       },
       "commitAfterPassing": true
     },
