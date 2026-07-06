@@ -202,7 +202,7 @@ Use the returned `sessionId` to stream events:
 curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 ```
 
-Task 4 evidence from this spike:
+Initial Task 4 evidence from this spike:
 
 - `GET /eve/v1/info` returned HTTP 200.
 - The agent model id was `google/gemini-2.5-flash`.
@@ -217,6 +217,21 @@ Task 4 evidence from this spike:
 - Eve reported missing AI Gateway credentials and said the local run needs
   `VERCEL_OIDC_TOKEN` from `eve link` or `AI_GATEWAY_API_KEY`.
 - No model response or `workspace_status` model-selected tool call was faked.
+
+Follow-up live Gateway proof:
+
+- A personal Vercel AI Gateway key was created under the
+  `cooper-corbetts-projects` scope and stored only in ignored local file
+  `apps/agent/.env.local`.
+- `GET /eve/v1/info` then returned the same model id,
+  `google/gemini-2.5-flash`, and reported Gateway endpoint
+  `connected: true` with credential type `api-key`.
+- `POST /eve/v1/session` returned `ok: true` for the workspace-status prompt.
+- The stream emitted `actions.requested` for `workspace_status`, followed by a
+  completed `action.result`.
+- The tool output listed `@bundjil/core`, `@bundjil/effect-start`, and
+  `@bundjil/eve-effect`.
+- The model completed with a concise answer naming those three packages.
 
 ## AI Gateway Setup
 
@@ -241,8 +256,16 @@ Use one of the supported credential paths:
   environment, or Vercel project environment.
 
 Do not commit `AI_GATEWAY_API_KEY`, `VERCEL_OIDC_TOKEN`, provider API keys, or
-Vercel project secrets. If credentials are missing, local sessions can start
-but the streamed turn fails before the model can select tools.
+Vercel project secrets. For local Bundjil development, the current working
+machine uses an ignored `apps/agent/.env.local` key from the personal Vercel
+scope `cooper-corbetts-projects`. If credentials are missing, local sessions
+can start but the streamed turn fails before the model can select tools.
+
+Before starting new integrations such as Sendblue, Cloudflare email, Vercel
+Connect, Notion, or a deployed app boundary, draft a compact SPEC with
+`prd-writer` and implement it through `prd-implementer` so call graphs,
+ownership, verification gates, and Effect audit evidence are recorded before
+code moves.
 
 ## Future Boundaries
 

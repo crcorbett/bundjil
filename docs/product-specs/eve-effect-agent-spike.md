@@ -1,6 +1,6 @@
 # Eve + Effect Agent Spike
 
-Status: Draft  
+Status: Complete
 Owner: Bundjil  
 Created: 2026-07-06
 
@@ -93,6 +93,31 @@ Completed on 2026-07-06 against installed `eve@0.20.0`.
 - The local personal-agent template checkout is useful for app shape and channel
   ownership, but it uses older `eve` `^0.13.8` and Zod examples. Use installed
   `eve@0.20.0` docs/types for Bundjil implementation details.
+
+### Implementation Evidence: Live AI Gateway Proof
+
+Completed on 2026-07-06 after creating a personal Vercel AI Gateway key under
+the `cooper-corbetts-projects` scope. The key value lives only in ignored local
+file `apps/agent/.env.local` as `AI_GATEWAY_API_KEY`; no secret value is
+committed or printed in project docs.
+
+- `GET /eve/v1/info` against `http://127.0.0.1:2000` returned the configured
+  model `google/gemini-2.5-flash`, zero discovery errors, zero discovery
+  warnings, and a connected Gateway endpoint with credential type `api-key`.
+- `POST /eve/v1/session` with the prompt `Use the workspace_status tool to
+tell me what packages are available in the Bundjil repo. Keep the answer
+short.` returned `ok: true`.
+- The streamed turn emitted `actions.requested` for the authored
+  `workspace_status` tool, then `action.result` with status `completed`.
+- The tool result came from the Effect operation path and returned workspace
+  `bundjil` with packages `@bundjil/core`, `@bundjil/effect-start`, and
+  `@bundjil/eve-effect`.
+- The model completed with the summary:
+  `The Bundjil repo contains the packages: @bundjil/core,
+@bundjil/effect-start, and @bundjil/eve-effect.`
+- The earlier Task 4 missing-credential result is retained as historical
+  evidence of the expected failure mode when neither `AI_GATEWAY_API_KEY` nor
+  `VERCEL_OIDC_TOKEN` is available.
 
 ## Target Shape
 
@@ -295,8 +320,7 @@ recorded in the task evidence:
 - `GET /eve/v1/info` against the local Eve dev server
 - `POST /eve/v1/session` against the local Eve dev server with a prompt that
   causes the agent to use the `workspace_status` tool
-- At least one AI Gateway-backed response using a confirmed cheap model, unless
-  missing credentials are documented as the only blocker
+- At least one AI Gateway-backed response using a confirmed cheap model
 
 The Effect language service must remain active. A temporary local probe may be
 used to confirm an Effect diagnostic such as `effect(floatingEffect)`, but the
@@ -331,8 +355,8 @@ which files are committed, and which secrets are intentionally excluded.
 - Eve may expect Node/pnpm conventions from its examples while this repo uses
   Bun workspaces. The app package must fit Bun/Turbo without adding a second
   package manager.
-- Local AI Gateway verification depends on credentials. The work may need to
-  use Vercel OIDC from `vercel link` or executor Vercel env upsert, but no
+- Local AI Gateway verification depends on credentials. This spike now has a
+  personal-scope Vercel AI Gateway key in ignored `apps/agent/.env.local`; no
   secret should be committed.
 - The first slice should not add Sendblue, Cloudflare email, Notion, memory, or
   Vercel Connect workflows yet. Those remain follow-on integrations after the
@@ -349,7 +373,6 @@ which files are committed, and which secrets are intentionally excluded.
 
 ## Open Questions
 
-- Which cheap AI Gateway model should become the committed default? Candidate:
-  `google/gemini-2.5-flash`, pending current model availability.
+- The committed default cheap AI Gateway model is `google/gemini-2.5-flash`.
 - Should `apps/agent` deploy as its own Vercel service immediately, or should
   the first spike stay local-only until Sendblue/email channels are scoped?

@@ -18,7 +18,7 @@
     "bun run verification",
     "GET /eve/v1/info against the local Eve dev server",
     "POST /eve/v1/session against the local Eve dev server",
-    "AI Gateway-backed response with a confirmed cheap model, or documented missing-credential blocker"
+    "AI Gateway-backed response with a confirmed cheap model"
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
@@ -154,7 +154,9 @@
         "`POST /eve/v1/session` with prompt `Use the workspace_status tool to tell me what packages are available in the Bundjil repo. Keep the answer short.` returned HTTP 202 with body keys `continuationToken`, `ok`, and `sessionId`, plus an `x-eve-session-id` header. Captured only non-secret handle facts: `sessionId` prefix `wrun_01K` and `continuationToken` prefix `eve:9527`.",
         "Streaming `/eve/v1/session/<sessionId>/stream` produced 7 events: `session.started`, `turn.started`, `message.received`, `step.started`, `step.failed`, `turn.failed`, and `session.failed`. The failure code was `MODEL_CALL_FAILED` and the Eve error said AI Gateway received no credentials and needs `VERCEL_OIDC_TOKEN` via `eve link` or `AI_GATEWAY_API_KEY`. No `actions.requested`, `action.result`, or model message event occurred because the model call failed before tool selection.",
         "`bun run --filter @bundjil/agent test` passed after the HTTP probes, proving the `workspace_status` Eve tool execute path still delegates through the live Effect named operation without Eve server or model access. A live AI Gateway model response and model-triggered `workspace_status` tool call remain blocked only by the missing credentials above; no fake model response was recorded.",
-        "The first `bun run verification` attempt exposed a local artifact hygiene bug: Eve wrote `apps/agent/.workflow-data/` session/run/event files, and Ultracite tried to format-check those untracked runtime artifacts. Added `.workflow-data/` to `apps/agent/.gitignore`, removed the generated local artifacts, and reran verification."
+        "The first `bun run verification` attempt exposed a local artifact hygiene bug: Eve wrote `apps/agent/.workflow-data/` session/run/event files, and Ultracite tried to format-check those untracked runtime artifacts. Added `.workflow-data/` to `apps/agent/.gitignore`, removed the generated local artifacts, and reran verification.",
+        "Post-completion live Gateway proof on 2026-07-06 created a personal Vercel AI Gateway key under `cooper-corbetts-projects` and stored it only in ignored `apps/agent/.env.local`. A rerun of `GET /eve/v1/info` reported `google/gemini-2.5-flash`, zero discovery errors/warnings, and Gateway `connected: true` with credential type `api-key`.",
+        "A rerun of `POST /eve/v1/session` with the workspace-status prompt returned `ok: true`; streaming emitted `actions.requested` for `workspace_status`, a completed `action.result`, `message.completed`, `turn.completed`, and `session.waiting`. The model answered that the repo contains `@bundjil/core`, `@bundjil/effect-start`, and `@bundjil/eve-effect`."
       ],
       "mandatoryVerification": [
         "GET /eve/v1/info returns the configured agent metadata",
@@ -176,7 +178,8 @@
           "Pass 3 - verification coverage: Passed `bun run --filter @bundjil/agent test`, ran the local Eve dev server on port 2000, captured sanitized `/eve/v1/info` HTTP 200 evidence, captured sanitized `/eve/v1/session` HTTP 202 session evidence, streamed the session to the exact `MODEL_CALL_FAILED` missing-credential boundary, stopped before faking model success, shut down the dev server, fixed and removed generated `.workflow-data/` artifacts after the first verification attempt exposed them, and passed `bun run verification` after this evidence update.",
           "Parent audit 1 - ownership/call graph: Reviewed commit f44ba5d and confirmed the only source change was the app-local `.workflow-data/` ignore plus task evidence; the `/eve/v1/info` parent probe independently confirmed `workspace_status` is the authored app tool exposed by the Eve runtime.",
           "Parent audit 2 - implementation quality: Parent reran the app test and inspected the current tool/schema wiring from the Eve info response, confirming the task did not add DTO mirrors, zod schemas, unsafe casts, fallback model stubs, or fake model output.",
-          "Parent audit 3 - verification coverage: Parent reran `bun run --filter @bundjil/agent test`, `git diff --check HEAD~1 HEAD`, the local Eve server probe on port 2000, `POST /eve/v1/session`, and a stream read that ended at `MODEL_CALL_FAILED` with Eve logging the missing `VERCEL_OIDC_TOKEN` or `AI_GATEWAY_API_KEY` credential boundary."
+          "Parent audit 3 - verification coverage: Parent reran `bun run --filter @bundjil/agent test`, `git diff --check HEAD~1 HEAD`, the local Eve server probe on port 2000, `POST /eve/v1/session`, and a stream read that ended at `MODEL_CALL_FAILED` with Eve logging the missing `VERCEL_OIDC_TOKEN` or `AI_GATEWAY_API_KEY` credential boundary.",
+          "Post-completion parent proof - live Gateway: Parent deleted the mistakenly scoped Tilt Legal key, recreated `bundjil-local-dev` under personal Vercel scope `cooper-corbetts-projects`, confirmed Tilt Legal no longer listed that key, confirmed `/eve/v1/info` reported Gateway `connected: true`, then streamed a successful model turn that selected `workspace_status` and completed with the expected package summary."
         ]
       },
       "commitAfterPassing": true

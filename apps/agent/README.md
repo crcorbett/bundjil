@@ -71,6 +71,17 @@ The Task 4 local HTTP proof had none of `AI_GATEWAY_API_KEY`,
 failed with `MODEL_CALL_FAILED` because Eve had no AI Gateway credentials. Do
 not fake model output when this boundary is hit.
 
+Follow-up local proof created a personal Vercel AI Gateway key under the
+`cooper-corbetts-projects` scope and stored it only in ignored
+`apps/agent/.env.local`. With that key present, `/eve/v1/info` reports Gateway
+`connected: true`, the model selects `workspace_status`, the tool result
+completes, and the model summarizes the current packages:
+`@bundjil/core`, `@bundjil/effect-start`, and `@bundjil/eve-effect`.
+
+Do not commit `.env.local` or any copied Gateway key. Before adding new
+runtime integrations or deployed app boundaries, create a SPEC through
+`prd-writer` and execute it through `prd-implementer`.
+
 ## Runtime Artifacts
 
 The app ignores Eve and Nitro runtime output:
