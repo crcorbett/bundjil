@@ -8,6 +8,8 @@ not project source.
 
 - `.local/references/personal-agent-template`: shallow clone of
   `vercel-labs/personal-agent-template`.
+- `.local/references/eve`: shallow clone of `vercel/eve`, used for current Eve
+  framework docs, source, and TypeScript API lookup.
 - `.local/references/effect-v4`: symlink to
   `~/.local/share/effect-solutions/effect`, the guide-recommended shallow clone
   of `Effect-TS/effect-smol`.
@@ -15,6 +17,7 @@ not project source.
 ## Refresh
 
 ```bash
+git -C .local/references/eve pull --depth 1 --ff-only
 git -C .local/references/personal-agent-template pull --depth 1 --ff-only
 git -C ~/.local/share/effect-solutions/effect pull --depth 1
 ```

@@ -56,6 +56,9 @@ Local reference files inspected:
 - `.local/references/personal-agent-template/agent/channels/sendblue.ts`
 - `.local/references/personal-agent-template/agent/tools/weather.ts`
 - `.local/references/personal-agent-template/agent/tools/save_memory.ts`
+- `.local/references/eve/docs/tools/overview.mdx`
+- `.local/references/eve/packages/eve/src/public/definitions/tool.ts`
+- `.local/references/eve/packages/eve/src/shared/tool-definition.ts`
 - `.local/references/effect-v4/packages/effect/src/Schema.ts`
 - `.local/references/effect-v4/packages/effect/src/Context.ts`
 - `.local/references/effect-v4/packages/effect/src/Layer.ts`
@@ -91,8 +94,10 @@ packages/eve-effect
     tool-adapter.test.ts
 ```
 
-`apps/agent` owns Eve runtime shape and deployment concerns. It may use Eve's
-zod-facing APIs because that is the framework boundary.
+`apps/agent` owns Eve runtime shape and deployment concerns. Eve supports
+Standard Schema for tool `inputSchema` and `outputSchema`, so the first
+implementation should pass Effect Schema through `Schema.toStandardSchemaV1`
+instead of mirroring contracts in zod.
 
 `@bundjil/eve-effect` owns typed operation contracts, Effect Schema decoding and
 encoding, tagged errors, layers, and testable operations. It must not own Eve
@@ -113,10 +118,10 @@ provider secrets.
 - Use Effect Schema as the source of truth for:
   `WorkspaceStatusInput`, `WorkspaceStatusSuccess`, and
   `WorkspaceStatusError`.
-- Treat Eve's `defineTool({ inputSchema, outputSchema })` zod schemas as edge
-  adapters. If the implementation cannot derive zod from Effect Schema cleanly,
-  it must include a schema drift test proving the zod edge accepts the same
-  valid fixture and rejects the same invalid fixture as the Effect Schema.
+- Use `Schema.toStandardSchemaV1(...)` for Eve's
+  `defineTool({ inputSchema, outputSchema })` boundary. This lets Eve infer the
+  `execute` input and output types from the canonical Effect Schema contracts.
+  Do not add zod mirrors unless a concrete Eve API requires them.
 - Configure the first model through `agent/agent.ts` with an environment
   override and a cheap default candidate such as `google/gemini-2.5-flash`.
   Confirm the exact available model ID during implementation using Eve docs or
@@ -271,8 +276,8 @@ The implementation must include comprehensive documentation, not just code:
   exists.
 - `ARCHITECTURE.md`: add the final app/package boundary and call graph.
 - `docs/architecture/eve-agent.md`: document the Eve filesystem layout, model
-  config, Effect wrapper boundary, zod edge adapter, AI Gateway setup, local dev
-  commands, and verification evidence.
+  config, Effect wrapper boundary, Standard Schema tool boundary, AI Gateway
+  setup, local dev commands, and verification evidence.
 - `docs/reference-repositories.md`: add any new Eve docs lookup path such as
   `node_modules/eve/docs`.
 - Package READMEs for `@bundjil/eve-effect` and `@bundjil/agent`.
@@ -282,9 +287,9 @@ which files are committed, and which secrets are intentionally excluded.
 
 ## Risks And Tradeoffs
 
-- Eve tools currently use zod schemas while Bundjil wants Effect Schema as the
-  source of truth. The first implementation must either derive the edge schema
-  or include schema drift tests.
+- Eve docs still use zod examples, but current Eve tool types support any
+  Standard Schema. The first implementation should use
+  `Schema.toStandardSchemaV1(...)` directly and avoid maintaining zod mirrors.
 - Eve's model IDs and Gateway behavior can change. The implementation must
   verify the chosen cheap model against current Eve/Vercel docs before relying
   on it.
@@ -309,9 +314,6 @@ which files are committed, and which secrets are intentionally excluded.
 
 ## Open Questions
 
-- Does Eve accept Standard Schema v1 for tool schemas, or only zod? The
-  template uses zod. Implementation must inspect installed `node_modules/eve`
-  docs/types after adding `eve`.
 - Which cheap AI Gateway model should become the committed default? Candidate:
   `google/gemini-2.5-flash`, pending current model availability.
 - Should `apps/agent` deploy as its own Vercel service immediately, or should
