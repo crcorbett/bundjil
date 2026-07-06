@@ -3,39 +3,44 @@
 Bundjil is a Bun/Turbo monorepo for a personal agent built around Vercel Eve,
 Effect, and channel adapters for iMessage, email, and connected personal tools.
 
-The current codebase is deliberately small: it establishes package boundaries,
-TypeScript strictness, Effect conventions, and verification before the first
-deployable app lands.
+The current codebase contains the first local Eve app slice. It establishes the
+Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
+`@bundjil/eve-effect`, and keeps framework-neutral primitives in
+`@bundjil/core`.
 
 ## Product Shape
 
 ```text
 iMessage
   -> Sendblue webhook
-  -> Eve channel/app
+  -> future Eve channel/app boundary
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 
 Email
   -> Cloudflare Email Routing Worker
-  -> Eve channel/app
+  -> future Eve channel/app boundary
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 ```
 
-Vercel Eve is the intended agent runtime. Its public model treats an agent as a
+Vercel Eve is the agent runtime. Its public model treats an agent as a
 directory of instructions, skills, tools, channels, connections, schedules, and
-subagents. Bundjil's app code should map that runtime model onto the domain
-contracts in `@bundjil/core`.
+subagents. Bundjil's committed app currently uses the root `agent.ts`,
+`instructions.md`, and one `tools/workspace_status.ts` tool.
 
 ## Package Boundaries
 
 ```text
-apps/*
+apps/agent
+  -> @bundjil/eve-effect
+
+@bundjil/eve-effect
   -> @bundjil/core
-  -> @bundjil/effect-start when a TanStack Start app exists
+  -> effect
+  -> @standard-schema/spec
 
 @bundjil/effect-start
   -> effect
@@ -49,13 +54,61 @@ apps/*
 types, identity and consent contracts, tool intent schemas, service contracts,
 and pure or Effect-returning programs.
 
+`@bundjil/eve-effect` owns the Eve-facing Effect boundary: canonical Effect
+Schema contracts, schema-backed tagged errors, the `BundjilAgentOperations`
+service, live and memory layers, and `toEveSchema(schema)` for Eve
+`defineTool` schemas.
+
 `@bundjil/effect-start` is framework glue only. It adapts Effect HTTP programs
 to TanStack Start middleware and must not know about channel routing, product
 workflows, Eve runtime composition, or app-specific content.
 
-App packages own deployment concerns: Eve directory structure, channel
-webhooks, Vercel configuration, Cloudflare Worker boundaries, Sendblue
-callbacks, and concrete Vercel Connect usage.
+`apps/agent` owns deployment concerns: Eve directory structure, model config,
+instructions, authored tool files, future channel files, and runtime secrets.
+It imports stable operations from `@bundjil/eve-effect` instead of duplicating
+schemas or DTOs.
+
+## Current Call Graphs
+
+Production/local HTTP path:
+
+```text
+Eve HTTP API
+  -> GET /eve/v1/info
+  -> POST /eve/v1/session
+  -> GET /eve/v1/session/:sessionId/stream
+  -> apps/agent/agent/agent.ts model config
+  -> apps/agent/agent/instructions.md
+  -> apps/agent/agent/tools/workspace_status.ts
+  -> @bundjil/eve-effect getWorkspaceStatus
+  -> @bundjil/eve-effect BundjilAgentOperationsLive
+  -> @bundjil/core makeWorkspaceSummary
+```
+
+Schema boundary:
+
+```text
+@bundjil/eve-effect WorkspaceStatusInput / WorkspaceStatusSuccess
+  -> toEveSchema(schema)
+  -> Effect Schema Standard Schema validation
+  -> Effect Schema Standard JSON Schema metadata
+  -> Eve defineTool inputSchema / outputSchema
+```
+
+Test path:
+
+```text
+Vitest
+  -> apps/agent/test/workspace-status-tool.test.ts
+  -> workspace_status.execute(...)
+  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
+  -> @bundjil/core makeWorkspaceSummary
+
+Vitest
+  -> packages/eve-effect/test/bundjil-agent-operations.test.ts
+  -> BundjilAgentOperationsLive or BundjilAgentOperationsMemory
+  -> canonical WorkspaceStatus schemas and tagged errors
+```
 
 ## Runtime Principles
 
@@ -70,13 +123,23 @@ callbacks, and concrete Vercel Connect usage.
 - Put app-specific framework code in `apps/*`; move shared logic into packages
   only when it is stable and reusable.
 
+Future Sendblue, Cloudflare email, Vercel Connect, and Notion code belongs in
+app-owned boundaries first. Move shared contracts into `@bundjil/core` or
+`@bundjil/eve-effect` only after the boundary is proven stable.
+
 ## Quality Gates
 
 - `bun run build` compiles all packages through Turbo.
 - `bun run test` runs package test suites.
 - `bun run check-types` checks workspace TypeScript references.
+- `bun run check` runs Ultracite type-aware lint/format checks.
 - `bun run verification` runs lint, dependency hygiene, type checking, and
   tests.
+- `bun run --filter @bundjil/agent dev:no-ui` starts the local Eve app on port
+  `2000` by default for `eve@0.20.0`.
+
+See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
+operational Eve app guide and local HTTP verification commands.
 
 ## References
 

@@ -10,7 +10,8 @@ Victorian Aboriginal traditions who is often represented as a wedge-tailed
 eagle. Bunjil Place describes Bunjil as the creator spirit whose stories are
 connected to Boon Wurrung, Bunurong, and Wurundjeri peoples, and whose eagle
 form inspired the building's protective roof line. This project uses the name
-as a reminder to build a watchful, useful, and respectful personal agent.
+as a respectful reference point for building a watchful and useful personal
+agent; it is not an attempt to speak for those traditions.
 
 ## Product Direction
 
@@ -29,8 +30,8 @@ Bundjil is planned around a simple product shape:
 - Domain model: Effect for fallible, async, stateful, boundary-crossing, and
   dependency-injected code.
 
-The current repository is the foundation for that product. It does not yet ship
-the Eve agent app or live channel adapters.
+The current repository ships the first local Eve agent slice. It does not yet
+ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
 
 ## Current Packages
 
@@ -38,9 +39,15 @@ the Eve agent app or live channel adapters.
   Effect programs.
 - `@bundjil/effect-start` owns reusable TanStack Start middleware glue for
   running Effect HTTP programs.
+- `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
+  errors, named operation services, and the Standard Schema bridge used by Eve
+  tools.
+- `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
+  instructions, and the `workspace_status` tool that delegates into
+  `@bundjil/eve-effect`.
 
-`apps/` is intentionally empty until the first deployable Eve/Vercel app
-boundary is chosen.
+`apps/agent` owns Eve filesystem runtime shape and deployment concerns.
+Reusable app operations live in packages once the boundary is stable.
 
 ## Getting Started
 
@@ -54,22 +61,36 @@ bun run verification
 Use Bun from the repository root. During iteration, run the smallest useful
 check first, then run `bun run verification` before handing work back.
 
+For the local Eve app:
+
+```bash
+bun run --filter @bundjil/agent test
+bun run --filter @bundjil/agent dev:no-ui
+```
+
+`eve dev --no-ui` serves the app at `http://127.0.0.1:2000` by default for
+`eve@0.20.0`. Use `GET /eve/v1/info`, `POST /eve/v1/session`, and
+`GET /eve/v1/session/:sessionId/stream` for local HTTP verification.
+
 ## Layout
 
 ```text
 apps/
-  .gitkeep           Placeholder for the first deployable agent app.
+  agent/             Vercel Eve app and workspace_status tool.
 packages/
   core/              Framework-neutral Bundjil domain primitives.
   effect-start/      TanStack Start adapter for Effect HTTP programs.
+  eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
   README.md          Documentation index.
+  architecture/
+    eve-agent.md     Eve app architecture and verification guide.
 ARCHITECTURE.md      Agent architecture and package boundaries.
 ```
 
 ## Roadmap
 
-1. Choose the first deployable app boundary for the Eve agent.
+1. Keep proving the Eve app through local HTTP and Gateway-backed verification.
 2. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
 3. Add the Sendblue iMessage webhook and outbound delivery adapter.

@@ -184,8 +184,17 @@
     {
       "id": "document-eve-effect-agent",
       "title": "Write comprehensive Eve + Effect documentation",
-      "status": "pending",
+      "status": "completed",
       "description": "Document the final app/package shape, local commands, schema boundary, AI Gateway setup, and verification proof.",
+      "implementationNotes": [
+        "Updated the root README so it describes the committed `@bundjil/agent` Eve app, the current packages `@bundjil/core`, `@bundjil/effect-start`, `@bundjil/eve-effect`, the app-local Eve commands, and the respectful Bundjil name attribution without claiming cultural authority.",
+        "Updated `ARCHITECTURE.md` with the current app/package boundaries and the real call graph from Eve HTTP/API through `apps/agent/agent/tools/workspace_status.ts`, `@bundjil/eve-effect` `getWorkspaceStatus` / `BundjilAgentOperationsLive`, and `@bundjil/core`.",
+        "Created `docs/architecture/eve-agent.md` as the comprehensive operational guide covering filesystem layout, committed source versus ignored local artifacts/secrets, the Effect Schema to Eve Standard Schema/Standard JSON Schema bridge, production and test call graphs, local commands, HTTP endpoints, AI Gateway setup, Task 4 missing-credential behavior, and future Sendblue, Cloudflare email, Vercel Connect, and Notion boundaries.",
+        "Updated `docs/README.md` to link the Eve agent architecture guide and the `@bundjil/eve-effect` README.",
+        "Updated `docs/reference-repositories.md` to treat installed `node_modules/eve/docs` as authoritative for `eve@0.20.0`, while keeping `.local/references/eve` and `.local/references/personal-agent-template` as local-only source/pattern references.",
+        "Created `apps/agent/README.md` documenting the committed Eve app, root commands, local port 2000, HTTP endpoints, `BUNDJIL_AGENT_MODEL`, `AI_GATEWAY_API_KEY`, `VERCEL_OIDC_TOKEN`, Task 4 missing-credential result, and ignored runtime artifacts `.eve/`, `.workflow-data/`, and `.output/`.",
+        "Expanded `packages/eve-effect/README.md` with canonical schemas, tagged errors, service layers, `toEveSchema`, production and test call graphs, and verification commands."
+      ],
       "mandatoryVerification": [
         "Root README updated",
         "ARCHITECTURE.md updated",
@@ -202,7 +211,15 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: Kept this task scoped to documentation and task metadata. Docs now describe the committed app/package boundary and the concrete Eve HTTP/API -> `apps/agent/agent/tools/workspace_status.ts` -> `@bundjil/eve-effect` -> `@bundjil/core` call graph without adding or changing runtime code.",
+          "Pass 2 - implementation quality: Documentation points consumers at canonical `@bundjil/eve-effect` schemas, tagged errors, service layers, and `toEveSchema` instead of DTO mirrors or Zod examples; future Sendblue, Cloudflare email, Vercel Connect, and Notion work is clearly marked as app-owned future boundary work.",
+          "Pass 3 - verification coverage: Documentation includes exact local package checks, root checks, Eve dev command, HTTP probes, AI Gateway credential setup, and Task 4 missing-credential behavior, with local-only references and ignored runtime artifacts separated from committed source.",
+          "Parent audit 1 - ownership/call graph: Reviewed the docs diff against `apps/agent/agent/tools/workspace_status.ts`, `packages/eve-effect/src/services/bundjil-agent-operations.ts`, and `packages/core/src/index.ts`; the documented production and test paths match the current source and remain documentation-only.",
+          "Parent audit 2 - implementation quality: Confirmed the docs point to canonical Effect Schema contracts, tagged errors, service layers, and `toEveSchema`, keep Bundjil name attribution respectful, treat `node_modules/eve/docs` as the installed Eve authority, and do not describe unimplemented Sendblue, Cloudflare email, Vercel Connect, Notion, or memory features as live.",
+          "Parent audit 3 - verification coverage: Parent inspected the new and updated docs, checked repo/app ignore rules against documented runtime artifacts, verified `eve link` credential behavior in installed Eve docs, and reran the docs plus full repo verification gates before accepting the task."
+        ]
       },
       "commitAfterPassing": true
     },

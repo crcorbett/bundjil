@@ -17,13 +17,24 @@ not project source.
 ## Installed Package References
 
 After `bun install`, inspect the installed Eve package at `node_modules/eve`.
-For the `research-eve-installation` task, `eve@0.20.0` was installed as a root
-workspace dev dependency so its packaged docs, CLI, and TypeScript declarations
-can be inspected without creating `apps/agent` early.
+For this repo, installed `node_modules/eve/docs` is the authoritative Eve docs
+source because it matches the committed `eve@0.20.0` package. Use it before
+copying patterns from the local Eve source checkout or the personal-agent
+template.
 
 Useful installed paths:
 
 - `node_modules/eve/docs/`: packaged Eve docs matching the installed version.
+- `node_modules/eve/docs/reference/project-layout.md`: path-derived Eve
+  authored slots and naming rules.
+- `node_modules/eve/docs/agent-config.md`: `defineAgent` model and Gateway
+  model-id behavior.
+- `node_modules/eve/docs/tools/overview.mdx`: `defineTool` behavior, tool file
+  naming, `inputSchema`, `outputSchema`, and runtime execution notes.
+- `node_modules/eve/docs/channels/eve.mdx`: default HTTP API routes, including
+  `/eve/v1/info`, `/eve/v1/session`, and the stream route.
+- `node_modules/eve/docs/reference/cli.md`: CLI command behavior, artifact
+  locations, `eve link`, `eve dev`, `eve build`, and `eve start`.
 - `node_modules/eve/dist/src/public/definitions/tool.d.ts`: installed
   `defineTool` overloads.
 - `node_modules/eve/dist/src/shared/tool-definition.d.ts`: public tool schema
@@ -31,9 +42,19 @@ Useful installed paths:
 - `node_modules/eve/dist/src/internal/nitro/host/ports.d.ts`: local dev port
   constants used by `eve dev`.
 
-The local `.local/references/personal-agent-template` checkout currently uses an
-older Eve range and Zod examples. Treat `node_modules/eve` as authoritative for
-installed API behavior.
+The installed CLI help and runtime constants say `eve dev` defaults to `$PORT`,
+then `2000` for `eve@0.20.0`. The packaged CLI markdown still says `3000` in
+its option table, so use CLI help and
+`node_modules/eve/dist/src/internal/nitro/host/ports.d.ts` for the current port.
+
+The local `.local/references/personal-agent-template` checkout is useful for
+app shape, channel ownership, and Vercel personal-agent deployment patterns. It
+currently uses an older Eve range and Zod examples, so do not treat it as
+authoritative for Bundjil's installed API behavior.
+
+The local `.local/references/eve` checkout is useful when packaged docs point
+to a concept but the implementation detail is only visible in source. Check the
+installed package first, then compare source if needed.
 
 ## Refresh
 
