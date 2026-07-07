@@ -160,11 +160,11 @@ Source URLs:
 - <https://vercel.com/docs/redis>
 - <https://vercel.com/marketplace/upstash>
 
-### Executor / DeepWiki research status
+### Executor / DeepWiki research
 
 The user requested DeepWiki research through `mcp__executor_personal`.
 
-Attempts made on 2026-07-07:
+Initial attempts made on 2026-07-07:
 
 1. `mcp__executor_personal.skills({ name: "execute" })` returned
    `OAuth authorization required`.
@@ -175,13 +175,35 @@ Attempts made on 2026-07-07:
    waited on the loopback callback, then timed out with
    `timed out waiting for OAuth callback`.
 
-This spec therefore includes an implementation gate that must be completed
-before code starts: rerun executor personal DeepWiki research after OAuth is
-authorized and update this section with results for:
+After the forked thread was started and executor personal OAuth was completed,
+the DeepWiki tool became available at:
 
-- OpenAI / Codex auth runtime and SDK boundaries.
-- Eve model-provider / AI SDK `LanguageModel` wiring.
-- Effect v4 `KeyValueStore` and Vercel-compatible storage adapters.
+```text
+deepwiki_mcp.user.personaldeepwikimcp.ask_question
+```
+
+DeepWiki queries completed on 2026-07-07:
+
+- `vercel/eve`: Eve accepts either a Vercel AI Gateway model string or an AI
+  SDK `LanguageModel` object in `agent.ts`. Gateway strings get Gateway
+  attribution/caching behavior; direct `LanguageModel` objects route through
+  their own `provider` and `modelId` and do not get Eve's Gateway attribution
+  headers or automatic Gateway caching behavior. This confirms the integration
+  seam for a custom provider, but also confirms Bundjil must own provider
+  caching/headers/security when bypassing Gateway.
+- `openai/codex`: Codex supports auth modes including API key, ChatGPT-managed
+  OAuth, device-code login, personal access token, agent identity, and
+  host-provided `ChatgptAuthTokens`. DeepWiki identified `ChatgptAuthTokens` as
+  unstable and "FOR OPENAI INTERNAL USE ONLY - DO NOT USE." The supported
+  public path is therefore Codex workflow auth, not arbitrary chat completions
+  for another app. Bundjil must not treat Codex OAuth as a generic Eve model
+  credential unless a separate supported endpoint is proven.
+- `Effect-TS/effect`: DeepWiki confirmed the platform `KeyValueStore` concept,
+  schema-backed stores, memory and filesystem layers, and error mapping with
+  `mapError` / tagged boundaries. Its answer referenced the older
+  `@effect/platform` package path, so Bundjil's local Effect v4 source remains
+  authoritative for implementation imports:
+  `effect/unstable/persistence/KeyValueStore`.
 
 ### Subagent review passes
 
@@ -211,6 +233,10 @@ This spec was intentionally iterated before acceptance:
 4. Executor iteration: personal executor / DeepWiki was attempted twice through
    MCP, then through `codex mcp login`. It is blocked on user OAuth completion
    and remains a pre-implementation gate in the task list.
+5. Forked-thread DeepWiki iteration: executor personal OAuth succeeded after
+   thread refresh. DeepWiki findings tightened the plan away from "Codex OAuth
+   as generic Eve model access" and toward "Codex OAuth for Codex workflows;
+   keep Eve on Gateway until a supported `LanguageModel` path is proven."
 
 ## Target Shape
 
@@ -277,6 +303,11 @@ SDK clients in `@bundjil/core`.
   copy state file formats, or expose a general OpenClaw-style gateway.
 - The first implementation must prove the runtime path before changing the
   default Eve model from Vercel AI Gateway.
+- DeepWiki research makes the first safe runtime assumption narrower: Codex
+  OAuth is for Codex workflows, not generic Eve chat-completion access. Treat
+  Codex SDK / Codex workflow invocation as the first supported path to explore,
+  and keep Eve's default model on AI Gateway until a public, supported
+  `LanguageModel` path exists.
 - Do not expose a public OpenAI-compatible endpoint in the first iteration. If
   a compatibility endpoint is required for Eve, bind it to loopback or private
   Vercel protection only, then document the security model.
@@ -636,9 +667,11 @@ Docs must distinguish:
 ## Open Questions
 
 - Does the current Codex TypeScript SDK expose enough hooks to run under a
-  Bundjil-managed access token without shelling out?
-- Is a ChatGPT/Codex OAuth token accepted by any supported OpenAI-compatible
-  inference endpoint, or only by Codex local workflows?
+  Bundjil-managed access token without shelling out, or should Bundjil call the
+  Codex CLI/SDK as a specialist workflow runner?
+- Is there any public, supported OpenAI-compatible inference endpoint for
+  ChatGPT/Codex OAuth tokens? DeepWiki did not establish one; current evidence
+  points to Codex workflows only.
 - If Eve requires an AI SDK `LanguageModel`, should Bundjil implement a custom
   provider or a private OpenAI-compatible adapter?
 - What is the right hosted token encryption layer before using Upstash Redis
