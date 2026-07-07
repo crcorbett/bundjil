@@ -24,6 +24,9 @@ export {
   OAuthProfileNotFound,
   OAuthProfileSchemaError,
   OAuthProfileStorageError,
+  UpstashKeyValueStoreConfigBoundary,
+  UpstashKeyValueStoreConfigError,
+  UpstashKeyValueStoreFailure,
 } from "./errors.js";
 export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
@@ -38,6 +41,8 @@ export type {
   CodexStreamMapperOperation as CodexStreamMapperOperationType,
   OpenAICompatibleProxyFailure as OpenAICompatibleProxyFailureType,
   OpenAICompatibleProxyOperation as OpenAICompatibleProxyOperationType,
+  UpstashKeyValueStoreConfigBoundary as UpstashKeyValueStoreConfigBoundaryType,
+  UpstashKeyValueStoreFailure as UpstashKeyValueStoreFailureType,
 } from "./errors.js";
 export {
   CodexHttpClient,
@@ -165,6 +170,10 @@ export {
   OpenAICompatibleProxyInput,
   OpenAICompatibleProxyInternalToken,
   OAuthPrincipal,
+  UpstashRedisKeyPrefix,
+  UpstashRedisConfig,
+  UpstashRedisRestToken,
+  UpstashRedisRestUrl,
 } from "./schemas.js";
 export type {
   CodexOAuthAccessToken as CodexOAuthAccessTokenType,
@@ -208,6 +217,10 @@ export type {
   OpenAICompatibleProxyInput as OpenAICompatibleProxyInputType,
   OpenAICompatibleProxyInternalToken as OpenAICompatibleProxyInternalTokenType,
   OAuthPrincipal as OAuthPrincipalType,
+  UpstashRedisKeyPrefix as UpstashRedisKeyPrefixType,
+  UpstashRedisConfig as UpstashRedisConfigType,
+  UpstashRedisRestToken as UpstashRedisRestTokenType,
+  UpstashRedisRestUrl as UpstashRedisRestUrlType,
 } from "./schemas.js";
 export {
   codexOAuthProfileStorageKey,

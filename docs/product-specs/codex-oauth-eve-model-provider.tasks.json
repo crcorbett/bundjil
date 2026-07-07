@@ -349,13 +349,21 @@
     {
       "id": "add-vercel-kv-adapter",
       "title": "Add a Vercel-compatible KeyValueStore adapter",
-      "status": "pending",
+      "status": "completed",
       "description": "Add an adapter for a Vercel Marketplace KV provider, expected to be Upstash Redis, behind Effect KeyValueStore.",
       "implementationNotes": [
         "Do not use @vercel/kv; Vercel KV is sunset for new work.",
         "Prefer Upstash Redis through Vercel Marketplace so env vars are provisioned through the linked project.",
         "Keep the adapter behind KeyValueStore so @bundjil/codex-oauth does not depend on app code.",
-        "Decide and document token encryption before storing refresh tokens in hosted KV."
+        "Decide and document token encryption before storing refresh tokens in hosted KV.",
+        "Delegated worker `019f3e29-854a-7a92-9ae0-e503fd287885` was assigned this exact task but timed out and was closed without a final response; parent reviewed, refined, verified, and accepted the resulting worktree changes.",
+        "Added `@upstash/redis` to @bundjil/codex-oauth and exposed `@bundjil/codex-oauth/upstash-key-value-store.layer` for opt-in hosted storage wiring.",
+        "Added canonical `UpstashRedisConfig`, `UpstashRedisRestUrl`, `UpstashRedisRestToken`, and `UpstashRedisKeyPrefix` schemas plus `UpstashKeyValueStoreConfigError`.",
+        "Implemented `loadUpstashRedisConfig`, `loadUpstashRedisConfigFromEnv`, `makeUpstashKeyValueStore`, and `UpstashKeyValueStoreLive` behind Effect KeyValueStore.",
+        "Config reads `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` with `KV_REST_API_URL` / `KV_REST_API_TOKEN` aliases; secrets use `Config.redacted`; live construction uses `new Redis(...)` rather than `Redis.fromEnv()` or direct package `process.env` reads.",
+        "The adapter uses `automaticDeserialization: false` so Effect Schema remains the JSON boundary and implements `clear` and `size` by scanning the configured Bundjil key prefix rather than operating on the whole Redis database.",
+        "Added mocked Upstash client tests for config loading, Vercel alias loading, missing-config tagged errors, KeyValueStore operations, prefix-scoped clear/size behavior, existing Codex profile store compatibility, and provider failure mapping.",
+        "Documented Vercel Marketplace / Upstash Redis provisioning, `vercel env pull`, env aliases, prefix behavior, and the hosted-token-storage blocker pending application-side envelope encryption."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for adapter operations.",
@@ -374,8 +382,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: @bundjil/codex-oauth owns the reusable Upstash-to-KeyValueStore adapter, schemas, config error, subpath export, and mocked tests. apps/agent and apps/codex-proxy were not changed. The adapter provides only Effect KeyValueStore and is not composed into CodexOAuthLive or token profile storage by default.",
+          "Pass 2 - Effect implementation quality: adapter config uses Effect Config, ConfigProvider.fromEnv, Config.schema, Config.redacted, Schema.URL, Schema.RedactedFromValue, branded key-prefix schemas, flat Effect.gen, named Effect.fn operations, Layer.effect, safe tagged config errors, and KeyValueStoreError mapping. Parent scans found no raw native JSON calls, Redis.fromEnv usage, direct package process.env reads, @vercel/kv dependency, unsafe casts, DTO mirrors, manual object readers, flushdb/dbsize, or API-key fallback.",
+          "Pass 3 - verification coverage: mocked tests cover config loading, Vercel env aliases, missing-config tagged errors, KeyValueStore set/get/remove/clear/size, prefix isolation, profile-store compatibility, and provider failure mapping. bun install --frozen-lockfile, package test/check-types/build, repo check, knip, check-types, verification, build, diff check, and raw JSON/secret-boundary scans passed."
+        ]
       },
       "commitAfterPassing": true
     },

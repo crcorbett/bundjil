@@ -796,9 +796,41 @@ BUNDJIL_CODEX_PROFILE_ID=<profile id>
 BUNDJIL_CODEX_MODEL=<model id>
 ```
 
-Hosted storage config is added only when the Upstash / KeyValueStore adapter
-task is accepted. Raw refresh tokens must not be stored in hosted KV before the
-encryption-at-rest and operator-access model is documented and tested.
+Hosted storage config for the accepted Upstash / KeyValueStore adapter lives
+in `@bundjil/codex-oauth`, not in `apps/codex-proxy`. The adapter reads
+Vercel Marketplace / Upstash Redis credentials through Effect `Config`:
+
+```text
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+BUNDJIL_UPSTASH_REDIS_KEY_PREFIX
+```
+
+For Vercel compatibility, the adapter also accepts the SDK-documented aliases:
+
+```text
+KV_REST_API_URL
+KV_REST_API_TOKEN
+```
+
+`UPSTASH_REDIS_REST_TOKEN` / `KV_REST_API_TOKEN` must be loaded with
+`Config.redacted`. The Upstash SDK must be constructed from decoded Effect
+config and must not use `Redis.fromEnv()` or direct `process.env` reads in
+package logic. The adapter disables Upstash automatic deserialization so
+Effect Schema remains the JSON encoding boundary.
+
+The adapter prefixes Redis keys before storage. The default prefix is
+`bundjil:codex-oauth:`. `KeyValueStore.clear` and `KeyValueStore.size` scan
+that prefix instead of using whole-database Redis commands, so the adapter can
+share a Redis database without clearing unrelated keys.
+
+Raw refresh tokens must not be stored in hosted KV before an application-side
+envelope-encryption layer for `CodexOAuthProfile` payloads is implemented and
+tested. Provider TLS and provider-managed at-rest encryption do not satisfy the
+operator-access constraint because Vercel / Upstash operators and project env
+readers must not be able to inspect stored refresh-token values. Until that
+future encryption task exists, the Upstash adapter is an opt-in
+`KeyValueStore` primitive and is not composed into `CodexOAuthLive`.
 
 Vercel deployment rules:
 

@@ -13,8 +13,9 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`add-vercel-kv-adapter` is next in the ledger. Do not begin it without a new
-implementation pass because it changes hosted storage and token persistence.
+`document-codex-oauth-provider` is next in the ledger. Do not begin it without
+a new implementation pass because it changes durable user-facing setup,
+security, deployment, and verification documentation.
 
 ## Accepted Tasks
 
@@ -420,6 +421,82 @@ Verification:
 - `bun run verification`: passed.
 - `bun run build`: passed.
 
+### add-vercel-kv-adapter
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `packages/codex-oauth/package.json`
+- `packages/codex-oauth/src/upstash-key-value-store.layer.ts`
+- `packages/codex-oauth/src/errors/upstash-key-value-store-config-error.ts`
+- `packages/codex-oauth/src/errors.ts`
+- `packages/codex-oauth/src/errors/contracts.ts`
+- `packages/codex-oauth/src/index.ts`
+- `packages/codex-oauth/src/schemas.ts`
+- `packages/codex-oauth/test/upstash-key-value-store.test.ts`
+- `packages/codex-oauth/README.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+- `bun.lock`
+
+Evidence:
+
+- Delegated worker `019f3e29-854a-7a92-9ae0-e503fd287885` was assigned this
+  exact task but timed out and was closed without a final response. Parent
+  reviewed, refined, verified, and accepted the resulting worktree changes.
+- Added `@upstash/redis` and the
+  `@bundjil/codex-oauth/upstash-key-value-store.layer` subpath export.
+- Added canonical Upstash Redis config schemas, a tagged config error, and
+  `UpstashKeyValueStoreLive` behind Effect `KeyValueStore`.
+- Config is parsed through Effect `Config` with `Config.redacted` secrets and
+  supports `UPSTASH_REDIS_REST_*` plus Vercel `KV_REST_API_*` aliases.
+- The live layer constructs `new Redis(...)` from decoded config rather than
+  using `Redis.fromEnv()` or direct package `process.env` reads.
+- `automaticDeserialization: false` keeps Effect Schema as the JSON boundary.
+  No native JSON serialization calls were introduced.
+- `clear` and `size` scan only the configured Bundjil key prefix instead of
+  operating on the whole Redis database.
+- Hosted token-profile storage remains blocked until a future
+  application-side envelope encryption task decides and implements refresh
+  token encryption.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns the reusable
+   Upstash-to-KeyValueStore adapter, schemas, config error, subpath export, and
+   mocked tests. `apps/agent` and `apps/codex-proxy` were not changed. The
+   adapter provides only Effect `KeyValueStore`; it is not composed into
+   `CodexOAuthLive` by default.
+2. Effect implementation quality: adapter config uses `Config`,
+   `ConfigProvider.fromEnv`, `Config.schema`, `Config.redacted`, `Schema.URL`,
+   `Schema.RedactedFromValue`, branded key-prefix schemas, flat `Effect.gen`,
+   named `Effect.fn`, `Layer.effect`, safe tagged config errors, and
+   `KeyValueStoreError` mapping. Parent scans found no raw native JSON calls,
+   `Redis.fromEnv`, direct package `process.env`, `@vercel/kv`, unsafe casts,
+   DTO mirrors, manual object readers, `flushdb` / `dbsize`, or API-key
+   fallback.
+3. Verification coverage: mocked tests cover config loading, Vercel env
+   aliases, missing-config tagged errors, KeyValueStore operations, prefix
+   isolation, profile-store compatibility, and provider failure mapping. Live
+   Upstash remains opt-in and was not required.
+
+Verification:
+
+- `bun install --frozen-lockfile`: passed.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 26 tests.
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run check`: passed.
+- `bun run knip`: passed.
+- `bun run check-types`: passed.
+- `bun run verification`: passed.
+- `bun run build`: passed.
+- Raw JSON / unsafe-boundary scan: passed; only deliberate docs prohibitions
+  for `Redis.fromEnv()` and direct `process.env` remained.
+- `git diff --check`: passed.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -457,6 +534,10 @@ Out of scope:
   delayed wait. Parent reviewed the commit and audited Vercel ownership,
   app-owned deployment glue, preview proof, log hygiene, and production-skip
   state.
+- 2026-07-07: `add-vercel-kv-adapter` worker
+  `019f3e29-854a-7a92-9ae0-e503fd287885` timed out and was closed without a
+  final response. Parent reviewed, refined, verified, and accepted the
+  worktree changes with the required three-pass audit.
 
 ## Verification Log
 
@@ -480,3 +561,9 @@ Out of scope:
   Eve session proof, targeted app/package verification, and the mandatory
   three-pass Effect audit. Final `bun run verification` and `bun run build`
   both passed.
+- 2026-07-07: `add-vercel-kv-adapter` accepted after adding the Upstash Redis
+  KeyValueStore adapter, Effect Config/Schema contracts, mocked adapter tests,
+  package docs, spec/ledger updates, and the mandatory three-pass Effect
+  audit. `bun install --frozen-lockfile`, targeted package checks, repo
+  `check`, `knip`, `check-types`, `verification`, `build`, diff check, and
+  raw JSON/secret-boundary scans passed.

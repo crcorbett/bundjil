@@ -75,3 +75,10 @@ export const OpenAICompatibleProxyOperation = Schema.Literals([
 
 export type OpenAICompatibleProxyOperation =
   typeof OpenAICompatibleProxyOperation.Type;
+
+export const UpstashKeyValueStoreConfigBoundary = Schema.Literals([
+  "UpstashRedisConfig",
+]);
+
+export type UpstashKeyValueStoreConfigBoundary =
+  typeof UpstashKeyValueStoreConfigBoundary.Type;

@@ -300,6 +300,30 @@ export const OpenAICompatibleProxyInput = Schema.Struct({
 
 export type OpenAICompatibleProxyInput = typeof OpenAICompatibleProxyInput.Type;
 
+export const UpstashRedisRestUrl = Schema.URL;
+
+export type UpstashRedisRestUrl = typeof UpstashRedisRestUrl.Type;
+
+export const UpstashRedisRestToken = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+
+export type UpstashRedisRestToken = typeof UpstashRedisRestToken.Type;
+
+export const UpstashRedisKeyPrefix = Schema.NonEmptyString.pipe(
+  Schema.brand("UpstashRedisKeyPrefix")
+);
+
+export type UpstashRedisKeyPrefix = typeof UpstashRedisKeyPrefix.Type;
+
+export const UpstashRedisConfig = Schema.Struct({
+  keyPrefix: UpstashRedisKeyPrefix,
+  restUrl: UpstashRedisRestUrl,
+  restToken: UpstashRedisRestToken,
+});
+
+export type UpstashRedisConfig = typeof UpstashRedisConfig.Type;
+
 export const CodexResponsesProofInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   accountId: Schema.optional(Schema.NonEmptyString),

@@ -26,6 +26,11 @@
       "@bundjil/source": "./src/mock.layer.ts",
       "types": "./dist/mock.layer.d.ts",
       "default": "./dist/mock.layer.js"
+    },
+    "./upstash-key-value-store.layer": {
+      "@bundjil/source": "./src/upstash-key-value-store.layer.ts",
+      "types": "./dist/upstash-key-value-store.layer.d.ts",
+      "default": "./dist/upstash-key-value-store.layer.js"
     }
   },
   "publishConfig": {
@@ -41,6 +46,10 @@
       "./mock.layer": {
         "types": "./dist/mock.layer.d.ts",
         "default": "./dist/mock.layer.js"
+      },
+      "./upstash-key-value-store.layer": {
+        "types": "./dist/upstash-key-value-store.layer.d.ts",
+        "default": "./dist/upstash-key-value-store.layer.js"
       }
     }
   },
@@ -51,6 +60,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "effect": "catalog:effect"
   },
   "devDependencies": {

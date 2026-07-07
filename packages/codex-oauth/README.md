@@ -31,6 +31,8 @@ and composes this package's service contracts.
   Codex Responses client, and returns an OpenAI-compatible stream.
 - `OpenAICompatibleProxy` is a package-level private proxy contract that
   enforces an internal bearer token before delegating to the direct provider.
+- `UpstashKeyValueStoreLive` is an opt-in Vercel Marketplace / Upstash Redis
+  adapter for Effect `KeyValueStore`.
 
 Token schemas use Effect `Schema.RedactedFromValue`. Decoded values print and
 serialize as redacted placeholders, while the KeyValueStore JSON codec can
@@ -70,9 +72,66 @@ token values, prompts, and OAuth responses are not included in storage keys.
   profiles.
 - `CodexHttpClientMock` and `CodexDirectProviderMock`, exported from the mock
   subpath, replace provider boundaries in tests without network calls.
+- `UpstashKeyValueStoreLive`, exported from
+  `@bundjil/codex-oauth/upstash-key-value-store.layer`, provides only the
+  Effect `KeyValueStore` service. It is not composed into `CodexOAuthLive` by
+  default.
 
 The root export is reserved for schemas, errors, service tags, and pure
 operation helpers. Import live and mock layers from their explicit subpaths.
+
+## Upstash Redis KeyValueStore Adapter
+
+Use Vercel Marketplace Upstash Redis for hosted KV. Do not use `@vercel/kv`;
+new storage work should use the Upstash SDK directly behind Effect
+`KeyValueStore`.
+
+The adapter parses config through Effect `Config`:
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+For compatibility with Vercel-provisioned aliases, the layer also accepts:
+
+- `KV_REST_API_URL`
+- `KV_REST_API_TOKEN`
+
+The token is loaded with `Config.redacted`, decoded through
+`UpstashRedisConfig`, and passed to `new Redis(...)` with
+`automaticDeserialization: false` so Effect Schema remains the JSON boundary.
+Automated tests use a mocked Redis-like client and never require live Upstash
+credentials.
+
+Provisioning flow:
+
+```bash
+vercel link
+vercel env pull apps/codex-proxy/.env.local
+```
+
+Link an Upstash Redis Marketplace resource to the Vercel project, then pull
+the linked env vars locally. If Vercel injects only `KV_REST_API_*` aliases,
+either keep those aliases or map them to `UPSTASH_REDIS_REST_*` in project env
+settings.
+
+The adapter prefixes Redis keys before storage. The default prefix is:
+
+```text
+bundjil:codex-oauth:
+```
+
+Override it with `BUNDJIL_UPSTASH_REDIS_KEY_PREFIX` only when migrating or
+isolating another environment. Effect `KeyValueStore.clear` and `size` are
+implemented by scanning this prefix, so they operate on Bundjil-owned keys
+rather than the whole Redis database.
+
+Hosted token-profile storage remains blocked until a separate task implements
+application-side envelope encryption for `CodexOAuthProfile` payloads and
+documents the operator-access model. Upstash TLS and provider-managed
+at-rest encryption are not enough for raw refresh tokens because Vercel /
+Upstash operators and project env readers must not be able to inspect stored
+refresh-token values. Until that encryption layer exists, use the Upstash
+adapter only as a storage primitive or for non-token test data.
 
 ## Safe Secret Handling
 
@@ -138,6 +197,7 @@ Run from the repo root:
 ```bash
 bun run --filter @bundjil/codex-oauth test
 bun run --filter @bundjil/codex-oauth build
+bun run --filter @bundjil/codex-oauth check-types
 bun run --filter @bundjil/codex-oauth proof:codex-responses
 bun run check-types
 ```
