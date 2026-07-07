@@ -28,7 +28,8 @@
     "Vercel preview deploy under Cooper's personal Vercel account before production",
     "Sanitized hosted OAuth proof with no tokens, codes, prompts, or raw OAuth payloads in logs or docs",
     "Sanitized hosted live model proof with HTTP statuses, mode, content type, SSE line count, done marker, and leak booleans only",
-    "Upstash readback proof that stored profile values are encrypted and key-prefixed"
+    "Upstash readback proof that stored profile values are encrypted and key-prefixed",
+    "Dedicated 3-pass Effect TS audit sweep task completed after implementation and documentation"
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
@@ -306,25 +307,28 @@
       "commitAfterPassing": true
     },
     {
-      "id": "final-audit-and-production-decision",
-      "title": "Final audit and production decision",
+      "id": "three-pass-effect-ts-audit-sweep",
+      "title": "Run 3-pass Effect TS audit sweep",
       "status": "pending",
-      "description": "Run final verification, complete the mandatory 3-pass Effect TS audit across the whole implementation, and prepare a production decision without deploying production automatically.",
+      "description": "Run a dedicated cross-cutting 3-pass Effect TS audit sweep across the completed hosted Codex implementation before any production decision.",
       "implementationNotes": [
-        "Review package ownership, app ownership, call graphs, secret handling, docs, and deployment evidence.",
-        "Run root verification after targeted package/app checks.",
-        "Record any production blockers explicitly.",
-        "Production deploy requires a separate explicit user approval after this task."
+        "Pass 1 is the ownership and call-graph sweep: verify `@bundjil/codex-oauth`, `apps/codex-proxy`, and `apps/agent` own only their intended behavior and that production, test, CLI/script, Vercel, and rollback call graphs match the spec.",
+        "Pass 2 is the Effect implementation-quality sweep: inspect the diff for flat primary Effect.gen or Effect.fn programs, Context.Service tags, explicit Layers, Schema-derived types, package-owned tagged errors, Config.redacted, ConfigProvider.fromEnv, Redacted handling only at final provider boundaries, schema-backed KeyValueStore persistence, and no unsafe casts, DTO mirrors, manual object readers, process.env package reads, switch/case branching, instanceof checks, or helper sprawl.",
+        "Pass 3 is the verification-coverage sweep: prove targeted package/app commands, root verification, local mock proof, hosted preview OAuth proof, hosted preview live model proof, Upstash encrypted readback, Vercel log/leak scans, docs updates, rollback notes, and any skipped production proof with reason.",
+        "If any pass finds a gap, fix it and record another pass. Do not treat three entries as sufficient when an unresolved issue remains.",
+        "Production deploy requires a separate explicit user approval after this sweep."
       ],
       "mandatoryVerification": [
         "All prior tasks have completed audit evidence.",
         "Ownership/call graph audit confirms `@bundjil/codex-oauth`, `apps/codex-proxy`, and `apps/agent` boundaries match the spec.",
-        "Implementation quality audit confirms flat primary Effect.gen programs, schema-derived types, tagged errors, Config.redacted, explicit layers, no unsafe casts, no DTO mirrors, no manual object readers, and no helper sprawl.",
+        "Implementation quality audit confirms flat primary Effect.gen or Effect.fn programs, Context.Service tags, schema-derived types, tagged errors, Config.redacted, ConfigProvider.fromEnv, explicit layers, Redacted handling only at final provider boundaries, schema-backed KeyValueStore persistence, no unsafe casts, no DTO mirrors, no manual object readers, and no helper sprawl.",
         "Verification coverage audit records targeted checks, root verification, Vercel preview proof, log/leak scans, Upstash readback, docs updates, and any skipped production proof with reason.",
+        "The audit sweep itself is recorded in this task's implementationImprovementAudit evidence, not only in prior task notes.",
         "bun run verification",
         "git status --short is reviewed before commit"
       ],
       "completionCriteria": [
+        "The dedicated 3-pass audit sweep is complete with evidence for ownership/call graph, Effect implementation quality, and verification coverage.",
         "Hosted live Codex mode is either complete in preview with production pending approval, or blocked with concrete evidence.",
         "The task ledger and spec are updated to reflect final state.",
         "Commit and push only after verification passes."

@@ -84,9 +84,12 @@ owners:
 
 - `EncryptedCodexOAuthProfileV1`
 - `CodexOAuthProfileCipher`
+- `CodexOAuthProfileCipherError`
 - `CodexProfileStoreEncryptedKeyValueLive`
 - `CodexOAuthRefreshLock`
+- `CodexOAuthRefreshLockError`
 - `CodexOAuthStateStore`
+- `CodexOAuthStateStoreError`
 - `CodexOAuthClientLive`
 - `CodexProxyLiveLayers`
 
@@ -136,11 +139,21 @@ EncryptedCodexOAuthProfileV1
   updatedAtEpochMillis
 ```
 
+The stored value must be encoded through an owning Effect Schema before it
+crosses the `KeyValueStore` boundary. Prefer `KeyValueStore.toSchemaStore`
+when the boundary stores schema-owned values, and keep any lower-level
+string-only storage adapter behind a package-owned layer.
+
 `CodexOAuthProfileCipher` should use WebCrypto-compatible AES-GCM or an
 equivalent platform-supported authenticated encryption primitive. The key must
 come from `Config.redacted`, with a separate non-secret key id for rotation.
 The implementation must prove that stored values do not contain raw access
 tokens, refresh tokens, authorization codes, or full OAuth payloads.
+
+`Redacted.value(...)` may only appear at the final provider boundary that needs
+the raw bytes, such as WebCrypto key import or an outbound authorization
+header. It must not appear in diagnostics, errors, JSON proof output, task
+evidence, test snapshots, or route responses.
 
 Hosted storage should compose as:
 
@@ -197,8 +210,9 @@ POST /codex/oauth/logout
 `CodexOAuthStateStore`, and redirect to the current OpenAI/Codex authorization
 URL. `/codex/oauth/callback` must validate state, exchange the code, build a
 canonical `CodexOAuthProfile`, encrypt it, persist it, and return a minimal
-success page or JSON response that contains no token values. `/codex/oauth/logout`
-must remove the stored encrypted profile for the configured subject.
+success page or schema-encoded JSON response that contains no token values.
+`/codex/oauth/logout` must remove the stored encrypted profile for the
+configured subject.
 
 These routes are private operational routes, not public app-login routes.
 Production must either keep them behind deployment protection, an internal
@@ -219,6 +233,21 @@ The live chat route should:
 - call the direct Codex Responses backend;
 - stream OpenAI-compatible SSE chunks;
 - record only sanitized diagnostics.
+
+The app must compose live mode through explicit layers rather than hidden
+globals:
+
+```text
+CodexProxyLiveLayers
+  -> CodexProxyConfig
+  -> CodexOAuthClientLive
+  -> CodexOAuthService
+  -> CodexOAuthRefreshLockLive
+  -> CodexProfileStoreEncryptedKeyValueLive
+  -> CodexOAuthProfileCipherLive
+  -> UpstashKeyValueStoreLive
+  -> CodexDirectProviderLive
+```
 
 `apps/agent` should remain unchanged except for docs and optional local
 configuration notes. It should still treat the private proxy as a normal AI SDK
@@ -344,7 +373,31 @@ encode/decode adapters, or trivial helpers when Effect Schema, `Match`,
 JSON string boundaries in committed app or package code must use Effect Schema
 codecs such as `Schema.fromJsonString(...)` or `Schema.UnknownFromJsonString`.
 
-Every implementation task must record the mandatory 3-pass audit:
+Concrete requirements for this SPEC:
+
+- New runtime capabilities must be exposed as `Context.Service` tags with
+  live and memory/mock layers. Do not pass raw provider clients through domain
+  functions.
+- Primary operations must be named `Effect.gen` or `Effect.fn` programs with a
+  readable success path and `Effect.withSpan(...)` where the operation crosses
+  a provider, storage, route, or config boundary.
+- Expected failures must be package-owned `Schema.TaggedErrorClass` or
+  `Data.TaggedError` values. Translate provider/route failures once at the
+  boundary and handle them with `Effect.catchTag`, `Effect.catchTags`,
+  `Effect.mapError`, or `Match`.
+- Config must live beside the runtime or package that consumes it and use
+  `Config.schema(...)`, `Config.redacted(...)`, `Config.url(...)`, and
+  `ConfigProvider.fromEnv()`. Package logic must not read `process.env`
+  directly.
+- Persistence must flow through `effect/unstable/persistence/KeyValueStore`
+  and schema-backed stores. Raw Redis or Upstash commands are allowed only in a
+  narrow adapter layer that implements an owning service contract such as
+  `CodexOAuthRefreshLock`.
+- Tests should use `@effect/vitest` and compose memory/mock layers at the test
+  boundary.
+
+Every implementation task must record the mandatory 3-pass audit, and the task
+ledger must include a dedicated 3-pass audit sweep task after implementation:
 
 1. Ownership and call graph.
 2. Effect implementation quality.
@@ -373,6 +426,7 @@ Before implementation can be marked complete:
 - Vercel log scan for absent token values, authorization codes, raw OAuth
   payloads, prompts, and full response bodies
 - Upstash readback proof that hosted values are encrypted and prefixed
+- dedicated 3-pass Effect TS audit sweep task completed with evidence
 
 Production deployment remains a separate explicit approval gate after preview
 proof.
