@@ -405,7 +405,7 @@
         "Added production and test call graphs for the Eve model path, private proxy path, package provider path, Upstash KeyValueStore adapter, Vercel preview path, and app/package tests.",
         "Added Vercel preview-before-production commands, direct HTTP checks, rollback instructions, sanitized proof shapes, and the requirement that bundjil-codex-proxy stays in Cooper's personal Vercel account rather than Tilt Legal.",
         "Documented Schema JSON boundaries with Schema.fromJsonString(...) and Schema.UnknownFromJsonString and removed stale references to manual serialization handling.",
-        "Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit without committing or pushing. Parent removed residual direct runtime JSON API audit wording, reran verification, and accepted the slice for commit."
+        "Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit and left commit/push to the parent. Parent removed residual direct runtime JSON API audit wording, reran verification, and accepted the slice for commit."
       ],
       "mandatoryVerification": [
         "Documentation distinguishes implemented behavior from research, opt-in proof, and future hosted storage work.",
@@ -436,9 +436,18 @@
     {
       "id": "final-verification",
       "title": "Run final verification and prepare handoff",
-      "status": "pending",
+      "status": "completed",
       "description": "Run the full repository verification and summarize sanitized implementation evidence.",
-      "implementationNotes": [],
+      "implementationNotes": [
+        "Ran the required final verification sequence on 2026-07-07 from the repo root: frozen install, targeted codex-oauth tests/build, targeted codex-proxy tests/build/smoke-test, root verification, and git status.",
+        "Confirmed every previously completed task has non-empty implementation notes, at least 3 completed audit passes, and at least 3 audit evidence entries.",
+        "Product-surface scans covered root docs, apps, packages, and docs. They found no forbidden runtime JSON API names, stale Eve wiring text, stale proxy-start guidance, raw OAuth payload assignments, private-key/provider-secret shapes, or real secret-shaped token values.",
+        "A full tracked-file secret-shaped scan also found no token, authorization code, provider secret, or private-key matches. Product-surface stale-pattern scans intentionally remained scoped to Bundjil runtime and product docs.",
+        "Parent initially ran codex-oauth build and codex-proxy test in parallel, which raced on the codex-oauth dist entrypoint. After codex-oauth build completed, parent reran codex-proxy test sequentially and it passed.",
+        "Parent also ran `bun run build`; it passed across all 6 packages/apps.",
+        "Exact outputs recorded here are sanitized and do not include token values, authorization codes, raw OAuth payloads, prompts, or full model responses.",
+        "Worker `019f3e50-f6f3-7b42-91af-77b12cb7b0c1` ran final verification, updated evidence, and left commit/push to the parent. Parent reviewed the evidence, reran decisive checks, and accepted the slice for commit."
+      ],
       "mandatoryVerification": [
         "bun install --frozen-lockfile",
         "bun run --filter @bundjil/codex-oauth test when the package exists",
@@ -455,8 +464,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: final verification touched only the task ledger and active execution plan. apps/agent, apps/codex-proxy, @bundjil/codex-oauth, and the accepted provider/proxy/storage call graphs were not changed.",
+          "Pass 2 - Effect implementation quality: no implementation code changed in this task. The final audit confirmed prior completed tasks retained implementation notes and 3-pass evidence, and the product docs continue to describe Effect Schema JSON codecs with Schema.fromJsonString(...) and Schema.UnknownFromJsonString.",
+          "Pass 3 - verification coverage: bun install --frozen-lockfile passed; codex-oauth test passed with 26 tests and build passed; codex-proxy test passed with 5 tests after a sequential rerun, build passed, and smoke-test returned healthStatus 200, streamStatus 200, streamLines 5; bun run verification and bun run build passed; pre-edit git status was clean; product-surface stale scans and full tracked-file secret-shaped scans were clean."
+        ]
       },
       "commitAfterPassing": true
     }

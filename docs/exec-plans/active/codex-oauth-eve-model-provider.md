@@ -13,8 +13,9 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`document-codex-oauth-provider` is complete in the ledger. The next task is
-`final-verification`, but do not begin it without a new implementation pass.
+`final-verification` is complete in the ledger. No task remains in the sibling
+task list. Parent acceptance, commit, and push are pending for this final
+evidence slice.
 
 ## Accepted Tasks
 
@@ -533,8 +534,8 @@ Evidence:
   not Tilt Legal.
 - Documented Effect Schema JSON boundaries with `Schema.fromJsonString(...)`
   and `Schema.UnknownFromJsonString`.
-- Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit
-  without committing or pushing. Parent removed residual direct runtime JSON
+- Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit and
+  left commit/push to the parent. Parent removed residual direct runtime JSON
   API audit wording, reran verification, and accepted the slice for commit.
 - No code, package, runtime, deployment, or env files were changed.
 
@@ -562,6 +563,71 @@ Verification:
   passed.
 - Docs scan for updated Vercel deployment, rollback, and Schema JSON boundary
   references: passed.
+
+### final-verification
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+
+Evidence:
+
+- Ran the final required verification sequence from the repo root.
+- Confirmed all previously completed tasks have implementation notes, at least
+  3 completed audit passes, and at least 3 audit evidence entries.
+- Confirmed the product surface has no forbidden runtime JSON API names, stale
+  Eve wiring text, stale proxy-start guidance, raw OAuth payload assignments,
+  private-key/provider-secret shapes, or real secret-shaped token values.
+- A full tracked-file secret-shaped scan also found no token, authorization
+  code, provider secret, or private-key matches. Product-surface stale-pattern
+  scans intentionally remained scoped to Bundjil runtime and product docs.
+- Parent initially ran `@bundjil/codex-oauth` build and `@bundjil/codex-proxy`
+  test in parallel, which raced on the codex-oauth dist entrypoint. After the
+  codex-oauth build completed, parent reran the proxy test sequentially and it
+  passed.
+- Parent also ran `bun run build`; it passed across all 6 packages/apps.
+- No code, package, runtime, deployment, or env files were changed.
+- Worker `019f3e50-f6f3-7b42-91af-77b12cb7b0c1` ran final verification,
+  updated evidence, and left commit/push to the parent. Parent reviewed the
+  evidence, reran decisive checks, and accepted the slice for commit.
+
+Parent audit:
+
+1. Ownership and call graph: final verification touched only the task ledger and
+   active execution plan. `apps/agent`, `apps/codex-proxy`,
+   `@bundjil/codex-oauth`, and the accepted provider/proxy/storage call graphs
+   were not changed.
+2. Effect implementation quality: no implementation code changed. The audit
+   confirmed prior tasks retain implementation notes and 3-pass evidence, and
+   docs still describe Effect Schema JSON codecs with
+   `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
+3. Verification coverage: every required command passed, prior task evidence was
+   checked with `jq`, pre-edit `git status --short` was clean, final
+   product-surface stale scans were clean, and the full tracked-file
+   secret-shaped scan found no reportable findings.
+
+Verification:
+
+- `bun install --frozen-lockfile`: passed, no install changes.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 4 files and 26 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 1 file and 5 tests
+  after a sequential rerun. The first parent parallel run raced the
+  `@bundjil/codex-oauth` dist rebuild.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed with
+  `{"healthStatus":200,"streamStatus":200,"streamLines":5}`.
+- `bun run verification`: passed across Ultracite, knip, 6 package typechecks,
+  and 6 package test targets.
+- `bun run build`: passed across 6 packages/apps.
+- `git status --short`: clean before final evidence edits; after edits only the
+  task ledger and active plan are modified.
+- Completed-task audit check: passed.
+- Product-surface stale scans: passed.
+- Full tracked-file secret-shaped scan: passed.
 
 ## Original Task Scope
 
@@ -607,6 +673,9 @@ Out of scope:
 - 2026-07-07: `document-codex-oauth-provider` was implemented as a
   documentation-only slice in the current thread. Commit and push were
   explicitly skipped by user instruction.
+- 2026-07-07: `final-verification` was implemented as an evidence-only slice in
+  the current thread. The worker did not commit or push; parent acceptance,
+  commit, and push are handled in this closeout.
 
 ## Verification Log
 
@@ -641,3 +710,8 @@ Out of scope:
   active plan docs. `bun run check` and `bun run verification` passed; stale
   manual serialization wording, direct runtime JSON API names, obsolete proxy
   script guidance, and secret/token-value scans were clean.
+- 2026-07-07: `final-verification` accepted after frozen install, targeted
+  `@bundjil/codex-oauth` test/build, targeted `@bundjil/codex-proxy`
+  test/build/smoke-test, root `bun run verification`, `git status --short`,
+  completed-task audit checks, and product-surface stale/secret scans passed.
+  Parent reviewed the evidence and accepted the slice for commit.
