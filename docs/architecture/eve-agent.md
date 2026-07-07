@@ -56,8 +56,10 @@ Vercel-managed runtime configuration, never in committed source.
 
 `apps/agent` owns the Eve filesystem runtime:
 
-- `agent/agent.ts` defines the model using
-  `process.env["BUNDJIL_AGENT_MODEL"] ?? "google/gemini-2.5-flash"`.
+- `agent/agent.ts` defines the model through Effect Config and Schema:
+  `Config.schema(Schema.NonEmptyString, "BUNDJIL_AGENT_MODEL")`,
+  `Config.withDefault("google/gemini-2.5-flash")`, and
+  `ConfigProvider.fromEnv()`.
 - `agent/instructions.md` tells the agent to use `workspace_status` for
   current repo/package questions and not to claim live channels or integrations.
 - `agent/tools/workspace_status.ts` is the model-facing Eve tool slug.
@@ -235,8 +237,8 @@ Follow-up live Gateway proof:
 
 ## AI Gateway Setup
 
-`apps/agent/agent/agent.ts` uses a Gateway model id string. The committed
-default is:
+`apps/agent/agent/agent.ts` validates the Gateway model id as a non-empty
+Effect Schema string. The committed default is:
 
 ```text
 google/gemini-2.5-flash

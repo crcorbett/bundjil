@@ -4,8 +4,9 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 
 ## What Lives Here
 
-- `agent/agent.ts`: root Eve config. The model is
-  `process.env["BUNDJIL_AGENT_MODEL"] ?? "google/gemini-2.5-flash"`.
+- `agent/agent.ts`: root Eve config. The model is loaded through Effect
+  `Config.schema(Schema.NonEmptyString, "BUNDJIL_AGENT_MODEL")` with
+  `ConfigProvider.fromEnv()` and a default of `google/gemini-2.5-flash`.
 - `agent/instructions.md`: operational instructions for the minimal local
   agent.
 - `agent/tools/workspace_status.ts`: Eve tool that delegates to
@@ -61,7 +62,7 @@ curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 
 ## Environment
 
-- `BUNDJIL_AGENT_MODEL`: optional Gateway model override.
+- `BUNDJIL_AGENT_MODEL`: optional non-empty Gateway model override.
 - `AI_GATEWAY_API_KEY`: local or hosted AI Gateway credential.
 - `VERCEL_OIDC_TOKEN`: credential normally pulled by `eve link`.
 
