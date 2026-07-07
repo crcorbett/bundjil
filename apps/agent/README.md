@@ -21,6 +21,33 @@ Committed Vercel Eve app for the first Bundjil agent slice.
   Gateway by default and that Codex proxy mode sends private bearer auth only
   to the proxy.
 
+## Provider State
+
+Implemented:
+
+- Gateway mode is the default model path.
+- Codex proxy mode is opt-in with
+  `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`.
+- Local Codex proxy mode has been verified against `apps/codex-proxy` in mock
+  mode.
+- Hosted preview proof exists for `apps/codex-proxy`, but production and live
+  Codex mode remain gated.
+
+Future:
+
+- Hosted live Codex proxy mode.
+- Live OAuth endpoint exchange and refresh.
+- Hosted token-profile storage after envelope encryption is implemented in the
+  provider/storage boundary.
+
+Unsupported:
+
+- The Eve app must not import `CodexOAuthService`, `CodexProfileStore`, direct
+  Codex HTTP clients, or hosted token storage adapters.
+- Codex OAuth tokens are not OpenAI Platform API keys or AI Gateway
+  credentials.
+- The private proxy is not a public gateway.
+
 ## Commands
 
 Run from the repository root:
@@ -94,6 +121,30 @@ direct `chatgpt.com` Responses endpoint. In Codex proxy mode it only receives
 an AI SDK `LanguageModel` created with `@ai-sdk/openai-compatible`, and that
 model calls the private Bundjil proxy with the internal bearer token.
 
+Provider call graph:
+
+```text
+apps/agent/agent/agent.ts
+  -> loadAgentConfigFromEnv
+  -> BUNDJIL_AGENT_MODEL_PROVIDER
+  -> gateway model string or @ai-sdk/openai-compatible LanguageModel
+  -> apps/codex-proxy /v1/chat/completions when codex-proxy is selected
+```
+
+Test call graph:
+
+```text
+bun run --filter @bundjil/agent test
+  -> apps/agent/test/model-provider.test.ts
+  -> Effect Config provider selection
+  -> injected fetch proof for proxy bearer auth and no token body leak
+
+bun run --filter @bundjil/agent test
+  -> apps/agent/test/workspace-status-tool.test.ts
+  -> workspace_status.execute(...)
+  -> @bundjil/eve-effect BundjilAgentOperationsLive
+```
+
 The Task 4 local HTTP proof had none of `AI_GATEWAY_API_KEY`,
 `VERCEL_OIDC_TOKEN`, `VERCEL_ORG_ID`, or `VERCEL_PROJECT_ID` present.
 `/eve/v1/info` worked and `/eve/v1/session` returned HTTP 202, but streaming
@@ -136,6 +187,25 @@ With those two local processes running, `GET /eve/v1/info` reports model id
 mock model response through the private proxy. The proof output should include
 event type, model id, and status only; do not print bearer tokens, OAuth
 tokens, prompts beyond the probe prompt, or full upstream payloads.
+
+Schema JSON boundaries:
+
+- Provider request bodies and proof helpers must use
+  `Schema.fromJsonString(...)`.
+- Unknown diagnostic values must use `Schema.UnknownFromJsonString`.
+- Do not add manual JSON string assembly in app code.
+
+Rollback to Gateway:
+
+```bash
+unset BUNDJIL_AGENT_MODEL_PROVIDER
+unset BUNDJIL_CODEX_PROXY_BASE_URL
+unset BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN
+bun run --filter @bundjil/agent dev:no-ui
+```
+
+Hosted rollback is handled in `apps/codex-proxy`; the app-level rollback is to
+remove the `codex-proxy` env vars so Eve uses Gateway again.
 
 ## Runtime Artifacts
 

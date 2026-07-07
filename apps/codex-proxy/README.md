@@ -4,7 +4,36 @@ Private Effect HTTP proxy for Bundjil Codex subscription model access.
 
 This app exposes the first deployable HTTP boundary for the Codex provider
 work. It is private by bearer token, starts in mock mode, and does not call the
-live Codex backend yet. Eve is not wired to this app in the current slice.
+live Codex backend yet. Eve can opt into this app through
+`BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`, while Gateway remains the default
+model path.
+
+## Current State
+
+Implemented:
+
+- Local Effect HTTP handler for `GET /health` and
+  `POST /v1/chat/completions`.
+- Mock OpenAI-compatible SSE for local tests, local smoke tests, and Vercel
+  preview proof.
+- Vercel preview deployment for project `bundjil-codex-proxy` under Cooper's
+  personal Vercel account, not Tilt Legal.
+- Eve app opt-in model-provider wiring through an AI SDK OpenAI-compatible
+  `LanguageModel`.
+
+Future:
+
+- Hosted live Codex calls.
+- Live OAuth endpoint exchange and token refresh.
+- Hosted token-profile storage after `@bundjil/codex-oauth` adds
+  application-side envelope encryption.
+
+Unsupported:
+
+- Public gateway use.
+- `OPENAI_API_KEY` or `CODEX_API_KEY` fallback for subscription mode.
+- Treating Codex OAuth as a Vercel AI Gateway credential.
+- Deploying this project to Tilt Legal.
 
 ## Routes
 
@@ -40,6 +69,14 @@ Config is parsed in `src/env.ts` with Effect `Config`, `Config.schema`,
 - `PORT`: optional local dev port, defaults to `8787`.
 
 Do not commit `.env` files or token values.
+
+## Schema JSON Boundaries
+
+Route request bodies, route responses, smoke-test payloads, SSE chunks, and
+proof/leak-check output must stay tied to Effect Schema contracts. Use
+`Schema.fromJsonString(...)` for request/response string boundaries and
+`Schema.UnknownFromJsonString` for unknown diagnostic values. Do not add manual
+JSON string assembly in route or script code.
 
 ## Commands
 
@@ -80,7 +117,41 @@ curl -N \
   -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
 ```
 
+Sanitized local proof shape:
+
+```text
+healthStatus: 200
+healthMode: mock
+unauthenticatedStatus: 401
+invalidTokenStatus: 401
+streamStatus: 200
+streamContentType: text/event-stream
+streamDataLines: 2 or greater
+streamDone: true
+tokenLeak: false
+rawPayloadLeak: false
+```
+
+Record only statuses, modes, content type, stream-line counts, model ids, and
+leak booleans. Do not record bearer tokens, OAuth tokens, refresh tokens,
+authorization codes, raw OAuth payloads, prompts, or full model responses.
+
 ## Call Graph
+
+Production target path:
+
+```text
+Eve codex-proxy mode
+  -> @ai-sdk/openai-compatible LanguageModel
+  -> apps/codex-proxy /v1/chat/completions
+  -> OpenAICompatibleProxy.handleChatCompletions(input)
+  -> CodexDirectProvider.streamChatCompletion(input.completion)
+  -> CodexOAuthService.getValidToken(subject)
+  -> CodexHttpClient.postResponsesStream(input)
+  -> chatgpt.com/backend-api/codex/responses
+```
+
+Current local and preview path:
 
 ```text
 Request
@@ -93,18 +164,24 @@ Request
   -> OpenAI-compatible SSE Response
 ```
 
-The package-owned live path remains:
+Test path:
 
 ```text
-OpenAICompatibleProxy
-  -> CodexDirectProvider
-  -> CodexOAuthService / CodexProfileStore
-  -> CodexHttpClient
-  -> chatgpt.com/backend-api/codex/responses
+bun run --filter @bundjil/codex-proxy test
+  -> direct Request/Response tests
+  -> GET /health
+  -> unauthenticated POST returns 401
+  -> invalid-token POST returns 401
+  -> authenticated mock POST streams SSE
+
+bun run --filter @bundjil/codex-proxy smoke-test
+  -> ephemeral local Bun server
+  -> /health
+  -> authenticated mock OpenAI-compatible SSE
 ```
 
-That live path is not used by this app until the hosted storage and deployment
-tasks are completed.
+The production target path is not used by this app until hosted storage,
+refresh, and live-mode verification are completed.
 
 ## Vercel Deployment
 
@@ -117,6 +194,33 @@ The app deploys through `api/index.ts`, which routes Vercel rewrites back to
 the existing Effect web handler. `apps/codex-proxy/vercel.json` rewrites all
 paths to that function so public paths such as `/health` and
 `/v1/chat/completions` reach the same handler used by local tests.
+
+Use the Vercel CLI from this app directory:
+
+```bash
+cd apps/codex-proxy
+vercel link --project bundjil-codex-proxy
+vercel env pull .env.preview.local --environment=preview
+bun run --filter @bundjil/codex-proxy build
+vercel deploy
+```
+
+The link step must select Cooper's personal Vercel account. If the CLI is
+scoped to Tilt Legal, stop and switch scopes before linking or deploying.
+
+Set preview env vars through the Vercel dashboard or CLI. Do not print values
+in docs or command logs:
+
+```bash
+vercel env add BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN preview
+vercel env add BUNDJIL_CODEX_PROXY_MODE preview
+```
+
+Production deploy is allowed only after preview evidence is recorded:
+
+```bash
+vercel deploy --prod
+```
 
 Preview deployment proof recorded on 2026-07-07:
 
@@ -146,23 +250,66 @@ Preview deployment proof recorded on 2026-07-07:
 
 Required hosted checks before production:
 
-```text
-preview deploy
-  -> GET /health returns 200
-  -> unauthenticated POST /v1/chat/completions returns 401
-  -> invalid token POST /v1/chat/completions returns 401
-  -> authenticated mock POST /v1/chat/completions streams SSE
-  -> logs contain no token values, authorization codes, prompts, or raw bodies
+```bash
+PROXY_URL=<preview-url>
+
+curl -sS "${PROXY_URL}/health"
+
+curl -i -sS \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+
+curl -i -sS \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Authorization: Bearer invalid-token" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+
+curl -N \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+
+vercel logs "${PROXY_URL}" --since 30m
 ```
 
-Production deployment is allowed only after preview evidence is recorded in
-the task ledger.
+Expected result:
+
+```text
+GET /health returns HTTP 200 and mode mock.
+Unauthenticated POST returns HTTP 401.
+Invalid-token POST returns HTTP 401.
+Authenticated mock POST returns HTTP 200 and text/event-stream.
+Stream has data lines and a final [DONE].
+Logs contain no token values, authorization codes, raw OAuth payloads, prompts,
+or full model responses.
+```
 
 ## Rollback
 
-Until Eve is wired to the proxy, rollback is simply to leave
-`apps/agent` on its existing AI Gateway model config and avoid deploying this
-app. After deployment, roll back by promoting the previous Vercel deployment or
-removing the future Eve proxy provider env vars. Do not rotate or print the
-internal token in rollback notes; rotate it through Vercel env management if a
-secret exposure is suspected.
+Gateway is still the default model path. App-level rollback is to remove the
+agent proxy env vars so Eve returns to Gateway:
+
+```bash
+unset BUNDJIL_AGENT_MODEL_PROVIDER
+unset BUNDJIL_CODEX_PROXY_BASE_URL
+unset BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN
+```
+
+Production deployment rollback:
+
+```bash
+vercel rollback <deployment-id-or-url>
+vercel rollback status
+```
+
+Preview deployment cleanup, when a bad preview should no longer be reachable:
+
+```bash
+vercel remove <preview-deployment-url>
+```
+
+Do not rotate or print the internal token in rollback notes. Rotate it through
+Vercel env management if a secret exposure is suspected.

@@ -16,10 +16,11 @@ README.
   ownership, import/export rules, local references, and SPEC requirements.
 - [Testing And Quality](./architecture/testing-and-quality.md) defines
   verification scope, standard commands, Eve runtime checks, and documentation
-  quality rules.
+  quality rules, including the mandatory 3-pass Effect TS implementation
+  audit.
 - [Eve agent architecture](./architecture/eve-agent.md) documents the committed
   Eve app, Effect boundary, local HTTP endpoints, AI Gateway setup, and
-  verification commands.
+  Codex proxy model-provider setup.
 - [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
   describes the first planned Eve agent implementation and Effect wrapper
   boundary.
@@ -40,10 +41,28 @@ README.
   and verification commands for the Eve app operation boundary.
 - [`@bundjil/codex-oauth`](../packages/codex-oauth/README.md) documents the
   Codex OAuth profile store, direct Codex Responses proof service, service
-  tags, KeyValueStore layers, and safe secret-handling rules.
+  tags, KeyValueStore layers, Upstash Redis adapter, and safe
+  secret-handling rules.
 - [`@bundjil/codex-proxy`](../apps/codex-proxy/README.md) documents the
   private Effect HTTP proxy app, local mock SSE route, env vars, smoke tests,
   Vercel preview verification, and rollback rules.
+
+## Codex Provider Documentation Map
+
+- Current behavior: Gateway is the default Eve model path; Codex proxy mode is
+  opt-in and calls the private proxy through an AI SDK OpenAI-compatible
+  `LanguageModel`.
+- Hosted proof: `apps/codex-proxy` has preview proof in the
+  `bundjil-codex-proxy` Vercel project under Cooper's personal Vercel account,
+  not Tilt Legal.
+- Storage: `@bundjil/codex-oauth/upstash-key-value-store.layer` provides an
+  opt-in Upstash Redis adapter behind Effect `KeyValueStore`; hosted refresh
+  token storage waits for envelope encryption.
+- JSON boundaries: app and package code should use Effect Schema codecs such
+  as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
+- Unsupported paths: do not treat Codex OAuth as an OpenAI Platform API key,
+  do not route it through Vercel AI Gateway credentials, and do not expose the
+  proxy publicly.
 
 ## Planned Docs
 

@@ -13,9 +13,8 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`document-codex-oauth-provider` is next in the ledger. Do not begin it without
-a new implementation pass because it changes durable user-facing setup,
-security, deployment, and verification documentation.
+`document-codex-oauth-provider` is complete in the ledger. The next task is
+`final-verification`, but do not begin it without a new implementation pass.
 
 ## Accepted Tasks
 
@@ -368,9 +367,8 @@ Evidence:
   when codex-proxy mode is selected.
 - The Eve app still does not import Codex OAuth profile storage, token refresh,
   hosted storage, or direct Codex HTTP clients.
-- Raw native JSON serialization was removed from app/package source in favor
-  of Effect Schema JSON encoders for request bodies, SSE chunks, smoke output,
-  proof output, and leak checks.
+- Manual JSON boundary handling was replaced with Effect Schema JSON encoders
+  for request bodies, SSE chunks, smoke output, proof output, and leak checks.
 
 Runtime proof:
 
@@ -401,7 +399,7 @@ Parent audit:
    `fromJsonString` and `UnknownFromJsonString`.
 3. Verification coverage: targeted app/package checks passed, local Gateway
    and local Codex proxy Eve runtime proofs passed, and scans found no raw
-   native JSON calls, unsafe casts, local DTO mirrors, direct package env
+   manual JSON boundary calls, unsafe casts, local DTO mirrors, direct package env
    reads, or API-key fallback.
 
 Verification:
@@ -417,7 +415,7 @@ Verification:
 - `bun run --filter @bundjil/codex-proxy smoke-test`: passed with
   `{"healthStatus":200,"streamStatus":200,"streamLines":5}`.
 - Local Gateway and local Codex proxy Eve HTTP proofs passed.
-- Repo scan for raw native JSON calls: passed.
+- Repo scan for manual JSON boundary calls: passed.
 - `bun run verification`: passed.
 - `bun run build`: passed.
 
@@ -455,7 +453,7 @@ Evidence:
 - The live layer constructs `new Redis(...)` from decoded config rather than
   using `Redis.fromEnv()` or direct package `process.env` reads.
 - `automaticDeserialization: false` keeps Effect Schema as the JSON boundary.
-  No native JSON serialization calls were introduced.
+  No manual JSON boundary calls were introduced.
 - `clear` and `size` scan only the configured Bundjil key prefix instead of
   operating on the whole Redis database.
 - Hosted token-profile storage remains blocked until a future
@@ -473,7 +471,7 @@ Parent audit:
    `ConfigProvider.fromEnv`, `Config.schema`, `Config.redacted`, `Schema.URL`,
    `Schema.RedactedFromValue`, branded key-prefix schemas, flat `Effect.gen`,
    named `Effect.fn`, `Layer.effect`, safe tagged config errors, and
-   `KeyValueStoreError` mapping. Parent scans found no raw native JSON calls,
+   `KeyValueStoreError` mapping. Parent scans found no manual JSON boundary calls,
    `Redis.fromEnv`, direct package `process.env`, `@vercel/kv`, unsafe casts,
    DTO mirrors, manual object readers, `flushdb` / `dbsize`, or API-key
    fallback.
@@ -493,9 +491,77 @@ Verification:
 - `bun run check-types`: passed.
 - `bun run verification`: passed.
 - `bun run build`: passed.
-- Raw JSON / unsafe-boundary scan: passed; only deliberate docs prohibitions
+- Schema JSON / unsafe-boundary scan: passed; only deliberate docs prohibitions
   for `Redis.fromEnv()` and direct `process.env` remained.
 - `git diff --check`: passed.
+
+### document-codex-oauth-provider
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `README.md`
+- `ARCHITECTURE.md`
+- `docs/README.md`
+- `docs/architecture/effect-patterns.md`
+- `docs/architecture/eve-agent.md`
+- `docs/architecture/repo-structure.md`
+- `docs/architecture/testing-and-quality.md`
+- `apps/agent/README.md`
+- `apps/codex-proxy/README.md`
+- `packages/codex-oauth/README.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+
+Evidence:
+
+- Updated durable docs with the current Codex provider boundary:
+  `apps/agent` owns Gateway/default and opt-in private-proxy model selection,
+  `apps/codex-proxy` owns the private Effect HTTP/Vercel boundary, and
+  `@bundjil/codex-oauth` owns reusable OAuth/profile/provider/storage
+  contracts.
+- Distinguished implemented behavior from opt-in proof, Vercel preview mock
+  proof, future hosted live Codex/storage work, and unsupported paths.
+- Added production and test call graphs for Eve provider selection, proxy
+  routing, package provider/storage paths, Vercel preview proof, and app /
+  package tests.
+- Added exact local commands, Vercel preview-before-production commands,
+  direct HTTP checks, sanitized proof shapes, rollback instructions, and the
+  rule that `bundjil-codex-proxy` belongs in Cooper's personal Vercel account,
+  not Tilt Legal.
+- Documented Effect Schema JSON boundaries with `Schema.fromJsonString(...)`
+  and `Schema.UnknownFromJsonString`.
+- Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit
+  without committing or pushing. Parent removed residual direct runtime JSON
+  API audit wording, reran verification, and accepted the slice for commit.
+- No code, package, runtime, deployment, or env files were changed.
+
+Parent audit:
+
+1. Ownership and call graph: docs now align on app/package ownership, current
+   mock/proof behavior, future live behavior, and unsupported paths. The
+   production and test graphs match the accepted implementation slices.
+2. Effect implementation quality: docs reinforce flat Effect `gen`, Effect
+   Schema contracts, typed errors, `Config.redacted`, explicit layers,
+   subpath-owned provider/storage adapters, and the mandatory 3-pass Effect TS
+   audit. No implementation code changed.
+3. Verification coverage: `bun run check` passed, `bun run verification`
+   passed, and scans found no direct runtime JSON API names, stale manual
+   serialization wording, obsolete proxy script guidance, or committed token
+   values.
+
+Verification:
+
+- `bun run check`: passed.
+- `bun run verification`: passed across Ultracite, knip, typechecks for
+  6 packages, and tests for 6 packages.
+- Docs scan for stale manual serialization wording and direct runtime JSON API
+  names:
+  passed.
+- Docs scan for updated Vercel deployment, rollback, and Schema JSON boundary
+  references: passed.
 
 ## Original Task Scope
 
@@ -538,6 +604,9 @@ Out of scope:
   `019f3e29-854a-7a92-9ae0-e503fd287885` timed out and was closed without a
   final response. Parent reviewed, refined, verified, and accepted the
   worktree changes with the required three-pass audit.
+- 2026-07-07: `document-codex-oauth-provider` was implemented as a
+  documentation-only slice in the current thread. Commit and push were
+  explicitly skipped by user instruction.
 
 ## Verification Log
 
@@ -566,4 +635,9 @@ Out of scope:
   package docs, spec/ledger updates, and the mandatory three-pass Effect
   audit. `bun install --frozen-lockfile`, targeted package checks, repo
   `check`, `knip`, `check-types`, `verification`, `build`, diff check, and
-  raw JSON/secret-boundary scans passed.
+  Schema JSON/secret-boundary scans passed.
+- 2026-07-07: `document-codex-oauth-provider` accepted after durable docs were
+  updated across root, architecture, app, package, spec, task ledger, and
+  active plan docs. `bun run check` and `bun run verification` passed; stale
+  manual serialization wording, direct runtime JSON API names, obsolete proxy
+  script guidance, and secret/token-value scans were clean.

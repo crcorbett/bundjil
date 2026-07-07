@@ -43,13 +43,15 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
 - `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
-  lifecycle service contracts plus the direct Codex Responses proof surface.
-  The live proof is opt-in and sanitized; live OAuth endpoint exchange and
-  hosted token storage do not ship yet.
+  lifecycle service contracts, the direct Codex Responses proof surface, the
+  private OpenAI-compatible provider contract, and the opt-in Upstash Redis
+  `KeyValueStore` adapter. The live proof is opt-in and sanitized; live OAuth
+  endpoint exchange and encrypted hosted token storage do not ship yet.
 - `@bundjil/codex-proxy` is the private Effect HTTP proxy app. It exposes
   `GET /health` and a bearer-token-protected
   `POST /v1/chat/completions` mock SSE route for local and Vercel preview
-  proof.
+  proof. The Vercel project is `bundjil-codex-proxy` in Cooper's personal
+  Vercel account, not Tilt Legal.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, the `workspace_status` tool that delegates into
   `@bundjil/eve-effect`, and app-owned model-provider config. Gateway is the
@@ -57,6 +59,36 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
 
 `apps/agent` owns Eve filesystem runtime shape and deployment concerns.
 Reusable app operations live in packages once the boundary is stable.
+
+## Codex Provider State
+
+Implemented:
+
+- AI Gateway remains the default Eve model provider.
+- `apps/agent` can opt into a private Codex proxy `LanguageModel` with
+  `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`.
+- `apps/codex-proxy` runs locally and on Vercel preview in mock mode with
+  private bearer-token auth.
+- `@bundjil/codex-oauth` owns the direct Codex Responses proof, request/stream
+  mappers, profile/token service contracts, memory layers, and Upstash
+  `KeyValueStore` adapter.
+
+Opt-in proof and future work:
+
+- Direct Codex Responses proof requires a private `CODEX_ACCESS_TOKEN` source
+  for one process and prints only sanitized metadata.
+- Hosted live Codex proxy mode is still pending.
+- Hosted token-profile storage is blocked until Bundjil adds application-side
+  envelope encryption for refresh-token payloads.
+
+Unsupported paths:
+
+- Do not treat Codex OAuth tokens as OpenAI Platform API keys or Vercel AI
+  Gateway credentials.
+- Do not use `OPENAI_API_KEY`, `CODEX_API_KEY`, or `@vercel/kv` for the
+  subscription-backed provider path.
+- Do not expose `apps/codex-proxy` as a public gateway.
+- Do not deploy `bundjil-codex-proxy` to Tilt Legal.
 
 ## Getting Started
 
@@ -84,7 +116,9 @@ bun run --filter @bundjil/agent dev:no-ui
 For the private Codex proxy app:
 
 ```bash
+bun run --filter @bundjil/codex-proxy check-types
 bun run --filter @bundjil/codex-proxy test
+bun run --filter @bundjil/codex-proxy build
 bun run --filter @bundjil/codex-proxy smoke-test
 ```
 
@@ -111,6 +145,18 @@ BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
 BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
 bun run --filter @bundjil/agent dev:no-ui
 ```
+
+Direct local HTTP checks:
+
+```bash
+curl -sS http://127.0.0.1:8788/health
+curl -sS http://127.0.0.1:2101/eve/v1/info
+```
+
+The local proof shape should contain status fields, model ids, event names,
+line counts, and leak booleans only. Do not print bearer tokens, OAuth tokens,
+refresh tokens, authorization codes, raw upstream responses, or full private
+prompts.
 
 ## Layout
 
@@ -144,6 +190,11 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 - Before adding a new app, channel, provider integration, or durable package
   boundary, draft a SPEC through `$prd-writer` and implement through
   `$prd-implementer`.
+- Every implementation task that touches Effect runtime, provider, app, or
+  storage behavior must record the mandatory 3-pass Effect TS audit:
+  ownership/call graph, implementation quality, and verification coverage.
+- JSON string boundaries in app/package code must use Effect Schema codecs such
+  as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
 
 ## Roadmap
 

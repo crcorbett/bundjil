@@ -99,6 +99,17 @@ Codex proxy model path:
 - `apps/agent` owns only provider selection. It does not import Codex OAuth
   profile services, token refresh services, or direct Codex Responses clients.
 
+Current Codex provider state:
+
+- Implemented: Gateway default, opt-in Codex proxy `LanguageModel`, local
+  proxy proof, Vercel preview mock proof, direct Codex Responses package
+  proof, and Upstash `KeyValueStore` adapter.
+- Future: hosted live Codex proxy mode, live OAuth endpoint exchange, and
+  hosted token-profile storage with application-side envelope encryption.
+- Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
+  Codex OAuth through Vercel AI Gateway credentials, deploying
+  `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.
+
 ## Schema Boundary
 
 Eve tools accept Standard Schema or JSON Schema. Bundjil keeps Effect Schema as
@@ -151,8 +162,9 @@ Eve HTTP/API
   -> chatgpt.com/backend-api/codex/responses
 ```
 
-In current committed tests and local proof, the proxy runs in mock mode and
-does not call the live Codex backend.
+In current committed tests, local proof, and Vercel preview proof, the proxy
+runs in mock mode and does not call the live Codex backend. The live path is
+documented as the target production call graph but remains gated.
 
 The `workspace_status` tool runtime path is:
 
@@ -206,6 +218,17 @@ bun run --filter @bundjil/eve-effect test
   -> BundjilAgentOperationsMemory
   -> packages/eve-effect/test/tool-adapter.test.ts
   -> toEveSchema(WorkspaceStatusInput / WorkspaceStatusSuccess)
+
+bun run --filter @bundjil/codex-oauth test
+  -> profile store, token service, request/stream mappers
+  -> mocked Codex fetch/direct provider layers
+  -> mocked Upstash-like client through Effect KeyValueStore
+
+bun run --filter @bundjil/codex-proxy test
+  -> direct Request/Response handler tests
+  -> /health
+  -> unauthorized and invalid-token rejection
+  -> authenticated mock SSE
 ```
 
 These tests prove the operation path without starting Eve or calling a model.
@@ -391,7 +414,52 @@ Rules:
   direct Codex HTTP clients. Those remain package/proxy concerns.
 - Provider request bodies, proof output, tests, smoke scripts, and leak checks
   must use Effect Schema JSON encoders such as
-  `Schema.fromJsonString(...)`, rather than raw native JSON serialization.
+  `Schema.fromJsonString(...)`.
+- Unknown diagnostic values that need safe rendering must use
+  `Schema.UnknownFromJsonString`.
+
+## Hosted Proxy Verification
+
+The deployed proxy belongs to the `bundjil-codex-proxy` project in Cooper's
+personal Vercel account, not Tilt Legal. Preview must pass before production.
+
+Preview deployment command shape:
+
+```bash
+cd apps/codex-proxy
+vercel link --project bundjil-codex-proxy
+vercel env pull .env.preview.local --environment=preview
+bun run --filter @bundjil/codex-proxy build
+vercel deploy
+```
+
+Direct preview checks:
+
+```bash
+PROXY_URL=<preview-url>
+curl -sS "${PROXY_URL}/health"
+curl -i -sS -X POST "${PROXY_URL}/v1/chat/completions" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+curl -i -sS -X POST "${PROXY_URL}/v1/chat/completions" -H "Authorization: Bearer invalid-token" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+curl -N -X POST "${PROXY_URL}/v1/chat/completions" -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+```
+
+Record only sanitized proof fields: HTTP statuses, `mode`, model id, content
+type, SSE data-line count, `[DONE]` presence, and leak booleans. Do not record
+bearer tokens, OAuth tokens, refresh tokens, authorization codes, raw OAuth
+payloads, prompts, or full model responses.
+
+Rollback is either Vercel rollback for a production deployment or agent config
+rollback to Gateway:
+
+```bash
+vercel rollback <deployment-id-or-url>
+vercel rollback status
+```
+
+Remove `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`,
+`BUNDJIL_CODEX_PROXY_BASE_URL`, and
+`BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` from agent env to return Eve to the
+Gateway model path.
 
 Before starting new integrations such as Sendblue, Cloudflare email, Vercel
 Connect, Notion, or a deployed app boundary, draft a compact SPEC with

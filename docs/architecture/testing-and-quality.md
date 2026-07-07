@@ -56,6 +56,26 @@ bun run --filter @bundjil/agent build
 - Codex proxy app change: run `@bundjil/codex-proxy` check-types, tests,
   build, and smoke-test. Hosted deployment proof belongs in the deployment task
   and must verify preview before production.
+- Codex documentation task: update root, architecture, app, package, SPEC, and
+  task-ledger docs as needed, then run `bun run check` and
+  `bun run verification`.
+
+## Mandatory Effect Audit
+
+SPEC implementation tasks that touch Effect runtime, provider, storage, app
+config, deployment, or durable docs must record the 3-pass Effect TS audit:
+
+1. Ownership and call graph: right app/package owner, stable imports/exports,
+   production call graph, test call graph, and unsupported paths.
+2. Implementation quality: flat primary `Effect.gen` programs, Effect Schema
+   contracts, schema-derived types, tagged errors, `Config.redacted` for
+   secrets, explicit layers, and no unsafe casts, DTO mirrors, manual object
+   readers, or helper sprawl.
+3. Verification coverage: targeted commands, root commands, local/proxy/live
+   proof, preview-before-production evidence, leak scans, and docs updates.
+
+Do not mark a task accepted just because three entries exist. If an audit pass
+finds a gap, fix it and record another pass.
 
 ## Effect Test Patterns
 
@@ -187,6 +207,102 @@ curl -N \
 Hosted checks must run against a Vercel preview deployment before production
 and must inspect logs for absence of token values, authorization codes, raw
 OAuth payloads, prompts, and full response bodies.
+
+The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
+account. It must not be linked to Tilt Legal.
+
+Preview deployment command shape:
+
+```bash
+cd apps/codex-proxy
+vercel link --project bundjil-codex-proxy
+vercel env pull .env.preview.local --environment=preview
+bun run --filter @bundjil/codex-proxy build
+vercel deploy
+```
+
+The linked Vercel project settings should remain:
+
+```text
+project: bundjil-codex-proxy
+scope: Cooper Corbett's projects
+root directory: apps/codex-proxy
+framework: Other
+node version: 24.x
+build command: bun run --filter @bundjil/codex-proxy build
+output directory: .
+```
+
+Preview direct HTTP checks:
+
+```bash
+PROXY_URL=<preview-url>
+
+curl -sS "${PROXY_URL}/health"
+
+curl -i -sS \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+
+curl -i -sS \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Authorization: Bearer invalid-token" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+
+curl -N \
+  -X POST "${PROXY_URL}/v1/chat/completions" \
+  -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+```
+
+Sanitized proof shape:
+
+```text
+healthStatus: 200
+healthMode: mock
+unauthenticatedStatus: 401
+invalidTokenStatus: 401
+streamStatus: 200
+streamContentType: text/event-stream
+streamDataLines: 2 or greater
+streamDone: true
+tokenLeak: false
+authorizationCodeLeak: false
+rawPayloadLeak: false
+```
+
+Inspect hosted logs after preview checks:
+
+```bash
+vercel logs "${PROXY_URL}" --since 30m
+```
+
+Only status lines, route names, deployment ids, HTTP status codes, and sanitized
+proof counters belong in docs. Do not record bearer values, OAuth token
+values, refresh token values, authorization codes, raw OAuth payloads, full
+prompts, or full model responses.
+
+Production deployment is allowed only after preview proof is recorded:
+
+```bash
+vercel deploy --prod
+```
+
+Rollback:
+
+```bash
+vercel rollback <deployment-id-or-url>
+vercel rollback status
+```
+
+Application rollback is also valid: remove
+`BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy` and related
+`BUNDJIL_CODEX_PROXY_*` env vars from the agent so Eve returns to Gateway.
+Rotate the proxy token through Vercel env management if a secret exposure is
+suspected; never print the old value in rollback notes.
 
 ## Documentation Quality
 

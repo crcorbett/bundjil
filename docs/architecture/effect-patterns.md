@@ -94,11 +94,11 @@ Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
 This provides both Standard Schema validation and Standard JSON Schema metadata
 for Eve `defineTool` boundaries.
 
-## JSON Serialization
+## Schema JSON Boundaries
 
-Do not use raw native JSON serialization or ad hoc string assembly in committed
-app or package code. Boundary JSON must go through Effect Schema so encoded
-values stay tied to the canonical contract:
+Do not use ad hoc JSON string assembly in committed app or package code.
+Boundary JSON must go through Effect Schema so encoded values stay tied to the
+canonical contract:
 
 ```ts
 const encodeRequest = Schema.encodeSync(Schema.fromJsonString(RequestSchema));
@@ -124,7 +124,28 @@ const encodeUnknownJson = Schema.encodeUnknownSync(
 Tests, smoke scripts, provider request bodies, SSE chunks, proof output, and
 leak checks all follow this rule. If a framework hands you an already encoded
 request body string, validate it with the owning schema at the receiving edge
-instead of parsing it manually in domain code.
+instead of manually decoding it in domain code.
+
+## Implementation Audit
+
+Every implementation task that touches Effect runtime, provider, storage, app
+config, or deployment behavior must finish with the mandatory 3-pass Effect TS
+audit before acceptance:
+
+1. Ownership and call graph: confirm the right app or package owns the
+   behavior, imports point inward through stable exports, and production/test
+   call graphs match the SPEC.
+2. Implementation quality: inspect the diff for flat primary `Effect.gen`
+   programs, schema-derived types, tagged errors, `Config.redacted` for
+   secrets, explicit layers, no unsafe casts, no DTO mirrors, no manual object
+   readers, and no helper sprawl.
+3. Verification coverage: record targeted checks, root verification, proof
+   commands, log/leak scans, docs updates, and any deliberately skipped live
+   proof with the reason.
+
+The audit evidence belongs in the task ledger and active execution plan for
+SPEC-driven work. If a pass finds an unresolved gap, do another pass after the
+fix rather than treating the count as sufficient.
 
 ## Errors
 

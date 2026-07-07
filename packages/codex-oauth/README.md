@@ -8,6 +8,36 @@ perform live OAuth endpoint exchange, own Vercel deployment, or change the Eve
 app model. The deployable private proxy app now lives in `apps/codex-proxy`
 and composes this package's service contracts.
 
+## Current State
+
+Implemented:
+
+- Effect Schema contracts for Codex subjects, profiles, token values,
+  OpenAI-compatible chat-completion requests, Codex Responses requests, and
+  sanitized proof results.
+- `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`,
+  `CodexResponsesFetch`, `CodexHttpClient`, `CodexResponsesProof`,
+  `CodexDirectProvider`, and `OpenAICompatibleProxy` service contracts.
+- Memory/mock layers for automated tests.
+- Opt-in direct Codex Responses proof with sanitized output.
+- Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
+  `KeyValueStore`.
+
+Future:
+
+- Live OAuth endpoint exchange and refresh.
+- Hosted live Codex proxy mode.
+- Hosted token-profile storage after application-side envelope encryption is
+  implemented for refresh-token payloads.
+
+Unsupported:
+
+- Treating Codex OAuth tokens as OpenAI Platform API keys or Vercel AI Gateway
+  credentials.
+- Reading `OPENAI_API_KEY` or `CODEX_API_KEY` for subscription-provider mode.
+- Importing Eve, Vercel deployment code, OpenClaw code, or Goose code.
+- Storing raw refresh tokens in hosted KV.
+
 ## Contracts
 
 - `CodexOAuthSubject` identifies one Codex profile by provider, principal,
@@ -37,6 +67,14 @@ and composes this package's service contracts.
 Token schemas use Effect `Schema.RedactedFromValue`. Decoded values print and
 serialize as redacted placeholders, while the KeyValueStore JSON codec can
 persist the token value inside the approved storage boundary.
+
+## Schema JSON Boundaries
+
+Provider request bodies, provider stream chunks, proof output, smoke-test
+payloads, and leak checks must stay tied to Effect Schema contracts. Use
+`Schema.fromJsonString(...)` for JSON string boundaries and
+`Schema.UnknownFromJsonString` for safe rendering of unknown diagnostic values.
+Do not add manual JSON string assembly in package code.
 
 ## Storage Keys
 
@@ -105,8 +143,9 @@ credentials.
 Provisioning flow:
 
 ```bash
-vercel link
-vercel env pull apps/codex-proxy/.env.local
+cd apps/codex-proxy
+vercel link --project bundjil-codex-proxy
+vercel env pull .env.preview.local --environment=preview
 ```
 
 Link an Upstash Redis Marketplace resource to the Vercel project, then pull
@@ -132,6 +171,14 @@ at-rest encryption are not enough for raw refresh tokens because Vercel /
 Upstash operators and project env readers must not be able to inspect stored
 refresh-token values. Until that encryption layer exists, use the Upstash
 adapter only as a storage primitive or for non-token test data.
+
+Rollback for storage experiments:
+
+- Remove the `UpstashKeyValueStoreLive` layer from the app composition.
+- Return tests and local proof to `CodexOAuthMemory` or
+  `KeyValueStore.layerMemory`.
+- Leave Vercel/Upstash credentials in ignored env files or rotate them through
+  provider dashboards; do not print values in rollback notes.
 
 ## Safe Secret Handling
 
@@ -190,6 +237,41 @@ the reusable direct-provider contract.
 Subscription mode does not read `OPENAI_API_KEY` or `CODEX_API_KEY`. BYOK or
 AI Gateway fallback is future work and needs a separate spec update.
 
+## Production And Test Call Graphs
+
+Production target graph:
+
+```text
+OpenAICompatibleProxy.handleChatCompletions(input)
+  -> internal bearer-token check
+  -> CodexDirectProvider.streamChatCompletion(input.completion)
+  -> CodexOAuthService.getValidToken(subject)
+  -> CodexRequestMapper.toCodexResponses(request)
+  -> CodexHttpClient.postResponsesStream(input)
+  -> CodexStreamMapper.toOpenAICompatibleStream(stream)
+```
+
+Hosted storage target graph after encryption work:
+
+```text
+CodexOAuthService
+  -> CodexProfileStore
+  -> CodexProfileStoreKeyValueLive
+  -> encrypted profile codec
+  -> UpstashKeyValueStoreLive
+  -> Vercel Marketplace Upstash Redis
+```
+
+Current tests:
+
+```text
+bun run --filter @bundjil/codex-oauth test
+  -> schemas and storage-key tests
+  -> KeyValueStore memory profile-store tests
+  -> mocked fetch/direct provider tests
+  -> mocked Upstash-like client tests
+```
+
 ## Verification
 
 Run from the repo root:
@@ -201,3 +283,20 @@ bun run --filter @bundjil/codex-oauth check-types
 bun run --filter @bundjil/codex-oauth proof:codex-responses
 bun run check-types
 ```
+
+The direct proof command is opt-in and must report only this kind of sanitized
+shape:
+
+```text
+status: ok
+endpoint: https://chatgpt.com/backend-api/codex/responses
+httpStatus: 200
+contentType: text/event-stream or application/json
+responseBytes: positive integer
+streamLineCount: positive integer
+usedAccountHeader: true or false
+tokenLeak: false
+rawPayloadLeak: false
+```
+
+Do not run the proof in CI and do not commit proof env files.

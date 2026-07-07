@@ -12,7 +12,7 @@ apps/
 
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
-  codex-oauth/        Codex OAuth profiles and direct Responses proof.
+  codex-oauth/        Codex OAuth profiles, direct Responses proof, and KV adapters.
   effect-start/       Reusable TanStack Start middleware adapters for Effect.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
@@ -77,6 +77,8 @@ apps/codex-proxy/
 The proxy app may import `@bundjil/codex-oauth` service tags, schemas, and
 layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
+The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
+Vercel account. Do not link or deploy this app to Tilt Legal.
 
 Future Sendblue, Cloudflare email, Vercel Connect, and Notion code should start
 in app-owned boundaries until stable. Move shared contracts into packages only
@@ -120,11 +122,18 @@ after the shape has survived at least one real tool/channel implementation.
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;
+- owns explicit storage adapter subpaths such as
+  `@bundjil/codex-oauth/upstash-key-value-store.layer` when they provide
+  reusable Effect `KeyValueStore` implementations;
 - may depend on Effect and Effect v4 `KeyValueStore` primitives;
+- may depend on provider SDKs such as `@upstash/redis` only behind explicit
+  adapter subpaths and Effect Config/Layer boundaries;
 - must not import Eve, app files, Vercel deployment code, Sendblue,
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider
-  behavior is involved.
+  behavior is involved;
+- must not compose hosted token-profile storage by default until an
+  application-side envelope encryption layer exists for refresh tokens.
 
 `apps/codex-proxy`:
 
@@ -135,6 +144,9 @@ after the shape has survived at least one real tool/channel implementation.
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
 - must keep hosted live Codex calls disabled until deployment, storage, and
   secret verification tasks pass.
+- must deploy preview before production and record direct HTTP proof for
+  `/health`, unauthorized rejection, invalid-token rejection, and
+  authenticated mock streaming.
 
 `apps/agent` model-provider rules:
 
@@ -156,6 +168,10 @@ Rules:
 - Do not import app files from packages.
 - Do not import generated `dist` files from source or tests.
 - Keep `package.json` exports aligned with the public API callers actually use.
+- Keep provider-heavy or storage-heavy implementations on explicit subpaths so
+  consumers opt into them deliberately.
+- Keep JSON string boundaries on Effect Schema codecs such as
+  `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
 
 Bundjil packages currently expose `@bundjil/source` conditional exports so
 tests and workspace consumers can resolve TypeScript source during development.

@@ -313,7 +313,7 @@
         "Extended apps/agent/agent/config.ts to load provider mode, gateway model, proxy base URL, redacted internal token, optional proxy model, and context-window tokens through Effect Config and ConfigProvider.fromEnv().",
         "Updated apps/agent/agent/agent.ts so Eve receives either the Gateway model string or the Codex proxy LanguageModel and receives modelContextWindowTokens only in codex-proxy mode.",
         "Added apps/agent/test/model-provider.test.ts to prove Gateway is the default and Codex proxy mode sends bearer auth to /v1/chat/completions through injected fetch without placing the token in the request body.",
-        "Replaced raw native JSON serialization in app/package request bodies, SSE chunks, smoke output, proof output, and leak checks with Effect Schema JSON encoders such as Schema.fromJsonString(...) and Schema.UnknownFromJsonString.",
+        "Replaced manual JSON boundary handling in app/package request bodies, SSE chunks, smoke output, proof output, and leak checks with Effect Schema JSON encoders such as Schema.fromJsonString(...) and Schema.UnknownFromJsonString.",
         "Local Gateway proof returned /eve/v1/info with model google/gemini-2.5-flash, Gateway endpoint connected, workspace_status discovered, and diagnosticCount 0.",
         "Local Codex proxy proof ran apps/codex-proxy in mock mode on port 8788 and Eve in codex-proxy mode on port 2101. /eve/v1/info reported bundjil-codex-proxy/codex-default-model and contextWindowTokens 123456.",
         "Local Codex proxy session proof emitted session.started, message.appended, message.completed, step.completed, turn.completed, and session.waiting with the mock proxy response and no token values in output."
@@ -340,7 +340,7 @@
         "completedPasses": 3,
         "evidence": [
           "Pass 1 - ownership/call graph: apps/agent owns provider config, provider selection, Eve modelContextWindowTokens wiring, app-local proxy env schemas, and app-level tests. @bundjil/codex-oauth owns OpenAI-compatible proxy contracts. apps/codex-proxy owns the HTTP proxy runtime. The Eve app does not import @bundjil/codex-oauth, CodexOAuthService, CodexProfileStore, direct Codex HTTP clients, hosted storage, or token refresh.",
-          "Pass 2 - Effect implementation quality: provider config uses Effect Config, ConfigProvider.fromEnv, Config.url, Config.redacted, Effect Schema literals/unions, Schema.RedactedFromValue, Match, Effect.all, flat Effect.gen, Effect.fn, withSpan, and Data.TaggedError mapping. JSON boundary encoding uses Schema.fromJsonString and Schema.UnknownFromJsonString instead of raw native serialization. Parent scans found no unsafe casts, local DTO mirrors, manual object readers, process.env reads in package logic, or API-key fallback.",
+          "Pass 2 - Effect implementation quality: provider config uses Effect Config, ConfigProvider.fromEnv, Config.url, Config.redacted, Effect Schema literals/unions, Schema.RedactedFromValue, Match, Effect.all, flat Effect.gen, Effect.fn, withSpan, and Data.TaggedError mapping. JSON boundary encoding uses Schema.fromJsonString and Schema.UnknownFromJsonString. Parent scans found no unsafe casts, local DTO mirrors, manual object readers, process.env reads in package logic, or API-key fallback.",
           "Pass 3 - verification coverage: bun run --filter @bundjil/agent check-types/test/build passed; bun run --filter @bundjil/codex-oauth check-types/test/build passed; bun run --filter @bundjil/codex-proxy check-types/test/build/smoke-test passed; local Eve Gateway /eve/v1/info proof passed; local Eve Codex proxy /eve/v1/info and session stream proof passed; raw serialization scan across source/docs passed; bun run verification passed; bun run build passed."
         ]
       },
@@ -385,8 +385,8 @@
         "completedPasses": 3,
         "evidence": [
           "Pass 1 - ownership/call graph: @bundjil/codex-oauth owns the reusable Upstash-to-KeyValueStore adapter, schemas, config error, subpath export, and mocked tests. apps/agent and apps/codex-proxy were not changed. The adapter provides only Effect KeyValueStore and is not composed into CodexOAuthLive or token profile storage by default.",
-          "Pass 2 - Effect implementation quality: adapter config uses Effect Config, ConfigProvider.fromEnv, Config.schema, Config.redacted, Schema.URL, Schema.RedactedFromValue, branded key-prefix schemas, flat Effect.gen, named Effect.fn operations, Layer.effect, safe tagged config errors, and KeyValueStoreError mapping. Parent scans found no raw native JSON calls, Redis.fromEnv usage, direct package process.env reads, @vercel/kv dependency, unsafe casts, DTO mirrors, manual object readers, flushdb/dbsize, or API-key fallback.",
-          "Pass 3 - verification coverage: mocked tests cover config loading, Vercel env aliases, missing-config tagged errors, KeyValueStore set/get/remove/clear/size, prefix isolation, profile-store compatibility, and provider failure mapping. bun install --frozen-lockfile, package test/check-types/build, repo check, knip, check-types, verification, build, diff check, and raw JSON/secret-boundary scans passed."
+          "Pass 2 - Effect implementation quality: adapter config uses Effect Config, ConfigProvider.fromEnv, Config.schema, Config.redacted, Schema.URL, Schema.RedactedFromValue, branded key-prefix schemas, flat Effect.gen, named Effect.fn operations, Layer.effect, safe tagged config errors, and KeyValueStoreError mapping. Parent scans found no manual JSON boundary calls, Redis.fromEnv usage, direct package process.env reads, @vercel/kv dependency, unsafe casts, DTO mirrors, manual object readers, flushdb/dbsize, or API-key fallback.",
+          "Pass 3 - verification coverage: mocked tests cover config loading, Vercel env aliases, missing-config tagged errors, KeyValueStore set/get/remove/clear/size, prefix isolation, profile-store compatibility, and provider failure mapping. bun install --frozen-lockfile, package test/check-types/build, repo check, knip, check-types, verification, build, diff check, and Schema JSON/secret-boundary scans passed."
         ]
       },
       "commitAfterPassing": true
@@ -394,12 +394,18 @@
     {
       "id": "document-codex-oauth-provider",
       "title": "Write comprehensive Codex OAuth provider documentation",
-      "status": "pending",
+      "status": "completed",
       "description": "Update root, architecture, app, and package docs with the final provider boundary, setup commands, verification proof, and security constraints.",
       "implementationNotes": [
         "Update README.md, ARCHITECTURE.md, docs/README.md, docs/architecture/eve-agent.md, docs/architecture/effect-patterns.md if generalized, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, apps/codex-proxy/README.md, and packages/codex-oauth/README.md.",
         "Docs must mark future work and unsupported paths clearly.",
-        "Docs must include exact local commands, Vercel deployment commands, direct HTTP checks, rollback instructions, and sanitized proof shape."
+        "Docs must include exact local commands, Vercel deployment commands, direct HTTP checks, rollback instructions, and sanitized proof shape.",
+        "Updated the root README, ARCHITECTURE.md, docs index, architecture guides, app READMEs, package README, spec, task ledger, and active plan with Codex provider boundaries.",
+        "Documentation now distinguishes implemented Gateway/default behavior, opt-in Codex proxy proof, Vercel preview mock proof, future live hosted storage/envelope encryption work, and unsupported Codex-as-API-key / public-gateway paths.",
+        "Added production and test call graphs for the Eve model path, private proxy path, package provider path, Upstash KeyValueStore adapter, Vercel preview path, and app/package tests.",
+        "Added Vercel preview-before-production commands, direct HTTP checks, rollback instructions, sanitized proof shapes, and the requirement that bundjil-codex-proxy stays in Cooper's personal Vercel account rather than Tilt Legal.",
+        "Documented Schema JSON boundaries with Schema.fromJsonString(...) and Schema.UnknownFromJsonString and removed stale references to manual serialization handling.",
+        "Worker `019f3e3f-858c-7a91-a047-63731a433c76` completed the docs edit without committing or pushing. Parent removed residual direct runtime JSON API audit wording, reran verification, and accepted the slice for commit."
       ],
       "mandatoryVerification": [
         "Documentation distinguishes implemented behavior from research, opt-in proof, and future hosted storage work.",
@@ -418,8 +424,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: docs now identify apps/agent as the Gateway/default and opt-in proxy model owner, apps/codex-proxy as the private Vercel HTTP boundary, @bundjil/codex-oauth as the reusable provider/storage contract owner, and Cooper's personal Vercel project as the only accepted proxy deployment scope.",
+          "Pass 2 - implementation quality: documentation was scoped to durable docs only, preserves Effect Schema JSON boundary guidance with Schema.fromJsonString(...) and Schema.UnknownFromJsonString, records the mandatory 3-pass Effect TS audit rule, and does not introduce code, package, or runtime changes.",
+          "Pass 3 - verification coverage: bun run check passed; bun run verification passed across Ultracite, knip, check-types for 6 packages, and tests for 6 packages. Scans found no direct runtime JSON API names, stale manual serialization wording, obsolete proxy script guidance, or secret/token values in docs."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -10,6 +10,35 @@ Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
 deployment boundary. Eve uses AI Gateway by default and can opt into the
 private Codex proxy through app-owned Effect Config.
 
+## Implementation State
+
+Implemented:
+
+- `apps/agent` runs the Eve app, `workspace_status` tool, Gateway default
+  model config, and opt-in Codex proxy model-provider config.
+- `apps/codex-proxy` exposes the private Effect HTTP proxy routes locally and
+  through a Vercel preview deployment in mock mode.
+- `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
+  Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
+  memory layers, and the opt-in Upstash Redis `KeyValueStore` adapter.
+
+Research-gated or future:
+
+- Hosted live Codex proxy mode.
+- Live OAuth endpoint exchange.
+- Hosted token-profile storage with application-side envelope encryption.
+- Sendblue, Cloudflare email, Vercel Connect, Notion, and long-term memory.
+
+Unsupported:
+
+- Codex OAuth tokens are not OpenAI Platform API keys and are not Vercel AI
+  Gateway credentials.
+- `apps/codex-proxy` is not a public gateway.
+- Subscription-provider code must not read `OPENAI_API_KEY` or `CODEX_API_KEY`
+  unless a future SPEC explicitly adds a fallback.
+- `bundjil-codex-proxy` belongs in Cooper's personal Vercel account, not Tilt
+  Legal.
+
 ## Product Shape
 
 ```text
@@ -53,6 +82,7 @@ apps/agent
 @bundjil/codex-oauth
   -> effect
   -> effect/unstable/persistence/KeyValueStore
+  -> @upstash/redis only through explicit KeyValueStore adapter subpath
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
 
 apps/codex-proxy
@@ -81,8 +111,10 @@ contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
 storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
-OpenAI-compatible private proxy contract. It currently does not perform live
-OAuth endpoint exchange or hosted token storage.
+OpenAI-compatible private proxy contract. It also owns the explicit
+`upstash-key-value-store.layer` adapter for Vercel Marketplace Upstash Redis.
+It currently does not perform live OAuth endpoint exchange or encrypted hosted
+token-profile storage.
 
 `apps/codex-proxy` owns the deployable HTTP boundary for the private provider
 proof. It parses app-owned config with Effect Config, exposes `GET /health`,
@@ -178,6 +210,26 @@ Vitest
   -> Effect Config provider selection
   -> Gateway string or private proxy LanguageModel
   -> injected fetch proof for bearer auth and no token body leak
+
+Vitest
+  -> packages/codex-oauth/test/upstash-key-value-store.test.ts
+  -> mocked Upstash-like client
+  -> @bundjil/codex-oauth/upstash-key-value-store.layer
+  -> effect/unstable/persistence/KeyValueStore
+  -> CodexProfileStoreKeyValueLive compatibility
+```
+
+Hosted preview proof path:
+
+```text
+Vercel preview request
+  -> bundjil-codex-proxy in Cooper personal Vercel account
+  -> apps/codex-proxy/api/index.ts
+  -> apps/codex-proxy/src/vercel.ts
+  -> apps/codex-proxy/src/index.ts
+  -> Effect HttpRouter.toWebHandler
+  -> GET /health or POST /v1/chat/completions
+  -> mock-mode OpenAI-compatible SSE
 ```
 
 ## Runtime Principles
@@ -212,6 +264,26 @@ app-owned boundaries first. Move shared contracts into `@bundjil/core` or
   mock SSE without Codex network calls.
 - `bun run --filter @bundjil/agent test` proves Gateway default selection and
   private proxy provider construction without live credentials.
+- `bun run --filter @bundjil/codex-oauth test` proves profile storage,
+  request/stream mapping, direct proof boundaries, and the mocked Upstash
+  `KeyValueStore` adapter.
+
+Every implementation task touching Effect runtime, provider, storage, or app
+boundaries must complete and record the mandatory 3-pass Effect TS audit:
+
+1. Ownership and call graph.
+2. Effect implementation quality.
+3. Verification coverage.
+
+Vercel deployment rules for the proxy:
+
+- Preview deploy first and record direct HTTP evidence before production.
+- Keep the linked project under Cooper's personal Vercel scope.
+- Set secrets only through Vercel env vars or ignored local env files.
+- Direct proof may report status, content type, event/data-line counts, mode,
+  model id, and leak booleans only.
+- Roll back production with `vercel rollback <deployment-id-or-url>` or by
+  removing Eve proxy env vars so the agent falls back to Gateway.
 
 See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
 operational Eve app guide and local HTTP verification commands.

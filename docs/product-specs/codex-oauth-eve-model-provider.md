@@ -362,7 +362,7 @@ On 2026-07-07, `apps/agent` added app-owned Eve model-provider wiring:
   direct Codex HTTP clients. It only calls the private OpenAI-compatible proxy.
 - Provider request bodies, mock responses, smoke-test output, proof output, and
   leak checks now use Effect Schema JSON encoders such as
-  `Schema.fromJsonString(...)` rather than raw native JSON serialization.
+  `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
 
 Local Eve proof:
 
@@ -846,25 +846,28 @@ Vercel deployment rules:
   tokens, refresh tokens, authorization codes, raw OAuth responses, private
   prompts, or full upstream response bodies.
 
-Expected Vercel scripts in `apps/codex-proxy/package.json`:
+Implemented `apps/codex-proxy/package.json` scripts:
 
-```json
-{
-  "scripts": {
-    "dev": "bun --conditions=@bundjil/source src/dev.ts",
-    "build": "nitro build",
-    "check-types": "tsc --noEmit",
-    "test": "vitest run",
-    "smoke-test": "bun --conditions=@bundjil/source scripts/smoke-test-dev.ts",
-    "smoke-test:vercel": "bun --conditions=@bundjil/source scripts/smoke-test-vercel.ts",
-    "link-app": "vercel link --yes --project bundjil-codex-proxy"
-  }
-}
+```text
+dev: bun --conditions=@bundjil/source src/dev.ts
+build: rm -rf dist && tsc -p tsconfig.build.json
+check-types: tsc --noEmit
+test: vitest run
+smoke-test: bun --conditions=@bundjil/source scripts/smoke-test.ts
 ```
 
-If the implementer chooses direct Vercel Functions instead of Nitro, the spec
-must be updated before implementation to explain the replacement build and
-verification commands.
+The accepted implementation uses direct Vercel Functions through
+`apps/codex-proxy/api/index.ts`, `apps/codex-proxy/src/vercel.ts`, and
+`apps/codex-proxy/vercel.json`. It does not use Nitro. Vercel CLI operations
+remain operational commands, not package scripts:
+
+```bash
+cd apps/codex-proxy
+vercel link --project bundjil-codex-proxy
+vercel env pull .env.preview.local --environment=preview
+vercel deploy
+vercel deploy --prod
+```
 
 ## Effect Boundary Requirements
 
