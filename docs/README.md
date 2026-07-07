@@ -41,6 +41,9 @@ README.
 - [`@bundjil/codex-oauth`](../packages/codex-oauth/README.md) documents the
   Codex OAuth profile store, direct Codex Responses proof service, service
   tags, KeyValueStore layers, and safe secret-handling rules.
+- [`@bundjil/codex-proxy`](../apps/codex-proxy/README.md) documents the
+  private Effect HTTP proxy app, local mock SSE route, env vars, smoke tests,
+  Vercel preview verification, and rollback rules.
 
 ## Planned Docs
 

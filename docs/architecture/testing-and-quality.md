@@ -29,6 +29,10 @@ bun run --filter @bundjil/eve-effect test
 bun run --filter @bundjil/codex-oauth test
 bun run --filter @bundjil/codex-oauth build
 bun run --filter @bundjil/codex-oauth proof:codex-responses
+bun run --filter @bundjil/codex-proxy test
+bun run --filter @bundjil/codex-proxy check-types
+bun run --filter @bundjil/codex-proxy build
+bun run --filter @bundjil/codex-proxy smoke-test
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 ```
@@ -48,6 +52,9 @@ bun run --filter @bundjil/agent build
   typecheck/build, and the opt-in `proof:codex-responses` command only with a
   private `CODEX_ACCESS_TOKEN` source. Proof output must contain only status,
   endpoint, byte/line counts, and safe booleans.
+- Codex proxy app change: run `@bundjil/codex-proxy` check-types, tests,
+  build, and smoke-test. Hosted deployment proof belongs in the deployment task
+  and must verify preview before production.
 
 ## Effect Test Patterns
 
@@ -107,6 +114,48 @@ curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
+
+## Codex Proxy Verification
+
+Local proxy checks use mock mode and must not call Codex:
+
+```bash
+bun run --filter @bundjil/codex-proxy smoke-test
+```
+
+The smoke test starts a local Bun server on an ephemeral port, checks
+`GET /health`, and checks authenticated mock SSE from
+`POST /v1/chat/completions`.
+
+Manual local probes:
+
+```bash
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=dev-only-token \
+  bun run --filter @bundjil/codex-proxy dev
+```
+
+```bash
+curl -sS http://127.0.0.1:8787/health
+```
+
+```bash
+curl -i -sS \
+  -X POST http://127.0.0.1:8787/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+```
+
+```bash
+curl -N \
+  -X POST http://127.0.0.1:8787/v1/chat/completions \
+  -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
+```
+
+Hosted checks must run against a Vercel preview deployment before production
+and must inspect logs for absence of token values, authorization codes, raw
+OAuth payloads, prompts, and full response bodies.
 
 ## Documentation Quality
 

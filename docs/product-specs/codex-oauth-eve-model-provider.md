@@ -296,8 +296,26 @@ and private proxy contract:
 - `OpenAICompatibleProxy.handleChatCompletions(input)` enforces an internal
   bearer token before delegating to the direct provider.
 
-This is still a package contract, not a deployed proxy app. `apps/codex-proxy`
-remains the next implementation task for Vercel HTTP routes and deployment.
+On 2026-07-07, `apps/codex-proxy` added the first deployable Effect HTTP app
+boundary:
+
+- `src/env.ts` parses app-owned config with Effect `Config`,
+  `Config.schema`, `Config.redacted`, and `ConfigProvider.fromEnv()`.
+- `src/server.ts` registers `GET /health` and
+  `POST /v1/chat/completions` with Effect `HttpRouter`, exports a
+  `HttpRouter.toWebHandler` app boundary, and maps typed tagged errors into
+  safe JSON responses.
+- `src/mock.layer.ts` provides an app-owned mock `CodexDirectProvider` behind
+  the package service tag so local proof streams OpenAI-compatible SSE without
+  a Codex network call.
+- `src/index.ts` exports a one-argument Vercel-compatible fetch wrapper.
+- `src/dev.ts` starts the same handler through Bun for local development.
+- `scripts/smoke-test.ts` starts an ephemeral local Bun server and proves
+  health plus authenticated mock SSE.
+
+The proxy app is still not deployed and Eve is still not wired to it.
+Deployment remains the next task and must target Cooper's personal Vercel
+account first as a preview deployment.
 
 ### Executor / Parallel Task research
 
@@ -465,31 +483,24 @@ apps/agent/
     model-provider.test.ts
 ```
 
-Add a deployable proxy app after the package-level direct provider contract is
-stable:
+The deployable proxy app currently has this shape:
 
 ```text
 apps/codex-proxy/
   package.json
   README.md
-  nitro.config.ts                 # if mirroring Mobius' Vercel Bun function build
   src/
     index.ts                      # Vercel fetch handler
     dev.ts                        # local Bun HTTP host
     env.ts                        # Effect ConfigProvider / Config schema
-    live.layer.ts                 # route + infrastructure composition
-    server.ts                     # thin HttpRouter.toWebHandler adapter
-    routes/
-      health.ts                   # typed or raw health route
-      openai-compatible.ts        # raw streaming proxy route
+    errors.ts                     # app-owned tagged route/config errors
+    mock.layer.ts                 # app-owned mock direct provider
+    schemas.ts                    # app-owned route/config schemas
+    server.ts                     # HttpRouter routes and toWebHandler adapter
   scripts/
-    smoke-test-dev.ts
-    smoke-test-vercel.ts
+    smoke-test.ts
   test/
-    health.test.ts
-    proxy-auth.test.ts
-    proxy-streaming.test.ts
-    vercel-handler.test.ts
+    proxy-handler.test.ts
 ```
 
 The first deployment target is a separate Vercel project named

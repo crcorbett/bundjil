@@ -6,7 +6,8 @@ Effect, and channel adapters for iMessage, email, and connected personal tools.
 The current codebase contains the first local Eve app slice. It establishes the
 Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
 `@bundjil/eve-effect`, and keeps framework-neutral primitives in
-`@bundjil/core`.
+`@bundjil/core`. The private Codex proxy app now exists as a separate
+deployment boundary, but Eve still uses its AI Gateway model config.
 
 ## Product Shape
 
@@ -51,6 +52,10 @@ apps/agent
   -> effect/unstable/persistence/KeyValueStore
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
 
+apps/codex-proxy
+  -> effect/unstable/http
+  -> @bundjil/codex-oauth
+
 @bundjil/core
   -> effect
 ```
@@ -74,7 +79,14 @@ storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It currently does not perform live
-OAuth endpoint exchange, deploy an HTTP proxy app, or change the Eve model.
+OAuth endpoint exchange or change the Eve model.
+
+`apps/codex-proxy` owns the deployable HTTP boundary for the private provider
+proof. It parses app-owned config with Effect Config, exposes `GET /health`,
+exposes a private OpenAI-compatible `POST /v1/chat/completions` route through
+Effect `HttpRouter.toWebHandler`, and uses an app-owned mock
+`CodexDirectProvider` layer until hosted token storage and live deployment are
+implemented.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, future channel files, and runtime secrets.
@@ -106,6 +118,19 @@ Schema boundary:
   -> Effect Schema Standard Schema validation
   -> Effect Schema Standard JSON Schema metadata
   -> Eve defineTool inputSchema / outputSchema
+```
+
+Private Codex proxy path:
+
+```text
+Request
+  -> apps/codex-proxy/src/index.ts fetch wrapper
+  -> Effect HttpRouter.toWebHandler
+  -> apps/codex-proxy/src/server.ts
+  -> CodexProxyConfig
+  -> OpenAICompatibleProxy.handleChatCompletions(input)
+  -> app-owned CodexDirectProvider mock layer
+  -> OpenAI-compatible SSE Response
 ```
 
 Test path:
@@ -150,6 +175,9 @@ app-owned boundaries first. Move shared contracts into `@bundjil/core` or
   tests.
 - `bun run --filter @bundjil/agent dev:no-ui` starts the local Eve app on port
   `2000` by default for `eve@0.20.0`.
+- `bun run --filter @bundjil/codex-proxy smoke-test` starts the private proxy
+  handler on a local ephemeral Bun server and proves health plus authenticated
+  mock SSE without Codex network calls.
 
 See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
 operational Eve app guide and local HTTP verification commands.

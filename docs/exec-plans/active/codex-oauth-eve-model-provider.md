@@ -13,7 +13,7 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`create-codex-proxy-app`
+`deploy-codex-proxy-vercel`
 
 ## Accepted Tasks
 
@@ -170,6 +170,76 @@ Verification:
 - `bun run check-types`: passed.
 - `bun run verification`: passed.
 
+### create-codex-proxy-app
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `apps/codex-proxy/**`
+- `AGENTS.md`
+- `ARCHITECTURE.md`
+- `README.md`
+- `docs/README.md`
+- `docs/architecture/eve-agent.md`
+- `docs/architecture/repo-structure.md`
+- `docs/architecture/testing-and-quality.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `packages/codex-oauth/README.md`
+- `knip.json`
+- `bun.lock`
+
+Evidence:
+
+- Delegated worker `019f3d51-aea6-7de3-88c6-8b98eea158d6` was assigned this
+  exact task, but remained running after two waits and produced no worktree
+  changes. Parent closed it and implemented the slice locally.
+- Added `apps/codex-proxy` with package metadata, TypeScript configs, app-local
+  Vitest config, app README, Effect Config service, app-owned route/config
+  schemas, one schema-backed route error, app-owned mock
+  `CodexDirectProvider` layer, Effect HTTP routes, `HttpRouter.toWebHandler`
+  boundary, Vercel-compatible one-argument fetch export, local Bun dev host,
+  direct Request/Response tests, and an ephemeral-server smoke test.
+- The app composes `@bundjil/codex-oauth` `OpenAICompatibleProxy` and
+  `CodexDirectProvider` service tags. It does not duplicate Codex request
+  mapping or stream mapping.
+- Live mode intentionally returns HTTP 503 in this slice. No Eve model change,
+  hosted deployment, or Codex network call was introduced.
+
+Parent audit:
+
+1. Ownership and call graph: `apps/codex-proxy` owns the deployable HTTP app
+   boundary, app config, Vercel fetch export, local dev host, private route
+   auth, mock streaming, smoke tests, and README. `@bundjil/codex-oauth`
+   continues to own reusable schemas, service tags, request mapping, stream
+   mapping, and direct provider contracts. `apps/agent` was not changed.
+2. Effect implementation quality: route handlers use flat `Effect.gen`,
+   `Context.Service`, `Layer`, `Config.redacted`, `Config.schema`, package
+   schema-derived types, app-owned route/config schemas, `HttpRouter`, and
+   typed `catchTags` mapping. The one-argument fetch wrapper prevents Bun from
+   passing its server object as an Effect context. Parent scans found no
+   `OPENAI_API_KEY` / `CODEX_API_KEY` fallback and no committed token values.
+3. Verification coverage: direct `Request`/`Response` tests cover
+   `GET /health`, unauthenticated rejection, invalid-token rejection with
+   redaction, and authenticated mock SSE. The smoke test proves local health
+   and mock streaming through a real Bun server without a Codex network call.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 4 tests.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed with
+  `{"healthStatus":200,"streamStatus":200,"streamLines":5}`.
+- `bun run check`: passed.
+- `bun run knip`: passed.
+- `bun run check-types`: passed across 6 packages.
+- `bun run verification`: passed.
+- `bun install --frozen-lockfile`: passed.
+- Secret-pattern scan found only documented env var names and sanitized test
+  placeholders, not real token values.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -199,6 +269,9 @@ Out of scope:
 - 2026-07-07: worker subagent was shut down after an unresponsive partial
   scaffold. Parent completed the slice locally, reran verification, and
   recorded the required three audit passes.
+- 2026-07-07: create-codex-proxy-app worker
+  `019f3d51-aea6-7de3-88c6-8b98eea158d6` was closed after no result and no
+  filesystem changes. Parent implemented and audited the app locally.
 
 ## Verification Log
 
@@ -209,3 +282,6 @@ Out of scope:
   sanitized live proof, and `bun run verification` passed.
 - 2026-07-07: `define-codex-direct-provider-contract` accepted after package
   tests/build/typecheck, root typecheck, and `bun run verification` passed.
+- 2026-07-07: `create-codex-proxy-app` accepted after app
+  check-types/test/build/smoke-test, root `bun run verification`, frozen
+  install, and secret-pattern scan passed.

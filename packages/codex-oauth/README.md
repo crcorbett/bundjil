@@ -4,8 +4,9 @@ Effect contracts for Bundjil-owned Codex OAuth profiles and the direct Codex
 Responses proof path.
 
 This package owns reusable profile, token, and proof boundaries. It does not
-perform live OAuth endpoint exchange, deploy the private proxy, or change the
-Eve app model.
+perform live OAuth endpoint exchange, own Vercel deployment, or change the Eve
+app model. The deployable private proxy app now lives in `apps/codex-proxy`
+and composes this package's service contracts.
 
 ## Contracts
 
@@ -123,8 +124,9 @@ OpenAICompatibleProxy.handleChatCompletions(input)
 ```
 
 The proxy contract is private/internal only. It is not a public OpenAI
-gateway, and it is not a deployed HTTP route yet. `apps/codex-proxy` will own
-the Vercel HTTP route, smoke tests, and deployment in a later task.
+gateway. `apps/codex-proxy` owns the Vercel-compatible HTTP route, local
+mock-mode smoke tests, and future hosted deployment. This package keeps owning
+the reusable direct-provider contract.
 
 Subscription mode does not read `OPENAI_API_KEY` or `CODEX_API_KEY`. BYOK or
 AI Gateway fallback is future work and needs a separate spec update.

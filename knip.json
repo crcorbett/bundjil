@@ -5,6 +5,10 @@
     "apps/agent": {
       "entry": ["agent/agent.ts", "agent/tools/**/*.ts", "test/**/*.test.ts"],
       "project": ["agent/**/*.ts", "test/**/*.ts"]
+    },
+    "apps/codex-proxy": {
+      "entry": ["scripts/**/*.ts", "test/**/*.test.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
     }
   }
 }

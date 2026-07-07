@@ -16,6 +16,9 @@ Start here for repo conventions.
   errors, named operation services, and the Eve schema bridge.
 - `apps/agent` owns the committed Vercel Eve app, including the root agent,
   instructions, app-owned config, and Eve tools.
+- `apps/codex-proxy` owns the private Effect HTTP proxy app for Codex
+  provider proof, including app-owned config, Vercel fetch entrypoint, local
+  dev host, routes, mock streaming, and smoke tests.
 - `docs/architecture` owns durable rules for Effect patterns, repo structure,
   package ownership, and verification.
 

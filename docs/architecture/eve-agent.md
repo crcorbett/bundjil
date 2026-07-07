@@ -82,11 +82,12 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
-`@bundjil/codex-oauth` is not part of the Eve runtime path yet. It now proves
-that a private Codex access token can reach
-`https://chatgpt.com/backend-api/codex/responses`, but Eve still uses the
-configured AI Gateway model string until the private proxy and model-provider
-tasks are implemented and verified.
+`@bundjil/codex-oauth` and `apps/codex-proxy` are not part of the Eve runtime
+path yet. The package proves that a private Codex access token can reach
+`https://chatgpt.com/backend-api/codex/responses`, and the proxy app proves a
+private mock OpenAI-compatible SSE route. Eve still uses the configured AI
+Gateway model string until the deployment and model-provider tasks are
+implemented and verified.
 
 ## Schema Boundary
 
@@ -181,6 +182,16 @@ bun run --filter @bundjil/agent dev:no-ui
 
 For `eve@0.20.0`, the installed CLI help and runtime constants default to
 `$PORT`, then `2000`. The local URL is normally `http://127.0.0.1:2000`.
+
+The Codex proxy app is verified separately:
+
+```bash
+bun run --filter @bundjil/codex-proxy test
+bun run --filter @bundjil/codex-proxy smoke-test
+```
+
+Do not set Eve to use the Codex proxy until the proxy has passed hosted
+preview verification and the model-provider task updates `apps/agent`.
 
 ## HTTP Endpoints
 

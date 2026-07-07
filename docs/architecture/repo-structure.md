@@ -8,6 +8,7 @@ and ownership-driven.
 ```text
 apps/
   agent/              Vercel Eve app, instructions, tool files, runtime config.
+  codex-proxy/        Private Effect HTTP proxy app for Codex provider proof.
 
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
@@ -57,6 +58,25 @@ apps/agent/
   README.md           app usage and verification guide
 ```
 
+`apps/codex-proxy` owns the private Codex provider HTTP runtime:
+
+```text
+apps/codex-proxy/
+  src/
+    env.ts            app-owned Effect Config and service layer.
+    index.ts          Vercel-compatible fetch export.
+    server.ts         Effect HttpRouter routes and web handler.
+    dev.ts            local Bun host.
+    mock.layer.ts     app-owned mock direct provider layer.
+  scripts/            local smoke-test entrypoints.
+  test/               direct Request/Response handler tests.
+  README.md           routes, env vars, Vercel proof, rollback.
+```
+
+The proxy app may import `@bundjil/codex-oauth` service tags, schemas, and
+layers. It must not move app-owned env binding names, Vercel deployment
+metadata, local dev hosting, or route-specific HTTP behavior into the package.
+
 Future Sendblue, Cloudflare email, Vercel Connect, and Notion code should start
 in app-owned boundaries until stable. Move shared contracts into packages only
 after the shape has survived at least one real tool/channel implementation.
@@ -104,6 +124,16 @@ after the shape has survived at least one real tool/channel implementation.
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider
   behavior is involved.
+
+`apps/codex-proxy`:
+
+- owns private proxy deployment concerns, route auth, mock streaming proof,
+  local dev, Vercel fetch export, and app-owned env names;
+- may compose `@bundjil/codex-oauth` service tags and schemas;
+- must keep Eve model-provider selection out of this app;
+- must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
+- must keep hosted live Codex calls disabled until deployment, storage, and
+  secret verification tasks pass.
 
 ## Imports And Exports
 

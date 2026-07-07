@@ -200,7 +200,7 @@
     {
       "id": "create-codex-proxy-app",
       "title": "Create apps/codex-proxy Effect HTTP app",
-      "status": "pending",
+      "status": "completed",
       "description": "Add a deployable proxy app that composes @bundjil/codex-oauth services into Effect HTTP routes and exposes a private OpenAI-compatible streaming endpoint.",
       "implementationNotes": [
         "Create apps/codex-proxy as a separate Bun workspace app with README.md, package.json, tsconfig.json, local dev entrypoint, Vercel fetch entrypoint, smoke-test scripts, and tests.",
@@ -209,7 +209,11 @@
         "Use HttpRouter.toWebHandler at the app boundary and direct Request/Response tests for the handler.",
         "Start with Bun or Node Vercel Function deployment, not Vercel Edge Runtime.",
         "Implement health, internal bearer-token auth, mock-mode streaming, and private /v1/chat/completions route before any live Codex dependency.",
-        "Config belongs in apps/codex-proxy/src/env.ts and must use Effect Config with Config.redacted for BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN."
+        "Config belongs in apps/codex-proxy/src/env.ts and must use Effect Config with Config.redacted for BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN.",
+        "Delegated worker 019f3d51-aea6-7de3-88c6-8b98eea158d6 was assigned this exact task but stayed running after two waits and produced no worktree changes; the parent closed it and implemented the slice locally.",
+        "Implemented apps/codex-proxy with package metadata, README, Effect Config service, app-owned route/config schemas and tagged errors, app-owned mock CodexDirectProvider layer, Effect HttpRouter routes, HttpRouter.toWebHandler boundary, Vercel-compatible one-argument fetch wrapper, local Bun dev server, smoke-test script, app-local Vitest config, and direct Request/Response tests.",
+        "The app composes @bundjil/codex-oauth OpenAICompatibleProxy and CodexDirectProvider service tags rather than duplicating Codex request mapping or stream mapping.",
+        "Live mode intentionally returns 503 in this slice; no Eve app model change and no Codex network call were introduced."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for route handlers, config parsing, auth checks, and proxy calls.",
@@ -232,8 +236,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: apps/codex-proxy owns the deployable HTTP boundary, app config, Vercel fetch export, local dev host, route auth, mock streaming, smoke tests, and README. @bundjil/codex-oauth still owns reusable OpenAICompatibleProxy, CodexDirectProvider, schemas, and provider mapping. apps/agent was not changed.",
+          "Pass 2 - Effect implementation quality: route handlers use flat Effect.gen flow, Context.Service config, Layer composition, Effect Config with Config.redacted, Schema-derived route/config/package contracts, HttpRouter.toWebHandler, app-owned tagged errors, catchTags mapping, and package service tags. Parent scans found no OPENAI_API_KEY/CODEX_API_KEY reads and no committed token values.",
+          "Pass 3 - verification coverage: direct Request/Response tests cover GET /health, unauthenticated rejection, invalid-token rejection with redaction, and authenticated mock SSE. bun run --filter @bundjil/codex-proxy check-types, test, build, and smoke-test passed before acceptance."
+        ]
       },
       "commitAfterPassing": true
     },
