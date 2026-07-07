@@ -9,6 +9,14 @@ README.
   packages, setup, and roadmap.
 - [Architecture](../ARCHITECTURE.md) explains the planned agent runtime shape,
   package boundaries, and quality gates.
+- [Effect Patterns](./architecture/effect-patterns.md) defines the repo's
+  Effect TS rules for schemas, services, config, layers, errors, and control
+  flow.
+- [Repo Structure](./architecture/repo-structure.md) defines app/package
+  ownership, import/export rules, local references, and SPEC requirements.
+- [Testing And Quality](./architecture/testing-and-quality.md) defines
+  verification scope, standard commands, Eve runtime checks, and documentation
+  quality rules.
 - [Eve agent architecture](./architecture/eve-agent.md) documents the committed
   Eve app, Effect boundary, local HTTP endpoints, AI Gateway setup, and
   verification commands.

@@ -84,9 +84,24 @@ packages/
 docs/
   README.md          Documentation index.
   architecture/
+    effect-patterns.md
     eve-agent.md     Eve app architecture and verification guide.
-ARCHITECTURE.md      Agent architecture and package boundaries.
+    repo-structure.md
+    testing-and-quality.md
+ARCHITECTURE.md      Agent architecture and package boundary overview.
 ```
+
+## Development Rules
+
+- Start with [Effect Patterns](./docs/architecture/effect-patterns.md) before
+  adding schemas, services, config, layers, or provider wrappers.
+- Use [Repo Structure](./docs/architecture/repo-structure.md) when deciding
+  where code belongs.
+- Use [Testing And Quality](./docs/architecture/testing-and-quality.md) to pick
+  the narrowest useful check and the final verification gate.
+- Before adding a new app, channel, provider integration, or durable package
+  boundary, draft a SPEC through `$prd-writer` and implement through
+  `$prd-implementer`.
 
 ## Roadmap
 

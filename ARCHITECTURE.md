@@ -141,6 +141,15 @@ app-owned boundaries first. Move shared contracts into `@bundjil/core` or
 See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
 operational Eve app guide and local HTTP verification commands.
 
+See also:
+
+- [Effect Patterns](./docs/architecture/effect-patterns.md) for schema,
+  service, config, layer, and error rules.
+- [Repo Structure](./docs/architecture/repo-structure.md) for app/package
+  ownership and import/export rules.
+- [Testing And Quality](./docs/architecture/testing-and-quality.md) for
+  verification scope and commands.
+
 ## References
 
 - [eve - The Agent Framework - Vercel](https://vercel.com/eve)
