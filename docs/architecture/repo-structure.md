@@ -11,6 +11,7 @@ apps/
 
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
+  codex-oauth/        Codex OAuth profile and token lifecycle contracts.
   effect-start/       Reusable TanStack Start middleware adapters for Effect.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
@@ -85,6 +86,19 @@ after the shape has survived at least one real tool/channel implementation.
 - may depend on TanStack Start and Effect HTTP primitives;
 - must stay independent of the Bundjil agent runtime, channels, and domain
   workflows.
+
+`@bundjil/codex-oauth`:
+
+- owns Codex OAuth subjects, profiles, redacted token schemas, safe tagged
+  errors, deterministic storage keys, and service tags;
+- owns `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`, and
+  KeyValueStore-backed live/memory layers;
+- may depend on Effect and Effect v4 `KeyValueStore` primitives;
+- must not import Eve, app files, Vercel deployment code, Sendblue,
+  Cloudflare, Notion, OpenClaw, Goose, or Codex HTTP/client implementations in
+  its first contract slice;
+- must keep live/mock layers on explicit package subpaths when provider
+  behavior is involved.
 
 ## Imports And Exports
 

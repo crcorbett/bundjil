@@ -46,6 +46,10 @@ apps/agent
   -> effect
   -> @tanstack/react-start
 
+@bundjil/codex-oauth
+  -> effect
+  -> effect/unstable/persistence/KeyValueStore
+
 @bundjil/core
   -> effect
 ```
@@ -62,6 +66,13 @@ service, live and memory layers, and `toEveSchema(schema)` for Eve
 `@bundjil/effect-start` is framework glue only. It adapts Effect HTTP programs
 to TanStack Start middleware and must not know about channel routing, product
 workflows, Eve runtime composition, or app-specific content.
+
+`@bundjil/codex-oauth` owns the Codex OAuth profile and token lifecycle
+contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
+storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
+`CodexOAuthClient`, and KeyValueStore-backed live/memory layers. It currently
+does not perform live OAuth endpoint exchange, call Codex Responses, or change
+the Eve model.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, future channel files, and runtime secrets.

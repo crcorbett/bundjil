@@ -76,14 +76,16 @@
     {
       "id": "define-codex-oauth-package-contract",
       "title": "Define @bundjil/codex-oauth schemas and profile services",
-      "status": "pending",
+      "status": "completed",
       "description": "Create the package contract with canonical schemas, tagged errors, profile storage, OAuth service tags, storage keys, and memory layers without provider network calls.",
       "implementationNotes": [
         "Use package layout src/schemas.ts, src/errors.ts, src/storage-keys.ts, src/profile-store.service.ts, src/oauth.service.ts, src/oauth-client.service.ts, src/live.layer.ts, src/mock.layer.ts, and src/index.ts.",
         "Use effect/unstable/persistence/KeyValueStore for local Effect v4.",
         "Define CodexProfileStore, CodexOAuthService, and CodexOAuthClient as the first stable service tags.",
         "Use hashed subject keys under bundjil/oauth/v1/provider/codex/profile/{subjectHash}.",
-        "Do not add live OAuth endpoint exchange, Codex Responses HTTP calls, or Eve model replacement in this task."
+        "Do not add live OAuth endpoint exchange, Codex Responses HTTP calls, or Eve model replacement in this task.",
+        "Implemented packages/codex-oauth with Effect Schema contracts, per-class tagged errors, storage-key derivation, CodexProfileStore, CodexOAuthService, CodexOAuthClient, KeyValueStore-backed live layer, memory/mock layers, tests, README, and lockfile registration.",
+        "Root package export stays contract-focused; live and mock layers are exposed from explicit ./live.layer and ./mock.layer subpaths."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for primary operations.",
@@ -102,8 +104,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: @bundjil/codex-oauth owns Codex OAuth schemas, safe tagged errors, subject-key derivation, profile storage, OAuth service tags, and layers. No apps/agent, apps/codex-proxy, live OAuth endpoint exchange, Codex Responses HTTP calls, or Eve model replacement were introduced.",
+          "Pass 2 - Effect implementation quality: primary service operations use flat named Effect.fn / Effect.gen flow, Context.Service tags, Schema-derived types, Schema.RedactedFromValue token fields, per-class Schema.TaggedErrorClass errors, KeyValueStore.toSchemaStore, catchTag/mapError error mapping, and explicit live/mock layer subpaths. Parent scans found no unsafe casts, Object.values/Object.entries, switch, process.env, OPENAI_API_KEY, CODEX_ACCESS_TOKEN, console.log, or real token patterns in package source.",
+          "Pass 3 - verification coverage: bun install --frozen-lockfile passed; bun run --filter @bundjil/codex-oauth test passed with 8 tests; bun run --filter @bundjil/codex-oauth build passed; bun run --filter @bundjil/codex-oauth check-types passed; bun run check-types passed across 5 packages; bun run verification passed across lint, knip, typechecks, and tests."
+        ]
       },
       "commitAfterPassing": true
     },

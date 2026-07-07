@@ -35,6 +35,18 @@
         "vitest": "catalog:testing",
       },
     },
+    "packages/codex-oauth": {
+      "name": "@bundjil/codex-oauth",
+      "version": "0.1.0",
+      "dependencies": {
+        "effect": "catalog:effect",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:effect",
+        "typescript": "catalog:typescript",
+        "vitest": "catalog:testing",
+      },
+    },
     "packages/core": {
       "name": "@bundjil/core",
       "version": "0.1.0",
@@ -135,6 +147,8 @@
     "@blazediff/core": ["@blazediff/core@1.9.1", "", {}, "sha512-ehg3jIkYKulZh+8om/O25vkvSsXXwC+skXmyA87FFx6A/45eqOkZsBltMw/TVteb0mloiGT8oGRTcjRAz66zaA=="],
 
     "@bundjil/agent": ["@bundjil/agent@workspace:apps/agent"],
+
+    "@bundjil/codex-oauth": ["@bundjil/codex-oauth@workspace:packages/codex-oauth"],
 
     "@bundjil/core": ["@bundjil/core@workspace:packages/core"],
 

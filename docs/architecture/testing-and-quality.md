@@ -26,6 +26,8 @@ Package-focused commands:
 bun run --filter @bundjil/core test
 bun run --filter @bundjil/effect-start test
 bun run --filter @bundjil/eve-effect test
+bun run --filter @bundjil/codex-oauth test
+bun run --filter @bundjil/codex-oauth build
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 ```

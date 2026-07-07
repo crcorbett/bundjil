@@ -42,6 +42,9 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
 - `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
+- `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
+  lifecycle service contracts. It is currently non-networked: no live OAuth
+  endpoint exchange, Codex Responses call, or Eve model replacement ships yet.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, and the `workspace_status` tool that delegates into
   `@bundjil/eve-effect`.
@@ -79,6 +82,7 @@ apps/
   agent/             Vercel Eve app and workspace_status tool.
 packages/
   core/              Framework-neutral Bundjil domain primitives.
+  codex-oauth/       Codex OAuth profile and token lifecycle contracts.
   effect-start/      TanStack Start adapter for Effect HTTP programs.
   eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
