@@ -12,6 +12,7 @@ import { CodexResponsesProofResult, CodexResponsesRequest } from "./schemas.js";
 import type {
   CodexResponsesPostInput,
   CodexResponsesProofResult as CodexResponsesProofResultType,
+  CodexResponsesStreamResult,
 } from "./schemas.js";
 
 export type CodexHttpClientFailure =
@@ -24,6 +25,9 @@ export interface CodexHttpClientShape {
   readonly postResponses: (
     input: CodexResponsesPostInput
   ) => Effect.Effect<CodexResponsesProofResultType, CodexHttpClientFailure>;
+  readonly postResponsesStream: (
+    input: CodexResponsesPostInput
+  ) => Effect.Effect<CodexResponsesStreamResult, CodexHttpClientFailure>;
 }
 
 export class CodexHttpClient extends Context.Service<
@@ -111,6 +115,65 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         )
       );
     }),
+    postResponsesStream: Effect.fn("CodexHttpClient.postResponsesStream")(
+      function* (input: CodexResponsesPostInput) {
+        const encodedRequest = yield* Schema.encodeEffect(
+          CodexResponsesRequest
+        )(input.request).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesRequestError({
+                boundary: "CodexResponsesRequest",
+                message: "Unable to encode Codex Responses request.",
+                cause,
+              })
+          )
+        );
+        const headers = new Headers({
+          Authorization: `Bearer ${Redacted.value(input.accessToken)}`,
+          "Content-Type": "application/json",
+        });
+
+        if (input.accountId !== undefined) {
+          headers.set("chatgpt-account-id", input.accountId);
+        }
+
+        const upstreamRequest = new Request(endpoint, {
+          body: JSON.stringify(encodedRequest),
+          headers,
+          method: "POST",
+        });
+        const response = yield* fetcher.fetch(upstreamRequest);
+        const contentType = response.headers.get("content-type") ?? "";
+
+        if (!response.ok) {
+          return yield* new CodexHttpStatusError({
+            operation: "postResponsesStream",
+            status: response.status,
+            statusText: response.statusText,
+            contentType,
+            message:
+              "Codex Responses endpoint returned an unsuccessful status.",
+          });
+        }
+
+        const body = yield* Effect.tryPromise({
+          try: () => response.text(),
+          catch: (cause) =>
+            new CodexResponsesStreamError({
+              operation: "readResponseBody",
+              message: "Unable to read Codex Responses body.",
+              cause,
+            }),
+        });
+
+        return {
+          status: response.status,
+          contentType,
+          body: Redacted.make(body),
+        };
+      }
+    ),
   });
 }).pipe(Effect.withSpan("CodexHttpClientLive"));
 
@@ -119,4 +182,11 @@ export const postResponses = (input: CodexResponsesPostInput) =>
     const client = yield* CodexHttpClient;
 
     return yield* client.postResponses(input);
+  });
+
+export const postResponsesStream = (input: CodexResponsesPostInput) =>
+  Effect.gen(function* postResponsesStreamOperation() {
+    const client = yield* CodexHttpClient;
+
+    return yield* client.postResponsesStream(input);
   });

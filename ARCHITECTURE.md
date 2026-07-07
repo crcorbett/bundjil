@@ -71,9 +71,10 @@ workflows, Eve runtime composition, or app-specific content.
 `@bundjil/codex-oauth` owns the Codex OAuth profile and token lifecycle
 contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
 storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
-`CodexOAuthClient`, KeyValueStore-backed live/memory layers, and the opt-in
-direct Codex Responses proof service. It currently does not perform live OAuth
-endpoint exchange, deploy a private proxy, or change the Eve model.
+`CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
+direct Codex Responses proof service, and the package-level
+OpenAI-compatible private proxy contract. It currently does not perform live
+OAuth endpoint exchange, deploy an HTTP proxy app, or change the Eve model.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, future channel files, and runtime secrets.

@@ -143,9 +143,24 @@ export const CodexResponsesInputTextContent = Schema.Struct({
 export type CodexResponsesInputTextContent =
   typeof CodexResponsesInputTextContent.Type;
 
+export const CodexResponsesOutputTextContent = Schema.Struct({
+  type: Schema.Literal("output_text"),
+  text: Schema.NonEmptyString,
+});
+
+export type CodexResponsesOutputTextContent =
+  typeof CodexResponsesOutputTextContent.Type;
+
+export const CodexResponsesTextContent = Schema.Union([
+  CodexResponsesInputTextContent,
+  CodexResponsesOutputTextContent,
+]);
+
+export type CodexResponsesTextContent = typeof CodexResponsesTextContent.Type;
+
 export const CodexResponsesInputMessage = Schema.Struct({
   role: Schema.Literals(["user", "system", "assistant"]),
-  content: Schema.Array(CodexResponsesInputTextContent),
+  content: Schema.Array(CodexResponsesTextContent),
 });
 
 export type CodexResponsesInputMessage = typeof CodexResponsesInputMessage.Type;
@@ -167,6 +182,33 @@ export const CodexResponsesRequest = Schema.Struct({
 
 export type CodexResponsesRequest = typeof CodexResponsesRequest.Type;
 
+export const CodexResponsesStreamBody = Schema.RedactedFromValue(Schema.String);
+
+export type CodexResponsesStreamBody = typeof CodexResponsesStreamBody.Type;
+
+export const CodexResponsesStreamResult = Schema.Struct({
+  status: Schema.Number.check(Schema.isFinite()),
+  contentType: Schema.String,
+  body: CodexResponsesStreamBody,
+});
+
+export type CodexResponsesStreamResult = typeof CodexResponsesStreamResult.Type;
+
+export const CodexResponsesStreamEvent = Schema.Struct({
+  type: Schema.NonEmptyString,
+  delta: Schema.optional(Schema.String),
+});
+
+export type CodexResponsesStreamEvent = typeof CodexResponsesStreamEvent.Type;
+
+export const CodexResponsesStreamMapInput = Schema.Struct({
+  model: CodexResponsesModelId,
+  body: CodexResponsesStreamBody,
+});
+
+export type CodexResponsesStreamMapInput =
+  typeof CodexResponsesStreamMapInput.Type;
+
 export const CodexResponsesPostInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   accountId: Schema.optional(Schema.NonEmptyString),
@@ -174,6 +216,89 @@ export const CodexResponsesPostInput = Schema.Struct({
 });
 
 export type CodexResponsesPostInput = typeof CodexResponsesPostInput.Type;
+
+export const OpenAICompatibleChatRole = Schema.Literals([
+  "system",
+  "user",
+  "assistant",
+]);
+
+export type OpenAICompatibleChatRole = typeof OpenAICompatibleChatRole.Type;
+
+export const OpenAICompatibleChatMessage = Schema.Struct({
+  role: OpenAICompatibleChatRole,
+  content: Schema.NonEmptyString,
+});
+
+export type OpenAICompatibleChatMessage =
+  typeof OpenAICompatibleChatMessage.Type;
+
+export const OpenAICompatibleChatCompletionRequest = Schema.Struct({
+  model: CodexResponsesModelId,
+  messages: Schema.Array(OpenAICompatibleChatMessage),
+  stream: Schema.optional(Schema.Boolean),
+});
+
+export type OpenAICompatibleChatCompletionRequest =
+  typeof OpenAICompatibleChatCompletionRequest.Type;
+
+export const OpenAICompatibleChatCompletionDelta = Schema.Struct({
+  content: Schema.optional(Schema.String),
+});
+
+export type OpenAICompatibleChatCompletionDelta =
+  typeof OpenAICompatibleChatCompletionDelta.Type;
+
+export const OpenAICompatibleChatCompletionChoice = Schema.Struct({
+  index: Schema.Number.check(Schema.isFinite()),
+  delta: OpenAICompatibleChatCompletionDelta,
+  finish_reason: Schema.optional(Schema.NullOr(Schema.String)),
+});
+
+export type OpenAICompatibleChatCompletionChoice =
+  typeof OpenAICompatibleChatCompletionChoice.Type;
+
+export const OpenAICompatibleChatCompletionChunk = Schema.Struct({
+  id: Schema.NonEmptyString,
+  object: Schema.Literal("chat.completion.chunk"),
+  created: Schema.Number.check(Schema.isFinite()),
+  model: CodexResponsesModelId,
+  choices: Schema.Array(OpenAICompatibleChatCompletionChoice),
+});
+
+export type OpenAICompatibleChatCompletionChunk =
+  typeof OpenAICompatibleChatCompletionChunk.Type;
+
+export const OpenAICompatibleChatCompletionStream = Schema.Struct({
+  contentType: Schema.Literal("text/event-stream"),
+  body: Schema.String,
+});
+
+export type OpenAICompatibleChatCompletionStream =
+  typeof OpenAICompatibleChatCompletionStream.Type;
+
+export const CodexDirectProviderInput = Schema.Struct({
+  subject: CodexOAuthSubject,
+  accountId: Schema.optional(Schema.NonEmptyString),
+  request: OpenAICompatibleChatCompletionRequest,
+});
+
+export type CodexDirectProviderInput = typeof CodexDirectProviderInput.Type;
+
+export const OpenAICompatibleProxyInternalToken = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+
+export type OpenAICompatibleProxyInternalToken =
+  typeof OpenAICompatibleProxyInternalToken.Type;
+
+export const OpenAICompatibleProxyInput = Schema.Struct({
+  authorization: Schema.optional(Schema.String),
+  internalToken: OpenAICompatibleProxyInternalToken,
+  completion: CodexDirectProviderInput,
+});
+
+export type OpenAICompatibleProxyInput = typeof OpenAICompatibleProxyInput.Type;
 
 export const CodexResponsesProofInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,

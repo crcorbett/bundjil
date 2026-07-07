@@ -96,6 +96,9 @@ after the shape has survived at least one real tool/channel implementation.
   KeyValueStore-backed live/memory layers;
 - owns `CodexHttpClient`, `CodexResponsesFetch`, and `CodexResponsesProof` for
   the opt-in direct Codex Responses proof path;
+- owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
+  `OpenAICompatibleProxy` for the package-level private provider/proxy
+  contract;
 - may depend on Effect and Effect v4 `KeyValueStore` primitives;
 - must not import Eve, app files, Vercel deployment code, Sendblue,
   Cloudflare, Notion, OpenClaw, or Goose implementations;

@@ -281,6 +281,24 @@ returned `OAuth authorization required`. The implementation therefore used the
 previously recorded DeepWiki/Parallel findings plus current Goose source
 inspection for the parent proof baseline.
 
+On 2026-07-07, `@bundjil/codex-oauth` added the package-level direct provider
+and private proxy contract:
+
+- `OpenAICompatibleChatCompletionRequest` and related chunk/stream schemas
+  model the private OpenAI-compatible boundary.
+- `CodexRequestMapper.toCodexResponses(input)` maps OpenAI-compatible
+  messages into the direct Codex Responses payload shape.
+- `CodexStreamMapper.toOpenAICompatibleStream(input)` maps Codex stream
+  deltas into OpenAI-compatible SSE chunks.
+- `CodexDirectProvider.streamChatCompletion(input)` resolves the Codex OAuth
+  token from `CodexOAuthService`, posts to the Codex Responses client, and
+  returns OpenAI-compatible SSE.
+- `OpenAICompatibleProxy.handleChatCompletions(input)` enforces an internal
+  bearer token before delegating to the direct provider.
+
+This is still a package contract, not a deployed proxy app. `apps/codex-proxy`
+remains the next implementation task for Vercel HTTP routes and deployment.
+
 ### Executor / Parallel Task research
 
 The user challenged the DeepWiki framing because OpenClaw, Hermes-style

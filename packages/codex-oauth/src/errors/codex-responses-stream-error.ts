@@ -1,11 +1,11 @@
 import { Schema } from "effect";
 
-import { CodexHttpClientOperation } from "./contracts.js";
+import { CodexResponsesStreamOperation } from "./contracts.js";
 
 export class CodexResponsesStreamError extends Schema.TaggedErrorClass<CodexResponsesStreamError>()(
   "CodexResponsesStreamError",
   {
-    operation: CodexHttpClientOperation,
+    operation: CodexResponsesStreamOperation,
     message: Schema.NonEmptyString,
     cause: Schema.Defect,
   }

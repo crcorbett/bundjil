@@ -22,6 +22,14 @@ Eve app model.
   Responses endpoint.
 - `CodexResponsesProof` builds the minimal proof request and returns only safe
   status metadata.
+- `CodexRequestMapper` maps OpenAI-compatible chat completion requests into
+  Codex Responses payloads.
+- `CodexStreamMapper` maps Codex Responses stream events into
+  OpenAI-compatible SSE chunks.
+- `CodexDirectProvider` resolves a stored Codex access token, calls the direct
+  Codex Responses client, and returns an OpenAI-compatible stream.
+- `OpenAICompatibleProxy` is a package-level private proxy contract that
+  enforces an internal bearer token before delegating to the direct provider.
 
 Token schemas use Effect `Schema.RedactedFromValue`. Decoded values print and
 serialize as redacted placeholders, while the KeyValueStore JSON codec can
@@ -51,10 +59,16 @@ token values, prompts, and OAuth responses are not included in storage keys.
   `CodexResponsesProofLive`, exported from the live subpath, own the opt-in
   direct Codex Responses proof path. Tests can replace `CodexResponsesFetch`
   with a mock layer.
+- `CodexRequestMapperLive`, `CodexStreamMapperLive`,
+  `CodexDirectProviderLive`, and `OpenAICompatibleProxyLive`, exported from
+  the live subpath, own the package-level provider/proxy contract. They do not
+  start an HTTP server or change Eve.
 - `CodexOAuthMemory` and `CodexProfileStoreMemory`, exported from
   `@bundjil/codex-oauth/mock.layer`, use
   `KeyValueStore.layerMemory` for deterministic tests and optional seeded
   profiles.
+- `CodexHttpClientMock` and `CodexDirectProviderMock`, exported from the mock
+  subpath, replace provider boundaries in tests without network calls.
 
 The root export is reserved for schemas, errors, service tags, and pure
 operation helpers. Import live and mock layers from their explicit subpaths.
@@ -93,6 +107,27 @@ token into `CODEX_ACCESS_TOKEN` for one process. It returned HTTP 200 from the
 direct Codex Responses endpoint with sanitized body metadata. This proves the
 direct backend path, not the Eve integration. Eve replacement remains gated on
 the private proxy and model-provider tasks in the spec.
+
+## Direct Provider And Private Proxy Contract
+
+The package-level provider path is:
+
+```text
+OpenAICompatibleProxy.handleChatCompletions(input)
+  -> private internal bearer-token check
+  -> CodexDirectProvider.streamChatCompletion(input.completion)
+  -> CodexOAuthService.getValidToken(subject)
+  -> CodexRequestMapper.toCodexResponses(request)
+  -> CodexHttpClient.postResponsesStream(input)
+  -> CodexStreamMapper.toOpenAICompatibleStream(stream)
+```
+
+The proxy contract is private/internal only. It is not a public OpenAI
+gateway, and it is not a deployed HTTP route yet. `apps/codex-proxy` will own
+the Vercel HTTP route, smoke tests, and deployment in a later task.
+
+Subscription mode does not read `OPENAI_API_KEY` or `CODEX_API_KEY`. BYOK or
+AI Gateway fallback is future work and needs a separate spec update.
 
 ## Verification
 

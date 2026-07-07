@@ -161,13 +161,15 @@
     {
       "id": "define-codex-direct-provider-contract",
       "title": "Define direct Codex provider and private proxy services",
-      "status": "pending",
+      "status": "completed",
       "description": "Create the package contract for mapping OpenAI-compatible requests to Codex Responses and exposing a private proxy without wiring Eve's default model yet.",
       "implementationNotes": [
         "Use package layout src/schemas.ts, src/errors.ts, src/codex-http-client.service.ts, src/codex-direct-provider.service.ts, src/codex-request-mapper.ts, src/codex-stream-mapper.ts, src/openai-compatible-proxy.service.ts, and src/index.ts.",
         "Model auth strategies explicitly: subscription profile, test/mock, and future BYOK fallback only after a separate spec update.",
         "Subscription mode must ignore OPENAI_API_KEY and CODEX_API_KEY unless a task explicitly proves an intentional fallback path.",
-        "Keep the HTTP proxy private/internal and do not change apps/agent in this task."
+        "Keep the HTTP proxy private/internal and do not change apps/agent in this task.",
+        "Implemented OpenAI-compatible request/chunk/stream schemas, CodexRequestMapper, CodexStreamMapper, CodexDirectProvider, OpenAICompatibleProxy, safe proxy errors, live layers, mock layers, and tests.",
+        "No apps/agent or apps/codex-proxy files were changed. The deployed HTTP proxy remains the next task."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for proxy handling, Codex HTTP calls, request mapping, stream mapping, and token resolution.",
@@ -186,8 +188,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: @bundjil/codex-oauth owns the package-level contract OpenAICompatibleProxy -> CodexDirectProvider -> CodexOAuthService/CodexRequestMapper/CodexHttpClient/CodexStreamMapper. apps/agent and apps/codex-proxy were not changed.",
+          "Pass 2 - Effect implementation quality: services use Context.Service, Layer, Schema-derived inputs/outputs, redacted internal tokens and upstream stream bodies, flat Effect.gen operations, named Effect.fn operations, and safe tagged errors. Subscription proxy mode does not read OPENAI_API_KEY or CODEX_API_KEY.",
+          "Pass 3 - verification coverage: tests cover OpenAI-compatible request decode, Codex Responses payload encode, stream chunk mapping, proxy auth failure, upstream HTTP status failure redaction, and no OPENAI_API_KEY fallback. Package test, build, root check-types, and root `bun run verification` passed before acceptance."
+        ]
       },
       "commitAfterPassing": true
     },

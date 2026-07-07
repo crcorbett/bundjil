@@ -2,9 +2,17 @@ import { Effect, Layer, Option } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
+  CodexDirectProvider,
+  makeCodexDirectProvider,
+} from "./codex-direct-provider.service.js";
+import {
   CodexHttpClient,
   makeCodexHttpClient,
 } from "./codex-http-client.service.js";
+import {
+  CodexRequestMapper,
+  makeCodexRequestMapper,
+} from "./codex-request-mapper.js";
 import {
   CodexResponsesFetch,
   makeCodexResponsesFetch,
@@ -13,6 +21,10 @@ import {
   CodexResponsesProof,
   makeCodexResponsesProof,
 } from "./codex-responses-proof.service.js";
+import {
+  CodexStreamMapper,
+  makeCodexStreamMapper,
+} from "./codex-stream-mapper.js";
 import {
   OAuthProfileNotFound,
   OAuthProfileSchemaError,
@@ -23,6 +35,10 @@ import {
   CodexOAuthClientUnsupported,
 } from "./oauth-client.service.js";
 import { CodexOAuthService, makeCodexOAuthService } from "./oauth.service.js";
+import {
+  makeOpenAICompatibleProxy,
+  OpenAICompatibleProxy,
+} from "./openai-compatible-proxy.service.js";
 import { CodexProfileStore } from "./profile-store.service.js";
 import { CodexOAuthProfile } from "./schemas.js";
 import type {
@@ -186,3 +202,25 @@ export const CodexResponsesProofLive = Layer.effect(
 export const CodexResponsesProofFetchLive = CodexResponsesProofLive.pipe(
   Layer.provide(CodexResponsesFetchLive)
 );
+
+export const CodexRequestMapperLive = Layer.succeed(
+  CodexRequestMapper,
+  makeCodexRequestMapper
+);
+
+export const CodexStreamMapperLive = Layer.succeed(
+  CodexStreamMapper,
+  makeCodexStreamMapper
+);
+
+export const CodexDirectProviderLive = Layer.effect(
+  CodexDirectProvider,
+  makeCodexDirectProvider
+).pipe(
+  Layer.provideMerge(Layer.merge(CodexRequestMapperLive, CodexStreamMapperLive))
+);
+
+export const OpenAICompatibleProxyLive = Layer.effect(
+  OpenAICompatibleProxy,
+  makeOpenAICompatibleProxy
+).pipe(Layer.provide(CodexDirectProviderLive));

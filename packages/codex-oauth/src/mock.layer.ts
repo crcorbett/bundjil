@@ -1,8 +1,10 @@
 import { Effect, Layer, Redacted } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
+import { CodexDirectProvider } from "./codex-direct-provider.service.js";
+import { CodexHttpClient } from "./codex-http-client.service.js";
 import { CodexResponsesFetch } from "./codex-responses-fetch.service.js";
-import { OAuthProfileStorageError } from "./errors.js";
+import { CodexHttpNetworkError, OAuthProfileStorageError } from "./errors.js";
 import {
   CodexOAuthServiceLive,
   CodexProfileStoreKeyValueLive,
@@ -13,6 +15,9 @@ import type {
   CodexOAuthLoginStartResult,
   CodexOAuthProfile as CodexOAuthProfileType,
   CodexOAuthTokenRefreshResult,
+  CodexResponsesProofResult,
+  CodexResponsesStreamResult,
+  OpenAICompatibleChatCompletionStream,
 } from "./schemas.js";
 import { codexOAuthProfileStorageKey } from "./storage-keys.js";
 
@@ -31,6 +36,46 @@ export const CodexResponsesFetchMock = (
 ) =>
   Layer.succeed(CodexResponsesFetch, {
     fetch: options.fetch,
+  });
+
+export interface CodexHttpClientMockOptions {
+  readonly postResponses?: CodexResponsesProofResult;
+  readonly postResponsesStream?: CodexResponsesStreamResult;
+}
+
+export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
+  Layer.succeed(CodexHttpClient, {
+    postResponses: () =>
+      options.postResponses === undefined
+        ? Effect.fail(
+            new CodexHttpNetworkError({
+              operation: "postResponses",
+              message: "CodexHttpClientMock.postResponses is not seeded.",
+              cause: "missing mock postResponses result",
+            })
+          )
+        : Effect.succeed(options.postResponses),
+    postResponsesStream: () =>
+      options.postResponsesStream === undefined
+        ? Effect.fail(
+            new CodexHttpNetworkError({
+              operation: "postResponsesStream",
+              message: "CodexHttpClientMock.postResponsesStream is not seeded.",
+              cause: "missing mock postResponsesStream result",
+            })
+          )
+        : Effect.succeed(options.postResponsesStream),
+  });
+
+export interface CodexDirectProviderMockOptions {
+  readonly stream: OpenAICompatibleChatCompletionStream;
+}
+
+export const CodexDirectProviderMock = (
+  options: CodexDirectProviderMockOptions
+) =>
+  Layer.succeed(CodexDirectProvider, {
+    streamChatCompletion: () => Effect.succeed(options.stream),
   });
 
 export const CodexOAuthClientMock = (

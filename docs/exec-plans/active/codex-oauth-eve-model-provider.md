@@ -13,7 +13,7 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`define-codex-direct-provider-contract`
+`create-codex-proxy-app`
 
 ## Accepted Tasks
 
@@ -122,6 +122,54 @@ Verification:
   sanitized HTTP 200 metadata.
 - `bun run verification`: passed.
 
+### define-codex-direct-provider-contract
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `packages/codex-oauth/src/codex-request-mapper.ts`
+- `packages/codex-oauth/src/codex-stream-mapper.ts`
+- `packages/codex-oauth/src/codex-direct-provider.service.ts`
+- `packages/codex-oauth/src/openai-compatible-proxy.service.ts`
+- `packages/codex-oauth/src/schemas.ts`
+- `packages/codex-oauth/src/errors/**`
+- `packages/codex-oauth/src/live.layer.ts`
+- `packages/codex-oauth/src/mock.layer.ts`
+- `packages/codex-oauth/test/codex-direct-provider.test.ts`
+- docs/spec/task ledger updates
+
+Evidence:
+
+- Added OpenAI-compatible request/chunk/stream schemas and private proxy
+  internal-token schema.
+- Added `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
+  `OpenAICompatibleProxy` service contracts.
+- Added live layers and mock layers for the provider/proxy boundaries.
+- Kept the task package-only: no `apps/agent` or `apps/codex-proxy` changes.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns only the package
+   contract. The target call graph is
+   `OpenAICompatibleProxy -> CodexDirectProvider -> CodexOAuthService /
+CodexRequestMapper / CodexHttpClient / CodexStreamMapper`.
+2. Effect implementation quality: services use `Context.Service`, `Layer`,
+   schema-derived types, redacted internal tokens and upstream stream bodies,
+   named `Effect.fn` operations, and flat `Effect.gen` composition. No
+   `OPENAI_API_KEY` or `CODEX_API_KEY` fallback was added.
+3. Verification coverage: tests prove OpenAI-compatible request decode, Codex
+   payload mapping, stream chunk mapping, private proxy auth failure, upstream
+   HTTP status failure redaction, and no API-key fallback.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth test`: passed, 20 tests.
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run check-types`: passed.
+- `bun run verification`: passed.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -159,3 +207,5 @@ Out of scope:
   `bun run verification` passed.
 - 2026-07-07: `prove-codex-auth-runtime-path` accepted after package checks,
   sanitized live proof, and `bun run verification` passed.
+- 2026-07-07: `define-codex-direct-provider-contract` accepted after package
+  tests/build/typecheck, root typecheck, and `bun run verification` passed.
