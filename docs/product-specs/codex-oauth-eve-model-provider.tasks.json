@@ -11,7 +11,7 @@
     "Never commit, print, snapshot, or persist raw token values outside the approved token store."
   ],
   "globalVerification": [
-    "Keep the completed personal executor DeepWiki findings in the spec current before implementation starts.",
+    "Keep the completed personal executor DeepWiki and Parallel Task findings in the spec current before implementation starts.",
     "bun install --frozen-lockfile",
     "bun run --filter @bundjil/codex-oauth test when the package exists",
     "bun run --filter @bundjil/codex-oauth build when the package exists",
@@ -37,7 +37,8 @@
         "DeepWiki on `vercel/eve` confirmed `agent.ts` can use a Gateway model string or any AI SDK `LanguageModel`; direct `LanguageModel` providers bypass Gateway attribution/caching and route through their own provider/modelId.",
         "DeepWiki on `openai/codex` confirmed Codex auth modes include ChatGPT OAuth and access tokens, but `ChatgptAuthTokens` are marked unstable/internal. Current evidence does not support using Codex OAuth as arbitrary Eve chat-completion access.",
         "DeepWiki on `Effect-TS/effect` confirmed the KeyValueStore concept, memory/file layers, schema-backed storage, and typed error mapping, while local Effect v4 source remains authoritative for the `effect/unstable/persistence/KeyValueStore` import path.",
-        "The spec now treats Codex OAuth as a Codex workflow credential path first and keeps Eve on AI Gateway until a supported AI SDK LanguageModel path is proven."
+        "Parallel Task run `trun_e43fa758cfba40c3bf5ad5cddb1b7196` corrected the implementation direction: subscription-backed model access is viable through Codex app-server or a pinned Codex-to-OpenAI-compatible bridge, not by treating OAuth tokens as OpenAI API keys.",
+        "The spec now treats `codex app-server` embedding with isolated CODEX_HOME as the preferred proof target and keeps Eve on AI Gateway until that path is proven."
       ],
       "mandatoryVerification": [
         "Executor personal OAuth is authorized or a fresh blocker is recorded with command output.",
@@ -57,9 +58,9 @@
         "requiredPasses": 3,
         "completedPasses": 3,
         "evidence": [
-          "Pass 1 - ownership/call graph: DeepWiki evidence kept implementation gated. Eve remains app-owned and Gateway-backed by default; Codex OAuth remains a separate prospective package/service boundary.",
-          "Pass 2 - Effect implementation quality: Research task tightened future implementation requirements around Effect KeyValueStore, Schema-backed profiles, tagged errors, and local v4 import paths without adding code.",
-          "Pass 3 - verification coverage: Executor personal OAuth succeeded in the forked thread, DeepWiki returned results for `vercel/eve`, `openai/codex`, and `Effect-TS/effect`, and the spec/task ledger were updated with the findings."
+          "Pass 1 - ownership/call graph: DeepWiki and Parallel evidence kept implementation gated. Eve remains app-owned and Gateway-backed by default; Codex app-server/runtime becomes a separate prospective package/service boundary.",
+          "Pass 2 - Effect implementation quality: Research task tightened future implementation requirements around Effect KeyValueStore, Schema-backed profiles, app-server process/client services, tagged errors, local v4 import paths, and API-key env scrubbing without adding code.",
+          "Pass 3 - verification coverage: Executor personal OAuth succeeded in the forked thread, DeepWiki returned results for `vercel/eve`, `openai/codex`, and `Effect-TS/effect`, Parallel Task returned Codex subscription/app-server findings, and the spec/task ledger were updated with the findings."
         ]
       },
       "commitAfterPassing": true
@@ -100,13 +101,14 @@
     },
     {
       "id": "prove-codex-auth-runtime-path",
-      "title": "Prove the Codex-authenticated runtime path",
+      "title": "Prove the Codex app-server subscription path",
       "status": "pending",
-      "description": "Run an opt-in local proof that a stored Codex credential can produce a model result through the selected supported path without exposing secrets.",
+      "description": "Run an opt-in local proof that Codex subscription auth can produce a model result through `codex app-server` or a private pinned bridge without exposing secrets.",
       "implementationNotes": [
-        "If the supported path is Codex SDK, prove a coding-focused prompt through @openai/codex-sdk or Codex CLI without changing Eve's default model.",
-        "If the supported path is an AI SDK LanguageModel, prove generateText with a minimal prompt and sanitized output.",
-        "If only a private OpenAI-compatible endpoint works, keep it loopback/private and prove the endpoint cannot be reached publicly.",
+        "Prefer spawning `codex app-server` with isolated CODEX_HOME as the first proof target.",
+        "When subscription auth is selected, scrub OPENAI_API_KEY and other API-key env vars from the child process and assert this in tests.",
+        "If a private OpenAI-compatible bridge is needed for Eve, keep it loopback/private and prove the endpoint cannot be reached publicly.",
+        "If a direct AI SDK LanguageModel adapter over app-server is practical, prove generateText with a minimal prompt and sanitized output.",
         "If no supported path exists, mark this task blocked and do not proceed to Eve replacement."
       ],
       "mandatoryVerification": [
@@ -114,6 +116,7 @@
         "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
         "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
         "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "App-server startup, handshake, auth strategy, API-key env scrubbing, and failure mapping are tested without network where possible.",
         "Live proof logs contain no access tokens, refresh tokens, authorization codes, raw OAuth responses, private prompts, or full request/response bodies.",
         "Provider errors are mapped to safe tagged errors.",
         "bun run --filter @bundjil/codex-oauth test",
@@ -123,6 +126,39 @@
         "A sanitized live proof records the selected runtime path.",
         "The spec and package README are updated with the result.",
         "A failure to prove support blocks Eve model replacement rather than adding a fallback fake."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "define-codex-runtime-contract",
+      "title": "Define @bundjil/codex-runtime app-server services",
+      "status": "pending",
+      "description": "Create the package contract for starting, isolating, and speaking to Codex app-server without wiring Eve's default model yet.",
+      "implementationNotes": [
+        "Use package layout src/schemas.ts, src/errors.ts, src/auth-strategy.ts, src/app-server-protocol.ts, src/app-server-client.service.ts, src/app-server-process.layer.ts, and src/index.ts.",
+        "Model auth strategies explicitly: subscription via isolated CODEX_HOME, API key BYOK, and test/mock.",
+        "Subscription mode must remove OPENAI_API_KEY, CODEX_API_KEY, and other API-key env vars from the child process unless a task explicitly proves they are harmless.",
+        "Do not expose an HTTP bridge or change apps/agent in this task."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for process startup, protocol calls, and shutdown.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-runtime.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover app-server request/response encoding, auth strategy env scrubbing, process startup failure mapping, protocol failure mapping, and safe error redaction.",
+        "bun run --filter @bundjil/codex-runtime test",
+        "bun run --filter @bundjil/codex-runtime build",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "@bundjil/codex-runtime exports app-server schemas, errors, service tags, and memory/mock layers.",
+        "Package README documents app-server scope, auth strategy, env hygiene, and proof commands.",
+        "No Eve app model change is introduced."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,

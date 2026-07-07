@@ -205,6 +205,68 @@ DeepWiki queries completed on 2026-07-07:
   authoritative for implementation imports:
   `effect/unstable/persistence/KeyValueStore`.
 
+### Executor / Parallel Task research
+
+The user challenged the DeepWiki framing because OpenClaw, Hermes-style
+proxies, Pi-adjacent agent ecosystems, and Codex CLI automation demonstrate
+subscription-backed model use in practice.
+
+Parallel Task run `trun_e43fa758cfba40c3bf5ad5cddb1b7196` completed on
+2026-07-07 and refined the conclusion:
+
+- Do not treat a ChatGPT / Codex OAuth token as an OpenAI Platform API key or
+  as a Vercel AI Gateway credential. AI Gateway remains the official Eve /
+  AI SDK path for provider billing, BYOK, OIDC, observability, and routing.
+- The subscription-backed path used by OpenClaw-style systems is a different
+  architecture: run Codex's own runtime, especially `codex app-server`, or a
+  pinned OpenAI-compatible proxy that wraps Codex subscription access.
+- OpenClaw's OpenAI provider documentation says embedded agent turns on OpenAI
+  models run through the native Codex app-server runtime by default. Its Codex
+  harness reference documents app-server setup and per-agent isolation
+  patterns. Bundjil can copy the architecture, not the code.
+- Codex app-server exposes a JSON-RPC-style integration seam for host apps.
+  Promptfoo and other ecosystem docs treat it as a provider surface. This is a
+  better first proof target than reimplementing PKCE / refresh in TypeScript.
+- Community projects such as `codex-proxy`, `codex-bridge`, and
+  `llm-openai-via-codex` show OpenAI-compatible HTTP wrappers over Codex
+  subscription access. These are useful research artifacts but should be
+  treated as pinned sidecars or spike references, not as a stable primary
+  contract.
+- Hermes Agent exposes an OpenAI-compatible API server, but the research did
+  not establish Hermes as a Codex-subscription OAuth implementation. It is
+  relevant as a local OpenAI-compatible backend pattern, not as evidence that
+  Eve can directly spend a ChatGPT plan through AI Gateway.
+- Pi appears to be a flexible coding-agent toolkit with provider configuration
+  and local/OpenAI-compatible model support; the research did not establish a
+  first-class Codex OAuth subscription path inside Pi.
+
+This changes the implementation direction:
+
+```text
+Eve agent
+  -> AI Gateway model string by default
+  -> optional Codex subscription provider
+    -> Bundjil Codex app-server runner service
+      -> isolated CODEX_HOME / auth profile store
+      -> codex app-server subprocess or sandbox sidecar
+      -> AI SDK-compatible adapter or private OpenAI-compatible bridge
+```
+
+Source URLs:
+
+- <https://developers.openai.com/codex/cli>
+- <https://developers.openai.com/codex/auth>
+- <https://developers.openai.com/codex/app-server>
+- <https://docs.openclaw.ai/providers/openai>
+- <https://docs.openclaw.ai/plugins/codex-harness-reference>
+- <https://docs.openclaw.ai/plugins/codex-harness>
+- <https://www.promptfoo.dev/docs/providers/openai-codex-app-server>
+- <https://github.com/icebear0828/codex-proxy>
+- <https://github.com/xiaoshaoning/codex-bridge>
+- <https://simonwillison.net/2026/Apr/23/llm-openai-via-codex>
+- <https://hermes-agent.nousresearch.com/docs/user-guide/features/api-server>
+- <https://github.com/earendil-works/pi>
+
 ### Subagent review passes
 
 Two subagents reviewed the direction before this draft:
@@ -237,6 +299,10 @@ This spec was intentionally iterated before acceptance:
    thread refresh. DeepWiki findings tightened the plan away from "Codex OAuth
    as generic Eve model access" and toward "Codex OAuth for Codex workflows;
    keep Eve on Gateway until a supported `LanguageModel` path is proven."
+6. Parallel Task correction: deeper ecosystem research showed the viable
+   subscription-backed model path is not "OAuth token as API key"; it is Codex
+   app-server or a pinned Codex-to-OpenAI-compatible bridge. The spec now
+   treats Codex app-server embedding as the preferred proof target.
 
 ## Target Shape
 
@@ -275,6 +341,25 @@ apps/agent/
     model-provider.test.ts
 ```
 
+Add a Codex runtime package only after the app-server proof is accepted:
+
+```text
+packages/codex-runtime/
+  package.json
+  README.md
+  src/
+    index.ts
+    app-server-client.service.ts
+    app-server-process.layer.ts
+    app-server-protocol.ts
+    auth-strategy.ts
+    errors.ts
+    schemas.ts
+  test/
+    app-server-protocol.test.ts
+    auth-strategy.test.ts
+```
+
 Potential Vercel storage adapter after local service proof:
 
 ```text
@@ -303,11 +388,11 @@ SDK clients in `@bundjil/core`.
   copy state file formats, or expose a general OpenClaw-style gateway.
 - The first implementation must prove the runtime path before changing the
   default Eve model from Vercel AI Gateway.
-- DeepWiki research makes the first safe runtime assumption narrower: Codex
-  OAuth is for Codex workflows, not generic Eve chat-completion access. Treat
-  Codex SDK / Codex workflow invocation as the first supported path to explore,
-  and keep Eve's default model on AI Gateway until a public, supported
-  `LanguageModel` path exists.
+- Research conclusion: Codex OAuth is not a generic Platform API key and does
+  not plug into Vercel AI Gateway as subscription billing. The viable path is
+  Codex runtime embedding: first prove `codex app-server` with isolated
+  `CODEX_HOME`, then adapt that runtime into Eve through either a direct AI SDK
+  `LanguageModel` adapter or a private OpenAI-compatible bridge.
 - Do not expose a public OpenAI-compatible endpoint in the first iteration. If
   a compatibility endpoint is required for Eve, bind it to loopback or private
   Vercel protection only, then document the security model.
@@ -318,13 +403,17 @@ SDK clients in `@bundjil/core`.
 
 The service should support two credential sources, in this order:
 
-1. **Supported Codex token path:** use `CODEX_ACCESS_TOKEN` or
+1. **Codex CLI/app-server owned login:** prefer `codex login`, Codex
+   device-code login, or `codex app-server` auth modes over reimplementing
+   OAuth endpoints in TypeScript. The Codex binary should own fragile auth
+   details whenever possible.
+2. **Supported Codex token path:** use `CODEX_ACCESS_TOKEN` or
    `codex login --with-access-token` when the user has a Business /
    Enterprise Codex access token or another officially documented token source.
-2. **Interactive browser login spike:** investigate a PKCE loopback login flow
-   only after DeepWiki / source review confirms the current Codex auth flow and
-   policy boundary. This may resemble OpenClaw's pattern, but must be
-   implemented independently and verified against current OpenAI docs/source.
+3. **Interactive browser login spike:** investigate a PKCE loopback login flow
+   only if `codex app-server` cannot satisfy the Bundjil runtime requirement.
+   This may resemble OpenClaw's pattern, but must be implemented independently
+   and verified against current OpenAI docs/source.
 
 Candidate interactive steps for the spike:
 
@@ -394,14 +483,18 @@ where `input` is schema-owned and includes:
 
 Candidate runtime paths:
 
-1. **Codex SDK path:** best for coding-focused subagent/workflow tasks. It may
-   not be a drop-in Eve turn model because Eve expects an AI SDK
-   `LanguageModel`.
-2. **AI SDK custom provider path:** best fit for Eve if the implementation can
-   present Codex-authenticated inference through a private OpenAI-compatible or
-   custom AI SDK `LanguageModel`.
-3. **AI Gateway fallback:** keep current `google/gemini-2.5-flash` or another
-   cheap Gateway model while Codex OAuth is being proven.
+1. **Codex app-server path:** preferred proof target. Spawn or sandbox
+   `codex app-server`, isolate `CODEX_HOME` per agent/profile, scrub
+   `OPENAI_API_KEY` when subscription auth is selected, speak the documented
+   app-server protocol, and adapt the result to Eve.
+2. **Pinned private OpenAI-compatible bridge:** acceptable as a spike when it
+   wraps Codex app-server or a pinned Codex subscription proxy and is kept
+   loopback/private. It can make Eve integration easier through
+   `@ai-sdk/openai-compatible`, but it is a high-risk surface if exposed.
+3. **Codex SDK/CLI workflow path:** useful for coding-focused subagent tasks
+   even if it cannot become Eve's primary turn model immediately.
+4. **AI Gateway fallback:** keep current `google/gemini-2.5-flash` or another
+   cheap Gateway model while Codex subscription access is being proven.
 
 The spec does not approve replacing the default Eve model until a live proof
 shows a prompt can complete through the Codex-authenticated provider.
@@ -443,6 +536,11 @@ Package code must:
 Initial schemas:
 
 ```ts
+CodexAppServerAuthStrategy;
+CodexAppServerConfig;
+CodexAppServerRequest;
+CodexAppServerResponse;
+CodexAppServerSession;
 OAuthPrincipal;
 CodexOAuthSubject;
 CodexOAuthProfileId;
@@ -458,6 +556,8 @@ CodexModelProviderConfig;
 Initial service tags:
 
 ```ts
+CodexAppServerClient;
+CodexAppServerProcess;
 OAuthProfileStore;
 CodexOAuthTokenService;
 CodexOAuthClient;
@@ -467,6 +567,13 @@ CodexModelProvider;
 Initial named operations:
 
 ```ts
+CodexAppServerProcess.start(input);
+CodexAppServerProcess.stop(session);
+CodexAppServerClient.initialize(session);
+CodexAppServerClient.startThread(input);
+CodexAppServerClient.startTurn(input);
+CodexAppServerClient.interruptTurn(input);
+
 OAuthProfileStore.getProfile(subject);
 OAuthProfileStore.putProfile(profile);
 OAuthProfileStore.removeProfile(subject);
@@ -486,6 +593,9 @@ CodexModelProvider.createLanguageModel(input);
 Initial errors:
 
 ```ts
+CodexAppServerAuthError;
+CodexAppServerProtocolError;
+CodexAppServerProcessError;
 OAuthProfileSchemaError;
 OAuthProfileStorageError;
 OAuthProfileNotFound;
@@ -525,25 +635,23 @@ Eve HTTP /eve/v1/session
   -> apps/agent/agent/agent.ts
   -> apps/agent/agent/model-provider.ts
   -> CodexModelProvider
-    -> CodexOAuthTokenService
-      -> OAuthProfileStore
-        -> KeyValueStore.KeyValueStore layer
-          -> memory | filesystem | Upstash Redis adapter
-    -> AI SDK LanguageModel
-      -> verified Codex-authenticated runtime path
+    -> CodexAppServerClient
+      -> CodexAppServerProcess
+        -> isolated CODEX_HOME / env scrubber
+        -> codex app-server subprocess or sandbox sidecar
+      -> JSON-RPC initialize / thread / turn protocol
+    -> AI SDK LanguageModel adapter or private bridge
 ```
 
-OAuth login CLI path:
+Token/profile storage path:
 
 ```ts
-bun run --filter @bundjil/codex-oauth login
-  -> CodexOAuthClient.startLogin
-    -> Config / PKCE / state
-    -> Browser or printed URL
-  -> CodexOAuthClient.completeLogin
-    -> token exchange
-    -> Schema.decodeUnknownEffect(CodexOAuthProfile)
-    -> OAuthProfileStore.putProfile
+CodexAppServerProcess
+  -> CodexOAuthTokenService
+    -> OAuthProfileStore
+      -> KeyValueStore.KeyValueStore layer
+        -> memory | filesystem | Upstash Redis adapter
+  -> CODEX_HOME seed or Codex app-server auth mode
 ```
 
 Tests, package:
@@ -572,7 +680,9 @@ Opt-in live proof:
 ```ts
 local/private env
   -> Codex OAuth profile exists
-  -> run provider smoke script
+  -> isolated CODEX_HOME exists or is created
+  -> codex app-server starts
+  -> app-server JSON-RPC handshake succeeds
   -> Eve /eve/v1/session
   -> streamed model response through Codex-authenticated provider
 ```
@@ -581,12 +691,11 @@ local/private env
 
 Before implementation starts:
 
-- Complete personal executor OAuth authorization.
-- Use executor personal DeepWiki to research Codex auth, Eve model provider
-  integration, and Effect v4 KeyValueStore.
-- Update this spec's research section with DeepWiki findings.
-- Confirm whether the runtime path is Codex SDK, private OpenAI-compatible
-  endpoint, custom AI SDK provider, or "not currently supported".
+- Keep the completed DeepWiki and Parallel Task findings in this spec current.
+- Confirm the exact installed Codex CLI / app-server version and protocol docs.
+- Confirm whether the first proof is direct app-server JSON-RPC,
+  a direct AI SDK `LanguageModel` adapter, or a private OpenAI-compatible bridge
+  over app-server.
 
 Per implementation task:
 
@@ -633,14 +742,22 @@ Docs must distinguish:
 - Opt-in local-only proof scripts.
 - Future hosted/Vercel storage work.
 - Unsupported or unproven Codex runtime paths.
+- Difference between AI Gateway billing, OpenAI API-key billing, and ChatGPT /
+  Codex subscription-backed runtime access.
 
 ## Risks And Tradeoffs
 
-- Codex OAuth may not be a supported general-purpose model credential for Eve.
-  If so, use Codex SDK only for coding-specialist workflows and keep Eve on AI
-  Gateway or another supported AI SDK provider.
+- Codex OAuth is not an OpenAI Platform API key and should not be treated as
+  one. The subscription-backed path must route through Codex runtime surfaces
+  such as app-server or a pinned bridge.
 - PKCE endpoints inferred from OpenClaw may drift or may be unsupported for
   Bundjil. Do not hard-code them without current source/doc verification.
+- A direct dependency on `chatgpt.com/backend-api/codex/*` style endpoints is
+  brittle. Prefer `codex app-server`; if a proxy is used, pin it and treat it
+  as a replaceable sidecar.
+- If `OPENAI_API_KEY` and Codex subscription auth are both present, the runtime
+  can silently bill the wrong path. Subscription mode must scrub API-key env
+  from child processes and prove auth precedence in tests.
 - Refresh token rotation can log out other tools if multiple owners refresh the
   same token. Bundjil needs one token sink per profile.
 - Vercel serverless concurrency can race token refresh. The service needs a
@@ -666,14 +783,15 @@ Docs must distinguish:
 
 ## Open Questions
 
-- Does the current Codex TypeScript SDK expose enough hooks to run under a
-  Bundjil-managed access token without shelling out, or should Bundjil call the
-  Codex CLI/SDK as a specialist workflow runner?
-- Is there any public, supported OpenAI-compatible inference endpoint for
-  ChatGPT/Codex OAuth tokens? DeepWiki did not establish one; current evidence
-  points to Codex workflows only.
+- Can Bundjil run `codex app-server` reliably inside the local Eve dev process
+  and later inside a Vercel Sandbox or equivalent hosted sidecar?
+- Is a direct AI SDK `LanguageModel` adapter practical over the app-server
+  protocol, or should the first proof expose a private OpenAI-compatible bridge?
 - If Eve requires an AI SDK `LanguageModel`, should Bundjil implement a custom
   provider or a private OpenAI-compatible adapter?
+- What exact auth precedence rules does Codex app-server apply when API key and
+  ChatGPT subscription auth are both visible, and how do we enforce subscription
+  mode without accidental API billing?
 - What is the right hosted token encryption layer before using Upstash Redis
   on Vercel?
 - Should the first login UX be CLI-only, local web-only, or a Vercel-protected
