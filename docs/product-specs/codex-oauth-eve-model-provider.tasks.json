@@ -1,6 +1,6 @@
 {
   "title": "Codex OAuth Eve Model Provider Tasks",
-  "status": "draft",
+  "status": "completed",
   "spec": "docs/product-specs/codex-oauth-eve-model-provider.md",
   "principles": [
     "Prove the direct Codex Responses runtime path before replacing the current AI Gateway Eve model.",

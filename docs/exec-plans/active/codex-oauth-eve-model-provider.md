@@ -1,6 +1,6 @@
 # Codex OAuth Eve Model Provider Implementation Plan
 
-Status: Active  
+Status: Complete
 Spec: `docs/product-specs/codex-oauth-eve-model-provider.md`  
 Task ledger: `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
 
@@ -14,8 +14,8 @@ ledger, commits the accepted slice, and only then delegates the next task.
 ## Current Task
 
 `final-verification` is complete in the ledger. No task remains in the sibling
-task list. Parent acceptance, commit, and push are pending for this final
-evidence slice.
+task list. Parent acceptance, commit, and push are complete through the latest
+`main` push.
 
 ## Accepted Tasks
 
@@ -714,4 +714,4 @@ Out of scope:
   `@bundjil/codex-oauth` test/build, targeted `@bundjil/codex-proxy`
   test/build/smoke-test, root `bun run verification`, `git status --short`,
   completed-task audit checks, and product-surface stale/secret scans passed.
-  Parent reviewed the evidence and accepted the slice for commit.
+  Parent reviewed the evidence, committed it, and pushed it to `origin/main`.
