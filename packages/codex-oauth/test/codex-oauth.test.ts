@@ -22,6 +22,13 @@ import {
   CodexProfileStoreMemory,
 } from "../src/mock.layer.js";
 
+const encodeUnknownJson = Schema.encodeUnknownSync(
+  Schema.UnknownFromJsonString
+);
+
+const renderForLeakCheck = (value: unknown) =>
+  `${String(value)} ${encodeUnknownJson(value)}`;
+
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
   principal: {
@@ -105,7 +112,7 @@ it.effect("decodes and encodes profiles with redacted runtime tokens", () =>
     const profile = yield* makeProfile(subject, Date.now() + 60_000);
     const encoded = yield* Schema.encodeEffect(CodexOAuthProfile)(profile);
 
-    assert.strictEqual(JSON.stringify(profile.accessToken), '"<redacted>"');
+    assert.strictEqual(encodeUnknownJson(profile.accessToken), '"<redacted>"');
     assert.strictEqual(
       Redacted.value(profile.accessToken),
       "access-token-secret"
@@ -193,7 +200,7 @@ it.effect(
         Effect.provide(CodexOAuthMemory([profile])),
         Effect.flip
       );
-      const rendered = `${String(error)} ${JSON.stringify(error)}`;
+      const rendered = renderForLeakCheck(error);
 
       assert.strictEqual(error._tag, "CodexOAuthTokenExpired");
       assert.strictEqual(rendered.includes("access-token-secret"), false);
@@ -259,7 +266,7 @@ it.effect("maps KeyValueStore failures to safe storage errors", () =>
     }
     assert.strictEqual(error.operation, "getProfile");
     assert.strictEqual(
-      JSON.stringify(error).includes("access-token-secret"),
+      encodeUnknownJson(error).includes("access-token-secret"),
       false
     );
   })

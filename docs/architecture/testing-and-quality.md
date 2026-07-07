@@ -45,7 +45,8 @@ bun run --filter @bundjil/agent build
   build, then root `bun run verification`.
 - Eve tool change: run `@bundjil/eve-effect` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
-- Runtime config change: run app typecheck/build and verification.
+- Runtime config change: run app typecheck, app tests, app build, and
+  verification.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex-oauth` tests,
@@ -114,6 +115,36 @@ curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
+
+For Codex proxy mode, start the local proxy in mock mode first:
+
+```bash
+PORT=8788 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+BUNDJIL_CODEX_PROXY_MODE=mock \
+bun run --filter @bundjil/codex-proxy dev
+```
+
+Then start Eve with the private provider selected:
+
+```bash
+PORT=2101 \
+BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
+BUNDJIL_AGENT_MODEL=codex-default-model \
+BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=123456 \
+bun run --filter @bundjil/agent dev:no-ui
+```
+
+Required local proof:
+
+- `GET /eve/v1/health` returns ready.
+- `GET /eve/v1/info` reports `bundjil-codex-proxy/...` and the configured
+  context window.
+- `POST /eve/v1/session` plus the stream endpoint emits a completed message.
+- Output is sanitized and excludes bearer tokens, OAuth tokens, authorization
+  codes, raw upstream responses, and full private prompts.
 
 ## Codex Proxy Verification
 

@@ -15,10 +15,13 @@ apps/agent/
   vitest.config.ts
   agent/
     agent.ts
+    config.ts
     instructions.md
+    model-provider.ts
     tools/
       workspace_status.ts
   test/
+    model-provider.test.ts
     workspace-status-tool.test.ts
 
 packages/eve-effect/
@@ -58,10 +61,12 @@ Vercel-managed runtime configuration, never in committed source.
 
 - `agent/agent.ts` defines the Eve agent and reads app config from
   `agent/config.ts`.
-- `agent/config.ts` defines the model through Effect Config and Schema:
-  `Config.schema(Schema.NonEmptyString, "BUNDJIL_AGENT_MODEL")`,
-  `Config.withDefault("google/gemini-2.5-flash")`, and
+- `agent/config.ts` defines the model-provider config through Effect Config,
+  `Config.redacted`, `Config.url`, Effect Schema, and
   `ConfigProvider.fromEnv()`.
+- `agent/model-provider.ts` owns the provider selector. It returns either the
+  default Vercel AI Gateway model string or an AI SDK `LanguageModel` created
+  with `@ai-sdk/openai-compatible` for the private Bundjil Codex proxy.
 - `agent/instructions.md` tells the agent to use `workspace_status` for
   current repo/package questions and not to claim live channels or integrations.
 - `agent/tools/workspace_status.ts` is the model-facing Eve tool slug.
@@ -82,12 +87,17 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
-`@bundjil/codex-oauth` and `apps/codex-proxy` are not part of the Eve runtime
-path yet. The package proves that a private Codex access token can reach
-`https://chatgpt.com/backend-api/codex/responses`, and the proxy app proves a
-private mock OpenAI-compatible SSE route. Eve still uses the configured AI
-Gateway model string until the deployment and model-provider tasks are
-implemented and verified.
+`@bundjil/codex-oauth` and `apps/codex-proxy` now participate in the optional
+Codex proxy model path:
+
+- `@bundjil/codex-oauth` owns the direct Codex Responses package contracts,
+  OpenAI-compatible request/stream schemas, direct provider service, private
+  proxy service, and redacted internal-token schema.
+- `apps/codex-proxy` owns the deployable private Effect HTTP proxy app,
+  Vercel entrypoint, local dev host, app config, internal bearer-token auth,
+  and mock-mode proof.
+- `apps/agent` owns only provider selection. It does not import Codex OAuth
+  profile services, token refresh services, or direct Codex Responses clients.
 
 ## Schema Boundary
 
@@ -110,7 +120,41 @@ The `workspace_status` tool imports `WorkspaceStatusInput`,
 
 ## Production Call Graph
 
-The current local/production runtime path is:
+The default Gateway runtime path is:
+
+```text
+Eve HTTP/API
+  -> apps/agent/agent/agent.ts
+  -> agentConfig
+  -> loadAgentConfigFromEnv
+  -> loadAgentModelProviderConfig
+  -> provider: "gateway"
+  -> model string google/gemini-2.5-flash or BUNDJIL_AGENT_MODEL
+  -> Eve AI Gateway model runtime
+```
+
+The optional Codex proxy model path is:
+
+```text
+Eve HTTP/API
+  -> apps/agent/agent/agent.ts
+  -> agentConfig
+  -> loadAgentConfigFromEnv
+  -> loadAgentModelProviderConfig
+  -> provider: "codex-proxy"
+  -> createAgentModel(...)
+  -> @ai-sdk/openai-compatible LanguageModel
+  -> apps/codex-proxy /v1/chat/completions
+  -> OpenAICompatibleProxy.handleChatCompletions
+  -> CodexDirectProvider.streamChatCompletion
+  -> CodexOAuthService / CodexHttpClient / CodexStreamMapper
+  -> chatgpt.com/backend-api/codex/responses
+```
+
+In current committed tests and local proof, the proxy runs in mock mode and
+does not call the live Codex backend.
+
+The `workspace_status` tool runtime path is:
 
 ```text
 Eve HTTP/API
@@ -144,6 +188,13 @@ bun run --filter @bundjil/agent test
   -> workspaceStatusTool.execute(...)
   -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
   -> @bundjil/core defaultWorkspacePackages
+
+bun run --filter @bundjil/agent test
+  -> apps/agent/test/model-provider.test.ts
+  -> loadAgentConfig / loadAgentModelProviderConfig
+  -> createAgentModel
+  -> AI Gateway string or @ai-sdk/openai-compatible LanguageModel
+  -> injected fetch proof for private bearer auth and no token body leak
 ```
 
 Package test path:
@@ -190,8 +241,26 @@ bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy smoke-test
 ```
 
-Do not set Eve to use the Codex proxy until the proxy has passed hosted
-preview verification and the model-provider task updates `apps/agent`.
+When testing Eve against the local proxy, run the proxy first:
+
+```bash
+PORT=8788 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+BUNDJIL_CODEX_PROXY_MODE=mock \
+bun run --filter @bundjil/codex-proxy dev
+```
+
+Then start Eve in Codex proxy mode:
+
+```bash
+PORT=2101 \
+BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
+BUNDJIL_AGENT_MODEL=codex-default-model \
+BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=123456 \
+bun run --filter @bundjil/agent dev:no-ui
+```
 
 ## HTTP Endpoints
 
@@ -254,6 +323,22 @@ Follow-up live Gateway proof:
   `@bundjil/eve-effect`.
 - The model completed with a concise answer naming those three packages.
 
+Follow-up local Codex proxy proof:
+
+- `GET /eve/v1/health` returned `ok: true` and `status: ready`.
+- `GET /eve/v1/info` reported model id
+  `bundjil-codex-proxy/codex-default-model`, provider
+  `bundjil-codex-proxy`, and context window `123456`.
+- `GET /health` on the local proxy returned `ok: true` and `mode: mock`.
+- `POST /eve/v1/session` returned a session id for a short probe prompt.
+- `GET /eve/v1/session/<sessionId>/stream` emitted `session.started`,
+  `message.appended`, `message.completed`, `step.completed`,
+  `turn.completed`, and `session.waiting`.
+- The streamed model text was the mock proxy response, proving Eve used the
+  private proxy `LanguageModel`.
+- The proof output contained no bearer token, OAuth token, refresh token,
+  authorization code, or raw upstream response body.
+
 ## AI Gateway Setup
 
 `apps/agent/agent/config.ts` validates the Gateway model id as a non-empty
@@ -281,6 +366,32 @@ Vercel project secrets. For local Bundjil development, the current working
 machine uses an ignored `apps/agent/.env.local` key from the personal Vercel
 scope `cooper-corbetts-projects`. If credentials are missing, local sessions
 can start but the streamed turn fails before the model can select tools.
+
+## Codex Proxy Provider Setup
+
+Codex proxy mode is configured with app-owned Effect Config values:
+
+```text
+BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
+BUNDJIL_AGENT_MODEL=<fallback-or-proxy-model-id>
+BUNDJIL_CODEX_PROXY_BASE_URL=<private-proxy-base-url-including-/v1>
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=<redacted-internal-bearer-token>
+BUNDJIL_CODEX_PROXY_MODEL=<optional-proxy-model-id>
+BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=<optional-positive-integer>
+```
+
+Rules:
+
+- Keep Gateway mode as the default until the hosted live Codex proxy path has
+  storage, refresh, and production protection.
+- Put the internal proxy token only in ignored env files or Vercel env vars.
+- Keep `BUNDJIL_CODEX_PROXY_BASE_URL` pointed at the private proxy `/v1`
+  prefix, not the direct `chatgpt.com` endpoint.
+- The agent app must not import `CodexOAuthService`, `CodexProfileStore`, or
+  direct Codex HTTP clients. Those remain package/proxy concerns.
+- Provider request bodies, proof output, tests, smoke scripts, and leak checks
+  must use Effect Schema JSON encoders such as
+  `Schema.fromJsonString(...)`, rather than raw native JSON serialization.
 
 Before starting new integrations such as Sendblue, Cloudflare email, Vercel
 Connect, Notion, or a deployed app boundary, draft a compact SPEC with

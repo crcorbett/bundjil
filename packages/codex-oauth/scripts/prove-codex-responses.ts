@@ -1,8 +1,9 @@
 import process from "node:process";
 
-import { ConfigProvider, Effect, Exit } from "effect";
+import { ConfigProvider, Effect, Exit, Schema } from "effect";
 
 import {
+  CodexResponsesProofResult,
   loadCodexResponsesProofInput,
   runCodexResponsesProof,
 } from "../src/index.js";
@@ -21,30 +22,40 @@ const program = Effect.gen(function* proveCodexResponses() {
   Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv()))
 );
 
+const ProofSuccessOutput = Schema.Struct({
+  status: Schema.Literal("proved"),
+  result: CodexResponsesProofResult,
+});
+
+const ProofBlockedOutput = Schema.Struct({
+  status: Schema.Literal("blocked"),
+  message: Schema.String,
+});
+
+const encodeProofSuccessOutput = Schema.encodeSync(
+  Schema.fromJsonString(ProofSuccessOutput)
+);
+
+const encodeProofBlockedOutput = Schema.encodeSync(
+  Schema.fromJsonString(ProofBlockedOutput)
+);
+
 const exit = await Effect.runPromiseExit(program);
 
 if (Exit.isSuccess(exit)) {
   process.stdout.write(
-    `${JSON.stringify(
-      {
-        status: "proved",
-        result: exit.value,
-      },
-      null,
-      2
-    )}\n`
+    `${encodeProofSuccessOutput({
+      status: "proved",
+      result: exit.value,
+    })}\n`
   );
 } else {
   process.stderr.write(
-    `${JSON.stringify(
-      {
-        status: "blocked",
-        message:
-          "Codex Responses live proof requires CODEX_ACCESS_TOKEN and a working subscription-backed Codex endpoint. No token, prompt, authorization code, or response body was printed.",
-      },
-      null,
-      2
-    )}\n`
+    `${encodeProofBlockedOutput({
+      status: "blocked",
+      message:
+        "Codex Responses live proof requires CODEX_ACCESS_TOKEN and a working subscription-backed Codex endpoint. No token, prompt, authorization code, or response body was printed.",
+    })}\n`
   );
   process.exitCode = 1;
 }

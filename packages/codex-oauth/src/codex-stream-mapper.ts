@@ -8,7 +8,6 @@ import {
 } from "./schemas.js";
 import type {
   CodexResponsesStreamMapInput,
-  OpenAICompatibleChatCompletionChunk as OpenAICompatibleChatCompletionChunkType,
   OpenAICompatibleChatCompletionStream as OpenAICompatibleChatCompletionStreamType,
 } from "./schemas.js";
 
@@ -58,7 +57,7 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
         .filter((line) => line.trim().length > 0),
       decodeCodexStreamLine
     );
-    const chunks: OpenAICompatibleChatCompletionChunkType[] = [];
+    const chunks: string[] = [];
 
     for (const decodedEvent of decodedEvents) {
       if (Option.isNone(decodedEvent)) {
@@ -99,11 +98,24 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
         )
       );
 
-      chunks.push(chunk);
+      const encodedChunk = yield* Schema.encodeEffect(
+        Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
+      )(chunk).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexResponsesStreamError({
+              operation: "toOpenAICompatibleStream",
+              message: "Unable to encode OpenAI-compatible stream chunk.",
+              cause,
+            })
+        )
+      );
+
+      chunks.push(encodedChunk);
     }
 
     const body = `${chunks
-      .map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`)
+      .map((chunk) => `data: ${chunk}\n\n`)
       .join("")}data: [DONE]\n\n`;
 
     return yield* Schema.decodeUnknownEffect(

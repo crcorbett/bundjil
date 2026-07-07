@@ -40,11 +40,23 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
             })
         )
       );
+      const encodedChunk = yield* Schema.encodeEffect(
+        Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
+      )(chunk).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexResponsesStreamError({
+              operation: "toOpenAICompatibleStream",
+              message: "Unable to encode mock OpenAI-compatible stream chunk.",
+              cause,
+            })
+        )
+      );
 
       return yield* Schema.decodeUnknownEffect(
         OpenAICompatibleChatCompletionStream
       )({
-        body: `data: ${JSON.stringify(chunk)}\n\ndata: [DONE]\n\n`,
+        body: `data: ${encodedChunk}\n\ndata: [DONE]\n\n`,
         contentType: "text/event-stream",
       }).pipe(
         Effect.mapError(

@@ -13,8 +13,8 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-None. `deploy-codex-proxy-vercel` is accepted; the next task in the ledger is
-`wire-eve-model-provider`, but it was not implemented in this slice.
+`add-vercel-kv-adapter` is next in the ledger. Do not begin it without a new
+implementation pass because it changes hosted storage and token persistence.
 
 ## Accepted Tasks
 
@@ -329,6 +329,97 @@ Verification:
   clean.
 - Production deploy: skipped.
 
+### wire-eve-model-provider
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `apps/agent/agent/agent.ts`
+- `apps/agent/agent/config.ts`
+- `apps/agent/agent/model-provider.ts`
+- `apps/agent/test/model-provider.test.ts`
+- `apps/agent/README.md`
+- `apps/agent/package.json`
+- `packages/codex-oauth/src/schemas.ts`
+- `packages/codex-oauth/src/index.ts`
+- Schema JSON encoder updates across `packages/codex-oauth` and
+  `apps/codex-proxy`
+- root and architecture docs
+- `docs/product-specs/codex-oauth-eve-model-provider.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+- `bun.lock`
+
+Evidence:
+
+- Added `apps/agent/agent/model-provider.ts` with Effect Schema provider
+  contracts for `gateway` and `codex-proxy`.
+- Gateway mode remains the default and returns the model string
+  `google/gemini-2.5-flash` unless `BUNDJIL_AGENT_MODEL` overrides it.
+- Codex proxy mode creates an AI SDK OpenAI-compatible `LanguageModel` named
+  `bundjil-codex-proxy` and points it at the configured private proxy `/v1`
+  base URL with the internal bearer token.
+- `apps/agent/agent/config.ts` loads provider mode, model id, proxy base URL,
+  redacted internal token, optional proxy model id, and context-window tokens
+  through Effect Config and Effect Schema.
+- `apps/agent/agent/agent.ts` passes `modelContextWindowTokens` to Eve only
+  when codex-proxy mode is selected.
+- The Eve app still does not import Codex OAuth profile storage, token refresh,
+  hosted storage, or direct Codex HTTP clients.
+- Raw native JSON serialization was removed from app/package source in favor
+  of Effect Schema JSON encoders for request bodies, SSE chunks, smoke output,
+  proof output, and leak checks.
+
+Runtime proof:
+
+- Gateway mode `/eve/v1/info` reported model
+  `google/gemini-2.5-flash`, Gateway endpoint connected by API key,
+  `workspace_status`, and `diagnosticCount: 0`.
+- Local proxy mode ran `apps/codex-proxy` in mock mode on port `8788` and Eve
+  in codex-proxy mode on port `2101`.
+- Proxy mode `/eve/v1/info` reported model id
+  `bundjil-codex-proxy/codex-default-model`, provider
+  `bundjil-codex-proxy`, and context window `123456`.
+- Proxy mode session streaming emitted `session.started`, `message.appended`,
+  `message.completed`, `step.completed`, `turn.completed`, and
+  `session.waiting` with the mock proxy response.
+- No bearer token, OAuth token, refresh token, authorization code, or raw
+  upstream response body was printed in proof output.
+
+Parent audit:
+
+1. Ownership and call graph: `apps/agent` owns provider selection, app config,
+   Eve model wiring, and app tests. `@bundjil/codex-oauth` owns reusable
+   schemas and proxy contracts. `apps/codex-proxy` owns the HTTP proxy. The
+   Eve app only calls the proxy through an AI SDK `LanguageModel`.
+2. Effect implementation quality: config uses `Config`, `ConfigProvider`,
+   `Config.redacted`, `Config.url`, Schema literals/unions, redacted token
+   schemas, `Match`, `Effect.all`, flat `Effect.gen`, `Effect.fn`, spans, and
+   tagged config errors. JSON boundary encoding uses Effect Schema
+   `fromJsonString` and `UnknownFromJsonString`.
+3. Verification coverage: targeted app/package checks passed, local Gateway
+   and local Codex proxy Eve runtime proofs passed, and scans found no raw
+   native JSON calls, unsafe casts, local DTO mirrors, direct package env
+   reads, or API-key fallback.
+
+Verification:
+
+- `bun run --filter @bundjil/agent check-types`: passed.
+- `bun run --filter @bundjil/agent test`: passed, 4 tests.
+- `bun run --filter @bundjil/agent build`: passed.
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 20 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 5 tests.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed with
+  `{"healthStatus":200,"streamStatus":200,"streamLines":5}`.
+- Local Gateway and local Codex proxy Eve HTTP proofs passed.
+- Repo scan for raw native JSON calls: passed.
+- `bun run verification`: passed.
+- `bun run build`: passed.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -384,3 +475,8 @@ Out of scope:
   set, preview deployment `dpl_38aC4YSWLkCESQiJATs5JqHsSn4X` reached READY,
   direct preview health/auth/mock-SSE checks passed, Vercel runtime-log and
   CLI-output scans were clean, and production deployment was skipped.
+- 2026-07-07: `wire-eve-model-provider` accepted after app-owned provider
+  wiring, Schema JSON encoder cleanup, local Gateway proof, local Codex proxy
+  Eve session proof, targeted app/package verification, and the mandatory
+  three-pass Effect audit. Final `bun run verification` and `bun run build`
+  both passed.

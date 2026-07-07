@@ -7,7 +7,8 @@ The current codebase contains the first local Eve app slice. It establishes the
 Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
 `@bundjil/eve-effect`, and keeps framework-neutral primitives in
 `@bundjil/core`. The private Codex proxy app now exists as a separate
-deployment boundary, but Eve still uses its AI Gateway model config.
+deployment boundary. Eve uses AI Gateway by default and can opt into the
+private Codex proxy through app-owned Effect Config.
 
 ## Product Shape
 
@@ -37,6 +38,8 @@ subagents. Bundjil's committed app currently uses the root `agent.ts`,
 ```text
 apps/agent
   -> @bundjil/eve-effect
+  -> @ai-sdk/openai-compatible when BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
+  -> apps/codex-proxy over private HTTP when Codex proxy mode is enabled
 
 @bundjil/eve-effect
   -> @bundjil/core
@@ -79,7 +82,7 @@ storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It currently does not perform live
-OAuth endpoint exchange or change the Eve model.
+OAuth endpoint exchange or hosted token storage.
 
 `apps/codex-proxy` owns the deployable HTTP boundary for the private provider
 proof. It parses app-owned config with Effect Config, exposes `GET /health`,
@@ -91,7 +94,9 @@ implemented.
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, future channel files, and runtime secrets.
 It imports stable operations from `@bundjil/eve-effect` instead of duplicating
-schemas or DTOs.
+schemas or DTOs. For model selection, it owns only provider config and
+`LanguageModel` construction; it must not import Codex OAuth profile storage,
+token refresh, or direct Codex HTTP clients.
 
 ## Current Call Graphs
 
@@ -108,6 +113,27 @@ Eve HTTP API
   -> @bundjil/eve-effect getWorkspaceStatus
   -> @bundjil/eve-effect BundjilAgentOperationsLive
   -> @bundjil/core makeWorkspaceSummary
+```
+
+Gateway model path:
+
+```text
+apps/agent/agent/agent.ts
+  -> agentConfig
+  -> BUNDJIL_AGENT_MODEL_PROVIDER=gateway
+  -> Gateway model string
+  -> Eve AI Gateway runtime
+```
+
+Codex proxy model path:
+
+```text
+apps/agent/agent/agent.ts
+  -> agentConfig
+  -> BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
+  -> @ai-sdk/openai-compatible LanguageModel
+  -> apps/codex-proxy /v1/chat/completions
+  -> @bundjil/codex-oauth OpenAICompatibleProxy
 ```
 
 Schema boundary:
@@ -146,6 +172,12 @@ Vitest
   -> packages/eve-effect/test/bundjil-agent-operations.test.ts
   -> BundjilAgentOperationsLive or BundjilAgentOperationsMemory
   -> canonical WorkspaceStatus schemas and tagged errors
+
+Vitest
+  -> apps/agent/test/model-provider.test.ts
+  -> Effect Config provider selection
+  -> Gateway string or private proxy LanguageModel
+  -> injected fetch proof for bearer auth and no token body leak
 ```
 
 ## Runtime Principles
@@ -178,6 +210,8 @@ app-owned boundaries first. Move shared contracts into `@bundjil/core` or
 - `bun run --filter @bundjil/codex-proxy smoke-test` starts the private proxy
   handler on a local ephemeral Bun server and proves health plus authenticated
   mock SSE without Codex network calls.
+- `bun run --filter @bundjil/agent test` proves Gateway default selection and
+  private proxy provider construction without live credentials.
 
 See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
 operational Eve app guide and local HTTP verification commands.

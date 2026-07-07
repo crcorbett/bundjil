@@ -94,6 +94,38 @@ Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
 This provides both Standard Schema validation and Standard JSON Schema metadata
 for Eve `defineTool` boundaries.
 
+## JSON Serialization
+
+Do not use raw native JSON serialization or ad hoc string assembly in committed
+app or package code. Boundary JSON must go through Effect Schema so encoded
+values stay tied to the canonical contract:
+
+```ts
+const encodeRequest = Schema.encodeSync(Schema.fromJsonString(RequestSchema));
+const body = encodeRequest(request);
+```
+
+For Effect programs, keep encoding in the program and surface typed failures:
+
+```ts
+const body =
+  yield * Schema.encodeEffect(Schema.fromJsonString(RequestSchema))(request);
+```
+
+For unknown values that are only being rendered for safe test assertions or
+sanitized diagnostics, use Effect's JSON schema rather than raw serialization:
+
+```ts
+const encodeUnknownJson = Schema.encodeUnknownSync(
+  Schema.UnknownFromJsonString
+);
+```
+
+Tests, smoke scripts, provider request bodies, SSE chunks, proof output, and
+leak checks all follow this rule. If a framework hands you an already encoded
+request body string, validate it with the owning schema at the receiving edge
+instead of parsing it manually in domain code.
+
 ## Errors
 
 Expected failures should be typed and tagged:

@@ -301,14 +301,22 @@
     {
       "id": "wire-eve-model-provider",
       "title": "Wire Eve to the proven model provider",
-      "status": "pending",
+      "status": "completed",
       "description": "Add app-owned model-provider selection so apps/agent can choose AI Gateway fallback or the deployed private Codex proxy.",
       "implementationNotes": [
         "Keep apps/agent/agent/config.ts as the app-owned config boundary.",
         "Add app-owned model-provider wiring only after prove-codex-auth-runtime-path, create-codex-proxy-app, and deploy-codex-proxy-vercel complete or explicitly record a local-only exception.",
         "Preserve the current Vercel AI Gateway model as a fallback until Codex proxy proof is stable.",
         "Use @ai-sdk/openai-compatible only after the runtime endpoint is proven private and compatible.",
-        "The Eve app should call the proxy URL with BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and should not know about Codex OAuth internals."
+        "The Eve app should call the proxy URL with BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and should not know about Codex OAuth internals.",
+        "Implemented apps/agent/agent/model-provider.ts with Effect Schema provider config for gateway and codex-proxy modes, plus @ai-sdk/openai-compatible LanguageModel construction for the private proxy.",
+        "Extended apps/agent/agent/config.ts to load provider mode, gateway model, proxy base URL, redacted internal token, optional proxy model, and context-window tokens through Effect Config and ConfigProvider.fromEnv().",
+        "Updated apps/agent/agent/agent.ts so Eve receives either the Gateway model string or the Codex proxy LanguageModel and receives modelContextWindowTokens only in codex-proxy mode.",
+        "Added apps/agent/test/model-provider.test.ts to prove Gateway is the default and Codex proxy mode sends bearer auth to /v1/chat/completions through injected fetch without placing the token in the request body.",
+        "Replaced raw native JSON serialization in app/package request bodies, SSE chunks, smoke output, proof output, and leak checks with Effect Schema JSON encoders such as Schema.fromJsonString(...) and Schema.UnknownFromJsonString.",
+        "Local Gateway proof returned /eve/v1/info with model google/gemini-2.5-flash, Gateway endpoint connected, workspace_status discovered, and diagnosticCount 0.",
+        "Local Codex proxy proof ran apps/codex-proxy in mock mode on port 8788 and Eve in codex-proxy mode on port 2101. /eve/v1/info reported bundjil-codex-proxy/codex-default-model and contextWindowTokens 123456.",
+        "Local Codex proxy session proof emitted session.started, message.appended, message.completed, step.completed, turn.completed, and session.waiting with the mock proxy response and no token values in output."
       ],
       "mandatoryVerification": [
         "Eve agent model remains an AI SDK-compatible LanguageModel or Gateway model string.",
@@ -329,8 +337,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: apps/agent owns provider config, provider selection, Eve modelContextWindowTokens wiring, app-local proxy env schemas, and app-level tests. @bundjil/codex-oauth owns OpenAI-compatible proxy contracts. apps/codex-proxy owns the HTTP proxy runtime. The Eve app does not import @bundjil/codex-oauth, CodexOAuthService, CodexProfileStore, direct Codex HTTP clients, hosted storage, or token refresh.",
+          "Pass 2 - Effect implementation quality: provider config uses Effect Config, ConfigProvider.fromEnv, Config.url, Config.redacted, Effect Schema literals/unions, Schema.RedactedFromValue, Match, Effect.all, flat Effect.gen, Effect.fn, withSpan, and Data.TaggedError mapping. JSON boundary encoding uses Schema.fromJsonString and Schema.UnknownFromJsonString instead of raw native serialization. Parent scans found no unsafe casts, local DTO mirrors, manual object readers, process.env reads in package logic, or API-key fallback.",
+          "Pass 3 - verification coverage: bun run --filter @bundjil/agent check-types/test/build passed; bun run --filter @bundjil/codex-oauth check-types/test/build passed; bun run --filter @bundjil/codex-proxy check-types/test/build/smoke-test passed; local Eve Gateway /eve/v1/info proof passed; local Eve Codex proxy /eve/v1/info and session stream proof passed; raw serialization scan across source/docs passed; bun run verification passed; bun run build passed."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -53,6 +53,7 @@ apps/agent/
     agent.ts          root Eve definition
     config.ts         app-owned model/config parsing
     instructions.md   agent instructions
+    model-provider.ts app-owned Gateway/private-proxy provider selector
     tools/            Eve tool modules
   test/               app-level tool and runtime-edge tests
   README.md           app usage and verification guide
@@ -134,6 +135,16 @@ after the shape has survived at least one real tool/channel implementation.
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
 - must keep hosted live Codex calls disabled until deployment, storage, and
   secret verification tasks pass.
+
+`apps/agent` model-provider rules:
+
+- owns `BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_AGENT_MODEL`, and
+  `BUNDJIL_CODEX_PROXY_*` config parsing;
+- may construct an AI SDK `LanguageModel` for the private proxy;
+- must keep AI Gateway as the default provider until hosted live Codex proxy
+  proof passes;
+- must not import `CodexOAuthService`, `CodexProfileStore`, direct Codex HTTP
+  clients, or hosted token storage adapters.
 
 ## Imports And Exports
 

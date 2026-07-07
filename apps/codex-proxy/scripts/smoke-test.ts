@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
-import { Effect } from "effect";
+import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
+import { Effect, Schema } from "effect";
 
 import {
   CodexProxyConfigLayer,
@@ -8,6 +9,20 @@ import {
   makeCodexProxyConfig,
   makeCodexProxyWebHandler,
 } from "../src/index.js";
+
+const encodeChatCompletionRequest = Schema.encodeUnknownSync(
+  Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+);
+
+const SmokeTestResult = Schema.Struct({
+  healthStatus: Schema.Number,
+  streamStatus: Schema.Number,
+  streamLines: Schema.Number,
+});
+
+const encodeSmokeTestResult = Schema.encodeSync(
+  Schema.fromJsonString(SmokeTestResult)
+);
 
 const smokeConfig = makeCodexProxyConfig({
   internalToken: "smoke-test-token",
@@ -47,7 +62,7 @@ const runSmokeTest = Effect.gen(function* runCodexProxySmokeTest() {
 
     const stream = yield* Effect.promise(() =>
       fetch(`${baseUrl}/v1/chat/completions`, {
-        body: JSON.stringify({
+        body: encodeChatCompletionRequest({
           messages: [{ content: "Say OK.", role: "user" }],
           model: "gpt-5.5",
           stream: true,
@@ -78,4 +93,4 @@ const runSmokeTest = Effect.gen(function* runCodexProxySmokeTest() {
 
 const result = await Effect.runPromise(runSmokeTest);
 
-console.log(JSON.stringify(result));
+console.log(encodeSmokeTestResult(result));

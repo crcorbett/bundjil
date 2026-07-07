@@ -43,9 +43,9 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
     postResponses: Effect.fn("CodexHttpClient.postResponses")(function* (
       input: CodexResponsesPostInput
     ) {
-      const encodedRequest = yield* Schema.encodeEffect(CodexResponsesRequest)(
-        input.request
-      ).pipe(
+      const encodedRequestBody = yield* Schema.encodeEffect(
+        Schema.fromJsonString(CodexResponsesRequest)
+      )(input.request).pipe(
         Effect.mapError(
           (cause) =>
             new CodexResponsesRequestError({
@@ -65,7 +65,7 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
       }
 
       const upstreamRequest = new Request(endpoint, {
-        body: JSON.stringify(encodedRequest),
+        body: encodedRequestBody,
         headers,
         method: "POST",
       });
@@ -117,8 +117,8 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
     }),
     postResponsesStream: Effect.fn("CodexHttpClient.postResponsesStream")(
       function* (input: CodexResponsesPostInput) {
-        const encodedRequest = yield* Schema.encodeEffect(
-          CodexResponsesRequest
+        const encodedRequestBody = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CodexResponsesRequest)
         )(input.request).pipe(
           Effect.mapError(
             (cause) =>
@@ -139,7 +139,7 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         }
 
         const upstreamRequest = new Request(endpoint, {
-          body: JSON.stringify(encodedRequest),
+          body: encodedRequestBody,
           headers,
           method: "POST",
         });

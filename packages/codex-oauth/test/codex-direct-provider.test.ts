@@ -34,6 +34,13 @@ import {
   OpenAICompatibleProxy,
 } from "../src/openai-compatible-proxy.service.js";
 
+const encodeUnknownJson = Schema.encodeUnknownSync(
+  Schema.UnknownFromJsonString
+);
+
+const renderForLeakCheck = (value: unknown) =>
+  `${String(value)} ${encodeUnknownJson(value)}`;
+
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
   principal: {
@@ -176,7 +183,7 @@ it.effect("rejects private proxy calls with invalid internal auth", () =>
       Effect.provide(proxyLayer),
       Effect.flip
     );
-    const rendered = `${String(error)} ${JSON.stringify(error)}`;
+    const rendered = renderForLeakCheck(error);
 
     assert.strictEqual(error._tag, "OpenAICompatibleProxyAuthError");
     assert.strictEqual(rendered.includes("correct-internal-token"), false);
@@ -227,7 +234,7 @@ it.effect(
         ),
         Effect.flip
       );
-      const rendered = `${String(error)} ${JSON.stringify(error)}`;
+      const rendered = renderForLeakCheck(error);
 
       assert.strictEqual(error._tag, "CodexHttpStatusError");
       assert.strictEqual(rendered.includes("access-token-secret"), false);

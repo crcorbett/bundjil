@@ -343,8 +343,47 @@ Preview proof:
   terms, probe text, invalid-token text, and full mock response text; the
   sanitized scans were clean.
 
-Production deployment was skipped. Eve is still not wired to this proxy, and
-hosted live Codex proof remains pending and opt-in.
+Production deployment was skipped. Hosted live Codex proof remains pending and
+opt-in.
+
+On 2026-07-07, `apps/agent` added app-owned Eve model-provider wiring:
+
+- `agent/model-provider.ts` defines Gateway and Codex proxy provider config
+  schemas and creates either the Gateway model string or an AI SDK
+  OpenAI-compatible `LanguageModel`.
+- `agent/config.ts` loads provider config through Effect `Config`,
+  `ConfigProvider.fromEnv()`, `Config.url`, `Config.redacted`, and Effect
+  Schema. Gateway remains the default provider.
+- Codex proxy mode requires `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`,
+  `BUNDJIL_CODEX_PROXY_BASE_URL`, and
+  `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`. The proxy model id defaults to
+  `BUNDJIL_AGENT_MODEL` unless `BUNDJIL_CODEX_PROXY_MODEL` is set.
+- The Eve app does not import Codex OAuth profile storage, token refresh, or
+  direct Codex HTTP clients. It only calls the private OpenAI-compatible proxy.
+- Provider request bodies, mock responses, smoke-test output, proof output, and
+  leak checks now use Effect Schema JSON encoders such as
+  `Schema.fromJsonString(...)` rather than raw native JSON serialization.
+
+Local Eve proof:
+
+- The local codex proxy ran in mock mode on `http://127.0.0.1:8788`.
+- Eve ran on `http://127.0.0.1:2101` with
+  `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`,
+  `BUNDJIL_AGENT_MODEL=codex-default-model`,
+  `BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1`, and
+  `BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=123456`.
+- `GET /eve/v1/health` returned `ok: true` and `status: ready`.
+- `GET /eve/v1/info` reported model id
+  `bundjil-codex-proxy/codex-default-model`, provider
+  `bundjil-codex-proxy`, and context window `123456`.
+- `POST /eve/v1/session` and
+  `GET /eve/v1/session/<sessionId>/stream` emitted `session.started`,
+  `message.appended`, `message.completed`, `step.completed`,
+  `turn.completed`, and `session.waiting`.
+- The stream completed with the mock proxy response, proving Eve used the
+  private proxy `LanguageModel`.
+- The proof output contained no bearer token, OAuth token, refresh token,
+  authorization code, or raw upstream response body.
 
 ### Executor / Parallel Task research
 
@@ -711,8 +750,9 @@ Candidate runtime paths:
 4. **AI Gateway fallback:** keep current `google/gemini-2.5-flash` or another
    cheap Gateway model while Codex subscription access is being proven.
 
-The spec does not approve replacing the default Eve model until a live proof
-shows a prompt can complete through the Codex-authenticated provider.
+The spec does not approve making Codex proxy mode the default until a hosted
+live proof shows a prompt can complete through the Codex-authenticated provider
+with durable token storage, refresh handling, and production protection.
 
 ## Proxy HTTP API And Vercel Deployment
 

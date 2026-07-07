@@ -16,6 +16,13 @@ import {
   CodexResponsesProofLive,
 } from "../src/live.layer.js";
 
+const encodeUnknownJson = Schema.encodeUnknownSync(
+  Schema.UnknownFromJsonString
+);
+
+const renderForLeakCheck = (value: unknown) =>
+  `${String(value)} ${encodeUnknownJson(value)}`;
+
 const makeAccessToken = Schema.decodeUnknownEffect(CodexResponsesPostInput)({
   accessToken: "codex-access-token-secret",
   request: {
@@ -151,7 +158,7 @@ it.effect(
         Effect.provide(CodexHttpClientLive.pipe(Layer.provide(fetchLayer))),
         Effect.flip
       );
-      const rendered = `${String(error)} ${JSON.stringify(error)}`;
+      const rendered = renderForLeakCheck(error);
 
       assert.strictEqual(error._tag, "CodexHttpStatusError");
       assert.strictEqual(rendered.includes("access-token-secret"), false);
@@ -179,7 +186,7 @@ it.effect("maps fetch failures to safe network errors", () =>
 
     assert.strictEqual(error._tag, "CodexHttpNetworkError");
     assert.strictEqual(
-      JSON.stringify(error).includes("codex-access-token-secret"),
+      encodeUnknownJson(error).includes("codex-access-token-secret"),
       false
     );
   })

@@ -1,3 +1,4 @@
+import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
 import { assert, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
 import { describe, it as vitestIt } from "vitest";
@@ -11,6 +12,10 @@ import {
   makeCodexProxyWebHandler,
   toCodexProxyVercelRequest,
 } from "../src/index.js";
+
+const encodeChatCompletionRequest = Schema.encodeUnknownSync(
+  Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+);
 
 const testConfig = makeCodexProxyConfig({
   internalToken: "test-internal-token",
@@ -38,7 +43,7 @@ const testWebHandler = Effect.gen(function* makeTestWebHandler() {
 
 const chatCompletionRequest = (authorization?: string) =>
   new Request("https://bundjil.local/v1/chat/completions", {
-    body: JSON.stringify({
+    body: encodeChatCompletionRequest({
       messages: [{ content: "Say OK.", role: "user" }],
       model: "gpt-5.5",
       stream: true,

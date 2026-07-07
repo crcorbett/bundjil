@@ -44,15 +44,16 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
   tools.
 - `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
   lifecycle service contracts plus the direct Codex Responses proof surface.
-  The live proof is opt-in and sanitized; live OAuth endpoint exchange and Eve
-  model replacement do not ship yet.
+  The live proof is opt-in and sanitized; live OAuth endpoint exchange and
+  hosted token storage do not ship yet.
 - `@bundjil/codex-proxy` is the private Effect HTTP proxy app. It exposes
   `GET /health` and a bearer-token-protected
-  `POST /v1/chat/completions` mock SSE route for local and future Vercel
-  deployment proof. Hosted deployment is still a later task.
+  `POST /v1/chat/completions` mock SSE route for local and Vercel preview
+  proof.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
-  instructions, and the `workspace_status` tool that delegates into
-  `@bundjil/eve-effect`.
+  instructions, the `workspace_status` tool that delegates into
+  `@bundjil/eve-effect`, and app-owned model-provider config. Gateway is the
+  default model path; Codex proxy mode is opt-in.
 
 `apps/agent` owns Eve filesystem runtime shape and deployment concerns.
 Reusable app operations live in packages once the boundary is stable.
@@ -91,6 +92,26 @@ The proxy smoke test starts a local Bun server on an ephemeral port, verifies
 `GET /health`, and verifies authenticated mock OpenAI-compatible SSE without
 calling Codex.
 
+For local Eve proof through the private proxy, start the proxy in one shell:
+
+```bash
+PORT=8788 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+BUNDJIL_CODEX_PROXY_MODE=mock \
+bun run --filter @bundjil/codex-proxy dev
+```
+
+Then start Eve in another shell:
+
+```bash
+PORT=2101 \
+BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
+BUNDJIL_AGENT_MODEL=codex-default-model \
+BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+bun run --filter @bundjil/agent dev:no-ui
+```
+
 ## Layout
 
 ```text
@@ -126,12 +147,12 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 ## Roadmap
 
-1. Keep proving the Eve app through local HTTP and Gateway-backed verification.
-2. Deploy the private Codex proxy app to a personal Vercel preview project and
-   verify health, auth rejection, and authenticated mock streaming.
-3. Build the [Codex OAuth Eve model-provider spec](./docs/product-specs/codex-oauth-eve-model-provider.md)
-   through the Eve model-provider task before replacing AI Gateway with any
-   Codex-auth-backed provider.
+1. Keep Gateway as the default Eve model provider while Codex proxy remains
+   opt-in.
+2. Add hosted token storage and refresh for the Codex proxy behind Effect
+   `KeyValueStore`.
+3. Complete a hosted live Codex proxy proof before considering Codex proxy as
+   the default provider.
 4. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
 5. Add the Sendblue iMessage webhook and outbound delivery adapter.
