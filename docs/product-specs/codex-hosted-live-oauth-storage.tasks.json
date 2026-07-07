@@ -1,0 +1,340 @@
+{
+  "title": "Hosted Codex Live OAuth Storage Tasks",
+  "status": "draft",
+  "spec": "docs/product-specs/codex-hosted-live-oauth-storage.md",
+  "principles": [
+    "Preview proof comes before production.",
+    "Gateway remains the default Eve model path until hosted live Codex mode has encrypted storage, refresh coordination, deployment protection, and rollback.",
+    "Use Effect Schema, tagged errors, Context services, Layers, Config, Redacted, and KeyValueStore for every runtime-owned boundary.",
+    "Hosted KV must store only encrypted Codex OAuth profiles, never raw access tokens, refresh tokens, authorization codes, or full OAuth payloads.",
+    "Treat Codex OAuth as a Codex-specific subscription runtime path, not an OpenAI Platform API key or Vercel AI Gateway credential.",
+    "Keep apps/agent out of Codex OAuth internals; the agent only selects Gateway or a private OpenAI-compatible proxy LanguageModel.",
+    "Do not adopt code from OpenClaw, Goose, Hermes, or Pi. Use them only as research precedent when explicitly cited."
+  ],
+  "globalVerification": [
+    "Revalidate the current Codex OAuth surface and local Codex CLI behavior before implementing hosted OAuth exchange.",
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth build",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/agent test when agent config or examples change",
+    "bun run --filter @bundjil/agent build when agent config changes",
+    "bun run check-types",
+    "bun run verification",
+    "Vercel preview deploy under Cooper's personal Vercel account before production",
+    "Sanitized hosted OAuth proof with no tokens, codes, prompts, or raw OAuth payloads in logs or docs",
+    "Sanitized hosted live model proof with HTTP statuses, mode, content type, SSE line count, done marker, and leak booleans only",
+    "Upstash readback proof that stored profile values are encrypted and key-prefixed"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require more passes if OAuth support, encryption, lock semantics, Vercel deployment, or secret handling remains weak."
+  },
+  "tasks": [
+    {
+      "id": "revalidate-codex-oauth-surface-and-cli-login",
+      "title": "Revalidate Codex OAuth and local CLI login",
+      "status": "pending",
+      "description": "Resolve or explicitly bypass the local Codex duplicate-install/login issue, then confirm the current OAuth issuer, client, scopes, PKCE, redirect, and token response shape without recording secrets.",
+      "implementationNotes": [
+        "Inspect `which -a codex` and `codex --version` before relying on managed login behavior.",
+        "Record whether the active binary is the expected current Codex CLI or the app-bundled CLI.",
+        "Verify the localhost callback failure from 2026-07-07 is resolved or document why hosted OAuth can proceed without it.",
+        "Use current official docs, executor personal research, DeepWiki, or direct local inspection as needed, but record only sanitized findings.",
+        "Do not print, commit, or snapshot access tokens, refresh tokens, auth codes, raw OAuth responses, cookies, or account secrets."
+      ],
+      "mandatoryVerification": [
+        "Codex CLI binary paths and versions are recorded in sanitized form.",
+        "OAuth issuer, client id category, scopes, redirect behavior, PKCE behavior, and token response fields are confirmed or implementation is blocked.",
+        "The hosted redirect URI strategy is explicitly accepted, blocked, or deferred with evidence.",
+        "Flat meaningful Effect.gen programs are explicitly required for the implementation tasks that follow.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError are explicitly required.",
+        "Canonical Effect Schema contracts and schema-derived types from owning packages are explicitly required.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are approved by the revised implementation plan.",
+        "Implementation-improvement audit pass evidence is recorded before task acceptance."
+      ],
+      "completionCriteria": [
+        "The spec or a dated appendix contains current sanitized OAuth findings.",
+        "Implementation is either unblocked by current evidence or explicitly stopped before hosted OAuth code begins."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "define-encrypted-profile-contract",
+      "title": "Define encrypted profile schemas and cipher service",
+      "status": "pending",
+      "description": "Add versioned encrypted profile contracts and a CodexOAuthProfileCipher service in @bundjil/codex-oauth.",
+      "implementationNotes": [
+        "Define an `EncryptedCodexOAuthProfileV1` schema with version, algorithm, key id, nonce, ciphertext, subject hash, and timestamps.",
+        "Define schema-backed tagged errors for key config, encryption, decryption, decode, unsupported version, and key mismatch failures.",
+        "Use Effect Config with Redacted values for encryption key material and non-secret config for key id and algorithm.",
+        "Provide deterministic or memory-safe test layers and a WebCrypto-compatible live layer.",
+        "Prove encrypted stored values do not contain raw token fields or OAuth payload fragments.",
+        "Keep JSON string boundaries on Effect Schema codecs."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for encrypt and decrypt operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover round trip, wrong key, wrong key id, malformed ciphertext, unsupported version, and leak checks.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth check-types"
+      ],
+      "completionCriteria": [
+        "@bundjil/codex-oauth exports encrypted profile schemas, cipher service tag, live/test layers, and safe errors.",
+        "No hosted storage layer composes raw token profiles after this task."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-encrypted-profile-store-and-refresh-lock",
+      "title": "Implement encrypted storage and refresh locking",
+      "status": "pending",
+      "description": "Compose CodexProfileStore over encrypted KeyValueStore persistence and add refresh locking for hosted rotation safety.",
+      "implementationNotes": [
+        "Add `CodexProfileStoreEncryptedKeyValueLive` or an equivalent layer that encrypts before writing and decrypts after reading.",
+        "Keep the existing raw KeyValueStore profile layer available only for local tests and non-hosted proof.",
+        "Add `CodexOAuthRefreshLock` with lock acquisition, contention, expiry, and release errors.",
+        "Use an atomic Upstash lock operation when hosted; keep Redis command details behind a package-owned service/layer.",
+        "Use the existing canonical subject-hash derivation for profile and lock keys.",
+        "Test concurrent refresh programs so only one invocation refreshes while followers retry or read the updated profile."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for store read/write/delete and lock with-refresh operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover encrypted save/read/remove, Upstash-like adapter behavior, lock contention, lock expiry, owner-only release, refresh race behavior, and leak checks.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth build"
+      ],
+      "completionCriteria": [
+        "Hosted profile persistence can be composed through encrypted storage over Effect KeyValueStore.",
+        "Refresh coordination has a package-owned service contract and test evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-live-oauth-client-and-proxy-routes",
+      "title": "Implement live OAuth client and proxy routes",
+      "status": "pending",
+      "description": "Add live Codex OAuth endpoint exchange in @bundjil/codex-oauth and private operator OAuth routes in apps/codex-proxy.",
+      "implementationNotes": [
+        "Add `CodexOAuthClientLive` only after the OAuth surface is revalidated.",
+        "Add `CodexOAuthStateStore` for short-lived PKCE verifier and state values.",
+        "Expose private/operator `GET /codex/oauth/start`, `GET /codex/oauth/callback`, and `POST /codex/oauth/logout` routes in apps/codex-proxy.",
+        "Guard OAuth routes with deployment protection, an internal admin token, or another explicit operator-only mechanism.",
+        "Callback output must be minimal and must not include token values, auth codes, raw OAuth payloads, prompts, or cookies.",
+        "State and callback payload handling must use canonical schemas and typed tagged errors."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for start, callback, exchange, state validation, profile save, and logout operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth and apps/codex-proxy config.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover start redirect, state storage, callback state mismatch, exchange failure, encrypted profile save, logout deletion, route auth failures, and safe output.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy check-types"
+      ],
+      "completionCriteria": [
+        "A local/mock OAuth route flow can store an encrypted profile without live secrets.",
+        "Live OAuth route code remains disabled or unconfigured until Vercel preview env is ready."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "wire-live-codex-proxy-mode",
+      "title": "Wire live Codex proxy mode",
+      "status": "pending",
+      "description": "Compose apps/codex-proxy live mode with encrypted storage, refresh locking, and direct Codex Responses calls.",
+      "implementationNotes": [
+        "Keep `BUNDJIL_CODEX_PROXY_MODE=mock` as the default local proof path.",
+        "Allow `BUNDJIL_CODEX_PROXY_MODE=live` only when required encrypted storage, OAuth, subject, and internal-token config is present.",
+        "Use Effect Config and ConfigProvider.fromEnv through app-owned config files.",
+        "Do not read platform API keys as fallback credentials in subscription mode.",
+        "Keep apps/agent unchanged except for docs/config examples unless separate implementation work is explicitly approved.",
+        "Route diagnostics must be sanitized and schema-backed."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for live route handling, profile resolution, refresh, provider streaming, and route error mapping.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from owning packages.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover missing live config, encrypted profile missing, refresh-required flow, refresh failure, Codex HTTP failure, streaming success, and no API-key fallback.",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test"
+      ],
+      "completionCriteria": [
+        "Local tests prove live-mode composition through mocks.",
+        "Mock mode remains working and is still safe for preview smoke tests."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "provision-personal-vercel-preview-env",
+      "title": "Provision personal Vercel preview env and Upstash",
+      "status": "pending",
+      "description": "Configure the bundjil-codex-proxy preview deployment in Cooper's personal Vercel account with live-mode env, Upstash, encryption key material, and route protection.",
+      "implementationNotes": [
+        "Verify `vercel whoami`, project link, project scope, and root directory before setting env vars.",
+        "Do not use Tilt Legal scope or Tilt Legal storage resources.",
+        "Rotate `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` because earlier preview env pull showed an unusable value.",
+        "Provision or link Upstash Redis through personal Vercel Marketplace or another explicitly approved personal resource.",
+        "Set encryption key material only in Vercel env vars or ignored local env files.",
+        "Keep production env unset until preview live proof passes and production is explicitly approved."
+      ],
+      "mandatoryVerification": [
+        "Personal Vercel account and `bundjil-codex-proxy` project scope are recorded in sanitized form.",
+        "Preview env var names are confirmed without printing secret values.",
+        "Upstash connectivity is verified through a non-secret sentinel key or test namespace.",
+        "Route protection or operator-only OAuth route guard is verified.",
+        "Flat meaningful Effect.gen programs are preserved where deployment scripts touch Effect-owned behavior.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError remain intact.",
+        "Canonical Effect Schema contracts and schema-derived config types remain intact.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are introduced."
+      ],
+      "completionCriteria": [
+        "Preview environment can run live mode without production deployment.",
+        "No secret values are committed, printed in docs, or stored in task evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "run-hosted-live-proof",
+      "title": "Run hosted OAuth and live model proof",
+      "status": "pending",
+      "description": "Deploy a Vercel preview, complete OAuth, verify encrypted storage, and run an authenticated live Codex proxy streaming request with sanitized evidence.",
+      "implementationNotes": [
+        "Deploy preview from apps/codex-proxy after local checks pass.",
+        "Complete OAuth through preview routes and verify encrypted profile storage through safe readback.",
+        "Run unauthenticated, invalid-token, and authenticated chat-completion probes.",
+        "Record only status, mode, content type, SSE data-line count, done marker, model id category, and leak booleans.",
+        "Scan Vercel logs and Upstash values for token/code/prompt/body leakage.",
+        "Do not deploy production unless the user explicitly approves after preview proof."
+      ],
+      "mandatoryVerification": [
+        "GET /health proves expected preview mode.",
+        "OAuth start/callback succeeds and stores an encrypted profile.",
+        "Unauthenticated and invalid-token chat probes return 401.",
+        "Authenticated live chat-completions probe streams a live Codex response.",
+        "Vercel logs contain no access tokens, refresh tokens, auth codes, raw OAuth payloads, prompts, or full response bodies.",
+        "Upstash readback contains ciphertext only for token profile state.",
+        "Flat meaningful Effect.gen programs remain intact after proof fixes.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError remain intact.",
+        "Canonical Effect Schema contracts and schema-derived types remain intact.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are introduced.",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "Hosted live preview proof is recorded in the spec, task ledger, and app/package docs.",
+        "Production deployment remains blocked unless explicitly approved."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "document-live-codex-operations",
+      "title": "Document hosted live operations",
+      "status": "pending",
+      "description": "Update durable docs for hosted live OAuth, encrypted storage, refresh behavior, Vercel proof, rollback, and self-testing.",
+      "implementationNotes": [
+        "Update README, docs/README, ARCHITECTURE, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, apps/codex-proxy/README.md, and packages/codex-oauth/README.md as needed.",
+        "Document local mock testing, preview live testing, production approval gates, env var names, secret handling, and rollback.",
+        "Document the direct self-test path for the user without exposing secrets.",
+        "Keep examples sanitized and avoid recording private prompts or model response bodies."
+      ],
+      "mandatoryVerification": [
+        "Docs reflect the current implementation state rather than future claims.",
+        "Docs distinguish mock preview, live preview, and production.",
+        "Docs explain that Gateway remains the default Eve path unless a later task changes it.",
+        "Docs state that hosted storage uses encrypted profiles over Effect KeyValueStore.",
+        "Flat meaningful Effect.gen, typed errors, canonical schemas, no unsafe casts, and no trivial wrappers remain listed in implementation requirements.",
+        "JSON string boundaries continue to require Effect Schema codecs.",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "A future contributor can test mock mode, run hosted proof, inspect logs safely, and roll back without reading this task ledger."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "final-audit-and-production-decision",
+      "title": "Final audit and production decision",
+      "status": "pending",
+      "description": "Run final verification, complete the mandatory 3-pass Effect TS audit across the whole implementation, and prepare a production decision without deploying production automatically.",
+      "implementationNotes": [
+        "Review package ownership, app ownership, call graphs, secret handling, docs, and deployment evidence.",
+        "Run root verification after targeted package/app checks.",
+        "Record any production blockers explicitly.",
+        "Production deploy requires a separate explicit user approval after this task."
+      ],
+      "mandatoryVerification": [
+        "All prior tasks have completed audit evidence.",
+        "Ownership/call graph audit confirms `@bundjil/codex-oauth`, `apps/codex-proxy`, and `apps/agent` boundaries match the spec.",
+        "Implementation quality audit confirms flat primary Effect.gen programs, schema-derived types, tagged errors, Config.redacted, explicit layers, no unsafe casts, no DTO mirrors, no manual object readers, and no helper sprawl.",
+        "Verification coverage audit records targeted checks, root verification, Vercel preview proof, log/leak scans, Upstash readback, docs updates, and any skipped production proof with reason.",
+        "bun run verification",
+        "git status --short is reviewed before commit"
+      ],
+      "completionCriteria": [
+        "Hosted live Codex mode is either complete in preview with production pending approval, or blocked with concrete evidence.",
+        "The task ledger and spec are updated to reflect final state.",
+        "Commit and push only after verification passes."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}
