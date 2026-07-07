@@ -4,7 +4,8 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 
 ## What Lives Here
 
-- `agent/agent.ts`: root Eve config. The model is loaded through Effect
+- `agent/agent.ts`: root Eve definition.
+- `agent/config.ts`: app-owned runtime config. The model is loaded through Effect
   `Config.schema(Schema.NonEmptyString, "BUNDJIL_AGENT_MODEL")` with
   `ConfigProvider.fromEnv()` and a default of `google/gemini-2.5-flash`.
 - `agent/instructions.md`: operational instructions for the minimal local
