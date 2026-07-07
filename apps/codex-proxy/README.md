@@ -108,8 +108,41 @@ tasks are completed.
 
 ## Vercel Deployment
 
-Deployment is a later task. The project must be named `bundjil-codex-proxy`
-and linked under Cooper's personal Vercel account, not the Tilt Legal team.
+The project is linked as `bundjil-codex-proxy` under Cooper's personal Vercel
+scope, `Cooper Corbett's projects`, not the Tilt Legal team. The project root
+directory is `apps/codex-proxy`, the framework preset is `Other`, the Node.js
+version is `24.x`, and the output directory is `.`.
+
+The app deploys through `api/index.ts`, which routes Vercel rewrites back to
+the existing Effect web handler. `apps/codex-proxy/vercel.json` rewrites all
+paths to that function so public paths such as `/health` and
+`/v1/chat/completions` reach the same handler used by local tests.
+
+Preview deployment proof recorded on 2026-07-07:
+
+- Preview URL:
+  `https://bundjil-codex-proxy-llqa9rwss-cooper-corbetts-projects.vercel.app`.
+- Vercel project owner: `Cooper Corbett's projects`
+  (`team_1LX7ZujbijowTv8J9k0aU7nD`), not Tilt Legal
+  (`team_G8r6j3RIfXPtqb3j71bNQMbO`).
+- Preview env vars are set as encrypted Vercel env vars:
+  `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` and
+  `BUNDJIL_CODEX_PROXY_MODE=mock`.
+- Vercel SSO deployment protection is disabled for this project so direct
+  preview HTTP probes can reach the app routes. The model route remains
+  protected by `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`. This is acceptable only
+  for the current mock-mode preview; live Codex mode or production must
+  re-enable Vercel protection or an equivalent private network/control
+  boundary.
+- `GET /health`: HTTP 200, `mode: mock`.
+- Unauthenticated `POST /v1/chat/completions`: HTTP 401.
+- Invalid-token `POST /v1/chat/completions`: HTTP 401.
+- Authenticated mock `POST /v1/chat/completions`: HTTP 200,
+  `text/event-stream`, 2 `data:` lines, final line `[DONE]`.
+- Preview request logs scanned clean for bearer values, OAuth/token terms,
+  probe text, invalid-token text, and full mock response text.
+- Production deployment was skipped. Hosted live Codex proof remains pending
+  and opt-in.
 
 Required hosted checks before production:
 

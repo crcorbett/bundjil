@@ -13,7 +13,8 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`deploy-codex-proxy-vercel`
+None. `deploy-codex-proxy-vercel` is accepted; the next task in the ledger is
+`wire-eve-model-provider`, but it was not implemented in this slice.
 
 ## Accepted Tasks
 
@@ -240,6 +241,94 @@ Verification:
 - Secret-pattern scan found only documented env var names and sanitized test
   placeholders, not real token values.
 
+### deploy-codex-proxy-vercel
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `apps/codex-proxy/api/index.ts`
+- `apps/codex-proxy/src/vercel.ts`
+- `apps/codex-proxy/src/index.ts`
+- `apps/codex-proxy/test/proxy-handler.test.ts`
+- `apps/codex-proxy/tsconfig.json`
+- `apps/codex-proxy/vercel.json`
+- `apps/codex-proxy/README.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.md`
+- `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+- `knip.json`
+
+Evidence:
+
+- Linked `bundjil-codex-proxy` to Cooper's personal Vercel scope,
+  `Cooper Corbett's projects` (`team_1LX7ZujbijowTv8J9k0aU7nD`), not Tilt
+  Legal (`team_G8r6j3RIfXPtqb3j71bNQMbO`).
+- Project settings are root directory `apps/codex-proxy`, framework `Other`,
+  Node.js `24.x`, output directory `.`, and build command
+  `bun run --filter @bundjil/codex-proxy build`.
+- Added app-owned Vercel entrypoint and config:
+  `api/index.ts`, `src/vercel.ts`, and `vercel.json`. Vercel rewrites route
+  public paths back to the existing Effect web handler.
+- Preview env vars are encrypted Vercel Preview variables:
+  `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` and
+  `BUNDJIL_CODEX_PROXY_MODE=mock`. `vercel env pull --environment=preview`
+  wrote only ignored env files and did not print secret values.
+- Vercel SSO deployment protection was disabled on this proxy project so
+  direct preview HTTP checks can reach app routes. The model route remains
+  protected by the internal bearer token. This exception applies only to the
+  current mock-mode preview; live Codex mode or production must re-enable
+  Vercel protection or provide an equivalent private network/control boundary.
+- Preview deployment `dpl_38aC4YSWLkCESQiJATs5JqHsSn4X` is READY at
+  `https://bundjil-codex-proxy-llqa9rwss-cooper-corbetts-projects.vercel.app`
+  with target `preview`.
+- Direct preview checks returned `healthStatus: 200`, `healthMode: "mock"`,
+  `unauthenticatedStatus: 401`, `invalidTokenStatus: 401`,
+  `streamStatus: 200`, `streamContentType: "text/event-stream"`,
+  `streamDataLines: 2`, `streamDone: true`, and all secret-leak booleans
+  `false`.
+- Preview logs contained 4 request lines and the sanitized pattern scan was
+  clean for bearer values, OAuth/token terms, probe text, invalid-token text,
+  and full mock response text. Deploy/env CLI logs were checked for the
+  generated internal token value and were clean.
+- Production deployment was skipped. Hosted live Codex proof remains pending
+  and opt-in. `apps/agent` was not changed.
+
+Parent audit:
+
+1. Ownership and call graph: `apps/codex-proxy` owns Vercel project settings,
+   env binding names, Vercel function entrypoint, rewrite adapter, hosted
+   proof, and README evidence. `@bundjil/codex-oauth` contracts remain
+   unchanged, and `apps/agent` was not touched.
+2. Effect implementation quality: deployment-specific code is thin
+   app-owned framework glue delegating to the existing
+   `HttpRouter.toWebHandler` boundary. Existing flat `Effect.gen`
+   route/config flow, schema-derived contracts, `Config.redacted`, and typed
+   `catchTags` error mapping remain intact. No live Codex calls, DTO mirrors,
+   unsafe casts, or API-key fallback were introduced.
+3. Verification coverage: account/project metadata, encrypted preview env
+   vars, local typecheck/test/build, preview deploy, direct HTTP probes,
+   runtime-log scan, CLI-output token scan, docs updates, and production-skip
+   state prove the deployment task.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 5 tests.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- Local Vercel entrypoint probe: `GET /health` through
+  `api/index.ts?path=health` returned HTTP 200 with `mode: mock`.
+- `vercel env pull apps/codex-proxy/.env.preview.local --environment=preview`:
+  passed; values were not printed and the file is ignored.
+- `vercel inspect` confirmed preview deployment
+  `dpl_38aC4YSWLkCESQiJATs5JqHsSn4X` target `preview`, status `Ready`, and
+  function `api/index`.
+- Direct preview HTTP probes passed with sanitized evidence:
+  `{"healthStatus":200,"healthMode":"mock","unauthenticatedStatus":401,"invalidTokenStatus":401,"streamStatus":200,"streamContentType":"text/event-stream","streamDataLines":2,"streamDone":true,"healthSecretLeak":false,"invalidSecretLeak":false,"streamSecretLeak":false}`.
+- `vercel logs ... --since 30m --json`: 4 request log lines, sanitized scan
+  clean.
+- Production deploy: skipped.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -272,6 +361,11 @@ Out of scope:
 - 2026-07-07: create-codex-proxy-app worker
   `019f3d51-aea6-7de3-88c6-8b98eea158d6` was closed after no result and no
   filesystem changes. Parent implemented and audited the app locally.
+- 2026-07-07: `deploy-codex-proxy-vercel` worker
+  `019f3d68-663f-74b2-835c-9e3bfdf5eaaf` returned a committed slice after a
+  delayed wait. Parent reviewed the commit and audited Vercel ownership,
+  app-owned deployment glue, preview proof, log hygiene, and production-skip
+  state.
 
 ## Verification Log
 
@@ -285,3 +379,8 @@ Out of scope:
 - 2026-07-07: `create-codex-proxy-app` accepted after app
   check-types/test/build/smoke-test, root `bun run verification`, frozen
   install, and secret-pattern scan passed.
+- 2026-07-07: `deploy-codex-proxy-vercel` accepted after Vercel project
+  metadata confirmed Cooper personal scope, encrypted preview env vars were
+  set, preview deployment `dpl_38aC4YSWLkCESQiJATs5JqHsSn4X` reached READY,
+  direct preview health/auth/mock-SSE checks passed, Vercel runtime-log and
+  CLI-output scans were clean, and production deployment was skipped.

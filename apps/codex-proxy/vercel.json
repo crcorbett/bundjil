@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run --filter @bundjil/codex-proxy build",
+  "framework": null,
+  "installCommand": "bun install --frozen-lockfile",
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 30
+    }
+  },
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/api/index?path=:path*"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
-import { describe } from "vitest";
+import { describe, it as vitestIt } from "vitest";
 
 import {
   CodexProxyConfigLayer,
@@ -9,6 +9,7 @@ import {
   makeCodexProxyAppLayer,
   makeCodexProxyConfig,
   makeCodexProxyWebHandler,
+  toCodexProxyVercelRequest,
 } from "../src/index.js";
 
 const testConfig = makeCodexProxyConfig({
@@ -141,4 +142,26 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
       })
     )
   );
+
+  vitestIt("maps Vercel rewrites back to public proxy paths", async () => {
+    const routed = toCodexProxyVercelRequest(
+      new Request(
+        "https://bundjil.local/api/index?path=v1/chat/completions&check=1",
+        {
+          headers: {
+            authorization: "Bearer test-internal-token",
+          },
+          method: "POST",
+        }
+      )
+    );
+    const url = new URL(routed.url);
+
+    assert.strictEqual(url.pathname, "/v1/chat/completions");
+    assert.strictEqual(url.search, "?check=1");
+    assert.strictEqual(
+      routed.headers.get("authorization"),
+      "Bearer test-internal-token"
+    );
+  });
 });

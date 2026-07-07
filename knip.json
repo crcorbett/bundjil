@@ -7,8 +7,13 @@
       "project": ["agent/**/*.ts", "test/**/*.ts"]
     },
     "apps/codex-proxy": {
-      "entry": ["scripts/**/*.ts", "test/**/*.test.ts"],
-      "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+      "entry": ["api/**/*.ts", "scripts/**/*.ts", "test/**/*.test.ts"],
+      "project": [
+        "api/**/*.ts",
+        "src/**/*.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts"
+      ]
     }
   }
 }

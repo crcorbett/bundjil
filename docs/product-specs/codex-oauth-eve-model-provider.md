@@ -313,9 +313,38 @@ boundary:
 - `scripts/smoke-test.ts` starts an ephemeral local Bun server and proves
   health plus authenticated mock SSE.
 
-The proxy app is still not deployed and Eve is still not wired to it.
-Deployment remains the next task and must target Cooper's personal Vercel
-account first as a preview deployment.
+On 2026-07-07, `apps/codex-proxy` was linked to the
+`bundjil-codex-proxy` Vercel project under Cooper's personal Vercel scope,
+`Cooper Corbett's projects` (`team_1LX7ZujbijowTv8J9k0aU7nD`), not Tilt
+Legal (`team_G8r6j3RIfXPtqb3j71bNQMbO`), and deployed as a preview
+deployment.
+
+Preview proof:
+
+- URL:
+  `https://bundjil-codex-proxy-llqa9rwss-cooper-corbetts-projects.vercel.app`.
+- Project settings: root directory `apps/codex-proxy`, framework `Other`,
+  Node.js `24.x`, build command
+  `bun run --filter @bundjil/codex-proxy build`, output directory `.`.
+- Preview env vars are encrypted in Vercel:
+  `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` and
+  `BUNDJIL_CODEX_PROXY_MODE=mock`.
+- Vercel SSO deployment protection is disabled for this proxy project so
+  direct preview HTTP checks reach the app-level routes. The model route
+  remains protected by the internal bearer token. This exception applies only
+  to the current mock-mode preview; live Codex mode or production must
+  re-enable Vercel protection or provide an equivalent private
+  network/control boundary.
+- Direct preview checks returned: `/health` HTTP 200 with `mode: mock`,
+  unauthenticated chat completions HTTP 401, invalid-token chat completions
+  HTTP 401, and authenticated mock chat completions HTTP 200 with
+  `text/event-stream`, 2 `data:` lines, and `[DONE]`.
+- Preview logs and CLI output were checked for token values, OAuth/token
+  terms, probe text, invalid-token text, and full mock response text; the
+  sanitized scans were clean.
+
+Production deployment was skipped. Eve is still not wired to this proxy, and
+hosted live Codex proof remains pending and opt-in.
 
 ### Executor / Parallel Task research
 
@@ -575,7 +604,10 @@ SDK clients in `@bundjil/core`.
   Responses calls backed by ChatGPT / Codex OAuth.
 - Do not expose a public OpenAI-compatible endpoint in the first iteration. If
   a compatibility endpoint is required for Eve, bind it to loopback or private
-  Vercel protection only, then document the security model.
+  Vercel protection only, then document the security model. The mock-mode
+  preview can be network-reachable for direct HTTP proof only while
+  `/v1/chat/completions` is guarded by the internal bearer token and live
+  Codex mode remains unavailable.
 - Deploy the proxy as a separate Vercel project so it can be protected,
   rolled back, logged, and scaled independently from the Eve app.
 - Store no token values in source, logs, task ledgers, docs, error messages, or

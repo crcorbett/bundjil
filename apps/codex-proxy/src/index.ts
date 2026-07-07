@@ -32,6 +32,10 @@ export type {
   CodexProxyMode as CodexProxyModeType,
   CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType,
 } from "./schemas.js";
+export {
+  fetchCodexProxyVercelRequest,
+  toCodexProxyVercelRequest,
+} from "./vercel.js";
 
 export const fetch = (request: Request) =>
   codexProxyWebHandler.handler(request);

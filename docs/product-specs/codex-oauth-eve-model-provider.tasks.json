@@ -248,14 +248,22 @@
     {
       "id": "deploy-codex-proxy-vercel",
       "title": "Deploy and verify codex proxy on Vercel",
-      "status": "pending",
+      "status": "completed",
       "description": "Link apps/codex-proxy to the personal Vercel project, deploy preview first, run direct HTTP verification, and only then approve production deployment.",
       "implementationNotes": [
         "Link the app to a Vercel project named bundjil-codex-proxy in Cooper's personal Vercel account, not the Tilt Legal team.",
         "Use preview deployment as the first hosted proof. Production deployment is allowed only after preview verification is recorded.",
         "Set BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and other secrets through Vercel env vars; never commit .env files.",
         "Hosted live Codex proof is opt-in. If credentials are unavailable, verify health/auth/mock streaming and record live proof as pending.",
-        "Use Vercel logs only for sanitized status and chunk-shape proof; do not log token values, authorization codes, raw OAuth responses, prompts, or full model output."
+        "Use Vercel logs only for sanitized status and chunk-shape proof; do not log token values, authorization codes, raw OAuth responses, prompts, or full model output.",
+        "Added app-owned Vercel deployment files: api/index.ts, src/vercel.ts, and apps/codex-proxy/vercel.json. The Vercel function routes rewrites back to the existing Effect web handler without changing apps/agent or introducing live Codex network calls.",
+        "Linked project metadata confirms bundjil-codex-proxy belongs to Cooper Corbett's projects (team_1LX7ZujbijowTv8J9k0aU7nD), not Tilt Legal (team_G8r6j3RIfXPtqb3j71bNQMbO). Project settings use root directory apps/codex-proxy, framework Other, Node.js 24.x, output directory ., and build command bun run --filter @bundjil/codex-proxy build.",
+        "Preview env vars are set in Vercel as encrypted Preview variables: BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and BUNDJIL_CODEX_PROXY_MODE=mock. vercel env pull succeeded to ignored apps/codex-proxy/.env.preview.local, but sensitive values were not printed.",
+        "Vercel SSO deployment protection was disabled for this proxy project so direct preview HTTP checks can reach app routes. /v1/chat/completions remains protected by BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN. This exception applies only to the current mock-mode preview; live Codex mode or production must re-enable Vercel protection or provide an equivalent private network/control boundary.",
+        "Preview deployment dpl_38aC4YSWLkCESQiJATs5JqHsSn4X is READY at https://bundjil-codex-proxy-llqa9rwss-cooper-corbetts-projects.vercel.app with target preview.",
+        "Direct preview HTTP checks returned healthStatus 200, healthMode mock, unauthenticatedStatus 401, invalidTokenStatus 401, streamStatus 200, streamContentType text/event-stream, streamDataLines 2, streamDone true, and secret-leak booleans false.",
+        "Vercel request logs contained 4 lines and the sanitized pattern scan was clean for bearer values, OAuth/token terms, probe text, invalid-token text, and full mock response text. The deploy/env CLI logs were checked for the generated internal token value and were clean.",
+        "Production deployment was skipped. Hosted live Codex proof remains pending and opt-in."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs remain intact after deployment-specific changes.",
@@ -281,8 +289,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: apps/codex-proxy owns the Vercel api/index.ts entrypoint, rewrite adapter, vercel.json, project root settings, encrypted preview env vars, and hosted proof. @bundjil/codex-oauth service contracts remain unchanged, and apps/agent was not touched.",
+          "Pass 2 - Effect implementation quality: deployment-specific code is thin app-owned framework glue that delegates to the existing Effect HttpRouter.toWebHandler boundary. Existing flat Effect.gen route/config flow, Schema-derived contracts, Config.redacted secret parsing, and typed catchTags error mapping remain intact; no live Codex calls, DTO mirrors, unsafe casts, or API-key fallback were introduced.",
+          "Pass 3 - verification coverage: project/account metadata proved the personal Cooper Vercel scope, preview env vars were present without printing values, bun run --filter @bundjil/codex-proxy check-types/test/build passed, preview deploy dpl_38aC4YSWLkCESQiJATs5JqHsSn4X reached READY, direct HTTP health/auth/mock-SSE checks passed, runtime logs and CLI output scans were clean, production was skipped, and README/spec/active-plan evidence was updated."
+        ]
       },
       "commitAfterPassing": true
     },
