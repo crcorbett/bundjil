@@ -38,6 +38,7 @@
         "DeepWiki on `openai/codex` confirmed Codex auth modes include ChatGPT OAuth and access tokens, but `ChatgptAuthTokens` are marked unstable/internal. Current evidence does not support using Codex OAuth as arbitrary Eve chat-completion access.",
         "DeepWiki on `Effect-TS/effect` confirmed the KeyValueStore concept, memory/file layers, schema-backed storage, and typed error mapping, while local Effect v4 source remains authoritative for the `effect/unstable/persistence/KeyValueStore` import path.",
         "Parallel Task run `trun_e43fa758cfba40c3bf5ad5cddb1b7196` corrected the implementation direction: subscription-backed model access is viable through Codex app-server or a pinned Codex-to-OpenAI-compatible bridge, not by treating OAuth tokens as OpenAI API keys.",
+        "The full Parallel AI report is committed at docs/product-specs/codex-oauth-subscription-model-access.parallel-research.md.",
         "The spec now treats `codex app-server` embedding with isolated CODEX_HOME as the preferred proof target and keeps Eve on AI Gateway until that path is proven."
       ],
       "mandatoryVerification": [

@@ -26,6 +26,9 @@ README.
 - [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
   specifies the research-gated Codex OAuth service, Effect KeyValueStore
   profile store, Eve model-provider wiring, and mandatory implementation audit.
+- [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
+  preserves the Parallel AI report that corrected the subscription-backed model
+  access plan.
 - [Reference repositories](./reference-repositories.md) explains the local
   `.local/references` setup for Vercel and Effect source lookup.
 - [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral

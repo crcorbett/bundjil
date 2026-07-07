@@ -212,7 +212,8 @@ proxies, Pi-adjacent agent ecosystems, and Codex CLI automation demonstrate
 subscription-backed model use in practice.
 
 Parallel Task run `trun_e43fa758cfba40c3bf5ad5cddb1b7196` completed on
-2026-07-07 and refined the conclusion:
+2026-07-07 and refined the conclusion. The full report is committed at
+[Parallel Research: Codex OAuth For Third-Party Agent Model Access](./codex-oauth-subscription-model-access.parallel-research.md).
 
 - Do not treat a ChatGPT / Codex OAuth token as an OpenAI Platform API key or
   as a Vercel AI Gateway credential. AI Gateway remains the official Eve /
