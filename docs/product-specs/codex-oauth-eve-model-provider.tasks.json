@@ -15,11 +15,15 @@
     "bun install --frozen-lockfile",
     "bun run --filter @bundjil/codex-oauth test when the package exists",
     "bun run --filter @bundjil/codex-oauth build when the package exists",
+    "bun run --filter @bundjil/codex-proxy test when the app exists",
+    "bun run --filter @bundjil/codex-proxy build when the app exists",
+    "bun run --filter @bundjil/codex-proxy smoke-test when the app exists",
     "bun run --filter @bundjil/agent test when app wiring changes",
     "bun run --filter @bundjil/agent build when app wiring changes",
     "bun run check-types",
     "bun run verification",
-    "Opt-in live proof only with local/private credentials and sanitized output"
+    "Opt-in live proof only with local/private credentials and sanitized output",
+    "Vercel preview deployment proof before production deployment when apps/codex-proxy changes"
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
@@ -40,6 +44,8 @@
         "Parallel Task run `trun_e43fa758cfba40c3bf5ad5cddb1b7196` corrected the implementation direction: subscription-backed model access is viable through a Codex-specific runtime path or pinned OpenAI-compatible bridge, not by treating OAuth tokens as OpenAI API keys.",
         "The full Parallel AI report is committed at docs/product-specs/codex-oauth-subscription-model-access.parallel-research.md.",
         "Executor personal DeepWiki on `aaif-goose/goose` confirmed Goose's `chatgpt_codex` provider uses direct HTTP to `https://chatgpt.com/backend-api/codex/responses`, not app-server, ACP, or a Codex CLI subprocess.",
+        "Executor personal DeepWiki on `Effect-TS/effect` confirmed Effect HTTP API can expose web-standard handlers through HttpRouter/HttpApi layers, with typed JSON endpoints via HttpApi and raw streaming routes via HttpRouter/HttpServerResponse.",
+        "Mobius `apps/api` was inspected as the local Vercel deployment reference: app entrypoints own Nitro/Vercel/local dev, packages own Effect HTTP route layers and service composition.",
         "The spec now treats a private Bundjil OpenAI-compatible proxy over direct Codex Responses as the preferred proof target and keeps Eve on AI Gateway until that path is proven."
       ],
       "mandatoryVerification": [
@@ -60,9 +66,9 @@
         "requiredPasses": 3,
         "completedPasses": 3,
         "evidence": [
-          "Pass 1 - ownership/call graph: DeepWiki, Parallel, and Goose evidence kept implementation gated. Eve remains app-owned and Gateway-backed by default; direct Codex Responses and private proxy services become the prospective package boundary.",
-          "Pass 2 - Effect implementation quality: Research task tightened future implementation requirements around Effect KeyValueStore, Schema-backed profiles, direct Codex HTTP services, request/stream mappers, tagged errors, local v4 import paths, and no API-key fallback without adding code.",
-          "Pass 3 - verification coverage: Executor personal OAuth succeeded in the forked thread, DeepWiki returned results for `vercel/eve`, `openai/codex`, `Effect-TS/effect`, and `aaif-goose/goose`, Parallel Task returned Codex subscription findings, and the spec/task ledger were updated with the findings."
+          "Pass 1 - ownership/call graph: DeepWiki, Parallel, Goose, and Mobius API evidence kept implementation gated. Eve remains app-owned and Gateway-backed by default; direct Codex Responses services live in @bundjil/codex-oauth and Vercel deployment lives in apps/codex-proxy.",
+          "Pass 2 - Effect implementation quality: Research task tightened future implementation requirements around Effect KeyValueStore, Effect HTTP API/HttpRouter, Schema-backed profiles, direct Codex HTTP services, request/stream mappers, tagged errors, local v4 import paths, and no API-key fallback without adding code.",
+          "Pass 3 - verification coverage: Executor personal OAuth succeeded in the forked thread, DeepWiki returned results for `vercel/eve`, `openai/codex`, `Effect-TS/effect`, and `aaif-goose/goose`, Parallel Task returned Codex subscription findings, Mobius API deployment references were inspected, and the spec/task ledger were updated with the findings."
         ]
       },
       "commitAfterPassing": true
@@ -172,15 +178,97 @@
       "commitAfterPassing": true
     },
     {
+      "id": "create-codex-proxy-app",
+      "title": "Create apps/codex-proxy Effect HTTP app",
+      "status": "pending",
+      "description": "Add a deployable proxy app that composes @bundjil/codex-oauth services into Effect HTTP routes and exposes a private OpenAI-compatible streaming endpoint.",
+      "implementationNotes": [
+        "Create apps/codex-proxy as a separate Bun workspace app with README.md, package.json, tsconfig.json, local dev entrypoint, Vercel fetch entrypoint, smoke-test scripts, and tests.",
+        "Mirror the Mobius apps/api architecture: app entrypoints own Vercel/Nitro/local dev; package code owns reusable Effect services and route behavior.",
+        "Use Effect HTTP platform APIs: typed JSON management routes through effect/unstable/httpapi and raw streaming /v1/chat/completions through effect/unstable/http/HttpRouter.",
+        "Use HttpRouter.toWebHandler at the app boundary and direct Request/Response tests for the handler.",
+        "Start with Bun or Node Vercel Function deployment, not Vercel Edge Runtime.",
+        "Implement health, internal bearer-token auth, mock-mode streaming, and private /v1/chat/completions route before any live Codex dependency.",
+        "Config belongs in apps/codex-proxy/src/env.ts and must use Effect Config with Config.redacted for BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for route handlers, config parsing, auth checks, and proxy calls.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth and apps/codex-proxy route config.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Direct Request/Response tests cover GET /health, unauthenticated /v1/chat/completions rejection, invalid-token rejection, authenticated mock-mode streaming, and safe error redaction.",
+        "Smoke test proves local /health and mock-mode streaming with no Codex network call.",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "apps/codex-proxy exports a Vercel-compatible fetch handler and local dev host.",
+        "The proxy route is private by internal bearer token and can stream mocked OpenAI-compatible SSE.",
+        "apps/codex-proxy/README.md documents local dev, routes, env vars, Vercel project, smoke tests, and secret-handling rules.",
+        "No Eve app model change is introduced."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "deploy-codex-proxy-vercel",
+      "title": "Deploy and verify codex proxy on Vercel",
+      "status": "pending",
+      "description": "Link apps/codex-proxy to the personal Vercel project, deploy preview first, run direct HTTP verification, and only then approve production deployment.",
+      "implementationNotes": [
+        "Link the app to a Vercel project named bundjil-codex-proxy in Cooper's personal Vercel account, not the Tilt Legal team.",
+        "Use preview deployment as the first hosted proof. Production deployment is allowed only after preview verification is recorded.",
+        "Set BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and other secrets through Vercel env vars; never commit .env files.",
+        "Hosted live Codex proof is opt-in. If credentials are unavailable, verify health/auth/mock streaming and record live proof as pending.",
+        "Use Vercel logs only for sanitized status and chunk-shape proof; do not log token values, authorization codes, raw OAuth responses, prompts, or full model output."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs remain intact after deployment-specific changes.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from owning packages are reused.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "vercel link output or project metadata confirms bundjil-codex-proxy is under Cooper's personal Vercel account.",
+        "vercel env pull succeeds for preview and writes only ignored env files.",
+        "bun run --filter @bundjil/codex-proxy build",
+        "Preview deploy succeeds.",
+        "Preview direct HTTP GET /health returns 200 and no secret data.",
+        "Preview direct HTTP unauthenticated /v1/chat/completions returns 401 or 403.",
+        "Preview direct HTTP invalid-token /v1/chat/completions returns 401 or 403.",
+        "Preview authenticated mock-mode /v1/chat/completions streams OpenAI-compatible SSE.",
+        "Vercel logs and CLI output are checked for absence of access tokens, refresh tokens, authorization codes, raw OAuth responses, private prompts, and full upstream response bodies.",
+        "Production deploy is skipped or completed only after preview proof is recorded."
+      ],
+      "completionCriteria": [
+        "Preview URL and sanitized verification evidence are recorded in the task ledger.",
+        "Production URL is recorded only if production deploy was completed.",
+        "Rollback instructions are documented in apps/codex-proxy/README.md.",
+        "No provider secret is committed or logged."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "wire-eve-model-provider",
       "title": "Wire Eve to the proven model provider",
       "status": "pending",
-      "description": "Add app-owned model-provider selection so apps/agent can choose AI Gateway fallback or the proven Codex-auth-backed provider.",
+      "description": "Add app-owned model-provider selection so apps/agent can choose AI Gateway fallback or the deployed private Codex proxy.",
       "implementationNotes": [
         "Keep apps/agent/agent/config.ts as the app-owned config boundary.",
-        "Add app-owned model-provider wiring only after prove-codex-auth-runtime-path completes.",
-        "Preserve the current Vercel AI Gateway model as a fallback until Codex provider proof is stable.",
-        "If using @ai-sdk/openai-compatible, install and configure it only after the runtime endpoint is proven private and compatible."
+        "Add app-owned model-provider wiring only after prove-codex-auth-runtime-path, create-codex-proxy-app, and deploy-codex-proxy-vercel complete or explicitly record a local-only exception.",
+        "Preserve the current Vercel AI Gateway model as a fallback until Codex proxy proof is stable.",
+        "Use @ai-sdk/openai-compatible only after the runtime endpoint is proven private and compatible.",
+        "The Eve app should call the proxy URL with BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and should not know about Codex OAuth internals."
       ],
       "mandatoryVerification": [
         "Eve agent model remains an AI SDK-compatible LanguageModel or Gateway model string.",
@@ -191,12 +279,13 @@
         "bun run --filter @bundjil/agent test",
         "bun run --filter @bundjil/agent build",
         "bun run check-types",
-        "Local /eve/v1/info verifies the selected model/provider metadata without exposing secrets."
+        "Local /eve/v1/info verifies the selected model/provider metadata without exposing secrets.",
+        "If the Codex proxy mode is enabled, local Eve session proof uses the private proxy and logs sanitized status only."
       ],
       "completionCriteria": [
-        "apps/agent can select AI Gateway fallback or Codex provider through Effect Config.",
+        "apps/agent can select AI Gateway fallback or Codex proxy through Effect Config.",
         "No provider secret is committed or logged.",
-        "App README documents the provider selection and fallback behavior."
+        "App README documents the provider selection, proxy env vars, and fallback behavior."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
@@ -244,13 +333,15 @@
       "status": "pending",
       "description": "Update root, architecture, app, and package docs with the final provider boundary, setup commands, verification proof, and security constraints.",
       "implementationNotes": [
-        "Update README.md, ARCHITECTURE.md, docs/README.md, docs/architecture/eve-agent.md, docs/architecture/effect-patterns.md if generalized, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, and packages/codex-oauth/README.md.",
+        "Update README.md, ARCHITECTURE.md, docs/README.md, docs/architecture/eve-agent.md, docs/architecture/effect-patterns.md if generalized, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, apps/codex-proxy/README.md, and packages/codex-oauth/README.md.",
         "Docs must mark future work and unsupported paths clearly.",
-        "Docs must include exact local commands and sanitized proof shape."
+        "Docs must include exact local commands, Vercel deployment commands, direct HTTP checks, rollback instructions, and sanitized proof shape."
       ],
       "mandatoryVerification": [
         "Documentation distinguishes implemented behavior from research, opt-in proof, and future hosted storage work.",
         "Documentation includes production and test call graphs.",
+        "Documentation includes apps/codex-proxy Vercel deployment and preview-before-production verification.",
+        "Documentation records that bundjil-codex-proxy belongs in Cooper's personal Vercel account, not Tilt Legal.",
         "Documentation includes the mandatory 3-pass Effect TS implementation audit rule.",
         "No docs include token values, authorization codes, or raw OAuth payloads.",
         "bun run check",
@@ -276,6 +367,13 @@
       "implementationNotes": [],
       "mandatoryVerification": [
         "bun install --frozen-lockfile",
+        "bun run --filter @bundjil/codex-oauth test when the package exists",
+        "bun run --filter @bundjil/codex-oauth build when the package exists",
+        "bun run --filter @bundjil/codex-proxy test when the app exists",
+        "bun run --filter @bundjil/codex-proxy build when the app exists",
+        "bun run --filter @bundjil/codex-proxy smoke-test when the app exists",
+        "Preview Vercel deployment proof is recorded when apps/codex-proxy exists and deployment is in scope.",
+        "Direct HTTP proof covers /health, unauthorized rejection, invalid-token rejection, and authenticated mock streaming when apps/codex-proxy exists.",
         "bun run verification",
         "git status --short",
         "All completed tasks include implementation notes and 3-pass audit evidence.",

@@ -141,6 +141,42 @@ Source URL:
 
 - <https://effect.website/docs/platform/key-value-store/>
 
+### Effect HTTP API and Mobius API reference
+
+Executor personal DeepWiki on `Effect-TS/effect` confirmed the current Effect
+HTTP stack can expose a web-standard handler suitable for Vercel-style
+serverless entrypoints:
+
+- Use `effect/unstable/httpapi` (`HttpApi`, `HttpApiGroup`,
+  `HttpApiEndpoint`, `HttpApiBuilder`, `HttpApiScalar`, `OpenApi`) for typed
+  JSON management endpoints, schema-backed request/response validation, and
+  OpenAPI generation.
+- Use `effect/unstable/http/HttpRouter` for raw routes that need exact body
+  and streaming control. The Codex proxy's `/v1/chat/completions` route should
+  be an `HttpRouter.add(...)` route, not a fully buffered typed JSON endpoint.
+- Use `HttpRouter.toWebHandler(...)` at the app boundary to produce a
+  web-standard `Request -> Response` handler for Vercel and tests.
+- Use `HttpServerRequest.toWeb(...)` or request body access at the route edge
+  when a raw proxy route must preserve headers/body semantics.
+- Use `HttpServerResponse.raw(...)` or the current Effect streaming response
+  constructor for SSE so the proxy does not buffer Codex response streams.
+
+`~/Projects/Mobius/apps/api` provides the local deployment reference:
+
+- `apps/api/src/index.ts` composes live layers once at module scope and exports
+  a web-standard `fetch` handler for Vercel.
+- `apps/api/src/dev.ts` runs the same Effect routes locally with
+  `HttpRouter.serve(...)` and a Bun HTTP server layer.
+- `packages/backend/http-api/src/server.ts` keeps the app boundary thin by
+  exporting `HttpRouter.toWebHandler`.
+- `packages/backend/http-api/src/live.layer.ts` composes typed
+  `HttpApiBuilder.layer(...)` routes, raw `HttpRouter.add(...)` routes, docs,
+  middleware, and infrastructure layers.
+
+Bundjil should copy this architecture, not the Mobius domain code: packages
+own reusable Effect services and route layers; `apps/codex-proxy` owns Vercel
+deployment, env binding names, local dev, and smoke-test scripts.
+
 ### Vercel storage research
 
 Vercel KV is no longer the right target for new work. Vercel storage docs and
@@ -331,6 +367,11 @@ This spec was intentionally iterated before acceptance:
    `chatgpt.com/backend-api/codex/responses` directly. The spec now treats a
    private Bundjil OpenAI-compatible proxy over direct Codex HTTP as the
    preferred proof target.
+8. Effect HTTP / Vercel proxy iteration: executor personal DeepWiki on
+   `Effect-TS/effect` and the local Mobius `apps/api` reference confirmed the
+   proxy should be a separate deployable app. `apps/codex-proxy` owns Vercel
+   deployment and Effect HTTP route composition; `@bundjil/codex-oauth` owns
+   reusable OAuth, profile, direct Codex provider, and stream-mapping services.
 
 ## Target Shape
 
@@ -378,6 +419,40 @@ apps/agent/
     model-provider.test.ts
 ```
 
+Add a deployable proxy app after the package-level direct provider contract is
+stable:
+
+```text
+apps/codex-proxy/
+  package.json
+  README.md
+  nitro.config.ts                 # if mirroring Mobius' Vercel Bun function build
+  src/
+    index.ts                      # Vercel fetch handler
+    dev.ts                        # local Bun HTTP host
+    env.ts                        # Effect ConfigProvider / Config schema
+    live.layer.ts                 # route + infrastructure composition
+    server.ts                     # thin HttpRouter.toWebHandler adapter
+    routes/
+      health.ts                   # typed or raw health route
+      openai-compatible.ts        # raw streaming proxy route
+  scripts/
+    smoke-test-dev.ts
+    smoke-test-vercel.ts
+  test/
+    health.test.ts
+    proxy-auth.test.ts
+    proxy-streaming.test.ts
+    vercel-handler.test.ts
+```
+
+The first deployment target is a separate Vercel project named
+`bundjil-codex-proxy` under Cooper's personal Vercel account, not the Tilt
+Legal Vercel team. The first version should deploy as a Bun or Node Vercel
+Function rather than Vercel Edge Runtime. Edge Runtime can be reconsidered only
+after token storage, crypto, streaming, and Effect runtime behavior are proven
+compatible.
+
 Do not add a Codex app-server runtime package for the first proof. Keep this as
 fallback research only if the direct Goose-style provider fails:
 
@@ -417,6 +492,13 @@ SDK clients in `@bundjil/core`.
   WorkOS, user app sessions, channel authentication, and Eve tool contracts.
 - `@bundjil/codex-oauth` owns reusable Codex OAuth schemas, tagged errors,
   storage keys, profile storage, token refresh, and memory/live layers.
+- `apps/codex-proxy` owns the Vercel-deployed proxy edge: Effect HTTP route
+  composition, web-standard `fetch` entrypoint, local dev server, smoke-test
+  scripts, Vercel project/env binding names, and internal bearer-token auth.
+- The proxy app must use Effect HTTP APIs from platform: typed JSON endpoints
+  use `HttpApiBuilder.layer(...)`; streaming OpenAI-compatible model routes use
+  raw `HttpRouter.add(...)` and `HttpServerResponse.raw(...)` or the current
+  Effect streaming response primitive.
 - `apps/agent` owns Eve model selection, deployment config, and deciding when
   to use AI Gateway versus Codex OAuth.
 - Use Effect `KeyValueStore` as the persistence contract. Start with memory and
@@ -437,6 +519,8 @@ SDK clients in `@bundjil/core`.
 - Do not expose a public OpenAI-compatible endpoint in the first iteration. If
   a compatibility endpoint is required for Eve, bind it to loopback or private
   Vercel protection only, then document the security model.
+- Deploy the proxy as a separate Vercel project so it can be protected,
+  rolled back, logged, and scaled independently from the Eve app.
 - Store no token values in source, logs, task ledgers, docs, error messages, or
   test snapshots.
 
@@ -541,6 +625,86 @@ Candidate runtime paths:
 The spec does not approve replacing the default Eve model until a live proof
 shows a prompt can complete through the Codex-authenticated provider.
 
+## Proxy HTTP API And Vercel Deployment
+
+`apps/codex-proxy` should be a small deployable Effect HTTP service. It should
+not own Codex domain behavior; it should compose package-owned services from
+`@bundjil/codex-oauth` and adapt them to HTTP/Vercel.
+
+Initial routes:
+
+```text
+GET  /health
+  -> public or low-risk health check with no secret data
+
+GET  /openapi.json
+  -> optional local/preview typed API description for management endpoints
+  -> never include secret defaults or token examples
+
+POST /auth/start
+  -> private/local-only OAuth start route, if CLI-only auth is not enough
+
+POST /auth/callback
+  -> private/local-only OAuth callback route, if browser auth is app-hosted
+
+POST /v1/chat/completions
+  -> private OpenAI-compatible streaming route for Eve / AI SDK
+  -> requires internal bearer token
+```
+
+The first implementation should treat `/v1/chat/completions` as the only
+model route. `/v1/responses` is future work unless AI SDK compatibility
+requires it during proof.
+
+Proxy config belongs to `apps/codex-proxy/src/env.ts` and must use Effect
+Config:
+
+```text
+BUNDJIL_CODEX_PROXY_MODE=mock | live
+BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=<redacted>
+BUNDJIL_CODEX_PROXY_PUBLIC_BASE_URL=<url>
+BUNDJIL_CODEX_PROFILE_ID=<profile id>
+BUNDJIL_CODEX_MODEL=<model id>
+```
+
+Hosted storage config is added only when the Upstash / KeyValueStore adapter
+task is accepted. Raw refresh tokens must not be stored in hosted KV before the
+encryption-at-rest and operator-access model is documented and tested.
+
+Vercel deployment rules:
+
+- Link `apps/codex-proxy` to a separate Vercel project named
+  `bundjil-codex-proxy` in Cooper's personal Vercel account.
+- Do not link or deploy this app to the Tilt Legal Vercel team.
+- Use preview deployments for proof before production.
+- Keep `/v1/chat/completions` private by internal bearer token at minimum.
+- Prefer a Bun or Node Vercel Function for the first implementation; do not use
+  Edge Runtime until streaming, crypto, token storage, and Effect runtime
+  behavior are proven in that runtime.
+- Vercel logs, deployment output, and smoke-test output must not include access
+  tokens, refresh tokens, authorization codes, raw OAuth responses, private
+  prompts, or full upstream response bodies.
+
+Expected Vercel scripts in `apps/codex-proxy/package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "bun --conditions=@bundjil/source src/dev.ts",
+    "build": "nitro build",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke-test": "bun --conditions=@bundjil/source scripts/smoke-test-dev.ts",
+    "smoke-test:vercel": "bun --conditions=@bundjil/source scripts/smoke-test-vercel.ts",
+    "link-app": "vercel link --yes --project bundjil-codex-proxy"
+  }
+}
+```
+
+If the implementer chooses direct Vercel Functions instead of Nitro, the spec
+must be updated before implementation to explain the replacement build and
+verification commands.
+
 ## Effect Boundary Requirements
 
 Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
@@ -593,6 +757,9 @@ CodexResponsesUsage;
 OpenAICompatibleChatCompletionRequest;
 OpenAICompatibleChatCompletionChunk;
 BundjilCodexProxyConfig;
+BundjilCodexProxyInternalAuth;
+BundjilCodexProxyHealth;
+BundjilCodexProxyRouteError;
 CodexModelProviderConfig;
 ```
 
@@ -607,6 +774,8 @@ CodexRequestMapper;
 CodexStreamMapper;
 CodexDirectProvider;
 OpenAICompatibleProxy;
+BundjilCodexProxyHttpApi;
+BundjilCodexProxyRuntime;
 CodexModelProvider;
 ```
 
@@ -633,6 +802,9 @@ CodexStreamMapper.toOpenAICompatibleStream(input);
 CodexHttpClient.postResponses(input);
 CodexDirectProvider.streamChatCompletion(input);
 OpenAICompatibleProxy.handleChatCompletions(input);
+BundjilCodexProxyHttpApi.health(input);
+BundjilCodexProxyHttpApi.handleChatCompletions(request);
+BundjilCodexProxyRuntime.makeWebHandler(input);
 CodexModelProvider.createLanguageModel(input);
 ```
 
@@ -654,6 +826,8 @@ CodexHttpStatusError;
 CodexHttpNetworkError;
 OpenAICompatibleProxyAuthError;
 OpenAICompatibleProxyRequestError;
+BundjilCodexProxyConfigError;
+BundjilCodexProxyDeploymentError;
 CodexOAuthUnsupportedRuntimePath;
 CodexModelProviderError;
 CodexModelProviderVerificationError;
@@ -693,6 +867,37 @@ Eve HTTP /eve/v1/session
           -> CodexStreamMapper
 ```
 
+Production, `apps/codex-proxy` Vercel request:
+
+```ts
+Vercel Function fetch(request)
+  -> apps/codex-proxy/src/index.ts
+  -> BundjilCodexProxyRuntime.makeWebHandler
+    -> HttpRouter.toWebHandler(ProxyLive)
+      -> HttpRouter.add("POST", "/v1/chat/completions", ...)
+        -> OpenAICompatibleProxy.handleChatCompletions
+          -> CodexDirectProvider.streamChatCompletion
+            -> CodexOAuthService.getValidToken
+            -> CodexRequestMapper.toCodexResponses
+            -> CodexHttpClient.postResponses
+            -> CodexStreamMapper.toOpenAICompatibleStream
+        -> HttpServerResponse.raw | streaming response primitive
+```
+
+Production, typed proxy management routes:
+
+```ts
+Vercel Function fetch(request)
+  -> apps/codex-proxy/src/index.ts
+  -> BundjilCodexProxyRuntime.makeWebHandler
+    -> HttpRouter.toWebHandler(ProxyLive)
+      -> HttpApiBuilder.layer(BundjilCodexProxyApi)
+        -> GET /health
+        -> optional POST /auth/start
+        -> optional POST /auth/callback
+        -> optional GET /openapi.json
+```
+
 Token/profile storage path:
 
 ```ts
@@ -728,6 +933,43 @@ Tests, app integration:
   -> no provider network calls
 ```
 
+Tests, proxy app:
+
+```ts
+@bundjil/codex-proxy tests
+  -> HttpRouter.toWebHandler(ProxyTestLayer)
+    -> BundjilCodexProxyHttpApi test routes
+      -> OpenAICompatibleProxy mock layer
+      -> CodexDirectProvider mock layer
+      -> CodexProfileStoreMemory
+      -> KeyValueStore.layerMemory
+  -> direct Request / Response assertions
+  -> health, internal auth, streaming SSE, error redaction tests
+```
+
+Local dev path:
+
+```ts
+bun run --filter @bundjil/codex-proxy dev
+  -> apps/codex-proxy/src/dev.ts
+  -> HttpRouter.serve(ProxyLive)
+  -> Bun HTTP server layer
+  -> http://127.0.0.1:<port>/health
+  -> http://127.0.0.1:<port>/v1/chat/completions
+```
+
+Vercel deployment path:
+
+```ts
+apps/codex-proxy
+  -> vercel link --project bundjil-codex-proxy
+  -> vercel env pull
+  -> bun run --filter @bundjil/codex-proxy build
+  -> vercel deploy
+  -> preview URL direct HTTP checks
+  -> vercel deploy --prod only after preview proof
+```
+
 Opt-in live proof:
 
 ```ts
@@ -760,6 +1002,39 @@ Per implementation task:
   records a narrower reasoned exception.
 - Record implementation evidence in the task ledger.
 
+Proxy app verification:
+
+- `bun run --filter @bundjil/codex-proxy test`
+- `bun run --filter @bundjil/codex-proxy check-types`
+- `bun run --filter @bundjil/codex-proxy build`
+- `bun run --filter @bundjil/codex-proxy smoke-test`
+- Direct HTTP: `GET /health` returns 200 and contains no secret data.
+- Direct HTTP: unauthenticated `POST /v1/chat/completions` returns 401 or 403.
+- Direct HTTP: invalid internal token returns 401 or 403.
+- Direct HTTP: authenticated mock-mode `POST /v1/chat/completions` streams
+  OpenAI-compatible SSE without contacting Codex.
+- Direct HTTP: live-mode `POST /v1/chat/completions` is opt-in only and logs
+  sanitized status/chunk shape, not prompt text, token values, or full model
+  output.
+
+Vercel deployment verification:
+
+- `vercel link` output shows the `bundjil-codex-proxy` project under Cooper's
+  personal Vercel account, not Tilt Legal.
+- `vercel env pull` for preview succeeds and does not write committed env
+  files.
+- Preview deploy succeeds before production deploy.
+- Preview direct HTTP checks prove `/health`, unauthenticated rejection,
+  invalid-token rejection, and authenticated mock-mode streaming.
+- Production deploy is allowed only after preview proof is recorded in the task
+  ledger.
+- Vercel logs and CLI output are checked for absence of access tokens, refresh
+  tokens, authorization codes, raw OAuth responses, private prompts, and full
+  upstream response bodies.
+- If live Codex credentials are unavailable, hosted verification must stop at
+  mock-mode streaming plus auth/health proof and record that live model proof
+  remains pending.
+
 Mandatory 3-pass Effect TS audit after every implementation task:
 
 1. Ownership and call graph audit: package/app ownership, imports, layers,
@@ -788,6 +1063,8 @@ Implementation must update:
 - `docs/architecture/testing-and-quality.md`: Codex OAuth verification and
   live proof rules.
 - `apps/agent/README.md`: env vars, fallback model, Codex OAuth status.
+- `apps/codex-proxy/README.md`: local dev, Effect HTTP routes, Vercel project,
+  env vars, smoke tests, deployment, rollback, and secret-handling rules.
 - `packages/codex-oauth/README.md`: schemas, service tags, layers, storage
   backends, direct Codex Responses mapping, private proxy setup, verification,
   and secret handling.
@@ -800,6 +1077,8 @@ Docs must distinguish:
 - Unsupported or unproven Codex runtime paths.
 - Difference between AI Gateway billing, OpenAI API-key billing, and ChatGPT /
   Codex subscription-backed runtime access.
+- Difference between the private Bundjil proxy and a public OpenAI-compatible
+  gateway.
 
 ## Risks And Tradeoffs
 
@@ -828,6 +1107,14 @@ Docs must distinguish:
   path naturally implements the AI SDK `LanguageModel` contract.
 - A private OpenAI-compatible endpoint can become a high-risk operator surface.
   Do not expose it publicly.
+- Vercel Edge Runtime may not support the first implementation's required
+  Effect runtime, crypto, storage, or streaming behavior. Start with a Bun or
+  Node Vercel Function.
+- Linking the proxy app to the wrong Vercel team can leak env/secrets into the
+  wrong account boundary. Verification must prove the project is in Cooper's
+  personal Vercel account.
+- Hosted live proof can accidentally log sensitive request/response content.
+  Smoke tests must assert shape and status rather than dumping full payloads.
 
 ## Out Of Scope
 
@@ -850,8 +1137,10 @@ Docs must distinguish:
   sufficient over the private proxy, or does Bundjil need a custom provider?
 - Does the Codex model family handle non-coding personal-agent conversations
   well enough for Bundjil's first user experience?
-- What hosted runtime shape can safely perform loopback OAuth, or should
-  hosted login remain local/CLI-driven until a real UI exists?
+- Should the first hosted proxy use Nitro's Vercel Bun function output exactly
+  like Mobius `apps/api`, or a simpler direct Vercel Function build?
+- Can a hosted Vercel function safely perform OAuth callback handling, or
+  should login remain local/CLI-driven until a real UI exists?
 - What is the right hosted token encryption layer before using Upstash Redis
   on Vercel?
 - Should the first login UX be CLI-only, local web-only, or a Vercel-protected
