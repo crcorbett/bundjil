@@ -1,0 +1,247 @@
+{
+  "title": "Codex OAuth Eve Model Provider Tasks",
+  "status": "draft",
+  "spec": "docs/product-specs/codex-oauth-eve-model-provider.md",
+  "principles": [
+    "Prove the Codex-authenticated runtime path before replacing the current AI Gateway Eve model.",
+    "Keep Codex OAuth separate from app login, WorkOS, Better Auth, channels, and Eve tool contracts.",
+    "Use Effect Schema, tagged errors, Context services, Layers, Config, and KeyValueStore for every runtime-owned boundary.",
+    "Use Effect v4 local import paths for KeyValueStore while documenting the public Effect platform concept.",
+    "Treat OpenClaw as prior art only; do not adopt OpenClaw packages, code, state files, or gateway behavior.",
+    "Never commit, print, snapshot, or persist raw token values outside the approved token store."
+  ],
+  "globalVerification": [
+    "Complete `codex mcp login executor-personal` and rerun personal executor DeepWiki research before implementation starts.",
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/codex-oauth test when the package exists",
+    "bun run --filter @bundjil/codex-oauth build when the package exists",
+    "bun run --filter @bundjil/agent test when app wiring changes",
+    "bun run --filter @bundjil/agent build when app wiring changes",
+    "bun run check-types",
+    "bun run verification",
+    "Opt-in live proof only with local/private credentials and sanitized output"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require more passes if Codex auth support, token storage, Eve model-provider wiring, or secret handling remains weak."
+  },
+  "tasks": [
+    {
+      "id": "research-codex-oauth-runtime",
+      "title": "Complete executor and DeepWiki research",
+      "status": "pending",
+      "description": "Authorize executor personal, query DeepWiki for Codex OAuth, Eve model-provider wiring, and effect-smol KeyValueStore, then revise the spec with confirmed findings before code starts.",
+      "implementationNotes": [
+        "Current attempt on 2026-07-07 is blocked on executor-personal OAuth authorization; `codex mcp login executor-personal` opened the browser authorization URL but timed out waiting for the loopback callback.",
+        "Ask DeepWiki about OpenAI/Codex auth source and SDK runtime paths, including whether Codex OAuth can back a generic AI SDK LanguageModel.",
+        "Ask DeepWiki about vercel/eve model handling, direct LanguageModel support, external provider metadata, and hosted build constraints.",
+        "Ask DeepWiki about Effect v4 KeyValueStore import paths, schema stores, memory/file/sql layers, and any recommended locking primitive.",
+        "Record exact research outputs in the spec's Research Evidence section and update risks/open questions."
+      ],
+      "mandatoryVerification": [
+        "Executor personal OAuth is authorized or a fresh blocker is recorded with command output.",
+        "DeepWiki evidence is added to docs/product-specs/codex-oauth-eve-model-provider.md.",
+        "Flat meaningful Effect.gen programs are explicitly required for later primary operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError are explicitly required.",
+        "Canonical Effect Schema contracts and schema-derived types from owning packages are explicitly required.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are approved by the revised spec.",
+        "Implementation-improvement audit pass evidence is recorded before task acceptance."
+      ],
+      "completionCriteria": [
+        "The spec names the chosen first runtime path or explicitly blocks implementation if no supported path exists.",
+        "The spec distinguishes official OpenAI/Codex support from OpenClaw prior art.",
+        "The task ledger is updated with research evidence and audit notes."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "define-codex-oauth-package-contract",
+      "title": "Define @bundjil/codex-oauth schemas and services",
+      "status": "pending",
+      "description": "Create the package contract with canonical schemas, tagged errors, service tags, storage keys, and memory layers without provider network calls.",
+      "implementationNotes": [
+        "Use package layout src/schemas.ts, src/errors.ts, src/storage-keys.ts, src/profile-store.service.ts, src/token.service.ts, src/live.layer.ts, src/mock.layer.ts, and src/index.ts.",
+        "Use effect/unstable/persistence/KeyValueStore for local Effect v4.",
+        "Define OAuthProfileStore and CodexOAuthTokenService as the first stable service tags.",
+        "Use hashed subject keys under bundjil/oauth/v1/provider/codex/profile/{subjectHash}.",
+        "Do not add OAuth endpoint exchange or Eve model replacement in this task."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for primary operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError where relevant.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests cover schema decode/encode, stable key derivation, missing profile, expired token, remove/revoke, storage error mapping, memory layer seeding, and no token leakage in error messages.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "@bundjil/codex-oauth exports schemas, errors, service tags, and memory/live layers.",
+        "Package README documents contracts, layers, and safe secret handling.",
+        "No provider network dependency or Eve app model change is introduced."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-codex-auth-runtime-path",
+      "title": "Prove the Codex-authenticated runtime path",
+      "status": "pending",
+      "description": "Run an opt-in local proof that a stored Codex credential can produce a model result through the selected supported path without exposing secrets.",
+      "implementationNotes": [
+        "If the supported path is Codex SDK, prove a coding-focused prompt through @openai/codex-sdk or Codex CLI without changing Eve's default model.",
+        "If the supported path is an AI SDK LanguageModel, prove generateText with a minimal prompt and sanitized output.",
+        "If only a private OpenAI-compatible endpoint works, keep it loopback/private and prove the endpoint cannot be reached publicly.",
+        "If no supported path exists, mark this task blocked and do not proceed to Eve replacement."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for primary runtime operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Live proof logs contain no access tokens, refresh tokens, authorization codes, raw OAuth responses, private prompts, or full request/response bodies.",
+        "Provider errors are mapped to safe tagged errors.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "A sanitized live proof records the selected runtime path.",
+        "The spec and package README are updated with the result.",
+        "A failure to prove support blocks Eve model replacement rather than adding a fallback fake."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "wire-eve-model-provider",
+      "title": "Wire Eve to the proven model provider",
+      "status": "pending",
+      "description": "Add app-owned model-provider selection so apps/agent can choose AI Gateway fallback or the proven Codex-auth-backed provider.",
+      "implementationNotes": [
+        "Keep apps/agent/agent/config.ts as the app-owned config boundary.",
+        "Add app-owned model-provider wiring only after prove-codex-auth-runtime-path completes.",
+        "Preserve the current Vercel AI Gateway model as a fallback until Codex provider proof is stable.",
+        "If using @ai-sdk/openai-compatible, install and configure it only after the runtime endpoint is proven private and compatible."
+      ],
+      "mandatoryVerification": [
+        "Eve agent model remains an AI SDK-compatible LanguageModel or Gateway model string.",
+        "Flat meaningful Effect.gen programs for provider selection and config parsing where fallible.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from owning packages.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "bun run --filter @bundjil/agent test",
+        "bun run --filter @bundjil/agent build",
+        "bun run check-types",
+        "Local /eve/v1/info verifies the selected model/provider metadata without exposing secrets."
+      ],
+      "completionCriteria": [
+        "apps/agent can select AI Gateway fallback or Codex provider through Effect Config.",
+        "No provider secret is committed or logged.",
+        "App README documents the provider selection and fallback behavior."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "add-vercel-kv-adapter",
+      "title": "Add a Vercel-compatible KeyValueStore adapter",
+      "status": "pending",
+      "description": "Add an adapter for a Vercel Marketplace KV provider, expected to be Upstash Redis, behind Effect KeyValueStore.",
+      "implementationNotes": [
+        "Do not use @vercel/kv; Vercel KV is sunset for new work.",
+        "Prefer Upstash Redis through Vercel Marketplace so env vars are provisioned through the linked project.",
+        "Keep the adapter behind KeyValueStore so @bundjil/codex-oauth does not depend on app code.",
+        "Decide and document token encryption before storing refresh tokens in hosted KV."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs for adapter operations.",
+        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+        "Tests use a mock or memory adapter by default; live Upstash tests are opt-in.",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run check-types"
+      ],
+      "completionCriteria": [
+        "A KeyValueStore-compatible adapter exists for the chosen Vercel KV provider.",
+        "Env vars are parsed with Effect Config and secrets use Config.redacted.",
+        "Docs describe provisioning through Vercel Marketplace and local env pull."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "document-codex-oauth-provider",
+      "title": "Write comprehensive Codex OAuth provider documentation",
+      "status": "pending",
+      "description": "Update root, architecture, app, and package docs with the final provider boundary, setup commands, verification proof, and security constraints.",
+      "implementationNotes": [
+        "Update README.md, ARCHITECTURE.md, docs/README.md, docs/architecture/eve-agent.md, docs/architecture/effect-patterns.md if generalized, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, and packages/codex-oauth/README.md.",
+        "Docs must mark future work and unsupported paths clearly.",
+        "Docs must include exact local commands and sanitized proof shape."
+      ],
+      "mandatoryVerification": [
+        "Documentation distinguishes implemented behavior from research, opt-in proof, and future hosted storage work.",
+        "Documentation includes production and test call graphs.",
+        "Documentation includes the mandatory 3-pass Effect TS implementation audit rule.",
+        "No docs include token values, authorization codes, or raw OAuth payloads.",
+        "bun run check",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "All durable boundaries are documented.",
+        "Setup and rollback instructions are clear.",
+        "The task ledger records final verification evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "final-verification",
+      "title": "Run final verification and prepare handoff",
+      "status": "pending",
+      "description": "Run the full repository verification and summarize sanitized implementation evidence.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "bun install --frozen-lockfile",
+        "bun run verification",
+        "git status --short",
+        "All completed tasks include implementation notes and 3-pass audit evidence.",
+        "Secret scan confirms no token values, authorization codes, or raw OAuth payloads are committed."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

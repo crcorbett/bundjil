@@ -23,6 +23,9 @@ README.
 - [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
   describes the first planned Eve agent implementation and Effect wrapper
   boundary.
+- [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
+  specifies the research-gated Codex OAuth service, Effect KeyValueStore
+  profile store, Eve model-provider wiring, and mandatory implementation audit.
 - [Reference repositories](./reference-repositories.md) explains the local
   `.local/references` setup for Vercel and Effect source lookup.
 - [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral

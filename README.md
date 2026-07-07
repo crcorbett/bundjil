@@ -106,12 +106,14 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 ## Roadmap
 
 1. Keep proving the Eve app through local HTTP and Gateway-backed verification.
-2. Define channel-neutral message, identity, consent, and task contracts in
+2. Investigate the [Codex OAuth Eve model-provider spec](./docs/product-specs/codex-oauth-eve-model-provider.md)
+   before replacing AI Gateway with any Codex-auth-backed provider.
+3. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
-3. Add the Sendblue iMessage webhook and outbound delivery adapter.
-4. Add the Cloudflare email ingress path.
-5. Connect Notion through Vercel Connect and model the first personal workflows.
-6. Add readback, observability, and replayable verification for every channel.
+4. Add the Sendblue iMessage webhook and outbound delivery adapter.
+5. Add the Cloudflare email ingress path.
+6. Connect Notion through Vercel Connect and model the first personal workflows.
+7. Add readback, observability, and replayable verification for every channel.
 
 ## References
 
