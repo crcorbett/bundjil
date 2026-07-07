@@ -2,6 +2,18 @@ import { Effect, Layer, Option } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
+  CodexHttpClient,
+  makeCodexHttpClient,
+} from "./codex-http-client.service.js";
+import {
+  CodexResponsesFetch,
+  makeCodexResponsesFetch,
+} from "./codex-responses-fetch.service.js";
+import {
+  CodexResponsesProof,
+  makeCodexResponsesProof,
+} from "./codex-responses-proof.service.js";
+import {
   OAuthProfileNotFound,
   OAuthProfileSchemaError,
   OAuthProfileStorageError,
@@ -154,4 +166,23 @@ export const CodexOAuthLive = CodexOAuthServiceLive.pipe(
 
 export const CodexOAuthMemoryKeyValueLive = CodexOAuthLive.pipe(
   Layer.provide(KeyValueStore.layerMemory)
+);
+
+export const CodexResponsesFetchLive = Layer.succeed(
+  CodexResponsesFetch,
+  makeCodexResponsesFetch
+);
+
+export const CodexHttpClientLive = Layer.effect(
+  CodexHttpClient,
+  makeCodexHttpClient
+);
+
+export const CodexResponsesProofLive = Layer.effect(
+  CodexResponsesProof,
+  makeCodexResponsesProof
+).pipe(Layer.provide(CodexHttpClientLive));
+
+export const CodexResponsesProofFetchLive = CodexResponsesProofLive.pipe(
+  Layer.provide(CodexResponsesFetchLive)
 );

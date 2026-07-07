@@ -29,3 +29,20 @@ export const CodexOAuthClientOperation = Schema.Literals([
 ]);
 
 export type CodexOAuthClientOperation = typeof CodexOAuthClientOperation.Type;
+
+export const CodexResponsesSchemaBoundary = Schema.Literals([
+  "CodexResponsesRequest",
+  "CodexResponsesProofInput",
+  "CodexResponsesProofResult",
+]);
+
+export type CodexResponsesSchemaBoundary =
+  typeof CodexResponsesSchemaBoundary.Type;
+
+export const CodexHttpClientOperation = Schema.Literals([
+  "fetch",
+  "postResponses",
+  "readResponseBody",
+]);
+
+export type CodexHttpClientOperation = typeof CodexHttpClientOperation.Type;

@@ -1,4 +1,7 @@
 export {
+  CodexHttpClientOperation,
+  CodexHttpNetworkError,
+  CodexHttpStatusError,
   CodexOAuthClientOperation,
   CodexOAuthFailure,
   CodexOAuthProfileSchemaBoundary,
@@ -8,17 +11,33 @@ export {
   CodexOAuthTokenProviderError,
   CodexOAuthUnsupportedRuntimePath,
   CodexProfileStoreFailure,
+  CodexResponsesFailure,
+  CodexResponsesRequestError,
+  CodexResponsesSchemaBoundary,
+  CodexResponsesStreamError,
   OAuthProfileNotFound,
   OAuthProfileSchemaError,
   OAuthProfileStorageError,
 } from "./errors.js";
 export type {
+  CodexHttpClientOperation as CodexHttpClientOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
   CodexOAuthFailure as CodexOAuthFailureType,
   CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
   CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
   CodexProfileStoreFailure as CodexProfileStoreFailureType,
+  CodexResponsesFailure as CodexResponsesFailureType,
+  CodexResponsesSchemaBoundary as CodexResponsesSchemaBoundaryType,
 } from "./errors.js";
+export {
+  CodexHttpClient,
+  makeCodexHttpClient,
+  postResponses,
+} from "./codex-http-client.service.js";
+export type {
+  CodexHttpClientFailure,
+  CodexHttpClientShape,
+} from "./codex-http-client.service.js";
 export {
   CodexOAuthClient,
   CodexOAuthClientUnsupported,
@@ -44,6 +63,26 @@ export {
 } from "./profile-store.service.js";
 export type { CodexProfileStoreShape } from "./profile-store.service.js";
 export {
+  defaultCodexResponsesEndpoint,
+  defaultCodexResponsesModel,
+  loadCodexResponsesProofInput,
+  loadCodexResponsesProofInputFromEnv,
+} from "./codex-responses.config.js";
+export {
+  CodexResponsesFetch,
+  makeCodexResponsesFetch,
+} from "./codex-responses-fetch.service.js";
+export type { CodexResponsesFetchShape } from "./codex-responses-fetch.service.js";
+export {
+  CodexResponsesProof,
+  makeCodexResponsesProof,
+  runCodexResponsesProof,
+} from "./codex-responses-proof.service.js";
+export type {
+  CodexResponsesProofFailure,
+  CodexResponsesProofShape,
+} from "./codex-responses-proof.service.js";
+export {
   CodexOAuthAccessToken,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
@@ -59,6 +98,15 @@ export {
   CodexOAuthRevokeInput,
   CodexOAuthSubject,
   CodexOAuthTokenRefreshResult,
+  CodexResponsesEndpoint,
+  CodexResponsesInputMessage,
+  CodexResponsesInputTextContent,
+  CodexResponsesModelId,
+  CodexResponsesPostInput,
+  CodexResponsesProofInput,
+  CodexResponsesProofResult,
+  CodexResponsesReasoning,
+  CodexResponsesRequest,
   OAuthPrincipal,
 } from "./schemas.js";
 export type {
@@ -77,6 +125,15 @@ export type {
   CodexOAuthRevokeInput as CodexOAuthRevokeInputType,
   CodexOAuthSubject as CodexOAuthSubjectType,
   CodexOAuthTokenRefreshResult as CodexOAuthTokenRefreshResultType,
+  CodexResponsesEndpoint as CodexResponsesEndpointType,
+  CodexResponsesInputMessage as CodexResponsesInputMessageType,
+  CodexResponsesInputTextContent as CodexResponsesInputTextContentType,
+  CodexResponsesModelId as CodexResponsesModelIdType,
+  CodexResponsesPostInput as CodexResponsesPostInputType,
+  CodexResponsesProofInput as CodexResponsesProofInputType,
+  CodexResponsesProofResult as CodexResponsesProofResultType,
+  CodexResponsesReasoning as CodexResponsesReasoningType,
+  CodexResponsesRequest as CodexResponsesRequestType,
   OAuthPrincipal as OAuthPrincipalType,
 } from "./schemas.js";
 export {

@@ -116,23 +116,27 @@
     {
       "id": "prove-codex-auth-runtime-path",
       "title": "Prove the direct Codex Responses subscription path",
-      "status": "pending",
-      "description": "Run an opt-in local proof that Codex subscription auth can produce a model result through the direct Codex Responses backend and a private Bundjil proxy without exposing secrets.",
+      "status": "completed",
+      "description": "Run an opt-in local proof that Codex subscription auth can produce a model result through the direct Codex Responses backend before the private Bundjil proxy task, without exposing secrets.",
       "implementationNotes": [
         "Use Goose's `chatgpt_codex` provider as architecture precedent only; do not copy its implementation.",
         "Implement or spike PKCE OAuth against the researched OpenAI issuer/client/scopes behind CodexOAuthService and CodexOAuthClient.",
         "POST a minimal sanitized request to `https://chatgpt.com/backend-api/codex/responses` through CodexHttpClient.",
         "When subscription auth is selected, do not read or forward OPENAI_API_KEY and assert this in tests.",
-        "If a private OpenAI-compatible bridge is needed for Eve, keep it loopback/private and prove the endpoint cannot be reached publicly.",
+        "Private OpenAI-compatible bridge auth remains in `create-codex-proxy-app`; this proof task only proves the direct package-owned Codex Responses backend path.",
         "If an AI SDK LanguageModel over the private proxy is practical, prove generateText with a minimal prompt and sanitized output.",
-        "If no supported path exists, mark this task blocked and do not proceed to Eve replacement."
+        "If no supported path exists, mark this task blocked and do not proceed to Eve replacement.",
+        "Implemented CodexResponsesFetch, CodexHttpClient, CodexResponsesProof, direct Responses schemas, safe HTTP/request/stream errors, live/mock fetch layers, and `proof:codex-responses`.",
+        "Live proof used the local Codex auth cache access token injected into CODEX_ACCESS_TOKEN for one process. The command returned HTTP 200 from `https://chatgpt.com/backend-api/codex/responses`, 5528 response bytes, 18 stream lines, and `usedAccountHeader: true` without printing tokens, prompts, auth codes, raw OAuth responses, or response bodies.",
+        "Executor Personal CLI login completed, but the in-thread `mcp__executor_personal.skills({ name: \"execute\" })` call still returned `OAuth authorization required`; implementation used prior DeepWiki/Parallel evidence plus current Goose source inspection."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for primary runtime operations.",
         "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
         "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
         "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
-        "OAuth token refresh, Codex Responses request mapping, stream mapping, private proxy auth, no API-key fallback, and failure mapping are tested without network where possible.",
+        "OAuth token refresh, Codex Responses request mapping, stream shape proof, no API-key fallback, and failure mapping are tested without network where possible.",
+        "Private proxy auth remains explicitly deferred to `create-codex-proxy-app`.",
         "Live proof logs contain no access tokens, refresh tokens, authorization codes, raw OAuth responses, private prompts, or full request/response bodies.",
         "Provider errors are mapped to safe tagged errors.",
         "bun run --filter @bundjil/codex-oauth test",
@@ -145,8 +149,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: @bundjil/codex-oauth owns only the direct proof boundary: CodexResponsesFetch -> CodexHttpClient -> CodexResponsesProof. apps/agent and apps/codex-proxy were not changed; Eve still uses AI Gateway until later proxy/provider tasks pass.",
+          "Pass 2 - Effect implementation quality: proof operations use Effect Schema contracts, Context.Service tags, Layer composition, Config.redacted/Config.schema with ConfigProvider.fromEnv, Schema.RedactedFromValue token handling, safe Schema.TaggedErrorClass errors, flat Effect.gen operations, and injected fetch layers for tests. The implementation does not read OPENAI_API_KEY or emit raw response bodies.",
+          "Pass 3 - verification coverage: mocked tests cover refreshAccessToken, direct request headers/body, chatgpt-account-id behavior, HTTP status mapping without body reads, fetch failure mapping, and no OPENAI_API_KEY fallback. Live proof returned sanitized HTTP 200 metadata from the direct Codex Responses endpoint. Package test, check-types, build, and root `bun run verification` passed."
+        ]
       },
       "commitAfterPassing": true
     },

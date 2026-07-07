@@ -5,12 +5,14 @@ import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 import {
   CodexOAuthProfile,
   CodexOAuthSubject,
+  CodexOAuthTokenRefreshResult,
   codexOAuthProfileStorageKey,
   getProfile,
   getValidToken,
   hasProfile,
   putProfile,
   removeProfile,
+  refreshAccessToken,
   revokeToken,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
@@ -214,6 +216,31 @@ it.effect(
         assert.strictEqual(error._tag, "OAuthProfileNotFound");
       }).pipe(Effect.provide(CodexOAuthMemory([profile])));
     })
+);
+
+it.effect("refreshes an access token through the mock client", () =>
+  Effect.gen(function* testRefreshToken() {
+    const subject = yield* fixtureSubject;
+    const profile = yield* makeProfile(subject, -1);
+    const refreshResult = yield* Schema.decodeUnknownEffect(
+      CodexOAuthTokenRefreshResult
+    )({
+      subject,
+      accessToken: "fresh-access-token-secret",
+      refreshToken: "fresh-refresh-token-secret",
+      expiresAtEpochMillis: Date.now() + 60_000,
+      updatedAtEpochMillis: Date.now(),
+    });
+
+    const accessToken = yield* refreshAccessToken(subject).pipe(
+      Effect.provide(CodexOAuthMemory([profile], { refreshResult }))
+    );
+
+    assert.strictEqual(
+      Redacted.value(accessToken),
+      "fresh-access-token-secret"
+    );
+  })
 );
 
 it.effect("maps KeyValueStore failures to safe storage errors", () =>

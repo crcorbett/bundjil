@@ -13,7 +13,7 @@ ledger, commits the accepted slice, and only then delegates the next task.
 
 ## Current Task
 
-`prove-codex-auth-runtime-path`
+`define-codex-direct-provider-contract`
 
 ## Accepted Tasks
 
@@ -63,6 +63,65 @@ Verification:
 - `bun run check-types`: passed across 5 packages.
 - `bun run verification`: passed.
 
+### prove-codex-auth-runtime-path
+
+Accepted: 2026-07-07
+
+Changed files:
+
+- `packages/codex-oauth/src/codex-responses*.ts`
+- `packages/codex-oauth/src/codex-http-client.service.ts`
+- `packages/codex-oauth/src/errors/codex-http-*.ts`
+- `packages/codex-oauth/src/errors/codex-responses-*.ts`
+- `packages/codex-oauth/scripts/prove-codex-responses.ts`
+- `packages/codex-oauth/test/codex-responses-proof.test.ts`
+- `packages/codex-oauth/test/codex-oauth.test.ts`
+- `packages/codex-oauth/README.md`
+- repo architecture/docs/spec/task ledger updates
+
+Evidence:
+
+- Added `CodexResponsesFetch`, `CodexHttpClient`, and
+  `CodexResponsesProof` as the package-owned direct proof path.
+- Added schema-owned Codex Responses request/proof input/proof result
+  contracts plus safe tagged HTTP/request/stream errors.
+- Added `proof:codex-responses`, which reads `CODEX_ACCESS_TOKEN` through
+  Effect Config and prints only sanitized metadata.
+- Ran the live proof by injecting the local Codex auth cache access token into
+  `CODEX_ACCESS_TOKEN` for one process. It returned HTTP 200 from
+  `https://chatgpt.com/backend-api/codex/responses`, 5528 response bytes,
+  18 stream lines, and `usedAccountHeader: true`. No token, prompt,
+  authorization code, raw OAuth response, or response body was printed.
+- `codex mcp login executor-personal` completed, but
+  `mcp__executor_personal.skills({ name: "execute" })` still returned
+  `OAuth authorization required`; parent proof used current Goose source plus
+  previously recorded DeepWiki/Parallel evidence.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns the direct proof
+   boundary only. `apps/agent` and `apps/codex-proxy` were not changed; Eve
+   remains on AI Gateway until later proxy/provider tasks.
+2. Effect implementation quality: primary operations use flat `Effect.gen`,
+   `Context.Service`, `Layer`, `Config.redacted`, `Config.schema`,
+   `Schema.RedactedFromValue`, schema-derived types, and safe tagged errors.
+   Mocked fetch is injected through a service boundary. No `OPENAI_API_KEY`
+   fallback was added.
+3. Verification coverage: tests cover token refresh, request mapping, bearer
+   and `chatgpt-account-id` headers, safe status/network error mapping, stream
+   body shape counting, and no API-key fallback. Live proof output was
+   sanitized.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth test`: passed, 14 tests.
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run --filter @bundjil/codex-oauth proof:codex-responses`: passed with
+  one-process `CODEX_ACCESS_TOKEN` from the local Codex auth cache and
+  sanitized HTTP 200 metadata.
+- `bun run verification`: passed.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
@@ -98,3 +157,5 @@ Out of scope:
 - 2026-07-07: pre-implementation repo state was clean on `main`.
 - 2026-07-07: `define-codex-oauth-package-contract` accepted after
   `bun run verification` passed.
+- 2026-07-07: `prove-codex-auth-runtime-path` accepted after package checks,
+  sanitized live proof, and `bun run verification` passed.

@@ -253,6 +253,34 @@ DeepWiki queries completed on 2026-07-07:
   This makes the Goose-style direct provider the preferred first proof for
   Bundjil.
 
+### Implementation proof evidence
+
+On 2026-07-07, `@bundjil/codex-oauth` added a direct Codex Responses proof
+surface:
+
+- `CodexResponsesFetch` owns the fetch boundary.
+- `CodexHttpClient.postResponses(input)` posts to
+  `https://chatgpt.com/backend-api/codex/responses` with
+  `Authorization: Bearer <redacted>` and optional `chatgpt-account-id`.
+- `CodexResponsesProof.run(input)` builds a minimal streaming proof request
+  with `store: false` and returns only sanitized metadata.
+- `proof:codex-responses` reads `CODEX_ACCESS_TOKEN` through Effect Config and
+  Schema, then prints status, endpoint, HTTP status, content type, response
+  byte count, stream-line count, and account-header usage only.
+
+The live proof was run by injecting the local Codex cache access token into
+`CODEX_ACCESS_TOKEN` for a single process. The command returned HTTP 200 from
+the direct Codex Responses endpoint with 5528 response bytes and 18 stream
+lines. No token, prompt, authorization code, raw OAuth response, or response
+body was printed. This proves the direct backend path, but it does not approve
+Eve model replacement until the private proxy and Eve model-provider tasks pass.
+
+In this implementation thread, `codex mcp login executor-personal` completed
+successfully, but `mcp__executor_personal.skills({ name: "execute" })` still
+returned `OAuth authorization required`. The implementation therefore used the
+previously recorded DeepWiki/Parallel findings plus current Goose source
+inspection for the parent proof baseline.
+
 ### Executor / Parallel Task research
 
 The user challenged the DeepWiki framing because OpenClaw, Hermes-style

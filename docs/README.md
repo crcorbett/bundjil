@@ -39,8 +39,8 @@ README.
   Effect Schema contracts, tagged errors, service layers, Eve schema bridge,
   and verification commands for the Eve app operation boundary.
 - [`@bundjil/codex-oauth`](../packages/codex-oauth/README.md) documents the
-  non-networked Codex OAuth profile store, service tags, KeyValueStore layers,
-  and safe secret-handling rules.
+  Codex OAuth profile store, direct Codex Responses proof service, service
+  tags, KeyValueStore layers, and safe secret-handling rules.
 
 ## Planned Docs
 

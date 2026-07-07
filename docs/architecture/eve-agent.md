@@ -82,6 +82,12 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
+`@bundjil/codex-oauth` is not part of the Eve runtime path yet. It now proves
+that a private Codex access token can reach
+`https://chatgpt.com/backend-api/codex/responses`, but Eve still uses the
+configured AI Gateway model string until the private proxy and model-provider
+tasks are implemented and verified.
+
 ## Schema Boundary
 
 Eve tools accept Standard Schema or JSON Schema. Bundjil keeps Effect Schema as

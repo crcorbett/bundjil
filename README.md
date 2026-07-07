@@ -43,8 +43,9 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
 - `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
-  lifecycle service contracts. It is currently non-networked: no live OAuth
-  endpoint exchange, Codex Responses call, or Eve model replacement ships yet.
+  lifecycle service contracts plus the direct Codex Responses proof surface.
+  The live proof is opt-in and sanitized; live OAuth endpoint exchange,
+  deployed proxy routing, and Eve model replacement do not ship yet.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, and the `workspace_status` tool that delegates into
   `@bundjil/eve-effect`.
@@ -82,7 +83,7 @@ apps/
   agent/             Vercel Eve app and workspace_status tool.
 packages/
   core/              Framework-neutral Bundjil domain primitives.
-  codex-oauth/       Codex OAuth profile and token lifecycle contracts.
+  codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
   effect-start/      TanStack Start adapter for Effect HTTP programs.
   eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
@@ -110,8 +111,9 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 ## Roadmap
 
 1. Keep proving the Eve app through local HTTP and Gateway-backed verification.
-2. Investigate the [Codex OAuth Eve model-provider spec](./docs/product-specs/codex-oauth-eve-model-provider.md)
-   before replacing AI Gateway with any Codex-auth-backed provider.
+2. Build the [Codex OAuth Eve model-provider spec](./docs/product-specs/codex-oauth-eve-model-provider.md)
+   through the private proxy and Eve model-provider tasks before replacing AI
+   Gateway with any Codex-auth-backed provider.
 3. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
 4. Add the Sendblue iMessage webhook and outbound delivery adapter.

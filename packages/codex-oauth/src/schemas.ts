@@ -122,3 +122,76 @@ export const CodexOAuthRevokeInput = Schema.Struct({
 });
 
 export type CodexOAuthRevokeInput = typeof CodexOAuthRevokeInput.Type;
+
+export const CodexResponsesModelId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesModelId")
+);
+
+export type CodexResponsesModelId = typeof CodexResponsesModelId.Type;
+
+export const CodexResponsesEndpoint = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesEndpoint")
+);
+
+export type CodexResponsesEndpoint = typeof CodexResponsesEndpoint.Type;
+
+export const CodexResponsesInputTextContent = Schema.Struct({
+  type: Schema.Literal("input_text"),
+  text: Schema.NonEmptyString,
+});
+
+export type CodexResponsesInputTextContent =
+  typeof CodexResponsesInputTextContent.Type;
+
+export const CodexResponsesInputMessage = Schema.Struct({
+  role: Schema.Literals(["user", "system", "assistant"]),
+  content: Schema.Array(CodexResponsesInputTextContent),
+});
+
+export type CodexResponsesInputMessage = typeof CodexResponsesInputMessage.Type;
+
+export const CodexResponsesReasoning = Schema.Struct({
+  effort: Schema.Literals(["low", "medium", "high", "xhigh"]),
+});
+
+export type CodexResponsesReasoning = typeof CodexResponsesReasoning.Type;
+
+export const CodexResponsesRequest = Schema.Struct({
+  model: CodexResponsesModelId,
+  input: Schema.Array(CodexResponsesInputMessage),
+  store: Schema.Boolean,
+  instructions: Schema.optional(Schema.NonEmptyString),
+  stream: Schema.Boolean,
+  reasoning: Schema.optional(CodexResponsesReasoning),
+});
+
+export type CodexResponsesRequest = typeof CodexResponsesRequest.Type;
+
+export const CodexResponsesPostInput = Schema.Struct({
+  accessToken: CodexOAuthAccessToken,
+  accountId: Schema.optional(Schema.NonEmptyString),
+  request: CodexResponsesRequest,
+});
+
+export type CodexResponsesPostInput = typeof CodexResponsesPostInput.Type;
+
+export const CodexResponsesProofInput = Schema.Struct({
+  accessToken: CodexOAuthAccessToken,
+  accountId: Schema.optional(Schema.NonEmptyString),
+  model: CodexResponsesModelId,
+  prompt: Schema.NonEmptyString,
+});
+
+export type CodexResponsesProofInput = typeof CodexResponsesProofInput.Type;
+
+export const CodexResponsesProofResult = Schema.Struct({
+  transport: Schema.Literal("direct-codex-responses"),
+  endpoint: CodexResponsesEndpoint,
+  status: Schema.Number.check(Schema.isFinite()),
+  contentType: Schema.String,
+  receivedBodyBytes: Schema.Number.check(Schema.isFinite()),
+  receivedStreamLines: Schema.Number.check(Schema.isFinite()),
+  usedAccountHeader: Schema.Boolean,
+});
+
+export type CodexResponsesProofResult = typeof CodexResponsesProofResult.Type;

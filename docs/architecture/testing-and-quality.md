@@ -28,6 +28,7 @@ bun run --filter @bundjil/effect-start test
 bun run --filter @bundjil/eve-effect test
 bun run --filter @bundjil/codex-oauth test
 bun run --filter @bundjil/codex-oauth build
+bun run --filter @bundjil/codex-oauth proof:codex-responses
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 ```
@@ -43,6 +44,10 @@ bun run --filter @bundjil/agent build
 - Runtime config change: run app typecheck/build and verification.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
+- Codex subscription proof change: run `@bundjil/codex-oauth` tests,
+  typecheck/build, and the opt-in `proof:codex-responses` command only with a
+  private `CODEX_ACCESS_TOKEN` source. Proof output must contain only status,
+  endpoint, byte/line counts, and safe booleans.
 
 ## Effect Test Patterns
 

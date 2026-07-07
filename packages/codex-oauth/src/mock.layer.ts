@@ -1,6 +1,7 @@
 import { Effect, Layer, Redacted } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
+import { CodexResponsesFetch } from "./codex-responses-fetch.service.js";
 import { OAuthProfileStorageError } from "./errors.js";
 import {
   CodexOAuthServiceLive,
@@ -20,6 +21,17 @@ export interface CodexOAuthClientMockOptions {
   readonly loginProfile?: CodexOAuthProfileType;
   readonly refreshResult?: CodexOAuthTokenRefreshResult;
 }
+
+export interface CodexResponsesFetchMockOptions {
+  readonly fetch: (request: Request) => Effect.Effect<Response>;
+}
+
+export const CodexResponsesFetchMock = (
+  options: CodexResponsesFetchMockOptions
+) =>
+  Layer.succeed(CodexResponsesFetch, {
+    fetch: options.fetch,
+  });
 
 export const CodexOAuthClientMock = (
   options: CodexOAuthClientMockOptions = {}
