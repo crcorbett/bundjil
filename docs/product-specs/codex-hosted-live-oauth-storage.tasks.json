@@ -1,6 +1,6 @@
 {
   "title": "Hosted Codex Live OAuth Storage Tasks",
-  "status": "draft",
+  "status": "active",
   "spec": "docs/product-specs/codex-hosted-live-oauth-storage.md",
   "principles": [
     "Preview proof comes before production.",
@@ -39,14 +39,17 @@
     {
       "id": "revalidate-codex-oauth-surface-and-cli-login",
       "title": "Revalidate Codex OAuth and local CLI login",
-      "status": "pending",
+      "status": "completed",
       "description": "Resolve or explicitly bypass the local Codex duplicate-install/login issue, then confirm the current OAuth issuer, client, scopes, PKCE, redirect, and token response shape without recording secrets.",
       "implementationNotes": [
         "Inspect `which -a codex` and `codex --version` before relying on managed login behavior.",
         "Record whether the active binary is the expected current Codex CLI or the app-bundled CLI.",
         "Verify the localhost callback failure from 2026-07-07 is resolved or document why hosted OAuth can proceed without it.",
         "Use current official docs, executor personal research, DeepWiki, or direct local inspection as needed, but record only sanitized findings.",
-        "Do not print, commit, or snapshot access tokens, refresh tokens, auth codes, raw OAuth responses, cookies, or account secrets."
+        "Do not print, commit, or snapshot access tokens, refresh tokens, auth codes, raw OAuth responses, cookies, or account secrets.",
+        "2026-07-11 tracer bullet: the shell-selected standalone CLI at ~/.local/bin/codex reports 0.136.0 and `codex login status` reports a ChatGPT login. The pnpm shim reports 0.142.0 and the ChatGPT-app bundled binary reports 0.144.0-alpha.4; manual research is pinned to the selected standalone CLI. Only auth-cache field names were inspected.",
+        "2026-07-11 Executor Personal DeepWiki source research on openai/codex confirms the account-login issuer category, fixed public CLI client category, documented scope names, S256 PKCE, localhost callback behavior, and token-field names without recording secret values. It also confirms mcp_oauth_callback_url applies to remote MCP-server OAuth, not ChatGPT account login.",
+        "2026-07-11 decision: encryption, schema, storage, and lock tasks are unblocked. CodexOAuthClientLive, operator OAuth start/callback routes, and hosted live proof are blocked/deferred pending a supported OpenAI hosted grant with a registered Vercel redirect URI or a separately specified account-link mechanism."
       ],
       "mandatoryVerification": [
         "Codex CLI binary paths and versions are recorded in sanitized form.",
@@ -64,8 +67,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: Reviewed the current package and app boundaries. @bundjil/codex-oauth still owns reusable profiles and the intentionally unsupported CodexOAuthClientLive; apps/codex-proxy remains the private HTTP boundary. This documentation-only tracer bullet does not introduce an OAuth client, redirect route, token transfer, or new provider call graph.",
+          "Parent audit 2 - implementation quality: Reviewed the sanitized research diff and local selected CLI evidence. The decision correctly refuses to emulate the fixed public CLI client or its localhost callback. No Effect program, schema, service, layer, DTO, helper, cast, raw token, or unsafe storage path was added; later implementation requirements remain intact.",
+          "Parent audit 3 - verification coverage: Parent confirmed the selected CLI login-status command exits successfully without exposing account output, rechecked all local binary versions, ran `jq empty`, `git diff --check`, `bun run check`, and `bun run verification`. The manual helper's missing integrity header and the supported-source fallback are recorded in the active plan."
+        ]
       },
       "commitAfterPassing": true
     },

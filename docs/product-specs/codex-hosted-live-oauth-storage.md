@@ -119,6 +119,52 @@ The screenshot failure from 2026-07-07 showed a managed login attempting a
 localhost callback and failing after duplicate CLI installs were suspected.
 That must be resolved or intentionally bypassed before hosted OAuth work.
 
+#### Revalidation Evidence, 2026-07-11
+
+This tracer bullet inspected only executable metadata, CLI status, cache field
+names, and source-level protocol facts. It did not start an interactive login
+or read, print, persist, or commit credentials, authorization codes, cookies,
+or OAuth payloads.
+
+- The shell-selected CLI is the standalone binary at
+  `~/.local/bin/codex`, symlinked to the Codex-managed standalone install, and
+  reports `codex-cli 0.136.0`. `codex login status` reports a ChatGPT login.
+  Two other local binaries exist: the pnpm shim reports `0.142.0`, and the
+  ChatGPT-app bundled binary reports `0.144.0-alpha.4`. The duplicate-install
+  concern is therefore bypassed for this implementation by pinning all manual
+  investigation to the shell-selected standalone CLI; nothing should infer
+  behavior from the pnpm or bundled binary.
+- The local auth cache was inspected only for top-level field names:
+  `OPENAI_API_KEY`, `auth_mode`, `last_refresh`, and `tokens`. No values were
+  read. This confirms that the prior local callback failure is not a current
+  prerequisite for the already authenticated standalone CLI, but it does not
+  establish a hosted redirect flow.
+- Source-level research against `openai/codex` via Executor Personal DeepWiki
+  identifies `https://auth.openai.com` as the account-login issuer category,
+  a fixed public Codex CLI client identifier, scopes `openid`, `profile`,
+  `email`, `offline_access`, `api.connectors.read`, and
+  `api.connectors.invoke`, and PKCE `S256`. The CLI account login uses a
+  local loopback callback at `http://localhost:<port>/auth/callback`.
+- The relevant response/cache shape contains identity, access, refresh, and
+  expiry fields. The source names include `id_token`, `access_token`,
+  `refresh_token`, `expires_at`, `client_id`, and `token_response`. These
+  names establish the later schema boundary only; their values must never be
+  logged, stored unencrypted, or added to fixtures.
+- `mcp_oauth_callback_url` is not a hosted-account-login escape hatch. The
+  Codex source uses it only when Codex authenticates to a configured remote
+  MCP server. It does not provide an arbitrary hosted redirect setting for the
+  CLI's ChatGPT account authorization flow.
+
+**Decision: hosted account OAuth routes are blocked/deferred.** The current
+CLI/source evidence does not support implementing `/codex/oauth/start` and
+`/codex/oauth/callback` against the CLI's ChatGPT OAuth client from a Vercel
+deployment. Do not emulate or reuse that public client, localhost redirect,
+or its account tokens. Encryption, schema, storage, and lock work may proceed
+in `@bundjil/codex-oauth`; `CodexOAuthClientLive`, operator OAuth routes, and
+hosted live proof remain blocked until OpenAI provides a supported hosted grant
+with a registered Vercel redirect URI, or a separately supported account-link
+mechanism is verified and specified.
+
 ### Encrypted Profile Storage
 
 `@bundjil/codex-oauth` owns encryption contracts because token profiles are a
