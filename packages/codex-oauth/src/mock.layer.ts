@@ -6,10 +6,12 @@ import { CodexHttpClient } from "./codex-http-client.service.js";
 import { CodexResponsesFetch } from "./codex-responses-fetch.service.js";
 import { CodexHttpNetworkError, OAuthProfileStorageError } from "./errors.js";
 import {
+  CodexOAuthProfileCipherLive,
   CodexOAuthServiceLive,
   CodexProfileStoreKeyValueLive,
 } from "./live.layer.js";
 import { CodexOAuthClient } from "./oauth-client.service.js";
+import { CodexOAuthProfileCipherConfigService } from "./profile-cipher.config.js";
 import { CodexOAuthProfile } from "./schemas.js";
 import type {
   CodexOAuthLoginStartResult,
@@ -18,6 +20,7 @@ import type {
   CodexResponsesProofResult,
   CodexResponsesStreamResult,
   OpenAICompatibleChatCompletionStream,
+  CodexOAuthProfileCipherConfig as CodexOAuthProfileCipherConfigType,
 } from "./schemas.js";
 import { codexOAuthProfileStorageKey } from "./storage-keys.js";
 
@@ -165,6 +168,18 @@ export const CodexOAuthMemory = (
       Layer.merge(
         CodexProfileStoreMemory(profiles),
         CodexOAuthClientMock(clientOptions)
+      )
+    )
+  );
+
+export const CodexOAuthProfileCipherTest = (
+  config: CodexOAuthProfileCipherConfigType
+) =>
+  CodexOAuthProfileCipherLive.pipe(
+    Layer.provide(
+      Layer.succeed(
+        CodexOAuthProfileCipherConfigService,
+        CodexOAuthProfileCipherConfigService.of(config)
       )
     )
   );

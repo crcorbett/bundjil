@@ -2,6 +2,7 @@ import { Schema } from "effect";
 
 import { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 import { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
+import { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
 import { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 import { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 import { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
@@ -18,6 +19,7 @@ import { UpstashKeyValueStoreConfigError } from "./errors/upstash-key-value-stor
 export {
   CodexHttpClientOperation,
   CodexOAuthClientOperation,
+  CodexOAuthProfileCipherOperation,
   CodexOAuthProfileSchemaBoundary,
   CodexOAuthProfileStorageOperation,
   CodexRequestMapperOperation,
@@ -30,6 +32,7 @@ export {
 export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
+  CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
   CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
   CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
   CodexRequestMapperOperation as CodexRequestMapperOperationType,
@@ -44,6 +47,7 @@ export { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
 export { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 export { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 export { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
+export { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
 export { CodexOAuthUnsupportedRuntimePath } from "./errors/codex-oauth-unsupported-runtime-path.js";
 export { CodexResponsesRequestError } from "./errors/codex-responses-request-error.js";
 export { CodexResponsesStreamError } from "./errors/codex-responses-stream-error.js";
@@ -73,6 +77,13 @@ export const CodexOAuthFailure = Schema.Union([
 ]);
 
 export type CodexOAuthFailure = typeof CodexOAuthFailure.Type;
+
+export const CodexOAuthProfileCipherFailure = Schema.Union([
+  CodexOAuthProfileCipherError,
+]);
+
+export type CodexOAuthProfileCipherFailure =
+  typeof CodexOAuthProfileCipherFailure.Type;
 
 export const CodexResponsesFailure = Schema.Union([
   CodexResponsesRequestError,

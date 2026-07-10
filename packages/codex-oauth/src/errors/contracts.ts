@@ -21,6 +21,20 @@ export const CodexOAuthProfileStorageOperation = Schema.Literals([
 export type CodexOAuthProfileStorageOperation =
   typeof CodexOAuthProfileStorageOperation.Type;
 
+export const CodexOAuthProfileCipherOperation = Schema.Literals([
+  "loadKey",
+  "encrypt",
+  "decrypt",
+  "encode",
+  "decode",
+  "unsupportedVersion",
+  "keyMismatch",
+  "integrityMismatch",
+]);
+
+export type CodexOAuthProfileCipherOperation =
+  typeof CodexOAuthProfileCipherOperation.Type;
+
 export const CodexOAuthClientOperation = Schema.Literals([
   "startLogin",
   "completeLogin",

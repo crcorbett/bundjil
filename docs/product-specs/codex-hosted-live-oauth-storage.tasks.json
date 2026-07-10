@@ -79,7 +79,7 @@
     {
       "id": "define-encrypted-profile-contract",
       "title": "Define encrypted profile schemas and cipher service",
-      "status": "pending",
+      "status": "completed",
       "description": "Add versioned encrypted profile contracts and a CodexOAuthProfileCipher service in @bundjil/codex-oauth.",
       "implementationNotes": [
         "Define an `EncryptedCodexOAuthProfileV1` schema with version, algorithm, key id, nonce, ciphertext, subject hash, and timestamps.",
@@ -104,8 +104,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: Kept encryption contracts, config service, cipher service, errors, layers, exports, tests, and package documentation inside @bundjil/codex-oauth. CodexProfileStore remains raw/local-only in this task; hosted encrypted persistence, locks, OAuth routes, proxy live mode, and apps/agent remain unchanged.",
+          "Parent audit 2 - Effect implementation quality: Reviewed versioned Effect Schema envelopes, Context.Service tags, explicit live/test layers, Config.redacted key material, flat named Effect.fn generator operations, typed tagged cipher errors, and Schema.fromJsonString profile/envelope codecs. Redacted.value appears only immediately before base64 decode and WebCrypto key import. Scans found no JSON.stringify, process.env, Object.values/Object.entries, switch branches, unsafe casts, DTO mirrors, or trivial boundary wrappers in the new cipher path.",
+          "Parent audit 3 - verification coverage: Tests cover encryption/decryption round trip, no token/scope leakage from a schema-encoded envelope, wrong encryption key, wrong key id, malformed ciphertext, unsupported version, missing config, and the live Config/WebCrypto composition. Parent passed package check-types, 33 package tests, package build, jq validation, git diff check, and full bun run verification."
+        ]
       },
       "commitAfterPassing": true
     },

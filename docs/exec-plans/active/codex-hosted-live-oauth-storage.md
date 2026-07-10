@@ -17,9 +17,10 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`define-encrypted-profile-contract` is next, after Task 1 acceptance and
-commit. Its scope is limited to package-owned encrypted profile/cipher
-contracts; it must not implement the deferred hosted OAuth routes.
+`implement-encrypted-profile-store-and-refresh-lock` is next, after Task 2
+acceptance and commit. It may compose the completed cipher with hosted profile
+storage and refresh coordination, but it must not implement the deferred
+hosted OAuth routes.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -99,3 +100,56 @@ Verification:
 
 Commit: pending parent commit of the accepted tracer-bullet documentation
 slice.
+
+### define-encrypted-profile-contract
+
+Status: Accepted 2026-07-11
+
+Scope:
+
+- add versioned encrypted-profile schemas, safe tagged cipher errors, and
+  package-owned cipher service/live-test layers in `@bundjil/codex-oauth`;
+- use Effect Config and a WebCrypto-compatible AES-GCM boundary;
+- add focused tests and package documentation;
+- do not add hosted OAuth start/callback routes, real token exchange, Upstash
+  persistence composition, refresh locking, or proxy live mode.
+
+Implementation and parent review:
+
+- The assigned subagent produced a partial shared-worktree implementation but
+  did not report completion after repeated waits and was closed. The parent
+  reviewed and completed only the remaining Task 2 integration and verification
+  work; no separate task was delegated.
+- Added `EncryptedCodexOAuthProfileV1`, `CodexOAuthProfileCipher` with
+  AES-GCM WebCrypto encryption/decryption, a redacted config service, tagged
+  safe cipher errors, explicit live/test layers, root exports, and focused
+  tests. All profile and envelope JSON boundaries use Effect Schema codecs.
+- Package documentation now distinguishes the completed cipher contract from
+  the still-pending encrypted `CodexProfileStore` composition.
+
+Parent audit:
+
+1. Ownership and call graph: the package owns encryption contracts and service
+   layers. `CodexProfileStore`, proxy routes, app config, Vercel deployment,
+   OAuth exchange, and Eve selection were not changed.
+2. Implementation quality: reviewed Context.Service tags, explicit layers,
+   `Config.redacted`, named `Effect.fn` generator operations, tagged errors,
+   and schema-owned codec boundaries. `Redacted.value` appears only at key
+   import. Targeted scans found no JSON.stringify, process.env, unsafe casts,
+   DTO mirrors, stringly switches, or helper sprawl.
+3. Verification coverage: tests cover round trip, leak checks, wrong key,
+   wrong key id, malformed ciphertext, unsupported version, missing config,
+   and live Config/WebCrypto composition. Package check-types, 33 package
+   tests, package build, jq/diff checks, and full verification passed.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 33 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `jq empty docs/product-specs/codex-hosted-live-oauth-storage.tasks.json`:
+  passed.
+- `git diff --check`: passed.
+- `bun run verification`: passed.
+
+Commit: pending parent commit of the accepted encrypted-profile contract slice.

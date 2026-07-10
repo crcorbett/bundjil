@@ -1,12 +1,17 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   CodexOAuthProfile,
+  CodexOAuthProfileCipherConfig,
   CodexOAuthSubject,
   CodexOAuthTokenRefreshResult,
+  EncryptedCodexOAuthProfile,
+  EncryptedCodexOAuthProfileV1,
   codexOAuthProfileStorageKey,
+  decryptCodexOAuthProfile,
+  encryptCodexOAuthProfile,
   getProfile,
   getValidToken,
   hasProfile,
@@ -14,11 +19,17 @@ import {
   removeProfile,
   refreshAccessToken,
   revokeToken,
+  loadCodexOAuthProfileCipherConfig,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
-import { CodexProfileStoreKeyValueLive } from "../src/live.layer.js";
+import {
+  CodexOAuthProfileCipherConfigLive,
+  CodexOAuthProfileCipherLive,
+  CodexProfileStoreKeyValueLive,
+} from "../src/live.layer.js";
 import {
   CodexOAuthMemory,
+  CodexOAuthProfileCipherTest,
   CodexProfileStoreMemory,
 } from "../src/mock.layer.js";
 
@@ -54,6 +65,21 @@ const makeProfile = (
     createdAtEpochMillis: 1_700_000_000_000,
     updatedAtEpochMillis: 1_700_000_000_000,
     requiresReauthentication: false,
+  });
+
+const testCipherKeyMaterial = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=";
+
+const alternateTestCipherKeyMaterial =
+  "ZmVkY2JhOTg3NjU0MzIxMGZlZGNiYTk4NzY1NDMyMTA=";
+
+const makeCipherConfig = (
+  keyId = "test-key-v1",
+  keyMaterial = testCipherKeyMaterial
+) =>
+  Schema.decodeUnknownEffect(CodexOAuthProfileCipherConfig)({
+    algorithm: "AES-GCM",
+    keyId,
+    keyMaterial,
   });
 
 const failingKeyValueStore = Layer.succeed(
@@ -270,4 +296,183 @@ it.effect("maps KeyValueStore failures to safe storage errors", () =>
       false
     );
   })
+);
+
+it.effect(
+  "encrypts and decrypts profiles through the versioned schema envelope without leaks",
+  () =>
+    Effect.gen(function* testEncryptedProfileRoundTrip() {
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const config = yield* makeCipherConfig();
+      const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+        Effect.provide(CodexOAuthProfileCipherTest(config))
+      );
+      const encodedEnvelope = yield* Schema.encodeEffect(
+        Schema.fromJsonString(EncryptedCodexOAuthProfileV1)
+      )(encryptedProfile);
+      const decryptedProfile = yield* decryptCodexOAuthProfile(
+        encryptedProfile
+      ).pipe(Effect.provide(CodexOAuthProfileCipherTest(config)));
+
+      assert.strictEqual(encryptedProfile.version, 1);
+      assert.strictEqual(encryptedProfile.algorithm, "AES-GCM");
+      assert.strictEqual(encryptedProfile.keyId, config.keyId);
+      assert.notInclude(encodedEnvelope, "access-token-secret");
+      assert.notInclude(encodedEnvelope, "refresh-token-secret");
+      assert.notInclude(encodedEnvelope, "offline_access");
+      assert.deepStrictEqual(decryptedProfile.subject, profile.subject);
+      assert.deepStrictEqual(decryptedProfile.scopes, profile.scopes);
+      assert.strictEqual(
+        encodeUnknownJson(decryptedProfile.accessToken),
+        '"<redacted>"'
+      );
+      assert.strictEqual(
+        encodeUnknownJson(decryptedProfile.refreshToken),
+        '"<redacted>"'
+      );
+    })
+);
+
+it.effect("fails decryption with a different encryption key", () =>
+  Effect.gen(function* testWrongCipherKey() {
+    const subject = yield* fixtureSubject;
+    const profile = yield* makeProfile(subject, Date.now() + 60_000);
+    const encryptingConfig = yield* makeCipherConfig();
+    const decryptingConfig = yield* makeCipherConfig(
+      "test-key-v1",
+      alternateTestCipherKeyMaterial
+    );
+    const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+      Effect.provide(CodexOAuthProfileCipherTest(encryptingConfig))
+    );
+    const error = yield* decryptCodexOAuthProfile(encryptedProfile).pipe(
+      Effect.provide(CodexOAuthProfileCipherTest(decryptingConfig)),
+      Effect.flip
+    );
+
+    assert.strictEqual(error._tag, "CodexOAuthProfileCipherError");
+    assert.strictEqual(error.operation, "decrypt");
+    assert.notInclude(renderForLeakCheck(error), "access-token-secret");
+    assert.notInclude(renderForLeakCheck(error), "refresh-token-secret");
+  })
+);
+
+it.effect(
+  "rejects encrypted profiles from another key id before decryption",
+  () =>
+    Effect.gen(function* testWrongCipherKeyId() {
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const encryptingConfig = yield* makeCipherConfig();
+      const decryptingConfig = yield* makeCipherConfig("test-key-v2");
+      const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+        Effect.provide(CodexOAuthProfileCipherTest(encryptingConfig))
+      );
+      const error = yield* decryptCodexOAuthProfile(encryptedProfile).pipe(
+        Effect.provide(CodexOAuthProfileCipherTest(decryptingConfig)),
+        Effect.flip
+      );
+
+      assert.strictEqual(error._tag, "CodexOAuthProfileCipherError");
+      assert.strictEqual(error.operation, "keyMismatch");
+      assert.strictEqual(error.keyId, encryptingConfig.keyId);
+    })
+);
+
+it.effect(
+  "rejects malformed encrypted ciphertext without leaking profile payloads",
+  () =>
+    Effect.gen(function* testMalformedCiphertext() {
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const config = yield* makeCipherConfig();
+      const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+        Effect.provide(CodexOAuthProfileCipherTest(config))
+      );
+      const malformedProfile = yield* Schema.decodeUnknownEffect(
+        EncryptedCodexOAuthProfile
+      )({
+        ...encryptedProfile,
+        ciphertext: new Uint8Array([0]),
+      });
+      const error = yield* decryptCodexOAuthProfile(malformedProfile).pipe(
+        Effect.provide(CodexOAuthProfileCipherTest(config)),
+        Effect.flip
+      );
+
+      assert.strictEqual(error._tag, "CodexOAuthProfileCipherError");
+      assert.strictEqual(error.operation, "decrypt");
+      assert.notInclude(renderForLeakCheck(error), "access-token-secret");
+      assert.notInclude(renderForLeakCheck(error), "refresh-token-secret");
+    })
+);
+
+it.effect("rejects unsupported encrypted profile versions", () =>
+  Effect.gen(function* testUnsupportedEncryptedProfileVersion() {
+    const subject = yield* fixtureSubject;
+    const profile = yield* makeProfile(subject, Date.now() + 60_000);
+    const config = yield* makeCipherConfig();
+    const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+      Effect.provide(CodexOAuthProfileCipherTest(config))
+    );
+    const unsupportedProfile = yield* Schema.decodeUnknownEffect(
+      EncryptedCodexOAuthProfile
+    )({
+      ...encryptedProfile,
+      version: 2,
+    });
+    const error = yield* decryptCodexOAuthProfile(unsupportedProfile).pipe(
+      Effect.provide(CodexOAuthProfileCipherTest(config)),
+      Effect.flip
+    );
+
+    assert.strictEqual(error._tag, "CodexOAuthProfileCipherError");
+    assert.strictEqual(error.operation, "unsupportedVersion");
+    assert.strictEqual(error.version, 2);
+  })
+);
+
+it.effect("maps missing cipher config to a safe load-key error", () =>
+  Effect.gen(function* testMissingCipherConfig() {
+    const error = yield* loadCodexOAuthProfileCipherConfig.pipe(
+      Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} }))),
+      Effect.flip
+    );
+
+    assert.strictEqual(error._tag, "CodexOAuthProfileCipherError");
+    assert.strictEqual(error.operation, "loadKey");
+  })
+);
+
+it.effect(
+  "uses the live config and WebCrypto layers with a schema-owned key",
+  () =>
+    Effect.gen(function* testLiveCipherLayer() {
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
+        Effect.provide(
+          CodexOAuthProfileCipherLive.pipe(
+            Layer.provide(
+              CodexOAuthProfileCipherConfigLive.pipe(
+                Layer.provide(
+                  ConfigProvider.layer(
+                    ConfigProvider.fromEnv({
+                      env: {
+                        BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY:
+                          testCipherKeyMaterial,
+                        BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID: "test-key-v1",
+                      },
+                    })
+                  )
+                )
+              )
+            )
+          )
+        )
+      );
+
+      assert.strictEqual(encryptedProfile.keyId, "test-key-v1");
+    })
 );

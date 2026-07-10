@@ -39,6 +39,10 @@ import {
   makeOpenAICompatibleProxy,
   OpenAICompatibleProxy,
 } from "./openai-compatible-proxy.service.js";
+import {
+  CodexOAuthProfileCipher,
+  makeCodexOAuthProfileCipher,
+} from "./profile-cipher.service.js";
 import { CodexProfileStore } from "./profile-store.service.js";
 import { CodexOAuthProfile } from "./schemas.js";
 import type {
@@ -49,6 +53,13 @@ import {
   codexOAuthProfileStorageKey,
   codexOAuthProfileSubjectHash,
 } from "./storage-keys.js";
+
+export { CodexOAuthProfileCipherConfigLive } from "./profile-cipher.config.js";
+
+export const CodexOAuthProfileCipherLive = Layer.effect(
+  CodexOAuthProfileCipher,
+  makeCodexOAuthProfileCipher()
+);
 
 export const CodexProfileStoreKeyValueLive = Layer.effect(
   CodexProfileStore,

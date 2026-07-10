@@ -18,6 +18,11 @@ Implemented:
 - `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`,
   `CodexResponsesFetch`, `CodexHttpClient`, `CodexResponsesProof`,
   `CodexDirectProvider`, and `OpenAICompatibleProxy` service contracts.
+- Versioned `EncryptedCodexOAuthProfileV1` envelopes and a
+  `CodexOAuthProfileCipher` service using authenticated AES-GCM encryption.
+  The cipher has explicit live and test layers, keeps key material redacted
+  until WebCrypto key import, and uses Effect Schema for profile and envelope
+  JSON boundaries.
 - Memory/mock layers for automated tests.
 - Opt-in direct Codex Responses proof with sanitized output.
 - Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
@@ -27,8 +32,8 @@ Future:
 
 - Live OAuth endpoint exchange and refresh.
 - Hosted live Codex proxy mode.
-- Hosted token-profile storage after application-side envelope encryption is
-  implemented for refresh-token payloads.
+- Hosted token-profile storage composed through the application-side envelope
+  cipher for refresh-token payloads.
 
 Unsupported:
 
@@ -47,6 +52,9 @@ Unsupported:
 - `CodexProfileStore` is the profile persistence service.
 - `CodexOAuthService` is the token lifecycle service.
 - `CodexOAuthClient` is the future provider-client boundary.
+- `CodexOAuthProfileCipher` encrypts and decrypts canonical
+  `CodexOAuthProfile` values into versioned encrypted envelopes. It does not
+  persist profiles or implement OAuth endpoint exchange.
 - `CodexResponsesFetch` wraps the fetch boundary used by direct Codex
   Responses calls.
 - `CodexHttpClient` posts sanitized proof requests to the direct Codex
@@ -108,6 +116,13 @@ token values, prompts, and OAuth responses are not included in storage keys.
   `@bundjil/codex-oauth/mock.layer`, use
   `KeyValueStore.layerMemory` for deterministic tests and optional seeded
   profiles.
+- `CodexOAuthProfileCipherConfigLive` reads
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`,
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`, and the optional
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_ALGORITHM` through Effect Config.
+  `CodexOAuthProfileCipherLive` consumes that config through the package-owned
+  cipher service. `CodexOAuthProfileCipherTest` supplies a schema-owned test
+  config without reading the process environment.
 - `CodexHttpClientMock` and `CodexDirectProviderMock`, exported from the mock
   subpath, replace provider boundaries in tests without network calls.
 - `UpstashKeyValueStoreLive`, exported from
@@ -164,13 +179,13 @@ isolating another environment. Effect `KeyValueStore.clear` and `size` are
 implemented by scanning this prefix, so they operate on Bundjil-owned keys
 rather than the whole Redis database.
 
-Hosted token-profile storage remains blocked until a separate task implements
-application-side envelope encryption for `CodexOAuthProfile` payloads and
-documents the operator-access model. Upstash TLS and provider-managed
-at-rest encryption are not enough for raw refresh tokens because Vercel /
-Upstash operators and project env readers must not be able to inspect stored
-refresh-token values. Until that encryption layer exists, use the Upstash
-adapter only as a storage primitive or for non-token test data.
+Hosted token-profile storage remains blocked until a separate task composes
+this application-side cipher with `CodexProfileStore` and documents the
+operator-access model. Upstash TLS and provider-managed at-rest encryption are
+not enough for raw refresh tokens because Vercel / Upstash operators and
+project env readers must not be able to inspect stored refresh-token values.
+Until that encrypted persistence layer exists, use the Upstash adapter only as
+a storage primitive or for non-token test data.
 
 Rollback for storage experiments:
 

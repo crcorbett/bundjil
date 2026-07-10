@@ -3,6 +3,8 @@ export {
   CodexHttpNetworkError,
   CodexHttpStatusError,
   CodexOAuthClientOperation,
+  CodexOAuthProfileCipherError,
+  CodexOAuthProfileCipherOperation,
   CodexOAuthFailure,
   CodexOAuthProfileSchemaBoundary,
   CodexOAuthProfileStorageOperation,
@@ -31,6 +33,8 @@ export {
 export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
+  CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
+  CodexOAuthProfileCipherFailure as CodexOAuthProfileCipherFailureType,
   CodexOAuthFailure as CodexOAuthFailureType,
   CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
   CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
@@ -69,6 +73,17 @@ export {
   unsupportedCodexOAuthClientOperation,
 } from "./oauth-client.service.js";
 export type { CodexOAuthClientShape } from "./oauth-client.service.js";
+export {
+  CodexOAuthProfileCipherConfigService,
+  loadCodexOAuthProfileCipherConfig,
+} from "./profile-cipher.config.js";
+export {
+  CodexOAuthProfileCipher,
+  decryptCodexOAuthProfile,
+  encryptCodexOAuthProfile,
+  makeCodexOAuthProfileCipher,
+} from "./profile-cipher.service.js";
+export type { CodexOAuthProfileCipherShape } from "./profile-cipher.service.js";
 export {
   CodexOAuthService,
   completeLogin,
@@ -137,6 +152,9 @@ export {
   CodexOAuthLoginStartResult,
   CodexOAuthPrincipalType,
   CodexOAuthProfile,
+  CodexOAuthProfileCipherAlgorithm,
+  CodexOAuthProfileCipherConfig,
+  CodexOAuthProfileCipherKeyId,
   CodexOAuthProfileId,
   CodexOAuthProvider,
   CodexOAuthRefreshInput,
@@ -144,6 +162,8 @@ export {
   CodexOAuthRevokeInput,
   CodexOAuthSubject,
   CodexOAuthTokenRefreshResult,
+  EncryptedCodexOAuthProfile,
+  EncryptedCodexOAuthProfileV1,
   CodexDirectProviderInput,
   CodexResponsesEndpoint,
   CodexResponsesInputMessage,
@@ -184,6 +204,9 @@ export type {
   CodexOAuthLoginStartResult as CodexOAuthLoginStartResultType,
   CodexOAuthPrincipalType as CodexOAuthPrincipalTypeType,
   CodexOAuthProfile as CodexOAuthProfileType,
+  CodexOAuthProfileCipherAlgorithm as CodexOAuthProfileCipherAlgorithmType,
+  CodexOAuthProfileCipherConfig as CodexOAuthProfileCipherConfigType,
+  CodexOAuthProfileCipherKeyId as CodexOAuthProfileCipherKeyIdType,
   CodexOAuthProfileId as CodexOAuthProfileIdType,
   CodexOAuthProvider as CodexOAuthProviderType,
   CodexOAuthRefreshInput as CodexOAuthRefreshInputType,
@@ -191,6 +214,8 @@ export type {
   CodexOAuthRevokeInput as CodexOAuthRevokeInputType,
   CodexOAuthSubject as CodexOAuthSubjectType,
   CodexOAuthTokenRefreshResult as CodexOAuthTokenRefreshResultType,
+  EncryptedCodexOAuthProfile as EncryptedCodexOAuthProfileType,
+  EncryptedCodexOAuthProfileV1 as EncryptedCodexOAuthProfileV1Type,
   CodexDirectProviderInput as CodexDirectProviderInputType,
   CodexResponsesEndpoint as CodexResponsesEndpointType,
   CodexResponsesInputMessage as CodexResponsesInputMessageType,

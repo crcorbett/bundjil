@@ -83,6 +83,52 @@ export const CodexOAuthProfile = Schema.Struct({
 
 export type CodexOAuthProfile = typeof CodexOAuthProfile.Type;
 
+export const CodexOAuthProfileCipherAlgorithm = Schema.Literal("AES-GCM");
+
+export type CodexOAuthProfileCipherAlgorithm =
+  typeof CodexOAuthProfileCipherAlgorithm.Type;
+
+export const CodexOAuthProfileCipherKeyId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthProfileCipherKeyId")
+);
+
+export type CodexOAuthProfileCipherKeyId =
+  typeof CodexOAuthProfileCipherKeyId.Type;
+
+export const CodexOAuthProfileCipherConfig = Schema.Struct({
+  algorithm: CodexOAuthProfileCipherAlgorithm,
+  keyId: CodexOAuthProfileCipherKeyId,
+  keyMaterial: Schema.RedactedFromValue(Schema.NonEmptyString),
+});
+
+export type CodexOAuthProfileCipherConfig =
+  typeof CodexOAuthProfileCipherConfig.Type;
+
+const EncryptedCodexOAuthProfileFields = {
+  algorithm: CodexOAuthProfileCipherAlgorithm,
+  keyId: CodexOAuthProfileCipherKeyId,
+  nonce: Schema.Uint8Array,
+  ciphertext: Schema.Uint8Array,
+  subjectHash: Schema.NonEmptyString,
+  createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+} as const;
+
+export const EncryptedCodexOAuthProfile = Schema.Struct({
+  version: Schema.Number.check(Schema.isFinite()),
+  ...EncryptedCodexOAuthProfileFields,
+});
+
+export type EncryptedCodexOAuthProfile = typeof EncryptedCodexOAuthProfile.Type;
+
+export const EncryptedCodexOAuthProfileV1 = Schema.Struct({
+  version: Schema.Literal(1),
+  ...EncryptedCodexOAuthProfileFields,
+});
+
+export type EncryptedCodexOAuthProfileV1 =
+  typeof EncryptedCodexOAuthProfileV1.Type;
+
 export const CodexOAuthLoginStart = Schema.Struct({
   profileId: CodexOAuthProfileId,
   connectorId: CodexOAuthConnectorId,
