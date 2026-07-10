@@ -17,9 +17,9 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`implement-encrypted-profile-store-and-refresh-lock` is active. It may compose
-the completed cipher with hosted profile storage and refresh coordination, but
-it must not implement the deferred hosted OAuth routes.
+`implement-live-oauth-client-and-proxy-routes` is blocked. The accepted
+revalidation evidence still does not establish a supported hosted
+ChatGPT-account OAuth grant with a registered Vercel redirect URI.
 
 Parent preflight evidence, 2026-07-11:
 

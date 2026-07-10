@@ -154,7 +154,7 @@
     {
       "id": "implement-live-oauth-client-and-proxy-routes",
       "title": "Implement live OAuth client and proxy routes",
-      "status": "pending",
+      "status": "blocked",
       "description": "Add live Codex OAuth endpoint exchange in @bundjil/codex-oauth and private operator OAuth routes in apps/codex-proxy.",
       "implementationNotes": [
         "Add `CodexOAuthClientLive` only after the OAuth surface is revalidated.",
@@ -162,7 +162,8 @@
         "Expose private/operator `GET /codex/oauth/start`, `GET /codex/oauth/callback`, and `POST /codex/oauth/logout` routes in apps/codex-proxy.",
         "Guard OAuth routes with deployment protection, an internal admin token, or another explicit operator-only mechanism.",
         "Callback output must be minimal and must not include token values, auth codes, raw OAuth payloads, prompts, or cookies.",
-        "State and callback payload handling must use canonical schemas and typed tagged errors."
+        "State and callback payload handling must use canonical schemas and typed tagged errors.",
+        "2026-07-11 revalidation: selected Codex CLI login remains active, but current local CLI/source evidence and official OpenAI developer documentation do not establish a supported hosted ChatGPT-account grant with a registered Vercel redirect URI. Do not emulate the public CLI client or its localhost callback."
       ],
       "mandatoryVerification": [
         "Flat meaningful Effect.gen programs for start, callback, exchange, state validation, profile save, and logout operations.",
@@ -178,6 +179,7 @@
         "A local/mock OAuth route flow can store an encrypted profile without live secrets.",
         "Live OAuth route code remains disabled or unconfigured until Vercel preview env is ready."
       ],
+      "blockedBy": "A supported OpenAI hosted account-link/OAuth grant that permits Bundjil's registered Vercel redirect URI, or an explicitly specified replacement account-link mechanism.",
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 0,
