@@ -17,10 +17,9 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`implement-encrypted-profile-store-and-refresh-lock` is next, after Task 2
-acceptance and commit. It may compose the completed cipher with hosted profile
-storage and refresh coordination, but it must not implement the deferred
-hosted OAuth routes.
+`implement-encrypted-profile-store-and-refresh-lock` is active. It may compose
+the completed cipher with hosted profile storage and refresh coordination, but
+it must not implement the deferred hosted OAuth routes.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -153,3 +152,23 @@ Verification:
 - `bun run verification`: passed.
 
 Commit: pending parent commit of the accepted encrypted-profile contract slice.
+
+### implement-encrypted-profile-store-and-refresh-lock
+
+Status: Accepted 2026-07-11
+
+Scope:
+
+- compose `CodexProfileStore` over the completed encrypted profile envelope
+  and Effect `KeyValueStore`;
+- add a package-owned refresh-lock service with explicit live/test layers;
+- keep atomic Upstash commands behind the package boundary;
+- add race, expiry, owner-release, adapter, and leak tests;
+- do not add OAuth start/callback routes, a live OAuth client, proxy live mode,
+  deployment configuration, or app changes.
+
+Parent audit: encrypted profile persistence uses `KeyValueStore.toSchemaStore`
+with the completed cipher; lock acquisition/release is package-owned and
+atomic for Upstash; `refreshAccessToken` now runs under the lock and returns a
+fresh winner profile rather than rotating twice. Package check-types, 37 tests,
+build, diff check, and full verification passed. Commit pending.

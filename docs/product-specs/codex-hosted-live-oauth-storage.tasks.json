@@ -116,7 +116,7 @@
     {
       "id": "implement-encrypted-profile-store-and-refresh-lock",
       "title": "Implement encrypted storage and refresh locking",
-      "status": "pending",
+      "status": "completed",
       "description": "Compose CodexProfileStore over encrypted KeyValueStore persistence and add refresh locking for hosted rotation safety.",
       "implementationNotes": [
         "Add `CodexProfileStoreEncryptedKeyValueLive` or an equivalent layer that encrypts before writing and decrypts after reading.",
@@ -142,8 +142,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: package-only encrypted persistence and refresh coordination; apps, routes, and deployment remain unchanged.",
+          "Parent audit 2 - Effect implementation quality: verified Context services, explicit layers, Schema persistence, tagged errors, atomic Upstash acquire/release, and lock-aware refreshAccessToken re-read behavior.",
+          "Parent audit 3 - verification coverage: encrypted-store leak checks, lock contention/expiry/owner release, concurrency coordination, Upstash adapter behavior, package check-types/tests/build, and full bun run verification passed."
+        ]
       },
       "commitAfterPassing": true
     },

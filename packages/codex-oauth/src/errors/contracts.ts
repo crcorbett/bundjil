@@ -35,6 +35,24 @@ export const CodexOAuthProfileCipherOperation = Schema.Literals([
 export type CodexOAuthProfileCipherOperation =
   typeof CodexOAuthProfileCipherOperation.Type;
 
+export const CodexOAuthRefreshLockOperation = Schema.Literals([
+  "acquire",
+  "release",
+]);
+
+export type CodexOAuthRefreshLockOperation =
+  typeof CodexOAuthRefreshLockOperation.Type;
+
+export const CodexOAuthRefreshLockFailureReason = Schema.Literals([
+  "acquisition",
+  "contended",
+  "expired",
+  "release",
+]);
+
+export type CodexOAuthRefreshLockFailureReason =
+  typeof CodexOAuthRefreshLockFailureReason.Type;
+
 export const CodexOAuthClientOperation = Schema.Literals([
   "startLogin",
   "completeLogin",

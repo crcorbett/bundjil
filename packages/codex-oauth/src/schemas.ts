@@ -129,6 +129,37 @@ export const EncryptedCodexOAuthProfileV1 = Schema.Struct({
 export type EncryptedCodexOAuthProfileV1 =
   typeof EncryptedCodexOAuthProfileV1.Type;
 
+export const CodexOAuthRefreshLockTtlMillis = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThan(0)),
+  Schema.brand("CodexOAuthRefreshLockTtlMillis")
+);
+
+export type CodexOAuthRefreshLockTtlMillis =
+  typeof CodexOAuthRefreshLockTtlMillis.Type;
+
+export const CodexOAuthRefreshLockOwner = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+
+export type CodexOAuthRefreshLockOwner = typeof CodexOAuthRefreshLockOwner.Type;
+
+export const CodexOAuthRefreshLockAcquireInput = Schema.Struct({
+  subject: CodexOAuthSubject,
+  ttlMillis: CodexOAuthRefreshLockTtlMillis,
+});
+
+export type CodexOAuthRefreshLockAcquireInput =
+  typeof CodexOAuthRefreshLockAcquireInput.Type;
+
+export const CodexOAuthRefreshLockLease = Schema.Struct({
+  subject: CodexOAuthSubject,
+  subjectHash: Schema.NonEmptyString,
+  owner: CodexOAuthRefreshLockOwner,
+  expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+});
+
+export type CodexOAuthRefreshLockLease = typeof CodexOAuthRefreshLockLease.Type;
+
 export const CodexOAuthLoginStart = Schema.Struct({
   profileId: CodexOAuthProfileId,
   connectorId: CodexOAuthConnectorId,

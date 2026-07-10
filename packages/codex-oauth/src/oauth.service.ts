@@ -4,6 +4,11 @@ import { CodexOAuthTokenExpired, CodexOAuthTokenMissing } from "./errors.js";
 import type { CodexOAuthFailure } from "./errors.js";
 import { CodexOAuthClient } from "./oauth-client.service.js";
 import { CodexProfileStore } from "./profile-store.service.js";
+import {
+  CodexOAuthRefreshLock,
+  defaultCodexOAuthRefreshLockTtlMillis,
+  withCodexOAuthRefreshLock,
+} from "./refresh-lock.service.js";
 import type {
   CodexOAuthAccessToken,
   CodexOAuthLoginCallback,
@@ -38,6 +43,7 @@ export class CodexOAuthService extends Context.Service<
 export const makeCodexOAuthService = Effect.gen(function* makeService() {
   const profileStore = yield* CodexProfileStore;
   const oauthClient = yield* CodexOAuthClient;
+  const refreshLock = yield* CodexOAuthRefreshLock;
 
   return CodexOAuthService.of({
     startLogin: Effect.fn("CodexOAuthService.startLogin")(
@@ -69,33 +75,46 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
     }),
     refreshAccessToken: Effect.fn("CodexOAuthService.refreshAccessToken")(
       function* (subject: CodexOAuthSubject) {
-        const profile = yield* profileStore.getProfile(subject);
+        return yield* withCodexOAuthRefreshLock(
+          {
+            subject,
+            ttlMillis: defaultCodexOAuthRefreshLockTtlMillis,
+          },
+          Effect.gen(function* refreshUnderLock() {
+            const profile = yield* profileStore.getProfile(subject);
+            const nowEpochMillis = yield* Clock.currentTimeMillis;
 
-        if (profile.refreshToken === undefined) {
-          return yield* new CodexOAuthTokenMissing({
-            profileId: subject.profileId,
-            tokenName: "refreshToken",
-            message: "Codex OAuth profile has no refresh token.",
-          });
-        }
+            if (profile.expiresAtEpochMillis > nowEpochMillis) {
+              return profile.accessToken;
+            }
 
-        const refreshResult = yield* oauthClient.refresh({
-          subject,
-          refreshToken: profile.refreshToken,
-        });
+            if (profile.refreshToken === undefined) {
+              return yield* new CodexOAuthTokenMissing({
+                profileId: subject.profileId,
+                tokenName: "refreshToken",
+                message: "Codex OAuth profile has no refresh token.",
+              });
+            }
 
-        yield* profileStore.putProfile({
-          ...profile,
-          accessToken: refreshResult.accessToken,
-          ...(refreshResult.refreshToken === undefined
-            ? {}
-            : { refreshToken: refreshResult.refreshToken }),
-          expiresAtEpochMillis: refreshResult.expiresAtEpochMillis,
-          updatedAtEpochMillis: refreshResult.updatedAtEpochMillis,
-          requiresReauthentication: false,
-        });
+            const refreshResult = yield* oauthClient.refresh({
+              subject,
+              refreshToken: profile.refreshToken,
+            });
 
-        return refreshResult.accessToken;
+            yield* profileStore.putProfile({
+              ...profile,
+              accessToken: refreshResult.accessToken,
+              ...(refreshResult.refreshToken === undefined
+                ? {}
+                : { refreshToken: refreshResult.refreshToken }),
+              expiresAtEpochMillis: refreshResult.expiresAtEpochMillis,
+              updatedAtEpochMillis: refreshResult.updatedAtEpochMillis,
+              requiresReauthentication: false,
+            });
+
+            return refreshResult.accessToken;
+          })
+        ).pipe(Effect.provideService(CodexOAuthRefreshLock, refreshLock));
       }
     ),
     revokeToken: Effect.fn("CodexOAuthService.revokeToken")(function* (

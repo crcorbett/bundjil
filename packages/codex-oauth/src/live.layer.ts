@@ -26,6 +26,7 @@ import {
   makeCodexStreamMapper,
 } from "./codex-stream-mapper.js";
 import {
+  CodexOAuthProfileCipherError,
   OAuthProfileNotFound,
   OAuthProfileSchemaError,
   OAuthProfileStorageError,
@@ -44,7 +45,7 @@ import {
   makeCodexOAuthProfileCipher,
 } from "./profile-cipher.service.js";
 import { CodexProfileStore } from "./profile-store.service.js";
-import { CodexOAuthProfile } from "./schemas.js";
+import { CodexOAuthProfile, EncryptedCodexOAuthProfile } from "./schemas.js";
 import type {
   CodexOAuthProfile as CodexOAuthProfileType,
   CodexOAuthSubject,
@@ -173,6 +174,132 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
       }),
     });
   }).pipe(Effect.withSpan("CodexProfileStoreKeyValueLive"))
+);
+
+export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
+  CodexProfileStore,
+  Effect.gen(function* makeCodexProfileStoreEncryptedKeyValue() {
+    const cipher = yield* CodexOAuthProfileCipher;
+    const keyValueStore = yield* KeyValueStore.KeyValueStore;
+    const encryptedProfileStore = KeyValueStore.toSchemaStore(
+      keyValueStore,
+      EncryptedCodexOAuthProfile
+    );
+
+    return CodexProfileStore.of({
+      getProfile: Effect.fn("CodexProfileStoreEncrypted.getProfile")(function* (
+        subject: CodexOAuthSubject
+      ) {
+        const key = yield* codexOAuthProfileStorageKey(subject);
+        const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
+        const encryptedProfile = yield* encryptedProfileStore.get(key).pipe(
+          Effect.catchTag("KeyValueStoreError", (cause) =>
+            Effect.fail(
+              new OAuthProfileStorageError({
+                operation: "getProfile",
+                key,
+                message: "Unable to read encrypted Codex OAuth profile.",
+                cause,
+              })
+            )
+          ),
+          Effect.catchTag("SchemaError", (cause) =>
+            Effect.fail(
+              new OAuthProfileSchemaError({
+                boundary: "CodexOAuthProfile",
+                message: "Unable to decode encrypted Codex OAuth profile.",
+                cause,
+              })
+            )
+          )
+        );
+
+        if (Option.isNone(encryptedProfile)) {
+          return yield* new OAuthProfileNotFound({
+            profileId: subject.profileId,
+            subjectHash,
+            message: "Codex OAuth profile was not found.",
+          });
+        }
+
+        if (encryptedProfile.value.subjectHash !== subjectHash) {
+          return yield* new CodexOAuthProfileCipherError({
+            operation: "integrityMismatch",
+            keyId: encryptedProfile.value.keyId,
+            version: encryptedProfile.value.version,
+            message:
+              "Encrypted Codex OAuth profile belongs to another subject.",
+          });
+        }
+
+        return yield* cipher.decrypt(encryptedProfile.value);
+      }),
+      putProfile: Effect.fn("CodexProfileStoreEncrypted.putProfile")(function* (
+        profile: CodexOAuthProfileType
+      ) {
+        const key = yield* codexOAuthProfileStorageKey(profile.subject);
+        const encryptedProfile = yield* cipher.encrypt(profile);
+
+        yield* encryptedProfileStore.set(key, encryptedProfile).pipe(
+          Effect.catchTag("KeyValueStoreError", (cause) =>
+            Effect.fail(
+              new OAuthProfileStorageError({
+                operation: "putProfile",
+                key,
+                message: "Unable to store encrypted Codex OAuth profile.",
+                cause,
+              })
+            )
+          ),
+          Effect.catchTag("SchemaError", (cause) =>
+            Effect.fail(
+              new OAuthProfileSchemaError({
+                boundary: "CodexOAuthProfile",
+                message: "Unable to encode encrypted Codex OAuth profile.",
+                cause,
+              })
+            )
+          )
+        );
+      }),
+      removeProfile: Effect.fn("CodexProfileStoreEncrypted.removeProfile")(
+        function* (subject: CodexOAuthSubject) {
+          const key = yield* codexOAuthProfileStorageKey(subject);
+
+          yield* encryptedProfileStore.remove(key).pipe(
+            Effect.catchTag("KeyValueStoreError", (cause) =>
+              Effect.fail(
+                new OAuthProfileStorageError({
+                  operation: "removeProfile",
+                  key,
+                  message: "Unable to remove encrypted Codex OAuth profile.",
+                  cause,
+                })
+              )
+            )
+          );
+        }
+      ),
+      hasProfile: Effect.fn("CodexProfileStoreEncrypted.hasProfile")(function* (
+        subject: CodexOAuthSubject
+      ) {
+        const key = yield* codexOAuthProfileStorageKey(subject);
+
+        return yield* encryptedProfileStore.has(key).pipe(
+          Effect.catchTag("KeyValueStoreError", (cause) =>
+            Effect.fail(
+              new OAuthProfileStorageError({
+                operation: "hasProfile",
+                key,
+                message: "Unable to check encrypted Codex OAuth profile.",
+                cause,
+              })
+            )
+          )
+        );
+      }),
+    });
+  }).pipe(Effect.withSpan("CodexProfileStoreEncryptedKeyValueLive"))
 );
 
 export const CodexOAuthClientLive = Layer.succeed(

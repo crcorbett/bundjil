@@ -3,6 +3,7 @@ import { Schema } from "effect";
 import { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 import { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
 import { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
+import { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-error.js";
 import { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 import { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 import { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
@@ -20,6 +21,8 @@ export {
   CodexHttpClientOperation,
   CodexOAuthClientOperation,
   CodexOAuthProfileCipherOperation,
+  CodexOAuthRefreshLockFailureReason,
+  CodexOAuthRefreshLockOperation,
   CodexOAuthProfileSchemaBoundary,
   CodexOAuthProfileStorageOperation,
   CodexRequestMapperOperation,
@@ -33,6 +36,8 @@ export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
   CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
+  CodexOAuthRefreshLockFailureReason as CodexOAuthRefreshLockFailureReasonType,
+  CodexOAuthRefreshLockOperation as CodexOAuthRefreshLockOperationType,
   CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
   CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
   CodexRequestMapperOperation as CodexRequestMapperOperationType,
@@ -48,6 +53,7 @@ export { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 export { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 export { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
 export { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
+export { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-error.js";
 export { CodexOAuthUnsupportedRuntimePath } from "./errors/codex-oauth-unsupported-runtime-path.js";
 export { CodexResponsesRequestError } from "./errors/codex-responses-request-error.js";
 export { CodexResponsesStreamError } from "./errors/codex-responses-stream-error.js";
@@ -62,9 +68,17 @@ export const CodexProfileStoreFailure = Schema.Union([
   OAuthProfileSchemaError,
   OAuthProfileStorageError,
   OAuthProfileNotFound,
+  CodexOAuthProfileCipherError,
 ]);
 
 export type CodexProfileStoreFailure = typeof CodexProfileStoreFailure.Type;
+
+export const CodexOAuthRefreshLockFailure = Schema.Union([
+  CodexOAuthRefreshLockError,
+]);
+
+export type CodexOAuthRefreshLockFailure =
+  typeof CodexOAuthRefreshLockFailure.Type;
 
 export const CodexOAuthFailure = Schema.Union([
   OAuthProfileSchemaError,
@@ -74,6 +88,8 @@ export const CodexOAuthFailure = Schema.Union([
   CodexOAuthTokenExpired,
   CodexOAuthTokenProviderError,
   CodexOAuthUnsupportedRuntimePath,
+  CodexOAuthProfileCipherError,
+  CodexOAuthRefreshLockError,
 ]);
 
 export type CodexOAuthFailure = typeof CodexOAuthFailure.Type;

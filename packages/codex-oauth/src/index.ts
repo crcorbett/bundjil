@@ -4,7 +4,10 @@ export {
   CodexHttpStatusError,
   CodexOAuthClientOperation,
   CodexOAuthProfileCipherError,
+  CodexOAuthRefreshLockError,
   CodexOAuthProfileCipherOperation,
+  CodexOAuthRefreshLockFailureReason,
+  CodexOAuthRefreshLockOperation,
   CodexOAuthFailure,
   CodexOAuthProfileSchemaBoundary,
   CodexOAuthProfileStorageOperation,
@@ -35,6 +38,9 @@ export type {
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
   CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
   CodexOAuthProfileCipherFailure as CodexOAuthProfileCipherFailureType,
+  CodexOAuthRefreshLockFailure as CodexOAuthRefreshLockFailureType,
+  CodexOAuthRefreshLockFailureReason as CodexOAuthRefreshLockFailureReasonType,
+  CodexOAuthRefreshLockOperation as CodexOAuthRefreshLockOperationType,
   CodexOAuthFailure as CodexOAuthFailureType,
   CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
   CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
@@ -84,6 +90,15 @@ export {
   makeCodexOAuthProfileCipher,
 } from "./profile-cipher.service.js";
 export type { CodexOAuthProfileCipherShape } from "./profile-cipher.service.js";
+export {
+  CodexOAuthRefreshLock,
+  makeCodexOAuthRefreshLock,
+  withCodexOAuthRefreshLock,
+} from "./refresh-lock.service.js";
+export type {
+  CodexOAuthRefreshLockProvider,
+  CodexOAuthRefreshLockShape,
+} from "./refresh-lock.service.js";
 export {
   CodexOAuthService,
   completeLogin,
@@ -155,6 +170,10 @@ export {
   CodexOAuthProfileCipherAlgorithm,
   CodexOAuthProfileCipherConfig,
   CodexOAuthProfileCipherKeyId,
+  CodexOAuthRefreshLockAcquireInput,
+  CodexOAuthRefreshLockLease,
+  CodexOAuthRefreshLockOwner,
+  CodexOAuthRefreshLockTtlMillis,
   CodexOAuthProfileId,
   CodexOAuthProvider,
   CodexOAuthRefreshInput,
@@ -207,6 +226,10 @@ export type {
   CodexOAuthProfileCipherAlgorithm as CodexOAuthProfileCipherAlgorithmType,
   CodexOAuthProfileCipherConfig as CodexOAuthProfileCipherConfigType,
   CodexOAuthProfileCipherKeyId as CodexOAuthProfileCipherKeyIdType,
+  CodexOAuthRefreshLockAcquireInput as CodexOAuthRefreshLockAcquireInputType,
+  CodexOAuthRefreshLockLease as CodexOAuthRefreshLockLeaseType,
+  CodexOAuthRefreshLockOwner as CodexOAuthRefreshLockOwnerType,
+  CodexOAuthRefreshLockTtlMillis as CodexOAuthRefreshLockTtlMillisType,
   CodexOAuthProfileId as CodexOAuthProfileIdType,
   CodexOAuthProvider as CodexOAuthProviderType,
   CodexOAuthRefreshInput as CodexOAuthRefreshInputType,
@@ -251,4 +274,6 @@ export {
   codexOAuthProfileStorageKey,
   codexOAuthProfileStoragePrefix,
   codexOAuthProfileSubjectHash,
+  codexOAuthRefreshLockStorageKey,
+  codexOAuthRefreshLockStoragePrefix,
 } from "./storage-keys.js";

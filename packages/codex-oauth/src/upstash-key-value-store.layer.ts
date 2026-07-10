@@ -10,16 +10,25 @@ import {
 } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
-import { UpstashKeyValueStoreConfigError } from "./errors.js";
+import {
+  CodexOAuthRefreshLockError,
+  UpstashKeyValueStoreConfigError,
+} from "./errors.js";
+import {
+  CodexOAuthRefreshLock,
+  makeCodexOAuthRefreshLock,
+} from "./refresh-lock.service.js";
 import {
   UpstashRedisConfig,
   UpstashRedisKeyPrefix,
   UpstashRedisRestUrl,
 } from "./schemas.js";
 import type {
+  CodexOAuthRefreshLockLease,
   UpstashRedisConfig as UpstashRedisConfigType,
   UpstashRedisKeyPrefix as UpstashRedisKeyPrefixType,
 } from "./schemas.js";
+import { codexOAuthRefreshLockStorageKey } from "./storage-keys.js";
 
 export interface UpstashRedisKeyValueClient {
   readonly get: (key: string) => Promise<string | null>;
@@ -35,6 +44,24 @@ export type UpstashRedisScanOptions = Readonly<{
   count: number;
   match: string;
 }>;
+
+export type UpstashRedisRefreshLockSetOptions = Readonly<{
+  nx: true;
+  px: number;
+}>;
+
+export interface UpstashRedisRefreshLockClient {
+  readonly set: (
+    key: string,
+    value: string,
+    options: UpstashRedisRefreshLockSetOptions
+  ) => Promise<unknown>;
+  readonly eval: (
+    script: string,
+    keys: string[],
+    args: string[]
+  ) => Promise<unknown>;
+}
 
 class UpstashRedisSdkError extends Data.TaggedError("UpstashRedisSdkError")<{
   readonly cause: unknown;
@@ -88,6 +115,9 @@ export const loadUpstashRedisConfigFromEnv = loadUpstashRedisConfig.pipe(
 
 const toUpstashRedisKey = (keyPrefix: UpstashRedisKeyPrefixType, key: string) =>
   `${keyPrefix}${key}`;
+
+const releaseIfOwnerScript =
+  "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
 
 const scanUpstashKeys = (
   client: UpstashRedisKeyValueClient,
@@ -221,6 +251,101 @@ export const makeUpstashKeyValueStore = (
     ),
   });
 
+export const makeUpstashCodexOAuthRefreshLock = (
+  client: UpstashRedisRefreshLockClient,
+  config: Pick<UpstashRedisConfigType, "keyPrefix">
+) =>
+  makeCodexOAuthRefreshLock({
+    acquire: Effect.fn("UpstashCodexOAuthRefreshLock.acquire")(function* (
+      lease: CodexOAuthRefreshLockLease,
+      nowEpochMillis: number
+    ) {
+      const key = yield* codexOAuthRefreshLockStorageKey(lease.subject).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexOAuthRefreshLockError({
+              operation: "acquire",
+              reason: "acquisition",
+              subjectHash: lease.subjectHash,
+              message:
+                "Unable to derive the Upstash Codex OAuth refresh-lock key.",
+              cause,
+            })
+        )
+      );
+      const redisKey = toUpstashRedisKey(config.keyPrefix, key);
+      const result = yield* Effect.tryPromise({
+        try: () =>
+          client.set(redisKey, Redacted.value(lease.owner), {
+            nx: true,
+            px: lease.expiresAtEpochMillis - nowEpochMillis,
+          }),
+        catch: (cause) => new UpstashRedisSdkError({ cause }),
+      }).pipe(
+        Effect.flatMap(
+          Schema.decodeUnknownEffect(
+            Schema.Union([Schema.Literal("OK"), Schema.Null])
+          )
+        ),
+        Effect.mapError(
+          (cause) =>
+            new CodexOAuthRefreshLockError({
+              operation: "acquire",
+              reason: "acquisition",
+              subjectHash: lease.subjectHash,
+              message:
+                "Unable to acquire the Upstash Codex OAuth refresh lock.",
+              cause,
+            })
+        )
+      );
+
+      return result === "OK";
+    }),
+    release: Effect.fn("UpstashCodexOAuthRefreshLock.release")(function* (
+      lease: CodexOAuthRefreshLockLease
+    ) {
+      const key = yield* codexOAuthRefreshLockStorageKey(lease.subject).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexOAuthRefreshLockError({
+              operation: "release",
+              reason: "release",
+              subjectHash: lease.subjectHash,
+              message:
+                "Unable to derive the Upstash Codex OAuth refresh-lock key.",
+              cause,
+            })
+        )
+      );
+      const redisKey = toUpstashRedisKey(config.keyPrefix, key);
+      const result = yield* Effect.tryPromise({
+        try: () =>
+          client.eval(
+            releaseIfOwnerScript,
+            [redisKey],
+            [Redacted.value(lease.owner)]
+          ),
+        catch: (cause) => new UpstashRedisSdkError({ cause }),
+      }).pipe(
+        Effect.flatMap(Schema.decodeUnknownEffect(Schema.Literals([0, 1]))),
+        Effect.mapError(
+          (cause) =>
+            new CodexOAuthRefreshLockError({
+              operation: "release",
+              reason: "release",
+              subjectHash: lease.subjectHash,
+              message:
+                "Unable to release the Upstash Codex OAuth refresh lock.",
+              cause,
+            })
+        )
+      );
+
+      return result === 1;
+    }),
+  });
+
 export const UpstashKeyValueStoreLive = Layer.effect(
   KeyValueStore.KeyValueStore,
   Effect.gen(function* makeUpstashKeyValueStoreLive() {
@@ -236,4 +361,21 @@ export const UpstashKeyValueStoreLive = Layer.effect(
       config
     );
   }).pipe(Effect.withSpan("UpstashKeyValueStoreLive"))
+).pipe(Layer.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));
+
+export const UpstashCodexOAuthRefreshLockLive = Layer.effect(
+  CodexOAuthRefreshLock,
+  Effect.gen(function* makeUpstashCodexOAuthRefreshLockLive() {
+    const config = yield* loadUpstashRedisConfig;
+
+    return yield* makeUpstashCodexOAuthRefreshLock(
+      new Redis({
+        url: config.restUrl.href,
+        token: Redacted.value(config.restToken),
+        automaticDeserialization: false,
+        enableTelemetry: false,
+      }),
+      config
+    );
+  }).pipe(Effect.withSpan("UpstashCodexOAuthRefreshLockLive"))
 ).pipe(Layer.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));

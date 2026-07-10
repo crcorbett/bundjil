@@ -1,10 +1,22 @@
 import { assert, it } from "@effect/vitest";
-import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  ConfigProvider,
+  Deferred,
+  Effect,
+  Fiber,
+  Layer,
+  Redacted,
+  Schema,
+} from "effect";
+import { TestClock } from "effect/testing";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   CodexOAuthProfile,
   CodexOAuthProfileCipherConfig,
+  CodexOAuthRefreshLock,
+  CodexOAuthRefreshLockAcquireInput,
+  CodexOAuthRefreshLockLease,
   CodexOAuthSubject,
   CodexOAuthTokenRefreshResult,
   EncryptedCodexOAuthProfile,
@@ -20,16 +32,19 @@ import {
   refreshAccessToken,
   revokeToken,
   loadCodexOAuthProfileCipherConfig,
+  withCodexOAuthRefreshLock,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
+  CodexProfileStoreEncryptedKeyValueLive,
   CodexProfileStoreKeyValueLive,
 } from "../src/live.layer.js";
 import {
   CodexOAuthMemory,
   CodexOAuthProfileCipherTest,
+  CodexOAuthRefreshLockMemory,
   CodexProfileStoreMemory,
 } from "../src/mock.layer.js";
 
@@ -80,6 +95,15 @@ const makeCipherConfig = (
     algorithm: "AES-GCM",
     keyId,
     keyMaterial,
+  });
+
+const makeRefreshLockInput = (
+  subject: CodexOAuthSubjectType,
+  ttlMillis = 1000
+) =>
+  Schema.decodeUnknownEffect(CodexOAuthRefreshLockAcquireInput)({
+    subject,
+    ttlMillis,
   });
 
 const failingKeyValueStore = Layer.succeed(
@@ -199,6 +223,142 @@ it.effect(
       yield* removeProfile(subject);
       assert.strictEqual(yield* hasProfile(subject), false);
     }).pipe(Effect.provide(CodexProfileStoreMemory()))
+);
+
+it.effect(
+  "stores encrypted profile envelopes through KeyValueStore without token leaks",
+  () =>
+    Effect.gen(function* testEncryptedProfileStoreRoundTrip() {
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const cipherConfig = yield* makeCipherConfig();
+      const keyValueStoreLayer = KeyValueStore.layerMemory;
+      const encryptedStoreLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
+        Layer.provideMerge(CodexOAuthProfileCipherTest(cipherConfig)),
+        Layer.provide(keyValueStoreLayer)
+      );
+      const testLayer = Layer.merge(encryptedStoreLayer, keyValueStoreLayer);
+
+      return yield* Effect.gen(function* encryptedStoreOperations() {
+        yield* putProfile(profile);
+        const keyValueStore = yield* KeyValueStore.KeyValueStore;
+        const key = yield* codexOAuthProfileStorageKey(subject);
+        const storedEnvelope = yield* keyValueStore.get(key);
+
+        assert.isDefined(storedEnvelope);
+        assert.notInclude(storedEnvelope, "access-token-secret");
+        assert.notInclude(storedEnvelope, "refresh-token-secret");
+        assert.notInclude(storedEnvelope, "offline_access");
+        assert.strictEqual(yield* hasProfile(subject), true);
+        assert.strictEqual(
+          Redacted.value((yield* getProfile(subject)).accessToken),
+          "access-token-secret"
+        );
+
+        yield* removeProfile(subject);
+        assert.strictEqual(yield* hasProfile(subject), false);
+        assert.strictEqual(yield* keyValueStore.get(key), undefined);
+      }).pipe(Effect.provide(testLayer));
+    })
+);
+
+it.effect(
+  "rejects contended refresh locks and releases only the owner lease",
+  () =>
+    Effect.gen(function* testRefreshLockContentionAndOwnership() {
+      const subject = yield* fixtureSubject;
+      const input = yield* makeRefreshLockInput(subject);
+      const lock = yield* CodexOAuthRefreshLock;
+      const ownerLease = yield* lock.acquire(input);
+      const contention = yield* lock.acquire(input).pipe(Effect.flip);
+      const nonOwnerLease = yield* Schema.decodeUnknownEffect(
+        CodexOAuthRefreshLockLease
+      )({
+        ...ownerLease,
+        owner: "another-invocation",
+      });
+      const nonOwnerRelease = yield* lock
+        .release(nonOwnerLease)
+        .pipe(Effect.flip);
+
+      assert.strictEqual(contention._tag, "CodexOAuthRefreshLockError");
+      assert.strictEqual(contention.reason, "contended");
+      assert.strictEqual(nonOwnerRelease._tag, "CodexOAuthRefreshLockError");
+      assert.strictEqual(nonOwnerRelease.reason, "release");
+
+      yield* lock.release(ownerLease);
+      yield* lock.acquire(input).pipe(Effect.flatMap(lock.release));
+    }).pipe(Effect.provide(CodexOAuthRefreshLockMemory))
+);
+
+it.effect("expires stale refresh locks before the next acquisition", () =>
+  Effect.gen(function* testRefreshLockExpiry() {
+    const subject = yield* fixtureSubject;
+    const input = yield* makeRefreshLockInput(subject, 1);
+    const lock = yield* CodexOAuthRefreshLock;
+    const expiredLease = yield* lock.acquire(input);
+
+    yield* TestClock.adjust("2 millis");
+
+    const expiredRelease = yield* lock.release(expiredLease).pipe(Effect.flip);
+    const nextLease = yield* lock.acquire(input);
+
+    assert.strictEqual(expiredRelease._tag, "CodexOAuthRefreshLockError");
+    assert.strictEqual(expiredRelease.reason, "expired");
+    yield* lock.release(nextLease);
+  }).pipe(Effect.provide(CodexOAuthRefreshLockMemory))
+);
+
+it.effect(
+  "coordinates concurrent refresh programs so followers read the winner profile",
+  () =>
+    Effect.gen(function* testConcurrentRefreshCoordination() {
+      const subject = yield* fixtureSubject;
+      const expiredProfile = yield* makeProfile(subject, -1);
+      const refreshedProfile = yield* makeProfile(subject, Date.now() + 60_000);
+      const input = yield* makeRefreshLockInput(subject);
+      const refreshStarted = yield* Deferred.make<null>();
+      const allowRefresh = yield* Deferred.make<null>();
+      let refreshCalls = 0;
+      const coordinationLayer = Layer.merge(
+        CodexProfileStoreMemory([expiredProfile]),
+        CodexOAuthRefreshLockMemory
+      );
+
+      return yield* Effect.gen(function* coordinateRefreshes() {
+        const winner = withCodexOAuthRefreshLock(
+          input,
+          Effect.gen(function* runSingleRefresh() {
+            refreshCalls += 1;
+            yield* Deferred.succeed(null)(refreshStarted);
+            yield* Deferred.await(allowRefresh);
+            yield* putProfile(refreshedProfile);
+
+            return refreshedProfile.accessToken;
+          })
+        );
+        const winnerFiber = yield* Effect.forkChild(winner);
+
+        yield* Deferred.await(refreshStarted);
+
+        const follower = yield* withCodexOAuthRefreshLock(
+          input,
+          Effect.void
+        ).pipe(Effect.flip);
+
+        assert.strictEqual(follower._tag, "CodexOAuthRefreshLockError");
+        assert.strictEqual(follower.reason, "contended");
+
+        yield* Deferred.succeed(null)(allowRefresh);
+        yield* Fiber.join(winnerFiber);
+
+        assert.strictEqual(refreshCalls, 1);
+        assert.strictEqual(
+          Redacted.value((yield* getProfile(subject)).accessToken),
+          "access-token-secret"
+        );
+      }).pipe(Effect.provide(coordinationLayer));
+    })
 );
 
 it.effect("uses memory layer seeding for profile reads", () =>

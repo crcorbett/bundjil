@@ -1,4 +1,4 @@
-import { Effect, Layer, Redacted } from "effect";
+import { Effect, Equal, Layer, Redacted, Ref } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import { CodexDirectProvider } from "./codex-direct-provider.service.js";
@@ -12,6 +12,10 @@ import {
 } from "./live.layer.js";
 import { CodexOAuthClient } from "./oauth-client.service.js";
 import { CodexOAuthProfileCipherConfigService } from "./profile-cipher.config.js";
+import {
+  CodexOAuthRefreshLock,
+  makeCodexOAuthRefreshLock,
+} from "./refresh-lock.service.js";
 import { CodexOAuthProfile } from "./schemas.js";
 import type {
   CodexOAuthLoginStartResult,
@@ -165,9 +169,13 @@ export const CodexOAuthMemory = (
 ) =>
   CodexOAuthServiceLive.pipe(
     Layer.provideMerge(
-      Layer.merge(
+      Layer.mergeAll(
         CodexProfileStoreMemory(profiles),
-        CodexOAuthClientMock(clientOptions)
+        CodexOAuthClientMock(clientOptions),
+        // The lock layer is declared below so its implementation stays beside
+        // its provider state.
+        // eslint-disable-next-line no-use-before-define
+        CodexOAuthRefreshLockMemory
       )
     )
   );
@@ -183,3 +191,61 @@ export const CodexOAuthProfileCipherTest = (
       )
     )
   );
+
+export const CodexOAuthRefreshLockMemory = Layer.effect(
+  CodexOAuthRefreshLock,
+  Effect.gen(function* makeCodexOAuthRefreshLockMemory() {
+    const leases = yield* Ref.make(
+      new Map<
+        string,
+        {
+          readonly owner: ReturnType<typeof Redacted.make<string>>;
+          readonly expiresAtEpochMillis: number;
+        }
+      >()
+    );
+
+    return yield* makeCodexOAuthRefreshLock({
+      acquire: (lease, nowEpochMillis) =>
+        Ref.modify(leases, (currentLeases) => {
+          const existingLease = currentLeases.get(lease.subjectHash);
+
+          if (
+            existingLease !== undefined &&
+            existingLease.expiresAtEpochMillis > nowEpochMillis
+          ) {
+            return [false, currentLeases] as const;
+          }
+
+          const nextLeases = new Map([
+            ...currentLeases,
+            [
+              lease.subjectHash,
+              {
+                owner: lease.owner,
+                expiresAtEpochMillis: lease.expiresAtEpochMillis,
+              },
+            ],
+          ]);
+
+          return [true, nextLeases] as const;
+        }),
+      release: (lease) =>
+        Ref.modify(leases, (currentLeases) => {
+          const existingLease = currentLeases.get(lease.subjectHash);
+
+          if (
+            existingLease === undefined ||
+            !Equal.equals(existingLease.owner, lease.owner)
+          ) {
+            return [false, currentLeases] as const;
+          }
+
+          const nextLeases = new Map(currentLeases);
+          nextLeases.delete(lease.subjectHash);
+
+          return [true, nextLeases] as const;
+        }),
+    });
+  }).pipe(Effect.withSpan("CodexOAuthRefreshLockMemory"))
+);

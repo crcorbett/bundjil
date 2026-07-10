@@ -6,6 +6,9 @@ import type { CodexOAuthSubject } from "./schemas.js";
 export const codexOAuthProfileStoragePrefix =
   "bundjil/oauth/v1/provider/codex/profile";
 
+export const codexOAuthRefreshLockStoragePrefix =
+  "bundjil/oauth/v1/provider/codex/refresh-lock";
+
 export const codexOAuthProfileSubjectHash = (subject: CodexOAuthSubject) =>
   Effect.tryPromise({
     try: async () => {
@@ -42,4 +45,12 @@ export const codexOAuthProfileStorageKey = Effect.fn(
   const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
 
   return `${codexOAuthProfileStoragePrefix}/${subjectHash}`;
+});
+
+export const codexOAuthRefreshLockStorageKey = Effect.fn(
+  "CodexOAuthRefreshLockStorageKey.derive"
+)(function* (subject: CodexOAuthSubject) {
+  const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
+
+  return `${codexOAuthRefreshLockStoragePrefix}/${subjectHash}`;
 });
