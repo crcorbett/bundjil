@@ -2,6 +2,7 @@ import { Schema } from "effect";
 
 import { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 import { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
+import { CodexLocalProfileImportError } from "./errors/codex-local-profile-import-error.js";
 import { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
 import { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-error.js";
 import { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
@@ -19,6 +20,7 @@ import { UpstashKeyValueStoreConfigError } from "./errors/upstash-key-value-stor
 
 export {
   CodexHttpClientOperation,
+  CodexLocalProfileImportOperation,
   CodexOAuthClientOperation,
   CodexOAuthProfileCipherOperation,
   CodexOAuthRefreshLockFailureReason,
@@ -34,6 +36,7 @@ export {
 } from "./errors/contracts.js";
 export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
+  CodexLocalProfileImportOperation as CodexLocalProfileImportOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
   CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
   CodexOAuthRefreshLockFailureReason as CodexOAuthRefreshLockFailureReasonType,
@@ -49,6 +52,7 @@ export type {
 } from "./errors/contracts.js";
 export { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 export { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
+export { CodexLocalProfileImportError } from "./errors/codex-local-profile-import-error.js";
 export { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 export { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 export { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
@@ -100,6 +104,17 @@ export const CodexOAuthProfileCipherFailure = Schema.Union([
 
 export type CodexOAuthProfileCipherFailure =
   typeof CodexOAuthProfileCipherFailure.Type;
+
+export const CodexLocalProfileImportFailure = Schema.Union([
+  CodexLocalProfileImportError,
+  OAuthProfileSchemaError,
+  OAuthProfileStorageError,
+  OAuthProfileNotFound,
+  CodexOAuthProfileCipherError,
+]);
+
+export type CodexLocalProfileImportFailure =
+  typeof CodexLocalProfileImportFailure.Type;
 
 export const CodexResponsesFailure = Schema.Union([
   CodexResponsesRequestError,

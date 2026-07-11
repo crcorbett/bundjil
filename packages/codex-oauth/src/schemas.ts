@@ -83,6 +83,45 @@ export const CodexOAuthProfile = Schema.Struct({
 
 export type CodexOAuthProfile = typeof CodexOAuthProfile.Type;
 
+export const CodexCliAuthMode = Schema.Literal("chatgpt");
+
+export type CodexCliAuthMode = typeof CodexCliAuthMode.Type;
+
+export const CodexCliAuthCache = Schema.Struct({
+  auth_mode: CodexCliAuthMode,
+  last_refresh: Schema.DateFromString,
+  tokens: Schema.Struct({
+    access_token: CodexOAuthAccessToken,
+  }),
+});
+
+export type CodexCliAuthCache = typeof CodexCliAuthCache.Type;
+
+export const CodexLocalProfileImportConfig = Schema.Struct({
+  localAuthFile: Schema.NonEmptyString,
+  subject: CodexOAuthSubject,
+  accessTokenTtlMillis: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+});
+
+export type CodexLocalProfileImportConfig =
+  typeof CodexLocalProfileImportConfig.Type;
+
+export const CodexLocalProfileImportExpiryStatus = Schema.Literal("valid");
+
+export type CodexLocalProfileImportExpiryStatus =
+  typeof CodexLocalProfileImportExpiryStatus.Type;
+
+export const CodexLocalProfileImportResult = Schema.Struct({
+  profileId: CodexOAuthProfileId,
+  mode: CodexCliAuthMode,
+  requiresReauthentication: Schema.Literal(true),
+  expiryStatus: CodexLocalProfileImportExpiryStatus,
+  encryptedStore: Schema.Literal("stored"),
+});
+
+export type CodexLocalProfileImportResult =
+  typeof CodexLocalProfileImportResult.Type;
+
 export const CodexOAuthProfileCipherAlgorithm = Schema.Literal("AES-GCM");
 
 export type CodexOAuthProfileCipherAlgorithm =

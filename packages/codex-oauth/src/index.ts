@@ -2,6 +2,9 @@ export {
   CodexHttpClientOperation,
   CodexHttpNetworkError,
   CodexHttpStatusError,
+  CodexLocalProfileImportError,
+  CodexLocalProfileImportFailure,
+  CodexLocalProfileImportOperation,
   CodexOAuthClientOperation,
   CodexOAuthProfileCipherError,
   CodexOAuthRefreshLockError,
@@ -35,6 +38,7 @@ export {
 } from "./errors.js";
 export type {
   CodexHttpClientOperation as CodexHttpClientOperationType,
+  CodexLocalProfileImportOperation as CodexLocalProfileImportOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
   CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
   CodexOAuthProfileCipherFailure as CodexOAuthProfileCipherFailureType,
@@ -110,6 +114,12 @@ export {
 } from "./oauth.service.js";
 export type { CodexOAuthServiceShape } from "./oauth.service.js";
 export {
+  CodexLocalProfileImportService,
+  importCodexLocalProfile,
+  makeCodexLocalProfileImportService,
+} from "./local-profile-import.service.js";
+export type { CodexLocalProfileImportServiceShape } from "./local-profile-import.service.js";
+export {
   CodexProfileStore,
   getProfile,
   hasProfile,
@@ -159,6 +169,11 @@ export type {
   OpenAICompatibleProxyShape,
 } from "./openai-compatible-proxy.service.js";
 export {
+  CodexCliAuthCache,
+  CodexCliAuthMode,
+  CodexLocalProfileImportConfig,
+  CodexLocalProfileImportExpiryStatus,
+  CodexLocalProfileImportResult,
   CodexOAuthAccessToken,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
@@ -215,6 +230,11 @@ export {
   UpstashRedisRestUrl,
 } from "./schemas.js";
 export type {
+  CodexCliAuthCache as CodexCliAuthCacheType,
+  CodexCliAuthMode as CodexCliAuthModeType,
+  CodexLocalProfileImportConfig as CodexLocalProfileImportConfigType,
+  CodexLocalProfileImportExpiryStatus as CodexLocalProfileImportExpiryStatusType,
+  CodexLocalProfileImportResult as CodexLocalProfileImportResultType,
   CodexOAuthAccessToken as CodexOAuthAccessTokenType,
   CodexOAuthConnectorId as CodexOAuthConnectorIdType,
   CodexOAuthInstallationId as CodexOAuthInstallationIdType,

@@ -56,6 +56,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
+    "import:local-profile": "bun --conditions=@bundjil/source scripts/import-local-profile.ts",
     "proof:codex-responses": "bun --conditions=@bundjil/source scripts/prove-codex-responses.ts",
     "test": "vitest run"
   },

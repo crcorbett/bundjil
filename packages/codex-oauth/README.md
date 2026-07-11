@@ -27,13 +27,20 @@ Implemented:
 - Opt-in direct Codex Responses proof with sanitized output.
 - Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
   `KeyValueStore`.
+- Trusted-local, access-token-only import for an already authenticated Codex
+  ChatGPT CLI cache. The command is package-owned, reads the cache only on the
+  operator machine, validates the minimal cache shape with Effect Schema, and
+  writes an encrypted profile through `CodexProfileStore`. It deliberately
+  excludes the local refresh token and ID token, sets
+  `requiresReauthentication: true`, and never runs in Vercel, Eve, routes, CI,
+  or browser code.
 
 Future:
 
 - Live OAuth endpoint exchange and refresh.
-- Hosted live Codex proxy mode.
-- Hosted token-profile storage composed through the application-side envelope
-  cipher for refresh-token payloads.
+- Supported hosted account-link OAuth with a registered redirect URI.
+- Hosted live Codex proxy mode after the access-token-only workaround has its
+  own preview proof.
 
 Unsupported:
 
@@ -42,6 +49,8 @@ Unsupported:
 - Reading `OPENAI_API_KEY` or `CODEX_API_KEY` for subscription-provider mode.
 - Importing Eve, Vercel deployment code, OpenClaw code, or Goose code.
 - Storing raw refresh tokens in hosted KV.
+- Importing, persisting, or refreshing the Codex CLI's local `refresh_token`
+  or `id_token` through the local-import workaround.
 
 ## Contracts
 
@@ -201,6 +210,45 @@ Do not log, snapshot, or include access tokens, refresh tokens, authorization
 codes, raw OAuth responses, or private prompts in errors. Public tagged errors
 only include safe fields such as operation names, profile ids, hashed subject
 keys, timestamps, and sanitized messages.
+
+## Trusted-Local Profile Import
+
+The temporary local-import workaround is documented in
+[`docs/product-specs/codex-local-profile-import-workaround.md`](../../docs/product-specs/codex-local-profile-import-workaround.md).
+It is not a supported hosted OAuth flow: it does not reuse the Codex CLI
+client, redirect URI, browser session, PKCE exchange, or refresh token.
+
+Run it only on the trusted machine with an active local Codex ChatGPT login:
+
+```bash
+bun run --filter @bundjil/codex-oauth import:local-profile
+```
+
+The command reads configuration through Effect `Config` and
+`ConfigProvider.fromEnv()`. It needs the existing encryption and Upstash
+configuration plus these explicit, non-secret profile fields:
+
+- `BUNDJIL_CODEX_PROFILE_PRINCIPAL_ID`
+- `BUNDJIL_CODEX_PROFILE_CONNECTOR_ID`
+- `BUNDJIL_CODEX_PROFILE_INSTALLATION_ID`
+- `BUNDJIL_CODEX_PROFILE_ID`
+
+`BUNDJIL_CODEX_LOCAL_AUTH_FILE` is optional and defaults to
+`$HOME/.codex/auth.json` for this command only. The importer uses
+`BUNDJIL_CODEX_LOCAL_ACCESS_TOKEN_TTL` to calculate the short-lived profile
+expiry; it defaults to one hour from Codex's local `last_refresh` timestamp.
+Set `BUNDJIL_CODEX_ACCOUNT_ID` only in proxy configuration when the direct
+provider needs its optional account header; the importer never reads it from
+the Codex cache.
+
+Success output is schema-backed metadata only: the profile id, `chatgpt` mode,
+the re-import-required state, valid-expiry status, and encrypted-store
+confirmation. Failure output names no cache path, account id, cache contents,
+token, prompt, or model response.
+
+The profile contains only the current access token. When it expires, the
+hosted proxy must fail closed; renew the local Codex login if needed and run
+the import command again. Do not add automatic refresh around this workaround.
 
 ## Direct Codex Responses Proof
 
