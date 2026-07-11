@@ -20,13 +20,12 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 ## Current Task
 
-`compose-access-only-live-proxy-mode`
+`prove-personal-preview-workaround`
 
-The next slice may compose `apps/codex-proxy` live mode around the accepted
-access-token-only encrypted profile. It must preserve mock mode, use
-`CodexOAuthService.getValidToken` only, and fail closed for missing or expired
-profiles. It must not start hosted OAuth, refresh imported profiles, or change
-Eve.
+The code path is accepted. The next task is external-state proof only: confirm
+the personal Vercel scope and preview-only Upstash/cipher configuration, run
+the local importer intentionally, deploy a preview in live mode, then record
+sanitized HTTP, ciphertext, and log evidence. Production remains untouched.
 
 ## Baseline Evidence
 
@@ -105,7 +104,7 @@ Commit: pending parent commit.
 
 ### compose-access-only-live-proxy-mode
 
-Status: Pending
+Status: Accepted 2026-07-11
 
 Parent acceptance requirements:
 
@@ -116,3 +115,64 @@ Parent acceptance requirements:
 - no refresh of imported profiles and no API-key fallback;
 - three parent audits, package/app checks, smoke test, full verification, and a
   coherent commit.
+
+Implementation and parent review:
+
+- Added `apps/codex-proxy/src/live.layer.ts`, which composes the existing
+  encrypted profile store, cipher config/cipher, Upstash KeyValueStore, Upstash
+  refresh lock, unsupported OAuth client, OAuth service, Responses fetch/HTTP
+  client, direct provider, and OpenAI-compatible proxy.
+- `makeCodexProxyAppLayer` now selects a complete mock or live proxy layer only
+  after `CodexProxyConfig` is decoded. Mock remains the default; it has no
+  Upstash/config dependency.
+- Live setup failures use an unavailable proxy service rather than falling back
+  to mock. Missing/expired/storage/OAuth-unavailable profile failures map to a
+  generic 502 that tells the operator to re-import; the direct provider calls
+  only `getValidToken` and imported profiles have no refresh token.
+- Expanded handler tests cover unavailable live configuration, an imported
+  access-only live profile streaming through a mocked Responses fetch, expired
+  live profile failure, and response leak checks. The app README now separates
+  code/test proof from the still-pending hosted preview proof.
+
+Parent audit:
+
+1. Ownership and call graph: app-owned configuration selects app-owned layers;
+   `@bundjil/codex-oauth` remains the owner of profile/cipher/storage/provider
+   contracts. Eve, browser code, OAuth start/callback, and local cache access
+   are unchanged. The implemented graph matches the workaround SPEC.
+2. Implementation quality: reviewed complete layer composition, flat route
+   `Effect.gen`, typed `catchTags`, canonical schemas, and safe unavailable
+   service. No token refresh call, API-key fallback, direct environment read,
+   manual JSON parser/stringifier, unsafe cast, DTO mirror, or helper sprawl is
+   present in the new app code.
+3. Verification coverage: app typecheck, 8 handler tests, app build, smoke
+   test, fallback scans, `git diff --check`, Ultracite, Knip, workspace
+   typechecks/tests, and `bun run verification` passed. Tests prove the
+   imported profile route uses mocked fetch, preserves the live mode header,
+   fails closed on expiry/config absence, and does not leak internal or access
+   tokens.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 8 tests.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed.
+- `bun run verification`: passed.
+
+Commit: pending parent commit.
+
+### prove-personal-preview-workaround
+
+Status: Pending
+
+Parent acceptance requirements:
+
+- confirm personal Vercel project/scope and preview-only env names without
+  printing values; do not use Tilt Legal or production;
+- validate an invalid import source first, then optionally run the local
+  importer with an active user-approved local Codex session;
+- verify ciphertext-only Upstash storage, live health/auth/profile failure
+  probes, authenticated live stream, and Vercel log leak scans;
+- record sanitized proof evidence or a precise external-state blocker, then
+  complete the three audit passes and commit the documentation slice.

@@ -27,7 +27,6 @@ export type CodexProxyHealthResponse = typeof CodexProxyHealthResponse.Type;
 
 export const CodexProxyErrorCode = Schema.Literals([
   "bad_request",
-  "live_mode_unavailable",
   "not_found",
   "proxy_error",
   "unauthorized",

@@ -9,6 +9,7 @@ import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
 
 import { CodexProxyConfig, CodexProxyConfigLive } from "./env.js";
 import { CodexProxyRouteError } from "./errors.js";
+import { CodexProxyOpenAICompatibleProxyLiveOrUnavailable } from "./live.layer.js";
 import { CodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
 import {
   CodexProxyErrorResponse,
@@ -34,6 +35,12 @@ const errorResponse = (
     { status }
   ).pipe(Effect.orDie);
 
+const reimportRequiredResponse = errorResponse(
+  "proxy_error",
+  "Codex authorization is unavailable. Re-import the local Codex profile and try again.",
+  502
+);
+
 const healthRoute = Effect.gen(function* healthRoute() {
   const config = yield* CodexProxyConfig;
 
@@ -47,16 +54,6 @@ const healthRoute = Effect.gen(function* healthRoute() {
 const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
   Effect.gen(function* chatCompletionsRoute() {
     const config = yield* CodexProxyConfig;
-
-    if (config.mode === "live") {
-      return yield* new CodexProxyRouteError({
-        code: "live_mode_unavailable",
-        message:
-          "Live Codex proxy mode is not enabled in this implementation slice.",
-        responseMessage: "Live Codex proxy mode is not available yet.",
-        status: 503,
-      });
-    }
 
     const body = yield* request.text.pipe(
       Effect.mapError(
@@ -141,20 +138,13 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
       CodexResponsesStreamError: () =>
         errorResponse("proxy_error", "The proxy stream failed.", 502),
-      OAuthProfileNotFound: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      OAuthProfileSchemaError: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      OAuthProfileStorageError: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      CodexOAuthTokenMissing: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      CodexOAuthTokenExpired: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      CodexOAuthTokenProviderError: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
-      CodexOAuthUnsupportedRuntimePath: () =>
-        errorResponse("proxy_error", "Codex auth is not available.", 502),
+      OAuthProfileNotFound: () => reimportRequiredResponse,
+      OAuthProfileSchemaError: () => reimportRequiredResponse,
+      OAuthProfileStorageError: () => reimportRequiredResponse,
+      CodexOAuthTokenMissing: () => reimportRequiredResponse,
+      CodexOAuthTokenExpired: () => reimportRequiredResponse,
+      CodexOAuthTokenProviderError: () => reimportRequiredResponse,
+      CodexOAuthUnsupportedRuntimePath: () => reimportRequiredResponse,
     })
   );
 
@@ -170,12 +160,27 @@ export const CodexProxyRoutesLive = Layer.effectDiscard(
   })
 );
 
-export const makeCodexProxyAppLayer = (configLayer = CodexProxyConfigLive) =>
-  Layer.mergeAll(
-    configLayer,
-    CodexProxyOpenAICompatibleProxyMockLive,
-    CodexProxyRoutesLive
+const makeCodexProxyModeLayer = (
+  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable
+) =>
+  Layer.unwrap(
+    Effect.gen(function* makeCodexProxyModeLayer() {
+      const config = yield* CodexProxyConfig;
+
+      return config.mode === "mock"
+        ? CodexProxyOpenAICompatibleProxyMockLive
+        : liveProxyLayer;
+    })
   );
+
+export const makeCodexProxyAppLayer = (
+  configLayer = CodexProxyConfigLive,
+  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable
+) =>
+  Layer.mergeAll(
+    makeCodexProxyModeLayer(liveProxyLayer),
+    CodexProxyRoutesLive
+  ).pipe(Layer.provideMerge(configLayer));
 
 export const CodexProxyAppLive = makeCodexProxyAppLayer();
 

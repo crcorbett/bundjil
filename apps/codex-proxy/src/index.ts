@@ -8,6 +8,11 @@ export {
   makeCodexProxyWebHandler,
 } from "./server.js";
 export {
+  CodexProxyOpenAICompatibleProxyLive,
+  CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+  CodexProxyOpenAICompatibleProxyUnavailableLive,
+} from "./live.layer.js";
+export {
   CodexProxyConfig,
   CodexProxyConfigLayer,
   CodexProxyConfigLive,

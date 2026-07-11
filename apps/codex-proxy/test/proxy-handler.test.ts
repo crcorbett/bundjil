@@ -1,6 +1,18 @@
-import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
+import {
+  CodexOAuthProfile,
+  OpenAICompatibleChatCompletionRequest,
+} from "@bundjil/codex-oauth";
+import {
+  CodexDirectProviderLive,
+  CodexHttpClientLive,
+  OpenAICompatibleProxyLive,
+} from "@bundjil/codex-oauth/live.layer";
+import {
+  CodexOAuthMemory,
+  CodexResponsesFetchMock,
+} from "@bundjil/codex-oauth/mock.layer";
 import { assert, it } from "@effect/vitest";
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 import { describe, it as vitestIt } from "vitest";
 
 import {
@@ -33,6 +45,37 @@ const testConfig = makeCodexProxyConfig({
   },
 });
 
+const liveTestConfig = makeCodexProxyConfig({
+  internalToken: "test-internal-token",
+  mode: "live",
+  subject: {
+    connectorId: "bundjil-codex-proxy",
+    installationId: "test",
+    principal: {
+      id: "test",
+      issuer: "https://auth.openai.com",
+      type: "chatgpt-user",
+    },
+    profileId: "default",
+    provider: "codex",
+  },
+});
+
+const makeLiveProfile = (expiresAtEpochMillis: number) =>
+  Effect.gen(function* makeImportedLiveProfile() {
+    const config = yield* liveTestConfig;
+
+    return yield* Schema.decodeUnknownEffect(CodexOAuthProfile)({
+      subject: config.subject,
+      accessToken: "live-access-token",
+      expiresAtEpochMillis,
+      scopes: [],
+      createdAtEpochMillis: 1_700_000_000_000,
+      updatedAtEpochMillis: 1_700_000_000_000,
+      requiresReauthentication: true,
+    });
+  });
+
 const testWebHandler = Effect.gen(function* makeTestWebHandler() {
   const config = yield* testConfig;
 
@@ -40,6 +83,49 @@ const testWebHandler = Effect.gen(function* makeTestWebHandler() {
     makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
   );
 });
+
+const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
+  Effect.gen(function* makeLiveProxyLayer() {
+    const profile = yield* makeLiveProfile(expiresAtEpochMillis);
+    const httpClient = CodexHttpClientLive.pipe(
+      Layer.provide(
+        CodexResponsesFetchMock({
+          fetch: () =>
+            Effect.succeed(
+              new Response(
+                [
+                  'data: {"type":"response.output_text.delta","delta":"Live OK."}',
+                  'data: {"type":"response.completed"}',
+                  "",
+                ].join("\n"),
+                {
+                  headers: { "content-type": "text/event-stream" },
+                  status: 200,
+                }
+              )
+            ),
+        })
+      )
+    );
+    const directProvider = CodexDirectProviderLive.pipe(
+      Layer.provideMerge(Layer.merge(CodexOAuthMemory([profile]), httpClient))
+    );
+
+    return OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider));
+  });
+
+const liveTestWebHandler = (expiresAtEpochMillis: number) =>
+  Effect.gen(function* makeLiveTestWebHandler() {
+    const config = yield* liveTestConfig;
+    const liveProxyLayer = yield* makeLiveProxyLayer(expiresAtEpochMillis);
+
+    return makeCodexProxyWebHandler(
+      makeCodexProxyAppLayer(
+        CodexProxyConfigLayer(config),
+        liveProxyLayer.pipe(Layer.orDie)
+      )
+    );
+  });
 
 const chatCompletionRequest = (authorization?: string) =>
   new Request("https://bundjil.local/v1/chat/completions", {
@@ -65,6 +151,15 @@ const withTestHandler = <A>(
 ) =>
   Effect.acquireRelease(testWebHandler, (webHandler) =>
     Effect.promise(() => webHandler.dispose())
+  ).pipe(Effect.flatMap((webHandler) => run(webHandler.handler)));
+
+const withLiveTestHandler = <A>(
+  expiresAtEpochMillis: number,
+  run: (handler: TestFetchHandler) => Effect.Effect<A>
+) =>
+  Effect.acquireRelease(
+    liveTestWebHandler(expiresAtEpochMillis),
+    (webHandler) => Effect.promise(() => webHandler.dispose())
   ).pipe(Effect.flatMap((webHandler) => run(webHandler.handler)));
 
 describe("@bundjil/codex-proxy Effect HTTP handler", () => {
@@ -144,6 +239,78 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         assert.match(body, /^data: /);
         assert.match(body, /Bundjil Codex proxy mock response/);
         assert.match(body, /data: \[DONE\]/);
+      })
+    )
+  );
+
+  it.effect("fails closed when live configuration is unavailable", () =>
+    Effect.gen(function* testUnavailableLiveConfiguration() {
+      const config = yield* liveTestConfig;
+      const webHandler = makeCodexProxyWebHandler(
+        makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+      );
+      const response = yield* Effect.acquireRelease(
+        Effect.succeed(webHandler),
+        (handler) => Effect.promise(() => handler.dispose())
+      ).pipe(
+        Effect.flatMap((handler) =>
+          Effect.promise(() =>
+            handler.handler(chatCompletionRequest("Bearer test-internal-token"))
+          )
+        )
+      );
+      const body = yield* Effect.promise(() => response.text());
+      const payload = yield* Schema.decodeUnknownEffect(
+        Schema.fromJsonString(CodexProxyErrorResponse)
+      )(body).pipe(Effect.orDie);
+
+      assert.strictEqual(response.status, 502);
+      assert.strictEqual(payload.error.code, "proxy_error");
+      assert.match(payload.error.message, /Re-import the local Codex profile/);
+      assert.strictEqual(body.includes("test-internal-token"), false);
+      assert.strictEqual(body.includes("OPENAI_API_KEY"), false);
+    })
+  );
+
+  it.effect(
+    "streams an imported access-only live profile through mocked fetch",
+    () =>
+      withLiveTestHandler(Date.now() + 60_000, (handler) =>
+        Effect.gen(function* testImportedLiveProfileStream() {
+          const response = yield* Effect.promise(() =>
+            handler(chatCompletionRequest("Bearer test-internal-token"))
+          );
+          const body = yield* Effect.promise(() => response.text());
+
+          assert.strictEqual(response.status, 200);
+          assert.strictEqual(
+            response.headers.get("x-bundjil-codex-proxy-mode"),
+            "live"
+          );
+          assert.match(body, /Live OK\./);
+          assert.match(body, /data: \[DONE\]/);
+          assert.strictEqual(body.includes("live-access-token"), false);
+        })
+      )
+  );
+
+  it.effect("fails closed when the imported live profile has expired", () =>
+    withLiveTestHandler(-1, (handler) =>
+      Effect.gen(function* testExpiredImportedLiveProfile() {
+        const response = yield* Effect.promise(() =>
+          handler(chatCompletionRequest("Bearer test-internal-token"))
+        );
+        const body = yield* Effect.promise(() => response.text());
+        const payload = yield* Schema.decodeUnknownEffect(
+          Schema.fromJsonString(CodexProxyErrorResponse)
+        )(body).pipe(Effect.orDie);
+
+        assert.strictEqual(response.status, 502);
+        assert.match(
+          payload.error.message,
+          /Re-import the local Codex profile/
+        );
+        assert.strictEqual(body.includes("live-access-token"), false);
       })
     )
   );

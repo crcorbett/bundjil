@@ -67,7 +67,7 @@
     {
       "id": "compose-access-only-live-proxy-mode",
       "title": "Compose access-only live proxy mode",
-      "status": "pending",
+      "status": "completed",
       "description": "Wire apps/codex-proxy live mode to encrypted Upstash profiles and the direct Codex provider while preserving mock mode.",
       "implementationNotes": [
         "Compose live dependencies through explicit layers after Effect config decoding; do not introduce import-time environment branching.",
@@ -91,8 +91,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: apps/codex-proxy owns live-mode selection and composition, while @bundjil/codex-oauth continues to own encryption, storage, OAuth, fetch, and direct-provider contracts. The app selects mock or live only after CodexProxyConfig decoding and leaves Eve unchanged.",
+          "Parent audit 2 - Effect implementation quality: reviewed explicit layers for encrypted store, cipher, Upstash store, refresh lock, unsupported OAuth client, OAuth service, HTTP client, direct provider, and proxy. Route errors remain typed in .pipe(catchTags); live profiles call getValidToken only. No refresh fallback, platform API-key fallback, process.env, JSON.stringify, JSON.parse, unsafe cast, or DTO mapper was introduced.",
+          "Parent audit 3 - verification coverage: app check-types, 8 app handler tests, app build, smoke test, static fallback scans, git diff --check, Ultracite, Knip, workspace typechecks, workspace tests, and full bun run verification passed. Tests prove mock preservation, unavailable live config, imported access-only profile stream through mocked fetch, expiry fail-closed handling, 401 auth, and no token/API-key leakage in responses."
+        ]
       },
       "commitAfterPassing": true
     },

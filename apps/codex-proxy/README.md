@@ -2,9 +2,11 @@
 
 Private Effect HTTP proxy for Bundjil Codex subscription model access.
 
-This app exposes the first deployable HTTP boundary for the Codex provider
-work. It is private by bearer token, starts in mock mode, and does not call the
-live Codex backend yet. Eve can opt into this app through
+This app exposes the deployable HTTP boundary for the Codex provider work. It
+is private by bearer token and starts in mock mode. Its live composition can
+read only an encrypted, access-token-only profile supplied by the trusted-local
+import command; it has not received a hosted Vercel preview proof yet. Eve can
+opt into this app through
 `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`, while Gateway remains the default
 model path.
 
@@ -20,10 +22,17 @@ Implemented:
   personal Vercel account, not Tilt Legal.
 - Eve app opt-in model-provider wiring through an AI SDK OpenAI-compatible
   `LanguageModel`.
+- Explicit live composition of the encrypted profile store, cipher, Upstash
+  KeyValueStore, refresh lock, OAuth service, direct provider, and private
+  proxy contract.
+- Fail-closed live handling: missing configuration, profile storage failures,
+  missing profiles, and expired profiles return a sanitized 502 that tells the
+  operator to re-import the local profile. Imported profiles have no refresh
+  token, so the proxy never refreshes them.
 
 Future:
 
-- Hosted live Codex calls.
+- Personal Vercel preview proof for access-token-only live calls.
 - Live OAuth endpoint exchange and token refresh.
 - Hosted token-profile storage after `@bundjil/codex-oauth` adds
   application-side envelope encryption.
@@ -50,8 +59,11 @@ data: {"id":"chatcmpl-bundjil-codex-proxy-mock",...}
 data: [DONE]
 ```
 
-In `live` mode, this implementation slice returns HTTP 503. Live Codex calls
-remain gated on the deployment and storage tasks in the spec.
+In `live` mode, the app composes the direct Codex Responses provider through
+encrypted Upstash profile storage. A valid imported profile can stream a
+response. Any unavailable configuration, missing profile, expiry, or storage
+failure returns a generic HTTP 502 with a re-import instruction; it never
+falls back to mock mode, an API key, or token refresh.
 
 ## Environment
 
@@ -67,6 +79,15 @@ Config is parsed in `src/env.ts` with Effect `Config`, `Config.schema`,
 - `BUNDJIL_CODEX_SUBJECT_ID`: optional, defaults to `default`.
 - `BUNDJIL_CODEX_ACCOUNT_ID`: optional Codex account id.
 - `PORT`: optional local dev port, defaults to `8787`.
+
+Live mode also needs the profile cipher and Upstash configuration documented in
+[`@bundjil/codex-oauth`](../../packages/codex-oauth/README.md):
+`BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`,
+`BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`, and either
+`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` or the Vercel-provided
+`KV_REST_API_URL` / `KV_REST_API_TOKEN` aliases. Run the local importer before
+starting live mode; do not set any of these values in a browser bundle, CI, or
+committed file.
 
 Do not commit `.env` files or token values.
 
@@ -159,8 +180,10 @@ Request
   -> HttpRouter.toWebHandler(...)
   -> apps/codex-proxy/src/server.ts routes
   -> CodexProxyConfig
-  -> OpenAICompatibleProxy.handleChatCompletions(input)
-  -> app-owned CodexDirectProvider mock layer
+  -> CodexProxyConfig selects mock or live layer
+  -> mock: app-owned deterministic CodexDirectProvider
+  -> live: encrypted profile -> CodexOAuthService.getValidToken
+      -> direct Codex Responses provider
   -> OpenAI-compatible SSE Response
 ```
 
@@ -173,6 +196,9 @@ bun run --filter @bundjil/codex-proxy test
   -> unauthenticated POST returns 401
   -> invalid-token POST returns 401
   -> authenticated mock POST streams SSE
+  -> live mode with unavailable config returns a re-import-safe 502
+  -> imported access-only profile streams through mocked Codex fetch
+  -> expired imported profile returns a re-import-safe 502
 
 bun run --filter @bundjil/codex-proxy smoke-test
   -> ephemeral local Bun server
@@ -180,8 +206,8 @@ bun run --filter @bundjil/codex-proxy smoke-test
   -> authenticated mock OpenAI-compatible SSE
 ```
 
-The production target path is not used by this app until hosted storage,
-refresh, and live-mode verification are completed.
+The live composition is code- and test-proven only. Do not call it a hosted
+integration until the separate personal Vercel preview proof task completes.
 
 ## Vercel Deployment
 
