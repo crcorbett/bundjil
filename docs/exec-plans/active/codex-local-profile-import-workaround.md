@@ -22,10 +22,10 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 `prove-personal-preview-workaround`
 
-The code path is accepted. The next task is external-state proof only: confirm
-the personal Vercel scope and preview-only Upstash/cipher configuration, run
-the local importer intentionally, deploy a preview in live mode, then record
-sanitized HTTP, ciphertext, and log evidence. Production remains untouched.
+`prove-personal-preview-workaround` is blocked on personal preview storage
+provisioning. The code path is accepted, but the Vercel project has no Upstash
+or cipher environment variables. Do not substitute API keys, raw token storage,
+or Tilt Legal resources. Production remains untouched.
 
 ## Baseline Evidence
 
@@ -164,7 +164,7 @@ Commit: pending parent commit.
 
 ### prove-personal-preview-workaround
 
-Status: Pending
+Status: Blocked 2026-07-11
 
 Parent acceptance requirements:
 
@@ -176,3 +176,28 @@ Parent acceptance requirements:
   probes, authenticated live stream, and Vercel log leak scans;
 - record sanitized proof evidence or a precise external-state blocker, then
   complete the three audit passes and commit the documentation slice.
+
+Read-only external-state evidence:
+
+- Executor Personal Vercel API confirms project `bundjil-codex-proxy` belongs
+  to the personal team `team_1LX7ZujbijowTv8J9k0aU7nD`, has root directory
+  `apps/codex-proxy`, Node `24.x`, and preview-ready deployments. No Tilt Legal
+  project or resource was selected.
+- Its preview environment currently contains only
+  `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` and `BUNDJIL_CODEX_PROXY_MODE`, both
+  marked sensitive. It does not contain a cipher key/id or any
+  `UPSTASH_REDIS_REST_*` / `KV_REST_API_*` variable.
+- The local Vercel CLI is not installed and no `apps/codex-proxy/.vercel`
+  project link exists. The Executor Personal Vercel API was used instead; no
+  environment value was requested or displayed.
+- Without an explicitly personal Upstash resource and preview-only cipher
+  configuration, an importer run cannot store an encrypted profile and a live
+  proxy deployment must remain unavailable. The task is therefore blocked on
+  provider configuration, not on code, tests, or an OAuth redirect grant.
+
+Deferred audit status:
+
+- The 3-pass audit will be recorded only after a real preview proof can test
+  personal-resource ownership, ciphertext-only storage, authenticated live
+  stream behavior, and Vercel log leakage. The code-level audit for the
+  preceding tasks is complete; this task has no valid hosted evidence yet.
