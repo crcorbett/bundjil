@@ -17,12 +17,11 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`run-real-local-login-tracer` is ready for implementation through
-`prd-implementer`. The personal preview configuration is accepted: canonical
-subject names now match the trusted-local login command, storage connectivity
-is proven without value access, and production remains inactive. The next task
-may start the owner browser login locally; Vercel still exposes no OAuth browser
-route.
+`enable-refresh-capable-live-proxy` is ready for implementation through
+`prd-implementer`. The real owner login and encrypted V2 subscription-profile
+readback are accepted as the preceding gate. The next task may compose hosted
+refresh and private proxy mode in preview; Vercel still exposes no OAuth
+browser route, and production remains inactive.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -493,4 +492,4 @@ Parent audit:
    passed; no deployment, production/development mutation, model call, or Eve
    wiring occurred.
 
-Commit: pending parent commit of this accepted tracer slice.
+Commit: `9b68998` (`feat: prove live codex subscription login`).
