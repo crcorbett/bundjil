@@ -9,6 +9,8 @@ import {
 import type { CodexDirectProviderInputType } from "@bundjil/codex-oauth";
 import { Effect, Layer, Schema } from "effect";
 
+import { CodexProxyReadyLive } from "./readiness.service.js";
+
 export const CodexProxyMockDirectProviderLive = Layer.succeed(
   CodexDirectProvider,
   {
@@ -75,4 +77,7 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
 export const CodexProxyOpenAICompatibleProxyMockLive = Layer.effect(
   OpenAICompatibleProxy,
   makeOpenAICompatibleProxy
-).pipe(Layer.provide(CodexProxyMockDirectProviderLive));
+).pipe(
+  Layer.provide(CodexProxyMockDirectProviderLive),
+  Layer.merge(CodexProxyReadyLive)
+);

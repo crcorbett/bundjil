@@ -115,6 +115,22 @@ export const CodexOAuthTokenRefreshResult = Schema.Struct({
 export type CodexOAuthTokenRefreshResult =
   typeof CodexOAuthTokenRefreshResult.Type;
 
+export const CodexOAuthCredential = Schema.Struct({
+  accessToken: CodexOAuthAccessToken,
+  accountId: CodexOAuthAccountId,
+  credentialRevision: CodexOAuthCredentialRevision,
+});
+
+export type CodexOAuthCredential = typeof CodexOAuthCredential.Type;
+
+export const CodexOAuthRecoverAfterUnauthorizedInput = Schema.Struct({
+  subject: CodexOAuthSubject,
+  observedCredentialRevision: CodexOAuthCredentialRevision,
+});
+
+export type CodexOAuthRecoverAfterUnauthorizedInput =
+  typeof CodexOAuthRecoverAfterUnauthorizedInput.Type;
+
 export const CodexOAuthProfileVersion = Schema.Literal(2);
 
 export type CodexOAuthProfileVersion = typeof CodexOAuthProfileVersion.Type;
@@ -280,6 +296,15 @@ export const CodexOAuthRefreshLockTtlMillis = Schema.Int.pipe(
 
 export type CodexOAuthRefreshLockTtlMillis =
   typeof CodexOAuthRefreshLockTtlMillis.Type;
+
+export const CodexOAuthRefreshPolicy = Schema.Struct({
+  refreshSkewMillis: Schema.Int.pipe(
+    Schema.check(Schema.isGreaterThanOrEqualTo(0))
+  ),
+  lockTtlMillis: CodexOAuthRefreshLockTtlMillis,
+});
+
+export type CodexOAuthRefreshPolicy = typeof CodexOAuthRefreshPolicy.Type;
 
 export const CodexOAuthRefreshLockOwner = Schema.RedactedFromValue(
   Schema.NonEmptyString

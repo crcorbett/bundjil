@@ -273,7 +273,7 @@
     {
       "id": "enable-refresh-capable-live-proxy",
       "title": "Enable refresh-capable private live proxy mode",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["run-real-local-login-tracer"],
       "description": "Implement proactive fenced refresh, atomic credentials, revision-aware 401 recovery, explicit app errors/readiness, and private live composition without OAuth browser routes.",
       "implementationNotes": [
@@ -303,8 +303,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: @bundjil/codex-oauth owns canonical credential, refresh-policy, refresh-client, profile lifecycle, lock, fenced-CAS, and bounded-401 services. apps/codex-proxy owns app config, explicit live composition, readiness, private routes, and HTTP error mapping; local remains a separate legacy access-only composition and Vercel exposes no OAuth route.",
+          "Parent audit 2 - implementation quality: reviewed explicit Context services and Layers, Effect Config schemas, Redacted credential boundaries, canonical Effect Schemas, tagged errors, named Effects, Effect Platform HTTP transport, revision-aware fenced writes, and stable route schemas. Scans found no raw JSON, package process.env reads, unsafe casts, DTO mirrors, or stale claim that live is access-token-only; reviewed provider source protocol retains form code exchange and JSON refresh deliberately.",
+          "Parent audit 3 - verification coverage: parent independently ran codex-oauth 99/99 tests, typecheck, and build; codex-proxy 16/16 tests, typecheck, build, and smoke (health 200, stream 200); and bun run verification across six workspaces. Tests cover lifecycle/rotation, no-mutation failures, legacy refusal, bounded 401 replay, readiness/error mapping, local/mock preservation, and leak checks. git diff --check and task JSON validation passed."
+        ]
       },
       "commitAfterPassing": true
     },

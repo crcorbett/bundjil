@@ -25,11 +25,13 @@ import {
   CodexOAuthServiceLive,
 } from "./live.layer.js";
 import { CodexOAuthClient } from "./oauth-client.service.js";
+import { CodexOAuthRefreshPolicyTest } from "./oauth-refresh.config.js";
 import { CodexOAuthObserver } from "./observer.service.js";
 import { CodexOAuthProfileCipherConfigService } from "./profile-cipher.config.js";
 import { CodexProfileStore } from "./profile-store.service.js";
 import {
   CodexOAuthRefreshLock,
+  defaultCodexOAuthRefreshLockTtlMillis,
   makeCodexOAuthRefreshLock,
 } from "./refresh-lock.service.js";
 import { CodexOAuthObserverSnapshot, CodexOAuthProfile } from "./schemas.js";
@@ -60,6 +62,7 @@ export interface CodexOAuthClientMockOptions {
   readonly loginStart?: CodexOAuthLoginStartResult;
   readonly loginProfile?: CodexOAuthProfileType;
   readonly refreshResult?: CodexOAuthTokenRefreshResult;
+  readonly refresh?: CodexOAuthClient["Service"]["refresh"];
 }
 
 export interface CodexResponsesFetchMockOptions {
@@ -76,6 +79,7 @@ export const CodexResponsesFetchMock = (
 export interface CodexHttpClientMockOptions {
   readonly postResponses?: CodexResponsesProofResult;
   readonly postResponsesStream?: CodexResponsesStreamResult;
+  readonly postResponsesStreamEffect?: CodexHttpClient["Service"]["postResponsesStream"];
 }
 
 export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
@@ -90,16 +94,21 @@ export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
             })
           )
         : Effect.succeed(options.postResponses),
-    postResponsesStream: () =>
-      options.postResponsesStream === undefined
-        ? Effect.fail(
-            new CodexHttpNetworkError({
-              operation: "postResponsesStream",
-              message: "CodexHttpClientMock.postResponsesStream is not seeded.",
-              cause: "missing mock postResponsesStream result",
-            })
-          )
-        : Effect.succeed(options.postResponsesStream),
+    postResponsesStream: (input) => {
+      if (options.postResponsesStreamEffect !== undefined) {
+        return options.postResponsesStreamEffect(input);
+      }
+      if (options.postResponsesStream === undefined) {
+        return Effect.fail(
+          new CodexHttpNetworkError({
+            operation: "postResponsesStream",
+            message: "CodexHttpClientMock.postResponsesStream is not seeded.",
+            cause: "missing mock postResponsesStream result",
+          })
+        );
+      }
+      return Effect.succeed(options.postResponsesStream);
+    },
   });
 
 export interface CodexDirectProviderMockOptions {
@@ -135,16 +144,21 @@ export const CodexOAuthClientMock = (
             })
           )
         : Effect.succeed(options.loginProfile),
-    refresh: () =>
-      options.refreshResult === undefined
-        ? Effect.fail(
-            new OAuthProfileStorageError({
-              operation: "seedProfiles",
-              message: "Mock refresh requires a seeded refresh result.",
-              cause: "missing mock refresh result",
-            })
-          )
-        : Effect.succeed(options.refreshResult),
+    refresh: (input) => {
+      if (options.refresh !== undefined) {
+        return options.refresh(input);
+      }
+      if (options.refreshResult === undefined) {
+        return Effect.fail(
+          new OAuthProfileStorageError({
+            operation: "seedProfiles",
+            message: "Mock refresh requires a seeded refresh result.",
+            cause: "missing mock refresh result",
+          })
+        );
+      }
+      return Effect.succeed(options.refreshResult);
+    },
     revoke: () => Effect.void,
   });
 
@@ -488,23 +502,38 @@ export const CodexOAuthRefreshLockMemory = Layer.effect(
   }).pipe(Effect.withSpan("CodexOAuthRefreshLockMemory"))
 );
 
+const defaultCodexOAuthRefreshPolicy = {
+  refreshSkewMillis: 0,
+  lockTtlMillis: defaultCodexOAuthRefreshLockTtlMillis,
+};
+
 export const CodexOAuthMemory = (
   profiles: readonly CodexOAuthProfileType[] = [],
-  clientOptions: CodexOAuthClientMockOptions = {}
+  clientOptions: CodexOAuthClientMockOptions = {},
+  refreshPolicy = defaultCodexOAuthRefreshPolicy
 ) => {
   const state = CodexOAuthMemoryProfilesLive(profiles);
   const observer = CodexOAuthObserverMemory;
   const client = CodexOAuthClientMock(clientOptions);
   const refreshLock = CodexOAuthRefreshLockMemory;
+  const policy = CodexOAuthRefreshPolicyTest(refreshPolicy);
   const store = CodexProfileStoreMemoryLive.pipe(Layer.provide(state));
   const commit = CodexOAuthProfileCommitMemory.pipe(
     Layer.provideMerge(Layer.merge(state, observer))
   );
   const service = CodexOAuthServiceLive.pipe(
     Layer.provideMerge(
-      Layer.mergeAll(store, commit, client, observer, refreshLock)
+      Layer.mergeAll(store, commit, client, observer, refreshLock, policy)
     )
   );
 
-  return Layer.mergeAll(store, commit, client, observer, refreshLock, service);
+  return Layer.mergeAll(
+    store,
+    commit,
+    client,
+    observer,
+    refreshLock,
+    policy,
+    service
+  );
 };

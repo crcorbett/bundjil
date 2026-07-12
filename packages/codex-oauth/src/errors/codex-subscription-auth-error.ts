@@ -40,5 +40,7 @@ export class CodexSubscriptionAuthError extends Schema.TaggedErrorClass<CodexSub
     operation: CodexSubscriptionAuthOperation,
     reason: CodexSubscriptionAuthFailureReason,
     message: Schema.NonEmptyString,
+    status: Schema.optional(Schema.Int),
+    providerCode: Schema.optional(Schema.NonEmptyString),
   }
 ) {}

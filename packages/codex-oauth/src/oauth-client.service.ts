@@ -1,7 +1,11 @@
 import { Context, Effect } from "effect";
 
 import { CodexOAuthUnsupportedRuntimePath } from "./errors.js";
-import type { CodexOAuthClientOperation, CodexOAuthFailure } from "./errors.js";
+import type {
+  CodexOAuthClientOperation,
+  CodexOAuthFailure,
+  CodexSubscriptionAuthError,
+} from "./errors.js";
 import type {
   CodexOAuthLoginCallback,
   CodexOAuthLoginStart,
@@ -21,7 +25,10 @@ export interface CodexOAuthClientShape {
   ) => Effect.Effect<CodexOAuthProfile, CodexOAuthFailure>;
   readonly refresh: (
     input: CodexOAuthRefreshInput
-  ) => Effect.Effect<CodexOAuthTokenRefreshResult, CodexOAuthFailure>;
+  ) => Effect.Effect<
+    CodexOAuthTokenRefreshResult,
+    CodexOAuthFailure | CodexSubscriptionAuthError
+  >;
   readonly revoke: (
     input: CodexOAuthRevokeInput
   ) => Effect.Effect<void, CodexOAuthFailure>;

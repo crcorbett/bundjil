@@ -138,9 +138,10 @@ start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
 Codex proxy mode is not an Eve test requirement. Gateway remains the default;
-do not use the access-token-only workaround to wire Eve to a preview proxy.
-When a separate Eve integration SPEC authorizes it, source ignored env values
-rather than printing them:
+the implemented refresh-capable `live` path is not yet wired into Eve, and the
+access-token-only `local` workaround must never be used as hosted auth. When a
+separate Eve integration task is accepted after hosted preview proof, source
+ignored env values rather than printing them:
 
 ```bash
 PORT=<local-port> \
@@ -150,7 +151,8 @@ bun run --filter @bundjil/codex-proxy dev
 
 Use the dedicated proxy runbook in
 [`apps/codex-proxy/README.md`](../../apps/codex-proxy/README.md) for mock,
-local filesystem, preview live, expiry/re-import, and rollback operations.
+access-token-only local filesystem, refresh-capable preview live,
+reauthentication, and rollback operations.
 
 ## Codex Proxy Verification
 
@@ -169,7 +171,8 @@ decodes it through the owning Effect Schema boundary.
 Record no request body or model output. Checks must run against the personal
 Vercel preview before any production proposal and must scan logs for absence of
 token values, authorization codes, raw OAuth payloads, prompts, and full
-response bodies.
+response bodies. The refresh-capable code path is implemented, but this hosted
+preview proof is still pending and must not be inferred from local tests.
 
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.
@@ -233,12 +236,12 @@ proof counters belong in docs. Do not record bearer values, OAuth token
 values, refresh token values, authorization codes, raw OAuth payloads, full
 prompts, or full model responses.
 
-For the current workaround, rollback is setting preview
+For the current refresh-capable preview composition, rollback is setting preview
 `BUNDJIL_CODEX_PROXY_MODE` to `mock` and deploying another preview. The
-filesystem proof is revoked by deleting its ignored directory. Rotate Vercel or
-Upstash credentials through provider controls if exposure is suspected; never
-print the old value. Production deployment needs a later explicit approval and
-is not covered by this runbook.
+access-token-only filesystem proof is revoked by deleting its ignored
+directory. Rotate Vercel or Upstash credentials through provider controls if
+exposure is suspected; never print the old value. Production deployment needs
+a later explicit approval and is not covered by this runbook.
 
 ## Documentation Quality
 

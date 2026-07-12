@@ -20,6 +20,9 @@ export {
   CodexOAuthTokenExpired,
   CodexOAuthTokenMissing,
   CodexOAuthTokenProviderError,
+  CodexOAuthAuthTemporarilyUnavailable,
+  CodexOAuthReauthenticationRequired,
+  CodexOAuthTemporaryFailureReason,
   CodexOAuthUnsupportedRuntimePath,
   CodexRequestMapperOperation,
   CodexProfileStoreFailure,
@@ -139,6 +142,7 @@ export type {
 } from "./codex-http-client.service.js";
 export {
   CodexDirectProvider,
+  makeCodexLegacyDirectProvider,
   makeCodexDirectProvider,
   streamChatCompletion,
 } from "./codex-direct-provider.service.js";
@@ -184,12 +188,20 @@ export {
   CodexOAuthService,
   completeLogin,
   getValidToken,
+  getValidCredential,
   makeCodexOAuthService,
   refreshAccessToken,
+  recoverAfterUnauthorized,
   revokeToken,
   startLogin,
 } from "./oauth.service.js";
 export type { CodexOAuthServiceShape } from "./oauth.service.js";
+export {
+  CodexOAuthRefreshPolicyService,
+  CodexOAuthRefreshPolicyTest,
+  loadCodexOAuthRefreshPolicy,
+} from "./oauth-refresh.config.js";
+export { makeCodexOAuthRefreshClient } from "./oauth-refresh-client.service.js";
 export {
   CodexLocalProfileImportService,
   importCodexLocalProfile,
@@ -263,6 +275,7 @@ export {
   CodexOAuthCodeVerifier,
   CodexOAuthCodeExchangeInput,
   CodexOAuthConnectorId,
+  CodexOAuthCredential,
   CodexOAuthCredentialRevision,
   CodexOAuthInstallationId,
   CodexOAuthIdToken,
@@ -287,6 +300,8 @@ export {
   CodexOAuthProfileId,
   CodexOAuthProvider,
   CodexOAuthRefreshInput,
+  CodexOAuthRefreshPolicy,
+  CodexOAuthRecoverAfterUnauthorizedInput,
   CodexOAuthRefreshResponse,
   CodexOAuthRefreshTransportInput,
   CodexOAuthRefreshToken,
@@ -362,6 +377,7 @@ export type {
   CodexOAuthCodeVerifier as CodexOAuthCodeVerifierType,
   CodexOAuthCodeExchangeInput as CodexOAuthCodeExchangeInputType,
   CodexOAuthConnectorId as CodexOAuthConnectorIdType,
+  CodexOAuthCredential as CodexOAuthCredentialType,
   CodexOAuthCredentialRevision as CodexOAuthCredentialRevisionType,
   CodexOAuthInstallationId as CodexOAuthInstallationIdType,
   CodexOAuthIdToken as CodexOAuthIdTokenType,
@@ -386,6 +402,8 @@ export type {
   CodexOAuthProfileId as CodexOAuthProfileIdType,
   CodexOAuthProvider as CodexOAuthProviderType,
   CodexOAuthRefreshInput as CodexOAuthRefreshInputType,
+  CodexOAuthRefreshPolicy as CodexOAuthRefreshPolicyType,
+  CodexOAuthRecoverAfterUnauthorizedInput as CodexOAuthRecoverAfterUnauthorizedInputType,
   CodexOAuthRefreshResponse as CodexOAuthRefreshResponseType,
   CodexOAuthRefreshTransportInput as CodexOAuthRefreshTransportInputType,
   CodexOAuthRefreshToken as CodexOAuthRefreshTokenType,

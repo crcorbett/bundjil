@@ -17,11 +17,11 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`enable-refresh-capable-live-proxy` is ready for implementation through
-`prd-implementer`. The real owner login and encrypted V2 subscription-profile
-readback are accepted as the preceding gate. The next task may compose hosted
-refresh and private proxy mode in preview; Vercel still exposes no OAuth
-browser route, and production remains inactive.
+`run-hosted-refresh-preview-proof` is the next task. The real owner login,
+encrypted V2 subscription-profile readback, and refresh-capable proxy
+implementation are accepted as preceding gates. This task may create personal
+preview-only proof evidence; Vercel still exposes no OAuth browser route, and
+production remains inactive.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -493,3 +493,90 @@ Parent audit:
    wiring occurred.
 
 Commit: `9b68998` (`feat: prove live codex subscription login`).
+
+### enable-refresh-capable-live-proxy
+
+Status: accepted; parent commit pending.
+
+Sanitized implementation notes:
+
+- `@bundjil/codex-oauth` now owns `CodexOAuthCredential`, refresh policy
+  config, refresh-only OAuth client composition, proactive validity checks,
+  distributed-lock refresh, fenced profile rotation, permanent
+  reauthentication marking, and revision-aware unauthorized recovery.
+- The refresh path re-reads under the lock, preserves omitted refresh/account
+  fields only from the current subscription profile, validates access-token
+  JWT expiry, rejects cross-account metadata, and uses the revision fence for
+  every stored generation. Transient network, timeout, rate-limit, and
+  provider-5xx failures leave the stored profile unchanged.
+- `CodexDirectProvider` performs at most one replay after a provider 401. A
+  newer credential revision wins; an unchanged rejected revision is force
+  refreshed. A second 401 becomes a reauthentication requirement and unrelated
+  failures are never replayed.
+- `apps/codex-proxy` composes the encrypted store, Upstash profile commit,
+  Upstash refresh lock, Effect Platform OAuth HTTP transport, refresh client,
+  and direct provider only for `live`. `local` retains the legacy filesystem
+  provider and `mock` remains the default.
+- Live readiness is explicit. Unavailable live construction returns HTTP 503
+  with `ok: false`; permanent credentials map to HTTP 502
+  `codex_reauthentication_required`, temporary auth failures map to HTTP 503
+  `codex_auth_temporarily_unavailable`, and other provider failures remain a
+  sanitized HTTP 502.
+- No OAuth browser route, API-key fallback, mock fallback, retry loop, Vercel
+  mutation, deployment, production action, provider request, live browser,
+  or Eve wiring was added or run.
+
+Implementation verification:
+
+- `@bundjil/codex-oauth`: typecheck and build passed; 99 tests passed across
+  10 files.
+- `@bundjil/codex-proxy`: typecheck and build passed; 16 tests passed; mock
+  smoke test returned health 200 and stream 200.
+- `bun run verification`: passed across all six workspaces, including
+  Ultracite, Knip, typechecks, builds required by the task graph, and tests.
+- `git diff --check`, task JSON validation, and stale/leak scans passed.
+
+Call graph:
+
+```text
+POST /v1/chat/completions
+  -> CodexProxyRoutesLive
+  -> OpenAICompatibleProxy.handleChatCompletions
+  -> CodexDirectProvider.streamChatCompletion
+  -> CodexOAuthService.getValidCredential
+  -> CodexProfileStoreEncryptedKeyValueLive
+  -> optional UpstashCodexOAuthRefreshLockLive
+  -> CodexOAuthRefreshClientLive
+  -> CodexOAuthHttpClientLive
+  -> UpstashCodexOAuthProfileCommitLive fenced CAS
+  -> CodexHttpClient.postResponsesStream
+  -> first 401 only: recoverAfterUnauthorized -> winner or forced refresh
+  -> one replay -> stream or stable sanitized error
+```
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns canonical
+   credentials, refresh policy/client, encrypted profile lifecycle, lock,
+   fenced-CAS commit, and bounded recovery. `apps/codex-proxy` owns app config,
+   live composition, readiness, routes, and sanitized HTTP mapping. Legacy
+   `local` remains separate and access-token-only; no browser OAuth boundary
+   enters Vercel, Eve, routes, CI, or browser bundles.
+2. Implementation quality: reviewed explicit Context services and Layers,
+   Effect Config schemas, Redacted credential boundaries, canonical Schemas,
+   tagged errors, named Effects, Effect Platform HTTP transport, revision-aware
+   writes, and route response schemas. Targeted scans found no raw JSON,
+   package `process.env`, unsafe casts, DTO mirrors, or stale live-mode claims.
+   The reviewed provider protocol intentionally retains a form-encoded code
+   exchange and JSON refresh request.
+3. Verification coverage: parent independently ran OAuth 99/99 tests,
+   typecheck, and build; proxy 16/16 tests, typecheck, build, and smoke
+   (`healthStatus: 200`, `streamStatus: 200`); and `bun run verification`
+   across all six workspaces. The tests cover proactive/forced refresh,
+   fencing, no-mutation errors, legacy refusal, one 401 replay, readiness,
+   error contracts, local/mock preservation, and leak safety. `git diff
+   --check` and task JSON validation passed.
+
+Remaining gap: the later hosted preview proof task has not run. This accepted
+implementation made no deployment, remote configuration change, production
+action, provider request, or Eve wiring.

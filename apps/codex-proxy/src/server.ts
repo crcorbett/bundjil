@@ -15,6 +15,7 @@ import {
   makeCodexProxyOpenAICompatibleProxyLocal,
 } from "./local.layer.js";
 import { CodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
+import { CodexProxyReadiness } from "./readiness.service.js";
 import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
@@ -39,20 +40,30 @@ const errorResponse = (
     { status }
   ).pipe(Effect.orDie);
 
-const reimportRequiredResponse = errorResponse(
-  "proxy_error",
-  "Codex authorization is unavailable. Re-import the local Codex profile and try again.",
+const reauthenticationRequiredResponse = errorResponse(
+  "codex_reauthentication_required",
+  "Codex authorization requires a new trusted-local login.",
   502
+);
+
+const authTemporarilyUnavailableResponse = errorResponse(
+  "codex_auth_temporarily_unavailable",
+  "Codex authorization is temporarily unavailable.",
+  503
 );
 
 const healthRoute = Effect.gen(function* healthRoute() {
   const config = yield* CodexProxyConfig;
+  const readiness = yield* CodexProxyReadiness;
 
-  return yield* healthJson({
-    mode: config.mode,
-    ok: true,
-    service: "bundjil-codex-proxy",
-  }).pipe(Effect.orDie);
+  return yield* healthJson(
+    {
+      mode: config.mode,
+      ok: readiness.ready,
+      service: "bundjil-codex-proxy",
+    },
+    { status: readiness.ready ? 200 : 503 }
+  ).pipe(Effect.orDie);
 });
 
 const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
@@ -142,13 +153,23 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
       CodexResponsesStreamError: () =>
         errorResponse("proxy_error", "The proxy stream failed.", 502),
-      OAuthProfileNotFound: () => reimportRequiredResponse,
-      OAuthProfileSchemaError: () => reimportRequiredResponse,
-      OAuthProfileStorageError: () => reimportRequiredResponse,
-      CodexOAuthTokenMissing: () => reimportRequiredResponse,
-      CodexOAuthTokenExpired: () => reimportRequiredResponse,
-      CodexOAuthTokenProviderError: () => reimportRequiredResponse,
-      CodexOAuthUnsupportedRuntimePath: () => reimportRequiredResponse,
+      OAuthProfileNotFound: () => reauthenticationRequiredResponse,
+      OAuthProfileSchemaError: () => reauthenticationRequiredResponse,
+      OAuthProfileStorageError: () => authTemporarilyUnavailableResponse,
+      CodexOAuthTokenMissing: () => reauthenticationRequiredResponse,
+      CodexOAuthTokenExpired: () => reauthenticationRequiredResponse,
+      CodexOAuthTokenProviderError: () => reauthenticationRequiredResponse,
+      CodexOAuthReauthenticationRequired: () =>
+        reauthenticationRequiredResponse,
+      CodexOAuthAuthTemporarilyUnavailable: () =>
+        authTemporarilyUnavailableResponse,
+      CodexOAuthRefreshLockError: () => authTemporarilyUnavailableResponse,
+      CodexSubscriptionAuthError: () => authTemporarilyUnavailableResponse,
+      CodexOAuthProfileCommitConflict: () => authTemporarilyUnavailableResponse,
+      CodexOAuthProfileCommitError: () => authTemporarilyUnavailableResponse,
+      CodexOAuthProfileCipherError: () => reauthenticationRequiredResponse,
+      CodexOAuthUnsupportedRuntimePath: () =>
+        authTemporarilyUnavailableResponse,
     })
   );
 

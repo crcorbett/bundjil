@@ -1,24 +1,33 @@
 import {
-  CodexOAuthProfileCommitUnsupported,
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
 } from "@bundjil/codex-oauth";
 import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
-  CodexOAuthClientLive,
+  CodexOAuthHttpClientLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
+  CodexOAuthRefreshClientLive,
+  CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
   CodexResponsesFetchLive,
+  CodexSubscriptionAuthProtocolConfigLive,
   OpenAICompatibleProxyLive,
 } from "@bundjil/codex-oauth/live.layer";
 import {
+  UpstashCodexOAuthProfileCommitLive,
   UpstashCodexOAuthRefreshLockLive,
   UpstashKeyValueStoreLive,
 } from "@bundjil/codex-oauth/upstash-key-value-store.layer";
+import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
+
+import {
+  CodexProxyReadyLive,
+  CodexProxyUnavailableLive,
+} from "./readiness.service.js";
 
 const CodexProxyEncryptedProfileStoreLive =
   CodexProfileStoreEncryptedKeyValueLive.pipe(
@@ -33,12 +42,30 @@ const CodexProxyEncryptedProfileStoreLive =
   );
 
 const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
-  Layer.provide(CodexOAuthProfileCommitUnsupported),
   Layer.provideMerge(
     Layer.mergeAll(
       CodexProxyEncryptedProfileStoreLive,
-      CodexOAuthClientLive,
-      UpstashCodexOAuthRefreshLockLive
+      UpstashCodexOAuthProfileCommitLive.pipe(
+        Layer.provide(
+          CodexOAuthProfileCipherLive.pipe(
+            Layer.provide(CodexOAuthProfileCipherConfigLive)
+          )
+        )
+      ),
+      UpstashCodexOAuthRefreshLockLive,
+      CodexOAuthRefreshPolicyLive,
+      CodexOAuthRefreshClientLive.pipe(
+        Layer.provide(
+          CodexOAuthHttpClientLive.pipe(
+            Layer.provideMerge(
+              Layer.merge(
+                CodexSubscriptionAuthProtocolConfigLive,
+                BunHttpClient.layer
+              )
+            )
+          )
+        )
+      )
     )
   )
 );
@@ -53,8 +80,10 @@ const CodexProxyDirectProviderLive = CodexDirectProviderLive.pipe(
   )
 );
 
-export const CodexProxyOpenAICompatibleProxyLive =
-  OpenAICompatibleProxyLive.pipe(Layer.provide(CodexProxyDirectProviderLive));
+export const CodexProxyOpenAICompatibleProxyLive = Layer.merge(
+  OpenAICompatibleProxyLive.pipe(Layer.provide(CodexProxyDirectProviderLive)),
+  CodexProxyReadyLive
+);
 
 export const CodexProxyOpenAICompatibleProxyUnavailableLive = Layer.succeed(
   OpenAICompatibleProxy,
@@ -68,7 +97,7 @@ export const CodexProxyOpenAICompatibleProxyUnavailableLive = Layer.succeed(
       });
     }),
   })
-);
+).pipe(Layer.merge(CodexProxyUnavailableLive));
 
 export const CodexProxyOpenAICompatibleProxyLiveOrUnavailable =
   CodexProxyOpenAICompatibleProxyLive.pipe(

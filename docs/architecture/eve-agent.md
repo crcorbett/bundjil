@@ -105,13 +105,16 @@ Current Codex provider state:
   mock proof, trusted-local encrypted filesystem proof, direct Codex Responses
   package proof, and a personal-Vercel preview `live` composition over
   encrypted Upstash storage.
-- The live composition accepts only an imported short-lived access token. It
-  fails closed on expiry and requires a trusted-local re-import; it neither
-  stores nor refreshes refresh or ID tokens.
-- Future: trusted-local personal subscription sign-in and fenced encrypted
-  hosted refresh under the successor SPEC. Those are not yet supplied by the
-  access-token-only preview workaround, and Vercel will expose no OAuth browser
-  callback.
+- The `live` composition is refresh-capable. It reads the encrypted subscription
+  profile, refreshes inside skew under a distributed lock, fenced-CAS commits
+  each generation, and performs one revision-aware replay after a provider 401.
+  It persists no ID token.
+- The trusted-local browser/loopback PKCE login writes that encrypted profile.
+  Vercel exposes no OAuth start or callback route. `local` remains the separate
+  access-token-only filesystem proof and never refreshes.
+- Pending: sanitized hosted preview proof and wiring the refresh-capable live
+  proxy into Eve. Gateway remains the Eve default until those steps are
+  accepted.
 - Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
   Codex OAuth through Vercel AI Gateway credentials, deploying
   `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.
@@ -172,7 +175,8 @@ Tests prove all three compositions without provider credentials. `mock` remains
 the default. `local` is a trusted Bun-only proof, while `live` is a personal
 Vercel preview composition that must be exercised through the sanitized
 operator runbook before it is described as a live-provider proof. No production
-mode, profile, cipher configuration, or deployment was set by Bundjil.
+mode or deployment was set by Bundjil, and the refresh-capable live path is not
+wired into Eve.
 
 The `workspace_status` tool runtime path is:
 
@@ -413,9 +417,9 @@ BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=<optional-positive-integer>
 
 Rules:
 
-- Keep Gateway mode as the default. The access-token-only preview workaround
-  does not authorize an Eve integration; changing that boundary requires a
-  separate SPEC.
+- Keep Gateway mode as the default. Implementing refresh-capable `live` proxy
+  behavior does not authorize an Eve integration; hosted preview proof and a
+  separate accepted integration task are still required.
 - Put the internal proxy token only in ignored env files or Vercel env vars.
 - Keep `BUNDJIL_CODEX_PROXY_BASE_URL` pointed at the private proxy `/v1`
   prefix, not the direct `chatgpt.com` endpoint.
@@ -460,9 +464,9 @@ type, SSE data-line count, `[DONE]` presence, and leak booleans. Do not record
 bearer tokens, OAuth tokens, refresh tokens, authorization codes, raw OAuth
 payloads, prompts, or full model responses.
 
-For the workaround, rollback is preview mode change to `mock` or agent config
-rollback to Gateway. Production rollback is not relevant because Bundjil did
-not deploy production:
+For the preview composition, rollback is a preview mode change to `mock` or an
+agent config rollback to Gateway. Production rollback is not relevant because
+Bundjil did not deploy production:
 
 ```bash
 vercel rollback <deployment-id-or-url>

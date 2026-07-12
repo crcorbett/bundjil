@@ -625,7 +625,7 @@ it.effect(
         subject,
         accessToken: "observer-fresh-access-token-secret",
         refreshToken: "observer-fresh-refresh-token-secret",
-        accountId: "acct-observer-fresh-secret",
+        accountId: "acct-observer-secret",
         expiresAtEpochMillis: Date.now() + 60_000,
         updatedAtEpochMillis: 1_700_000_020_000,
       });

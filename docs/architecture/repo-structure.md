@@ -135,10 +135,10 @@ after the shape has survived at least one real tool/channel implementation.
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider
   behavior is involved;
-- currently composes only the accepted access-token fallback, but may add the
-  SPEC-gated personal subscription design: trusted-local loopback PKCE login,
-  explicit legacy/subscription profile variants, encrypted refresh persistence,
-  fenced profile commits, and distributed refresh locking;
+- owns the implemented personal subscription design: trusted-local loopback
+  PKCE login, explicit legacy/subscription profile variants, encrypted refresh
+  persistence, atomic credentials, fenced profile commits, distributed refresh
+  locking, and bounded 401 recovery;
 - must keep browser launch, callback server, PKCE state/verifier, and
   authorization code inside the trusted-local command boundary; Vercel, Eve,
   routes, CI, and browser bundles must not import that boundary;
@@ -152,9 +152,11 @@ after the shape has survived at least one real tool/channel implementation.
 - may compose `@bundjil/codex-oauth` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
-- currently composes encrypted access-token-only `live` mode for personal
-  preview; after the successor SPEC's local-login, fenced-refresh, and preview
-  proof tasks pass, it may compose refresh-capable subscription credentials;
+- composes refresh-capable encrypted `live` mode for personal preview using the
+  package-owned OAuth refresh transport, Upstash lock, fenced profile commit,
+  and encrypted profile store. The hosted preview proof is still pending;
+- keeps the trusted filesystem `local` mode access-token-only and rejects that
+  mode on Vercel;
 - must expose no OAuth browser start/callback route, must fail closed, and must
   never fall back to API keys or mock output after a live auth failure.
 - must keep `mock` as the default, reject filesystem `local` mode on Vercel,
@@ -170,6 +172,8 @@ after the shape has survived at least one real tool/channel implementation.
 - may construct an AI SDK `LanguageModel` for the private proxy;
 - must keep AI Gateway as the default provider until hosted live Codex proxy
   proof passes;
+- must not wire the refresh-capable hosted live proxy into Eve until that
+  preview proof and a separate integration task are accepted;
 - must not import `CodexOAuthService`, `CodexProfileStore`, direct Codex HTTP
   clients, or hosted token storage adapters.
 

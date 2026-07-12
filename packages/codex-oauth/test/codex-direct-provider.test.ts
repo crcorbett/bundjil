@@ -223,8 +223,8 @@ it.effect(
           Effect.fail(
             new CodexHttpStatusError({
               operation: "postResponsesStream",
-              status: 401,
-              statusText: "Unauthorized",
+              status: 403,
+              statusText: "Forbidden",
               contentType: "application/json",
               message:
                 "Codex Responses endpoint returned an unsuccessful status.",

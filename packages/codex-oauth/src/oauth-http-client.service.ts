@@ -1,4 +1,12 @@
-import { Context, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  Context,
+  Effect,
+  Layer,
+  Match,
+  Option,
+  Redacted,
+  Schema,
+} from "effect";
 import {
   HttpClient,
   HttpClientRequest,
@@ -63,14 +71,34 @@ const decodeProviderRejection = Effect.fn(
   response: HttpClientResponse.HttpClientResponse,
   operation: "exchangeAuthorizationCode" | "refreshToken"
 ) {
-  yield* HttpClientResponse.schemaBodyJson(CodexOAuthProviderErrorResponse)(
-    response
-  ).pipe(Effect.mapError(() => mapResponseFailure(operation)));
+  const providerError = yield* HttpClientResponse.schemaBodyJson(
+    CodexOAuthProviderErrorResponse
+  )(response).pipe(Effect.option);
+
+  if (Option.isNone(providerError)) {
+    if (response.status === 429 || response.status >= 500) {
+      return yield* new CodexSubscriptionAuthError({
+        operation,
+        reason: "providerRejected",
+        message: "The Codex OAuth token endpoint rejected the request.",
+        status: response.status,
+      });
+    }
+
+    return yield* mapResponseFailure(operation);
+  }
+
+  const providerCode = Match.value(providerError.value.error).pipe(
+    Match.when(Match.string, (value) => value),
+    Match.orElse((value) => value.code)
+  );
 
   return yield* new CodexSubscriptionAuthError({
     operation,
     reason: "providerRejected",
     message: "The Codex OAuth token endpoint rejected the request.",
+    status: response.status,
+    ...(providerCode === undefined ? {} : { providerCode }),
   });
 });
 

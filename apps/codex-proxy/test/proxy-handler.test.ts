@@ -1,5 +1,10 @@
 import {
   CodexAccessTokenImportProfile,
+  CodexHttpStatusError,
+  CodexOAuthAuthTemporarilyUnavailable,
+  CodexOAuthReauthenticationRequired,
+  OpenAICompatibleProxy,
+  CodexSubscriptionProfile,
   OpenAICompatibleChatCompletionRequest,
   putProfile,
 } from "@bundjil/codex-oauth";
@@ -33,6 +38,7 @@ import {
   makeCodexProxyConfig,
   makeCodexProxyOpenAICompatibleProxyLocal,
   makeCodexProxyWebHandler,
+  CodexProxyReadyLive,
   toCodexProxyVercelRequest,
 } from "../src/index.js";
 
@@ -104,6 +110,28 @@ const makeLiveProfile = (expiresAtEpochMillis: number) =>
   Effect.gen(function* makeImportedLiveProfile() {
     const config = yield* liveTestConfig;
 
+    return yield* Schema.decodeUnknownEffect(CodexSubscriptionProfile)({
+      profileVersion: 2,
+      profileKind: "subscription",
+      subject: config.subject,
+      accessToken: "live-access-token",
+      refreshToken: "live-refresh-token",
+      expiresAtEpochMillis,
+      accountId: "live-account-id",
+      protocolScopeVersion: "codex-cli-rs-v1",
+      scopes: [],
+      createdAtEpochMillis: 1_700_000_000_000,
+      updatedAtEpochMillis: 1_700_000_000_000,
+      lastRefreshedAtEpochMillis: 1_700_000_000_000,
+      credentialRevision: "live-revision",
+      requiresReauthentication: false,
+    });
+  });
+
+const makeLocalProfile = (expiresAtEpochMillis: number) =>
+  Effect.gen(function* makeImportedLocalProfile() {
+    const config = yield* localTestConfig("/tmp/bundjil-local-test");
+
     return yield* Schema.decodeUnknownEffect(CodexAccessTokenImportProfile)({
       profileVersion: 2,
       profileKind: "access-token-import",
@@ -152,7 +180,10 @@ const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
       Layer.provideMerge(Layer.merge(CodexOAuthMemory([profile]), httpClient))
     );
 
-    return OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider));
+    return Layer.merge(
+      OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider)),
+      CodexProxyReadyLive
+    );
   });
 
 const liveTestWebHandler = (expiresAtEpochMillis: number) =>
@@ -203,6 +234,45 @@ const withLiveTestHandler = <A>(
     (webHandler) => Effect.promise(() => webHandler.dispose())
   ).pipe(Effect.flatMap((webHandler) => run(webHandler.handler)));
 
+const makeFailureProxyLayer = (
+  error:
+    | CodexOAuthReauthenticationRequired
+    | CodexOAuthAuthTemporarilyUnavailable
+    | CodexHttpStatusError
+) =>
+  Layer.merge(
+    Layer.succeed(
+      OpenAICompatibleProxy,
+      OpenAICompatibleProxy.of({
+        handleChatCompletions: () => Effect.fail(error),
+      })
+    ),
+    CodexProxyReadyLive
+  );
+
+const withFailureHandler = <A>(
+  error:
+    | CodexOAuthReauthenticationRequired
+    | CodexOAuthAuthTemporarilyUnavailable
+    | CodexHttpStatusError,
+  run: (handler: TestFetchHandler) => Effect.Effect<A>
+) =>
+  Effect.gen(function* makeFailureHandler() {
+    const config = yield* liveTestConfig;
+    const webHandler = makeCodexProxyWebHandler(
+      makeCodexProxyAppLayer(
+        CodexProxyConfigLayer(config),
+        makeFailureProxyLayer(error)
+      )
+    );
+
+    return yield* Effect.acquireUseRelease(
+      Effect.succeed(webHandler),
+      (handler) => run(handler.handler),
+      (handler) => Effect.promise(() => handler.dispose())
+    );
+  });
+
 const withTemporaryDirectory = <A, E, R>(
   use: (directory: string) => Effect.Effect<A, E, R>
 ) =>
@@ -243,7 +313,7 @@ const withLocalTestHandler = <A>(
 ) =>
   Effect.gen(function* makeLocalTestHandler() {
     const config = yield* localTestConfig(directory);
-    const profile = yield* makeLiveProfile(Date.now() + 60_000);
+    const profile = yield* makeLocalProfile(Date.now() + 60_000);
 
     yield* putProfile(profile).pipe(
       Effect.provide(makeLocalEncryptedProfileStore(directory))
@@ -440,12 +510,147 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         Schema.fromJsonString(CodexProxyErrorResponse)
       )(body).pipe(Effect.orDie);
 
-      assert.strictEqual(response.status, 502);
-      assert.strictEqual(payload.error.code, "proxy_error");
-      assert.match(payload.error.message, /Re-import the local Codex profile/);
+      assert.strictEqual(response.status, 503);
+      assert.strictEqual(
+        payload.error.code,
+        "codex_auth_temporarily_unavailable"
+      );
       assert.strictEqual(body.includes("test-internal-token"), false);
       assert.strictEqual(body.includes("OPENAI_API_KEY"), false);
     })
+  );
+
+  it.effect(
+    "reports live health as non-ready when configuration is unavailable",
+    () =>
+      Effect.gen(function* testUnavailableLiveHealth() {
+        const config = yield* liveTestConfig;
+        const webHandler = makeCodexProxyWebHandler(
+          makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+        );
+        const response = yield* Effect.acquireUseRelease(
+          Effect.succeed(webHandler),
+          (handler) =>
+            Effect.promise(() =>
+              handler.handler(new Request("https://bundjil.local/health"))
+            ),
+          (handler) => Effect.promise(() => handler.dispose())
+        );
+        const body = yield* Effect.promise(() => response.text());
+        const payload = yield* Schema.decodeUnknownEffect(
+          Schema.fromJsonString(CodexProxyHealthResponse)
+        )(body).pipe(Effect.orDie);
+
+        assert.strictEqual(response.status, 503);
+        assert.strictEqual(payload.ok, false);
+        assert.strictEqual(payload.mode, "live");
+        assert.strictEqual(body.includes("UPSTASH"), false);
+      })
+  );
+
+  it.effect(
+    "maps permanent credential failure to the stable reauthentication error",
+    () =>
+      Effect.gen(function* testReauthenticationError() {
+        const config = yield* liveTestConfig;
+
+        return yield* withFailureHandler(
+          new CodexOAuthReauthenticationRequired({
+            profileId: config.subject.profileId,
+            message: "Sanitized package failure.",
+          }),
+          (handler) =>
+            Effect.gen(function* assertReauthenticationResponse() {
+              const response = yield* Effect.promise(() =>
+                handler(chatCompletionRequest("Bearer test-internal-token"))
+              );
+              const body = yield* Effect.promise(() => response.text());
+              const payload = yield* Schema.decodeUnknownEffect(
+                Schema.fromJsonString(CodexProxyErrorResponse)
+              )(body).pipe(Effect.orDie);
+
+              assert.strictEqual(response.status, 502);
+              assert.strictEqual(
+                payload.error.code,
+                "codex_reauthentication_required"
+              );
+              assert.strictEqual(
+                body.includes("Sanitized package failure"),
+                false
+              );
+            })
+        );
+      })
+  );
+
+  it.effect("maps transient auth failure to the stable temporary error", () =>
+    withFailureHandler(
+      new CodexOAuthAuthTemporarilyUnavailable({
+        reason: "providerUnavailable",
+        message: "Sanitized package failure.",
+      }),
+      (handler) =>
+        Effect.gen(function* assertTemporaryResponse() {
+          const response = yield* Effect.promise(() =>
+            handler(chatCompletionRequest("Bearer test-internal-token"))
+          );
+          const body = yield* Effect.promise(() => response.text());
+          const payload = yield* Schema.decodeUnknownEffect(
+            Schema.fromJsonString(CodexProxyErrorResponse)
+          )(body).pipe(Effect.orDie);
+
+          assert.strictEqual(response.status, 503);
+          assert.strictEqual(
+            payload.error.code,
+            "codex_auth_temporarily_unavailable"
+          );
+          assert.strictEqual(body.includes("Sanitized package failure"), false);
+        })
+    )
+  );
+
+  it.effect("keeps non-auth provider failures as sanitized 502 responses", () =>
+    withFailureHandler(
+      new CodexHttpStatusError({
+        operation: "postResponsesStream",
+        status: 500,
+        statusText: "Provider detail secret",
+        contentType: "application/json",
+        message: "Sanitized package failure.",
+      }),
+      (handler) =>
+        Effect.gen(function* assertProviderResponse() {
+          const response = yield* Effect.promise(() =>
+            handler(chatCompletionRequest("Bearer test-internal-token"))
+          );
+          const body = yield* Effect.promise(() => response.text());
+          const payload = yield* Schema.decodeUnknownEffect(
+            Schema.fromJsonString(CodexProxyErrorResponse)
+          )(body).pipe(Effect.orDie);
+
+          assert.strictEqual(response.status, 502);
+          assert.strictEqual(payload.error.code, "proxy_error");
+          assert.strictEqual(body.includes("Provider detail secret"), false);
+          assert.strictEqual(body.includes("Sanitized package failure"), false);
+        })
+    )
+  );
+
+  it.effect("does not expose hosted OAuth browser routes", () =>
+    withTestHandler((handler) =>
+      Effect.gen(function* testNoOAuthRoutes() {
+        const response = yield* Effect.promise(() =>
+          handler(new Request("https://bundjil.local/oauth/start"))
+        );
+        const body = yield* Effect.promise(() => response.text());
+        const payload = yield* Schema.decodeUnknownEffect(
+          Schema.fromJsonString(CodexProxyErrorResponse)
+        )(body).pipe(Effect.orDie);
+
+        assert.strictEqual(response.status, 404);
+        assert.strictEqual(payload.error.code, "not_found");
+      })
+    )
   );
 
   it.effect(
@@ -481,10 +686,10 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           Schema.fromJsonString(CodexProxyErrorResponse)
         )(body).pipe(Effect.orDie);
 
-        assert.strictEqual(response.status, 502);
-        assert.match(
-          payload.error.message,
-          /Re-import the local Codex profile/
+        assert.strictEqual(response.status, 503);
+        assert.strictEqual(
+          payload.error.code,
+          "codex_auth_temporarily_unavailable"
         );
         assert.strictEqual(body.includes("live-access-token"), false);
       })
@@ -502,7 +707,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             );
             const body = yield* Effect.promise(() => response.text());
 
-            assert.strictEqual(response.status, 200);
+            assert.strictEqual(response.status, 200, body);
             assert.strictEqual(
               response.headers.get("x-bundjil-codex-proxy-mode"),
               "local"

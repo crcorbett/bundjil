@@ -28,6 +28,8 @@ export type CodexProxyHealthResponse = typeof CodexProxyHealthResponse.Type;
 
 export const CodexProxyErrorCode = Schema.Literals([
   "bad_request",
+  "codex_auth_temporarily_unavailable",
+  "codex_reauthentication_required",
   "not_found",
   "proxy_error",
   "unauthorized",

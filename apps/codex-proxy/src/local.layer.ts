@@ -5,11 +5,12 @@ import {
 } from "@bundjil/codex-oauth";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex-oauth/filesystem-key-value-store.layer";
 import {
-  CodexDirectProviderLive,
+  CodexLegacyDirectProviderLive,
   CodexHttpClientLive,
   CodexOAuthClientLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
+  CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
   CodexResponsesFetchLive,
@@ -17,6 +18,11 @@ import {
 } from "@bundjil/codex-oauth/live.layer";
 import { CodexOAuthRefreshLockMemory } from "@bundjil/codex-oauth/mock.layer";
 import { ConfigProvider, Effect, Layer } from "effect";
+
+import {
+  CodexProxyReadyLive,
+  CodexProxyUnavailableLive,
+} from "./readiness.service.js";
 
 export const CodexProxyOpenAICompatibleProxyLocalUnavailableLive =
   Layer.succeed(
@@ -31,7 +37,7 @@ export const CodexProxyOpenAICompatibleProxyLocalUnavailableLive =
         });
       }),
     })
-  );
+  ).pipe(Layer.merge(CodexProxyUnavailableLive));
 
 const makeCodexProxyEncryptedFileSystemProfileStoreLive = (
   directory: string,
@@ -65,7 +71,8 @@ const makeCodexProxyOAuthServiceLocal = (
           configProviderLayer
         ),
         CodexOAuthClientLive,
-        CodexOAuthRefreshLockMemory
+        CodexOAuthRefreshLockMemory,
+        CodexOAuthRefreshPolicyLive
       )
     )
   );
@@ -75,16 +82,20 @@ export const makeCodexProxyOpenAICompatibleProxyLocal = (
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv()),
   responsesFetchLayer = CodexResponsesFetchLive
 ) =>
-  OpenAICompatibleProxyLive.pipe(
-    Layer.provide(
-      CodexDirectProviderLive.pipe(
-        Layer.provideMerge(
-          Layer.merge(
-            makeCodexProxyOAuthServiceLocal(directory, configProviderLayer),
-            CodexHttpClientLive.pipe(Layer.provide(responsesFetchLayer))
+  Layer.merge(
+    OpenAICompatibleProxyLive.pipe(
+      Layer.provide(
+        CodexLegacyDirectProviderLive.pipe(
+          Layer.provideMerge(
+            Layer.merge(
+              makeCodexProxyOAuthServiceLocal(directory, configProviderLayer),
+              CodexHttpClientLive.pipe(Layer.provide(responsesFetchLayer))
+            )
           )
         )
       )
     ),
+    CodexProxyReadyLive
+  ).pipe(
     Layer.catchCause(() => CodexProxyOpenAICompatibleProxyLocalUnavailableLive)
   );

@@ -70,12 +70,28 @@ Implemented:
 - Memory layers for callback, browser, and OAuth HTTP boundaries. Automated
   login tests do not open a browser, contact OpenAI, or require credentials.
 
+Also implemented:
+
+- `CodexOAuthCredential` atomically carries the access token, account id, and
+  credential revision. `getValidCredential` bypasses valid profiles and
+  proactively refreshes profiles inside the configured skew.
+- Refresh runs under `CodexOAuthRefreshLock`, re-reads the winner under the
+  lease, validates the new access-token JWT expiry, preserves optional token
+  fields only under the reviewed protocol rules, rejects cross-account
+  metadata, and fenced-CAS commits every new generation.
+- Permanent provider credential failure fenced-marks reauthentication.
+  Network, timeout, rate-limit, and provider-5xx failures are typed as
+  temporary and do not mutate the profile.
+- `recoverAfterUnauthorized` uses a newer revision winner or forces one refresh
+  of the exact rejected revision. `CodexDirectProvider` permits one replay
+  after a 401 and stops after the second 401 or any unrelated failure.
+- Separate refresh-capable and legacy direct-provider layers keep hosted
+  `live` strict while preserving the trusted filesystem `local` path.
+
 Future:
 
-- Hosted refresh policy, bounded `401` recovery, and preview verification.
-- Integration of the refresh-capable profile into the private proxy live path.
-- The proxy continues to use the unsupported commit layer until the dedicated
-  refresh-capable live-proxy task is accepted.
+- Personal Vercel preview deployment and sanitized hosted proof.
+- Eve integration after the hosted proof is accepted.
 
 Unsupported:
 
@@ -98,8 +114,10 @@ Unsupported:
   `initialWrite`, revision-based `replace`, and legacy `replaceLegacy` have
   distinct atomic preconditions. `CodexProfileStore.putProfile` remains
   restricted to the legacy import path.
-- `CodexOAuthService` is the token lifecycle service.
-- `CodexOAuthClient` is the future provider-client boundary.
+- `CodexOAuthService` owns atomic credential validity, refresh, fenced
+  reauthentication marking, and revision-aware unauthorized recovery.
+- `CodexOAuthClient` is the provider-client boundary. The hosted refresh layer
+  exposes refresh only; browser login and revoke remain unsupported there.
 - `CodexSubscriptionAuthProtocolConfigService` owns the reviewed first-party
   public OAuth endpoints, client id, scopes, authorization parameters, and
   callback ports. These are package constants, not process configuration.
@@ -121,8 +139,10 @@ Unsupported:
   Codex Responses payloads.
 - `CodexStreamMapper` maps Codex Responses stream events into
   OpenAI-compatible SSE chunks.
-- `CodexDirectProvider` resolves a stored Codex access token, calls the direct
-  Codex Responses client, and returns an OpenAI-compatible stream.
+- `CodexDirectProvider` resolves an atomic credential, calls the direct Codex
+  Responses client, performs the single bounded 401 recovery, and returns an
+  OpenAI-compatible stream. `CodexLegacyDirectProviderLive` preserves the
+  access-token-only local proof without enabling refresh.
 - `OpenAICompatibleProxy` is a package-level private proxy contract that
   enforces an internal bearer token before delegating to the direct provider.
 - `UpstashKeyValueStoreLive` is an opt-in Vercel Marketplace / Upstash Redis
@@ -160,10 +180,10 @@ token values, prompts, and OAuth responses are not included in storage keys.
 - `CodexProfileStoreKeyValueLive`, exported from
   `@bundjil/codex-oauth/live.layer`, wires `CodexProfileStore` to
   `effect/unstable/persistence/KeyValueStore`.
-- `CodexOAuthClientLive` and `CodexOAuthServiceLive`, also exported from the
-  live subpath, are deterministic and non-networked in this slice. Client
-  operations fail with `CodexOAuthUnsupportedRuntimePath` until the live OAuth
-  task implements endpoint exchange.
+- `CodexOAuthRefreshClientLive`, `CodexOAuthRefreshPolicyLive`, and
+  `CodexOAuthServiceLive` form the hosted credential lifecycle. The refresh
+  client uses the package OAuth HTTP transport; login/browser operations stay
+  outside this hosted layer.
 - `CodexResponsesFetchLive`, `CodexHttpClientLive`, and
   `CodexResponsesProofLive`, exported from the live subpath, own the opt-in
   direct Codex Responses proof path. Tests can replace `CodexResponsesFetch`
@@ -264,10 +284,9 @@ implemented by scanning this prefix, so they operate on Bundjil-owned keys
 rather than the whole Redis database.
 
 The proxy's explicit preview `live` composition applies the package-owned
-AES-GCM cipher before this adapter receives an imported access-token-only
-profile. Upstash TLS and provider-managed at-rest encryption are still not
-enough to make unsupported refresh-token use safe, so this workaround never
-imports, stores, or refreshes refresh tokens.
+AES-GCM cipher before the Upstash adapter receives a refresh-capable
+subscription profile. Only the versioned encrypted envelope crosses the KV
+boundary; revision keys contain only the non-token CAS fence.
 
 Marketplace provisioning can auto-bind Upstash credentials to Vercel
 production as well as preview. Bundjil's proxy mode, cipher key, profile
@@ -351,9 +370,10 @@ Run it only on the trusted machine with an active local Codex ChatGPT login:
 bun run --filter @bundjil/codex-oauth import:local-profile
 ```
 
-That command remains the Upstash importer for the personal-Vercel preview
-path. For the separate local filesystem proof, use
-`import:local-profile:filesystem` instead; it never composes Upstash.
+That command remains a rollback-only access-import path. The refresh-capable
+personal preview path uses `login:subscription`. For the separate local
+filesystem proof, use `import:local-profile:filesystem`; it never composes
+Upstash.
 
 The command reads configuration through Effect `Config` and
 `ConfigProvider.fromEnv()`. It needs the existing encryption and Upstash

@@ -502,13 +502,13 @@ it.effect(
         error: "invalid_grant",
         error_description: "provider-secret-description",
       });
-      const makeErrorLayer = (body: string) => {
+      const makeErrorLayer = (body: string, status = 400) => {
         const client = HttpClient.make((request) =>
           Effect.succeed(
             HttpClientResponse.fromWeb(
               request,
               new Response(body, {
-                status: 400,
+                status,
                 headers: { "content-type": "application/json" },
               })
             )
@@ -542,9 +542,18 @@ it.effect(
           .refresh({ refreshToken: Redacted.make("refresh-secret") })
           .pipe(Effect.flip);
       }).pipe(Effect.provide(makeErrorLayer("not-json")));
+      const unavailableError = yield* Effect.gen(function* rejectUnavailable() {
+        const client = yield* CodexOAuthHttpClient;
+
+        return yield* client
+          .refresh({ refreshToken: Redacted.make("refresh-secret") })
+          .pipe(Effect.flip);
+      }).pipe(Effect.provide(makeErrorLayer("not-json", 503)));
 
       assert.strictEqual(exchangeError.reason, "providerRejected");
       assert.strictEqual(refreshError.reason, "tokenResponseInvalid");
+      assert.strictEqual(unavailableError.reason, "providerRejected");
+      assert.strictEqual(unavailableError.status, 503);
       assert.strictEqual(
         String(exchangeError).includes("provider-secret-description"),
         false
