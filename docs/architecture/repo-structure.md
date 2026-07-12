@@ -135,9 +135,15 @@ after the shape has survived at least one real tool/channel implementation.
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider
   behavior is involved;
-- must not compose durable refresh-token storage or hosted account-link OAuth
-  until a supported authorization design exists. The current imported profile
-  contains only an encrypted short-lived access token.
+- currently composes only the accepted access-token fallback, but may add the
+  SPEC-gated personal subscription design: trusted-local loopback PKCE login,
+  explicit legacy/subscription profile variants, encrypted refresh persistence,
+  fenced profile commits, and distributed refresh locking;
+- must keep browser launch, callback server, PKCE state/verifier, and
+  authorization code inside the trusted-local command boundary; Vercel, Eve,
+  routes, CI, and browser bundles must not import that boundary;
+- must not expose this personal design as public/multi-user auth, account
+  pooling, credential resale, or a stable OpenAI Platform replacement.
 
 `apps/codex-proxy`:
 
@@ -146,9 +152,11 @@ after the shape has survived at least one real tool/channel implementation.
 - may compose `@bundjil/codex-oauth` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
-- may compose encrypted access-token-only `live` mode only for the personal
-  Vercel preview after its storage, configuration, and secret checks pass;
-  this mode must fail closed and never refresh or fall back to mock.
+- currently composes encrypted access-token-only `live` mode for personal
+  preview; after the successor SPEC's local-login, fenced-refresh, and preview
+  proof tasks pass, it may compose refresh-capable subscription credentials;
+- must expose no OAuth browser start/callback route, must fail closed, and must
+  never fall back to API keys or mock output after a live auth failure.
 - must keep `mock` as the default, reject filesystem `local` mode on Vercel,
   and never enable production without a separate explicit approval.
 - must record preview direct HTTP proof for `/health`, unauthorized rejection,
@@ -206,6 +214,11 @@ Ignored source references are for inspection only:
   structure.
 - `.local/references/effect-v4` for Effect v4 source and API details.
 - `.local/references/eve` when present for Eve framework source.
+- `.local/references/opencode-openai-codex-auth` for pinned personal
+  interoperability research only; it is not a dependency or implementation
+  authority.
+- `.local/references/codex` for the pinned first-party authentication source
+  snapshot used as protocol authority during SPEC and implementation review.
 
 Do not copy code from references blindly. Use them to verify real APIs and
 adapt the pattern to Bundjil's package boundaries.

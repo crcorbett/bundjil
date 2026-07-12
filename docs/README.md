@@ -27,13 +27,13 @@ README.
 - [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
   specifies the research-gated Codex OAuth service, Effect KeyValueStore
   profile store, Eve model-provider wiring, and mandatory implementation audit.
-- [Hosted Codex Live OAuth Storage](./product-specs/codex-hosted-live-oauth-storage.md)
-  specifies the next hosted live Codex slice: OAuth revalidation, encrypted
-  token-profile storage, refresh locking, personal Vercel preview proof, and
-  mandatory implementation audits.
+- [Personal Codex Subscription Auth And Hosted Proxy](./product-specs/codex-hosted-live-oauth-storage.md)
+  specifies trusted-local loopback PKCE sign-in, versioned encrypted
+  refresh-capable profiles, fenced rotation, personal Vercel preview proof,
+  and mandatory implementation audits without a hosted OAuth callback.
 - [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
-  records the narrow access-token-only alternative while hosted account-link
-  OAuth remains blocked.
+  records the accepted access-token-only fallback while refresh-capable
+  personal subscription proof remains pending.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
   preserves the Parallel AI report that corrected the subscription-backed model
   access plan.

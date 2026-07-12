@@ -3,19 +3,34 @@ import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
-  CodexOAuthProfile,
+  CodexAccessTokenImportProfile,
+  CodexOAuthProfileCipherConfig,
+  CodexOAuthProfileCommit,
   CodexOAuthSubject,
+  CodexSubscriptionProfile,
   getProfile,
   putProfile,
   UpstashRedisKeyPrefix,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
-import { CodexProfileStoreKeyValueLive } from "../src/live.layer.js";
+import {
+  CodexProfileStoreEncryptedKeyValueLive,
+  CodexProfileStoreKeyValueLive,
+} from "../src/live.layer.js";
+import { CodexOAuthProfileCipherTest } from "../src/mock.layer.js";
+import {
+  codexOAuthProfileRevisionStorageKey,
+  codexOAuthProfileStorageKey,
+} from "../src/storage-keys.js";
 import {
   loadUpstashRedisConfig,
+  makeUpstashCodexOAuthProfileCommit,
   makeUpstashKeyValueStore,
 } from "../src/upstash-key-value-store.layer.js";
-import type { UpstashRedisKeyValueClient } from "../src/upstash-key-value-store.layer.js";
+import type {
+  UpstashRedisKeyValueClient,
+  UpstashRedisProfileCommitClient,
+} from "../src/upstash-key-value-store.layer.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString
@@ -40,15 +55,45 @@ const makeProfile = (
   subject: CodexOAuthSubjectType,
   expiresAtEpochMillis: number
 ) =>
-  Schema.decodeUnknownEffect(CodexOAuthProfile)({
+  Schema.decodeUnknownEffect(CodexAccessTokenImportProfile)({
+    profileVersion: 2,
+    profileKind: "access-token-import",
     subject,
     accessToken: "access-token-secret",
-    refreshToken: "refresh-token-secret",
     expiresAtEpochMillis,
-    scopes: ["openid", "profile", "email", "offline_access"],
+    scopes: [],
     createdAtEpochMillis: 1_700_000_000_000,
     updatedAtEpochMillis: 1_700_000_000_000,
+    requiresReauthentication: true,
+  });
+
+const makeSubscriptionProfile = (
+  subject: CodexOAuthSubjectType,
+  credentialRevision: string,
+  accessToken: string
+) =>
+  Schema.decodeUnknownEffect(CodexSubscriptionProfile)({
+    profileVersion: 2,
+    profileKind: "subscription",
+    subject,
+    accessToken,
+    refreshToken: "refresh-token-secret",
+    accountId: "acct_upstash",
+    protocolScopeVersion: "codex-cli-v1",
+    expiresAtEpochMillis: Date.now() + 60_000,
+    scopes: ["offline_access"],
+    createdAtEpochMillis: 1_700_000_000_000,
+    updatedAtEpochMillis: 1_700_000_000_000,
+    lastRefreshedAtEpochMillis: 1_700_000_000_000,
+    credentialRevision,
     requiresReauthentication: false,
+  });
+
+const makeCipherConfig = () =>
+  Schema.decodeUnknownEffect(CodexOAuthProfileCipherConfig)({
+    algorithm: "AES-GCM",
+    keyId: "test-key-v1",
+    keyMaterial: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
   });
 
 const makeKeyPrefix = (value: string) =>
@@ -56,6 +101,11 @@ const makeKeyPrefix = (value: string) =>
 
 const makeMockUpstashClient = () => {
   const values = new Map<string, string>();
+  const evalCalls: {
+    script: string;
+    keys: string[];
+    args: string[];
+  }[] = [];
   const client = {
     get: (key) => Promise.resolve(values.get(key) ?? null),
     set: (key, value) => {
@@ -93,9 +143,41 @@ const makeMockUpstashClient = () => {
 
       return Promise.resolve(scanResult);
     },
-  } satisfies UpstashRedisKeyValueClient;
+    eval: (script, keys, args) => {
+      evalCalls.push({
+        script,
+        keys,
+        args,
+      });
 
-  return { client, values };
+      const [profileKey = "", revisionKey = ""] = keys;
+      const [
+        operation = "",
+        expectedRevision = "",
+        encodedProfile = "",
+        nextRevision = "",
+      ] = args;
+      const currentProfile = values.get(profileKey) ?? null;
+      const currentRevision = values.get(revisionKey) ?? null;
+      const createConflict =
+        operation === "initialWrite" &&
+        (currentProfile !== null || currentRevision !== null);
+      const casConflict =
+        operation !== "initialWrite" &&
+        (currentRevision === null || currentRevision !== expectedRevision);
+
+      if (createConflict || casConflict) {
+        return Promise.resolve(0);
+      }
+
+      values.set(profileKey, encodedProfile);
+      values.set(revisionKey, nextRevision);
+
+      return Promise.resolve(1);
+    },
+  } satisfies UpstashRedisKeyValueClient & UpstashRedisProfileCommitClient;
+
+  return { client, values, evalCalls };
 };
 
 const failingUpstashClient = {
@@ -250,4 +332,143 @@ it.effect("maps Upstash provider failures to KeyValueStore errors", () =>
     assert.strictEqual(error.method, "get");
     assert.strictEqual(error.key, "test:failing");
   })
+);
+
+it.effect(
+  "uses create-only and fenced CAS Lua arguments for Upstash profile commits",
+  () =>
+    Effect.gen(function* testUpstashCommitArguments() {
+      const { client, values, evalCalls } = makeMockUpstashClient();
+      const keyPrefix = yield* makeKeyPrefix("test:");
+      const cipherConfig = yield* makeCipherConfig();
+      const subject = yield* fixtureSubject;
+      const profile = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-initial-secret",
+        "upstash-access-token-secret"
+      );
+      const commit = yield* makeUpstashCodexOAuthProfileCommit(client, {
+        keyPrefix,
+      }).pipe(Effect.provide(CodexOAuthProfileCipherTest(cipherConfig)));
+      const profileKey = yield* codexOAuthProfileStorageKey(subject);
+      const revisionKey = yield* codexOAuthProfileRevisionStorageKey(subject);
+
+      yield* commit.initialWrite(profile);
+
+      assert.strictEqual(evalCalls.length, 1);
+      const [evalCall] = evalCalls;
+
+      assert.isDefined(evalCall);
+      if (evalCall === undefined) {
+        return;
+      }
+
+      assert.include(evalCall.script, "initialWrite");
+      assert.deepStrictEqual(evalCall.keys, [
+        `test:${profileKey}`,
+        `test:${revisionKey}`,
+      ]);
+      assert.strictEqual(evalCall.args[0], "initialWrite");
+      assert.strictEqual(evalCall.args[1], "");
+      assert.strictEqual(evalCall.args[3], "rev-upstash-initial-secret");
+      assert.isDefined(values.get(`test:${profileKey}`));
+      assert.strictEqual(
+        values.get(`test:${revisionKey}`),
+        "rev-upstash-initial-secret"
+      );
+    })
+);
+
+it.effect(
+  "preserves Upstash winners across duplicate create and stale CAS attempts",
+  () =>
+    Effect.gen(function* testUpstashCommitConflicts() {
+      const { client, values } = makeMockUpstashClient();
+      const keyPrefix = yield* makeKeyPrefix("test:");
+      const cipherConfig = yield* makeCipherConfig();
+      const subject = yield* fixtureSubject;
+      const initialProfile = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-start-secret",
+        "upstash-start-token-secret"
+      );
+      const replacementProfile = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-winner-secret",
+        "upstash-winner-token-secret"
+      );
+      const staleProfile = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-stale-secret",
+        "upstash-stale-token-secret"
+      );
+      const keyValueStoreLayer = Layer.succeed(
+        KeyValueStore.KeyValueStore,
+        makeUpstashKeyValueStore(client, {
+          keyPrefix,
+        })
+      );
+      const cipherLayer = CodexOAuthProfileCipherTest(cipherConfig);
+      const profileStoreLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
+        Layer.provideMerge(keyValueStoreLayer),
+        Layer.provideMerge(cipherLayer)
+      );
+      const commitLayer = Layer.effect(
+        CodexOAuthProfileCommit,
+        makeUpstashCodexOAuthProfileCommit(client, {
+          keyPrefix,
+        })
+      ).pipe(Layer.provide(cipherLayer));
+
+      return yield* Effect.gen(function* commitAgainstSharedMockRedis() {
+        const commit = yield* CodexOAuthProfileCommit;
+
+        yield* commit.initialWrite(initialProfile);
+
+        const duplicateConflict = yield* commit
+          .initialWrite(replacementProfile)
+          .pipe(Effect.flip);
+
+        yield* commit.replace({
+          profile: replacementProfile,
+          expectedRevision: initialProfile.credentialRevision,
+        });
+
+        const staleConflict = yield* commit
+          .replace({
+            profile: staleProfile,
+            expectedRevision: initialProfile.credentialRevision,
+          })
+          .pipe(Effect.flip);
+        const storedProfile = yield* getProfile(subject);
+        const profileKey = yield* codexOAuthProfileStorageKey(subject);
+        const revisionKey = yield* codexOAuthProfileRevisionStorageKey(subject);
+
+        assert.strictEqual(
+          duplicateConflict._tag,
+          "CodexOAuthProfileCommitConflict"
+        );
+        assert.strictEqual(
+          staleConflict._tag,
+          "CodexOAuthProfileCommitConflict"
+        );
+        assert.strictEqual(storedProfile.profileKind, "subscription");
+        if (storedProfile.profileKind !== "subscription") {
+          return;
+        }
+        assert.strictEqual(
+          storedProfile.credentialRevision,
+          "rev-upstash-winner-secret"
+        );
+        assert.strictEqual(
+          Redacted.value(storedProfile.accessToken),
+          "upstash-winner-token-secret"
+        );
+        assert.isDefined(values.get(`test:${profileKey}`));
+        assert.strictEqual(
+          values.get(`test:${revisionKey}`),
+          "rev-upstash-winner-secret"
+        );
+      }).pipe(Effect.provide(Layer.merge(profileStoreLayer, commitLayer)));
+    })
 );

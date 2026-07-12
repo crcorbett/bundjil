@@ -25,6 +25,7 @@ import {
   CodexStreamMapper,
   makeCodexStreamMapper,
 } from "./codex-stream-mapper.js";
+import { CodexOAuthProfileCommitUnsupported } from "./commit.service.js";
 import {
   CodexOAuthProfileCipherError,
   OAuthProfileNotFound,
@@ -47,7 +48,7 @@ import {
 import { CodexProfileStore } from "./profile-store.service.js";
 import { CodexOAuthProfile, EncryptedCodexOAuthProfile } from "./schemas.js";
 import type {
-  CodexOAuthProfile as CodexOAuthProfileType,
+  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
   CodexOAuthSubject,
 } from "./schemas.js";
 import {
@@ -110,7 +111,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         return profile.value;
       }),
       putProfile: Effect.fn("CodexProfileStore.putProfile")(function* (
-        profile: CodexOAuthProfileType
+        profile: CodexAccessTokenImportProfileType
       ) {
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
 
@@ -235,7 +236,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         return yield* cipher.decrypt(encryptedProfile.value);
       }),
       putProfile: Effect.fn("CodexProfileStoreEncrypted.putProfile")(function* (
-        profile: CodexOAuthProfileType
+        profile: CodexAccessTokenImportProfileType
       ) {
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
         const encryptedProfile = yield* cipher.encrypt(profile);
@@ -314,7 +315,11 @@ export const CodexOAuthServiceLive = Layer.effect(
 
 export const CodexOAuthLive = CodexOAuthServiceLive.pipe(
   Layer.provideMerge(
-    Layer.merge(CodexProfileStoreKeyValueLive, CodexOAuthClientLive)
+    Layer.mergeAll(
+      CodexProfileStoreKeyValueLive,
+      CodexOAuthClientLive,
+      CodexOAuthProfileCommitUnsupported
+    )
   )
 );
 

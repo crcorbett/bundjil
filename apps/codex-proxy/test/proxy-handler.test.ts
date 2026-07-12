@@ -1,5 +1,5 @@
 import {
-  CodexOAuthProfile,
+  CodexAccessTokenImportProfile,
   OpenAICompatibleChatCompletionRequest,
   putProfile,
 } from "@bundjil/codex-oauth";
@@ -104,7 +104,9 @@ const makeLiveProfile = (expiresAtEpochMillis: number) =>
   Effect.gen(function* makeImportedLiveProfile() {
     const config = yield* liveTestConfig;
 
-    return yield* Schema.decodeUnknownEffect(CodexOAuthProfile)({
+    return yield* Schema.decodeUnknownEffect(CodexAccessTokenImportProfile)({
+      profileVersion: 2,
+      profileKind: "access-token-import",
       subject: config.subject,
       accessToken: "live-access-token",
       expiresAtEpochMillis,

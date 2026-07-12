@@ -125,7 +125,7 @@ it.effect(
           Redacted.value(profile.accessToken),
           fixtureAccessToken
         );
-        assert.strictEqual(profile.refreshToken, undefined);
+        assert.strictEqual(profile.profileKind, "access-token-import");
         assert.strictEqual(profile.requiresReauthentication, true);
       })
     )

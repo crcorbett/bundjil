@@ -1,77 +1,70 @@
 {
-  "title": "Hosted Codex Live OAuth Storage Tasks",
+  "title": "Personal Codex Subscription Auth And Hosted Proxy Tasks",
   "status": "active",
   "spec": "docs/product-specs/codex-hosted-live-oauth-storage.md",
   "principles": [
-    "Preview proof comes before production.",
-    "Gateway remains the default Eve model path until hosted live Codex mode has encrypted storage, refresh coordination, deployment protection, and rollback.",
-    "Use Effect Schema, tagged errors, Context services, Layers, Config, Redacted, and KeyValueStore for every runtime-owned boundary.",
-    "Hosted KV must store only encrypted Codex OAuth profiles, never raw access tokens, refresh tokens, authorization codes, or full OAuth payloads.",
-    "Treat Codex OAuth as a Codex-specific subscription runtime path, not an OpenAI Platform API key or Vercel AI Gateway credential.",
-    "Keep apps/agent out of Codex OAuth internals; the agent only selects Gateway or a private OpenAI-compatible proxy LanguageModel.",
-    "Do not adopt code from OpenClaw, Goose, Hermes, or Pi. Use them only as research precedent when explicitly cited."
+    "Interactive ChatGPT subscription login runs only on the trusted local owner machine through a loopback PKCE callback; Vercel exposes no OAuth browser routes.",
+    "This is a private single-owner personal integration, not a public or multi-user authentication product.",
+    "Persist only an encrypted versioned subscription profile; never persist the authorization code, PKCE verifier, state, raw response, cookie, or ID token.",
+    "Every profile mutation uses a fenced compare-and-set commit so an expired lease holder cannot overwrite a newer login, refresh, or reauthentication state.",
+    "Refresh under the distributed lock, re-read under lock, and perform one revision-aware forced refresh/replay after a classified 401.",
+    "Gateway remains the default Eve model path; Eve integration requires a separate SPEC.",
+    "Use Effect Schema, tagged errors, Context services, explicit Layers, Config, Redacted, Effect Platform HTTP and Command, Scope, Deferred, and KeyValueStore for runtime-owned boundaries.",
+    "Official OpenAI docs and openai/codex source are protocol authority; community repositories are personal interoperability precedent only.",
+    "Preview proof comes before any production decision, and production requires separate explicit user approval."
   ],
   "globalVerification": [
-    "Revalidate the current Codex OAuth surface and local Codex CLI behavior before implementing hosted OAuth exchange.",
+    "Revalidate current OpenAI authentication docs and openai/codex source protocol fields before live implementation and proof.",
     "bun install --frozen-lockfile",
-    "bun run --filter @bundjil/codex-oauth test",
     "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth test",
     "bun run --filter @bundjil/codex-oauth build",
-    "bun run --filter @bundjil/codex-proxy test",
     "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
     "bun run --filter @bundjil/codex-proxy build",
     "bun run --filter @bundjil/codex-proxy smoke-test",
-    "bun run --filter @bundjil/agent test when agent config or examples change",
-    "bun run --filter @bundjil/agent build when agent config changes",
-    "bun run check-types",
     "bun run verification",
-    "Vercel preview deploy under Cooper's personal Vercel account before production",
-    "Sanitized hosted OAuth proof with no tokens, codes, prompts, or raw OAuth payloads in logs or docs",
-    "Sanitized hosted live model proof with HTTP statuses, mode, content type, SSE line count, done marker, and leak booleans only",
-    "Upstash readback proof that stored profile values are encrypted and key-prefixed",
-    "Dedicated 3-pass Effect TS audit sweep task completed after implementation and documentation"
+    "git diff --check",
+    "Sanitized local loopback login proof with no credentials, callback query, code, verifier, state, account id, or raw provider payload",
+    "Upstash readback proof of a versioned ciphertext envelope with no plaintext credential markers",
+    "Personal Vercel preview proof of proactive refresh, fenced rotation, concurrency, bounded 401 recovery, private SSE, safe failures, and leak-free logs",
+    "Dedicated final 3-pass Effect TS audit sweep with evidence"
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "description": "Before accepting each task, run parent audit passes for ownership/call graph, Effect implementation quality, and verification coverage. Require more passes if OAuth support, encryption, lock semantics, Vercel deployment, or secret handling remains weak."
+    "description": "The parent records distinct ownership/call-graph, Effect implementation-quality, and verification-coverage passes before acceptance. Additional passes are required while any finding remains unresolved."
   },
   "tasks": [
     {
-      "id": "revalidate-codex-oauth-surface-and-cli-login",
-      "title": "Revalidate Codex OAuth and local CLI login",
+      "id": "revalidate-codex-subscription-auth-surface",
+      "title": "Revalidate personal Codex subscription authentication",
       "status": "completed",
-      "description": "Resolve or explicitly bypass the local Codex duplicate-install/login issue, then confirm the current OAuth issuer, client, scopes, PKCE, redirect, and token response shape without recording secrets.",
+      "dependsOn": [],
+      "description": "Correct the hosted-redirect assumption using official docs, current openai/codex source research, and a pinned community reference.",
       "implementationNotes": [
-        "Inspect `which -a codex` and `codex --version` before relying on managed login behavior.",
-        "Record whether the active binary is the expected current Codex CLI or the app-bundled CLI.",
-        "Verify the localhost callback failure from 2026-07-07 is resolved or document why hosted OAuth can proceed without it.",
-        "Use current official docs, executor personal research, DeepWiki, or direct local inspection as needed, but record only sanitized findings.",
-        "Do not print, commit, or snapshot access tokens, refresh tokens, auth codes, raw OAuth responses, cookies, or account secrets.",
-        "2026-07-11 tracer bullet: the shell-selected standalone CLI at ~/.local/bin/codex reports 0.136.0 and `codex login status` reports a ChatGPT login. The pnpm shim reports 0.142.0 and the ChatGPT-app bundled binary reports 0.144.0-alpha.4; manual research is pinned to the selected standalone CLI. Only auth-cache field names were inspected.",
-        "2026-07-11 Executor Personal DeepWiki source research on openai/codex confirms the account-login issuer category, fixed public CLI client category, documented scope names, S256 PKCE, localhost callback behavior, and token-field names without recording secret values. It also confirms mcp_oauth_callback_url applies to remote MCP-server OAuth, not ChatGPT account login.",
-        "2026-07-11 decision: encryption, schema, storage, and lock tasks are unblocked. CodexOAuthClientLive, operator OAuth start/callback routes, and hosted live proof are blocked/deferred pending a supported OpenAI hosted grant with a registered Vercel redirect URI or a separately specified account-link mechanism."
+        "Official docs establish Sign in with ChatGPT for subscription access in local Codex clients.",
+        "Current openai/codex source is authoritative for loopback PKCE, transports, ports, scopes, token fields, account metadata, expiry, and refresh behavior.",
+        "The pinned opencode reference is interoperability evidence only and its unsafe JSON, logging, expires_in, and manual fallback patterns are rejected.",
+        "The accepted boundary is trusted-local login plus encrypted hosted profile sync; Vercel has no OAuth start/callback route."
       ],
       "mandatoryVerification": [
-        "Codex CLI binary paths and versions are recorded in sanitized form.",
-        "OAuth issuer, client id category, scopes, redirect behavior, PKCE behavior, and token response fields are confirmed or implementation is blocked.",
-        "The hosted redirect URI strategy is explicitly accepted, blocked, or deferred with evidence.",
-        "Flat meaningful Effect.gen programs are explicitly required for the implementation tasks that follow.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError are explicitly required.",
-        "Canonical Effect Schema contracts and schema-derived types from owning packages are explicitly required.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are approved by the revised implementation plan.",
-        "Implementation-improvement audit pass evidence is recorded before task acceptance."
+        "Record source categories without credential values or local auth-cache content.",
+        "Distinguish official evidence, community precedent, and Bundjil inference.",
+        "Verify local login, hosted refresh, test, proof, failure, and rollback call graphs.",
+        "jq empty docs/product-specs/codex-hosted-live-oauth-storage.tasks.json",
+        "git diff --check"
       ],
       "completionCriteria": [
-        "The spec or a dated appendix contains current sanitized OAuth findings.",
-        "Implementation is either unblocked by current evidence or explicitly stopped before hosted OAuth code begins."
+        "Implementation is not blocked on a Vercel redirect grant.",
+        "Personal/single-owner scope and product-support risk are explicit."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 3,
         "evidence": [
-          "Parent audit 1 - ownership/call graph: Reviewed the current package and app boundaries. @bundjil/codex-oauth still owns reusable profiles and the intentionally unsupported CodexOAuthClientLive; apps/codex-proxy remains the private HTTP boundary. This documentation-only tracer bullet does not introduce an OAuth client, redirect route, token transfer, or new provider call graph.",
-          "Parent audit 2 - implementation quality: Reviewed the sanitized research diff and local selected CLI evidence. The decision correctly refuses to emulate the fixed public CLI client or its localhost callback. No Effect program, schema, service, layer, DTO, helper, cast, raw token, or unsafe storage path was added; later implementation requirements remain intact.",
-          "Parent audit 3 - verification coverage: Parent confirmed the selected CLI login-status command exits successfully without exposing account output, rechecked all local binary versions, ran `jq empty`, `git diff --check`, `bun run check`, and `bun run verification`. The manual helper's missing integrity header and the supported-source fallback are recorded in the active plan."
+          "Parent audit 1 - ownership/call graph: interactive callback ownership moved to a trusted-local package command; Vercel retains encrypted profile use and refresh only.",
+          "Parent audit 2 - quality: revised contracts require scoped Effect Platform HTTP/Command, Deferred callback completion, Schema/Redacted boundaries, tagged failures, and no hosted state store/routes.",
+          "Parent audit 3 - evidence: official docs, Executor Personal DeepWiki on openai/codex, pinned opencode source inspection, current repo contracts, and prior preview proof were reconciled without reading credentials."
         ]
       },
       "commitAfterPassing": true
@@ -80,35 +73,29 @@
       "id": "define-encrypted-profile-contract",
       "title": "Define encrypted profile schemas and cipher service",
       "status": "completed",
-      "description": "Add versioned encrypted profile contracts and a CodexOAuthProfileCipher service in @bundjil/codex-oauth.",
+      "dependsOn": ["revalidate-codex-subscription-auth-surface"],
+      "description": "Retain the accepted versioned AES-GCM envelope, cipher service, redacted config, and Schema-owned JSON boundaries.",
       "implementationNotes": [
-        "Define an `EncryptedCodexOAuthProfileV1` schema with version, algorithm, key id, nonce, ciphertext, subject hash, and timestamps.",
-        "Define schema-backed tagged errors for key config, encryption, decryption, decode, unsupported version, and key mismatch failures.",
-        "Use Effect Config with Redacted values for encryption key material and non-secret config for key id and algorithm.",
-        "Provide deterministic or memory-safe test layers and a WebCrypto-compatible live layer.",
-        "Prove encrypted stored values do not contain raw token fields or OAuth payload fragments.",
-        "Keep JSON string boundaries on Effect Schema codecs."
+        "Reuse EncryptedCodexOAuthProfileV1, CodexOAuthProfileCipher, Config.redacted key material, and existing live/test layers."
       ],
       "mandatoryVerification": [
-        "Flat meaningful Effect.gen programs for encrypt and decrypt operations.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
-        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
-        "Tests cover round trip, wrong key, wrong key id, malformed ciphertext, unsupported version, and leak checks.",
+        "Flat named Effect.gen/Effect.fn operations and typed .pipe(...) error handling.",
+        "Canonical Schema-derived contracts; no unsafe casts, DTO mirrors, manual readers/mappers, or trivial helpers.",
+        "Round-trip, key, malformed-ciphertext, version, and plaintext-marker tests.",
+        "bun run --filter @bundjil/codex-oauth check-types",
         "bun run --filter @bundjil/codex-oauth test",
-        "bun run --filter @bundjil/codex-oauth check-types"
+        "bun run --filter @bundjil/codex-oauth build"
       ],
       "completionCriteria": [
-        "@bundjil/codex-oauth exports encrypted profile schemas, cipher service tag, live/test layers, and safe errors.",
-        "No hosted storage layer composes raw token profiles after this task."
+        "Only a versioned encrypted envelope crosses hosted persistence."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 3,
         "evidence": [
-          "Parent audit 1 - ownership/call graph: Kept encryption contracts, config service, cipher service, errors, layers, exports, tests, and package documentation inside @bundjil/codex-oauth. CodexProfileStore remains raw/local-only in this task; hosted encrypted persistence, locks, OAuth routes, proxy live mode, and apps/agent remain unchanged.",
-          "Parent audit 2 - Effect implementation quality: Reviewed versioned Effect Schema envelopes, Context.Service tags, explicit live/test layers, Config.redacted key material, flat named Effect.fn generator operations, typed tagged cipher errors, and Schema.fromJsonString profile/envelope codecs. Redacted.value appears only immediately before base64 decode and WebCrypto key import. Scans found no JSON.stringify, process.env, Object.values/Object.entries, switch branches, unsafe casts, DTO mirrors, or trivial boundary wrappers in the new cipher path.",
-          "Parent audit 3 - verification coverage: Tests cover encryption/decryption round trip, no token/scope leakage from a schema-encoded envelope, wrong encryption key, wrong key id, malformed ciphertext, unsupported version, missing config, and the live Config/WebCrypto composition. Parent passed package check-types, 33 package tests, package build, jq validation, git diff check, and full bun run verification."
+          "Parent audit 1 - ownership/call graph: encryption remains package-owned and consumers use the service contract.",
+          "Parent audit 2 - quality: versioned Schema, Config.redacted, WebCrypto, named Effects, tagged errors, and Schema JSON codecs were accepted.",
+          "Parent audit 3 - verification: cipher/config/leak tests, package typecheck/build, and root verification passed."
         ]
       },
       "commitAfterPassing": true
@@ -117,69 +104,98 @@
       "id": "implement-encrypted-profile-store-and-refresh-lock",
       "title": "Implement encrypted storage and refresh locking",
       "status": "completed",
-      "description": "Compose CodexProfileStore over encrypted KeyValueStore persistence and add refresh locking for hosted rotation safety.",
+      "dependsOn": ["define-encrypted-profile-contract"],
+      "description": "Retain the accepted encrypted KeyValueStore composition and atomic Upstash refresh lease as foundations for fenced mutation.",
       "implementationNotes": [
-        "Add `CodexProfileStoreEncryptedKeyValueLive` or an equivalent layer that encrypts before writing and decrypts after reading.",
-        "Keep the existing raw KeyValueStore profile layer available only for local tests and non-hosted proof.",
-        "Add `CodexOAuthRefreshLock` with lock acquisition, contention, expiry, and release errors.",
-        "Use an atomic Upstash lock operation when hosted; keep Redis command details behind a package-owned service/layer.",
-        "Use the existing canonical subject-hash derivation for profile and lock keys.",
-        "Test concurrent refresh programs so only one invocation refreshes while followers retry or read the updated profile."
+        "Reuse encrypted storage, canonical subject hashes, atomic acquire, TTL, owner release, and lock-aware profile re-read.",
+        "The existing lease is coordination, not sufficient stale-write protection; the pending fenced-commit task completes that invariant."
       ],
       "mandatoryVerification": [
-        "Flat meaningful Effect.gen programs for store read/write/delete and lock with-refresh operations.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
-        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
-        "Tests cover encrypted save/read/remove, Upstash-like adapter behavior, lock contention, lock expiry, owner-only release, refresh race behavior, and leak checks.",
-        "bun run --filter @bundjil/codex-oauth test",
+        "Flat named storage/lock Effects, typed errors, canonical Schemas/services, and no unsafe casts/DTOs/manual readers/helpers.",
+        "Encrypted save/read/remove, contention, expiry, owner release, and winner re-read tests.",
         "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth test",
         "bun run --filter @bundjil/codex-oauth build"
       ],
       "completionCriteria": [
-        "Hosted profile persistence can be composed through encrypted storage over Effect KeyValueStore.",
-        "Refresh coordination has a package-owned service contract and test evidence."
+        "Encrypted persistence and refresh coordination remain accepted foundations."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 3,
         "evidence": [
-          "Parent audit 1 - ownership/call graph: package-only encrypted persistence and refresh coordination; apps, routes, and deployment remain unchanged.",
-          "Parent audit 2 - Effect implementation quality: verified Context services, explicit layers, Schema persistence, tagged errors, atomic Upstash acquire/release, and lock-aware refreshAccessToken re-read behavior.",
-          "Parent audit 3 - verification coverage: encrypted-store leak checks, lock contention/expiry/owner release, concurrency coordination, Upstash adapter behavior, package check-types/tests/build, and full bun run verification passed."
+          "Parent audit 1 - ownership/call graph: persistence/lock remain package-owned; Redis details stay in the adapter.",
+          "Parent audit 2 - quality: Schema store, Context services, explicit Layers, lock semantics, and profile re-read were accepted.",
+          "Parent audit 3 - verification: encrypted-store, contention, expiry, owner release, race, adapter, package, and root checks passed."
         ]
       },
       "commitAfterPassing": true
     },
     {
-      "id": "implement-live-oauth-client-and-proxy-routes",
-      "title": "Implement live OAuth client and proxy routes",
-      "status": "blocked",
-      "description": "Add live Codex OAuth endpoint exchange in @bundjil/codex-oauth and private operator OAuth routes in apps/codex-proxy.",
+      "id": "define-subscription-profile-and-fenced-commit",
+      "title": "Define subscription profile variants and fenced commits",
+      "status": "completed",
+      "dependsOn": ["implement-encrypted-profile-store-and-refresh-lock"],
+      "description": "Add explicit legacy/import and refresh-capable subscription profile variants, opaque credential revisions, migration behavior, and atomic fenced profile mutation.",
       "implementationNotes": [
-        "Add `CodexOAuthClientLive` only after the OAuth surface is revalidated.",
-        "Add `CodexOAuthStateStore` for short-lived PKCE verifier and state values.",
-        "Expose private/operator `GET /codex/oauth/start`, `GET /codex/oauth/callback`, and `POST /codex/oauth/logout` routes in apps/codex-proxy.",
-        "Guard OAuth routes with deployment protection, an internal admin token, or another explicit operator-only mechanism.",
-        "Callback output must be minimal and must not include token values, auth codes, raw OAuth payloads, prompts, or cookies.",
-        "State and callback payload handling must use canonical schemas and typed tagged errors.",
-        "2026-07-11 revalidation: selected Codex CLI login remains active, but current local CLI/source evidence and official OpenAI developer documentation do not establish a supported hosted ChatGPT-account grant with a registered Vercel redirect URI. Do not emulate the public CLI client or its localhost callback."
+        "CodexAccessTokenImportProfile represents legacy ciphertext; CodexSubscriptionProfile requires refresh token, account id, access-JWT expiry, protocol/scope version, revision, timestamps, and reauthentication state.",
+        "Decode existing V1 plaintext only as legacy and never silently treat it as refresh-capable.",
+        "Add CodexOAuthProfileCommit with Upstash fenced-CAS and memory layers; login, refresh, and permanent-failure marking all use it.",
+        "A stale lease holder or stale permanent failure receives a typed conflict and cannot mutate a newer revision.",
+        "Add sanitized refresh observer events/counters without exposing revision values."
       ],
       "mandatoryVerification": [
-        "Flat meaningful Effect.gen programs for start, callback, exchange, state validation, profile save, and logout operations.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
-        "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth and apps/codex-proxy config.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
-        "Tests cover start redirect, state storage, callback state mismatch, exchange failure, encrypted profile save, logout deletion, route auth failures, and safe output.",
+        "Flat meaningful Effect.gen/Effect.fn decode, migrate, commit, conflict, and observer operations with typed .pipe(...) errors.",
+        "Canonical Effect Schema unions/brands and service contracts; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, or trivial helpers.",
+        "Tests cover legacy decode, required subscription fields, V2 round trip, initial write, matching-revision commit, stale commit rejection, lease expiry during mutation, concurrent login replacement, stale reauth marking, and observer redaction.",
+        "bun run --filter @bundjil/codex-oauth check-types",
         "bun run --filter @bundjil/codex-oauth test",
-        "bun run --filter @bundjil/codex-proxy test",
-        "bun run --filter @bundjil/codex-proxy check-types"
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run verification"
       ],
       "completionCriteria": [
-        "A local/mock OAuth route flow can store an encrypted profile without live secrets.",
-        "Live OAuth route code remains disabled or unconfigured until Vercel preview env is ready."
+        "No delayed refresh/login/failure can overwrite a newer profile generation.",
+        "Legacy profiles remain readable only as access-token fallback."
       ],
-      "blockedBy": "A supported OpenAI hosted account-link/OAuth grant that permits Bundjil's registered Vercel redirect URI, or an explicitly specified replacement account-link mechanism.",
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: explicit legacy/subscription variants and fenced mutation remain owned by @bundjil/codex-oauth; the Upstash commit layer is separately named, while current local/live proxy composition explicitly uses the unsupported commit layer until the later enablement task.",
+          "Parent audit 2 - implementation quality: reviewed canonical Schema unions/brands, Context services, explicit memory/Upstash Layers, flat named Effects, AES-GCM V1 migration/V2 encoding, atomic Lua create/CAS, shared atomic memory state, sanitized observer events, and restricted legacy putProfile; Ultracite and stale-pattern scans found no unsafe casts, raw JSON calls, process.env reads, duplicated operation schemas, or unresolved helper sprawl.",
+          "Parent audit 3 - verification coverage: focused tests prove V1 legacy-only migration, required subscription fields, V2 round trip, create-only writes, matching replacement/refresh, stale worker and reauthentication rejection, concurrent login replacement, observer redaction, and mocked Upstash winner preservation; package 60/60 tests, proxy 11/11 tests, package/proxy builds, mock SSE smoke, git diff --check, and bun run verification all passed."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-local-subscription-login-broker",
+      "title": "Implement the trusted-local subscription login broker",
+      "status": "pending",
+      "dependsOn": ["define-subscription-profile-and-fenced-commit"],
+      "description": "Implement protocol config, loopback PKCE, browser launch, separate code-exchange/refresh transports, account/expiry extraction, fenced encrypted save, and sanitized CLI output.",
+      "implementationNotes": [
+        "Add CodexSubscriptionAuthProtocolConfigService, CodexOAuthHttpClient, CodexLoopbackCallback, CodexBrowserLauncher, CodexSubscriptionLogin, and explicit live/test layers.",
+        "Use first-party ports 1455/1457, scope set, PKCE S256, state, strict callback validation, timeout, request-log suppression, and scoped cleanup for every exit.",
+        "Authorization URL/state/verifier/code/token payload/ID token stay redacted and memory-only; reveal URL only to the browser launcher.",
+        "Code exchange is form encoded; refresh is JSON; both responses use narrow Schemas and no expires_in assumption.",
+        "Derive expiry from access JWT and required account metadata from the current first-party canonical source; persist no ID token.",
+        "Exclude manual paste from the tracer unless separately proven safe."
+      ],
+      "mandatoryVerification": [
+        "Flat named login/callback/exchange/metadata/profile-save/cleanup Effects with tagged .pipe(...) errors.",
+        "Canonical Schema types and no unsafe casts, DTO mirrors, manual readers/mappers, raw fetch/JSON, process.env package reads, or helper sprawl.",
+        "Tests cover protocol URL, ports, scopes, state entropy/mismatch, PKCE, callback method/path/denial/missing-code/timeout/conflict, exchange without expires_in, access-JWT expiry, account metadata, cross-account rejection, ID-token disposal, browser failure, every Scope finalizer path, fenced save, and sanitized output.",
+        "Automated proof uses mock providers only.",
+        "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "Mock loopback login writes a refresh-capable encrypted profile without hosted callback routes.",
+        "No app, Vercel, Eve, browser bundle, or CI imports local callback/browser layers."
+      ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 0,
@@ -188,103 +204,90 @@
       "commitAfterPassing": true
     },
     {
-      "id": "wire-live-codex-proxy-mode",
-      "title": "Wire live Codex proxy mode",
+      "id": "revalidate-personal-preview-configuration",
+      "title": "Revalidate personal Vercel preview configuration",
       "status": "pending",
-      "description": "Compose apps/codex-proxy live mode with encrypted storage, refresh locking, and direct Codex Responses calls.",
+      "dependsOn": ["implement-local-subscription-login-broker"],
+      "description": "Confirm the personal Upstash/cipher/private-proxy preview can receive a subscription profile and remains production-inactive.",
       "implementationNotes": [
-        "Keep `BUNDJIL_CODEX_PROXY_MODE=mock` as the default local proof path.",
-        "Allow `BUNDJIL_CODEX_PROXY_MODE=live` only when required encrypted storage, OAuth, subject, and internal-token config is present.",
-        "Use Effect Config and ConfigProvider.fromEnv through app-owned config files.",
-        "Do not read platform API keys as fallback credentials in subscription mode.",
-        "Keep apps/agent unchanged except for docs/config examples unless separate implementation work is explicitly approved.",
-        "Route diagnostics must be sanitized and schema-backed."
+        "Verify personal scope/project/root/Node, preview mode, sensitive env names, Upstash binding, cipher key id, and private token without values.",
+        "Do not use Tilt Legal or enable production Bundjil mode/key/profile/deployment.",
+        "Marketplace production bindings are not Bundjil production activation."
       ],
       "mandatoryVerification": [
-        "Flat meaningful Effect.gen programs for live route handling, profile resolution, refresh, provider streaming, and route error mapping.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
-        "Canonical Effect Schema contracts and schema-derived types from owning packages.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
-        "Tests cover missing live config, encrypted profile missing, refresh-required flow, refresh failure, Codex HTTP failure, streaming success, and no API-key fallback.",
-        "bun run --filter @bundjil/codex-proxy test",
+        "Sanitized personal project/scope and preview-only Bundjil config evidence.",
+        "Safe Upstash namespace connectivity check.",
+        "Effect Config/Schema ownership remains intact; no unsafe casts/DTOs/manual readers/helpers.",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "Preview is ready for a real local login tracer; production remains inactive."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "run-real-local-login-tracer",
+      "title": "Run the real local login tracer",
+      "status": "pending",
+      "dependsOn": ["revalidate-personal-preview-configuration"],
+      "description": "Complete owner browser sign-in through localhost and prove a refresh-capable encrypted subscription profile reaches personal Upstash before hosted refresh work continues.",
+      "implementationNotes": [
+        "Use the trusted local command and current first-party protocol; no Vercel callback.",
+        "Record status, mode, refresh-capable flag, profile variant, ciphertext shape, and leak booleans only.",
+        "Stop downstream tasks if login interoperability, account metadata, expiry, or encrypted persistence differs from the SPEC."
+      ],
+      "mandatoryVerification": [
+        "Loopback sign-in completes and emits sanitized Schema output only.",
+        "Upstash readback is a V2 ciphertext envelope with no credential, code, verifier, state, account-id, callback, JWT-claim, or ID-token markers.",
+        "Stored profile decrypts only inside the trusted proof and confirms required subscription fields without printing values.",
+        "No credential/callback/provider payload appears in local logs or shell history.",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "Real local subscription login and encrypted profile sync are proven before hosted refresh implementation."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "enable-refresh-capable-live-proxy",
+      "title": "Enable refresh-capable private live proxy mode",
+      "status": "pending",
+      "dependsOn": ["run-real-local-login-tracer"],
+      "description": "Implement proactive fenced refresh, atomic credentials, revision-aware 401 recovery, explicit app errors/readiness, and private live composition without OAuth browser routes.",
+      "implementationNotes": [
+        "getValidCredential returns access token, account id, and revision atomically; it refreshes inside skew under lock and fenced-CAS commits rotation.",
+        "recoverAfterUnauthorized uses a newer winner or forces refresh of the unchanged rejected revision, then permits one replay only.",
+        "Permanent credential failures fenced-mark reauthentication; transient network/timeout/rate-limit/5xx failures do not mutate storage.",
+        "Account metadata is invariant across refresh unless current source proves a valid same-account update.",
+        "Refresh transport decodes optional provider fields, but success requires a new access token and valid JWT expiry; omitted refresh/ID tokens retain the current refresh token/account id only when current source permits it.",
+        "HTTP 502 codex_reauthentication_required, HTTP 503 codex_auth_temporarily_unavailable, sanitized provider 502, and non-ready live health are explicit.",
+        "No hosted OAuth route, API-key fallback, mock fallback, or retry loop."
+      ],
+      "mandatoryVerification": [
+        "Flat named credential/refresh/commit/recovery/retry/route/readiness Effects with tagged .pipe(...) errors and canonical Schemas.",
+        "No unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, process.env package reads, or helper sprawl.",
+        "Tests cover valid bypass, skew refresh, lock winner/re-read, rotated replacement, omitted access failure, allowed refresh/ID omission retention, malformed expiry, lease-expiry stale commit, concurrent login, transient no-mutation, permanent fenced mark, cross-account no-mutation, revision-aware forced refresh, one replay, second-401 stop, unrelated no-replay, legacy refusal, missing config, mock/local preservation, error codes, readiness, and leak safety.",
+        "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth test",
         "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy test",
         "bun run --filter @bundjil/codex-proxy build",
-        "bun run --filter @bundjil/codex-proxy smoke-test"
-      ],
-      "completionCriteria": [
-        "Local tests prove live-mode composition through mocks.",
-        "Mock mode remains working and is still safe for preview smoke tests."
-      ],
-      "implementationImprovementAudit": {
-        "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
-      },
-      "commitAfterPassing": true
-    },
-    {
-      "id": "provision-personal-vercel-preview-env",
-      "title": "Provision personal Vercel preview env and Upstash",
-      "status": "pending",
-      "description": "Configure the bundjil-codex-proxy preview deployment in Cooper's personal Vercel account with live-mode env, Upstash, encryption key material, and route protection.",
-      "implementationNotes": [
-        "Verify `vercel whoami`, project link, project scope, and root directory before setting env vars.",
-        "Do not use Tilt Legal scope or Tilt Legal storage resources.",
-        "Rotate `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` because earlier preview env pull showed an unusable value.",
-        "Provision or link Upstash Redis through personal Vercel Marketplace or another explicitly approved personal resource.",
-        "Set encryption key material only in Vercel env vars or ignored local env files.",
-        "Keep production env unset until preview live proof passes and production is explicitly approved."
-      ],
-      "mandatoryVerification": [
-        "Personal Vercel account and `bundjil-codex-proxy` project scope are recorded in sanitized form.",
-        "Preview env var names are confirmed without printing secret values.",
-        "Upstash connectivity is verified through a non-secret sentinel key or test namespace.",
-        "Route protection or operator-only OAuth route guard is verified.",
-        "Flat meaningful Effect.gen programs are preserved where deployment scripts touch Effect-owned behavior.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError remain intact.",
-        "Canonical Effect Schema contracts and schema-derived config types remain intact.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are introduced."
-      ],
-      "completionCriteria": [
-        "Preview environment can run live mode without production deployment.",
-        "No secret values are committed, printed in docs, or stored in task evidence."
-      ],
-      "implementationImprovementAudit": {
-        "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
-      },
-      "commitAfterPassing": true
-    },
-    {
-      "id": "run-hosted-live-proof",
-      "title": "Run hosted OAuth and live model proof",
-      "status": "pending",
-      "description": "Deploy a Vercel preview, complete OAuth, verify encrypted storage, and run an authenticated live Codex proxy streaming request with sanitized evidence.",
-      "implementationNotes": [
-        "Deploy preview from apps/codex-proxy after local checks pass.",
-        "Complete OAuth through preview routes and verify encrypted profile storage through safe readback.",
-        "Run unauthenticated, invalid-token, and authenticated chat-completion probes.",
-        "Record only status, mode, content type, SSE data-line count, done marker, model id category, and leak booleans.",
-        "Scan Vercel logs and Upstash values for token/code/prompt/body leakage.",
-        "Do not deploy production unless the user explicitly approves after preview proof."
-      ],
-      "mandatoryVerification": [
-        "GET /health proves expected preview mode.",
-        "OAuth start/callback succeeds and stores an encrypted profile.",
-        "Unauthenticated and invalid-token chat probes return 401.",
-        "Authenticated live chat-completions probe streams a live Codex response.",
-        "Vercel logs contain no access tokens, refresh tokens, auth codes, raw OAuth payloads, prompts, or full response bodies.",
-        "Upstash readback contains ciphertext only for token profile state.",
-        "Flat meaningful Effect.gen programs remain intact after proof fixes.",
-        "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError remain intact.",
-        "Canonical Effect Schema contracts and schema-derived types remain intact.",
-        "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are introduced.",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
         "bun run verification"
       ],
       "completionCriteria": [
-        "Hosted live preview proof is recorded in the spec, task ledger, and app/package docs.",
-        "Production deployment remains blocked unless explicitly approved."
+        "Mocked private route proves durable fenced refresh and bounded 401 recovery.",
+        "No stale writer can overwrite a newer credential generation."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
@@ -294,27 +297,58 @@
       "commitAfterPassing": true
     },
     {
-      "id": "document-live-codex-operations",
-      "title": "Document hosted live operations",
+      "id": "run-hosted-refresh-preview-proof",
+      "title": "Run hosted refresh and private proxy preview proof",
       "status": "pending",
-      "description": "Update durable docs for hosted live OAuth, encrypted storage, refresh behavior, Vercel proof, rollback, and self-testing.",
+      "dependsOn": ["enable-refresh-capable-live-proxy"],
+      "description": "Prove private personal preview streaming and safe refresh using isolated proof state and sanitized refresh observation.",
       "implementationNotes": [
-        "Update README, docs/README, ARCHITECTURE, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, apps/codex-proxy/README.md, and packages/codex-oauth/README.md as needed.",
-        "Document local mock testing, preview live testing, production approval gates, env var names, secret handling, and rollback.",
-        "Document the direct self-test path for the user without exposing secrets.",
-        "Keep examples sanitized and avoid recording private prompts or model response bodies."
+        "Use an isolated proof subject/namespace and do not damage the owner's working profile to simulate permanent failure.",
+        "Record statuses, mode, ciphertext shape, content type, SSE count/DONE, refresh winner/follower booleans, and leak booleans only.",
+        "Permanent failure is deterministic/mock proof; real preview proves normal proactive/concurrent refresh and private streaming.",
+        "Do not deploy production."
       ],
       "mandatoryVerification": [
-        "Docs reflect the current implementation state rather than future claims.",
-        "Docs distinguish mock preview, live preview, and production.",
-        "Docs explain that Gateway remains the default Eve path unless a later task changes it.",
-        "Docs state that hosted storage uses encrypted profiles over Effect KeyValueStore.",
-        "Flat meaningful Effect.gen, typed errors, canonical schemas, no unsafe casts, and no trivial wrappers remain listed in implementation requirements.",
-        "JSON string boundaries continue to require Effect Schema codecs.",
+        "Live health is ready; unauthenticated/invalid-token calls are 401; authenticated SSE is 200 with data and DONE.",
+        "Near-expiry concurrent requests produce one safe observed refresh winner, followers use the winner, revision changes once, and no stale overwrite occurs.",
+        "Upstash remains a ciphertext envelope with no credential/callback/account/JWT markers.",
+        "Deterministic permanent failure yields 502 reauthentication; transient failure yields 503 and preserves profile; second 401 does not retry.",
+        "Vercel logs/responses contain no credentials, revision values, callback query, provider payload, prompt, request body, or full model response.",
         "bun run verification"
       ],
       "completionCriteria": [
-        "A future contributor can test mock mode, run hosted proof, inspect logs safely, and roll back without reading this task ledger."
+        "Personal preview has a durable refresh-capable proof with sanitized evidence.",
+        "Production remains a separate explicit decision."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "document-and-supersede-access-only-workaround",
+      "title": "Document operations and supersede the access-only workaround",
+      "status": "pending",
+      "dependsOn": ["run-hosted-refresh-preview-proof"],
+      "description": "Update durable docs for local subscription login, hosted refresh, preview proof, failure/re-login, disconnect, and rollback; mark access-only normal operation as superseded.",
+      "implementationNotes": [
+        "Update root/docs/package/app/architecture/testing docs and the old workaround SPEC/ledger status.",
+        "Distinguish official evidence, community precedent, and Bundjil personal experimental use.",
+        "Document local login, preview verification, refresh, provider-side revocation, mock rollback, and production approval.",
+        "Keep examples value-free and exclude callback URLs/codes, prompts, and model output."
+      ],
+      "mandatoryVerification": [
+        "Docs match implementation and claim no hosted callback, general client registration, public support, or multi-user capability.",
+        "Docs preserve flat Effect programs, tagged errors, canonical Schemas, Schema JSON, Config/Redacted, explicit Layers, scoped resources, fenced commits, KeyValueStore, and no unsafe casts/DTOs/manual readers/helpers.",
+        "Stale-claim scans cover hosted redirect blocker, access-only normal path, no-refresh claims, and pending proof.",
+        "git diff --check",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "A future operator can sign in, verify refresh, disconnect, and roll back without task history.",
+        "Access-token-only operation is fallback/superseded only after live refresh proof."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
@@ -325,30 +359,28 @@
     },
     {
       "id": "three-pass-effect-ts-audit-sweep",
-      "title": "Run 3-pass Effect TS audit sweep",
+      "title": "Run the mandatory 3-pass Effect TS audit sweep",
       "status": "pending",
-      "description": "Run a dedicated cross-cutting 3-pass Effect TS audit sweep across the completed hosted Codex implementation before any production decision.",
+      "dependsOn": ["document-and-supersede-access-only-workaround"],
+      "description": "Perform the cross-cutting ownership, Effect quality, and verification audit before any production proposal.",
       "implementationNotes": [
-        "Pass 1 is the ownership and call-graph sweep: verify `@bundjil/codex-oauth`, `apps/codex-proxy`, and `apps/agent` own only their intended behavior and that production, test, CLI/script, Vercel, and rollback call graphs match the spec.",
-        "Pass 2 is the Effect implementation-quality sweep: inspect the diff for flat primary Effect.gen or Effect.fn programs, Context.Service tags, explicit Layers, Schema-derived types, package-owned tagged errors, Config.redacted, ConfigProvider.fromEnv, Redacted handling only at final provider boundaries, schema-backed KeyValueStore persistence, and no unsafe casts, DTO mirrors, manual object readers, process.env package reads, switch/case branching, instanceof checks, or helper sprawl.",
-        "Pass 3 is the verification-coverage sweep: prove targeted package/app commands, root verification, local mock proof, hosted preview OAuth proof, hosted preview live model proof, Upstash encrypted readback, Vercel log/leak scans, docs updates, rollback notes, and any skipped production proof with reason.",
-        "If any pass finds a gap, fix it and record another pass. Do not treat three entries as sufficient when an unresolved issue remains.",
-        "Production deploy requires a separate explicit user approval after this sweep."
+        "Pass 1 verifies package/app/local-command ownership and production/test/CLI/proof/rollback call graphs.",
+        "Pass 2 audits flat Effects, Context services, explicit Layers, Effect Platform resource scoping, Deferred callback, Schema types, tagged errors, Config.redacted, final-boundary Redacted access, fenced persistence, and absence of unsafe casts/DTOs/manual readers/raw JSON/process.env/stringly tags/helper sprawl.",
+        "Pass 3 proves targeted/root checks, local login, encrypted readback, hosted rotation/concurrency, bounded retry, SSE, errors/readiness, Vercel leak scans, docs, and rollback.",
+        "Fix findings and add passes until no unresolved gap remains; production requires separate approval."
       ],
       "mandatoryVerification": [
-        "All prior tasks have completed audit evidence.",
-        "Ownership/call graph audit confirms `@bundjil/codex-oauth`, `apps/codex-proxy`, and `apps/agent` boundaries match the spec.",
-        "Implementation quality audit confirms flat primary Effect.gen or Effect.fn programs, Context.Service tags, schema-derived types, tagged errors, Config.redacted, ConfigProvider.fromEnv, explicit layers, Redacted handling only at final provider boundaries, schema-backed KeyValueStore persistence, no unsafe casts, no DTO mirrors, no manual object readers, and no helper sprawl.",
-        "Verification coverage audit records targeted checks, root verification, Vercel preview proof, log/leak scans, Upstash readback, docs updates, and any skipped production proof with reason.",
-        "The audit sweep itself is recorded in this task's implementationImprovementAudit evidence, not only in prior task notes.",
+        "All prior tasks have complete parent audit evidence.",
+        "No OAuth browser route exists in Vercel and no local callback/browser layer is imported by apps.",
+        "No plaintext credential, callback data, revision value, ID token, account id, prompt, or provider payload appears in storage/log/proof scans.",
         "bun run verification",
+        "git diff --check",
         "git status --short is reviewed before commit"
       ],
       "completionCriteria": [
-        "The dedicated 3-pass audit sweep is complete with evidence for ownership/call graph, Effect implementation quality, and verification coverage.",
-        "Hosted live Codex mode is either complete in preview with production pending approval, or blocked with concrete evidence.",
-        "The task ledger and spec are updated to reflect final state.",
-        "Commit and push only after verification passes."
+        "The dedicated audit is recorded with no unresolved finding.",
+        "Personal refresh-capable preview is complete or blocked by concrete evidence.",
+        "Ledger, plan, specs, and durable docs reflect final state."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,

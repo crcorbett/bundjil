@@ -27,6 +27,13 @@ The local target exists to exercise the real importer and direct-provider call
 graph while Marketplace storage is unavailable; it must never be treated as
 Vercel persistence or hosted OAuth evidence.
 
+Revision note, 2026-07-12: the successor SPEC now targets a trusted-local
+Codex-compatible loopback PKCE login that stores a refresh-capable encrypted
+profile for the private Vercel proxy. A Vercel-hosted callback is still out of
+scope, but it is no longer a blocker for the personal subscription design.
+This access-token-only path remains the accepted operational fallback until the
+successor refresh proof passes; only then may documentation mark it superseded.
+
 ## Decision And Boundaries
 
 - The original hosted account-link flow remains blocked. Bundjil must not

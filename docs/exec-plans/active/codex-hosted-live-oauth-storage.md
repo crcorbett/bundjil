@@ -17,9 +17,11 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`implement-live-oauth-client-and-proxy-routes` is blocked. The accepted
-revalidation evidence still does not establish a supported hosted
-ChatGPT-account OAuth grant with a registered Vercel redirect URI.
+`implement-local-subscription-login-broker` is ready for implementation through
+`prd-implementer`. The accepted profile/commit slice now provides explicit
+legacy and subscription variants plus atomic create/replacement/refresh/
+reauthentication fences. The login broker must use those contracts from a
+trusted-local loopback command; Vercel still exposes no OAuth browser route.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -31,6 +33,46 @@ Parent preflight evidence, 2026-07-11:
 - the official Codex-manual helper failed because the response omitted the
   required `x-content-sha256` integrity header, so task research must use the
   narrow official-doc fallback and local CLI/source inspection.
+
+Revision evidence, 2026-07-12:
+
+- OpenAI's current authentication documentation states that Sign in with
+  ChatGPT provides subscription access and returns browser credentials to a
+  local Codex client.
+- Executor Personal DeepWiki research checked against local `openai/codex`
+  snapshot `9e552e9d15ba52bed7077d5357f3e18e330f8f38` confirms
+  authorization-code PKCE S256, a loopback callback, current authorization and
+  token endpoints, public client category, official scope set, ID/access/refresh
+  token response, access-token expiry derivation, account metadata, and rotating
+  refresh persistence. The direct source check resolved a DeepWiki expiry
+  conflict in favor of access-token JWT `exp`.
+- Local reference
+  `.local/references/opencode-openai-codex-auth` is pinned at
+  `bec2ad69b252ef4ad7dd33b9532ff8b4fdb6d016`. It demonstrates personal external
+  client interoperability, but its manual JSON, unsafe casts, response-body
+  logging, `expires_in` assumption, and weak manual fallback are explicitly
+  rejected.
+- The revised architecture has no Vercel OAuth start/callback routes and no
+  hosted PKCE state store. A scoped local Effect command owns browser/loopback
+  interaction and writes only a minimum encrypted refresh-capable profile to
+  personal Upstash.
+- The completed encrypted profile, KeyValueStore persistence, Upstash adapter,
+  distributed refresh lock, direct provider, and private preview proxy remain
+  accepted foundations. The access-token-only workaround remains the active
+  operational fallback until refresh-capable proof passes.
+- Spec review pass 1 corrected the auth boundary. Independent review pass 2
+  removed the `expires_in` assumption, required access-JWT expiry decoding,
+  distinguished official/community scope sets, and separated permanent
+  reauthentication failures from transient failures that must not mutate the
+  stored profile.
+- Independent review pass 3 found that the existing short lease plus
+  unconditional profile write could still allow stale overwrite. The revised
+  SPEC now requires legacy/subscription profile variants, an opaque credential
+  revision, fenced compare-and-set mutation for every login/refresh/failure
+  write, revision-aware one-time 401 recovery, exact first-party transports and
+  loopback ports, concrete Effect service/layer call graphs, safe refresh
+  observation, progressive `dependsOn` gates, and explicit route/readiness
+  errors.
 
 ## Task Log
 
@@ -69,6 +111,10 @@ Subagent evidence, 2026-07-11:
   encryption/schema/storage/lock tasks remain independently valid; do not
   delegate live OAuth client/routes or hosted proof until a supported hosted
   grant or account-link mechanism is added to the SPEC.
+
+This 2026-07-11 hosted-route conclusion is historical and superseded by the
+2026-07-12 local-loopback design. It remains useful only as evidence for why
+Vercel must not expose OAuth start/callback routes.
 
 Parent audit:
 
@@ -172,3 +218,56 @@ with the completed cipher; lock acquisition/release is package-owned and
 atomic for Upstash; `refreshAccessToken` now runs under the lock and returns a
 fresh winner profile rather than rotating twice. Package check-types, 37 tests,
 build, diff check, and full verification passed. Commit pending.
+
+### define-subscription-profile-and-fenced-commit
+
+Status: Accepted 2026-07-12
+
+Scope and implementation:
+
+- replaced the ambiguous profile struct with explicit
+  `CodexAccessTokenImportProfile` and `CodexSubscriptionProfile` variants;
+- retained encrypted V1 decode only as a legacy access-token fallback and
+  added encrypted V2 subscription round trips;
+- added `CodexOAuthProfileCommit` with create-only initial writes and
+  expected-revision replacement, refresh, and reauthentication operations;
+- added one atomic shared-state memory layer and one Upstash Lua CAS layer so
+  delayed login, refresh, and failure writers cannot replace a newer winner;
+- added sanitized observer events/counters without token, account, or revision
+  values;
+- kept the current local and hosted proxy on
+  `CodexOAuthProfileCommitUnsupported`; the named Upstash commit layer is not
+  composed into the live proxy until the later enablement task.
+
+Parent audit:
+
+1. Ownership and call graph: profile schemas, migration, cipher, commit
+   service, observer, memory implementation, and Upstash implementation remain
+   package-owned. App layers only preserve the current unsupported runtime
+   path, and Eve remains unchanged.
+2. Implementation quality: canonical Effect Schemas and tagged errors,
+   Context services, explicit Layers, named flat Effects, Schema JSON codecs,
+   AES-GCM, shared atomic memory state, and atomic Lua create/CAS were reviewed.
+   The parent removed duplicate operation-schema ownership and one-use adapter
+   helpers. Ultracite and stale-pattern scans found no raw JSON calls,
+   `process.env`, unsafe casts, stringly switches, or unresolved helper sprawl.
+3. Verification coverage: focused tests prove legacy-only migration, required
+   subscription fields, V2 encryption, create-only writes, matching
+   replacement/refresh, stale-writer rejection after a newer winner,
+   concurrent login replacement, stale reauthentication rejection, observer
+   redaction, and mocked Upstash CAS behavior.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 60 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 11 tests.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed with HTTP 200
+  health/stream and five SSE lines.
+- `bun run verification`: passed.
+- `git diff --check`: passed.
+
+Commit: pending parent commit of this accepted slice.

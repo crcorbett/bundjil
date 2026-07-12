@@ -108,8 +108,10 @@ Current Codex provider state:
 - The live composition accepts only an imported short-lived access token. It
   fails closed on expiry and requires a trusted-local re-import; it neither
   stores nor refreshes refresh or ID tokens.
-- Future: supported hosted account-link OAuth and durable refresh. Those are
-  blocked and are not supplied by the preview workaround.
+- Future: trusted-local personal subscription sign-in and fenced encrypted
+  hosted refresh under the successor SPEC. Those are not yet supplied by the
+  access-token-only preview workaround, and Vercel will expose no OAuth browser
+  callback.
 - Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
   Codex OAuth through Vercel AI Gateway credentials, deploying
   `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.

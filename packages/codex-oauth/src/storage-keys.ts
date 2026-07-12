@@ -9,6 +9,9 @@ export const codexOAuthProfileStoragePrefix =
 export const codexOAuthRefreshLockStoragePrefix =
   "bundjil/oauth/v1/provider/codex/refresh-lock";
 
+export const codexOAuthProfileRevisionStoragePrefix =
+  "bundjil/oauth/v1/provider/codex/profile-revision";
+
 export const codexOAuthProfileSubjectHash = (subject: CodexOAuthSubject) =>
   Effect.tryPromise({
     try: async () => {
@@ -53,4 +56,12 @@ export const codexOAuthRefreshLockStorageKey = Effect.fn(
   const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
 
   return `${codexOAuthRefreshLockStoragePrefix}/${subjectHash}`;
+});
+
+export const codexOAuthProfileRevisionStorageKey = Effect.fn(
+  "CodexOAuthProfileRevisionStorageKey.derive"
+)(function* (subject: CodexOAuthSubject) {
+  const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
+
+  return `${codexOAuthProfileRevisionStoragePrefix}/${subjectHash}`;
 });

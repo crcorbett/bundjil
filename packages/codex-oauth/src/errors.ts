@@ -4,6 +4,8 @@ import { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 import { CodexHttpStatusError } from "./errors/codex-http-status-error.js";
 import { CodexLocalProfileImportError } from "./errors/codex-local-profile-import-error.js";
 import { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
+import { CodexOAuthProfileCommitConflict } from "./errors/codex-oauth-profile-commit-conflict.js";
+import { CodexOAuthProfileCommitError } from "./errors/codex-oauth-profile-commit-error.js";
 import { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-error.js";
 import { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 import { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
@@ -56,6 +58,8 @@ export { CodexLocalProfileImportError } from "./errors/codex-local-profile-impor
 export { CodexOAuthTokenExpired } from "./errors/codex-oauth-token-expired.js";
 export { CodexOAuthTokenMissing } from "./errors/codex-oauth-token-missing.js";
 export { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provider-error.js";
+export { CodexOAuthProfileCommitConflict } from "./errors/codex-oauth-profile-commit-conflict.js";
+export { CodexOAuthProfileCommitError } from "./errors/codex-oauth-profile-commit-error.js";
 export { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
 export { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-error.js";
 export { CodexOAuthUnsupportedRuntimePath } from "./errors/codex-oauth-unsupported-runtime-path.js";
@@ -92,6 +96,8 @@ export const CodexOAuthFailure = Schema.Union([
   CodexOAuthTokenExpired,
   CodexOAuthTokenProviderError,
   CodexOAuthUnsupportedRuntimePath,
+  CodexOAuthProfileCommitConflict,
+  CodexOAuthProfileCommitError,
   CodexOAuthProfileCipherError,
   CodexOAuthRefreshLockError,
 ]);
@@ -104,6 +110,19 @@ export const CodexOAuthProfileCipherFailure = Schema.Union([
 
 export type CodexOAuthProfileCipherFailure =
   typeof CodexOAuthProfileCipherFailure.Type;
+
+export const CodexOAuthProfileCommitFailure = Schema.Union([
+  CodexOAuthProfileCommitConflict,
+  CodexOAuthProfileCommitError,
+  CodexOAuthUnsupportedRuntimePath,
+  OAuthProfileSchemaError,
+  OAuthProfileStorageError,
+  OAuthProfileNotFound,
+  CodexOAuthProfileCipherError,
+]);
+
+export type CodexOAuthProfileCommitFailure =
+  typeof CodexOAuthProfileCommitFailure.Type;
 
 export const CodexLocalProfileImportFailure = Schema.Union([
   CodexLocalProfileImportError,

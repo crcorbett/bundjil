@@ -5,7 +5,10 @@ import type { CodexLocalProfileImportFailure } from "./errors.js";
 import { CodexLocalAuthCacheSource } from "./local-auth-cache-source.service.js";
 import { CodexLocalProfileImportConfigService } from "./local-profile-import.config.js";
 import { CodexProfileStore } from "./profile-store.service.js";
-import { CodexLocalProfileImportResult, CodexOAuthProfile } from "./schemas.js";
+import {
+  CodexAccessTokenImportProfile,
+  CodexLocalProfileImportResult,
+} from "./schemas.js";
 import type { CodexLocalProfileImportResult as CodexLocalProfileImportResultType } from "./schemas.js";
 
 export interface CodexLocalProfileImportServiceShape {
@@ -47,7 +50,11 @@ export const makeCodexLocalProfileImportService = Effect.gen(
             });
           }
 
-          const profile = yield* Schema.decodeUnknownEffect(CodexOAuthProfile)({
+          const profile = yield* Schema.decodeUnknownEffect(
+            CodexAccessTokenImportProfile
+          )({
+            profileVersion: 2,
+            profileKind: "access-token-import",
             subject: config.subject,
             accessToken: Redacted.value(cache.tokens.access_token),
             expiresAtEpochMillis,

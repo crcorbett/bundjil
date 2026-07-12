@@ -13,6 +13,12 @@ not project source.
 - `.local/references/effect-v4`: symlink to
   `~/.local/share/effect-solutions/effect`, the guide-recommended shallow clone
   of `Effect-TS/effect-smol`.
+- `.local/references/codex`: sparse shallow clone of `openai/codex`, used as
+  first-party protocol authority for the personal subscription auth SPEC.
+- `.local/references/opencode-openai-codex-auth`: shallow clone of
+  `numman-ali/opencode-openai-codex-auth`, used only as personal external-client
+  interoperability precedent. It is not an implementation dependency or policy
+  authority.
 
 ## Installed Package References
 
@@ -61,6 +67,8 @@ installed package first, then compare source if needed.
 ```bash
 git -C .local/references/eve pull --depth 1 --ff-only
 git -C .local/references/personal-agent-template pull --depth 1 --ff-only
+git -C .local/references/codex pull --depth 1 --ff-only
+git -C .local/references/opencode-openai-codex-auth pull --depth 1 --ff-only
 git -C ~/.local/share/effect-solutions/effect pull --depth 1
 ```
 

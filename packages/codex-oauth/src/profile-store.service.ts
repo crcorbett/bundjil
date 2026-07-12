@@ -1,9 +1,10 @@
 import { Context, Effect, Schema } from "effect";
 
-import { OAuthProfileSchemaError } from "./errors.js";
+import { OAuthProfileSchemaError, OAuthProfileStorageError } from "./errors.js";
 import type { CodexProfileStoreFailure } from "./errors.js";
-import { CodexOAuthProfile } from "./schemas.js";
+import { CodexAccessTokenImportProfile, CodexOAuthProfile } from "./schemas.js";
 import type {
+  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
   CodexOAuthProfile as CodexOAuthProfileType,
   CodexOAuthSubject,
 } from "./schemas.js";
@@ -13,7 +14,7 @@ export interface CodexProfileStoreShape {
     subject: CodexOAuthSubject
   ) => Effect.Effect<CodexOAuthProfileType, CodexProfileStoreFailure>;
   readonly putProfile: (
-    profile: CodexOAuthProfileType
+    profile: CodexAccessTokenImportProfileType
   ) => Effect.Effect<void, CodexProfileStoreFailure>;
   readonly removeProfile: (
     subject: CodexOAuthSubject
@@ -45,6 +46,26 @@ export const putProfile = (profile: CodexOAuthProfileType) =>
           new OAuthProfileSchemaError({
             boundary: "CodexOAuthProfile",
             message: "Unable to encode Codex OAuth profile.",
+            cause,
+          })
+      )
+    );
+
+    if (profile.profileKind !== "access-token-import") {
+      return yield* new OAuthProfileStorageError({
+        operation: "putLegacyProfile",
+        message:
+          "CodexProfileStore.putProfile is reserved for legacy import and bootstrap profiles only.",
+        cause: "subscription profiles must use CodexOAuthProfileCommit",
+      });
+    }
+
+    yield* Schema.encodeEffect(CodexAccessTokenImportProfile)(profile).pipe(
+      Effect.mapError(
+        (cause) =>
+          new OAuthProfileSchemaError({
+            boundary: "CodexAccessTokenImportProfile",
+            message: "Unable to encode the legacy Codex OAuth profile.",
             cause,
           })
       )

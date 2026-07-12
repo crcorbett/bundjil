@@ -3,15 +3,25 @@ import { Context, Effect, Redacted, Schema } from "effect";
 import { CodexOAuthProfileCipherError } from "./errors.js";
 import type { CodexOAuthProfileCipherFailure } from "./errors.js";
 import { CodexOAuthProfileCipherConfigService } from "./profile-cipher.config.js";
-import { CodexOAuthProfile, EncryptedCodexOAuthProfileV1 } from "./schemas.js";
+import {
+  CodexOAuthCredentialRevision,
+  CodexOAuthProfile,
+  EncryptedCodexOAuthProfileV2,
+  LegacyCodexOAuthProfileV1,
+} from "./schemas.js";
 import type {
+  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
   CodexOAuthProfile as CodexOAuthProfileType,
   EncryptedCodexOAuthProfile,
-  EncryptedCodexOAuthProfileV1 as EncryptedCodexOAuthProfileV1Type,
+  EncryptedCodexOAuthProfileV2 as EncryptedCodexOAuthProfileV2Type,
+  LegacyCodexOAuthProfileV1 as LegacyCodexOAuthProfileV1Type,
 } from "./schemas.js";
 import { codexOAuthProfileSubjectHash } from "./storage-keys.js";
 
 const codexOAuthProfileJson = Schema.fromJsonString(CodexOAuthProfile);
+const legacyCodexOAuthProfileJson = Schema.fromJsonString(
+  LegacyCodexOAuthProfileV1
+);
 
 const toArrayBuffer = (value: Uint8Array) => {
   const copy = new Uint8Array(value.byteLength);
@@ -19,11 +29,25 @@ const toArrayBuffer = (value: Uint8Array) => {
   return copy.buffer;
 };
 
+const migrateLegacyCodexOAuthProfile = (
+  profile: LegacyCodexOAuthProfileV1Type
+): CodexAccessTokenImportProfileType => ({
+  profileVersion: 2,
+  profileKind: "access-token-import",
+  subject: profile.subject,
+  accessToken: profile.accessToken,
+  expiresAtEpochMillis: profile.expiresAtEpochMillis,
+  scopes: profile.scopes,
+  createdAtEpochMillis: profile.createdAtEpochMillis,
+  updatedAtEpochMillis: profile.updatedAtEpochMillis,
+  requiresReauthentication: profile.requiresReauthentication,
+});
+
 export interface CodexOAuthProfileCipherShape {
   readonly encrypt: (
     profile: CodexOAuthProfileType
   ) => Effect.Effect<
-    EncryptedCodexOAuthProfileV1Type,
+    EncryptedCodexOAuthProfileV2Type,
     CodexOAuthProfileCipherFailure
   >;
   readonly decrypt: (
@@ -128,8 +152,8 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
           }),
       });
 
-      return yield* Schema.decodeUnknownEffect(EncryptedCodexOAuthProfileV1)({
-        version: 1,
+      return yield* Schema.decodeUnknownEffect(EncryptedCodexOAuthProfileV2)({
+        version: 2,
         algorithm: config.algorithm,
         keyId: config.keyId,
         nonce,
@@ -151,7 +175,7 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
     decrypt: Effect.fn("CodexOAuthProfileCipher.decrypt")(function* (
       encryptedProfile: EncryptedCodexOAuthProfile
     ) {
-      if (encryptedProfile.version !== 1) {
+      if (encryptedProfile.version !== 1 && encryptedProfile.version !== 2) {
         return yield* new CodexOAuthProfileCipherError({
           operation: "unsupportedVersion",
           keyId: encryptedProfile.keyId,
@@ -189,19 +213,43 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
             message: "Unable to decrypt the Codex OAuth profile.",
           }),
       });
-      const profile = yield* Schema.decodeUnknownEffect(codexOAuthProfileJson)(
-        new TextDecoder().decode(plaintext)
-      ).pipe(
-        Effect.mapError(
-          () =>
-            new CodexOAuthProfileCipherError({
-              operation: "decode",
-              keyId: encryptedProfile.keyId,
-              version: encryptedProfile.version,
-              message: "Unable to decode the decrypted Codex OAuth profile.",
-            })
-        )
-      );
+      const profile = yield* Effect.gen(function* decodeProfile() {
+        const plaintextJson = new TextDecoder().decode(plaintext);
+
+        if (encryptedProfile.version === 2) {
+          return yield* Schema.decodeUnknownEffect(codexOAuthProfileJson)(
+            plaintextJson
+          ).pipe(
+            Effect.mapError(
+              () =>
+                new CodexOAuthProfileCipherError({
+                  operation: "decode",
+                  keyId: encryptedProfile.keyId,
+                  version: encryptedProfile.version,
+                  message:
+                    "Unable to decode the decrypted Codex OAuth profile.",
+                })
+            )
+          );
+        }
+
+        const legacyProfile = yield* Schema.decodeUnknownEffect(
+          legacyCodexOAuthProfileJson
+        )(plaintextJson).pipe(
+          Effect.mapError(
+            () =>
+              new CodexOAuthProfileCipherError({
+                operation: "decode",
+                keyId: encryptedProfile.keyId,
+                version: encryptedProfile.version,
+                message:
+                  "Unable to decode the legacy decrypted Codex OAuth profile.",
+              })
+          )
+        );
+
+        return migrateLegacyCodexOAuthProfile(legacyProfile);
+      });
       const subjectHash = yield* codexOAuthProfileSubjectHash(
         profile.subject
       ).pipe(
@@ -246,3 +294,20 @@ export const decryptCodexOAuthProfile = (
 
     return yield* cipher.decrypt(encryptedProfile);
   });
+
+export const generateCodexOAuthCredentialRevision = Effect.fn(
+  "CodexOAuthCredentialRevision.generate"
+)(function* generateCodexOAuthCredentialRevisionOperation() {
+  return yield* Schema.decodeUnknownEffect(CodexOAuthCredentialRevision)(
+    globalThis.crypto.randomUUID()
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new CodexOAuthProfileCipherError({
+          operation: "encode",
+          keyId: "generated",
+          message: "Unable to generate a Codex OAuth credential revision.",
+        })
+    )
+  );
+});

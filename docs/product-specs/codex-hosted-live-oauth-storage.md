@@ -1,499 +1,676 @@
-# Hosted Codex Live OAuth Storage
+# Personal Codex Subscription Auth And Hosted Proxy
 
-Status: Draft  
-Owner: Bundjil  
+Status: Ready for Implementation
+Owner: Bundjil
 Created: 2026-07-07
+Revised: 2026-07-12
+
+## Decision Summary
+
+Bundjil can authenticate a single owner's personal Codex subscription without
+an OpenAI Platform API key and without a Vercel-hosted OAuth callback.
+
+The interactive authorization flow must run on the owner's trusted local
+machine. A local Bundjil command starts the Codex-compatible loopback PKCE
+flow, receives the authorization code on localhost, exchanges it for the
+subscription credential bundle, discards the ID token after deriving the
+required account metadata, encrypts the refresh-capable profile, and writes the
+ciphertext to the owner's Upstash store. The private Vercel proxy reads that
+profile and rotates access and refresh tokens under the existing distributed
+refresh lock.
+
+This supersedes the prior design assumption that Bundjil needs a separately
+registered Vercel redirect URI. Bundjil must not add hosted OAuth start or
+callback routes for this flow.
+
+This is a personal, single-owner integration. It is not a public OAuth product,
+multi-user SaaS authentication system, credential resale service, or general
+OpenAI Platform replacement.
 
 ## Purpose
 
-Complete the next Codex provider slice: hosted live Codex mode for the private
-proxy, live OAuth refresh and storage, and encrypted token-profile persistence
-for Vercel preview and eventual production.
-
-This is the continuation of
-`docs/product-specs/codex-oauth-eve-model-provider.md`. The current repo has a
-mock Vercel preview, direct Codex Responses proof services, an
-OpenAI-compatible proxy contract, and an opt-in Upstash `KeyValueStore`
-adapter. It does not yet have hosted live OAuth endpoint exchange, refresh
-coordination, or encrypted hosted profile storage.
-
-The target runtime remains:
+Replace the completed access-token-only workaround with a durable personal
+subscription sign-in and refresh path while preserving the existing private
+OpenAI-compatible proxy contract:
 
 ```text
-apps/agent Eve runtime
-  -> AI SDK OpenAI-compatible LanguageModel when codex-proxy is opted in
-  -> private apps/codex-proxy Vercel deployment
-  -> @bundjil/codex-oauth OpenAICompatibleProxy
-  -> @bundjil/codex-oauth CodexDirectProvider
-  -> @bundjil/codex-oauth CodexOAuthService
-  -> encrypted CodexProfileStore over Effect KeyValueStore
-  -> Upstash Redis in Cooper's personal Vercel project
+trusted local login command
+  -> ChatGPT subscription authorization through Codex-compatible PKCE
+  -> encrypted refresh-capable profile in personal Upstash
+
+apps/agent Eve runtime (later, separately enabled)
+  -> private apps/codex-proxy Vercel preview
+  -> @bundjil/codex-oauth
+  -> refreshed subscription access token
   -> https://chatgpt.com/backend-api/codex/responses
 ```
 
+The access-token-only filesystem and Upstash import paths remain available as
+rollback tools until the refresh-capable proof passes. They become deprecated,
+not silently deleted, when this SPEC is accepted.
+
+## Corrected Research Conclusion
+
+### Evidence hierarchy
+
+1. OpenAI's current authentication documentation states that Codex supports
+   **Sign in with ChatGPT for subscription access** and that the desktop app,
+   CLI, and IDE extension complete that sign-in through a browser returning
+   credentials to the local Codex client:
+   <https://learn.chatgpt.com/docs/auth?surface=app>.
+2. Current `openai/codex` source is the protocol authority for the local client
+   implementation. Executor Personal DeepWiki research was checked against the
+   ignored local source snapshot at commit
+   `9e552e9d15ba52bed7077d5357f3e18e330f8f38`. Direct source confirms
+   authorization-code PKCE, S256, ports 1455/1457, the first-party scope set,
+   form-encoded code exchange, JSON refresh, required initial ID/access/refresh
+   tokens, optional refreshed tokens, access-JWT expiry, ID-token account
+   metadata, and bounded unauthorized recovery. Implementation must revalidate
+   exact source before live proof.
+3. `numman-ali/opencode-openai-codex-auth` is community interoperability
+   evidence, not an OpenAI policy or API stability guarantee. Local reference
+   commit `bec2ad69b252ef4ad7dd33b9532ff8b4fdb6d016` demonstrates a personal
+   external client using a localhost callback, manual fallback, code exchange,
+   automatic refresh, rotating refresh persistence, account header derivation,
+   and the Codex backend. Its own notice limits intended use to personal
+   development and recommends the Platform API for public or multi-user
+   applications.
+
+### What changed
+
+The earlier revision correctly rejected a **hosted Vercel callback** using the
+Codex public client, but incorrectly treated that as a blocker for the whole
+feature. The supported client shape is local: the browser returns to localhost,
+then the trusted client persists credentials. Bundjil can use the same client
+shape for its single owner and synchronize only the encrypted profile to its
+private hosted proxy.
+
+The following prior requirements are removed:
+
+- a registered Bundjil Vercel redirect URI;
+- `GET /codex/oauth/start` on Vercel;
+- `GET /codex/oauth/callback` on Vercel;
+- a hosted `CodexOAuthStateStore` for PKCE verifier/state;
+- browser cookies or authorization codes crossing into Vercel.
+
+### Protocol baseline
+
+The implementation tracer bullet must verify the current `openai/codex` source
+and local behavior before hard-coding protocol values. The current
+source/reference comparison establishes:
+
+- authorization endpoint `https://auth.openai.com/oauth/authorize`;
+- token endpoint `https://auth.openai.com/oauth/token`;
+- public Codex client identifier category;
+- allow-listed loopback redirects `http://localhost:1455/auth/callback` and
+  first-party fallback port `1457`;
+- authorization-code grant with PKCE S256 and random state;
+- community-reference scopes `openid profile email offline_access`; current
+  first-party source also requests connector scopes, so the tracer bullet must
+  compare both sets and document the minimum accepted set;
+- `id_token_add_organizations=true`;
+- `codex_cli_simplified_flow=true`;
+- `originator=codex_cli_rs`;
+- ID token, access token, and rotating refresh token from the token endpoint;
+  access expiry derived through a narrow schema for the access-token `exp`
+  claim, matching current first-party behavior rather than assuming
+  `expires_in` exists.
+
+The tracer must start with the current first-party scope set and document each
+scope. Do not experiment with alternate scope sets during the owner's real
+login. A later least-privilege reduction requires its own deterministic proof
+and source review. Public protocol constants are not secrets, but they must
+live in one package-owned schema/config module so source drift is visible.
+
 ## Goals
 
-- Revalidate the current Codex OAuth surface before writing live endpoint
-  exchange code.
-- Fix or explicitly bypass local Codex CLI duplicate-install/login issues so
-  OAuth behavior can be inspected without stale tooling.
-- Add application-side envelope encryption for stored Codex OAuth profiles.
-- Store only encrypted token profiles in hosted KV.
-- Add refresh coordination so rotating refresh tokens are not raced by
-  concurrent Vercel invocations.
-- Wire `apps/codex-proxy` live mode to real profile storage and direct Codex
-  calls behind private bearer-token auth.
-- Prove hosted live mode in a Vercel preview deployment under Cooper's
-  personal Vercel account before considering production.
-- Keep `apps/agent` on Gateway by default until the hosted live path has
-  storage, refresh, deployment protection, and documented rollback.
+- Add a trusted-local, refresh-capable Codex subscription login command.
+- Use a scoped loopback callback server with state and PKCE verifier held only
+  in local memory.
+- Exchange and decode OAuth responses through Effect HTTP and Effect Schema.
+- Persist only the minimum encrypted hosted profile: access token, rotating
+  refresh token, expiry, required account metadata, scopes, and timestamps.
+- Never persist the authorization code, PKCE verifier, state, browser cookies,
+  raw token response, or ID token.
+- Make the existing refresh lock guard real hosted refresh and refresh-token
+  rotation.
+- Refresh proactively near expiry and perform at most one forced refresh/retry
+  after an upstream authorization failure.
+- Prove local login, encrypted Upstash persistence, hosted refresh, concurrent
+  refresh safety, private proxy streaming, and safe reauthentication failure.
+- Keep Gateway as the default Eve provider until a separate Eve integration
+  SPEC is accepted.
 
 ## Non-Goals
 
-- Do not adopt OpenClaw, Goose, Hermes, or Pi code.
-- Do not introduce WorkOS, Better Auth, or app-user login for this slice.
-- Do not treat Codex OAuth tokens as OpenAI Platform API keys.
-- Do not route Codex OAuth through Vercel AI Gateway credentials.
-- Do not expose `apps/codex-proxy` as a public gateway.
-- Do not store raw access or refresh tokens in Upstash, Vercel KV, logs, test
-  snapshots, proof files, or docs.
-- Do not make Codex proxy the default Eve model provider in this slice.
+- No hosted browser callback or app-user login.
+- No Better Auth, WorkOS, Auth.js, or user/session database.
+- No multi-user account linking, team account pool, credential sharing,
+  subscription resale, or public proxy.
+- No adoption or dependency on OpenCode, OpenClaw, Goose, Hermes, or Pi code.
+- No copying of their implementation, prompts, model maps, request logs, or
+  unsafe parsing patterns.
+- No automatic extraction from `~/.codex/auth.json` as the primary login path.
+- No storage of ID tokens or raw OAuth responses after login completion.
+- No assumption that the subscription backend is a stable OpenAI Platform API.
+- No production deployment until personal preview proof, policy review, and
+  explicit user approval.
+- No Eve model-provider change in this SPEC.
 
-## Current Foundations
+## Existing Foundations
 
-Reuse these existing boundaries instead of creating parallel DTOs:
+The following implemented package boundaries remain canonical:
 
 - `CodexOAuthSubject`
 - `CodexOAuthProfile`
-- `CodexOAuthService`
-- `CodexOAuthClient`
-- `CodexProfileStore`
-- `CodexResponsesFetch`
-- `CodexHttpClient`
-- `CodexDirectProvider`
-- `OpenAICompatibleProxy`
-- `OpenAICompatibleChatCompletionRequest`
-- `OpenAICompatibleProxyInput`
-- `CodexProxyConfig`
-- `CodexProxyRoutesLive`
-- `CodexProfileStoreKeyValueLive`
-- `UpstashKeyValueStoreLive`
-
-The new implementation should add focused contracts beside these existing
-owners:
-
 - `EncryptedCodexOAuthProfileV1`
 - `CodexOAuthProfileCipher`
-- `CodexOAuthProfileCipherError`
+- `CodexProfileStore`
 - `CodexProfileStoreEncryptedKeyValueLive`
 - `CodexOAuthRefreshLock`
-- `CodexOAuthRefreshLockError`
-- `CodexOAuthStateStore`
-- `CodexOAuthStateStoreError`
-- `CodexOAuthClientLive`
-- `CodexProxyLiveLayers`
+- `UpstashCodexOAuthRefreshLockLive`
+- `CodexOAuthClient`
+- `CodexOAuthService`
+- `CodexDirectProvider`
+- `CodexHttpClient`
+- `OpenAICompatibleProxy`
+- `UpstashKeyValueStoreLive`
+- `CodexProxyConfig`
+- `CodexProxyRoutesLive`
 
-Names may change during implementation, but equivalent package-owned schemas,
-service tags, layers, and tagged errors must exist before hosted live mode is
-enabled.
+Completed encryption, encrypted persistence, storage keys, Upstash adapter, and
+lock semantics must be reused. The current access-token-only importer and live
+preview prove the storage and provider call graph, but do not prove refresh.
 
 ## Design
 
-### OAuth Revalidation
+### Trusted-local login boundary
 
-Codex OAuth behavior is not a stable public model-provider API. Before
-implementation, re-run the research against the current Codex CLI and current
-auth surface, then record sanitized findings in this spec or a dated research
-appendix.
+`@bundjil/codex-oauth` owns protocol schemas, token exchange, refresh, and the
+login operation because it already owns the profile and provider contracts.
+The Bun command is the only executable allowed to open a browser or bind a
+loopback callback.
 
-The first implementation task must verify:
+Add or refine these contracts:
 
-- `which -a codex` and `codex --version` are not masking an older binary.
-- The local managed Codex sign-in flow works or the blocker is documented.
-- Current issuer, client id, scopes, PKCE behavior, redirect behavior, and
-  token response shape are confirmed without recording secret values.
-- The hosted redirect URI can be registered or otherwise accepted by the
-  current Codex OAuth flow.
+- `CodexSubscriptionAuthProtocolConfig`: issuer/endpoints, public client id,
+  redirect URI, scopes, and approved authorization parameters.
+- `CodexOAuthAuthorizationSession`: redacted state, redacted PKCE verifier,
+  redacted authorization URL, redirect URI, and expiry. This value is
+  memory-only; reveal the URL only at the browser-launch boundary.
+- `CodexOAuthAuthorizationCallback`: redacted code and state decoded from the
+  loopback request.
+- `CodexOAuthTokenResponse`: minimal ID/access/refresh token endpoint response
+  schema without an assumed `expires_in` field.
+- `CodexOAuthAccountId`: redacted account/workspace identifier needed for the
+  backend request header.
+- `CodexOAuthCredentialRevision`: opaque revision/fencing value for one
+  encrypted profile generation.
+- `CodexSubscriptionLoginResult`: sanitized profile id, mode, expiry category,
+  refresh capability, and encrypted-store confirmation.
+- tagged errors for callback bind, callback timeout, state mismatch, denied
+  authorization, code exchange, token response schema, account metadata,
+  refresh, and reauthentication required.
 
-The screenshot failure from 2026-07-07 showed a managed login attempting a
-localhost callback and failing after duplicate CLI installs were suspected.
-That must be resolved or intentionally bypassed before hosted OAuth work.
+Use concrete package-owned service tags and explicit layers:
 
-#### Revalidation Evidence, 2026-07-11
+- `CodexSubscriptionAuthProtocolConfigService` with live/test layers;
+- `CodexOAuthHttpClient` with live/mock HTTP layers;
+- `CodexLoopbackCallback` with Bun live and memory test layers;
+- `CodexBrowserLauncher` with platform-command live and memory test layers;
+- `CodexSubscriptionLogin` with live/mock composition;
+- `CodexOAuthProfileCommit` with Upstash fenced-CAS and memory layers.
 
-This tracer bullet inspected only executable metadata, CLI status, cache field
-names, and source-level protocol facts. It did not start an interactive login
-or read, print, persist, or commit credentials, authorization codes, cookies,
-or OAuth payloads.
-
-- The shell-selected CLI is the standalone binary at
-  `~/.local/bin/codex`, symlinked to the Codex-managed standalone install, and
-  reports `codex-cli 0.136.0`. `codex login status` reports a ChatGPT login.
-  Two other local binaries exist: the pnpm shim reports `0.142.0`, and the
-  ChatGPT-app bundled binary reports `0.144.0-alpha.4`. The duplicate-install
-  concern is therefore bypassed for this implementation by pinning all manual
-  investigation to the shell-selected standalone CLI; nothing should infer
-  behavior from the pnpm or bundled binary.
-- The local auth cache was inspected only for top-level field names:
-  `OPENAI_API_KEY`, `auth_mode`, `last_refresh`, and `tokens`. No values were
-  read. This confirms that the prior local callback failure is not a current
-  prerequisite for the already authenticated standalone CLI, but it does not
-  establish a hosted redirect flow.
-- Source-level research against `openai/codex` via Executor Personal DeepWiki
-  identifies `https://auth.openai.com` as the account-login issuer category,
-  a fixed public Codex CLI client identifier, scopes `openid`, `profile`,
-  `email`, `offline_access`, `api.connectors.read`, and
-  `api.connectors.invoke`, and PKCE `S256`. The CLI account login uses a
-  local loopback callback at `http://localhost:<port>/auth/callback`.
-- The relevant response/cache shape contains identity, access, refresh, and
-  expiry fields. The source names include `id_token`, `access_token`,
-  `refresh_token`, `expires_at`, `client_id`, and `token_response`. These
-  names establish the later schema boundary only; their values must never be
-  logged, stored unencrypted, or added to fixtures.
-- `mcp_oauth_callback_url` is not a hosted-account-login escape hatch. The
-  Codex source uses it only when Codex authenticates to a configured remote
-  MCP server. It does not provide an arbitrary hosted redirect setting for the
-  CLI's ChatGPT account authorization flow.
-
-**Decision: hosted account OAuth routes are blocked/deferred.** The current
-CLI/source evidence does not support implementing `/codex/oauth/start` and
-`/codex/oauth/callback` against the CLI's ChatGPT OAuth client from a Vercel
-deployment. Do not emulate or reuse that public client, localhost redirect,
-or its account tokens. Encryption, schema, storage, and lock work may proceed
-in `@bundjil/codex-oauth`; `CodexOAuthClientLive`, operator OAuth routes, and
-hosted live proof remain blocked until OpenAI provides a supported hosted grant
-with a registered Vercel redirect URI, or a separately supported account-link
-mechanism is verified and specified.
-
-### Encrypted Profile Storage
-
-`@bundjil/codex-oauth` owns encryption contracts because token profiles are a
-provider concern, not a Vercel route concern. The live deployment supplies key
-material through app-owned Effect Config.
-
-The encrypted profile shape should be versioned and schema-backed:
+The local operation should be a scoped, named Effect program:
 
 ```text
-EncryptedCodexOAuthProfileV1
-  version
-  algorithm
-  keyId
-  nonce
-  ciphertext
-  subjectHash
-  createdAtEpochMillis
-  updatedAtEpochMillis
+CodexSubscriptionLogin.run
+  -> generate cryptographic state and PKCE pair
+  -> acquire CodexLoopbackCallback through Effect Scope on 127.0.0.1
+  -> build authorization URL
+  -> reveal redacted URL only to CodexBrowserLauncher
+  -> await one callback through Deferred with a strict timeout
+  -> validate method, path, state, and code
+  -> exchange code through CodexOAuthClientLive
+  -> decode minimum account metadata
+  -> construct canonical refresh-capable CodexOAuthProfile
+  -> encrypt and store through CodexProfileStore
+  -> close server through Scope finalization
+  -> emit Schema-encoded sanitized result
 ```
 
-The stored value must be encoded through an owning Effect Schema before it
-crosses the `KeyValueStore` boundary. Prefer `KeyValueStore.toSchemaStore`
-when the boundary stores schema-owned values, and keep any lower-level
-string-only storage adapter behind a package-owned layer.
+State and verifier must never enter Upstash. Callback query strings and the
+authorization code must not enter logs, spans, errors, proof output, shell
+history, or docs. A port-bind failure returns a safe actionable error. Manual
+redirect paste is a later opt-in fallback unless it can be implemented without
+printing or retaining the code. Request logging is disabled for the callback
+server, and Scope finalization must close it after success, denial, timeout,
+interruption, state mismatch, exchange failure, or browser-launch failure.
 
-`CodexOAuthProfileCipher` should use WebCrypto-compatible AES-GCM or an
-equivalent platform-supported authenticated encryption primitive. The key must
-come from `Config.redacted`, with a separate non-secret key id for rotation.
-The implementation must prove that stored values do not contain raw access
-tokens, refresh tokens, authorization codes, or full OAuth payloads.
+### OAuth client operations
 
-`Redacted.value(...)` may only appear at the final provider boundary that needs
-the raw bytes, such as WebCrypto key import or an outbound authorization
-header. It must not appear in diagnostics, errors, JSON proof output, task
-evidence, test snapshots, or route responses.
+Implement `CodexOAuthClientLive` with named operations for:
 
-Hosted storage should compose as:
+- creating the authorization session;
+- exchanging an authorization code with the PKCE verifier;
+- refreshing an expired/near-expiry profile;
+- returning an explicit unsupported result for remote revocation if no current
+  provider revocation endpoint exists.
+
+The client uses Effect HTTP APIs and separate owning request contracts:
+
+- authorization-code exchange uses the current first-party form-url-encoded
+  request shape;
+- refresh uses the current first-party JSON request shape;
+- successful and error responses use narrow Effect Schemas, including optional
+  token fields where current source permits them.
+
+Redacted values are revealed only at the final request body boundary. The
+client must not use raw `fetch`, `JSON.parse`, `JSON.stringify`, unsafe casts,
+unverified object readers, or provider response logging.
+
+### Token and account profile
+
+Replace the ambiguous single profile shape with an explicit versioned union:
+
+```text
+CodexOAuthProfileV2 =
+  | CodexAccessTokenImportProfile
+  | CodexSubscriptionProfile
+```
+
+`CodexAccessTokenImportProfile` represents the accepted legacy/import fallback
+and may omit refresh/account metadata. `CodexSubscriptionProfile` must require
+the rotating refresh token, account id, access expiry, protocol/scope version,
+credential revision, and `requiresReauthentication` state.
+
+The encrypted subscription plaintext may contain:
+
+```text
+CodexSubscriptionProfile
+  profileVersion
+  profileKind
+  subject
+  accessToken (Redacted)
+  refreshToken (Redacted, required for subscription login profiles)
+  expiresAtEpochMillis (derived from access-token `exp`)
+  accountId (Redacted or otherwise excluded from keys/logs)
+  scopes
+  createdAtEpochMillis
+  updatedAtEpochMillis
+  lastRefreshedAtEpochMillis
+  credentialRevision
+  requiresReauthentication
+```
+
+Decode existing encrypted V1 plaintext only as the legacy access-token-import
+variant. Do not silently reinterpret it as refresh-capable. A successful new
+login writes V2; live refresh refuses a legacy profile with safe
+reauthentication guidance. Migration and rollback tests must cover both
+variants.
+
+Do not persist the ID token. Derive the access expiry from the access-token
+`exp` claim and extract the required account metadata from the first-party
+canonical token/claim source using narrow Effect Schema decoders after the
+response is received directly over TLS. This extraction supplies routing and
+expiry metadata only; it must not be treated as independent proof of identity
+or authorization. Never place account metadata in a Redis key, URL, log,
+error, or route response.
+
+If current `openai/codex` source proves that a different token or claim is the
+canonical account source, update this SPEC before implementation proceeds.
+On refresh, retain the stored account id when no new identity metadata is
+returned. If a refresh response identifies a different account, fail without
+mutating storage and require a new local login.
+
+Although current first-party refresh response fields are optional at the
+transport schema, Bundjil requires a new access token for a successful refresh.
+It may retain the current refresh token when the replacement is omitted and
+current source permits that behavior. An omitted ID token retains the existing
+account id. Missing access token, malformed expiry, or cross-account metadata
+is a typed failure with no profile mutation.
+
+### Encrypted persistence
+
+All refresh-capable profiles must continue through:
 
 ```text
 CodexProfileStore
   -> CodexProfileStoreEncryptedKeyValueLive
-  -> CodexOAuthProfileCipher
-  -> effect/unstable/persistence/KeyValueStore
+  -> CodexOAuthProfileCipherLive (AES-GCM)
+  -> KeyValueStore.toSchemaStore
   -> UpstashKeyValueStoreLive
-  -> @upstash/redis
+  -> personal Upstash Redis
 ```
 
-The existing raw `CodexProfileStoreKeyValueLive` remains valid for local tests
-and non-hosted proof, but it must not be composed with Upstash for hosted
-refresh-token storage.
+Only the versioned encrypted envelope may cross the Upstash boundary. Key
+material comes from `Config.redacted`; key ids remain non-secret. Rotation of
+the encryption key is operationally separate from OAuth refresh-token
+rotation.
 
-### Refresh Coordination
+### Refresh and rotation
 
-Refresh tokens can rotate, so hosted live mode needs an explicit lock before
-refresh. Add a `CodexOAuthRefreshLock` service with typed acquisition,
-contention, release, and expiry errors.
+The five-second refresh lease alone is insufficient: a slow request can finish
+after lease expiry and overwrite a newer login or refresh. Add
+`CodexOAuthProfileCommit`, a package-owned fenced compare-and-set mutation
+contract. Its Upstash adapter atomically verifies the expected credential
+revision/fence and writes the new encrypted profile/revision. All subscription
+profile mutations—new login, refresh rotation, and permanent reauthentication
+marking—must use this boundary. A stale lease holder receives a typed conflict
+and re-reads the winner instead of writing.
 
-The lock key should derive from the existing canonical subject hash. The
-owner value should be per invocation. The TTL must be short enough to recover
-from crashed serverless invocations, and tests must prove stale lock expiry.
+Refine `CodexOAuthService.getValidToken` into a canonical credential operation
+that returns access token, account id, and credential revision together:
 
-Preferred hosted implementation:
+1. Read and decrypt the profile.
+2. Return the access token when it remains valid beyond a configured refresh
+   skew.
+3. Otherwise acquire `CodexOAuthRefreshLock` using the canonical subject hash.
+4. Re-read the profile under lock.
+5. Return the newer winner token if another invocation already refreshed.
+6. Exchange the current refresh token at the token endpoint.
+7. Fenced-CAS commit the new access token, new expiry, account id, new revision,
+   and rotated refresh token before releasing the lock.
+8. On `invalid_grant`, missing refresh token, or another permanent credential
+   failure, atomically mark `requiresReauthentication=true` and return a safe
+   tagged error. On network, timeout, rate-limit, or provider 5xx failure,
+   leave the stored profile unchanged and return a retryable typed failure.
 
-```text
-CodexOAuthRefreshLock
-  -> Upstash Redis atomic lock command
-  -> set-if-absent with expiry
-  -> compare-owner release
-```
+The old refresh token must never overwrite a newer winner. If the provider
+omits a replacement refresh token, retain the current token only when current
+source evidence permits it; otherwise fail closed.
 
-If the current Upstash SDK cannot express the required atomic operation through
-the generic `KeyValueStore`, add a narrow package-owned Upstash lock adapter
-behind the service tag rather than leaking Redis commands into app route code.
+Add `recoverAfterUnauthorized({ subject, observedCredentialRevision })`. Under
+lock it re-reads the profile, uses the winner if the revision changed, or
+forces a refresh regardless of JWT expiry when the rejected revision is still
+current. It returns one atomic credential containing access token, account id,
+and revision. The direct provider may replay exactly once with that credential.
+It must not loop, retry arbitrary 4xx responses, or refresh after policy or
+rate-limit errors.
 
-### OAuth Routes
+### Private hosted proxy
 
-`apps/codex-proxy` owns the deployable route boundary because it owns Vercel
-entrypoints, app config, and private operator access.
+`apps/codex-proxy` keeps its existing routes:
 
-Add private/operator routes:
+- `GET /health`
+- private `POST /v1/chat/completions`
 
-```text
-GET /codex/oauth/start
-GET /codex/oauth/callback
-POST /codex/oauth/logout
-```
+It must not add OAuth browser routes. Live mode composes the refresh-capable
+`CodexOAuthClientLive`, encrypted profile store, Upstash lock, OAuth service,
+direct provider, and existing OpenAI-compatible stream mapper. Missing or
+invalid credentials return a generic reauthentication instruction with no
+provider body or token metadata.
 
-`/codex/oauth/start` must create PKCE/state values, store short-lived state in
-`CodexOAuthStateStore`, and redirect to the current OpenAI/Codex authorization
-URL. `/codex/oauth/callback` must validate state, exchange the code, build a
-canonical `CodexOAuthProfile`, encrypt it, persist it, and return a minimal
-success page or schema-encoded JSON response that contains no token values.
-`/codex/oauth/logout` must remove the stored encrypted profile for the
-configured subject.
+Route error semantics are explicit:
 
-These routes are private operational routes, not public app-login routes.
-Production must either keep them behind deployment protection, an internal
-admin token, or another explicit operator-only guard.
+- missing/invalid private proxy bearer remains HTTP 401;
+- permanent subscription credential failure returns HTTP 502 with stable code
+  `codex_reauthentication_required`;
+- transient token refresh or auth-provider failure returns HTTP 503 with stable
+  code `codex_auth_temporarily_unavailable`;
+- non-auth upstream failure remains a sanitized HTTP 502 provider error.
 
-### Live Proxy Mode
+`GET /health` must not report `ok: true` when `live` layer construction has
+fallen back to the unavailable proxy service. In that state it returns a
+sanitized non-ready status without probing or exposing the stored profile.
 
-`BUNDJIL_CODEX_PROXY_MODE=mock` remains the local and default preview proof
-mode. `BUNDJIL_CODEX_PROXY_MODE=live` may only compose live layers after
-encrypted storage, refresh coordination, and Vercel preview env are verified.
+`mock` remains the default. `local` remains a trusted filesystem proof and is
+rejected on Vercel. `live` remains explicit and personal-preview only until a
+later production decision.
 
-The live chat route should:
+### Disconnect and revocation
 
-- validate the internal bearer token;
-- decode the OpenAI-compatible request through canonical Effect Schema;
-- resolve the configured Codex subject/profile;
-- refresh under lock when the access token is near expiry;
-- call the direct Codex Responses backend;
-- stream OpenAI-compatible SSE chunks;
-- record only sanitized diagnostics.
+Bundjil can always disconnect locally by deleting the encrypted profile and
+switching the proxy to `mock`. If OpenAI does not expose a supported remote
+revocation endpoint, do not fabricate one. Documentation must direct the owner
+to the current ChatGPT/Codex account controls for provider-side revocation.
 
-The app must compose live mode through explicit layers rather than hidden
-globals:
+### Evidence and usage boundary
 
-```text
-CodexProxyLiveLayers
-  -> CodexProxyConfig
-  -> CodexOAuthClientLive
-  -> CodexOAuthService
-  -> CodexOAuthRefreshLockLive
-  -> CodexProfileStoreEncryptedKeyValueLive
-  -> CodexOAuthProfileCipherLive
-  -> UpstashKeyValueStoreLive
-  -> CodexDirectProviderLive
-```
-
-`apps/agent` should remain unchanged except for docs and optional local
-configuration notes. It should still treat the private proxy as a normal AI SDK
-OpenAI-compatible provider.
-
-### Vercel and Upstash
-
-The Vercel project is `bundjil-codex-proxy` in Cooper's personal Vercel
-account. Do not deploy or configure this under Tilt Legal.
-
-Required preview environment categories:
-
-- proxy auth: `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`
-- mode: `BUNDJIL_CODEX_PROXY_MODE`
-- subject/profile ids: the existing `BUNDJIL_CODEX_*` profile identifiers
-- Upstash: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, optional
-  key prefix
-- encryption: `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`,
-  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`
-- OAuth: verified Codex OAuth client, issuer, redirect, and scope settings if
-  they cannot be safely derived from the current implementation
-
-All secret values belong in Vercel env vars or ignored local env files. The
-earlier preview env pull showed the internal token value was effectively empty;
-that must be rotated and verified before authenticated preview proof.
+The protocol is appropriate only for Cooper's personal agent using Cooper's
+own subscription. The proxy must remain private and single-profile. Any move
+to multiple users, commercial access, account pooling, or public traffic
+requires a new SPEC and the OpenAI Platform API unless OpenAI publishes a
+different supported product surface.
 
 ## Call Graphs
 
-Production hosted OAuth start:
+### Local login CLI
 
 ```text
-GET /codex/oauth/start
-  -> apps/codex-proxy CodexOAuthRoutesLive
-  -> CodexOAuthClientLive.startLogin
-  -> CodexOAuthStateStore
-  -> encrypted or short-lived Effect KeyValueStore state
-  -> redirect to current Codex authorization URL
-```
-
-Production hosted OAuth callback:
-
-```text
-GET /codex/oauth/callback
-  -> apps/codex-proxy CodexOAuthRoutesLive
-  -> CodexOAuthStateStore.validate
-  -> CodexOAuthClientLive.completeLogin
-  -> CodexOAuthProfileCipher.encrypt
-  -> CodexProfileStoreEncryptedKeyValueLive.save
+bun run --filter @bundjil/codex-oauth login:subscription
+  -> CodexSubscriptionLogin.run
+  -> CodexSubscriptionAuthProtocolConfigServiceLive
+  -> CodexLoopbackCallbackBunLive
+     -> Effect Scope + Bun platform services + Deferred callback
+  -> CodexOAuthClientLive.createAuthorizationSession
+  -> CodexBrowserLauncherCommandLive
+  -> browser -> auth.openai.com/oauth/authorize
+  -> localhost callback -> Deferred<AuthorizationCallback>
+  -> CodexOAuthClientLive.exchangeAuthorizationCode
+  -> auth.openai.com/oauth/token
+  -> CodexOAuthProfileCipherLive
+  -> CodexOAuthProfileCommitUpstashLive (fenced initial/replacement write)
   -> UpstashKeyValueStoreLive
 ```
 
-Production live model path:
+### Hosted refresh-capable request
 
 ```text
-apps/agent Eve runtime
-  -> @ai-sdk/openai-compatible LanguageModel
-  -> POST apps/codex-proxy /v1/chat/completions
-  -> CodexProxyRoutesLive
+POST /v1/chat/completions
+  -> apps/codex-proxy CodexProxyRoutesLive
   -> OpenAICompatibleProxy.handleChatCompletions
   -> CodexDirectProvider.streamChatCompletion
-  -> CodexOAuthService.getValidAccessToken
-  -> CodexOAuthRefreshLock.withLock when refresh is needed
+  -> CodexOAuthService.getValidCredential
   -> CodexProfileStoreEncryptedKeyValueLive
-  -> CodexHttpClient
+  -> when near expiry: UpstashCodexOAuthRefreshLockLive
+  -> CodexOAuthClientLive.refresh
+  -> auth.openai.com/oauth/token
+  -> CodexOAuthProfileCommitUpstashLive fenced-CAS rotated write
+  -> CodexHttpClient.postResponsesStream
   -> chatgpt.com/backend-api/codex/responses
 ```
 
-Package tests:
+### Forced authorization retry
 
 ```text
-Vitest
-  -> CodexOAuthProfileCipher deterministic or WebCrypto test layer
-  -> CodexProfileStoreEncryptedKeyValueLive
-  -> KeyValueStore.layerMemory
-  -> leak checks against encoded stored values
-
-Vitest
-  -> CodexOAuthRefreshLock memory and Upstash-like test layers
-  -> concurrent refresh programs
-  -> one refresh winner, retry/read followers
+Codex backend 401 with observed credential revision
+  -> CodexDirectProvider classifies authorization failure
+  -> CodexOAuthService.recoverAfterUnauthorized
+  -> distributed lock + profile re-read
+  -> winner credential OR forced refresh of unchanged rejected revision
+  -> fenced-CAS rotated profile write
+  -> one replay
+  -> success OR CodexOAuthReauthenticationRequired
 ```
 
-App tests:
+### Tests
 
 ```text
-Vitest
-  -> apps/codex-proxy server/router
-  -> mock CodexOAuthClientLive
-  -> memory CodexOAuthStateStore
-  -> memory encrypted CodexProfileStore
-  -> mocked CodexDirectProvider
+@effect/vitest
+  -> CodexSubscriptionLogin
+  -> CodexSubscriptionAuthProtocolConfigTest
+  -> CodexLoopbackCallbackMemory
+  -> CodexBrowserLauncherMemory
+  -> CodexOAuthHttpClientMock
+  -> encrypted profile store over KeyValueStore.layerMemory
+
+@effect/vitest
+  -> concurrent CodexOAuthService requests
+  -> memory/Upstash-like refresh lock
+  -> rotating mock token endpoint
+  -> CodexOAuthProfileCommitMemory fenced-CAS
+  -> exactly one refresh and one winning encrypted profile
 ```
 
-Vercel proof:
+### Live proof
 
 ```text
-vercel deploy preview
-  -> GET /health reports live mode when configured
-  -> OAuth start/callback stores encrypted profile
-  -> authenticated /v1/chat/completions streams live Codex result
-  -> Vercel logs and Upstash readback show no secret leakage
+trusted local login command
+  -> sanitized success only
+  -> encrypted Upstash envelope readback
+
+Vercel personal preview
+  -> health/auth checks
+  -> force near-expiry profile
+  -> isolated proof subject and concurrent live requests
+  -> safe refresh observer reports one winner without revision values
+  -> successful private SSE stream
+  -> response/storage/log leak scans
 ```
 
 ## Effect Requirements
 
 Use Effect TS native approaches first. Prefer `Data`, `Schema`, `Array`,
 `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`,
-`Service`, `Record`, `Result`, `Exit`, `Bun/Platform Command`, and
-`ManagedRuntime` over plain TypeScript helpers when the code is fallible,
-async, runtime-owned, collection-heavy, or crosses a package, route, command,
-config, provider, or service boundary.
+`Service`, `Record`, `Result`, `Exit`, Effect Platform HTTP/Command,
+`Deferred`, `Scope`, and `ManagedRuntime` over plain TypeScript helpers when
+the code is fallible, async, runtime-owned, resource-scoped, or crosses a
+package, HTTP, command, config, provider, or persistence boundary.
 
 Reuse canonical schemas, types, service contracts, errors, and branded
-identifiers from the owning package. Do not define standalone DTO mirrors or
-duplicate fields such as id, slug, status, or metadata outside their canonical
-schema/type owner.
+identifiers from `@bundjil/codex-oauth`. Do not create script-local DTOs,
+token-response mirrors, or duplicate profile fields.
 
-Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
-mappers, transformers, switch/case branches, unsafe casts, manual
-encode/decode adapters, or trivial helpers when Effect Schema, `Match`,
-`Result`, `Exit`, or an owning service contract should carry the behavior.
+Primary login, callback, exchange, refresh, profile update, and provider retry
+operations must be flat, named `Effect.gen` or `Effect.fn` programs. Handle
+expected failures in the following `.pipe(...)` with `catchTag`, `catchTags`,
+`mapError`, or `Match`.
 
-JSON string boundaries in committed app or package code must use Effect Schema
-codecs such as `Schema.fromJsonString(...)` or `Schema.UnknownFromJsonString`.
+Additional requirements:
 
-Concrete requirements for this SPEC:
+- Effect Schema owns URL/query/form/token/profile/callback/result boundaries
+  and all derived TypeScript types.
+- JSON string boundaries use `Schema.fromJsonString(...)` or
+  `Schema.UnknownFromJsonString`; no manual JSON parser/stringifier.
+- Effect Platform owns HTTP client/server and browser-opening command
+  lifecycles; no raw Node HTTP server or unmanaged child process.
+- Callback listener acquisition and release are scoped; state completion uses
+  `Deferred` or an equivalent Effect concurrency primitive.
+- Config lives beside its consumer and uses `Config`, `Config.redacted`, and
+  `ConfigProvider.fromEnv()`; package logic does not read `process.env`.
+- Secrets remain `Redacted` until the final crypto, form body, or authorization
+  header boundary.
+- Provider response bodies, callback query strings, and credentials never
+  enter spans, errors, logs, snapshots, or proof output.
+- Persistence uses Effect `KeyValueStore` plus owning schemas. Raw Upstash
+  commands remain isolated to the lock adapter.
+- No unsafe casts, `instanceof`, stringly `_tag` checks, manual object readers,
+  one-line wrappers, or helper sprawl.
+- Tests use `@effect/vitest` with explicit memory/mock layers.
 
-- New runtime capabilities must be exposed as `Context.Service` tags with
-  live and memory/mock layers. Do not pass raw provider clients through domain
-  functions.
-- Primary operations must be named `Effect.gen` or `Effect.fn` programs with a
-  readable success path and `Effect.withSpan(...)` where the operation crosses
-  a provider, storage, route, or config boundary.
-- Expected failures must be package-owned `Schema.TaggedErrorClass` or
-  `Data.TaggedError` values. Translate provider/route failures once at the
-  boundary and handle them with `Effect.catchTag`, `Effect.catchTags`,
-  `Effect.mapError`, or `Match`.
-- Config must live beside the runtime or package that consumes it and use
-  `Config.schema(...)`, `Config.redacted(...)`, `Config.url(...)`, and
-  `ConfigProvider.fromEnv()`. Package logic must not read `process.env`
-  directly.
-- Persistence must flow through `effect/unstable/persistence/KeyValueStore`
-  and schema-backed stores. Raw Redis or Upstash commands are allowed only in a
-  narrow adapter layer that implements an owning service contract such as
-  `CodexOAuthRefreshLock`.
-- Tests should use `@effect/vitest` and compose memory/mock layers at the test
-  boundary.
-
-Every implementation task must record the mandatory 3-pass audit, and the task
-ledger must include a dedicated 3-pass audit sweep task after implementation:
-
-1. Ownership and call graph.
-2. Effect implementation quality.
-3. Verification coverage.
+Every implementation task requires three parent audit passes before
+acceptance: ownership/call graph, Effect implementation quality, and
+verification coverage. A dedicated final 3-pass audit sweep remains mandatory.
 
 ## Verification
 
-Before implementation can be marked complete:
+Automated gates:
 
-- `bun install --frozen-lockfile`
-- `bun run --filter @bundjil/codex-oauth test`
 - `bun run --filter @bundjil/codex-oauth check-types`
+- `bun run --filter @bundjil/codex-oauth test`
 - `bun run --filter @bundjil/codex-oauth build`
-- `bun run --filter @bundjil/codex-proxy test`
 - `bun run --filter @bundjil/codex-proxy check-types`
+- `bun run --filter @bundjil/codex-proxy test`
 - `bun run --filter @bundjil/codex-proxy build`
 - `bun run --filter @bundjil/codex-proxy smoke-test`
-- `bun run --filter @bundjil/agent test` if agent wiring or docs examples
-  change
-- `bun run --filter @bundjil/agent build` if agent wiring changes
-- `bun run check-types`
 - `bun run verification`
-- Vercel preview deploy and direct HTTP checks before production
-- sanitized hosted live OAuth proof
-- sanitized hosted live model proof
-- Vercel log scan for absent token values, authorization codes, raw OAuth
-  payloads, prompts, and full response bodies
-- Upstash readback proof that hosted values are encrypted and prefixed
-- dedicated 3-pass Effect TS audit sweep task completed with evidence
+- `git diff --check`
 
-Production deployment remains a separate explicit approval gate after preview
-proof.
+Required deterministic tests:
 
-## Risks
+- authorization URL protocol fields and least-privilege scopes;
+- state entropy/validation, PKCE S256, callback path/method validation;
+- callback timeout, denial, missing code, state mismatch, and port conflict;
+- code exchange success without `expires_in`, access-JWT expiry decoding, and
+  safe provider/schema failures;
+- ID token is not persisted and account metadata is never exposed;
+- refresh-capable encrypted profile contains no plaintext token markers;
+- legacy-profile decode/migration behavior and required subscription fields;
+- proactive refresh skew, rotating refresh replacement, lock contention,
+  winner re-read, lock expiry during exchange, fenced stale-write rejection,
+  concurrent login replacement, stale permanent-failure rejection, and
+  owner-only release;
+- permanent refresh failure marks reauthentication and does not loop, while
+  transient refresh failure leaves the stored profile unchanged;
+- one forced 401 refresh/replay and no replay for unrelated errors;
+- mock/local mode preservation and live config failure safety.
 
-- Codex OAuth is not a general OpenAI API credential path and may change.
-- Refresh-token rotation can corrupt a profile if concurrent invocations race.
-- Hosted token storage can become a durable credential leak if encryption or
-  logs are wrong.
-- Vercel preview protection and project scope mistakes can expose a private
-  provider endpoint.
-- The Eve app could accidentally become coupled to Codex OAuth internals if
-  provider selection logic crosses the app/package boundary.
+Required opt-in live proof, with values suppressed:
+
+- local browser sign-in completes through the loopback callback;
+- sanitized result confirms refresh capability and encrypted persistence;
+- Upstash readback proves a versioned ciphertext envelope and no token, code,
+  verifier, state, account-id, or ID-token markers;
+- preview health is live, unauthorized/invalid-token calls are 401, and a
+  private authenticated request streams SSE with `[DONE]`;
+- a controlled near-expiry or test-profile proof exercises hosted refresh;
+- concurrent proof requests use safe observer counters/booleans to prove one
+  refresh winner and no stale overwrite without recording revision values;
+- permanent-failure behavior is proven against deterministic token endpoints
+  and an isolated proof profile, not by damaging the owner's working profile;
+- Vercel logs contain no credentials, callback query, raw provider payload,
+  prompt, request body, or full model response;
+- no production deploy occurs without a later explicit approval.
+
+## Documentation Deliverables
+
+Update the root README, `docs/README.md`, package/app READMEs, Effect/repository
+architecture guides, testing guide, this SPEC, task ledger, and active plan.
+After refresh-capable live proof passes, mark the access-token-only workaround
+as superseded for normal operation while retaining its rollback instructions.
+
+Documentation must distinguish:
+
+- official OpenAI documentation and `openai/codex` source behavior;
+- community interoperability evidence;
+- Bundjil's personal experimental use of the subscription backend;
+- the OpenAI Platform API requirement for public or multi-user products.
+
+## Risks And Mitigations
+
+- **Protocol drift:** revalidate current `openai/codex` source before each live
+  proof; keep constants centralized and test authorization URL shape.
+- **Ambiguous product support:** keep the feature personal, private, and
+  single-owner; do not describe it as a general third-party OAuth product.
+- **Credential exfiltration:** local-only callback, encrypted profile store,
+  redacted contracts, no raw payload logs, and ciphertext readback checks.
+- **Refresh-token race:** distributed lock, profile re-read under lock,
+  fenced-CAS encrypted winner write, and lease-expiry/concurrent tests.
+- **Callback interception:** loopback-only bind, random state, PKCE S256,
+  strict path/method validation, timeout, one-shot completion, scoped close.
+- **JWT misuse:** narrow schema extraction only after direct token exchange;
+  do not use unverified claims as an independent identity decision.
+- **Backend instability:** isolate request mapping and auth client behind
+  package services; fail closed and retain Gateway/mock rollback.
+- **Subscription misuse:** no pooling, resale, multi-user service, or public
+  gateway; revisit terms and current official docs before production.
 
 ## Rollback
 
-- Set `BUNDJIL_CODEX_PROXY_MODE=mock` for the proxy.
-- Remove `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy` so Eve returns to Gateway.
-- Rotate `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` if route auth is suspected to be
-  exposed.
-- Delete the encrypted Codex profile and short-lived OAuth state keys from
-  Upstash.
-- Roll back the Vercel preview or production deployment.
+- Set preview `BUNDJIL_CODEX_PROXY_MODE=mock` and deploy another preview.
+- Remove the encrypted refresh-capable profile from Upstash.
+- Rotate the Bundjil encryption key and private proxy token if exposure is
+  suspected.
+- Disconnect/revoke Codex access through current ChatGPT account controls when
+  provider-side revocation is required.
+- Restore the accepted access-token-only importer only as a temporary personal
+  fallback.
+- Keep Eve on AI Gateway.
+
+## Spec Review Record
+
+- Revision 1, 2026-07-12: official authentication docs, Executor Personal
+  DeepWiki research on `openai/codex`, and local inspection of
+  `opencode-openai-codex-auth` corrected the hosted-redirect assumption and
+  established the local-broker/hosted-refresh design.
+- Revision 2, 2026-07-12: the first independent auth/security review removed
+  the `expires_in` assumption, required access-JWT expiry decoding, classified
+  the official/community scope discrepancy, tightened transient versus
+  permanent refresh failure semantics, and confirmed that no hosted browser
+  route or durable PKCE state store belongs in the design.
+- Revision 3, 2026-07-12: the second independent Effect/task review required
+  explicit legacy/subscription profile variants, fenced-CAS profile mutation,
+  revision-aware 401 recovery, first-party refresh transport/port/scope parity,
+  concrete local service layers, safe proof instrumentation, explicit route
+  error/readiness semantics, and progressive task dependencies.

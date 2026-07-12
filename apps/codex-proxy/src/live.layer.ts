@@ -1,4 +1,5 @@
 import {
+  CodexOAuthProfileCommitUnsupported,
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
 } from "@bundjil/codex-oauth";
@@ -32,6 +33,7 @@ const CodexProxyEncryptedProfileStoreLive =
   );
 
 const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
+  Layer.provide(CodexOAuthProfileCommitUnsupported),
   Layer.provideMerge(
     Layer.mergeAll(
       CodexProxyEncryptedProfileStoreLive,

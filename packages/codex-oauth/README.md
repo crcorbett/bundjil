@@ -18,7 +18,11 @@ Implemented:
 - `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`,
   `CodexResponsesFetch`, `CodexHttpClient`, `CodexResponsesProof`,
   `CodexDirectProvider`, and `OpenAICompatibleProxy` service contracts.
-- Versioned `EncryptedCodexOAuthProfileV1` envelopes and a
+- Explicit `CodexAccessTokenImportProfile` and `CodexSubscriptionProfile`
+  variants. Existing encrypted V1 plaintext decodes only as the access-token
+  fallback; refresh-capable profiles use V2 envelopes.
+- Versioned `EncryptedCodexOAuthProfileV1` and
+  `EncryptedCodexOAuthProfileV2` envelopes and a
   `CodexOAuthProfileCipher` service using authenticated AES-GCM encryption.
   The cipher has explicit live and test layers, keeps key material redacted
   until WebCrypto key import, and uses Effect Schema for profile and envelope
@@ -27,6 +31,9 @@ Implemented:
 - Opt-in direct Codex Responses proof with sanitized output.
 - Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
   `KeyValueStore`.
+- `CodexOAuthProfileCommit` with atomic create, replacement, refresh, and
+  reauthentication fences. Memory and Upstash layers reject stale profile
+  generations without exposing revision values through observer events.
 - Explicit trusted-local filesystem `KeyValueStore` adapter backed by
   `KeyValueStore.layerFileSystem(...)` and `BunServices.layer`. It is a
   persistent development/proof store, never a Vercel or multi-instance store.
@@ -41,9 +48,10 @@ Implemented:
 Future:
 
 - Live OAuth endpoint exchange and refresh.
-- Supported hosted account-link OAuth with a registered redirect URI.
-- Durable refresh-token persistence is deliberately deferred until a supported
-  hosted authorization path exists.
+- Trusted-local Codex-compatible loopback sign-in plus encrypted hosted refresh
+  under the successor SPEC; Vercel will expose no OAuth browser callback.
+- The proxy continues to use the unsupported commit layer until the dedicated
+  refresh-capable live-proxy task is accepted.
 
 Unsupported:
 
@@ -62,6 +70,8 @@ Unsupported:
 - `CodexOAuthProfile` stores redacted access and refresh token wrappers,
   expiry timestamps, scopes, and reauthentication state.
 - `CodexProfileStore` is the profile persistence service.
+- `CodexOAuthProfileCommit` is the only subscription-profile mutation service;
+  `CodexProfileStore.putProfile` remains restricted to the legacy import path.
 - `CodexOAuthService` is the token lifecycle service.
 - `CodexOAuthClient` is the future provider-client boundary.
 - `CodexOAuthProfileCipher` encrypts and decrypts canonical

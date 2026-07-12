@@ -59,10 +59,31 @@ export const CodexOAuthRefreshToken = Schema.RedactedFromValue(
 
 export type CodexOAuthRefreshToken = typeof CodexOAuthRefreshToken.Type;
 
+export const CodexOAuthAccountId = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+
+export type CodexOAuthAccountId = typeof CodexOAuthAccountId.Type;
+
+export const CodexOAuthCredentialRevision = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCredentialRevision")
+);
+
+export type CodexOAuthCredentialRevision =
+  typeof CodexOAuthCredentialRevision.Type;
+
+export const CodexOAuthProtocolScopeVersion = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthProtocolScopeVersion")
+);
+
+export type CodexOAuthProtocolScopeVersion =
+  typeof CodexOAuthProtocolScopeVersion.Type;
+
 export const CodexOAuthTokenRefreshResult = Schema.Struct({
   subject: CodexOAuthSubject,
   accessToken: CodexOAuthAccessToken,
   refreshToken: Schema.optional(CodexOAuthRefreshToken),
+  accountId: Schema.optional(CodexOAuthAccountId),
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
 });
@@ -70,7 +91,59 @@ export const CodexOAuthTokenRefreshResult = Schema.Struct({
 export type CodexOAuthTokenRefreshResult =
   typeof CodexOAuthTokenRefreshResult.Type;
 
-export const CodexOAuthProfile = Schema.Struct({
+export const CodexOAuthProfileVersion = Schema.Literal(2);
+
+export type CodexOAuthProfileVersion = typeof CodexOAuthProfileVersion.Type;
+
+export const CodexOAuthProfileKind = Schema.Literals([
+  "access-token-import",
+  "subscription",
+]);
+
+export type CodexOAuthProfileKind = typeof CodexOAuthProfileKind.Type;
+
+export const CodexAccessTokenImportProfile = Schema.Struct({
+  profileVersion: CodexOAuthProfileVersion,
+  profileKind: Schema.Literal("access-token-import"),
+  subject: CodexOAuthSubject,
+  accessToken: CodexOAuthAccessToken,
+  expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  scopes: Schema.Array(Schema.NonEmptyString),
+  createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  requiresReauthentication: Schema.Boolean,
+});
+
+export type CodexAccessTokenImportProfile =
+  typeof CodexAccessTokenImportProfile.Type;
+
+export const CodexSubscriptionProfile = Schema.Struct({
+  profileVersion: CodexOAuthProfileVersion,
+  profileKind: Schema.Literal("subscription"),
+  subject: CodexOAuthSubject,
+  accessToken: CodexOAuthAccessToken,
+  refreshToken: CodexOAuthRefreshToken,
+  expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  accountId: CodexOAuthAccountId,
+  protocolScopeVersion: CodexOAuthProtocolScopeVersion,
+  scopes: Schema.Array(Schema.NonEmptyString),
+  createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  lastRefreshedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+  credentialRevision: CodexOAuthCredentialRevision,
+  requiresReauthentication: Schema.Boolean,
+});
+
+export type CodexSubscriptionProfile = typeof CodexSubscriptionProfile.Type;
+
+export const CodexOAuthProfile = Schema.Union([
+  CodexAccessTokenImportProfile,
+  CodexSubscriptionProfile,
+]);
+
+export type CodexOAuthProfile = typeof CodexOAuthProfile.Type;
+
+export const LegacyCodexOAuthProfileV1 = Schema.Struct({
   subject: CodexOAuthSubject,
   accessToken: CodexOAuthAccessToken,
   refreshToken: Schema.optional(CodexOAuthRefreshToken),
@@ -81,7 +154,7 @@ export const CodexOAuthProfile = Schema.Struct({
   requiresReauthentication: Schema.Boolean,
 });
 
-export type CodexOAuthProfile = typeof CodexOAuthProfile.Type;
+export type LegacyCodexOAuthProfileV1 = typeof LegacyCodexOAuthProfileV1.Type;
 
 export const CodexCliAuthMode = Schema.Literal("chatgpt");
 
@@ -168,6 +241,14 @@ export const EncryptedCodexOAuthProfileV1 = Schema.Struct({
 export type EncryptedCodexOAuthProfileV1 =
   typeof EncryptedCodexOAuthProfileV1.Type;
 
+export const EncryptedCodexOAuthProfileV2 = Schema.Struct({
+  version: Schema.Literal(2),
+  ...EncryptedCodexOAuthProfileFields,
+});
+
+export type EncryptedCodexOAuthProfileV2 =
+  typeof EncryptedCodexOAuthProfileV2.Type;
+
 export const CodexOAuthRefreshLockTtlMillis = Schema.Int.pipe(
   Schema.check(Schema.isGreaterThan(0)),
   Schema.brand("CodexOAuthRefreshLockTtlMillis")
@@ -238,6 +319,77 @@ export const CodexOAuthRevokeInput = Schema.Struct({
 });
 
 export type CodexOAuthRevokeInput = typeof CodexOAuthRevokeInput.Type;
+
+export const CodexOAuthProfileCommitOperation = Schema.Literals([
+  "initialWrite",
+  "replace",
+  "refresh",
+  "markReauthenticationRequired",
+]);
+
+export type CodexOAuthProfileCommitOperation =
+  typeof CodexOAuthProfileCommitOperation.Type;
+
+export const CodexOAuthProfileCommitReplacementInput = Schema.Struct({
+  profile: CodexSubscriptionProfile,
+  expectedRevision: CodexOAuthCredentialRevision,
+});
+
+export type CodexOAuthProfileCommitReplacementInput =
+  typeof CodexOAuthProfileCommitReplacementInput.Type;
+
+export const CodexOAuthProfileCommitRefreshInput = Schema.Struct({
+  profile: CodexSubscriptionProfile,
+  expectedRevision: CodexOAuthCredentialRevision,
+});
+
+export type CodexOAuthProfileCommitRefreshInput =
+  typeof CodexOAuthProfileCommitRefreshInput.Type;
+
+export const CodexOAuthProfileCommitReauthenticationInput = Schema.Struct({
+  profile: CodexSubscriptionProfile,
+  expectedRevision: CodexOAuthCredentialRevision,
+});
+
+export type CodexOAuthProfileCommitReauthenticationInput =
+  typeof CodexOAuthProfileCommitReauthenticationInput.Type;
+
+export const CodexOAuthObserverEventType = Schema.Literals([
+  "refreshStarted",
+  "refreshSucceeded",
+  "refreshConflict",
+  "refreshWinnerUsed",
+  "reauthenticationMarked",
+]);
+
+export type CodexOAuthObserverEventType =
+  typeof CodexOAuthObserverEventType.Type;
+
+export const CodexOAuthObserverEvent = Schema.Struct({
+  type: CodexOAuthObserverEventType,
+  operation: Schema.optional(CodexOAuthProfileCommitOperation),
+  profileKind: Schema.optional(CodexOAuthProfileKind),
+  requiresReauthentication: Schema.optional(Schema.Boolean),
+});
+
+export type CodexOAuthObserverEvent = typeof CodexOAuthObserverEvent.Type;
+
+export const CodexOAuthObserverCounters = Schema.Struct({
+  refreshStarted: Schema.Int,
+  refreshSucceeded: Schema.Int,
+  refreshConflict: Schema.Int,
+  refreshWinnerUsed: Schema.Int,
+  reauthenticationMarked: Schema.Int,
+});
+
+export type CodexOAuthObserverCounters = typeof CodexOAuthObserverCounters.Type;
+
+export const CodexOAuthObserverSnapshot = Schema.Struct({
+  counters: CodexOAuthObserverCounters,
+  events: Schema.Array(CodexOAuthObserverEvent),
+});
+
+export type CodexOAuthObserverSnapshot = typeof CodexOAuthObserverSnapshot.Type;
 
 export const CodexResponsesModelId = Schema.NonEmptyString.pipe(
   Schema.brand("CodexResponsesModelId")

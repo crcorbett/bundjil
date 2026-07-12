@@ -2,11 +2,11 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
 import {
+  CodexSubscriptionProfile,
   CodexDirectProviderInput,
   CodexHttpClient,
   CodexHttpNetworkError,
   CodexHttpStatusError,
-  CodexOAuthProfile,
   CodexOAuthSubject,
   CodexResponsesRequest,
   CodexResponsesStreamMapInput,
@@ -57,14 +57,20 @@ const makeProfile = (
   subject: CodexOAuthSubjectType,
   expiresAtEpochMillis: number
 ) =>
-  Schema.decodeUnknownEffect(CodexOAuthProfile)({
+  Schema.decodeUnknownEffect(CodexSubscriptionProfile)({
+    profileVersion: 2,
+    profileKind: "subscription",
     subject,
     accessToken: "access-token-secret",
     refreshToken: "refresh-token-secret",
+    accountId: "acct_456",
+    protocolScopeVersion: "codex-cli-v1",
     expiresAtEpochMillis,
     scopes: ["openid", "profile", "email", "offline_access"],
     createdAtEpochMillis: 1_700_000_000_000,
     updatedAtEpochMillis: 1_700_000_000_000,
+    lastRefreshedAtEpochMillis: 1_700_000_000_000,
+    credentialRevision: "rev-provider",
     requiresReauthentication: false,
   });
 

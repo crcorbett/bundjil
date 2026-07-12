@@ -2,6 +2,8 @@ import { Schema } from "effect";
 
 export const CodexOAuthProfileSchemaBoundary = Schema.Literals([
   "CodexOAuthProfile",
+  "CodexAccessTokenImportProfile",
+  "CodexSubscriptionProfile",
   "CodexOAuthSubject",
   "CodexOAuthTokenRefreshResult",
 ]);
@@ -13,6 +15,7 @@ export const CodexOAuthProfileStorageOperation = Schema.Literals([
   "deriveProfileStorageKey",
   "getProfile",
   "putProfile",
+  "putLegacyProfile",
   "removeProfile",
   "hasProfile",
   "seedProfiles",
