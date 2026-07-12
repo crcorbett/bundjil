@@ -520,6 +520,20 @@ export const CodexSubscriptionLoginResult = Schema.Struct({
 export type CodexSubscriptionLoginResult =
   typeof CodexSubscriptionLoginResult.Type;
 
+export const CodexStoredProfileProofResult = Schema.Struct({
+  found: Schema.Boolean,
+  envelopeVersion2: Schema.Boolean,
+  ciphertextPresent: Schema.Boolean,
+  profileKindSubscription: Schema.Boolean,
+  refreshCapable: Schema.Boolean,
+  expiryValid: Schema.Boolean,
+  requiresReauthenticationFalse: Schema.Boolean,
+  markerLeakFalse: Schema.Boolean,
+});
+
+export type CodexStoredProfileProofResult =
+  typeof CodexStoredProfileProofResult.Type;
+
 export const CodexOAuthObserverEventType = Schema.Literals([
   "refreshStarted",
   "refreshSucceeded",

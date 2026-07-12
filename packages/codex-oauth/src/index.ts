@@ -66,7 +66,10 @@ export type {
   UpstashKeyValueStoreConfigBoundary as UpstashKeyValueStoreConfigBoundaryType,
   UpstashKeyValueStoreFailure as UpstashKeyValueStoreFailureType,
 } from "./errors.js";
-export { CodexBrowserLauncher } from "./browser-launcher.service.js";
+export {
+  CodexBrowserLauncher,
+  makeCodexBrowserCommand,
+} from "./browser-launcher.service.js";
 export type { CodexBrowserLauncherShape } from "./browser-launcher.service.js";
 export {
   CodexLoopbackCallback,
@@ -92,6 +95,12 @@ export {
   decodeCodexAccountMetadata,
   ensureCodexRefreshAccount,
 } from "./oauth-token-metadata.js";
+export {
+  CodexStoredProfileProof,
+  makeCodexStoredProfileProof,
+  proveCodexStoredProfile,
+} from "./stored-profile-proof.service.js";
+export type { CodexStoredProfileProofShape } from "./stored-profile-proof.service.js";
 export {
   buildCodexOAuthAuthorizationSession,
   CodexSubscriptionAuthProtocolConfigService,
@@ -299,6 +308,7 @@ export {
   CodexSubscriptionLoginExpiryCategory,
   CodexSubscriptionLoginInput,
   CodexSubscriptionLoginResult,
+  CodexStoredProfileProofResult,
   EncryptedCodexOAuthProfile,
   EncryptedCodexOAuthProfileV1,
   EncryptedCodexOAuthProfileV2,
@@ -396,6 +406,7 @@ export type {
   CodexSubscriptionAuthProtocolConfig as CodexSubscriptionAuthProtocolConfigType,
   CodexSubscriptionLoginInput as CodexSubscriptionLoginInputType,
   CodexSubscriptionLoginResult as CodexSubscriptionLoginResultType,
+  CodexStoredProfileProofResult as CodexStoredProfileProofResultType,
   EncryptedCodexOAuthProfile as EncryptedCodexOAuthProfileType,
   EncryptedCodexOAuthProfileV1 as EncryptedCodexOAuthProfileV1Type,
   EncryptedCodexOAuthProfileV2 as EncryptedCodexOAuthProfileV2Type,

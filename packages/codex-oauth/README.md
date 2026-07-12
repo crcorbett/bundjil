@@ -322,6 +322,22 @@ The callback is local-only. There is deliberately no `/oauth/start`,
 Hosted code reads the resulting encrypted profile in later tasks; it never
 conducts the interactive login.
 
+After a successful trusted-local login, verify the persisted profile from the
+same private shell:
+
+```bash
+bun run --filter @bundjil/codex-oauth proof:stored-profile
+```
+
+The proof reads the persisted envelope through Effect `KeyValueStore`, decodes
+the canonical encrypted-envelope Schema, and decrypts only inside the trusted
+process through the profile store and cipher services. Its Schema-encoded
+output contains only `found`, `envelopeVersion2`, `ciphertextPresent`,
+`profileKindSubscription`, `refreshCapable`, `expiryValid`,
+`requiresReauthenticationFalse`, and `markerLeakFalse` booleans. It never
+prints the storage key, subject hash, revision, timestamps, ciphertext,
+configuration, credentials, account metadata, claims, or raw payload.
+
 ## Trusted-Local Profile Import
 
 The temporary local-import workaround is documented in

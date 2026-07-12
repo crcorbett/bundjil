@@ -33,6 +33,7 @@ import {
   decodeCodexOAuthCallbackRequest,
   ensureCodexRefreshAccount,
   getProfile,
+  makeCodexBrowserCommand,
   runCodexSubscriptionLogin,
 } from "../src/index.js";
 import type {
@@ -66,6 +67,35 @@ const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   installationId: "agent-dev",
   profileId: "default",
 });
+
+it.effect(
+  "constructs platform browser commands without spawning a process",
+  () =>
+    Effect.sync(() => {
+      const authorizationUrl = Redacted.make(
+        "https://auth.openai.com/oauth/authorize?fixture=redacted"
+      );
+      const mac = makeCodexBrowserCommand(authorizationUrl, "MacIntel");
+      const windows = makeCodexBrowserCommand(authorizationUrl, "Win32");
+      const linux = makeCodexBrowserCommand(authorizationUrl, "Linux x86_64");
+
+      assert.strictEqual(mac.command, "osascript");
+      assert.deepStrictEqual(mac.args.slice(0, -1), [
+        "-e",
+        "on run argv",
+        "-e",
+        'tell application "Google Chrome" to open location (item 1 of argv)',
+        "-e",
+        "end run",
+      ]);
+      assert.strictEqual(mac.args.length, 7);
+      assert.strictEqual(windows.command, "cmd");
+      assert.deepStrictEqual(windows.args.slice(0, 3), ["/c", "start", ""]);
+      assert.strictEqual(windows.args.length, 4);
+      assert.strictEqual(linux.command, "xdg-open");
+      assert.strictEqual(linux.args.length, 1);
+    })
+);
 
 const encodeJwt = (claims: unknown) =>
   Effect.gen(function* encodeTestJwt() {

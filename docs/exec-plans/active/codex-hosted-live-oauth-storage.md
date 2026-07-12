@@ -405,3 +405,92 @@ Verification:
 - `git diff --check`: passed.
 
 Commit: pending parent commit of this accepted configuration slice.
+
+### run-real-local-login-tracer
+
+Status: Accepted 2026-07-12.
+
+Sanitized implementation evidence:
+
+- The personal Vercel CLI identity was confirmed before any write. A fresh
+  32-byte cipher key and key id were generated only inside one private shell
+  program and retained in an ignored mode-`0600` temporary env file; neither
+  value appeared in command arguments or output.
+- The cipher key and key id were rotated as sensitive preview-only variables.
+  A separate encrypted preview-only key prefix isolates the subscription
+  profile from every earlier profile and revision. Metadata-only API readback
+  confirmed all three entries target preview only and were not decrypted.
+- The package-owned Effect `KeyValueStore.size` probe confirmed the selected
+  namespace was empty before the preview prefix was written. It read no key or
+  value and emitted only `namespaceEmpty`.
+- Added a package-owned stored-profile proof service and CLI. It reads the raw
+  envelope through Effect `KeyValueStore`, decodes the canonical encrypted
+  profile Schema, decrypts only through the package profile-store/cipher
+  boundary, and emits only the eight approved booleans. Focused tests include
+  valid, absent, expired, and deliberately contaminated envelope cases.
+- The first live callback attempt timed out without a callback and emitted only
+  the sanitized blocked result. Investigation showed the authorization page
+  was absent from the installed browsers.
+- The macOS launcher now constructs a parameterized `osascript` command through
+  Effect ChildProcess. The authorization URL is only the final argv item and is
+  never interpolated into AppleScript source. A focused non-spawning test
+  confirms the static macOS executable/argument shape and preserves the
+  existing Windows and Linux commands.
+- The corrected parameterized AppleScript retry opened an `auth.openai.com`
+  tab, confirmed by host only without reading or printing its path or query.
+  Owner sign-in completed through localhost and emitted only
+  `stored`/`chatgpt`/`valid`/refresh-capable/encrypted-store categories.
+- The trusted readback returned all eight approved booleans as true:
+  `found`, `envelopeVersion2`, `ciphertextPresent`,
+  `profileKindSubscription`, `refreshCapable`, `expiryValid`,
+  `requiresReauthenticationFalse`, and `markerLeakFalse`. Persisted-envelope
+  and emitted-output marker scans passed without printing raw data.
+- All temporary env/proof files were removed after readback. No loopback,
+  login, or proof process remains.
+
+Production boundary:
+
+- The fresh cipher and isolated key prefix remain preview-only. No deployment,
+  production/development mutation, model call, or Eve wiring occurred.
+
+Verification to date:
+
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- focused subscription-login tests: passed, 17 tests.
+- full OAuth package tests: passed, 83 tests across 9 files.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run verification`: passed across all six workspaces.
+- `git diff --check`: passed.
+- live encrypted V2 subscription readback and marker scan: passed with all
+  eight approved booleans true.
+- temporary runtime files, localhost listeners, and trusted proof processes:
+  absent.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns the parameterized
+   browser command, loopback callback, stored-profile proof service, canonical
+   result Schema, encrypted profile store, cipher, storage-key derivation, and
+   Upstash `KeyValueStore` composition. Only trusted-local package scripts
+   compose browser, loopback, and proof live layers; apps, Eve, Vercel routes,
+   and CI import none of those local boundaries.
+2. Implementation quality: reviewed the parameterized macOS `osascript`
+   ChildProcess command with static AppleScript and the redacted URL only as
+   final argv, unchanged Windows/Linux commands, Context services, explicit
+   Layers, `ConfigProvider.fromEnv()` CLI boundaries, canonical encrypted
+   envelope/profile/subject Schemas, Schema JSON codecs, Redacted credential
+   comparisons confined to the trusted proof, Effect Clock and Array
+   primitives, tagged storage/schema errors, and sanitized Schema outputs.
+   Stale scans found no raw JSON, `process.env` package logic, raw Bun server,
+   unsafe casts, DTO mirrors, switch/Object iteration, or helper sprawl.
+3. Verification coverage: the real localhost login completed with sanitized
+   stored/ChatGPT/valid/refresh-capable/encrypted-store output; the package
+   proof returned all eight approved booleans true for the personal Upstash
+   profile, its persisted-envelope and emitted-output marker scans passed, and
+   temporary env/proof files plus loopback/proof processes were removed.
+   Package typecheck, 83/83 tests, build, `git diff --check`, task JSON
+   validation, and full six-workspace verification including 11 proxy tests
+   passed; no deployment, production/development mutation, model call, or Eve
+   wiring occurred.
+
+Commit: pending parent commit of this accepted tracer slice.

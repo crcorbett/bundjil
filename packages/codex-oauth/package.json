@@ -68,6 +68,8 @@
     "import:local-profile": "bun --conditions=@bundjil/source scripts/import-local-profile.ts",
     "import:local-profile:filesystem": "bun --conditions=@bundjil/source scripts/import-local-profile-filesystem.ts",
     "login:subscription": "bun --conditions=@bundjil/source scripts/login-subscription.ts",
+    "probe:empty-namespace": "bun --conditions=@bundjil/source scripts/probe-empty-namespace.ts",
+    "proof:stored-profile": "bun --conditions=@bundjil/source scripts/prove-stored-profile.ts",
     "proof:codex-responses": "bun --conditions=@bundjil/source scripts/prove-codex-responses.ts",
     "test": "vitest run"
   },

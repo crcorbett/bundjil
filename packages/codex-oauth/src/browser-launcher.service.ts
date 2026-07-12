@@ -15,13 +15,24 @@ export class CodexBrowserLauncher extends Context.Service<
   CodexBrowserLauncherShape
 >()("@bundjil/codex-oauth/CodexBrowserLauncher") {}
 
-const browserCommand = (authorizationUrl: CodexOAuthAuthorizationUrl) => {
+export const makeCodexBrowserCommand = (
+  authorizationUrl: CodexOAuthAuthorizationUrl,
+  platform: string
+) => {
   const url = Redacted.value(authorizationUrl);
 
-  if (globalThis.navigator.platform.toLowerCase().includes("mac")) {
-    return ChildProcess.make("open", [url]);
+  if (platform.toLowerCase().includes("mac")) {
+    return ChildProcess.make("osascript", [
+      "-e",
+      "on run argv",
+      "-e",
+      'tell application "Google Chrome" to open location (item 1 of argv)',
+      "-e",
+      "end run",
+      url,
+    ]);
   }
-  if (globalThis.navigator.platform.toLowerCase().includes("win")) {
+  if (platform.toLowerCase().includes("win")) {
     return ChildProcess.make("cmd", ["/c", "start", "", url]);
   }
   return ChildProcess.make("xdg-open", [url]);
@@ -34,27 +45,34 @@ export const CodexBrowserLauncherCommandLive = Layer.effect(
 
     return CodexBrowserLauncher.of({
       open: Effect.fn("CodexBrowserLauncher.open")((authorizationUrl) =>
-        spawner.exitCode(browserCommand(authorizationUrl)).pipe(
-          Effect.flatMap((exitCode) =>
-            exitCode === 0
-              ? Effect.void
-              : Effect.fail(
-                  new CodexSubscriptionAuthError({
-                    operation: "launchBrowser",
-                    reason: "browserFailure",
-                    message: "The system browser command did not succeed.",
-                  })
-                )
-          ),
-          Effect.mapError(
-            () =>
-              new CodexSubscriptionAuthError({
-                operation: "launchBrowser",
-                reason: "browserFailure",
-                message: "Unable to open the system browser for Codex login.",
-              })
+        spawner
+          .exitCode(
+            makeCodexBrowserCommand(
+              authorizationUrl,
+              globalThis.navigator.platform
+            )
           )
-        )
+          .pipe(
+            Effect.flatMap((exitCode) =>
+              exitCode === 0
+                ? Effect.void
+                : Effect.fail(
+                    new CodexSubscriptionAuthError({
+                      operation: "launchBrowser",
+                      reason: "browserFailure",
+                      message: "The system browser command did not succeed.",
+                    })
+                  )
+            ),
+            Effect.mapError(
+              () =>
+                new CodexSubscriptionAuthError({
+                  operation: "launchBrowser",
+                  reason: "browserFailure",
+                  message: "Unable to open the system browser for Codex login.",
+                })
+            )
+          )
       ),
     });
   })

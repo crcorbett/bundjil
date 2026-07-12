@@ -241,7 +241,7 @@
     {
       "id": "run-real-local-login-tracer",
       "title": "Run the real local login tracer",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["revalidate-personal-preview-configuration"],
       "description": "Complete owner browser sign-in through localhost and prove a refresh-capable encrypted subscription profile reaches personal Upstash before hosted refresh work continues.",
       "implementationNotes": [
@@ -261,8 +261,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: @bundjil/codex-oauth owns the parameterized browser command, loopback callback, stored-profile proof service, canonical result Schema, encrypted profile store, cipher, storage-key derivation, and Upstash KeyValueStore composition; only trusted-local package scripts compose browser/loopback/proof live layers, while apps, Eve, Vercel routes, and CI import none of those local boundaries.",
+          "Parent audit 2 - implementation quality: reviewed the parameterized macOS osascript ChildProcess command with static AppleScript and the redacted URL only as final argv, unchanged Windows/Linux commands, Context services, explicit Layers, ConfigProvider.fromEnv CLI boundaries, canonical encrypted-envelope/profile/subject Schemas, Schema JSON codecs, Redacted credential comparisons confined to the trusted proof, Effect Clock and Array primitives, tagged storage/schema errors, and sanitized Schema outputs; stale scans found no raw JSON, process.env package logic, raw Bun server, unsafe casts, DTO mirrors, switch/Object iteration, or helper sprawl.",
+          "Parent audit 3 - verification coverage: the real localhost login completed with sanitized stored/chatgpt/valid/refresh-capable/encrypted-store output; the package proof returned all eight approved booleans true for the personal Upstash profile, its persisted-envelope and emitted-output marker scans passed, and temporary env/proof files plus loopback/proof processes were removed. Package typecheck, 83/83 tests, build, git diff --check, task JSON validation, and full six-workspace verification including 11 proxy tests passed; no deployment, production/development mutation, model call, or Eve wiring occurred."
+        ]
       },
       "commitAfterPassing": true
     },

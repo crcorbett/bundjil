@@ -55,6 +55,10 @@ import {
   codexOAuthProfileStorageKey,
   codexOAuthProfileSubjectHash,
 } from "./storage-keys.js";
+import {
+  CodexStoredProfileProof,
+  makeCodexStoredProfileProof,
+} from "./stored-profile-proof.service.js";
 
 export { CodexOAuthProfileCipherConfigLive } from "./profile-cipher.config.js";
 export { CodexBrowserLauncherCommandLive } from "./browser-launcher.service.js";
@@ -67,6 +71,11 @@ export { CodexSubscriptionLoginLive } from "./subscription-login.service.js";
 export const CodexOAuthProfileCipherLive = Layer.effect(
   CodexOAuthProfileCipher,
   makeCodexOAuthProfileCipher()
+);
+
+export const CodexStoredProfileProofLive = Layer.effect(
+  CodexStoredProfileProof,
+  makeCodexStoredProfileProof
 );
 
 export const CodexProfileStoreKeyValueLive = Layer.effect(
