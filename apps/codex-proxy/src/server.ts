@@ -3,13 +3,17 @@ import {
   OpenAICompatibleProxy,
   OpenAICompatibleProxyInput,
 } from "@bundjil/codex-oauth";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { Effect, Layer, Match, Redacted, Schema } from "effect";
 import type { HttpServerRequest } from "effect/unstable/http";
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
 
 import { CodexProxyConfig, CodexProxyConfigLive } from "./env.js";
 import { CodexProxyRouteError } from "./errors.js";
 import { CodexProxyOpenAICompatibleProxyLiveOrUnavailable } from "./live.layer.js";
+import {
+  CodexProxyOpenAICompatibleProxyLocalUnavailableLive,
+  makeCodexProxyOpenAICompatibleProxyLocal,
+} from "./local.layer.js";
 import { CodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
 import {
   CodexProxyErrorResponse,
@@ -161,24 +165,35 @@ export const CodexProxyRoutesLive = Layer.effectDiscard(
 );
 
 const makeCodexProxyModeLayer = (
-  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable
+  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+  makeLocalProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal
 ) =>
   Layer.unwrap(
     Effect.gen(function* makeCodexProxyModeLayer() {
       const config = yield* CodexProxyConfig;
 
-      return config.mode === "mock"
-        ? CodexProxyOpenAICompatibleProxyMockLive
-        : liveProxyLayer;
+      return Match.value(config.mode).pipe(
+        Match.when("mock", () => CodexProxyOpenAICompatibleProxyMockLive),
+        Match.when("local", () => {
+          if (config.localProfileStoreDirectory === undefined) {
+            return CodexProxyOpenAICompatibleProxyLocalUnavailableLive;
+          }
+
+          return makeLocalProxyLayer(config.localProfileStoreDirectory);
+        }),
+        Match.when("live", () => liveProxyLayer),
+        Match.exhaustive
+      );
     })
   );
 
 export const makeCodexProxyAppLayer = (
   configLayer = CodexProxyConfigLive,
-  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable
+  liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+  makeLocalProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal
 ) =>
   Layer.mergeAll(
-    makeCodexProxyModeLayer(liveProxyLayer),
+    makeCodexProxyModeLayer(liveProxyLayer, makeLocalProxyLayer),
     CodexProxyRoutesLive
   ).pipe(Layer.provideMerge(configLayer));
 

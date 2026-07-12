@@ -14,8 +14,8 @@ import {
 import { CodexLocalProfileImportResult } from "../src/schemas.js";
 import { UpstashKeyValueStoreLive } from "../src/upstash-key-value-store.layer.js";
 
-declare const Bun: {
-  readonly exit: (code: number) => never;
+declare const process: {
+  exitCode: number | undefined;
 };
 
 const program = importCodexLocalProfile.pipe(
@@ -61,5 +61,5 @@ if (Exit.isSuccess(exit)) {
         "Codex local profile import requires valid local config, encrypted storage configuration, and a fresh ChatGPT-mode Codex login. No cache path, account id, token, or cache contents were printed.",
     })
   );
-  Bun.exit(1);
+  process.exitCode = 1;
 }

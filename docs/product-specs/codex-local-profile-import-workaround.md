@@ -21,6 +21,11 @@ profile and calls the already-proven Codex Responses endpoint until the access
 token expires. It then fails closed and requires another local import.
 
 This is a temporary operational workaround, not a replacement OAuth design.
+It has two deliberately separate execution targets: a local encrypted
+filesystem proof for development and a personal-Vercel/Upstash preview proof.
+The local target exists to exercise the real importer and direct-provider call
+graph while Marketplace storage is unavailable; it must never be treated as
+Vercel persistence or hosted OAuth evidence.
 
 ## Decision And Boundaries
 
@@ -39,9 +44,10 @@ This is a temporary operational workaround, not a replacement OAuth design.
   safe tagged errors. Diagnostics may name fields and schema boundaries but
   never values, raw cache JSON, token lengths, prompts, request bodies, or
   account identifiers.
-- The hosted profile is encrypted by the completed AES-GCM envelope before it
-  reaches Upstash through Effect `KeyValueStore`. Only redacted values cross
-  the package service contracts.
+- Every persisted profile is encrypted by the completed AES-GCM envelope
+  before it reaches a `KeyValueStore`. The local proof uses a local
+  filesystem-backed store; the Vercel preview uses Upstash. Only redacted
+  values cross the package service contracts.
 - `apps/codex-proxy` stays private and internal-token protected. It is not a
   public OpenAI-compatible service. The Eve app remains on AI Gateway; a later
   Eve model-provider integration requires its own SPEC.
@@ -95,6 +101,24 @@ POST /v1/chat/completions
   -> CodexProfileStoreEncryptedKeyValueLive
   -> UpstashKeyValueStoreLive
   -> CodexHttpClient.postResponsesStream
+  -> chatgpt.com/backend-api/codex/responses
+```
+
+### Local encrypted filesystem proof
+
+```text
+bun run --filter @bundjil/codex-oauth import:local-profile:filesystem
+  -> CodexLocalProfileImportService.importProfile
+  -> CodexProfileStoreEncryptedKeyValueLive
+  -> CodexOAuthProfileCipherLive + KeyValueStore.toSchemaStore
+  -> KeyValueStore.layerFileSystem(BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR)
+  -> @effect/platform-bun BunServices.layer
+
+BUNDJIL_CODEX_PROXY_MODE=local bun run --filter @bundjil/codex-proxy dev
+  -> apps/codex-proxy/src/local.layer.ts
+  -> same encrypted filesystem KeyValueStore and profile subject
+  -> CodexOAuthService.getValidToken (no refresh)
+  -> CodexDirectProvider.streamChatCompletion
   -> chatgpt.com/backend-api/codex/responses
 ```
 
@@ -163,9 +187,25 @@ The package-owned importer config must use `Config` plus
 - Existing encryption and Upstash config. The local command must fail before
   reading the cache if they are absent.
 
-The Vercel app config owns `BUNDJIL_CODEX_PROXY_MODE=live`, its internal token,
-subject, optional account id, and its hosted Upstash/encryption config. It
-must retain `mock` as the default.
+The filesystem proof adds a separate, explicit local-only configuration:
+
+- `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR`: required directory for encrypted
+  local profile files. It is used only by the filesystem importer and
+  `BUNDJIL_CODEX_PROXY_MODE=local`; it must be ignored by git and must not be
+  supplied to Vercel.
+- `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY` and
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`: required locally as well as for
+  preview, but never read from a committed file or printed by a script.
+
+The local target has no Upstash variables and never silently falls back to the
+filesystem when `BUNDJIL_CODEX_PROXY_MODE=live` is selected.
+
+The proxy app config owns `BUNDJIL_CODEX_PROXY_MODE=mock | local | live`, its
+internal token, subject, optional account id, and storage binding names. It
+must retain `mock` as the default. `local` is valid only in a trusted local Bun
+process; when the standard Vercel runtime marker is present, `local` must fail
+closed during Effect Config decoding. `live` remains Upstash-only and is the
+sole Vercel preview mode.
 
 ### Proxy composition
 
@@ -182,18 +222,24 @@ and never consult platform API keys.
 
 ## Operational Flow
 
-1. Keep the deployed proxy in `mock` mode until local importer and live-layer
-   tests pass.
-2. Configure a personal Vercel-linked Upstash database and preview-only
+1. Use the local filesystem target first: configure ignored local encryption,
+   subject, proxy-token, and store-directory values; run the filesystem
+   importer; then start the proxy with `BUNDJIL_CODEX_PROXY_MODE=local`.
+   Record only sanitized HTTP status, mode, content type, stream markers, and
+   ciphertext/leak booleans. Delete the local store directory to revoke the
+   local profile.
+2. Keep the deployed proxy in `mock` mode until the separate personal-Vercel
+   preview proof can run.
+3. Configure a personal Vercel-linked Upstash database and preview-only
    encryption/internal-token settings. Do not use Tilt Legal scope or storage.
-3. Pull preview environment into an ignored local file, add explicit local
+4. Pull preview environment into an ignored local file, add explicit local
    subject configuration, and run the importer locally. It writes only the
    encrypted access-token profile to the shared preview store.
-4. Deploy a preview in `live` mode and run generic unauthenticated,
+5. Deploy a preview in `live` mode and run generic unauthenticated,
    invalid-internal-token, missing-profile, expired-profile, and authenticated
    short-prompt probes. Record only status, mode, content type, stream marker
    count, and leak booleans.
-5. When the provider reports expiry or upstream authorization failure, switch
+6. When the provider reports expiry or upstream authorization failure, switch
    the preview back to mock or re-run the trusted-local importer after renewing
    the local Codex login. Do not build automatic token refresh around this
    workaround.
@@ -208,6 +254,10 @@ and never consult platform API keys.
 - Proxy tests cover mock preservation, valid imported profile streaming through
   mocked fetch, missing profile, expiry, missing live config, no API-key
   fallback, and safe errors.
+- Filesystem-proof tests cover a process-persistent encrypted profile written
+  by the importer and read by local proxy composition, missing local directory
+  config, no Upstash composition in local mode, and ciphertext-only file
+  contents. They use fixtures and a temporary directory, never the real cache.
 - The local command must be checked with a deliberately invalid fixture/path
   before any opt-in real import. Its real import output must be captured only
   as sanitized metadata.
@@ -242,6 +292,8 @@ minimum, not a substitute for resolving a finding.
 - Hosted browser OAuth routes, arbitrary Vercel redirect URIs, device-code
   flows, or reuse of Codex CLI client credentials.
 - Importing or storing refresh/id tokens, or refresh logic for imported profiles.
+- Treating local filesystem storage as Vercel storage, deploying `local` mode,
+  or using it for concurrent/multi-instance proxy execution.
 - General public proxy access, user login, Better Auth, WorkOS, Sendblue,
   Cloudflare Email, Vercel Connect, or Notion integration.
 - Changing Eve away from its current Vercel AI Gateway configuration.

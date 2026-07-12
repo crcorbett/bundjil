@@ -1,26 +1,37 @@
 import {
   CodexOAuthProfile,
   OpenAICompatibleChatCompletionRequest,
+  putProfile,
 } from "@bundjil/codex-oauth";
+import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex-oauth/filesystem-key-value-store.layer";
 import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
+  CodexOAuthProfileCipherConfigLive,
+  CodexOAuthProfileCipherLive,
+  CodexProfileStoreEncryptedKeyValueLive,
   OpenAICompatibleProxyLive,
 } from "@bundjil/codex-oauth/live.layer";
 import {
   CodexOAuthMemory,
   CodexResponsesFetchMock,
 } from "@bundjil/codex-oauth/mock.layer";
+import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Schema } from "effect";
+import * as FileSystem from "effect/FileSystem";
 import { describe, it as vitestIt } from "vitest";
 
+import { CodexProxyRouteError } from "../src/errors.js";
 import {
   CodexProxyConfigLayer,
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
+  CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+  loadCodexProxyConfig,
   makeCodexProxyAppLayer,
   makeCodexProxyConfig,
+  makeCodexProxyOpenAICompatibleProxyLocal,
   makeCodexProxyWebHandler,
   toCodexProxyVercelRequest,
 } from "../src/index.js";
@@ -60,6 +71,34 @@ const liveTestConfig = makeCodexProxyConfig({
     provider: "codex",
   },
 });
+
+const cipherConfig = {
+  BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY:
+    "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+  BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID: "proxy-local-test-key-v1",
+};
+
+const localCipherConfigProvider = ConfigProvider.layer(
+  ConfigProvider.fromEnv({ env: cipherConfig })
+);
+
+const localTestConfig = (directory: string) =>
+  makeCodexProxyConfig({
+    internalToken: "test-internal-token",
+    localProfileStoreDirectory: directory,
+    mode: "local",
+    subject: {
+      connectorId: "bundjil-codex-proxy",
+      installationId: "test",
+      principal: {
+        id: "test",
+        issuer: "https://auth.openai.com",
+        type: "chatgpt-user",
+      },
+      profileId: "default",
+      provider: "codex",
+    },
+  });
 
 const makeLiveProfile = (expiresAtEpochMillis: number) =>
   Effect.gen(function* makeImportedLiveProfile() {
@@ -162,6 +201,86 @@ const withLiveTestHandler = <A>(
     (webHandler) => Effect.promise(() => webHandler.dispose())
   ).pipe(Effect.flatMap((webHandler) => run(webHandler.handler)));
 
+const withTemporaryDirectory = <A, E, R>(
+  use: (directory: string) => Effect.Effect<A, E, R>
+) =>
+  Effect.acquireUseRelease(
+    Effect.sync(
+      () => `/tmp/bundjil-codex-proxy-local-${globalThis.crypto.randomUUID()}`
+    ),
+    use,
+    (directory) =>
+      Effect.gen(function* removeTemporaryDirectory() {
+        const fileSystem = yield* FileSystem.FileSystem;
+
+        yield* fileSystem
+          .remove(directory, { recursive: true })
+          .pipe(Effect.catchTag("PlatformError", () => Effect.void));
+      })
+  ).pipe(Effect.provide(BunServices.layer));
+
+const makeLocalEncryptedProfileStore = (directory: string) =>
+  CodexProfileStoreEncryptedKeyValueLive.pipe(
+    Layer.provideMerge(
+      Layer.merge(
+        CodexOAuthProfileCipherLive.pipe(
+          Layer.provide(
+            CodexOAuthProfileCipherConfigLive.pipe(
+              Layer.provide(localCipherConfigProvider)
+            )
+          )
+        ),
+        CodexFileSystemKeyValueStoreLive(directory)
+      )
+    )
+  );
+
+const withLocalTestHandler = <A>(
+  directory: string,
+  run: (handler: TestFetchHandler) => Effect.Effect<A>
+) =>
+  Effect.gen(function* makeLocalTestHandler() {
+    const config = yield* localTestConfig(directory);
+    const profile = yield* makeLiveProfile(Date.now() + 60_000);
+
+    yield* putProfile(profile).pipe(
+      Effect.provide(makeLocalEncryptedProfileStore(directory))
+    );
+    const localProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal(
+      directory,
+      localCipherConfigProvider,
+      CodexResponsesFetchMock({
+        fetch: () =>
+          Effect.succeed(
+            new Response(
+              [
+                'data: {"type":"response.output_text.delta","delta":"Local OK."}',
+                'data: {"type":"response.completed"}',
+                "",
+              ].join("\n"),
+              {
+                headers: { "content-type": "text/event-stream" },
+                status: 200,
+              }
+            )
+          ),
+      })
+    );
+    const webHandler = makeCodexProxyWebHandler(
+      makeCodexProxyAppLayer(
+        CodexProxyConfigLayer(config),
+        CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+        () => localProxyLayer
+      )
+    );
+
+    return yield* Effect.acquireUseRelease(
+      Effect.succeed(webHandler),
+      (handler) => run(handler.handler),
+      (handler) => Effect.promise(() => handler.dispose())
+    );
+  });
+
 describe("@bundjil/codex-proxy Effect HTTP handler", () => {
   it.effect("returns GET /health", () =>
     withTestHandler((handler) =>
@@ -180,6 +299,61 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         assert.strictEqual(payload.mode, "mock");
       })
     )
+  );
+
+  it.effect("rejects local mode without an explicit filesystem directory", () =>
+    Effect.gen(function* testMissingLocalDirectory() {
+      const error = yield* loadCodexProxyConfig.pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({
+              env: {
+                BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                BUNDJIL_CODEX_PROXY_MODE: "local",
+              },
+            })
+          )
+        ),
+        Effect.flip
+      );
+
+      if (!Schema.is(CodexProxyRouteError)(error)) {
+        assert.fail("Expected a sanitized Codex proxy configuration error.");
+        return;
+      }
+      assert.strictEqual(error.code, "bad_request");
+      assert.notInclude(error.message, "test-internal-token");
+    })
+  );
+
+  it.effect(
+    "rejects local mode when the Vercel runtime marker is present",
+    () =>
+      Effect.gen(function* testLocalModeInVercel() {
+        const error = yield* loadCodexProxyConfig.pipe(
+          Effect.provide(
+            ConfigProvider.layer(
+              ConfigProvider.fromEnv({
+                env: {
+                  BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR: "/tmp/bundjil-local",
+                  BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                  BUNDJIL_CODEX_PROXY_MODE: "local",
+                  VERCEL: "1",
+                },
+              })
+            )
+          ),
+          Effect.flip
+        );
+
+        if (!Schema.is(CodexProxyRouteError)(error)) {
+          assert.fail("Expected a sanitized Codex proxy configuration error.");
+          return;
+        }
+        assert.strictEqual(error.code, "bad_request");
+        assert.notInclude(error.message, "/tmp/bundjil-local");
+        assert.notInclude(error.message, "test-internal-token");
+      })
   );
 
   it.effect("rejects unauthenticated chat completions", () =>
@@ -313,6 +487,30 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         assert.strictEqual(body.includes("live-access-token"), false);
       })
     )
+  );
+
+  it.effect(
+    "streams an encrypted local filesystem profile through mocked fetch without Upstash",
+    () =>
+      withTemporaryDirectory((directory) =>
+        withLocalTestHandler(directory, (handler) =>
+          Effect.gen(function* testLocalProfileStream() {
+            const response = yield* Effect.promise(() =>
+              handler(chatCompletionRequest("Bearer test-internal-token"))
+            );
+            const body = yield* Effect.promise(() => response.text());
+
+            assert.strictEqual(response.status, 200);
+            assert.strictEqual(
+              response.headers.get("x-bundjil-codex-proxy-mode"),
+              "local"
+            );
+            assert.match(body, /Local OK\./);
+            assert.match(body, /data: \[DONE\]/);
+            assert.strictEqual(body.includes("live-access-token"), false);
+          })
+        )
+      )
   );
 
   vitestIt("maps Vercel rewrites back to public proxy paths", async () => {

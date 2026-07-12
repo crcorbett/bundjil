@@ -25,6 +25,10 @@ Implemented:
 - Explicit live composition of the encrypted profile store, cipher, Upstash
   KeyValueStore, refresh lock, OAuth service, direct provider, and private
   proxy contract.
+- Explicit local-only composition of the same encrypted profile store and
+  cipher over a filesystem KeyValueStore. It uses the in-memory refresh lock
+  solely to satisfy the access-token-only OAuth service contract; no imported
+  profile can refresh.
 - Fail-closed live handling: missing configuration, profile storage failures,
   missing profiles, and expired profiles return a sanitized 502 that tells the
   operator to re-import the local profile. Imported profiles have no refresh
@@ -34,8 +38,6 @@ Future:
 
 - Personal Vercel preview proof for access-token-only live calls.
 - Live OAuth endpoint exchange and token refresh.
-- Hosted token-profile storage after `@bundjil/codex-oauth` adds
-  application-side envelope encryption.
 
 Unsupported:
 
@@ -65,19 +67,28 @@ response. Any unavailable configuration, missing profile, expiry, or storage
 failure returns a generic HTTP 502 with a re-import instruction; it never
 falls back to mock mode, an API key, or token refresh.
 
+In `local` mode, the same path uses an explicit encrypted filesystem store.
+This is a trusted local Bun proof only: the app rejects it when Vercel's
+standard `VERCEL` runtime marker is present. It is not a Vercel deployment
+mode, shared store, or replacement for Upstash preview proof.
+
 ## Environment
 
 Config is parsed in `src/env.ts` with Effect `Config`, `Config.schema`,
 `Config.redacted`, and `ConfigProvider.fromEnv()`.
 
 - `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`: required private bearer token.
-- `BUNDJIL_CODEX_PROXY_MODE`: optional, `mock` or `live`, defaults to `mock`.
+- `BUNDJIL_CODEX_PROXY_MODE`: optional, `mock`, `local`, or `live`; defaults
+  to `mock`.
 - `BUNDJIL_CODEX_PROFILE_ID`: optional, defaults to `default`.
 - `BUNDJIL_CODEX_CONNECTOR_ID`: optional, defaults to
   `bundjil-codex-proxy`.
 - `BUNDJIL_CODEX_INSTALLATION_ID`: optional, defaults to `local`.
 - `BUNDJIL_CODEX_SUBJECT_ID`: optional, defaults to `default`.
 - `BUNDJIL_CODEX_ACCOUNT_ID`: optional Codex account id.
+- `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR`: required only for `local` mode and
+  the separate filesystem importer. Use an ignored absolute local directory;
+  never supply it to Vercel.
 - `PORT`: optional local dev port, defaults to `8787`.
 
 Live mode also needs the profile cipher and Upstash configuration documented in
@@ -88,6 +99,26 @@ Live mode also needs the profile cipher and Upstash configuration documented in
 `KV_REST_API_URL` / `KV_REST_API_TOKEN` aliases. Run the local importer before
 starting live mode; do not set any of these values in a browser bundle, CI, or
 committed file.
+
+Local mode needs only the profile cipher configuration and
+`BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR`; it deliberately does not read Upstash
+variables. Import into that exact directory first:
+
+```bash
+BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR=/absolute/ignored/bundjil-codex-store \
+  bun run --filter @bundjil/codex-oauth import:local-profile:filesystem
+```
+
+Then use the same directory to run the local proxy:
+
+```bash
+BUNDJIL_CODEX_PROXY_MODE=local \
+BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR=/absolute/ignored/bundjil-codex-store \
+  bun run --filter @bundjil/codex-proxy dev
+```
+
+Do not deploy `local` mode. Vercel rejects it during Effect Config loading; the
+deployed preview remains `mock` until the separate Upstash proof is complete.
 
 Do not commit `.env` files or token values.
 
@@ -180,8 +211,10 @@ Request
   -> HttpRouter.toWebHandler(...)
   -> apps/codex-proxy/src/server.ts routes
   -> CodexProxyConfig
-  -> CodexProxyConfig selects mock or live layer
+  -> CodexProxyConfig selects mock, local, or live layer
   -> mock: app-owned deterministic CodexDirectProvider
+  -> local: encrypted filesystem profile -> CodexOAuthService.getValidToken
+      -> direct Codex Responses provider
   -> live: encrypted profile -> CodexOAuthService.getValidToken
       -> direct Codex Responses provider
   -> OpenAI-compatible SSE Response
@@ -199,6 +232,8 @@ bun run --filter @bundjil/codex-proxy test
   -> live mode with unavailable config returns a re-import-safe 502
   -> imported access-only profile streams through mocked Codex fetch
   -> expired imported profile returns a re-import-safe 502
+  -> local mode rejects Vercel and missing-directory configuration
+  -> encrypted filesystem local profile streams through mocked Codex fetch
 
 bun run --filter @bundjil/codex-proxy smoke-test
   -> ephemeral local Bun server

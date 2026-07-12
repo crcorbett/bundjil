@@ -31,6 +31,11 @@
       "@bundjil/source": "./src/upstash-key-value-store.layer.ts",
       "types": "./dist/upstash-key-value-store.layer.d.ts",
       "default": "./dist/upstash-key-value-store.layer.js"
+    },
+    "./filesystem-key-value-store.layer": {
+      "@bundjil/source": "./src/filesystem-key-value-store.layer.ts",
+      "types": "./dist/filesystem-key-value-store.layer.d.ts",
+      "default": "./dist/filesystem-key-value-store.layer.js"
     }
   },
   "publishConfig": {
@@ -50,6 +55,10 @@
       "./upstash-key-value-store.layer": {
         "types": "./dist/upstash-key-value-store.layer.d.ts",
         "default": "./dist/upstash-key-value-store.layer.js"
+      },
+      "./filesystem-key-value-store.layer": {
+        "types": "./dist/filesystem-key-value-store.layer.d.ts",
+        "default": "./dist/filesystem-key-value-store.layer.js"
       }
     }
   },
@@ -57,10 +66,12 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "import:local-profile": "bun --conditions=@bundjil/source scripts/import-local-profile.ts",
+    "import:local-profile:filesystem": "bun --conditions=@bundjil/source scripts/import-local-profile-filesystem.ts",
     "proof:codex-responses": "bun --conditions=@bundjil/source scripts/prove-codex-responses.ts",
     "test": "vitest run"
   },
   "dependencies": {
+    "@effect/platform-bun": "catalog:effect",
     "@upstash/redis": "^1.38.0",
     "effect": "catalog:effect"
   },

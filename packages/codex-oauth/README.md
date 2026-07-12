@@ -27,6 +27,9 @@ Implemented:
 - Opt-in direct Codex Responses proof with sanitized output.
 - Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
   `KeyValueStore`.
+- Explicit trusted-local filesystem `KeyValueStore` adapter backed by
+  `KeyValueStore.layerFileSystem(...)` and `BunServices.layer`. It is a
+  persistent development/proof store, never a Vercel or multi-instance store.
 - Trusted-local, access-token-only import for an already authenticated Codex
   ChatGPT CLI cache. The command is package-owned, reads the cache only on the
   operator machine, validates the minimal cache shape with Effect Schema, and
@@ -80,6 +83,10 @@ Unsupported:
   enforces an internal bearer token before delegating to the direct provider.
 - `UpstashKeyValueStoreLive` is an opt-in Vercel Marketplace / Upstash Redis
   adapter for Effect `KeyValueStore`.
+- `CodexFileSystemKeyValueStoreLive(directory)`, exported from
+  `@bundjil/codex-oauth/filesystem-key-value-store.layer`, is an explicit
+  local Bun filesystem adapter. The caller supplies its directory; the layer
+  does not read app environment variables or make deployment decisions.
 
 Token schemas use Effect `Schema.RedactedFromValue`. Decoded values print and
 serialize as redacted placeholders, while the KeyValueStore JSON codec can
@@ -142,6 +149,27 @@ token values, prompts, and OAuth responses are not included in storage keys.
 The root export is reserved for schemas, errors, service tags, and pure
 operation helpers. Import live and mock layers from their explicit subpaths.
 
+## Local Filesystem Proof
+
+The filesystem path is for a trusted local development/proof process while
+Vercel Marketplace storage is unavailable. It writes the same encrypted
+profile envelope as the hosted path but is not deployable and must not be
+pointed at a shared, synced, or committed directory.
+
+Use an ignored directory and explicit profile fields in an ignored local env
+source, then run:
+
+```bash
+BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR=/absolute/ignored/bundjil-codex-store \
+  bun run --filter @bundjil/codex-oauth import:local-profile:filesystem
+```
+
+The filesystem importer needs the existing local importer configuration and
+encryption key material, plus `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR`. It does
+not read Upstash configuration, does not print the store path or token data,
+and stores only the current access token. Delete the directory to revoke the
+local profile.
+
 ## Upstash Redis KeyValueStore Adapter
 
 Use Vercel Marketplace Upstash Redis for hosted KV. Do not use `@vercel/kv`;
@@ -188,13 +216,11 @@ isolating another environment. Effect `KeyValueStore.clear` and `size` are
 implemented by scanning this prefix, so they operate on Bundjil-owned keys
 rather than the whole Redis database.
 
-Hosted token-profile storage remains blocked until a separate task composes
-this application-side cipher with `CodexProfileStore` and documents the
-operator-access model. Upstash TLS and provider-managed at-rest encryption are
-not enough for raw refresh tokens because Vercel / Upstash operators and
-project env readers must not be able to inspect stored refresh-token values.
-Until that encrypted persistence layer exists, use the Upstash adapter only as
-a storage primitive or for non-token test data.
+The proxy's explicit `live` composition applies the package-owned AES-GCM
+cipher before this adapter receives an imported access-token-only profile.
+Upstash TLS and provider-managed at-rest encryption are still not enough for
+raw refresh tokens, so this workaround never imports or stores refresh tokens.
+Hosted preview proof remains a separate operational task.
 
 Rollback for storage experiments:
 
@@ -224,6 +250,10 @@ Run it only on the trusted machine with an active local Codex ChatGPT login:
 bun run --filter @bundjil/codex-oauth import:local-profile
 ```
 
+That command remains the Upstash importer for the personal-Vercel preview
+path. For the separate local filesystem proof, use
+`import:local-profile:filesystem` instead; it never composes Upstash.
+
 The command reads configuration through Effect `Config` and
 `ConfigProvider.fromEnv()`. It needs the existing encryption and Upstash
 configuration plus these explicit, non-secret profile fields:
@@ -237,14 +267,18 @@ configuration plus these explicit, non-secret profile fields:
 `$HOME/.codex/auth.json` for this command only. The importer uses
 `BUNDJIL_CODEX_LOCAL_ACCESS_TOKEN_TTL` to calculate the short-lived profile
 expiry; it defaults to one hour from Codex's local `last_refresh` timestamp.
+When overriding it, use Effect duration syntax such as `"1 hour"` or
+`"720 hours"`, not abbreviated values such as `1h`.
 Set `BUNDJIL_CODEX_ACCOUNT_ID` only in proxy configuration when the direct
 provider needs its optional account header; the importer never reads it from
 the Codex cache.
 
 Success output is schema-backed metadata only: the profile id, `chatgpt` mode,
 the re-import-required state, valid-expiry status, and encrypted-store
-confirmation. Failure output names no cache path, account id, cache contents,
-token, prompt, or model response.
+confirmation. Filesystem-import failure output additionally includes a fixed
+safe operation category such as `decodeCache`, `validateExpiry`,
+`profileCipher`, or `storage`; it names no cache path, account id, cache
+contents, token, prompt, or model response.
 
 The profile contains only the current access token. When it expires, the
 hosted proxy must fail closed; renew the local Codex login if needed and run

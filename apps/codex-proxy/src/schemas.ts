@@ -4,7 +4,7 @@ import {
 } from "@bundjil/codex-oauth";
 import { Schema } from "effect";
 
-export const CodexProxyMode = Schema.Literals(["mock", "live"]);
+export const CodexProxyMode = Schema.Literals(["mock", "local", "live"]);
 
 export type CodexProxyMode = typeof CodexProxyMode.Type;
 
@@ -13,6 +13,7 @@ export const CodexProxyRuntimeConfig = Schema.Struct({
   internalToken: OpenAICompatibleProxyInternalToken,
   subject: CodexOAuthSubject,
   accountId: Schema.optional(Schema.NonEmptyString),
+  localProfileStoreDirectory: Schema.optional(Schema.NonEmptyString),
 });
 
 export type CodexProxyRuntimeConfig = typeof CodexProxyRuntimeConfig.Type;

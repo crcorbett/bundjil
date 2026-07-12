@@ -22,10 +22,10 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 `prove-personal-preview-workaround`
 
-`prove-personal-preview-workaround` is blocked only on personal preview storage
-provisioning. The code path is accepted, preview cipher variables are present,
-and the current mock-mode preview is healthy. Do not substitute API keys, raw
-token storage, or Tilt Legal resources. Production remains untouched.
+The local encrypted-filesystem tracer bullet is accepted. The personal preview
+proof remains blocked only on Upstash provisioning. The accepted local task did
+not change the hosted OAuth conclusion, Vercel preview, or production; it is
+not a substitute for preview persistence or a deployable mode.
 
 ## Baseline Evidence
 
@@ -162,6 +162,97 @@ Verification:
 
 Commit: pending parent commit.
 
+### implement-local-encrypted-filesystem-proof
+
+Status: Accepted 2026-07-12
+
+Parent acceptance requirements:
+
+- explicit package-owned filesystem `KeyValueStore` layer using Effect v4
+  `KeyValueStore.layerFileSystem` plus Bun platform services;
+- separate filesystem importer command with the existing access-token-only
+  importer contracts and AES-GCM envelope;
+- app-owned `local` mode and `local.layer.ts`, with Vercel rejection,
+  no Upstash composition, no refresh, and no fallback;
+- fixture tests, real local proof with sanitized-only evidence, three parent
+  Effect audits, focused checks, root verification, and a coherent commit.
+
+Implementation and parent review:
+
+- Added the opt-in
+  `@bundjil/codex-oauth/filesystem-key-value-store.layer` subpath. It accepts
+  a caller-supplied directory and composes Effect
+  `KeyValueStore.layerFileSystem` with `@effect/platform-bun` services; it
+  owns no app env names or Vercel behavior.
+- Added `import:local-profile:filesystem`. It reuses the existing trusted-local
+  cache source, importer service, canonical profile schemas, AES-GCM cipher,
+  and encrypted profile store. It requires an explicit ignored store directory
+  and does not compose Upstash. Its blocked response is Schema JSON with a
+  fixed operation category only; it contains no path, account, token, cache,
+  prompt, or provider response value.
+- Added app-owned `local` mode and `local.layer.ts`. It composes the encrypted
+  filesystem store, cipher config, memory refresh lock, unsupported OAuth
+  client, OAuth service, HTTP client, direct provider, and private proxy. It
+  calls `getValidToken` only. `VERCEL` is decoded through Effect Config and
+  makes `local` fail closed; `live` remains Upstash-only and mock remains the
+  default.
+- Corrected both importer scripts to use graceful `process.exitCode` failure
+  handling. `Bun.exit` is unavailable in the pinned Bun runtime and had hidden
+  the intended sanitized output behind a `TypeError`.
+
+Parent audit:
+
+1. Ownership and call graph: the package owns the reusable filesystem adapter
+   and importer script, while the proxy app owns mode selection, Vercel guard,
+   and HTTP behavior. The local graph reuses canonical encrypted profile,
+   cipher, token, direct-provider, and proxy contracts; it has no Upstash or
+   local-cache import in app code.
+2. Implementation quality: reviewed `Config`/`ConfigProvider.fromEnv`,
+   `Config.redacted` cipher key material, `KeyValueStore.layerFileSystem`,
+   `BunServices.layer`, Context services, explicit local/live/mock layers,
+   schema-derived contracts, and typed error mapping. No `process.env`, manual
+   JSON parser/stringifier, unsafe cast, DTO mirror, raw secret storage,
+   automatic refresh, platform API-key fallback, or hosted OAuth route was
+   introduced.
+3. Verification coverage: package typecheck, 46 package tests, package build,
+   proxy typecheck, 11 proxy tests, proxy build, mock smoke test, invalid
+   filesystem-import command, real local proof, static leak scans, root
+   verification, and diff checks were run. The real proof used ephemeral
+   in-process encryption/internal-token values and a removed ignored store;
+   it recorded only the sanitized outcomes below.
+
+Sanitized local proof, 2026-07-12:
+
+- the filesystem importer returned `status: imported` for a ChatGPT-mode cache
+  with an explicit temporary profile directory;
+- `GET /health` returned HTTP 200 with `mode: local`;
+- unauthenticated and invalid-internal-token completion requests returned HTTP
+  401;
+- one authenticated short request returned HTTP 200, `text/event-stream`, two
+  data lines, and the SSE completion marker;
+- response and server-log scans found no access/refresh/ID token, auth-cache,
+  or account-header markers; stored profile files had no access/refresh/ID
+  token field markers; and the store plus captured response were deleted;
+- the default one-hour import window reported the safe `validateExpiry`
+  category for the existing cache. A controlled local-only retry used Effect's
+  documented `"720 hours"` duration syntax; the direct provider stream was
+  still the authority for the successful live request.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth check-types`: passed.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 46 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run --filter @bundjil/codex-proxy check-types`: passed.
+- `bun run --filter @bundjil/codex-proxy test`: passed, 11 tests.
+- `bun run --filter @bundjil/codex-proxy build`: passed.
+- `bun run --filter @bundjil/codex-proxy smoke-test`: passed.
+- `bun run --filter @bundjil/codex-oauth import:local-profile:filesystem`
+  without configuration: exits 1 with only the Schema JSON safe blocked output.
+- `bun run verification`: passed after formatting and documentation checks.
+
+Commit: pending parent commit.
+
 ### prove-personal-preview-workaround
 
 Status: Blocked 2026-07-11
@@ -208,7 +299,7 @@ Follow-up evidence, 2026-07-12:
   the proxy. Focused package/app checks and `bun run verification` passed.
 - Preview deployment `dpl_2gnQwmyeFJXmXMyNgVYCYqWyv1kC` for commit `91a4e84`
   is `READY`. Direct probes recorded `GET /health` as HTTP 200 with `mode:
-  mock` and an unauthenticated completion request as HTTP 401. No credential
+mock` and an unauthenticated completion request as HTTP 401. No credential
   value was requested or displayed.
 - The Executor Personal Vercel API cannot create a Marketplace Upstash resource.
   The Vercel Marketplace Upstash page is reachable, but the available browser

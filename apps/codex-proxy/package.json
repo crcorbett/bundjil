@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@bundjil/codex-oauth": "workspace:*",
+    "@effect/platform-bun": "catalog:effect",
     "effect": "catalog:effect"
   },
   "devDependencies": {

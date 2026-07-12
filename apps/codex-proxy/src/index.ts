@@ -13,6 +13,10 @@ export {
   CodexProxyOpenAICompatibleProxyUnavailableLive,
 } from "./live.layer.js";
 export {
+  CodexProxyOpenAICompatibleProxyLocalUnavailableLive,
+  makeCodexProxyOpenAICompatibleProxyLocal,
+} from "./local.layer.js";
+export {
   CodexProxyConfig,
   CodexProxyConfigLayer,
   CodexProxyConfigLive,

@@ -59,6 +59,14 @@ const accountIdConfig = Config.option(
   Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_ACCOUNT_ID")
 );
 
+const localProfileStoreDirectoryConfig = Config.option(
+  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR")
+);
+
+const vercelRuntimeMarkerConfig = Config.option(
+  Config.nonEmptyString("VERCEL")
+);
+
 const portConfig = Config.port("PORT").pipe(Config.withDefault(8787));
 
 const SchemaDecode = {
@@ -120,6 +128,8 @@ export const loadCodexProxyConfig = Effect.gen(
     const installationId = yield* installationIdConfig;
     const subjectPrincipalId = yield* subjectPrincipalIdConfig;
     const accountId = yield* accountIdConfig;
+    const localProfileStoreDirectory = yield* localProfileStoreDirectoryConfig;
+    const vercelRuntimeMarker = yield* vercelRuntimeMarkerConfig;
     const subject = yield* SchemaDecode.codexOAuthSubject({
       connectorId,
       installationId,
@@ -132,12 +142,41 @@ export const loadCodexProxyConfig = Effect.gen(
       provider: "codex",
     });
 
-    return yield* SchemaDecode.codexProxyRuntimeConfig({
+    const config = yield* SchemaDecode.codexProxyRuntimeConfig({
       mode,
       internalToken: Redacted.value(internalToken),
       subject,
       ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
+      ...(Option.isNone(localProfileStoreDirectory)
+        ? {}
+        : { localProfileStoreDirectory: localProfileStoreDirectory.value }),
     });
+
+    if (
+      config.mode === "local" &&
+      config.localProfileStoreDirectory === undefined
+    ) {
+      return yield* new CodexProxyRouteError({
+        boundary: "CodexProxyRuntimeConfig",
+        code: "bad_request",
+        message:
+          "Local Codex proxy mode requires a local profile store directory.",
+        responseMessage: "The Codex proxy config is invalid.",
+        status: 400,
+      });
+    }
+
+    if (config.mode === "local" && Option.isSome(vercelRuntimeMarker)) {
+      return yield* new CodexProxyRouteError({
+        boundary: "CodexProxyRuntimeConfig",
+        code: "bad_request",
+        message: "Local Codex proxy mode is unavailable in Vercel.",
+        responseMessage: "The Codex proxy config is invalid.",
+        status: 400,
+      });
+    }
+
+    return config;
   }
 ).pipe(Effect.withSpan("CodexProxyConfig.load"));
 

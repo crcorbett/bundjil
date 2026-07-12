@@ -6,6 +6,7 @@
     "Keep the original hosted OAuth blocker intact; this is a local trusted-operator workaround only.",
     "Import only an access token, never a refresh or ID token, and fail closed at expiry.",
     "Keep local cache reads in @bundjil/codex-oauth and out of Vercel, Eve, routes, CI, and browser code.",
+    "Keep local encrypted filesystem proof distinct from Vercel/Upstash live mode; it must not be deployable or silently selected.",
     "Use canonical Effect Schema contracts, Context services, Layers, Config, Config.redacted, and KeyValueStore.",
     "Do not inspect, print, commit, test against, or document real credential values."
   ],
@@ -96,6 +97,48 @@
           "Parent audit 1 - ownership and call graph: apps/codex-proxy owns live-mode selection and composition, while @bundjil/codex-oauth continues to own encryption, storage, OAuth, fetch, and direct-provider contracts. The app selects mock or live only after CodexProxyConfig decoding and leaves Eve unchanged.",
           "Parent audit 2 - Effect implementation quality: reviewed explicit layers for encrypted store, cipher, Upstash store, refresh lock, unsupported OAuth client, OAuth service, HTTP client, direct provider, and proxy. Route errors remain typed in .pipe(catchTags); live profiles call getValidToken only. No refresh fallback, platform API-key fallback, process.env, JSON.stringify, JSON.parse, unsafe cast, or DTO mapper was introduced.",
           "Parent audit 3 - verification coverage: app check-types, 8 app handler tests, app build, smoke test, static fallback scans, git diff --check, Ultracite, Knip, workspace typechecks, workspace tests, and full bun run verification passed. Tests prove mock preservation, unavailable live config, imported access-only profile stream through mocked fetch, expiry fail-closed handling, 401 auth, and no token/API-key leakage in responses."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-local-encrypted-filesystem-proof",
+      "title": "Implement local encrypted filesystem proxy proof",
+      "status": "completed",
+      "description": "Add an explicit local-only persistent Effect KeyValueStore composition so the access-token importer and proxy can be proven together without Upstash.",
+      "implementationNotes": [
+        "Add a package-owned explicit local filesystem KeyValueStore layer using KeyValueStore.layerFileSystem and @effect/platform-bun BunServices.layer. It accepts a directory value; it does not own app environment names or Vercel concerns.",
+        "Add a separate filesystem importer command which shares canonical importer/profile/cipher contracts, requires BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR, and never composes Upstash. Preserve the existing Upstash importer command for the preview path.",
+        "Add apps/codex-proxy/src/local.layer.ts. Mode local composes encrypted filesystem storage, the existing cipher, memory refresh lock, unsupported OAuth client, OAuth service, HTTP client, direct provider, and OpenAI-compatible proxy. It calls getValidToken only and fails closed.",
+        "Extend the app-owned Effect config/schema mode with local and the local store directory. Mock stays default. Live stays Upstash-only. Decode the standard Vercel runtime marker through Effect Config and fail closed if it is present with local mode; do not use process.env.",
+        "Use only ignored temporary test/proof directories. Do not add a fallback to raw files, process.env, token logging, API keys, automatic refresh, or hosted OAuth routes."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen programs and typed .pipe(...) error handling for filesystem config/layer selection and importer/proxy operations.",
+        "Canonical @bundjil/codex-oauth schemas, tags, cipher, profile store, and KeyValueStore contracts; no unsafe casts, DTO mirrors, manual JSON readers/mappers, or trivial wrappers.",
+        "Tests prove importer persistence across fresh layer construction, encrypted file contents omit fixture access/refresh/ID token data, local proxy stream via mocked fetch, missing directory fails safe, mock preservation, and local composition does not require Upstash.",
+        "Run the filesystem importer only against an invalid fixture/path as automated proof; a real opt-in import must emit sanitized metadata only.",
+        "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "bun run verification"
+      ],
+      "completionCriteria": [
+        "A trusted local operator can import a local ChatGPT access token into an encrypted filesystem store and start the proxy in explicit local mode using the same subject/store directory.",
+        "The local proxy proves protected streaming against a mocked provider in tests and can be manually exercised without Upstash, while Vercel preview remains mock and live remains Upstash-only.",
+        "The 3-pass audit, docs, ignored-path guidance, and sanitized verification evidence are recorded before acceptance."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: @bundjil/codex-oauth owns the explicit filesystem KeyValueStore adapter and filesystem importer command; apps/codex-proxy owns local mode selection and its Vercel guard. The local call graph uses the existing encrypted profile store, cipher, OAuth service, direct provider, and OpenAI-compatible proxy, with no local-cache import in app code and no Upstash layer in local composition.",
+          "Parent audit 2 - Effect implementation quality: reviewed canonical schema-derived mode/config/profile contracts, ConfigProvider.fromEnv, Config.redacted cipher input, explicit BunServices/KeyValueStore layers, memory refresh lock, flat route/import programs, typed catchTags, and schema JSON output. No process.env, JSON.stringify, JSON.parse, unsafe casts, DTO mirrors, raw token storage, automatic refresh, API-key fallback, or hosted OAuth route was introduced. The Vercel marker is decoded through Effect Config and rejects local mode before composition.",
+          "Parent audit 3 - verification coverage: package typecheck, 46 package tests, package build, proxy typecheck, 11 proxy tests, proxy build, mock smoke test, invalid filesystem-import command proof, and a real sanitized local proof passed. The real proof recorded encrypted import, local health 200, unauthenticated and invalid-token 401s, authenticated SSE 200 with two data lines and DONE, no response/log leak markers, and ciphertext-only stored files; ephemeral secrets, response capture, and the temporary store were removed. Full root verification is recorded separately before commit."
         ]
       },
       "commitAfterPassing": true
