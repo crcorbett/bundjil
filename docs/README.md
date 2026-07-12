@@ -31,6 +31,9 @@ README.
   specifies the next hosted live Codex slice: OAuth revalidation, encrypted
   token-profile storage, refresh locking, personal Vercel preview proof, and
   mandatory implementation audits.
+- [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
+  records the narrow access-token-only alternative while hosted account-link
+  OAuth remains blocked.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
   preserves the Parallel AI report that corrected the subscription-backed model
   access plan.
@@ -48,25 +51,32 @@ README.
   tags, KeyValueStore layers, Upstash Redis adapter, and safe
   secret-handling rules.
 - [`@bundjil/codex-proxy`](../apps/codex-proxy/README.md) documents the
-  private Effect HTTP proxy app, local mock SSE route, env vars, smoke tests,
-  Vercel preview verification, and rollback rules.
+  private Effect HTTP proxy app, local mock and filesystem proof, personal
+  Vercel preview live mode, safe self-tests, expiry recovery, and rollback.
 
 ## Codex Provider Documentation Map
 
 - Current behavior: Gateway is the default Eve model path; Codex proxy mode is
   opt-in and calls the private proxy through an AI SDK OpenAI-compatible
   `LanguageModel`.
-- Hosted proof: `apps/codex-proxy` has preview proof in the
-  `bundjil-codex-proxy` Vercel project under Cooper's personal Vercel account,
-  not Tilt Legal.
+- Operating modes: `mock` is the default and never calls Codex; `local` is an
+  encrypted filesystem proof rejected by Vercel; `live` is the encrypted
+  Upstash composition for the personal Vercel preview project only.
+- Preview scope: `apps/codex-proxy` is linked to the
+  `bundjil-codex-proxy` project under Cooper's personal Vercel account, not
+  Tilt Legal. Bundjil did not configure or deploy production. Marketplace
+  Upstash credentials may nevertheless be auto-bound to production and must
+  not be treated as a production approval.
 - Storage: `@bundjil/codex-oauth/upstash-key-value-store.layer` provides an
-  opt-in Upstash Redis adapter behind Effect `KeyValueStore`; hosted refresh
-  token storage waits for envelope encryption.
+  opt-in Upstash Redis adapter behind Effect `KeyValueStore`. The workaround
+  stores only an encrypted, short-lived access-token profile; it never stores
+  refresh or ID tokens and fails closed on expiry.
 - JSON boundaries: app and package code should use Effect Schema codecs such
   as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
 - Unsupported paths: do not treat Codex OAuth as an OpenAI Platform API key,
   do not route it through Vercel AI Gateway credentials, and do not expose the
-  proxy publicly.
+  proxy publicly. Hosted browser OAuth/account linking and durable refresh are
+  blocked; Eve integration remains a later, separately specified boundary.
 
 ## Planned Docs
 

@@ -125,6 +125,9 @@ after the shape has survived at least one real tool/channel implementation.
 - owns explicit storage adapter subpaths such as
   `@bundjil/codex-oauth/upstash-key-value-store.layer` when they provide
   reusable Effect `KeyValueStore` implementations;
+- owns the trusted-local access-token-only importer and encrypted filesystem
+  adapter; that cache-reading boundary must stay out of app routes, Vercel,
+  Eve, CI, and browser code;
 - may depend on Effect and Effect v4 `KeyValueStore` primitives;
 - may depend on provider SDKs such as `@upstash/redis` only behind explicit
   adapter subpaths and Effect Config/Layer boundaries;
@@ -132,21 +135,25 @@ after the shape has survived at least one real tool/channel implementation.
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider
   behavior is involved;
-- must not compose hosted token-profile storage by default until an
-  application-side envelope encryption layer exists for refresh tokens.
+- must not compose durable refresh-token storage or hosted account-link OAuth
+  until a supported authorization design exists. The current imported profile
+  contains only an encrypted short-lived access token.
 
 `apps/codex-proxy`:
 
-- owns private proxy deployment concerns, route auth, mock streaming proof,
-  local dev, Vercel fetch export, and app-owned env names;
+- owns private proxy deployment concerns, route auth, mock/local/live mode
+  selection, local dev, Vercel fetch export, and app-owned env names;
 - may compose `@bundjil/codex-oauth` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
-- must keep hosted live Codex calls disabled until deployment, storage, and
-  secret verification tasks pass.
-- must deploy preview before production and record direct HTTP proof for
-  `/health`, unauthorized rejection, invalid-token rejection, and
-  authenticated mock streaming.
+- may compose encrypted access-token-only `live` mode only for the personal
+  Vercel preview after its storage, configuration, and secret checks pass;
+  this mode must fail closed and never refresh or fall back to mock.
+- must keep `mock` as the default, reject filesystem `local` mode on Vercel,
+  and never enable production without a separate explicit approval.
+- must record preview direct HTTP proof for `/health`, unauthorized rejection,
+  invalid-token rejection, authenticated stream behavior, encrypted Upstash
+  readback, and log/leak scans before a production proposal.
 
 `apps/agent` model-provider rules:
 

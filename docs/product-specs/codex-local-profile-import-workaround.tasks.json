@@ -146,7 +146,7 @@
     {
       "id": "prove-personal-preview-workaround",
       "title": "Prove the personal Vercel preview workaround",
-      "status": "blocked",
+      "status": "completed",
       "description": "Provision preview-only personal Vercel/Upstash configuration, perform the opt-in local import, and verify a live proxy stream with sanitized evidence.",
       "implementationNotes": [
         "Verify personal Vercel scope and project before changing preview env. Do not use Tilt Legal resources.",
@@ -165,18 +165,21 @@
         "A personal Vercel preview has a recorded live access-token-only proof or a precise external blocker.",
         "Production stays untouched."
       ],
-      "blockedBy": "A personal Vercel-linked Upstash Redis resource (or explicitly approved equivalent). Preview-only cipher configuration is now present, and the current mock-mode preview deployment is healthy, but no UPSTASH_REDIS_REST_* or KV_REST_API_* storage variables exist yet.",
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: personal preview runs the app-owned live layer with existing @bundjil/codex-oauth encrypted profile, Upstash KeyValueStore, OAuth, direct-provider, and private-proxy contracts. It selected neither local mode, hosted OAuth callback, Eve integration, Tilt Legal, nor production deployment.",
+          "Parent audit 2 - Effect implementation quality: the deployed path exercises accepted Config/Layer composition. The imported access-token-only profile remains an Effect Schema-derived AES-GCM envelope and the proxy calls getValidToken only. No refresh, API-key fallback, raw credential storage, direct process.env read, manual JSON boundary, unsafe cast, DTO mirror, or helper was added.",
+          "Parent audit 3 - verification coverage: personal scope and preview-only variable names were confirmed; sanitized import completed; Upstash returned HTTP 200 with encrypted envelope fields and no token markers; health was 200, unauthenticated and invalid-token calls were 401, authenticated SSE was 200 with nine data lines and DONE, response scans found no secrets, and Vercel error/fatal logs were empty. No Bundjil production mode/key/profile/deployment was set."
+        ]
       },
       "commitAfterPassing": true
     },
     {
       "id": "document-workaround-operations",
       "title": "Document workaround operation and rollback",
-      "status": "pending",
+      "status": "completed",
       "description": "Make the current implementation, expiry/re-import workflow, self-test procedure, preview proof, and rollback discoverable without claiming hosted OAuth support.",
       "implementationNotes": [
         "Update READMEs and architecture docs named in the SPEC.",
@@ -194,8 +197,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: the documentation retains package ownership for trusted-local import, encryption, profile storage, and provider operations; app ownership for mode selection, private routes, and Vercel deployment; and agent ownership for future provider selection. It keeps hosted OAuth and Eve integration as distinct blocked/future boundaries.",
+          "Parent audit 2 - implementation quality: reviewed the operator runbook, README map, Effect architecture, repository ownership, and verification guidance. The docs consistently distinguish mock, local, and personal-preview live modes; require Effect Schema JSON boundaries; name no secret values; and state access-token-only expiry/re-import and mock rollback without implying automatic refresh or production activation.",
+          "Parent audit 3 - verification coverage: the delegated documentation worker ran stale-claim scans and git diff --check. Parent corrected two inaccurate schema-encoding phrases and the importer result field name, reran stale-claim scans and git diff --check, then ran full bun run verification successfully: format/lint, Knip, all workspace typechecks, and all workspace tests (including 46 codex-oauth and 11 codex-proxy tests)."
+        ]
       },
       "commitAfterPassing": true
     }

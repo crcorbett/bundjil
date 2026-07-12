@@ -42,8 +42,8 @@ Future:
 
 - Live OAuth endpoint exchange and refresh.
 - Supported hosted account-link OAuth with a registered redirect URI.
-- Hosted live Codex proxy mode after the access-token-only workaround has its
-  own preview proof.
+- Durable refresh-token persistence is deliberately deferred until a supported
+  hosted authorization path exists.
 
 Unsupported:
 
@@ -151,10 +151,9 @@ operation helpers. Import live and mock layers from their explicit subpaths.
 
 ## Local Filesystem Proof
 
-The filesystem path is for a trusted local development/proof process while
-Vercel Marketplace storage is unavailable. It writes the same encrypted
-profile envelope as the hosted path but is not deployable and must not be
-pointed at a shared, synced, or committed directory.
+The filesystem path is for a trusted local development/proof process. It writes
+the same encrypted profile envelope as the preview path but is not deployable
+and must not be pointed at a shared, synced, or committed directory.
 
 Use an ignored directory and explicit profile fields in an ignored local env
 source, then run:
@@ -216,11 +215,16 @@ isolating another environment. Effect `KeyValueStore.clear` and `size` are
 implemented by scanning this prefix, so they operate on Bundjil-owned keys
 rather than the whole Redis database.
 
-The proxy's explicit `live` composition applies the package-owned AES-GCM
-cipher before this adapter receives an imported access-token-only profile.
-Upstash TLS and provider-managed at-rest encryption are still not enough for
-raw refresh tokens, so this workaround never imports or stores refresh tokens.
-Hosted preview proof remains a separate operational task.
+The proxy's explicit preview `live` composition applies the package-owned
+AES-GCM cipher before this adapter receives an imported access-token-only
+profile. Upstash TLS and provider-managed at-rest encryption are still not
+enough to make unsupported refresh-token use safe, so this workaround never
+imports, stores, or refreshes refresh tokens.
+
+Marketplace provisioning can auto-bind Upstash credentials to Vercel
+production as well as preview. Bundjil's proxy mode, cipher key, profile
+subject, import, and deploy are configured for preview only; a marketplace
+binding is not a production activation or approval.
 
 Rollback for storage experiments:
 
@@ -281,8 +285,33 @@ safe operation category such as `decodeCache`, `validateExpiry`,
 contents, token, prompt, or model response.
 
 The profile contains only the current access token. When it expires, the
-hosted proxy must fail closed; renew the local Codex login if needed and run
-the import command again. Do not add automatic refresh around this workaround.
+proxy must fail closed; renew the local Codex login if needed and run the
+import command again. Do not add automatic refresh around this workaround.
+
+### Operator Modes
+
+- `mock` is app-owned and the default. It needs no imported profile and never
+  calls Codex.
+- `local` is a trusted Bun-only proof. The filesystem importer and proxy use
+  `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR`; Vercel rejects this mode.
+- `live` is the personal Vercel preview path. The Upstash importer and proxy
+  require preview-only cipher, internal-token, subject, and KV configuration.
+  The package never chooses the mode or deploys Vercel.
+
+Local and preview import commands return schema-backed, sanitized status only:
+
+```text
+status: imported
+mode: chatgpt
+requiresReauthentication: true
+expiryStatus: valid
+encryptedStore: stored
+```
+
+That output does not establish durable authentication. It records an
+access-token-only profile which must be re-imported after expiry or upstream
+authorization failure. The package deliberately does not implement hosted
+OAuth start/callback routes, browser account linking, or an Eve integration.
 
 ## Direct Codex Responses Proof
 

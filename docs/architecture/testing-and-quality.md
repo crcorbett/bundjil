@@ -57,8 +57,9 @@ bun run --filter @bundjil/agent build
   build, and smoke-test. Hosted deployment proof belongs in the deployment task
   and must verify preview before production.
 - Codex documentation task: update root, architecture, app, package, SPEC, and
-  task-ledger docs as needed, then run `bun run check` and
-  `bun run verification`.
+  task-ledger docs as needed. Documentation-only verification must include
+  stale-claim scans and `git diff --check`; run broader checks only when the
+  parent acceptance task requires them.
 
 ## Mandatory Effect Audit
 
@@ -136,35 +137,20 @@ Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
-For Codex proxy mode, start the local proxy in mock mode first:
+Codex proxy mode is not an Eve test requirement. Gateway remains the default;
+do not use the access-token-only workaround to wire Eve to a preview proxy.
+When a separate Eve integration SPEC authorizes it, source ignored env values
+rather than printing them:
 
 ```bash
-PORT=8788 \
-BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
+PORT=<local-port> \
 BUNDJIL_CODEX_PROXY_MODE=mock \
 bun run --filter @bundjil/codex-proxy dev
 ```
 
-Then start Eve with the private provider selected:
-
-```bash
-PORT=2101 \
-BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
-BUNDJIL_AGENT_MODEL=codex-default-model \
-BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
-BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
-BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=123456 \
-bun run --filter @bundjil/agent dev:no-ui
-```
-
-Required local proof:
-
-- `GET /eve/v1/health` returns ready.
-- `GET /eve/v1/info` reports `bundjil-codex-proxy/...` and the configured
-  context window.
-- `POST /eve/v1/session` plus the stream endpoint emits a completed message.
-- Output is sanitized and excludes bearer tokens, OAuth tokens, authorization
-  codes, raw upstream responses, and full private prompts.
+Use the dedicated proxy runbook in
+[`apps/codex-proxy/README.md`](../../apps/codex-proxy/README.md) for mock,
+local filesystem, preview live, expiry/re-import, and rollback operations.
 
 ## Codex Proxy Verification
 
@@ -178,35 +164,12 @@ The smoke test starts a local Bun server on an ephemeral port, checks
 `GET /health`, and checks authenticated mock SSE from
 `POST /v1/chat/completions`.
 
-Manual local probes:
-
-```bash
-BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=dev-only-token \
-  bun run --filter @bundjil/codex-proxy dev
-```
-
-```bash
-curl -sS http://127.0.0.1:8787/health
-```
-
-```bash
-curl -i -sS \
-  -X POST http://127.0.0.1:8787/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-```
-
-```bash
-curl -N \
-  -X POST http://127.0.0.1:8787/v1/chat/completions \
-  -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-```
-
-Hosted checks must run against a Vercel preview deployment before production
-and must inspect logs for absence of token values, authorization codes, raw
-OAuth payloads, prompts, and full response bodies.
+Manual probes must use a minimal request from a private shell; the server
+decodes it through the owning Effect Schema boundary.
+Record no request body or model output. Checks must run against the personal
+Vercel preview before any production proposal and must scan logs for absence of
+token values, authorization codes, raw OAuth payloads, prompts, and full
+response bodies.
 
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.
@@ -233,36 +196,21 @@ build command: bun run --filter @bundjil/codex-proxy build
 output directory: .
 ```
 
-Preview direct HTTP checks:
+Preview direct HTTP checks start with the public health endpoint. Send the
+private authenticated request only from an ignored local env source and record
+the sanitized result shape below:
 
 ```bash
 PROXY_URL=<preview-url>
 
 curl -sS "${PROXY_URL}/health"
-
-curl -i -sS \
-  -X POST "${PROXY_URL}/v1/chat/completions" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-
-curl -i -sS \
-  -X POST "${PROXY_URL}/v1/chat/completions" \
-  -H "Authorization: Bearer invalid-token" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-
-curl -N \
-  -X POST "${PROXY_URL}/v1/chat/completions" \
-  -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
 ```
 
 Sanitized proof shape:
 
 ```text
 healthStatus: 200
-healthMode: mock
+healthMode: mock or live
 unauthenticatedStatus: 401
 invalidTokenStatus: 401
 streamStatus: 200
@@ -285,24 +233,12 @@ proof counters belong in docs. Do not record bearer values, OAuth token
 values, refresh token values, authorization codes, raw OAuth payloads, full
 prompts, or full model responses.
 
-Production deployment is allowed only after preview proof is recorded:
-
-```bash
-vercel deploy --prod
-```
-
-Rollback:
-
-```bash
-vercel rollback <deployment-id-or-url>
-vercel rollback status
-```
-
-Application rollback is also valid: remove
-`BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy` and related
-`BUNDJIL_CODEX_PROXY_*` env vars from the agent so Eve returns to Gateway.
-Rotate the proxy token through Vercel env management if a secret exposure is
-suspected; never print the old value in rollback notes.
+For the current workaround, rollback is setting preview
+`BUNDJIL_CODEX_PROXY_MODE` to `mock` and deploying another preview. The
+filesystem proof is revoked by deleting its ignored directory. Rotate Vercel or
+Upstash credentials through provider controls if exposure is suspected; never
+print the old value. Production deployment needs a later explicit approval and
+is not covered by this runbook.
 
 ## Documentation Quality
 

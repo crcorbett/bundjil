@@ -20,12 +20,12 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 ## Current Task
 
-`prove-personal-preview-workaround`
+`document-workaround-operations`
 
-The local encrypted-filesystem tracer bullet is accepted. The personal preview
-proof remains blocked only on Upstash provisioning. The accepted local task did
-not change the hosted OAuth conclusion, Vercel preview, or production; it is
-not a substitute for preview persistence or a deployable mode.
+The personal preview workaround is accepted. The final documentation task is
+accepted and ready to commit. The original hosted OAuth conclusion remains
+blocked; the access-token-only preview proof does not create a hosted
+account-link or durable refresh path.
 
 ## Baseline Evidence
 
@@ -255,7 +255,7 @@ Commit: pending parent commit.
 
 ### prove-personal-preview-workaround
 
-Status: Blocked 2026-07-11
+Status: Accepted 2026-07-12
 
 Parent acceptance requirements:
 
@@ -268,7 +268,7 @@ Parent acceptance requirements:
 - record sanitized proof evidence or a precise external-state blocker, then
   complete the three audit passes and commit the documentation slice.
 
-Read-only external-state evidence:
+Historical pre-provisioning evidence:
 
 - Executor Personal Vercel API confirms project `bundjil-codex-proxy` belongs
   to the personal team `team_1LX7ZujbijowTv8J9k0aU7nD`, has root directory
@@ -307,9 +307,79 @@ mock` and an unauthenticated completion request as HTTP 401. No credential
   personal Vercel sign-in. No `UPSTASH_REDIS_REST_*` or `KV_REST_API_*`
   preview variables exist yet.
 
-Deferred audit status:
+Accepted preview evidence, 2026-07-12:
 
-- The 3-pass audit will be recorded only after a real preview proof can test
-  personal-resource ownership, ciphertext-only storage, authenticated live
-  stream behavior, and Vercel log leakage. The code-level audit for the
-  preceding tasks is complete; this task has no valid hosted evidence yet.
+- Personal Vercel project `bundjil-codex-proxy` is linked to team
+  `team_1LX7ZujbijowTv8J9k0aU7nD` with root directory `apps/codex-proxy` and
+  Node `24.x`; no Tilt Legal resource was selected. Preview-only sensitive
+  cipher, internal-token, live-mode, and Marketplace Upstash bindings were
+  configured without displaying, committing, or recording any values.
+- The trusted-local importer completed against the preview storage with only
+  sanitized confirmation metadata. It imports an access token only and requires
+  reauthentication; it does not import a refresh or ID token.
+- Upstash readback returned HTTP 200. Its record was structurally an encrypted
+  profile envelope with `version`, `algorithm`, `keyId`, `nonce`, `ciphertext`,
+  `subjectHash`, and timestamps. Marker scans found no access, refresh, ID,
+  cache, or account fields.
+- A fresh personal `live` preview returned health HTTP 200, unauthenticated and
+  invalid-internal-token HTTP 401, and authenticated SSE HTTP 200 with
+  `text/event-stream`, nine `data:` lines, and `[DONE]`. Captured responses had
+  no temporary internal-token or token/cache-field marker.
+- Vercel logs show the expected health 200, authorization 401, and completion
+  200 requests. Error/fatal log queries returned no entries. Prompts, provider
+  responses, credentials, and raw storage values were not retained as evidence.
+- Only preview deployments were created. Bundjil did not set a production mode,
+  cipher key, profile, or deployment. Marketplace provider credentials may be
+  auto-bound to production, but that is not a Bundjil production activation.
+
+Parent audit:
+
+1. Ownership and call graph: the proof uses the app-owned `live` composition
+   and the existing package-owned encrypted-profile, Upstash, `KeyValueStore`,
+   OAuth, direct-provider, and private-proxy contracts. It did not select local
+   filesystem mode, Eve, a browser OAuth callback, Tilt Legal, or production.
+2. Effect implementation quality: the deployed path exercises the accepted
+   explicit Config/Layer composition. Its access-token-only profile is an
+   Effect Schema-derived AES-GCM envelope and live requests use `getValidToken`
+   only. No refresh, API-key fallback, raw credential store, direct env read,
+   manual JSON boundary, DTO, or helper was added.
+3. Verification coverage: personal scope, preview-only configuration names,
+   encrypted Upstash shape, health/auth/live-SSE probes, response leak scans,
+   and Vercel error-log scans were independently checked. The accepted code
+   commit and the final documentation task both passed full repository
+   verification.
+
+### document-workaround-operations
+
+Status: Accepted 2026-07-12
+
+Implementation and parent review:
+
+- Updated the root and docs indexes, `@bundjil/codex-oauth` package README,
+  proxy README, and relevant Effect/Eve/repository/testing architecture guides.
+  They now distinguish `mock`, trusted-local filesystem `local`, and
+  personal-Vercel/Upstash preview `live` modes; provide local/preview import,
+  sanitized self-test, expiry/re-import, and mock rollback steps; and keep
+  hosted account-link OAuth plus Eve integration out of scope.
+- Documentation examples name environment variables and expected status shapes
+  only. They do not contain credentials, identifiers, cache paths, request
+  content, model output, or raw storage values. They also state that Bundjil did
+  not set a production mode/key/profile or deploy production, notwithstanding
+  possible Marketplace credential auto-binding.
+
+Parent audit:
+
+1. Ownership and call graph: docs retain package ownership for trusted-local
+   import, encryption, storage, and provider contracts; app ownership for mode
+   selection, private routes, and Vercel; and agent ownership for future model
+   selection. Hosted OAuth and Eve integration remain distinct boundaries.
+2. Documentation quality: reviewed the runbook, README map, Effect pattern
+   guidance, repository ownership, and testing guidance. They consistently
+   describe Effect Schema JSON boundaries, access-token-only expiry/re-import,
+   no refresh, and preview-only rollback without claiming production support.
+3. Verification coverage: stale-claim scans and `git diff --check` passed.
+   Parent corrected two inaccurate Schema wording phrases and one importer
+   result-field label, then ran full `bun run verification`: formatting, Knip,
+   workspace typechecks, and all workspace tests passed.
+
+Commit: pending parent commit.

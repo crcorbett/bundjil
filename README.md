@@ -45,13 +45,14 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
 - `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
   lifecycle service contracts, the direct Codex Responses proof surface, the
   private OpenAI-compatible provider contract, and the opt-in Upstash Redis
-  `KeyValueStore` adapter. The live proof is opt-in and sanitized; live OAuth
-  endpoint exchange and encrypted hosted token storage do not ship yet.
+  `KeyValueStore` adapter. It also owns the trusted-local, access-token-only
+  import command and encrypted profile envelope. It does not own a hosted
+  account-link OAuth flow or durable refresh.
 - `@bundjil/codex-proxy` is the private Effect HTTP proxy app. It exposes
   `GET /health` and a bearer-token-protected
-  `POST /v1/chat/completions` mock SSE route for local and Vercel preview
-  proof. The Vercel project is `bundjil-codex-proxy` in Cooper's personal
-  Vercel account, not Tilt Legal.
+  `POST /v1/chat/completions` route with explicit mock, local, and live
+  compositions. The Vercel project is `bundjil-codex-proxy` in Cooper's
+  personal Vercel account, not Tilt Legal.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, the `workspace_status` tool that delegates into
   `@bundjil/eve-effect`, and app-owned model-provider config. Gateway is the
@@ -67,19 +68,27 @@ Implemented:
 - AI Gateway remains the default Eve model provider.
 - `apps/agent` can opt into a private Codex proxy `LanguageModel` with
   `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`.
-- `apps/codex-proxy` runs locally and on Vercel preview in mock mode with
-  private bearer-token auth.
-- `@bundjil/codex-oauth` owns the direct Codex Responses proof, request/stream
-  mappers, profile/token service contracts, memory layers, and Upstash
-  `KeyValueStore` adapter.
+- `mock` is the default proxy mode for local smoke tests and safe preview
+  rollback. It never calls Codex.
+- `local` is an explicit encrypted filesystem proof. It runs only in trusted
+  local Bun and Vercel rejects it.
+- `live` is an explicit personal-Vercel preview composition: a trusted-local
+  importer writes an encrypted access-token-only profile to Upstash, and the
+  proxy fails closed if that profile is absent or expired.
 
-Opt-in proof and future work:
+Operational constraints:
 
-- Direct Codex Responses proof requires a private `CODEX_ACCESS_TOKEN` source
-  for one process and prints only sanitized metadata.
-- Hosted live Codex proxy mode is still pending.
-- Hosted token-profile storage is blocked until Bundjil adds application-side
-  envelope encryption for refresh-token payloads.
+- Imports intentionally exclude refresh and ID tokens, set
+  `requiresReauthentication: true`, and cannot refresh. Expiry requires a new
+  trusted-local import or a rollback to `mock`.
+- The personal Vercel configuration and deploys are preview only. Bundjil did
+  not set a production proxy mode, profile, or cipher configuration, and did
+  not deploy production. A Marketplace Upstash resource may still auto-bind
+  its provider credentials to production; that is not permission to run live
+  mode there.
+- The operator runbook is in
+  [`apps/codex-proxy/README.md`](./apps/codex-proxy/README.md). It records only
+  sanitized statuses and leak booleans.
 
 Unsupported paths:
 
@@ -89,6 +98,11 @@ Unsupported paths:
   subscription-backed provider path.
 - Do not expose `apps/codex-proxy` as a public gateway.
 - Do not deploy `bundjil-codex-proxy` to Tilt Legal.
+- Hosted browser OAuth/account linking remains blocked. Bundjil does not reuse
+  the Codex CLI client, redirect URI, PKCE exchange, browser session, or
+  refresh token.
+- Eve integration with this workaround is out of scope. Gateway remains the
+  default until a separate SPEC changes that boundary.
 
 ## Getting Started
 
@@ -126,37 +140,11 @@ The proxy smoke test starts a local Bun server on an ephemeral port, verifies
 `GET /health`, and verifies authenticated mock OpenAI-compatible SSE without
 calling Codex.
 
-For local Eve proof through the private proxy, start the proxy in one shell:
-
-```bash
-PORT=8788 \
-BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
-BUNDJIL_CODEX_PROXY_MODE=mock \
-bun run --filter @bundjil/codex-proxy dev
-```
-
-Then start Eve in another shell:
-
-```bash
-PORT=2101 \
-BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
-BUNDJIL_AGENT_MODEL=codex-default-model \
-BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
-BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
-bun run --filter @bundjil/agent dev:no-ui
-```
-
-Direct local HTTP checks:
-
-```bash
-curl -sS http://127.0.0.1:8788/health
-curl -sS http://127.0.0.1:2101/eve/v1/info
-```
-
-The local proof shape should contain status fields, model ids, event names,
-line counts, and leak booleans only. Do not print bearer tokens, OAuth tokens,
-refresh tokens, authorization codes, raw upstream responses, or full private
-prompts.
+The Codex proxy runbook is deliberately separate from Eve. It provides local
+import, preview import, status-only self-tests, expiry/re-import, and mock
+rollback without exposing credentials or request content. Do not point Eve at
+the preview proxy as part of this workaround; a later integration requires its
+own SPEC.
 
 ## Layout
 

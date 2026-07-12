@@ -95,17 +95,21 @@ Codex proxy model path:
   proxy service, and redacted internal-token schema.
 - `apps/codex-proxy` owns the deployable private Effect HTTP proxy app,
   Vercel entrypoint, local dev host, app config, internal bearer-token auth,
-  and mock-mode proof.
+  mock/local/live composition, and proxy proof.
 - `apps/agent` owns only provider selection. It does not import Codex OAuth
   profile services, token refresh services, or direct Codex Responses clients.
 
 Current Codex provider state:
 
-- Implemented: Gateway default, opt-in Codex proxy `LanguageModel`, local
-  proxy proof, Vercel preview mock proof, direct Codex Responses package
-  proof, and Upstash `KeyValueStore` adapter.
-- Future: hosted live Codex proxy mode, live OAuth endpoint exchange, and
-  hosted token-profile storage with application-side envelope encryption.
+- Implemented: Gateway default, opt-in Codex proxy `LanguageModel`, default
+  mock proof, trusted-local encrypted filesystem proof, direct Codex Responses
+  package proof, and a personal-Vercel preview `live` composition over
+  encrypted Upstash storage.
+- The live composition accepts only an imported short-lived access token. It
+  fails closed on expiry and requires a trusted-local re-import; it neither
+  stores nor refreshes refresh or ID tokens.
+- Future: supported hosted account-link OAuth and durable refresh. Those are
+  blocked and are not supplied by the preview workaround.
 - Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
   Codex OAuth through Vercel AI Gateway credentials, deploying
   `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.
@@ -162,9 +166,11 @@ Eve HTTP/API
   -> chatgpt.com/backend-api/codex/responses
 ```
 
-In current committed tests, local proof, and Vercel preview proof, the proxy
-runs in mock mode and does not call the live Codex backend. The live path is
-documented as the target production call graph but remains gated.
+Tests prove all three compositions without provider credentials. `mock` remains
+the default. `local` is a trusted Bun-only proof, while `live` is a personal
+Vercel preview composition that must be exercised through the sanitized
+operator runbook before it is described as a live-provider proof. No production
+mode, profile, cipher configuration, or deployment was set by Bundjil.
 
 The `workspace_status` tool runtime path is:
 
@@ -405,8 +411,9 @@ BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=<optional-positive-integer>
 
 Rules:
 
-- Keep Gateway mode as the default until the hosted live Codex proxy path has
-  storage, refresh, and production protection.
+- Keep Gateway mode as the default. The access-token-only preview workaround
+  does not authorize an Eve integration; changing that boundary requires a
+  separate SPEC.
 - Put the internal proxy token only in ignored env files or Vercel env vars.
 - Keep `BUNDJIL_CODEX_PROXY_BASE_URL` pointed at the private proxy `/v1`
   prefix, not the direct `chatgpt.com` endpoint.
@@ -418,10 +425,13 @@ Rules:
 - Unknown diagnostic values that need safe rendering must use
   `Schema.UnknownFromJsonString`.
 
-## Hosted Proxy Verification
+## Preview Proxy Verification
 
 The deployed proxy belongs to the `bundjil-codex-proxy` project in Cooper's
-personal Vercel account, not Tilt Legal. Preview must pass before production.
+personal Vercel account, not Tilt Legal. The proxy's personal Vercel setup is
+preview only. Bundjil did not configure a production mode/key/profile or deploy
+production; Marketplace Upstash credentials may be auto-bound to production but
+do not activate it.
 
 Preview deployment command shape:
 
@@ -433,14 +443,14 @@ bun run --filter @bundjil/codex-proxy build
 vercel deploy
 ```
 
-Direct preview checks:
+Direct preview checks use a minimal request from a private shell; the server
+decodes it through the owning Effect Schema boundary.
+do not paste the request body, bearer value, account identifier, or model output
+into a terminal transcript or documentation:
 
 ```bash
 PROXY_URL=<preview-url>
 curl -sS "${PROXY_URL}/health"
-curl -i -sS -X POST "${PROXY_URL}/v1/chat/completions" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-curl -i -sS -X POST "${PROXY_URL}/v1/chat/completions" -H "Authorization: Bearer invalid-token" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
-curl -N -X POST "${PROXY_URL}/v1/chat/completions" -H "Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}" -H "Content-Type: application/json" -d '{"model":"gpt-5.5","stream":true,"messages":[{"role":"user","content":"Say OK."}]}'
 ```
 
 Record only sanitized proof fields: HTTP statuses, `mode`, model id, content
@@ -448,8 +458,9 @@ type, SSE data-line count, `[DONE]` presence, and leak booleans. Do not record
 bearer tokens, OAuth tokens, refresh tokens, authorization codes, raw OAuth
 payloads, prompts, or full model responses.
 
-Rollback is either Vercel rollback for a production deployment or agent config
-rollback to Gateway:
+For the workaround, rollback is preview mode change to `mock` or agent config
+rollback to Gateway. Production rollback is not relevant because Bundjil did
+not deploy production:
 
 ```bash
 vercel rollback <deployment-id-or-url>
