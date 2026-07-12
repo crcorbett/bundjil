@@ -22,10 +22,10 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 `prove-personal-preview-workaround`
 
-`prove-personal-preview-workaround` is blocked on personal preview storage
-provisioning. The code path is accepted, but the Vercel project has no Upstash
-or cipher environment variables. Do not substitute API keys, raw token storage,
-or Tilt Legal resources. Production remains untouched.
+`prove-personal-preview-workaround` is blocked only on personal preview storage
+provisioning. The code path is accepted, preview cipher variables are present,
+and the current mock-mode preview is healthy. Do not substitute API keys, raw
+token storage, or Tilt Legal resources. Production remains untouched.
 
 ## Baseline Evidence
 
@@ -194,6 +194,27 @@ Read-only external-state evidence:
   configuration, an importer run cannot store an encrypted profile and a live
   proxy deployment must remain unavailable. The task is therefore blocked on
   provider configuration, not on code, tests, or an OAuth redirect grant.
+
+Follow-up evidence, 2026-07-12:
+
+- With the user's approval, preview-only
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY` and
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID` were created as sensitive personal
+  Vercel environment variables. Values were not committed or included in this
+  plan.
+- The first current-code preview returned `FUNCTION_INVOCATION_FAILED` because
+  Vercel built `apps/codex-proxy` without its workspace runtime dependency.
+  Commit `91a4e84` fixes `vercel.json` to build `@bundjil/codex-oauth` before
+  the proxy. Focused package/app checks and `bun run verification` passed.
+- Preview deployment `dpl_2gnQwmyeFJXmXMyNgVYCYqWyv1kC` for commit `91a4e84`
+  is `READY`. Direct probes recorded `GET /health` as HTTP 200 with `mode:
+  mock` and an unauthenticated completion request as HTTP 401. No credential
+  value was requested or displayed.
+- The Executor Personal Vercel API cannot create a Marketplace Upstash resource.
+  The Vercel Marketplace Upstash page is reachable, but the available browser
+  session is unauthenticated and the install flow requires an interactive
+  personal Vercel sign-in. No `UPSTASH_REDIS_REST_*` or `KV_REST_API_*`
+  preview variables exist yet.
 
 Deferred audit status:
 

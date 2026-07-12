@@ -122,7 +122,7 @@
         "A personal Vercel preview has a recorded live access-token-only proof or a precise external blocker.",
         "Production stays untouched."
       ],
-      "blockedBy": "A personal Vercel-linked Upstash Redis resource (or explicitly approved equivalent) and preview-only cipher configuration. Current personal project inspection found only BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and BUNDJIL_CODEX_PROXY_MODE in preview; no encrypted-store resource variables are present.",
+      "blockedBy": "A personal Vercel-linked Upstash Redis resource (or explicitly approved equivalent). Preview-only cipher configuration is now present, and the current mock-mode preview deployment is healthy, but no UPSTASH_REDIS_REST_* or KV_REST_API_* storage variables exist yet.",
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 0,
