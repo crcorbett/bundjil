@@ -59,6 +59,30 @@ export const CodexOAuthRefreshToken = Schema.RedactedFromValue(
 
 export type CodexOAuthRefreshToken = typeof CodexOAuthRefreshToken.Type;
 
+export const CodexOAuthState = Schema.RedactedFromValue(Schema.NonEmptyString);
+export type CodexOAuthState = typeof CodexOAuthState.Type;
+
+export const CodexOAuthCodeVerifier = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthCodeVerifier = typeof CodexOAuthCodeVerifier.Type;
+
+export const CodexOAuthAuthorizationUrl = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthAuthorizationUrl = typeof CodexOAuthAuthorizationUrl.Type;
+
+export const CodexOAuthAuthorizationCode = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthAuthorizationCode =
+  typeof CodexOAuthAuthorizationCode.Type;
+
+export const CodexOAuthIdToken = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthIdToken = typeof CodexOAuthIdToken.Type;
+
 export const CodexOAuthAccountId = Schema.RedactedFromValue(
   Schema.NonEmptyString
 );
@@ -322,6 +346,7 @@ export type CodexOAuthRevokeInput = typeof CodexOAuthRevokeInput.Type;
 
 export const CodexOAuthProfileCommitOperation = Schema.Literals([
   "initialWrite",
+  "replaceLegacy",
   "replace",
   "refresh",
   "markReauthenticationRequired",
@@ -329,6 +354,14 @@ export const CodexOAuthProfileCommitOperation = Schema.Literals([
 
 export type CodexOAuthProfileCommitOperation =
   typeof CodexOAuthProfileCommitOperation.Type;
+
+export const CodexOAuthProfileCommitLegacyReplacementInput = Schema.Struct({
+  expectedLegacyProfile: CodexAccessTokenImportProfile,
+  profile: CodexSubscriptionProfile,
+});
+
+export type CodexOAuthProfileCommitLegacyReplacementInput =
+  typeof CodexOAuthProfileCommitLegacyReplacementInput.Type;
 
 export const CodexOAuthProfileCommitReplacementInput = Schema.Struct({
   profile: CodexSubscriptionProfile,
@@ -353,6 +386,139 @@ export const CodexOAuthProfileCommitReauthenticationInput = Schema.Struct({
 
 export type CodexOAuthProfileCommitReauthenticationInput =
   typeof CodexOAuthProfileCommitReauthenticationInput.Type;
+
+export const CodexSubscriptionAuthProtocolConfig = Schema.Struct({
+  issuer: Schema.NonEmptyString,
+  authorizationEndpoint: Schema.NonEmptyString,
+  tokenEndpoint: Schema.NonEmptyString,
+  clientId: Schema.NonEmptyString,
+  callbackHost: Schema.Literal("127.0.0.1"),
+  callbackPath: Schema.Literal("/auth/callback"),
+  callbackPorts: Schema.Tuple([Schema.Literal(1455), Schema.Literal(1457)]),
+  scopes: Schema.Tuple([
+    Schema.Literal("openid"),
+    Schema.Literal("profile"),
+    Schema.Literal("email"),
+    Schema.Literal("offline_access"),
+    Schema.Literal("api.connectors.read"),
+    Schema.Literal("api.connectors.invoke"),
+  ]),
+  originator: Schema.Literal("codex_cli_rs"),
+  protocolScopeVersion: CodexOAuthProtocolScopeVersion,
+});
+
+export type CodexSubscriptionAuthProtocolConfig =
+  typeof CodexSubscriptionAuthProtocolConfig.Type;
+
+export const CodexOAuthAuthorizationMaterial = Schema.Struct({
+  state: CodexOAuthState,
+  codeVerifier: CodexOAuthCodeVerifier,
+  codeChallenge: Schema.NonEmptyString,
+});
+
+export type CodexOAuthAuthorizationMaterial =
+  typeof CodexOAuthAuthorizationMaterial.Type;
+
+export const CodexOAuthAuthorizationSession = Schema.Struct({
+  state: CodexOAuthState,
+  codeVerifier: CodexOAuthCodeVerifier,
+  codeChallenge: Schema.NonEmptyString,
+  authorizationUrl: CodexOAuthAuthorizationUrl,
+  redirectUri: Schema.NonEmptyString,
+});
+
+export type CodexOAuthAuthorizationSession =
+  typeof CodexOAuthAuthorizationSession.Type;
+
+export const CodexOAuthAuthorizationCallback = Schema.Struct({
+  code: CodexOAuthAuthorizationCode,
+  state: CodexOAuthState,
+  redirectUri: Schema.NonEmptyString,
+});
+
+export type CodexOAuthAuthorizationCallback =
+  typeof CodexOAuthAuthorizationCallback.Type;
+
+export const CodexOAuthTokenResponse = Schema.Struct({
+  id_token: CodexOAuthIdToken,
+  access_token: CodexOAuthAccessToken,
+  refresh_token: CodexOAuthRefreshToken,
+});
+
+export type CodexOAuthTokenResponse = typeof CodexOAuthTokenResponse.Type;
+
+export const CodexOAuthRefreshResponse = Schema.Struct({
+  id_token: Schema.optional(CodexOAuthIdToken),
+  access_token: Schema.optional(CodexOAuthAccessToken),
+  refresh_token: Schema.optional(CodexOAuthRefreshToken),
+});
+
+export type CodexOAuthRefreshResponse = typeof CodexOAuthRefreshResponse.Type;
+
+export const CodexOAuthCodeExchangeInput = Schema.Struct({
+  code: CodexOAuthAuthorizationCode,
+  codeVerifier: CodexOAuthCodeVerifier,
+  redirectUri: Schema.NonEmptyString,
+});
+
+export type CodexOAuthCodeExchangeInput =
+  typeof CodexOAuthCodeExchangeInput.Type;
+
+export const CodexOAuthRefreshTransportInput = Schema.Struct({
+  refreshToken: CodexOAuthRefreshToken,
+});
+
+export type CodexOAuthRefreshTransportInput =
+  typeof CodexOAuthRefreshTransportInput.Type;
+
+export const CodexOAuthProviderErrorResponse = Schema.Union([
+  Schema.Struct({
+    error: Schema.NonEmptyString,
+    error_description: Schema.optional(Schema.NonEmptyString),
+  }),
+  Schema.Struct({
+    error: Schema.Struct({
+      code: Schema.optional(Schema.NonEmptyString),
+      message: Schema.optional(Schema.NonEmptyString),
+    }),
+  }),
+]);
+
+export type CodexOAuthProviderErrorResponse =
+  typeof CodexOAuthProviderErrorResponse.Type;
+
+export const CodexOAuthJwtExpiry = Schema.Struct({
+  expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
+});
+
+export type CodexOAuthJwtExpiry = typeof CodexOAuthJwtExpiry.Type;
+
+export const CodexOAuthAccountMetadata = Schema.Struct({
+  accountId: CodexOAuthAccountId,
+});
+
+export type CodexOAuthAccountMetadata = typeof CodexOAuthAccountMetadata.Type;
+
+export const CodexSubscriptionLoginInput = Schema.Struct({
+  subject: CodexOAuthSubject,
+  callbackTimeoutMillis: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+});
+
+export type CodexSubscriptionLoginInput =
+  typeof CodexSubscriptionLoginInput.Type;
+
+export const CodexSubscriptionLoginExpiryCategory = Schema.Literal("valid");
+
+export const CodexSubscriptionLoginResult = Schema.Struct({
+  profileId: CodexOAuthProfileId,
+  mode: CodexCliAuthMode,
+  expiryCategory: CodexSubscriptionLoginExpiryCategory,
+  refreshCapable: Schema.Literal(true),
+  encryptedStore: Schema.Literal("stored"),
+});
+
+export type CodexSubscriptionLoginResult =
+  typeof CodexSubscriptionLoginResult.Type;
 
 export const CodexOAuthObserverEventType = Schema.Literals([
   "refreshStarted",

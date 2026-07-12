@@ -4,6 +4,7 @@ import type { CodexOAuthProfileCommitFailure } from "./errors.js";
 import { CodexOAuthUnsupportedRuntimePath } from "./errors.js";
 import type {
   CodexOAuthProfileCommitReplacementInput,
+  CodexOAuthProfileCommitLegacyReplacementInput,
   CodexOAuthProfileCommitReauthenticationInput,
   CodexOAuthProfileCommitRefreshInput,
   CodexSubscriptionProfile,
@@ -15,6 +16,9 @@ export interface CodexOAuthProfileCommitShape {
   ) => Effect.Effect<CodexSubscriptionProfile, CodexOAuthProfileCommitFailure>;
   readonly replace: (
     input: CodexOAuthProfileCommitReplacementInput
+  ) => Effect.Effect<CodexSubscriptionProfile, CodexOAuthProfileCommitFailure>;
+  readonly replaceLegacy: (
+    input: CodexOAuthProfileCommitLegacyReplacementInput
   ) => Effect.Effect<CodexSubscriptionProfile, CodexOAuthProfileCommitFailure>;
   readonly refresh: (
     input: CodexOAuthProfileCommitRefreshInput
@@ -41,6 +45,7 @@ export const CodexOAuthProfileCommitUnsupported = Layer.succeed(
   CodexOAuthProfileCommit,
   CodexOAuthProfileCommit.of({
     initialWrite: unsupportedCommit("completeLogin"),
+    replaceLegacy: unsupportedCommit("completeLogin"),
     replace: unsupportedCommit("completeLogin"),
     refresh: unsupportedCommit("refresh"),
     markReauthenticationRequired: unsupportedCommit("refresh"),
@@ -72,6 +77,15 @@ export const replaceCodexSubscriptionProfile = (
     const commit = yield* CodexOAuthProfileCommit;
 
     return yield* commit.replace(input);
+  });
+
+export const replaceLegacyCodexOAuthProfile = (
+  input: CodexOAuthProfileCommitLegacyReplacementInput
+) =>
+  Effect.gen(function* replaceLegacyCodexOAuthProfileOperation() {
+    const commit = yield* CodexOAuthProfileCommit;
+
+    return yield* commit.replaceLegacy(input);
   });
 
 export const markCodexSubscriptionReauthenticationRequired = (

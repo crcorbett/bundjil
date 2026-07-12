@@ -67,6 +67,7 @@
     "check-types": "tsc --noEmit",
     "import:local-profile": "bun --conditions=@bundjil/source scripts/import-local-profile.ts",
     "import:local-profile:filesystem": "bun --conditions=@bundjil/source scripts/import-local-profile-filesystem.ts",
+    "login:subscription": "bun --conditions=@bundjil/source scripts/login-subscription.ts",
     "proof:codex-responses": "bun --conditions=@bundjil/source scripts/prove-codex-responses.ts",
     "test": "vitest run"
   },
@@ -77,6 +78,7 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:effect",
+    "@types/bun": "^1.3.14",
     "typescript": "catalog:typescript",
     "vitest": "catalog:testing"
   }

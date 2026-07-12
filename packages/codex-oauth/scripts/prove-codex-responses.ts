@@ -1,25 +1,25 @@
 import process from "node:process";
 
-import { ConfigProvider, Effect, Exit, Schema } from "effect";
+import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   CodexResponsesProofResult,
   loadCodexResponsesProofInput,
   runCodexResponsesProof,
 } from "../src/index.js";
-import {
-  CodexResponsesFetchLive,
-  CodexResponsesProofLive,
-} from "../src/live.layer.js";
+import { CodexResponsesProofFetchLive } from "../src/live.layer.js";
 
 const program = Effect.gen(function* proveCodexResponses() {
   const input = yield* loadCodexResponsesProofInput;
 
   return yield* runCodexResponsesProof(input);
 }).pipe(
-  Effect.provide(CodexResponsesProofLive),
-  Effect.provide(CodexResponsesFetchLive),
-  Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv()))
+  Effect.provide(
+    Layer.merge(
+      CodexResponsesProofFetchLive,
+      ConfigProvider.layer(ConfigProvider.fromEnv())
+    )
+  )
 );
 
 const ProofSuccessOutput = Schema.Struct({

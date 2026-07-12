@@ -4,6 +4,7 @@ import {
   ConfigProvider,
   Effect,
   Exit,
+  Layer,
   Option,
   Schema,
 } from "effect";
@@ -65,19 +66,35 @@ const encodeImportBlockedOutput = Schema.encodeSync(
   Schema.fromJsonString(ImportBlockedOutput)
 );
 
+const configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv());
+
 const program = Effect.gen(function* importLocalProfileToFileSystem() {
   const directory = yield* localProfileStoreDirectoryConfig;
-
-  return yield* importCodexLocalProfile.pipe(
-    Effect.provide(CodexLocalProfileImportServiceLive),
-    Effect.provide(CodexLocalAuthCacheSourceLive),
-    Effect.provide(CodexLocalProfileImportConfigLive),
-    Effect.provide(CodexProfileStoreEncryptedKeyValueLive),
-    Effect.provide(CodexOAuthProfileCipherLive),
-    Effect.provide(CodexOAuthProfileCipherConfigLive),
-    Effect.provide(CodexFileSystemKeyValueStoreLive(directory))
+  const importConfigLayer = CodexLocalProfileImportConfigLive.pipe(
+    Layer.provide(configProviderLayer)
   );
-}).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));
+  const sourceLayer = CodexLocalAuthCacheSourceLive.pipe(
+    Layer.provide(importConfigLayer)
+  );
+  const cipherConfigLayer = CodexOAuthProfileCipherConfigLive.pipe(
+    Layer.provide(configProviderLayer)
+  );
+  const cipherLayer = CodexOAuthProfileCipherLive.pipe(
+    Layer.provide(cipherConfigLayer)
+  );
+  const storeLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
+    Layer.provideMerge(
+      Layer.merge(cipherLayer, CodexFileSystemKeyValueStoreLive(directory))
+    )
+  );
+  const importLayer = CodexLocalProfileImportServiceLive.pipe(
+    Layer.provideMerge(
+      Layer.mergeAll(importConfigLayer, sourceLayer, storeLayer)
+    )
+  );
+
+  return yield* importCodexLocalProfile.pipe(Effect.provide(importLayer));
+}).pipe(Effect.provide(configProviderLayer));
 
 const exit = await Effect.runPromiseExit(program);
 
@@ -86,24 +103,25 @@ if (Exit.isSuccess(exit)) {
     encodeImportSuccessOutput({ status: "imported", result: exit.value })
   );
 } else {
-  const operation = Option.match(Cause.findErrorOption(exit.cause), {
-    onNone: () => "unavailable",
-    onSome: (failure) => {
-      if (Schema.is(CodexLocalProfileImportError)(failure)) {
-        return failure.operation;
-      }
+  const operation: (typeof ImportBlockedOutput.Type)["operation"] =
+    Option.match(Cause.findErrorOption(exit.cause), {
+      onNone: () => "unavailable",
+      onSome: (failure) => {
+        if (Schema.is(CodexLocalProfileImportError)(failure)) {
+          return failure.operation;
+        }
 
-      if (Schema.is(CodexOAuthProfileCipherError)(failure)) {
-        return "profileCipher";
-      }
+        if (Schema.is(CodexOAuthProfileCipherError)(failure)) {
+          return "profileCipher";
+        }
 
-      if (Schema.is(OAuthProfileStorageError)(failure)) {
-        return "storage";
-      }
+        if (Schema.is(OAuthProfileStorageError)(failure)) {
+          return "storage";
+        }
 
-      return "unavailable";
-    },
-  });
+        return "unavailable";
+      },
+    });
 
   console.error(
     encodeImportBlockedOutput({

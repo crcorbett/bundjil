@@ -27,6 +27,8 @@ import {
   makeCodexOAuthRefreshLock,
 } from "./refresh-lock.service.js";
 import {
+  CodexAccessTokenImportProfile,
+  EncryptedCodexOAuthProfile,
   EncryptedCodexOAuthProfileV2,
   UpstashRedisConfig,
   UpstashRedisKeyPrefix,
@@ -34,6 +36,7 @@ import {
 } from "./schemas.js";
 import type {
   CodexOAuthProfileCommitOperation,
+  CodexOAuthProfileCommitLegacyReplacementInput,
   CodexOAuthProfileCommitReplacementInput,
   CodexOAuthProfileCommitReauthenticationInput,
   CodexOAuthProfileCommitRefreshInput,
@@ -83,6 +86,7 @@ export interface UpstashRedisRefreshLockClient {
 }
 
 export interface UpstashRedisProfileCommitClient {
+  readonly get: (key: string) => Promise<string | null>;
   readonly eval: (
     script: string,
     keys: string[],
@@ -154,6 +158,10 @@ if operation == 'initialWrite' then
   if currentProfile ~= false or currentRevision ~= false then
     return 0
   end
+elseif operation == 'replaceLegacy' then
+  if currentProfile == false or currentRevision ~= false or currentProfile ~= ARGV[2] then
+    return 0
+  end
 else
   if currentRevision == false or currentRevision ~= ARGV[2] then
     return 0
@@ -172,18 +180,110 @@ const encryptedCodexOAuthProfileV2Json = Schema.fromJsonString(
   Schema.toCodecJson(EncryptedCodexOAuthProfileV2)
 );
 
+const encryptedCodexOAuthProfileJson = Schema.fromJsonString(
+  Schema.toCodecJson(EncryptedCodexOAuthProfile)
+);
+
+const codexAccessTokenImportProfileJson = Schema.fromJsonString(
+  Schema.toCodecJson(CodexAccessTokenImportProfile)
+);
+
 const commitProfileArguments = (
   operation: CodexOAuthProfileCommitOperation,
   encodedProfile: string,
   profile: CodexSubscriptionProfile,
-  expectedRevision?: CodexSubscriptionProfile["credentialRevision"]
+  expectedFence?: string
 ) =>
   [
     operation,
-    expectedRevision ?? "",
+    expectedFence ?? "",
     encodedProfile,
     profile.credentialRevision,
   ] as const;
+
+const readLegacyProfileFence = Effect.fn(
+  "UpstashCodexOAuthProfileCommit.readLegacyFence"
+)(function* (
+  client: UpstashRedisProfileCommitClient,
+  config: Pick<UpstashRedisConfigType, "keyPrefix">,
+  cipher: CodexOAuthProfileCipherShape,
+  input: CodexOAuthProfileCommitLegacyReplacementInput
+) {
+  const profileKey = yield* codexOAuthProfileStorageKey(input.profile.subject);
+  const subjectHash = yield* codexOAuthProfileSubjectHash(
+    input.profile.subject
+  );
+  const conflict = new CodexOAuthProfileCommitConflict({
+    operation: "replaceLegacy",
+    profileId: input.profile.subject.profileId,
+    subjectHash,
+    message:
+      "The stored Codex OAuth legacy profile no longer matches the fenced migration precondition.",
+  });
+  const encodedProfile = yield* Effect.tryPromise({
+    try: () => client.get(toUpstashRedisKey(config.keyPrefix, profileKey)),
+    catch: (cause) => new UpstashRedisSdkError({ cause }),
+  }).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexOAuthProfileCommitError({
+          operation: "replaceLegacy",
+          profileId: input.profile.subject.profileId,
+          subjectHash,
+          message: "Unable to read the encrypted legacy profile fence.",
+          cause,
+        })
+    )
+  );
+
+  if (encodedProfile === null) {
+    return yield* conflict;
+  }
+
+  const encryptedProfile = yield* Schema.decodeUnknownEffect(
+    encryptedCodexOAuthProfileJson
+  )(encodedProfile).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexOAuthProfileCommitError({
+          operation: "replaceLegacy",
+          profileId: input.profile.subject.profileId,
+          subjectHash,
+          message: "Unable to decode the encrypted legacy profile fence.",
+          cause,
+        })
+    )
+  );
+  const currentProfile = yield* cipher.decrypt(encryptedProfile);
+
+  if (currentProfile.profileKind !== "access-token-import") {
+    return yield* conflict;
+  }
+
+  const [currentCanonical, expectedCanonical] = yield* Effect.all([
+    Schema.encodeEffect(codexAccessTokenImportProfileJson)(currentProfile),
+    Schema.encodeEffect(codexAccessTokenImportProfileJson)(
+      input.expectedLegacyProfile
+    ),
+  ]).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexOAuthProfileCommitError({
+          operation: "replaceLegacy",
+          profileId: input.profile.subject.profileId,
+          subjectHash,
+          message: "Unable to compare the legacy profile fence.",
+          cause,
+        })
+    )
+  );
+
+  if (currentCanonical !== expectedCanonical) {
+    return yield* conflict;
+  }
+
+  return encodedProfile;
+});
 
 const writeCommittedProfile = (
   client: UpstashRedisProfileCommitClient,
@@ -192,7 +292,7 @@ const writeCommittedProfile = (
   observer: Option.Option<CodexOAuthObserverShape>,
   operation: CodexOAuthProfileCommitOperation,
   profile: CodexSubscriptionProfile,
-  expectedRevision?: CodexSubscriptionProfile["credentialRevision"]
+  expectedFence?: string
 ) =>
   Effect.gen(function* writeCommittedProfileOperation() {
     const profileKey = yield* codexOAuthProfileStorageKey(profile.subject);
@@ -229,7 +329,7 @@ const writeCommittedProfile = (
               operation,
               encodedProfile,
               profile,
-              expectedRevision
+              expectedFence
             ),
           ]
         ),
@@ -531,6 +631,22 @@ export const makeUpstashCodexOAuthProfileCommit = (
             "replace",
             input.profile,
             input.expectedRevision
+          )
+      ),
+      replaceLegacy: Effect.fn("UpstashCodexOAuthProfileCommit.replaceLegacy")(
+        (input: CodexOAuthProfileCommitLegacyReplacementInput) =>
+          readLegacyProfileFence(client, config, cipher, input).pipe(
+            Effect.flatMap((legacyFence) =>
+              writeCommittedProfile(
+                client,
+                config,
+                cipher,
+                observer,
+                "replaceLegacy",
+                input.profile,
+                legacyFence
+              )
+            )
           )
       ),
       refresh: Effect.fn("UpstashCodexOAuthProfileCommit.refresh")(

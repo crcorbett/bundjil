@@ -13,6 +13,7 @@ import { CodexOAuthTokenProviderError } from "./errors/codex-oauth-token-provide
 import { CodexOAuthUnsupportedRuntimePath } from "./errors/codex-oauth-unsupported-runtime-path.js";
 import { CodexResponsesRequestError } from "./errors/codex-responses-request-error.js";
 import { CodexResponsesStreamError } from "./errors/codex-responses-stream-error.js";
+import { CodexSubscriptionAuthError } from "./errors/codex-subscription-auth-error.js";
 import { OAuthProfileNotFound } from "./errors/oauth-profile-not-found.js";
 import { OAuthProfileSchemaError } from "./errors/oauth-profile-schema-error.js";
 import { OAuthProfileStorageError } from "./errors/oauth-profile-storage-error.js";
@@ -65,6 +66,11 @@ export { CodexOAuthRefreshLockError } from "./errors/codex-oauth-refresh-lock-er
 export { CodexOAuthUnsupportedRuntimePath } from "./errors/codex-oauth-unsupported-runtime-path.js";
 export { CodexResponsesRequestError } from "./errors/codex-responses-request-error.js";
 export { CodexResponsesStreamError } from "./errors/codex-responses-stream-error.js";
+export {
+  CodexSubscriptionAuthError,
+  CodexSubscriptionAuthFailureReason,
+  CodexSubscriptionAuthOperation,
+} from "./errors/codex-subscription-auth-error.js";
 export { OAuthProfileNotFound } from "./errors/oauth-profile-not-found.js";
 export { OAuthProfileSchemaError } from "./errors/oauth-profile-schema-error.js";
 export { OAuthProfileStorageError } from "./errors/oauth-profile-storage-error.js";
@@ -123,6 +129,20 @@ export const CodexOAuthProfileCommitFailure = Schema.Union([
 
 export type CodexOAuthProfileCommitFailure =
   typeof CodexOAuthProfileCommitFailure.Type;
+
+export const CodexSubscriptionAuthFailure = Schema.Union([
+  CodexSubscriptionAuthError,
+  CodexOAuthProfileCommitConflict,
+  CodexOAuthProfileCommitError,
+  CodexOAuthUnsupportedRuntimePath,
+  OAuthProfileSchemaError,
+  OAuthProfileStorageError,
+  OAuthProfileNotFound,
+  CodexOAuthProfileCipherError,
+]);
+
+export type CodexSubscriptionAuthFailure =
+  typeof CodexSubscriptionAuthFailure.Type;
 
 export const CodexLocalProfileImportFailure = Schema.Union([
   CodexLocalProfileImportError,

@@ -51,6 +51,11 @@ import {
   codexOAuthProfileSubjectHash,
 } from "./storage-keys.js";
 
+export { CodexBrowserLauncherMemory } from "./browser-launcher.service.js";
+export { CodexLoopbackCallbackMemory } from "./loopback-callback.service.js";
+export { CodexOAuthHttpClientMock } from "./oauth-http-client.service.js";
+export { CodexSubscriptionAuthProtocolConfigTest } from "./subscription-auth-protocol.service.js";
+
 export interface CodexOAuthClientMockOptions {
   readonly loginStart?: CodexOAuthLoginStartResult;
   readonly loginProfile?: CodexOAuthProfileType;
@@ -261,7 +266,8 @@ export const CodexOAuthProfileCommitMemory = Layer.effect(
     const writeProfile = (
       operation: CodexOAuthProfileCommitOperation,
       profile: CodexSubscriptionProfile,
-      expectedRevision?: CodexSubscriptionProfile["credentialRevision"]
+      expectedRevision?: CodexSubscriptionProfile["credentialRevision"],
+      expectedLegacyProfile?: CodexAccessTokenImportProfileType
     ) =>
       Effect.gen(function* writeProfileCommit() {
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
@@ -286,11 +292,16 @@ export const CodexOAuthProfileCommitMemory = Layer.effect(
               : undefined;
           const initialConflict =
             operation === "initialWrite" && currentProfile !== undefined;
+          const legacyReplacementConflict =
+            operation === "replaceLegacy" &&
+            (currentProfile?.profileKind !== "access-token-import" ||
+              currentProfile !== expectedLegacyProfile);
           const casConflict =
             operation !== "initialWrite" &&
+            operation !== "replaceLegacy" &&
             currentRevision !== expectedRevision;
 
-          if (initialConflict || casConflict) {
+          if (initialConflict || legacyReplacementConflict || casConflict) {
             return [
               new CodexOAuthProfileCommitConflict({
                 operation,
@@ -336,6 +347,15 @@ export const CodexOAuthProfileCommitMemory = Layer.effect(
       ),
       replace: Effect.fn("CodexOAuthProfileCommitMemory.replace")((input) =>
         writeProfile("replace", input.profile, input.expectedRevision)
+      ),
+      replaceLegacy: Effect.fn("CodexOAuthProfileCommitMemory.replaceLegacy")(
+        (input) =>
+          writeProfile(
+            "replaceLegacy",
+            input.profile,
+            undefined,
+            input.expectedLegacyProfile
+          )
       ),
       refresh: Effect.fn("CodexOAuthProfileCommitMemory.refresh")((input) =>
         writeProfile("refresh", input.profile, input.expectedRevision)

@@ -3,10 +3,11 @@
 Effect contracts for Bundjil-owned Codex OAuth profiles and the direct Codex
 Responses proof path.
 
-This package owns reusable profile, token, and proof boundaries. It does not
-perform live OAuth endpoint exchange, own Vercel deployment, or change the Eve
-app model. The deployable private proxy app now lives in `apps/codex-proxy`
-and composes this package's service contracts.
+This package owns reusable profile, token, trusted-local subscription login,
+and proof boundaries. It performs OAuth exchange only from its local Bun login
+command; it does not expose hosted OAuth routes, own Vercel deployment, or
+change the Eve app model. The deployable private proxy app lives in
+`apps/codex-proxy` and composes this package's service contracts.
 
 ## Current State
 
@@ -44,12 +45,35 @@ Implemented:
   excludes the local refresh token and ID token, sets
   `requiresReauthentication: true`, and never runs in Vercel, Eve, routes, CI,
   or browser code.
+- Trusted-local Codex subscription login through the first-party loopback PKCE
+  protocol. `CodexSubscriptionLogin` composes package-owned protocol config,
+  callback, browser, OAuth HTTP, token-metadata, encrypted-store, and fenced
+  commit services. The Bun command binds only `127.0.0.1`, tries registered
+  callback ports `1455` then `1457`, opens the system browser, exchanges the
+  authorization code, discards the ID token after decoding canonical account
+  metadata, and stores a refresh-capable encrypted profile.
+- The loopback listener is owned by Effect Platform through
+  `BunHttpServer.make` and `HttpServer.serveEffect`. It does not create a raw
+  Bun server, enable request logging, or outlive the scoped login operation.
+- Separate form-url-encoded authorization-code exchange and JSON refresh
+  transports through Effect Platform `HttpClient`. Response schemas do not
+  assume `expires_in`; access-token expiry comes from the JWT `exp` claim.
+- Successful and non-success token responses have separate narrow Schemas.
+  Provider error values are decoded only to validate the boundary, then
+  discarded in favor of stable sanitized errors. An exchanged access token
+  whose JWT expiry is not in the future is rejected before persistence.
+- `CodexOAuthProfileCommit.replaceLegacy` atomically migrates an observed
+  access-token import. Memory fencing compares the observed generation;
+  Upstash verifies the encrypted legacy envelope and fences the Lua swap
+  against its exact ciphertext while installing the first subscription
+  revision. Concurrent or delayed migrations cannot replace the winner.
+- Memory layers for callback, browser, and OAuth HTTP boundaries. Automated
+  login tests do not open a browser, contact OpenAI, or require credentials.
 
 Future:
 
-- Live OAuth endpoint exchange and refresh.
-- Trusted-local Codex-compatible loopback sign-in plus encrypted hosted refresh
-  under the successor SPEC; Vercel will expose no OAuth browser callback.
+- Hosted refresh policy, bounded `401` recovery, and preview verification.
+- Integration of the refresh-capable profile into the private proxy live path.
 - The proxy continues to use the unsupported commit layer until the dedicated
   refresh-capable live-proxy task is accepted.
 
@@ -71,9 +95,19 @@ Unsupported:
   expiry timestamps, scopes, and reauthentication state.
 - `CodexProfileStore` is the profile persistence service.
 - `CodexOAuthProfileCommit` is the only subscription-profile mutation service;
-  `CodexProfileStore.putProfile` remains restricted to the legacy import path.
+  `initialWrite`, revision-based `replace`, and legacy `replaceLegacy` have
+  distinct atomic preconditions. `CodexProfileStore.putProfile` remains
+  restricted to the legacy import path.
 - `CodexOAuthService` is the token lifecycle service.
 - `CodexOAuthClient` is the future provider-client boundary.
+- `CodexSubscriptionAuthProtocolConfigService` owns the reviewed first-party
+  public OAuth endpoints, client id, scopes, authorization parameters, and
+  callback ports. These are package constants, not process configuration.
+- `CodexLoopbackCallback` owns the scoped callback resource and strict callback
+  validation. `CodexBrowserLauncher` is the only boundary that reveals the
+  redacted authorization URL to an operating-system command.
+- `CodexOAuthHttpClient` owns code exchange and refresh transport only.
+  `CodexSubscriptionLogin` owns the local orchestration and fenced save.
 - `CodexOAuthProfileCipher` encrypts and decrypts canonical
   `CodexOAuthProfile` values into versioned encrypted envelopes. It does not
   persist profiles or implement OAuth endpoint exchange.
@@ -151,6 +185,10 @@ token values, prompts, and OAuth responses are not included in storage keys.
   config without reading the process environment.
 - `CodexHttpClientMock` and `CodexDirectProviderMock`, exported from the mock
   subpath, replace provider boundaries in tests without network calls.
+- `CodexSubscriptionAuthProtocolConfigLive`,
+  `CodexLoopbackCallbackBunLive`, `CodexBrowserLauncherCommandLive`,
+  `CodexOAuthHttpClientLive`, and `CodexSubscriptionLoginLive` form the local
+  production graph. Their `Test` or `Memory` counterparts form the mock graph.
 - `UpstashKeyValueStoreLive`, exported from
   `@bundjil/codex-oauth/upstash-key-value-store.layer`, provides only the
   Effect `KeyValueStore` service. It is not composed into `CodexOAuthLive` by
@@ -250,6 +288,39 @@ Do not log, snapshot, or include access tokens, refresh tokens, authorization
 codes, raw OAuth responses, or private prompts in errors. Public tagged errors
 only include safe fields such as operation names, profile ids, hashed subject
 keys, timestamps, and sanitized messages.
+
+## Trusted-Local Subscription Login
+
+Run the broker only on the trusted owner machine. It requires the personal
+Upstash and profile-encryption configuration documented above, plus the
+non-secret subject identifier:
+
+```bash
+BUNDJIL_CODEX_PROFILE_PRINCIPAL_ID=personal-owner \
+  bun run --filter @bundjil/codex-oauth login:subscription
+```
+
+Optional non-secret settings are:
+
+- `BUNDJIL_CODEX_PROFILE_CONNECTOR_ID`, default `bundjil-local`
+- `BUNDJIL_CODEX_PROFILE_INSTALLATION_ID`, default `agent-dev`
+- `BUNDJIL_CODEX_PROFILE_ID`, default `default`
+- `BUNDJIL_CODEX_LOGIN_CALLBACK_TIMEOUT`, default `5 minutes`
+
+The command prints only a Schema-encoded result containing the profile id,
+ChatGPT mode, valid-expiry category, refresh capability, and encrypted-store
+confirmation. It never prints the authorization URL, callback query, code,
+state, verifier, tokens, ID token, account id, provider response, prompt, or
+model output.
+
+Package typechecking includes `src`, `test`, and `scripts`, so the executable
+composition is checked alongside its service contracts. The build remains
+source-only and does not emit CLI entrypoints into the package library output.
+
+The callback is local-only. There is deliberately no `/oauth/start`,
+`/oauth/callback`, Vercel callback, Eve callback, or browser-bundle import.
+Hosted code reads the resulting encrypted profile in later tasks; it never
+conducts the interactive login.
 
 ## Trusted-Local Profile Import
 

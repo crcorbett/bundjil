@@ -171,7 +171,7 @@
     {
       "id": "implement-local-subscription-login-broker",
       "title": "Implement the trusted-local subscription login broker",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["define-subscription-profile-and-fenced-commit"],
       "description": "Implement protocol config, loopback PKCE, browser launch, separate code-exchange/refresh transports, account/expiry extraction, fenced encrypted save, and sanitized CLI output.",
       "implementationNotes": [
@@ -198,8 +198,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: @bundjil/codex-oauth owns protocol, callback, browser-command, HTTP transport, token metadata, login, and fenced profile-commit contracts; only the trusted-local CLI composes browser and loopback layers, while apps, Eve, Vercel functions, and CI import neither local boundary.",
+          "Parent audit 2 - implementation quality: reviewed exact first-party protocol fields, scoped Effect Platform Bun HTTP callback handling without request logging, Platform ChildProcess browser launch, Deferred completion, canonical Redacted and Schema boundaries, narrow success/error response schemas, JWT metadata decoding, expired-token rejection, legacy ciphertext CAS and subscription revision CAS, flat named Effects, explicit Layers, sanitized errors/output, and no raw fetch/server/JSON/process.env/unsafe casts/generic Redacted/helper sprawl.",
+          "Parent audit 3 - verification coverage: tests prove protocol URL/ports/scopes/PKCE/state, callback validation and cleanup paths, form exchange versus JSON refresh, provider-error sanitization, JWT expiry/account metadata, expired-token and cross-account rejection, ID-token disposal, initial/subscription/legacy fenced saves and concurrent winner preservation; package typecheck including scripts, 78/78 tests, build, missing-config sanitized CLI proof, git diff --check, and full six-workspace verification passed."
+        ]
       },
       "commitAfterPassing": true
     },

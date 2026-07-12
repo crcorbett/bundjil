@@ -1,5 +1,12 @@
 import { assert, it } from "@effect/vitest";
-import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  ConfigProvider,
+  Effect,
+  Layer,
+  Redacted,
+  Result,
+  Schema,
+} from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
@@ -162,11 +169,17 @@ const makeMockUpstashClient = () => {
       const createConflict =
         operation === "initialWrite" &&
         (currentProfile !== null || currentRevision !== null);
+      const legacyReplacementConflict =
+        operation === "replaceLegacy" &&
+        (currentProfile === null ||
+          currentRevision !== null ||
+          currentProfile !== expectedRevision);
       const casConflict =
         operation !== "initialWrite" &&
+        operation !== "replaceLegacy" &&
         (currentRevision === null || currentRevision !== expectedRevision);
 
-      if (createConflict || casConflict) {
+      if (createConflict || legacyReplacementConflict || casConflict) {
         return Promise.resolve(0);
       }
 
@@ -470,5 +483,81 @@ it.effect(
           "rev-upstash-winner-secret"
         );
       }).pipe(Effect.provide(Layer.merge(profileStoreLayer, commitLayer)));
+    })
+);
+
+it.effect(
+  "atomically migrates a legacy Upstash profile and preserves the first winner",
+  () =>
+    Effect.gen(function* testUpstashLegacyMigration() {
+      const { client } = makeMockUpstashClient();
+      const keyPrefix = yield* makeKeyPrefix("test:");
+      const cipherConfig = yield* makeCipherConfig();
+      const subject = yield* fixtureSubject;
+      const legacyProfile = yield* makeProfile(subject, 1_900_000_000_000);
+      const first = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-legacy-first-secret",
+        "upstash-legacy-first-token-secret"
+      );
+      const second = yield* makeSubscriptionProfile(
+        subject,
+        "rev-upstash-legacy-second-secret",
+        "upstash-legacy-second-token-secret"
+      );
+      const keyValueStoreLayer = Layer.succeed(
+        KeyValueStore.KeyValueStore,
+        makeUpstashKeyValueStore(client, { keyPrefix })
+      );
+      const cipherLayer = CodexOAuthProfileCipherTest(cipherConfig);
+      const storeLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
+        Layer.provideMerge(keyValueStoreLayer),
+        Layer.provideMerge(cipherLayer)
+      );
+      const commitLayer = Layer.effect(
+        CodexOAuthProfileCommit,
+        makeUpstashCodexOAuthProfileCommit(client, { keyPrefix })
+      ).pipe(Layer.provide(cipherLayer));
+
+      return yield* Effect.gen(function* migrateSharedUpstashProfile() {
+        const commit = yield* CodexOAuthProfileCommit;
+        yield* putProfile(legacyProfile);
+        const results = yield* Effect.all(
+          [
+            Effect.result(
+              commit.replaceLegacy({
+                expectedLegacyProfile: legacyProfile,
+                profile: first,
+              })
+            ),
+            Effect.result(
+              commit.replaceLegacy({
+                expectedLegacyProfile: legacyProfile,
+                profile: second,
+              })
+            ),
+          ],
+          { concurrency: "unbounded" }
+        );
+        const successes = results.filter(Result.isSuccess);
+        const failures = results.filter(Result.isFailure);
+        const storedProfile = yield* getProfile(subject);
+
+        assert.strictEqual(successes.length, 1);
+        assert.strictEqual(failures.length, 1);
+        assert.strictEqual(
+          failures[0]?.failure._tag,
+          "CodexOAuthProfileCommitConflict"
+        );
+        assert.strictEqual(storedProfile.profileKind, "subscription");
+        if (storedProfile.profileKind === "subscription") {
+          assert.strictEqual(
+            [first.credentialRevision, second.credentialRevision].includes(
+              storedProfile.credentialRevision
+            ),
+            true
+          );
+        }
+      }).pipe(Effect.provide(Layer.merge(storeLayer, commitLayer)));
     })
 );

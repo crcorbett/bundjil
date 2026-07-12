@@ -1,4 +1,4 @@
-import { ConfigProvider, Effect, Exit, Schema } from "effect";
+import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   CodexOAuthProfileCipherConfigLive,
@@ -18,16 +18,27 @@ declare const process: {
   exitCode: number | undefined;
 };
 
-const program = importCodexLocalProfile.pipe(
-  Effect.provide(CodexLocalProfileImportServiceLive),
-  Effect.provide(CodexLocalAuthCacheSourceLive),
-  Effect.provide(CodexLocalProfileImportConfigLive),
-  Effect.provide(CodexProfileStoreEncryptedKeyValueLive),
-  Effect.provide(CodexOAuthProfileCipherLive),
-  Effect.provide(CodexOAuthProfileCipherConfigLive),
-  Effect.provide(UpstashKeyValueStoreLive),
-  Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv()))
+const configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv());
+const importConfigLayer = CodexLocalProfileImportConfigLive.pipe(
+  Layer.provide(configProviderLayer)
 );
+const sourceLayer = CodexLocalAuthCacheSourceLive.pipe(
+  Layer.provide(importConfigLayer)
+);
+const cipherConfigLayer = CodexOAuthProfileCipherConfigLive.pipe(
+  Layer.provide(configProviderLayer)
+);
+const cipherLayer = CodexOAuthProfileCipherLive.pipe(
+  Layer.provide(cipherConfigLayer)
+);
+const storeLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
+  Layer.provideMerge(Layer.merge(cipherLayer, UpstashKeyValueStoreLive))
+);
+const importLayer = CodexLocalProfileImportServiceLive.pipe(
+  Layer.provideMerge(Layer.mergeAll(importConfigLayer, sourceLayer, storeLayer))
+);
+
+const program = importCodexLocalProfile.pipe(Effect.provide(importLayer));
 
 const ImportSuccessOutput = Schema.Struct({
   status: Schema.Literal("imported"),

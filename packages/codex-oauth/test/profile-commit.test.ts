@@ -1,8 +1,9 @@
 import { assert, it } from "@effect/vitest";
-import { Data, Effect, Fiber, Redacted, Schema } from "effect";
+import { Data, Effect, Fiber, Redacted, Result, Schema } from "effect";
 
 import {
   CodexOAuthObserverSnapshot,
+  CodexAccessTokenImportProfile,
   CodexOAuthProfileCommit,
   CodexOAuthProfileCipherConfig,
   CodexOAuthSubject,
@@ -93,6 +94,19 @@ const makeSubscriptionProfile = (
       overrides.lastRefreshedAtEpochMillis ?? 1_700_000_000_000,
     credentialRevision: overrides.credentialRevision ?? "rev-initial-secret",
     requiresReauthentication: overrides.requiresReauthentication ?? false,
+  });
+
+const makeAccessTokenImportProfile = (subject: CodexOAuthSubjectType) =>
+  Schema.decodeUnknownEffect(CodexAccessTokenImportProfile)({
+    profileVersion: 2,
+    profileKind: "access-token-import",
+    subject,
+    accessToken: "legacy-access-token-secret",
+    expiresAtEpochMillis: 1_700_000_060_000,
+    scopes: [],
+    createdAtEpochMillis: 1_700_000_000_000,
+    updatedAtEpochMillis: 1_700_000_000_000,
+    requiresReauthentication: true,
   });
 
 const makeLegacyEncryptedProfileV1 = (
@@ -314,6 +328,62 @@ it.effect("commits initial write only when the profile is absent", () =>
       "rev-initial-write-secret"
     );
   }).pipe(Effect.provide(CodexOAuthMemory()))
+);
+
+it.effect(
+  "atomically migrates one legacy profile and preserves the concurrent winner",
+  () =>
+    Effect.gen(function* testLegacyReplacementFence() {
+      const subject = yield* fixtureSubject;
+      const legacyProfile = yield* makeAccessTokenImportProfile(subject);
+      const first = yield* makeSubscriptionProfile(subject, {
+        credentialRevision: "rev-legacy-first-secret",
+      });
+      const second = yield* makeSubscriptionProfile(subject, {
+        credentialRevision: "rev-legacy-second-secret",
+      });
+      const layer = CodexOAuthMemory([legacyProfile]);
+
+      return yield* Effect.gen(function* migrateLegacyProfile() {
+        const commit = yield* CodexOAuthProfileCommit;
+        const results = yield* Effect.all(
+          [
+            Effect.result(
+              commit.replaceLegacy({
+                expectedLegacyProfile: legacyProfile,
+                profile: first,
+              })
+            ),
+            Effect.result(
+              commit.replaceLegacy({
+                expectedLegacyProfile: legacyProfile,
+                profile: second,
+              })
+            ),
+          ],
+          { concurrency: "unbounded" }
+        );
+        const successes = results.filter(Result.isSuccess);
+        const failures = results.filter(Result.isFailure);
+        const storedProfile = yield* getProfile(subject);
+
+        assert.strictEqual(successes.length, 1);
+        assert.strictEqual(failures.length, 1);
+        assert.strictEqual(
+          failures[0]?.failure._tag,
+          "CodexOAuthProfileCommitConflict"
+        );
+        assert.strictEqual(storedProfile.profileKind, "subscription");
+        if (storedProfile.profileKind === "subscription") {
+          assert.strictEqual(
+            [first.credentialRevision, second.credentialRevision].includes(
+              storedProfile.credentialRevision
+            ),
+            true
+          );
+        }
+      }).pipe(Effect.provide(layer));
+    })
 );
 
 it.effect("applies matching replacement and refresh commits", () =>

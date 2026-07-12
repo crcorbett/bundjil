@@ -17,11 +17,11 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`implement-local-subscription-login-broker` is ready for implementation through
-`prd-implementer`. The accepted profile/commit slice now provides explicit
-legacy and subscription variants plus atomic create/replacement/refresh/
-reauthentication fences. The login broker must use those contracts from a
-trusted-local loopback command; Vercel still exposes no OAuth browser route.
+`revalidate-personal-preview-configuration` is ready for implementation through
+`prd-implementer`. The trusted-local login broker is accepted and committed as
+the preceding gate. Preview revalidation must inspect only sanitized project,
+environment-name, integration, and deployment metadata before any real owner
+login; Vercel still exposes no OAuth browser route.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -269,5 +269,57 @@ Verification:
   health/stream and five SSE lines.
 - `bun run verification`: passed.
 - `git diff --check`: passed.
+
+Commit: pending parent commit of this accepted slice.
+
+### implement-local-subscription-login-broker
+
+Status: Accepted 2026-07-12
+
+Scope and implementation:
+
+- added exact first-party authorization protocol config, 32-byte state and
+  PKCE material, canonical redacted session/callback/token contracts, and
+  narrow success/error response schemas;
+- added a scoped Effect Platform Bun loopback listener on `127.0.0.1` with
+  approved port fallback, Deferred callback completion, strict validation,
+  request-log suppression, timeout, and cleanup on every scoped exit;
+- added the Platform ChildProcess browser launcher, separate form-encoded code
+  exchange and Schema-encoded JSON refresh transports, JWT expiry/account
+  metadata decoding, expired-token rejection, and ID-token disposal;
+- added a sanitized trusted-local CLI whose TypeScript compilation is part of
+  package `check-types`;
+- added legacy-to-subscription replacement using an exact encrypted-profile
+  Lua CAS fence, while preserving revision CAS for subscription replacement;
+- kept all app, Eve, hosted callback, and CI surfaces unchanged.
+
+Parent audit:
+
+1. Ownership and call graph: protocol, loopback, browser command, HTTP
+   transport, metadata, login, and fenced commit remain package-owned. Only the
+   local CLI composes browser/loopback live layers; no app or Vercel route does.
+2. Implementation quality: reviewed Effect Platform HTTP/ChildProcess,
+   scoped resource ownership, Deferred completion, canonical Schema and
+   Redacted boundaries, tagged sanitized errors, flat named Effects, explicit
+   Layers, exact protocol fields, narrow provider response schemas, and atomic
+   legacy/revision fences. Stale scans found no raw server/fetch/JSON,
+   `process.env`, unsafe casts, generic Redacted contracts, or helper sprawl.
+3. Verification coverage: focused tests cover protocol generation, callback
+   validation and cleanup, HTTP encodings and safe provider errors, expiry and
+   account metadata, ID-token disposal, and initial/subscription/legacy race
+   winners. The missing-config CLI proof emitted only a sanitized blocked
+   object and could not launch a browser.
+
+Verification:
+
+- `bun run --filter @bundjil/codex-oauth check-types`: passed, including
+  `scripts/**/*.ts`.
+- `bun run --filter @bundjil/codex-oauth test`: passed, 78 tests.
+- `bun run --filter @bundjil/codex-oauth build`: passed.
+- `bun run check`: passed with no warnings or errors.
+- `bun run verification`: passed across all six workspaces.
+- `git diff --check`: passed.
+- sanitized missing-config `login:subscription`: exited blocked without a
+  callback URL, code, state, verifier, token, account id, or provider payload.
 
 Commit: pending parent commit of this accepted slice.
