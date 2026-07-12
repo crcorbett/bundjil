@@ -210,7 +210,7 @@
     {
       "id": "revalidate-personal-preview-configuration",
       "title": "Revalidate personal Vercel preview configuration",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-local-subscription-login-broker"],
       "description": "Confirm the personal Upstash/cipher/private-proxy preview can receive a subscription profile and remains production-inactive.",
       "implementationNotes": [
@@ -229,8 +229,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: the personal bundjil-codex-proxy project remains linked to apps/codex-proxy with the expected build/runtime settings; only preview owns Bundjil mode, bearer, cipher, and canonical subject configuration, while production has no Bundjil activation and no app/package call graph changed.",
+          "Parent audit 2 - implementation quality: the task changed only four approved non-secret preview subject entries and sanitized docs; existing Effect Config/Schema ownership remains intact, no secret value or stored profile was read or recorded, and no code, DTO, cast, manual reader, helper, deployment, login, development, or production behavior changed.",
+          "Parent audit 3 - verification coverage: Executor Personal metadata readback confirmed all eight Bundjil entries target preview only, zero Bundjil production entries, integration-backed KV aliases, expected project settings, and a READY preview; the package-owned Upstash namespace size probe proved connectivity without value access, and bun run check, jq validation, temporary-file cleanup, and git diff --check passed."
+        ]
       },
       "commitAfterPassing": true
     },

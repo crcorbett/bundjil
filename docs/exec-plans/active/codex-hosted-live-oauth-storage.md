@@ -17,11 +17,12 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`revalidate-personal-preview-configuration` is ready for implementation through
-`prd-implementer`. The trusted-local login broker is accepted and committed as
-the preceding gate. Preview revalidation must inspect only sanitized project,
-environment-name, integration, and deployment metadata before any real owner
-login; Vercel still exposes no OAuth browser route.
+`run-real-local-login-tracer` is ready for implementation through
+`prd-implementer`. The personal preview configuration is accepted: canonical
+subject names now match the trusted-local login command, storage connectivity
+is proven without value access, and production remains inactive. The next task
+may start the owner browser login locally; Vercel still exposes no OAuth browser
+route.
 
 Parent preflight evidence, 2026-07-11:
 
@@ -323,3 +324,84 @@ Verification:
   callback URL, code, state, verifier, token, account id, or provider payload.
 
 Commit: pending parent commit of this accepted slice.
+
+### revalidate-personal-preview-configuration
+
+Status: Accepted 2026-07-12.
+
+Remote evidence:
+
+- Executor Personal Vercel API resolved `bundjil-codex-proxy` without a team
+  override. The project remains in the personal connection, with root directory
+  `apps/codex-proxy`, framework `Other` (`null` in the API), Node `24.x`, build
+  command `bun run --filter @bundjil/codex-proxy build`, and output directory
+  `.`. The local Vercel CLI identity is `crcorbett`; linked project identifiers
+  were not read or recorded.
+- Preview contains sensitive, preview-only entries for
+  `BUNDJIL_CODEX_PROXY_MODE`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`,
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`, and
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`. Values were not decrypted, printed,
+  or persisted.
+- Executor Personal Vercel API upserted exactly four non-secret preview entries:
+  `BUNDJIL_CODEX_PROFILE_ID=default`,
+  `BUNDJIL_CODEX_CONNECTOR_ID=bundjil-local`,
+  `BUNDJIL_CODEX_INSTALLATION_ID=agent-dev`, and
+  `BUNDJIL_CODEX_SUBJECT_ID=personal-owner`. These are the canonical proxy-side
+  equivalents of the trusted-local login command's profile, connector,
+  installation, and principal subject fields. The API acknowledged all four
+  writes with no failures.
+- A separate metadata-only API readback confirmed all four subject entries are
+  `plain` and target preview only. None targets development or production; no
+  environment value was returned by the readback.
+- Marketplace-provided `KV_REST_API_URL`, `KV_REST_API_TOKEN`, and
+  `KV_REST_API_READ_ONLY_TOKEN` aliases remain integration-backed for
+  development, preview, and production. No direct `UPSTASH_REDIS_REST_*` aliases
+  are required because the package accepts the `KV_REST_API_*` fallback.
+- A temporary preview env pull followed by the package-owned
+  `UpstashKeyValueStoreLive` namespace `size` operation confirmed connectivity
+  and at least one namespaced entry. The probe returned only booleans, read no
+  stored value, printed no key or credential, and deleted the temporary env
+  file.
+- The latest preview deployment was `READY` at 2026-07-12 13:03:24 CEST and was
+  created by the CLI. No deployment was created by this task. The latest
+  production-target deployment in the returned history was already `ERROR` at
+  2026-07-07 18:37:40 CEST.
+- No `BUNDJIL_*` entry targets production. Production therefore has no Bundjil
+  mode, bearer, cipher, subject, profile, or live-deployment activation. The
+  Marketplace Upstash production aliases alone are not Bundjil production
+  activation.
+
+Configuration readiness:
+
+- Preview now has matching explicit subject names for the real local login
+  tracer. This task changed only the four approved non-secret preview entries;
+  it altered no existing secret, started no login, created no deployment, and
+  made no development or production change.
+
+Parent audit:
+
+1. Ownership and call graph: the personal project remains rooted at
+   `apps/codex-proxy` with the expected build/runtime settings. Bundjil mode,
+   bearer, cipher, and subject configuration target preview only; no production
+   Bundjil activation or runtime call graph changed.
+2. Implementation quality: only four approved non-secret preview subject
+   entries and sanitized documentation changed. Effect Config/Schema ownership
+   remains intact; no secret or stored value, code, DTO, cast, manual reader,
+   helper, deployment, login, development, or production behavior changed.
+3. Verification coverage: independent Executor Personal readback confirmed all
+   eight Bundjil entries target preview only, zero target production, KV aliases
+   are integration-backed, project settings match, and the latest preview is
+   `READY`. The namespace-only Upstash probe confirmed connectivity without
+   reading a key or value.
+
+Verification:
+
+- Executor Personal preview env metadata readback: passed without decryption.
+- Upstash namespace `size` connectivity probe: passed without value access.
+- `bun run check`: passed with no warnings or errors.
+- `jq empty docs/product-specs/codex-hosted-live-oauth-storage.tasks.json`:
+  passed.
+- temporary preview credential file removal: confirmed.
+- `git diff --check`: passed.
+
+Commit: pending parent commit of this accepted configuration slice.
