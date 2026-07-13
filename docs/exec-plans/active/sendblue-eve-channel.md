@@ -19,20 +19,21 @@ and proof artifacts contain only variable names and sanitized metadata.
 
 ## Current Task
 
-No task is currently in progress. `implement-sendblue-security-identity-replay`
-has passed parent acceptance and awaits its coherent commit before
-`implement-sendblue-eve-channel` begins.
+No task is currently in progress. `implement-sendblue-eve-channel` has passed
+parent acceptance and awaits its coherent commit before
+`prove-sendblue-preview` begins.
 
 Accepted scope:
 
-- constant-time `sb-signing-secret` verification before body decoding;
-- configured sender-to-principal policy and opaque keyed conversation routing;
-- atomic inbound and outbound replay claims with deterministic memory and
-  Upstash live Layers;
-- concurrency, transition, command-shape, and leak-safety tests.
+- thin Eve channel route and framework runtime adapter;
+- linear inbound auth, decode, classification, identity, routing, claim, and
+  dispatch program;
+- outbound completed-message filtering, replay claim, provider send, and
+  complete/uncertain transition program;
+- direct Request/Response and Eve event tests with injected Layers.
 
 Provider account mutation and webhook provisioning are deferred until the
-authenticated route exists and its automated checks pass.
+accepted channel slice is committed.
 
 ## Provider Discovery
 
@@ -129,6 +130,51 @@ Parent audit:
    retryable immediate release, stale-owner failure, exact Upstash command
    shape, and leak-safe failures. Agent and repository gates pass.
 
+### implement-sendblue-eve-channel
+
+Accepted: 2026-07-13
+
+Changed files:
+
+- `apps/agent/agent/channels/sendblue.ts`
+- `apps/agent/agent/lib/sendblue/{channel.service,live.layer,schemas}.ts`
+- `apps/agent/test/sendblue-channel.test.ts`
+- `knip.json`
+
+Evidence:
+
+- Added a stateful Eve custom channel discovered as `sendblue` with
+  `POST /webhook`, mounted by Eve at `/eve/v1/sendblue/webhook`.
+- Added authenticated inbound classification and durable claim decisions,
+  opaque continuation routing, minimal Eve auth/state, and background dispatch
+  through `waitUntil`.
+- Added visible completed-message delivery with stable Eve coordinates,
+  outbound replay claims, provider-handle completion, known-failure release,
+  and uncertainty quarantine.
+- Added an injectable channel factory for direct framework-edge tests while the
+  default export owns one app-level live `ManagedRuntime`.
+- Registered Eve filesystem channels as Knip entrypoints.
+
+Parent audit:
+
+1. Ownership and call graph: the thin Eve file owns framework adaptation only;
+   provider, config, authentication, identity, routing, replay, and delivery
+   policy remain in app-owned Effect services. No package or generic channel
+   abstraction was introduced.
+2. Implementation quality: primary operations are named linear Effects over
+   canonical Schema, Match, Context, Layer, and ManagedRuntime boundaries.
+   Claims precede all side effects; accepted dispatch and provider send paths
+   complete or quarantine owner-fenced claims. Review corrected duplicate
+   service injection, direction handling, length validation, and completion
+   failure semantics. No manual JSON, unsafe casts, raw fetch, direct env reads,
+   or helper sprawl remains.
+3. Verification coverage: fifteen channel tests prove direct HTTP statuses and
+   side effects, auth-before-decode, ignored classes, sequential/concurrent
+   replay, Eve rejection release, stable outbound coordinates, visible-only
+   delivery, over-limit/provider failure behavior, and uncertain no-resend.
+   Agent checks/build, all repository verification, diff checks, Knip, and Eve
+   discovery with zero diagnostics pass.
+
 ## Audit Log
 
 `implement-sendblue-contracts-and-client` completed three parent passes. The
@@ -144,3 +190,10 @@ Corrections included replacing JavaScript secret comparison with
 discriminated union, injecting claim ids, failing stale transitions, aligning
 memory/Upstash retryable behavior through owner-fenced release, and extending
 equal-length auth, outbound contention, and successful CAS verification.
+
+`implement-sendblue-eve-channel` completed three parent passes. Corrections
+included teaching Knip about Eve filesystem entrypoints, removing duplicate
+service injection, adding literal direction and nullable line handling,
+validating provider limits before send, quarantining accepted dispatch/send
+completion failures, adding direct Eve route tests, and proving bounded claim
+release when Eve rejects before acceptance.

@@ -112,7 +112,7 @@
     {
       "id": "implement-sendblue-eve-channel",
       "title": "Implement the thin Eve route and outbound event adapter",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-sendblue-security-identity-replay"],
       "description": "Compose the Sendblue Effect services behind a custom Eve channel route, route accepted direct text into deterministic sessions, and deliver completed assistant text with outbound replay protection.",
       "implementationNotes": [
@@ -140,8 +140,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: apps/agent owns the custom Eve channel, app-owned Sendblue service, and live Layer; the Eve filesystem entrypoint contains only ManagedRuntime composition, HTTP status mapping, waitUntil dispatch, and completed-message event projection, while provider/auth/identity/replay policy remains in agent/lib/sendblue.",
+          "Implementation quality: named flat Effect programs authenticate before one Schema JSON decode, classify with Match, derive canonical auth/state only after identity resolution, claim before dispatch/send, and apply owner-fenced complete/retryable/uncertain transitions; review corrected duplicate service injection, direction handling, pre-provider length validation, and completion-failure quarantine without unsafe casts, manual JSON, raw fetch, or helper sprawl.",
+          "Verification coverage: fifteen focused channel tests prove direct route 401/400/200/202/503 behavior, accepted waitUntil dispatch, sequential/concurrent replay, line/loop/identity guards, Eve rejection release, stable outbound coordinates, one concurrent provider send, visible-text filtering, over-limit and known-failure retryability, uncertain no-resend, and completion quarantine; agent typecheck/test/build, Knip, all workspace verification, diff checks, and Eve discovery with zero diagnostics pass."
+        ]
       },
       "commitAfterPassing": true
     },

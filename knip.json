@@ -3,7 +3,12 @@
   "ignoreExportsUsedInFile": true,
   "workspaces": {
     "apps/agent": {
-      "entry": ["agent/agent.ts", "agent/tools/**/*.ts", "test/**/*.test.ts"],
+      "entry": [
+        "agent/agent.ts",
+        "agent/channels/**/*.ts",
+        "agent/tools/**/*.ts",
+        "test/**/*.test.ts"
+      ],
       "project": ["agent/**/*.ts", "test/**/*.ts"]
     },
     "apps/codex-proxy": {

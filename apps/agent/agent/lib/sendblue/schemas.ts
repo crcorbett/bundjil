@@ -67,12 +67,23 @@ export const SendblueSenderIdentities = Schema.Record(
 );
 export type SendblueSenderIdentities = typeof SendblueSenderIdentities.Type;
 
+export const SendblueMessageDirection = Schema.Literals([
+  "inbound",
+  "outbound",
+]);
+export type SendblueMessageDirection = typeof SendblueMessageDirection.Type;
+
 export const SendblueInboundMessage = Schema.Struct({
   content: Schema.String,
+  direction: Schema.optional(SendblueMessageDirection),
   from_number: E164PhoneNumber,
   group_id: Schema.optional(Schema.String),
+  is_outbound: Schema.optional(Schema.Boolean),
+  is_typing: Schema.optional(Schema.Boolean),
+  media_url: Schema.optional(Schema.String),
+  media_urls: Schema.optional(Schema.Array(Schema.String)),
   message_handle: SendblueMessageHandle,
-  sendblue_number: E164PhoneNumber,
+  sendblue_number: Schema.NullOr(E164PhoneNumber),
   service: Schema.Literals(["iMessage", "SMS", "RCS"]),
   status: Schema.String,
   to_number: E164PhoneNumber,
@@ -82,12 +93,16 @@ export type SendblueInboundMessage = typeof SendblueInboundMessage.Type;
 export const SendblueIgnoredEvent = Schema.Struct({
   reason: Schema.Literals([
     "duplicate",
+    "empty",
     "group",
+    "lineMismatch",
+    "loop",
     "media",
     "outbound",
     "senderNotAllowed",
     "serviceNotAllowed",
     "statusNotReceived",
+    "typing",
   ]),
 });
 export type SendblueIgnoredEvent = typeof SendblueIgnoredEvent.Type;
@@ -180,6 +195,63 @@ export const SendblueWebhookAcknowledgement = Schema.Struct({
 });
 export type SendblueWebhookAcknowledgement =
   typeof SendblueWebhookAcknowledgement.Type;
+
+export const SendblueEveAuth = Schema.Struct({
+  attributes: Schema.Record(Schema.String, Schema.String),
+  authenticator: Schema.Literal("sendblue"),
+  principalId: SendbluePrincipalId,
+  principalType: Schema.Literal("user"),
+});
+export type SendblueEveAuth = typeof SendblueEveAuth.Type;
+
+export const SendblueInboundIgnoredDecision = Schema.TaggedStruct("Ignore", {
+  outcome: SendblueIgnoredEvent,
+});
+export type SendblueInboundIgnoredDecision =
+  typeof SendblueInboundIgnoredDecision.Type;
+
+export const SendblueInboundDuplicateDecision = Schema.TaggedStruct(
+  "Duplicate",
+  {}
+);
+export type SendblueInboundDuplicateDecision =
+  typeof SendblueInboundDuplicateDecision.Type;
+
+export const SendblueInboundDispatchDecision = Schema.TaggedStruct("Dispatch", {
+  auth: SendblueEveAuth,
+  claim: SendblueReplayClaim,
+  continuationToken: SendblueConversationKey,
+  message: Schema.NonEmptyString,
+  state: SendblueChannelState,
+});
+export type SendblueInboundDispatchDecision =
+  typeof SendblueInboundDispatchDecision.Type;
+
+export const SendblueInboundDecision = Schema.Union([
+  SendblueInboundIgnoredDecision,
+  SendblueInboundDuplicateDecision,
+  SendblueInboundDispatchDecision,
+]);
+export type SendblueInboundDecision = typeof SendblueInboundDecision.Type;
+
+export const SendblueCompletedMessage = Schema.Struct({
+  finishReason: Schema.String,
+  message: Schema.NullOr(Schema.String),
+  sequence: NonNegativeInt,
+  sessionId: Schema.NonEmptyString,
+  state: SendblueChannelState,
+  stepIndex: NonNegativeInt,
+  turnId: Schema.NonEmptyString,
+});
+export type SendblueCompletedMessage = typeof SendblueCompletedMessage.Type;
+
+export const SendblueCompletedMessageResult = Schema.Literals([
+  "delivered",
+  "duplicate",
+  "ignored",
+]);
+export type SendblueCompletedMessageResult =
+  typeof SendblueCompletedMessageResult.Type;
 
 export const SendblueProofResult = Schema.Struct({
   accepted: Schema.Boolean,
