@@ -1,0 +1,269 @@
+{
+  "title": "Vercel Production Promotion Tasks",
+  "spec": "docs/product-specs/vercel-production-promotion.md",
+  "status": "pending",
+  "principles": [
+    "A clean encrypted-variable Preview redeploy is a hard gate before any Production target changes.",
+    "Preview and Production use separate proxy URLs, bearer tokens, storage namespaces, profile subjects, OAuth profiles, and cipher keys.",
+    "Production deployment requires explicit operator approval after the Preview evidence is accepted.",
+    "Keep browser OAuth and plaintext token material in the trusted-local command boundary; Vercel exposes no OAuth start or callback route.",
+    "Use canonical Effect Schema contracts, tagged errors, Context services, Layers, Config, Redacted, HttpClient, Command, and KeyValueStore boundaries.",
+    "Helper sprawl is forbidden: every new function, module, service, mapper, adapter, and wrapper needs multiple concrete call sites or ownership of a real provider, security, serialization, resource, or policy boundary.",
+    "This SPEC adds no React or visible operator route; any frontend requires a separate SPEC following primitive -> composite -> layout -> route and leaf-owned state/commands.",
+    "Never print, commit, snapshot, or persist prompt content or secret values in deployment evidence."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth build",
+    "bun run check",
+    "bun run knip",
+    "bun run verification",
+    "git diff --check",
+    "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
+    "No React/component/visible route files change; otherwise stop for a separate frontend SPEC and Browser verification",
+    "No broad lint suppressions, structural casts, generic helper modules, pass-through services, or dead exports",
+    "Sanitized Vercel project, target, deployment, env-name, HTTP, session-stream, runtime-log, storage, and leak-scan evidence"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Add passes while any production safety, auth, storage, rollback, or attempted frontend-composition finding remains."
+  },
+  "tasks": [
+    {
+      "id": "prove-clean-encrypted-preview",
+      "title": "Redeploy and prove a clean encrypted-variable Preview",
+      "status": "pending",
+      "dependsOn": [],
+      "description": "Redeploy proxy then agent from one clean committed source revision using only target-scoped encrypted Vercel Preview variables, and record the complete hosted Eve-to-Codex proof.",
+      "implementationNotes": [
+        "Begin with a clean worktree, pushed source SHA, personal Vercel scope, and read-only verification of required Preview variable names/targets without values.",
+        "Deploy the proxy without --env, --build-env, shell-prefixed secret values, pulled env files as build inputs, or prebuilt output carrying local values.",
+        "Run the existing sanitized proxy proof against the immutable READY Preview URL and confirm live mode, private auth rejection, authenticated SSE, encrypted readback, refresh/fencing behavior, and clean logs.",
+        "Update the encrypted agent Preview proxy URL to that immutable accepted deployment, then deploy the agent with no inline values.",
+        "Inspect build logs for Turbo strict-environment warnings and prove turbo.json exposed all Eve build-time model inputs.",
+        "Use fresh Vercel project OIDC auth for /eve/v1/info, create one minimal session, replay startIndex=0 through session.waiting, and correlate one authenticated proxy 200.",
+        "Record deployment ids, immutable URLs, source SHA, target, model id, event names/counts, statuses, and timings only."
+      ],
+      "mandatoryVerification": [
+        "No Production target is changed by this task.",
+        "No inline secret/build-env flag or stale local/prebuilt output participates in either deployment.",
+        "Flat meaningful Effect.gen/Effect.fn proof programs with tagged errors handled in .pipe(...) through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema-derived evidence/config contracts; no unsafe casts, DTO mirrors, manual readers/mappers, JSON.stringify/JSON.parse, or trivial wrappers/helpers.",
+        "Proxy health/auth/SSE/encryption/refresh/fencing/leak proof and agent info/session/stream/proxy-correlation proof pass against the new deployments.",
+        "Targeted app/package checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "One source SHA has accepted immutable proxy and agent Preview deployments built only from encrypted Vercel variables.",
+        "The hosted session proves codex-proxy mode and one correlated live proxy request without secret markers.",
+        "Sanitized evidence and all three audit passes are recorded in an active execution plan and this ledger."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-production-preflight",
+      "title": "Implement the Production preflight and auth/config matrix",
+      "status": "pending",
+      "dependsOn": ["prove-clean-encrypted-preview"],
+      "description": "Create a read-only, schema-backed preflight that validates Production project ownership, target-scoped config names, auth policy, storage binding presence, stable proxy URL requirements, and rollback inputs without exposing values.",
+      "implementationNotes": [
+        "Keep agent preflight code in apps/agent and proxy/storage/profile preflight code in apps/codex-proxy; reuse @bundjil/codex-oauth contracts instead of copying profile/config DTOs.",
+        "Decode the minimal Vercel CLI/API response through Effect Schema at the executable edge; do not mirror full provider responses.",
+        "Commit apps/agent/agent/channels/eve.ts with the installed Eve 0.20.0 explicit auth policy eveChannel({ auth: [vercelOidc(), localDev()] }); test that Vercel OIDC is accepted, non-local anonymous callers are rejected, and localDev does not admit Production traffic.",
+        "Reject Tilt Legal scope, Preview/branch proxy URLs, shared Preview key prefixes, missing Production-only credentials, mock/local proxy mode, unprotected private routes, and absent rollback deployment ids.",
+        "Document the route auth matrix: Deployment Protection, Eve vercelOidc(), proxy bearer auth, health exposure, and future provider-specific webhook auth.",
+        "Emit only a sanitized schema-encoded preflight result and no secret values."
+      ],
+      "mandatoryVerification": [
+        "Read-only preflight cannot deploy, alias, write env vars, provision storage, or mutate profiles.",
+        "Flat meaningful Effect.gen/Effect.fn operations; expected errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical schemas/types/errors and Config.redacted; no unsafe casts, local DTO mirrors, manual readers/mappers, raw JSON serialization, process.env reads, or helper sprawl.",
+        "Tests cover correct personal scope and each wrong-target/shared-config/missing-auth/stale-URL rejection.",
+        "Eve route-auth tests cover valid Vercel OIDC, invalid/missing bearer in deployed mode, and localhost-only development fallback.",
+        "Focused app checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "A documented command returns a sanitized go/no-go result for Production.",
+        "The auth/config matrix and stable proxy URL contract are recorded in app docs.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "provision-production-profile-and-credentials",
+      "title": "Provision isolated Production storage, credentials, and Codex profile",
+      "status": "pending",
+      "dependsOn": ["implement-production-preflight"],
+      "requiresExplicitApproval": true,
+      "description": "After explicit operator approval, create the separate Production storage/profile namespace, internal bearer, cipher key/key id, subject, and trusted-local OAuth profile, then prove ciphertext-only readback.",
+      "implementationNotes": [
+        "Confirm Production Upstash target bindings and namespace without values; do not assume Marketplace automatic binding is correctly isolated.",
+        "Generate independent Production credentials. Never reuse Preview internal token, routing/profile prefix, cipher key, or lock/fence records.",
+        "Run only the package-owned trusted-local OAuth/profile provision command. Vercel receives the encrypted profile but no browser, callback, PKCE, code, or plaintext token operation.",
+        "Read back schema-decoded sanitized metadata and ciphertext/plaintext-marker checks; do not print the envelope or identifiers that are secret.",
+        "Record recovery inputs and current profile generation/revision without creating a downgrade path."
+      ],
+      "mandatoryVerification": [
+        "Explicit approval is recorded before any Production mutation.",
+        "Flat named Effect programs and package-owned profile/cipher/store services; tagged errors handled in .pipe(...).",
+        "Canonical OAuth schemas and Config.redacted; no casts, DTO mirrors, manual mappers/readers, JSON.stringify/JSON.parse, token inspection, or wrapper sprawl.",
+        "Tests/proofs cover target separation, encrypted write/read, absent plaintext markers, refresh readiness, lock/fence namespace, and sanitized failures.",
+        "@bundjil/codex-oauth checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "Production has a separate encrypted, refresh-capable profile and credentials in the personal Vercel scope.",
+        "No Preview profile/cipher/lock/fence key is shared.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "deploy-production-proxy",
+      "title": "Deploy and verify the Production Codex proxy",
+      "status": "pending",
+      "dependsOn": ["provision-production-profile-and-credentials"],
+      "requiresExplicitApproval": true,
+      "description": "Deploy apps/codex-proxy to Production, verify the immutable deployment, accept its stable Production alias, and record private live-provider proof before the agent references it.",
+      "implementationNotes": [
+        "Deploy from the accepted source SHA using only encrypted Production variables and target bindings.",
+        "Prove live mode, stable alias ownership, Deployment Protection/private bearer behavior, health, one authenticated SSE completion, encrypted profile access, refresh/fencing readiness, and clean logs.",
+        "Reject any mock/local/API-key/Gateway fallback and any Preview URL or Tilt Legal project ownership.",
+        "Record current and previous accepted immutable deployments plus environment configuration version for rollback."
+      ],
+      "mandatoryVerification": [
+        "No agent Production env or deployment changes until this task passes.",
+        "Flat Effect proof/config flows, typed errors handled in .pipe(...) with catchTag/catchTags/mapError, canonical schemas, and no unsafe casts/DTO mirrors/manual readers/raw JSON/helper sprawl.",
+        "Direct health, missing/invalid bearer 401, authenticated SSE 200/content type, refresh/storage, log, and leak checks pass.",
+        "Production stable URL resolves to the accepted immutable deployment.",
+        "Proxy/Codex OAuth checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "A stable personal-scope Production proxy URL is accepted and privately authenticated.",
+        "Rollback deployment/config references are recorded.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "deploy-production-agent",
+      "title": "Deploy and verify the Production Eve agent through Codex",
+      "status": "pending",
+      "dependsOn": ["deploy-production-proxy"],
+      "requiresExplicitApproval": true,
+      "description": "Configure the agent Production target with the stable Production proxy URL and separate bearer, deploy it, and prove one protected minimal Eve session through the Production proxy.",
+      "implementationNotes": [
+        "Set only encrypted Production variables; do not point at an immutable Preview URL or inject build values from the CLI.",
+        "Inspect the build for the scoped Turbo environment contract and confirm the Eve manifest reports the intended Codex proxy model/context window.",
+        "Use fresh Vercel OIDC auth to inspect info, create a minimal non-sensitive session, replay startIndex=0 to a terminal waiting/completed state, and correlate the proxy request.",
+        "Observe for the defined soak window before enabling Sendblue or another external channel."
+      ],
+      "mandatoryVerification": [
+        "Eve vercelOidc() and Deployment Protection remain active; no anonymous default Eve route is introduced.",
+        "Flat Effect config/proof flows, tagged pipe error handling, canonical schemas, no casts/DTO mirrors/manual readers/raw JSON/trivial wrappers.",
+        "Info/model/context-window, session stream, proxy correlation, log, and leak checks pass without Gateway/mock/Preview fallback.",
+        "Agent/proxy targeted checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "One Production Eve session reaches the verified stable Production proxy and Codex provider.",
+        "Source SHA, agent/proxy deployments, config versions, and sanitized evidence correlate.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "monitor-and-drill-production-rollback",
+      "title": "Implement monitoring and execute a rollback drill",
+      "status": "pending",
+      "dependsOn": ["deploy-production-agent"],
+      "description": "Add sanitized production health/auth/provider/storage/refresh signals and prove the ordered agent/config/proxy rollback procedure without rolling profile generations backward.",
+      "implementationNotes": [
+        "Monitor deployment/source identity, health and completion latency/status, Eve terminal events, OAuth expiry/refresh/401 replay, lock/fence outcomes, storage errors, and auth rejection rates.",
+        "Exclude prompts, outputs, headers, tokens, raw profiles/ciphertext, PII, and bypass-bearing URLs from logs/alerts.",
+        "Drill rollback against controlled deployments/configuration: stop external traffic, restore the agent, restore matching env and redeploy, restore proxy, preserve newest fenced profile generation, then rerun proof.",
+        "Document credential rotation and re-login paths separately from deployment rollback."
+      ],
+      "mandatoryVerification": [
+        "Flat Effect monitoring/proof operations with canonical schemas, tagged pipe errors, and Config.redacted.",
+        "No unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, broad lint suppression, or generic monitoring helpers.",
+        "Synthetic failure tests cover health, auth spike, storage failure, refresh/reauth, wrong mode/URL/scope, and leak detection.",
+        "Rollback drill ends on an accepted deployment/configuration with a passing minimal session and no profile generation downgrade.",
+        "bun run verification and git diff --check pass."
+      ],
+      "completionCriteria": [
+        "Alerts and a no-content/no-secret dashboard or log query are documented and verified.",
+        "The rollback runbook has exercised evidence, not only prose.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-production-documentation",
+      "title": "Reconcile production docs, ledgers, and final verification",
+      "status": "pending",
+      "dependsOn": ["monitor-and-drill-production-rollback"],
+      "description": "Update every current architecture/app/SPEC status statement to the actual Production implementation and evidence, then run the final repository gate.",
+      "implementationNotes": [
+        "Update README.md, ARCHITECTURE.md, apps/agent/README.md, apps/codex-proxy/README.md, docs/architecture/eve-agent.md, related Codex SPEC/task ledgers, and the active execution plan.",
+        "Remove stale claims that combined hosted Eve-to-live-proxy proof or Production are unverified only when the corresponding evidence exists.",
+        "Document Production auth, stable URL, profile provisioning/re-login, monitoring, rollback, and explicit Sendblue gating without secret values.",
+        "Run stale-language, Preview URL, wrong-scope, mock/local fallback, raw serialization, secret marker, and task-ledger consistency scans."
+      ],
+      "mandatoryVerification": [
+        "Docs match the implemented production/test/CLI call graphs and package/app ownership.",
+        "Documentation examples require canonical Effect schemas/config and do not introduce DTO mirrors, manual readers, raw JSON, or helper sprawl.",
+        "Any reconciliation script or code change keeps flat meaningful Effect flows, tagged errors handled in .pipe(...), canonical Schema-derived types, and no unsafe casts or trivial wrappers.",
+        "All targeted checks, bun run verification, git diff --check, and task-ledger evidence checks pass.",
+        "No Production credential, full protected URL, prompt/output, phone/email, profile record, or ciphertext is committed."
+      ],
+      "completionCriteria": [
+        "Current docs and ledgers state exactly what is live, what was proved, and what remains gated.",
+        "Every preceding task has three or more accepted audit passes and complete sanitized evidence.",
+        "Repository verification is green."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}
