@@ -1,8 +1,8 @@
 # Sendblue Eve Channel
 
-Status: Draft  
-Owner: `apps/agent`  
-Last reviewed: 2026-07-13
+- Status: Preview verified; Production gated
+- Owner: `apps/agent`
+- Last reviewed: 2026-07-13
 
 ## Decision
 
@@ -352,8 +352,8 @@ primary operations.
 ## Configuration
 
 Load configuration with Effect `Config`, `ConfigProvider.fromEnv()`,
-`Config.redacted`, and Schema validation. Required Preview/Production variables
-are target-scoped:
+`Config.redacted`, and Schema validation. The accepted channel has these
+Preview-only variables; Production has no Sendblue variables:
 
 - `BUNDJIL_SENDBLUE_API_KEY` (redacted);
 - `BUNDJIL_SENDBLUE_API_SECRET` (redacted);
@@ -362,18 +362,25 @@ are target-scoped:
 - `BUNDJIL_SENDBLUE_SENDER_IDENTITIES` (redacted schema-encoded mapping from
   E.164 sender to stable principal id);
 - `BUNDJIL_SENDBLUE_ROUTING_KEY` (redacted key for conversation digests);
-- replay-store Upstash URL/token/prefix and TTL/lease settings;
-- optional allowed service set, defaulting to only `iMessage`.
+- `BUNDJIL_SENDBLUE_REPLAY_STORE_URL` (redacted, preferred replay URL);
+- `BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN` (redacted, preferred replay token);
+- `BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX`;
+- `BUNDJIL_SENDBLUE_REPLAY_STORE_TTL_SECONDS`;
+- `BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS`;
+- `BUNDJIL_SENDBLUE_ALLOWED_SERVICES` (optional, defaults to `iMessage`).
 
-The provider API base URL defaults to `https://api.sendblue.com` and may be
-overridden only in tests/local fixtures. The channel must not silently enable
-itself when any required secret, identity mapping, line, or replay store is
+The replay URL/token prefer their app-owned names and fall back only to the
+Preview Marketplace `KV_REST_API_URL` and `KV_REST_API_TOKEN` inputs. The
+provider API defaults to `https://api.sendblue.com`; the only override is
+`BUNDJIL_SENDBLUE_TEST_API_BASE_URL` with
+`BUNDJIL_SENDBLUE_TEST_MODE=true` in tests/local fixtures. The channel fails
+closed when any required secret, identity mapping, line, or replay store is
 missing.
 
 ## Webhook Authentication And Parsing
 
-The route is `POST /eve/v1/sendblue/webhook` unless installed Eve route
-resolution proves a different non-conflicting path is required.
+The route is `POST /eve/v1/sendblue/webhook`. The build-output test rejects
+accidental root `/webhook` exposure.
 
 Processing order is mandatory:
 
@@ -394,11 +401,10 @@ Processing order is mandatory:
    senders receive a `2xx` ignored acknowledgement, no Eve session, and a
    sanitized metric; do not disclose enrollment policy over the webhook.
 
-The route returns `2xx` for valid ignored events and already-claimed duplicate
-events. It returns `400` for authenticated malformed payloads, `401` for auth
-failure, and `503` when the replay store cannot safely make a claim. The exact
-accepted status (`200` or `202`) must be verified against Sendblue and Eve
-behavior and used consistently.
+The route returns `200` for valid ignored events and already-claimed duplicate
+events, `202` after an accepted dispatch is scheduled, `400` for authenticated
+malformed payloads, `401` for auth failure, and `503` when replay or routing
+cannot safely proceed.
 
 ## Replay Protection
 
@@ -417,9 +423,9 @@ sendblue:inbound:<environment>:<message_handle_digest>
 ```
 
 Claim before calling Eve `send`. If the durable Eve dispatch fails before a
-session is accepted, transition the claim to a bounded retryable state or
-release it through a compare-and-delete lease. If dispatch is accepted, mark it
-complete and retain it longer than Sendblue's retry horizon. Never clear a
+session is accepted, the owner-fenced `retryable` operation compare-and-deletes
+the claim and releases it for a later provider retry. If dispatch is accepted,
+mark it complete and retain it longer than Sendblue's retry horizon. Never clear a
 completed claim merely because outbound delivery later fails.
 
 Outbound claim key uses stable Eve event coordinates available in
@@ -498,12 +504,10 @@ state transition.
 
 ## Vercel Preview Proof
 
-The preview must remain protected while allowing Sendblue to reach the webhook.
-If Sendblue cannot set Vercel's custom bypass header, configure a dedicated
-Vercel Protection Bypass for Automation secret as the
-`x-vercel-protection-bypass` query parameter in the Sendblue webhook URL. This
-credential only bypasses Vercel's outer protection; the app must still require
-the independent `sb-signing-secret`.
+The Preview deployment remains protected while Sendblue reaches the route with
+a dedicated Vercel Protection Bypass for Automation. This bypass is independent
+platform authentication; the app always additionally verifies the separate
+`sb-signing-secret` shared header secret. That header is not a body HMAC.
 
 Requirements:
 
@@ -532,20 +536,27 @@ Mandatory live proof matrix:
 | Same Eve event replayed                       | no second provider send                            |
 | Provider timeout/unknown result               | outbound claim `uncertain`, no auto-resend         |
 
-The final preview proof sends one minimal non-sensitive message from an allowed
-test sender and receives one reply. Correlate the inbound provider handle,
-opaque conversation key, Eve session id, outbound event coordinates, provider
-outbound handle, statuses, and timings through sanitized digests/suffixes only.
+Accepted proof is the READY immutable Preview deployment
+`dpl_C2Xg1F8H8KFiARopc59WeDwKV7tQ` from commit
+`fdb71a87e930899aea1e75dd1f7a417f6c7a307e`. It established the
+`401`/`400`/`200`/`202` route matrix, a temporary isolated `503` storage
+fixture, one provider-originated inbound to one delivered outbound, and
+sequential plus concurrent synthetic and real-handle replay suppression.
+Runtime logs in the proof window had no error or fatal entries. Evidence keeps
+only deployment ids, status codes, counts, and a short opaque digest; it omits
+message text, full phone numbers, protected URL, provider body, replay payload,
+credentials, and ciphertext. Production variables, deployment, aliases,
+storage, and webhooks remain untouched.
 
 ## Call Graphs
 
-### Production Runtime
+### Preview Runtime
 
 ```text
 Sendblue receive webhook
   -> Vercel Deployment Protection / automation bypass
   -> apps/agent/agent/channels/sendblue.ts POST route
-  -> SendblueChannel.handleInbound
+  -> SendblueChannel.authorizeAndClaimInbound
   -> SendblueWebhookVerifier (constant-time sb-signing-secret check)
   -> Schema JSON decode: SendblueInboundMessage
   -> SendblueIdentityDirectory
@@ -558,7 +569,7 @@ Sendblue receive webhook
   -> SendblueReplayStore.claimOutbound
   -> SendblueClient.sendMessage
   -> Sendblue POST /api/send-message
-  -> SendblueReplayStore.completeOutbound(provider message_handle)
+  -> SendblueReplayStore.complete(provider message handle)
 ```
 
 Live Layer composition:
@@ -570,8 +581,8 @@ SendblueChannelLive
   -> SendblueIdentityDirectoryLive
   -> SendblueSessionRouterLive
   -> SendblueReplayStoreUpstashLive
-  -> SendblueClientHttpLive
-  -> Effect HTTP client + Clock + platform constant-time crypto primitive
+  -> SendblueClientLive
+  -> FetchHttpClient + Clock + platform constant-time crypto primitive
 ```
 
 ### Tests
@@ -580,9 +591,9 @@ SendblueChannelLive
 Vitest signed webhook fixture
   -> thin Eve route adapter
   -> SendblueChannel
-  -> fixed ConfigProvider
+  -> injected SendblueConfigService
   -> SendblueWebhookVerifierLive with deterministic secret
-  -> SendblueIdentityDirectoryMemory
+  -> SendblueIdentityDirectoryLive over injected config
   -> SendblueSessionRouterLive with fixed key
   -> SendblueReplayStoreMemory with atomic test semantics
   -> fake Eve send
@@ -594,23 +605,19 @@ Concurrency tests must race identical inbound claims and outbound claims and
 prove one winner. Memory test semantics must model the live atomic contract,
 not hide races behind sequential test setup.
 
-### CLI And Preview Provisioning
+### CLI And Preview Operations
 
 ```text
-Bun Sendblue preview proof/provision command
-  -> ConfigProvider.fromEnv()
-  -> SendblueConfig Schema
-  -> Sendblue webhook admin API or documented operator step
-  -> Vercel Preview URL + protected automation bypass
-  -> configure receive webhook object + secret
-  -> direct invalid/valid/replay probes
-  -> real minimal inbound iMessage
-  -> Eve/Sendblue/Vercel sanitized readback
-  -> Schema-encoded proof result
+No committed Sendblue provisioning CLI exists. Operator-only provider actions
+create or rotate the Preview webhook and its independent bypass/route secrets;
+they do not run inside the app. Local CLI verification starts `eve dev --no-ui`
+with ignored configuration and runs focused tests. The accepted provider proof
+used a temporary private operator surface and retained only the sanitized
+results stated above.
 ```
 
-The CLI is an executable edge. It may run `Effect.runPromise`; services and
-domain operations may not.
+Any future CLI is an executable edge: it may run `Effect.runPromise` or a
+`ManagedRuntime`; services and domain operations may not.
 
 ## Effect Implementation Rules
 
@@ -668,12 +675,13 @@ Static-analysis requirements:
 - no floating provider/Eve promises: background work is registered explicitly
   with Eve `waitUntil` and errors remain observable.
 
-## Frontend Composition Guardrail
+## Frontend Composition Audit Result
 
 The Sendblue slice is a machine webhook/channel integration and adds no React
-route or operator UI. Implementation must not introduce a dashboard, contact
-screen, replay viewer, or credential form under this SPEC. If one is needed,
-stop and create a separate SPEC before adding visible frontend code.
+route or operator UI. Frontend composition rules are not applicable to this
+task. No dashboard, contact screen, replay viewer, credential form, Browser
+evidence, or frontend audit work was invented. A future UI requires a separate
+SPEC.
 
 That future UI must follow
 `docs/architecture/frontend-composition.md` and the hierarchy:
@@ -730,20 +738,29 @@ Every implementation task requires three recorded audit passes:
 
 More passes are required while any finding remains.
 
-## Operational Behavior
+## Operational Behavior, Rotation, And Rollback
 
 - A failed/missing webhook secret is an auth incident, not an ignored event.
 - Replay-store failure returns `503` so Sendblue retries; it must not dispatch
   without a durable claim.
 - Unknown senders and unsupported authenticated event types are acknowledged
   and counted without content/PII logs.
-- Provider `401` disables outbound sends and alerts for credential rotation.
-- Provider `429` may use a bounded provider-directed retry only while the
-  outbound claim lease owns the event and the API outcome is known not accepted.
+- Provider `401` is a known rejection; the outbound claim becomes retryable
+  and requires operator credential investigation before any retry.
+- Provider `429` is also retryable only after an operator policy decision; no
+  background provider retry is implemented.
 - Indeterminate send outcomes are quarantined as `uncertain` and require
   operator inspection.
 - Channel failure must not switch the Eve model provider or expose the default
   Eve API publicly.
+- Rotate the Vercel bypass and Sendblue webhook secret independently, store
+  them only in provider/operator systems and encrypted Preview configuration,
+  redeploy, then update the provider receive webhook. Never print an old or
+  new value or the protected URL.
+- To disable Preview, remove the Sendblue receive webhook first, then revoke
+  the Preview bypass and remove/revoke Preview Sendblue configuration. Do not
+  infer or perform Production rollback; Production promotion is separately
+  gated by the Vercel Production Promotion SPEC.
 
 ## Documentation Deliverables
 

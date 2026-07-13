@@ -26,7 +26,8 @@ Implemented:
 Research-gated or future:
 
 - A recorded combined Eve -> hosted-live-proxy end-to-end request.
-- Sendblue, Cloudflare email, Vercel Connect, Notion, and long-term memory.
+- Production Sendblue promotion, Cloudflare email, Vercel Connect, Notion, and
+  long-term memory.
 
 Unsupported:
 
@@ -43,14 +44,14 @@ Unsupported:
 ```text
 iMessage
   -> Sendblue webhook
-  -> future Eve channel/app boundary
+  -> apps/agent Sendblue Eve channel (Preview verified)
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 
 Email
   -> Cloudflare Email Routing Worker
-  -> future Eve channel/app boundary
+  -> future Eve email channel/app boundary
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
@@ -123,7 +124,7 @@ OpenAI-compatible `POST /v1/chat/completions` through Effect
 refresh-capable preview-live providers. It exposes no browser OAuth route.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
-instructions, authored tool files, future channel files, and runtime secrets.
+instructions, authored tool files, channel files, and runtime secrets.
 It imports stable operations from `@bundjil/eve-effect` instead of duplicating
 schemas or DTOs. For model selection, it owns only provider config and
 `LanguageModel` construction; it must not import Codex OAuth profile storage,
@@ -170,6 +171,25 @@ apps/agent/agent/agent.ts
 The adapter and proxy have independent proof records. This call graph describes
 the configured integration, not a recorded Eve-to-hosted-live-proxy end-to-end
 proof. Gateway remains the default path.
+
+Sendblue Preview inbound/outbound path:
+
+```text
+Sendblue receive webhook
+  -> Vercel Preview Deployment Protection bypass (platform boundary only)
+  -> POST /eve/v1/sendblue/webhook
+  -> apps/agent/agent/channels/sendblue.ts
+  -> app-owned ManagedRuntime and SendblueChannel
+  -> header verification -> Schema decode -> identity -> opaque route -> Upstash claim
+  -> Eve send under waitUntil
+  -> message.completed -> outbound claim -> SendblueClient -> Sendblue API
+```
+
+The header verifier compares `sb-signing-secret` with the redacted configured
+shared secret before body decoding; it is not a body HMAC. Tests replace the
+provider and replay layers with deterministic memory layers. The CLI/local path
+starts `eve dev --no-ui` and exercises the same authored channel with local
+test configuration. Preview is verified; Production is not enabled.
 
 Schema boundary:
 
@@ -249,9 +269,11 @@ Vercel preview request
 - Put app-specific framework code in `apps/*`; move shared logic into packages
   only when it is stable and reusable.
 
-Future Sendblue, Cloudflare email, Vercel Connect, and Notion code belongs in
-app-owned boundaries first. Move shared contracts into `@bundjil/core` or
-`@bundjil/eve-effect` only after the boundary is proven stable.
+The Preview-verified Sendblue channel belongs in its existing app-owned
+boundary; keep Production promotion separately gated. Future Cloudflare email,
+Vercel Connect, and Notion code belongs in app-owned boundaries first. Move
+shared contracts into `@bundjil/core` or `@bundjil/eve-effect` only after the
+boundary is proven stable.
 
 ## Quality Gates
 

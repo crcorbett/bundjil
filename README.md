@@ -30,8 +30,9 @@ Bundjil is planned around a simple product shape:
 - Domain model: Effect for fallible, async, stateful, boundary-crossing, and
   dependency-injected code.
 
-The current repository ships the first local Eve agent slice. It does not yet
-ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
+The current repository ships the Eve agent slice and one Sendblue channel
+verified on Vercel Preview. Cloudflare email, Vercel Connect, and Notion remain
+future integrations. Sendblue is not enabled in Production.
 
 ## Current Packages
 
@@ -56,6 +57,27 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
   instructions, the `workspace_status` tool that delegates into
   `@bundjil/eve-effect`, and app-owned model-provider config. Gateway is the
   default model path; Codex proxy mode is opt-in.
+
+## Sendblue Channel State
+
+`apps/agent` owns the Sendblue custom Eve channel, including its Effect Schema
+contracts, redacted Config, explicit Layers, authentication, identity policy,
+opaque routing, replay claims, and provider client. The public route is
+`POST /eve/v1/sendblue/webhook` on the accepted immutable Preview deployment.
+
+Sendblue authenticates at the route with its shared `sb-signing-secret` header,
+not a body HMAC. Vercel's bypass is separate platform authentication and does
+not authenticate the route. Only direct allowlisted iMessage events are
+dispatched; ignored or duplicate events receive `200`, malformed authenticated
+input gets `400`, failed route authentication gets `401`, unavailable durable
+claims get `503`, and accepted dispatch gets `202`.
+
+The Preview proof established one provider-originated inbound to one delivered
+outbound response plus sequential and concurrent replay suppression. It used
+sanitized status/count/digest evidence only. Production variables, deployments,
+storage, aliases, and webhooks remain untouched. See
+[`apps/agent/README.md`](./apps/agent/README.md) for config, operations, and
+rollback; the future Production decision remains separately gated.
 
 `apps/agent` owns Eve filesystem runtime shape and deployment concerns.
 Reusable app operations live in packages once the boundary is stable.
@@ -199,7 +221,8 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
    changes that boundary.
 4. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
-5. Add the Sendblue iMessage webhook and outbound delivery adapter.
+5. Keep the Preview-verified Sendblue channel healthy; Production promotion
+   remains separately gated.
 6. Add the Cloudflare email ingress path.
 7. Connect Notion through Vercel Connect and model the first personal workflows.
 8. Add readback, observability, and replayable verification for every channel.

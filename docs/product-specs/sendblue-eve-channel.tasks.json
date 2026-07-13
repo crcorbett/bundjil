@@ -193,7 +193,7 @@
     {
       "id": "document-and-audit-sendblue-channel",
       "title": "Reconcile Sendblue docs and run the final audits",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["prove-sendblue-preview"],
       "description": "Update architecture, app, root, SPEC, and execution-plan documentation to the verified implementation, then complete the three-pass audits and final repository gate.",
       "implementationNotes": [
@@ -218,8 +218,13 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 4,
+        "evidence": [
+          "Ownership/call graph: root, app, architecture, repo-structure, SPEC, and plan docs now place the thin Eve adapter and provider-specific Effect services in apps/agent, describe the live Preview and deterministic test graphs, remove stale future-Sendblue claims, and keep Production promotion separately gated. Parent review returned and corrected stale repo tree, future-boundary, roadmap, and retry-state language.",
+          "Implementation quality: documented rules match the accepted canonical Schema-derived contracts, Redacted Config, Context services, explicit Layers, app-owned ManagedRuntime, named flat linear Effects, tagged pipe error handling, claim-before-side-effect ordering, and owner-fenced replay transitions. Runtime scans found no unsafe casts, manual JSON, direct process.env/raw fetch, JavaScript replay Map/Set, lint suppressions, DTO mirrors, or helper sprawl; frontend composition was correctly not applicable. Parent review also corrected rendered metadata and retry prose.",
+          "Verification coverage: agent typecheck and all 38 tests, root Ultracite, Knip, all workspace typechecks/tests, task-ledger consistency, and git diff checks pass. Leak/stale scans found no exact 32-hex credential, protected webhook URL, untracked runtime proof artifact, or stale Sendblue status; the only tracked env-like file is the empty .env.example and all E.164 values are synthetic test fixtures.",
+          "Final consistency: a post-audit read corrected historical provider-discovery and build entries that still used present or future tense and replaced the final ambiguous bounded-release phrase with the implemented owner-fenced release; formatting and diff checks remained green."
+        ]
       },
       "commitAfterPassing": true
     }

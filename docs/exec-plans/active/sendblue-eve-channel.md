@@ -1,6 +1,6 @@
 # Sendblue Eve Channel Implementation Plan
 
-Status: In progress
+Status: Complete
 
 Spec: `docs/product-specs/sendblue-eve-channel.md`  
 Task ledger: `docs/product-specs/sendblue-eve-channel.tasks.json`
@@ -17,12 +17,12 @@ Credentials remain in 1Password, executor-managed provider connections, and
 encrypted Vercel environment variables. Plans, tests, command output, commits,
 and proof artifacts contain only variable names and sanitized metadata.
 
-## Current Task
+## Rollout Status
 
-`document-and-audit-sendblue-channel` is pending after the accepted Preview
-proof.
+All five tasks are accepted. The Sendblue channel remains Preview-only;
+Production promotion remains gated by the Vercel Production Promotion SPEC.
 
-Next scope:
+Completed scope:
 
 - reconcile root, app, architecture, SPEC, task-ledger, and operator docs with
   the verified Preview behavior;
@@ -32,12 +32,18 @@ Next scope:
 
 Production resources and environment variables remain untouched.
 
+Documentation reconciliation is complete. The root, app, architecture, and
+SPEC surfaces now describe the accepted Preview-only route/auth/status/replay
+behavior, exact app-owned Config names and KV fallback, supported/ignored
+matrix, opaque identity/routing, failure/uncertainty semantics, and
+rotation/disable procedure. The final parent audits and repository gates pass.
+
 ## Provider Discovery
 
 Recorded: 2026-07-13
 
 - The personal executor Sendblue connection is available.
-- No receive, outbound, or typing webhook is currently configured.
+- At discovery time, no receive, outbound, or typing webhook was configured.
 - The account has an active iMessage line and recent message history.
 - API credentials exist in the `SendBlue API` 1Password item; values were not
   copied into repository files or command output.
@@ -47,8 +53,8 @@ Recorded: 2026-07-13
   inputs when those dedicated values are unavailable.
 - All required Sendblue config inputs are Preview-only; Production has zero
   Sendblue variables.
-- A dedicated Vercel automation bypass exists, but its first generated value is
-  intentionally treated as unknown and will be replaced by an operator-owned
+- A dedicated Vercel automation bypass existed, but its first generated value
+  was intentionally treated as unknown and later replaced by an operator-owned
   value saved in 1Password before webhook registration.
 
 ## Preview Build Log
@@ -69,7 +75,7 @@ Recorded: 2026-07-13
   `@bundjil/core -> @bundjil/eve-effect -> @bundjil/agent` with zero cached
   tasks, followed by full repository verification.
 - The failed deployment is retained as diagnostic evidence. A new clean commit
-  and immutable Preview deployment will be used for route and webhook proof.
+  and immutable Preview deployment were used for route and webhook proof.
 
 ## Preview Proof Log
 
@@ -250,6 +256,53 @@ Parent audit:
    Agent checks/build, all repository verification, diff checks, Knip, and Eve
    discovery with zero diagnostics pass.
 
+### document-and-audit-sendblue-channel
+
+Accepted: 2026-07-14
+
+Changed files:
+
+- `README.md`
+- `ARCHITECTURE.md`
+- `apps/agent/README.md`
+- `docs/architecture/eve-agent.md`
+- `docs/architecture/repo-structure.md`
+- Sendblue SPEC, task ledger, and execution plan
+
+Evidence:
+
+- Reconciled every durable documentation surface from future/draft language to
+  the actual Preview-verified, Production-gated state.
+- Documented the full route/status matrix, independent Vercel and Sendblue
+  authentication boundaries, Config names and KV fallback, sender policy,
+  opaque routing, claim lifecycle, uncertain delivery semantics, local tests,
+  proof constraints, rotation, disablement, and rollback boundary.
+- Corrected stale call-graph and retry wording found during parent review; no
+  frontend work was invented for this machine-channel slice.
+
+Parent audit:
+
+1. Ownership and call graph: root, app, architecture, repo-structure, SPEC, and
+   plan docs now place the thin Eve adapter and provider-specific Effect
+   services in `apps/agent`, describe the live Preview and test graphs, remove
+   stale future-Sendblue claims, and keep Production separately gated.
+2. Implementation quality: the documented rules match the accepted canonical
+   Schema, Redacted Config, Context, Layer, ManagedRuntime, named linear Effect,
+   tagged-error, claim-before-side-effect, and owner-fenced replay patterns.
+   Runtime scans found no unsafe casts, manual JSON, direct process env/raw
+   fetch, JavaScript replay Map/Set, lint suppressions, DTO mirrors, or helper
+   sprawl. Frontend composition is correctly not applicable.
+3. Verification coverage: agent typecheck and all 38 tests pass; root
+   Ultracite, Knip, all workspace typechecks/tests, task-ledger checks, and diff
+   checks pass. Leak/stale scans found no exact 32-hex credential, protected
+   webhook URL, untracked runtime proof artifact, or stale Sendblue status; the
+   only tracked env-like file is the empty `.env.example`, and all E.164 values
+   are synthetic test fixtures.
+4. Final consistency: a post-audit read corrected historical discovery/build
+   entries that still used present or future tense and replaced the final
+   ambiguous bounded-release phrase with the implemented owner-fenced release.
+   Formatting and diff checks remained green.
+
 ## Audit Log
 
 `implement-sendblue-contracts-and-client` completed three parent passes. The
@@ -270,7 +323,7 @@ equal-length auth, outbound contention, and successful CAS verification.
 included teaching Knip about Eve filesystem entrypoints, removing duplicate
 service injection, adding literal direction and nullable line handling,
 validating provider limits before send, quarantining accepted dispatch/send
-completion failures, adding direct Eve route tests, and proving bounded claim
+completion failures, adding direct Eve route tests, and proving owner-fenced claim
 release when Eve rejects before acceptance.
 
 `prove-sendblue-preview` completed three parent passes. The ownership/call-graph
@@ -285,3 +338,13 @@ verification pass proved the full direct route matrix, storage-failure fixture,
 one provider-originated inbound to one delivered outbound, sequential and
 concurrent synthetic replay suppression, real-handle replay suppression,
 clean runtime logs, sanitized evidence, and no Production mutation.
+
+`document-and-audit-sendblue-channel` completed four parent passes. Pass one
+corrected stale ownership, future-boundary, roadmap, call-graph, and retry-state
+claims. Pass two audited the actual Effect source and helper inventory, then
+corrected rendered metadata and remaining retry prose; no runtime or frontend
+composition defect remained. Pass three reran targeted agent checks, all root
+quality gates, ledger consistency, diff checks, and sanitized leak/PII/artifact
+scans before accepting the task. A fourth consistency pass corrected historical
+tense and the final replay-release phrase, then reran formatting and diff
+checks.

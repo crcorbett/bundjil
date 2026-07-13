@@ -54,6 +54,9 @@ apps/agent/
     config.ts         app-owned model/config parsing
     instructions.md   agent instructions
     model-provider.ts app-owned Gateway/private-proxy provider selector
+    channels/
+      sendblue.ts     thin Eve route/event adapter
+    lib/sendblue/     app-owned Sendblue contracts, services, and Layers
     tools/            Eve tool modules
   test/               app-level tool and runtime-edge tests
   README.md           app usage and verification guide
@@ -86,9 +89,12 @@ account-linking endpoint. Deployable apps import server-safe layers from
 `@bundjil/codex-oauth/live.layer`; trusted-local browser, loopback, and login
 composition is isolated behind `@bundjil/codex-oauth/trusted-local.layer`.
 
-Future Sendblue, Cloudflare email, Vercel Connect, and Notion code should start
-in app-owned boundaries until stable. Move shared contracts into packages only
-after the shape has survived at least one real tool/channel implementation.
+The Preview-verified Sendblue channel remains app-owned in
+`apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; it is not a
+shared package contract and is not enabled in Production. Future Cloudflare
+email, Vercel Connect, and Notion code should likewise start in app-owned
+boundaries. Move shared contracts into packages only after the shape has
+survived at least one real tool/channel implementation.
 
 ## Package Boundaries
 

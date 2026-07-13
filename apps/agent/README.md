@@ -92,6 +92,90 @@ Stream the returned session:
 curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 ```
 
+## Sendblue Preview Channel
+
+The app has an app-owned Sendblue custom channel. It is verified on one
+immutable Vercel Preview deployment only; it is not enabled in Production.
+
+- Route: `POST /eve/v1/sendblue/webhook`. The build test rejects `/webhook`.
+- Authentication: Sendblue sends the configured shared secret in the
+  `sb-signing-secret` header. It is compared in constant time before the body
+  is read. This is a shared header secret, not a body HMAC.
+- Deployment Protection: the Vercel bypass is an independent platform-auth
+  credential. It lets Sendblue reach the Preview deployment but does not
+  replace the route's `sb-signing-secret` authentication.
+- Sender identity: only the redacted, schema-decoded
+  `BUNDJIL_SENDBLUE_SENDER_IDENTITIES` allowlist may start a conversation. The
+  sender and configured line produce an opaque keyed continuation token; raw
+  phone numbers are not used as the Eve principal or routing key.
+- Supported inbound event: direct, text-bearing, non-typing, `RECEIVED`
+  iMessage from an allowlisted sender, addressed to the configured Sendblue
+  line. The default allowed service is `iMessage`.
+- Ignored with `200`: typing, outbound/direction-outbound, non-`RECEIVED`,
+  group, media, blank, non-allowed-service, wrong-line, loopback, unknown
+  sender, and duplicate events. Ignored events do not create an Eve session.
+- Rejections: absent or invalid header returns `401`; authenticated malformed
+  input returns `400`; an unavailable replay store or routing failure returns
+  `503`; an accepted dispatch returns `202`.
+
+Inbound handles are atomically claimed before Eve dispatch. On a rejected
+dispatch, the owner-fenced retryable transition compare-and-deletes the claim,
+releasing it for a later provider retry; an accepted dispatch is marked
+complete. `message.completed` claims stable Eve coordinates before calling
+Sendblue. Known provider rejections become retryable, while timeout,
+transport, malformed-response, or completion-persistence failures become
+uncertain and are not automatically resent. This protects against duplicate
+personal messages; it does not promise exactly-once delivery after an
+indeterminate provider outcome.
+
+### Sendblue Configuration
+
+All values are app-owned Effect `Config`; secrets use `Config.redacted` and
+missing required configuration fails closed. Configure only Preview for the
+accepted channel:
+
+```text
+BUNDJIL_SENDBLUE_API_KEY
+BUNDJIL_SENDBLUE_API_SECRET
+BUNDJIL_SENDBLUE_WEBHOOK_SECRET
+BUNDJIL_SENDBLUE_FROM_NUMBER
+BUNDJIL_SENDBLUE_SENDER_IDENTITIES
+BUNDJIL_SENDBLUE_ROUTING_KEY
+BUNDJIL_SENDBLUE_REPLAY_STORE_URL
+BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN
+BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX
+BUNDJIL_SENDBLUE_REPLAY_STORE_TTL_SECONDS
+BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS
+BUNDJIL_SENDBLUE_ALLOWED_SERVICES
+```
+
+Replay storage prefers the two `BUNDJIL_SENDBLUE_REPLAY_STORE_*` credentials
+and otherwise uses the Preview-only Marketplace `KV_REST_API_URL` and
+`KV_REST_API_TOKEN` fallback. `BUNDJIL_SENDBLUE_TEST_MODE=true` plus
+`BUNDJIL_SENDBLUE_TEST_API_BASE_URL` is restricted to tests/local fixtures.
+Never put values in commands, docs, test fixtures, or commits.
+
+### Local Verification And Operations
+
+```bash
+bun run --filter @bundjil/agent check-types
+bun run --filter @bundjil/agent test
+bun run --filter @bundjil/agent build
+```
+
+The Preview proof recorded an authenticated `401`/`400`/`200`/`202` route
+matrix, a fail-closed `503` replay-store fixture, one provider-originated
+inbound to one delivered outbound, and sequential plus concurrent replay
+suppression. It retained only deployment/status/count/digest metadata and had
+no error or fatal runtime logs. It did not alter Production.
+
+Rotate the Vercel bypass and Sendblue webhook secret independently in their
+provider/operator stores, update the corresponding encrypted Preview values,
+redeploy, then update the provider webhook. To disable the channel, remove the
+Preview receive webhook first and then remove or revoke the Preview Sendblue
+configuration; do not use a Production rollback as a substitute. Production
+promotion remains gated by the separate Vercel Production Promotion SPEC.
+
 ## Environment
 
 Gateway mode is the default:

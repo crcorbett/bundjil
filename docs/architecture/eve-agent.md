@@ -10,8 +10,9 @@ record these as combined Eve -> hosted-live-proxy evidence unless an actual Eve
 request has been verified through that deployed route.
 
 This guide documents the committed Bundjil Eve app and the Effect package
-boundary it uses. It covers the current local slice only; Sendblue, Cloudflare
-email, Vercel Connect, and Notion are future boundaries.
+boundary it uses. Sendblue is a Preview-verified app-owned channel; Cloudflare
+email, Vercel Connect, and Notion remain future boundaries. No Sendblue
+Production enablement is recorded here.
 
 ## Filesystem Layout
 
@@ -27,6 +28,14 @@ apps/agent/
     config.ts
     instructions.md
     model-provider.ts
+    channels/
+      sendblue.ts
+    lib/sendblue/
+      config.ts
+      schemas.ts
+      channel.service.ts
+      client.service.ts
+      live.layer.ts
     tools/
       workspace_status.ts
   test/
@@ -79,6 +88,14 @@ Vercel-managed runtime configuration, never in committed source.
 - `agent/instructions.md` tells the agent to use `workspace_status` for
   current repo/package questions and not to claim live channels or integrations.
 - `agent/tools/workspace_status.ts` is the model-facing Eve tool slug.
+- `agent/channels/sendblue.ts` is a thin Eve adapter only. It owns the
+  absolute route, `waitUntil` scheduling, HTTP status mapping, and projection
+  of `message.completed` into the app-owned channel service.
+- `agent/lib/sendblue/` owns canonical Schema contracts, tagged errors,
+  redacted Config, Context services, live/memory Layers, provider
+  authentication, sender policy, opaque routing, replay persistence, and the
+  Sendblue HTTP client. It does not move into a shared package until a stable
+  second-channel contract exists.
 
 `@bundjil/eve-effect` owns the reusable operation boundary:
 
@@ -211,6 +228,46 @@ Effect.runPromise(
 );
 ```
 
+## Sendblue Channel Call Graphs
+
+Preview production-style ingress is:
+
+```text
+Sendblue receive webhook
+  -> independent Vercel Deployment Protection bypass
+  -> POST /eve/v1/sendblue/webhook
+  -> makeSendblueEveChannel ManagedRuntime
+  -> SendblueChannel.authorizeAndClaimInbound
+  -> constant-time shared sb-signing-secret verification
+  -> Schema JSON decode and ignored-event classification
+  -> allowlisted identity + opaque keyed continuation token + atomic Upstash claim
+  -> Eve send under waitUntil
+```
+
+An accepted event returns `202`; ignored or duplicate events return `200`.
+Authentication failures return `401`, authenticated malformed input returns
+`400`, and replay/routing failures return `503`. `sb-signing-secret` is a
+shared header secret, not a body HMAC. The Vercel bypass is only platform
+authentication and never substitutes for route authentication.
+
+Outbound delivery is:
+
+```text
+Eve message.completed
+  -> SendblueChannel.deliverCompletedMessage
+  -> stable event-coordinate replay claim
+  -> SendblueClient.sendMessage
+  -> POST /api/send-message
+  -> owner-fenced completion record
+```
+
+Known provider rejections release the claim so a later operator-directed or
+provider retry can make a new claim; no automatic or background provider retry
+is implemented. Timeout, transport, malformed provider response, and
+completion-persistence failures become uncertain and are not automatically
+resent. This limits duplicate personal messages but cannot establish exactly-once
+delivery after an indeterminate provider outcome.
+
 ## Test Call Graph
 
 App test path:
@@ -228,6 +285,11 @@ bun run --filter @bundjil/agent test
   -> createAgentModel
   -> AI Gateway string or @ai-sdk/openai-compatible LanguageModel
   -> injected fetch proof for private bearer auth and no token body leak
+
+bun run --filter @bundjil/agent test
+  -> apps/agent/test/sendblue-*.test.ts
+  -> injected Config, memory replay/client Layers, and direct Eve route factory
+  -> auth/status/replay/outbound behavior without provider access
 ```
 
 Package test path:
@@ -521,21 +583,23 @@ Remove `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`,
 `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` from agent env to return Eve to the
 Gateway model path.
 
-Before starting new integrations such as Sendblue, Cloudflare email, Vercel
-Connect, Notion, or a deployed app boundary, draft a compact SPEC with
+Before starting new integrations such as Cloudflare email, Vercel Connect,
+Notion, or a new deployed app boundary, draft a compact SPEC with
 `prd-writer` and implement it through `prd-implementer` so call graphs,
 ownership, verification gates, and Effect audit evidence are recorded before
 code moves.
 
 ## Future Boundaries
 
-These integrations are intentionally not implemented in the current slice:
+Sendblue is implemented and verified on Preview only. Production promotion
+remains separately gated. These integrations are intentionally not implemented
+in the current slice:
 
-- Sendblue iMessage/SMS/RCS channel files and webhooks.
 - Cloudflare Email Routing Workers and email handlers.
 - Vercel Connect connection setup and token exchange.
 - Notion tools and workflow-specific operations.
 - Long-term memory persistence.
 
 Add them in `apps/agent` first unless the contract has become stable enough to
-move into `@bundjil/core` or `@bundjil/eve-effect`.
+move into `@bundjil/core` or `@bundjil/eve-effect`. Keep the existing Sendblue
+boundary app-owned until a stable second-channel contract exists.
