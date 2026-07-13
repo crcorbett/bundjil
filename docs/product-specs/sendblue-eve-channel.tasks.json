@@ -1,0 +1,215 @@
+{
+  "title": "Sendblue Eve Channel Tasks",
+  "spec": "docs/product-specs/sendblue-eve-channel.md",
+  "status": "pending",
+  "principles": [
+    "Keep Sendblue contracts and services app-owned in apps/agent until a stable cross-channel abstraction is proven.",
+    "Authenticate sb-signing-secret in constant time before decoding or trusting any body field; missing config fails closed.",
+    "Use Effect Schema, tagged errors, Context services, Layers, Config, Redacted, HttpClient, and explicit live/memory persistence boundaries.",
+    "Use atomic durable claims for inbound message_handle and outbound Eve event coordinates; process-local replay state is forbidden.",
+    "Map only explicitly configured E.164 senders to stable Eve principals and opaque continuation tokens.",
+    "Helper sprawl is forbidden: retain only abstractions with multiple concrete call sites or ownership of a provider, security, atomic persistence, serialization, resource, or policy boundary.",
+    "This SPEC adds no React or visible operator route; any frontend requires a separate SPEC following primitive -> composite -> layout -> route and leaf-owned state/commands.",
+    "Do not log or persist credentials, message text, full phone numbers, protected webhook URLs, or raw provider bodies in evidence."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run check",
+    "bun run knip",
+    "bun run verification",
+    "git diff --check",
+    "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
+    "No React/component/visible route files change; otherwise stop for a separate frontend SPEC and Browser verification",
+    "No broad lint suppressions, structural casts, generic helper modules, pass-through services, or dead exports",
+    "Direct HTTP proof for webhook auth/status behavior",
+    "Concurrent replay-claim tests",
+    "Sanitized Vercel Preview, Eve session, Sendblue provider, storage, runtime-log, and leak-scan evidence"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Add passes while any authentication, identity, replay, delivery, PII, Vercel proof, or attempted frontend-composition finding remains."
+  },
+  "tasks": [
+    {
+      "id": "implement-sendblue-contracts-and-client",
+      "title": "Implement app-owned Sendblue contracts, config, and HTTP client",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Create the canonical Effect Schema contracts, redacted Effect Config, tagged errors, and named SendblueClient service with live HTTP and deterministic memory/test Layers.",
+      "implementationNotes": [
+        "Keep the boundary under Eve's supported import-only apps/agent/agent/lib/sendblue directory; do not create a workspace package, an unsupported direct agent/sendblue directory, or changes in @bundjil/core/@bundjil/eve-effect.",
+        "Define branded E.164, message-handle, principal, conversation, send input/success, webhook payload, claim, and sanitized result schemas and derive all TypeScript types from them.",
+        "Load API key/secret, webhook secret, line, identity mapping, routing key, service allowlist, API URL, and replay-store config through a distinct sendblue/config.ts using Config.redacted and ConfigProvider.fromEnv.",
+        "Implement SendblueClient.sendMessage as a named Effect operation over Effect HttpClient or a narrowly wrapped SDK. Encode/decode JSON with Effect Schema and classify 2xx, 4xx, 401, 429, malformed, network, timeout, and uncertain outcomes.",
+        "Do not add typing, status, contacts, groups, media, or webhook-admin runtime operations unless required by the preview provisioning task and kept at the CLI edge.",
+        "Add only modules/services with a provider, config, serialization, security, or reusable policy owner; inline one-off transforms."
+      ],
+      "mandatoryVerification": [
+        "Flat meaningful Effect.gen/Effect.fn programs for config load and sendMessage; typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+        "Canonical app-owned Effect Schema types; no unsafe casts, DTO mirrors, manual object readers/mappers, JSON.stringify/JSON.parse, direct process.env, raw fetch in the channel boundary, or trivial wrappers/helpers.",
+        "Config tests prove required fields, E.164/identity-map decoding, redaction, missing-secret fail-closed behavior, test-only base URL override, and no value leakage.",
+        "Client tests prove headers and schema-encoded body without secret/body snapshots, response decoding, provider error classes, timeout/uncertain classification, and no automatic uncertain retry.",
+        "Agent check-types/test/build and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "SendblueClient has explicit live and memory/test Layers and one named sendMessage operation.",
+        "All provider/config boundaries are canonical, redacted, and app-owned.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: app-owned contracts, config, HTTP client, and memory Layer live under Eve's supported agent/lib/sendblue import-only boundary; no shared package or provider state changed.",
+          "Implementation quality: canonical Schema-derived contracts, safe tagged errors without raw causes, flat named sendMessage flow, Config/Context/Layer/HttpClient/Match primitives, one provider decode, and no unsafe casts/manual JSON/helper sprawl; initial Config/service/error findings were corrected by the same Terra Medium worker.",
+          "Verification coverage: seven focused tests prove redacted fail-closed Config, E.164 and allowlist decoding, test-only URL override, exact synthetic headers/body, success/provider rejection/status/schema/transport/timeout behavior, memory Layer determinism, and leak-safe errors; agent typecheck/test/build, root verification, and diff checks pass."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-sendblue-security-identity-replay",
+      "title": "Implement webhook verification, sender identity, routing, and replay services",
+      "status": "pending",
+      "dependsOn": ["implement-sendblue-contracts-and-client"],
+      "description": "Add fail-closed constant-time Sendblue shared-secret verification, allowlisted sender mapping, opaque conversation routing, and atomic inbound/outbound replay claims with memory and Upstash live Layers.",
+      "implementationNotes": [
+        "SendblueWebhookVerifier receives Redacted config and verifies sb-signing-secret in constant time before any body decode. Length mismatch and absent configured secret are authentication failures.",
+        "SendblueIdentityDirectory maps normalized E.164 numbers from redacted config to stable non-phone principal ids. Unknown senders do not create a session.",
+        "SendblueSessionRouter uses a keyed digest of sender plus configured line to derive an opaque deterministic continuation token; raw phone numbers never become principal ids or channel metadata.",
+        "SendblueReplayStore exposes atomic claim/complete/retryable/uncertain operations. The Upstash Layer uses a single NX+TTL provider operation for claims rather than KeyValueStore get-then-set/modify defaults.",
+        "Use inbound message_handle-derived claim keys and outbound sessionId/turnId/stepIndex/sequence claim keys. Store opaque ids/status/timestamps only.",
+        "On storage failure fail closed with a typed error; do not dispatch or send without a durable claim."
+      ],
+      "mandatoryVerification": [
+        "Flat named Effect programs with expected tagged errors handled in .pipe(...) and canonical Schema-derived contracts.",
+        "No unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, process-local Map/Set replay state, timing-variable equality, direct process.env, or helper sprawl.",
+        "Verifier tests cover missing/malformed/mismatch/match and prove the body decoder is not invoked before successful auth.",
+        "Identity/routing tests cover E.164 normalization, mapped/unknown senders, line separation, stable opaque keys, and no phone number in principal/metadata.",
+        "Concurrency tests race identical/different inbound and outbound claims, prove exactly one winner, exercise lease expiry/retryable/complete/uncertain transitions, and model live atomic semantics.",
+        "Upstash adapter tests prove NX+TTL command shape and sanitized errors without using real credentials.",
+        "Agent checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "Authentication, identity, routing, and durable replay policies are independent named Effect services with live/memory Layers.",
+        "No request can reach body-derived identity or Eve dispatch before provider auth and atomic claim.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-sendblue-eve-channel",
+      "title": "Implement the thin Eve route and outbound event adapter",
+      "status": "pending",
+      "dependsOn": ["implement-sendblue-security-identity-replay"],
+      "description": "Compose the Sendblue Effect services behind a custom Eve channel route, route accepted direct text into deterministic sessions, and deliver completed assistant text with outbound replay protection.",
+      "implementationNotes": [
+        "Create apps/agent/agent/channels/sendblue.ts with defineChannel and POST /eve/v1/sendblue/webhook. It may run Effects at the framework edge but must contain no provider, parsing, identity, storage, or delivery policy.",
+        "Create SendblueChannel.handleInbound as the linear auth -> decode -> classify -> line/loop check -> identity -> route -> claim -> Eve dispatch program. Decode the request body once through Schema.fromJsonString or the canonical codec.",
+        "Acknowledge authenticated ignored and duplicate events without dispatch. Return 400 for authenticated malformed input, 401 for auth failure, and 503 when no durable claim can be made.",
+        "Support direct text-only iMessage receive events. Ignore outbound/status/typing/group/media-only/empty/unsupported-service events with sanitized outcomes.",
+        "Build Eve auth only after identity mapping and call send through waitUntil after a successful inbound claim. Durable channel state contains only fields required for reply routing.",
+        "On message.completed, deliver only non-empty visible text. Claim outbound using ctx.session.id plus turnId/stepIndex/sequence before SendblueClient.sendMessage; persist provider handle on success and uncertain state on indeterminate outcome.",
+        "Do not send reasoning, tool payloads/intermediate tool-call messages, secrets, error details, or status callbacks."
+      ],
+      "mandatoryVerification": [
+        "Production/test call graphs match the SPEC and apps/agent remains the owner; no new package or generic channel abstraction is introduced.",
+        "Flat meaningful Effect.gen/Effect.fn channel programs with tagged errors handled in .pipe(...); the Eve file is a thin runPromise/ManagedRuntime adapter.",
+        "Canonical schemas and service contracts; no unsafe casts, DTO mirrors, manual object guards/readers/mappers, JSON.stringify/JSON.parse, raw fetch, swallowed errors, or trivial wrappers/helpers.",
+        "Direct Request/Response tests cover all auth/status/classification cases, one accepted session, same-handle sequential and concurrent replay, line confusion/loop prevention, and storage fail-closed behavior.",
+        "Event tests cover stable outbound coordinates, one provider send, duplicate replay suppression, tool/reasoning exclusion, over-limit response handling, provider failures, and uncertain no-auto-resend.",
+        "Eve build discovers the sendblue channel and does not expose secrets in info/metadata.",
+        "Agent checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "The channel handles a valid signed fixture end to end through a fake Eve send and memory Sendblue client.",
+        "Every invalid/ignored/replayed event has explicit HTTP and side-effect behavior.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-sendblue-preview",
+      "title": "Provision and prove the Sendblue channel on Vercel Preview",
+      "status": "pending",
+      "dependsOn": ["implement-sendblue-eve-channel"],
+      "description": "Configure isolated Preview credentials/storage/identity and a protected Sendblue receive webhook, then prove invalid, valid, concurrent replay, Eve routing, and one real outbound reply with sanitized evidence.",
+      "implementationNotes": [
+        "Use only Cooper's personal Vercel and Sendblue resources. Scope API/webhook/routing/storage variables to Preview and keep them encrypted.",
+        "Redeploy from a clean committed source using only Vercel-managed variables; declare any Eve build-time discovery inputs in turbo.json if required.",
+        "Keep Deployment Protection active. If Sendblue cannot set its bypass header, use a dedicated x-vercel-protection-bypass query credential in the webhook URL; the route must independently require sb-signing-secret.",
+        "Configure a receive webhook object with a Preview secret through a documented operator command/API step. Do not print or commit the full protected URL.",
+        "Run direct missing/wrong-secret, malformed, unknown, ignored, storage-failure fixture, valid signed, and concurrent duplicate probes against the Preview route.",
+        "Send one minimal non-sensitive real iMessage from an allowed test sender, observe one Eve session and one outbound Sendblue reply, then replay the inbound handle and outbound Eve event proof with no duplicate.",
+        "Correlate only digests/suffixes for provider handles/conversation/session/event ids plus status/timing metadata. Inspect Vercel logs, Sendblue readback, and replay records for leaks.",
+        "Rotate/revoke the Vercel automation bypass if exposed and redeploy as Vercel requires. Production remains untouched."
+      ],
+      "mandatoryVerification": [
+        "No Production env, webhook, storage namespace, line, alias, or deployment changes occur.",
+        "Preview is built from clean source using encrypted variables only; no inline secret/build-env flags or protected URL output.",
+        "Flat Effect proof/provision programs, tagged pipe error handling, canonical schemas, no unsafe casts/DTO mirrors/manual readers/raw JSON/helper sprawl.",
+        "The full SPEC proof matrix passes with direct HTTP statuses and side-effect counts.",
+        "One real inbound message produces exactly one accepted Eve dispatch and exactly one outbound provider handle; duplicate replay produces neither.",
+        "No credential, message text, full phone number, full webhook URL, raw provider body, or ciphertext appears in source, output, logs, snapshots, or proof artifacts.",
+        "Agent checks and bun run verification pass."
+      ],
+      "completionCriteria": [
+        "The personal Vercel Preview has a live, authenticated, replay-protected Sendblue direct-message channel.",
+        "Sanitized preview evidence and rollback/rotation inputs are recorded in the active plan and ledger.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "document-and-audit-sendblue-channel",
+      "title": "Reconcile Sendblue docs and run the final audits",
+      "status": "pending",
+      "dependsOn": ["prove-sendblue-preview"],
+      "description": "Update architecture, app, root, SPEC, and execution-plan documentation to the verified implementation, then complete the three-pass audits and final repository gate.",
+      "implementationNotes": [
+        "Update apps/agent/README.md with config names, route/auth, supported event matrix, identity/replay behavior, local tests, preview proof, credential rotation, failure handling, and rollback.",
+        "Update docs/architecture/eve-agent.md with production/test/CLI call graphs and docs/architecture/repo-structure.md only if the app-owned integration layout is now a durable convention.",
+        "Update README.md and ARCHITECTURE.md from future to Preview-verified only after live proof; do not imply Production promotion.",
+        "State explicitly that Sendblue supplies a shared signing-secret header rather than a body HMAC and that Vercel bypass does not replace route authentication.",
+        "Reconcile this SPEC/task ledger and active execution plan with actual files, operations, Layers, env names, proof ids, limitations, and follow-up work.",
+        "Run helper-sprawl, unsafe-cast, manual-reader/mapper, raw JSON, process.env, raw fetch, Map/Set replay, lint-suppression, PII/secret marker, stale-status, and untracked-runtime-artifact scans."
+      ],
+      "mandatoryVerification": [
+        "Docs match the actual app-owned production/test/CLI call graphs and do not describe unsupported group/media/HITL/Production behavior as live.",
+        "Each implementation task has three or more recorded ownership, quality/helper-admission, and verification/evidence audit passes.",
+        "All source uses flat meaningful Effect flows, tagged pipe error handling, canonical schemas, and no unsafe casts/DTO mirrors/manual readers/mappers/raw JSON/trivial wrappers.",
+        "Agent targeted checks, bun run check, bun run knip, bun run verification, git diff --check, and task-ledger consistency checks pass.",
+        "No credentials, message content, full phone numbers, protected webhook URLs, raw provider bodies, or replay payloads are committed."
+      ],
+      "completionCriteria": [
+        "Current documentation explains exactly how to configure, test, observe, rotate, and disable the verified Preview channel.",
+        "All mandatory audits and verification gates are green with sanitized evidence.",
+        "Production Sendblue enablement remains gated by the Vercel Production Promotion SPEC."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+import { Context, Effect, Layer, Match, Option, Redacted } from "effect";
+import {
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+} from "effect/unstable/http";
+
+import { SendblueConfigService } from "./config.js";
+import {
+  SendblueDeliveryUncertainError,
+  SendblueRequestError,
+  SendblueResponseError,
+} from "./errors.js";
+import {
+  SendblueSendMessageInput,
+  SendblueSendMessageProviderResponse,
+} from "./schemas.js";
+import type {
+  SendblueSendMessageInput as SendblueSendMessageInputType,
+  SendblueSendMessageSuccess as SendblueSendMessageSuccessType,
+} from "./schemas.js";
+
+export type SendblueClientError =
+  | SendblueDeliveryUncertainError
+  | SendblueRequestError
+  | SendblueResponseError;
+
+export interface SendblueClientShape {
+  readonly sendMessage: (
+    input: SendblueSendMessageInputType
+  ) => Effect.Effect<SendblueSendMessageSuccessType, SendblueClientError>;
+}
+
+export class SendblueClient extends Context.Service<
+  SendblueClient,
+  SendblueClientShape
+>()("@bundjil/agent/SendblueClient") {}
+
+const executionTimeout = "30 seconds";
+
+export const makeSendblueClient = Effect.gen(
+  function* makeSendblueClientOperation() {
+    const config = yield* SendblueConfigService;
+    const client = yield* HttpClient.HttpClient;
+
+    return SendblueClient.of({
+      sendMessage: Effect.fn("SendblueClient.sendMessage")(function* (input) {
+        const request = yield* HttpClientRequest.post(
+          new URL("/api/send-message", config.apiBaseUrl).href
+        ).pipe(
+          HttpClientRequest.setHeader(
+            "sb-api-key-id",
+            Redacted.value(config.apiKey)
+          ),
+          HttpClientRequest.setHeader(
+            "sb-api-secret-key",
+            Redacted.value(config.apiSecret)
+          ),
+          HttpClientRequest.schemaBodyJson(SendblueSendMessageInput)(input),
+          Effect.mapError(
+            () =>
+              new SendblueRequestError({
+                message: "Unable to encode the Sendblue message request.",
+                operation: "sendMessage",
+                reason: "requestEncoding",
+              })
+          )
+        );
+        const response = yield* client.execute(request).pipe(
+          Effect.mapError(
+            () =>
+              new SendblueDeliveryUncertainError({
+                message: "The Sendblue delivery outcome is uncertain.",
+                operation: "sendMessage",
+                reason: "transport",
+              })
+          ),
+          Effect.timeoutOption(executionTimeout),
+          Effect.flatMap(
+            Option.match({
+              onNone: () =>
+                Effect.fail(
+                  new SendblueDeliveryUncertainError({
+                    message: "The Sendblue delivery request timed out.",
+                    operation: "sendMessage",
+                    reason: "timeout",
+                  })
+                ),
+              onSome: Effect.succeed,
+            })
+          )
+        );
+
+        if (response.status < 200 || response.status >= 300) {
+          return yield* new SendblueResponseError({
+            message: "Sendblue rejected the message request.",
+            operation: "sendMessage",
+            reason: Match.value(response.status).pipe(
+              Match.when(401, () => "unauthorized" as const),
+              Match.when(429, () => "rateLimited" as const),
+              Match.when(
+                (status) => status >= 500,
+                () => "serverRejected" as const
+              ),
+              Match.orElse(() => "clientRejected" as const)
+            ),
+            status: response.status,
+          });
+        }
+
+        const providerResponse = yield* HttpClientResponse.schemaBodyJson(
+          SendblueSendMessageProviderResponse
+        )(response).pipe(
+          Effect.mapError(
+            () =>
+              new SendblueResponseError({
+                message: "Sendblue returned an invalid message response.",
+                operation: "sendMessage",
+                reason: "malformedResponse",
+                status: response.status,
+              })
+          )
+        );
+        if (providerResponse.status === "ERROR") {
+          return yield* new SendblueResponseError({
+            message: "Sendblue rejected the message request.",
+            operation: "sendMessage",
+            reason: "providerRejected",
+            status: response.status,
+          });
+        }
+
+        return providerResponse;
+      }),
+    });
+  }
+).pipe(Effect.withSpan("SendblueClientLive"));
+
+export const SendblueClientLive = Layer.effect(
+  SendblueClient,
+  makeSendblueClient
+);

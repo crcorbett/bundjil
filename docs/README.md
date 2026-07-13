@@ -38,6 +38,14 @@ README.
   preserves the historical access-token-only fallback. It is superseded for
   normal hosted operation and remains only as a deprecated emergency/local
   diagnostic path.
+- [Vercel Production Promotion](./product-specs/vercel-production-promotion.md)
+  gates production on a clean encrypted-variable Preview redeploy, then defines
+  target-separated auth, proxy URL, profile provisioning, monitoring, and
+  rollback.
+- [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) specifies the
+  app-owned iMessage channel, shared-secret webhook verification, sender
+  identity mapping, deterministic Eve routing, durable replay protection,
+  outbound delivery, and Vercel Preview proof.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
   preserves the Parallel AI report that corrected the subscription-backed model
   access plan.
@@ -70,9 +78,10 @@ README.
   preview project only.
 - Preview scope: `apps/codex-proxy` is linked to the
   `bundjil-codex-proxy` project under Cooper's personal Vercel account, not
-  Tilt Legal. Bundjil did not configure or deploy production. Marketplace
-  Upstash credentials may nevertheless be auto-bound to production and must
-  not be treated as a production approval.
+  Tilt Legal. A combined Eve-to-hosted-live-proxy Preview session is accepted;
+  Bundjil did not configure or deploy production. Marketplace Upstash
+  credentials may nevertheless be auto-bound to production and must not be
+  treated as a production approval.
 - Storage: `@bundjil/codex-oauth/upstash-key-value-store.layer` provides an
   opt-in Upstash Redis adapter behind Effect `KeyValueStore`. `live` stores a
   versioned encrypted subscription profile, refreshes under a distributed
@@ -84,14 +93,11 @@ README.
 - Unsupported paths: do not treat Codex OAuth as an OpenAI Platform API key,
   do not route it through Vercel AI Gateway credentials, and do not expose the
   proxy publicly. Browser authorization and loopback callbacks remain
-  trusted-local only; the proxy exposes no hosted OAuth routes. Hosted preview
-  proof and the opt-in Eve adapter are accepted separately; a combined
-  Eve-to-hosted-live request remains unrecorded.
+  trusted-local only; the proxy exposes no hosted OAuth routes. The accepted
+  combined hosted Preview proof does not approve Production.
 
 ## Planned Docs
 
 - Agent identity, consent, and memory model.
-- iMessage ingress and egress through Sendblue.
 - Email ingress through Cloudflare Email Routing Workers.
 - Vercel Connect setup for Notion and future integrations.
-- Verification playbooks for webhook replay, readback, and production safety.
