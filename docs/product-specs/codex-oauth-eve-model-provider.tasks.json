@@ -1,6 +1,6 @@
 {
   "title": "Codex OAuth Eve Model Provider Tasks",
-  "status": "completed",
+  "status": "in_progress",
   "spec": "docs/product-specs/codex-oauth-eve-model-provider.md",
   "principles": [
     "Prove the direct Codex Responses runtime path before replacing the current AI Gateway Eve model.",
@@ -470,6 +470,112 @@
           "Pass 2 - Effect implementation quality: no implementation code changed in this task. The final audit confirmed prior completed tasks retained implementation notes and 3-pass evidence, and the product docs continue to describe Effect Schema JSON codecs with Schema.fromJsonString(...) and Schema.UnknownFromJsonString.",
           "Pass 3 - verification coverage: bun install --frozen-lockfile passed; codex-oauth test passed with 26 tests and build passed; codex-proxy test passed with 5 tests after a sequential rerun, build passed, and smoke-test returned healthStatus 200, streamStatus 200, streamLines 5; bun run verification and bun run build passed; pre-edit git status was clean; product-surface stale scans and full tracked-file secret-shaped scans were clean."
         ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "harden-preview-proof-contract",
+      "title": "Make preview proof assertions enforce the live contract",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Turn the preview proof's documented health, auth, streaming, and leak predicates into a typed success/failure contract so a failed authenticated request cannot exit successfully.",
+      "implementationNotes": [
+        "Keep apps/codex-proxy/scripts/prove-preview.ts as the app-owned operator boundary.",
+        "Use Effect Schema for the proof result and tagged Effect failures for assertion errors; do not manually assemble JSON or use process.exit in domain helpers.",
+        "Keep one flat primary Effect.gen program. Do not add generic assertion or HTTP helper modules for this one proof.",
+        "Add deterministic coverage for a passing proof and at least one failed authenticated/SSE or leak predicate without provider credentials.",
+        "Implemented PreviewProofContract as the schema-owned success contract. The script emits status proved only after decode succeeds and emits only status blocked with non-zero exit for request, decoding, or assertion failure.",
+        "Added apps/codex-proxy/test/prove-preview.test.ts. It uses canonical health, error, and OpenAI-compatible chunk schemas for the fixture and proves both a sanitized success result and failed authenticated request."
+      ],
+      "mandatoryVerification": [
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "A deliberately malformed or unauthorized proof fixture exits non-zero.",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "The proof exits zero only when all documented predicates hold.",
+        "The emitted success shape remains sanitized and contains no credential, prompt, or model-body content.",
+        "The durable runbook and active plan distinguish a passing proof from an attempted probe."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: apps/codex-proxy retains ownership of the operator proof script, its HTTP requests, and the focused subprocess fixture. The contract consumes canonical @bundjil/codex-oauth request/chunk schemas and app-owned health/error schemas; no OAuth, storage, or Eve behavior moved into the proof boundary.",
+          "Pass 2 - implementation quality: the primary proof remains one flat Effect.gen program. PreviewProofContract validates the complete expected result through Effect Schema, PreviewProofError is the single tagged failure type, JSON outputs use schema codecs, and the fixture uses canonical schemas rather than handwritten JSON. No generic assertion helper, unsafe cast, DTO mirror, or wrapper module was added.",
+          "Pass 3 - verification coverage: codex-proxy check-types, 21 focused tests, build, and smoke test passed; root bun run verification passed; an intentionally stale empty-bearer env exited 1 with only status blocked; a fresh preview env produced proved with authenticated 200 SSE, 2 data lines, done marker, missing/invalid 401, and all leak predicates false; git diff --check passed."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "redeploy-current-preview-and-record-live-evidence",
+      "title": "Redeploy current proxy preview and record hardened live evidence",
+      "status": "pending",
+      "dependsOn": ["harden-preview-proof-contract"],
+      "description": "Deploy apps/codex-proxy from current main to the personal preview project and use the hardened command to prove private live streaming without recording secrets.",
+      "implementationNotes": [
+        "Deploy only bundjil-codex-proxy under Cooper's personal Vercel team.",
+        "Pull current preview environment to an ignored temporary file; do not rely on a stale local env pull.",
+        "Record deployment id, commit SHA, statuses, booleans, SSE data-line count, and log-scan result only.",
+        "Do not promote or configure production in this task."
+      ],
+      "mandatoryVerification": [
+        "Vercel preview deployment reaches READY and identifies current main commit.",
+        "Hardened preview proof exits zero against the deployed URL.",
+        "GET /health reports live mode without sensitive data.",
+        "Runtime log inspection finds no credentials, authorization codes, prompt bodies, or full model responses.",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "Current main is deployed to the personal preview project.",
+        "The persisted evidence proves live private SSE and safe error handling.",
+        "Documentation no longer describes this proof as pending."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "deploy-hosted-eve-codex-preview",
+      "title": "Deploy Eve with the private Codex proxy in personal preview",
+      "status": "pending",
+      "dependsOn": ["redeploy-current-preview-and-record-live-evidence"],
+      "description": "Create or link a personal Vercel Eve project, bind only agent-owned proxy configuration, and prove a hosted Eve session against the private preview proxy.",
+      "implementationNotes": [
+        "Do not give apps/agent Codex OAuth tokens, profile storage, cipher keys, or Upstash credentials.",
+        "Keep Gateway as the default code path; select codex-proxy only through the deployed preview environment.",
+        "Use a private/stable preview proxy URL and encrypted Vercel environment variables.",
+        "Build with VERCEL=1 so Eve emits Vercel Build Output, then use vercel deploy --prebuilt --yes --target=preview. Do not use eve deploy because that command targets production.",
+        "Production promotion is out of scope for this task and requires an explicit separate production approval after preview proof."
+      ],
+      "mandatoryVerification": [
+        "Personal Vercel scope and agent project ownership are recorded.",
+        "Hosted Eve info reports bundjil-codex-proxy model metadata.",
+        "One minimal hosted Eve session streams a sanitized successful response.",
+        "Agent and proxy runtime logs are inspected for sensitive-data absence.",
+        "bun run --filter @bundjil/agent test",
+        "bun run --filter @bundjil/agent build",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "A hosted Eve preview calls the private live Codex proxy successfully.",
+        "The app/provider/token ownership boundaries remain intact.",
+        "Docs and task evidence clearly distinguish hosted preview from production."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
       },
       "commitAfterPassing": true
     }

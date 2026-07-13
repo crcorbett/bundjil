@@ -1,6 +1,6 @@
 # Codex OAuth Eve Model Provider
 
-Status: Implemented adapter; hosted end-to-end proof remains unrecorded
+Status: Implementation resumed; preview proxy is live and local Eve-to-preview proof is recorded; hosted Eve deployment remains pending
 Owner: Bundjil  
 Created: 2026-07-07
 
@@ -8,9 +8,33 @@ Created: 2026-07-07
 
 The app-owned opt-in `codex-proxy` LanguageModel adapter and Gateway-default
 selection are implemented and covered by focused configuration/fetch tests.
-The hosted refresh-capable proxy is separately proven in personal Vercel
-preview. Neither record establishes a combined Eve -> hosted-live-proxy
-end-to-end request; do not infer one from these independent proofs.
+The refresh-capable proxy is deployed in Cooper's personal Vercel preview and
+has a sanitized authenticated live-SSE proof.
+
+On 2026-07-13, a local Eve runtime configured with the fresh preview
+environment selected `bundjil-codex-proxy/gpt-5.5`, created a session, and
+streamed a minimal Codex response through the deployed proxy. This proves the
+combined application call graph below, but it is not a hosted Eve deployment
+proof and does not authorize production use:
+
+```text
+local Eve runtime
+  -> private deployed preview Codex proxy
+  -> encrypted Upstash subscription profile
+  -> Codex Responses endpoint
+  -> OpenAI-compatible SSE
+  -> Eve session stream
+```
+
+The original preview proof command exposed a verification defect: it emitted a
+result object but exited successfully even when the authenticated request was
+not `200` or SSE completion/leak predicates failed. The first resumed task
+makes those predicates hard pass/fail assertions and adds deterministic test
+coverage before the current source is redeployed.
+
+Hosted Eve deployment, its personal Vercel project, its environment binding,
+and an external Eve request remain unproven. Gateway remains the default until
+that deployment task is accepted.
 
 ## Purpose
 
@@ -1174,6 +1198,8 @@ Per implementation task:
 - Run `bun run verification` before commit/handoff unless the task explicitly
   records a narrower reasoned exception.
 - Record implementation evidence in the task ledger.
+- Run the required three parent Effect TS audit passes and record actual
+  findings, not placeholder pass counts.
 
 Proxy app verification:
 
@@ -1189,6 +1215,9 @@ Proxy app verification:
 - Direct HTTP: live-mode `POST /v1/chat/completions` is opt-in only and logs
   sanitized status/chunk shape, not prompt text, token values, or full model
   output.
+- The preview proof command must exit non-zero when health, auth rejection,
+  authenticated status, SSE content type/completion, or leak predicates do not
+  meet the documented contract. A JSON result alone is not proof of success.
 
 Vercel deployment verification:
 
@@ -1207,6 +1236,21 @@ Vercel deployment verification:
 - If live Codex credentials are unavailable, hosted verification must stop at
   mock-mode streaming plus auth/health proof and record that live model proof
   remains pending.
+
+Hosted Eve deployment verification:
+
+- Link or create the Eve project only under Cooper's personal Vercel scope.
+- Bind the agent's `codex-proxy` configuration only as encrypted server-side
+  values. The agent receives the private proxy bearer, never the Codex OAuth
+  profile, access token, refresh token, or profile cipher key.
+- Use the current proxy deployment URL only for preview evidence; production
+  Eve requires an explicitly approved stable production proxy deployment and
+  separate production credential/profile provisioning.
+- Verify the hosted `/eve/v1/info` model metadata and one minimal Eve session
+  stream. Record only provider/model id, status, event kinds, and safe counts.
+- Inspect Vercel runtime logs for both the agent and proxy after the probe.
+  Stop and rotate credentials if tokens, authorization codes, prompts, request
+  bodies, or full model responses appear.
 
 Mandatory 3-pass Effect TS audit after every implementation task:
 
@@ -1298,6 +1342,7 @@ Docs must distinguish:
 - Migration of existing Codex CLI auth files.
 - Copying OpenClaw implementation code or state formats.
 - Replacing AI Gateway as the default Eve model before live proof.
+- Treating a local Eve-to-preview proof as a hosted Eve or production proof.
 
 ## Open Questions
 

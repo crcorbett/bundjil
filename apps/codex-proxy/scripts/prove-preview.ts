@@ -48,30 +48,52 @@ const PreviewProofResult = Schema.Struct({
   unauthenticatedStatus: Schema.Number,
 });
 
+const PreviewProofSuccess = Schema.Struct({
+  result: PreviewProofResult,
+  status: Schema.Literal("proved"),
+});
+
 const PreviewProofBlocked = Schema.Struct({
   status: Schema.Literal("blocked"),
 });
 
-const encodePreviewProofResult = Schema.encodeSync(
-  Schema.fromJsonString(PreviewProofResult)
+const PreviewProofContract = Schema.Struct({
+  authenticatedStatus: Schema.Literal(200),
+  authorizationCodeLeak: Schema.Literal(false),
+  healthModeLive: Schema.Literal(true),
+  healthReady: Schema.Literal(true),
+  healthStatus: Schema.Literal(200),
+  invalidTokenStatus: Schema.Literal(401),
+  rawPayloadLeak: Schema.Literal(false),
+  streamContentTypeSse: Schema.Literal(true),
+  streamDataLines: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(1))),
+  streamDone: Schema.Literal(true),
+  tokenLeak: Schema.Literal(false),
+  unauthenticatedStatus: Schema.Literal(401),
+});
+
+const encodePreviewProofSuccess = Schema.encodeSync(
+  Schema.fromJsonString(PreviewProofSuccess)
 );
 const encodePreviewProofBlocked = Schema.encodeSync(
   Schema.fromJsonString(PreviewProofBlocked)
 );
 
-class PreviewProofRequestError extends Data.TaggedError(
-  "PreviewProofRequestError"
-)<{ readonly cause: unknown }> {}
+class PreviewProofError extends Data.TaggedError("PreviewProofError")<{
+  readonly cause: unknown;
+  readonly operation: "assert" | "request";
+  readonly result?: typeof PreviewProofResult.Type;
+}> {}
 
 const fetchResponse = (request: Request) =>
   Effect.tryPromise({
-    catch: (cause) => new PreviewProofRequestError({ cause }),
+    catch: (cause) => new PreviewProofError({ cause, operation: "request" }),
     try: () => fetch(request),
   });
 
 const responseText = (response: Response) =>
   Effect.tryPromise({
-    catch: (cause) => new PreviewProofRequestError({ cause }),
+    catch: (cause) => new PreviewProofError({ cause, operation: "request" }),
     try: () => response.text(),
   });
 
@@ -115,29 +137,47 @@ const program = Effect.gen(function* provePreview() {
   yield* decodeError(unauthorizedBody);
   yield* decodeError(invalidBody);
 
-  return PreviewProofResult.make({
+  const result = PreviewProofResult.make({
     authenticatedStatus: authenticated.status,
     authorizationCodeLeak:
-      !authenticatedBody.includes("authorization_code") &&
-      !authenticatedBody.includes("code_verifier"),
+      authenticatedBody.includes("authorization_code") ||
+      authenticatedBody.includes("code_verifier"),
     healthModeLive: healthPayload.mode === "live",
     healthReady: healthPayload.ok,
     healthStatus: health.status,
     invalidTokenStatus: invalid.status,
-    rawPayloadLeak: !authenticatedBody.includes("Reply only: OK."),
+    rawPayloadLeak: authenticatedBody.includes("Reply only: OK."),
     streamContentTypeSse:
       authenticated.headers.get("content-type") === "text/event-stream",
     streamDataLines: dataLines.length,
     streamDone: authenticatedBody.includes("data: [DONE]"),
-    tokenLeak: !authenticatedBody.includes(Redacted.value(internalToken)),
+    tokenLeak: authenticatedBody.includes(Redacted.value(internalToken)),
     unauthenticatedStatus: unauthenticated.status,
   });
+
+  yield* Schema.decodeUnknownEffect(PreviewProofContract)(result).pipe(
+    Effect.mapError(
+      (cause) =>
+        new PreviewProofError({
+          cause,
+          operation: "assert",
+          result,
+        })
+    )
+  );
+
+  return result;
 }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));
 
 const exit = await Effect.runPromiseExit(program);
 
 if (Exit.isSuccess(exit)) {
-  console.log(encodePreviewProofResult(exit.value));
+  console.log(
+    encodePreviewProofSuccess({
+      result: exit.value,
+      status: "proved",
+    })
+  );
 } else {
   console.error(encodePreviewProofBlocked({ status: "blocked" }));
   process.exitCode = 1;

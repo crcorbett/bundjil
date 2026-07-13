@@ -178,7 +178,12 @@ rawPayloadLeak: false
 `bun run --filter @bundjil/codex-proxy proof:preview` performs that basic
 black-box check when its preview URL and internal bearer are supplied through
 ignored environment state. It emits only the documented statuses, booleans, and
-SSE data-line count. It never print the bearer, request body, or stream body.
+SSE data-line count inside a `status: "proved"` result, and exits zero only
+when health is ready/live, both rejected bearer checks return `401`, the
+authenticated response is complete SSE with at least two data lines, and every
+leak predicate is false. A `status: "blocked"` result means the command was an
+attempted probe, not passing proof. It never prints the bearer, request body,
+or stream body.
 This command does not force a refresh; use the separate isolated-profile
 refresh proof before using a new profile/cipher pair. The accepted proof uses a
 trusted-local isolated profile, stages only that profile near expiry, makes two

@@ -634,6 +634,51 @@ Verification:
 - Product-surface stale scans: passed.
 - Full tracked-file secret-shaped scan: passed.
 
+## 2026-07-13 Resumed Rollout
+
+### Accepted Evidence Before Resuming
+
+- The personal Vercel `bundjil-codex-proxy` preview deployment was `READY` in
+  `live` mode.
+- A fresh pull of its preview environment produced a sanitized direct probe
+  with health `200`, missing/invalid bearer `401`, authenticated SSE `200`,
+  SSE completion, and no token, authorization-code, or raw-prompt leak.
+- A local Eve runtime configured only with app-owned proxy settings reported
+  `bundjil-codex-proxy/gpt-5.5`; its minimal session streamed a Codex response
+  through the deployed live proxy. This is a local-Eve-to-hosted-proxy proof,
+  not hosted Eve or production proof.
+
+### Gap Found
+
+`apps/codex-proxy/scripts/prove-preview.ts` emitted a result object but did not
+convert failed predicates into a failed process exit. An old local preview env
+pull with an empty bearer therefore returned authenticated `401` while the
+command exited zero. The current fresh preview pull succeeded, but a successful
+attempt is not sufficient verification until the script enforces the contract.
+
+### Serial Tasks
+
+1. `harden-preview-proof-contract`: accepted on 2026-07-13. The script now
+   validates the complete result with an Effect Schema contract, emits
+   `status: "proved"` only on success, and emits only `status: "blocked"` with
+   non-zero exit for a failed attempt. The focused fixture covers pass and
+   authenticated-failure behavior without provider credentials. Parent audits
+   confirmed app ownership, flat Effect flow and schema ownership, plus
+   targeted checks, root verification, stale-env failure, fresh-preview pass,
+   and diff hygiene.
+2. `redeploy-current-preview-and-record-live-evidence`: deploy current main to
+   the personal preview proxy and run the hardened black-box proof and log
+   checks.
+3. `deploy-hosted-eve-codex-preview`: create/link a personal Eve project,
+   supply only app-owned proxy config, and run one hosted Eve session proof.
+
+No production proxy or Eve deployment is included. A production proposal needs
+an explicit later decision after the preview evidence and operational review.
+DeepWiki on `vercel/eve` confirms the preview path: build with `VERCEL=1` so
+Eve writes Vercel Build Output, then deploy it through `vercel deploy
+--prebuilt --yes --target=preview`. `eve deploy` itself targets production and
+is deliberately not used by this plan.
+
 ## Original Task Scope
 
 `define-codex-oauth-package-contract`
