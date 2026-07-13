@@ -7,6 +7,15 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".output/**", ".vercel/output/**", "dist/**"]
     },
+    "@bundjil/agent#build": {
+      "env": [
+        "BUNDJIL_AGENT_MODEL_PROVIDER",
+        "BUNDJIL_AGENT_MODEL",
+        "BUNDJIL_CODEX_PROXY_BASE_URL",
+        "BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS",
+        "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true

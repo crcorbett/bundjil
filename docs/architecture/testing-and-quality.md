@@ -137,12 +137,11 @@ Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
-Codex proxy mode is not an Eve test requirement. Gateway remains the default.
-The refresh-capable `live` path and opt-in Eve adapter are proven separately;
-do not claim Eve -> hosted-live-proxy end-to-end evidence without a verified
-deployed Eve request. The access-token-only `local` workaround is deprecated
-and must never be used as hosted auth. Source ignored env values rather than
-printing them:
+Codex proxy mode is not an ordinary Eve test requirement. Gateway remains the
+default. The accepted personal preview proof verifies a deployed Eve request
+through the live private proxy; it does not authorize production. The
+access-token-only `local` workaround is deprecated and must never be used as
+hosted auth. Source ignored env values rather than printing them:
 
 ```bash
 PORT=<local-port> \
@@ -173,8 +172,15 @@ Record no request body or model output. Checks must run against the personal
 Vercel preview before any production proposal and must scan logs for absence of
 token values, authorization codes, raw OAuth payloads, prompts, and full
 response bodies. The refresh-capable code path and hosted preview proof are
-accepted. Do not infer a combined Eve-to-hosted-live request from the separate
-proxy and adapter proof records.
+accepted. Do not infer production approval from the combined
+Eve-to-preview proof record.
+
+Hosted Eve preview verification additionally requires the scoped
+`@bundjil/agent#build` environment contract in `turbo.json`, a source deploy
+from the repository root, a fresh Vercel OIDC bearer for `/eve/v1/*`, and a
+durable stream replay with `startIndex=0`. Record provider/model id, HTTP
+status, event types/count, and leak booleans only; never record the bearer,
+prompt, or full model response.
 
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.

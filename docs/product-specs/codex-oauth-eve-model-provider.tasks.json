@@ -553,14 +553,15 @@
     {
       "id": "deploy-hosted-eve-codex-preview",
       "title": "Deploy Eve with the private Codex proxy in personal preview",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["redeploy-current-preview-and-record-live-evidence"],
       "description": "Create or link a personal Vercel Eve project, bind only agent-owned proxy configuration, and prove a hosted Eve session against the private preview proxy.",
       "implementationNotes": [
         "Do not give apps/agent Codex OAuth tokens, profile storage, cipher keys, or Upstash credentials.",
         "Keep Gateway as the default code path; select codex-proxy only through the deployed preview environment.",
         "Use a private/stable preview proxy URL and encrypted Vercel environment variables.",
-        "Build with VERCEL=1 so Eve emits Vercel Build Output, then use vercel deploy --prebuilt --yes --target=preview. Do not use eve deploy because that command targets production.",
+        "Deploy from source with vercel deploy --yes --target=preview so Eve receives Vercel deployment context and prewarms its sandbox templates. Do not use vercel deploy --prebuilt (the template prewarm is skipped) or eve deploy (it targets production).",
+        "Declare the five agent provider values in turbo.json for @bundjil/agent#build. Eve resolves model routing during build and Turbo strict mode otherwise filters the Vercel Preview environment.",
         "Production promotion is out of scope for this task and requires an explicit separate production approval after preview proof."
       ],
       "mandatoryVerification": [
@@ -580,8 +581,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: apps/agent retains app-owned Effect Config and AI SDK provider selection; turbo.json grants the five provider names only to @bundjil/agent#build. The agent imports no Codex OAuth service, profile storage, Upstash adapter, or cipher key. The proxy remains the sole OAuth/profile owner.",
+          "Pass 2 - Effect implementation quality: the deployment fix changes only Turborepo environment propagation. Existing app config remains the reviewed flat Effect Config/Schema/Redacted boundary with no new direct process.env reads, JSON boundary code, unsafe casts, DTO mirrors, helper layer, or secret logging.",
+          "Pass 3 - verification coverage: @bundjil/agent Turbo dry run included all five provider names as hashes; deployment dpl_7UoZs5PVmdtvK4Ee9RPmyaXzD6Lc reached READY in Cooper's personal preview project; authenticated Eve info reported bundjil-codex-proxy/gpt-5.5, external routing, context window 200000, and zero diagnostics; one minimal session replayed nine events including message.completed, turn.completed, and session.waiting with no credential markers; proxy deployment dpl_4uK4tZc6Whd3kCuV5vfRdyZMAU24 logged authenticated POST /v1/chat/completions 200; agent/proxy runtime logs were safe and both runtime-error queries were empty. Production was neither configured nor deployed."
+        ]
       },
       "commitAfterPassing": true
     }

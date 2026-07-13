@@ -1,6 +1,6 @@
 # Codex OAuth Eve Model Provider
 
-Status: Implementation resumed; preview proxy is live and local Eve-to-preview proof is recorded; hosted Eve deployment remains pending
+Status: Preview implementation accepted; private live proxy and hosted Eve-to-proxy proof are recorded; production remains out of scope
 Owner: Bundjil  
 Created: 2026-07-07
 
@@ -32,9 +32,16 @@ not `200` or SSE completion/leak predicates failed. The first resumed task
 makes those predicates hard pass/fail assertions and adds deterministic test
 coverage before the current source is redeployed.
 
-Hosted Eve deployment, its personal Vercel project, its environment binding,
-and an external Eve request remain unproven. Gateway remains the default until
-that deployment task is accepted.
+On 2026-07-13, personal Vercel preview deployment
+`dpl_7UoZs5PVmdtvK4Ee9RPmyaXzD6Lc` proved the hosted boundary. Authenticated
+Eve info reported external routing to `bundjil-codex-proxy/gpt-5.5` with a
+200000-token context window and no discovery diagnostics. One minimal session
+replayed nine durable events through `session.waiting`; the private live proxy
+recorded one authenticated HTTP 200 chat-completions request. Vercel runtime
+logs were status/route-only and both runtime-error queries were empty. The
+proof contains no bearer, OAuth profile, authorization code, prompt, or full
+model-response value. Gateway remains the default whenever this opt-in preview
+configuration is absent; production remains unconfigured and unapproved.
 
 ## Purpose
 
@@ -1246,6 +1253,14 @@ Hosted Eve deployment verification:
 - Use the current proxy deployment URL only for preview evidence; production
   Eve requires an explicitly approved stable production proxy deployment and
   separate production credential/profile provisioning.
+- Deploy Eve preview from source with `vercel deploy --target=preview`, not
+  `vercel deploy --prebuilt`: Eve provisions its Vercel sandbox templates only
+  when the Vercel build has a deployment context. `eve deploy` remains
+  unsuitable because it targets production.
+- Declare every agent provider variable in the scoped
+  `@bundjil/agent#build` Turbo environment contract. Eve captures model routing
+  at build time, so Vercel strict environment filtering must not silently
+  compile the Gateway default.
 - Verify the hosted `/eve/v1/info` model metadata and one minimal Eve session
   stream. Record only provider/model id, status, event kinds, and safe counts.
 - Inspect Vercel runtime logs for both the agent and proxy after the probe.

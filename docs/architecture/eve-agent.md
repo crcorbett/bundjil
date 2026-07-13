@@ -427,8 +427,9 @@ BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=<optional-positive-integer>
 Rules:
 
 - Keep Gateway mode as the default. Implementing refresh-capable `live` proxy
-  behavior does not authorize an Eve integration; hosted preview proof and a
-  separate accepted integration task are still required.
+  behavior does not authorize production. The accepted hosted-preview proof
+  uses `bundjil-codex-proxy/gpt-5.5`; production still requires an explicit
+  approval, stable production proxy URL, and separate credentials.
 - Put the internal proxy token only in ignored env files or Vercel env vars.
 - Keep `BUNDJIL_CODEX_PROXY_BASE_URL` pointed at the private proxy `/v1`
   prefix, not the direct `chatgpt.com` endpoint.
@@ -439,6 +440,39 @@ Rules:
   `Schema.fromJsonString(...)`.
 - Unknown diagnostic values that need safe rendering must use
   `Schema.UnknownFromJsonString`.
+
+### Hosted Eve Preview
+
+The personal Vercel project `bundjil-agent` has root directory `apps/agent`.
+It uses Vercel Preview variables for the five app-owned Codex-proxy settings
+and Vercel OIDC route authentication. It must not receive the OAuth profile,
+refresh token, Upstash credentials, or cipher key owned by the proxy/provider
+boundary.
+
+Eve records model metadata during `eve build`. Therefore
+`turbo.json` declares the provider variables on `@bundjil/agent#build`; this is
+both the least-privilege build contract and the Vercel strict-environment
+requirement. A source preview deploy runs from the repository root:
+
+```bash
+vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes
+```
+
+Do not use `eve deploy` for preview because it targets production, and do not
+use `vercel deploy --prebuilt` because Eve cannot prewarm sandbox templates
+without Vercel's hosted build context. Hosted checks use a fresh Vercel OIDC
+token and `vercel curl`; replaying a durable session stream includes
+`?startIndex=0`. Record only status, model id, event kinds, counts, and leak
+booleans.
+
+On 2026-07-13, personal preview deployment
+`dpl_7UoZs5PVmdtvK4Ee9RPmyaXzD6Lc` reported external model routing to
+`bundjil-codex-proxy/gpt-5.5` with a 200000-token context window. One minimal
+authenticated session replayed nine events including `message.completed`,
+`turn.completed`, and `session.waiting`; the private proxy recorded one
+authenticated `POST /v1/chat/completions` with HTTP 200. Agent and proxy logs
+contained route/status metadata only and their runtime-error queries were
+empty. This is preview proof, not production deployment evidence.
 
 ## Preview Proxy Verification
 

@@ -30,15 +30,14 @@ Implemented:
   `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`.
 - Local Codex proxy mode has been verified against `apps/codex-proxy` in mock
   mode.
-- Hosted preview proof exists for `apps/codex-proxy`, but production and live
-  Codex mode remain gated.
+- Hosted Eve preview has been verified with model id
+  `bundjil-codex-proxy/gpt-5.5` through the private live proxy. Gateway remains
+  the default when the opt-in preview configuration is absent.
 
 Future:
 
-- Hosted live Codex proxy mode.
-- Live OAuth endpoint exchange and refresh.
-- Hosted token-profile storage after envelope encryption is implemented in the
-  provider/storage boundary.
+- Production promotion, a stable production proxy URL, and separate production
+  credential/profile provisioning require explicit approval.
 
 Unsupported:
 
@@ -120,6 +119,35 @@ The Eve app does not know about Codex OAuth profiles, refresh tokens, or the
 direct `chatgpt.com` Responses endpoint. In Codex proxy mode it only receives
 an AI SDK `LanguageModel` created with `@ai-sdk/openai-compatible`, and that
 model calls the private Bundjil proxy with the internal bearer token.
+
+## Hosted Preview
+
+`bundjil-agent` is a personal Vercel preview project with root directory
+`apps/agent`. Its Preview environment contains only the agent-owned provider
+values above. It must not receive Codex OAuth profiles, access/refresh tokens,
+Upstash credentials, or envelope cipher keys.
+
+The root [`turbo.json`](../../turbo.json) declares those five provider values
+only for `@bundjil/agent#build`. Eve resolves the model manifest during
+`eve build`; without that scoped Turbo environment contract, a Vercel build can
+silently compile the Gateway default instead of the selected proxy model.
+
+Deploy preview from the repository root so Vercel uploads the workspace while
+the project root remains `apps/agent`:
+
+```bash
+vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes
+```
+
+Use the encrypted Preview values already bound to the Vercel project. Do not
+pass bearer values through shell history, commit them, or add them to source.
+`eve deploy` targets production and `vercel deploy --prebuilt` skips Eve's
+sandbox-template prewarm, so neither is the preview deployment command.
+
+Hosted `/eve/v1/*` routes are intentionally fail-closed and accept a Vercel
+OIDC bearer. Use a fresh `vercel project token` and `vercel curl` for private
+preview checks. Replaying an existing session requires `startIndex=0`; record
+only the resulting HTTP status, model id, event kinds, and counts.
 
 Provider call graph:
 
@@ -213,8 +241,13 @@ The `codex-proxy` adapter is opt-in and uses app-owned Effect Config to create
 an OpenAI-compatible `LanguageModel`; Gateway is the default. Its
 configuration and injected-fetch tests prove adapter construction, private
 bearer handling, and Gateway fallback. They do not prove a combined Eve ->
-hosted Vercel live-proxy request. Refresh, fencing, SSE, and preview proof
-belong to `apps/codex-proxy` and the hosted OAuth-storage SPEC.
+hosted Vercel live-proxy request in isolation. The accepted hosted-preview
+proof adds that boundary: authenticated Eve info selected
+`bundjil-codex-proxy/gpt-5.5`, one minimal session replayed nine durable events
+through `session.waiting`, and the private proxy logged one authenticated 200
+chat-completions request. This is preview evidence only, not production
+approval. Refresh, fencing, and proxy ownership remain in `apps/codex-proxy`
+and `@bundjil/codex-oauth`.
 
 ## Runtime Artifacts
 
