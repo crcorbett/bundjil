@@ -34,7 +34,7 @@ export const makeSendblueEveChannel = <E>(
         },
       },
       routes: [
-        POST("/webhook", async (request, { send, waitUntil }) =>
+        POST("/eve/v1/sendblue/webhook", async (request, { send, waitUntil }) =>
           channelRuntime.runPromise(
             Effect.gen(function* handleSendblueWebhook() {
               const sendblue = yield* SendblueChannel;

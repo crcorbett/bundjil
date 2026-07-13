@@ -43,10 +43,11 @@ Recorded: 2026-07-13
 - API credentials exist in the `SendBlue API` 1Password item; values were not
   copied into repository files or command output.
 - The existing personal Upstash resource is connected to `bundjil-agent` for
-  Preview only. Its URL/token are mapped into the app-owned replay variables
-  without exposing values.
-- All 12 required `BUNDJIL_SENDBLUE_*` variables exist for Preview only;
-  Production has zero Sendblue variables.
+  Preview only. The app-owned replay Config prefers its dedicated names and
+  falls back to the provider-owned `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+  inputs when those dedicated values are unavailable.
+- All required Sendblue config inputs are Preview-only; Production has zero
+  Sendblue variables.
 - A dedicated Vercel automation bypass exists, but its first generated value is
   intentionally treated as unknown and will be replaced by an operator-owned
   value saved in 1Password before webhook registration.
@@ -64,9 +65,10 @@ Recorded: 2026-07-13
   dropped the root `dependsOn: ["^build"]`; Eve therefore could not resolve the
   unbuilt `@bundjil/eve-effect` workspace output.
 - The package-specific build task now restores the upstream build edge and
-  declares the exact 12 Sendblue build environment names. A forced clean local
-  build executed `@bundjil/core -> @bundjil/eve-effect -> @bundjil/agent` with
-  zero cached tasks, followed by full repository verification.
+  declares the Sendblue config names plus the two provider-owned KV fallback
+  inputs. A forced clean local build executed
+  `@bundjil/core -> @bundjil/eve-effect -> @bundjil/agent` with zero cached
+  tasks, followed by full repository verification.
 - The failed deployment is retained as diagnostic evidence. A new clean commit
   and immutable Preview deployment will be used for route and webhook proof.
 
@@ -168,8 +170,8 @@ Changed files:
 
 Evidence:
 
-- Added a stateful Eve custom channel discovered as `sendblue` with
-  `POST /webhook`, mounted by Eve at `/eve/v1/sendblue/webhook`.
+- Added a stateful Eve custom channel discovered as `sendblue` with public
+  `POST /eve/v1/sendblue/webhook` routing.
 - Added authenticated inbound classification and durable claim decisions,
   opaque continuation routing, minimal Eve auth/state, and background dispatch
   through `waitUntil`.

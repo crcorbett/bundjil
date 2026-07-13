@@ -38,7 +38,11 @@ it.effect("loads required Sendblue config with redacted secrets", () =>
           Layer.provide(
             ConfigProvider.layer(
               ConfigProvider.fromEnv({
-                env: environment,
+                env: {
+                  ...environment,
+                  KV_REST_API_TOKEN: "fallback-replay-token",
+                  KV_REST_API_URL: "https://fallback.example.test/redis",
+                },
               })
             )
           )
@@ -53,6 +57,14 @@ it.effect("loads required Sendblue config with redacted secrets", () =>
       Schema.is(Schema.Redacted(Schema.NonEmptyString))(config.apiKey),
       true
     );
+    assert.strictEqual(
+      Redacted.value(config.replayStore.url),
+      "https://example.test/redis"
+    );
+    assert.strictEqual(
+      Redacted.value(config.replayStore.token),
+      "test-replay-token"
+    );
     assert.deepStrictEqual(
       Schema.encodeSync(SendblueSenderIdentities)(config.senderIdentities),
       { "+14155550100": "owner" }
@@ -60,16 +72,50 @@ it.effect("loads required Sendblue config with redacted secrets", () =>
   })
 );
 
+it.effect(
+  "uses the provider KV replay variables only when preferred names are absent",
+  () =>
+    Effect.gen(function* testReplayStoreFallback() {
+      const {
+        BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN: ignoredReplayStoreToken,
+        BUNDJIL_SENDBLUE_REPLAY_STORE_URL: ignoredReplayStoreUrl,
+        ...withoutPreferredReplayStore
+      } = environment;
+      const config = yield* loadSendblueConfig.pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({
+              env: {
+                ...withoutPreferredReplayStore,
+                KV_REST_API_TOKEN: "fallback-replay-token",
+                KV_REST_API_URL: "https://fallback.example.test/redis",
+              },
+            })
+          )
+        )
+      );
+
+      assert.strictEqual(
+        Redacted.value(config.replayStore.url),
+        "https://fallback.example.test/redis"
+      );
+      assert.strictEqual(
+        Redacted.value(config.replayStore.token),
+        "fallback-replay-token"
+      );
+    })
+);
+
 it.effect("fails closed when a required Sendblue secret is missing", () =>
   Effect.gen(function* testMissingSecret() {
-    const { BUNDJIL_SENDBLUE_WEBHOOK_SECRET: _, ...withoutWebhookSecret } =
-      environment;
+    const {
+      BUNDJIL_SENDBLUE_WEBHOOK_SECRET: ignoredWebhookSecret,
+      ...withoutWebhookSecret
+    } = environment;
     const error = yield* loadSendblueConfig.pipe(
       Effect.provide(
         ConfigProvider.layer(
-          ConfigProvider.fromEnv({
-            env: withoutWebhookSecret,
-          })
+          ConfigProvider.fromEnv({ env: withoutWebhookSecret })
         )
       ),
       Effect.flip
@@ -78,6 +124,21 @@ it.effect("fails closed when a required Sendblue secret is missing", () =>
     assert.strictEqual(Schema.is(SendblueConfigError)(error), true);
     assert.notInclude(String(error), "test-api-key");
     assert.notInclude(String(error), "test-webhook-secret");
+
+    const {
+      BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN: ignoredReplayStoreToken,
+      BUNDJIL_SENDBLUE_REPLAY_STORE_URL: ignoredReplayStoreUrl,
+      ...withoutReplayStore
+    } = environment;
+    const replayStoreError = yield* loadSendblueConfig.pipe(
+      Effect.provide(
+        ConfigProvider.layer(
+          ConfigProvider.fromEnv({ env: withoutReplayStore })
+        )
+      ),
+      Effect.flip
+    );
+    assert.strictEqual(Schema.is(SendblueConfigError)(replayStoreError), true);
   })
 );
 

@@ -29,10 +29,10 @@ const senderIdentitiesConfig = Config.redacted(
 );
 const replayStoreUrlConfig = Config.redacted(
   "BUNDJIL_SENDBLUE_REPLAY_STORE_URL"
-);
+).pipe(Config.orElse(() => Config.redacted("KV_REST_API_URL")));
 const replayStoreTokenConfig = Config.redacted(
   "BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN"
-);
+).pipe(Config.orElse(() => Config.redacted("KV_REST_API_TOKEN")));
 const replayStorePrefixConfig = Config.nonEmptyString(
   "BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX"
 );
