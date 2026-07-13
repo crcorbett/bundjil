@@ -1,6 +1,6 @@
 {
   "title": "Personal Codex Subscription Auth And Hosted Proxy Tasks",
-  "status": "active",
+  "status": "completed",
   "spec": "docs/product-specs/codex-hosted-live-oauth-storage.md",
   "principles": [
     "Interactive ChatGPT subscription login runs only on the trusted local owner machine through a loopback PKCE callback; Vercel exposes no OAuth browser routes.",
@@ -8,14 +8,20 @@
     "Persist only an encrypted versioned subscription profile; never persist the authorization code, PKCE verifier, state, raw response, cookie, or ID token.",
     "Every profile mutation uses a fenced compare-and-set commit so an expired lease holder cannot overwrite a newer login, refresh, or reauthentication state.",
     "Refresh under the distributed lock, re-read under lock, and perform one revision-aware forced refresh/replay after a classified 401.",
-    "Gateway remains the default Eve model path; Eve integration requires a separate SPEC.",
+    "Gateway remains the default Eve model path; the sibling Eve provider SPEC owns the implemented opt-in adapter, and combined hosted proof must be recorded separately.",
     "Use Effect Schema, tagged errors, Context services, explicit Layers, Config, Redacted, Effect Platform HTTP and Command, Scope, Deferred, and KeyValueStore for runtime-owned boundaries.",
+    "Keep primary operations as clean linear named Effects with typed error translation at the owning boundary; runtime execution and Layer construction stay at executable edges.",
+    "Forbid helper sprawl, pass-through services, local DTO mirrors, generic utility modules, speculative abstractions, and one-line wrappers; every new abstraction needs a concrete owner and admission reason.",
+    "Keep Ultracite/Oxlint, Knip, TypeScript, and Effect language-service checks clean without broad suppressions or new ignore rules.",
+    "This backend SPEC introduces no React UI; any later visible surface must follow docs/architecture/frontend-composition.md, leaf ownership, Schema-owned server boundaries, and browser verification.",
     "Official OpenAI docs and openai/codex source are protocol authority; community repositories are personal interoperability precedent only.",
     "Preview proof comes before any production decision, and production requires separate explicit user approval."
   ],
   "globalVerification": [
     "Revalidate current OpenAI authentication docs and openai/codex source protocol fields before live implementation and proof.",
     "bun install --frozen-lockfile",
+    "bun run check",
+    "bun run knip",
     "bun run --filter @bundjil/codex-oauth check-types",
     "bun run --filter @bundjil/codex-oauth test",
     "bun run --filter @bundjil/codex-oauth build",
@@ -84,7 +90,8 @@
         "Round-trip, key, malformed-ciphertext, version, and plaintext-marker tests.",
         "bun run --filter @bundjil/codex-oauth check-types",
         "bun run --filter @bundjil/codex-oauth test",
-        "bun run --filter @bundjil/codex-oauth build"
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run verification"
       ],
       "completionCriteria": [
         "Only a versioned encrypted envelope crosses hosted persistence."
@@ -115,7 +122,8 @@
         "Encrypted save/read/remove, contention, expiry, owner release, and winner re-read tests.",
         "bun run --filter @bundjil/codex-oauth check-types",
         "bun run --filter @bundjil/codex-oauth test",
-        "bun run --filter @bundjil/codex-oauth build"
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run verification"
       ],
       "completionCriteria": [
         "Encrypted persistence and refresh coordination remain accepted foundations."
@@ -254,6 +262,7 @@
         "Upstash readback is a V2 ciphertext envelope with no credential, code, verifier, state, account-id, callback, JWT-claim, or ID-token markers.",
         "Stored profile decrypts only inside the trusted proof and confirms required subscription fields without printing values.",
         "No credential/callback/provider payload appears in local logs or shell history.",
+        "Any tracer-script helper is inline or has a concrete owner, multiple call sites, or a non-trivial directly tested policy; no speculative wrapper survives.",
         "bun run verification"
       ],
       "completionCriteria": [
@@ -330,6 +339,7 @@
         "Upstash remains a ciphertext envelope with no credential/callback/account/JWT markers.",
         "Deterministic permanent failure yields 502 reauthentication; transient failure yields 503 and preserves profile; second 401 does not retry.",
         "Vercel logs/responses contain no credentials, revision values, callback query, provider payload, prompt, request body, or full model response.",
+        "Proof-script helpers pass the abstraction admission test; there are no one-line wrappers, DTO mirrors, property readers, or speculative utilities.",
         "bun run verification"
       ],
       "completionCriteria": [
@@ -350,7 +360,7 @@
     {
       "id": "document-and-supersede-access-only-workaround",
       "title": "Document operations and supersede the access-only workaround",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["run-hosted-refresh-preview-proof"],
       "description": "Update durable docs for local subscription login, hosted refresh, preview proof, failure/re-login, disconnect, and rollback; mark access-only normal operation as superseded.",
       "implementationNotes": [
@@ -372,15 +382,19 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: root, app, package, architecture, SPEC, plan, and skill documentation now matches package-owned trusted-local PKCE, encrypted KeyValueStore persistence, fenced refresh/commit services, app-owned private proxy composition, and the app-owned opt-in Eve adapter. It explicitly separates proxy proof, adapter proof, and the unrecorded combined Eve-to-hosted request.",
+          "Parent audit 2 - implementation quality: docs preserve canonical Effect Schema contracts, tagged errors, Context services, explicit Layers, Config and Redacted boundaries, scoped loopback resources, Schema JSON, distributed locking, and fenced commits. The access-token-only importer is consistently deprecated for normal hosted operation, and no credential, callback, revision, account, prompt, or provider payload value was added.",
+          "Parent audit 3 - verification: stale-claim scans found no current pending-preview, no-refresh, blocked-hosted-design, or accepted-access-only-normal-path claim; Vercel route scans show only health, chat completions, and not-found routes; git diff --check passed; and bun run verification passed across formatting, lint, Knip, all six workspace typechecks, 102 OAuth tests, 19 proxy tests, and all remaining workspace tests."
+        ]
       },
       "commitAfterPassing": true
     },
     {
       "id": "three-pass-effect-ts-audit-sweep",
       "title": "Run the mandatory 3-pass Effect TS audit sweep",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["document-and-supersede-access-only-workaround"],
       "description": "Perform the cross-cutting ownership, Effect quality, and verification audit before any production proposal.",
       "implementationNotes": [
@@ -393,6 +407,7 @@
         "All prior tasks have complete parent audit evidence.",
         "No OAuth browser route exists in Vercel and no local callback/browser layer is imported by apps.",
         "No plaintext credential, callback data, revision value, ID token, account id, prompt, or provider payload appears in storage/log/proof scans.",
+        "Every new helper, wrapper, mapper, service, and Layer has a documented owner and admission reason; weak or single-use abstractions are inlined or removed.",
         "bun run verification",
         "git diff --check",
         "git status --short is reviewed before commit"
@@ -404,8 +419,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership and call graph: package, app, trusted-local CLI, production, test, proof, and rollback graphs match the SPEC. The audit found and fixed a broad-barrel weakness by moving browser, loopback, and subscription-login exports to @bundjil/codex-oauth/trusted-local.layer; deployable apps now use a server-safe live.layer module graph. Vercel exposes only health, chat-completions, and not-found routes.",
+          "Parent audit 2 - Effect quality: named flat Effects, Context services, explicit Layers, scoped Effect Platform callback resources with Deferred, canonical Schemas, tagged errors, Config.redacted, final-boundary Redacted access, encrypted KeyValueStore persistence, distributed refresh locks, and fenced commits were reviewed. Production scans found no raw JSON calls, process.env, unsafe casts, DTO mirrors/manual readers, instanceof, switch protocol branching, or unresolved helper sprawl.",
+          "Parent audit 3 - verification: targeted OAuth and proxy typechecks, builds, and 102 plus 19 tests passed after the module split. Final bun run verification passed formatting, lint, Knip, all six workspace typechecks, task-graph builds, and every workspace test. App-import, Vercel-route, stale-claim, task-JSON, diff, and secret-shape scans passed; only deliberate non-secret test placeholders matched the shape scan. No unresolved finding remains, production is inactive, and combined Eve-to-hosted-live proof remains explicitly unrecorded."
+        ]
       },
       "commitAfterPassing": true
     }

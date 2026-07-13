@@ -16,17 +16,16 @@ Implemented:
 
 - `apps/agent` runs the Eve app, `workspace_status` tool, Gateway default
   model config, and opt-in Codex proxy model-provider config.
-- `apps/codex-proxy` exposes the private Effect HTTP proxy routes locally and
-  through a Vercel preview deployment in mock mode.
+- `apps/codex-proxy` exposes private Effect HTTP proxy routes locally and in a
+  personal Vercel preview. Its refresh-capable live composition is proven
+  separately from the agent adapter.
 - `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
   memory layers, and the opt-in Upstash Redis `KeyValueStore` adapter.
 
 Research-gated or future:
 
-- Hosted live Codex proxy mode.
-- Live OAuth endpoint exchange.
-- Hosted token-profile storage with application-side envelope encryption.
+- A recorded combined Eve -> hosted-live-proxy end-to-end request.
 - Sendblue, Cloudflare email, Vercel Connect, Notion, and long-term memory.
 
 Unsupported:
@@ -113,15 +112,15 @@ storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It also owns the explicit
 `upstash-key-value-store.layer` adapter for Vercel Marketplace Upstash Redis.
-It currently does not perform live OAuth endpoint exchange or encrypted hosted
-token-profile storage.
+It owns the trusted-local loopback PKCE exchange and encrypted hosted
+subscription-profile lifecycle. Browser interaction is never composed into a
+Vercel function.
 
-`apps/codex-proxy` owns the deployable HTTP boundary for the private provider
-proof. It parses app-owned config with Effect Config, exposes `GET /health`,
-exposes a private OpenAI-compatible `POST /v1/chat/completions` route through
-Effect `HttpRouter.toWebHandler`, and uses an app-owned mock
-`CodexDirectProvider` layer until hosted token storage and live deployment are
-implemented.
+`apps/codex-proxy` owns the deployable HTTP boundary for the private provider.
+It parses app-owned Effect Config, exposes `GET /health` and private
+OpenAI-compatible `POST /v1/chat/completions` through Effect
+`HttpRouter.toWebHandler`, and composes mock, local diagnostic, or
+refresh-capable preview-live providers. It exposes no browser OAuth route.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, future channel files, and runtime secrets.
@@ -167,6 +166,10 @@ apps/agent/agent/agent.ts
   -> apps/codex-proxy /v1/chat/completions
   -> @bundjil/codex-oauth OpenAICompatibleProxy
 ```
+
+The adapter and proxy have independent proof records. This call graph describes
+the configured integration, not a recorded Eve-to-hosted-live-proxy end-to-end
+proof. Gateway remains the default path.
 
 Schema boundary:
 
@@ -229,7 +232,8 @@ Vercel preview request
   -> apps/codex-proxy/src/index.ts
   -> Effect HttpRouter.toWebHandler
   -> GET /health or POST /v1/chat/completions
-  -> mock-mode OpenAI-compatible SSE
+  -> configured preview provider
+  -> private OpenAI-compatible SSE
 ```
 
 ## Runtime Principles

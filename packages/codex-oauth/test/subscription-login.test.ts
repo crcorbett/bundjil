@@ -47,7 +47,6 @@ import type {
 import {
   CodexOAuthHttpClientLive,
   CodexSubscriptionAuthProtocolConfigLive,
-  CodexSubscriptionLoginLive,
 } from "../src/live.layer.js";
 import {
   CodexBrowserLauncherMemory,
@@ -55,6 +54,7 @@ import {
   CodexOAuthHttpClientMock,
   CodexOAuthMemory,
 } from "../src/mock.layer.js";
+import { CodexSubscriptionLoginLive } from "../src/trusted-local.layer.js";
 
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",

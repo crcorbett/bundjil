@@ -22,6 +22,11 @@
       "types": "./dist/live.layer.d.ts",
       "default": "./dist/live.layer.js"
     },
+    "./trusted-local.layer": {
+      "@bundjil/source": "./src/trusted-local.layer.ts",
+      "types": "./dist/trusted-local.layer.d.ts",
+      "default": "./dist/trusted-local.layer.js"
+    },
     "./mock.layer": {
       "@bundjil/source": "./src/mock.layer.ts",
       "types": "./dist/mock.layer.d.ts",
@@ -47,6 +52,10 @@
       "./live.layer": {
         "types": "./dist/live.layer.d.ts",
         "default": "./dist/live.layer.js"
+      },
+      "./trusted-local.layer": {
+        "types": "./dist/trusted-local.layer.d.ts",
+        "default": "./dist/trusted-local.layer.js"
       },
       "./mock.layer": {
         "types": "./dist/mock.layer.d.ts",

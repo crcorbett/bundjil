@@ -21,6 +21,9 @@ README.
 - [Eve agent architecture](./architecture/eve-agent.md) documents the committed
   Eve app, Effect boundary, local HTTP endpoints, AI Gateway setup, and
   Codex proxy model-provider setup.
+- [Frontend Composition](./architecture/frontend-composition.md) defines the
+  conditional React hierarchy, leaf ownership, Effect/runtime boundary, and
+  browser verification rules for future visible apps.
 - [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
   describes the first planned Eve agent implementation and Effect wrapper
   boundary.
@@ -32,9 +35,9 @@ README.
   refresh-capable profiles, fenced rotation, personal Vercel preview proof,
   and mandatory implementation audits without a hosted OAuth callback.
 - [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
-  records the historical access-token-only fallback that remains available to
-  the trusted-local filesystem mode. The hosted refresh-capable preview proof
-  remains pending.
+  preserves the historical access-token-only fallback. It is superseded for
+  normal hosted operation and remains only as a deprecated emergency/local
+  diagnostic path.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
   preserves the Parallel AI report that corrected the subscription-backed model
   access plan.
@@ -82,7 +85,8 @@ README.
   do not route it through Vercel AI Gateway credentials, and do not expose the
   proxy publicly. Browser authorization and loopback callbacks remain
   trusted-local only; the proxy exposes no hosted OAuth routes. Hosted preview
-  proof and wiring the refresh-capable live proxy into Eve remain pending.
+  proof and the opt-in Eve adapter are accepted separately; a combined
+  Eve-to-hosted-live request remains unrecorded.
 
 ## Planned Docs
 

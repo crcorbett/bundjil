@@ -1,5 +1,14 @@
 # Eve Agent Architecture
 
+## Codex Provider Proof Boundary
+
+Gateway remains the default Eve provider. `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`
+selects an app-owned Effect Config path that builds a private
+OpenAI-compatible `LanguageModel`. This adapter has its own focused proof; the
+hosted proxy has separate preview proof for encrypted refresh and SSE. Do not
+record these as combined Eve -> hosted-live-proxy evidence unless an actual Eve
+request has been verified through that deployed route.
+
 This guide documents the committed Bundjil Eve app and the Effect package
 boundary it uses. It covers the current local slice only; Sendblue, Cloudflare
 email, Vercel Connect, and Notion are future boundaries.
@@ -112,9 +121,9 @@ Current Codex provider state:
 - The trusted-local browser/loopback PKCE login writes that encrypted profile.
   Vercel exposes no OAuth start or callback route. `local` remains the separate
   access-token-only filesystem proof and never refreshes.
-- Pending: sanitized hosted preview proof and wiring the refresh-capable live
-  proxy into Eve. Gateway remains the Eve default until those steps are
-  accepted.
+- Proven separately: the sanitized hosted refresh-capable preview and the
+  opt-in Eve `codex-proxy` adapter. A combined Eve -> hosted-live-proxy request
+  has not yet been recorded. Gateway remains the Eve default.
 - Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
   Codex OAuth through Vercel AI Gateway credentials, deploying
   `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.

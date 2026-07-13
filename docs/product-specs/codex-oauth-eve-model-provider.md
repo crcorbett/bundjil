@@ -1,8 +1,16 @@
 # Codex OAuth Eve Model Provider
 
-Status: Draft  
+Status: Implemented adapter; hosted end-to-end proof remains unrecorded
 Owner: Bundjil  
 Created: 2026-07-07
+
+## Current Evidence Boundary
+
+The app-owned opt-in `codex-proxy` LanguageModel adapter and Gateway-default
+selection are implemented and covered by focused configuration/fetch tests.
+The hosted refresh-capable proxy is separately proven in personal Vercel
+preview. Neither record establishes a combined Eve -> hosted-live-proxy
+end-to-end request; do not infer one from these independent proofs.
 
 ## Purpose
 
@@ -343,8 +351,9 @@ Preview proof:
   terms, probe text, invalid-token text, and full mock response text; the
   sanitized scans were clean.
 
-Production deployment was skipped. Hosted live Codex proof remains pending and
-opt-in.
+At this 2026-07-07 checkpoint, production deployment was skipped and hosted
+live Codex proof remained pending. The successor hosted OAuth-storage SPEC has
+since accepted personal preview proof; production remains inactive and opt-in.
 
 On 2026-07-07, `apps/agent` added app-owned Eve model-provider wiring:
 

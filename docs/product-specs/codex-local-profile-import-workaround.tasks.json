@@ -1,6 +1,7 @@
 {
   "title": "Codex Local Profile Import Workaround Tasks",
-  "status": "active",
+  "status": "completed",
+  "supersededBy": "docs/product-specs/codex-hosted-live-oauth-storage.md",
   "spec": "docs/product-specs/codex-local-profile-import-workaround.md",
   "principles": [
     "Keep the original hosted OAuth blocker intact; this is a local trusted-operator workaround only.",

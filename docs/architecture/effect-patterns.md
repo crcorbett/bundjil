@@ -1,5 +1,14 @@
 # Effect Patterns
 
+## Codex Provider Boundaries
+
+For the Codex subscription path, canonical schemas, tagged errors, Context
+services, explicit Layers, `Config`/`Redacted`, scoped loopback resources,
+`KeyValueStore`, refresh locking, and fenced commits remain package-owned in
+`@bundjil/codex-oauth`. `apps/codex-proxy` owns only app config and private HTTP
+composition. Do not recreate profile DTOs, token mappers, or OAuth routes in
+either app; Vercel must not host browser OAuth or account linking.
+
 Bundjil uses Effect for code that can fail, cross an async boundary, depend on
 runtime services, read configuration, or form a durable integration contract.
 Plain TypeScript is still fine for simple framework glue and local rendering,
@@ -72,6 +81,44 @@ Avoid nested `Effect.gen` blocks unless a nested program is genuinely reusable
 or scopes a resource. Do not add helpers whose only job is to rename one call,
 hide a single property access, wrap one `Effect.map`, or shorten a clear
 two-line operation.
+
+Runtime execution with `Effect.runSync`, `Effect.runPromise`, or
+`ManagedRuntime` belongs at executable app, adapter, test, or CLI edges. Domain
+services return Effects and depend on service tags. Keep live Layer composition
+in `*.layer.ts` or the executable composition root rather than constructing it
+inside operations.
+
+## Helper Admission
+
+Helper sprawl is an architecture failure, not merely a style preference. Keep
+one-off Effect pipelines and transformations inline. Add a helper, mapper,
+wrapper, service, or adapter only when it has at least one defensible reason:
+
+- multiple real call sites;
+- ownership of a package/provider/serialization/resource/security boundary;
+- isolation of a non-trivial policy or algorithm that becomes directly
+  testable;
+- conformance with an established repo abstraction at the same ownership
+  level.
+
+Do not add one-line wrappers, property-reader helpers, single-use aliases,
+local DTO converters, pass-through services, or generic `utils`, `helpers`,
+`common`, and `shared` modules. Do not abstract for possible future reuse. The
+implementation audit must inspect new abstractions and inline those without a
+clear owner and concrete value.
+
+## Static Analysis
+
+`bun run check` runs the root Ultracite/Oxlint formatting and type-aware lint
+configuration. `bun run knip` enforces dead-code, export, file, and dependency
+hygiene. Package/app typechecks and the configured Effect language service are
+also required.
+
+Do not weaken the root lint config, add broad suppressions, introduce unsafe
+casts, or expand ignore patterns to land a change. A narrow suppression needs
+an adjacent reason and cannot hide Effect, promise, hook, accessibility, or
+Schema failures. Lint does not prove ownership, linear Effect control flow, or
+helper quality, so the manual 3-pass audit remains mandatory.
 
 ## Schemas
 
@@ -218,3 +265,9 @@ Effect.runPromise(
 
 When multiple tools share the same live services, introduce an app runtime or
 layer composition module instead of repeating provider wiring in every tool.
+
+React and route composition follow
+[`frontend-composition.md`](./frontend-composition.md). Keep Effect runtimes,
+Layers, Config, secrets, and provider clients outside render functions and
+browser bundles; expose Schema-owned serializable contracts at the server
+boundary.

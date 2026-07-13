@@ -543,3 +543,23 @@ rawPayloadLeak: false
 ```
 
 Do not run the proof in CI and do not commit proof env files.
+
+# Current Subscription Profile State
+
+`@bundjil/codex-oauth` owns the trusted-local loopback PKCE subscription login,
+canonical refresh-capable profile schemas, encrypted persistence, refresh
+locking, and fenced profile commits used by the hosted proxy. The interactive
+browser callback binds only on the trusted owner machine; no hosted browser
+OAuth callback or account-linking service exists.
+
+Trusted-local browser, loopback callback, and subscription-login Layers are
+exported only from `@bundjil/codex-oauth/trusted-local.layer`. Deployable apps
+use `@bundjil/codex-oauth/live.layer`, whose module graph excludes those local
+runtime boundaries.
+
+The legacy access-token-only importer remains available solely as a deprecated
+emergency/local diagnostic fallback. It deliberately creates a profile that
+cannot refresh and is not the normal hosted path. Remove a profile through the
+canonical profile service for disconnect; provider-side revocation, when
+needed, requires re-login and does not cause Bundjil to expose a revocation or
+browser endpoint.

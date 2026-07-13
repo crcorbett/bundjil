@@ -1,6 +1,6 @@
 ---
 name: prd-implementer
-description: "Thin router for implementing specs and plans in the site repo. Use when executing a SPEC or plan so work follows the canonical iterative rollout and verification flow."
+description: "Thin router for implementing Bundjil specs and plans with the canonical iterative rollout and verification flow."
 ---
 
 # PRD Implementer
@@ -13,9 +13,10 @@ Read in this order:
 
 1. the target spec
 2. the sibling task list when the spec has one
-3. `docs/exec-plans/implementing-specs.md`
-4. `docs/PLANS.md`
-5. the relevant architecture docs for the touched packages
+3. the matching active plan in `docs/exec-plans/active/`, if implementation
+   has started
+4. `AGENTS.md`
+5. the relevant files in `docs/architecture/`
 
 ## Default Rules
 
@@ -40,29 +41,23 @@ Read in this order:
 - Reuse canonical schemas, types, service contracts, branded identifiers, and
   typed errors from owning packages.
 - For frontend design-system implementation tasks that change token taxonomy,
-  component catalogue structure, `/design`, accessibility expectations,
-  documentation, governance, or foundations, query the Southleft Design Systems
-  MCP documented in `docs/references/design-systems-mcp.md` and record the
-  local decision in the active plan.
-- For frontend implementation tasks that affect visible text, use canonical
-  typography roles from `@packages/ui`: `Heading`, `Text`, `CodeText`,
-  documented semantic role classes for allowed CSS/native surfaces, and
-  `WEB_OG_TYPOGRAPHY` for OG inline rendering. Do not reintroduce local
-  `text-*`, `leading-*`, `tracking-*`, `font-*`, or font-weight utility piles
-  in routes or package components.
+  component catalogue structure, accessibility expectations, documentation,
+  governance, or foundations, follow the design-system authority named by the
+  SPEC and record external guidance and local decisions in the active plan.
+- For frontend implementation tasks that affect visible text, use the
+  typography roles or tokens owned by the app/design system named in the SPEC.
+  Do not introduce route-local typography piles as a parallel API.
 - For visible text changes, capture Browser screenshot evidence for the
   affected route or component state, including desktop and mobile viewports
   when hierarchy, wrapping, or density can change.
 - For frontend implementation tasks, follow
-  `docs/architecture/frontend/component-composition.md` and
-  `docs/architecture/frontend/leaf-components-and-skeletons.md`: compose
-  visible structure as high as practical through primitive -> composite ->
-  layout -> route, and let leaves own their data, search/page params, commands,
-  atoms, skeletons, and fallbacks.
+  `docs/architecture/frontend-composition.md`: compose visible structure as
+  high as practical through primitive -> composite -> layout -> route, and let
+  leaves own their data, commands, loading/error states, skeletons, and
+  fallbacks.
 - For reusable URL/search/page-param work, follow
-  `docs/architecture/frontend/url-state-and-page-params.md`: use
-  schema-backed field URL atoms for search params, read-only page-param atoms
-  for route identity, keep TanStack Router as the URL writer, and keep app route
+  `docs/architecture/frontend-composition.md`: use schema-owned URL and route
+  identity contracts, keep the app router as the URL writer, and keep app route
   APIs out of reusable packages.
 - Prefer flat, linear `Effect.gen` programs for primary operations. Put typed
   error handling in the `.pipe(...)` after `Effect.gen` with `catchTag`,
@@ -96,19 +91,16 @@ mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
 or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
 primitive or owning service contract should carry the behavior.
 
-For UI work, compose stable visible structure as high as practical, usually in
-the route or nearest page-level parent. Use the primitive -> composite ->
-layout -> route chain for visible structure. Let leaves own the data,
-search/page params, commands, atoms, skeletons, and fallbacks for the exact
-fragment or action they render. Do not add nested feature wrappers merely to
-shorten route JSX, and do not prop-drill query results, selected ids, loading
-flags, command callbacks, or derived option lists when a leaf can own the
-narrow value.
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
 
-For reusable URL state, use schema-backed field URL atoms for search params and
-read-only page-param atoms for route identity. Keep TanStack Router as the app
-URL writer, and do not import app route files, `routeTree.gen`,
-`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
 ```
 
 ## Task-List Delegation Loop
@@ -162,26 +154,20 @@ Before accepting a task, audit for:
   than route-local server functions or import-time runtime branching
 - frontend routes compose visible structure as high as practical and do not add
   nested feature wrappers only to hide route JSX
-- frontend visible text uses `Heading`, `Text`, `CodeText`, semantic role
-  classes, package compact helpers, or `WEB_OG_TYPOGRAPHY` as appropriate, with
-  typography Oxlint rules and Browser screenshot evidence proving no overlap or
-  overflow when text rendering changes
-- data-bearing leaves own their own reads, search/page params, commands, atoms,
-  skeletons, and fallbacks
-- reusable URL state uses schema-backed field URL atoms, read-only page-param
-  atoms, and a TanStack Router adapter rather than app route API imports
+- frontend visible text uses the app/design-system typography contract, with
+  applicable lint rules and Browser evidence proving no overlap or overflow
+- data-bearing leaves own their own reads, commands, loading, empty, error,
+  retry, skeleton, and fallback states
+- reusable URL state uses schema-owned search and route identity contracts,
+  with the app router as writer and no app route imports in reusable packages
 - no prop drilling of query results, selected ids, loading flags, command
   callbacks, or derived option lists when a leaf can own the narrow value
 - implementation call graphs still match the spec's production/test/CLI graphs,
   or the spec and task list are updated with the intentional architecture
   change before acceptance
-- route/runtime/SEO/AEO changes include Browser screenshot evidence for the
-  affected visible page or OG route, plus direct HTTP evidence for canonical
-  redirects and route-owned machine sibling responses where relevant
-- route-owned Markdown work keeps canonical negotiation redirect-only:
-  `@packages/aeo` owns redirect decisions, `@packages/effect-start` owns
-  reusable TanStack Start adapter glue, and `apps/web` owns the Markdown
-  sibling registry plus `.md` sibling rendering
+- visible route/runtime changes include Browser evidence for affected states,
+  plus direct HTTP evidence for redirects and machine-readable responses where
+  relevant
 - leaf-component frontend composition when UI is touched
 - completed `implementationImprovementAudit.passEvidence` when the task list
   requires repeated parent audit turns
@@ -213,8 +199,8 @@ After each meaningful step, choose the smallest verification set that proves the
 2. targeted tests
 3. filtered build when runtime output changed
 4. browser/runtime verification for user-facing flows
-5. Browser screenshots when route rendering, route negotiation, SEO/AEO
-   visible output, or machine-readable sibling behavior changes
+5. Browser screenshots when visible route output changes, plus direct HTTP
+   evidence when redirects or machine-readable behavior changes
 6. `bun run verification` before accepting or committing a task
 
 Do not defer all verification until the end of the rollout. Narrow checks are
@@ -224,19 +210,14 @@ repo findings.
 
 ## Common References
 
-- `docs/exec-plans/implementing-specs.md`
-- `docs/product-specs/writing-task-lists.md`
-- `docs/product-specs/writing-specs.md`
 - `ARCHITECTURE.md`
-- `docs/architecture/effect-services.md`
-- `docs/architecture/package-ownership.md`
-- `docs/architecture/content-and-posts.md`
-- `docs/architecture/frontend/index.md`
-- `docs/architecture/frontend/component-composition.md`
-- `docs/architecture/frontend/leaf-components-and-skeletons.md`
-- `docs/architecture/frontend/url-state-and-page-params.md`
+- `AGENTS.md`
+- `docs/architecture/effect-patterns.md`
+- `docs/architecture/repo-structure.md`
+- `docs/architecture/eve-agent.md`
+- `docs/architecture/frontend-composition.md`
 - `docs/architecture/testing-and-quality.md`
-- `docs/references/design-systems-mcp.md`
+- `docs/exec-plans/active/`
 
 ## Notes
 

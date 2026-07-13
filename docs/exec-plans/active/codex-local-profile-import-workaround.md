@@ -1,6 +1,6 @@
 # Codex Local Profile Import Workaround Plan
 
-Status: Active  
+Status: Superseded and complete (historical record)
 Spec: `docs/product-specs/codex-local-profile-import-workaround.md`  
 Task ledger: `docs/product-specs/codex-local-profile-import-workaround.tasks.json`
 
@@ -20,17 +20,18 @@ named by repo skills do not exist in this repository. The target SPEC, ledger,
 
 ## Current Task
 
-`document-workaround-operations`
-
-The personal preview workaround is accepted. The final documentation task is
-accepted and ready to commit. The original hosted OAuth conclusion remains
-blocked; the access-token-only preview proof does not create a hosted
-account-link or durable refresh path.
+Completed and superseded 2026-07-13 by the refresh-capable hosted proxy proof
+recorded in `codex-hosted-live-oauth-storage.md`. Preserve this plan as dated
+evidence for the former access-token-only diagnostic path. It does not prove
+hosted account linking or refresh, and it must not be used as the normal
+operator path.
 
 ## Baseline Evidence
 
-- The original hosted OAuth task remains blocked because no supported arbitrary
-  Vercel redirect grant has been established.
+- At this historical checkpoint, the original hosted callback design was
+  blocked because no supported arbitrary Vercel redirect grant had been
+  established. The successor uses trusted-local PKCE provisioning and no
+  hosted callback.
 - The current local Codex cache was inspected only for top-level and token field
   names; it reports `auth_mode: chatgpt` and contains the expected token-key
   labels. No values were printed or persisted as evidence.
@@ -131,8 +132,9 @@ Implementation and parent review:
   only `getValidToken` and imported profiles have no refresh token.
 - Expanded handler tests cover unavailable live configuration, an imported
   access-only live profile streaming through a mocked Responses fetch, expired
-  live profile failure, and response leak checks. The app README now separates
-  code/test proof from the still-pending hosted preview proof.
+  live profile failure, and response leak checks. At that checkpoint, the app
+  README separated code/test proof from the not-yet-run hosted preview proof;
+  the successor hosted proof is now accepted.
 
 Parent audit:
 

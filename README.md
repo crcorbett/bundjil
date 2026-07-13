@@ -42,12 +42,11 @@ ship live Sendblue, Cloudflare email, Vercel Connect, or Notion integrations.
 - `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
-- `@bundjil/codex-oauth` owns the research-gated Codex OAuth profile and token
-  lifecycle service contracts, the direct Codex Responses proof surface, the
-  private OpenAI-compatible provider contract, and the opt-in Upstash Redis
-  `KeyValueStore` adapter. It also owns the trusted-local, access-token-only
-  import command and encrypted profile envelope. It does not own a hosted
-  account-link OAuth flow or durable refresh.
+- `@bundjil/codex-oauth` owns the Codex subscription profile/token lifecycle,
+  trusted-local loopback PKCE login, encrypted profile envelope, fenced
+  persistence and refresh services, direct Codex Responses proof surface, and
+  opt-in Upstash Redis `KeyValueStore` adapter. It does not own a hosted
+  browser OAuth callback or account-linking flow.
 - `@bundjil/codex-proxy` is the private Effect HTTP proxy app. It exposes
   `GET /health` and a bearer-token-protected
   `POST /v1/chat/completions` route with explicit mock, local, and live
@@ -72,15 +71,20 @@ Implemented:
   rollback. It never calls Codex.
 - `local` is an explicit encrypted filesystem proof. It runs only in trusted
   local Bun and Vercel rejects it.
-- `live` is an explicit personal-Vercel preview composition: a trusted-local
-  importer writes an encrypted access-token-only profile to Upstash, and the
-  proxy fails closed if that profile is absent or expired.
+- `live` is an explicit personal-Vercel preview composition. A trusted-local
+  loopback PKCE login writes an encrypted refresh-capable profile to Upstash;
+  the proxy refreshes under a distributed lock with fenced commits, retries one
+  classified unauthorized response, and fails closed for absent or unusable
+  credentials.
+- The hosted proxy proof and the agent adapter proof are separate. Recorded
+  evidence does not establish an Eve-to-hosted-live-proxy end-to-end run.
 
 Operational constraints:
 
-- Imports intentionally exclude refresh and ID tokens, set
-  `requiresReauthentication: true`, and cannot refresh. Expiry requires a new
-  trusted-local import or a rollback to `mock`.
+- Access-token-only import intentionally excludes refresh and ID tokens. It is
+  a deprecated emergency/local diagnostic fallback, not normal hosted
+  operation; use trusted-local subscription login for a refresh-capable
+  profile.
 - The personal Vercel configuration and deploys are preview only. Bundjil did
   not set a production proxy mode, profile, or cipher configuration, and did
   not deploy production. A Marketplace Upstash resource may still auto-bind
@@ -98,11 +102,12 @@ Unsupported paths:
   subscription-backed provider path.
 - Do not expose `apps/codex-proxy` as a public gateway.
 - Do not deploy `bundjil-codex-proxy` to Tilt Legal.
-- Hosted browser OAuth/account linking remains blocked. Bundjil does not reuse
-  the Codex CLI client, redirect URI, PKCE exchange, browser session, or
-  refresh token.
-- Eve integration with this workaround is out of scope. Gateway remains the
-  default until a separate SPEC changes that boundary.
+- The Vercel proxy exposes no hosted browser OAuth callback, OAuth start route,
+  or account-linking endpoint. Interactive login stays on the trusted local
+  owner machine through a loopback PKCE callback.
+- Gateway remains the default. The optional adapter is implemented through
+  app-owned Effect Config, but its proof is separate from hosted live proxy
+  proof.
 
 ## Getting Started
 
@@ -140,11 +145,11 @@ The proxy smoke test starts a local Bun server on an ephemeral port, verifies
 `GET /health`, and verifies authenticated mock OpenAI-compatible SSE without
 calling Codex.
 
-The Codex proxy runbook is deliberately separate from Eve. It provides local
-import, preview import, status-only self-tests, expiry/re-import, and mock
-rollback without exposing credentials or request content. Do not point Eve at
-the preview proxy as part of this workaround; a later integration requires its
-own SPEC.
+The Codex proxy runbook is deliberately separate from Eve. It covers local
+subscription login, preview proof, refresh/re-login, disconnect, deprecated
+local import diagnostics, and mock rollback without exposing credentials or
+request content. The agent adapter can be enabled separately; its unit proof is
+not evidence of a hosted end-to-end Eve request.
 
 ## Layout
 
@@ -188,10 +193,10 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 1. Keep Gateway as the default Eve model provider while Codex proxy remains
    opt-in.
-2. Add hosted token storage and refresh for the Codex proxy behind Effect
-   `KeyValueStore`.
-3. Complete a hosted live Codex proxy proof before considering Codex proxy as
-   the default provider.
+2. Record a combined Eve -> hosted-live-proxy request before treating the two
+   independent proof records as end-to-end evidence.
+3. Keep Gateway as default unless a separately approved production decision
+   changes that boundary.
 4. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
 5. Add the Sendblue iMessage webhook and outbound delivery adapter.

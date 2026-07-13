@@ -1,10 +1,16 @@
 # Codex Local Profile Import Workaround
 
-Status: Draft  
+Status: Superseded and completed (historical record)
 Owner: Bundjil  
 Created: 2026-07-11  
-Supersedes: the hosted-live proof path only while
-`codex-hosted-live-oauth-storage.md` remains blocked
+Superseded by: `codex-hosted-live-oauth-storage.md` (refresh-capable preview
+proof accepted 2026-07-13)
+
+> Historical record, superseded 2026-07-13. This SPEC preserves the accepted
+> access-token-only import implementation and its dated proof. It is no longer
+> the normal hosted proxy path: use trusted-local PKCE provisioning and the
+> refresh-capable hosted profile. Import remains only as a deprecated emergency
+> or trusted-local diagnostic fallback.
 
 ## Purpose
 
@@ -27,16 +33,15 @@ The local target exists to exercise the real importer and direct-provider call
 graph while Marketplace storage is unavailable; it must never be treated as
 Vercel persistence or hosted OAuth evidence.
 
-Revision note, 2026-07-12: the successor SPEC now targets a trusted-local
+Revision note, 2026-07-13: the successor SPEC implemented a trusted-local
 Codex-compatible loopback PKCE login that stores a refresh-capable encrypted
-profile for the private Vercel proxy. A Vercel-hosted callback is still out of
-scope, but it is no longer a blocker for the personal subscription design.
-This access-token-only path remains the accepted operational fallback until the
-successor refresh proof passes; only then may documentation mark it superseded.
+profile for the private Vercel proxy. The hosted refresh proof passed. A
+Vercel-hosted callback remains out of scope, while this access-token-only path
+is now only a deprecated emergency or trusted-local diagnostic fallback.
 
 ## Decision And Boundaries
 
-- The original hosted account-link flow remains blocked. Bundjil must not
+- A hosted account-link flow remains unsupported. Bundjil must not
   register, emulate, or reuse the Codex CLI public client, redirect URI, PKCE
   exchange, refresh exchange, browser session, or `auth.json` format as a
   hosted OAuth protocol.

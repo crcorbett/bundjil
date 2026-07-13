@@ -1,6 +1,6 @@
 ---
 name: prd-writer
-description: "Thin router for site repo spec authoring. Use when writing a SPEC, PRD, or feature proposal so the work follows canonical docs instead of inventing a new PRD bundle."
+description: "Thin router for Bundjil spec authoring. Use when writing a SPEC, PRD, or feature proposal so the work follows canonical repo docs."
 ---
 
 # PRD Writer
@@ -11,11 +11,11 @@ This skill is intentionally thin. It routes spec authoring into canonical repo d
 
 Read in this order:
 
-1. `docs/product-specs/writing-specs.md`
-2. `docs/product-specs/writing-task-lists.md` when the spec needs
-   implementation sequencing
-3. `docs/PLANS.md`
-4. the relevant architecture docs from `ARCHITECTURE.md` or `docs/architecture/*`
+1. `AGENTS.md`
+2. the target SPEC in `docs/product-specs/`
+3. its sibling task list when implementation needs sequencing
+4. the matching plan in `docs/exec-plans/active/`, if work has started
+5. the relevant files in `docs/architecture/`
 
 ## Default Rules
 
@@ -31,8 +31,8 @@ Read in this order:
 - For Effect TS work, specs and task lists must require flat, meaningful
   `Effect.gen` control flow for primary operations, tagged errors handled in
   `.pipe(...)`, canonical Effect Schema-derived types, and an audit against
-  `docs/architecture/effect-services.md` plus
-  `docs/architecture/package-ownership.md`.
+  `docs/architecture/effect-patterns.md` plus
+  `docs/architecture/repo-structure.md`.
 - Specs that touch runtime, service, RPC, schema, config, command, or package
   boundaries must name the canonical schemas/types/service contracts/errors
   being reused and must require Effect-native primitives over plain TypeScript
@@ -42,40 +42,29 @@ Read in this order:
   for the production path and test path, plus CLI/script paths when relevant.
   The graphs should name service tags, live/mock layers, owning packages, and
   major third-party adapters.
-- Specs that touch route rendering, route negotiation, SEO/AEO surfaces, or
-  machine-readable sibling routes must require Browser screenshot evidence for
-  the affected visible page or OG route, plus direct HTTP evidence for
-  canonical redirects and sibling-owned machine responses.
-- Route-owned Markdown specs must distinguish canonical negotiation redirects
-  from sibling-owned Markdown rendering: `@packages/aeo` owns redirect
-  decisions, `@packages/effect-start` owns reusable TanStack Start adapter
-  glue, and `apps/web` owns the Markdown sibling registry and `.md` sibling
-  output.
-- Frontend design-system specs that touch tokens, component catalogue
-  structure, `/design`, accessibility guidance, documentation, governance, or
-  foundations must query the Southleft Design Systems MCP documented in
-  `docs/references/design-systems-mcp.md` and record which guidance was used or
-  intentionally rejected.
-- Frontend specs that touch visible text must require canonical typography
-  roles from `@packages/ui`: use `Heading`, `Text`, `CodeText`, semantic role
-  classes for allowed CSS/native surfaces, and `WEB_OG_TYPOGRAPHY` for OG
-  inline rendering. Do not approve local `text-*`, `leading-*`, `tracking-*`,
-  `font-*`, or font-weight utility piles as the production typography API.
+- Specs that touch route rendering or machine-readable routes must require
+  Browser evidence for affected visible states and direct HTTP evidence for
+  redirects, status codes, content types, and machine responses.
+- Frontend design-system specs that touch tokens, component catalogues,
+  accessibility guidance, documentation, governance, or foundations must name
+  the design-system authority being followed and record which external
+  guidance was used or intentionally rejected.
+- Frontend specs that touch visible text must name the canonical typography
+  roles or tokens owned by that app/design system. Do not approve route-local
+  typography piles as a substitute for a stable design-system contract.
 - Frontend specs that change visible text must require Browser screenshot
   evidence for affected routes or component states, including desktop and
   mobile viewports when wrapping, density, or hierarchy can change.
 - Frontend specs that touch route/component composition must reference
-  `docs/architecture/frontend/component-composition.md` and
-  `docs/architecture/frontend/leaf-components-and-skeletons.md`, require the
-  primitive -> composite -> layout -> route chain for visible structure, and
-  require leaf-owned data, search/page params, commands, atoms, skeletons, and
-  fallbacks. Do not approve nested feature wrappers that merely shorten route
-  JSX or prop-drill leaf state.
+  `docs/architecture/frontend-composition.md`, require the primitive ->
+  composite -> layout -> route chain for visible structure, and require
+  leaf-owned data, commands, loading/error states, skeletons, and fallbacks.
+  Do not approve nested feature wrappers that merely shorten route JSX or
+  prop-drill leaf state.
 - Frontend specs that touch reusable URL state, search params, page params, or
   route-agnostic component state must reference
-  `docs/architecture/frontend/url-state-and-page-params.md`, require
-  schema-backed field URL atoms for search params, read-only page-param atoms
-  for route identity, and keep app route APIs out of reusable packages.
+  `docs/architecture/frontend-composition.md`, require schema-owned URL and
+  route identity contracts, and keep app route APIs out of reusable packages.
 - Do not approve specs that introduce local DTO mirrors or repeated standalone
   fields such as `id: string`, `slug: string`, status, or metadata when an
   owning package already has a schema/type for that value.
@@ -142,7 +131,7 @@ HTTP handlers
 
 For small work, a single spec may be enough.
 
-Task lists should follow `docs/product-specs/writing-task-lists.md`: include
+Task lists should live beside their SPEC in `docs/product-specs/`: include
 principles, global verification, ordered tasks, mandatory verification,
 browser verification where relevant, completion criteria, and
 `commitAfterPassing` for each implementation spike. Use `bun run verification`
@@ -151,10 +140,10 @@ reasoned exception. For substantial implementation or verification work, also
 include `implementationImprovementAuditCounter` plus per-task
 `implementationImprovementAudit` evidence counters.
 
-For route/runtime/SEO/AEO task lists, add Browser screenshot evidence to
-`browserVerification` for each task that changes visible route behavior or OG
-output. Direct HTTP checks should prove canonical redirects and direct
-route-owned `.md`, `.og`, robots, sitemap, LLM, or RPC behavior as relevant.
+For visible route/runtime task lists, add Browser evidence to
+`browserVerification` for each changed state. Direct HTTP checks should prove
+redirects, status codes, content types, and machine-readable behavior as
+relevant.
 
 For Effect TS tasks, every task's `mandatoryVerification` or
 `completionCriteria` must explicitly check:
@@ -172,19 +161,18 @@ For Effect TS tasks, every task's `mandatoryVerification` or
 
 For frontend tasks that affect visible text, every task's
 `mandatoryVerification` or `browserVerification` must also require canonical
-typography role usage, the typography Oxlint rules where relevant, and Browser
-screenshot evidence proving the changed text does not overlap or overflow.
+design-system typography usage, applicable lint rules, and Browser evidence
+proving the changed text does not overlap or overflow.
 
 ## Common References
 
 - `ARCHITECTURE.md`
-- `docs/architecture/effect-services.md`
-- `docs/architecture/package-ownership.md`
-- `docs/architecture/content-and-posts.md`
-- `docs/architecture/frontend/index.md`
 - `docs/architecture/testing-and-quality.md`
-- `docs/references/design-systems-mcp.md`
-- `docs/product-specs/writing-task-lists.md`
+- `docs/architecture/effect-patterns.md`
+- `docs/architecture/repo-structure.md`
+- `docs/architecture/eve-agent.md`
+- `docs/architecture/frontend-composition.md`
+- `docs/exec-plans/active/` for active implementation evidence
 
 ## Notes
 

@@ -1,6 +1,6 @@
 # Hosted Codex Live OAuth Storage Implementation Plan
 
-Status: Active
+Status: Complete
 Spec: `docs/product-specs/codex-hosted-live-oauth-storage.md`
 Task ledger: `docs/product-specs/codex-hosted-live-oauth-storage.tasks.json`
 
@@ -17,10 +17,11 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-`run-hosted-refresh-preview-proof` is the next task. The real owner login,
-encrypted V2 subscription-profile readback, and refresh-capable proxy
-implementation are accepted as preceding gates. This task may create personal
-preview-only proof evidence; Vercel still exposes no OAuth browser route, and
+All tasks are accepted. The real owner login, encrypted V2
+subscription-profile readback, refresh, fenced concurrency, bounded 401
+recovery, private SSE, safe-log evidence, durable documentation, and final
+cross-cutting Effect audit are complete. Vercel exposes no OAuth browser route,
+the combined Eve -> hosted-live-proxy request remains unrecorded, and
 production remains inactive.
 
 Parent preflight evidence, 2026-07-11:
@@ -58,8 +59,8 @@ Revision evidence, 2026-07-12:
   personal Upstash.
 - The completed encrypted profile, KeyValueStore persistence, Upstash adapter,
   distributed refresh lock, direct provider, and private preview proxy remain
-  accepted foundations. The access-token-only workaround remains the active
-  operational fallback until refresh-capable proof passes.
+  accepted foundations. The refresh-capable proof has now passed, so the
+  access-token-only workaround is deprecated for normal operation.
 - Spec review pass 1 corrected the auth boundary. Independent review pass 2
   removed the `expires_in` assumption, required access-JWT expiry decoding,
   distinguished official/community scope sets, and separated permanent
@@ -639,3 +640,64 @@ Parent audit:
    diff check, ciphertext proof, basic preview proof, staged hosted proof, and
    runtime-log readback passed. The hosted result proves final revision rotation
    and successful concurrent streaming without exposing the opaque revision.
+
+### document-and-supersede-access-only-workaround
+
+Status: Accepted 2026-07-13.
+
+Durable documentation now describes trusted-local PKCE provisioning, encrypted
+hosted persistence, refresh and bounded recovery, disconnect/re-login, preview
+verification, and mock/Gateway rollback without relying on task history. The
+access-token-only importer is consistently marked as a deprecated emergency or
+trusted-local diagnostic fallback. Root, app, package, architecture, SPEC,
+execution-plan, and repo-local PRD skill docs were reconciled. Historical
+evidence remains dated rather than being rewritten as current proof.
+
+Parent audit:
+
+1. Ownership and call graph: documentation assigns OAuth profile/login/refresh
+   contracts to `@bundjil/codex-oauth`, HTTP composition to
+   `apps/codex-proxy`, and provider selection to `apps/agent`. It distinguishes
+   separate proxy and adapter proof from the unrecorded combined hosted Eve
+   request.
+2. Effect quality: the documented path preserves canonical Schemas, tagged
+   errors, Context services, explicit Layers, Config/Redacted, scoped loopback
+   resources, Schema JSON, KeyValueStore, distributed locking, and fenced
+   commits. No secret-bearing example or raw provider payload was added.
+3. Verification coverage: stale-claim and Vercel-route scans passed,
+   `git diff --check` passed, and `bun run verification` passed across
+   formatting, lint, Knip, six workspace typechecks, 102 OAuth tests, 19 proxy
+   tests, and all remaining workspace tests.
+
+### three-pass-effect-ts-audit-sweep
+
+Status: Accepted 2026-07-13.
+
+The final audit found one module-boundary weakness: deployable apps imported
+the broad `@bundjil/codex-oauth/live.layer` barrel while it re-exported
+trusted-local browser, loopback, and subscription-login Layers. Those services
+were not composed into Vercel, but the module graph did not prove the boundary.
+The trusted-local exports now live exclusively in
+`@bundjil/codex-oauth/trusted-local.layer`; the server-safe `live.layer` module
+graph excludes them.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns canonical auth,
+   storage, refresh, and trusted-local services; `apps/codex-proxy` owns private
+   HTTP composition; `apps/agent` owns opt-in provider selection. Vercel routes
+   are limited to health, chat completions, and not-found handling. Proxy proof
+   and adapter proof remain distinct from the unrecorded combined Eve request.
+2. Effect quality: reviewed named Effects, Context services, explicit Layers,
+   scoped Bun/Effect Platform callback resources with Deferred, canonical
+   Schemas and tagged errors, Config.redacted, final-boundary Redacted access,
+   encrypted KeyValueStore persistence, distributed locking, and fenced
+   commits. Production-source scans found no raw JSON calls, `process.env`,
+   unsafe casts, manual DTO readers, `instanceof`, or switch-based protocol
+   branching.
+3. Verification coverage: targeted OAuth and proxy typechecks, builds, and
+   tests passed after the module split. Final `bun run verification` passed
+   formatting, lint, Knip, six workspace typechecks, 102 OAuth tests, 19 proxy
+   tests, and all remaining workspace suites. Stale-claim, app-import,
+   Vercel-route, task-JSON, diff, and secret-shape scans passed with only
+   deliberate test placeholders.

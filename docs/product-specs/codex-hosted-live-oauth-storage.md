@@ -1,9 +1,21 @@
 # Personal Codex Subscription Auth And Hosted Proxy
 
-Status: Ready for Implementation
+Status: Implemented and accepted for personal preview
 Owner: Bundjil
 Created: 2026-07-07
-Revised: 2026-07-12
+Revised: 2026-07-13
+
+## Current State
+
+The trusted-local PKCE login, encrypted Upstash V2 persistence,
+refresh-capable hosted proxy, fenced concurrency, bounded unauthorized replay,
+private SSE, and leak-safe preview proof are implemented and recorded. The
+mandatory final three-pass cross-cutting Effect audit passed. The personal
+Vercel preview is not a production approval.
+
+`apps/agent` independently implements an opt-in `codex-proxy` LanguageModel
+adapter through Effect Config, with Gateway as default. Its focused adapter
+proof is not a recorded combined Eve -> hosted-live-proxy proof.
 
 ## Decision Summary
 
@@ -38,16 +50,16 @@ trusted local login command
   -> ChatGPT subscription authorization through Codex-compatible PKCE
   -> encrypted refresh-capable profile in personal Upstash
 
-apps/agent Eve runtime (later, separately enabled)
+apps/agent Eve runtime (opt-in adapter implemented; combined proof unrecorded)
   -> private apps/codex-proxy Vercel preview
   -> @bundjil/codex-oauth
   -> refreshed subscription access token
   -> https://chatgpt.com/backend-api/codex/responses
 ```
 
-The access-token-only filesystem and Upstash import paths remain available as
-rollback tools until the refresh-capable proof passes. They become deprecated,
-not silently deleted, when this SPEC is accepted.
+The access-token-only filesystem and Upstash import paths are now deprecated
+emergency/local diagnostic fallbacks. They are preserved for rollback history
+and diagnostics, not normal hosted operation.
 
 ## Corrected Research Conclusion
 
@@ -65,8 +77,8 @@ not silently deleted, when this SPEC is accepted.
    authorization-code PKCE, S256, ports 1455/1457, the first-party scope set,
    form-encoded code exchange, JSON refresh, required initial ID/access/refresh
    tokens, optional refreshed tokens, access-JWT expiry, ID-token account
-   metadata, and bounded unauthorized recovery. Implementation must revalidate
-   exact source before live proof.
+   metadata, and bounded unauthorized recovery. Future live proofs must
+   revalidate the exact current source before touching the owner's profile.
 3. `numman-ali/opencode-openai-codex-auth` is community interoperability
    evidence, not an OpenAI policy or API stability guarantee. Local reference
    commit `bec2ad69b252ef4ad7dd33b9532ff8b4fdb6d016` demonstrates a personal
@@ -95,9 +107,9 @@ The following prior requirements are removed:
 
 ### Protocol baseline
 
-The implementation tracer bullet must verify the current `openai/codex` source
-and local behavior before hard-coding protocol values. The current
-source/reference comparison establishes:
+The accepted implementation tracer verified the pinned `openai/codex` source
+and local behavior before protocol values were committed. Future live proofs
+must repeat that source-drift check. The accepted comparison established:
 
 - authorization endpoint `https://auth.openai.com/oauth/authorize`;
 - token endpoint `https://auth.openai.com/oauth/token`;
@@ -105,9 +117,9 @@ source/reference comparison establishes:
 - allow-listed loopback redirects `http://localhost:1455/auth/callback` and
   first-party fallback port `1457`;
 - authorization-code grant with PKCE S256 and random state;
-- community-reference scopes `openid profile email offline_access`; current
-  first-party source also requests connector scopes, so the tracer bullet must
-  compare both sets and document the minimum accepted set;
+- community-reference scopes `openid profile email offline_access`; the pinned
+  first-party source also requests connector scopes, and the accepted tracer
+  recorded that first-party set;
 - `id_token_add_organizations=true`;
 - `codex_cli_simplified_flow=true`;
 - `originator=codex_cli_rs`;
@@ -116,15 +128,16 @@ source/reference comparison establishes:
   claim, matching current first-party behavior rather than assuming
   `expires_in` exists.
 
-The tracer must start with the current first-party scope set and document each
-scope. Do not experiment with alternate scope sets during the owner's real
-login. A later least-privilege reduction requires its own deterministic proof
-and source review. Public protocol constants are not secrets, but they must
-live in one package-owned schema/config module so source drift is visible.
+Each future live proof must start with the then-current first-party scope set
+and record source drift before login. Do not experiment with alternate scope
+sets during the owner's real login. A later least-privilege reduction requires
+its own deterministic proof and source review. Public protocol constants are
+not secrets, but they must live in one package-owned schema/config module so
+source drift is visible.
 
 ## Goals
 
-- Add a trusted-local, refresh-capable Codex subscription login command.
+- Provide a trusted-local, refresh-capable Codex subscription login command.
 - Use a scoped loopback callback server with state and PKCE verifier held only
   in local memory.
 - Exchange and decode OAuth responses through Effect HTTP and Effect Schema.
@@ -138,8 +151,9 @@ live in one package-owned schema/config module so source drift is visible.
   after an upstream authorization failure.
 - Prove local login, encrypted Upstash persistence, hosted refresh, concurrent
   refresh safety, private proxy streaming, and safe reauthentication failure.
-- Keep Gateway as the default Eve provider until a separate Eve integration
-  SPEC is accepted.
+- Keep Gateway as the default Eve provider unless a separately approved
+  production decision changes that boundary. The sibling Eve provider SPEC
+  owns the implemented opt-in adapter.
 
 ## Non-Goals
 
@@ -153,8 +167,9 @@ live in one package-owned schema/config module so source drift is visible.
 - No automatic extraction from `~/.codex/auth.json` as the primary login path.
 - No storage of ID tokens or raw OAuth responses after login completion.
 - No assumption that the subscription backend is a stable OpenAI Platform API.
-- No production deployment until personal preview proof, policy review, and
-  explicit user approval.
+- No production deployment without a fresh protocol/policy review and explicit
+  user approval. Personal preview proof is complete but is not production
+  approval.
 - No Eve model-provider change in this SPEC.
 
 ## Existing Foundations
@@ -163,13 +178,19 @@ The following implemented package boundaries remain canonical:
 
 - `CodexOAuthSubject`
 - `CodexOAuthProfile`
+- `CodexSubscriptionProfile`
 - `EncryptedCodexOAuthProfileV1`
+- `EncryptedCodexOAuthProfileV2`
 - `CodexOAuthProfileCipher`
 - `CodexProfileStore`
 - `CodexProfileStoreEncryptedKeyValueLive`
 - `CodexOAuthRefreshLock`
 - `UpstashCodexOAuthRefreshLockLive`
+- `CodexOAuthProfileCommit`
+- `UpstashCodexOAuthProfileCommitLive`
 - `CodexOAuthClient`
+- `CodexOAuthHttpClient`
+- `CodexOAuthRefreshClientLive`
 - `CodexOAuthService`
 - `CodexDirectProvider`
 - `CodexHttpClient`
@@ -178,9 +199,10 @@ The following implemented package boundaries remain canonical:
 - `CodexProxyConfig`
 - `CodexProxyRoutesLive`
 
-Completed encryption, encrypted persistence, storage keys, Upstash adapter, and
-lock semantics must be reused. The current access-token-only importer and live
-preview prove the storage and provider call graph, but do not prove refresh.
+Completed encryption, encrypted persistence, storage keys, Upstash adapter,
+lock semantics, refresh-capable preview proof, and the server-safe/trusted-local
+Layer split must be preserved. The access-token-only importer proves only its
+deprecated diagnostic path and is not refresh evidence.
 
 ## Design
 
@@ -191,12 +213,12 @@ login operation because it already owns the profile and provider contracts.
 The Bun command is the only executable allowed to open a browser or bind a
 loopback callback.
 
-Add or refine these contracts:
+The implemented design owns these contracts:
 
 - `CodexSubscriptionAuthProtocolConfig`: issuer/endpoints, public client id,
   redirect URI, scopes, and approved authorization parameters.
 - `CodexOAuthAuthorizationSession`: redacted state, redacted PKCE verifier,
-  redacted authorization URL, redirect URI, and expiry. This value is
+  code challenge, redacted authorization URL, and redirect URI. This value is
   memory-only; reveal the URL only at the browser-launch boundary.
 - `CodexOAuthAuthorizationCallback`: redacted code and state decoded from the
   loopback request.
@@ -218,7 +240,8 @@ Use concrete package-owned service tags and explicit layers:
 - `CodexOAuthHttpClient` with live/mock HTTP layers;
 - `CodexLoopbackCallback` with Bun live and memory test layers;
 - `CodexBrowserLauncher` with platform-command live and memory test layers;
-- `CodexSubscriptionLogin` with live/mock composition;
+- `CodexSubscriptionLogin` with a live Layer composed against memory/mock
+  dependencies in tests;
 - `CodexOAuthProfileCommit` with Upstash fenced-CAS and memory layers.
 
 The local operation should be a scoped, named Effect program:
@@ -231,10 +254,10 @@ CodexSubscriptionLogin.run
   -> reveal redacted URL only to CodexBrowserLauncher
   -> await one callback through Deferred with a strict timeout
   -> validate method, path, state, and code
-  -> exchange code through CodexOAuthClientLive
+  -> exchange code through CodexOAuthHttpClient.exchangeAuthorizationCode
   -> decode minimum account metadata
-  -> construct canonical refresh-capable CodexOAuthProfile
-  -> encrypt and store through CodexProfileStore
+  -> construct canonical CodexSubscriptionProfile
+  -> fenced initial/replace write through CodexOAuthProfileCommit
   -> close server through Scope finalization
   -> emit Schema-encoded sanitized result
 ```
@@ -247,17 +270,23 @@ printing or retaining the code. Request logging is disabled for the callback
 server, and Scope finalization must close it after success, denial, timeout,
 interruption, state mismatch, exchange failure, or browser-launch failure.
 
-### OAuth client operations
+### OAuth transport and refresh adapter
 
-Implement `CodexOAuthClientLive` with named operations for:
+The implementation deliberately separates interactive login from hosted
+refresh instead of presenting one broad client as if every operation were
+available in every runtime:
 
-- creating the authorization session;
-- exchanging an authorization code with the PKCE verifier;
-- refreshing an expired/near-expiry profile;
-- returning an explicit unsupported result for remote revocation if no current
-  provider revocation endpoint exists.
+- `CodexSubscriptionAuthProtocolConfigService` and package-owned named
+  functions create authorization material and the authorization session;
+- `CodexSubscriptionLogin` owns the trusted-local interactive workflow;
+- `CodexOAuthHttpClient` owns code-exchange and refresh HTTP transport;
+- `CodexOAuthRefreshClientLive` implements only the refresh operation of
+  `CodexOAuthClient` for hosted composition; start-login, complete-login, and
+  revoke remain explicit unsupported operations there;
+- remote revocation remains unsupported unless a current provider endpoint is
+  established by a future SPEC revision.
 
-The client uses Effect HTTP APIs and separate owning request contracts:
+The transport uses Effect HTTP APIs and separate owning request contracts:
 
 - authorization-code exchange uses the current first-party form-url-encoded
   request shape;
@@ -271,10 +300,10 @@ unverified object readers, or provider response logging.
 
 ### Token and account profile
 
-Replace the ambiguous single profile shape with an explicit versioned union:
+The canonical profile is the explicit versioned union:
 
 ```text
-CodexOAuthProfileV2 =
+CodexOAuthProfile (profileVersion = 2) =
   | CodexAccessTokenImportProfile
   | CodexSubscriptionProfile
 ```
@@ -317,8 +346,9 @@ expiry metadata only; it must not be treated as independent proof of identity
 or authorization. Never place account metadata in a Redis key, URL, log,
 error, or route response.
 
-If current `openai/codex` source proves that a different token or claim is the
-canonical account source, update this SPEC before implementation proceeds.
+If future `openai/codex` source proves that a different token or claim is the
+canonical account source, update this SPEC before another implementation or
+live-proof change proceeds.
 On refresh, retain the stored account id when no new identity metadata is
 returned. If a refresh response identifies a different account, fail without
 mutating storage and require a new local login.
@@ -332,7 +362,7 @@ is a typed failure with no profile mutation.
 
 ### Encrypted persistence
 
-All refresh-capable profiles must continue through:
+Hosted reads continue through the Schema-backed profile store:
 
 ```text
 CodexProfileStore
@@ -340,6 +370,16 @@ CodexProfileStore
   -> CodexOAuthProfileCipherLive (AES-GCM)
   -> KeyValueStore.toSchemaStore
   -> UpstashKeyValueStoreLive
+  -> personal Upstash Redis
+```
+
+Hosted writes do not bypass fencing:
+
+```text
+CodexOAuthProfileCommit
+  -> UpstashCodexOAuthProfileCommitLive
+  -> CodexOAuthProfileCipherLive (AES-GCM)
+  -> atomic expected-revision compare-and-set
   -> personal Upstash Redis
 ```
 
@@ -351,16 +391,18 @@ rotation.
 ### Refresh and rotation
 
 The five-second refresh lease alone is insufficient: a slow request can finish
-after lease expiry and overwrite a newer login or refresh. Add
-`CodexOAuthProfileCommit`, a package-owned fenced compare-and-set mutation
+after lease expiry and overwrite a newer login or refresh. The implemented
+`CodexOAuthProfileCommit` is the package-owned fenced compare-and-set mutation
 contract. Its Upstash adapter atomically verifies the expected credential
 revision/fence and writes the new encrypted profile/revision. All subscription
 profile mutations—new login, refresh rotation, and permanent reauthentication
 marking—must use this boundary. A stale lease holder receives a typed conflict
 and re-reads the winner instead of writing.
 
-Refine `CodexOAuthService.getValidToken` into a canonical credential operation
-that returns access token, account id, and credential revision together:
+`CodexOAuthService.getValidCredential` is the canonical hosted credential
+operation and returns access token, account id, and credential revision
+together. The legacy `getValidToken` operation remains access-token-only and is
+not the hosted refresh path:
 
 1. Read and decrypt the profile.
 2. Return the access token when it remains valid beyond a configured refresh
@@ -380,12 +422,12 @@ The old refresh token must never overwrite a newer winner. If the provider
 omits a replacement refresh token, retain the current token only when current
 source evidence permits it; otherwise fail closed.
 
-Add `recoverAfterUnauthorized({ subject, observedCredentialRevision })`. Under
-lock it re-reads the profile, uses the winner if the revision changed, or
-forces a refresh regardless of JWT expiry when the rejected revision is still
-current. It returns one atomic credential containing access token, account id,
-and revision. The direct provider may replay exactly once with that credential.
-It must not loop, retry arbitrary 4xx responses, or refresh after policy or
+`recoverAfterUnauthorized({ subject, observedCredentialRevision })` re-reads
+the profile under lock, uses the winner if the revision changed, or forces a
+refresh regardless of JWT expiry when the rejected revision is still current.
+It returns one atomic credential containing access token, account id, and
+revision. The direct provider may replay exactly once with that credential. It
+must not loop, retry arbitrary 4xx responses, or refresh after policy or
 rate-limit errors.
 
 ### Private hosted proxy
@@ -395,11 +437,14 @@ rate-limit errors.
 - `GET /health`
 - private `POST /v1/chat/completions`
 
-It must not add OAuth browser routes. Live mode composes the refresh-capable
-`CodexOAuthClientLive`, encrypted profile store, Upstash lock, OAuth service,
-direct provider, and existing OpenAI-compatible stream mapper. Missing or
-invalid credentials return a generic reauthentication instruction with no
-provider body or token metadata.
+It must not add OAuth browser routes. Live mode composes the server-safe
+`CodexOAuthHttpClientLive`, `CodexOAuthRefreshClientLive`, encrypted profile
+store, Upstash lock and fenced commit, OAuth service, direct provider, and
+existing OpenAI-compatible stream mapper. Trusted-local browser, callback, and
+login Layers are exported only from
+`@bundjil/codex-oauth/trusted-local.layer` and cannot enter the deployable app
+module graph. Missing or invalid credentials return a generic reauthentication
+instruction with no provider body or token metadata.
 
 Route error semantics are explicit:
 
@@ -443,15 +488,16 @@ bun run --filter @bundjil/codex-oauth login:subscription
   -> CodexSubscriptionAuthProtocolConfigServiceLive
   -> CodexLoopbackCallbackBunLive
      -> Effect Scope + Bun platform services + Deferred callback
-  -> CodexOAuthClientLive.createAuthorizationSession
+  -> createCodexOAuthAuthorizationMaterial
+  -> buildCodexOAuthAuthorizationSession
   -> CodexBrowserLauncherCommandLive
   -> browser -> auth.openai.com/oauth/authorize
   -> localhost callback -> Deferred<AuthorizationCallback>
-  -> CodexOAuthClientLive.exchangeAuthorizationCode
+  -> CodexOAuthHttpClient.exchangeAuthorizationCode
   -> auth.openai.com/oauth/token
-  -> CodexOAuthProfileCipherLive
-  -> CodexOAuthProfileCommitUpstashLive (fenced initial/replacement write)
-  -> UpstashKeyValueStoreLive
+  -> UpstashCodexOAuthProfileCommitLive
+     -> CodexOAuthProfileCipherLive
+     -> fenced initial/replacement write to personal Upstash Redis
 ```
 
 ### Hosted refresh-capable request
@@ -464,9 +510,10 @@ POST /v1/chat/completions
   -> CodexOAuthService.getValidCredential
   -> CodexProfileStoreEncryptedKeyValueLive
   -> when near expiry: UpstashCodexOAuthRefreshLockLive
-  -> CodexOAuthClientLive.refresh
+  -> CodexOAuthRefreshClientLive
+  -> CodexOAuthHttpClient.refresh
   -> auth.openai.com/oauth/token
-  -> CodexOAuthProfileCommitUpstashLive fenced-CAS rotated write
+  -> UpstashCodexOAuthProfileCommitLive fenced-CAS rotated write
   -> CodexHttpClient.postResponsesStream
   -> chatgpt.com/backend-api/codex/responses
 ```
@@ -521,23 +568,71 @@ Vercel personal preview
 
 ## Effect Requirements
 
+### Native ownership and contracts
+
 Use Effect TS native approaches first. Prefer `Data`, `Schema`, `Array`,
 `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`,
 `Service`, `Record`, `Result`, `Exit`, Effect Platform HTTP/Command,
 `Deferred`, `Scope`, and `ManagedRuntime` over plain TypeScript helpers when
-the code is fallible, async, runtime-owned, resource-scoped, or crosses a
-package, HTTP, command, config, provider, or persistence boundary.
+the code is fallible, async, runtime-owned, resource-scoped, collection-heavy,
+or crosses a package, HTTP, command, config, provider, or persistence boundary.
 
 Reuse canonical schemas, types, service contracts, errors, and branded
 identifiers from `@bundjil/codex-oauth`. Do not create script-local DTOs,
-token-response mirrors, or duplicate profile fields.
+token-response mirrors, duplicate profile fields, or app-owned copies of a
+package contract. Decode unknown input once at the owning boundary and encode
+it when it crosses HTTP, persistence, command-output, or proof boundaries.
+
+### Linear Effect programs
 
 Primary login, callback, exchange, refresh, profile update, and provider retry
 operations must be flat, named `Effect.gen` or `Effect.fn` programs. Handle
 expected failures in the following `.pipe(...)` with `catchTag`, `catchTags`,
 `mapError`, or `Match`.
 
-Additional requirements:
+The success path must read top-to-bottom in domain order: decode, acquire the
+required services, execute the operation, and encode at the outbound boundary.
+Use this shape:
+
+```ts
+export const executeOperation = Effect.fn("CodexService.executeOperation")(
+  function* (unknownInput: unknown) {
+    const input =
+      yield* Schema.decodeUnknownEffect(OperationInput)(unknownInput);
+    const dependency = yield* CodexDependency;
+    const result = yield* dependency.execute(input).pipe(
+      Effect.mapError(
+        (cause) =>
+          new CodexOAuthTokenProviderError({
+            operation: "refresh",
+            message: "Unable to execute the Codex operation.",
+            cause,
+          })
+      )
+    );
+
+    return yield* Schema.encodeEffect(OperationOutput)(result);
+  }
+);
+```
+
+A nested `Effect.gen` is allowed only when it scopes a resource, defines a
+materially reusable sub-operation, or keeps a lock/commit critical section
+explicit. Do not bury policy branches inside nested pipelines.
+
+- Runtime execution with `Effect.runSync`, `Effect.runPromise`, or
+  `ManagedRuntime` belongs only at an executable app, route adapter, test, or
+  CLI edge, never package domain logic.
+- Layer composition belongs in `*.layer.ts`, app-runtime, CLI composition, or
+  test setup files. Domain services depend on service tags, not concrete live
+  Layers.
+- Operation and span names describe domain behavior. Span attributes must not
+  contain credentials, callback URLs, account ids, prompts, or provider
+  payloads.
+- Prefer `Match` and typed schema discriminants over `switch` statements or
+  chained string comparisons for closed variants.
+
+### Resources, config, and secrets
 
 - Effect Schema owns URL/query/form/token/profile/callback/result boundaries
   and all derived TypeScript types.
@@ -554,14 +649,89 @@ Additional requirements:
 - Provider response bodies, callback query strings, and credentials never
   enter spans, errors, logs, snapshots, or proof output.
 - Persistence uses Effect `KeyValueStore` plus owning schemas. Raw Upstash
-  commands remain isolated to the lock adapter.
-- No unsafe casts, `instanceof`, stringly `_tag` checks, manual object readers,
-  one-line wrappers, or helper sprawl.
-- Tests use `@effect/vitest` with explicit memory/mock layers.
+  commands remain isolated to the lock and fenced-commit adapter.
+- Deployable apps import server-safe `live.layer` exports only. Browser,
+  loopback, and interactive login Layers remain behind `trusted-local.layer`.
+
+### Helper and abstraction budget
+
+Helper sprawl is forbidden. Keep a one-off transformation or Effect pipeline
+inline at its consumer. A new helper, wrapper, mapper, adapter, or service is
+allowed only when at least one of these is true:
+
+1. it is reused by multiple real call sites;
+2. it names and enforces a package, provider, serialization, resource, crypto,
+   lock, or security boundary;
+3. it isolates a non-trivial algorithm or policy that is clearer and directly
+   testable in isolation;
+4. it matches an established repo abstraction with the same ownership.
+
+The following are not acceptable abstractions:
+
+- one-line wrappers around one Effect or SDK call;
+- helpers that only read one property, rename a field, or wrap one `map`;
+- local DTO converters that mirror an owning Schema;
+- generic `utils`, `helpers`, `common`, or `shared` modules without one clear
+  owner;
+- pass-through services or Layers created only to shorten a call site;
+- script-specific clients that duplicate package services;
+- abstractions justified only by possible future reuse.
+
+Every implementation audit must inspect each new helper and record its owner,
+call sites, and admission reason. If the reason is weak, inline or delete it.
+
+### Static analysis and lint policy
+
+- `bun run check` is authoritative for Ultracite/Oxlint formatting and
+  type-aware linting; `oxlint.config.ts` is the root rule authority.
+- `bun run knip` rejects dead files, exports, and dependencies. Do not retain an
+  abstraction merely because it may be used later.
+- Package and app `check-types` commands plus the configured Effect language
+  service must remain clean.
+- Do not add broad lint disables, ignore patterns, `eslint-disable`,
+  `oxlint-disable`, `@ts-ignore`, `@ts-expect-error`, unsafe casts, or config
+  exceptions to land the work. A narrow suppression requires an adjacent
+  reason and must not hide Effect, promise, hook, accessibility, or schema
+  failures.
+- The Eve tool filename-case exception is local to Eve's filesystem convention
+  and is not precedent for disabling other rules.
+- Lint cannot prove good Effect ownership or detect helper sprawl; those remain
+  mandatory manual audit checks.
+- Tests use `@effect/vitest` with explicit memory/mock Layers and schema failure
+  assertions at public boundaries.
 
 Every implementation task requires three parent audit passes before
 acceptance: ownership/call graph, Effect implementation quality, and
-verification coverage. A dedicated final 3-pass audit sweep remains mandatory.
+verification coverage. The dedicated final 3-pass audit sweep was completed,
+and its trusted-local Layer export finding was fixed before acceptance.
+
+## Frontend And React Applicability
+
+This SPEC adds no React route or operator UI. Do not introduce one as incidental
+scope. Any later visible account, connection, or proxy-status surface requires
+a SPEC amendment or a new SPEC and must follow
+`docs/architecture/frontend-composition.md`.
+
+That future work must:
+
+- compose visible structure as primitive -> composite -> layout -> route;
+- let leaf components own the data, command, loading, empty, error, retry, and
+  skeleton behavior for the exact fragment they render;
+- avoid prop-drilling query results, ids, loading flags, derived options, and
+  command callbacks through unrelated ancestors;
+- avoid nested feature wrappers, boolean-prop matrices, controller components,
+  and component/helper aliases that exist only to shorten JSX;
+- derive render values directly instead of mirroring props/query data into
+  state, and use React effects only to synchronize with external systems;
+- prefer explicit children/slots and narrow domain props over generic callback
+  bags and presentation-flag matrices;
+- keep Effect runtimes, services, Layers, Config, credentials, and provider
+  clients out of render functions and browser bundles;
+- expose Schema-owned serializable contracts at route/loader/RPC boundaries
+  rather than duplicating package DTOs in components;
+- verify accessibility, focus/keyboard behavior, responsive layout, stable
+  loading dimensions, long content, and error states with browser evidence at
+  desktop and mobile widths.
 
 ## Verification
 
@@ -674,3 +844,15 @@ Documentation must distinguish:
   revision-aware 401 recovery, first-party refresh transport/port/scope parity,
   concrete local service layers, safe proof instrumentation, explicit route
   error/readiness semantics, and progressive task dependencies.
+- Revision 4, 2026-07-13: the completion review reconciled the SPEC with the
+  implemented split between trusted-local login, OAuth HTTP transport, and the
+  hosted refresh adapter; added enforceable linear-Effect, helper-admission,
+  lint/suppression, runtime/Layer-boundary, and React leaf-composition rules;
+  and linked the new durable frontend composition guide. No frontend was added
+  to this backend-only scope.
+- Revision 5, 2026-07-13: the adversarial implementation review corrected
+  remaining pre-implementation language and stale Eve/proof gates, aligned the
+  authorization-session, profile-union, fenced-write, read/write persistence,
+  login, and refresh call graphs with the committed schemas and services, and
+  tightened typed error, lint-suppression, derived-state, effect, and component
+  API rules.

@@ -12,7 +12,7 @@ apps/
 
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
-  codex-oauth/        Codex OAuth profiles, direct Responses proof, and KV adapters.
+  codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and KV adapters.
   effect-start/       Reusable TanStack Start middleware adapters for Effect.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
@@ -79,6 +79,12 @@ layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
 The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
 Vercel account. Do not link or deploy this app to Tilt Legal.
+
+The proxy composes mock, deprecated local diagnostic, and refresh-capable
+preview-live modes. It never owns a hosted browser OAuth callback or an
+account-linking endpoint. Deployable apps import server-safe layers from
+`@bundjil/codex-oauth/live.layer`; trusted-local browser, loopback, and login
+composition is isolated behind `@bundjil/codex-oauth/trusted-local.layer`.
 
 Future Sendblue, Cloudflare email, Vercel Connect, and Notion code should start
 in app-owned boundaries until stable. Move shared contracts into packages only
@@ -154,7 +160,7 @@ after the shape has survived at least one real tool/channel implementation.
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
 - composes refresh-capable encrypted `live` mode for personal preview using the
   package-owned OAuth refresh transport, Upstash lock, fenced profile commit,
-  and encrypted profile store. The hosted preview proof is still pending;
+  and encrypted profile store. The hosted preview proof is accepted;
 - keeps the trusted filesystem `local` mode access-token-only and rejects that
   mode on Vercel;
 - must expose no OAuth browser start/callback route, must fail closed, and must
@@ -170,10 +176,10 @@ after the shape has survived at least one real tool/channel implementation.
 - owns `BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_AGENT_MODEL`, and
   `BUNDJIL_CODEX_PROXY_*` config parsing;
 - may construct an AI SDK `LanguageModel` for the private proxy;
-- must keep AI Gateway as the default provider until hosted live Codex proxy
-  proof passes;
-- must not wire the refresh-capable hosted live proxy into Eve until that
-  preview proof and a separate integration task are accepted;
+- must keep AI Gateway as the default provider unless a separately approved
+  production decision changes that boundary;
+- may expose the accepted opt-in Codex proxy adapter, but must not describe it
+  and the separate hosted preview proof as combined end-to-end evidence;
 - must not import `CodexOAuthService`, `CodexProfileStore`, direct Codex HTTP
   clients, or hosted token storage adapters.
 

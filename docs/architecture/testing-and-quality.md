@@ -137,11 +137,12 @@ Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
-Codex proxy mode is not an Eve test requirement. Gateway remains the default;
-the implemented refresh-capable `live` path is not yet wired into Eve, and the
-access-token-only `local` workaround must never be used as hosted auth. When a
-separate Eve integration task is accepted after hosted preview proof, source
-ignored env values rather than printing them:
+Codex proxy mode is not an Eve test requirement. Gateway remains the default.
+The refresh-capable `live` path and opt-in Eve adapter are proven separately;
+do not claim Eve -> hosted-live-proxy end-to-end evidence without a verified
+deployed Eve request. The access-token-only `local` workaround is deprecated
+and must never be used as hosted auth. Source ignored env values rather than
+printing them:
 
 ```bash
 PORT=<local-port> \
@@ -171,8 +172,9 @@ decodes it through the owning Effect Schema boundary.
 Record no request body or model output. Checks must run against the personal
 Vercel preview before any production proposal and must scan logs for absence of
 token values, authorization codes, raw OAuth payloads, prompts, and full
-response bodies. The refresh-capable code path is implemented, but this hosted
-preview proof is still pending and must not be inferred from local tests.
+response bodies. The refresh-capable code path and hosted preview proof are
+accepted. Do not infer a combined Eve-to-hosted-live request from the separate
+proxy and adapter proof records.
 
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.

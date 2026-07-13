@@ -47,6 +47,8 @@ Start here for repo conventions.
 - `docs/architecture/testing-and-quality.md` defines verification scope and
   commands.
 - `docs/architecture/eve-agent.md` documents the committed Eve app runtime.
+- `docs/architecture/frontend-composition.md` defines conditional React,
+  leaf-component, state ownership, and browser verification rules.
 
 ## Local Reference Repositories
 

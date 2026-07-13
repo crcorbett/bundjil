@@ -207,6 +207,15 @@ bun run --filter @bundjil/agent dev:no-ui
 Hosted rollback is handled in `apps/codex-proxy`; the app-level rollback is to
 remove the `codex-proxy` env vars so Eve uses Gateway again.
 
+## Proof Boundary
+
+The `codex-proxy` adapter is opt-in and uses app-owned Effect Config to create
+an OpenAI-compatible `LanguageModel`; Gateway is the default. Its
+configuration and injected-fetch tests prove adapter construction, private
+bearer handling, and Gateway fallback. They do not prove a combined Eve ->
+hosted Vercel live-proxy request. Refresh, fencing, SSE, and preview proof
+belong to `apps/codex-proxy` and the hosted OAuth-storage SPEC.
+
 ## Runtime Artifacts
 
 The app ignores Eve and Nitro runtime output:

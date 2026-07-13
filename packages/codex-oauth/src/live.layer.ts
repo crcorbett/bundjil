@@ -62,14 +62,11 @@ import {
 } from "./stored-profile-proof.service.js";
 
 export { CodexOAuthProfileCipherConfigLive } from "./profile-cipher.config.js";
-export { CodexBrowserLauncherCommandLive } from "./browser-launcher.service.js";
-export { CodexLoopbackCallbackBunLive } from "./loopback-callback.service.js";
 export { CodexOAuthHttpClientLive } from "./oauth-http-client.service.js";
 export { CodexOAuthRefreshClientLive } from "./oauth-refresh-client.service.js";
 export { CodexOAuthRefreshPolicyLive } from "./oauth-refresh.config.js";
 export { CodexSubscriptionAuthProtocolConfigLive } from "./subscription-auth-protocol.service.js";
 export { CodexSubscriptionLoginConfigLive } from "./subscription-login.config.js";
-export { CodexSubscriptionLoginLive } from "./subscription-login.service.js";
 
 export const CodexOAuthProfileCipherLive = Layer.effect(
   CodexOAuthProfileCipher,

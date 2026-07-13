@@ -245,3 +245,18 @@ POST /v1/chat/completions
 The `local` branch remains access-import-only and never refreshes. The `live`
 branch refuses legacy profiles and composes only refresh-capable credentials.
 The app imports no browser, loopback, or Codex CLI cache-reading boundary.
+
+# Hosted Refresh-Capable State
+
+The personal Vercel preview `live` composition is implemented and has recorded
+sanitized proof of encrypted Upstash persistence, trusted-local PKCE profile
+provisioning, proactive refresh, fenced concurrent rotation, bounded 401
+recovery, private SSE, and safe logs. This is single-owner experimental use;
+production remains a separate explicit approval. The Vercel app exposes no
+browser OAuth callback, OAuth start route, or account-linking endpoint.
+
+Access-token-only import is deprecated for normal hosted operation. Retain it
+only for emergency or trusted-local diagnostic use; it cannot refresh and must
+not be used as evidence for the refresh-capable path. The agent adapter is
+proven separately, so this runbook does not claim an Eve -> hosted-live-proxy
+end-to-end proof.
