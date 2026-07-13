@@ -39,6 +39,10 @@ export {
   CodexProxyReadyLive,
   CodexProxyUnavailableLive,
 } from "./readiness.service.js";
+export {
+  CodexProxyProfileCipherConfigLive,
+  makeCodexProxyProfileCipherConfigLayer,
+} from "./proof-cipher-config.layer.js";
 export type {
   CodexProxyDevServerConfig as CodexProxyDevServerConfigType,
   CodexProxyErrorCode as CodexProxyErrorCodeType,

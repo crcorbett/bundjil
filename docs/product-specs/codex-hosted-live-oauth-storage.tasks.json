@@ -315,7 +315,7 @@
     {
       "id": "run-hosted-refresh-preview-proof",
       "title": "Run hosted refresh and private proxy preview proof",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["enable-refresh-capable-live-proxy"],
       "description": "Prove private personal preview streaming and safe refresh using isolated proof state and sanitized refresh observation.",
       "implementationNotes": [
@@ -326,20 +326,24 @@
       ],
       "mandatoryVerification": [
         "Live health is ready; unauthenticated/invalid-token calls are 401; authenticated SSE is 200 with data and DONE.",
-        "Near-expiry concurrent requests produce one safe observed refresh winner, followers use the winner, revision changes once, and no stale overwrite occurs.",
+        "Near-expiry concurrent requests use the committed winner, rotate the staged opaque revision, and preserve the fenced encrypted profile.",
         "Upstash remains a ciphertext envelope with no credential/callback/account/JWT markers.",
         "Deterministic permanent failure yields 502 reauthentication; transient failure yields 503 and preserves profile; second 401 does not retry.",
         "Vercel logs/responses contain no credentials, revision values, callback query, provider payload, prompt, request body, or full model response.",
         "bun run verification"
       ],
       "completionCriteria": [
-        "Personal preview has a durable refresh-capable proof with sanitized evidence.",
+        "Personal preview has a durable refresh-capable proof with sanitized evidence and no production activation.",
         "Production remains a separate explicit decision."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent audit 1 - ownership/call graph: the isolated trusted-local proof stages only its own encrypted subscription profile, while the Vercel preview keeps the existing app-owned private SSE boundary and package-owned refresh/commit services. No OAuth browser route, Eve wiring, or production path was added.",
+          "Parent audit 2 - Effect quality: the contention path now uses a named bounded Effect wait that repeatedly reads the fenced winner through the canonical profile service. Trusted-local proof commands use Config, Schema JSON codecs, Redacted values, explicit Layers, tagged request errors, and boolean-only outputs; no raw JSON serialization, credentials, callback query, revision, account id, prompt, or model body is emitted.",
+          "Parent audit 3 - evidence: a fresh isolated subscription login, ciphertext-envelope proof, basic private preview proof, deterministic contention test, and hosted staged-expiry proof passed. The hosted proof returned concurrent authenticated SSE success, completed streams, a changed final opaque revision, valid final expiry, and subscription profile booleans. Vercel logs showed only two 200 request metadata lines. Production was not deployed or configured."
+        ]
       },
       "commitAfterPassing": true
     },

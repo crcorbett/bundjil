@@ -575,8 +575,67 @@ Parent audit:
    across all six workspaces. The tests cover proactive/forced refresh,
    fencing, no-mutation errors, legacy refusal, one 401 replay, readiness,
    error contracts, local/mock preservation, and leak safety. `git diff
-   --check` and task JSON validation passed.
+--check` and task JSON validation passed.
 
 Remaining gap: the later hosted preview proof task has not run. This accepted
 implementation made no deployment, remote configuration change, production
 action, provider request, or Eve wiring.
+
+### run-hosted-refresh-preview-proof
+
+Status: Accepted 2026-07-13.
+
+Hosted preview evidence:
+
+- A fresh isolated trusted-local ChatGPT subscription login completed and wrote
+  only its own preview-prefixed Upstash profile. The sanitized stored-profile
+  proof confirmed a V2 ciphertext envelope, subscription profile,
+  refresh capability, valid expiry, false reauthentication marker, and no
+  plaintext marker leak.
+- The private preview basic probe returned live health `200`, missing/invalid
+  bearer `401`, and authenticated SSE `200` with two data lines and `[DONE]`.
+  Its Schema output confirmed no bearer, authorization-code, request-payload,
+  or stream-payload marker leak.
+- The reusable trusted-local staged-hosted proof atomically changed only the
+  isolated profile to near expiry, retained the staged opaque revision in
+  memory, and issued two concurrent private preview calls. It returned all
+  approved booleans true: concurrent authenticated success, SSE content type,
+  completed streams, staged expiry, changed final revision, valid final expiry,
+  and final subscription profile.
+- Initial hosted evidence exposed that a lock contender could receive `503`
+  while the winner was still refreshing. `CodexOAuthService` now waits up to
+  the configured refresh-lease TTL, re-reading the fenced winner every 50ms.
+  A deterministic Effect test proves one refresh, one successful winner use,
+  and identical winner/follower revisions. The corrected preview proof passed.
+- Runtime logs for the corrected deployment contained only two
+  `POST /v1/chat/completions 200` metadata lines. They contained no credential,
+  callback query, revision, provider payload, prompt, request body, or model
+  response body.
+
+Isolation and production boundary:
+
+- The proof-only cipher selector remains opt-in per deployment. Normal live
+  configuration keeps the package-owned owner cipher; proof deployments use a
+  separate preview-only cipher and unique Upstash key prefix.
+- All browser login, near-expiry staging, and envelope inspection ran only on
+  the trusted local machine. Their outputs are Schema-owned booleans/statuses.
+  Temporary environment files and loopback listeners were removed after use.
+- All deployments were personal Vercel previews. No production deployment,
+  production Bundjil configuration, or Eve integration was created.
+
+Parent audit:
+
+1. Ownership and call graph: `@bundjil/codex-oauth` owns trusted-local staging,
+   profile/cipher/commit operations, refresh coordination, and proof contracts;
+   `apps/codex-proxy` owns private routing and the proof-only cipher selector.
+   The public app contract and Eve remain unchanged.
+2. Effect quality: reviewed the named recursive contender wait, bounded by the
+   refresh lock TTL; canonical profile/schema decoding; explicit Config and
+   Layers; `Redacted` boundaries; tagged errors; Schema JSON encoders; and
+   boolean-only proof results. No raw JSON serialization, casts, DTO mirrors,
+   `process.env` package logic, or secret-bearing logs were introduced.
+3. Verification coverage: the deterministic contention test, full package and
+   proxy suites, builds, smoke test, root verification, JSON validation,
+   diff check, ciphertext proof, basic preview proof, staged hosted proof, and
+   runtime-log readback passed. The hosted result proves final revision rotation
+   and successful concurrent streaming without exposing the opaque revision.

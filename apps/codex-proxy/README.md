@@ -154,8 +154,8 @@ vercel deploy
 
 Set `BUNDJIL_CODEX_PROXY_MODE=live` for preview only. The login command writes
 the encrypted subscription profile to Upstash and must not run inside a Vercel
-function, CI, Eve, or browser runtime. This implementation task did not deploy
-or run the later hosted preview proof.
+function, CI, Eve, or browser runtime. The hosted refresh proof is complete on
+an isolated preview subject; it did not activate production or wire Eve.
 
 For a direct preview check, set `PROXY_URL` to the preview deployment and use a
 minimal request from a private shell. The server decodes it through the owning
@@ -174,6 +174,17 @@ upstashValueEncrypted: true
 tokenLeak: false
 rawPayloadLeak: false
 ```
+
+`bun run --filter @bundjil/codex-proxy proof:preview` performs that basic
+black-box check when its preview URL and internal bearer are supplied through
+ignored environment state. It emits only the documented statuses, booleans, and
+SSE data-line count. It never print the bearer, request body, or stream body.
+This command does not force a refresh; use the separate isolated-profile
+refresh proof before using a new profile/cipher pair. The accepted proof uses a
+trusted-local isolated profile, stages only that profile near expiry, makes two
+concurrent private preview calls, and emits only booleans for successful SSE,
+staged expiry, final revision rotation, final valid expiry, and final
+subscription state. It must never be run against the owner profile.
 
 Inspect Vercel runtime logs after the probe. Logs and the Upstash readback must
 not contain access, refresh, or ID token values, cache content, account

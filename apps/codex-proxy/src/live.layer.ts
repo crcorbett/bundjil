@@ -6,7 +6,6 @@ import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
   CodexOAuthHttpClientLive,
-  CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexOAuthRefreshClientLive,
   CodexOAuthRefreshPolicyLive,
@@ -24,20 +23,20 @@ import {
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
 
+import { CodexProxyProfileCipherConfigLive } from "./proof-cipher-config.layer.js";
 import {
   CodexProxyReadyLive,
   CodexProxyUnavailableLive,
 } from "./readiness.service.js";
 
+const CodexProxyProfileCipherLive = CodexOAuthProfileCipherLive.pipe(
+  Layer.provide(CodexProxyProfileCipherConfigLive)
+);
+
 const CodexProxyEncryptedProfileStoreLive =
   CodexProfileStoreEncryptedKeyValueLive.pipe(
     Layer.provideMerge(
-      Layer.merge(
-        CodexOAuthProfileCipherLive.pipe(
-          Layer.provide(CodexOAuthProfileCipherConfigLive)
-        ),
-        UpstashKeyValueStoreLive
-      )
+      Layer.merge(CodexProxyProfileCipherLive, UpstashKeyValueStoreLive)
     )
   );
 
@@ -46,11 +45,7 @@ const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
     Layer.mergeAll(
       CodexProxyEncryptedProfileStoreLive,
       UpstashCodexOAuthProfileCommitLive.pipe(
-        Layer.provide(
-          CodexOAuthProfileCipherLive.pipe(
-            Layer.provide(CodexOAuthProfileCipherConfigLive)
-          )
-        )
+        Layer.provide(CodexProxyProfileCipherLive)
       ),
       UpstashCodexOAuthRefreshLockLive,
       CodexOAuthRefreshPolicyLive,

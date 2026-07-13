@@ -22,6 +22,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "dev": "bun --conditions=@bundjil/source src/dev.ts",
+    "proof:preview": "bun --conditions=@bundjil/source scripts/prove-preview.ts",
     "smoke-test": "bun --conditions=@bundjil/source scripts/smoke-test.ts",
     "test": "vitest run"
   },

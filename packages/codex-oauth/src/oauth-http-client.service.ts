@@ -47,6 +47,8 @@ const RefreshRequest = Schema.Struct({
   refresh_token: Schema.NonEmptyString,
 });
 
+const codexOAuthHttpExecutionTimeout = "30 seconds";
+
 const mapTransportFailure = (
   operation: "exchangeAuthorizationCode" | "refreshToken"
 ) =>
@@ -54,6 +56,15 @@ const mapTransportFailure = (
     operation,
     reason: "transportFailure",
     message: "The Codex OAuth token endpoint request failed.",
+  });
+
+const mapTimeoutFailure = (
+  operation: "exchangeAuthorizationCode" | "refreshToken"
+) =>
+  new CodexSubscriptionAuthError({
+    operation,
+    reason: "timeout",
+    message: "The Codex OAuth token endpoint request timed out.",
   });
 
 const mapResponseFailure = (
@@ -122,13 +133,19 @@ export const makeCodexOAuthHttpClient = Effect.gen(
             ["code_verifier", Redacted.value(input.codeVerifier)],
           ])
         );
-        const response = yield* client
-          .execute(request)
-          .pipe(
-            Effect.mapError(() =>
-              mapTransportFailure("exchangeAuthorizationCode")
-            )
-          );
+        const response = yield* client.execute(request).pipe(
+          Effect.mapError(() =>
+            mapTransportFailure("exchangeAuthorizationCode")
+          ),
+          Effect.timeoutOption(codexOAuthHttpExecutionTimeout),
+          Effect.flatMap(
+            Option.match({
+              onNone: () =>
+                Effect.fail(mapTimeoutFailure("exchangeAuthorizationCode")),
+              onSome: Effect.succeed,
+            })
+          )
+        );
 
         if (response.status < 200 || response.status >= 300) {
           return yield* decodeProviderRejection(
@@ -155,9 +172,16 @@ export const makeCodexOAuthHttpClient = Effect.gen(
           HttpClientRequest.schemaBodyJson(RefreshRequest)(body),
           Effect.mapError(() => mapResponseFailure("refreshToken"))
         );
-        const response = yield* client
-          .execute(request)
-          .pipe(Effect.mapError(() => mapTransportFailure("refreshToken")));
+        const response = yield* client.execute(request).pipe(
+          Effect.mapError(() => mapTransportFailure("refreshToken")),
+          Effect.timeoutOption(codexOAuthHttpExecutionTimeout),
+          Effect.flatMap(
+            Option.match({
+              onNone: () => Effect.fail(mapTimeoutFailure("refreshToken")),
+              onSome: Effect.succeed,
+            })
+          )
+        );
 
         if (response.status < 200 || response.status >= 300) {
           return yield* decodeProviderRejection(response, "refreshToken");

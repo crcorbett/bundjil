@@ -1,6 +1,7 @@
 import {
   CodexAccessTokenImportProfile,
   CodexHttpStatusError,
+  CodexOAuthProfileCipherConfigService,
   CodexOAuthAuthTemporarilyUnavailable,
   CodexOAuthReauthenticationRequired,
   OpenAICompatibleProxy,
@@ -23,7 +24,7 @@ import {
 } from "@bundjil/codex-oauth/mock.layer";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
-import { ConfigProvider, Effect, Layer, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import { describe, it as vitestIt } from "vitest";
 
@@ -33,6 +34,7 @@ import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
   CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
+  makeCodexProxyProfileCipherConfigLayer,
   loadCodexProxyConfig,
   makeCodexProxyAppLayer,
   makeCodexProxyConfig,
@@ -87,6 +89,21 @@ const cipherConfig = {
 const localCipherConfigProvider = ConfigProvider.layer(
   ConfigProvider.fromEnv({ env: cipherConfig })
 );
+
+const proofCipherConfig = {
+  BUNDJIL_CODEX_PROOF_PROFILE_ENCRYPTION_KEY:
+    "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+  BUNDJIL_CODEX_PROOF_PROFILE_ENCRYPTION_KEY_ID: "proxy-proof-test-key-v1",
+  BUNDJIL_CODEX_PROXY_PROOF_MODE: "true",
+};
+
+const proofCipherConfigProvider = ConfigProvider.fromEnv({
+  env: proofCipherConfig,
+});
+
+const normalCipherConfigProvider = ConfigProvider.fromEnv({
+  env: cipherConfig,
+});
 
 const localTestConfig = (directory: string) =>
   makeCodexProxyConfig({
@@ -354,6 +371,54 @@ const withLocalTestHandler = <A>(
   });
 
 describe("@bundjil/codex-proxy Effect HTTP handler", () => {
+  it.effect(
+    "uses the normal package cipher config when proof mode is disabled",
+    () =>
+      Effect.gen(function* testNormalCipherConfig() {
+        const config = yield* CodexOAuthProfileCipherConfigService;
+
+        assert.strictEqual(config.keyId, "proxy-local-test-key-v1");
+        assert.strictEqual(
+          Redacted.value(config.keyMaterial),
+          cipherConfig.BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY
+        );
+      }).pipe(
+        Effect.provide(
+          makeCodexProxyProfileCipherConfigLayer(normalCipherConfigProvider)
+        )
+      )
+  );
+
+  it.effect("uses proof-only cipher variables when proof mode is enabled", () =>
+    Effect.gen(function* testProofCipherConfig() {
+      const config = yield* CodexOAuthProfileCipherConfigService;
+
+      assert.strictEqual(config.keyId, "proxy-proof-test-key-v1");
+      assert.strictEqual(
+        Redacted.value(config.keyMaterial),
+        proofCipherConfig.BUNDJIL_CODEX_PROOF_PROFILE_ENCRYPTION_KEY
+      );
+    }).pipe(
+      Effect.provide(
+        makeCodexProxyProfileCipherConfigLayer(proofCipherConfigProvider)
+      )
+    )
+  );
+
+  it.effect(
+    "does not require proof cipher variables when normal live config is selected",
+    () =>
+      Effect.gen(function* testNormalCipherConfigWithoutProofVariables() {
+        const config = yield* CodexOAuthProfileCipherConfigService;
+
+        assert.strictEqual(config.keyId, "proxy-local-test-key-v1");
+      }).pipe(
+        Effect.provide(
+          makeCodexProxyProfileCipherConfigLayer(normalCipherConfigProvider)
+        )
+      )
+  );
+
   it.effect("returns GET /health", () =>
     withTestHandler((handler) =>
       Effect.gen(function* testHealth() {

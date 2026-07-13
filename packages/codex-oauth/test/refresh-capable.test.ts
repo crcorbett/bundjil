@@ -1,5 +1,6 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { Deferred, Effect, Fiber, Layer, Redacted, Schema } from "effect";
+import { TestClock } from "effect/testing";
 
 import {
   CodexDirectProviderInput,
@@ -172,6 +173,59 @@ it.effect("proactively refreshes inside skew and commits rotated fields", () =>
       }
     }).pipe(Effect.provide(layer));
   })
+);
+
+it.effect(
+  "waits for a contended refresh winner before returning a credential",
+  () =>
+    Effect.gen(function* testContendedRefreshWinnerWait() {
+      const value = yield* subject;
+      const profile = yield* makeProfile(value, {
+        expiresAtEpochMillis: 0,
+      });
+      const refreshResult = yield* makeRefreshResult(value);
+      const refreshStarted = yield* Deferred.make<null>();
+      let refreshCalls = 0;
+      const layer = CodexOAuthMemory(
+        [profile],
+        {
+          refresh: () => {
+            refreshCalls += 1;
+
+            return Deferred.succeed(refreshStarted, null).pipe(
+              Effect.andThen(Effect.sleep("10 millis")),
+              Effect.as(refreshResult)
+            );
+          },
+        },
+        {
+          refreshSkewMillis: 300_000,
+          lockTtlMillis: Schema.decodeUnknownSync(
+            CodexOAuthRefreshLockTtlMillis
+          )(5000),
+        }
+      );
+
+      return yield* Effect.gen(function* readWinnerAndFollower() {
+        const fiber = yield* Effect.forkChild(
+          Effect.all([getValidCredential(value), getValidCredential(value)], {
+            concurrency: "unbounded",
+          })
+        );
+        yield* Deferred.await(refreshStarted);
+        yield* TestClock.adjust("1 second");
+        const [winner, follower] = yield* Fiber.join(fiber);
+        const observer = yield* getCodexOAuthObserverSnapshot;
+
+        assert.strictEqual(refreshCalls, 1);
+        assert.strictEqual(
+          winner.credentialRevision,
+          follower.credentialRevision
+        );
+        assert.strictEqual(observer.counters.refreshSucceeded, 1);
+        assert.strictEqual(observer.counters.refreshWinnerUsed, 1);
+      }).pipe(Effect.provide(layer));
+    })
 );
 
 it.effect(

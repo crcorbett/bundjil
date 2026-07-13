@@ -219,6 +219,34 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
     });
   });
 
+  const awaitContendedRefreshWinner: (
+    subject: CodexOAuthSubject,
+    deadlineEpochMillis: number
+  ) => Effect.Effect<CodexOAuthCredentialType, CodexOAuthFailure> = Effect.fn(
+    "CodexOAuthService.awaitContendedRefreshWinner"
+  )(function* (subject: CodexOAuthSubject, deadlineEpochMillis: number) {
+    const profile = yield* requireSubscriptionProfile(subject);
+    const nowEpochMillis = yield* Clock.currentTimeMillis;
+
+    if (profile.expiresAtEpochMillis > nowEpochMillis) {
+      yield* recordObserverEvent(observer, {
+        type: "refreshWinnerUsed",
+        profileKind: "subscription",
+      });
+      return yield* credentialFromProfile(profile);
+    }
+
+    if (nowEpochMillis >= deadlineEpochMillis) {
+      return yield* new CodexOAuthAuthTemporarilyUnavailable({
+        reason: "lockContended",
+        message: "Codex authorization is temporarily unavailable.",
+      });
+    }
+
+    yield* Effect.sleep("50 millis");
+    return yield* awaitContendedRefreshWinner(subject, deadlineEpochMillis);
+  });
+
   const refreshCredential = Effect.fn("CodexOAuthService.refreshCredential")(
     function* (
       subject: CodexOAuthSubject,
@@ -361,25 +389,12 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
           CodexOAuthRefreshLockError: (error) =>
             error.reason === "contended"
               ? Effect.gen(function* readContendedWinner() {
-                  const winner = yield* requireSubscriptionProfile(subject);
                   const nowEpochMillis = yield* Clock.currentTimeMillis;
 
-                  if (
-                    winner.expiresAtEpochMillis > nowEpochMillis &&
-                    (observedCredentialRevision === undefined ||
-                      winner.credentialRevision !== observedCredentialRevision)
-                  ) {
-                    yield* recordObserverEvent(observer, {
-                      type: "refreshWinnerUsed",
-                      profileKind: "subscription",
-                    });
-                    return yield* credentialFromProfile(winner);
-                  }
-
-                  return yield* new CodexOAuthAuthTemporarilyUnavailable({
-                    reason: "lockContended",
-                    message: "Codex authorization is temporarily unavailable.",
-                  });
+                  return yield* awaitContendedRefreshWinner(
+                    subject,
+                    nowEpochMillis + refreshPolicy.lockTtlMillis
+                  );
                 })
               : Effect.fail(error),
         })
