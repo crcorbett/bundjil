@@ -152,7 +152,7 @@
     {
       "id": "prove-sendblue-preview",
       "title": "Provision and prove the Sendblue channel on Vercel Preview",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["implement-sendblue-eve-channel"],
       "description": "Configure isolated Preview credentials/storage/identity and a protected Sendblue receive webhook, then prove invalid, valid, concurrent replay, Eve routing, and one real outbound reply with sanitized evidence.",
       "implementationNotes": [

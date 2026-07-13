@@ -19,21 +19,19 @@ and proof artifacts contain only variable names and sanitized metadata.
 
 ## Current Task
 
-No task is currently in progress. `implement-sendblue-eve-channel` has passed
-parent acceptance and awaits its coherent commit before
-`prove-sendblue-preview` begins.
+`prove-sendblue-preview` is in progress after the accepted Eve channel was
+committed as `5061a86`.
 
-Accepted scope:
+Current scope:
 
-- thin Eve channel route and framework runtime adapter;
-- linear inbound auth, decode, classification, identity, routing, claim, and
-  dispatch program;
-- outbound completed-message filtering, replay claim, provider send, and
-  complete/uncertain transition program;
-- direct Request/Response and Eve event tests with injected Layers.
+- connect the existing personal Upstash resource to the agent for Preview only;
+- create encrypted Preview Sendblue, routing, identity, replay, and protection
+  configuration from 1Password/provider-owned values;
+- deploy one clean committed Preview and prove the authenticated route matrix;
+- configure the Sendblue receive webhook and prove one replay-safe iMessage
+  round trip with sanitized evidence.
 
-Provider account mutation and webhook provisioning are deferred until the
-accepted channel slice is committed.
+Production resources and environment variables remain untouched.
 
 ## Provider Discovery
 
@@ -44,6 +42,33 @@ Recorded: 2026-07-13
 - The account has an active iMessage line and recent message history.
 - API credentials exist in the `SendBlue API` 1Password item; values were not
   copied into repository files or command output.
+- The existing personal Upstash resource is connected to `bundjil-agent` for
+  Preview only. Its URL/token are mapped into the app-owned replay variables
+  without exposing values.
+- All 12 required `BUNDJIL_SENDBLUE_*` variables exist for Preview only;
+  Production has zero Sendblue variables.
+- A dedicated Vercel automation bypass exists, but its first generated value is
+  intentionally treated as unknown and will be replaced by an operator-owned
+  value saved in 1Password before webhook registration.
+
+## Preview Build Log
+
+Recorded: 2026-07-13
+
+- Accepted commits through `5061a86` were pushed to `origin/main`.
+- Clean Git deployment `dpl_E1Pu7XEF6NG458yS4JPwJGQrqX12` cloned exact commit
+  `5061a86a47a1a1b3c8742fd3b442a24c3cb235c8` with `dirty=false` and made no
+  Production change.
+- The deployment failed before runtime in `buildStep`: Vercel's optimized Turbo
+  scope ran the package-specific `@bundjil/agent#build`, whose override had
+  dropped the root `dependsOn: ["^build"]`; Eve therefore could not resolve the
+  unbuilt `@bundjil/eve-effect` workspace output.
+- The package-specific build task now restores the upstream build edge and
+  declares the exact 12 Sendblue build environment names. A forced clean local
+  build executed `@bundjil/core -> @bundjil/eve-effect -> @bundjil/agent` with
+  zero cached tasks, followed by full repository verification.
+- The failed deployment is retained as diagnostic evidence. A new clean commit
+  and immutable Preview deployment will be used for route and webhook proof.
 
 ## Accepted Tasks
 
