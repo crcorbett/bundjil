@@ -515,14 +515,16 @@
     {
       "id": "redeploy-current-preview-and-record-live-evidence",
       "title": "Redeploy current proxy preview and record hardened live evidence",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["harden-preview-proof-contract"],
       "description": "Deploy apps/codex-proxy from current main to the personal preview project and use the hardened command to prove private live streaming without recording secrets.",
       "implementationNotes": [
         "Deploy only bundjil-codex-proxy under Cooper's personal Vercel team.",
         "Pull current preview environment to an ignored temporary file; do not rely on a stale local env pull.",
         "Record deployment id, commit SHA, statuses, booleans, SSE data-line count, and log-scan result only.",
-        "Do not promote or configure production in this task."
+        "Do not promote or configure production in this task.",
+        "Deployed commit af35a16840cfebd8f940c280e98bcad18ba3b741 to personal preview deployment dpl_4uK4tZc6Whd3kCuV5vfRdyZMAU24. The ready preview URL is recorded in the active plan without secret values.",
+        "A fresh preview environment pull and hardened proof returned status proved with health 200/live, missing and invalid bearer 401, authenticated SSE 200, two data lines, done marker, and all leak predicates false."
       ],
       "mandatoryVerification": [
         "Vercel preview deployment reaches READY and identifies current main commit.",
@@ -539,8 +541,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership/call graph: deployment remains apps/codex-proxy-owned and is linked to prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB under Cooper's personal Vercel team. It runs the existing private proxy call graph; no agent, OAuth package, storage contract, or production configuration changed.",
+          "Pass 2 - implementation quality: this task changed no runtime code. The deployed source is the accepted af35a16 proof-contract commit; Vercel built the configured codex-oauth and codex-proxy workspaces successfully and the preview target remains non-production.",
+          "Pass 3 - verification coverage: deployment dpl_4uK4tZc6Whd3kCuV5vfRdyZMAU24 reached READY with af35a16 metadata; a freshly pulled preview env passed the hardened proof; runtime logs showed only safe route/status metadata for health 200 and rejected 401 requests; Vercel reported no runtime errors; prior root verification and git diff --check passed."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -668,7 +668,14 @@ attempt is not sufficient verification until the script enforces the contract.
    and diff hygiene.
 2. `redeploy-current-preview-and-record-live-evidence`: deploy current main to
    the personal preview proxy and run the hardened black-box proof and log
-   checks.
+   checks. Accepted on 2026-07-13: Vercel deployment
+   `dpl_4uK4tZc6Whd3kCuV5vfRdyZMAU24` reached `READY` for commit
+   `af35a16840cfebd8f940c280e98bcad18ba3b741` at
+   `https://bundjil-codex-proxy-ial9pku2i-cooper-corbetts-projects.vercel.app`.
+   A fresh preview env pull passed the hardened live proof with health `200`,
+   missing/invalid bearer `401`, authenticated SSE `200`, two data lines and
+   completion, and false leak predicates. Runtime logs contained only safe
+   route/status metadata and Vercel reported no runtime errors.
 3. `deploy-hosted-eve-codex-preview`: create/link a personal Eve project,
    supply only app-owned proxy config, and run one hosted Eve session proof.
 
