@@ -73,7 +73,7 @@
     {
       "id": "implement-sendblue-security-identity-replay",
       "title": "Implement webhook verification, sender identity, routing, and replay services",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-sendblue-contracts-and-client"],
       "description": "Add fail-closed constant-time Sendblue shared-secret verification, allowlisted sender mapping, opaque conversation routing, and atomic inbound/outbound replay claims with memory and Upstash live Layers.",
       "implementationNotes": [
@@ -100,8 +100,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: Eve import-only app code owns independent verifier, identity, routing, replay, and secure claim-id services; live paths use Config and Upstash while tests inject Config, deterministic ids, synchronized memory state, and provider clients.",
+          "Implementation quality: platform timingSafeEqual authenticates before decode; HMAC/Encoding produces opaque keys; replay results are discriminated Schemas; SynchronizedRef plus HashMap models atomic memory behavior; Upstash claims use one SET NX EX and owner-fenced Lua transitions; review corrected raw JS comparison, manual hex, invalid optional-claim states, global UUIDs, stale-transition success, and inconsistent retryable semantics.",
+          "Verification coverage: ten focused security/replay tests cover missing, length-mismatched, equal-length-mismatched, and matching secrets; decode ordering; sender policy; line-separated opaque routing; concurrent identical inbound/outbound claims and independent keys; lease/complete/uncertain/retryable transitions; owner fencing; Upstash SET/eval arguments; and leak-safe provider failures. Frozen install, agent checks/build, root verification, and diff checks pass."
+        ]
       },
       "commitAfterPassing": true
     },

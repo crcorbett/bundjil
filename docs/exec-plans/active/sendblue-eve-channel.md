@@ -19,17 +19,17 @@ and proof artifacts contain only variable names and sanitized metadata.
 
 ## Current Task
 
-No task is currently in progress. `implement-sendblue-contracts-and-client`
+No task is currently in progress. `implement-sendblue-security-identity-replay`
 has passed parent acceptance and awaits its coherent commit before
-`implement-sendblue-security-identity-replay` begins.
+`implement-sendblue-eve-channel` begins.
 
-Scope:
+Accepted scope:
 
-- app-owned Effect Schema contracts under `apps/agent/agent/lib/sendblue`;
-- distinct redacted Effect Config;
-- one named `SendblueClient.sendMessage` operation;
-- live Effect HTTP and deterministic test Layers;
-- focused config/client tests.
+- constant-time `sb-signing-secret` verification before body decoding;
+- configured sender-to-principal policy and opaque keyed conversation routing;
+- atomic inbound and outbound replay claims with deterministic memory and
+  Upstash live Layers;
+- concurrency, transition, command-shape, and leak-safety tests.
 
 Provider account mutation and webhook provisioning are deferred until the
 authenticated route exists and its automated checks pass.
@@ -87,6 +87,48 @@ Parent audit:
    responses, transport/timeout uncertainty, leak safety, and memory-layer
    behavior. Agent and repository gates pass.
 
+### implement-sendblue-security-identity-replay
+
+Accepted: 2026-07-13
+
+Changed files:
+
+- `apps/agent/agent/lib/sendblue/{webhook-verifier,identity-directory,session-router,replay-store,replay-claim-id-generator}.service.ts`
+- `apps/agent/agent/lib/sendblue/schemas.ts`
+- `apps/agent/test/sendblue-security-identity.test.ts`
+- `apps/agent/test/sendblue-replay-store.test.ts`
+- `apps/agent/package.json`
+
+Evidence:
+
+- Added platform constant-time `sb-signing-secret` verification before any
+  body-derived operation.
+- Added allowlisted sender identity and HMAC-based opaque conversation routing
+  services.
+- Added discriminated replay claims, synchronized atomic memory behavior, and
+  Upstash `SET NX EX` claims with owner-fenced compare/set and compare/delete
+  Lua transitions.
+- Added injectable secure claim ids so concurrency tests are deterministic.
+- Reused the already locked `@upstash/redis` dependency; frozen install made no
+  lockfile changes.
+
+Parent audit:
+
+1. Ownership and call graph: security, identity, routing, and replay policy are
+   independent app-owned services. The live replay path is
+   `SendblueReplayStore -> Upstash Redis`; tests replace both persistence and
+   claim-id resources.
+2. Implementation quality: the final implementation uses Schema, Redacted,
+   Context, Layer, Effect, Match, Encoding, Clock, HashMap, SynchronizedRef,
+   Effect HTTP-adjacent provider boundaries, and named operations. Every
+   retained helper has multiple concrete call sites or owns cryptography,
+   serialization, key derivation, atomic state, or Layer construction.
+3. Verification coverage: ten focused tests prove auth-before-decode, sender
+   policy, opaque line-partitioned routing, inbound/outbound contention, key
+   independence, lease expiry, completed/uncertain duplicate protection,
+   retryable immediate release, stale-owner failure, exact Upstash command
+   shape, and leak-safe failures. Agent and repository gates pass.
+
 ## Audit Log
 
 `implement-sendblue-contracts-and-client` completed three parent passes. The
@@ -95,3 +137,10 @@ leakage, and the transport test failure channel. The second corrected request
 proof, allowlist/E.164 coverage, provider 2xx rejection handling, and Eve file
 ownership. The third removed a redundant second provider-response decode and
 confirmed the final verification surface.
+
+`implement-sendblue-security-identity-replay` completed three parent passes.
+Corrections included replacing JavaScript secret comparison with
+`timingSafeEqual`, replacing manual hex encoding, making claim results a valid
+discriminated union, injecting claim ids, failing stale transitions, aligning
+memory/Upstash retryable behavior through owner-fenced release, and extending
+equal-length auth, outbound contention, and successful CAS verification.

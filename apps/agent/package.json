@@ -19,6 +19,7 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
     "@bundjil/eve-effect": "workspace:*",
+    "@upstash/redis": "^1.38.0",
     "ai": "^7.0.16",
     "effect": "catalog:effect",
     "eve": "0.20.0"

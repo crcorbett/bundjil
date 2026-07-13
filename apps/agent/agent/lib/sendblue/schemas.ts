@@ -30,6 +30,28 @@ export const SendblueOutboundClaimKey = Schema.NonEmptyString.pipe(
 );
 export type SendblueOutboundClaimKey = typeof SendblueOutboundClaimKey.Type;
 
+export const SendblueReplayClaimKey = Schema.Union([
+  SendblueInboundClaimKey,
+  SendblueOutboundClaimKey,
+]);
+export type SendblueReplayClaimKey = typeof SendblueReplayClaimKey.Type;
+
+const NonNegativeInt = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0));
+
+export const SendblueReplayClaimId = Schema.String.check(Schema.isUUID()).pipe(
+  Schema.brand("SendblueReplayClaimId")
+);
+export type SendblueReplayClaimId = typeof SendblueReplayClaimId.Type;
+
+export const SendblueOutboundEventCoordinates = Schema.Struct({
+  sequence: NonNegativeInt,
+  sessionId: Schema.NonEmptyString,
+  stepIndex: NonNegativeInt,
+  turnId: Schema.NonEmptyString,
+});
+export type SendblueOutboundEventCoordinates =
+  typeof SendblueOutboundEventCoordinates.Type;
+
 export const SendblueWebhookSecret = Schema.Redacted(Schema.NonEmptyString);
 export type SendblueWebhookSecret = typeof SendblueWebhookSecret.Type;
 
@@ -108,9 +130,50 @@ export const ReplayClaimStatus = Schema.Literals([
   "claimed",
   "complete",
   "duplicate",
+  "retryable",
   "uncertain",
 ]);
 export type ReplayClaimStatus = typeof ReplayClaimStatus.Type;
+
+export const SendblueReplayClaim = Schema.Struct({
+  claimedAtEpochMillis: NonNegativeInt,
+  claimId: SendblueReplayClaimId,
+  key: SendblueReplayClaimKey,
+  status: Schema.Literal("claimed"),
+});
+export type SendblueReplayClaim = typeof SendblueReplayClaim.Type;
+
+export const SendblueReplayClaimed = Schema.Struct({
+  claim: SendblueReplayClaim,
+  status: Schema.Literal("claimed"),
+});
+export type SendblueReplayClaimed = typeof SendblueReplayClaimed.Type;
+
+export const SendblueReplayDuplicate = Schema.Struct({
+  status: Schema.Literal("duplicate"),
+});
+export type SendblueReplayDuplicate = typeof SendblueReplayDuplicate.Type;
+
+export const SendblueReplayClaimResult = Schema.Union([
+  SendblueReplayClaimed,
+  SendblueReplayDuplicate,
+]);
+export type SendblueReplayClaimResult = typeof SendblueReplayClaimResult.Type;
+
+export const SendblueReplayCompletion = Schema.Struct({
+  providerMessageHandle: Schema.optional(SendblueMessageHandle),
+});
+export type SendblueReplayCompletion = typeof SendblueReplayCompletion.Type;
+
+export const SendblueReplayRecord = Schema.Struct({
+  claimedAtEpochMillis: NonNegativeInt,
+  claimId: SendblueReplayClaimId,
+  completedAtEpochMillis: Schema.optional(NonNegativeInt),
+  key: SendblueReplayClaimKey,
+  providerMessageHandle: Schema.optional(SendblueMessageHandle),
+  status: Schema.Literals(["claimed", "complete", "retryable", "uncertain"]),
+});
+export type SendblueReplayRecord = typeof SendblueReplayRecord.Type;
 
 export const SendblueWebhookAcknowledgement = Schema.Struct({
   accepted: Schema.Boolean,
