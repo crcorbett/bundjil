@@ -152,7 +152,7 @@
     {
       "id": "prove-sendblue-preview",
       "title": "Provision and prove the Sendblue channel on Vercel Preview",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["implement-sendblue-eve-channel"],
       "description": "Configure isolated Preview credentials/storage/identity and a protected Sendblue receive webhook, then prove invalid, valid, concurrent replay, Eve routing, and one real outbound reply with sanitized evidence.",
       "implementationNotes": [
@@ -181,8 +181,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: personal Vercel owns encrypted Preview inputs, Deployment Protection, and the Preview-only Marketplace Upstash connection; Sendblue owns one receive webhook; the thin Eve route delegates authentication, identity, routing, replay, Codex dispatch, and provider delivery to the accepted app-owned Effect services. Production remained untouched.",
+          "Implementation quality: the immutable deployment uses the full public Eve route, app-owned replay Config with preferred-name precedence and provider KV fallback, independent platform and webhook credentials, and fail-closed durable claims. Review corrected the root route, missing build-time provider inputs, agent build dependency/test coverage, exposed approval credentials, and stale operator metadata without adding a provisioning helper layer, unsafe cast, manual runtime JSON, or helper sprawl.",
+          "Verification coverage: clean Preview deployment dpl_C2Xg1F8H8KFiARopc59WeDwKV7tQ from exact pushed commit fdb71a87 passed the post-rotation 401/400/200/202 route matrix and an isolated 503 storage fixture; exactly one receive webhook is registered; one provider-originated inbound produced one delivered outbound; sequential and concurrent synthetic replays plus replay of the real provider handle returned 200 with no message-count increase; Vercel error/fatal logs were empty and all evidence remained sanitized."
+        ]
       },
       "commitAfterPassing": true
     },

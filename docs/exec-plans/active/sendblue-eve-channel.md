@@ -19,17 +19,16 @@ and proof artifacts contain only variable names and sanitized metadata.
 
 ## Current Task
 
-`prove-sendblue-preview` is in progress after the accepted Eve channel was
-committed as `5061a86`.
+`document-and-audit-sendblue-channel` is pending after the accepted Preview
+proof.
 
-Current scope:
+Next scope:
 
-- connect the existing personal Upstash resource to the agent for Preview only;
-- create encrypted Preview Sendblue, routing, identity, replay, and protection
-  configuration from 1Password/provider-owned values;
-- deploy one clean committed Preview and prove the authenticated route matrix;
-- configure the Sendblue receive webhook and prove one replay-safe iMessage
-  round trip with sanitized evidence.
+- reconcile root, app, architecture, SPEC, task-ledger, and operator docs with
+  the verified Preview behavior;
+- run the final three-pass ownership, Effect/helper-admission, and verification
+  audit;
+- run all repository, leak, stale-pattern, and task-ledger consistency gates.
 
 Production resources and environment variables remain untouched.
 
@@ -71,6 +70,55 @@ Recorded: 2026-07-13
   tasks, followed by full repository verification.
 - The failed deployment is retained as diagnostic evidence. A new clean commit
   and immutable Preview deployment will be used for route and webhook proof.
+
+## Preview Proof Log
+
+Recorded: 2026-07-13
+
+- Clean Preview deployment `dpl_C2Xg1F8H8KFiARopc59WeDwKV7tQ` is `READY`
+  from exact pushed commit `fdb71a87e930899aea1e75dd1f7a417f6c7a307e`.
+  Its immutable host is recorded in the operator-owned 1Password item; the
+  protected URL and credential values are not recorded here.
+- The agent route is the public Eve path
+  `POST /eve/v1/sendblue/webhook`. A build-output test rejects accidental
+  exposure at root `/webhook`.
+- Replay Config prefers the app-owned names and falls back to Vercel
+  Marketplace's Preview-only `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+  Preferred app variables retain precedence and missing storage fails closed.
+- A temporary Preview-only invalid preferred replay-store fixture returned
+  `503` for an otherwise valid allowed-sender event with no downstream side
+  effect. Both fixture variables were deleted immediately, and a clean restore
+  deployment was verified before provider registration.
+- An attempted provider mutation was cancelled before execution when its
+  approval surface exposed the protected webhook URL. The affected Vercel
+  bypass and independent Sendblue webhook secret were both revoked or rotated,
+  saved back to the existing 1Password operator item, and deployed before any
+  webhook was registered.
+- Sendblue now has exactly one receive webhook. It targets the immutable
+  Preview host and full Eve route, uses the Vercel bypass only at the platform
+  boundary, and supplies the separate `sb-signing-secret` application secret.
+- The post-rotation route matrix returned `401` for absent and wrong signing
+  secrets, `400` for authenticated malformed JSON, `200` for an authenticated
+  ignored outbound event, and `202` for a valid signed allowed-sender event.
+- The accepted signed event produced one additional Sendblue provider message,
+  whose final status was `DELIVERED`. One sequential and two concurrent replays
+  of the same provider-shaped event all returned `200`; provider message count
+  remained unchanged at five, with four outbound and one historical inbound.
+- Vercel runtime evidence for the proof window contains no error or fatal logs.
+  Evidence uses only deployment ids, status codes, counts, and a truncated
+  SHA-256 handle digest. No message text, full number, handle, protected URL,
+  credential, raw provider body, replay payload, or ciphertext is retained.
+- A minimal outbound verification prompt was delivered to the allowlisted
+  counterpart ending in `7386`. Its provider-originated reply traversed the
+  registered Sendblue webhook and produced exactly one additional delivered
+  outbound response, moving the conversation totals to seven messages: two
+  inbound and five outbound.
+- Replaying that real inbound provider handle returned `200`. After the
+  observation window the totals remained seven, two inbound and five outbound,
+  proving no duplicate Eve dispatch or provider reply. Only a 12-character
+  SHA-256 digest prefix was used to correlate the handle.
+- Production environment variables, storage connection, aliases, deployments,
+  and webhooks remain untouched.
 
 ## Accepted Tasks
 
@@ -224,3 +272,16 @@ service injection, adding literal direction and nullable line handling,
 validating provider limits before send, quarantining accepted dispatch/send
 completion failures, adding direct Eve route tests, and proving bounded claim
 release when Eve rejects before acceptance.
+
+`prove-sendblue-preview` completed three parent passes. The ownership/call-graph
+pass confirmed that Vercel owns platform protection and encrypted Preview
+inputs, Sendblue owns webhook delivery, the Eve channel owns framework
+adaptation, and app-owned Effect services own authentication, identity,
+routing, replay, and provider delivery.
+The implementation-quality pass confirmed the corrected absolute route,
+Config fallback precedence, fail-closed storage path, independent secrets, and
+absence of a provisioning helper layer or committed operator script. The final
+verification pass proved the full direct route matrix, storage-failure fixture,
+one provider-originated inbound to one delivered outbound, sequential and
+concurrent synthetic replay suppression, real-handle replay suppression,
+clean runtime logs, sanitized evidence, and no Production mutation.
