@@ -372,6 +372,80 @@ changing this evidence, its status, or any accepted audit count.
   runtime errors, clean leak scans, agent typecheck/51 tests/build, root
   verification, ledger validation, diff check, and local-material cleanup.
 
+### 2026-07-14 `soak-monitor-and-drill-rollback` worker evidence
+
+- A mode-`0600` sanitized `agent-accepted-rollback-ready` snapshot passed with
+  the exact personal team/project scope, current and previous immutable
+  references for both applications, accepted source
+  `e53e7a48270db4bb571d90c771186f92a0282922`, Production `live` proxy mode,
+  sensitive-variable inventory, Vercel OIDC, Deployment Protection, accepted
+  model/provider facts, and disjoint profile/cipher/namespace fingerprints.
+  A preliminary snapshot with a duplicated opaque identity fingerprint failed
+  closed before mutation; the corrected snapshot passed. No values or profile
+  material were read into the evidence.
+- The elapsed interval since the accepted Production deployments was treated as
+  the practical soak. Sanitized Production metadata kept both current releases
+  `READY`, Production-targeted, source-matched, and alias-assigned. Runtime
+  logs recorded proxy completion `200`s, Eve anonymous rejection `401`, and
+  fresh-OIDC acceptance `200`; the current agent and proxy error-log queries
+  were empty. The available request metadata did not expose latency, refresh,
+  lock, fence, or storage outcome fields, so those facts are evidenced by the
+  unchanged profile/config state and successful live completions rather than
+  inferred from absent logs.
+- External Sendblue remained disabled in Production: the proxy has zero
+  Sendblue entries and the agent's ten Sendblue entries are Preview-only. No
+  production webhook/channel binding was active. No protection bypass was
+  created or changed; the existing Preview bypasses, including Sendblue Preview,
+  were not touched.
+- The ordered rollback drill used only existing immutable deployments and made
+  no environment, profile, namespace, cipher, subject, or external-channel
+  mutation. The agent alias moved first to
+  `dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD`, then the proxy alias moved to
+  `dpl_CU9Y7UiFEV84QLcjczzsCnsBvFRZ`; both were verified `READY`,
+  Production-targeted, protected, source-matched, and alias-assigned.
+- A pre-existing rollback session was replayed from `startIndex=0` using fresh
+  OIDC and a mode-`0600` partial-output file. Direct curl returned `28` only
+  after exactly the nine ordered events `session.started`, `turn.started`,
+  `message.received`, `step.started`, `message.appended`,
+  `message.completed`, `step.completed`, `turn.completed`, and
+  `session.waiting`; no failure event occurred. Three rollback session `202`s
+  each had exactly one subsequent previous-proxy completion `200`; the replay
+  did not add a completion.
+- Restoration was ordered proxy first to
+  `dpl_DJBqdgbJRL3qGMpXjSgrUp8u3HsW`, then agent to
+  `dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz`. Current aliases, source, protection,
+  proxy health `200`, anonymous Eve `401`, and fresh-OIDC Eve `200` were
+  verified. One final minimal non-sensitive restored-pair session returned
+  `202`, replayed the same nine ordered events with no failure and curl `28`,
+  and added exactly one current-proxy completion `200`; its replay added none.
+- Read-only metadata fingerprints were retained for the post-drill Production
+  environment inventories. Current and previous proxy deployment config
+  inventories matched exactly, and post-restore live completion proved that the
+  newest stored profile generation remained usable. No profile-generation
+  downgrade was observed.
+- Focused synthetic failure coverage passed: agent `51` tests, proxy `21`
+  tests, and OAuth `102` tests covering health, auth, storage, refresh,
+  reauthentication, invalid mode/host/scope, rollback, and leak boundaries.
+  Temporary mode-`0600` proof material was removed.
+- Parent pass 1, ownership and call graph: accepted alias-only rollback and
+  restoration with no Production variable or package-owned profile, refresh,
+  lock, fence, cipher, subject, or Upstash mutation. Agent-first/proxy-second
+  rollback and proxy-first/agent-second restoration preserved the deployed
+  Eve-to-proxy-to-OAuth/provider graph; Sendblue Production stayed disabled.
+- Parent pass 2, implementation quality: accepted the staged Schema gate's
+  fail-closed duplicate-identity rejection and corrected canonical snapshot,
+  plus the existing Config/Redacted, explicit Layer, flat named Effect, tagged
+  error, and Schema JSON runtime boundaries. The worker changed documentation
+  only and added no helper, raw JSON path, unsafe cast, DTO mirror, manual
+  mapper, or plaintext persistence.
+- Parent pass 3, verification and evidence: accepted the practical soak,
+  explicit preliminary-retry accounting, empty runtime errors, both ordered
+  nine-event/no-failure rollback and restore proofs, one completion per proof
+  session and none on replay, final current aliases, unchanged environment and
+  profile/config fingerprints, inactive Sendblue Production, unchanged bypass
+  inventory, agent 51/proxy 21/OAuth 102 tests, root verification, ledger and
+  diff checks, and temporary-file cleanup.
+
 ## Staged Checkpoints
 
 The preflight remains read-only and fail closed. Checkpoints consume only

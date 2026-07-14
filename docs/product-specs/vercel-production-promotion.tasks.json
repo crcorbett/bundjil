@@ -274,7 +274,13 @@
     {
       "id": "soak-monitor-and-drill-rollback",
       "title": "Soak Production, validate monitoring, and drill rollback",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "A mode-0600 agent-accepted-rollback-ready checkpoint first rejected one duplicated opaque identity, then passed after the sanitized metadata was corrected. The accepted snapshot proved exact personal scope, same e53e7a4 source/configuration, current/previous immutable references for both apps, live proxy mode, sensitive variable inventory, disjoint identities, Deployment Protection, Vercel OIDC, and accepted model/provider facts before rollback.",
+        "The elapsed interval since Production deployment supplied the practical soak: both current deployments remained READY/source-matched, anonymous Eve rejection and OIDC acceptance were visible, completions were successful, and agent/proxy runtime-error queries were empty. Sendblue Production remained inactive; all ten existing Sendblue bindings were Preview-only. No task bypass or environment/profile/namespace/cipher/subject mutation occurred.",
+        "The drill rolled agent first to dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD and proxy second to dpl_CU9Y7UiFEV84QLcjczzsCnsBvFRZ. A fresh-OIDC durable replay produced exactly nine ordered events through session.waiting with no failure and no replay completion; each non-sensitive rollback proof session had exactly one previous-proxy 200. Restoration ran proxy first to dpl_DJBqdgbJRL3qGMpXjSgrUp8u3HsW and agent second to dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz; one final session produced the same nine events and exactly one current-proxy 200. Unchanged config fingerprints plus successful post-restore completion proved no profile-generation downgrade. Agent 51, proxy 21, and OAuth 102 tests plus bun run verification passed."
+      ],
       "dependsOn": ["deploy-and-prove-production-agent"],
       "description": "Observe the Production release, validate sanitized signals and alerts, and execute the ordered rollback drill without profile-generation downgrade.",
       "implementationNotes": [
@@ -294,8 +300,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified the app aliases alone changed during rollback/restoration; Production environment variables and package-owned encrypted profile, refresh lock, fence, cipher, subject, and Upstash identities were unchanged. Agent-first/proxy-second rollback and proxy-first/agent-second restoration preserved the stable Eve -> proxy -> package OAuth/provider graph. Sendblue Production remained outside the task.",
+          "Parent pass 2 - implementation quality: reviewed the operational sequence and docs-only diff against the Effect architecture. The existing staged Schema preflight failed closed on duplicate identity metadata, then accepted the corrected canonical snapshot; runtime paths retained Config/Redacted, explicit Layers, flat named Effect flows, tagged error handling, and Schema JSON boundaries. No runtime source, wrapper/helper, raw JSON helper, unsafe cast, DTO mirror, manual mapper, or plaintext persistence was added.",
+          "Parent pass 3 - verification and evidence: accepted the soak inventory and empty error logs; current/previous source/config/protection/alias checks; explicit preliminary-retry accounting; rolled-back and restored nine-event/no-failure durable replays; one completion per proof session and none per replay; restored current aliases; unchanged Production variable/config fingerprints and usable newest profile; inactive Sendblue Production; unchanged bypass inventory; synthetic agent 51/proxy 21/OAuth 102 tests; bun run verification; jq and diff checks; and temporary-file cleanup."
+        ]
       },
       "commitAfterPassing": true
     },
