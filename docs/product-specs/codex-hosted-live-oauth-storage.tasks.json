@@ -233,7 +233,7 @@
         "git diff --check"
       ],
       "completionCriteria": [
-        "Preview is ready for a real local login tracer; production remains inactive."
+        "Preview was ready for a real local login tracer at this historical checkpoint; later Production promotion is recorded separately."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,

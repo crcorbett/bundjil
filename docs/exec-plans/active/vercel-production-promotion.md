@@ -1,17 +1,17 @@
 # Vercel Production Promotion Execution Plan
 
-Status: Active - approved, gated rollout
+Status: Complete - Production accepted and documentation reconciled
 
 Spec: `docs/product-specs/vercel-production-promotion.md`  
 Task ledger: `docs/product-specs/vercel-production-promotion.tasks.json`
 
 ## Execution Rule
 
-Implement the ledger sequentially. The user has granted approval for Production
-provisioning, deployment, commits, and pushes, but each task remains fail
-closed: a missing proof, failed check, wrong target, unsafe evidence boundary,
-or unresolved audit finding blocks the next task. Commit and push each accepted
-slice before a deployment consumes it.
+The ledger was implemented sequentially under the user's approval for
+Production provisioning, deployment, commits, and pushes. Every task is
+accepted with three parent audit passes. This completed plan remains in
+`docs/exec-plans/active/` because the repository has no separate archive
+convention; its directory does not imply unfinished work.
 
 The parent records only sanitized evidence here and in the ledger. Allowed
 evidence is deployment id, source SHA, target, status/content type, event
@@ -19,7 +19,25 @@ counts, timing, variable names, cipher key id, and approved boolean proof
 results. Never record credentials, prompts/outputs, raw OAuth/profile/ciphertext
 data, PII, or protected URLs.
 
-## Reconciled Baseline
+## Current Production State
+
+- The proxy and agent are `READY` at accepted source `e53e7a4`; rollback
+  references remain recorded below.
+- Production Eve is protected by Vercel Deployment Protection and explicit
+  Vercel OIDC. The private proxy bearer and Sendblue route secret are distinct
+  from platform bypass authentication.
+- Sendblue Production has independent durable Upstash replay state and an
+  accepted provider ingress -> Eve -> private proxy -> outbound delivery proof.
+  The retained Preview webhook and proof are historical evidence.
+- The temporary Production configuration bundle was removed after use.
+  1Password and Vercel-managed encrypted configuration own credentials; no
+  credential material is tracked in this repository.
+
+## Historical Baseline
+
+The following baseline describes the state before the accepted Production
+rollout. It is retained as historical evidence and must not be read as current
+configuration.
 
 - The private proxy is implemented in `apps/codex-proxy`; its live composition
   already uses the package-owned encrypted profile, Upstash store, refresh
@@ -234,21 +252,9 @@ changing this evidence, its status, or any accepted audit count.
   Production only. The proxy mode is `live`, and the independent Production
   cipher key id is `bundjil-production-20260714-v1`.
 - The shared Marketplace Upstash resource is isolated by a strongly disjoint
-  Production namespace. Opaque Preview fingerprints are namespace
-  `d4a4cef32ff098fedcba468a27369b06a507a17d3310318a671e612075f9b666`,
-  subject `c9a736d3a0fcc37aa32530b36611505eff71814f51fa8ef1cc9aeaa9dd1482ed`,
-  profile `4a7701004b0fa4792f2d5f8bcd762c75c0b78ba1bf2a4e35c280b9d1d52cb13b`,
-  lock `724ce00c10a3a326846dca3c7048a68f4d0e1b7514ec3740b9a4a97cd4e8b814`,
-  and fence
-  `4a9b01ed12fad74de5bc5cd9e8b81218a1cf1cd2c21f7a00f32d99d943be0ab8`.
-  Production fingerprints are namespace
-  `dbe9ab7f238d29b031ee4800ad98767cd61f5c9b62402c8ef59889ff00647131`,
-  subject `55c20fbe57601960dbc5ad3687d8783b6b29cd473c2e790eb9257395e5a4bec1`,
-  profile `18e024d52a3c4cb85b521a1e72e2d6de1b82b73f9e702230312ad94d2031b630`,
-  lock `6775eb2276022c68e775eab993b95485417bab79757631043aa7433b08384846`,
-  and fence
-  `96ef3b4064bee17194488d90f55368308f9e1e817151c79d1a223276057cfffb`.
-  Every corresponding identity and cipher key id comparison is disjoint.
+  Production namespace. Sanitized comparison proof confirmed every
+  Preview/Production namespace, subject, profile, lock, fence, and cipher-key
+  identity is disjoint; opaque fingerprints are intentionally not retained.
 - The package-owned trusted-local subscription login stored an encrypted
   refresh-capable profile with `valid` expiry horizon. Final stored-profile
   proof returned true for found, envelope v2, ciphertext present,

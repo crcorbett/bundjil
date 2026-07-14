@@ -12,11 +12,11 @@ own a browser OAuth flow, a public gateway, or Eve model selection.
 
 `BUNDJIL_CODEX_PROXY_MODE` selects one complete composition:
 
-| Mode    | Purpose                               | Storage                                        | Deployment rule                                     |
-| ------- | ------------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
-| `mock`  | Default smoke test and rollback state | None                                           | Local or personal Vercel preview; never calls Codex |
-| `local` | Trusted Bun-only proof                | Encrypted filesystem `KeyValueStore`           | Vercel rejects it                                   |
-| `live`  | Explicit personal Vercel preview path | Encrypted profile over Upstash `KeyValueStore` | Preview only; never silently falls back to mock     |
+| Mode    | Purpose                               | Storage                                        | Deployment rule                                          |
+| ------- | ------------------------------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| `mock`  | Default smoke test and rollback state | None                                           | Local; never calls Codex                                 |
+| `local` | Trusted Bun-only proof                | Encrypted filesystem `KeyValueStore`           | Vercel rejects it                                        |
+| `live`  | Hosted private provider path          | Encrypted profile over Upstash `KeyValueStore` | Production or Preview; never silently falls back to mock |
 
 All modes expose `GET /health`. `POST /v1/chat/completions` is private and
 requires `Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}`.
@@ -36,24 +36,23 @@ live layer reports `ok: false` from `GET /health` with HTTP 503.
 
 ## Scope And State
 
-- `mock` is the safe default and supports the ordinary local and preview
-  smoke-test path.
+- `mock` is the safe default and supports the ordinary local smoke-test path.
+  It does not assert the mode of any retained Preview deployment.
 - `local` exercises the real encrypted profile path on a trusted machine. It
   is not shared, durable hosted storage, or Vercel evidence.
-- `live` is the personal Vercel preview/Upstash composition. The trusted-local
-  subscription login writes the refresh-capable encrypted profile before the
-  proxy can use it.
+- `live` is the personal Vercel/Upstash composition used by Production and
+  retained Preview. The trusted-local subscription login writes the
+  refresh-capable encrypted profile before the proxy can use it.
 - The linked project is `bundjil-codex-proxy` under Cooper's personal Vercel
   account, not Tilt Legal.
-- Bundjil configured and deployed **preview only**. It did not set a
-  production Bundjil proxy mode, cipher key, profile subject, or profile, and
-  it did not deploy production. A Vercel Marketplace Upstash resource may
-  auto-bind provider credentials to production; that is not a production
-  activation or approval.
+- Production uses independent encrypted Vercel bindings, an isolated profile
+  subject/cipher/namespace, and a separate internal bearer. Production Eve
+  proof recorded one completion through this private live proxy. Preview proof
+  remains historical and independent.
 - OAuth browser and loopback handling remains trusted-local only. Vercel
   exposes no OAuth start or callback route and never persists an ID token.
-- Eve remains on AI Gateway by default. Pointing Eve at this proxy is a later
-  integration slice and is out of scope for this workaround.
+- Eve remains on AI Gateway by default. The opt-in agent configuration can use
+  this proxy and has accepted Production evidence.
 
 ## Configuration
 
@@ -132,7 +131,7 @@ Do not record a cache path, account identifier, credential, prompt, request
 body, or model output. Delete `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR` to revoke
 the local profile.
 
-### 2. Personal Vercel preview live mode
+### 2. Historical Preview live provisioning
 
 Link only the personal Vercel project and pull preview environment locally:
 
@@ -142,9 +141,10 @@ vercel link --project bundjil-codex-proxy
 vercel env pull .env.preview.local --environment=preview
 ```
 
-In that ignored preview env source, provide the explicit profile fields and
-preview cipher/KV configuration. Complete subscription login on the trusted
-local machine before a later preview deployment task selects `live` mode:
+This historical command block provisions the isolated Preview environment.
+Provide the explicit Preview profile fields and cipher/KV configuration, then
+complete subscription login on the trusted local machine before the Preview
+deployment selects `live` mode:
 
 ```bash
 bun run --filter @bundjil/codex-oauth login:subscription
@@ -152,10 +152,12 @@ vercel env add BUNDJIL_CODEX_PROXY_MODE preview
 vercel deploy
 ```
 
-Set `BUNDJIL_CODEX_PROXY_MODE=live` for preview only. The login command writes
-the encrypted subscription profile to Upstash and must not run inside a Vercel
-function, CI, Eve, or browser runtime. The hosted refresh proof is complete on
-an isolated preview subject; it did not activate production or wire Eve.
+Set `BUNDJIL_CODEX_PROXY_MODE=live` only through Vercel-managed encrypted
+configuration. The login command writes the encrypted subscription profile to
+Upstash and must not run inside a Vercel function, CI, Eve, or browser runtime.
+The historical refresh proof is complete on an isolated Preview subject. Current
+Production is separately accepted with its own profile, configuration, and Eve
+completion evidence.
 
 For a direct preview check, set `PROXY_URL` to the preview deployment and use a
 minimal request from a private shell. The server decodes it through the owning
@@ -201,8 +203,8 @@ The proxy refreshes proactively and may replay exactly once after a provider 401
 login again. On `codex_auth_temporarily_unavailable`, do not mutate credentials
 or add an app retry loop; retry the original caller operation later.
 
-To immediately stop live calls, set the preview mode back to `mock` and deploy
-a new preview:
+For a retained Preview rollback, set the preview mode back to `mock` and deploy
+a new Preview:
 
 ```bash
 vercel env add BUNDJIL_CODEX_PROXY_MODE preview
@@ -212,8 +214,10 @@ vercel deploy
 Delete the local filesystem directory when revoking a local proof. For preview
 credential concerns, rotate the encrypted Vercel variables and Upstash
 credentials through their provider controls; do not print them. Production
-rollback and deployment remain out of scope because this workaround did not
-deploy production.
+rollback is ordered with the agent: restore the agent first to the retained
+rollback deployment, then restore the proxy deployment, and rerun sanitized
+health, auth, and Eve session proof. Preserve the newest fenced profile
+generation.
 
 ## Verification
 
@@ -227,8 +231,8 @@ bun run --filter @bundjil/codex-proxy smoke-test
 The app tests use explicit mock Layers and schema-owned fixtures. They cover
 route authentication, mock streaming, unavailable live configuration, missing
 or expired profiles, Vercel rejection of `local`, and encrypted local profile
-composition. The hosted account-link OAuth flow and an Eve integration remain
-separate SPEC-driven work.
+composition. The hosted account-link OAuth flow remains unsupported. Eve
+integration is proven through the app-owned private proxy boundary.
 
 ## Call Graph
 
@@ -253,15 +257,15 @@ The app imports no browser, loopback, or Codex CLI cache-reading boundary.
 
 # Hosted Refresh-Capable State
 
-The personal Vercel preview `live` composition is implemented and has recorded
-sanitized proof of encrypted Upstash persistence, trusted-local PKCE profile
-provisioning, proactive refresh, fenced concurrent rotation, bounded 401
-recovery, private SSE, and safe logs. This is single-owner experimental use;
-production remains a separate explicit approval. The Vercel app exposes no
-browser OAuth callback, OAuth start route, or account-linking endpoint.
+The personal Vercel `live` composition is implemented and has recorded
+sanitized Production and historical Preview proof of encrypted Upstash
+persistence, trusted-local PKCE profile provisioning, proactive refresh,
+fenced concurrent rotation, bounded 401 recovery, private SSE, and safe logs.
+The Vercel app exposes no browser OAuth callback, OAuth start route, or
+account-linking endpoint.
 
 Access-token-only import is deprecated for normal hosted operation. Retain it
 only for emergency or trusted-local diagnostic use; it cannot refresh and must
-not be used as evidence for the refresh-capable path. The agent adapter is
-proven separately, so this runbook does not claim an Eve -> hosted-live-proxy
-end-to-end proof.
+not be used as evidence for the refresh-capable path. Production evidence
+includes one deployed Eve -> hosted-live-proxy completion; local and Preview
+records remain separate evidence classes.

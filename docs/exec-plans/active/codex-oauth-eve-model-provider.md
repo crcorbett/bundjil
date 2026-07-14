@@ -2,9 +2,10 @@
 
 Status: Complete
 
-Evidence boundary: the opt-in Eve adapter and hosted refresh-capable proxy were
-verified separately. This completed plan does not record a combined Eve ->
-hosted-live-proxy end-to-end request; Gateway remains the default.
+Historical evidence boundary: the opt-in Eve adapter and hosted
+refresh-capable Preview proxy were verified separately. This completed plan
+does not record the later Production Eve -> hosted-live-proxy proof; Gateway
+remains the default.
 Spec: `docs/product-specs/codex-oauth-eve-model-provider.md`  
 Task ledger: `docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
 
@@ -296,9 +297,10 @@ Evidence:
   clean for bearer values, OAuth/token terms, probe text, invalid-token text,
   and full mock response text. Deploy/env CLI logs were checked for the
   generated internal token value and were clean.
-- At this 2026-07-07 checkpoint, production deployment was skipped and hosted
-  live Codex proof was pending. The successor hosted OAuth-storage plan later
-  accepted the personal preview proof; production remains inactive.
+- At this historical 2026-07-07 checkpoint, Production deployment was skipped
+  and hosted live Codex proof was pending. The successor hosted OAuth-storage
+  plan later accepted the personal Preview proof; later Production promotion is
+  recorded separately.
 
 Parent audit:
 

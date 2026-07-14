@@ -19,8 +19,9 @@ and proof artifacts contain only variable names and sanitized metadata.
 
 ## Rollout Status
 
-All five tasks are accepted. The Sendblue channel remains Preview-only;
-Production promotion remains gated by the Vercel Production Promotion SPEC.
+All five tasks are accepted. This plan is retained as a historical Preview-era
+execution record. Production promotion is accepted in the Vercel Production
+Promotion plan and does not alter this plan's dated evidence.
 
 Completed scope:
 
@@ -30,17 +31,20 @@ Completed scope:
   audit;
 - run all repository, leak, stale-pattern, and task-ledger consistency gates.
 
-Production resources and environment variables remain untouched.
+At this plan's completion, Production resources and environment variables
+remained untouched; that is historical state, not the current Production
+configuration.
 
-Documentation reconciliation is complete. The root, app, architecture, and
-SPEC surfaces now describe the accepted Preview-only route/auth/status/replay
-behavior, exact app-owned Config names and KV fallback, supported/ignored
-matrix, opaque identity/routing, failure/uncertainty semantics, and
-rotation/disable procedure. The final parent audits and repository gates pass.
+At this historical plan's completion, documentation reconciliation was
+complete. The root, app, architecture, and SPEC surfaces described the
+accepted Preview-only route/auth/status/replay behavior, exact app-owned Config
+names and KV fallback, supported/ignored matrix, opaque identity/routing,
+failure/uncertainty semantics, and rotation/disable procedure. The later
+Production state is recorded in the Production promotion SPEC and plan.
 
 ## Provider Discovery
 
-Recorded: 2026-07-13
+Historical discovery record: 2026-07-13
 
 - The personal executor Sendblue connection is available.
 - At discovery time, no receive, outbound, or typing webhook was configured.
@@ -51,8 +55,8 @@ Recorded: 2026-07-13
   Preview only. The app-owned replay Config prefers its dedicated names and
   falls back to the provider-owned `KV_REST_API_URL` and `KV_REST_API_TOKEN`
   inputs when those dedicated values are unavailable.
-- All required Sendblue config inputs are Preview-only; Production has zero
-  Sendblue variables.
+- At this historical checkpoint, all required Sendblue config inputs were
+  Preview-only and Production had zero Sendblue variables.
 - A dedicated Vercel automation bypass existed, but its first generated value
   was intentionally treated as unknown and later replaced by an operator-owned
   value saved in 1Password before webhook registration.

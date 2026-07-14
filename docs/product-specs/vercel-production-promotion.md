@@ -1,19 +1,19 @@
 # Vercel Production Promotion
 
-Status: Active - approved, gated rollout
+Status: Complete - Production accepted and documentation reconciled
 Owner: Bundjil runtime
 Last reconciled: 2026-07-14
 
 ## Decision
 
-The user has granted approval for Production provisioning and deployment. That
-approval authorizes the ordered work in this SPEC; it does not waive any
-preflight, test, deployment, soak, rollback, or no-secret evidence gate. A
-failed or incomplete gate stops the rollout at its current state.
+The user granted approval for Production provisioning and deployment. The
+ordered rollout completed its preflight, deployment, soak, rollback,
+Sendblue, no-secret, and documentation-reconciliation evidence gates. The task
+ledger records the three parent audit passes that accepted the final state.
 
 Production is a distinct runtime, not a Preview alias or copied profile. The
-proxy is promoted before the agent. Sendblue stays disabled until the proxy and
-agent have passed Production proof, the soak window, and the rollback drill.
+proxy was promoted before the agent; Sendblue was enabled only after Production
+proof, soak, and rollback evidence. Preview remains independently retained.
 
 ## Reconciled State
 
@@ -29,29 +29,24 @@ agent have passed Production proof, the soak window, and the rollback drill.
   profile/envelope, profile-store, refresh-lock, fenced-commit, trusted-local
   login, and stored-profile-proof contracts. No production DTO or alternate
   profile format is needed.
-- `apps/agent` owns model selection and currently has no explicit Eve auth
-  policy. Production must add the installed Eve policy
-  `eveChannel({ auth: [vercelOidc(), localDev()] })` at the app boundary and
-  test deployed rejection/local-only behavior.
-- The Codex OAuth and model-provider plans record Preview proofs separately.
-  The Sendblue plan records an accepted Preview webhook proof, including route
-  status/replay behavior and provider delivery. It also records that Production
-  Sendblue variables, storage, aliases, deployments, and webhooks were
-  untouched.
-- Vercel currently reports old failed Production deployments for both linked
-  projects. The proxy Production target is missing Bundjil runtime variables
-  other than the Marketplace Upstash aliases; the agent Production target has
-  no Bundjil runtime variables. Those deployments are rollback history only,
-  not accepted releases.
+- `apps/agent` owns model selection and the explicit Eve policy
+  `eveChannel({ auth: [vercelOidc(), localDev()] })` at the app boundary.
+  Vercel OIDC protects deployed Eve callers; `localDev()` is localhost-only.
+- The Codex OAuth, model-provider, and Sendblue plans retain Preview evidence
+  as historical. Production evidence now includes route matrices, provider
+  ingress/delivery, durable replay, private proxy completion, inventory,
+  monitoring, and rollback proof.
+- The accepted Production proxy and agent are `READY` at source `e53e7a4`.
+  The earlier rejected channel deployment remains historical evidence only;
+  rollback targets are recorded in the active plan.
 - The stable project domains are `bundjil-codex-proxy.vercel.app` and
   `bundjil-agent.vercel.app`. The agent has Vercel SSO protection configured
-  for Production deployment URLs and all Preview deployments. The preflight
-  must re-read and prove these facts before mutation.
+  for Production deployment URLs and all Preview deployments. A future
+  Production rerun must re-read and prove these facts before mutation.
 
-The first task therefore revalidates a clean combined Codex Preview baseline;
-the completed Sendblue proof is retained as evidence for the final,
-Production-only enablement task, not misrepresented as a Codex or Production
-proof.
+The clean combined Codex Preview baseline and earlier Sendblue proof are
+retained as historical evidence. They are not substitutes for the accepted
+Production evidence.
 
 ## Boundaries And Isolation
 
@@ -65,13 +60,14 @@ proof.
 | Cipher                    | Preview key and key id                      | independent Production key and key id                                      |
 | OAuth profile             | trusted-local Preview login                 | separate trusted-local Production login                                    |
 | Eve access                | current Preview state                       | Deployment Protection plus explicit Vercel OIDC; `localDev()` only locally |
-| Sendblue                  | accepted Preview-only configuration         | disabled until its final task passes                                       |
+| Sendblue                  | retained historical configuration           | accepted Production configuration and provider proof                       |
 
-Preflight is staged. Every checkpoint decodes only the minimum sanitized
-metadata that exists at that point and fails closed; a later checkpoint cannot
-be substituted for an earlier one. No checkpoint prints values, profile
-material, URLs carrying bypasses, or raw provider output. A Marketplace binding
-is not evidence of environment isolation by itself.
+The accepted rollout used staged preflight. For any future Production rerun,
+each checkpoint must decode only the minimum sanitized metadata available at
+that point and fail closed; a later checkpoint cannot substitute for an earlier
+one. No checkpoint prints values, profile material, URLs carrying bypasses, or
+raw provider output. A Marketplace binding is not evidence of environment
+isolation by itself.
 
 | Checkpoint                        | When it runs                                                     | Required proof                                                                                                                                                                                                                                                                                                                                                                      |
 | --------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -81,7 +77,10 @@ is not evidence of environment isolation by itself.
 | `agent-accepted-rollback-ready`   | After accepted agent deployment and rollback references          | `proxy-accepted-agent-configured` facts plus immutable accepted agent deployment/source/config evidence and accepted current/previous rollback references for the proxy and agent.                                                                                                                                                                                                  |
 | `sendblue-final-promotion`        | Immediately before Sendblue Production enablement                | `agent-accepted-rollback-ready` facts, completed soak and rollback drill, and proof that Sendblue Production remains unactivated until this final task. Sendblue-specific variables, ingress, delivery, and replay proof are created and accepted only in this task.                                                                                                                |
 
-## Required Production Sequence
+## Historical Production Sequence And Future Rerun Invariant
+
+The ordered sequence below was completed for the accepted rollout and is the
+required order for any future Production rerun.
 
 1. Revalidate a clean encrypted-variable Preview proxy-to-agent baseline from
    one pushed SHA. No Production target changes occur here.

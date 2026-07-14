@@ -1,8 +1,8 @@
 # Sendblue Eve Channel
 
-- Status: Preview verified; Production gated
+- Status: Production verified; Preview evidence retained as historical
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-13
+- Last reviewed: 2026-07-14
 
 ## Decision
 
@@ -23,6 +23,23 @@ Sendblue calls its header value a signing secret, but the documented protocol
 is a shared secret copied into `sb-signing-secret`; it is not a body HMAC. The
 implementation must describe and test the real mechanism without claiming
 cryptographic body signing that the provider does not supply.
+
+## Production Evidence Boundary
+
+The later Production promotion accepted the route matrix, provider ingress,
+one 15-event Eve replay through waiting, one private proxy completion, one
+`DELIVERED` outbound, and replay suppression without a second dispatch or
+delivery. Production and Preview retain independent receive webhooks and
+automation bypasses. Durable Upstash replay claims, Vercel platform bypass,
+and route-level `sb-signing-secret` authentication remain distinct boundaries.
+Only sanitized status/count evidence is retained. The earlier Preview proof in
+this SPEC is historical and is not rewritten as Production proof.
+
+## Historical Implementation Inputs
+
+The following context, configuration, Preview proof, and documentation
+deliverables describe the original implementation slice. They remain historical
+evidence and are not restated as current Production configuration.
 
 ## Context And Research
 
@@ -349,11 +366,12 @@ invokes it only from the route/event adapter. Services never call
 `Effect.runPromise`, construct their own runtime, or provide live Layers inside
 primary operations.
 
-## Configuration
+## Historical Preview Configuration
 
 Load configuration with Effect `Config`, `ConfigProvider.fromEnv()`,
-`Config.redacted`, and Schema validation. The accepted channel has these
-Preview-only variables; Production has no Sendblue variables:
+`Config.redacted`, and Schema validation. At the historical implementation
+checkpoint, the accepted Preview channel used these variables and Production
+had no Sendblue variables:
 
 - `BUNDJIL_SENDBLUE_API_KEY` (redacted);
 - `BUNDJIL_SENDBLUE_API_SECRET` (redacted);
@@ -502,7 +520,7 @@ Status callbacks and outbound webhooks are ignored by the receive route and do
 not create sessions. A later delivery-status slice may add a separate route and
 state transition.
 
-## Vercel Preview Proof
+## Historical Vercel Preview Proof
 
 The Preview deployment remains protected while Sendblue reaches the route with
 a dedicated Vercel Protection Bypass for Automation. This bypass is independent
@@ -515,8 +533,8 @@ Requirements:
 - Store the Vercel bypass and Sendblue webhook secrets only in provider/Vercel
   configuration. Never commit or print the full webhook URL.
 - Configure Sendblue's `receive` webhook as an object with its own secret.
-- Use a Preview-specific sender identity map, line, routing key, and replay
-  prefix.
+- Historical Preview input: use a Preview-specific sender identity map, line,
+  routing key, and replay prefix.
 - Rotate/revoke the automation bypass after proof if the URL was exposed in
   operator history or logs; Vercel requires redeployment after bypass-secret
   rotation.
@@ -536,7 +554,7 @@ Mandatory live proof matrix:
 | Same Eve event replayed                       | no second provider send                            |
 | Provider timeout/unknown result               | outbound claim `uncertain`, no auto-resend         |
 
-Accepted proof is the READY immutable Preview deployment
+Historical accepted proof is the READY immutable Preview deployment
 `dpl_C2Xg1F8H8KFiARopc59WeDwKV7tQ` from commit
 `fdb71a87e930899aea1e75dd1f7a417f6c7a307e`. It established the
 `401`/`400`/`200`/`202` route matrix, a temporary isolated `503` storage
@@ -545,8 +563,8 @@ sequential plus concurrent synthetic and real-handle replay suppression.
 Runtime logs in the proof window had no error or fatal entries. Evidence keeps
 only deployment ids, status codes, counts, and a short opaque digest; it omits
 message text, full phone numbers, protected URL, provider body, replay payload,
-credentials, and ciphertext. Production variables, deployment, aliases,
-storage, and webhooks remain untouched.
+credentials, and ciphertext. At this historical checkpoint, Production
+variables, deployment, aliases, storage, and webhooks remained untouched.
 
 ## Call Graphs
 
@@ -605,7 +623,7 @@ Concurrency tests must race identical inbound claims and outbound claims and
 prove one winner. Memory test semantics must model the live atomic contract,
 not hide races behind sequential test setup.
 
-### CLI And Preview Operations
+### Historical CLI And Preview Operations
 
 ```text
 No committed Sendblue provisioning CLI exists. Operator-only provider actions
@@ -753,16 +771,15 @@ More passes are required while any finding remains.
   operator inspection.
 - Channel failure must not switch the Eve model provider or expose the default
   Eve API publicly.
-- Rotate the Vercel bypass and Sendblue webhook secret independently, store
-  them only in provider/operator systems and encrypted Preview configuration,
-  redeploy, then update the provider receive webhook. Never print an old or
-  new value or the protected URL.
-- To disable Preview, remove the Sendblue receive webhook first, then revoke
-  the Preview bypass and remove/revoke Preview Sendblue configuration. Do not
-  infer or perform Production rollback; Production promotion is separately
-  gated by the Vercel Production Promotion SPEC.
+- Historical Preview operation: rotate the Vercel bypass and Sendblue webhook
+  secret independently, store them only in provider/operator systems and
+  encrypted Preview configuration, redeploy, then update the provider receive
+  webhook. Never print an old or new value or the protected URL.
+- Historical Preview rollback: remove the Sendblue receive webhook first, then
+  revoke the Preview bypass and remove/revoke Preview Sendblue configuration.
+  Current Production rollback is recorded in the promotion plan.
 
-## Documentation Deliverables
+## Historical Documentation Deliverables
 
 Implementation updates:
 
@@ -776,7 +793,17 @@ Implementation updates:
 - this SPEC/task ledger and an active execution plan with sanitized evidence.
 
 Docs must state that the provider uses a shared signing-secret header, not a
-body signature, and that Preview proof does not authorize Production.
+body signature, and that historical Preview proof did not authorize Production.
+
+## Current Environment Ownership
+
+Production and retained Preview each have app-owned Sendblue configuration,
+receive-webhook, and automation-bypass records. Production replay storage uses
+the app-owned `BUNDJIL_SENDBLUE_REPLAY_STORE_*` URL/token bindings or the
+configured-environment Marketplace fallback; those credentials are distinct
+from Codex OAuth/profile/cipher storage. 1Password and Vercel own credential
+values. The accepted Production evidence is recorded only in the promotion
+SPEC/plan; this SPEC retains the earlier Preview proof as historical evidence.
 
 ## Risks And Tradeoffs
 

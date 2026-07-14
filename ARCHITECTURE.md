@@ -3,7 +3,7 @@
 Bundjil is a Bun/Turbo monorepo for a personal agent built around Vercel Eve,
 Effect, and channel adapters for iMessage, email, and connected personal tools.
 
-The current codebase contains the first local Eve app slice. It establishes the
+The current codebase contains a deployed Eve app slice. It establishes the
 Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
 `@bundjil/eve-effect`, and keeps framework-neutral primitives in
 `@bundjil/core`. The private Codex proxy app now exists as a separate
@@ -16,18 +16,16 @@ Implemented:
 
 - `apps/agent` runs the Eve app, `workspace_status` tool, Gateway default
   model config, and opt-in Codex proxy model-provider config.
-- `apps/codex-proxy` exposes private Effect HTTP proxy routes locally and in a
-  personal Vercel preview. Its refresh-capable live composition is proven
-  separately from the agent adapter.
+- `apps/codex-proxy` exposes private Effect HTTP proxy routes locally and on
+  personal Vercel Production and Preview deployments. Its refresh-capable live
+  composition is proven through Production Eve.
 - `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
   memory layers, and the opt-in Upstash Redis `KeyValueStore` adapter.
 
-Research-gated or future:
+Future:
 
-- A recorded combined Eve -> hosted-live-proxy end-to-end request.
-- Production Sendblue promotion, Cloudflare email, Vercel Connect, Notion, and
-  long-term memory.
+- Cloudflare email, Vercel Connect, Notion, and long-term memory.
 
 Unsupported:
 
@@ -44,7 +42,7 @@ Unsupported:
 ```text
 iMessage
   -> Sendblue webhook
-  -> apps/agent Sendblue Eve channel (Preview verified)
+  -> apps/agent Sendblue Eve channel (Production verified; Preview retained)
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
@@ -121,7 +119,7 @@ Vercel function.
 It parses app-owned Effect Config, exposes `GET /health` and private
 OpenAI-compatible `POST /v1/chat/completions` through Effect
 `HttpRouter.toWebHandler`, and composes mock, local diagnostic, or
-refresh-capable preview-live providers. It exposes no browser OAuth route.
+refresh-capable live providers. It exposes no browser OAuth route.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, channel files, and runtime secrets.
@@ -132,7 +130,7 @@ token refresh, or direct Codex HTTP clients.
 
 ## Current Call Graphs
 
-Production/local HTTP path:
+Eve HTTP path:
 
 ```text
 Eve HTTP API
@@ -168,15 +166,14 @@ apps/agent/agent/agent.ts
   -> @bundjil/codex-oauth OpenAICompatibleProxy
 ```
 
-The adapter and proxy have independent proof records. This call graph describes
-the configured integration, not a recorded Eve-to-hosted-live-proxy end-to-end
-proof. Gateway remains the default path.
+The deployed Production proof records this configured Eve -> proxy path through
+one private proxy completion. Gateway remains the default path.
 
-Sendblue Preview inbound/outbound path:
+Sendblue Production inbound/outbound path:
 
 ```text
 Sendblue receive webhook
-  -> Vercel Preview Deployment Protection bypass (platform boundary only)
+  -> Vercel Deployment Protection bypass (platform boundary only)
   -> POST /eve/v1/sendblue/webhook
   -> apps/agent/agent/channels/sendblue.ts
   -> app-owned ManagedRuntime and SendblueChannel
@@ -189,7 +186,8 @@ The header verifier compares `sb-signing-secret` with the redacted configured
 shared secret before body decoding; it is not a body HMAC. Tests replace the
 provider and replay layers with deterministic memory layers. The CLI/local path
 starts `eve dev --no-ui` and exercises the same authored channel with local
-test configuration. Preview is verified; Production is not enabled.
+test configuration. Production is verified; Preview evidence and its
+independent route remain historical/retained.
 
 Schema boundary:
 
@@ -269,11 +267,11 @@ Vercel preview request
 - Put app-specific framework code in `apps/*`; move shared logic into packages
   only when it is stable and reusable.
 
-The Preview-verified Sendblue channel belongs in its existing app-owned
-boundary; keep Production promotion separately gated. Future Cloudflare email,
-Vercel Connect, and Notion code belongs in app-owned boundaries first. Move
-shared contracts into `@bundjil/core` or `@bundjil/eve-effect` only after the
-boundary is proven stable.
+The Production-verified Sendblue channel belongs in its existing app-owned
+boundary. Retain Preview as an independent historical environment. Future
+Cloudflare email, Vercel Connect, and Notion code belongs in app-owned
+boundaries first. Move shared contracts into `@bundjil/core` or
+`@bundjil/eve-effect` only after the boundary is proven stable.
 
 ## Quality Gates
 

@@ -1,6 +1,6 @@
 {
   "title": "Eve + Effect Agent Spike Tasks",
-  "status": "draft",
+  "status": "completed",
   "spec": "docs/product-specs/eve-effect-agent-spike.md",
   "principles": [
     "Ship one end-to-end Eve agent slice before adding Sendblue, email, Notion, or memory.",

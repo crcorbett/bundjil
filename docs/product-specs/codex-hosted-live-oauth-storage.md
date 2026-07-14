@@ -1,21 +1,25 @@
 # Personal Codex Subscription Auth And Hosted Proxy
 
-Status: Implemented and accepted for personal preview
+Status: Implemented and accepted; Preview evidence is historical and Production promotion is recorded separately
 Owner: Bundjil
 Created: 2026-07-07
-Revised: 2026-07-13
+Revised: 2026-07-14
 
 ## Current State
 
 The trusted-local PKCE login, encrypted Upstash V2 persistence,
 refresh-capable hosted proxy, fenced concurrency, bounded unauthorized replay,
-private SSE, and leak-safe preview proof are implemented and recorded. The
-mandatory final three-pass cross-cutting Effect audit passed. The personal
-Vercel preview is not a production approval.
+private SSE, and leak-safe Preview proof are implemented and recorded. The
+mandatory final three-pass cross-cutting Effect audit passed. The later
+Production promotion records an independently provisioned encrypted profile,
+private proxy completion through Eve, monitoring, and rollback evidence in
+`vercel-production-promotion.md`; this SPEC retains the Preview-era proof as
+historical evidence.
 
 `apps/agent` independently implements an opt-in `codex-proxy` LanguageModel
-adapter through Effect Config, with Gateway as default. Its focused adapter
-proof is not a recorded combined Eve -> hosted-live-proxy proof.
+adapter through Effect Config, with Gateway as default. Production evidence now
+records the deployed Eve -> hosted-live-proxy path; this SPEC's adapter proof
+remains historical and does not replace the promotion record.
 
 ## Decision Summary
 
@@ -39,6 +43,12 @@ This is a personal, single-owner integration. It is not a public OAuth product,
 multi-user SaaS authentication system, credential resale service, or general
 OpenAI Platform replacement.
 
+## Historical Implementation Scope
+
+The following purpose, goals, non-goals, verification contract, and rollback
+steps describe the original Preview-era implementation boundary. They remain
+useful for a future rerun, but do not describe current Production state.
+
 ## Purpose
 
 Replace the completed access-token-only workaround with a durable personal
@@ -50,8 +60,8 @@ trusted local login command
   -> ChatGPT subscription authorization through Codex-compatible PKCE
   -> encrypted refresh-capable profile in personal Upstash
 
-apps/agent Eve runtime (opt-in adapter implemented; combined proof unrecorded)
-  -> private apps/codex-proxy Vercel preview
+apps/agent Eve runtime (historical opt-in adapter proof)
+  -> private apps/codex-proxy Vercel Preview
   -> @bundjil/codex-oauth
   -> refreshed subscription access token
   -> https://chatgpt.com/backend-api/codex/responses
@@ -151,9 +161,8 @@ source drift is visible.
   after an upstream authorization failure.
 - Prove local login, encrypted Upstash persistence, hosted refresh, concurrent
   refresh safety, private proxy streaming, and safe reauthentication failure.
-- Keep Gateway as the default Eve provider unless a separately approved
-  production decision changes that boundary. The sibling Eve provider SPEC
-  owns the implemented opt-in adapter.
+- Keep Gateway as the default Eve provider unless app-owned configuration
+  selects the opt-in proxy. The sibling Eve provider SPEC owns the adapter.
 
 ## Non-Goals
 
@@ -167,9 +176,9 @@ source drift is visible.
 - No automatic extraction from `~/.codex/auth.json` as the primary login path.
 - No storage of ID tokens or raw OAuth responses after login completion.
 - No assumption that the subscription backend is a stable OpenAI Platform API.
-- No production deployment without a fresh protocol/policy review and explicit
-  user approval. Personal preview proof is complete but is not production
-  approval.
+- Historical gate: no Production deployment without a fresh protocol/policy
+  review and explicit user approval. Personal Preview proof was not Production
+  approval; the later accepted promotion is recorded separately.
 - No Eve model-provider change in this SPEC.
 
 ## Existing Foundations
@@ -200,9 +209,9 @@ The following implemented package boundaries remain canonical:
 - `CodexProxyRoutesLive`
 
 Completed encryption, encrypted persistence, storage keys, Upstash adapter,
-lock semantics, refresh-capable preview proof, and the server-safe/trusted-local
-Layer split must be preserved. The access-token-only importer proves only its
-deprecated diagnostic path and is not refresh evidence.
+lock semantics, refresh-capable historical Preview proof, and the
+server-safe/trusted-local Layer split must be preserved. The access-token-only
+importer proves only its deprecated diagnostic path and is not refresh evidence.
 
 ## Design
 
@@ -460,8 +469,9 @@ fallen back to the unavailable proxy service. In that state it returns a
 sanitized non-ready status without probing or exposing the stored profile.
 
 `mock` remains the default. `local` remains a trusted filesystem proof and is
-rejected on Vercel. `live` remains explicit and personal-preview only until a
-later production decision.
+rejected on Vercel. In this historical scope, `live` was explicit and
+Preview-only until a later Production decision; the accepted Production
+composition is documented in the promotion SPEC.
 
 ### Disconnect and revocation
 
@@ -557,7 +567,7 @@ trusted local login command
   -> sanitized success only
   -> encrypted Upstash envelope readback
 
-Vercel personal preview
+Historical Vercel Preview
   -> health/auth checks
   -> force near-expiry profile
   -> isolated proof subject and concurrent live requests
@@ -781,7 +791,7 @@ Required opt-in live proof, with values suppressed:
   and an isolated proof profile, not by damaging the owner's working profile;
 - Vercel logs contain no credentials, callback query, raw provider payload,
   prompt, request body, or full model response;
-- no production deploy occurs without a later explicit approval.
+- Historical gate: no Production deploy occurred until later explicit approval.
 
 ## Documentation Deliverables
 
@@ -814,11 +824,13 @@ Documentation must distinguish:
 - **Backend instability:** isolate request mapping and auth client behind
   package services; fail closed and retain Gateway/mock rollback.
 - **Subscription misuse:** no pooling, resale, multi-user service, or public
-  gateway; revisit terms and current official docs before production.
+  gateway; revisit terms and current official docs before any future Production
+  change.
 
 ## Rollback
 
-- Set preview `BUNDJIL_CODEX_PROXY_MODE=mock` and deploy another preview.
+- Historical Preview rollback: set Preview `BUNDJIL_CODEX_PROXY_MODE=mock` and
+  deploy another Preview. Production rollback is recorded in the promotion plan.
 - Remove the encrypted refresh-capable profile from Upstash.
 - Rotate the Bundjil encryption key and private proxy token if exposure is
   suspected.

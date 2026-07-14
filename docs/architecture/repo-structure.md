@@ -84,14 +84,15 @@ The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
 Vercel account. Do not link or deploy this app to Tilt Legal.
 
 The proxy composes mock, deprecated local diagnostic, and refresh-capable
-preview-live modes. It never owns a hosted browser OAuth callback or an
-account-linking endpoint. Deployable apps import server-safe layers from
+hosted `live` modes for Production and retained Preview. It never owns a
+hosted browser OAuth callback or an account-linking endpoint. Deployable apps
+import server-safe layers from
 `@bundjil/codex-oauth/live.layer`; trusted-local browser, loopback, and login
 composition is isolated behind `@bundjil/codex-oauth/trusted-local.layer`.
 
-The Preview-verified Sendblue channel remains app-owned in
-`apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; it is not a
-shared package contract and is not enabled in Production. Future Cloudflare
+The Production-verified Sendblue channel remains app-owned in
+`apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; retained
+Preview evidence does not make it a shared package contract. Future Cloudflare
 email, Vercel Connect, and Notion code should likewise start in app-owned
 boundaries. Move shared contracts into packages only after the shape has
 survived at least one real tool/channel implementation.
@@ -164,28 +165,32 @@ survived at least one real tool/channel implementation.
 - may compose `@bundjil/codex-oauth` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
-- composes refresh-capable encrypted `live` mode for personal preview using the
-  package-owned OAuth refresh transport, Upstash lock, fenced profile commit,
-  and encrypted profile store. The hosted preview proof is accepted;
+- composes refresh-capable encrypted `live` mode for personal Production and
+  retained Preview using the package-owned OAuth refresh transport, Upstash
+  lock, fenced profile commit, and encrypted profile store. The Production
+  Eve-to-proxy proof is accepted; Preview proof is historical;
 - keeps the trusted filesystem `local` mode access-token-only and rejects that
   mode on Vercel;
 - must expose no OAuth browser start/callback route, must fail closed, and must
   never fall back to API keys or mock output after a live auth failure.
-- must keep `mock` as the default, reject filesystem `local` mode on Vercel,
-  and never enable production without a separate explicit approval.
-- must record preview direct HTTP proof for `/health`, unauthorized rejection,
+- must keep `mock` as the default configuration, reject filesystem `local`
+  mode on Vercel, and never fall back to `mock` after a live failure. A default
+  does not assert the mode of any retained deployment.
+- must record direct HTTP proof for `/health`, unauthorized rejection,
   invalid-token rejection, authenticated stream behavior, encrypted Upstash
-  readback, and log/leak scans before a production proposal.
+  readback, and log/leak scans. Preview-first sequencing remains required for
+  future Production changes.
 
 `apps/agent` model-provider rules:
 
 - owns `BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_AGENT_MODEL`, and
   `BUNDJIL_CODEX_PROXY_*` config parsing;
 - may construct an AI SDK `LanguageModel` for the private proxy;
-- must keep AI Gateway as the default provider unless a separately approved
-  production decision changes that boundary;
-- may expose the accepted opt-in Codex proxy adapter, but must not describe it
-  and the separate hosted preview proof as combined end-to-end evidence;
+- must keep AI Gateway as the default provider unless app-owned configuration
+  selects the accepted opt-in Codex proxy;
+- may expose the accepted opt-in Codex proxy adapter, but must distinguish its
+  historical Preview proof from the separately accepted Production end-to-end
+  evidence;
 - must not import `CodexOAuthService`, `CodexProfileStore`, direct Codex HTTP
   clients, or hosted token storage adapters.
 

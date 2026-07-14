@@ -4,15 +4,14 @@
 
 Gateway remains the default Eve provider. `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`
 selects an app-owned Effect Config path that builds a private
-OpenAI-compatible `LanguageModel`. This adapter has its own focused proof; the
-hosted proxy has separate preview proof for encrypted refresh and SSE. Do not
-record these as combined Eve -> hosted-live-proxy evidence unless an actual Eve
-request has been verified through that deployed route.
+OpenAI-compatible `LanguageModel`. Production evidence verifies one deployed
+Eve request through the private live proxy. Earlier adapter and Preview proofs
+remain distinct historical evidence for their own environments.
 
 This guide documents the committed Bundjil Eve app and the Effect package
-boundary it uses. Sendblue is a Preview-verified app-owned channel; Cloudflare
-email, Vercel Connect, and Notion remain future boundaries. No Sendblue
-Production enablement is recorded here.
+boundary it uses. Sendblue is a Production-verified app-owned channel with a
+retained Preview webhook. Cloudflare email, Vercel Connect, and Notion remain
+future boundaries.
 
 ## Filesystem Layout
 
@@ -129,8 +128,8 @@ Current Codex provider state:
 
 - Implemented: Gateway default, opt-in Codex proxy `LanguageModel`, default
   mock proof, trusted-local encrypted filesystem proof, direct Codex Responses
-  package proof, and a personal-Vercel preview `live` composition over
-  encrypted Upstash storage.
+  package proof, and personal-Vercel Production/Preview `live` compositions
+  over encrypted Upstash storage.
 - The `live` composition is refresh-capable. It reads the encrypted subscription
   profile, refreshes inside skew under a distributed lock, fenced-CAS commits
   each generation, and performs one revision-aware replay after a provider 401.
@@ -138,9 +137,9 @@ Current Codex provider state:
 - The trusted-local browser/loopback PKCE login writes that encrypted profile.
   Vercel exposes no OAuth start or callback route. `local` remains the separate
   access-token-only filesystem proof and never refreshes.
-- Proven separately: the sanitized hosted refresh-capable preview and the
-  opt-in Eve `codex-proxy` adapter. A combined Eve -> hosted-live-proxy request
-  has not yet been recorded. Gateway remains the Eve default.
+- Proven in Production: one deployed Eve -> hosted-live-proxy completion.
+  Sanitized hosted Preview and adapter proofs remain historical. Gateway
+  remains the Eve default.
 - Unsupported: treating Codex OAuth as an OpenAI Platform API key, routing
   Codex OAuth through Vercel AI Gateway credentials, deploying
   `bundjil-codex-proxy` to Tilt Legal, or exposing the proxy publicly.
@@ -503,7 +502,7 @@ Rules:
 - Unknown diagnostic values that need safe rendering must use
   `Schema.UnknownFromJsonString`.
 
-### Hosted Eve Preview
+### Historical Hosted Eve Preview
 
 The personal Vercel project `bundjil-agent` has root directory `apps/agent`.
 It uses Vercel Preview variables for the five app-owned Codex-proxy settings
@@ -536,13 +535,12 @@ authenticated `POST /v1/chat/completions` with HTTP 200. Agent and proxy logs
 contained route/status metadata only and their runtime-error queries were
 empty. This is preview proof, not production deployment evidence.
 
-## Preview Proxy Verification
+## Historical Preview Proxy Verification
 
 The deployed proxy belongs to the `bundjil-codex-proxy` project in Cooper's
-personal Vercel account, not Tilt Legal. The proxy's personal Vercel setup is
-preview only. Bundjil did not configure a production mode/key/profile or deploy
-production; Marketplace Upstash credentials may be auto-bound to production but
-do not activate it.
+personal Vercel account, not Tilt Legal. At this historical Preview checkpoint,
+the proxy setup was Preview-only and Bundjil had not configured or deployed
+Production; Marketplace Upstash credentials did not activate it.
 
 Preview deployment command shape:
 
@@ -569,9 +567,9 @@ type, SSE data-line count, `[DONE]` presence, and leak booleans. Do not record
 bearer tokens, OAuth tokens, refresh tokens, authorization codes, raw OAuth
 payloads, prompts, or full model responses.
 
-For the preview composition, rollback is a preview mode change to `mock` or an
-agent config rollback to Gateway. Production rollback is not relevant because
-Bundjil did not deploy production:
+For this historical Preview composition, rollback is a Preview mode change to
+`mock` or an agent config rollback to Gateway. Production rollback is recorded
+separately in the Production promotion plan:
 
 ```bash
 vercel rollback <deployment-id-or-url>
@@ -591,9 +589,8 @@ code moves.
 
 ## Future Boundaries
 
-Sendblue is implemented and verified on Preview only. Production promotion
-remains separately gated. These integrations are intentionally not implemented
-in the current slice:
+Sendblue is Production verified with retained historical Preview evidence.
+These integrations are intentionally not implemented in the current slice:
 
 - Cloudflare Email Routing Workers and email handlers.
 - Vercel Connect connection setup and token exchange.

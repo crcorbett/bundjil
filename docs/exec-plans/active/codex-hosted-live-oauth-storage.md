@@ -17,12 +17,14 @@ repo architecture guides are the active local execution authority.
 
 ## Current Task
 
-All tasks are accepted. The real owner login, encrypted V2
+All tasks are accepted. This plan is retained as a historical Preview-era
+execution record; Production promotion is documented in
+`vercel-production-promotion.md`. The real owner login, encrypted V2
 subscription-profile readback, refresh, fenced concurrency, bounded 401
 recovery, private SSE, safe-log evidence, durable documentation, and final
-cross-cutting Effect audit are complete. Vercel exposes no OAuth browser route,
-the combined Eve -> hosted-live-proxy request remains unrecorded, and
-production remains inactive.
+cross-cutting Effect audit are complete. Vercel exposes no OAuth browser route.
+The Production Eve -> hosted-live-proxy proof is accepted separately; do not
+attribute it to this historical plan.
 
 Parent preflight evidence, 2026-07-11:
 

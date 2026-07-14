@@ -30,9 +30,10 @@ Bundjil is planned around a simple product shape:
 - Domain model: Effect for fallible, async, stateful, boundary-crossing, and
   dependency-injected code.
 
-The current repository ships the Eve agent slice and one Sendblue channel
-verified on Vercel Preview. Cloudflare email, Vercel Connect, and Notion remain
-future integrations. Sendblue is not enabled in Production.
+The current repository ships a Production Eve agent, private Codex subscription
+proxy, and Sendblue channel. Cloudflare email, Vercel Connect, and Notion remain
+future integrations. Preview remains an independently retained environment;
+its earlier proofs are historical evidence, not the current Production state.
 
 ## Current Packages
 
@@ -63,7 +64,8 @@ future integrations. Sendblue is not enabled in Production.
 `apps/agent` owns the Sendblue custom Eve channel, including its Effect Schema
 contracts, redacted Config, explicit Layers, authentication, identity policy,
 opaque routing, replay claims, and provider client. The public route is
-`POST /eve/v1/sendblue/webhook` on the accepted immutable Preview deployment.
+`POST /eve/v1/sendblue/webhook` on accepted Production and retained Preview
+deployments.
 
 Sendblue authenticates at the route with its shared `sb-signing-secret` header,
 not a body HMAC. Vercel's bypass is separate platform authentication and does
@@ -72,12 +74,14 @@ dispatched; ignored or duplicate events receive `200`, malformed authenticated
 input gets `400`, failed route authentication gets `401`, unavailable durable
 claims get `503`, and accepted dispatch gets `202`.
 
-The Preview proof established one provider-originated inbound to one delivered
-outbound response plus sequential and concurrent replay suppression. It used
-sanitized status/count/digest evidence only. Production variables, deployments,
-storage, aliases, and webhooks remain untouched. See
-[`apps/agent/README.md`](./apps/agent/README.md) for config, operations, and
-rollback; the future Production decision remains separately gated.
+Production evidence records one provider-originated inbound, a 15-event Eve
+replay through `session.waiting`, one private proxy completion, and one
+`DELIVERED` outbound. A provider replay was suppressed without another
+dispatch, proxy completion, or delivery. Production and Preview each retain a
+receive webhook; route probes, durable replay fixtures, inventories, and leak
+scans are recorded only as sanitized status/count evidence. See
+[`apps/agent/README.md`](./apps/agent/README.md) for configuration ownership,
+monitoring, and rollback. The earlier Preview proof remains historical.
 
 `apps/agent` owns Eve filesystem runtime shape and deployment concerns.
 Reusable app operations live in packages once the boundary is stable.
@@ -93,13 +97,15 @@ Implemented:
   rollback. It never calls Codex.
 - `local` is an explicit encrypted filesystem proof. It runs only in trusted
   local Bun and Vercel rejects it.
-- `live` is an explicit personal-Vercel preview composition. A trusted-local
+- `live` is the hosted composition used by the private Production proxy and
+  retained Preview proofs. A trusted-local
   loopback PKCE login writes an encrypted refresh-capable profile to Upstash;
   the proxy refreshes under a distributed lock with fenced commits, retries one
   classified unauthorized response, and fails closed for absent or unusable
   credentials.
-- The hosted proxy proof and the agent adapter proof are separate. Recorded
-  evidence does not establish an Eve-to-hosted-live-proxy end-to-end run.
+- Production Eve proof establishes the deployed Eve -> private live proxy ->
+  Codex provider path. Gateway remains the default model provider unless the
+  app-owned configuration selects the opt-in proxy.
 
 Operational constraints:
 
@@ -107,11 +113,9 @@ Operational constraints:
   a deprecated emergency/local diagnostic fallback, not normal hosted
   operation; use trusted-local subscription login for a refresh-capable
   profile.
-- The personal Vercel configuration and deploys are preview only. Bundjil did
-  not set a production proxy mode, profile, or cipher configuration, and did
-  not deploy production. A Marketplace Upstash resource may still auto-bind
-  its provider credentials to production; that is not permission to run live
-  mode there.
+- Production uses independently configured encrypted Vercel bindings, a
+  separate encrypted profile/cipher/namespace, and a private bearer. OAuth
+  login remains trusted-local; Vercel has no OAuth start or callback route.
 - The operator runbook is in
   [`apps/codex-proxy/README.md`](./apps/codex-proxy/README.md). It records only
   sanitized statuses and leak booleans.
@@ -167,11 +171,10 @@ The proxy smoke test starts a local Bun server on an ephemeral port, verifies
 `GET /health`, and verifies authenticated mock OpenAI-compatible SSE without
 calling Codex.
 
-The Codex proxy runbook is deliberately separate from Eve. It covers local
-subscription login, preview proof, refresh/re-login, disconnect, deprecated
-local import diagnostics, and mock rollback without exposing credentials or
-request content. The agent adapter can be enabled separately; its unit proof is
-not evidence of a hosted end-to-end Eve request.
+The Codex proxy runbook is deliberately separate from Eve. It covers
+trusted-local subscription login, Production and historical Preview proof,
+refresh/re-login, deprecated local import diagnostics, monitoring, and ordered
+rollback without exposing credentials or request content.
 
 ## Layout
 
@@ -215,17 +218,15 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 1. Keep Gateway as the default Eve model provider while Codex proxy remains
    opt-in.
-2. Record a combined Eve -> hosted-live-proxy request before treating the two
-   independent proof records as end-to-end evidence.
-3. Keep Gateway as default unless a separately approved production decision
-   changes that boundary.
-4. Define channel-neutral message, identity, consent, and task contracts in
+2. Keep Gateway as default unless app-owned configuration selects the
+   Production-proven Codex proxy path.
+3. Define channel-neutral message, identity, consent, and task contracts in
    `@bundjil/core`.
-5. Keep the Preview-verified Sendblue channel healthy; Production promotion
-   remains separately gated.
-6. Add the Cloudflare email ingress path.
-7. Connect Notion through Vercel Connect and model the first personal workflows.
-8. Add readback, observability, and replayable verification for every channel.
+4. Keep the Production Sendblue channel and its retained Preview counterpart
+   healthy through route, replay, inventory, monitoring, and rollback checks.
+5. Add the Cloudflare email ingress path.
+6. Connect Notion through Vercel Connect and model the first personal workflows.
+7. Add readback, observability, and replayable verification for every channel.
 
 ## References
 

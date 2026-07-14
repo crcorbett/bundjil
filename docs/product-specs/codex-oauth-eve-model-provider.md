@@ -1,6 +1,6 @@
 # Codex OAuth Eve Model Provider
 
-Status: Preview implementation accepted; private live proxy and hosted Eve-to-proxy proof are recorded; production remains out of scope
+Status: Implemented and accepted; Preview evidence is historical and Production promotion is recorded separately
 Owner: Bundjil  
 Created: 2026-07-07
 
@@ -8,8 +8,10 @@ Created: 2026-07-07
 
 The app-owned opt-in `codex-proxy` LanguageModel adapter and Gateway-default
 selection are implemented and covered by focused configuration/fetch tests.
-The refresh-capable proxy is deployed in Cooper's personal Vercel preview and
-has a sanitized authenticated live-SSE proof.
+The refresh-capable proxy has sanitized historical Preview proof. Production
+promotion separately proves deployed Eve through the private live proxy, with
+independent encrypted credentials, OIDC route authentication, monitoring, and
+rollback evidence.
 
 On 2026-07-13, a local Eve runtime configured with the fresh preview
 environment selected `bundjil-codex-proxy/gpt-5.5`, created a session, and
@@ -41,7 +43,15 @@ recorded one authenticated HTTP 200 chat-completions request. Vercel runtime
 logs were status/route-only and both runtime-error queries were empty. The
 proof contains no bearer, OAuth profile, authorization code, prompt, or full
 model-response value. Gateway remains the default whenever this opt-in preview
-configuration is absent; production remains unconfigured and unapproved.
+configuration is absent. This paragraph records Preview history only; it does
+not describe the current Production state.
+
+## Historical Implementation Scope
+
+The remaining implementation, deployment, and verification requirements in
+this completed SPEC describe the Preview-era rollout. They remain useful for a
+future rerun, while the current Production state is owned by the promotion
+SPEC/plan.
 
 ## Purpose
 
@@ -382,9 +392,10 @@ Preview proof:
   terms, probe text, invalid-token text, and full mock response text; the
   sanitized scans were clean.
 
-At this 2026-07-07 checkpoint, production deployment was skipped and hosted
-live Codex proof remained pending. The successor hosted OAuth-storage SPEC has
-since accepted personal preview proof; production remains inactive and opt-in.
+At this historical 2026-07-07 checkpoint, Production deployment was skipped
+and hosted live Codex proof remained pending. The successor hosted OAuth-storage
+SPEC later accepted personal Preview proof; Production promotion is recorded
+separately and remains opt-in at the app configuration boundary.
 
 On 2026-07-07, `apps/agent` added app-owned Eve model-provider wiring:
 

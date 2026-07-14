@@ -31,14 +31,9 @@ Implemented:
   `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`.
 - Local Codex proxy mode has been verified against `apps/codex-proxy` in mock
   mode.
-- Hosted Eve preview has been verified with model id
-  `bundjil-codex-proxy/gpt-5.5` through the private live proxy. Gateway remains
-  the default when the opt-in preview configuration is absent.
-
-Future:
-
-- Production promotion, a stable production proxy URL, and separate production
-  credential/profile provisioning require explicit approval.
+- Hosted Eve Production has been verified through the private live proxy.
+  Gateway remains the default unless the app-owned opt-in configuration selects
+  the proxy. Earlier Preview proof is retained as historical evidence.
 
 Unsupported:
 
@@ -76,7 +71,8 @@ Default Eve channel routes:
 
 `/eve/v1/session*` routes require Vercel OIDC when deployed. `localDev()` is
 the final fallback for loopback development only; anonymous deployed callers
-are rejected. `GET /eve/v1/health` remains the public Eve health probe.
+are rejected. Vercel Deployment Protection is a separate platform boundary.
+`GET /eve/v1/health` remains the public Eve health probe.
 
 ## Production Preflight
 
@@ -88,16 +84,16 @@ ordered discriminant: `before-first-mutation`, `proxy-provisioned`,
 point; later bindings, profiles, aliases, deployments, rollback references,
 and Sendblue controls are rejected as premature evidence.
 
-`before-first-mutation` requires granted approval, the exact personal team id
-`team_1LX7ZujbijowTv8J9k0aU7nD`, linked projects and stable domains, Deployment
-Protection, a clean pushed SHA, absent Bundjil Production activation, no
-Preview identity reuse, and read-only inventory. The inventory then advances
+The historical `before-first-mutation` checkpoint required granted approval,
+the linked personal projects and stable domains, Deployment Protection, a clean
+pushed SHA, absent Bundjil Production activation, no Preview identity reuse,
+and read-only inventory. The inventory then advanced
 exactly through proxy provisioned/agent absent, proxy accepted/agent configured,
-and both accepted. Later stages add proxy binding/profile proof, accepted proxy
-and agent configuration with Eve OIDC, immutable agent and rollback references,
-then completed soak/rollback proof with Sendblue still unactivated. The command
-does not read values and cannot deploy, alias, set variables, provision storage,
-or write profiles.
+and both accepted. Later stages added proxy binding/profile proof, accepted
+proxy and agent configuration with Eve OIDC, immutable agent and rollback
+references, then completed soak/rollback proof with Sendblue still unactivated.
+The command does not read values and cannot deploy, alias, set variables,
+provision storage, or write profiles.
 
 ```bash
 BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT="$PWD/.local/production-preflight.json" \
@@ -135,10 +131,12 @@ Stream the returned session:
 curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 ```
 
-## Sendblue Preview Channel
+## Sendblue Channel
 
-The app has an app-owned Sendblue custom channel. It is verified on one
-immutable Vercel Preview deployment only; it is not enabled in Production.
+The app has an app-owned Sendblue custom channel. Production and Preview each
+retain a receive webhook; the Production route, provider ingress, Eve replay,
+private proxy completion, outbound delivery, and replay suppression are
+accepted. Preview evidence remains historical.
 
 - Route: `POST /eve/v1/sendblue/webhook`. The build test rejects `/webhook`.
 - Authentication: Sendblue sends the configured shared secret in the
@@ -174,8 +172,10 @@ indeterminate provider outcome.
 ### Sendblue Configuration
 
 All values are app-owned Effect `Config`; secrets use `Config.redacted` and
-missing required configuration fails closed. Configure only Preview for the
-accepted channel:
+missing required configuration fails closed. Production and Preview use
+independent Vercel-managed encrypted bindings. 1Password and Vercel own
+credentials; temporary Production configuration bundles are removed after
+operator use:
 
 ```text
 BUNDJIL_SENDBLUE_API_KEY
@@ -193,8 +193,8 @@ BUNDJIL_SENDBLUE_ALLOWED_SERVICES
 ```
 
 Replay storage prefers the two `BUNDJIL_SENDBLUE_REPLAY_STORE_*` credentials
-and otherwise uses the Preview-only Marketplace `KV_REST_API_URL` and
-`KV_REST_API_TOKEN` fallback. `BUNDJIL_SENDBLUE_TEST_MODE=true` plus
+and otherwise uses the Vercel Marketplace `KV_REST_API_URL` and
+`KV_REST_API_TOKEN` fallback for the configured environment. `BUNDJIL_SENDBLUE_TEST_MODE=true` plus
 `BUNDJIL_SENDBLUE_TEST_API_BASE_URL` is restricted to tests/local fixtures.
 Never put values in commands, docs, test fixtures, or commits.
 
@@ -206,18 +206,19 @@ bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 ```
 
-The Preview proof recorded an authenticated `401`/`400`/`200`/`202` route
-matrix, a fail-closed `503` replay-store fixture, one provider-originated
-inbound to one delivered outbound, and sequential plus concurrent replay
-suppression. It retained only deployment/status/count/digest metadata and had
-no error or fatal runtime logs. It did not alter Production.
+Production proof recorded the route matrix, a fail-closed `503` replay-store
+fixture, one provider-originated inbound to one `DELIVERED` outbound, a
+15-event replay through waiting, one private proxy completion, and real-provider
+replay suppression. It retained only sanitized status/count evidence and had
+no sensitive-value or credential-marker log hits. The Preview proof is retained
+as historical evidence.
 
 Rotate the Vercel bypass and Sendblue webhook secret independently in their
-provider/operator stores, update the corresponding encrypted Preview values,
-redeploy, then update the provider webhook. To disable the channel, remove the
-Preview receive webhook first and then remove or revoke the Preview Sendblue
-configuration; do not use a Production rollback as a substitute. Production
-promotion remains gated by the separate Vercel Production Promotion SPEC.
+provider/operator stores, update the corresponding encrypted environment
+values, redeploy, then update the provider webhook. Production rollback order
+is: remove the Production receive webhook, revoke its dedicated automation
+bypass, restore the retained agent deployment, then remove Production Sendblue
+variables. Preserve the retained Preview webhook separately.
 
 ## Environment
 
@@ -247,12 +248,14 @@ direct `chatgpt.com` Responses endpoint. In Codex proxy mode it only receives
 an AI SDK `LanguageModel` created with `@ai-sdk/openai-compatible`, and that
 model calls the private Bundjil proxy with the internal bearer token.
 
-## Hosted Preview
+## Hosted Deployment And Historical Preview Operations
 
-`bundjil-agent` is a personal Vercel preview project with root directory
-`apps/agent`. Its Preview environment contains only the agent-owned provider
-values above. It must not receive Codex OAuth profiles, access/refresh tokens,
-Upstash credentials, or envelope cipher keys.
+`bundjil-agent` is a personal Vercel project with root directory `apps/agent`.
+Its deployed environments contain only agent-owned provider and channel values.
+They must not receive Codex OAuth profiles, access/refresh tokens, proxy-owned
+Upstash credentials, or envelope cipher keys. App-owned Sendblue replay-store
+Upstash URL/token bindings are legitimate agent configuration and remain
+separate from the Codex profile, cipher, lock, and fence material.
 
 The root [`turbo.json`](../../turbo.json) declares those five provider values
 only for `@bundjil/agent#build`. Eve resolves the model manifest during
@@ -362,7 +365,7 @@ bun run --filter @bundjil/agent dev:no-ui
 Hosted rollback is handled in `apps/codex-proxy`; the app-level rollback is to
 remove the `codex-proxy` env vars so Eve uses Gateway again.
 
-## Proof Boundary
+## Historical Preview Proof Boundary
 
 The `codex-proxy` adapter is opt-in and uses app-owned Effect Config to create
 an OpenAI-compatible `LanguageModel`; Gateway is the default. Its
@@ -375,6 +378,16 @@ through `session.waiting`, and the private proxy logged one authenticated 200
 chat-completions request. This is preview evidence only, not production
 approval. Refresh, fencing, and proxy ownership remain in `apps/codex-proxy`
 and `@bundjil/codex-oauth`.
+
+## Current Production Proof Boundary
+
+Production evidence separately records one deployed Eve -> private live proxy
+completion and one Sendblue-triggered provider ingress -> Eve replay through
+waiting -> `DELIVERED` outbound proof. The Production route remains protected
+by Vercel Deployment Protection, deployed callers require Vercel OIDC, and the
+private proxy bearer plus Sendblue route secret remain independent boundaries.
+The historical adapter and Preview proof above do not substitute for this
+accepted Production evidence.
 
 ## Runtime Artifacts
 

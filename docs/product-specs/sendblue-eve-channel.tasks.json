@@ -1,7 +1,7 @@
 {
   "title": "Sendblue Eve Channel Tasks",
   "spec": "docs/product-specs/sendblue-eve-channel.md",
-  "status": "pending",
+  "status": "completed",
   "principles": [
     "Keep Sendblue contracts and services app-owned in apps/agent until a stable cross-channel abstraction is proven.",
     "Authenticate sb-signing-secret in constant time before decoding or trusting any body field; missing config fails closed.",

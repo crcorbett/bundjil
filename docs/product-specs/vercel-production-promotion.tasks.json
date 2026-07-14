@@ -1,7 +1,7 @@
 {
   "title": "Vercel Production Promotion Tasks",
   "spec": "docs/product-specs/vercel-production-promotion.md",
-  "status": "active",
+  "status": "completed",
   "approval": {
     "status": "granted",
     "scope": "Production provisioning and deployment",
@@ -10,7 +10,7 @@
   },
   "principles": [
     "Production is independent from Preview: proxy URL, bearer, Upstash binding and namespace, CodexOAuthSubject inputs, derived profile/lock/fence keys, cipher/key id, and OAuth profile must be distinct.",
-    "The completed Sendblue Preview proof is retained as Preview-only evidence; Sendblue Production enablement is the final task.",
+    "The completed Sendblue Preview proof is retained as historical Preview evidence; Sendblue Production enablement and final documentation reconciliation are accepted.",
     "Trusted-local OAuth owns browser/PKCE/callback/plaintext-token handling; Vercel receives only encrypted profile material and exposes no OAuth route.",
     "Production uses Deployment Protection, explicit Eve Vercel OIDC authentication, and the proxy's separate internal bearer boundary.",
     "Preflight is staged and read-only: each checkpoint requires only the sanitized facts that its preceding tasks can truthfully establish; missing, premature, or forbidden fields fail closed.",
@@ -345,7 +345,8 @@
     {
       "id": "reconcile-production-documentation",
       "title": "Reconcile documentation, ledgers, and final evidence",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
       "dependsOn": ["enable-sendblue-production-last"],
       "description": "Update current app, architecture, SPEC, ledger, and execution-plan state only after the corresponding Production evidence exists.",
       "implementationNotes": [
@@ -364,8 +365,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: reconciled the root, app, architecture, SPEC, ledger, and execution-plan surfaces against the deployed graph. Gateway remains the default; the opt-in agent model calls the private proxy; the proxy alone owns the encrypted Codex profile, cipher, refresh lock, fence, and trusted-local PKCE boundary; the agent owns distinct Sendblue Config, durable replay storage, channel services, and the single route-edge ManagedRuntime. Vercel OIDC, Vercel automation bypass, the Sendblue route secret, and the proxy bearer remain independent authentication boundaries. Cloudflare email, Vercel Connect, Notion, hosted OAuth callbacks, and public proxy access remain unsupported.",
+          "Parent pass 2 - implementation quality and documentation patterns: verified that durable rules and all affected SPECs require Schema-derived contracts and JSON codecs, Config/Redacted, Context services, explicit Layers, flat named Effect.gen/Effect.fn programs, tagged pipe error handling, executable-edge ManagedRuntime use, and Effect KeyValueStore ownership. Helper sprawl, raw JSON, DTO mirrors, unsafe casts, direct process.env access, broad lint suppression, and speculative shared abstractions are forbidden. The no-frontend scope and future leaf-component composition rules are explicit, and historical Preview evidence is separated from current Production state.",
+          "Parent pass 3 - verification and evidence: bun run verification passed with clean Ultracite, Knip, six workspace typechecks, agent 51 tests, proxy 21 tests, OAuth 102 tests, and all remaining workspace tests. Every task ledger decoded with jq; all-complete ledger statuses were reconciled; git diff --check passed; stale-current-state and credential scans found no added phone number, authorization code, bearer literal, 64-hex fingerprint, ciphertext value, or protected URL; the temporary Production bundle and untracked artifacts were absent. The accepted live proof remains one Sendblue inbound, one Codex-backed Eve run through waiting, one private proxy completion, one delivered outbound, and replay without duplicate dispatch or delivery."
+        ]
       },
       "commitAfterPassing": true
     }

@@ -55,7 +55,7 @@ bun run --filter @bundjil/agent build
   endpoint, byte/line counts, and safe booleans.
 - Codex proxy app change: run `@bundjil/codex-proxy` check-types, tests,
   build, and smoke-test. Hosted deployment proof belongs in the deployment task
-  and must verify preview before production.
+  and must verify isolated Preview before Production changes.
 - Codex documentation task: update root, architecture, app, package, SPEC, and
   task-ledger docs as needed. Documentation-only verification must include
   stale-claim scans and `git diff --check`; run broader checks only when the
@@ -138,10 +138,10 @@ start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
 Codex proxy mode is not an ordinary Eve test requirement. Gateway remains the
-default. The accepted personal preview proof verifies a deployed Eve request
-through the live private proxy; it does not authorize production. The
-access-token-only `local` workaround is deprecated and must never be used as
-hosted auth. Source ignored env values rather than printing them:
+default. Accepted Production proof verifies a deployed Eve request through the
+live private proxy; Preview proof is historical. The access-token-only `local`
+workaround is deprecated and must never be used as hosted auth. Source ignored
+env values rather than printing them:
 
 ```bash
 PORT=<local-port> \
@@ -151,8 +151,8 @@ bun run --filter @bundjil/codex-proxy dev
 
 Use the dedicated proxy runbook in
 [`apps/codex-proxy/README.md`](../../apps/codex-proxy/README.md) for mock,
-access-token-only local filesystem, refresh-capable preview live,
-reauthentication, and rollback operations.
+access-token-only local filesystem, refresh-capable hosted live,
+reauthentication, monitoring, and rollback operations.
 
 ## Codex Proxy Verification
 
@@ -168,19 +168,19 @@ The smoke test starts a local Bun server on an ephemeral port, checks
 
 Manual probes must use a minimal request from a private shell; the server
 decodes it through the owning Effect Schema boundary.
-Record no request body or model output. Checks must run against the personal
-Vercel preview before any production proposal and must scan logs for absence of
-token values, authorization codes, raw OAuth payloads, prompts, and full
-response bodies. The refresh-capable code path and hosted preview proof are
-accepted. Do not infer production approval from the combined
-Eve-to-preview proof record.
+Record no request body or model output. Checks must run against the isolated
+personal Vercel environment before a Production change and must scan logs for
+absence of token values, authorization codes, raw OAuth payloads, prompts, and
+full response bodies. The refresh-capable code path, historical Preview proof,
+and Production proof are accepted. Do not infer a future deployment change
+from a prior proof record.
 
-Hosted Eve preview verification additionally requires the scoped
-`@bundjil/agent#build` environment contract in `turbo.json`, a source deploy
-from the repository root, a fresh Vercel OIDC bearer for `/eve/v1/*`, and a
-durable stream replay with `startIndex=0`. Record provider/model id, HTTP
-status, event types/count, and leak booleans only; never record the bearer,
-prompt, or full model response.
+Hosted Eve verification requires the scoped `@bundjil/agent#build` environment
+contract in `turbo.json`, a source deploy from the repository root, a fresh
+Vercel OIDC bearer for `/eve/v1/*`, and a durable stream replay with
+`startIndex=0`. Record provider/model id, HTTP status, event types/count, and
+leak booleans only; never record the bearer, prompt, or full model response.
+For future Production changes, establish the isolated Preview proof first.
 
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.
@@ -244,12 +244,13 @@ proof counters belong in docs. Do not record bearer values, OAuth token
 values, refresh token values, authorization codes, raw OAuth payloads, full
 prompts, or full model responses.
 
-For the current refresh-capable preview composition, rollback is setting preview
+For the historical refresh-capable Preview composition, rollback is setting preview
 `BUNDJIL_CODEX_PROXY_MODE` to `mock` and deploying another preview. The
 access-token-only filesystem proof is revoked by deleting its ignored
 directory. Rotate Vercel or Upstash credentials through provider controls if
-exposure is suspected; never print the old value. Production deployment needs
-a later explicit approval and is not covered by this runbook.
+exposure is suspected; never print the old value. Current Production rollback
+is recorded in the Production promotion plan and is not performed by this
+historical Preview runbook.
 
 ## Documentation Quality
 
