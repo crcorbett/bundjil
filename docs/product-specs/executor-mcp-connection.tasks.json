@@ -1,0 +1,267 @@
+{
+  "title": "Executor MCP Connection Tasks",
+  "spec": "docs/product-specs/executor-mcp-connection.md",
+  "status": "draft",
+  "principles": [
+    "Use Eve's native defineMcpClientConnection boundary; do not add an Executor SDK, custom production MCP client, MCP proxy, or workspace package.",
+    "Keep the boundary app-owned under apps/agent and keep configuration in a distinct agent/lib/executor/config.ts using Effect Config, ConfigProvider, Schema policy, Redacted, and sanitized tagged errors.",
+    "Expose exactly skills, execute, and resume through Eve's allowlist; Executor owns all remote integration schemas and downstream provider DTOs.",
+    "Pin elicitation_mode=browser. Missing, unknown, model, native, or legacy model-resume modes are rejected for the Bundjil hosted connection.",
+    "Use separate implicit-deny Preview and Production toolkits and separate API keys; never promote the broad personal root endpoint or discovery key.",
+    "Read-only operations may be approved, state-changing operations require browser approval, and destructive, credential, billing, infrastructure, policy, toolkit, and irreversible operations are blocked in the first Production slice.",
+    "The model may resume only by executionId after Executor records the human browser decision; Sendblue can transport an approval URL but cannot express approval.",
+    "Helper sprawl is forbidden and audited after every task: inventory every new helper, mapper, wrapper, hook, service, layer, factory, and module with owner/reason, concrete call sites, direct test, and retain-or-inline decision.",
+    "Primary operations are named, flat, sequential Effect.fn/Effect.gen programs; decode/load, acquire, decide, call, encode, and return remain visible in the success path; Effect.fn transforms or the outer Effect.gen pipe own typed failure translation, and spans are named exactly once.",
+    "Expected typed failures must not be collapsed through broad catchAll, orDie, or defects; do not add runFork, unscoped fibers, daemon work, hidden queues, unbounded concurrency, or automatic retry around Executor execute/resume.",
+    "Do not weaken Ultracite/Oxlint, TypeScript, Effect language-service, Knip, Turbo, formatter, or test configuration; no broad suppression or ignore-list expansion can land this work.",
+    "Keep Schema-owned values typed until a real adapter requires wire representation, provide Layers once at executable edges, and acquire/release test servers and ManagedRuntime instances through Effect scopes.",
+    "Effect tests use @effect/vitest, injected deterministic ConfigProvider fixtures, scoped resource acquisition/release, and no live Executor, Vercel, Sendblue, model, or public-network dependency.",
+    "Every implementation delegation includes this SPEC, the exact task object, architecture docs, accepted helper/module budget, scope stops, and verification gates; only the parent implementer records the three audit passes after inspecting the diff.",
+    "Do not log or retain API keys, authorization headers, prompts, generated execution code, message text, provider records, raw MCP payloads, downstream results, or full toolkit/approval URLs.",
+    "No Bundjil frontend is added. Any unexpected React/route/visible-text/URL-state change stops this work for a separate SPEC requiring highest-parent primitive -> composite -> layout -> route composition; leaf-owned reads, mutations, params, commands, atoms, loading/empty/error/retry states, skeletons, and fallbacks; children/slot composition; render-time derivation; schema-backed URL state; and app-router-only URL writes."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent check-types",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent test",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent build",
+    "bun run check",
+    "bun run knip",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run verification",
+    "jq empty docs/product-specs/executor-mcp-connection.tasks.json",
+    "git diff --check",
+    "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
+    "No broad lint suppressions, @ts-ignore, structural double casts, non-null assertions, any, local DTO mirrors, manual object readers/mappers, raw JSON helpers, process.env reads, raw production fetch, generic helper modules, pass-through services, or dead exports",
+    "No broad expected-error collapse, Effect.runFork, unscoped/daemon fibers, hidden queues, unbounded concurrency, or Bundjil-owned retry around Executor execute/resume; any future concurrency/retry policy is scoped, bounded, interruption-safe, idempotency-proven, typed, tested, and preceded by a SPEC/task update",
+    "No lint/formatter/Knip/Turbo/TypeScript/test ignore-list expansion or dependency/configuration weakening; every narrow suppression has adjacent rationale, direct test evidence, and explicit parent-audit acceptance",
+    "A per-task helper-admission inventory lists every introduced helper/mapper/wrapper/hook/service/layer/factory/module, its ownership reason, call sites, direct test, and retain-or-inline decision; unqualified candidates are removed before task acceptance",
+    "Effect tests use @effect/vitest with injected deterministic ConfigProvider fixtures and Effect-scoped resources; unit/integration tests do not call Executor, Vercel, Sendblue, a model, or the public network",
+    "Compiled output, tests, logs, proof artifacts, git diff, and tracked files contain no synthetic or live Executor key, Authorization header, protected toolkit URL, approval URL, prompt, execution code, provider payload, message content, or downstream credential",
+    "No React/component/visible Bundjil route files change; otherwise stop for a separate frontend SPEC and Browser verification",
+    "Sanitized Preview and Production evidence proves independent toolkits, keys, Vercel targets, deployments, policies, and rollback references"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "completedPasses": 3,
+    "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
+  },
+  "tasks": [
+    {
+      "id": "freeze-executor-eve-contract-and-policy-inventory",
+      "title": "Freeze the current Eve/Executor contract and initial authority inventory",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Revalidate the pinned Eve MCP definition and current Executor hosted/toolkit/browser-approval behavior, then produce a sanitized candidate integration and operation-policy inventory before runtime code or Production provisioning.",
+      "implementationNotes": [
+        "Inspect the ignored current Eve and Executor references plus official documentation. Record source commit/version, relevant file paths, and documented behavior without copying external source into Bundjil.",
+        "Use the existing broad personal Executor credential only through a 1Password reference or mode-0600 ephemeral material for read-only initialize, tools/list, skills, and catalog inventory. Do not execute a downstream mutation.",
+        "Confirm that the hosted toolkit endpoint exists, root and toolkit routes differ, the remote MCP surface is skills/execute/resume, absent mode defaults to model, and browser-mode resume accepts only executionId.",
+        "Inventory only candidate connections needed for the first capability. Classify each selected operation as read-only, reversible mutation, destructive/irreversible, or authority management, and propose approve/require_approval/block without provider data.",
+        "Explicitly exclude Executor core toolkit/policy/key/credential management and any operation that would let Bundjil enlarge its own authority.",
+        "Create docs/exec-plans/active/executor-mcp-connection.md when implementation begins and link this task ledger; do not revise accepted prior SPEC evidence."
+      ],
+      "mandatoryVerification": [
+        "Direct read-only MCP initialize/tools-list evidence returns success with no secret, protected URL, provider data, or raw response retained in the repo.",
+        "Source evidence proves browser mode, model-mode default, browser resume input shape, toolkit dedicated URL, selected-connection implicit deny, and approve/require_approval/block semantics.",
+        "The sanitized inventory has an explicit owner, operation category, and policy for every selected entry; unclassified entries are excluded/blocked.",
+        "Review all proposed code boundaries against docs/architecture/effect-patterns.md and docs/architecture/repo-structure.md; no SDK, proxy, DTO mirror, custom MCP client, helper layer, pass-through service, generic module, or speculative abstraction is planned.",
+        "Record the initial helper/module budget: name every anticipated module and abstraction, its owner/reason, expected call sites and direct test; reject anything without a current boundary or materially complex tested policy.",
+        "Before implementation delegation, prepare the exact one-task prompt containing this SPEC, the task object, architecture docs, file ownership, accepted helper/module budget, linear Effect/lint/secret/frontend rules, and verification gates; delegated work cannot self-approve parent audit passes.",
+        "Confirm no frontend file is in scope. Any React/route/visible-text/URL-state need stops this task for a separate frontend SPEC with highest-parent composition and leaf-owned data/command/state rules.",
+        "Run JSON validation, documentation formatting/lint as applicable, git diff --check, and a secret/protected-URL scan."
+      ],
+      "browserVerification": [
+        "None in this task; no approval page is opened and no state-changing live operation is run."
+      ],
+      "completionCriteria": [
+        "Current contract evidence, a minimal sanitized authority inventory, and the accepted helper/module budget are recorded in the active plan.",
+        "The first Preview capability and every selected operation policy are explicitly accepted before provisioning.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: parent inspected Eve public MCP and Executor host/toolkit sources plus the live read-only personal MCP surface; accepted apps/agent -> Eve native MCP -> isolated Executor toolkit with three exact GitHub PR reads, one browser-gated disposable Preview comment, and every other operation blocked.",
+          "Implementation quality/helper admission: parent replaced grouped authority claims with an operation-level inventory, clarified that only an in-module ConfigProvider Layer is admitted, accepted the four-file task-2 maximum, and confirmed task 1 introduced no source helper or speculative boundary.",
+          "Verification/evidence: parent read-only MCP guidance/catalog proof confirmed 16 connections and GitHub availability without a provider call; source checks confirmed exact tools/modes/policies; frozen install, check, Knip, six package typechecks, 185 tests, JSON/diff/whitespace checks, and leak scans passed after correcting one formatter finding."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-effect-config-and-eve-mcp-connection",
+      "title": "Implement the Effect config boundary and native Eve MCP connection",
+      "status": "pending",
+      "dependsOn": ["freeze-executor-eve-contract-and-policy-inventory"],
+      "description": "Add the app-owned endpoint/config policy and thin Eve connection, with exact tool filtering, runtime-only redacted bearer resolution, deterministic stub tests, and no duplicated remote contracts.",
+      "implementationNotes": [
+        "Create apps/agent/agent/connections/executor.ts and the smallest justified apps/agent/agent/lib/executor modules. Config belongs in lib/executor/config.ts, not the root model config and not the connection file.",
+        "Define canonical Effect Schemas only for Bundjil-owned endpoint/config/proof values. Derive types from Schema and do not mirror Executor skills/execute/resume, integrations, execution state, or provider payloads.",
+        "Validate HTTPS, approved Executor host, toolkit path, no userinfo/fragment, and exactly elicitation_mode=browser. Reject root, model, native, missing, unknown, duplicate, and legacy model-resume forms.",
+        "Load BUNDJIL_EXECUTOR_MCP_URL through Effect Config at the connection definition edge and preserve the decoded URL until Eve needs a string. Load BUNDJIL_EXECUTOR_API_KEY through Config.schema(Schema.Redacted(Schema.NonEmptyString), ...) inside auth.getToken and unwrap it only to satisfy Eve's bearer adapter.",
+        "Set principalType app and tools.allow to exactly skills, execute, resume. Do not add a coarse Eve approval callback, Executor SDK, custom transport, Context service wrapper, direct fetch, or fallback provider path.",
+        "Use only Eve's documented public connection exports and direct app-local imports. Do not deep-import Eve internals, import .local references, create a barrel, cross an app boundary, or add a production dependency without an accepted SPEC/task update.",
+        "Add only the actual environment names required by the Eve build to turbo.json. Prove eve build does not resolve or embed the key.",
+        "Use an in-process Streamable HTTP MCP stub based on Eve's test pattern; it is test-only infrastructure and must not become a production client.",
+        "Acquire/release the MCP stub server and any ManagedRuntime with Effect.acquireRelease inside the test Effect, use ephemeral ports and injected ConfigProvider fixtures, and avoid module-global resources or ambient process.env mutation."
+      ],
+      "mandatoryVerification": [
+        "Each primary operation is one named flat sequential Effect.fn/Effect.gen whose decode/load -> acquire -> policy -> framework call -> return path is visible; expected tagged errors use Effect.fn transforms or the outer Effect.gen .pipe(...) with catchTag, catchTags, or mapError; a named Effect.fn supplies its span and a plain Effect.gen uses one outer withSpan without duplication; nested generators require a scoped-resource or separately reusable-program justification; Effect.runSync/runPromise appear only at the authored framework adapter edge.",
+        "Canonical Effect Schema-derived Bundjil contracts and non-empty Schema.Redacted credential config; no unsafe casts, structural double casts, non-null assertions, any, local remote DTO mirrors, manual object readers/mappers, JSON.stringify/JSON.parse, ad hoc JSON, process.env, raw production fetch, raw _tag checks, switch/case policy branches, trivial wrappers/helpers, generic utility modules, or pass-through service tags.",
+        "A helper-admission inventory covers every new helper, mapper, wrapper, service, layer, factory, barrel, and module with owner/reason, concrete call sites, direct test, and retain-or-inline/remove decision; one-line Config/Eve/Effect wrappers and speculative abstractions are removed.",
+        "Ultracite/Oxlint, TypeScript strictness, Effect language-service, Knip, Turbo, formatter, and test configuration remain unchanged unless a separately justified repo-wide requirement is accepted; no broad suppression/ignore expansion, and any narrow suppression has adjacent rationale plus direct proof.",
+        "Import/dependency audit proves only public Eve APIs and direct app-local modules are used, no .local or cross-app import exists, no unnecessary barrel/export was added, and package metadata/lockfile remain unchanged unless separately accepted.",
+        "Config tests prove accepted browser-mode toolkit URL, every rejected URL/mode case, missing fields, Redacted behavior, sanitized errors whose operation is exactly loadEndpoint or loadApiKey, and synthetic marker non-leakage.",
+        "Connection tests prove app principal, exact allowlist, synthetic fourth-tool filtering, bearer delivery without model-visible leakage, deterministic read-only execute, malformed/auth/timeout failures, and no direct fallback.",
+        "Browser-paused stub tests prove the model-visible resume contract accepts only executionId and rejects action/content.",
+        "@effect/vitest resource tests prove the MCP stub and any ManagedRuntime are released on success, typed failure, interruption, and assertion failure; ConfigProvider fixtures are injected, no open handle, fixed port, global mutable runtime, ambient process.env mutation, unmatched lifecycle hook, or live public-network dependency remains.",
+        "Control-flow tests and diff review prove no broad expected-error collapse, Effect.runFork, unscoped/daemon fiber, hidden queue, unbounded concurrency, or Bundjil-owned retry around Executor execute/resume exists.",
+        "Eve build/compiled-output tests prove the endpoint is normalized, the key is not read at build, and no synthetic secret/Authorization/protected URL marker is emitted.",
+        "Focused agent check-types/test/build, Effect language-service review, root check, knip, bun run verification with synthetic URL, JSON validation, git diff --check, and leak scans pass."
+      ],
+      "browserVerification": [
+        "None against a live approval page; the paused/resume shape is proved through the in-process MCP stub in this task."
+      ],
+      "completionCriteria": [
+        "The authored connection compiles through Eve and exposes exactly Executor's three orchestration tools.",
+        "Schema-owned URL and Redacted values remain decoded until the Eve adapter requires string/bearer representations; dependencies are provided once at the adapter/test edge.",
+        "The bearer remains runtime-only and redacted until Eve's adapter requires the token string.",
+        "No unnecessary abstraction, remote DTO mirror, or second MCP/provider boundary exists, and the helper-admission inventory is accepted.",
+        "All three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "provision-isolated-preview-toolkit-and-credentials",
+      "title": "Provision the isolated Preview toolkit, key, and Vercel configuration",
+      "status": "pending",
+      "dependsOn": ["implement-effect-config-and-eve-mcp-connection"],
+      "description": "Create the least-privilege Bundjil Preview Executor toolkit and dedicated API key, store them through 1Password and target-scoped Vercel variables, and prove policy/readback without a downstream mutation.",
+      "implementationNotes": [
+        "Create a Preview-only toolkit with only the accepted connection patterns from the inventory. Do not attach the broad personal catalog or Executor authority-management operations.",
+        "Apply explicit approve, require_approval, and block policies. Treat missing/unclassified operations as blocked and read back the effective policy categories.",
+        "Create a dedicated Preview Executor API key. Save labeled Preview toolkit URL and key references in the existing personal-vault Executor record without printing values.",
+        "Set BUNDJIL_EXECUTOR_MCP_URL as an encrypted Preview variable and BUNDJIL_EXECUTOR_API_KEY as a sensitive/write-only Preview variable in the personal Bundjil agent Vercel project. Do not touch Production.",
+        "Use mode-0600 ephemeral material and direct Streamable HTTP initialization/tools-list for the dedicated toolkit. Remove all temporary files and clear clipboard state after proof.",
+        "Record only environment, sanitized toolkit/key identity categories, selected connection count/categories, policy counts/categories, variable names/types/targets, HTTP status, and cleanup booleans."
+      ],
+      "mandatoryVerification": [
+        "Readback proves a dedicated toolkit path with elicitation_mode=browser, an independent dedicated key, selected connections only, and no root-catalog or authority-management exposure.",
+        "Readback proves every selected operation is approve, require_approval, or block as accepted and unknown/outside operations are blocked.",
+        "Vercel readback proves personal project scope, Preview-only targets, encrypted URL, sensitive/write-only key, and no Production mutation without exposing values.",
+        "Direct MCP initialize/tools-list succeeds with the Preview key and returns exactly skills, execute, resume; no downstream mutation is run.",
+        "Operational code/commands use Effect Platform/Bun Command or secret-safe operator tooling at executable edges where committed code is needed; primary effects remain flat/sequential with typed errors in Effect.fn transforms or the outer Effect.gen pipe and exactly one named span; no plain helper script, raw JSON app code, unsafe/structural cast, non-null assertion, any, DTO mirror, manual reader/mapper, process.env, raw _tag branch, or helper sprawl is introduced.",
+        "Inventory every new operational helper/script/module/service/layer with owner/reason, call sites, direct test, and retain-or-remove decision; mode-0600 one-off operator commands remain evidence procedures rather than generic committed helper libraries.",
+        "No lint/type/Knip/Turbo/test configuration or ignore list is weakened; focused type-aware lint and Effect language-service diagnostics have zero unresolved findings.",
+        "Focused checks, root verification with synthetic/local-safe config, JSON/diff checks, temporary-file cleanup, git scan, Vercel log scan, and terminal/evidence secret scans pass."
+      ],
+      "browserVerification": [
+        "Executor toolkit UI readback, when used, shows only the selected Preview connections and accepted policy categories; screenshots omit account data, full URLs, ids, and credentials."
+      ],
+      "completionCriteria": [
+        "Preview has an isolated implicit-deny toolkit and key stored in 1Password and target-scoped Vercel configuration.",
+        "Production and the broad personal discovery credential remain unchanged.",
+        "The helper-admission inventory is accepted and all three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-preview-eve-executor-and-browser-resume",
+      "title": "Prove the deployed Preview Eve, Executor, browser approval, and Sendblue path",
+      "status": "pending",
+      "dependsOn": ["provision-isolated-preview-toolkit-and-credentials"],
+      "description": "Deploy a clean Preview and prove connection discovery, read execution, human browser approval/decline, safe resume, owner-channel delivery, policy restoration, observability, and leak safety end to end.",
+      "implementationNotes": [
+        "Deploy from a clean pushed SHA using only target-scoped encrypted/sensitive variables. Record the immutable Preview deployment and source SHA.",
+        "Use an authenticated Eve principal to call connection_search, skills, and one selected read-only execute operation. Correlate Eve Agent Run, Vercel request, and Executor execution evidence.",
+        "Temporarily mark a harmless proof operation require_approval. Prove paused output returns an executionId and approval URL, but resume exposes no action/content input.",
+        "Open the approval URL as the authenticated owner and separately prove approve and decline. Call resume with executionId only and verify the corresponding completed/denied outcome.",
+        "Send an allowlisted Sendblue request requiring the same connection. Prove the approval URL reaches only the owner and the final agent reply follows the recorded browser decision.",
+        "Restore the intended Preview policy after proof and read it back. Never leave a temporarily loosened or gated proof policy undocumented.",
+        "Retain sanitized counts/statuses/correlation ids only; do not retain prompts, message text, generated code, provider records, raw MCP/results, or full approval/toolkit URLs."
+      ],
+      "mandatoryVerification": [
+        "The immutable Preview deployment is Ready, source-correlated, authenticated, and built without secret output.",
+        "Authenticated Eve proof shows connection_search -> skills -> execute read-only success with no broad root catalog exposure.",
+        "Approval proof shows browser mode, authenticated human decision, executionId-only resume, successful approve, successful decline, settled-link replay prevention, and no model self-approval path.",
+        "Sendblue proof shows only the allowlisted owner receives the approval URL and final delivery follows the Executor decision without treating message text as approval.",
+        "Policy readback after proof matches the accepted intended Preview policy.",
+        "Review any changed code for one named flat sequential Effect.fn/Effect.gen success path, tagged errors in Effect.fn transforms or the outer Effect.gen .pipe(...), exactly one named span, canonical Schema-derived contracts, adapter-edge runtime execution, and no nested helper chains, unsafe/structural casts, non-null assertions, any, DTO mirrors, manual readers/mappers, raw JSON, process.env, raw production fetch, raw _tag checks, or trivial wrapper/helper sprawl.",
+        "Record and accept a helper-admission inventory for every new helper/mapper/wrapper/script/service/layer/factory/module; remove anything without current call sites, boundary ownership, or a materially complex directly tested policy.",
+        "No lint/type/Knip/Turbo/test configuration or ignore list changes; type-aware lint, Knip, strict typecheck, and Effect language-service diagnostics report no unresolved findings.",
+        "Focused checks, full bun run verification, direct HTTP evidence, Browser evidence, Agent Run/log/Executor/Sendblue correlation, replay checks, diff/JSON checks, language-service review, and comprehensive leak scans pass."
+      ],
+      "browserVerification": [
+        "Unauthenticated approval URL requires Executor sign-in and does not expose the pending action.",
+        "Authenticated approval page identifies the sanitized pending operation and exposes distinct approve, decline, and cancel controls without credentials or raw provider data.",
+        "Approve and decline each produce the expected execution outcome; refresh/reuse cannot settle the execution twice.",
+        "The approval URL delivered over Sendblue opens the same authenticated decision surface.",
+        "Evidence redacts full URL, execution id, account data, provider payload, message content, and credentials."
+      ],
+      "completionCriteria": [
+        "Preview has complete local-to-live proof for discovery, read execution, browser-gated resume, Sendblue delivery, observability, policy restoration, and rollback inputs.",
+        "The model cannot submit or infer an approval action through the resume tool.",
+        "The helper-admission inventory is accepted and all three audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "promote-production-document-and-audit",
+      "title": "Promote an isolated Production connection, document operations, and complete the final audit",
+      "status": "pending",
+      "dependsOn": ["prove-preview-eve-executor-and-browser-resume"],
+      "description": "Create independent Production Executor authority, promote only the accepted policy intent, prove a read-only live path, retain rollback/revocation controls, reconcile all documentation, and complete the mandatory final audits.",
+      "implementationNotes": [
+        "Create a Production toolkit and key independent from Preview. Recreate the accepted policy intent from reviewed inventory; do not reuse mutable Preview identity or copy unreviewed catalog entries.",
+        "Store labeled Production references in 1Password and Production-only encrypted/sensitive Vercel variables without values in output. Read back names, targets, security types, and sanitized identity separation.",
+        "Record the current accepted immutable agent deployment before promotion. Deploy the accepted clean source SHA and prove stable alias/source/environment correlation.",
+        "Run one authenticated read-only Executor operation in Production. Do not run a Production write as acceptance proof; browser-gated write behavior is accepted from the isolated Preview proof.",
+        "Test rollback by restoring or dry-running the exact accepted immutable deployment procedure as safely supported, then leave the intended Production deployment active. Prove key revocation/toolkit disablement procedures through read-only inventory or a disposable Preview key, not by disabling the accepted Production key during traffic.",
+        "Update root/app READMEs, Eve/repo/testing architecture docs, this SPEC/task ledger, and the active plan with actual verified behavior. Archive the plan only after every acceptance gate passes.",
+        "Document how to add one future integration: inventory, classify, update SPEC/tasks, configure Preview toolkit, test read/approval/block, promote policy intent, and monitor."
+      ],
+      "mandatoryVerification": [
+        "Production readback proves independent toolkit/key identities, Production-only Vercel targets, browser-mode toolkit URL, exact selected connections/policies, and no Preview or broad personal identity reuse.",
+        "Production deployment proof shows clean source SHA, immutable current and previous rollback deployments, authenticated Eve route, exact three-tool connection surface, and one correlated read-only execution.",
+        "Rollback and incident runbooks cover deployment restore, key revocation, toolkit disablement, policy block, post-revocation execution check, rotation, and sanitized investigation evidence.",
+        "Final code audit proves each primary operation is one named flat sequential Effect.fn/Effect.gen with visible decode/load -> acquire -> decide -> call -> encode/return control flow; expected tagged errors use Effect.fn transforms or the outer Effect.gen .pipe(...) with catchTag/catchTags/mapError; named Effect.fn or one outer withSpan supplies exactly one span; contracts are canonical Effect Schema-derived; Config/ConfigProvider/non-empty Redacted ownership and adapter-edge runtime execution are correct; and no nested helper chains, unsafe/structural casts, non-null assertions, any, DTO mirrors, manual readers/mappers, raw JSON helpers, process.env, raw production fetch, raw _tag checks, broad expected-error collapse, Effect.runFork, unscoped/daemon fibers, hidden queues, unbounded concurrency, automatic execute/resume retry, direct-provider fallback, or helper sprawl remains.",
+        "Final helper-admission inventory covers every introduced helper, mapper, wrapper, hook, script, service, layer, factory, barrel, and module with owner/reason, call sites, direct test, and retain-or-inline/remove evidence; no generic or speculative abstraction survives.",
+        "Final lint audit proves zero Ultracite/Oxlint warnings/errors, zero Effect language-service findings, clean strict typechecks and Knip, no dead exports/dependencies/files, no widened ignore lists or weakened configs, and no unaccepted suppression.",
+        "Documentation distinguishes intended, Preview-verified, and Production-verified behavior and contains no stale endpoints, policy claims, variable guidance, or secret-bearing commands.",
+        "Frozen install, agent check-types/test/build, root check, knip, bun run verification with safe fixture configuration, Effect language-service review, Browser/direct HTTP proof, JSON validation, git diff --check, tracked-file/output/log/evidence secret scans, and clean temporary-file checks pass."
+      ],
+      "browserVerification": [
+        "No new Bundjil UI exists. Retain the accepted external Executor approval-page evidence from Preview and verify the Production toolkit URL still pins browser mode without initiating a Production mutation.",
+        "Any unexpected Bundjil React/route/visible-text/URL-state change blocks acceptance pending a separate frontend SPEC requiring highest-parent primitive -> composite -> layout -> route composition; leaf-owned reads, mutations, params, commands, atoms, loading/empty/error/retry/skeleton/fallback states; children/slot composition instead of boolean-prop matrices; render-time derivation rather than mirrored state; schema-backed URL state with app-router-only writes; no reusable-package route API/generated route-tree imports; no prop drilling or wrapper/hook sprawl; canonical typography/accessibility; and desktop/mobile Browser verification for loading, empty, error, success, and long-content states."
+      ],
+      "completionCriteria": [
+        "The deployed Production Eve agent can use the isolated Executor toolkit for the accepted read-only capability through the user's Codex-backed model path.",
+        "Production authority is explicit, browser-mode, least-privilege, observable, independently revocable, and rollback-ready.",
+        "All documentation and evidence reflect the actual implementation and live state, and the final helper/lint inventories are accepted.",
+        "At least three final parent audit passes are recorded, with additional passes for every corrected finding."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}
