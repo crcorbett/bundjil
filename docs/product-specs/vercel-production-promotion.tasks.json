@@ -122,7 +122,13 @@
     {
       "id": "implement-staged-production-preflight-checkpoints",
       "title": "Implement staged read-only Production preflight checkpoints",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "The app-owned read-only Production preflight is now a strict five-variant Schema union: before-first-mutation, proxy-provisioned, proxy-accepted-agent-configured, agent-accepted-rollback-ready, and sendblue-final-promotion. The CLI rejects excess fields so future-stage evidence cannot be smuggled into an earlier checkpoint.",
+        "Checkpoint contracts require the exact personal Vercel team, projects, stable domains, Deployment Protection, clean pushed SHA, truthful stage-specific activation state, sensitive bearer bindings, canonical HTTPS proxy URL, disjoint opaque identities, stored-profile proof, Eve OIDC, source correlation, current/previous rollback references, soak/rollback completion, and Sendblue-last state only when each fact exists.",
+        "Parent review found and resolved inherited absent-state contradictions, missing personal-team correlation, permissive proxy URLs, missing source/current-rollback correlation, and an encrypted-bearer downgrade. Focused typecheck/build and 51 agent tests, a mode-0600 direct CLI fixture, bun run verification, jq empty, and git diff --check passed. No Vercel or Production state changed."
+      ],
       "dependsOn": ["implement-production-preflight-and-eve-auth"],
       "description": "Extend the accepted app-owned preflight with ordered Schema-backed checkpoints without altering accepted task history or granting mutation capability.",
       "implementationNotes": [
@@ -142,8 +148,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified all staged contracts and the named preflight operation remain app-owned in apps/agent, while ConfigProvider, Effect Platform FileSystem, strict JSON decoding, and Effect.runPromise remain at the executable CLI edge. The command imports no Vercel client and has no deployment, alias, variable-write, storage-provisioning, profile-write, or other mutation capability.",
+          "Parent pass 2 - implementation quality: reviewed the complete diff for canonical Schema-derived stage variants, exact literals/checks, flat Effect.fn/Effect.gen flow, typed error mapping, Schema JSON boundaries, and helper admission. Parent review corrected stage-state inheritance, exact team ownership, canonical HTTPS URL restrictions, source/current-rollback correlation, and write-only sensitive bearers. The identity and variable-binding helpers own directly tested non-trivial policy; no raw JSON, process.env, unsafe cast, provider DTO mirror, manual reader, nested generator, generic helper/service layer, or helper sprawl remains.",
+          "Parent pass 3 - verification and evidence: five successful stage fixtures plus missing/premature fields, wrong target/scope/team/type/state/mode/URL/OIDC, shared identity/bearer, source mismatch, current rollback mismatch, invalid immutable references, and non-read-only input are covered by 51 passing agent tests. Agent typecheck/build, the mode-0600 direct CLI fixture, root lint/format, knip, all workspace typechecks/tests, bun run verification, jq empty, and git diff --check passed with only sanitized evidence and no Production access or mutation."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -7,35 +7,44 @@ import {
   ProductionPreflightSnapshot,
 } from "../agent/production-preflight.js";
 
-const fingerprint = (prefix: string) => prefix.repeat(64);
+const fingerprint = (character: string) => character.repeat(64);
 
-const fixture = {
+const beforeFirstMutation = {
   adapter: "vercel-readonly-metadata-v1",
   agent: {
     deploymentProtection: true,
-    eveAuth: true,
-    modelProvider: "codex-proxy",
     project: "bundjil-agent",
-    proxyBaseUrl: "https://bundjil-codex-proxy.vercel.app/v1",
     scope: "personal",
     stableDomain: "bundjil-agent.vercel.app",
-    variables: [
-      {
-        name: "BUNDJIL_AGENT_MODEL_PROVIDER",
-        target: "production",
-        type: "encrypted",
-      },
-      {
-        name: "BUNDJIL_CODEX_PROXY_BASE_URL",
-        target: "production",
-        type: "encrypted",
-      },
-      {
-        name: "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
-        target: "production",
-        type: "sensitive",
-      },
-    ],
+    teamId: "team_1LX7ZujbijowTv8J9k0aU7nD",
+  },
+  approval: "granted",
+  inventory: {
+    previewIdentityReuse: false,
+    productionAgentActivation: "absent",
+    productionProxyActivation: "absent",
+  },
+  proxy: {
+    deploymentProtection: true,
+    project: "bundjil-codex-proxy",
+    scope: "personal",
+    stableDomain: "bundjil-codex-proxy.vercel.app",
+    teamId: "team_1LX7ZujbijowTv8J9k0aU7nD",
+  },
+  readOnly: true,
+  source: {
+    clean: true,
+    pushedSha: "0f30d3b000000000000000000000000000000000",
+  },
+  stage: "before-first-mutation",
+} as const;
+
+const proxyProvisioned = {
+  ...beforeFirstMutation,
+  inventory: {
+    previewIdentityReuse: false,
+    productionAgentActivation: "absent",
+    productionProxyActivation: "provisioned",
   },
   previewIdentity: {
     cipherKeyId: "preview-key",
@@ -54,11 +63,8 @@ const fixture = {
     subjectFingerprint: fingerprint("3"),
   },
   proxy: {
-    deploymentProtection: true,
+    ...beforeFirstMutation.proxy,
     mode: "live",
-    project: "bundjil-codex-proxy",
-    scope: "personal",
-    stableDomain: "bundjil-codex-proxy.vercel.app",
     variables: [
       {
         name: "BUNDJIL_CODEX_PROXY_MODE",
@@ -109,42 +115,204 @@ const fixture = {
       },
     ],
   },
-  readOnly: true,
-  rollback: { agentDeploymentId: "dpl_agent", proxyDeploymentId: "dpl_proxy" },
+  stage: "proxy-provisioned",
+  storedProfileProof: {
+    ciphertextPresent: true,
+    envelopeVersion2: true,
+    expiryValid: true,
+    found: true,
+    markerLeakFalse: true,
+    profileKindSubscription: true,
+    refreshCapable: true,
+    requiresReauthenticationFalse: true,
+  },
 } as const;
 
-const decodeFixture = (input: unknown) =>
-  Schema.decodeUnknownEffect(ProductionPreflightSnapshot)(input);
+const proxyAcceptedAgentConfigured = {
+  ...proxyProvisioned,
+  acceptedProxy: {
+    configFingerprint: fingerprint("4"),
+    deploymentId: "dpl_proxycurrent",
+    sourceSha: beforeFirstMutation.source.pushedSha,
+    stableUrl: "https://bundjil-codex-proxy.vercel.app/v1",
+  },
+  agent: {
+    ...beforeFirstMutation.agent,
+    bearerFingerprint: fingerprint("5"),
+    eveAuth: {
+      anonymousFallback: false,
+      deployedLocalDev: false,
+      vercelOidc: true,
+    },
+    modelProvider: "codex-proxy",
+    proxyBaseUrl: "https://bundjil-codex-proxy.vercel.app/v1",
+    variables: [
+      {
+        name: "BUNDJIL_AGENT_MODEL_PROVIDER",
+        target: "production",
+        type: "encrypted",
+      },
+      {
+        name: "BUNDJIL_CODEX_PROXY_BASE_URL",
+        target: "production",
+        type: "encrypted",
+      },
+      {
+        name: "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+        target: "production",
+        type: "sensitive",
+      },
+    ],
+  },
+  inventory: {
+    previewIdentityReuse: false,
+    productionAgentActivation: "configured",
+    productionProxyActivation: "accepted",
+  },
+  previewBearerFingerprint: fingerprint("6"),
+  stage: "proxy-accepted-agent-configured",
+} as const;
+
+const agentAcceptedRollbackReady = {
+  ...proxyAcceptedAgentConfigured,
+  acceptedAgent: {
+    configFingerprint: fingerprint("7"),
+    deploymentId: "dpl_agentcurrent",
+    sourceSha: beforeFirstMutation.source.pushedSha,
+  },
+  rollback: {
+    agent: {
+      current: {
+        configFingerprint: fingerprint("7"),
+        deploymentId: "dpl_agentcurrent",
+      },
+      previous: {
+        configFingerprint: fingerprint("8"),
+        deploymentId: "dpl_agentprevious",
+      },
+    },
+    proxy: {
+      current: {
+        configFingerprint: fingerprint("4"),
+        deploymentId: "dpl_proxycurrent",
+      },
+      previous: {
+        configFingerprint: fingerprint("9"),
+        deploymentId: "dpl_proxyprevious",
+      },
+    },
+  },
+  inventory: {
+    previewIdentityReuse: false,
+    productionAgentActivation: "accepted",
+    productionProxyActivation: "accepted",
+  },
+  stage: "agent-accepted-rollback-ready",
+} as const;
+
+const sendblueFinalPromotion = {
+  ...agentAcceptedRollbackReady,
+  rollbackDrill: { completed: true },
+  sendblue: { productionActivated: false },
+  soak: { completed: true },
+  stage: "sendblue-final-promotion",
+} as const;
+
+const decode = (input: unknown) =>
+  Schema.decodeUnknownEffect(ProductionPreflightSnapshot, {
+    onExcessProperty: "error",
+  })(input);
 
 describe("Production promotion preflight", () => {
-  it.effect(
-    "accepts a personal-scope, live, isolated Production metadata snapshot",
-    () =>
+  for (const fixture of [
+    beforeFirstMutation,
+    proxyProvisioned,
+    proxyAcceptedAgentConfigured,
+    agentAcceptedRollbackReady,
+    sendblueFinalPromotion,
+  ]) {
+    it.effect(`accepts the ${fixture.stage} checkpoint`, () =>
       Effect.gen(function* () {
-        const evidence = yield* decodeFixture(fixture).pipe(
+        const evidence = yield* decode(fixture).pipe(
           Effect.andThen(preflightProductionPromotion)
         );
 
         assert.strictEqual(evidence.go, true);
         assert.deepStrictEqual(evidence.rejected, []);
+        assert.strictEqual(evidence.stage, fixture.stage);
       })
-  );
+    );
+  }
 
-  it.effect("rejects secret bindings downgraded to plain text", () =>
+  vitestIt("rejects missing and premature checkpoint evidence", () => {
+    expect(() =>
+      decode(beforeFirstMutation).pipe(Effect.runSync)
+    ).not.toThrow();
+    expect(() =>
+      decode({ ...beforeFirstMutation, approval: undefined }).pipe(
+        Effect.runSync
+      )
+    ).toThrow("Expected");
+    expect(() =>
+      decode({ ...proxyProvisioned, storedProfileProof: undefined }).pipe(
+        Effect.runSync
+      )
+    ).toThrow("Expected");
+    expect(() =>
+      decode({
+        ...proxyAcceptedAgentConfigured,
+        acceptedProxy: undefined,
+      }).pipe(Effect.runSync)
+    ).toThrow("Expected");
+    expect(() =>
+      decode({ ...agentAcceptedRollbackReady, rollback: undefined }).pipe(
+        Effect.runSync
+      )
+    ).toThrow("Expected");
+    expect(() =>
+      decode({ ...sendblueFinalPromotion, soak: undefined }).pipe(
+        Effect.runSync
+      )
+    ).toThrow("Expected");
+    expect(() =>
+      decode({
+        ...beforeFirstMutation,
+        proxy: { ...beforeFirstMutation.proxy, mode: "live" },
+      }).pipe(Effect.runSync)
+    ).toThrow("Unexpected key");
+    expect(() =>
+      decode({
+        ...proxyProvisioned,
+        acceptedProxy: proxyAcceptedAgentConfigured.acceptedProxy,
+      }).pipe(Effect.runSync)
+    ).toThrow("Unexpected key");
+    expect(() =>
+      decode({
+        ...proxyAcceptedAgentConfigured,
+        acceptedAgent: agentAcceptedRollbackReady.acceptedAgent,
+      }).pipe(Effect.runSync)
+    ).toThrow("Unexpected key");
+    expect(() =>
+      decode({ ...agentAcceptedRollbackReady, soak: { completed: true } }).pipe(
+        Effect.runSync
+      )
+    ).toThrow("Unexpected key");
+    expect(() =>
+      decode({
+        ...sendblueFinalPromotion,
+        sendblue: { productionActivated: false, variables: [] },
+      }).pipe(Effect.runSync)
+    ).toThrow("Unexpected key");
+  });
+
+  it.effect("rejects plain secret bindings and shared identities", () =>
     Effect.gen(function* () {
-      const evidence = yield* decodeFixture({
-        ...fixture,
-        agent: {
-          ...fixture.agent,
-          variables: fixture.agent.variables.map((variable) =>
-            variable.name === "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
-              ? { ...variable, type: "plain" }
-              : variable
-          ),
-        },
+      const evidence = yield* decode({
+        ...proxyProvisioned,
+        productionIdentity: proxyProvisioned.previewIdentity,
         proxy: {
-          ...fixture.proxy,
-          variables: fixture.proxy.variables.map((variable) =>
+          ...proxyProvisioned.proxy,
+          variables: proxyProvisioned.proxy.variables.map((variable) =>
             variable.name === "BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY"
               ? { ...variable, type: "plain" }
               : variable
@@ -154,90 +322,273 @@ describe("Production promotion preflight", () => {
 
       assert.strictEqual(evidence.go, false);
       assert.deepStrictEqual(evidence.rejected, [
-        "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
         "missing-production-variable:BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY",
+        "shared-preview-production-identity",
       ]);
     })
   );
 
   it.effect(
-    "rejects wrong projects, stale hosts, absent Eve auth, wrong mode, missing bindings, shared identity, protection, and rollback references",
+    "requires sensitive metadata for both internal bearer bindings",
     () =>
       Effect.gen(function* () {
-        const evidence = yield* decodeFixture({
-          ...fixture,
-          agent: {
-            ...fixture.agent,
-            deploymentProtection: false,
-            eveAuth: false,
-            project: "wrong-agent",
-            proxyBaseUrl: "https://preview-bundjil-codex-proxy.vercel.app/v1",
-            variables: [],
+        for (const type of ["plain", "encrypted"] as const) {
+          const proxyEvidence = yield* decode({
+            ...proxyProvisioned,
+            proxy: {
+              ...proxyProvisioned.proxy,
+              variables: proxyProvisioned.proxy.variables.map((variable) =>
+                variable.name === "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
+                  ? { ...variable, type }
+                  : variable
+              ),
+            },
+          }).pipe(Effect.andThen(preflightProductionPromotion));
+
+          assert.deepStrictEqual(proxyEvidence.rejected, [
+            "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+          ]);
+
+          const agentEvidence = yield* decode({
+            ...proxyAcceptedAgentConfigured,
+            agent: {
+              ...proxyAcceptedAgentConfigured.agent,
+              variables: proxyAcceptedAgentConfigured.agent.variables.map(
+                (variable) =>
+                  variable.name === "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
+                    ? { ...variable, type }
+                    : variable
+              ),
+            },
+          }).pipe(Effect.andThen(preflightProductionPromotion));
+
+          assert.deepStrictEqual(agentEvidence.rejected, [
+            "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+          ]);
+        }
+      })
+  );
+
+  it.effect(
+    "rejects mismatched accepted source and current rollback evidence",
+    () =>
+      Effect.gen(function* () {
+        const sourceEvidence = yield* decode({
+          ...agentAcceptedRollbackReady,
+          acceptedAgent: {
+            ...agentAcceptedRollbackReady.acceptedAgent,
+            sourceSha: "a".repeat(40),
           },
-          productionIdentity: fixture.previewIdentity,
-          proxy: {
-            ...fixture.proxy,
-            mode: "mock",
-            project: "wrong-proxy",
-            variables: [],
+          acceptedProxy: {
+            ...agentAcceptedRollbackReady.acceptedProxy,
+            sourceSha: "b".repeat(40),
           },
-          rollback: { agentDeploymentId: "", proxyDeploymentId: "" },
         }).pipe(Effect.andThen(preflightProductionPromotion));
 
-        assert.strictEqual(evidence.go, false);
-        assert.deepStrictEqual(evidence.rejected, [
-          "wrong-agent-project",
-          "wrong-proxy-project",
-          "missing-deployment-protection",
-          "missing-eve-auth",
-          "wrong-proxy-mode",
-          "stale-or-nonproduction-proxy-host",
-          "missing-production-variable:BUNDJIL_AGENT_MODEL_PROVIDER",
-          "missing-production-variable:BUNDJIL_CODEX_PROXY_BASE_URL",
-          "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
-          "missing-production-variable:BUNDJIL_CODEX_PROXY_MODE",
-          "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
-          "missing-production-variable:BUNDJIL_CODEX_PROFILE_ID",
-          "missing-production-variable:BUNDJIL_CODEX_CONNECTOR_ID",
-          "missing-production-variable:BUNDJIL_CODEX_INSTALLATION_ID",
-          "missing-production-variable:BUNDJIL_CODEX_SUBJECT_ID",
-          "missing-production-variable:BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY",
-          "missing-production-variable:BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID",
-          "missing-production-variable:BUNDJIL_UPSTASH_REDIS_REST_URL",
-          "missing-production-variable:BUNDJIL_UPSTASH_REDIS_REST_TOKEN",
-          "missing-production-variable:BUNDJIL_UPSTASH_REDIS_KEY_PREFIX",
-          "shared-preview-production-identity",
-          "missing-accepted-rollback-reference",
+        assert.deepStrictEqual(sourceEvidence.rejected, [
+          "accepted-proxy-source-mismatch",
+          "accepted-agent-source-mismatch",
         ]);
+
+        const deploymentEvidence = yield* decode({
+          ...agentAcceptedRollbackReady,
+          rollback: {
+            agent: {
+              ...agentAcceptedRollbackReady.rollback.agent,
+              current: {
+                ...agentAcceptedRollbackReady.rollback.agent.current,
+                deploymentId: "dpl_wrongagent",
+              },
+            },
+            proxy: {
+              ...agentAcceptedRollbackReady.rollback.proxy,
+              current: {
+                ...agentAcceptedRollbackReady.rollback.proxy.current,
+                deploymentId: "dpl_wrongproxy",
+              },
+            },
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.deepStrictEqual(deploymentEvidence.rejected, [
+          "proxy-current-rollback-mismatch",
+          "agent-current-rollback-mismatch",
+        ]);
+
+        const configEvidence = yield* decode({
+          ...agentAcceptedRollbackReady,
+          rollback: {
+            agent: {
+              ...agentAcceptedRollbackReady.rollback.agent,
+              current: {
+                ...agentAcceptedRollbackReady.rollback.agent.current,
+                configFingerprint: fingerprint("a"),
+              },
+            },
+            proxy: {
+              ...agentAcceptedRollbackReady.rollback.proxy,
+              current: {
+                ...agentAcceptedRollbackReady.rollback.proxy.current,
+                configFingerprint: fingerprint("b"),
+              },
+            },
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.deepStrictEqual(configEvidence.rejected, [
+          "proxy-current-rollback-mismatch",
+          "agent-current-rollback-mismatch",
+        ]);
+
+        const sharedPreviousConfig = yield* decode({
+          ...agentAcceptedRollbackReady,
+          rollback: {
+            agent: {
+              ...agentAcceptedRollbackReady.rollback.agent,
+              previous: {
+                ...agentAcceptedRollbackReady.rollback.agent.previous,
+                configFingerprint:
+                  agentAcceptedRollbackReady.rollback.agent.current
+                    .configFingerprint,
+              },
+            },
+            proxy: {
+              ...agentAcceptedRollbackReady.rollback.proxy,
+              previous: {
+                ...agentAcceptedRollbackReady.rollback.proxy.previous,
+                configFingerprint:
+                  agentAcceptedRollbackReady.rollback.proxy.current
+                    .configFingerprint,
+              },
+            },
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.strictEqual(sharedPreviousConfig.go, true);
       })
   );
 
   vitestIt(
-    "fails closed when target bindings, scope, or the read-only capability are absent",
+    "fails closed for wrong targets, scope, mode, hosts, OIDC, immutable references, and read-only state",
     () => {
       expect(() =>
-        Schema.decodeUnknownSync(ProductionPreflightSnapshot)({
-          ...fixture,
-          agent: {
-            ...fixture.agent,
-            variables: fixture.agent.variables.map((variable) => ({
+        decode({
+          ...proxyProvisioned,
+          proxy: {
+            ...proxyProvisioned.proxy,
+            variables: proxyProvisioned.proxy.variables.map((variable) => ({
               ...variable,
               target: "preview",
             })),
           },
-        })
+        }).pipe(Effect.runSync)
       ).toThrow("Expected");
       expect(() =>
-        Schema.decodeUnknownSync(ProductionPreflightSnapshot)({
-          ...fixture,
-          proxy: { ...fixture.proxy, scope: "team" },
-        })
+        decode({
+          ...beforeFirstMutation,
+          agent: { ...beforeFirstMutation.agent, scope: "team" },
+        }).pipe(Effect.runSync)
       ).toThrow("Expected");
       expect(() =>
-        Schema.decodeUnknownSync(ProductionPreflightSnapshot)({
-          ...fixture,
-          readOnly: false,
-        })
+        decode({
+          ...beforeFirstMutation,
+          agent: { ...beforeFirstMutation.agent, teamId: "team_wrong" },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...beforeFirstMutation,
+          proxy: { ...beforeFirstMutation.proxy, teamId: "team_wrong" },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...proxyProvisioned,
+          inventory: {
+            ...proxyProvisioned.inventory,
+            productionProxyActivation: "absent",
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...proxyAcceptedAgentConfigured,
+          inventory: {
+            ...proxyAcceptedAgentConfigured.inventory,
+            productionAgentActivation: "accepted",
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...agentAcceptedRollbackReady,
+          inventory: {
+            ...agentAcceptedRollbackReady.inventory,
+            productionAgentActivation: "configured",
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...proxyProvisioned,
+          proxy: { ...proxyProvisioned.proxy, mode: "mock" },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      for (const stableUrl of [
+        "http://bundjil-codex-proxy.vercel.app/v1",
+        "https://operator@bundjil-codex-proxy.vercel.app/v1",
+        "https://operator:password@bundjil-codex-proxy.vercel.app/v1",
+        "https://bundjil-codex-proxy.vercel.app:443/v1",
+        "https://bundjil-codex-proxy.vercel.app:8443/v1",
+        "https://bundjil-codex-proxy.vercel.app/v1?bypass=present",
+        "https://bundjil-codex-proxy.vercel.app/v1#fragment",
+      ]) {
+        expect(() =>
+          decode({
+            ...proxyAcceptedAgentConfigured,
+            acceptedProxy: {
+              ...proxyAcceptedAgentConfigured.acceptedProxy,
+              stableUrl,
+            },
+          }).pipe(Effect.runSync)
+        ).toThrow("Expected");
+      }
+      expect(() =>
+        decode({
+          ...proxyAcceptedAgentConfigured,
+          agent: {
+            ...proxyAcceptedAgentConfigured.agent,
+            proxyBaseUrl:
+              "https://bundjil-codex-proxy.vercel.app/v1?bypass=present",
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...proxyAcceptedAgentConfigured,
+          agent: {
+            ...proxyAcceptedAgentConfigured.agent,
+            eveAuth: {
+              ...proxyAcceptedAgentConfigured.agent.eveAuth,
+              vercelOidc: false,
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("Expected");
+      expect(() =>
+        decode({
+          ...agentAcceptedRollbackReady,
+          rollback: {
+            ...agentAcceptedRollbackReady.rollback,
+            proxy: {
+              ...agentAcceptedRollbackReady.rollback.proxy,
+              previous: agentAcceptedRollbackReady.rollback.proxy.current,
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("distinct deployments");
+      expect(() =>
+        decode({ ...beforeFirstMutation, readOnly: false }).pipe(Effect.runSync)
       ).toThrow("Expected");
     }
   );

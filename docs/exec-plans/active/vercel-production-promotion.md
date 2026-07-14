@@ -255,3 +255,43 @@ Before a task is accepted, run its focused checks and the ledger's global gate,
 including `bun run verification`, `jq empty`, and `git diff --check`. Record
 the three audit passes in both this plan and the task entry. Keep production
 status unchanged until the corresponding evidence has been recorded.
+
+### 2026-07-14 `implement-staged-production-preflight-checkpoints` worker evidence
+
+- The app-owned, read-only preflight now accepts five strict ordered Schema
+  checkpoint variants. The first checkpoint needs only approval, exact personal
+  team/project/domain/protection facts, a clean pushed source reference,
+  inactive Production state, Preview-reuse absence, and inventory. Later
+  inventories advance through proxy provisioned/agent absent, proxy
+  accepted/agent configured, and both accepted; excess or contradictory stage
+  facts are rejected at decode.
+- Focused agent typecheck, the complete agent suite (51 tests), and agent build
+  passed. The staged tests cover five accepted fixtures plus per-stage missing
+  and premature fields, wrong target/scope/team/security type, contradictory
+  state, exact HTTPS URL restrictions, missing OIDC, shared identities, source
+  and current rollback correlation, invalid immutable references, and
+  non-read-only metadata rejection. Both internal bearer bindings require
+  `sensitive`; `plain` and `encrypted` downgrades are rejected.
+- A temporary mode-`0600` local fixture exercised the direct CLI with the
+  `before-first-mutation` checkpoint. It emitted only sanitized Schema-encoded
+  evidence: `go: true`, an empty rejection list, and the checkpoint name. The
+  fixture was removed. No Vercel or Production state was read or changed.
+- `bun run verification`, task-ledger `jq empty`, and `git diff --check` passed.
+  Review found no mutation capability, raw JSON, `process.env`, unsafe cast,
+  provider DTO mirror, manual reader, or new helper/service layer.
+- Parent pass 1, ownership and call graph: accepted the app-owned staged Schema
+  union and named operation with ConfigProvider, Effect Platform FileSystem,
+  strict JSON decode, and `Effect.runPromise` only at the CLI edge. No Vercel
+  client or mutation capability enters this boundary.
+- Parent pass 2, implementation quality: accepted canonical stage variants,
+  flat `Effect.fn`/`Effect.gen`, Schema JSON, typed error mapping, and the two
+  policy-owning helpers after correcting inherited absent-state contradictions,
+  exact personal-team ownership, HTTPS URL restrictions, source/current
+  rollback correlation, and write-only sensitive bearer enforcement. No helper
+  sprawl or prohibited boundary pattern remains.
+- Parent pass 3, verification and evidence: accepted five positive checkpoint
+  fixtures and the complete missing, premature, target, scope, team, security,
+  state, URL, OIDC, identity, source, rollback, and read-only failure matrix.
+  Agent typecheck/build/51 tests, direct mode-`0600` CLI proof, root lint/format,
+  knip, all workspace checks, `bun run verification`, `jq empty`, and
+  `git diff --check` passed. The task is accepted without Production access.

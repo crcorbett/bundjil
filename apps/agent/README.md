@@ -81,23 +81,40 @@ are rejected. `GET /eve/v1/health` remains the public Eve health probe.
 ## Production Preflight
 
 The read-only promotion gate consumes a mode-`0600`, ignored Vercel metadata
-snapshot produced by a read-only operator adapter. It accepts only the minimal
-project/scope/domain, target-bound variable name/security type, route-protection,
-mode, opaque identity-fingerprint, and rollback-reference fields. It does not
-read values and cannot deploy, alias, set variables, provision storage, or
-write profiles.
+snapshot produced by a read-only operator adapter. Its `stage` is a strict,
+ordered discriminant: `before-first-mutation`, `proxy-provisioned`,
+`proxy-accepted-agent-configured`, `agent-accepted-rollback-ready`, or
+`sendblue-final-promotion`. Each stage accepts only facts available at that
+point; later bindings, profiles, aliases, deployments, rollback references,
+and Sendblue controls are rejected as premature evidence.
+
+`before-first-mutation` requires granted approval, the exact personal team id
+`team_1LX7ZujbijowTv8J9k0aU7nD`, linked projects and stable domains, Deployment
+Protection, a clean pushed SHA, absent Bundjil Production activation, no
+Preview identity reuse, and read-only inventory. The inventory then advances
+exactly through proxy provisioned/agent absent, proxy accepted/agent configured,
+and both accepted. Later stages add proxy binding/profile proof, accepted proxy
+and agent configuration with Eve OIDC, immutable agent and rollback references,
+then completed soak/rollback proof with Sendblue still unactivated. The command
+does not read values and cannot deploy, alias, set variables, provision storage,
+or write profiles.
 
 ```bash
 BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT=.local/production-preflight.json \
   bun run --filter @bundjil/agent preflight:production
 ```
 
-It emits only Schema-encoded sanitized go/no-go evidence. A non-`0600` file,
-non-read-only adapter, non-Production variable target, plain-text secret,
-Preview/branch proxy host, mock/local mode, missing auth/protection, shared
-derived identity, or missing rollback reference fails closed. Write-only
-Vercel `sensitive` variables are required for the bearer, cipher key, and
-Upstash credentials; only non-secret identifiers may remain `plain`.
+It emits only Schema-encoded sanitized go/no-go evidence, including the
+checkpoint stage. A non-`0600` file, non-read-only adapter, unexpected field,
+non-Production variable target, plain-text secret, Preview/branch proxy host,
+mock/local mode, missing auth/protection, shared identity, or invalid immutable
+reference fails closed. The accepted proxy and agent source references must
+match the clean pushed SHA, and current rollback deployment/config references
+must match the accepted deployments. The proxy URL is exactly
+`https://bundjil-codex-proxy.vercel.app/v1`, without user info, port, query, or
+fragment. Write-only Vercel `sensitive` variables are required for both internal
+bearer bindings, the cipher key, and Upstash credentials; only non-secret
+identifiers may remain `plain`.
 
 Useful local probes:
 

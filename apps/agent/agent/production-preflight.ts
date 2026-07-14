@@ -10,15 +10,45 @@ type ExpectedVariableBinding = readonly [
   allowedTypes: readonly VercelVariableKind[],
 ];
 
+const ImmutableDeploymentReference = Schema.String.pipe(
+  Schema.check(Schema.isPattern(/^dpl_[A-Za-z0-9]+$/))
+);
+
+const ImmutableSourceReference = Schema.String.pipe(
+  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/))
+);
+
+const OpaqueIdentityFingerprint = Schema.String.pipe(
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
+);
+
+const PersonalVercelTeamId = Schema.Literal("team_1LX7ZujbijowTv8J9k0aU7nD");
+
+const ProductionProxyUrl = Schema.Literal(
+  "https://bundjil-codex-proxy.vercel.app/v1"
+).pipe(Schema.decodeTo(Schema.URLFromString));
+
 const VercelProductionVariable = Schema.Struct({
   name: Schema.NonEmptyString,
   target: Schema.Literal("production"),
   type: VercelVariableType,
 });
 
-const OpaqueIdentityFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
-);
+const agentProjectFields = {
+  deploymentProtection: Schema.Literal(true),
+  project: Schema.Literal("bundjil-agent"),
+  scope: Schema.Literal("personal"),
+  stableDomain: Schema.Literal("bundjil-agent.vercel.app"),
+  teamId: PersonalVercelTeamId,
+} as const;
+
+const proxyProjectFields = {
+  deploymentProtection: Schema.Literal(true),
+  project: Schema.Literal("bundjil-codex-proxy"),
+  scope: Schema.Literal("personal"),
+  stableDomain: Schema.Literal("bundjil-codex-proxy.vercel.app"),
+  teamId: PersonalVercelTeamId,
+} as const;
 
 const ProductionIdentity = Schema.Struct({
   cipherKeyId: Schema.NonEmptyString,
@@ -29,34 +59,165 @@ const ProductionIdentity = Schema.Struct({
   subjectFingerprint: OpaqueIdentityFingerprint,
 });
 
-export const ProductionPreflightSnapshot = Schema.Struct({
+const commonSnapshotFields = {
   adapter: Schema.Literal("vercel-readonly-metadata-v1"),
-  agent: Schema.Struct({
-    deploymentProtection: Schema.Boolean,
-    eveAuth: Schema.Boolean,
-    modelProvider: AgentModelProviderMode,
-    project: Schema.NonEmptyString,
-    proxyBaseUrl: Schema.URLFromString,
-    scope: Schema.Literal("personal"),
-    stableDomain: Schema.NonEmptyString,
-    variables: Schema.Array(VercelProductionVariable),
+  agent: Schema.Struct(agentProjectFields),
+  approval: Schema.Literal("granted"),
+  proxy: Schema.Struct(proxyProjectFields),
+  readOnly: Schema.Literal(true),
+  source: Schema.Struct({
+    clean: Schema.Literal(true),
+    pushedSha: ImmutableSourceReference,
+  }),
+} as const;
+
+const proxyProvisionedFields = {
+  ...commonSnapshotFields,
+  inventory: Schema.Struct({
+    previewIdentityReuse: Schema.Literal(false),
+    productionAgentActivation: Schema.Literal("absent"),
+    productionProxyActivation: Schema.Literal("provisioned"),
   }),
   previewIdentity: ProductionIdentity,
   productionIdentity: ProductionIdentity,
   proxy: Schema.Struct({
-    deploymentProtection: Schema.Boolean,
-    mode: Schema.Literals(["live", "local", "mock"]),
-    project: Schema.NonEmptyString,
-    scope: Schema.Literal("personal"),
-    stableDomain: Schema.NonEmptyString,
+    ...proxyProjectFields,
+    mode: Schema.Literal("live"),
     variables: Schema.Array(VercelProductionVariable),
   }),
-  readOnly: Schema.Literal(true),
-  rollback: Schema.Struct({
-    agentDeploymentId: Schema.String,
-    proxyDeploymentId: Schema.String,
+  storedProfileProof: Schema.Struct({
+    ciphertextPresent: Schema.Literal(true),
+    envelopeVersion2: Schema.Literal(true),
+    expiryValid: Schema.Literal(true),
+    found: Schema.Literal(true),
+    markerLeakFalse: Schema.Literal(true),
+    profileKindSubscription: Schema.Literal(true),
+    refreshCapable: Schema.Literal(true),
+    requiresReauthenticationFalse: Schema.Literal(true),
   }),
+} as const;
+
+const acceptedProxyFields = {
+  ...proxyProvisionedFields,
+  inventory: Schema.Struct({
+    previewIdentityReuse: Schema.Literal(false),
+    productionAgentActivation: Schema.Literal("configured"),
+    productionProxyActivation: Schema.Literal("accepted"),
+  }),
+  acceptedProxy: Schema.Struct({
+    configFingerprint: OpaqueIdentityFingerprint,
+    deploymentId: ImmutableDeploymentReference,
+    sourceSha: ImmutableSourceReference,
+    stableUrl: ProductionProxyUrl,
+  }),
+  agent: Schema.Struct({
+    ...agentProjectFields,
+    bearerFingerprint: OpaqueIdentityFingerprint,
+    eveAuth: Schema.Struct({
+      anonymousFallback: Schema.Literal(false),
+      deployedLocalDev: Schema.Literal(false),
+      vercelOidc: Schema.Literal(true),
+    }),
+    modelProvider: AgentModelProviderMode.pipe(
+      Schema.check(
+        Schema.makeFilter((mode) =>
+          mode === "codex-proxy"
+            ? undefined
+            : "Production agent must use the Codex proxy model provider."
+        )
+      )
+    ),
+    proxyBaseUrl: ProductionProxyUrl,
+    variables: Schema.Array(VercelProductionVariable),
+  }),
+  previewBearerFingerprint: OpaqueIdentityFingerprint,
+} as const;
+
+const rollbackReference = Schema.Struct({
+  configFingerprint: OpaqueIdentityFingerprint,
+  deploymentId: ImmutableDeploymentReference,
 });
+
+export const BeforeFirstMutationPreflightSnapshot = Schema.Struct({
+  ...commonSnapshotFields,
+  inventory: Schema.Struct({
+    previewIdentityReuse: Schema.Literal(false),
+    productionAgentActivation: Schema.Literal("absent"),
+    productionProxyActivation: Schema.Literal("absent"),
+  }),
+  stage: Schema.Literal("before-first-mutation"),
+});
+
+export const ProxyProvisionedPreflightSnapshot = Schema.Struct({
+  ...proxyProvisionedFields,
+  stage: Schema.Literal("proxy-provisioned"),
+});
+
+export const ProxyAcceptedAgentConfiguredPreflightSnapshot = Schema.Struct({
+  ...acceptedProxyFields,
+  stage: Schema.Literal("proxy-accepted-agent-configured"),
+});
+
+const agentAcceptedRollbackReadyFields = {
+  ...acceptedProxyFields,
+  inventory: Schema.Struct({
+    previewIdentityReuse: Schema.Literal(false),
+    productionAgentActivation: Schema.Literal("accepted"),
+    productionProxyActivation: Schema.Literal("accepted"),
+  }),
+  acceptedAgent: Schema.Struct({
+    configFingerprint: OpaqueIdentityFingerprint,
+    deploymentId: ImmutableDeploymentReference,
+    sourceSha: ImmutableSourceReference,
+  }),
+  rollback: Schema.Struct({
+    agent: Schema.Struct({
+      current: rollbackReference,
+      previous: rollbackReference,
+    }).pipe(
+      Schema.check(
+        Schema.makeFilter((references) =>
+          references.current.deploymentId !== references.previous.deploymentId
+            ? undefined
+            : "Agent rollback references must identify distinct deployments."
+        )
+      )
+    ),
+    proxy: Schema.Struct({
+      current: rollbackReference,
+      previous: rollbackReference,
+    }).pipe(
+      Schema.check(
+        Schema.makeFilter((references) =>
+          references.current.deploymentId !== references.previous.deploymentId
+            ? undefined
+            : "Proxy rollback references must identify distinct deployments."
+        )
+      )
+    ),
+  }),
+} as const;
+
+export const AgentAcceptedRollbackReadyPreflightSnapshot = Schema.Struct({
+  ...agentAcceptedRollbackReadyFields,
+  stage: Schema.Literal("agent-accepted-rollback-ready"),
+});
+
+export const SendblueFinalPromotionPreflightSnapshot = Schema.Struct({
+  ...agentAcceptedRollbackReadyFields,
+  rollbackDrill: Schema.Struct({ completed: Schema.Literal(true) }),
+  sendblue: Schema.Struct({ productionActivated: Schema.Literal(false) }),
+  soak: Schema.Struct({ completed: Schema.Literal(true) }),
+  stage: Schema.Literal("sendblue-final-promotion"),
+});
+
+export const ProductionPreflightSnapshot = Schema.Union([
+  BeforeFirstMutationPreflightSnapshot,
+  ProxyProvisionedPreflightSnapshot,
+  ProxyAcceptedAgentConfiguredPreflightSnapshot,
+  AgentAcceptedRollbackReadyPreflightSnapshot,
+  SendblueFinalPromotionPreflightSnapshot,
+]);
 
 export type ProductionPreflightSnapshot =
   typeof ProductionPreflightSnapshot.Type;
@@ -65,6 +226,13 @@ export const ProductionPreflightEvidence = Schema.Struct({
   checks: Schema.Array(Schema.NonEmptyString),
   go: Schema.Boolean,
   rejected: Schema.Array(Schema.NonEmptyString),
+  stage: Schema.Literals([
+    "before-first-mutation",
+    "proxy-provisioned",
+    "proxy-accepted-agent-configured",
+    "agent-accepted-rollback-ready",
+    "sendblue-final-promotion",
+  ]),
 });
 
 export type ProductionPreflightEvidence =
@@ -82,7 +250,7 @@ const expectedAgentVariables = [
 
 const expectedProxyVariables = [
   ["BUNDJIL_CODEX_PROXY_MODE", ["encrypted", "sensitive"]],
-  ["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN", ["encrypted", "sensitive"]],
+  ["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN", ["sensitive"]],
   ["BUNDJIL_CODEX_PROFILE_ID", ["plain"]],
   ["BUNDJIL_CODEX_CONNECTOR_ID", ["plain"]],
   ["BUNDJIL_CODEX_INSTALLATION_ID", ["plain"]],
@@ -95,8 +263,8 @@ const expectedProxyVariables = [
 ] as const;
 
 const sameIdentity = (
-  preview: ProductionPreflightSnapshot["previewIdentity"],
-  production: ProductionPreflightSnapshot["productionIdentity"]
+  preview: typeof ProductionIdentity.Type,
+  production: typeof ProductionIdentity.Type
 ) =>
   preview.namespaceFingerprint === production.namespaceFingerprint ||
   preview.subjectFingerprint === production.subjectFingerprint ||
@@ -122,64 +290,63 @@ const missingVariableBindings = (
 export const preflightProductionPromotion = Effect.fn(
   "ProductionPromotion.preflight"
 )(function* (snapshot: ProductionPreflightSnapshot) {
-  const rejected = [
-    ...(snapshot.agent.project === "bundjil-agent"
+  const rejected =
+    snapshot.stage === "before-first-mutation"
       ? []
-      : ["wrong-agent-project"]),
-    ...(snapshot.proxy.project === "bundjil-codex-proxy"
-      ? []
-      : ["wrong-proxy-project"]),
-    ...(snapshot.agent.stableDomain === "bundjil-agent.vercel.app"
-      ? []
-      : ["wrong-agent-domain"]),
-    ...(snapshot.proxy.stableDomain === "bundjil-codex-proxy.vercel.app"
-      ? []
-      : ["wrong-proxy-domain"]),
-    ...(snapshot.agent.deploymentProtection &&
-    snapshot.proxy.deploymentProtection
-      ? []
-      : ["missing-deployment-protection"]),
-    ...(snapshot.agent.eveAuth ? [] : ["missing-eve-auth"]),
-    ...(snapshot.agent.modelProvider === "codex-proxy"
-      ? []
-      : ["wrong-agent-model-provider"]),
-    ...(snapshot.proxy.mode === "live" ? [] : ["wrong-proxy-mode"]),
-    ...(snapshot.agent.proxyBaseUrl.hostname ===
-      "bundjil-codex-proxy.vercel.app" &&
-    snapshot.agent.proxyBaseUrl.pathname === "/v1"
-      ? []
-      : ["stale-or-nonproduction-proxy-host"]),
-    ...missingVariableBindings(
-      snapshot.agent.variables,
-      expectedAgentVariables
-    ),
-    ...missingVariableBindings(
-      snapshot.proxy.variables,
-      expectedProxyVariables
-    ),
-    ...(sameIdentity(snapshot.previewIdentity, snapshot.productionIdentity)
-      ? ["shared-preview-production-identity"]
-      : []),
-    ...(snapshot.rollback.agentDeploymentId.length > 0 &&
-    snapshot.rollback.proxyDeploymentId.length > 0
-      ? []
-      : ["missing-accepted-rollback-reference"]),
-  ];
+      : [
+          ...missingVariableBindings(
+            snapshot.proxy.variables,
+            expectedProxyVariables
+          ),
+          ...(sameIdentity(
+            snapshot.previewIdentity,
+            snapshot.productionIdentity
+          )
+            ? ["shared-preview-production-identity"]
+            : []),
+          ...(snapshot.stage === "proxy-provisioned"
+            ? []
+            : [
+                ...missingVariableBindings(
+                  snapshot.agent.variables,
+                  expectedAgentVariables
+                ),
+                ...(snapshot.previewBearerFingerprint ===
+                snapshot.agent.bearerFingerprint
+                  ? ["shared-preview-production-bearer"]
+                  : []),
+                ...(snapshot.acceptedProxy.sourceSha ===
+                snapshot.source.pushedSha
+                  ? []
+                  : ["accepted-proxy-source-mismatch"]),
+                ...(snapshot.stage === "proxy-accepted-agent-configured"
+                  ? []
+                  : [
+                      ...(snapshot.acceptedAgent.sourceSha ===
+                      snapshot.source.pushedSha
+                        ? []
+                        : ["accepted-agent-source-mismatch"]),
+                      ...(snapshot.rollback.proxy.current.deploymentId ===
+                        snapshot.acceptedProxy.deploymentId &&
+                      snapshot.rollback.proxy.current.configFingerprint ===
+                        snapshot.acceptedProxy.configFingerprint
+                        ? []
+                        : ["proxy-current-rollback-mismatch"]),
+                      ...(snapshot.rollback.agent.current.deploymentId ===
+                        snapshot.acceptedAgent.deploymentId &&
+                      snapshot.rollback.agent.current.configFingerprint ===
+                        snapshot.acceptedAgent.configFingerprint
+                        ? []
+                        : ["agent-current-rollback-mismatch"]),
+                    ]),
+              ]),
+        ];
 
   return yield* ProductionPreflightEvidence.pipe(Schema.decodeUnknownEffect)({
-    checks: [
-      "personal-scope",
-      "stable-production-domains",
-      "production-variable-bindings",
-      "live-codex-proxy-mode",
-      "explicit-eve-auth",
-      "deployment-protection",
-      "disjoint-derived-identities",
-      "accepted-rollback-references",
-      "read-only-adapter",
-    ],
+    checks: ["read-only-adapter", "ordered-staged-preflight", snapshot.stage],
     go: rejected.length === 0,
     rejected,
+    stage: snapshot.stage,
   }).pipe(
     Effect.mapError(
       () =>

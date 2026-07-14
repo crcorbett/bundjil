@@ -51,7 +51,8 @@ await Effect.runPromise(
       )
     );
     const snapshot = yield* Schema.decodeUnknownEffect(
-      Schema.fromJsonString(ProductionPreflightSnapshot)
+      Schema.fromJsonString(ProductionPreflightSnapshot),
+      { onExcessProperty: "error" }
     )(content);
     const evidence = yield* preflightProductionPromotion(snapshot);
 
