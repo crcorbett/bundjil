@@ -34,7 +34,7 @@ const config = Schema.decodeUnknownSync(SendblueConfig)({
   apiBaseUrl: new URL("https://api.sendblue.test"),
   apiKey: Redacted.make("test-api-key"),
   apiSecret: Redacted.make("test-api-secret"),
-  fromNumber: "+13472760577",
+  fromNumber: "+14155550177",
   replayStore: {
     leaseSeconds: 60,
     prefix: "sendblue:test",
@@ -49,7 +49,7 @@ const config = Schema.decodeUnknownSync(SendblueConfig)({
 
 const input = Schema.decodeUnknownSync(SendblueSendMessageInput)({
   content: "A concise reply.",
-  from_number: "+13472760577",
+  from_number: "+14155550177",
   number: "+14155550100",
 });
 

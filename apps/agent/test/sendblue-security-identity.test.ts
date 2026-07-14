@@ -30,7 +30,7 @@ import {
 const senderNumber = Schema.decodeUnknownSync(E164PhoneNumber)("+14155550100");
 const otherSenderNumber =
   Schema.decodeUnknownSync(E164PhoneNumber)("+14155550101");
-const sendblueLine = Schema.decodeUnknownSync(E164PhoneNumber)("+13472760577");
+const sendblueLine = Schema.decodeUnknownSync(E164PhoneNumber)("+14155550177");
 const configLayer = Layer.succeed(
   SendblueConfigService,
   Schema.decodeUnknownSync(SendblueConfig)({

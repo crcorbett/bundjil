@@ -551,3 +551,47 @@ status unchanged until the corresponding evidence has been recorded.
   Agent typecheck/build/51 tests, direct mode-`0600` CLI proof, root lint/format,
   knip, all workspace checks, `bun run verification`, `jq empty`, and
   `git diff --check` passed. The task is accepted without Production access.
+
+### 2026-07-14 `enable-sendblue-production-last` accepted evidence
+
+- The mode-`0600` `sendblue-final-promotion` checkpoint returned `go: true`.
+  Production Sendblue received twelve `sensitive`, Production-only bindings and
+  one dedicated automation bypass; the existing Preview bypasses remain.
+- The first channel deployment was rejected as evidence after a malformed
+  identity-map dotenv encoding caused sanitized `SendblueConfigError` route
+  failures. The Production bundle was repaired by copying the approved Preview
+  assignment verbatim, its local `loadSendblueConfig` proof passed, and only
+  that sensitive Production variable was upserted.
+- Rejected deployment `dpl_9KKkPqbAKTcShH3bm8X6KBcf5xXj` is retained as
+  evidence. Current source-only Production deployment
+  `dpl_6g91e8CEg7JTkQnAEtvAdeR6CWrT` is `READY` at accepted source
+  `e53e7a4`; `dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz` remains the rollback target.
+- Sendblue has exactly two receive webhooks: retained Preview plus Production.
+  Stable-route probes now return missing-secret `401`, invalid-secret `401`,
+  and authenticated-malformed `400`. Focused agent checks (51 tests/build) and
+  root verification passed.
+- Non-handset follow-up: a signed Production loop event returned `200` without
+  dispatch or delivery. Deterministic agent fixtures cover replay-store
+  fail-closed `503` plus sequential and concurrent inbound/outbound replay
+  suppression; the focused suite passed all 51 tests. Read-only inventory
+  confirms two receive webhooks and five automation bypasses, including the
+  retained Preview and dedicated Production notes. Root verification passed.
+- Live provider readback: one correlated Production inbound was `RECEIVED` via
+  iMessage at `2026-07-14T15:21:30.810Z`; exactly one subsequent outbound was
+  `DELIVERED` at `2026-07-14T15:21:46.728Z`. Content, identities, handles, and
+  protected URLs were not retained.
+- Live proof completed: the one-hour Production window contains one successful
+  Sendblue-triggered agent run using the private proxy model, with one turn and
+  no failed or cancelled execution. The durable Eve replay returned 15 ordered
+  events from `session.started` through `session.waiting`, including seven
+  `message.appended` events and one each of `message.completed`,
+  `step.completed`, and `turn.completed`; waiting was one and failure was zero.
+- The proof window contains one private proxy completion `200` and one
+  subsequent Sendblue outbound `DELIVERED` record. Reposting the real provider
+  handle returned `200`; outbound inventory and proxy completion count were
+  unchanged before and after. Agent/proxy leak scans found zero sensitive-value
+  and credential-marker hits. No content, identity, handle, URL, credential,
+  run/session id, or token count was retained.
+- Rollback order, not executed after acceptance: remove the Production receive
+  webhook; revoke the Production automation bypass; return the agent alias to
+  `dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz`; then remove Production Sendblue vars.

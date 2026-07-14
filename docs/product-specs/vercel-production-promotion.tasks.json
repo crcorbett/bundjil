@@ -312,7 +312,8 @@
     {
       "id": "enable-sendblue-production-last",
       "title": "Enable and prove Sendblue Production last",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
       "dependsOn": ["soak-monitor-and-drill-rollback"],
       "description": "Promote the already Preview-proved Sendblue channel only after the Production platform has passed soak and rollback gates.",
       "implementationNotes": [
@@ -332,8 +333,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified the stable Production route remains a thin Eve channel adapter in apps/agent and delegates authentication, canonical Schema decoding, allowlisted identity resolution, opaque continuation routing, atomic replay claims, Codex dispatch, and Sendblue delivery to the accepted app-owned Effect services. Personal Vercel owns twelve sensitive Production-only Sendblue bindings, the dedicated automation bypass, protected source-only deployment, and Marketplace replay binding; Sendblue owns the second receive webhook. Preview resources remain present and Production uses independent route, routing, replay-prefix, and platform credentials.",
+          "Parent pass 2 - implementation quality and helper admission: reviewed the route, channel service, Config, live Layer, client, and replay store against the Effect architecture. The malformed identity-map input failed closed at Redacted Effect Config before request authentication, then the corrected canonical input restored the existing Config -> Context Service -> Layer -> ManagedRuntime graph. Primary operations remain named flat Effect.fn/Effect.gen programs with tagged pipe error handling, Effect Schema JSON codecs, Match classification, HttpClient, and owner-fenced replay transitions. Static scans found no raw JSON helpers, process.env, raw fetch, Object.values/Object.entries, switch branches, unsafe casts, lint suppressions, DTO mirrors, manual readers/mappers, or new helper sprawl; no runtime source changed in this operational slice.",
+          "Parent pass 3 - verification and evidence: accepted the strict sendblue-final-promotion gate; READY source-only deployment and retained rollback id; route 401/401/400 plus signed-loop 200 and isolated storage 503 behavior; exactly two receive webhooks and five automation bypasses; one provider RECEIVED inbound; one channel-triggered Eve run using the private Codex proxy model; 15 ordered durable events through session.waiting with no failure; one proxy completion 200; one DELIVERED outbound; real-handle replay 200 with unchanged proxy and outbound counts; zero sensitive-value and credential-marker log hits; agent typecheck/build/51 tests; bun run verification; jq, diff, and temporary-file cleanup checks. The final exact-value scan found the Production line reused as a tracked test fixture, replaced every occurrence with a reserved synthetic 555 number, and reran the complete gate. Rollback order is documented and was not executed after acceptance."
+        ]
       },
       "commitAfterPassing": true
     },

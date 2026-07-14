@@ -41,7 +41,7 @@ const config = Schema.decodeUnknownSync(SendblueConfig)({
   apiBaseUrl: new URL("https://api.sendblue.test"),
   apiKey: Redacted.make("test-api-key"),
   apiSecret: Redacted.make("test-api-secret"),
-  fromNumber: "+13472760577",
+  fromNumber: "+14155550177",
   replayStore: {
     leaseSeconds: 60,
     prefix: "sendblue:test",
@@ -56,7 +56,7 @@ const config = Schema.decodeUnknownSync(SendblueConfig)({
 const channelState = Schema.decodeUnknownSync(SendblueChannelState)({
   conversationKey: "sendblue:conversation:test",
   principalId: "owner",
-  sendblueNumber: "+13472760577",
+  sendblueNumber: "+14155550177",
   senderNumber: "+14155550100",
 });
 const sendSuccess = Schema.decodeUnknownSync(SendblueSendMessageSuccess)({
@@ -89,10 +89,10 @@ const inbound = (input: Record<string, unknown> = {}) => ({
   is_outbound: false,
   media_url: "",
   message_handle: "inbound-message-handle",
-  sendblue_number: "+13472760577",
+  sendblue_number: "+14155550177",
   service: "iMessage",
   status: "RECEIVED",
-  to_number: "+13472760577",
+  to_number: "+14155550177",
   ...input,
 });
 
@@ -218,7 +218,7 @@ it.effect(
           "lineMismatch",
           { sendblue_number: "+14155550111", to_number: "+14155550111" },
         ],
-        ["loop", { from_number: "+13472760577" }],
+        ["loop", { from_number: "+14155550177" }],
         ["senderNotAllowed", { from_number: "+14155550101" }],
       ] as const;
       for (const [reason, changes] of cases) {

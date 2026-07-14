@@ -35,7 +35,7 @@ const configLayer = Layer.succeed(
     apiBaseUrl: new URL("https://api.sendblue.test"),
     apiKey: Redacted.make("test-api-key"),
     apiSecret: Redacted.make("test-api-secret"),
-    fromNumber: "+13472760577",
+    fromNumber: "+14155550177",
     replayStore: {
       leaseSeconds: replayOptions.leaseSeconds,
       prefix: replayOptions.prefix,

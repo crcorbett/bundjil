@@ -348,3 +348,33 @@ quality gates, ledger consistency, diff checks, and sanitized leak/PII/artifact
 scans before accepting the task. A fourth consistency pass corrected historical
 tense and the final replay-release phrase, then reran formatting and diff
 checks.
+
+### Production Promotion Accepted (2026-07-14)
+
+- Production has independent route, routing, replay-prefix, and automation
+  credentials; the same owned Sendblue account, line, and allowlisted identity
+  mapping are retained. Exactly two receive webhooks exist: Preview and
+  Production.
+- A malformed dotenv identity-map encoding initially failed closed with `500`.
+  Copying the approved Preview assignment verbatim restored local config load;
+  the repaired source-only Production deployment returns `401`, `401`, and
+  `400` for missing-secret, invalid-secret, and authenticated-malformed route
+  probes respectively.
+- Before the live inbound, a signed loop event returned `200` with no
+  delivery path. The deterministic `503` storage and replay/concurrency
+  fixtures remain green in the 51-test agent suite; root verification passed.
+  Provider inventory confirms Preview and Production receive webhooks and their
+  respective automation bypass records are retained.
+- The real Production inbound is provider-confirmed `RECEIVED`/iMessage and
+  has exactly one subsequent `DELIVERED` outbound provider record. Only the
+  sanitized timestamps and counts are retained; no content, phone identity,
+  handle, or protected URL is recorded.
+- Live Production proof is complete: one successful channel-triggered run
+  reached durable waiting with 15 ordered Eve events and no failure; one private
+  proxy completion returned `200`; and exactly one subsequent Sendblue outbound
+  record reached `DELIVERED`. A real-handle replay returned `200` without a
+  second dispatch, proxy completion, or provider delivery. Current agent/proxy
+  leak scans found zero sensitive-value and credential-marker hits.
+- Operational rollback order, not executed: remove the Production receive
+  webhook first, revoke its dedicated automation bypass, restore the retained
+  agent rollback deployment, then remove Production Sendblue variables.

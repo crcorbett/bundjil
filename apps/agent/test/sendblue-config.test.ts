@@ -19,7 +19,7 @@ const senderIdentities = Schema.decodeUnknownSync(SendblueSenderIdentities)({
 const environment = {
   BUNDJIL_SENDBLUE_API_KEY: "test-api-key",
   BUNDJIL_SENDBLUE_API_SECRET: "test-api-secret",
-  BUNDJIL_SENDBLUE_FROM_NUMBER: "+13472760577",
+  BUNDJIL_SENDBLUE_FROM_NUMBER: "+14155550177",
   BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS: "60",
   BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX: "sendblue:test",
   BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN: "test-replay-token",
