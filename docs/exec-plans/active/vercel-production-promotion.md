@@ -323,6 +323,55 @@ changing this evidence, its status, or any accepted audit count.
   rollback candidacy, focused checks, root verification, ledger validation,
   diff check, clean tracked state, and local-material cleanup.
 
+### 2026-07-14 `deploy-and-prove-production-agent` worker evidence
+
+- The read-only `proxy-accepted-agent-configured` checkpoint returned
+  `go: true` for the accepted proxy and agent deployment source
+  `e53e7a48270db4bb571d90c771186f92a0282922`. It retained the exact personal
+  team/project scope, stable proxy URL, sensitive agent binding types,
+  disjoint bearer fingerprints, Deployment Protection, explicit Vercel OIDC,
+  and no deployed local or anonymous Eve fallback.
+- Two source-only Production agent deployments from that clean reachable source
+  are `READY`: rollback `dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD` and current stable
+  alias `dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz`. Neither used prebuilt output,
+  inline runtime values, or build-environment injection.
+- Anonymous deployed Eve info returned `401`; a fresh Vercel OIDC caller
+  returned `200`. Sanitized info metadata reported
+  `bundjil-codex-proxy/gpt-5.5`, external endpoint/routing, and context window
+  `200000`, with no Gateway, mock, local, or Preview fallback.
+- One minimal non-sensitive session replayed from `startIndex=0` with the
+  expected curl timeout after durable bytes were received. The mode-`0600`
+  partial replay contained exactly nine events, once and in order:
+  `session.started`, `turn.started`, `message.received`, `step.started`,
+  `message.appended`, `message.completed`, `step.completed`,
+  `turn.completed`, and `session.waiting`. It reached waiting with no failure
+  event. The fresh-session proxy correlation advanced exactly once from three
+  to four accepted current-proxy completion `200` requests; later replay reads
+  did not add a completion.
+- Agent and proxy runtime-error queries were empty. Sanitized log scans found
+  no token, authorization, prompt, ciphertext, bypass, Preview, mock, or
+  Gateway markers; request metadata recorded only expected Eve/proxy routes.
+  No task-created bypass existed, and the pre-existing Preview Sendblue
+  automation bypass was unchanged. Detached worktree and local proof material
+  were removed after proof.
+- Parent pass 1, ownership and call graph: accepted the personal agent-project
+  variable/deployment boundary, app-owned Config/model-provider/Eve auth graph,
+  stable proxy HTTP boundary, and package-owned OAuth/profile/refresh/lock/fence
+  graph. Agent and proxy deployment sources match at `e53e7a4`; no provider
+  secret or Sendblue Production state crossed into Eve.
+- Parent pass 2, implementation quality: accepted the deployed Effect Config,
+  Redacted, canonical model-provider Schema, Match selection, flat named Effect,
+  Eve auth, and proxy Schema/Layer/tagged-error boundaries. The worker changed
+  documentation only; no raw JSON helper, unsafe cast, DTO mirror, manual
+  mapper, plaintext credential, Gateway fallback, or helper sprawl was added.
+- Parent pass 3, verification and evidence: accepted sensitive Production
+  variable readback, strict staged preflight, two READY same-source/config
+  deployments, alias/protection/bypass readback, anonymous `401`, OIDC `200`,
+  external model metadata, nine ordered durable events through waiting with no
+  failure, one accepted-session proxy completion with none on replay, empty
+  runtime errors, clean leak scans, agent typecheck/51 tests/build, root
+  verification, ledger validation, diff check, and local-material cleanup.
+
 ## Staged Checkpoints
 
 The preflight remains read-only and fail closed. Checkpoints consume only

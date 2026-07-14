@@ -236,7 +236,13 @@
     {
       "id": "deploy-and-prove-production-agent",
       "title": "Deploy and prove the protected Production Eve agent",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "The agent received only five app-owned sensitive Production bindings: codex-proxy provider, gpt-5.5 model, canonical stable proxy /v1 URL, the matching internal bearer, and 200000-token context window. No OAuth profile, refresh token, cipher, Upstash, Gateway credential, or Sendblue Production binding entered the app. The proxy-accepted-agent-configured checkpoint passed with exact personal scope, accepted proxy/source, disjoint Preview/Production bearer identities, SSO protection, explicit Eve OIDC, and no deployed local or anonymous fallback.",
+        "Rollback deployment dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD and current stable deployment dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz are READY Production source deployments from e53e7a48270db4bb571d90c771186f92a0282922, matching both accepted proxy deployments. Neither used prebuilt output, inline runtime values, or build-environment injection; the stable personal alias resolves to the current deployment.",
+        "Anonymous Eve info returned 401 and fresh Vercel OIDC returned 200 with external bundjil-codex-proxy/gpt-5.5 metadata and context window 200000. The final accepted non-sensitive session replayed exactly nine ordered events through session.waiting with no failure; its proxy completion count advanced exactly once from three to four and replay added no model request. Agent/proxy runtime errors were empty, leak scans were clean, all four pre-existing Preview automation bypasses were unchanged, focused agent checks and bun run verification passed, and detached/local proof material was removed."
+      ],
       "dependsOn": ["deploy-and-accept-production-proxy"],
       "description": "Configure the agent Production target with the accepted stable proxy alias and independent bearer, then prove a protected minimal Eve session through the Production proxy.",
       "implementationNotes": [
@@ -256,8 +262,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified Vercel mutation stayed in the personal agent project and only app-owned model-provider inputs crossed into Eve. AgentModelProviderConfig created the OpenAI-compatible model, the stable alias called the accepted app-owned proxy HTTP boundary, and package-owned OAuth/profile/refresh/lock/fence/provider services remained opaque to the agent. Both apps use the same accepted e53e7a4 source; Sendblue Production remains untouched.",
+          "Parent pass 2 - implementation quality: reviewed the deployed source and worker docs-only diff. Existing Effect Config/Redacted parsing, canonical AgentModelProviderConfig Schema, Match-based provider selection, flat named Effect flow, Eve auth policy, and proxy Schema/Layer/tagged-error boundaries remain authoritative. No runtime source helper was needed and no raw JSON helper, unsafe cast, DTO mirror, manual mapper, process.env package logic, plaintext credential, Gateway fallback, or helper sprawl was introduced.",
+          "Parent pass 3 - verification and evidence: accepted the strict staged preflight, sensitive Production variable readback, two READY same-source/config deployments and stable alias, SSO protection and unchanged bypass inventory, anonymous 401 and OIDC 200, external proxy/model/context metadata, exactly nine ordered durable events through waiting with no failure, exactly one accepted-session proxy completion and zero replay completions, empty agent/proxy runtime errors, clean leak scans, focused agent typecheck/51 tests/build, bun run verification, jq validation, git diff check, and detached/temp cleanup."
+        ]
       },
       "commitAfterPassing": true
     },
