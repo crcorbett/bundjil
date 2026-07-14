@@ -198,7 +198,13 @@
     {
       "id": "deploy-and-accept-production-proxy",
       "title": "Deploy and accept the private Production Codex proxy",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "The read-only proxy-provisioned checkpoint passed before deployment. The Production internal bearer was rotated once into the write-only sensitive Vercel binding and the dedicated personal-vault Bundjil Production record without committing it; two post-rotation source deployments built from accepted SHA e53e7a48270db4bb571d90c771186f92a0282922 with no inline runtime/build variables or prebuilt output.",
+        "Current deployment dpl_DJBqdgbJRL3qGMpXjSgrUp8u3HsW and previous accepted rollback deployment dpl_CU9Y7UiFEV84QLcjczzsCnsBvFRZ are READY Production deployments from the same source/configuration. The stable personal alias resolves to the current deployment, the project remains in team_1LX7ZujbijowTv8J9k0aU7nD with SSO protection prod_deployment_urls_and_all_previews, and no agent Production variable, agent deployment, or Sendblue Production state changed.",
+        "Stable-alias health returned 200 with mode live. Valid-shape missing and invalid bearers returned 401 with no marker leak; the matched bearer returned 200 text/event-stream, mode live, two data lines, and a terminal [DONE] marker with no bearer leak. Production logs contained only sanitized route/status/deployment metadata, current completion correlation was exactly one 200, and the runtime-error query was empty. Focused and global verification passed before acceptance."
+      ],
       "dependsOn": ["provision-isolated-production-profile"],
       "description": "Deploy the proxy from the accepted SHA, prove its immutable deployment, then accept the stable Production alias before the agent can reference it.",
       "implementationNotes": [
@@ -218,8 +224,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified Vercel mutation remained in the personal codex-proxy project; app-owned Config and HTTP routes consume the sensitive internal bearer and package-owned OpenAICompatibleProxy/CodexOAuth services own encrypted profile, refresh, lock, fence, and provider behavior. The agent still has no Production configuration or deployment, and Sendblue Production remains untouched.",
+          "Parent pass 2 - implementation quality: reviewed the live call graph and deployed source at e53e7a4. Existing Config.redacted and canonical Effect Schema contracts, explicit Layers, flat named Effect.gen flow, typed catchTags translation, HttpServerResponse.schemaJson responses, and Schema JSON request boundaries remain authoritative. No source change or helper was needed, and no raw JSON helper, unsafe cast, DTO mirror, manual mapper, process.env package boundary, plaintext persistence, or helper sprawl was introduced.",
+          "Parent pass 3 - verification and evidence: accepted two READY same-SHA/same-configuration Production deployments, exact stable-alias resolution, SSO protection readback, live health 200, missing and invalid bearer 401, authenticated SSE 200/text-event-stream/[DONE], no marker or bearer leaks, one current-deployment 200 correlation, clean runtime-error readback, retained previous rollback candidate, focused package checks, bun run verification, jq validation, git diff --check, clean tracked worktree, and temporary-file/clipboard cleanup."
+        ]
       },
       "commitAfterPassing": true
     },

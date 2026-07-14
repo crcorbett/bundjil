@@ -284,6 +284,45 @@ changing this evidence, its status, or any accepted audit count.
   ledger validation, diff check, and secret-file cleanup. The task is accepted
   without deployment or downstream activation.
 
+### 2026-07-14 `deploy-and-accept-production-proxy` evidence
+
+- The read-only `proxy-provisioned` checkpoint passed before deployment. The
+  Production internal bearer was synchronized as a write-only `sensitive`
+  Vercel variable and in the personal-vault `Bundjil Production` record. No
+  bearer, OAuth token, profile, ciphertext, prompt, response, or bypass value
+  was recorded; temporary files and the local clipboard were cleared.
+- Two post-rotation immutable Production deployments built from accepted source
+  `e53e7a48270db4bb571d90c771186f92a0282922` without inline runtime/build
+  variables or prebuilt output. Current deployment
+  `dpl_DJBqdgbJRL3qGMpXjSgrUp8u3HsW` and previous accepted rollback deployment
+  `dpl_CU9Y7UiFEV84QLcjczzsCnsBvFRZ` are both `READY`, target Production, and
+  retained as rollback candidates. The stable personal alias resolves to the
+  current deployment.
+- Personal-project SSO protection remains
+  `prod_deployment_urls_and_all_previews`. Stable-alias health returned `200`
+  with `mode: live`. Valid-shape requests with missing and invalid internal
+  bearers returned `401` without marker leaks. The matched bearer returned
+  `200`, `text/event-stream`, `mode: live`, two data lines, and terminal
+  `[DONE]`, with no bearer leak.
+- Production logs recorded only route, status, deployment, and cache metadata.
+  The accepted current deployment had exactly one correlated completion `200`;
+  the runtime-error query was empty. No agent Production variable or deployment
+  and no Sendblue Production state changed in this task.
+- Parent pass 1, ownership and call graph: accepted personal proxy-project
+  deployment/alias ownership, app-owned Config and HTTP ingress, and the
+  package-owned proxy/OAuth/profile/refresh/lock/fence/provider graph. No agent
+  or channel mutation entered the task.
+- Parent pass 2, implementation quality: accepted the deployed
+  `Config.redacted`, canonical Schema, explicit Layer, flat named Effect,
+  `catchTags`, `HttpServerResponse.schemaJson`, and Schema JSON boundaries. No
+  source helper was added and no raw JSON helper, unsafe cast, DTO mirror,
+  manual mapper, plaintext persistence, or helper sprawl entered the slice.
+- Parent pass 3, verification and evidence: accepted both same-source/config
+  immutable deployments, alias and protection readback, health/auth/SSE and
+  leak proofs, exactly one current completion correlation, empty runtime errors,
+  rollback candidacy, focused checks, root verification, ledger validation,
+  diff check, clean tracked state, and local-material cleanup.
+
 ## Staged Checkpoints
 
 The preflight remains read-only and fail closed. Checkpoints consume only
