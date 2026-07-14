@@ -42,7 +42,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "completedPasses": 3,
+    "completedPasses": 6,
     "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
@@ -92,9 +92,9 @@
     {
       "id": "implement-effect-config-and-eve-mcp-connection",
       "title": "Implement the Effect config boundary and native Eve MCP connection",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["freeze-executor-eve-contract-and-policy-inventory"],
-      "description": "Add the app-owned endpoint/config policy and thin Eve connection, with exact tool filtering, runtime-only redacted bearer resolution, deterministic stub tests, and no duplicated remote contracts.",
+      "description": "Add the app-owned endpoint/config policy and thin Eve connection, with exact tool filtering, runtime-only redacted bearer resolution, executable-edge definition tests, and no duplicated remote contracts.",
       "implementationNotes": [
         "Create apps/agent/agent/connections/executor.ts and the smallest justified apps/agent/agent/lib/executor modules. Config belongs in lib/executor/config.ts, not the root model config and not the connection file.",
         "Define canonical Effect Schemas only for Bundjil-owned endpoint/config/proof values. Derive types from Schema and do not mirror Executor skills/execute/resume, integrations, execution state, or provider payloads.",
@@ -103,8 +103,8 @@
         "Set principalType app and tools.allow to exactly skills, execute, resume. Do not add a coarse Eve approval callback, Executor SDK, custom transport, Context service wrapper, direct fetch, or fallback provider path.",
         "Use only Eve's documented public connection exports and direct app-local imports. Do not deep-import Eve internals, import .local references, create a barrel, cross an app boundary, or add a production dependency without an accepted SPEC/task update.",
         "Add only the actual environment names required by the Eve build to turbo.json. Prove eve build does not resolve or embed the key.",
-        "Use an in-process Streamable HTTP MCP stub based on Eve's test pattern; it is test-only infrastructure and must not become a production client.",
-        "Acquire/release the MCP stub server and any ManagedRuntime with Effect.acquireRelease inside the test Effect, use ephemeral ports and injected ConfigProvider fixtures, and avoid module-global resources or ambient process.env mutation."
+        "Use no test-only custom MCP client or server. Eve 0.20.0 exposes no public executable MCP client or test harness, so remote MCP transport behavior belongs to the deployed Preview proof task. No app-owned resource exists in this task, so acquireRelease lifecycle coverage is not applicable.",
+        "Use injected ConfigProvider fixtures for config operations and isolated subprocess environment options for executable-edge import/getToken proof. Do not mutate ambient process.env."
       ],
       "mandatoryVerification": [
         "Each primary operation is one named flat sequential Effect.fn/Effect.gen whose decode/load -> acquire -> policy -> framework call -> return path is visible; expected tagged errors use Effect.fn transforms or the outer Effect.gen .pipe(...) with catchTag, catchTags, or mapError; a named Effect.fn supplies its span and a plain Effect.gen uses one outer withSpan without duplication; nested generators require a scoped-resource or separately reusable-program justification; Effect.runSync/runPromise appear only at the authored framework adapter edge.",
@@ -113,27 +113,31 @@
         "Ultracite/Oxlint, TypeScript strictness, Effect language-service, Knip, Turbo, formatter, and test configuration remain unchanged unless a separately justified repo-wide requirement is accepted; no broad suppression/ignore expansion, and any narrow suppression has adjacent rationale plus direct proof.",
         "Import/dependency audit proves only public Eve APIs and direct app-local modules are used, no .local or cross-app import exists, no unnecessary barrel/export was added, and package metadata/lockfile remain unchanged unless separately accepted.",
         "Config tests prove accepted browser-mode toolkit URL, every rejected URL/mode case, missing fields, Redacted behavior, sanitized errors whose operation is exactly loadEndpoint or loadApiKey, and synthetic marker non-leakage.",
-        "Connection tests prove app principal, exact allowlist, synthetic fourth-tool filtering, bearer delivery without model-visible leakage, deterministic read-only execute, malformed/auth/timeout failures, and no direct fallback.",
-        "Browser-paused stub tests prove the model-visible resume contract accepts only executionId and rejects action/content.",
-        "@effect/vitest resource tests prove the MCP stub and any ManagedRuntime are released on success, typed failure, interruption, and assertion failure; ConfigProvider fixtures are injected, no open handle, fixed port, global mutable runtime, ambient process.env mutation, unmatched lifecycle hook, or live public-network dependency remains.",
+        "Connection tests prove app principal, exact allowlist, no approval callback or custom headers, URL-only import/eve build without an API key, and runtime getToken sanitizes a missing key and returns a synthetic key only at the adapter edge when supplied through isolated subprocess environment options.",
+        "No synthetic fourth-tool, remote execute, resume-schema, auth/timeout/malformed transport, or resource-lifecycle test is owned locally: Eve's public API exposes only the authored definition and Executor owns the remote schema/transport. The deployed Preview proof task verifies those behaviors without a direct fallback.",
+        "No app-owned scoped resource, custom MCP client, custom MCP server, fixed port, global mutable runtime, ambient process.env mutation, unmatched lifecycle hook, or live public-network dependency is introduced.",
         "Control-flow tests and diff review prove no broad expected-error collapse, Effect.runFork, unscoped/daemon fiber, hidden queue, unbounded concurrency, or Bundjil-owned retry around Executor execute/resume exists.",
         "Eve build/compiled-output tests prove the endpoint is normalized, the key is not read at build, and no synthetic secret/Authorization/protected URL marker is emitted.",
         "Focused agent check-types/test/build, Effect language-service review, root check, knip, bun run verification with synthetic URL, JSON validation, git diff --check, and leak scans pass."
       ],
       "browserVerification": [
-        "None against a live approval page; the paused/resume shape is proved through the in-process MCP stub in this task."
+        "None in this task. The deployed Preview proof task verifies the browser pause/resume contract."
       ],
       "completionCriteria": [
-        "The authored connection compiles through Eve and exposes exactly Executor's three orchestration tools.",
+        "The authored connection compiles through Eve with a URL but no API key, and declares exactly Executor's three orchestration tools.",
         "Schema-owned URL and Redacted values remain decoded until the Eve adapter requires string/bearer representations; dependencies are provided once at the adapter/test edge.",
         "The bearer remains runtime-only and redacted until Eve's adapter requires the token string.",
-        "No unnecessary abstraction, remote DTO mirror, or second MCP/provider boundary exists, and the helper-admission inventory is accepted.",
+        "No unnecessary abstraction, remote DTO mirror, second MCP/provider boundary, test-only MCP client, or test-only MCP server exists, and the helper-admission inventory is accepted.",
         "All three audit passes are recorded."
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: parent rejected an unsupported local Eve-runtime stub, verified Eve 0.20.0 exposes only the public authored definition, and updated the SPEC/task so Bundjil owns Config plus the thin adapter while deployed Preview owns remote filtering, transport, execution, and resume proof.",
+          "Implementation quality/helper admission: parent inspected all changed TypeScript and corrected the subprocess proof to Effect v4 callback with interruption cleanup and Match; removed machine-specific execution, direct env reads, Promise wrappers, discarded output, unnecessary conversions, and meaningless markers; accepted only the two production modules, two direct tests, ConfigProvider Layer, and tested subprocess boundary.",
+          "Verification/evidence: parent proved URL-only import/build without a key, sanitized missing-key and supplied-key adapter behavior, exact app principal/allowlist, 55 agent tests, clean agent build/typecheck, zero Ultracite/Oxlint findings, clean Knip, six package typechecks, 189 repository tests, and JSON/diff/known-secret/compiled-output leak scans."
+        ]
       },
       "commitAfterPassing": true
     },
@@ -184,7 +188,7 @@
       "description": "Deploy a clean Preview and prove connection discovery, read execution, human browser approval/decline, safe resume, owner-channel delivery, policy restoration, observability, and leak safety end to end.",
       "implementationNotes": [
         "Deploy from a clean pushed SHA using only target-scoped encrypted/sensitive variables. Record the immutable Preview deployment and source SHA.",
-        "Use an authenticated Eve principal to call connection_search, skills, and one selected read-only execute operation. Correlate Eve Agent Run, Vercel request, and Executor execution evidence.",
+        "Use an authenticated Eve principal to call connection_search, confirm the exact remote skills/execute/resume surface, and run one selected read-only execute operation. Correlate Eve Agent Run, Vercel request, and Executor execution evidence.",
         "Temporarily mark a harmless proof operation require_approval. Prove paused output returns an executionId and approval URL, but resume exposes no action/content input.",
         "Open the approval URL as the authenticated owner and separately prove approve and decline. Call resume with executionId only and verify the corresponding completed/denied outcome.",
         "Send an allowlisted Sendblue request requiring the same connection. Prove the approval URL reaches only the owner and the final agent reply follows the recorded browser decision.",
@@ -193,7 +197,8 @@
       ],
       "mandatoryVerification": [
         "The immutable Preview deployment is Ready, source-correlated, authenticated, and built without secret output.",
-        "Authenticated Eve proof shows connection_search -> skills -> execute read-only success with no broad root catalog exposure.",
+        "Authenticated Eve proof shows connection_search -> exact skills/execute/resume surface -> skills -> execute read-only success with no broad root catalog exposure.",
+        "Preview proof records sanitized bearer/auth failure plus malformed and unavailable remote MCP failures, confirms they fail closed without a direct-provider fallback, and proves browser-paused resume accepts executionId only after an authenticated human decision.",
         "Approval proof shows browser mode, authenticated human decision, executionId-only resume, successful approve, successful decline, settled-link replay prevention, and no model self-approval path.",
         "Sendblue proof shows only the allowlisted owner receives the approval URL and final delivery follows the Executor decision without treating message text as approval.",
         "Policy readback after proof matches the accepted intended Preview policy.",

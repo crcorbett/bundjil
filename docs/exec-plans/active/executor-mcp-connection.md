@@ -34,7 +34,7 @@ material after each proof.
 ## Ordered Tasks
 
 1. `freeze-executor-eve-contract-and-policy-inventory`: accepted.
-2. `implement-effect-config-and-eve-mcp-connection`: pending.
+2. `implement-effect-config-and-eve-mcp-connection`: accepted.
 3. `provision-isolated-preview-toolkit-and-credentials`: pending.
 4. `prove-preview-eve-executor-and-browser-resume`: pending.
 5. `promote-production-document-and-audit`: pending.
@@ -207,3 +207,87 @@ task ledger after parent acceptance. The one-task prompt must include this:
   or approval URL, token assignment, or secret-shaped key.
 - Browser verification was not run by design. No approval page was opened and
   no state-changing operation was attempted.
+
+### implement-effect-config-and-eve-mcp-connection
+
+Status: Accepted 2026-07-14
+
+The accepted write budget is limited to the two app-owned production modules
+and two direct test modules recorded above, plus the minimum `turbo.json`
+environment declaration if Eve's build proves it necessary. No provider or
+public-network call is permitted in this task.
+
+#### Worker Implementation Record
+
+Changed files:
+
+- `apps/agent/agent/lib/executor/config.ts`: canonical endpoint/config Schemas,
+  sanitized tagged config errors, named endpoint/key loading effects, and the
+  executable ConfigProvider Layer.
+- `apps/agent/agent/connections/executor.ts`: public Eve MCP definition with
+  app principal, runtime-only Redacted bearer conversion, and the exact three
+  tool allowlist.
+- `apps/agent/test/executor-config.test.ts`: injected ConfigProvider coverage
+  for valid, malformed, missing, and redacted configuration.
+- `apps/agent/test/executor-connection.test.ts`: public definition assertions
+  plus isolated child-process import and runtime bearer-adapter proof.
+- `turbo.json`: `BUNDJIL_EXECUTOR_MCP_URL` is supplied to the agent build and
+  test tasks because both execute `eve build`. The API-key name is deliberately
+  absent because build does not resolve it.
+
+| Candidate                                                      | Owner/reason                                    | Concrete call sites                                  | Direct test                              | Decision                                   |
+| -------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------- | ---------------------------------------- | ------------------------------------------ |
+| `ExecutorMcpEndpoint` / config operations                      | App-owned configuration and security boundary.  | `executor.ts` endpoint load and bearer resolver.     | `executor-config.test.ts`.               | Retain in `config.ts`.                     |
+| `ExecutorConfigProviderLayer`                                  | Executable adapter edge only.                   | `executor.ts`.                                       | Build plus connection-definition import. | Retain in `config.ts`; no service wrapper. |
+| `executor.ts` definition                                       | Required public Eve framework boundary.         | Eve discovery and direct definition test.            | `executor-connection.test.ts`.           | Retain.                                    |
+| `runExecutorConnectionSubprocess`                              | Three executable-edge probes with isolated env. | URL-only import, missing-key, and runtime-key proof. | `executor-connection.test.ts`.           | Retain in the direct test only.            |
+| `ExecutorConnectionTestError`                                  | Sanitized typed subprocess failure.             | `runExecutorConnectionSubprocess`.                   | `executor-connection.test.ts`.           | Retain in the direct test only.            |
+| Other helper, mapper, wrapper, service, Layer, factory, barrel | No justified owner or call site.                | None.                                                | Not applicable.                          | Not added.                                 |
+
+Focused evidence with a non-secret synthetic toolkit endpoint:
+
+- `bun run --filter @bundjil/agent check-types`: passed.
+- `bun run --filter @bundjil/agent test`: passed, 12 files and 55 tests.
+- `bun run --filter @bundjil/agent build`: passed without an API key.
+- Isolated subprocess proof imports with URL only, confirms `getToken` fails
+  with the sanitized `loadApiKey` error when absent, then confirms it returns
+  the synthetic child-environment key without emitting it.
+- `bun run check`, `bun run knip`, and `bun run verification`: passed.
+- `jq empty docs/product-specs/executor-mcp-connection.tasks.json` and
+  `git diff --check`: passed.
+- Compiled-output scan found no synthetic secret marker or bearer header.
+
+Task-2 scope correction for parent review: Eve's documented public
+`eve/connections` surface exports a connection definition, not an executable
+connection client or test server. The task therefore adds no in-process MCP
+stub, custom transport, deep runtime import, or scoped server resource.
+Remote exact-tool discovery, bearer/auth failure, malformed/unavailable
+failure, read execution, browser-paused executionId-only resume, and no
+fallback move to the deployed Preview task, which uses `connection_search`
+against the isolated Executor toolkit.
+
+#### Parent Acceptance Audits
+
+1. **Ownership and call graph:** accepted after rejecting the original local
+   stub requirement. Eve 0.20.0 publicly exposes the authored definition but
+   not its runtime MCP client harness, so Bundjil owns only Effect Config and
+   the thin `eve/connections` adapter. The SPEC and ledger now require remote
+   filtering, transport failure, read execution, and browser resume proof in
+   the deployed Preview task rather than admitting a deep import, custom
+   client/server, or second transport boundary.
+2. **Implementation quality and helper admission:** accepted after multiple
+   corrections. The final production code is two modules with named
+   `Effect.fn` config operations, Schema endpoint policy, sanitized tagged
+   errors, Redacted credential handling, one ConfigProvider Layer, and adapter-
+   edge runtime execution. The subprocess proof uses `Match` and Effect v4
+   `Effect.callback` with interruption cleanup; machine-specific execution,
+   discarded output, direct environment reads, Promise wrappers, unnecessary
+   conversions, and a meaningless marker were removed. Every retained helper
+   is in the inventory and owns a tested boundary.
+3. **Verification and evidence:** accepted after parent-focused and root
+   reruns. URL-only import and Eve build pass without an API key; missing-key
+   and supplied-key adapter probes pass without output leakage. Agent
+   typecheck, 55 tests, and build pass. Ultracite/Oxlint report zero findings,
+   Knip is clean, six package typechecks and all 189 repository tests pass,
+   and JSON, diff, changed-file, known-secret, and compiled-output leak scans
+   pass. No provider, model, public-network, or frontend operation occurred.

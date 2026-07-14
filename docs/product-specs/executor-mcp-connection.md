@@ -467,7 +467,8 @@ Layer and service composition must be proportional. Add a `Context.Service`
 and Live/Memory Layers only when Bundjil owns multiple meaningful operations or
 a replaceable resource/provider boundary. Do not wrap Eve's one connection
 definition or a single Config effect in a pass-through service. Tests inject
-`ConfigProvider` and the in-process MCP server at the test edge.
+`ConfigProvider` at the local task-2 edge. Remote MCP behavior is exercised
+only by the deployed Preview proof.
 
 Composable here means each app-owned operation remains an Effect value until a
 real Eve/test/CLI edge executes it, dependencies are supplied once at that
@@ -659,9 +660,12 @@ terminal output. Remove temporary material after each proof.
 Eve does not currently expose a conditional `enabled` field for an authored
 MCP connection. Do not invent an unsupported toggle or point a disabled
 connection at a fake endpoint. Local and CI builds must inject a syntactically
-valid non-secret fixture toolkit URL; tests use an in-process MCP stub. Runtime
-rollback restores the last accepted immutable deployment that predates or
-disables the connection, then revokes the affected Executor key/toolkit.
+valid non-secret fixture toolkit URL. Task 2 adds no test-only MCP client or
+server because Eve 0.20.0 exposes no public executable MCP client or test
+harness; remote transport behavior is proved through the deployed Preview
+task. Runtime rollback restores the last accepted immutable deployment that
+predates or disables the connection, then revokes the affected Executor
+key/toolkit.
 
 ## Call Graphs
 
@@ -716,12 +720,10 @@ Vitest
       -> canonical endpoint/config Schemas
   -> authored executor connection definition
     -> Eve build/normalization
-      -> in-process Streamable HTTP MCP stub
-        -> initialize
-        -> tools/list = skills, execute, resume
-        -> read-only execute fixture
-        -> browser-paused fixture
-        -> resume schema accepts executionId only
+      -> URL-only import succeeds without API key
+      -> isolated runtime getToken fixture
+        -> missing key is a sanitized tagged error
+        -> synthetic key is returned only to Eve's bearer adapter
   -> compiled artifact/log/evidence leak scans
 ```
 
@@ -748,79 +750,38 @@ Vitest
 
 - Accept only HTTPS Executor toolkit URLs with the exact browser elicitation
   mode.
-- Reject root MCP URLs, wrong hosts, HTTP outside an in-process test fixture,
+- Reject root MCP URLs, wrong hosts, HTTP,
   userinfo, fragments, missing/duplicate/wrong elicitation mode, and the legacy
   model-resume query.
 - Prove missing URL and missing key fail closed with sanitized tagged errors.
 - Prove key failures and `Redacted` rendering do not emit a synthetic secret
   marker.
-- Prove the connection is app-scoped and exposes exactly `skills`, `execute`,
-  and `resume`.
-- Prove `eve build` imports the URL but does not resolve or unwrap the key.
+- Prove the connection is app-scoped, exposes exactly `skills`, `execute`, and
+  `resume`, and has no approval callback, custom headers, or fallback path.
+- Prove URL-only import and `eve build` succeed without resolving or unwrapping
+  the key; an isolated executable-edge subprocess proves missing-key
+  sanitization and synthetic-key delivery only to `auth.getToken`.
 - Scan `.output`, `.vercel/output`, test snapshots, and logs for synthetic key,
   authorization, protected URL, and approval URL markers.
 
-### Stub MCP Tests
+### Task 2 Local Boundary
 
-Use an in-process Streamable HTTP MCP stub based on Eve's own test pattern.
-This is test infrastructure, not a production client.
+Task 2 owns only Bundjil configuration and the authored Eve definition. Eve
+0.20.0's documented public `eve/connections` API exposes no executable MCP
+client or test harness, so an in-process MCP server, custom transport, or
+deep runtime import would create an unsupported second client boundary.
 
-The stub server and any `ManagedRuntime` are scoped resources. Acquire and
-release them inside the Effect test program; do not hide mutable servers,
-runtimes, ports, or credentials in module globals or unmatched
-`beforeAll`/`afterAll` hooks:
+No app-owned resource exists in this task; `Effect.acquireRelease` lifecycle
+coverage is therefore not applicable. Tests use `@effect/vitest`, injected
+`ConfigProvider` fixtures, and isolated child-process environment options.
+They do not mutate ambient `process.env`, start a server, choose a port, call
+Executor/Vercel/Sendblue/a model/the public network, or hand-roll JSON-RPC.
 
-```ts
-import { it } from "@effect/vitest";
-import { ConfigProvider, Effect } from "effect";
-
-type ExecutorMcpStub = Readonly<{
-  close: Effect.Effect<void>;
-  syntheticEnvironment: Readonly<Record<string, string>>;
-}>;
-
-declare const startExecutorMcpStub: Effect.Effect<ExecutorMcpStub>;
-declare const verifyExecutorConnection: (
-  stub: ExecutorMcpStub
-) => Effect.Effect<void>;
-
-it.effect("filters and invokes the Executor MCP connection", () =>
-  Effect.acquireRelease(startExecutorMcpStub, (stub) => stub.close).pipe(
-    Effect.flatMap((stub) =>
-      verifyExecutorConnection(stub).pipe(
-        Effect.provide(
-          ConfigProvider.layer(
-            ConfigProvider.fromEnv({ env: stub.syntheticEnvironment })
-          )
-        )
-      )
-    )
-  )
-);
-```
-
-`startExecutorMcpStub` and `verifyExecutorConnection` are illustrative names,
-not pre-approved helpers. Retain them only if they own the server resource and
-multi-assertion harness respectively, appear in the helper-admission inventory,
-and have clearer ownership than an inline test program. Use an ephemeral port,
-deterministic release, and Effect Schema for any test-owned JSON boundary.
-Never mutate ambient `process.env`, hand-roll MCP JSON-RPC, or use raw
-`JSON.stringify`/`JSON.parse` in the harness.
-
-Use `@effect/vitest` for Effect tests and injected deterministic fixtures for
-all unit/integration paths. Unit tests must not call Executor, Vercel,
-Sendblue, a model, or the public network. Live provider proof is explicit,
-secret-safe, Preview-first, and belongs only to the staged live tasks.
-
-- Perform MCP initialization and list the exact three remote tools.
-- Verify Eve applies bearer auth without exposing it to the model-visible
-  result.
-- Verify the allowlist hides a synthetic fourth server tool.
-- Run a deterministic read-only `execute` fixture.
-- Return a browser-paused fixture and prove the model-visible `resume` schema
-  accepts only `executionId` and rejects action/content.
-- Prove malformed MCP responses, auth failures, timeout, and unavailability
-  fail closed without direct-provider fallback.
+Remote tool filtering, bearer/auth failures, malformed/unavailable transport,
+read execution, browser-paused resume input, and no-fallback behavior are
+Eve/Executor runtime responsibilities. The deployed Preview task proves them
+against the isolated toolkit through `connection_search` and real remote tool
+discovery; Bundjil does not mirror those contracts locally.
 
 ### Live Preview Proof
 
@@ -831,7 +792,10 @@ secret-safe, Preview-first, and belongs only to the staged live tasks.
   key using ephemeral mode-0600 material.
 - Deploy a clean pushed SHA and confirm the immutable deployment is Ready.
 - Through an authenticated Eve session, prove `connection_search`, `skills`,
-  and one selected read-only `execute` operation.
+  exact remote `skills`/`execute`/`resume` discovery, and one selected
+  read-only `execute` operation.
+- Prove a sanitized bearer/auth failure plus malformed and unavailable remote
+  MCP failures fail closed without a direct-provider fallback.
 - Temporarily require browser approval for a harmless proof operation. Prove
   the Eve turn pauses, the owner opens the authenticated Executor page,
   approve and decline each work, and `resume` carries only the execution id.
@@ -868,11 +832,12 @@ not authorize Bundjil route/component work.
 
 1. Freeze current Eve and Executor contract evidence and create a sanitized
    inventory of candidate integrations/operations.
-2. Implement Effect config, endpoint policy, the thin Eve connection, stub
-   tests, documentation, and compiled-output leak checks.
+2. Implement Effect config, endpoint policy, the thin Eve connection,
+   executable-edge definition tests, documentation, and compiled-output leak
+   checks.
 3. Create the isolated Preview toolkit/key and target-scoped Vercel variables.
-4. Pass local, stub, direct MCP, deployed Eve, browser approval, Sendblue, log,
-   and leak proof in Preview.
+4. Pass local config/definition, direct MCP, deployed Eve, browser approval,
+   Sendblue, log, and leak proof in Preview.
 5. Create an independent Production toolkit/key from the accepted policy
    intent. Do not reuse Preview identities or copy unreviewed catalog entries.
 6. Deploy Production from the accepted clean SHA, prove one read-only
@@ -932,8 +897,8 @@ Implementation must update:
 - `docs/architecture/effect-patterns.md` only if the implementation proves a
   new reusable adapter/config rule;
 - `docs/architecture/repo-structure.md` with the app-owned connection boundary;
-- `docs/architecture/testing-and-quality.md` with MCP stub/live proof rules if
-  they generalize;
+- `docs/architecture/testing-and-quality.md` with local definition and
+  deployed MCP proof rules if they generalize;
 - this SPEC and its task ledger with accepted evidence and audit passes; and
 - an active execution plan under `docs/exec-plans/active/` only when
   implementation starts, archived after acceptance.
@@ -961,8 +926,9 @@ Every implementation task must complete at least three parent review passes:
    concurrency, automatic `execute`/`resume` retry, or helper sprawl. Record
    the helper-admission table and remove every candidate without accepted
    ownership, call sites, and direct tests.
-3. **Verification and evidence:** review focused tests, Eve build, MCP stub,
-   direct HTTP, browser approval, Sendblue, deployment, logs, leak scans,
+3. **Verification and evidence:** review focused tests, Eve build, task-owned
+   config/definition evidence, deployed MCP/direct HTTP, browser approval,
+   Sendblue, deployment, logs, leak scans,
    documentation, rollback evidence, zero-warning Ultracite/Oxlint, strict
    typechecks, Effect language-service diagnostics, Knip, and proof that no
    lint/type/test/configuration escape was introduced.

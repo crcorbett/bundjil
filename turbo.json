@@ -12,6 +12,7 @@
       "env": [
         "BUNDJIL_AGENT_MODEL_PROVIDER",
         "BUNDJIL_AGENT_MODEL",
+        "BUNDJIL_EXECUTOR_MCP_URL",
         "BUNDJIL_CODEX_PROXY_BASE_URL",
         "BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS",
         "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
@@ -30,6 +31,9 @@
         "BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS",
         "BUNDJIL_SENDBLUE_ALLOWED_SERVICES"
       ]
+    },
+    "@bundjil/agent#test": {
+      "env": ["BUNDJIL_EXECUTOR_MCP_URL"]
     },
     "dev": {
       "cache": false,
