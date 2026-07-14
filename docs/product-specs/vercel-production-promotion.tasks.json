@@ -42,7 +42,14 @@
     {
       "id": "revalidate-clean-codex-preview-baseline",
       "title": "Revalidate the clean combined Codex Preview baseline",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "recoveryEvidence": [
+        "2026-07-14 recovery replaced only Preview runtime cipher entries with a newly generated sensitive BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY and BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID, updated encrypted Preview proof-only copies, and moved BUNDJIL_UPSTASH_REDIS_KEY_PREFIX to a new isolated Preview namespace. No values were printed or written to tracked paths; BUNDJIL_CODEX_PROXY_MODE remained live and deployed proof mode was not enabled.",
+        "Trusted-local subscription provisioning and canonical stored-profile proof passed for the isolated Preview namespace: found, V2 envelope, ciphertext present, subscription profile, refresh capable, valid expiry, no reauthentication marker, and no plaintext marker leak were all true.",
+        "Immutable Preview proxy deployment dpl_BhiCBKKW4Ti4PZ5AA2Ukpv3uD3n5 and agent deployment dpl_CDuXrTdnGaiFKvSCo7nBreZ5aAYa are READY with source SHA f3a7d9c53b70de7b7772415bfef4bf8151446af3. Proxy proof passed health 200/live/ready, missing and invalid bearer 401, authenticated SSE 200 with two data lines and completion, plus false leak predicates. Staged refresh/fence proof returned all seven approved booleans true.",
+        "Protected Preview agent evidence: anonymous info returned 401; a fresh Vercel OIDC bearer plus a Preview-only automation bypass reached info 200 and a minimal session 202. The corresponding startIndex=0 replay returned 200 in sanitized runtime logs and the first session correlates to exactly one later proxy POST /v1/chat/completions 200. Parent replayed both existing session streams from startIndex=0: each produced exactly one of session.started, turn.started, message.received, step.started, message.appended, message.completed, step.completed, turn.completed, and session.waiting; reachesWaiting=true and reachesFailure=false. Curl timed out only because the durable stream remains open after waiting. The parent revoked the temporary Preview automation bypass through the Vercel protection-bypass API; four pre-existing bypass records remain unchanged. Local temporary files were removed. No Production state changed."
+      ],
       "dependsOn": [],
       "description": "From one clean pushed SHA, deploy proxy then agent to Preview using encrypted target-scoped variables only and establish a new, correlated Eve-to-live-proxy baseline. This task does not mutate Production.",
       "implementationNotes": [
@@ -64,8 +71,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified both READY Preview deployments resolve to pushed SHA f3a7d9c, the agent references the accepted immutable proxy, the proxy remains live with the package-owned encrypted profile/refresh/lock/fence layers, and Vercel metadata shows no Production Bundjil variable, deployment, alias, storage, profile, webhook, or Sendblue mutation.",
+          "Parent pass 2 - implementation quality: reviewed the operational diff and existing proof programs against Effect ownership rules. No runtime source changed; trusted-local login, stored-profile, staged-refresh, proxy, and Eve boundaries continue to use Config, Redacted, Schema, Layer, Effect.gen/Effect.fn, and tagged errors without DTO mirrors, unsafe casts, manual JSON, or helper sprawl. Build warnings were classified: all five agent model-provider inputs were admitted by @bundjil/agent#build; warnings belonged to unrelated Marketplace aliases or upstream packages that must not receive app secrets.",
+          "Parent pass 3 - verification and evidence: focused package checks and bun run verification passed; build logs show successful Effect language-service patching and READY deployments; proxy health/auth/SSE, stored-profile ciphertext, staged refresh/fencing, anonymous rejection, protected info/session, nine-event startIndex=0 replay through session.waiting, exact proxy correlation, and leak predicates passed. The temporary Preview bypass was revoked and only sanitized identifiers/statuses/counts are recorded."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -44,6 +44,63 @@ data, PII, or protected URLs.
   `bundjil-codex-proxy.vercel.app` and `bundjil-agent.vercel.app`; the agent has
   Vercel SSO protection for Production deployment URLs and all Previews.
 
+## Reopened Preview Evidence
+
+### 2026-07-14 `revalidate-clean-codex-preview-baseline`
+
+- Recovered the former local-proof blocker with a newly generated Preview
+  cipher/key id, encrypted proof-only copies, and a new isolated Preview
+  Upstash namespace. The runtime cipher entries are sensitive; the proof-only
+  copies are encrypted and were mapped to canonical names only in a mode-`0600`
+  untracked local file. `BUNDJIL_CODEX_PROXY_MODE` remained `live`; deployed
+  proof mode was not enabled.
+- Trusted-local subscription provisioning and `proof:stored-profile` passed:
+  V2 ciphertext envelope, subscription/refresh capability, valid expiry, no
+  reauthentication marker, and no plaintext marker leak. No values, callback
+  material, profile data, or tracked env files were emitted.
+- From detached clean worktrees at
+  `f3a7d9c53b70de7b7772415bfef4bf8151446af3`, Preview proxy deployment
+  `dpl_BhiCBKKW4Ti4PZ5AA2Ukpv3uD3n5` and agent deployment
+  `dpl_CDuXrTdnGaiFKvSCo7nBreZ5aAYa` are both `READY` with matching source
+  metadata. The agent's encrypted Preview proxy-base variable references the
+  accepted immutable proxy deployment.
+- The proxy proof passed health `200` in `live`/ready mode, missing and invalid
+  bearer `401`, authenticated SSE `200` with two data lines and completion, and
+  all leak predicates false. The staged refresh/fence proof passed its seven
+  approved booleans, including concurrent authenticated success, final revision
+  change, final valid expiry, and completed SSE responses.
+- Anonymous agent info was `401`; fresh Vercel OIDC plus a Preview-only
+  automation protection bypass produced protected info `200`, minimal session
+  `202`, and `startIndex=0` stream `200`. The first session has exactly one
+  subsequent proxy completion `200` in the sanitized runtime log. Parent
+  replayed both existing session streams from `startIndex=0`: each produced
+  exactly one event of each kind: `session.started`, `turn.started`,
+  `message.received`, `step.started`, `message.appended`, `message.completed`,
+  `step.completed`, `turn.completed`, and `session.waiting`.
+  `reachesWaiting=true`; `reachesFailure=false`. Curl timed out only because
+  the durable stream remains open after waiting. The parent revoked the
+  temporary Preview automation bypass through the Vercel protection-bypass
+  API; four pre-existing bypass records remain unchanged. Local temporary files
+  and the detached worktree were removed. No Production state, Sendblue
+  setting, or Production variable changed.
+
+Parent acceptance audits:
+
+1. Ownership and call graph: both READY deployments resolve to pushed SHA
+   `f3a7d9c`; the agent references the immutable proxy; the live proxy retains
+   package-owned encrypted profile, refresh, lock, and fence ownership; Vercel
+   metadata proves no Production Bundjil mutation.
+2. Implementation quality: no runtime source changed. Existing proofs retain
+   Effect `Config`, `Redacted`, `Schema`, `Layer`, flat `Effect.gen`/`Effect.fn`,
+   and tagged-error boundaries without DTO mirrors, unsafe casts, manual JSON,
+   or helper sprawl. The agent build admitted all five model-provider inputs;
+   remaining Turbo warnings concern unrelated Marketplace aliases or upstream
+   packages that must not receive app secrets.
+3. Verification and evidence: focused checks and `bun run verification`
+   passed. Build, ciphertext, refresh/fence, proxy auth/SSE, Eve auth/session,
+   nine-event replay, exact correlation, leak predicates, and temporary-bypass
+   cleanup passed with sanitized evidence only. Task accepted 2026-07-14.
+
 ## Ordered Tasks
 
 1. `revalidate-clean-codex-preview-baseline`: no Production mutation; establish
