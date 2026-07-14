@@ -128,6 +128,39 @@ Each task must finish three parent audits before acceptance:
    `.pipe(...)` error handling, and helper admission;
 3. verification coverage and evidence hygiene.
 
+## Accepted Implementation Evidence
+
+### 2026-07-14 `implement-production-preflight-and-eve-auth`
+
+- Added the explicit app-owned Eve policy `vercelOidc(), localDev()` and a
+  read-only `apps/agent` snapshot command. The command accepts only a
+  mode-`0600` local metadata file, Schema-decodes a minimal sanitized
+  projection, and emits Schema-encoded go/no-go evidence. It has no Vercel
+  mutation, deployment, alias, variable, storage, or profile capability.
+- Focused agent checks passed: typecheck; 45 tests; and build. The auth tests
+  cover a mocked Vercel OIDC bearer accepted for the linked agent project,
+  anonymous deployed rejection, and loopback-only `localDev()` behavior.
+  Direct local HTTP evidence: loopback `GET /eve/v1/info` returned `200`; the
+  same request with deployed agent host and no bearer returned `401`.
+- Focused proxy checks passed: 21 tests and mock smoke health/SSE evidence
+  (`200`, `200`, five stream lines). `bun run verification` passed. No
+  Production state was changed.
+- Parent pass 1, ownership and call graph: accepted the explicit policy in the
+  app-owned Eve channel, the app-owned preflight contract/operation, and the
+  ConfigProvider/FileSystem/Effect.runPromise executable edge. The preflight
+  has no Vercel mutation, deployment, alias, storage, or profile capability.
+- Parent pass 2, implementation quality: accepted flat `Effect.fn`/`Effect.gen`,
+  Schema-derived contracts and JSON encoding, tagged error translation, and
+  the two policy-owning helpers. Parent review corrected Vercel variable
+  metadata to admit `sensitive` only where security policy permits it and added
+  plain-text-secret rejection coverage. No raw JSON, `process.env`, unsafe
+  cast, provider DTO mirror, nested generator, or helper sprawl remains.
+- Parent pass 3, verification and evidence: the mode-`0600` CLI fixture emitted
+  only Schema-encoded `go: true` evidence; agent typecheck/build/45 tests,
+  proxy 21 tests/private-route proof, root lint/format, knip, all workspace
+  typechecks/tests, `bun run verification`, `jq empty`, and `git diff --check`
+  passed. The task is accepted with no Production state mutation.
+
 ## Call Graphs
 
 ### Production

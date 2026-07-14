@@ -14,11 +14,13 @@
     "dev:no-ui": "eve dev --no-ui",
     "build": "eve build",
     "check-types": "tsc --noEmit",
+    "preflight:production": "bun scripts/production-preflight.ts",
     "test": "eve build && vitest run"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
     "@bundjil/eve-effect": "workspace:*",
+    "@effect/platform-bun": "catalog:effect",
     "@upstash/redis": "^1.38.0",
     "ai": "^7.0.16",
     "effect": "catalog:effect",
@@ -28,6 +30,7 @@
     "@bundjil/core": "workspace:*",
     "@effect/vitest": "catalog:effect",
     "@types/bun": "^1.3.14",
+    "jose": "6.2.3",
     "typescript": "catalog:typescript",
     "vitest": "catalog:testing"
   }

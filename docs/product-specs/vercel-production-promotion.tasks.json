@@ -83,7 +83,13 @@
     {
       "id": "implement-production-preflight-and-eve-auth",
       "title": "Implement read-only Production preflight and explicit Eve auth",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "The agent now owns an explicit Eve channel policy with Vercel OIDC first and localhost-only localDev fallback. Tests prove a valid linked-project OIDC bearer is accepted, an anonymous deployed caller is rejected, and localDev does not authorize a deployed host.",
+        "The app-owned read-only preflight consumes only a mode-0600 sanitized metadata snapshot, validates personal scope, stable domains, Production-target variable names and security types, live proxy mode, Eve auth, Deployment Protection, disjoint opaque identity fingerprints, and rollback references, then emits only Effect Schema-encoded go/no-go evidence. It has no mutation, deployment, alias, variable-write, storage-provisioning, or profile-write capability.",
+        "Parent review corrected the variable policy to understand Vercel sensitive metadata and to reject plain-text bearer, cipher, and Upstash credential bindings. The positive CLI fixture emitted go true with no rejected checks; focused agent typecheck and 45 tests passed; the proxy retained 21 passing tests and its private route behavior; bun run verification, jq empty, and git diff --check passed. No Production state changed."
+      ],
       "dependsOn": ["revalidate-clean-codex-preview-baseline"],
       "description": "Add a schema-backed, read-only Production preflight and explicit deployed Eve authentication before any Production mutation.",
       "implementationNotes": [
@@ -103,8 +109,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified the explicit Eve policy remains in apps/agent/agent/channels/eve.ts, the preflight contract and operation remain app-owned, and the executable edge owns ConfigProvider, FileSystem, and Effect.runPromise. The domain operation imports only the owning AgentModelProviderMode contract and cannot call Vercel mutation, deployment, alias, storage, or profile APIs.",
+          "Parent pass 2 - implementation quality: reviewed the complete diff for flat Effect.fn/Effect.gen control flow, Config and Effect Platform FileSystem use, Schema-derived input/output and Schema JSON encoding, URL decoding, tagged error translation, and helper admission. The identity comparison and variable-policy functions each own a non-trivial directly tested policy. Removed the discovered metadata mismatch by admitting Vercel sensitive bindings only at explicitly allowed variables and rejecting plain secret downgrades. No process.env access, raw JSON helpers, unsafe cast, DTO mirror, manual provider reader, nested Effect.gen, or helper sprawl remains.",
+          "Parent pass 3 - verification and evidence: agent typecheck, Eve build, 45 tests, root lint/format, knip, all workspace typechecks/tests, bun run verification, jq empty, and git diff --check passed. The mode-0600 CLI fixture emitted Schema-encoded go true evidence; tests cover positive personal scope, wrong target/scope/read-only decoding, wrong projects/host/mode/provider, missing auth/protection/bindings/rollback, shared identity, and plain-text secret rejection. Worker direct HTTP evidence retained loopback info 200 and anonymous deployed-host 401; proxy health/private-route tests remain green."
+        ]
       },
       "commitAfterPassing": true
     },

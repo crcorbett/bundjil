@@ -5,6 +5,7 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 ## What Lives Here
 
 - `agent/agent.ts`: root Eve definition.
+- `agent/channels/eve.ts`: explicit Vercel OIDC route policy with localhost-only development fallback.
 - `agent/config.ts`: app-owned runtime config. The model is loaded through Effect
   `Config`, `ConfigProvider.fromEnv()`, and Effect Schema.
 - `agent/model-provider.ts`: app-owned provider selector. It keeps AI Gateway
@@ -72,6 +73,31 @@ Default Eve channel routes:
 - `POST /eve/v1/session`
 - `POST /eve/v1/session/:sessionId`
 - `GET /eve/v1/session/:sessionId/stream`
+
+`/eve/v1/session*` routes require Vercel OIDC when deployed. `localDev()` is
+the final fallback for loopback development only; anonymous deployed callers
+are rejected. `GET /eve/v1/health` remains the public Eve health probe.
+
+## Production Preflight
+
+The read-only promotion gate consumes a mode-`0600`, ignored Vercel metadata
+snapshot produced by a read-only operator adapter. It accepts only the minimal
+project/scope/domain, target-bound variable name/security type, route-protection,
+mode, opaque identity-fingerprint, and rollback-reference fields. It does not
+read values and cannot deploy, alias, set variables, provision storage, or
+write profiles.
+
+```bash
+BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT=.local/production-preflight.json \
+  bun run --filter @bundjil/agent preflight:production
+```
+
+It emits only Schema-encoded sanitized go/no-go evidence. A non-`0600` file,
+non-read-only adapter, non-Production variable target, plain-text secret,
+Preview/branch proxy host, mock/local mode, missing auth/protection, shared
+derived identity, or missing rollback reference fails closed. Write-only
+Vercel `sensitive` variables are required for the bearer, cipher key, and
+Upstash credentials; only non-secret identifiers may remain `plain`.
 
 Useful local probes:
 
