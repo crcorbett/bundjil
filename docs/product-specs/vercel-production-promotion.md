@@ -67,35 +67,52 @@ proof.
 | Eve access                | current Preview state                       | Deployment Protection plus explicit Vercel OIDC; `localDev()` only locally |
 | Sendblue                  | accepted Preview-only configuration         | disabled until its final task passes                                       |
 
-The production preflight must prove names, target assignment, stable host,
-project/scope, and disjoint derived key identities without printing values,
-profile material, URLs carrying bypasses, or raw provider output. A Marketplace
-binding is not evidence of environment isolation by itself.
+Preflight is staged. Every checkpoint decodes only the minimum sanitized
+metadata that exists at that point and fails closed; a later checkpoint cannot
+be substituted for an earlier one. No checkpoint prints values, profile
+material, URLs carrying bypasses, or raw provider output. A Marketplace binding
+is not evidence of environment isolation by itself.
+
+| Checkpoint                        | When it runs                                                     | Required proof                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `before-first-mutation`           | Before Production provisioning                                   | Granted approval; personal scope; exact linked projects and stable domains; Deployment Protection posture; clean pushed source SHA; known, expected absence of Bundjil Production activation; no Preview identity reuse; read-only inventory. It must not require future variables, profiles, aliases, or deployments.                                                              |
+| `proxy-provisioned`               | After proxy credential/profile provisioning, before proxy deploy | `before-first-mutation` facts plus required proxy Production variable names and security types, `live` mode, independent opaque proxy/profile/namespace/lock/fence identities, encrypted stored-profile proof, and no Preview reuse. It does not require a stable proxy URL or accepted deployment reference.                                                                       |
+| `proxy-accepted-agent-configured` | After accepted proxy and agent variables, before agent deploy    | `proxy-provisioned` facts plus the stable proxy URL resolving to the accepted immutable proxy deployment, required agent Production variable names and security types, independent bearer identity, Deployment Protection, and explicit Eve OIDC with no deployed `localDev()` or anonymous fallback. It does not require an accepted agent deployment or agent rollback reference. |
+| `agent-accepted-rollback-ready`   | After accepted agent deployment and rollback references          | `proxy-accepted-agent-configured` facts plus immutable accepted agent deployment/source/config evidence and accepted current/previous rollback references for the proxy and agent.                                                                                                                                                                                                  |
+| `sendblue-final-promotion`        | Immediately before Sendblue Production enablement                | `agent-accepted-rollback-ready` facts, completed soak and rollback drill, and proof that Sendblue Production remains unactivated until this final task. Sendblue-specific variables, ingress, delivery, and replay proof are created and accepted only in this task.                                                                                                                |
 
 ## Required Production Sequence
 
 1. Revalidate a clean encrypted-variable Preview proxy-to-agent baseline from
    one pushed SHA. No Production target changes occur here.
-2. Add and prove the explicit Eve auth policy and a read-only Production
-   preflight. It must fail closed on missing/mis-scoped variables, Preview or
-   branch proxy URLs, non-`live` mode, missing protection, or missing rollback
-   references.
-3. Provision isolated Upstash/profile/lock/fence namespaces, an independent
+2. Add and prove the explicit Eve auth policy and read-only preflight baseline.
+   Its accepted historical evidence remains intact; it does not authorize a
+   checkpoint to require resources that have not yet been created.
+3. Add staged-preflight support before provisioning. Define Schema-backed
+   checkpoint inputs/results and tests for stage-specific missing and forbidden
+   fields, while retaining fail-closed read-only behavior and the existing
+   accepted history.
+4. Run `before-first-mutation`, then provision isolated
+   Upstash/profile/lock/fence namespaces, an independent
    bearer and cipher/key id, and the separate trusted-local OAuth profile.
    The browser, PKCE values, callback, authorization code, and plaintext token
    stay in the package-owned local command boundary.
-4. Deploy and prove the Production proxy before assigning/accepting its stable
+5. Run `proxy-provisioned`, then deploy and prove the Production proxy before
+   assigning/accepting its stable
    alias. Prove health, `401` for missing/invalid bearer, authenticated SSE
    `200` with the expected content type, encrypted readback, refresh/fencing
    readiness, and sanitized logs.
-5. Configure and deploy the Production agent only with that stable proxy URL
-   and its independent bearer. Prove protected Eve info, one minimal session,
+6. Configure the Production agent only with that stable proxy URL and its
+   independent bearer, run `proxy-accepted-agent-configured`, then deploy the
+   agent. Prove protected Eve info, one minimal session,
    stream replay from `startIndex=0`, and exactly one correlated proxy request.
-6. Observe the defined soak window, validate monitoring, and run the ordered
-   rollback drill. Do not roll a successful fenced profile generation backward.
-7. Only then configure and prove Sendblue Production ingress. Its Vercel bypass
-   is platform-only; the independent `sb-signing-secret` route authentication,
-   allowlist, and replay protection remain required.
+7. Run `agent-accepted-rollback-ready`, observe the defined soak window,
+   validate monitoring, and run the ordered rollback drill. Do not roll a
+   successful fenced profile generation backward.
+8. Run `sendblue-final-promotion` only then configure and prove Sendblue
+   Production ingress. Its Vercel bypass is platform-only; the independent
+   `sb-signing-secret` route authentication, allowlist, and replay protection
+   remain required.
 
 No CLI `--env`/`--build-env`, shell-injected secret, tracked pulled env file,
 or stale prebuilt output may participate in deployment. Vercel variables remain

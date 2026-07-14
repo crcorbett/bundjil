@@ -103,22 +103,28 @@ Parent acceptance audits:
 
 ## Ordered Tasks
 
-1. `revalidate-clean-codex-preview-baseline`: no Production mutation; establish
-   one clean SHA's correlated Preview proxy and Eve proof.
-2. `implement-production-preflight-and-eve-auth`: add explicit Eve auth and a
-   read-only, Schema-backed go/no-go check for target/scope/isolation/protection.
-3. `provision-isolated-production-profile`: use granted approval to provision
-   separate Upstash/profile/lock/fence identity, bearer, cipher, and
-   trusted-local OAuth profile with encrypted readback evidence.
-4. `deploy-and-accept-production-proxy`: deploy and prove the private live
-   proxy, then accept its stable alias before agent changes.
-5. `deploy-and-prove-production-agent`: deploy against that alias and correlate
-   a protected minimal Eve session to one proxy request.
-6. `soak-monitor-and-drill-rollback`: validate no-content monitoring and
-   execute the ordered rollback drill without profile rollback.
-7. `enable-sendblue-production-last`: only after soak/rollback, independently
-   configure and prove the existing Preview-proved Sendblue channel.
-8. `reconcile-production-documentation`: reconcile all durable status language
+1. `revalidate-clean-codex-preview-baseline`: completed; no Production mutation
+   and one clean SHA's correlated Preview proxy and Eve proof.
+2. `implement-production-preflight-and-eve-auth`: completed historical baseline
+   for explicit Eve auth and a read-only Schema-backed command. Its accepted
+   evidence and three audit passes are not rewritten.
+3. `implement-staged-production-preflight-checkpoints`: serial support before
+   provisioning. Add read-only Schema-backed checkpoints and stage-specific
+   missing/forbidden-field tests without mutation capability or helper sprawl.
+4. `provision-isolated-production-profile`: first run
+   `before-first-mutation`, then provision separate Upstash/profile/lock/fence
+   identity, bearer, cipher, and trusted-local OAuth profile.
+5. `deploy-and-accept-production-proxy`: first run `proxy-provisioned`, then
+   deploy and prove the private live proxy and accept its stable alias.
+6. `deploy-and-prove-production-agent`: configure accepted agent variables,
+   run `proxy-accepted-agent-configured`, then deploy and correlate a protected
+   minimal Eve session to one proxy request.
+7. `soak-monitor-and-drill-rollback`: run
+   `agent-accepted-rollback-ready`, validate no-content monitoring, and execute
+   the ordered rollback drill without profile rollback.
+8. `enable-sendblue-production-last`: run `sendblue-final-promotion` only after
+   soak/rollback, then independently configure and prove Sendblue.
+9. `reconcile-production-documentation`: reconcile all durable status language
    and final sanitized evidence.
 
 Each task must finish three parent audits before acceptance:
@@ -160,6 +166,58 @@ Each task must finish three parent audits before acceptance:
   proxy 21 tests/private-route proof, root lint/format, knip, all workspace
   typechecks/tests, `bun run verification`, `jq empty`, and `git diff --check`
   passed. The task is accepted with no Production state mutation.
+
+### 2026-07-14 `provision-isolated-production-profile` preflight
+
+- Read-only personal-scope Vercel metadata preflight is blocked before the
+  first Production mutation. The linked proxy project is
+  `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB` under
+  `team_1LX7ZujbijowTv8J9k0aU7nD`; the agent project is also under that
+  personal scope.
+- The proxy has only Marketplace Upstash aliases in the Production target; all
+  required Bundjil proxy bindings remain Preview-only. The agent has no
+  Production Bundjil bindings. This task cannot repair the agent condition
+  because its approved scope excludes agent Production variables.
+- No independent Production bearer, cipher/key id, subject/profile identity,
+  namespace, encrypted profile, lock/fence proof, deployment, alias, or
+  Sendblue configuration was created or changed. The task remains fail-closed
+  pending a scope-compatible preflight that can establish every prerequisite.
+
+This blocker is preserved as accepted read-only inventory evidence. It exposed
+a circular gate rather than a provisioning failure: the prior full preflight
+required agent variables owned later by the agent task, proxy variables owned
+by this task, and accepted rollback deployments owned by later deployment
+tasks. The new serial staged-preflight task resolves that ordering without
+changing this evidence, its status, or any accepted audit count.
+
+## Staged Checkpoints
+
+The preflight remains read-only and fail closed. Checkpoints consume only
+sanitized metadata and may never print values, raw Vercel output, protected
+URLs, profiles, or credentials.
+
+1. `before-first-mutation`: granted approval, personal scope, exact projects and
+   stable domains, Deployment Protection posture, clean pushed source SHA,
+   expected absence of Bundjil Production activation, no Preview identity reuse,
+   and read-only inventory. Future variables, profile state, aliases, and
+   deployment/rollback references are forbidden inputs.
+2. `proxy-provisioned`: after provision and before proxy deploy, require proxy
+   Production variable names/security types, `live` mode, disjoint opaque
+   identities, and encrypted stored-profile proof. Stable proxy URL and
+   immutable deployment references are forbidden inputs.
+3. `proxy-accepted-agent-configured`: after proxy acceptance and agent variable
+   configuration, require the stable proxy URL resolving to the accepted
+   immutable proxy, agent Production variable names/security types, independent
+   bearer identity, Deployment Protection, and Eve OIDC with no deployed
+   local/anonymous fallback. Agent deployment and rollback references are not
+   required yet.
+4. `agent-accepted-rollback-ready`: after agent acceptance, require immutable
+   agent source/config/deployment evidence and current/previous accepted
+   rollback references for both apps.
+5. `sendblue-final-promotion`: immediately before final Sendblue enablement,
+   require the preceding checkpoint, completed soak/rollback proof, and known
+   unactivated Sendblue Production state. Sendblue-specific variables, ingress,
+   provider delivery, and replay proof remain final-task work.
 
 ## Call Graphs
 

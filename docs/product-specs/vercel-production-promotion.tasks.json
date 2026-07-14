@@ -13,6 +13,7 @@
     "The completed Sendblue Preview proof is retained as Preview-only evidence; Sendblue Production enablement is the final task.",
     "Trusted-local OAuth owns browser/PKCE/callback/plaintext-token handling; Vercel receives only encrypted profile material and exposes no OAuth route.",
     "Production uses Deployment Protection, explicit Eve Vercel OIDC authentication, and the proxy's separate internal bearer boundary.",
+    "Preflight is staged and read-only: each checkpoint requires only the sanitized facts that its preceding tasks can truthfully establish; missing, premature, or forbidden fields fail closed.",
     "Evidence is sanitized: no values, prompt/output, PII, raw profile/ciphertext, headers, or protected URLs are committed.",
     "Commit and push every accepted coherent slice before a deployment consumes it; deployment evidence must reference a clean pushed source revision."
   ],
@@ -119,10 +120,38 @@
       "commitAfterPassing": true
     },
     {
+      "id": "implement-staged-production-preflight-checkpoints",
+      "title": "Implement staged read-only Production preflight checkpoints",
+      "status": "pending",
+      "dependsOn": ["implement-production-preflight-and-eve-auth"],
+      "description": "Extend the accepted app-owned preflight with ordered Schema-backed checkpoints without altering accepted task history or granting mutation capability.",
+      "implementationNotes": [
+        "Keep the command and contracts app-owned at the CLI boundary. Reuse AgentModelProviderConfig, CodexProxyConfig, CodexOAuthSubject, and existing tagged errors; do not add Vercel/profile DTO mirrors or a generic preflight helper layer.",
+        "Define before-first-mutation for approval, personal scope, exact projects/stable domains, Deployment Protection posture, clean pushed SHA, expected absence of Bundjil Production activation, no Preview identity reuse, and read-only inventory only. Future bindings, profiles, aliases, and deployments are forbidden at this stage.",
+        "Define proxy-provisioned, proxy-accepted-agent-configured, agent-accepted-rollback-ready, and sendblue-final-promotion so variable security types, live mode, stable proxy URL, disjoint opaque identities, Eve OIDC, accepted immutable deployments/rollback references, and Sendblue-last controls enter only when their owner has established them.",
+        "Tests must prove every stage rejects missing required fields and rejects fields that are premature for that stage, as well as wrong target/scope, Preview identity reuse, plain secret downgrade, stale host, wrong mode, missing protection/OIDC, and invalid immutable references. Encode only sanitized results."
+      ],
+      "mandatoryVerification": [
+        "Verify flat meaningful Effect.gen/Effect.fn flow; expected typed errors are handled in .pipe(...) with catchTag, catchTags, or mapError; contracts are canonical Effect Schema-derived; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON helpers, or trivial wrapper/helper sprawl.",
+        "Tests cover each stage's allowed, missing, and forbidden fields and prove the operation remains read-only with no Vercel mutation, deployment, alias, variable-write, storage-provisioning, or profile-write capability.",
+        "Run focused agent checks, direct CLI evidence from a mode-0600 fixture, jq validation, git diff --check, and the global verification gate."
+      ],
+      "completionCriteria": [
+        "The command emits Schema-encoded sanitized go/no-go evidence for each ordered checkpoint without circular future-resource requirements.",
+        "The active plan and ledger record three new parent audit passes; accepted task evidence and audit pass counts remain unchanged."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "provision-isolated-production-profile",
       "title": "Provision isolated Production storage, credentials, and OAuth profile",
       "status": "pending",
-      "dependsOn": ["implement-production-preflight-and-eve-auth"],
+      "dependsOn": ["implement-staged-production-preflight-checkpoints"],
       "description": "Use granted approval to create and prove the isolated Production Upstash/profile/lock/fence boundary, bearer, cipher/key id, subject, and trusted-local refresh-capable profile.",
       "implementationNotes": [
         "Confirm a Production Upstash binding and namespace independently of Preview. Prove disjoint derived profile, refresh-lock, and fenced-commit identities without emitting keys or values.",
@@ -131,7 +160,7 @@
         "Record only approved encrypted-envelope/proof booleans, profile variant, generation/revision category, expiry horizon category, and cipher key id. Preserve the newest fenced generation; do not invent a downgrade path."
       ],
       "mandatoryVerification": [
-        "Verify the ledger's granted approval before the first Production mutation and stop on any failed preflight condition.",
+        "Run the before-first-mutation checkpoint before the first Production mutation. It must verify granted approval, personal scope, exact projects/stable domains, Deployment Protection posture, clean pushed SHA, expected absence of Bundjil Production activation, no Preview identity reuse, and read-only inventory without requiring future variables or deployments.",
         "Verify flat meaningful Effect.gen/Effect.fn flow; expected typed errors are handled in .pipe(...) with catchTag, catchTags, or mapError; contracts are canonical Effect Schema-derived; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON helpers, or trivial wrapper/helper sprawl.",
         "Prove isolation, encrypted write/read, plaintext-marker absence, refresh readiness, lock/fence behavior, and sanitized failures with package tests plus the global verification gate."
       ],
@@ -155,7 +184,8 @@
       "implementationNotes": [
         "Use encrypted Production variables only. Reject mock/local mode, Preview host, API-key/Gateway fallback, wrong scope, or public completion access.",
         "Prove health/readiness, missing and invalid bearer 401, authenticated SSE 200/content type, encrypted profile/readiness, refresh/fencing, clean logs, and alias-to-immutable-deployment resolution.",
-        "Record current and previous accepted immutable deployment ids and configuration version references for rollback, without secret values."
+        "Run the proxy-provisioned checkpoint before deployment: require proxy Production variable names/security types, live mode, disjoint opaque identities, and encrypted profile proof, but forbid requiring a stable proxy URL or accepted deployment reference until this task establishes it.",
+        "Record current and previous accepted immutable proxy deployment ids and configuration version references for rollback, without secret values."
       ],
       "mandatoryVerification": [
         "No Production agent variable or deployment changes occur before this task is accepted.",
@@ -181,6 +211,7 @@
       "description": "Configure the agent Production target with the accepted stable proxy alias and independent bearer, then prove a protected minimal Eve session through the Production proxy.",
       "implementationNotes": [
         "Use encrypted Production variables only and confirm the scoped Turbo environment includes required model-provider inputs.",
+        "Configure the accepted agent Production variables before deploying, then run proxy-accepted-agent-configured: require the stable proxy URL resolving to the accepted immutable proxy, agent variable names/security types, independent bearer identity, Deployment Protection, and explicit Eve OIDC. Do not require an accepted agent deployment or agent rollback reference yet.",
         "Use fresh Vercel OIDC for Eve info, create a minimal non-sensitive session, replay from startIndex=0 to a terminal state, and correlate exactly one proxy completion.",
         "Reject anonymous Eve access, Gateway/mock/Preview fallback, stale proxy alias, and mismatched agent/proxy SHA/configuration evidence."
       ],
@@ -207,6 +238,7 @@
       "dependsOn": ["deploy-and-prove-production-agent"],
       "description": "Observe the Production release, validate sanitized signals and alerts, and execute the ordered rollback drill without profile-generation downgrade.",
       "implementationNotes": [
+        "Run agent-accepted-rollback-ready after recording the accepted agent deployment and immutable current/previous rollback references for both apps; it must fail closed before soak if either reference is absent or mismatched.",
         "Monitor deployment/source identity, mode/host/scope, health/completion status and latency, Eve terminal events, refresh/401/lock/fence/Upstash outcomes, and auth rejection rates.",
         "Exclude prompts, outputs, headers, tokens, raw profile/ciphertext, PII, and bypass URLs from telemetry and evidence.",
         "Drill disable external traffic, restore agent and matching configuration, restore proxy, preserve newest fenced profile generation, and rerun the minimal protected session proof. Document rotation/re-login separately."
@@ -234,6 +266,7 @@
       "dependsOn": ["soak-monitor-and-drill-rollback"],
       "description": "Promote the already Preview-proved Sendblue channel only after the Production platform has passed soak and rollback gates.",
       "implementationNotes": [
+        "Run sendblue-final-promotion immediately before the first Sendblue Production mutation. It requires accepted agent/rollback evidence, completed soak/rollback proof, and known unactivated Sendblue Production state; Sendblue-specific configuration and proof remain owned by this task.",
         "Use the accepted Preview route/status/replay evidence as implementation baseline, not as Production proof. Provision independent Production Sendblue and replay-store configuration only now.",
         "Keep Vercel protection bypass distinct from the independent sb-signing-secret route authentication. Preserve allowlist, opaque routing, atomic owner-fenced replay claims, and fail-closed storage behavior.",
         "Prove the Production route matrix, one allowlisted inbound-to-delivered outbound path, sequential/concurrent replay suppression, clean logs, and disable/rollback procedure without recording content, number, handle, webhook URL, or credentials."
