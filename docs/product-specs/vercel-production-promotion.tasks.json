@@ -160,12 +160,18 @@
     {
       "id": "provision-isolated-production-profile",
       "title": "Provision isolated Production storage, credentials, and OAuth profile",
-      "status": "pending",
+      "status": "completed",
+      "completedAt": "2026-07-14",
+      "completionEvidence": [
+        "The live before-first-mutation inventory first rejected the proxy's absent Deployment Protection. Under the user's existing Production approval, the parent enabled and read-backed personal-project Vercel SSO protection with prod_deployment_urls_and_all_previews, matching the agent, then a fresh mode-0600 checkpoint passed for exact personal team/projects/domains, clean pushed c4313c7 source, absent Bundjil Production activation, and no Preview identity reuse.",
+        "Proxy Production now owns an independent sensitive bearer, sensitive cipher/key id, explicit plain subject selectors, sensitive canonical Upstash URL/token, and a strongly disjoint sensitive namespace prefix. All Bundjil bindings target Production only. Opaque namespace, subject, profile, lock, fence, bearer, and cipher identities are disjoint from Preview; no value was printed or committed.",
+        "The package-owned trusted-local subscription login stored a refresh-capable encrypted V2 profile. Stored-profile proof passed all eight approved booleans, and the staged concurrent refresh proof passed all seven approved booleans while advancing the fenced generation; a second proof confirmed the newest encrypted envelope. The proxy-provisioned checkpoint returned go true with no rejection. OAuth 102 tests, proxy 21 tests/build/smoke, agent 51 tests/build, bun run verification, jq empty, and git diff --check passed. Temporary secret/helper/proof files were removed; no deployment, agent Production variable, alias, or Sendblue state changed."
+      ],
       "dependsOn": ["implement-staged-production-preflight-checkpoints"],
       "description": "Use granted approval to create and prove the isolated Production Upstash/profile/lock/fence boundary, bearer, cipher/key id, subject, and trusted-local refresh-capable profile.",
       "implementationNotes": [
         "Confirm a Production Upstash binding and namespace independently of Preview. Prove disjoint derived profile, refresh-lock, and fenced-commit identities without emitting keys or values.",
-        "Generate independent Production internal bearer and profile cipher; store them only as encrypted Production variables. Set an independent non-secret cipher key id and CodexOAuthSubject inputs.",
+        "Generate independent Production internal bearer and profile cipher; store secrets as write-only sensitive Production variables and non-secret selectors as explicit target-scoped values. Set an independent cipher key id and CodexOAuthSubject inputs.",
         "Run only the package-owned trusted-local login/profile command and CodexStoredProfileProof. Browser, PKCE, callback, authorization code, and plaintext token stay local.",
         "Record only approved encrypted-envelope/proof booleans, profile variant, generation/revision category, expiry horizon category, and cipher key id. Preserve the newest fenced generation; do not invent a downgrade path."
       ],
@@ -180,8 +186,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Parent pass 1 - ownership and call graph: verified Vercel security posture and Production variable mutation stayed in the personal proxy project; trusted-local browser/PKCE/token handling, encrypted persistence, stored-profile proof, refresh locking, and fenced commit remained package-owned in @bundjil/codex-oauth; and the app-owned staged preflight only consumed sanitized metadata. No OAuth route, deployment, alias, agent Production variable, or Sendblue mutation entered this task.",
+          "Parent pass 2 - implementation quality: reviewed the operational path against the existing Effect boundaries. ConfigProvider/Config.redacted, canonical CodexOAuthSubject/profile/envelope Schemas, explicit Upstash/profile/cipher/lock/fence Layers, flat named Effect operations, Schema JSON outputs, and tagged errors remained authoritative. No runtime source abstraction was added, no helper survived cleanup, and no raw JSON, process.env package logic, unsafe cast, DTO mirror, manual reader/mapper, plaintext credential persistence, or helper sprawl remains.",
+          "Parent pass 3 - verification and evidence: live personal-team/project/domain/protection and Production variable name/type/target readback passed; before-first-mutation and proxy-provisioned checkpoints returned go true; namespace/subject/profile/lock/fence/cipher comparisons were disjoint; stored-profile and staged concurrent refresh/fence proofs returned every approved boolean true and preserved the newest generation. OAuth typecheck/build/102 tests, proxy typecheck/build/21 tests/smoke, agent typecheck/build/51 tests, bun run verification, jq empty, git diff --check, and secret-file cleanup passed with sanitized evidence only."
+        ]
       },
       "commitAfterPassing": true
     },

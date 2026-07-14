@@ -100,7 +100,7 @@ does not read values and cannot deploy, alias, set variables, provision storage,
 or write profiles.
 
 ```bash
-BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT=.local/production-preflight.json \
+BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT="$PWD/.local/production-preflight.json" \
   bun run --filter @bundjil/agent preflight:production
 ```
 

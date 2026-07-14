@@ -190,6 +190,100 @@ by this task, and accepted rollback deployments owned by later deployment
 tasks. The new serial staged-preflight task resolves that ordering without
 changing this evidence, its status, or any accepted audit count.
 
+### 2026-07-14 resumed `before-first-mutation` at `c4313c7`
+
+- Read-only personal-scope metadata confirmed exact projects
+  `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB` (`bundjil-codex-proxy`) and
+  `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN` (`bundjil-agent`) under
+  `team_1LX7ZujbijowTv8J9k0aU7nD`. Their verified stable domains are
+  `bundjil-codex-proxy.vercel.app` and `bundjil-agent.vercel.app`.
+- Local `HEAD` and `origin/main` both resolved to clean pushed source
+  `c4313c7a3701c417e768f386b6310a4cc7332453`. Read-only variable inventory
+  found no Bundjil Production activation in either project, so no Production
+  identity existed that could reuse the accepted Preview identity.
+- The agent project retained Vercel SSO posture
+  `prod_deployment_urls_and_all_previews`. The proxy project reported no SSO,
+  password, or passport Deployment Protection policy. A mode-`0600` ignored
+  `before-first-mutation` snapshot encoded that observed false posture; the
+  package-owned CLI rejected `proxy.deploymentProtection` because `true` is
+  required.
+- The rollout stopped before its first Production mutation. No proxy variable,
+  Upstash namespace/profile key, OAuth profile, lock/fence state, deployment,
+  alias, agent Production variable, or Sendblue setting changed. The temporary
+  sanitized snapshot was removed.
+
+### 2026-07-14 `provision-isolated-production-profile` evidence
+
+- A fresh read-only personal-scope snapshot confirmed both exact projects,
+  stable domains, clean pushed source
+  `c4313c7a3701c417e768f386b6310a4cc7332453`, absent Bundjil Production
+  activation, and Vercel SSO Deployment Protection
+  `prod_deployment_urls_and_all_previews` on both projects. The mode-`0600`
+  package CLI returned `go: true` with no rejection at
+  `before-first-mutation` before any Production write.
+- Proxy Production now has `plain` subject selectors
+  `BUNDJIL_CODEX_PROFILE_ID`, `BUNDJIL_CODEX_CONNECTOR_ID`,
+  `BUNDJIL_CODEX_INSTALLATION_ID`, and `BUNDJIL_CODEX_SUBJECT_ID`.
+  `BUNDJIL_CODEX_PROXY_MODE`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`,
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`,
+  `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`,
+  `BUNDJIL_UPSTASH_REDIS_REST_URL`,
+  `BUNDJIL_UPSTASH_REDIS_REST_TOKEN`,
+  `BUNDJIL_UPSTASH_REDIS_KEY_PREFIX`, `UPSTASH_REDIS_REST_URL`, and
+  `UPSTASH_REDIS_REST_TOKEN` are `sensitive`; every listed binding targets
+  Production only. The proxy mode is `live`, and the independent Production
+  cipher key id is `bundjil-production-20260714-v1`.
+- The shared Marketplace Upstash resource is isolated by a strongly disjoint
+  Production namespace. Opaque Preview fingerprints are namespace
+  `d4a4cef32ff098fedcba468a27369b06a507a17d3310318a671e612075f9b666`,
+  subject `c9a736d3a0fcc37aa32530b36611505eff71814f51fa8ef1cc9aeaa9dd1482ed`,
+  profile `4a7701004b0fa4792f2d5f8bcd762c75c0b78ba1bf2a4e35c280b9d1d52cb13b`,
+  lock `724ce00c10a3a326846dca3c7048a68f4d0e1b7514ec3740b9a4a97cd4e8b814`,
+  and fence
+  `4a9b01ed12fad74de5bc5cd9e8b81218a1cf1cd2c21f7a00f32d99d943be0ab8`.
+  Production fingerprints are namespace
+  `dbe9ab7f238d29b031ee4800ad98767cd61f5c9b62402c8ef59889ff00647131`,
+  subject `55c20fbe57601960dbc5ad3687d8783b6b29cd473c2e790eb9257395e5a4bec1`,
+  profile `18e024d52a3c4cb85b521a1e72e2d6de1b82b73f9e702230312ad94d2031b630`,
+  lock `6775eb2276022c68e775eab993b95485417bab79757631043aa7433b08384846`,
+  and fence
+  `96ef3b4064bee17194488d90f55368308f9e1e817151c79d1a223276057cfffb`.
+  Every corresponding identity and cipher key id comparison is disjoint.
+- The package-owned trusted-local subscription login stored an encrypted
+  refresh-capable profile with `valid` expiry horizon. Final stored-profile
+  proof returned true for found, envelope v2, ciphertext present,
+  subscription variant, refresh capability, valid expiry, reauthentication
+  false, and marker leak false.
+- The package-owned staged refresh proof ran through a trusted-local proxy
+  process using only the Production namespace. It returned true for staged
+  expiry, concurrent authenticated success, SSE responses, complete streams,
+  final subscription variant, valid final expiry, and final revision changed.
+  The final fenced generation is therefore newer than the forced-expiry
+  generation; a second stored-profile proof confirmed the newest envelope.
+- A mode-`0600` sanitized `proxy-provisioned` snapshot returned `go: true` with
+  no rejection. Focused OAuth typecheck, 102 tests, and build; agent typecheck,
+  51 tests, and build; proxy typecheck, 21 tests, build, and smoke; and
+  `bun run verification` passed. No deployment or alias was created, and no
+  agent Production variable, Sendblue setting, task status, or parent audit
+  field changed.
+- Parent pass 1, ownership and call graph: accepted personal proxy-project
+  security/variable mutation, package-owned trusted-local OAuth and encrypted
+  profile/lock/fence services, and app-owned sanitized staged preflight. No
+  hosted OAuth route, deployment, alias, agent variable, or Sendblue mutation
+  entered this task.
+- Parent pass 2, implementation quality: accepted the existing Config/Redacted,
+  canonical Schema, explicit Layer, flat named Effect, tagged-error, and Schema
+  JSON boundaries. No source abstraction was added; all one-off helpers and
+  local material were removed after proof, leaving no plaintext persistence,
+  raw JSON, unsafe cast, DTO mirror, manual mapper, or helper sprawl.
+- Parent pass 3, verification and evidence: accepted exact personal scope,
+  project/domain/protection and variable metadata readback, both staged gates,
+  disjoint identity fingerprints, stored V2 profile proof, concurrent refresh
+  and fenced-generation advancement, final encrypted-envelope proof, OAuth 102
+  tests, proxy 21 tests/build/smoke, agent 51 tests/build, root verification,
+  ledger validation, diff check, and secret-file cleanup. The task is accepted
+  without deployment or downstream activation.
+
 ## Staged Checkpoints
 
 The preflight remains read-only and fail closed. Checkpoints consume only
