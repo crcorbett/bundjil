@@ -42,7 +42,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "completedPasses": 6,
+    "completedPasses": 9,
     "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
@@ -144,7 +144,7 @@
     {
       "id": "provision-isolated-preview-toolkit-and-credentials",
       "title": "Provision the isolated Preview toolkit, key, and Vercel configuration",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-effect-config-and-eve-mcp-connection"],
       "description": "Create the least-privilege Bundjil Preview Executor toolkit and dedicated API key, store them through 1Password and target-scoped Vercel variables, and prove policy/readback without a downstream mutation.",
       "implementationNotes": [
@@ -175,8 +175,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: parent confirmed Executor owns the personal GitHub connection, dynamic provider schemas, toolkit filtering, ordered policy resolution, browser approval, and hosted execution; Bundjil owns only its dedicated toolkit bearer in app Config and target-scoped Vercel variables. The broad Codex discovery key, Tilt Legal organization, Production, downstream GitHub credential, and Executor authority-management surfaces remain outside the Preview app boundary.",
+          "Implementation quality/helper admission: parent inspected the committed diff and provider procedure and confirmed Task 3 adds no code, package, SDK, proxy, script, service, Layer, DTO mirror, raw JSON app path, process environment read, unsafe cast, suppression, dependency, or helper. All provider work used typed APIs or mode-0600 one-off operator tooling; the first exposed key was revoked, the final key and endpoint were concealed in the existing 1Password record, and temporary material plus clipboards were removed.",
+          "Verification/evidence: parent read back one user-owned Preview toolkit, one personal GitHub connection pattern, three ordered approved reads, one ordered browser-gated comment, and final wildcard block; proved Preview-only encrypted URL and sensitive key Vercel writes; matched both concealed 1Password values; completed direct MCP discovery with exactly skills/execute/resume and no downstream call; passed agent typecheck/build/55 tests, zero lint findings, clean Knip, six package typechecks, all 189 repository tests, JSON/diff checks, and repository secret/protected-URL scans."
+        ]
       },
       "commitAfterPassing": true
     },

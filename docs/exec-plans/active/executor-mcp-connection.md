@@ -35,7 +35,7 @@ material after each proof.
 
 1. `freeze-executor-eve-contract-and-policy-inventory`: accepted.
 2. `implement-effect-config-and-eve-mcp-connection`: accepted.
-3. `provision-isolated-preview-toolkit-and-credentials`: pending.
+3. `provision-isolated-preview-toolkit-and-credentials`: accepted.
 4. `prove-preview-eve-executor-and-browser-resume`: pending.
 5. `promote-production-document-and-audit`: pending.
 
@@ -46,8 +46,8 @@ material after each proof.
 - Eve owns the production MCP client boundary; Executor owns hosted tool
   schemas, toolkit policy, downstream credentials, browser approval, and
   resume state.
-- No Executor runtime connection, dedicated Bundjil toolkit/key, or related
-  Vercel variables have yet been accepted by this plan.
+- Preview now has an accepted dedicated Executor toolkit/key and target-scoped
+  Vercel variables. Production remains unprovisioned by this rollout.
 - No Bundjil frontend work is in scope.
 
 ## Task Evidence
@@ -291,3 +291,94 @@ against the isolated Executor toolkit.
    Knip is clean, six package typechecks and all 189 repository tests pass,
    and JSON, diff, changed-file, known-secret, and compiled-output leak scans
    pass. No provider, model, public-network, or frontend operation occurred.
+
+### provision-isolated-preview-toolkit-and-credentials
+
+Status: Accepted 2026-07-15
+
+#### Provisioning Surface Readback
+
+- Codex MCP configuration identifies the pre-existing personal Executor
+  organization separately from the Tilt Legal organization. The personal
+  bearer remains the discovery/bootstrap credential and was not replaced or
+  repurposed. A redundant organization created while that identity was
+  misread contained only this rollout's transient objects and was fully
+  removed before personal-org provisioning continued.
+- Typed Executor API readback confirms one user-owned `Bundjil Preview`
+  toolkit. It selects exactly one existing user-owned connection pattern: the
+  personal GitHub connection. Executor core tools, the root catalog, and all
+  other connections are absent.
+- Five explicit rules are present in evaluation order: three approved
+  read-only pull-request operations, one browser-approval comment operation,
+  and one final wildcard block. The wildcard was initially auto-inserted at
+  highest precedence by the Toolkit API; source inspection found the ordering
+  defect before credential acceptance, and explicit fractional positions now
+  place exact rules before the final implicit-deny rule.
+- One first-attempt dedicated key exposed its one-time value in an automation
+  diagnostic. It was immediately revoked and never stored or configured. A
+  later clean key became unrecoverable when the OS removed its temporary copy
+  while 1Password was locked, so the credential was rotated again rather than
+  weakening storage policy. The final dedicated key was stored in 1Password
+  before Vercel was overwritten and direct MCP proof was rerun.
+- The personal `bundjil-agent` Vercel project now contains Preview-only
+  `BUNDJIL_EXECUTOR_MCP_URL` and `BUNDJIL_EXECUTOR_API_KEY` variables. Creation
+  evidence records the URL as encrypted/non-sensitive and the key as
+  sensitive/write-only. Production was not queried or changed.
+- A direct Streamable HTTP MCP handshake using the replacement key succeeded
+  against the protected browser-elicitation toolkit endpoint. Tool discovery
+  returned exactly `skills`, `execute`, and `resume`; no downstream provider
+  operation was run.
+- The existing personal-vault `Executor` item now owns a `Bundjil Preview`
+  section with concealed `Toolkit URL` and `API Key` fields. Reveal-to-file
+  readback matched both final values without printing them. All mode-`0600`
+  files, browser/runtime key variables, and browser/system clipboards were
+  removed or cleared after proof.
+- No protected URL, API key, authorization header, raw MCP payload, provider
+  record, or downstream result is retained in this plan.
+
+#### Verification To Date
+
+- `jq empty docs/product-specs/executor-mcp-connection.tasks.json`: passed.
+- Agent strict typecheck: passed.
+- Agent Eve build and 55 tests: passed with a non-secret synthetic endpoint
+  on the approved Executor host and no API key.
+- `bun run verification`: passed with the same synthetic endpoint. Ultracite
+  and Oxlint report zero findings, Knip is clean, all six package typechecks
+  pass, and all 189 repository tests pass.
+- Replacement-key and protected-endpoint scans across tracked and hidden
+  repository files found no match. Vercel readback lists both variable names
+  only in Preview. Direct MCP readback remains limited to the three accepted
+  orchestration tools.
+- The initial synthetic verification endpoint intentionally used an
+  unapproved host and was rejected by `ExecutorMcpEndpoint`; rerunning with a
+  synthetic toolkit path on `executor.sh` passed. This confirms the host
+  allowlist rather than a test or build regression.
+- Post-storage readback, cleanup, and the three parent acceptance audits pass.
+
+#### Helper Admission
+
+| Candidate | Owner/reason                           | Concrete call sites | Direct test     | Decision                                                      |
+| --------- | -------------------------------------- | ------------------- | --------------- | ------------------------------------------------------------- |
+| None      | Task 3 is provider configuration only. | None.               | Not applicable. | No committed helper, script, module, service, or Layer added. |
+
+#### Parent Acceptance Audits
+
+1. **Ownership and call graph:** accepted. Executor owns the existing personal
+   GitHub connection, dynamic schemas, toolkit filtering, policy evaluation,
+   approval, and execution. Bundjil owns only the dedicated toolkit endpoint
+   and bearer through app Config and Preview Vercel variables. The Codex
+   discovery key, Tilt Legal organization, Production, GitHub credential, root
+   catalog, and authority-management operations remain outside app authority.
+2. **Implementation quality and helper admission:** accepted. This provider-
+   only slice adds no code, package, SDK, proxy, script, service, Layer, DTO,
+   helper, suppression, dependency, or configuration weakening. Typed APIs and
+   mode-`0600` one-off procedures handled provisioning. Exposed or
+   unrecoverable credentials were rotated instead of reused; final values are
+   concealed in 1Password and sensitive/target-scoped in Vercel.
+3. **Verification and evidence:** accepted. Readback proves one user-owned
+   toolkit, one personal GitHub pattern, three ordered approved reads, one
+   browser-gated comment, and final wildcard block. 1Password values matched,
+   Vercel writes target Preview only, and MCP discovery returns exactly
+   `skills`, `execute`, and `resume` without a downstream call. Agent build and
+   55 tests, zero lint findings, clean Knip, six typechecks, all 189 repository
+   tests, JSON/diff checks, cleanup checks, and secret/protected-URL scans pass.
