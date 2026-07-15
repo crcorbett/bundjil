@@ -182,6 +182,12 @@ Vercel OIDC bearer for `/eve/v1/*`, and a durable stream replay with
 leak booleans only; never record the bearer, prompt, or full model response.
 For future Production changes, establish the isolated Preview proof first.
 
+`@bundjil/agent#build` must remain non-cacheable. `eve build` owns
+deployment-local `.vercel/output` materialization and sandbox-template prewarm;
+a replayed Turbo log is not proof that those artifacts were restored. A
+deployment check must include one non-forced redeploy after this task contract
+changes and fail if Vercel falls back to a configured static output directory.
+
 The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
 account. It must not be linked to Tilt Legal.
 

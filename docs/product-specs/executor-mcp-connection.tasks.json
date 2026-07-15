@@ -223,6 +223,17 @@
         "The model cannot submit or infer an approval action through the resume tool.",
         "The helper-admission inventory is accepted and all three audit passes are recorded."
       ],
+      "liveEvidence": [
+        "Final retained-key Preview deployment dpl_7JLTd2r6nDLZiG9JS18ZNQjHKGxC is Ready from accepted source commit fc6729d. Its fresh Eve session completed connection_search, executor__skills, and four executor__execute calls for a read-only GitHub lookup; replay reached turn.completed and session.waiting with no failure event or secret marker.",
+        "Connection discovery exposed exactly executor__skills, executor__execute, and executor__resume; a separate direct Streamable HTTP initialize/tools-list probe returned HTTP 200, retained Mcp-Session-Id, and listed exactly skills, execute, and resume.",
+        "A fully cached credential-only redeploy failed because replayed eve build logs did not materialize the Vercel Build Output API tree. The root Turbo contract now marks @bundjil/agent#build non-cacheable; non-forced redeploy proof of that correction remains required.",
+        "A reversible Eve write request reached user_approval_required with an HTTPS Executor approval URL and execution id. No resume action was submitted and no GitHub write occurred.",
+        "The rendered approval page immediately reported the pause unavailable while visibly scoped to Personal. A direct MCP client that preserved Mcp-Session-Id and the existing executor_personal credential reproduced the same hosted result, excluding Eve and Bundjil transport handling.",
+        "Executor PR #1317 documents the exact pre-fix cloud failure: approval lookup used idFromString while sessions were name-addressed with idFromName. Current source contains the fix, but hosted executor.sh still reproduces the unavailable-page symptom."
+      ],
+      "knownBlockers": [
+        "Hosted executor.sh must serve a working name-addressed browser approval lookup before approve, decline, replay, Sendblue decision-following delivery, and policy-restoration evidence can be accepted. Model elicitation, source-only evidence, or a Bundjil-owned MCP client/proxy are forbidden substitutes."
+      ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 0,

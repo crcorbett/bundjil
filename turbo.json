@@ -8,6 +8,7 @@
       "outputs": [".output/**", ".vercel/output/**", "dist/**"]
     },
     "@bundjil/agent#build": {
+      "cache": false,
       "dependsOn": ["^build"],
       "env": [
         "BUNDJIL_AGENT_MODEL_PROVIDER",

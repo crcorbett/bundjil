@@ -269,6 +269,12 @@ the project root remains `apps/agent`:
 vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes
 ```
 
+The `@bundjil/agent#build` Turbo task is intentionally non-cacheable. `eve
+build` must materialize the deployment-local `.vercel/output` Build Output API
+tree and prewarm Eve sandbox templates on every Vercel build. A cached task can
+replay logs without restoring that deployment artifact, causing Vercel to fall
+back to the configured `public` directory and reject the deployment.
+
 Use the encrypted Preview values already bound to the Vercel project. Do not
 pass bearer values through shell history, commit them, or add them to source.
 `eve deploy` targets production and `vercel deploy --prebuilt` skips Eve's

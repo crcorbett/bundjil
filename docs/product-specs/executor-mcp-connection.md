@@ -76,6 +76,14 @@ and the already committed Eve architecture:
 - In `elicitation_mode=browser`, a paused execution returns an approval URL;
   the signed-in human decides in Executor's UI and `resume` accepts only the
   execution id. This is the required mode.
+- Executor PR
+  [#1317](https://github.com/UsefulSoftwareCo/executor/pull/1317) fixed a
+  hosted-cloud failure with the exact unavailable-page symptom by routing
+  approval lookups through the name-addressed MCP session Durable Object
+  instead of treating the session id as a Durable Object id string. Live
+  Preview acceptance must therefore prove the rendered hosted page, not infer
+  browser approval from a `user_approval_required` tool result or from source
+  alone.
 - Executor resolves downstream credentials on its host. Bundjil, Eve, the
   model, conversation history, and proof artifacts must not receive those
   credentials.
@@ -996,6 +1004,7 @@ active execution plan before accepting the task.
 - [Executor Cloud](https://executor.sh/docs/hosted/cloud)
 - [Executor Policies](https://executor.sh/docs/concepts/policies)
 - [Executor source](https://github.com/UsefulSoftwareCo/executor)
+- [Executor hosted browser-approval lookup fix](https://github.com/UsefulSoftwareCo/executor/pull/1317)
 - Ignored current Executor reference:
   `.local/references/executor` at researched commit
   `0a50c796c2cc334cf3e9bf6d4be33c77dbfac93b`

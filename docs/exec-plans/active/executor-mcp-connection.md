@@ -457,3 +457,93 @@ schemas:
    config. Diff and prohibited-pattern scans pass. A new clean immutable
    Preview deployment and live Eve tool-call proof remain required before this
    task can be accepted.
+
+#### Clean Preview Credential And Read Proof
+
+- The current Preview definition still targets the Personal organization at
+  `executor.sh/personal-3548`, the dedicated `bundjil-preview` toolkit, and
+  browser elicitation. The Tilt Legal toolkit/root endpoint is not configured
+  in Bundjil.
+- Diagnostic key rotation proved write-only Vercel delivery but did not change
+  the hosted approval outcome. The original accepted Task 3 Preview key remains
+  valid and was restored to the Preview-only Sensitive Vercel variable; no
+  Production variable changed. Vercel intentionally returns an empty value for
+  Sensitive variables, so acceptance uses authenticated runtime behavior
+  rather than an impossible readback-value comparison.
+- Final retained-key agent Preview deployment
+  `dpl_7JLTd2r6nDLZiG9JS18ZNQjHKGxC` is Ready from accepted source commit
+  `fc6729d`. Its deployed Eve session again completed the read-only proof with
+  `connection_search`, `executor__skills`, four `executor__execute` results,
+  `turn.completed`, and `session.waiting`; it emitted no failure or secret
+  marker.
+- One fresh Eve session completed `connection_search`, `executor__skills`, and
+  three sequential `executor__execute` calls for a read-only GitHub issue
+  lookup. The replay contained `message.completed`, `turn.completed`, and
+  `session.waiting`, no failure event, and discovered exactly
+  `executor__skills`, `executor__execute`, and `executor__resume`.
+- A separate direct Streamable HTTP probe using the dedicated key returned
+  HTTP 200, preserved an `Mcp-Session-Id`, and listed exactly `execute`,
+  `resume`, and `skills`. Sanitized stream scans found no bearer, key, refresh,
+  access-token, or protection-bypass marker.
+- A fully cached credential-only redeploy replayed `eve build` logs without
+  materializing the Vercel Build Output API tree, so Vercel rejected the build
+  after falling back to `public`. The root Turbo contract now marks
+  `@bundjil/agent#build` non-cacheable; `eve build` owns deployment-local
+  `.vercel/output` materialization and sandbox prewarm. A forced source rebuild
+  produced the Ready retained-key deployment above. Non-forced redeploy proof
+  of the corrected task contract remains required before Task 4 acceptance.
+
+#### Hosted Browser Approval Regression
+
+- A reversible Eve request reached `user_approval_required` for the accepted
+  browser-gated GitHub issue-comment operation and returned an HTTPS Executor
+  approval URL plus execution id. No `resume` action was submitted and no
+  GitHub write occurred.
+- Opening the URL while the Executor shell was visibly scoped to Personal
+  transitioned immediately to "This paused execution is no longer available"
+  before any approve, decline, or cancel decision. Reloading after explicitly
+  selecting Personal produced the same result.
+- The same outcome reproduced outside Eve through a direct MCP client that
+  retained the server-issued `Mcp-Session-Id` across initialize, initialized,
+  and execute. It also reproduced with the already configured
+  `executor_personal` credential. This excludes the Codex bridge, Eve tool
+  history, Vercel credential delivery, and lost MCP transport identity as the
+  immediate cause.
+- Executor PR
+  [#1317](https://github.com/UsefulSoftwareCo/executor/pull/1317) documents the
+  exact hosted symptom: the approval handler used `idFromString` while MCP
+  sessions were created with `idFromName`, so the page queried a different
+  Durable Object and reported the execution unavailable. Current ignored
+  source contains the canonical helper and regression test, but the live
+  hosted behavior still reproduces the pre-fix failure.
+- Task 4 remains in progress. Browser approve, decline, settled-link replay,
+  Sendblue decision-following delivery, policy restoration, correlated final
+  evidence, and all three parent acceptance audits are intentionally
+  unaccepted. Task 5 and Production promotion remain gated; model elicitation,
+  a Bundjil-owned MCP client/proxy, or source-only evidence are not accepted
+  substitutes.
+
+#### Deployment Cache Corrective Slice Review
+
+| Surface                               | Owner/reason                                                                                                      | Concrete call sites                                                     | Direct proof                                                                                                                | Decision                                                                                               |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `@bundjil/agent#build` `cache: false` | Root Turbo task contract; `eve build` owns deployment-local Build Output API materialization and sandbox prewarm. | Agent local builds, Vercel Preview builds, and later Production builds. | Turbo dry-run cache state, focused agent build/tests, full repository verification, and pending non-forced Vercel redeploy. | Retain on the existing task; no script, helper, wrapper, service, Layer, factory, or module was added. |
+
+1. **Ownership and call graph:** reviewed. The cache change is scoped only to
+   the existing agent build task. Dependency package builds remain cacheable,
+   no environment variable moved to a global/pass-through scope, and Executor,
+   Eve, Vercel, Sendblue, and app/package ownership boundaries are unchanged.
+2. **Implementation quality and helper admission:** reviewed. The executable
+   diff is one explicit task-policy field. It adds no helper, command wrapper,
+   package, dependency, suppression, ignore, unsafe type, JSON boundary,
+   environment reader, Effect service, or alternative deployment path. The
+   adjacent operator and architecture docs explain the constraint at the
+   owning surfaces.
+3. **Verification coverage:** reviewed for the committed candidate. Turbo
+   dry-run reports local and remote cache disabled for
+   `@bundjil/agent#build`; agent strict typecheck and all 55 agent tests pass.
+   Root verification reports zero Ultracite/Oxlint findings, clean Knip, all
+   six strict package typechecks, and all 193 tests passing. JSON validation,
+   formatting, diff checks, and sanitized live retained-key read proof pass.
+   A normal non-forced Vercel redeploy from the pushed corrective SHA remains
+   required before this specific deployment finding is closed.

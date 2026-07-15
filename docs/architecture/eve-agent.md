@@ -513,7 +513,9 @@ boundary.
 Eve records model metadata during `eve build`. Therefore
 `turbo.json` declares the provider variables on `@bundjil/agent#build`; this is
 both the least-privilege build contract and the Vercel strict-environment
-requirement. A source preview deploy runs from the repository root:
+requirement. That task is intentionally non-cacheable because each hosted
+`eve build` must materialize `.vercel/output` and prewarm the deployment's
+sandbox templates. A source preview deploy runs from the repository root:
 
 ```bash
 vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes
