@@ -470,28 +470,30 @@ schemas:
   Production variable changed. Vercel intentionally returns an empty value for
   Sensitive variables, so acceptance uses authenticated runtime behavior
   rather than an impossible readback-value comparison.
-- Final retained-key agent Preview deployment
-  `dpl_7JLTd2r6nDLZiG9JS18ZNQjHKGxC` is Ready from accepted source commit
-  `fc6729d`. Its deployed Eve session again completed the read-only proof with
-  `connection_search`, `executor__skills`, four `executor__execute` results,
-  `turn.completed`, and `session.waiting`; it emitted no failure or secret
-  marker.
-- One fresh Eve session completed `connection_search`, `executor__skills`, and
-  three sequential `executor__execute` calls for a read-only GitHub issue
-  lookup. The replay contained `message.completed`, `turn.completed`, and
-  `session.waiting`, no failure event, and discovered exactly
-  `executor__skills`, `executor__execute`, and `executor__resume`.
+- Final ordinary, non-forced retained-key Preview deployment
+  `dpl_Fz4wDdZpc1i2dof8SimKUCerqdCb` is Ready. Vercel's authenticated
+  deployment readback records CLI source plus explicit Bundjil source metadata
+  for pushed commit `ff8ddfe94d33dbfc96dcbb98315c1294df2bda09` on `main`.
+  The hosted build restored only dependency caches, force-executed the
+  non-cacheable agent task, and regenerated `.vercel/output` through
+  `eve build`.
+- A fresh authenticated session on that exact deployment completed
+  `connection_search`, `executor__skills`, and three sequential
+  `executor__execute` calls for a read-only public GitHub inspection. The
+  replay contained five requested/result pairs, `message.completed`,
+  `turn.completed`, and `session.waiting`, with no failure event. Exact-value
+  and generic credential scans across the deployment log, session response,
+  and 469-event replay returned zero hits.
 - A separate direct Streamable HTTP probe using the dedicated key returned
   HTTP 200, preserved an `Mcp-Session-Id`, and listed exactly `execute`,
   `resume`, and `skills`. Sanitized stream scans found no bearer, key, refresh,
   access-token, or protection-bypass marker.
-- A fully cached credential-only redeploy replayed `eve build` logs without
-  materializing the Vercel Build Output API tree, so Vercel rejected the build
-  after falling back to `public`. The root Turbo contract now marks
+- An earlier fully cached credential-only redeploy replayed `eve build` logs
+  without materializing the Vercel Build Output API tree, so Vercel rejected
+  the build after falling back to `public`. The root Turbo contract now marks
   `@bundjil/agent#build` non-cacheable; `eve build` owns deployment-local
-  `.vercel/output` materialization and sandbox prewarm. A forced source rebuild
-  produced the Ready retained-key deployment above. Non-forced redeploy proof
-  of the corrected task contract remains required before Task 4 acceptance.
+  `.vercel/output` materialization and sandbox prewarm. The source-correlated
+  non-forced deployment above closes this corrective deployment finding.
 
 #### Hosted Browser Approval Regression
 
@@ -503,6 +505,17 @@ schemas:
   transitioned immediately to "This paused execution is no longer available"
   before any approve, decline, or cancel decision. Reloading after explicitly
   selecting Personal produced the same result.
+- Two additional pauses from the source-correlated Preview deployment repeated
+  the same outcome. Each emitted URL was HTTPS, hosted on `executor.sh`, scoped
+  to `/personal-3548/resume/`, matched its opaque execution id, carried exactly
+  one non-empty `mcp_session_id`, and had no extra query input. The authenticated
+  page initially rendered disabled Cancel, Decline, and Approve controls, then
+  hydrated from a stale Tilt Legal shell label to Personal and replaced the
+  controls with the unavailable message. Browser diagnostics also recorded
+  React hydration errors. Reissuing a pause while the tab was already settled
+  on Personal did not change the result, excluding an incorrect operator
+  organization selection or a one-off expired link. GitHub readback confirmed
+  neither unique proof marker was posted.
 - The same outcome reproduced outside Eve through a direct MCP client that
   retained the server-issued `Mcp-Session-Id` across initialize, initialized,
   and execute. It also reproduced with the already configured
@@ -525,9 +538,9 @@ schemas:
 
 #### Deployment Cache Corrective Slice Review
 
-| Surface                               | Owner/reason                                                                                                      | Concrete call sites                                                     | Direct proof                                                                                                                | Decision                                                                                               |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `@bundjil/agent#build` `cache: false` | Root Turbo task contract; `eve build` owns deployment-local Build Output API materialization and sandbox prewarm. | Agent local builds, Vercel Preview builds, and later Production builds. | Turbo dry-run cache state, focused agent build/tests, full repository verification, and pending non-forced Vercel redeploy. | Retain on the existing task; no script, helper, wrapper, service, Layer, factory, or module was added. |
+| Surface                               | Owner/reason                                                                                                      | Concrete call sites                                                     | Direct proof                                                                                                                          | Decision                                                                                               |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `@bundjil/agent#build` `cache: false` | Root Turbo task contract; `eve build` owns deployment-local Build Output API materialization and sandbox prewarm. | Agent local builds, Vercel Preview builds, and later Production builds. | Turbo dry-run cache state, focused agent build/tests, full repository verification, and source-correlated non-forced Vercel redeploy. | Retain on the existing task; no script, helper, wrapper, service, Layer, factory, or module was added. |
 
 1. **Ownership and call graph:** reviewed. The cache change is scoped only to
    the existing agent build task. Dependency package builds remain cacheable,
@@ -539,11 +552,14 @@ schemas:
    environment reader, Effect service, or alternative deployment path. The
    adjacent operator and architecture docs explain the constraint at the
    owning surfaces.
-3. **Verification coverage:** reviewed for the committed candidate. Turbo
+3. **Verification coverage:** accepted for this corrective slice. Turbo
    dry-run reports local and remote cache disabled for
    `@bundjil/agent#build`; agent strict typecheck and all 55 agent tests pass.
    Root verification reports zero Ultracite/Oxlint findings, clean Knip, all
    six strict package typechecks, and all 193 tests passing. JSON validation,
-   formatting, diff checks, and sanitized live retained-key read proof pass.
-   A normal non-forced Vercel redeploy from the pushed corrective SHA remains
-   required before this specific deployment finding is closed.
+   formatting, diff checks, and sanitized live retained-key read proof pass. A
+   normal non-forced deployment from pushed SHA `ff8ddfe` reached Ready,
+   force-executed the agent build task, regenerated the Build Output API tree,
+   and completed the authenticated read path without credential leakage. This
+   closes only the deployment-cache corrective slice; Task 4 acceptance still
+   requires the unresolved browser and Sendblue gates.
