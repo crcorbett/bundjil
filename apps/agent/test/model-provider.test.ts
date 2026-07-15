@@ -72,6 +72,7 @@ it.effect(
                 BUNDJIL_CODEX_PROXY_BASE_URL: "http://127.0.0.1:8787/v1",
                 BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS: "123456",
                 BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                BUNDJIL_CODEX_PROXY_VERCEL_BYPASS: "test-protection-bypass",
               },
             })
           )
@@ -81,6 +82,7 @@ it.effect(
         authorization: string | null;
         body: string | undefined;
         contentType: string | null;
+        protectionBypass: string | null;
         url: string;
       }[] = [];
       const fetch = Object.assign(
@@ -100,6 +102,7 @@ it.effect(
             authorization: headers.get("authorization"),
             body: typeof init?.body === "string" ? init.body : undefined,
             contentType: headers.get("content-type"),
+            protectionBypass: headers.get("x-vercel-protection-bypass"),
             url: requestUrl,
           });
 
@@ -175,8 +178,10 @@ it.effect(
         "http://127.0.0.1:8787/v1/chat/completions"
       );
       assert.strictEqual(request.authorization, "Bearer test-internal-token");
+      assert.strictEqual(request.protectionBypass, "test-protection-bypass");
       assert.include(request.contentType, "application/json");
       assert.strictEqual(result.text, "OK");
       assert.notInclude(request.body ?? "", "test-internal-token");
+      assert.notInclude(request.body ?? "", "test-protection-bypass");
     })
 );

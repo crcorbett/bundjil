@@ -41,6 +41,10 @@ const codexProxyInternalTokenConfig = Config.redacted(
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
 );
 
+const codexProxyProtectionBypassConfig = Config.option(
+  Config.redacted("BUNDJIL_CODEX_PROXY_VERCEL_BYPASS")
+);
+
 const codexProxyModelConfig = Config.option(
   Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_PROXY_MODEL")
 );
@@ -66,6 +70,7 @@ export const loadAgentModelProviderConfig = Effect.gen(
           baseURL: codexProxyBaseUrlConfig,
           internalToken: codexProxyInternalTokenConfig,
           modelContextWindowTokens: codexProxyContextWindowTokensConfig,
+          protectionBypass: codexProxyProtectionBypassConfig,
           proxyModel: codexProxyModelConfig,
         }).pipe(
           Effect.map(
@@ -73,6 +78,7 @@ export const loadAgentModelProviderConfig = Effect.gen(
               baseURL,
               internalToken,
               modelContextWindowTokens,
+              protectionBypass,
               proxyModel,
             }) =>
               ({
@@ -82,6 +88,11 @@ export const loadAgentModelProviderConfig = Effect.gen(
                   ? gatewayModel
                   : proxyModel.value,
                 modelContextWindowTokens,
+                ...(Option.isNone(protectionBypass)
+                  ? {}
+                  : {
+                      protectionBypass: Redacted.value(protectionBypass.value),
+                    }),
                 provider,
               }) as const
           )

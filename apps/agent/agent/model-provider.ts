@@ -25,6 +25,9 @@ export const AgentCodexProxyModelProviderConfig = Schema.Struct({
   internalToken: Schema.RedactedFromValue(Schema.NonEmptyString),
   model: Schema.NonEmptyString,
   modelContextWindowTokens: Schema.Int.check(Schema.isGreaterThan(0)),
+  protectionBypass: Schema.optional(
+    Schema.RedactedFromValue(Schema.NonEmptyString)
+  ),
   provider: Schema.Literal("codex-proxy"),
 });
 
@@ -50,10 +53,18 @@ export const createAgentModel = (
     Match.when({ provider: "gateway" }, ({ model }) => model),
     Match.when(
       { provider: "codex-proxy" },
-      ({ baseURL, internalToken, model }) => {
+      ({ baseURL, internalToken, model, protectionBypass }) => {
         const provider = createOpenAICompatible({
           apiKey: Redacted.value(internalToken),
           baseURL: baseURL.toString(),
+          ...(protectionBypass === undefined
+            ? {}
+            : {
+                headers: {
+                  "x-vercel-protection-bypass":
+                    Redacted.value(protectionBypass),
+                },
+              }),
           ...(deps.fetch === undefined ? {} : { fetch: deps.fetch }),
           name: "bundjil-codex-proxy",
         });
