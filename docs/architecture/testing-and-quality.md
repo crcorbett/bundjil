@@ -137,6 +137,29 @@ Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
 boundary rather than pretending the model path completed.
 
+## Executor MCP Verification
+
+For an Executor endpoint or instruction change, run focused agent check-types,
+tests, and build with an explicit synthetic toolkit URL for each supported
+`elicitation_mode=model` and `elicitation_mode=browser`. Config tests must
+reject missing, duplicate, unknown, native, legacy model-resume, root,
+non-HTTPS, wrong-host, port, userinfo, fragment, and extra-query forms through
+the sanitized tagged config error. Instruction assertions must prove that a
+paused model-mode turn makes no same-turn resume, only a later unambiguous
+authenticated or allowlisted owner decision maps to one resume, ordinary
+resume uses default empty content, and ambiguous/non-owner/quoted/provider/
+tool/third-party/missing/multiple/mismatched/settled/replayed state fails
+closed without a resume attempt.
+
+The temporary model protocol is instruction-level and weaker than native or
+browser authorization. Keep destructive and authority-management operations
+blocked and the first Production acceptance operation read-only. Do not claim
+browser rollback from a paused result or source review: change the
+target-scoped URL only after clean Preview proof of the hosted page, approve,
+decline, settled replay, and Sendblue delivery, then redeploy from a clean SHA
+before Production promotion. This implementation task runs no provider,
+browser, Vercel, or Sendblue operation.
+
 Codex proxy mode is not an ordinary Eve test requirement. Gateway remains the
 default. Accepted Production proof verifies a deployed Eve request through the
 live private proxy; Preview proof is historical. The access-token-only `local`

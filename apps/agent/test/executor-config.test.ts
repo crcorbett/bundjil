@@ -3,28 +3,36 @@ import { ConfigProvider, Effect, Redacted, Schema } from "effect";
 
 import {
   ExecutorConnectionConfigError,
+  ExecutorElicitationMode,
   ExecutorMcpEndpoint,
   loadExecutorApiKey,
   loadExecutorEndpoint,
 } from "../agent/lib/executor/config.js";
 
-const validEndpoint =
+const browserEndpoint =
   "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser";
+const modelEndpoint =
+  "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model";
 const syntheticKey = "executor-config-synthetic-secret";
 
 it.effect(
-  "loads a browser-mode Executor toolkit endpoint and redacted key",
+  "loads explicit model and browser Executor toolkit endpoints and a redacted key",
   () =>
     Effect.gen(function* testExecutorConfig() {
-      const endpoint = yield* loadExecutorEndpoint().pipe(
-        Effect.provide(
-          ConfigProvider.layer(
-            ConfigProvider.fromEnv({
-              env: { BUNDJIL_EXECUTOR_MCP_URL: validEndpoint },
-            })
+      for (const endpointUrl of [modelEndpoint, browserEndpoint]) {
+        const endpoint = yield* loadExecutorEndpoint().pipe(
+          Effect.provide(
+            ConfigProvider.layer(
+              ConfigProvider.fromEnv({
+                env: { BUNDJIL_EXECUTOR_MCP_URL: endpointUrl },
+              })
+            )
           )
-        )
-      );
+        );
+
+        assert.strictEqual(endpoint.href, endpointUrl);
+        assert.strictEqual(Schema.is(ExecutorMcpEndpoint)(endpoint), true);
+      }
       const key = yield* loadExecutorApiKey().pipe(
         Effect.provide(
           ConfigProvider.layer(
@@ -35,8 +43,9 @@ it.effect(
         )
       );
 
-      assert.strictEqual(endpoint.href, validEndpoint);
-      assert.strictEqual(Schema.is(ExecutorMcpEndpoint)(endpoint), true);
+      assert.strictEqual(Schema.is(ExecutorElicitationMode)("model"), true);
+      assert.strictEqual(Schema.is(ExecutorElicitationMode)("browser"), true);
+      assert.strictEqual(Schema.is(ExecutorElicitationMode)("native"), false);
       assert.strictEqual(
         Schema.is(Schema.Redacted(Schema.NonEmptyString))(key),
         true
@@ -46,7 +55,7 @@ it.effect(
 );
 
 it.effect(
-  "rejects every endpoint form outside the browser-mode toolkit policy",
+  "rejects every endpoint form outside the explicit supported-mode toolkit policy",
   () =>
     Effect.gen(function* testExecutorEndpointPolicy() {
       for (const endpoint of [
@@ -59,7 +68,6 @@ it.effect(
         "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser#fragment",
         "https://executor.sh/mcp/toolkits/bundjil-test",
         "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser&elicitation_mode=browser",
-        "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model",
         "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=native",
         "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=unknown",
         "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser&allow_model_resume=true",

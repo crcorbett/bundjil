@@ -36,7 +36,7 @@ material after each proof.
 1. `freeze-executor-eve-contract-and-policy-inventory`: accepted.
 2. `implement-effect-config-and-eve-mcp-connection`: accepted.
 3. `provision-isolated-preview-toolkit-and-credentials`: accepted.
-4. `adopt-temporary-chat-model-approval`: pending.
+4. `adopt-temporary-chat-model-approval`: accepted.
 5. `prove-preview-eve-executor-and-chat-resume`: pending; the earlier browser
    proof attempt and its hosted blocker are retained below as historical evidence.
 6. `promote-production-document-and-audit`: pending.
@@ -390,7 +390,7 @@ Status: Accepted 2026-07-15
 
 ### adopt-temporary-chat-model-approval
 
-Status: Pending 2026-07-15
+Status: Accepted 2026-07-15
 
 This new ordered implementation slice changes only the existing app-owned
 Executor endpoint policy, direct tests, agent instructions, and documentation.
@@ -416,6 +416,50 @@ hosted decision page and repeats approve, decline, replay, and Sendblue proof.
 The task receives exactly one Terra Medium implementation subagent after this
 SPEC revision is committed. Parent acceptance still requires the three-pass
 ownership/call-graph, Effect/helper-admission, and verification/evidence audit.
+
+#### Accepted Implementation Record
+
+- `agent/lib/executor/config.ts` now owns `ExecutorElicitationMode`, the
+  canonical Effect Schema for explicit `model` or `browser`. The endpoint
+  policy still rejects missing, duplicate, native, unknown, legacy, root,
+  transport, host, port, userinfo, fragment, and extra-query forms.
+- `agent/instructions.md` now requires the first paused turn to stop without
+  `resume`, then permits exactly one later direct owner decision for one
+  matching pending execution. Ambiguous, quoted, forwarded, provider, tool,
+  third-party, non-owner, missing, multiple, mismatched, settled, and replayed
+  state fails closed; ordinary resume uses default empty content and no retry.
+- Existing config and connection tests cover both supported modes, rejected
+  modes/forms, and the exact instruction contract. Root/app READMEs and Eve,
+  repo-structure, and testing architecture docs disclose the temporary weaker
+  boundary, blocked authority, read-only Production gate, and browser rollback.
+
+#### Helper Admission
+
+| Candidate                                                                                                     | Owner/reason                                                           | Concrete call sites                        | Direct test                                | Decision                  |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------ | ------------------------- |
+| `ExecutorElicitationMode`                                                                                     | App-owned endpoint security policy.                                    | `ExecutorMcpEndpoint` and its direct test. | Both accepted values and native rejection. | Retain.                   |
+| Instruction assertion                                                                                         | Direct policy-document proof at the existing Eve connection test edge. | One test in `executor-connection.test.ts`. | The assertion itself.                      | Retain inline; no helper. |
+| Approval service, persistence, state machine, MCP client, proxy, SDK, Layer, mapper, wrapper, factory, module | No accepted owner or runtime need.                                     | None.                                      | Not applicable.                            | Not added.                |
+
+#### Parent Acceptance Audits
+
+1. **Ownership and call graph:** accepted after parent diff inspection. The
+   production path remains `apps/agent -> Eve native MCP -> isolated Executor
+toolkit`; only existing app-owned Config and instructions changed. Eve owns
+   turn continuity, Executor owns paused state/policy, and no new runtime or UI
+   boundary exists.
+2. **Implementation quality and helper admission:** accepted. The single new
+   Schema is canonical, directly used, and tested; the existing named flat
+   Config Effects, sanitized tagged errors, Redacted bearer, and adapter-edge
+   runtime remain unchanged. No helper sprawl, unsafe cast, DTO mirror, raw
+   JSON helper, process environment read, broad error collapse, concurrency,
+   retry, suppression, dependency, or config weakening exists.
+3. **Verification and evidence:** accepted after parent-focused strict
+   typecheck, 56 agent tests with explicit model mode, explicit browser build,
+   and full verification with explicit model mode. Type-aware Ultracite/Oxlint,
+   Knip, six package typechecks, and all 194 tests pass; JSON/diff and scoped
+   output/diff leak scans pass. No provider or Vercel mutation, Sendblue send,
+   browser action, or frontend change occurred.
 
 ### prove-preview-eve-executor-and-chat-resume
 
@@ -456,7 +500,7 @@ schemas:
 2. `CodexRequestMapper.toCodexResponses` maps system instructions, user and
    assistant text, function-call history, function-call outputs, flat Responses
    function tools, and tool choice in one linear named Effect operation. Tools
-   set `parallel_tool_calls: false` so browser-gated execution remains
+   set `parallel_tool_calls: false` so approval-gated execution remains
    sequential.
 3. `CodexStreamMapper.toOpenAICompatibleStream` decodes Responses output-item
    and function-argument events through Effect Schema, emits Chat Completions
@@ -609,5 +653,5 @@ schemas:
    normal non-forced deployment from pushed SHA `ff8ddfe` reached Ready,
    force-executed the agent build task, regenerated the Build Output API tree,
    and completed the authenticated read path without credential leakage. This
-   closes only the deployment-cache corrective slice; Task 4 acceptance still
-   requires the unresolved browser and Sendblue gates.
+   closes only the deployment-cache corrective slice. Its historical browser
+   and Sendblue gates are superseded by the revised explicit-model Preview task.

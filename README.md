@@ -56,8 +56,26 @@ its earlier proofs are historical evidence, not the current Production state.
   personal Vercel account, not Tilt Legal.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, the `workspace_status` tool that delegates into
-  `@bundjil/eve-effect`, and app-owned model-provider config. Gateway is the
-  default model path; Codex proxy mode is opt-in.
+  `@bundjil/eve-effect`, app-owned model-provider config, and its scoped
+  Executor MCP connection. Gateway is the default model path; Codex proxy mode
+  is opt-in.
+
+## Executor Connection State
+
+The Eve app connects to an Executor toolkit endpoint only when its URL declares
+exactly one explicit `elicitation_mode=model` or `elicitation_mode=browser`.
+Model mode is a temporary chat-compatible workaround: the instructions require
+the paused execution turn to end, then permit one later unambiguous decision
+from the authenticated or allowlisted owner. This is an instruction-level
+control, not a hard authorization boundary equivalent to Executor native or
+browser approval. Executor toolkit policy remains authoritative: destructive
+and authority-management operations stay blocked, and the first Production
+acceptance operation remains read-only.
+
+Browser mode is the rollback target. Change a target-scoped endpoint URL only
+after clean Preview proof renders the hosted approval page, covers approve,
+decline, and settled replay, confirms Sendblue delivery, and redeploys from a
+clean SHA before any Production promotion.
 
 ## Sendblue Channel State
 

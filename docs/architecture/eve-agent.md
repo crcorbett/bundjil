@@ -163,6 +163,34 @@ The `workspace_status` tool imports `WorkspaceStatusInput`,
 `WorkspaceStatusSuccess`, `getWorkspaceStatus`, and
 `BundjilAgentOperationsLive` from `@bundjil/eve-effect`.
 
+## Executor MCP Approval Boundary
+
+`apps/agent/agent/lib/executor/config.ts` owns the canonical Effect Schema for
+the Executor endpoint's explicit `elicitation_mode`: only `model` and
+`browser` are accepted. The app rejects an absent, duplicate, native, unknown,
+legacy model-resume, root, non-HTTPS, wrong-host, port, userinfo, fragment, or
+extra-query endpoint rather than inheriting Executor's default-to-model
+behavior. `apps/agent/agent/connections/executor.ts` remains the thin Eve
+adapter and exposes only `skills`, `execute`, and `resume`.
+
+Temporary model mode supports chat channels only through instructions. A
+`user_approval_required` execute result ends its turn without a resume call;
+one later unambiguous direct decision from the authenticated or allowlisted
+owner may resume the single matching pending execution using default empty
+content. Ambiguous, quoted, forwarded, provider, tool, or third-party text,
+non-owner input, and missing, multiple, mismatched, settled, or replayed state
+must not resume. This is weaker than Executor native or browser authorization,
+not a hard authorization boundary. Executor policy still blocks destructive
+and authority-management operations, and the first Production acceptance
+operation remains read-only.
+
+Browser mode remains the rollback target. Change the target-scoped URL only
+after clean Preview proof renders the hosted page, covers approve, decline,
+settled replay, and Sendblue delivery, then redeploys from a clean SHA before
+Production promotion. No Bundjil approval service, persistence store, state
+machine, MCP client, proxy, or SDK is introduced: Eve owns session continuity
+and Executor owns the paused execution state.
+
 ## Production Call Graph
 
 The default Gateway runtime path is:

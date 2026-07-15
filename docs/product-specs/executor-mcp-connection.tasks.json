@@ -42,7 +42,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "completedPasses": 9,
+    "completedPasses": 12,
     "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, model/browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
@@ -187,7 +187,7 @@
     {
       "id": "adopt-temporary-chat-model-approval",
       "title": "Adopt explicit temporary model approval for chat channels",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["provision-isolated-preview-toolkit-and-credentials"],
       "description": "Permit explicit model or browser endpoint modes, encode the temporary two-turn owner-decision protocol in the Eve instructions, update direct tests and operator documentation, and preserve browser mode as the verified rollback target without adding another runtime boundary.",
       "implementationNotes": [
@@ -216,8 +216,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: parent inspected the complete diff and retained apps/agent -> Eve native MCP client -> isolated Executor toolkit. The only production changes are the existing app-owned Config Schema and agent instructions; no approval service, persistence store, state machine, client, proxy, SDK, package, provider mutation, or frontend boundary was added. Eve/session history remains responsible for turn continuity and Executor remains responsible for paused execution state and policy.",
+          "Implementation quality/helper admission: parent confirmed ExecutorElicitationMode is the sole new code abstraction, owns the canonical explicit model-or-browser policy, is used directly by ExecutorMcpEndpoint, and is directly tested. Instruction assertions remain inline in the existing connection test. No new helper, mapper, wrapper, service, Layer, factory, module, unsafe cast, DTO mirror, manual reader, raw JSON helper, process environment read, broad error collapse, fiber, queue, retry, suppression, or dependency exists.",
+          "Verification/evidence: parent ran focused agent strict typecheck, 56 agent tests with explicit synthetic model mode, an explicit browser-mode build, and full repository verification with explicit model mode: zero Ultracite/Oxlint findings, clean Knip, six package typechecks, and all 194 tests passed. JSON and diff checks passed; stale-claim review distinguished historical browser evidence; compiled output and diff scans found no synthetic key, bearer, protected toolkit URL, approval URL, or provider data. No live provider, Vercel mutation, Sendblue send, or browser action occurred."
+        ]
       },
       "commitAfterPassing": true
     },

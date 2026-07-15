@@ -5,6 +5,8 @@ export const ExecutorConnectionConfigOperation = Schema.Literals([
   "loadApiKey",
 ]);
 
+export const ExecutorElicitationMode = Schema.Literals(["model", "browser"]);
+
 export class ExecutorConnectionConfigError extends Schema.TaggedErrorClass<ExecutorConnectionConfigError>()(
   "ExecutorConnectionConfigError",
   {
@@ -37,8 +39,8 @@ export const ExecutorMcpEndpoint = Schema.URL.pipe(
         return "Executor MCP endpoint must not contain userinfo or a fragment.";
       }
       const modes = endpoint.searchParams.getAll("elicitation_mode");
-      if (modes.length !== 1 || modes[0] !== "browser") {
-        return "Executor MCP endpoint must select browser elicitation exactly once.";
+      if (modes.length !== 1 || !Schema.is(ExecutorElicitationMode)(modes[0])) {
+        return "Executor MCP endpoint must select one explicit supported elicitation mode.";
       }
       if (endpoint.searchParams.has("allow_model_resume")) {
         return "Executor MCP endpoint must not enable legacy model resume.";

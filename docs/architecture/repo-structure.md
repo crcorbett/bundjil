@@ -54,8 +54,12 @@ apps/agent/
     config.ts         app-owned model/config parsing
     instructions.md   agent instructions
     model-provider.ts app-owned Gateway/private-proxy provider selector
+    connections/
+      executor.ts     thin Eve Executor MCP definition
     channels/
       sendblue.ts     thin Eve route/event adapter
+    lib/executor/
+      config.ts       app-owned Executor endpoint policy and Redacted bearer
     lib/sendblue/     app-owned Sendblue contracts, services, and Layers
     tools/            Eve tool modules
   test/               app-level tool and runtime-edge tests
@@ -96,6 +100,13 @@ Preview evidence does not make it a shared package contract. Future Cloudflare
 email, Vercel Connect, and Notion code should likewise start in app-owned
 boundaries. Move shared contracts into packages only after the shape has
 survived at least one real tool/channel implementation.
+
+The Executor MCP connection is also app-owned: `agent/lib/executor/config.ts`
+owns its Effect Config endpoint policy and redacted bearer, while
+`agent/connections/executor.ts` is the thin Eve framework adapter. It does not
+justify a shared package, custom MCP client, proxy, SDK wrapper, approval
+service, persistence store, or state machine. Eve owns conversation/session
+continuity and Executor owns paused execution state.
 
 ## Package Boundaries
 

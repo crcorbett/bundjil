@@ -12,7 +12,9 @@ Committed Vercel Eve app for the first Bundjil agent slice.
   as the default and can build an AI SDK OpenAI-compatible `LanguageModel` for
   the private Bundjil Codex proxy.
 - `agent/instructions.md`: operational instructions for the minimal local
-  agent.
+  agent, including the temporary Executor model-mode approval protocol.
+- `agent/lib/executor/config.ts`: app-owned Effect Config and endpoint policy
+  for the scoped Executor MCP connection.
 - `agent/tools/workspace_status.ts`: Eve tool that delegates to
   `@bundjil/eve-effect`.
 - `test/workspace-status-tool.test.ts`: app-level proof that the Eve tool
@@ -42,6 +44,29 @@ Unsupported:
 - Codex OAuth tokens are not OpenAI Platform API keys or AI Gateway
   credentials.
 - The private proxy is not a public gateway.
+
+## Executor MCP Approval
+
+`BUNDJIL_EXECUTOR_MCP_URL` must be an HTTPS `executor.sh` toolkit URL with
+exactly one explicit `elicitation_mode=model` or `elicitation_mode=browser`.
+Missing, duplicate, native, unknown, legacy, root, or otherwise malformed URLs
+fail closed. Bundjil does not rely on Executor's default model mode.
+
+Model mode is temporary for authenticated email and iMessage conversations.
+When Executor pauses an execution, Bundjil instructions stop the current turn
+without a `resume` call. A later direct, unambiguous authenticated or
+allowlisted owner decision can resume the one matching pending execution with
+the default empty content. Ambiguous, quoted, forwarded, provider, tool, or
+third-party text, non-owner input, and missing, multiple, mismatched, settled,
+or replayed state make no resume call.
+
+This is an instruction-level workaround, not a hard authorization boundary or
+an equivalent to Executor native or browser authorization. Executor policies
+remain authoritative: destructive and authority-management operations stay
+blocked, and the first Production acceptance operation is read-only. Browser
+mode is the rollback target. Switch the target-scoped URL only after clean
+Preview proof of the hosted page, approve, decline, settled replay, and
+Sendblue delivery; then redeploy from a clean SHA before Production promotion.
 
 ## Commands
 
@@ -230,6 +255,13 @@ Gateway mode is the default:
   to `google/gemini-2.5-flash`.
 - `AI_GATEWAY_API_KEY`: local or hosted AI Gateway credential.
 - `VERCEL_OIDC_TOKEN`: credential normally pulled by `eve link`.
+
+Executor MCP mode is explicit:
+
+- `BUNDJIL_EXECUTOR_MCP_URL`: required HTTPS Executor toolkit endpoint with
+  exactly one `elicitation_mode=model` during the temporary chat workaround or
+  `elicitation_mode=browser` after verified rollback.
+- `BUNDJIL_EXECUTOR_API_KEY`: required Executor toolkit bearer credential.
 
 Codex proxy mode is opt-in:
 
