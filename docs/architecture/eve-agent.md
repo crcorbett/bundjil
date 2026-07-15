@@ -5,8 +5,10 @@
 Gateway remains the default Eve provider. `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`
 selects an app-owned Effect Config path that builds a private
 OpenAI-compatible `LanguageModel`. Production evidence verifies one deployed
-Eve request through the private live proxy. Earlier adapter and Preview proofs
-remain distinct historical evidence for their own environments.
+Eve request through the private live proxy. The current isolated Preview also
+has source-correlated live-proxy, Executor model-approval, Sendblue owner
+continuation, non-owner rejection, and replay-suppression evidence. Earlier
+adapter proofs remain distinct historical evidence for their own environments.
 
 This guide documents the committed Bundjil Eve app and the Effect package
 boundary it uses. Sendblue is a Production-verified app-owned channel with a

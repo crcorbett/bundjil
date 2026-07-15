@@ -35,7 +35,13 @@ Implemented:
   mode.
 - Hosted Eve Production has been verified through the private live proxy.
   Gateway remains the default unless the app-owned opt-in configuration selects
-  the proxy. Earlier Preview proof is retained as historical evidence.
+  the proxy.
+- Hosted Preview has a source-correlated model-mode proof through the isolated
+  live Codex proxy and Personal Executor toolkit. It covers a first-turn pause,
+  later owner approve and decline, ambiguity/multiple/replay rejection,
+  Sendblue owner and non-owner routing, provider delivery, and replay
+  suppression. Model mode remains temporary and is not equivalent to browser
+  or native authorization.
 
 Unsupported:
 

@@ -42,7 +42,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "completedPasses": 12,
+    "completedPasses": 15,
     "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, model/browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
@@ -228,7 +228,7 @@
     {
       "id": "prove-preview-eve-executor-and-chat-resume",
       "title": "Prove deployed Preview Eve, Executor model approval, and Sendblue continuation",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["adopt-temporary-chat-model-approval"],
       "description": "Deploy a clean explicit-model Preview and prove connection discovery, read execution, first-turn pause, later-turn authenticated owner decisions, safe resume, owner-channel routing, policy restoration, observability, and leak safety end to end.",
       "implementationNotes": [
@@ -266,8 +266,12 @@
       "knownBlockers": [],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph accepted: exact source-correlated Preview proof retains apps/agent -> Eve native MCP -> dedicated Personal Executor toolkit and apps/agent -> private codex-proxy -> Codex subscription paths. Eve owns turn continuity, Executor owns paused execution and policy, Sendblue owns provider delivery, and no Bundjil approval client, proxy, state store, provider fallback, or Production authority was introduced.",
+          "Implementation quality and helper admission accepted: Task 5 changes only sanitized documentation and evidence. The previously accepted canonical Effect Config Schema, Redacted key, named linear operations, tagged errors, adapter-edge runtime, and model instructions remain unchanged. No helper, mapper, wrapper, hook, script, service, Layer, factory, barrel, DTO mirror, raw JSON reader, process environment access, cast, suppression, UI component, or speculative abstraction was added.",
+          "Verification and evidence accepted: the exact pushed Preview agent and proxy deployments are Ready and source-correlated; protected live Codex streaming, Eve discovery, first-turn pause, later owner approve and decline, ambiguous/settled/multiple rejection, one-resume limits, Sendblue owner continuation, non-owner rejection, provider delivery, replay suppression, policy readback, encrypted profile storage, restrictive temporary-file handling, and zero-leak/zero-5xx log scans pass. Root type-aware lint and formatting report zero findings, Knip is clean, all six strict typechecks pass, and all 194 tests pass with a nonsecret synthetic model-mode Executor fixture."
+        ]
       },
       "commitAfterPassing": true
     },

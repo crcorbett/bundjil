@@ -37,7 +37,7 @@ material after each proof.
 2. `implement-effect-config-and-eve-mcp-connection`: accepted.
 3. `provision-isolated-preview-toolkit-and-credentials`: accepted.
 4. `adopt-temporary-chat-model-approval`: accepted.
-5. `prove-preview-eve-executor-and-chat-resume`: in progress; the earlier browser
+5. `prove-preview-eve-executor-and-chat-resume`: accepted; the earlier browser
    proof attempt and its hosted blocker are retained below as historical evidence.
 6. `promote-production-document-and-audit`: pending.
 
@@ -463,7 +463,7 @@ toolkit`; only existing app-owned Config and instructions changed. Eve owns
 
 ### prove-preview-eve-executor-and-chat-resume
 
-Status: In progress 2026-07-15
+Status: Accepted 2026-07-15
 
 The browser evidence below is retained as historical diagnosis. It no longer
 blocks the revised task, which must deploy explicit model mode and prove a
@@ -627,6 +627,85 @@ schemas:
   MCP client/proxy and source-only acceptance remain forbidden. Browser mode
   can return only after `executor.sh` demonstrates a working name-addressed
   approval lookup through the separate Preview rollback gate.
+
+#### Accepted Model-Mode Preview Proof
+
+- The isolated Preview Codex profile was reauthenticated on a trusted local
+  callback, stored refresh-capable and encrypted in the Preview-only Upstash
+  namespace, and read successfully by the redeployed private proxy. Its rotated
+  cipher and key id are stored in a dedicated Personal 1Password record; a
+  concealed readback matched both ephemeral source values. Production profile,
+  cipher, storage, and Vercel variables were not changed.
+- Proxy deployment `dpl_8EMpMnmzxHR1YvFyxuXAsw23HgTo` and agent deployment
+  `dpl_AiMMmiMX9wMKxYjJquiCnrExx5N7` are Ready Preview deployments. Vercel API
+  readback records `main`, `crcorbett/bundjil`, and pushed source SHA
+  `440656d88db9a7a98cc044ba618d5fcdae9a2bf5` for both. The agent reports model
+  `bundjil-codex-proxy/gpt-5.5`; the protected proxy reports live/ready and
+  completes authenticated SSE with the terminal marker.
+- On that exact agent deployment, the authenticated Eve proof reached one
+  `waiting_for_interaction` result and `session.waiting` with zero `resume`
+  requests and zero downstream comments. A later direct owner approval called
+  `executor__resume` exactly once, completed, created exactly one disposable
+  comment, and the operator deleted it after readback. Separate sessions proved
+  decline with one resume and no write, ambiguous and already-settled replies
+  with zero resume, and a request referring to multiple pending actions with
+  zero resume followed by explicit clarification and a single decline.
+- On the exact source-correlated deployment, a signed allowlisted Sendblue
+  request returned `202` and delivered the pending-approval reply. A correctly
+  signed non-owner request returned the documented ignored `200` and created no
+  write. The later owner decision returned `202`, produced exactly one
+  disposable comment, and delivered the completion reply. Replaying the same
+  inbound handle returned `200`, produced no second write or outbound reply,
+  and the operator deleted the disposable comment after evidence capture.
+- Executor policy readback contains only the pre-existing Personal Gmail read
+  approval; no disposable GitHub allow rule or management authority was added.
+  The selected GitHub mutation therefore retained Executor's approval gate,
+  while unselected operations remained blocked by toolkit scope. No Production
+  Executor toolkit, key, URL, policy, or write authority was provisioned.
+- Final deployment logs contained 46 agent records and 14 proxy records, zero
+  5xx responses, zero exact secret hits, zero OAuth/credential marker hits, and
+  zero sensitive environment-name hits. All retained live response, stream,
+  log, and provider material was mode `0600` and removed after sanitized
+  inspection. An earlier stream capture was briefly created with the process
+  default mode, immediately corrected to `0600`, excluded from retained
+  evidence, and removed; every subsequent capture used an explicit restrictive
+  umask or chmod.
+
+The first proxy proof helper attempt returned blocked because the retained
+Preview deployment is protected and that historical helper does not send the
+Vercel automation-bypass header. Acceptance therefore used an equivalent
+private black-box probe with the independent bypass and proxy bearer, retained
+only statuses and booleans, and deleted the response body. Production
+promotion must either extend the existing helper at its owning boundary or
+retain this explicit protected-probe procedure; it must not disable deployment
+protection.
+
+#### Model-Mode Preview Parent Acceptance Audits
+
+1. **Ownership and call graph:** accepted. The exact source-correlated Preview
+   path remains the agent through Eve native MCP to the dedicated Personal
+   Executor toolkit. Model traffic remains the agent through the private Codex
+   proxy to the Codex subscription. Eve owns turn continuity, Executor owns
+   paused execution and policy, and Sendblue owns provider delivery. No Bundjil
+   approval client, proxy, state store, provider fallback, or Production
+   authority was added.
+2. **Implementation quality and helper admission:** accepted. Task 5 changes
+   only sanitized documentation and evidence. The previously accepted
+   canonical Effect Config Schema, `Redacted` key, named linear operations,
+   tagged errors, adapter-edge runtime, and model instructions are unchanged.
+   No helper, mapper, wrapper, hook, script, service, `Layer`, factory, barrel,
+   DTO mirror, raw JSON reader, `process.env`, cast, suppression, UI component,
+   or speculative abstraction was added.
+3. **Verification and evidence:** accepted. The exact pushed Preview agent and
+   proxy deployments are Ready and source-correlated. Protected live Codex
+   streaming, Eve discovery, first-turn pause, owner approve and decline,
+   ambiguous/settled/multiple rejection, one-resume limits, Sendblue owner
+   continuation, non-owner rejection, provider delivery, replay suppression,
+   policy readback, encrypted profile storage, restrictive temporary-file
+   handling, and zero-leak/zero-5xx log scans pass. Root type-aware lint and
+   formatting report zero findings, Knip is clean, all six strict typechecks
+   pass, and all 194 tests pass with a nonsecret synthetic model-mode Executor
+   fixture.
 
 #### Deployment Cache Corrective Slice Review
 
