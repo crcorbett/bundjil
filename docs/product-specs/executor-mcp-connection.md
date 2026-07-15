@@ -2,7 +2,7 @@
 
 - Status: Draft
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-14
+- Last reviewed: 2026-07-15
 
 ## Decision
 
@@ -13,8 +13,10 @@ client, an MCP proxy, or a new workspace package.
 The authored connection lives at
 `apps/agent/agent/connections/executor.ts`. It obtains its toolkit-scoped URL
 and bearer credential from an app-owned Effect Config module, exposes only the
-remote `skills`, `execute`, and `resume` MCP tools through Eve's allowlist, and
-uses Executor's browser-mediated approval mode. Executor remains responsible
+remote `skills`, `execute`, and `resume` MCP tools through Eve's allowlist. The
+hosted connection temporarily uses Executor's explicit model-mediated approval
+mode so authenticated email and iMessage conversations can pause on one turn
+and submit the owner's decision on a later turn. Executor remains responsible
 for its dynamic tool schemas, sandbox execution, downstream credential
 injection, connection scoping, policy evaluation, approval state, and
 execution resumption.
@@ -22,9 +24,9 @@ execution resumption.
 Preview and Production use separate Executor toolkits and separate API keys.
 Each toolkit is implicit-deny and admits only explicitly selected downstream
 connections. Read-only operations may be approved automatically, mutations
-require a human decision in Executor's browser UI, and destructive,
-administrative, credential, billing, policy-management, and irreversible
-operations are blocked for the first production slice.
+require an explicit later-turn owner decision while model mode is active, and
+destructive, administrative, credential, billing, policy-management, and
+irreversible operations are blocked for the first production slice.
 
 The broad personal Executor MCP endpoint and existing API key may be used for
 read-only discovery and connectivity proof only. They are not accepted as the
@@ -48,7 +50,7 @@ Executor already owns the difficult provider boundary:
 - host-side downstream credential injection;
 - toolkit-scoped connection patterns with implicit deny;
 - `approve`, `require_approval`, and `block` policy actions; and
-- durable paused execution plus browser-mediated resume.
+- durable paused execution plus model-, browser-, or native-mediated resume.
 
 Duplicating either side in Bundjil would create stale DTOs, a second policy
 engine, a second credential boundary, and unnecessary helper/service sprawl.
@@ -71,11 +73,14 @@ and the already committed Eve architecture:
   connections.
 - Executor's current source defaults an absent or unknown
   `elicitation_mode` to `model`.
-- In `elicitation_mode=model`, the model can submit an `accept`, `decline`, or
-  `cancel` response itself. That mode is forbidden for Bundjil.
+- In `elicitation_mode=model`, `resume` accepts an execution id, an `accept`,
+  `decline`, or `cancel` action, and optional JSON-encoded content. Bundjil
+  temporarily uses this mode because email and iMessage cannot complete native
+  MCP elicitation and Executor's hosted browser decision page is unavailable.
 - In `elicitation_mode=browser`, a paused execution returns an approval URL;
   the signed-in human decides in Executor's UI and `resume` accepts only the
-  execution id. This is the required mode.
+  execution id. This remains the preferred mode and rollback target once the
+  hosted page is verified working.
 - Executor PR
   [#1317](https://github.com/UsefulSoftwareCo/executor/pull/1317) fixed a
   hosted-cloud failure with the exact unavailable-page symptom by routing
@@ -84,6 +89,9 @@ and the already committed Eve architecture:
   Preview acceptance must therefore prove the rendered hosted page, not infer
   browser approval from a `user_approval_required` tool result or from source
   alone.
+- Eve's current MCP runtime does not advertise elicitation capabilities or
+  install an elicitation request handler, so Executor's native mode cannot be
+  used without an Eve framework change.
 - Executor resolves downstream credentials on its host. Bundjil, Eve, the
   model, conversation history, and proof artifacts must not receive those
   credentials.
@@ -93,6 +101,22 @@ current source plus a direct read-only live probe are authoritative. The
 implementation task must revalidate the installed/current contracts before
 provisioning because Executor and Eve are external, evolving systems.
 
+### 2026-07-15 Model-Mode Revision Review
+
+1. **Contract pass:** re-read Executor's current `readElicitationMode`, model
+   and browser `resume` registrations, and Eve MCP client construction. This
+   confirmed explicit model mode exposes `executionId`, `action`, and defaulted
+   JSON content; browser mode exposes only `executionId`; native mode lacks the
+   required Eve elicitation handler; and missing or unknown mode silently falls
+   back to model. The SPEC therefore accepts only explicit `model` or `browser`.
+2. **Security and task pass:** reviewed the complete threat model, call graphs,
+   config example, tests, rollout, rollback, Production gate, task ordering, and
+   retained browser-failure evidence. This added the first-turn stop and
+   later-turn owner-decision protocol, ambiguity/non-owner/replay rejection,
+   default empty resume content, explicit disclosure that model instructions
+   are not a hard authorization boundary, and a separate implementation task
+   before live Preview proof.
+
 ## Goals
 
 - Let the Eve agent discover and invoke a deliberately small set of connected
@@ -101,10 +125,12 @@ provisioning because Executor and Eve are external, evolving systems.
   committed files, build logs, runtime logs, traces, and proof artifacts.
 - Preserve Effect Config, Schema, Redacted, tagged-error, Layer, and linear
   control-flow rules at the app-owned boundary.
-- Ensure the model cannot approve its own gated Executor operation.
+- Require a separate authenticated owner continuation before the model submits
+  an approval action, while documenting that this instruction is not a hard
+  authorization boundary.
 - Isolate Preview and Production credentials, toolkits, policies, and evidence.
-- Prove one read-only execution and one browser-gated pause/decision/resume
-  sequence through the deployed Eve agent before Production promotion.
+- Prove one read-only execution and model-mode pause/decision/resume sequences
+  through the deployed Eve agent and Sendblue before Production promotion.
 - Make rollback possible without changing Executor or Eve source under
   incident pressure.
 - Document how operators add an integration or change a policy without
@@ -126,13 +152,16 @@ provisioning because Executor and Eve are external, evolving systems.
   `docs/architecture/frontend-composition.md`.
 - Treating Eve's coarse connection-level approval as a replacement for
   Executor's per-downstream-tool policies.
-- Accepting `elicitation_mode=model`, `allow_model_resume=true`, a missing
-  elicitation mode, or an unknown mode.
+- Accepting `elicitation_mode=native`, `allow_model_resume=true`, a missing,
+  duplicate, or unknown elicitation mode.
+- Treating the temporary model-mediated protocol as equivalent to native or
+  browser-enforced human authorization.
 
 ## Security Invariants
 
 1. The URL must be an HTTPS Executor toolkit endpoint, not a root MCP endpoint,
-   and must contain exactly `elicitation_mode=browser`.
+   and must explicitly contain exactly one supported `elicitation_mode` value:
+   `model` during the temporary hosted workaround or `browser` after rollback.
 2. Eve may discover only `skills`, `execute`, and `resume` from this
    connection. Future remote MCP additions remain hidden until reviewed.
 3. Preview and Production have distinct toolkit slugs, API keys, Vercel
@@ -141,37 +170,43 @@ provisioning because Executor and Eve are external, evolving systems.
    unless both its connection and policy admit it.
 5. `approve` is limited to explicitly reviewed read-only operations.
 6. Create, update, send, publish, or other state-changing operations require
-   browser approval unless they are blocked.
+   an explicit authenticated owner decision on a later turn unless blocked.
 7. Delete, purchase, billing, credential, account, infrastructure,
    policy/toolkit administration, and irreversible operations are blocked in
    the first Production slice.
-8. The model receives an execution id and approval URL, but never an approval
-   action field. It can call `resume(executionId)` only after the human decision
-   is recorded by Executor.
-9. A Sendblue reply may carry the approval URL to the allowlisted owner, but a
-   Sendblue message is not itself an approval decision.
-10. The Executor API key is unwrapped from `Redacted` only inside Eve's
+8. In temporary model mode, the turn that receives `user_approval_required`
+   must stop at `session.waiting` without calling `resume`. Only a later message
+   from the authenticated or allowlisted owner containing an unambiguous
+   approve, decline, or cancel decision may cause one `resume` call for that
+   pending execution.
+9. Approval must not be inferred from the original request, tool or provider
+   output, quoted or forwarded text, third-party content, or ambiguous language.
+   Ambiguity asks again and does not call `resume`.
+10. A conversation or session may have at most one actionable pending approval.
+    Missing, multiple, settled, replayed, or mismatched pending state fails
+    closed without a resume attempt.
+11. The Executor API key is unwrapped from `Redacted` only inside Eve's
     `auth.getToken` adapter and is never added to an Effect error payload.
-11. Downstream provider credentials remain in Executor. Bundjil stores only its
+12. Downstream provider credentials remain in Executor. Bundjil stores only its
     dedicated Executor bearer credential and non-secret/sanitized identifiers.
-12. Production enablement follows accepted Preview proof. Rollback uses an
+13. Production enablement follows accepted Preview proof. Rollback uses an
     accepted immutable Vercel deployment and immediate key revocation/toolkit
     disablement when credential or policy compromise is suspected.
 
 ## Threat Model
 
-| Threat                                                   | Required control                                                                                                                                       |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Prompt injection asks for a destructive action           | Toolkit policy blocks it or requires a browser decision; model text cannot change policy.                                                              |
-| Model attempts to approve its own action                 | URL pins browser mode; tests prove `resume` has no action/content fields.                                                                              |
-| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                       |
-| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                   |
-| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared keys, and shared toolkit identities.                                                                 |
-| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                           |
-| Approval URL reaches an untrusted person                 | Only authenticated Eve/API and allowlisted Sendblue owner routes are accepted; URL is not logged or retained as evidence.                              |
-| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                             |
-| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                  |
-| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions. |
+| Threat                                                   | Required control                                                                                                                                                   |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Prompt injection asks for a destructive action           | Toolkit policy blocks destructive authority; reversible mutations pause and require a separate authenticated owner continuation.                                   |
+| Model attempts to approve its own action                 | Instructions require a two-turn stop/resume protocol, identity checks, one pending decision, and ambiguity/replay rejection; this is not a hard security boundary. |
+| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                                   |
+| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                               |
+| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared keys, and shared toolkit identities.                                                                             |
+| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                                       |
+| Approval request reaches an untrusted person             | Only authenticated Eve/API and allowlisted Sendblue owner continuations may decide; non-owner messages cannot resume and protected details are not retained.       |
+| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                                         |
+| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                              |
+| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions.             |
 
 ## Ownership And File Shape
 
@@ -224,8 +259,10 @@ unless another app proves a stable shared contract.
 
 Bundjil owns only the contracts it must validate or emit:
 
-- `ExecutorMcpEndpoint`: HTTPS, Executor host, toolkit path, browser elicitation
-  mode, and no userinfo or fragment;
+- `ExecutorElicitationMode`: exactly `model` or `browser`; `model` is the
+  temporary chat-compatible mode and `browser` is the preferred rollback mode;
+- `ExecutorMcpEndpoint`: HTTPS, Executor host, toolkit path, one explicit
+  supported elicitation mode, and no userinfo or fragment;
 - `ExecutorConnectionConfigOperation`: exactly `loadEndpoint` or `loadApiKey`
   so sanitized configuration failures retain operation identity;
 - `ExecutorConnectionEnvironment`: `preview` or `production` when a proof or
@@ -272,6 +309,8 @@ export class ExecutorConnectionConfigError extends Schema.TaggedErrorClass<Execu
   }
 ) {}
 
+export const ExecutorElicitationMode = Schema.Literals(["model", "browser"]);
+
 export const ExecutorMcpEndpoint = Schema.URL.pipe(
   Schema.check(
     Schema.makeFilter((endpoint) => {
@@ -295,8 +334,8 @@ export const ExecutorMcpEndpoint = Schema.URL.pipe(
         return "Executor MCP endpoint must not contain userinfo or a fragment.";
       }
       const modes = endpoint.searchParams.getAll("elicitation_mode");
-      if (modes.length !== 1 || modes[0] !== "browser") {
-        return "Executor MCP endpoint must select browser elicitation exactly once.";
+      if (modes.length !== 1 || !Schema.is(ExecutorElicitationMode)(modes[0])) {
+        return "Executor MCP endpoint must select a supported elicitation mode exactly once.";
       }
       if (endpoint.searchParams.has("allow_model_resume")) {
         return "Executor MCP endpoint must not enable legacy model resume.";
@@ -602,16 +641,49 @@ accepted SPEC/task update.
 
 The Eve connection allowlist is exact:
 
-| MCP tool  | Purpose                                                             | Eve policy                                                                  |
-| --------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `skills`  | Retrieve Executor usage guidance and discover the selected catalog. | Allowed. Read-only metadata.                                                |
-| `execute` | Run code that invokes one or more selected downstream tools.        | Allowed. Executor evaluates every downstream operation against the toolkit. |
-| `resume`  | Continue a browser-decided paused execution by execution id.        | Allowed only because browser mode removes model-supplied decision fields.   |
+| MCP tool  | Purpose                                                                | Eve policy                                                                                                                                        |
+| --------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `skills`  | Retrieve Executor usage guidance and discover the selected catalog.    | Allowed. Read-only metadata.                                                                                                                      |
+| `execute` | Run code that invokes one or more selected downstream tools.           | Allowed. Executor evaluates every downstream operation against the toolkit.                                                                       |
+| `resume`  | Continue one paused execution with the authenticated owner's decision. | Allowed temporarily in explicit model mode under the two-turn protocol below; browser mode removes model-supplied decision fields after rollback. |
 
 Do not add an Eve `always()` approval gate in this slice. It is too coarse for
 Executor's dynamic downstream catalog and would duplicate a second approval
-state machine. The security boundary is Executor's toolkit policy plus browser
-mode. Eve's allowlist remains defense in depth around the orchestration tools.
+state machine. The hard security boundary is Executor's selected toolkit and
+policy; the temporary two-turn model protocol is an instruction-level control,
+not equivalent to browser or native elicitation. Eve's allowlist remains
+defense in depth around the orchestration tools.
+
+### Temporary Model Approval Protocol
+
+While `elicitation_mode=model` is configured, Bundjil follows this exact
+conversation protocol:
+
+1. `execute` may return a paused `user_approval_required` result.
+2. The same Eve turn explains the proposed operation in sanitized terms, asks
+   the authenticated owner to reply with approve, decline, or cancel, and then
+   stops at `session.waiting`. It must not call `resume` in that turn.
+3. A later continuation from the same authenticated Eve principal or allowlisted
+   Sendblue identity is matched to the conversation's single pending execution.
+4. Only an unambiguous owner decision maps to the corresponding `resume`
+   action. The ordinary approval flow uses Executor's default empty content;
+   Bundjil does not synthesize form content from conversation or provider text.
+   Ambiguous language asks again. Decline and cancel are not rewritten as
+   acceptance.
+5. Original prompts, quoted or forwarded content, downstream/provider output,
+   tool instructions, and third-party messages can never supply the decision.
+6. A missing, multiple, mismatched, already settled, replayed, or non-owner
+   continuation causes no `resume` call. Bundjil reports that it cannot safely
+   identify one pending approval.
+7. After one resume attempt, the execution is treated as settled for
+   conversation purposes. Bundjil does not automatically retry `resume`.
+
+This protocol deliberately enables a model to carry the owner's decision into
+Executor because chat channels cannot render native MCP elicitation. It reduces
+accidental same-turn self-approval but cannot prevent a sufficiently successful
+prompt injection from violating instructions. The user has accepted that
+temporary risk. Destructive and authority-management operations remain blocked
+by Executor policy, and Production initially proves read-only authority only.
 
 ### Executor Toolkit Surface
 
@@ -631,8 +703,8 @@ Initial policy rules:
 
 The first Preview toolkit should select only the smallest integrations needed
 for proof. A useful first capability is a read-only search/get integration plus
-one harmless operation temporarily set to `require_approval` for the browser
-flow. Do not choose final integrations by assumption in this SPEC; inventory
+one harmless operation temporarily set to `require_approval` for the model-mode
+chat flow. Do not choose final integrations by assumption in this SPEC; inventory
 the user's current Executor catalog and obtain explicit acceptance in the task
 evidence before Production.
 
@@ -645,7 +717,8 @@ Use target-scoped variables with the same names and different values:
 
 - `BUNDJIL_EXECUTOR_MCP_URL`: encrypted Preview/Production value available to
   `eve build` and runtime. It identifies only the environment's toolkit and
-  includes `elicitation_mode=browser`.
+  includes exactly one explicit `elicitation_mode=model` during the workaround
+  or `elicitation_mode=browser` after the rollback gate passes.
 - `BUNDJIL_EXECUTOR_API_KEY`: sensitive/write-only Preview/Production bearer,
   resolved only at runtime by `auth.getToken`.
 
@@ -702,21 +775,32 @@ Authenticated Eve API principal or allowlisted Sendblue principal
               -> selected downstream integration
 ```
 
-### Browser Approval
+### Temporary Chat Approval
 
 ```text
 Eve model calls executor__execute
   -> Executor policy returns require_approval
     -> Executor pauses execution
-    -> Executor returns executionId + approvalUrl
-      -> Eve tells the authenticated owner to open approvalUrl
-      -> Sendblue may deliver the same URL to the allowlisted owner
-        -> owner signs into Executor in browser
-        -> owner approves, declines, or cancels
-          -> Executor stores the human decision
-          -> Eve model calls executor__resume({ executionId })
-            -> Executor consumes the stored decision
+    -> Executor returns executionId + decision request
+      -> Eve sanitizes the proposed action and asks the authenticated owner
+      -> Eve stops the first turn at session.waiting without resume
+        -> owner sends a later approve | decline | cancel message
+          -> Eve/Sendblue authenticates the same owner and conversation
+          -> Eve verifies exactly one pending unsettled execution
+          -> Eve model calls executor__resume({ executionId, action }) once
+            -> Executor consumes the submitted decision
             -> completed or denied result returns to Eve
+```
+
+### Browser Rollback
+
+```text
+Hosted Executor browser lookup is proven fixed in Preview
+  -> change target-scoped URL from explicit model to explicit browser
+    -> deploy a clean pushed SHA
+      -> repeat approve, decline, replay, and Sendblue proof
+        -> resume accepts executionId only after Executor stores the decision
+          -> promote browser mode independently to Production
 ```
 
 ### Tests
@@ -745,7 +829,7 @@ Vitest
     -> Vercel Preview target variables
       -> clean source deployment
         -> Eve connection_search -> skills -> execute read-only
-        -> browser pause -> human decision -> resume
+        -> chat pause -> later owner decision -> model resume
         -> Vercel Agent Run + Executor trace readback
         -> sanitized proof only
           -> independent Production toolkit/key/variables
@@ -756,11 +840,11 @@ Vitest
 
 ### Config And Definition Tests
 
-- Accept only HTTPS Executor toolkit URLs with the exact browser elicitation
-  mode.
+- Accept only HTTPS Executor toolkit URLs with exactly one explicit supported
+  elicitation mode: `model` or `browser`.
 - Reject root MCP URLs, wrong hosts, HTTP,
-  userinfo, fragments, missing/duplicate/wrong elicitation mode, and the legacy
-  model-resume query.
+  userinfo, fragments, missing/duplicate/unknown/native elicitation mode, and
+  the legacy model-resume query.
 - Prove missing URL and missing key fail closed with sanitized tagged errors.
 - Prove key failures and `Redacted` rendering do not emit a synthetic secret
   marker.
@@ -786,7 +870,7 @@ They do not mutate ambient `process.env`, start a server, choose a port, call
 Executor/Vercel/Sendblue/a model/the public network, or hand-roll JSON-RPC.
 
 Remote tool filtering, bearer/auth failures, malformed/unavailable transport,
-read execution, browser-paused resume input, and no-fallback behavior are
+read execution, model-mode resume input, and no-fallback behavior are
 Eve/Executor runtime responsibilities. The deployed Preview task proves them
 against the isolated toolkit through `connection_search` and real remote tool
 discovery; Bundjil does not mirror those contracts locally.
@@ -804,22 +888,24 @@ discovery; Bundjil does not mirror those contracts locally.
   read-only `execute` operation.
 - Prove a sanitized bearer/auth failure plus malformed and unavailable remote
   MCP failures fail closed without a direct-provider fallback.
-- Temporarily require browser approval for a harmless proof operation. Prove
-  the Eve turn pauses, the owner opens the authenticated Executor page,
-  approve and decline each work, and `resume` carries only the execution id.
+- Temporarily require approval for a harmless proof operation. Prove the first
+  Eve turn pauses without `resume`, a later authenticated owner continuation
+  separately approves and declines, ambiguity and non-owner messages do not
+  resume, and replay cannot settle the execution twice.
 - Restore and read back the intended toolkit policy after the proof.
 - Send one allowlisted Sendblue message that requires the Executor connection;
-  prove a usable approval URL is delivered when gated and the final reply is
-  delivered only after the browser decision.
+  prove the first reply asks for a decision, the owner's later explicit reply
+  resumes the same execution, and a non-owner cannot resume it.
 - Correlate sanitized Eve Agent Run, Vercel request, Executor execution, and
   Sendblue delivery status without retaining prompts, message text, provider
   records, execution code, full URLs, or credentials.
 
 ## Browser Verification
 
-Bundjil adds no React route or component in this slice. Browser evidence is
-still mandatory for the external approval state because it is the human
-security decision surface:
+Bundjil adds no React route or component in this slice. The failed external
+browser evidence remains retained as the reason for the temporary workaround.
+It is not an acceptance gate while explicit model mode is active. Before
+switching either environment to browser mode, Preview must prove:
 
 - approval URL opens the expected Executor origin over HTTPS;
 - unauthenticated access requires Executor authentication;
@@ -844,8 +930,9 @@ not authorize Bundjil route/component work.
    executable-edge definition tests, documentation, and compiled-output leak
    checks.
 3. Create the isolated Preview toolkit/key and target-scoped Vercel variables.
-4. Pass local config/definition, direct MCP, deployed Eve, browser approval,
-   Sendblue, log, and leak proof in Preview.
+4. Adopt explicit model mode and pass local config/definition, direct MCP,
+   deployed Eve two-turn approval, Sendblue, log, replay, and leak proof in
+   Preview.
 5. Create an independent Production toolkit/key from the accepted policy
    intent. Do not reuse Preview identities or copy unreviewed catalog entries.
 6. Deploy Production from the accepted clean SHA, prove one read-only
@@ -863,8 +950,12 @@ not authorize Bundjil route/component work.
 - For policy overreach, block the affected operation/toolkit immediately,
   retain sanitized execution identifiers for investigation, and do not rely
   only on a code rollback.
-- For approval-mode regression, revoke the key and disable the toolkit. A
-  missing or model mode is a stop condition, not a degraded operating mode.
+- For approval-mode regression, revoke the key and disable the toolkit. Missing,
+  duplicate, native, unknown, or legacy modes are stop conditions. Model mode
+  is allowed only as the explicit temporary chat-compatible configuration.
+- To return to browser mode, first prove the hosted decision page in Preview,
+  switch only the target-scoped URL, deploy from a clean SHA, and rerun approve,
+  decline, replay, and Sendblue evidence before Production promotion.
 - Confirm no post-revocation execution succeeds and scan Vercel/Executor logs
   for the incident interval without copying provider payloads into the repo.
 - Rotate the 1Password and Vercel values together and record only dates,
@@ -935,8 +1026,8 @@ Every implementation task must complete at least three parent review passes:
    the helper-admission table and remove every candidate without accepted
    ownership, call sites, and direct tests.
 3. **Verification and evidence:** review focused tests, Eve build, task-owned
-   config/definition evidence, deployed MCP/direct HTTP, browser approval,
-   Sendblue, deployment, logs, leak scans,
+   config/definition evidence, deployed MCP/direct HTTP, two-turn chat approval
+   and any later browser rollback proof, Sendblue, deployment, logs, leak scans,
    documentation, rollback evidence, zero-warning Ultracite/Oxlint, strict
    typechecks, Effect language-service diagnostics, Knip, and proof that no
    lint/type/test/configuration escape was introduced.
@@ -955,8 +1046,12 @@ active execution plan before accepting the task.
   unsupported runtime toggle.
 - Executor's `execute` tool is intentionally powerful. Toolkits and policies,
   not the small number of MCP orchestration tools, define the true authority.
-- Browser approval adds latency and requires the owner to authenticate in a
-  browser. This is the intended security tradeoff for state-changing actions.
+- Model mode works across email and iMessage, but instruction-level two-turn
+  approval is weaker than browser/native elicitation because the model submits
+  the decision action. Destructive authority remains blocked and the user has
+  explicitly accepted this temporary risk.
+- Browser approval adds latency and currently fails on the hosted approval
+  lookup. It remains the preferred mode once Preview proves the hosted fix.
 - A dedicated hosted dependency adds availability risk. Bundjil fails closed
   rather than bypassing Executor and calling providers directly.
 - App-scoped Executor credentials are appropriate for a single-owner personal
@@ -968,16 +1063,17 @@ active execution plan before accepting the task.
   client, Executor SDK, proxy, or new workspace package exists.
 - Config is app-owned, in a distinct `config.ts`, uses Effect Config,
   ConfigProvider, Schema policy, Redacted, and sanitized tagged errors.
-- The URL is toolkit-scoped and browser-mode; root and model-mode endpoints are
-  rejected.
+- The URL is toolkit-scoped and explicitly `model` or `browser`; missing,
+  duplicate, native, unknown, legacy, and root endpoints are rejected.
 - Eve exposes exactly `skills`, `execute`, and `resume`.
 - Preview and Production toolkits and keys are independent and implicit-deny.
 - The initial operation inventory has explicit approve/require/block outcomes
   and no agent-accessible authority-management operation.
-- Stub tests prove auth, filtering, read execution, browser resume shape,
-  failures, and leak safety.
-- Preview proves authenticated Eve discovery/execution, browser approval and
-  decline, Sendblue approval-link delivery, policy restoration, and correlated
+- Tests prove config, auth, filtering, explicit mode selection, failures, and
+  leak safety.
+- Preview proves authenticated Eve discovery/execution, a first-turn pause with
+  no resume, later-turn approve and decline, ambiguity/non-owner/replay
+  rejection, Sendblue continuation, policy restoration, and correlated
   provider/runtime evidence.
 - Production is promoted only from accepted Preview evidence and retains a
   tested rollback deployment plus key/toolkit revocation procedure.

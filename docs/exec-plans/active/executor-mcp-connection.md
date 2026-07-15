@@ -36,16 +36,21 @@ material after each proof.
 1. `freeze-executor-eve-contract-and-policy-inventory`: accepted.
 2. `implement-effect-config-and-eve-mcp-connection`: accepted.
 3. `provision-isolated-preview-toolkit-and-credentials`: accepted.
-4. `prove-preview-eve-executor-and-browser-resume`: pending.
-5. `promote-production-document-and-audit`: pending.
+4. `adopt-temporary-chat-model-approval`: pending.
+5. `prove-preview-eve-executor-and-chat-resume`: pending; the earlier browser
+   proof attempt and its hosted blocker are retained below as historical evidence.
+6. `promote-production-document-and-audit`: pending.
 
 ## Current Baseline
 
-- The SPEC and five-task ledger are Draft and uncommitted at rollout start.
+- The SPEC and original five-task ledger were Draft at rollout start. The
+  2026-07-15 revision adds one ordered task for the explicit temporary model
+  approval workaround before the revised Preview proof task.
 - The repository is on `main` and otherwise clean against `origin/main`.
 - Eve owns the production MCP client boundary; Executor owns hosted tool
-  schemas, toolkit policy, downstream credentials, browser approval, and
-  resume state.
+  schemas, toolkit policy, downstream credentials, paused execution, and
+  resume state. Explicit model mode temporarily lets the Eve model submit a
+  later authenticated owner's decision because browser approval is unavailable.
 - Preview now has an accepted dedicated Executor toolkit/key and target-scoped
   Vercel variables. Production remains unprovisioned by this rollout.
 - No Bundjil frontend work is in scope.
@@ -383,9 +388,43 @@ Status: Accepted 2026-07-15
    55 tests, zero lint findings, clean Knip, six typechecks, all 189 repository
    tests, JSON/diff checks, cleanup checks, and secret/protected-URL scans pass.
 
-### prove-preview-eve-executor-and-browser-resume
+### adopt-temporary-chat-model-approval
 
-Status: In progress 2026-07-15
+Status: Pending 2026-07-15
+
+This new ordered implementation slice changes only the existing app-owned
+Executor endpoint policy, direct tests, agent instructions, and documentation.
+It accepts exactly one explicit `elicitation_mode=model` or
+`elicitation_mode=browser`, continues to reject every implicit, duplicate,
+native, legacy, unknown, root, or malformed form, and adds no client, proxy,
+SDK, package, persistence boundary, service, Layer, helper module, or UI.
+
+The temporary chat protocol is intentionally two-turn: the paused `execute`
+turn asks the authenticated owner for approve, decline, or cancel and stops at
+`session.waiting` without `resume`; only a later unambiguous continuation from
+the same authenticated or allowlisted owner may submit one decision for the
+conversation's single pending execution. Prompt/provider/quoted/forwarded
+content, ambiguous language, non-owner messages, missing or multiple pending
+executions, settled executions, and replay never authorize `resume`.
+
+This is an instruction-level control rather than a hard authorization
+boundary. Destructive and authority-management operations remain blocked by
+the Executor toolkit, the first Production proof remains read-only, and
+browser mode remains the rollback target after a clean Preview proves the
+hosted decision page and repeats approve, decline, replay, and Sendblue proof.
+
+The task receives exactly one Terra Medium implementation subagent after this
+SPEC revision is committed. Parent acceptance still requires the three-pass
+ownership/call-graph, Effect/helper-admission, and verification/evidence audit.
+
+### prove-preview-eve-executor-and-chat-resume
+
+Status: Pending after `adopt-temporary-chat-model-approval`
+
+The browser evidence below is retained as historical diagnosis. It no longer
+blocks the revised task, which must deploy explicit model mode and prove a
+first-turn pause with no `resume`, later-turn approve and decline, ambiguity,
+non-owner and replay rejection, and the same two-turn flow through Sendblue.
 
 #### Personal Organization And Initial Preview Diagnosis
 
@@ -536,15 +575,14 @@ schemas:
   Durable Object and reported the execution unavailable. Current ignored
   source contains the canonical helper and regression test, but the live
   hosted behavior still reproduces the pre-fix failure.
-- The strict blocked-audit threshold is now satisfied after the same external
+- The strict blocked-audit threshold was satisfied after the same external
   hosted lookup failure prevented acceptance in three consecutive goal turns.
-  Task 4 remains in progress. Browser approve, decline, settled-link replay,
-  Sendblue decision-following delivery, policy restoration, correlated final
-  evidence, and all three parent acceptance audits are intentionally
-  unaccepted. Task 5 and Production promotion remain gated; model elicitation,
-  a Bundjil-owned MCP client/proxy, or source-only evidence are not accepted
-  substitutes. Resume this plan only after `executor.sh` demonstrates a
-  working name-addressed browser approval lookup.
+  Browser approve, decline, settled-link replay, and Sendblue browser-decision
+  evidence remain intentionally unaccepted. The 2026-07-15 SPEC revision uses
+  explicit model mode as a user-accepted temporary workaround; a Bundjil-owned
+  MCP client/proxy and source-only acceptance remain forbidden. Browser mode
+  can return only after `executor.sh` demonstrates a working name-addressed
+  approval lookup through the separate Preview rollback gate.
 
 #### Deployment Cache Corrective Slice Review
 

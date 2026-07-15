@@ -6,10 +6,10 @@
     "Use Eve's native defineMcpClientConnection boundary; do not add an Executor SDK, custom production MCP client, MCP proxy, or workspace package.",
     "Keep the boundary app-owned under apps/agent and keep configuration in a distinct agent/lib/executor/config.ts using Effect Config, ConfigProvider, Schema policy, Redacted, and sanitized tagged errors.",
     "Expose exactly skills, execute, and resume through Eve's allowlist; Executor owns all remote integration schemas and downstream provider DTOs.",
-    "Pin elicitation_mode=browser. Missing, unknown, model, native, or legacy model-resume modes are rejected for the Bundjil hosted connection.",
+    "Require exactly one explicit elicitation_mode of model or browser. Model is the temporary chat-compatible mode; browser is the preferred rollback mode. Missing, duplicate, unknown, native, or legacy model-resume modes are rejected.",
     "Use separate implicit-deny Preview and Production toolkits and separate API keys; never promote the broad personal root endpoint or discovery key.",
-    "Read-only operations may be approved, state-changing operations require browser approval, and destructive, credential, billing, infrastructure, policy, toolkit, and irreversible operations are blocked in the first Production slice.",
-    "The model may resume only by executionId after Executor records the human browser decision; Sendblue can transport an approval URL but cannot express approval.",
+    "Read-only operations may be approved, state-changing operations require an explicit later-turn decision from the authenticated owner, and destructive, credential, billing, infrastructure, policy, toolkit, and irreversible operations are blocked in the first Production slice.",
+    "In temporary model mode, the paused turn must stop without resume; only a later unambiguous approve, decline, or cancel message from the same authenticated or allowlisted owner may resume the conversation's single pending execution. This is an instruction-level control, not a hard authorization boundary.",
     "Helper sprawl is forbidden and audited after every task: inventory every new helper, mapper, wrapper, hook, service, layer, factory, and module with owner/reason, concrete call sites, direct test, and retain-or-inline decision.",
     "Primary operations are named, flat, sequential Effect.fn/Effect.gen programs; decode/load, acquire, decide, call, encode, and return remain visible in the success path; Effect.fn transforms or the outer Effect.gen pipe own typed failure translation, and spans are named exactly once.",
     "Expected typed failures must not be collapsed through broad catchAll, orDie, or defects; do not add runFork, unscoped fibers, daemon work, hidden queues, unbounded concurrency, or automatic retry around Executor execute/resume.",
@@ -22,12 +22,12 @@
   ],
   "globalVerification": [
     "bun install --frozen-lockfile",
-    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent check-types",
-    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent test",
-    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run --filter @bundjil/agent build",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic explicit-mode toolkit fixture> bun run --filter @bundjil/agent check-types",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic explicit-mode toolkit fixture> bun run --filter @bundjil/agent test",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic explicit-mode toolkit fixture> bun run --filter @bundjil/agent build",
     "bun run check",
     "bun run knip",
-    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic browser-mode toolkit fixture> bun run verification",
+    "BUNDJIL_EXECUTOR_MCP_URL=<synthetic explicit-mode toolkit fixture> bun run verification",
     "jq empty docs/product-specs/executor-mcp-connection.tasks.json",
     "git diff --check",
     "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
@@ -43,7 +43,7 @@
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
     "completedPasses": 9,
-    "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
+    "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, model/browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
     {
@@ -185,58 +185,81 @@
       "commitAfterPassing": true
     },
     {
-      "id": "prove-preview-eve-executor-and-browser-resume",
-      "title": "Prove the deployed Preview Eve, Executor, browser approval, and Sendblue path",
-      "status": "in_progress",
+      "id": "adopt-temporary-chat-model-approval",
+      "title": "Adopt explicit temporary model approval for chat channels",
+      "status": "pending",
       "dependsOn": ["provision-isolated-preview-toolkit-and-credentials"],
-      "description": "Deploy a clean Preview and prove connection discovery, read execution, human browser approval/decline, safe resume, owner-channel delivery, policy restoration, observability, and leak safety end to end.",
+      "description": "Permit explicit model or browser endpoint modes, encode the temporary two-turn owner-decision protocol in the Eve instructions, update direct tests and operator documentation, and preserve browser mode as the verified rollback target without adding another runtime boundary.",
       "implementationNotes": [
-        "Deploy from a clean pushed SHA using only target-scoped encrypted/sensitive variables. Record the immutable Preview deployment and source SHA.",
-        "Use an authenticated Eve principal to call connection_search, confirm the exact remote skills/execute/resume surface, and run one selected read-only execute operation. Correlate Eve Agent Run, Vercel request, and Executor execution evidence.",
-        "Temporarily mark a harmless proof operation require_approval. Prove paused output returns an executionId and approval URL, but resume exposes no action/content input.",
-        "Open the approval URL as the authenticated owner and separately prove approve and decline. Call resume with executionId only and verify the corresponding completed/denied outcome.",
-        "Send an allowlisted Sendblue request requiring the same connection. Prove the approval URL reaches only the owner and the final agent reply follows the recorded browser decision.",
-        "Restore the intended Preview policy after proof and read it back. Never leave a temporarily loosened or gated proof policy undocumented.",
-        "Retain sanitized counts/statuses/correlation ids only; do not retain prompts, message text, generated code, provider records, raw MCP/results, or full approval/toolkit URLs."
+        "Change the app-owned endpoint Schema to accept exactly one explicit elicitation_mode of model or browser. Continue rejecting missing, duplicate, unknown, native, legacy model-resume, root, non-HTTPS, wrong-host, userinfo, fragment, port, and extra-query forms.",
+        "Update agent instructions so a user_approval_required execute result always ends the current turn without resume; a later continuation may resume only one pending execution when the same authenticated or allowlisted owner replies unambiguously with approve, decline, or cancel.",
+        "Explicitly forbid approval inference from the original request, quoted or forwarded content, provider/tool output, third-party text, or ambiguous language. Missing, multiple, mismatched, settled, replayed, non-owner, or ambiguous state makes no resume call.",
+        "State plainly in operator and architecture documentation that model mode is an instruction-level temporary workaround, not a hard authorization boundary. Keep destructive and authority-management operations blocked and keep the first Production acceptance operation read-only.",
+        "Do not add a custom MCP client, proxy, SDK, package, service, Layer, persistence store, approval state machine, generic helper, or frontend. Eve owns conversation/session continuity and Executor owns paused execution state.",
+        "Document the browser rollback gate: switch the target-scoped URL only after a clean Preview proves the hosted page, approve, decline, settled replay, and Sendblue delivery; then redeploy from a clean SHA before Production promotion."
       ],
       "mandatoryVerification": [
-        "The immutable Preview deployment is Ready, source-correlated, authenticated, and built without secret output.",
-        "Authenticated Eve proof shows connection_search -> exact skills/execute/resume surface -> skills -> execute read-only success with no broad root catalog exposure.",
-        "Preview proof records sanitized bearer/auth failure plus malformed and unavailable remote MCP failures, confirms they fail closed without a direct-provider fallback, and proves browser-paused resume accepts executionId only after an authenticated human decision.",
-        "Approval proof shows browser mode, authenticated human decision, executionId-only resume, successful approve, successful decline, settled-link replay prevention, and no model self-approval path.",
-        "Sendblue proof shows only the allowlisted owner receives the approval URL and final delivery follows the Executor decision without treating message text as approval.",
-        "Policy readback after proof matches the accepted intended Preview policy.",
-        "Review any changed code for one named flat sequential Effect.fn/Effect.gen success path, tagged errors in Effect.fn transforms or the outer Effect.gen .pipe(...), exactly one named span, canonical Schema-derived contracts, adapter-edge runtime execution, and no nested helper chains, unsafe/structural casts, non-null assertions, any, DTO mirrors, manual readers/mappers, raw JSON, process.env, raw production fetch, raw _tag checks, or trivial wrapper/helper sprawl.",
-        "Record and accept a helper-admission inventory for every new helper/mapper/wrapper/script/service/layer/factory/module; remove anything without current call sites, boundary ownership, or a materially complex directly tested policy.",
-        "No lint/type/Knip/Turbo/test configuration or ignore list changes; type-aware lint, Knip, strict typecheck, and Effect language-service diagnostics report no unresolved findings.",
-        "Focused checks, full bun run verification, direct HTTP evidence, Browser evidence, Agent Run/log/Executor/Sendblue correlation, replay checks, diff/JSON checks, language-service review, and comprehensive leak scans pass."
+        "Config tests accept explicit model and browser toolkit URLs and reject every missing, duplicate, unknown, native, legacy, root, transport, host, userinfo, fragment, port, and extra-query form with sanitized tagged errors.",
+        "Instruction tests or direct static assertions prove the first paused turn forbids same-turn resume; only a later authenticated owner continuation can map unambiguous approve, decline, or cancel to resume; ambiguity, non-owner, quoted/provider content, multiple pending state, settled state, and replay fail closed.",
+        "The complete diff retains one flat named Effect Config path with Schema-derived mode ownership, tagged failures at the existing operation boundary, Redacted key handling, adapter-edge execution, and no nested helper chain, unsafe or structural cast, non-null assertion, any, DTO mirror, manual reader/mapper, raw JSON helper, process.env read, raw production fetch, raw _tag branch, broad expected-error collapse, unscoped fiber, hidden queue, automatic retry, or helper sprawl.",
+        "A helper-admission inventory covers every changed or introduced helper, wrapper, service, Layer, factory, module, and test utility; anything without material policy, concrete call sites, and direct tests is inlined or removed.",
+        "No lint, formatter, TypeScript, Effect language-service, Knip, Turbo, or test setting is weakened; focused agent check-types/test/build, root check, Knip, full verification with an explicit synthetic mode, JSON validation, diff check, and leak scans pass.",
+        "No live provider mutation, Vercel configuration change, Sendblue send, browser decision, commit, or push occurs in this implementation task."
       ],
       "browserVerification": [
-        "Unauthenticated approval URL requires Executor sign-in and does not expose the pending action.",
-        "Authenticated approval page identifies the sanitized pending operation and exposes distinct approve, decline, and cancel controls without credentials or raw provider data.",
-        "Approve and decline each produce the expected execution outcome; refresh/reuse cannot settle the execution twice.",
-        "The approval URL delivered over Sendblue opens the same authenticated decision surface.",
-        "Evidence redacts full URL, execution id, account data, provider payload, message content, and credentials."
+        "None in this task. The previously captured hosted browser failure is retained as historical evidence; the following Preview proof task verifies chat mode live."
       ],
       "completionCriteria": [
-        "Preview has complete local-to-live proof for discovery, read execution, browser-gated resume, Sendblue delivery, observability, policy restoration, and rollback inputs.",
-        "The model cannot submit or infer an approval action through the resume tool.",
+        "Bundjil can be built with explicit model or browser mode while all implicit or unsupported modes fail closed.",
+        "The Eve instructions define the exact temporary two-turn chat protocol and disclose its weaker security boundary.",
+        "No new runtime boundary or helper sprawl exists, and all three parent audit passes are recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-preview-eve-executor-and-chat-resume",
+      "title": "Prove deployed Preview Eve, Executor model approval, and Sendblue continuation",
+      "status": "pending",
+      "dependsOn": ["adopt-temporary-chat-model-approval"],
+      "description": "Deploy a clean explicit-model Preview and prove connection discovery, read execution, first-turn pause, later-turn authenticated owner decisions, safe resume, owner-channel routing, policy restoration, observability, and leak safety end to end.",
+      "implementationNotes": [
+        "Set only the Preview target-scoped encrypted URL to explicit model mode, deploy from a clean pushed SHA, and record the immutable deployment and source SHA without exposing the URL or key.",
+        "Use an authenticated Eve principal to prove connection_search, exact remote skills/execute/resume discovery, and one selected read-only execute operation with correlated sanitized evidence.",
+        "Temporarily mark one harmless disposable Preview operation require_approval. Prove execute pauses and the first turn reaches session.waiting without a resume request.",
+        "In later turns from the same authenticated principal, separately prove explicit approve and decline. Prove an ambiguous response asks again, a replay or settled execution cannot run twice, and no automatic retry occurs.",
+        "Use the allowlisted Sendblue owner identity to prove one paused request and a later explicit decision resume the same execution. Prove a non-owner identity is rejected before resume.",
+        "Restore and read back the intended Preview policy after proof. Retain sanitized counts, statuses, and correlation ids only; do not retain prompts, message text, generated code, provider records, raw MCP results, execution ids, or protected URLs."
+      ],
+      "mandatoryVerification": [
+        "The immutable Preview deployment is Ready, source-correlated, authenticated, explicitly model-mode, and built without secret output.",
+        "Authenticated Eve proof shows connection_search -> exact skills/execute/resume surface -> skills -> execute read-only success with no broad root catalog exposure or direct-provider fallback.",
+        "Approval proof shows a first-turn pause with zero resume calls, later-turn successful approve, later-turn successful decline, ambiguous/no-pending/multiple-pending/non-owner rejection, settled execution replay prevention, and one resume attempt per accepted decision.",
+        "Sendblue proof shows only the allowlisted owner can decide and the final reply follows that later decision; quoted, forwarded, provider, tool, and third-party text are never treated as approval.",
+        "Policy readback after proof matches the accepted intended Preview policy, and no disposable GitHub comment capability is promoted to Production.",
+        "Review any changed code for one named flat sequential Effect.fn/Effect.gen success path, tagged errors in Effect.fn transforms or the outer Effect.gen pipe, exactly one named span, canonical Schema-derived contracts, adapter-edge runtime execution, and no helper sprawl or prohibited escape.",
+        "Focused checks, full verification, direct HTTP evidence, Agent Run/log/Executor/Sendblue correlation, replay checks, diff/JSON checks, language-service review, and comprehensive leak scans pass."
+      ],
+      "browserVerification": [
+        "No new browser proof is required while explicit model mode is active. Retain the failed hosted-page evidence and do not claim browser authorization works.",
+        "Any later switch to browser mode requires a separate clean Preview redeploy and approve, decline, settled replay, and Sendblue browser proof before Production promotion."
+      ],
+      "completionCriteria": [
+        "Preview has complete local-to-live proof for discovery, read execution, two-turn chat resume, Sendblue owner routing, observability, policy restoration, and rollback inputs.",
+        "Documentation identifies model-mode approval as temporary and weaker than browser or native elicitation.",
         "The helper-admission inventory is accepted and all three audit passes are recorded."
       ],
-      "liveEvidence": [
-        "Final ordinary, non-forced retained-key Preview deployment dpl_Fz4wDdZpc1i2dof8SimKUCerqdCb is Ready. Vercel authenticated readback records CLI source and explicit Bundjil source metadata for pushed commit ff8ddfe94d33dbfc96dcbb98315c1294df2bda09 on main; the hosted build force-executed the non-cacheable agent task and regenerated .vercel/output.",
-        "A fresh authenticated Eve session on that deployment completed connection_search, executor__skills, and three sequential executor__execute calls for a read-only public GitHub inspection. Its 469-event replay reached message.completed, turn.completed, and session.waiting with five requested/result pairs, no failure, and zero exact or generic credential-marker hits.",
-        "Connection discovery exposed exactly executor__skills, executor__execute, and executor__resume; a separate direct Streamable HTTP initialize/tools-list probe returned HTTP 200, retained Mcp-Session-Id, and listed exactly skills, execute, and resume.",
-        "An earlier fully cached credential-only redeploy failed because replayed eve build logs did not materialize the Vercel Build Output API tree. The source-correlated non-forced deployment above proves the @bundjil/agent#build non-cacheable correction and closes that deployment finding.",
-        "A reversible Eve write request reached user_approval_required with an HTTPS Executor approval URL and execution id. No resume action was submitted and no GitHub write occurred.",
-        "Two fresh source-correlated Preview pauses emitted correctly shaped HTTPS Executor URLs scoped to personal-3548 with matching execution ids, one non-empty mcp_session_id, and no extra query input. Each authenticated page initially rendered disabled Cancel, Decline, and Approve controls, then hydrated from a stale Tilt Legal shell label to Personal and replaced them with the pause-unavailable state; reissuing while already settled on Personal failed identically, Browser diagnostics recorded React hydration errors, and GitHub readback confirmed neither unique proof marker was posted.",
-        "A direct MCP client that preserved Mcp-Session-Id and the existing executor_personal credential reproduced the same hosted result, excluding Eve, Bundjil transport handling, Vercel key delivery, lost MCP session identity, and operator organization selection.",
-        "The third consecutive goal continuation repeated direct Streamable HTTP proof with a newly initialized session and the accepted dedicated Preview key: initialize 200, initialized 202, browser-gated execute 200 with user_approval_required, all canonical URL-shape predicates true, the same post-hydration unavailable page, and zero matching GitHub proof comments.",
-        "Executor PR #1317 documents the exact pre-fix cloud failure: approval lookup used idFromString while sessions were name-addressed with idFromName. Current source contains the fix, but hosted executor.sh still reproduces the unavailable-page symptom."
+      "historicalBrowserEvidence": [
+        "Final ordinary, non-forced retained-key Preview deployment dpl_Fz4wDdZpc1i2dof8SimKUCerqdCb was Ready and source-correlated to ff8ddfe94d33dbfc96dcbb98315c1294df2bda09 on main.",
+        "A source-correlated authenticated Eve session proved connection_search, skills, three read-only execute calls, exact skills/execute/resume discovery, and session.waiting without credential-marker leakage.",
+        "Three fresh browser-mode pauses, including one direct MCP session preserving Mcp-Session-Id, returned canonical personal-3548 approval URLs but the authenticated hosted page hydrated into an unavailable state. No GitHub proof comment was posted.",
+        "Executor PR #1317 documents the matching name-addressed Durable Object lookup defect. Current source contains the fix, but hosted executor.sh reproduced the unavailable-page symptom on 2026-07-15."
       ],
-      "knownBlockers": [
-        "Hosted executor.sh must serve a working name-addressed browser approval lookup before approve, decline, replay, Sendblue decision-following delivery, and policy-restoration evidence can be accepted. Model elicitation, source-only evidence, or a Bundjil-owned MCP client/proxy are forbidden substitutes."
-      ],
+      "knownBlockers": [],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 0,
@@ -248,19 +271,19 @@
       "id": "promote-production-document-and-audit",
       "title": "Promote an isolated Production connection, document operations, and complete the final audit",
       "status": "pending",
-      "dependsOn": ["prove-preview-eve-executor-and-browser-resume"],
+      "dependsOn": ["prove-preview-eve-executor-and-chat-resume"],
       "description": "Create independent Production Executor authority, promote only the accepted policy intent, prove a read-only live path, retain rollback/revocation controls, reconcile all documentation, and complete the mandatory final audits.",
       "implementationNotes": [
         "Create a Production toolkit and key independent from Preview. Recreate the accepted policy intent from reviewed inventory; do not reuse mutable Preview identity or copy unreviewed catalog entries.",
         "Store labeled Production references in 1Password and Production-only encrypted/sensitive Vercel variables without values in output. Read back names, targets, security types, and sanitized identity separation.",
         "Record the current accepted immutable agent deployment before promotion. Deploy the accepted clean source SHA and prove stable alias/source/environment correlation.",
-        "Run one authenticated read-only Executor operation in Production. Do not run a Production write as acceptance proof; browser-gated write behavior is accepted from the isolated Preview proof.",
+        "Run one authenticated read-only Executor operation in Production. Do not run a Production write as acceptance proof; any future Production mutation requires a SPEC/task update and separate chat-approval proof.",
         "Test rollback by restoring or dry-running the exact accepted immutable deployment procedure as safely supported, then leave the intended Production deployment active. Prove key revocation/toolkit disablement procedures through read-only inventory or a disposable Preview key, not by disabling the accepted Production key during traffic.",
         "Update root/app READMEs, Eve/repo/testing architecture docs, this SPEC/task ledger, and the active plan with actual verified behavior. Archive the plan only after every acceptance gate passes.",
         "Document how to add one future integration: inventory, classify, update SPEC/tasks, configure Preview toolkit, test read/approval/block, promote policy intent, and monitor."
       ],
       "mandatoryVerification": [
-        "Production readback proves independent toolkit/key identities, Production-only Vercel targets, browser-mode toolkit URL, exact selected connections/policies, and no Preview or broad personal identity reuse.",
+        "Production readback proves independent toolkit/key identities, Production-only Vercel targets, one explicit supported endpoint mode, exact selected connections/policies, and no Preview or broad personal identity reuse.",
         "Production deployment proof shows clean source SHA, immutable current and previous rollback deployments, authenticated Eve route, exact three-tool connection surface, and one correlated read-only execution.",
         "Rollback and incident runbooks cover deployment restore, key revocation, toolkit disablement, policy block, post-revocation execution check, rotation, and sanitized investigation evidence.",
         "Final code audit proves each primary operation is one named flat sequential Effect.fn/Effect.gen with visible decode/load -> acquire -> decide -> call -> encode/return control flow; expected tagged errors use Effect.fn transforms or the outer Effect.gen .pipe(...) with catchTag/catchTags/mapError; named Effect.fn or one outer withSpan supplies exactly one span; contracts are canonical Effect Schema-derived; Config/ConfigProvider/non-empty Redacted ownership and adapter-edge runtime execution are correct; and no nested helper chains, unsafe/structural casts, non-null assertions, any, DTO mirrors, manual readers/mappers, raw JSON helpers, process.env, raw production fetch, raw _tag checks, broad expected-error collapse, Effect.runFork, unscoped/daemon fibers, hidden queues, unbounded concurrency, automatic execute/resume retry, direct-provider fallback, or helper sprawl remains.",
@@ -270,12 +293,12 @@
         "Frozen install, agent check-types/test/build, root check, knip, bun run verification with safe fixture configuration, Effect language-service review, Browser/direct HTTP proof, JSON validation, git diff --check, tracked-file/output/log/evidence secret scans, and clean temporary-file checks pass."
       ],
       "browserVerification": [
-        "No new Bundjil UI exists. Retain the accepted external Executor approval-page evidence from Preview and verify the Production toolkit URL still pins browser mode without initiating a Production mutation.",
+        "No new Bundjil UI exists. Retain the failed external Executor approval-page evidence and do not claim browser mode works until the separate rollback gate passes.",
         "Any unexpected Bundjil React/route/visible-text/URL-state change blocks acceptance pending a separate frontend SPEC requiring highest-parent primitive -> composite -> layout -> route composition; leaf-owned reads, mutations, params, commands, atoms, loading/empty/error/retry/skeleton/fallback states; children/slot composition instead of boolean-prop matrices; render-time derivation rather than mirrored state; schema-backed URL state with app-router-only writes; no reusable-package route API/generated route-tree imports; no prop drilling or wrapper/hook sprawl; canonical typography/accessibility; and desktop/mobile Browser verification for loading, empty, error, success, and long-content states."
       ],
       "completionCriteria": [
         "The deployed Production Eve agent can use the isolated Executor toolkit for the accepted read-only capability through the user's Codex-backed model path.",
-        "Production authority is explicit, browser-mode, least-privilege, observable, independently revocable, and rollback-ready.",
+        "Production authority is explicit-mode, least-privilege, observable, independently revocable, and rollback-ready; its first acceptance operation is read-only.",
         "All documentation and evidence reflect the actual implementation and live state, and the final helper/lint inventories are accepted.",
         "At least three final parent audit passes are recorded, with additional passes for every corrected finding."
       ],
