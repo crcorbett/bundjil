@@ -638,6 +638,53 @@ export const CodexResponsesInputMessage = Schema.Struct({
 
 export type CodexResponsesInputMessage = typeof CodexResponsesInputMessage.Type;
 
+export const CodexResponsesFunctionCall = Schema.Struct({
+  type: Schema.Literal("function_call"),
+  id: Schema.NonEmptyString,
+  call_id: Schema.NonEmptyString,
+  name: Schema.NonEmptyString,
+  arguments: Schema.String,
+});
+
+export type CodexResponsesFunctionCall = typeof CodexResponsesFunctionCall.Type;
+
+export const CodexResponsesFunctionCallOutput = Schema.Struct({
+  type: Schema.Literal("function_call_output"),
+  call_id: Schema.NonEmptyString,
+  output: Schema.String,
+});
+
+export type CodexResponsesFunctionCallOutput =
+  typeof CodexResponsesFunctionCallOutput.Type;
+
+export const CodexResponsesInput = Schema.Union([
+  CodexResponsesInputMessage,
+  CodexResponsesFunctionCall,
+  CodexResponsesFunctionCallOutput,
+]);
+
+export type CodexResponsesInput = typeof CodexResponsesInput.Type;
+
+export const CodexResponsesFunctionTool = Schema.Struct({
+  type: Schema.Literal("function"),
+  name: Schema.NonEmptyString,
+  description: Schema.optional(Schema.String),
+  parameters: Schema.Unknown,
+  strict: Schema.optional(Schema.Boolean),
+});
+
+export type CodexResponsesFunctionTool = typeof CodexResponsesFunctionTool.Type;
+
+export const CodexResponsesToolChoice = Schema.Union([
+  Schema.Literals(["auto", "none", "required"]),
+  Schema.Struct({
+    type: Schema.Literal("function"),
+    name: Schema.NonEmptyString,
+  }),
+]);
+
+export type CodexResponsesToolChoice = typeof CodexResponsesToolChoice.Type;
+
 export const CodexResponsesReasoning = Schema.Struct({
   effort: Schema.Literals(["low", "medium", "high", "xhigh"]),
 });
@@ -646,11 +693,14 @@ export type CodexResponsesReasoning = typeof CodexResponsesReasoning.Type;
 
 export const CodexResponsesRequest = Schema.Struct({
   model: CodexResponsesModelId,
-  input: Schema.Array(CodexResponsesInputMessage),
+  input: Schema.Array(CodexResponsesInput),
   store: Schema.Boolean,
   instructions: Schema.optional(Schema.NonEmptyString),
   stream: Schema.Boolean,
   reasoning: Schema.optional(CodexResponsesReasoning),
+  tools: Schema.optional(Schema.Array(CodexResponsesFunctionTool)),
+  tool_choice: Schema.optional(CodexResponsesToolChoice),
+  parallel_tool_calls: Schema.optional(Schema.Boolean),
 });
 
 export type CodexResponsesRequest = typeof CodexResponsesRequest.Type;
@@ -670,9 +720,36 @@ export type CodexResponsesStreamResult = typeof CodexResponsesStreamResult.Type;
 export const CodexResponsesStreamEvent = Schema.Struct({
   type: Schema.NonEmptyString,
   delta: Schema.optional(Schema.String),
+  output_index: Schema.optional(Schema.Number.check(Schema.isFinite())),
+  item: Schema.optional(Schema.Unknown),
 });
 
 export type CodexResponsesStreamEvent = typeof CodexResponsesStreamEvent.Type;
+
+export const CodexResponsesOutputItemDiscriminator = Schema.Struct({
+  type: Schema.NonEmptyString,
+});
+
+export type CodexResponsesOutputItemDiscriminator =
+  typeof CodexResponsesOutputItemDiscriminator.Type;
+
+export const CodexResponsesFunctionCallAddedEvent = Schema.Struct({
+  type: Schema.Literal("response.output_item.added"),
+  output_index: Schema.Number.check(Schema.isFinite()),
+  item: CodexResponsesFunctionCall,
+});
+
+export type CodexResponsesFunctionCallAddedEvent =
+  typeof CodexResponsesFunctionCallAddedEvent.Type;
+
+export const CodexResponsesFunctionArgumentsDeltaEvent = Schema.Struct({
+  type: Schema.Literal("response.function_call_arguments.delta"),
+  output_index: Schema.Number.check(Schema.isFinite()),
+  delta: Schema.String,
+});
+
+export type CodexResponsesFunctionArgumentsDeltaEvent =
+  typeof CodexResponsesFunctionArgumentsDeltaEvent.Type;
 
 export const CodexResponsesStreamMapInput = Schema.Struct({
   model: CodexResponsesModelId,
@@ -694,22 +771,76 @@ export const OpenAICompatibleChatRole = Schema.Literals([
   "system",
   "user",
   "assistant",
+  "tool",
 ]);
 
 export type OpenAICompatibleChatRole = typeof OpenAICompatibleChatRole.Type;
 
-export const OpenAICompatibleChatMessage = Schema.Struct({
-  role: OpenAICompatibleChatRole,
-  content: Schema.NonEmptyString,
+export const OpenAICompatibleMessageToolCall = Schema.Struct({
+  type: Schema.Literal("function"),
+  id: Schema.NonEmptyString,
+  function: Schema.Struct({
+    arguments: Schema.String,
+    name: Schema.NonEmptyString,
+  }),
 });
+
+export type OpenAICompatibleMessageToolCall =
+  typeof OpenAICompatibleMessageToolCall.Type;
+
+export const OpenAICompatibleChatMessage = Schema.Union([
+  Schema.Struct({
+    role: Schema.Literal("system"),
+    content: Schema.String,
+  }),
+  Schema.Struct({
+    role: Schema.Literal("user"),
+    content: Schema.String,
+  }),
+  Schema.Struct({
+    role: Schema.Literal("assistant"),
+    content: Schema.optional(Schema.NullOr(Schema.String)),
+    tool_calls: Schema.optional(Schema.Array(OpenAICompatibleMessageToolCall)),
+  }),
+  Schema.Struct({
+    role: Schema.Literal("tool"),
+    content: Schema.String,
+    tool_call_id: Schema.NonEmptyString,
+  }),
+]);
 
 export type OpenAICompatibleChatMessage =
   typeof OpenAICompatibleChatMessage.Type;
+
+export const OpenAICompatibleFunctionTool = Schema.Struct({
+  type: Schema.Literal("function"),
+  function: Schema.Struct({
+    name: Schema.NonEmptyString,
+    description: Schema.optional(Schema.String),
+    parameters: Schema.Unknown,
+    strict: Schema.optional(Schema.Boolean),
+  }),
+});
+
+export type OpenAICompatibleFunctionTool =
+  typeof OpenAICompatibleFunctionTool.Type;
+
+export const OpenAICompatibleToolChoice = Schema.Union([
+  Schema.Literals(["auto", "none", "required"]),
+  Schema.Struct({
+    type: Schema.Literal("function"),
+    function: Schema.Struct({ name: Schema.NonEmptyString }),
+  }),
+]);
+
+export type OpenAICompatibleToolChoice = typeof OpenAICompatibleToolChoice.Type;
 
 export const OpenAICompatibleChatCompletionRequest = Schema.Struct({
   model: CodexResponsesModelId,
   messages: Schema.Array(OpenAICompatibleChatMessage),
   stream: Schema.optional(Schema.Boolean),
+  tools: Schema.optional(Schema.Array(OpenAICompatibleFunctionTool)),
+  tool_choice: Schema.optional(OpenAICompatibleToolChoice),
 });
 
 export type OpenAICompatibleChatCompletionRequest =
@@ -717,6 +848,19 @@ export type OpenAICompatibleChatCompletionRequest =
 
 export const OpenAICompatibleChatCompletionDelta = Schema.Struct({
   content: Schema.optional(Schema.String),
+  tool_calls: Schema.optional(
+    Schema.Array(
+      Schema.Struct({
+        index: Schema.Number.check(Schema.isFinite()),
+        id: Schema.optional(Schema.NonEmptyString),
+        type: Schema.optional(Schema.Literal("function")),
+        function: Schema.Struct({
+          name: Schema.optional(Schema.NonEmptyString),
+          arguments: Schema.optional(Schema.String),
+        }),
+      })
+    )
+  ),
 });
 
 export type OpenAICompatibleChatCompletionDelta =

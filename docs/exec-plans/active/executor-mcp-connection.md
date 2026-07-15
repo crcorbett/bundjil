@@ -382,3 +382,78 @@ Status: Accepted 2026-07-15
    `skills`, `execute`, and `resume` without a downstream call. Agent build and
    55 tests, zero lint findings, clean Knip, six typechecks, all 189 repository
    tests, JSON/diff checks, cleanup checks, and secret/protected-URL scans pass.
+
+### prove-preview-eve-executor-and-browser-resume
+
+Status: In progress 2026-07-15
+
+#### Personal Organization And Initial Preview Diagnosis
+
+- The accepted Executor authority remains in the personal organization at
+  `executor.sh/personal-3548`. The Tilt Legal organization is not used by the
+  Bundjil Preview toolkit, key, Vercel variables, or direct proof.
+- The first clean Preview deployment reached the Codex subscription-backed
+  model through the private proxy after the Preview proxy URL and internal
+  token were aligned. Direct proxy proof passed authenticated streaming,
+  unauthenticated and invalid-token rejection, live health, completion, and
+  leak checks.
+- Authenticated Eve runs then remained active without emitting a tool call.
+  Source review found the actual protocol gap: the existing Codex request
+  mapper retained only text messages and omitted Chat Completions `tools`,
+  `tool_choice`, assistant function-call history, and tool outputs. The stream
+  mapper retained only text deltas and omitted Responses function-call events.
+  Eve therefore advertised its intent in instructions but the model never
+  received the `connection_search` definition.
+
+#### Codex Tool Bridge Correction
+
+The existing `packages/codex-oauth` protocol boundary now owns the complete
+translation without changing Eve, adding another proxy, or mirroring Executor
+schemas:
+
+1. Canonical Effect Schemas decode Chat Completions function definitions,
+   forced or automatic tool choice, assistant tool calls, tool outputs, and
+   OpenAI-compatible tool-call chunks.
+2. `CodexRequestMapper.toCodexResponses` maps system instructions, user and
+   assistant text, function-call history, function-call outputs, flat Responses
+   function tools, and tool choice in one linear named Effect operation. Tools
+   set `parallel_tool_calls: false` so browser-gated execution remains
+   sequential.
+3. `CodexStreamMapper.toOpenAICompatibleStream` decodes Responses output-item
+   and function-argument events through Effect Schema, emits Chat Completions
+   tool-call deltas, and terminates with `tool_calls` or `stop` before `[DONE]`.
+   Malformed function-call events fail closed with the existing sanitized
+   tagged stream error.
+4. Provider tests prove exact tool-definition and conversation-history
+   mapping, function-call streaming, final finish reasons, text-stream
+   compatibility, and malformed-event rejection. No raw provider payload,
+   prompt, protected URL, credential, or downstream result is retained.
+
+#### Corrective Slice Helper Admission
+
+| Surface                                                                            | Owner/reason                                                                                             | Concrete call sites                                                 | Direct proof                                                | Decision                                                                                              |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Canonical tool and function-event Schemas in `packages/codex-oauth/src/schemas.ts` | Existing Codex protocol owner; required to decode both wire formats without DTO mirrors or unsafe reads. | Existing request and stream mappers plus proxy input/output codecs. | `packages/codex-oauth/test/codex-direct-provider.test.ts`   | Retain in the canonical schema owner.                                                                 |
+| Existing `CodexRequestMapper` service                                              | Existing OpenAI-compatible Chat Completions to Codex Responses request boundary.                         | `CodexDirectProvider` only.                                         | Exact request mapping tests.                                | Extend the existing operation; no new helper, service, Layer, or module.                              |
+| Existing `CodexStreamMapper` service and `decodeCodexStreamLine` boundary          | Existing Codex Responses SSE to OpenAI-compatible SSE boundary.                                          | `CodexDirectProvider` only.                                         | Text, function-call, completion, and malformed-event tests. | Extend the existing operation and retain the already-admitted line decoder; no new wrapper or helper. |
+
+#### Corrective Slice Review And Verification
+
+1. **Ownership and call graph:** reviewed. The production path remains Eve
+   `connection_search` to the OpenAI-compatible model, private Codex proxy, and
+   Codex Responses, with Executor's dynamic schema still discovered through
+   Eve. Only the owning protocol package changed; no app-local mapper, second
+   policy engine, provider fallback, or direct Executor client was added.
+2. **Implementation quality and helper admission:** reviewed. Primary mapping
+   remains one named linear `Effect.fn` per direction with canonical Schema
+   decode/encode and existing tagged errors. The changed files contain no raw
+   JSON helper, unsafe cast, `any`, non-null assertion, DTO mirror,
+   `process.env`, `Object.values`, `Object.entries`, `switch`, Context service,
+   Layer, standalone helper module, suppression, or helper sprawl.
+3. **Verification coverage:** reviewed. Codex package build and strict
+   typecheck pass; all 105 package tests and all 55 agent tests pass. Root
+   Ultracite/Oxlint is clean, Knip is clean, all six package typechecks pass,
+   and the repository gate passes all 192 tests with a synthetic Executor
+   config. Diff and prohibited-pattern scans pass. A new clean immutable
+   Preview deployment and live Eve tool-call proof remain required before this
+   task can be accepted.

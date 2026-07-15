@@ -122,6 +122,107 @@ it.effect("maps OpenAI-compatible requests into Codex Responses payloads", () =>
   })
 );
 
+it.effect("maps tool definitions and tool history into Codex Responses", () =>
+  Effect.gen(function* testCodexToolRequestMapping() {
+    const request = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleChatCompletionRequest
+    )({
+      model: "gpt-5.5",
+      stream: true,
+      messages: [
+        { role: "system", content: "Use connected tools when needed." },
+        { role: "user", content: "List the available Executor operations." },
+        {
+          role: "assistant",
+          content: null,
+          tool_calls: [
+            {
+              type: "function",
+              id: "call_executor_skills",
+              function: {
+                name: "connection_search",
+                arguments: '{"query":"Executor skills"}',
+              },
+            },
+          ],
+        },
+        {
+          role: "tool",
+          tool_call_id: "call_executor_skills",
+          content: "skills, execute, resume",
+        },
+      ],
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "connection_search",
+            description: "Search configured connections.",
+            parameters: {
+              type: "object",
+              properties: { query: { type: "string" } },
+              required: ["query"],
+            },
+            strict: true,
+          },
+        },
+      ],
+      tool_choice: {
+        type: "function",
+        function: { name: "connection_search" },
+      },
+    });
+    const codexRequest = yield* toCodexResponses(request).pipe(
+      Effect.provide(CodexRequestMapperLive)
+    );
+    const encoded = yield* Schema.encodeEffect(CodexResponsesRequest)(
+      codexRequest
+    );
+
+    assert.deepStrictEqual(encoded.tools, [
+      {
+        type: "function",
+        name: "connection_search",
+        description: "Search configured connections.",
+        parameters: {
+          type: "object",
+          properties: { query: { type: "string" } },
+          required: ["query"],
+        },
+        strict: true,
+      },
+    ]);
+    assert.deepStrictEqual(encoded.tool_choice, {
+      type: "function",
+      name: "connection_search",
+    });
+    assert.strictEqual(encoded.parallel_tool_calls, false);
+    assert.deepStrictEqual(encoded.input, [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: "List the available Executor operations.",
+          },
+        ],
+      },
+      {
+        type: "function_call",
+        id: "call_executor_skills",
+        call_id: "call_executor_skills",
+        name: "connection_search",
+        arguments: '{"query":"Executor skills"}',
+      },
+      {
+        type: "function_call_output",
+        call_id: "call_executor_skills",
+        output: "skills, execute, resume",
+      },
+    ]);
+  })
+);
+
 it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
   Effect.gen(function* testStreamMapping() {
     const input = yield* Schema.decodeUnknownEffect(
@@ -156,8 +257,83 @@ it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
       Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
     )(firstLine.slice("data: ".length));
 
+    const finalLine = stream.body
+      .split("\n\n")
+      .find((line) => line.includes('"finish_reason":"stop"'));
+
     assert.strictEqual(chunk.model, "gpt-5.5");
     assert.strictEqual(chunk.choices[0]?.delta.content, "Hel");
+    assert.notStrictEqual(finalLine, undefined);
+  })
+);
+
+it.effect("maps Codex function calls to OpenAI-compatible tool chunks", () =>
+  Effect.gen(function* testFunctionCallStreamMapping() {
+    const input = yield* Schema.decodeUnknownEffect(
+      CodexResponsesStreamMapInput
+    )({
+      model: "gpt-5.5",
+      body: [
+        'data: {"type":"response.output_item.added","output_index":0,"item":{"type":"function_call","id":"fc_executor","call_id":"call_executor","name":"connection_search","arguments":""}}',
+        'data: {"type":"response.function_call_arguments.delta","output_index":0,"delta":"{\\"query\\":\\"Executor"}',
+        'data: {"type":"response.function_call_arguments.delta","output_index":0,"delta":" skills\\"}"}',
+        'data: {"type":"response.completed"}',
+        "",
+      ].join("\n"),
+    });
+    const stream = yield* toOpenAICompatibleStream(input).pipe(
+      Effect.provide(CodexStreamMapperLive)
+    );
+    const chunks = yield* Effect.forEach(
+      stream.body
+        .split("\n\n")
+        .filter(
+          (line) => line.startsWith("data: {") && !line.endsWith("[DONE]")
+        ),
+      (line) =>
+        Schema.decodeUnknownEffect(
+          Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
+        )(line.slice("data: ".length))
+    );
+
+    assert.deepStrictEqual(chunks[0]?.choices[0]?.delta.tool_calls, [
+      {
+        index: 0,
+        id: "call_executor",
+        type: "function",
+        function: { name: "connection_search", arguments: "" },
+      },
+    ]);
+    assert.strictEqual(
+      chunks[1]?.choices[0]?.delta.tool_calls?.[0]?.function.arguments,
+      '{"query":"Executor'
+    );
+    assert.strictEqual(
+      chunks[2]?.choices[0]?.delta.tool_calls?.[0]?.function.arguments,
+      ' skills"}'
+    );
+    assert.strictEqual(chunks[3]?.choices[0]?.finish_reason, "tool_calls");
+  })
+);
+
+it.effect("fails closed on malformed Codex function-call events", () =>
+  Effect.gen(function* testMalformedFunctionCallEvent() {
+    const input = yield* Schema.decodeUnknownEffect(
+      CodexResponsesStreamMapInput
+    )({
+      model: "gpt-5.5",
+      body: 'data: {"type":"response.output_item.added","output_index":0,"item":{"type":"function_call","id":"fc_executor","name":"connection_search","arguments":""}}\n\n',
+    });
+    const error = yield* toOpenAICompatibleStream(input).pipe(
+      Effect.provide(CodexStreamMapperLive),
+      Effect.flip
+    );
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(
+      error.message,
+      "Unable to decode Codex function-call output item."
+    );
   })
 );
 

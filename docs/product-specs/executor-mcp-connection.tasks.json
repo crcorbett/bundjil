@@ -187,7 +187,7 @@
     {
       "id": "prove-preview-eve-executor-and-browser-resume",
       "title": "Prove the deployed Preview Eve, Executor, browser approval, and Sendblue path",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["provision-isolated-preview-toolkit-and-credentials"],
       "description": "Deploy a clean Preview and prove connection discovery, read execution, human browser approval/decline, safe resume, owner-channel delivery, policy restoration, observability, and leak safety end to end.",
       "implementationNotes": [

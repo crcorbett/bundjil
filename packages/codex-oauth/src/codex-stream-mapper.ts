@@ -2,12 +2,16 @@ import { Context, Effect, Option, Redacted, Schema } from "effect";
 
 import { CodexResponsesStreamError } from "./errors.js";
 import {
+  CodexResponsesFunctionArgumentsDeltaEvent,
+  CodexResponsesFunctionCallAddedEvent,
+  CodexResponsesOutputItemDiscriminator,
   CodexResponsesStreamEvent,
   OpenAICompatibleChatCompletionChunk,
   OpenAICompatibleChatCompletionStream,
 } from "./schemas.js";
 import type {
   CodexResponsesStreamMapInput,
+  OpenAICompatibleChatCompletionChunk as OpenAICompatibleChatCompletionChunkType,
   OpenAICompatibleChatCompletionStream as OpenAICompatibleChatCompletionStreamType,
 } from "./schemas.js";
 
@@ -57,7 +61,8 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
         .filter((line) => line.trim().length > 0),
       decodeCodexStreamLine
     );
-    const chunks: string[] = [];
+    const chunks: OpenAICompatibleChatCompletionChunkType[] = [];
+    let hasFunctionCall = false;
 
     for (const decodedEvent of decodedEvents) {
       if (Option.isNone(decodedEvent)) {
@@ -67,54 +72,153 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
       const event = decodedEvent.value;
 
       if (
-        event.type !== "response.output_text.delta" ||
-        event.delta === undefined
+        event.type === "response.output_text.delta" &&
+        event.delta !== undefined
       ) {
+        chunks.push({
+          id: "bundjil-codex",
+          object: "chat.completion.chunk",
+          created: 0,
+          model: input.model,
+          choices: [
+            {
+              index: 0,
+              delta: { content: event.delta },
+              finish_reason: null,
+            },
+          ],
+        });
         continue;
       }
 
-      const chunk = yield* Schema.decodeUnknownEffect(
-        OpenAICompatibleChatCompletionChunk
-      )({
-        id: "bundjil-codex",
-        object: "chat.completion.chunk",
-        created: 0,
-        model: input.model,
-        choices: [
-          {
-            index: 0,
-            delta: { content: event.delta },
-            finish_reason: null,
-          },
-        ],
-      }).pipe(
-        Effect.mapError(
-          (cause) =>
-            new CodexResponsesStreamError({
-              operation: "toOpenAICompatibleStream",
-              message: "Unable to encode OpenAI-compatible stream chunk.",
-              cause,
-            })
-        )
-      );
+      if (event.type === "response.output_item.added") {
+        const item = yield* Schema.decodeUnknownEffect(
+          CodexResponsesOutputItemDiscriminator
+        )(event.item).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesStreamError({
+                operation: "toOpenAICompatibleStream",
+                message: "Unable to decode Codex Responses output item.",
+                cause,
+              })
+          )
+        );
 
-      const encodedChunk = yield* Schema.encodeEffect(
-        Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
-      )(chunk).pipe(
-        Effect.mapError(
-          (cause) =>
-            new CodexResponsesStreamError({
-              operation: "toOpenAICompatibleStream",
-              message: "Unable to encode OpenAI-compatible stream chunk.",
-              cause,
-            })
-        )
-      );
+        if (item.type !== "function_call") {
+          continue;
+        }
 
-      chunks.push(encodedChunk);
+        const functionCall = yield* Schema.decodeUnknownEffect(
+          CodexResponsesFunctionCallAddedEvent
+        )(event).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesStreamError({
+                operation: "toOpenAICompatibleStream",
+                message: "Unable to decode Codex function-call output item.",
+                cause,
+              })
+          )
+        );
+        hasFunctionCall = true;
+        chunks.push({
+          id: "bundjil-codex",
+          object: "chat.completion.chunk",
+          created: 0,
+          model: input.model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: functionCall.output_index,
+                    id: functionCall.item.call_id,
+                    type: "function",
+                    function: {
+                      name: functionCall.item.name,
+                      arguments: functionCall.item.arguments,
+                    },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+        continue;
+      }
+
+      if (event.type === "response.function_call_arguments.delta") {
+        const functionArguments = yield* Schema.decodeUnknownEffect(
+          CodexResponsesFunctionArgumentsDeltaEvent
+        )(event).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesStreamError({
+                operation: "toOpenAICompatibleStream",
+                message: "Unable to decode Codex function-call arguments.",
+                cause,
+              })
+          )
+        );
+        hasFunctionCall = true;
+        chunks.push({
+          id: "bundjil-codex",
+          object: "chat.completion.chunk",
+          created: 0,
+          model: input.model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: functionArguments.output_index,
+                    function: { arguments: functionArguments.delta },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+      }
     }
 
-    const body = `${chunks
+    chunks.push({
+      id: "bundjil-codex",
+      object: "chat.completion.chunk",
+      created: 0,
+      model: input.model,
+      choices: [
+        {
+          index: 0,
+          delta: {},
+          finish_reason: hasFunctionCall ? "tool_calls" : "stop",
+        },
+      ],
+    });
+
+    const encodedChunks = yield* Effect.all(
+      chunks.map((chunk) =>
+        Schema.encodeEffect(
+          Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
+        )(chunk).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesStreamError({
+                operation: "toOpenAICompatibleStream",
+                message: "Unable to encode OpenAI-compatible stream chunk.",
+                cause,
+              })
+          )
+        )
+      )
+    );
+
+    const body = `${encodedChunks
       .map((chunk) => `data: ${chunk}\n\n`)
       .join("")}data: [DONE]\n\n`;
 
