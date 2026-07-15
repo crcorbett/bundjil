@@ -273,9 +273,9 @@ it.effect("maps Codex function calls to OpenAI-compatible tool chunks", () =>
     )({
       model: "gpt-5.5",
       body: [
-        'data: {"type":"response.output_item.added","output_index":0,"item":{"type":"function_call","id":"fc_executor","call_id":"call_executor","name":"connection_search","arguments":""}}',
-        'data: {"type":"response.function_call_arguments.delta","output_index":0,"delta":"{\\"query\\":\\"Executor"}',
-        'data: {"type":"response.function_call_arguments.delta","output_index":0,"delta":" skills\\"}"}',
+        'data: {"type":"response.output_item.added","output_index":1,"item":{"type":"function_call","id":"fc_executor","call_id":"call_executor","name":"connection_search","arguments":""}}',
+        'data: {"type":"response.function_call_arguments.delta","output_index":1,"delta":"{\\"query\\":\\"Executor"}',
+        'data: {"type":"response.function_call_arguments.delta","output_index":1,"delta":" skills\\"}"}',
         'data: {"type":"response.completed"}',
         "",
       ].join("\n"),
@@ -332,6 +332,27 @@ it.effect("fails closed on malformed Codex function-call events", () =>
     assert.strictEqual(
       error.message,
       "Unable to decode Codex function-call output item."
+    );
+  })
+);
+
+it.effect("fails closed on orphaned Codex function-call arguments", () =>
+  Effect.gen(function* testOrphanedFunctionCallArguments() {
+    const input = yield* Schema.decodeUnknownEffect(
+      CodexResponsesStreamMapInput
+    )({
+      model: "gpt-5.5",
+      body: 'data: {"type":"response.function_call_arguments.delta","output_index":3,"delta":"{}"}\n\n',
+    });
+    const error = yield* toOpenAICompatibleStream(input).pipe(
+      Effect.provide(CodexStreamMapperLive),
+      Effect.flip
+    );
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(
+      error.message,
+      "Codex function-call arguments arrived before their output item."
     );
   })
 );

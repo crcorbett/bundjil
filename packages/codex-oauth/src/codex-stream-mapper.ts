@@ -1,4 +1,4 @@
-import { Context, Effect, Option, Redacted, Schema } from "effect";
+import { Context, Effect, HashMap, Option, Redacted, Schema } from "effect";
 
 import { CodexResponsesStreamError } from "./errors.js";
 import {
@@ -62,6 +62,8 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
       decodeCodexStreamLine
     );
     const chunks: OpenAICompatibleChatCompletionChunkType[] = [];
+    let functionCallIndexes = HashMap.empty<number, number>();
+    let nextFunctionCallIndex = 0;
     let hasFunctionCall = false;
 
     for (const decodedEvent of decodedEvents) {
@@ -122,6 +124,13 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
           )
         );
         hasFunctionCall = true;
+        const functionCallIndex = nextFunctionCallIndex;
+        functionCallIndexes = HashMap.set(
+          functionCallIndexes,
+          functionCall.output_index,
+          functionCallIndex
+        );
+        nextFunctionCallIndex += 1;
         chunks.push({
           id: "bundjil-codex",
           object: "chat.completion.chunk",
@@ -133,7 +142,7 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
               delta: {
                 tool_calls: [
                   {
-                    index: functionCall.output_index,
+                    index: functionCallIndex,
                     id: functionCall.item.call_id,
                     type: "function",
                     function: {
@@ -163,6 +172,20 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
               })
           )
         );
+        const functionCallIndex = HashMap.get(
+          functionCallIndexes,
+          functionArguments.output_index
+        );
+
+        if (Option.isNone(functionCallIndex)) {
+          return yield* new CodexResponsesStreamError({
+            operation: "toOpenAICompatibleStream",
+            message:
+              "Codex function-call arguments arrived before their output item.",
+            cause: "Missing function-call output index.",
+          });
+        }
+
         hasFunctionCall = true;
         chunks.push({
           id: "bundjil-codex",
@@ -175,7 +198,7 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
               delta: {
                 tool_calls: [
                   {
-                    index: functionArguments.output_index,
+                    index: functionCallIndex.value,
                     function: { arguments: functionArguments.delta },
                   },
                 ],
