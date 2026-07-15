@@ -77,6 +77,26 @@ after clean Preview proof renders the hosted approval page, covers approve,
 decline, and settled replay, confirms Sendblue delivery, and redeploys from a
 clean SHA before any Production promotion.
 
+Production Executor promotion is accepted. The independent Production toolkit
+contains only the reviewed GitHub connection and ordered policy intent, with a
+separately labeled Personal 1Password record and Production-only Sensitive
+Vercel bindings. Executor keys are account-level; capability scope comes from
+the toolkit endpoint, selected connection, ordered policy, and Eve's exact
+`skills`/`execute`/`resume` allowlist. A mode-`0600`, git-ignored workstation
+copy at `.local/secrets/executor-production.env` avoids repeated 1Password
+prompts during local operations; it is not a deployment source of truth.
+
+The accepted agent deployment and rollback candidate are both `READY` at clean
+pushed revision `e1f33e8`. The refreshed private Codex proxy is also `READY` at
+that revision and reports healthy `live` mode. Direct MCP proof completed the
+approved GitHub PR read, and a fresh OIDC-authenticated deployed Eve session
+ran `connection_search` -> `executor__skills` -> `executor__execute` through
+the Codex subscription path, returned `succeeded`, and reached
+`session.waiting`. No Production write or approval was requested. Rollback,
+revocation, monitoring, and incident procedures are recorded in
+[`apps/agent/README.md`](./apps/agent/README.md) and the active Executor plan;
+no Production write is an acceptance step.
+
 ## Sendblue Channel State
 
 `apps/agent` owns the Sendblue custom Eve channel, including its Effect Schema

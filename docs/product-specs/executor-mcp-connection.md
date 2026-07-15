@@ -1,6 +1,6 @@
 # Executor MCP Connection
 
-- Status: Draft
+- Status: Complete - Production accepted and documented
 - Owner: `apps/agent`
 - Last reviewed: 2026-07-15
 
@@ -12,7 +12,8 @@ client, an MCP proxy, or a new workspace package.
 
 The authored connection lives at
 `apps/agent/agent/connections/executor.ts`. It obtains its toolkit-scoped URL
-and bearer credential from an app-owned Effect Config module, exposes only the
+and dedicated environment bearer credential from an app-owned Effect Config
+module, exposes only the
 remote `skills`, `execute`, and `resume` MCP tools through Eve's allowlist. The
 hosted connection temporarily uses Executor's explicit model-mediated approval
 mode so authenticated email and iMessage conversations can pause on one turn
@@ -22,6 +23,10 @@ injection, connection scoping, policy evaluation, approval state, and
 execution resumption.
 
 Preview and Production use separate Executor toolkits and separate API keys.
+Executor API keys are account-level credentials, not technically bound to one
+toolkit. Least privilege comes from the toolkit-scoped endpoint, its selected
+connections and ordered policy, the Eve tool allowlist, and operationally
+isolating one dedicated account key per Bundjil environment.
 Each toolkit is implicit-deny and admits only explicitly selected downstream
 connections. Read-only operations may be approved automatically, mutations
 require an explicit later-turn owner decision while model mode is active, and
@@ -164,7 +169,8 @@ provisioning because Executor and Eve are external, evolving systems.
    `model` during the temporary hosted workaround or `browser` after rollback.
 2. Eve may discover only `skills`, `execute`, and `resume` from this
    connection. Future remote MCP additions remain hidden until reviewed.
-3. Preview and Production have distinct toolkit slugs, API keys, Vercel
+3. Preview and Production have distinct toolkit slugs, dedicated account API
+   keys, Vercel
    variables, and acceptance evidence.
 4. Toolkit connection patterns are implicit-deny. An operation is unavailable
    unless both its connection and policy admit it.
@@ -188,25 +194,27 @@ provisioning because Executor and Eve are external, evolving systems.
 11. The Executor API key is unwrapped from `Redacted` only inside Eve's
     `auth.getToken` adapter and is never added to an Effect error payload.
 12. Downstream provider credentials remain in Executor. Bundjil stores only its
-    dedicated Executor bearer credential and non-secret/sanitized identifiers.
+    dedicated environment's Executor account bearer credential and
+    non-secret/sanitized identifiers. The bearer itself is account-level;
+    toolkit URL and policy provide the remote capability scope.
 13. Production enablement follows accepted Preview proof. Rollback uses an
     accepted immutable Vercel deployment and immediate key revocation/toolkit
     disablement when credential or policy compromise is suspected.
 
 ## Threat Model
 
-| Threat                                                   | Required control                                                                                                                                                   |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Prompt injection asks for a destructive action           | Toolkit policy blocks destructive authority; reversible mutations pause and require a separate authenticated owner continuation.                                   |
-| Model attempts to approve its own action                 | Instructions require a two-turn stop/resume protocol, identity checks, one pending decision, and ambiguity/replay rejection; this is not a hard security boundary. |
-| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                                   |
-| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                               |
-| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared keys, and shared toolkit identities.                                                                             |
-| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                                       |
-| Approval request reaches an untrusted person             | Only authenticated Eve/API and allowlisted Sendblue owner continuations may decide; non-owner messages cannot resume and protected details are not retained.       |
-| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                                         |
-| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                              |
-| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions.             |
+| Threat                                                   | Required control                                                                                                                                                                                            |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prompt injection asks for a destructive action           | Toolkit policy blocks destructive authority; reversible mutations pause and require a separate authenticated owner continuation.                                                                            |
+| Model attempts to approve its own action                 | Instructions require a two-turn stop/resume protocol, identity checks, one pending decision, and ambiguity/replay rejection; this is not a hard security boundary.                                          |
+| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                                                                            |
+| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                                                                        |
+| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared operational keys, and shared toolkit identities. Executor's key is account-level, so isolation is operational rather than a token-enforced toolkit scope. |
+| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                                                                                |
+| Approval request reaches an untrusted person             | Only authenticated Eve/API and allowlisted Sendblue owner continuations may decide; non-owner messages cannot resume and protected details are not retained.                                                |
+| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                                                                                  |
+| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                                                                       |
+| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions.                                                      |
 
 ## Ownership And File Shape
 
@@ -719,8 +727,10 @@ Use target-scoped variables with the same names and different values:
   `eve build` and runtime. It identifies only the environment's toolkit and
   includes exactly one explicit `elicitation_mode=model` during the workaround
   or `elicitation_mode=browser` after the rollback gate passes.
-- `BUNDJIL_EXECUTOR_API_KEY`: sensitive/write-only Preview/Production bearer,
-  resolved only at runtime by `auth.getToken`.
+- `BUNDJIL_EXECUTOR_API_KEY`: sensitive/write-only Preview/Production account
+  bearer dedicated operationally to that environment and resolved only at
+  runtime by `auth.getToken`. Executor does not bind the key itself to a
+  toolkit; the companion URL and toolkit policy enforce capability scope.
 
 Add both names to `@bundjil/agent#build.env` in `turbo.json` only as required
 by the actual Eve build behavior. The URL is necessarily import-time because
@@ -728,15 +738,25 @@ Eve requires a concrete URL in the compiled definition. The key must remain
 runtime-only; do not add a build-time read merely because the variable name is
 declared to Turbo.
 
-Create separate Bundjil Preview and Production API keys. Store them as newly
-labeled fields in the existing personal-vault Executor item and as encrypted
-target-scoped Vercel variables. Do not overwrite the broad discovery key until
-the dedicated keys have passed proof and rollback metadata is retained.
+Create separate Bundjil Preview and Production account API keys. Store them in
+separately labeled Personal 1Password records and encrypted target-scoped Vercel
+variables. Do not overwrite the broad discovery key until the dedicated
+environment keys have passed inventory correlation, live proof, and rollback
+metadata is retained. Correlate each newly created key's unique provider name
+and masked value before handoff; do not revoke any key that cannot be
+deterministically attributed to Bundjil.
 
 Provisioning and proof commands must use 1Password references or mode-0600
 temporary files. Never place a secret in shell history, process arguments,
 committed `.env` files, clipboard evidence, task ledgers, screenshots, or
 terminal output. Remove temporary material after each proof.
+
+A mode-`0600`, git-ignored workstation record under `.local/secrets/` may hold
+an operator recovery copy to avoid repeated biometric prompts. It is local to
+the trusted workstation, never a Vercel or package source of truth, and must not
+be printed, uploaded, copied into proof artifacts, or committed. Callback URLs,
+OIDC tokens, prompts, streams, provider outputs, and other proof captures remain
+ephemeral and must be removed after use.
 
 Eve does not currently expose a conditional `enabled` field for an authored
 MCP connection. Do not invent an unsupported toggle or point a disabled

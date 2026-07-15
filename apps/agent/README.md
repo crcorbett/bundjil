@@ -74,6 +74,78 @@ mode is the rollback target. Switch the target-scoped URL only after clean
 Preview proof of the hosted page, approve, decline, settled replay, and
 Sendblue delivery; then redeploy from a clean SHA before Production promotion.
 
+### Production Executor Operations
+
+Production promotion is accepted. The independent Production toolkit has one
+selected GitHub connection and five ordered policy rules matching the reviewed
+Preview intent. It is separate from Preview. Executor API keys are account-level
+rather than technically toolkit-scoped, so Bundjil uses a dedicated environment
+key operationally and relies on the toolkit endpoint and policy for capability
+scope. The replacement bearer is correlated to one provider inventory row,
+stored in the labeled Personal record, and bound only to Production as a
+Sensitive Vercel value. `model` remains the temporarily accepted explicit
+elicitation mode; it does not weaken the Executor policy boundary or authorize
+writes.
+
+The current and rollback agent deployments are `READY` at clean pushed revision
+`e1f33e8`; the latest owns the stable aliases and both return health HTTP `200`.
+The refreshed private Codex proxy is `READY` at the same revision and its stable
+alias reports healthy `live` mode. Direct MCP discovery returned exactly
+`skills`, `execute`, and `resume`, and the approved GitHub PR read succeeded. A
+fresh OIDC-authenticated Eve session then called `connection_search`,
+`executor__skills`, and `executor__execute`; the exact PR read returned
+`succeeded`, the turn completed, and the session reached `session.waiting`.
+Production runtime-error queries were empty and no write or approval path ran.
+
+The labeled Personal 1Password item and Vercel's Production-only Sensitive
+variables remain the durable sources of truth. This workstation also retains a
+mode-`0600`, git-ignored recovery copy at
+`.local/secrets/executor-production.env` so trusted local probes do not require
+repeated biometric approval. Never commit, print, upload, or treat that local
+file as deployment configuration. Set only these Vercel Production variables
+for `bundjil-agent`:
+
+```text
+BUNDJIL_EXECUTOR_MCP_URL
+BUNDJIL_EXECUTOR_API_KEY
+```
+
+Do not put either value in source, a shell history, a fixture, an Agent Run,
+or documentation. Read back only variable names, target, and Sensitive type.
+The endpoint must be the independent toolkit URL with exactly one explicit
+`elicitation_mode=model`; Preview and root endpoints are not valid Production
+substitutes.
+
+Deploy only a clean pushed source revision. Before changing the alias, retain
+sanitized immutable current and rollback deployment references. After deploy,
+prove the protected health route, the exact Eve MCP surface (`skills`,
+`execute`, `resume`), and one authenticated read-only Executor operation.
+Keep only statuses, counts, source/deployment correlation, and leak-scan
+booleans. Do not run a Production write.
+
+For an incident, first block the selected Production toolkit policy, revoke the
+dedicated key in Executor, remove the two Production Vercel variables, and
+restore the retained immutable deployment. Verify post-revocation rejection
+without recording the response body, rotate the 1Password-held key, configure
+the replacement as a new Sensitive value, and repeat the read-only acceptance
+path. The promotion record has current and rollback `READY` deployments,
+a correlated and durably stored bearer, and a name/target/type-only environment
+inventory. Before a key rotation, create and list-read the key
+through the same authenticated provider session, correlate its unique provider
+name and masked value, then prove only 1Password field presence, never its
+value. Do not revoke an earlier key unless its provider identity is
+deterministic. Use the Vercel
+and Executor inventories plus status-only runtime logs to investigate;
+never retain request content, provider output, credentials, OAuth material, or
+execution identifiers.
+
+To promote a future integration, inventory and classify its tools first, update
+the SPEC and task ledger, prove the intended read, approval, and block behavior
+in a separate Preview toolkit, review the resulting policy intent, recreate it
+in the Production toolkit, deploy from a clean source revision, and monitor
+only sanitized authorization, error, and leak-scan evidence. A new mutation or
+authority-management capability requires its own task and chat-approval proof.
+
 ## Commands
 
 Run from the repository root:
@@ -267,7 +339,9 @@ Executor MCP mode is explicit:
 - `BUNDJIL_EXECUTOR_MCP_URL`: required HTTPS Executor toolkit endpoint with
   exactly one `elicitation_mode=model` during the temporary chat workaround or
   `elicitation_mode=browser` after verified rollback.
-- `BUNDJIL_EXECUTOR_API_KEY`: required Executor toolkit bearer credential.
+- `BUNDJIL_EXECUTOR_API_KEY`: required Executor account bearer dedicated to
+  this Bundjil environment. Toolkit scope is enforced by the companion URL and
+  Executor policy, not by the key itself.
 
 Codex proxy mode is opt-in:
 

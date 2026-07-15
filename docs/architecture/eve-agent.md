@@ -193,6 +193,26 @@ Production promotion. No Bundjil approval service, persistence store, state
 machine, MCP client, proxy, or SDK is introduced: Eve owns session continuity
 and Executor owns the paused execution state.
 
+Production authority is therefore an app-owned configuration binding, not a
+shared package or a second policy engine. The independent Production toolkit
+holds the reviewed connection and ordered policy intent; the app may receive
+only its dedicated endpoint and redacted environment bearer through
+Production-only Sensitive Vercel variables. Executor keys are account-level,
+while the endpoint and policy are toolkit-scoped. The accepted promotion proves
+the Sensitive binding inventory, clean-source deployment correlation, protected
+health, exact `skills`/`execute`/`resume` discovery, direct read-only MCP proof,
+and a deployed OIDC-authenticated Eve read through the Codex proxy. The current
+and rollback agent deployments are `READY` at revision `e1f33e8`; the refreshed
+private proxy is also `READY` and healthy in `live` mode at that revision. The
+deployed turn called `connection_search`, `executor__skills`, and
+`executor__execute`, returned `succeeded`, and reached `session.waiting` with no
+write or approval request. Revocation remains provider-owned: block the toolkit
+policy and revoke the dedicated key, then remove the app binding and restore the
+retained immutable deployment. Executor and Vercel inventories may provide
+sanitized status evidence, but no raw provider result, execution identifier, or
+credential belongs in Bundjil. A mode-`0600` ignored local credential copy is a
+trusted-workstation recovery aid only, never a package or runtime owner.
+
 ## Production Call Graph
 
 The default Gateway runtime path is:

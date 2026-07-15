@@ -108,6 +108,17 @@ justify a shared package, custom MCP client, proxy, SDK wrapper, approval
 service, persistence store, or state machine. Eve owns conversation/session
 continuity and Executor owns paused execution state.
 
+Executor Production operations remain at this app/provider boundary. Personal
+1Password owns the labeled independent toolkit reference; Executor owns the
+toolkit, selected connection, ordered policy, and account-key lifecycle;
+toolkit scope is enforced by the endpoint/policy rather than the bearer itself.
+Vercel owns the two Production-only Sensitive app bindings, and the active
+execution plan owns sanitized acceptance evidence. A future integration starts in a Preview
+toolkit and is promoted only after its SPEC/task, policy review, read/approval/
+block proof, and clean-source deployment gate. No package may import or model
+the provider catalog, key, policy records, paused state, or deployment control
+plane.
+
 ## Package Boundaries
 
 `@bundjil/core`:

@@ -157,8 +157,40 @@ blocked and the first Production acceptance operation read-only. Do not claim
 browser rollback from a paused result or source review: change the
 target-scoped URL only after clean Preview proof of the hosted page, approve,
 decline, settled replay, and Sendblue delivery, then redeploy from a clean SHA
-before Production promotion. This implementation task runs no provider,
-browser, Vercel, or Sendblue operation.
+before Production promotion. The earlier implementation slice ran no provider,
+browser, Vercel, or Sendblue operation; the separately owned Task 6 promotion
+record below is the exception and retains only sanitized operator evidence.
+
+For Production Executor promotion, retain evidence in three
+separate states: reviewed intended policy, Preview-verified behavior, and
+Production-verified behavior. The reviewed state proves that an independent
+Production toolkit has one selected connection and five ordered policy rules
+matching accepted Preview intent. The accepted promotion record proves
+Production-only Sensitive Vercel bindings, clean-source current and rollback
+deployments, protected health, exact MCP discovery, and read-only execution.
+The replacement bearer matches exactly one current Executor inventory row by
+unique provider name and masked value, is durably stored in the labeled Personal
+item, and matches the replaced Production-only Sensitive binding. The temporary
+handoff file is removed. Since Executor keys are account-level, a dedicated
+environment key is an operational isolation control and toolkit scope comes
+from endpoint/policy. The accepted current and rollback agent deployments are
+`READY` at `e1f33e8`; the refreshed live proxy is also `READY` and healthy at
+that revision. Direct MCP proof and a deployed OIDC-authenticated Eve session
+both completed the exact approved GitHub PR read. The Eve run discovered the
+connection, loaded the execute skill, invoked the read, completed the turn, and
+reached `session.waiting`; no write or approval path ran.
+
+Before accepting Production, verify without retaining values: labeled Personal
+1Password storage before key handoff; exact unique-name/masked-value correlation
+for the dedicated environment key; both Vercel variables targeted only to
+Production and marked Sensitive; clean pushed source plus immutable current and
+rollback deployment references; protected health; exactly `skills`, `execute`,
+and `resume`; one authenticated read-only execution; zero Production writes;
+and log/evidence scans with zero credential, protected-URL, prompt, provider
+result, OAuth, message-content, and execution-id retention. Dry-run or
+read-only inventory must prove policy block, key revocation, deployment restore,
+and post-revocation rejection procedures while leaving the accepted Production
+key active until an incident or planned rotation.
 
 Codex proxy mode is not an ordinary Eve test requirement. Gateway remains the
 default. Accepted Production proof verifies a deployed Eve request through the

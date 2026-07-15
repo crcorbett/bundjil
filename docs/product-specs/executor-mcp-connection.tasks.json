@@ -1,7 +1,7 @@
 {
   "title": "Executor MCP Connection Tasks",
   "spec": "docs/product-specs/executor-mcp-connection.md",
-  "status": "draft",
+  "status": "completed",
   "principles": [
     "Use Eve's native defineMcpClientConnection boundary; do not add an Executor SDK, custom production MCP client, MCP proxy, or workspace package.",
     "Keep the boundary app-owned under apps/agent and keep configuration in a distinct agent/lib/executor/config.ts using Effect Config, ConfigProvider, Schema policy, Redacted, and sanitized tagged errors.",
@@ -42,7 +42,7 @@
   ],
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
-    "completedPasses": 15,
+    "completedPasses": 18,
     "description": "Before accepting each task, record separate parent audits for ownership/call graph, Effect implementation quality and helper admission, and verification/evidence coverage. Three passes are the floor; add passes while any MCP contract, toolkit authority, model/browser approval, secret handling, deployment isolation, documentation, or verification finding remains."
   },
   "tasks": [
@@ -278,7 +278,7 @@
     {
       "id": "promote-production-document-and-audit",
       "title": "Promote an isolated Production connection, document operations, and complete the final audit",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["prove-preview-eve-executor-and-chat-resume"],
       "description": "Create independent Production Executor authority, promote only the accepted policy intent, prove a read-only live path, retain rollback/revocation controls, reconcile all documentation, and complete the mandatory final audits.",
       "implementationNotes": [
@@ -312,8 +312,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph accepted: Production preserves apps/agent -> Eve native MCP -> independent Production Executor toolkit, while Executor owns remote schemas, ordered policy, downstream credentials, and paused execution. The model path remains apps/agent -> private codex-proxy -> package-owned encrypted Codex OAuth profile storage. No Executor SDK, Bundjil MCP proxy, duplicated DTO, approval service, state machine, direct-provider fallback, package boundary, or frontend surface was introduced.",
+          "Implementation quality and helper admission accepted: Task 6 changes sanitized documentation and operator configuration only. The accepted app-owned Effect Config/ConfigProvider, Effect Schema validation, Redacted bearer, tagged errors, named linear operations, Layers, and adapter-edge Effect runtime remain unchanged. The complete helper inventory contains only the previously accepted config, connection, instruction, and direct-test surfaces; no helper, mapper, wrapper, hook, script, service, layer, factory, barrel, DTO mirror, manual reader, raw JSON helper, process.env access, cast, suppression, UI component, or speculative abstraction was added.",
+          "Verification and evidence accepted: independent Production toolkit/policy/key ownership and Production-only Sensitive Vercel bindings were proved without retaining values; current and rollback agent deployments and a refreshed live Codex proxy are Ready at clean pushed revision e1f33e8; direct MCP discovery returned exactly skills/execute/resume and completed the approved GitHub PR read; a fresh OIDC-authenticated deployed Eve turn ran connection_search -> executor__skills -> executor__execute through the Codex subscription path, returned succeeded, and reached session.waiting with no write, resume, or approval request. Bounded runtime queries found no agent or proxy errors. Frozen install made no changes; focused agent typecheck/test/build passed; type-aware lint and formatting report zero findings; Knip is clean; all six strict typechecks and all 194 tests pass; Effect language-service diagnostics across root and all six projects report zero errors, warnings, or messages; JSON, diff, tracked/compiled-value, and temporary-artifact checks pass."
+        ]
       },
       "commitAfterPassing": true
     }

@@ -1,6 +1,6 @@
 # Executor MCP Connection Implementation Plan
 
-Status: In progress
+Status: Complete - Production accepted and documentation reconciled
 
 Spec: `docs/product-specs/executor-mcp-connection.md`
 Task ledger: `docs/product-specs/executor-mcp-connection.tasks.json`
@@ -28,8 +28,9 @@ Executor code, raw MCP/provider payloads, provider records, message content,
 or downstream results.
 
 Use 1Password references, Executor-managed connections, target-scoped Vercel
-variables, and mode-`0600` ephemeral material for live work. Remove temporary
-material after each proof.
+variables, and mode-`0600` ignored material for live work. Trusted-workstation
+recovery records may remain under `.local/secrets/`; remove callback, request,
+response, stream, and other proof captures after each proof.
 
 ## Ordered Tasks
 
@@ -39,7 +40,7 @@ material after each proof.
 4. `adopt-temporary-chat-model-approval`: accepted.
 5. `prove-preview-eve-executor-and-chat-resume`: accepted; the earlier browser
    proof attempt and its hosted blocker are retained below as historical evidence.
-6. `promote-production-document-and-audit`: pending.
+6. `promote-production-document-and-audit`: accepted.
 
 ## Current Baseline
 
@@ -51,9 +52,146 @@ material after each proof.
   schemas, toolkit policy, downstream credentials, paused execution, and
   resume state. Explicit model mode temporarily lets the Eve model submit a
   later authenticated owner's decision because browser approval is unavailable.
-- Preview now has an accepted dedicated Executor toolkit/key and target-scoped
-  Vercel variables. Production remains unprovisioned by this rollout.
+- Preview has an accepted dedicated Executor toolkit and operationally
+  dedicated account key plus target-scoped Vercel variables. Production has an
+  independent toolkit with reviewed policy intent, a distinct labeled Personal credential record, Production-only
+  Sensitive bindings, and the sanitized live proof recorded below. The record
+  title/category and non-empty fields are correct. A replacement bearer matches
+  exactly one current Executor inventory row by unique provider name and masked
+  value, is durably stored in that record, and matches the replaced
+  Production-only Sensitive binding. The temporary handoff file is removed.
 - No Bundjil frontend work is in scope.
+
+### Task 6 Production Evidence
+
+Status: Accepted 2026-07-15.
+
+- Executor API readback confirms an independent Production toolkit in the
+  Personal organization. It is distinct from the Preview toolkit; identifiers,
+  protected endpoint URLs, and credentials are intentionally omitted.
+- The Production toolkit was initially empty. Its policy now recreates only
+  the reviewed Preview intent: one selected connection and five ordered policy
+  rules. A post-write semantic readback matched the accepted Preview intent.
+  This records policy intent, not a shared Preview identity or an unreviewed
+  provider catalog entry.
+- A Production bearer was generated and delivered to the Production Sensitive
+  binding without source, task-evidence, or ephemeral-file retention. The
+  distinct Personal item was initially created as an untitled empty Login item,
+  then renamed to `Bundjil Executor Production`; it now has non-empty standard
+  credential/reference fields. The generic Bundjil Production record is
+  distinct and unchanged. A replacement bearer now matches exactly one current
+  key-inventory row by unique provider name and masked value, is durably stored
+  in the labeled Personal record, and matches the replaced Production-only
+  Sensitive binding. Executor keys are account-level, not toolkit-bound; the
+  toolkit endpoint and policy enforce capability scope. A mode-`0600`, ignored
+  workstation record now supports trusted local probes without repeated
+  1Password prompts. It is not a deployment source of truth and is not retained
+  as proof output.
+- Both Executor configuration names have separate Production-only Vercel
+  bindings of type Sensitive. Name/target/type inventory confirms the Preview
+  bindings remain separate. The endpoint uses the independent toolkit and
+  explicit `elicitation_mode=model`; its value is not retained here.
+- Two fresh Production deployments from clean pushed revision `e1f33e8` are
+  `READY`: current `dpl_8zHs2hLyXToTrauttibmeGcReLuF` owns the stable aliases,
+  and `dpl_BA63KVRxktQbYRQbByZFWrVihciL` is retained as the immediate rollback
+  candidate. Authenticated Vercel CLI requests returned health HTTP `200` for
+  both. Deployment metadata, source repository, source revision, target, and
+  binding inventory were correlated without retaining a protected URL.
+- Direct authenticated Streamable HTTP discovery established an MCP session and
+  returned exactly `skills`, `execute`, and `resume`. One subsequent
+  `execute` call completed the approved read of GitHub PR 1317 with content
+  present, `writeRequested: false`, and no MCP or provider error. No Production
+  write was invoked.
+- The Production Codex profile had independently reached its explicit
+  reauthentication-required state before final Eve proof. A fresh trusted-local
+  OAuth callback stored a refresh-capable encrypted subscription profile in a
+  new isolated Upstash namespace and cipher. The matching proxy variables were
+  rotated as Production-only Sensitive values. Proxy deployment
+  `dpl_5Nrw5hbs8oUwcP8NdSdfoHA3SBez` is `READY` at pushed revision `e1f33e8`;
+  its stable alias reports health HTTP `200`, `mode: live`, and `ok: true`.
+- A fresh Vercel OIDC bearer reached the deployed agent: session creation
+  returned `202`, and replay returned `200`. The accepted run emitted
+  `connection_search`, `executor__skills`, and `executor__execute`; the exact
+  `github.user.personalgithub.pull_request_read` call used `method: get`, the
+  reviewed owner/repository, and `pullNumber: 1317`. Executor returned
+  `isError: false`, `status: completed`, and `result: succeeded`; the Eve turn
+  completed and the session reached `session.waiting`. No write, resume, or
+  approval operation was requested. An earlier read-only attempt used an
+  incorrect generated argument shape, returned `succeeded: false`, and caused
+  no provider mutation; it was not accepted as proof.
+- Bounded post-proof runtime queries found no agent or proxy runtime errors.
+  The accepted agent deployment recorded only `200`/`202` responses and the
+  accepted proxy deployment recorded only `200` responses in the proof window.
+  Request, stream, OIDC, callback, and temporary deployment material was removed.
+- Vercel deployment-event and bounded Executor artifact scans found zero bearer,
+  credential-assignment, protected-endpoint, or OAuth markers. The scan output
+  retains no provider result, prompt, message content, or execution identifier.
+- Final repository verification passes with a nonsecret synthetic
+  explicit-model Production fixture: type-aware Ultracite/Oxlint reports zero
+  findings, Knip is clean, all six strict package typechecks pass, and all 194
+  tests pass. Effect language-service diagnostics across the root and all six
+  package/app TypeScript projects report zero errors, warnings, or messages.
+  Frozen install made no changes; focused agent typecheck, 56 tests, and build,
+  JSON validation, `git diff --check`, tracked/compiled-value scans, and
+  temporary-artifact cleanup also pass.
+
+#### Production Acceptance Audits
+
+- **Pass 1 - ownership and call graph:** accepted. The app uses Eve's native MCP
+  boundary with one independent Production toolkit; Executor owns schemas,
+  connection policy, downstream credentials, and paused execution. The Codex
+  path remains the private proxy and package-owned encrypted profile store. No
+  duplicate client, proxy, DTO, approval/state service, package, or frontend
+  owner was added.
+- **Pass 2 - Effect quality and helper admission:** accepted. Task 6 changes
+  documentation and operator configuration only. The previously accepted
+  Config/ConfigProvider, Schema, Redacted, tagged-error, named linear Effect,
+  Layer, and adapter-edge runtime surfaces remain unchanged. The helper
+  inventory contains only the accepted app config, Eve connection,
+  instructions, and direct tests; no new helper, mapper, wrapper, hook, script,
+  service, layer, factory, barrel, DTO, manual reader, raw JSON helper,
+  `process.env` access, cast, suppression, or UI component exists.
+- **Pass 3 - verification and evidence:** accepted. Independent Production
+  authority, target-scoped Sensitive bindings, clean-source current/rollback
+  deployments, direct MCP read, fresh encrypted Codex subscription profile,
+  OIDC-authenticated deployed Eve read, runtime-error absence, frozen install,
+  focused checks, all 194 tests, six strict typechecks, Knip, type-aware lint,
+  root plus six-project Effect diagnostics, JSON, diff, protected-value scans,
+  and proof-artifact cleanup pass. No Production write or approval ran.
+
+No Production write or destructive revocation rehearsal is an acceptance step.
+Do not disable an unrelated key.
+
+The incident procedure is proved by current read-only inventory and documented
+ordering, not a live destructive rehearsal: block the selected toolkit policy;
+revoke the dedicated key; remove the two Production bindings; restore the
+retained immutable Ready deployment; confirm rejection with a status-only
+probe; rotate the labeled key; add the replacement only as a new Production
+Sensitive value; and repeat the bounded read-only proof. The fresh current and
+rollback `READY` deployments are retained as immutable candidates while the
+correlated Production bearer remains active.
+
+#### Production Runbook
+
+- **Rollback:** retain the current and previous immutable deployment references
+  before promotion. On a deployment incident, restore the retained deployment,
+  then confirm protected health and runtime status without retaining bodies.
+- **Revocation:** on credential or authority concern, first block the selected
+  toolkit policy, revoke the dedicated key in Executor, remove both Production
+  Vercel bindings, and verify a status-only rejection. Create a replacement
+  only after its Personal 1Password reference exists, then repeat the
+  read-only acceptance path.
+- **Monitoring:** inspect only deployment/source state, protected-health status,
+  exact MCP tool names, read-only result category, HTTP status families, and
+  zero-leak/zero-5xx summaries. Never preserve secrets, protected URLs,
+  prompts, raw MCP/provider results, message content, OAuth material, or
+  execution identifiers.
+- **Future integration promotion:** inventory and classify the candidate,
+  update the SPEC and task ledger, configure a separate Preview toolkit, prove
+  read/approval/block behavior, review the resulting policy intent, recreate
+  it in Production, deploy a clean revision, and monitor sanitized evidence.
+  Any Production mutation or authority-management capability needs a new task
+  and separate chat-approval proof.
 
 ## Task Evidence
 
@@ -84,7 +222,7 @@ for the separate frontend SPEC required by the task ledger.
 | Resume mode         | The host accepts `browser`, `model`, and `native`; absent/unknown `elicitation_mode` and the legacy model-resume alias resolve to `model`. Model resume accepts execution id, action, and optional content. Browser resume accepts **only** execution id and waits for Executor's stored browser decision.         | Executor reference: `packages/hosts/mcp/src/browser-approval.ts` and `packages/hosts/mcp/src/tool-server.ts`. Direct personal MCP metadata advertises model-side resume, so it is discovery-only.                                          |
 | Root versus toolkit | The root MCP resource and a dedicated `/mcp/toolkits/<slug>` resource are distinct; toolkit routing scopes the catalog. Actual endpoint and approval URLs are protected and intentionally omitted.                                                                                                                 | Executor reference: `packages/hosts/cloudflare/src/mcp/agent-session-durable-object.ts` and `packages/plugins/toolkits/src/page.tsx`.                                                                                                      |
 | Policy semantics    | Tools outside selected connection patterns resolve to `block`. For selected connections, ordered explicit policies resolve to `approve`, `require_approval`, or `block`; an absent explicit policy uses the plugin default.                                                                                        | Executor reference: `packages/plugins/toolkits/src/server.ts` and `packages/plugins/toolkits/src/server.test.ts`; official [Executor Policies](https://executor.sh/docs/concepts/policies).                                                |
-| Credential boundary | Executor documents host-side downstream credential injection; agent/model sandbox code does not receive provider credentials. Bundjil will retain only its future dedicated toolkit bearer in app config.                                                                                                          | Official [Executor Cloud](https://executor.sh/cloud) and source above.                                                                                                                                                                     |
+| Credential boundary | Executor documents host-side downstream credential injection; agent/model sandbox code does not receive provider credentials. Executor API keys are account-level; Bundjil retains one operationally dedicated environment bearer while the toolkit URL/policy enforce capability scope.                           | Official [Executor Cloud](https://executor.sh/cloud) and current Executor auth/API-key source.                                                                                                                                             |
 
 The direct MCP read-only probe used the existing personal discovery connection
 only. `skills({ name: "execute" })` succeeded; a catalog inventory succeeded
@@ -328,7 +466,8 @@ Status: Accepted 2026-07-15
 - The personal `bundjil-agent` Vercel project now contains Preview-only
   `BUNDJIL_EXECUTOR_MCP_URL` and `BUNDJIL_EXECUTOR_API_KEY` variables. Creation
   evidence records the URL as encrypted/non-sensitive and the key as
-  sensitive/write-only. Production was not queried or changed.
+  sensitive/write-only. During that Preview task, Production was not queried
+  or changed.
 - A direct Streamable HTTP MCP handshake using the replacement key succeeded
   against the protected browser-elicitation toolkit endpoint. Tool discovery
   returned exactly `skills`, `execute`, and `resume`; no downstream provider
@@ -660,8 +799,9 @@ schemas:
 - Executor policy readback contains only the pre-existing Personal Gmail read
   approval; no disposable GitHub allow rule or management authority was added.
   The selected GitHub mutation therefore retained Executor's approval gate,
-  while unselected operations remained blocked by toolkit scope. No Production
-  Executor toolkit, key, URL, policy, or write authority was provisioned.
+  while unselected operations remained blocked by toolkit scope. At the time
+  of this Preview proof, no Production Executor toolkit, key, URL, policy, or
+  write authority was provisioned.
 - Final deployment logs contained 46 agent records and 14 proxy records, zero
   5xx responses, zero exact secret hits, zero OAuth/credential marker hits, and
   zero sensitive environment-name hits. All retained live response, stream,
