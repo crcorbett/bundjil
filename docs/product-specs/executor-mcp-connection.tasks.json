@@ -228,7 +228,7 @@
     {
       "id": "prove-preview-eve-executor-and-chat-resume",
       "title": "Prove deployed Preview Eve, Executor model approval, and Sendblue continuation",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["adopt-temporary-chat-model-approval"],
       "description": "Deploy a clean explicit-model Preview and prove connection discovery, read execution, first-turn pause, later-turn authenticated owner decisions, safe resume, owner-channel routing, policy restoration, observability, and leak safety end to end.",
       "implementationNotes": [

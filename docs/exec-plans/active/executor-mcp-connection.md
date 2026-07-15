@@ -37,7 +37,7 @@ material after each proof.
 2. `implement-effect-config-and-eve-mcp-connection`: accepted.
 3. `provision-isolated-preview-toolkit-and-credentials`: accepted.
 4. `adopt-temporary-chat-model-approval`: accepted.
-5. `prove-preview-eve-executor-and-chat-resume`: pending; the earlier browser
+5. `prove-preview-eve-executor-and-chat-resume`: in progress; the earlier browser
    proof attempt and its hosted blocker are retained below as historical evidence.
 6. `promote-production-document-and-audit`: pending.
 
@@ -463,7 +463,7 @@ toolkit`; only existing app-owned Config and instructions changed. Eve owns
 
 ### prove-preview-eve-executor-and-chat-resume
 
-Status: Pending after `adopt-temporary-chat-model-approval`
+Status: In progress 2026-07-15
 
 The browser evidence below is retained as historical diagnosis. It no longer
 blocks the revised task, which must deploy explicit model mode and prove a
