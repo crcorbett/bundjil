@@ -522,6 +522,13 @@ schemas:
   `executor_personal` credential. This excludes the Codex bridge, Eve tool
   history, Vercel credential delivery, and lost MCP transport identity as the
   immediate cause.
+- The third consecutive goal continuation repeated the direct proof with a
+  newly initialized session and the accepted dedicated Preview key. Initialize
+  returned 200, initialized returned 202, the selected browser-gated operation
+  returned 200 with `user_approval_required`, and the canonical URL-shape
+  predicates all passed. The authenticated page again replaced its initially
+  rendered disabled decision controls with the unavailable state after
+  hydration. GitHub readback found zero matching proof comments.
 - Executor PR
   [#1317](https://github.com/UsefulSoftwareCo/executor/pull/1317) documents the
   exact hosted symptom: the approval handler used `idFromString` while MCP
@@ -529,12 +536,15 @@ schemas:
   Durable Object and reported the execution unavailable. Current ignored
   source contains the canonical helper and regression test, but the live
   hosted behavior still reproduces the pre-fix failure.
-- Task 4 remains in progress. Browser approve, decline, settled-link replay,
+- The strict blocked-audit threshold is now satisfied after the same external
+  hosted lookup failure prevented acceptance in three consecutive goal turns.
+  Task 4 remains in progress. Browser approve, decline, settled-link replay,
   Sendblue decision-following delivery, policy restoration, correlated final
   evidence, and all three parent acceptance audits are intentionally
   unaccepted. Task 5 and Production promotion remain gated; model elicitation,
   a Bundjil-owned MCP client/proxy, or source-only evidence are not accepted
-  substitutes.
+  substitutes. Resume this plan only after `executor.sh` demonstrates a
+  working name-addressed browser approval lookup.
 
 #### Deployment Cache Corrective Slice Review
 
