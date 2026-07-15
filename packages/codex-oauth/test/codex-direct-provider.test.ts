@@ -209,7 +209,6 @@ it.effect("maps tool definitions and tool history into Codex Responses", () =>
       },
       {
         type: "function_call",
-        id: "call_executor_skills",
         call_id: "call_executor_skills",
         name: "connection_search",
         arguments: '{"query":"Executor skills"}',

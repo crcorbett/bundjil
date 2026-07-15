@@ -638,15 +638,26 @@ export const CodexResponsesInputMessage = Schema.Struct({
 
 export type CodexResponsesInputMessage = typeof CodexResponsesInputMessage.Type;
 
-export const CodexResponsesFunctionCall = Schema.Struct({
+const CodexResponsesFunctionCallFields = {
   type: Schema.Literal("function_call"),
-  id: Schema.NonEmptyString,
   call_id: Schema.NonEmptyString,
   name: Schema.NonEmptyString,
   arguments: Schema.String,
+};
+
+export const CodexResponsesFunctionCall = Schema.Struct({
+  ...CodexResponsesFunctionCallFields,
 });
 
 export type CodexResponsesFunctionCall = typeof CodexResponsesFunctionCall.Type;
+
+export const CodexResponsesFunctionCallOutputItem = Schema.Struct({
+  id: Schema.NonEmptyString,
+  ...CodexResponsesFunctionCallFields,
+});
+
+export type CodexResponsesFunctionCallOutputItem =
+  typeof CodexResponsesFunctionCallOutputItem.Type;
 
 export const CodexResponsesFunctionCallOutput = Schema.Struct({
   type: Schema.Literal("function_call_output"),
@@ -736,7 +747,7 @@ export type CodexResponsesOutputItemDiscriminator =
 export const CodexResponsesFunctionCallAddedEvent = Schema.Struct({
   type: Schema.Literal("response.output_item.added"),
   output_index: Schema.Number.check(Schema.isFinite()),
-  item: CodexResponsesFunctionCall,
+  item: CodexResponsesFunctionCallOutputItem,
 });
 
 export type CodexResponsesFunctionCallAddedEvent =

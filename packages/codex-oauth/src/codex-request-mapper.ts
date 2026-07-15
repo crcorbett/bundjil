@@ -69,7 +69,6 @@ export const makeCodexRequestMapper = CodexRequestMapper.of({
       for (const toolCall of message.tool_calls ?? []) {
         responsesInput.push({
           type: "function_call",
-          id: toolCall.id,
           call_id: toolCall.id,
           name: toolCall.function.name,
           arguments: toolCall.function.arguments,
