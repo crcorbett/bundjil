@@ -1,6 +1,6 @@
 # Vercel Production Promotion Execution Plan
 
-Status: Complete - Production accepted and documentation reconciled
+Status: Complete - Production and Sendblue routing correction accepted
 
 Spec: `docs/product-specs/vercel-production-promotion.md`  
 Task ledger: `docs/product-specs/vercel-production-promotion.tasks.json`
@@ -19,6 +19,20 @@ counts, timing, variable names, cipher key id, and approved boolean proof
 results. Never record credentials, prompts/outputs, raw OAuth/profile/ciphertext
 data, PII, or protected URLs.
 
+## Corrective Sendblue Follow-up
+
+Live investigation on 2026-07-16 confirmed that Sendblue account-level receive
+webhooks fan out rather than select a Vercel environment. One inbound reached
+both retained webhook targets and both returned `202`. The two-webhook evidence
+later in this plan remains historical, but its independent-routing conclusion
+is superseded.
+
+The canonical accepted task is `correct-account-level-sendblue-routing` in
+`docs/product-specs/sendblue-eve-channel.tasks.json`. Its accepted end state is
+one stable Production receive webhook, no Preview Sendblue ingress or dedicated
+bypass, one bounded Production handset execution, zero Preview side effects,
+and three recorded parent audit passes.
+
 ## Current Production State
 
 - The proxy and agent are `READY` at accepted source `e53e7a4`; rollback
@@ -28,7 +42,13 @@ data, PII, or protected URLs.
   from platform bypass authentication.
 - Sendblue Production has independent durable Upstash replay state and an
   accepted provider ingress -> Eve -> private proxy -> outbound delivery proof.
-  The retained Preview webhook and proof are historical evidence.
+  The retained Preview proof is historical evidence; its receive webhook and
+  dedicated Sendblue bypass were removed by the corrective task. The corrected
+  route's authenticated-malformed proof returned `400` with curl exit `0`
+  through a secret-preserving ephemeral shell. The accepted bounded handset
+  proof recorded one Production inbound and delivered outbound, zero Preview
+  requests, and one tool-use turn with two correlated successful proxy
+  completions; the user confirmed the broader Production Executor catalog.
 - The temporary Production configuration bundle was removed after use.
   1Password and Vercel-managed encrypted configuration own credentials; no
   credential material is tracked in this repository.
@@ -572,7 +592,9 @@ status unchanged until the corresponding evidence has been recorded.
   evidence. Current source-only Production deployment
   `dpl_6g91e8CEg7JTkQnAEtvAdeR6CWrT` is `READY` at accepted source
   `e53e7a4`; `dpl_8wuKAm1o5xJagcMdLsPDU1XtsYqz` remains the rollback target.
-- Sendblue has exactly two receive webhooks: retained Preview plus Production.
+- Historical 2026-07-14 state: Sendblue then had exactly two receive webhooks:
+  retained Preview plus Production. This was superseded by the 2026-07-16
+  account-level routing correction.
   Stable-route probes now return missing-secret `401`, invalid-secret `401`,
   and authenticated-malformed `400`. Focused agent checks (51 tests/build) and
   root verification passed.
@@ -580,8 +602,9 @@ status unchanged until the corresponding evidence has been recorded.
   dispatch or delivery. Deterministic agent fixtures cover replay-store
   fail-closed `503` plus sequential and concurrent inbound/outbound replay
   suppression; the focused suite passed all 51 tests. Read-only inventory
-  confirms two receive webhooks and five automation bypasses, including the
-  retained Preview and dedicated Production notes. Root verification passed.
+  historically confirmed two receive webhooks and five automation bypasses,
+  including the retained Preview and dedicated Production notes. Root
+  verification passed.
 - Live provider readback: one correlated Production inbound was `RECEIVED` via
   iMessage at `2026-07-14T15:21:30.810Z`; exactly one subsequent outbound was
   `DELIVERED` at `2026-07-14T15:21:46.728Z`. Content, identities, handles, and

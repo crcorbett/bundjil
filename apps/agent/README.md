@@ -236,18 +236,22 @@ curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 
 ## Sendblue Channel
 
-The app has an app-owned Sendblue custom channel. Production and Preview each
-retain a receive webhook; the Production route, provider ingress, Eve replay,
-private proxy completion, outbound delivery, and replay suppression are
-accepted. Preview evidence remains historical.
+The app has an app-owned Sendblue custom channel. The shared Sendblue account
+has one active receive webhook at the stable Production route. Preview
+configuration and prior dual-webhook evidence are historical only; Preview has
+no active shared-line receive webhook or dedicated Sendblue automation bypass.
+The accepted bounded handset proof recorded one Production inbound and
+delivered outbound, zero Preview requests, and the expected two-completion
+model/tool continuation for one Production turn. The handset response confirmed
+the broader Production Executor catalog.
 
 - Route: `POST /eve/v1/sendblue/webhook`. The build test rejects `/webhook`.
 - Authentication: Sendblue sends the configured shared secret in the
   `sb-signing-secret` header. It is compared in constant time before the body
   is read. This is a shared header secret, not a body HMAC.
 - Deployment Protection: the Vercel bypass is an independent platform-auth
-  credential. It lets Sendblue reach the Preview deployment but does not
-  replace the route's `sb-signing-secret` authentication.
+  credential. The active Production bypass does not replace the route's
+  `sb-signing-secret` authentication. The Preview Sendblue bypass is revoked.
 - Sender identity: only the redacted, schema-decoded
   `BUNDJIL_SENDBLUE_SENDER_IDENTITIES` allowlist may start a conversation. The
   sender and configured line produce an opaque keyed continuation token; raw
@@ -321,7 +325,8 @@ provider/operator stores, update the corresponding encrypted environment
 values, redeploy, then update the provider webhook. Production rollback order
 is: remove the Production receive webhook, revoke its dedicated automation
 bypass, restore the retained agent deployment, then remove Production Sendblue
-variables. Preserve the retained Preview webhook separately.
+variables. Do not restore Preview ingress on the shared account/line; an
+emergency cutover first disables Production ingress and is time-bounded.
 
 ## Environment
 

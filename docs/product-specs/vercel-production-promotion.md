@@ -1,8 +1,8 @@
 # Vercel Production Promotion
 
-Status: Complete - Production accepted and documentation reconciled
+Status: Production accepted; Sendblue routing correction in progress
 Owner: Bundjil runtime
-Last reconciled: 2026-07-14
+Last reconciled: 2026-07-16
 
 ## Decision
 
@@ -13,7 +13,41 @@ ledger records the three parent audit passes that accepted the final state.
 
 Production is a distinct runtime, not a Preview alias or copied profile. The
 proxy was promoted before the agent; Sendblue was enabled only after Production
-proof, soak, and rollback evidence. Preview remains independently retained.
+proof, soak, and rollback evidence. Preview deployment/configuration evidence
+remains independently retained, but a shared Sendblue account/line cannot keep
+simultaneous Preview and Production receive webhooks.
+
+## Corrective Sendblue Addendum
+
+The accepted rollout proved that the Production channel works, but its retained
+two-webhook topology was not a valid environment-isolation mechanism. Live
+investigation on 2026-07-16 confirmed Sendblue fans one account event out to
+every registered receive webhook: the same handset message reached Preview and
+Production and both returned `202`. Separate route secrets, automation bypasses,
+replay namespaces, and continuation tokens do not prevent this cross-environment
+duplicate delivery.
+
+The canonical corrective requirements and accepted implementation task live in
+[`sendblue-eve-channel.md`](./sendblue-eve-channel.md) and
+[`sendblue-eve-channel.tasks.json`](./sendblue-eve-channel.tasks.json). The
+required corrective end state is one active receive webhook on the shared
+account/line, targeting the stable Production host. Preview configuration and
+immutable proof may remain historical, but Preview provider ingress and its
+dedicated Sendblue automation bypass must be disabled. A separate Sendblue
+account/line is required for concurrent Preview testing.
+
+The corrective provider operation on 2026-07-16 removed the Preview receive
+entry after a fail-closed two-host inventory, then read back exactly one stable
+Production receive host. It subsequently revoked only the dedicated Preview
+Sendblue automation bypass while retaining the Production bypass. Direct
+Production missing-secret and invalid-secret probes both returned `401`; a
+secret-preserving authenticated-malformed probe returned `400` with curl exit
+`0`; and the bounded post-change window had no Preview request or Agent Run.
+The accepted 12:03:30Z through 12:09:30Z handset window recorded one Production
+webhook request, one received inbound, one accepted tool-use turn, two
+successful correlated proxy completions, one delivered outbound, and zero
+Preview requests. The user confirmed that the deployed reply found the broader
+Production Executor catalog, so the correction is accepted.
 
 ## Reconciled State
 
@@ -50,17 +84,17 @@ Production evidence.
 
 ## Boundaries And Isolation
 
-| Concern                   | Preview                                     | Production                                                                 |
-| ------------------------- | ------------------------------------------- | -------------------------------------------------------------------------- |
-| Proxy and agent           | immutable accepted Preview deployments      | stable aliases resolving to accepted immutable Production deployments      |
-| Proxy bearer              | Preview-only encrypted value                | independently generated encrypted value                                    |
-| Upstash                   | Preview binding and namespace               | independently confirmed binding and namespace                              |
-| Profile subject           | Preview-specific `CodexOAuthSubject` inputs | independently configured `CodexOAuthSubject` inputs                        |
-| Profile, lock, fence keys | derived only in Preview namespace           | derived only in Production namespace                                       |
-| Cipher                    | Preview key and key id                      | independent Production key and key id                                      |
-| OAuth profile             | trusted-local Preview login                 | separate trusted-local Production login                                    |
-| Eve access                | current Preview state                       | Deployment Protection plus explicit Vercel OIDC; `localDev()` only locally |
-| Sendblue                  | retained historical configuration           | accepted Production configuration and provider proof                       |
+| Concern                   | Preview                                                                        | Production                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Proxy and agent           | immutable accepted Preview deployments                                         | stable aliases resolving to accepted immutable Production deployments      |
+| Proxy bearer              | Preview-only encrypted value                                                   | independently generated encrypted value                                    |
+| Upstash                   | Preview binding and namespace                                                  | independently confirmed binding and namespace                              |
+| Profile subject           | Preview-specific `CodexOAuthSubject` inputs                                    | independently configured `CodexOAuthSubject` inputs                        |
+| Profile, lock, fence keys | derived only in Preview namespace                                              | derived only in Production namespace                                       |
+| Cipher                    | Preview key and key id                                                         | independent Production key and key id                                      |
+| OAuth profile             | trusted-local Preview login                                                    | separate trusted-local Production login                                    |
+| Eve access                | current Preview state                                                          | Deployment Protection plus explicit Vercel OIDC; `localDev()` only locally |
+| Sendblue                  | historical configuration/proof; no active shared-line ingress after correction | one active receive webhook plus accepted Production configuration/proof    |
 
 The accepted rollout used staged preflight. For any future Production rerun,
 each checkpoint must decode only the minimum sanitized metadata available at

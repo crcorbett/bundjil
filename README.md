@@ -101,9 +101,9 @@ no Production write is an acceptance step.
 
 `apps/agent` owns the Sendblue custom Eve channel, including its Effect Schema
 contracts, redacted Config, explicit Layers, authentication, identity policy,
-opaque routing, replay claims, and provider client. The public route is
-`POST /eve/v1/sendblue/webhook` on accepted Production and retained Preview
-deployments.
+opaque routing, replay claims, and provider client. The one active shared-line
+route is `POST /eve/v1/sendblue/webhook` on stable Production. The Preview
+deployment remains only as historical evidence and has no Sendblue ingress.
 
 Sendblue authenticates at the route with its shared `sb-signing-secret` header,
 not a body HMAC. Vercel's bypass is separate platform authentication and does
@@ -115,9 +115,14 @@ claims get `503`, and accepted dispatch gets `202`.
 Production evidence records one provider-originated inbound, a 15-event Eve
 replay through `session.waiting`, one private proxy completion, and one
 `DELIVERED` outbound. A provider replay was suppressed without another
-dispatch, proxy completion, or delivery. Production and Preview each retain a
-receive webhook; route probes, durable replay fixtures, inventories, and leak
-scans are recorded only as sanitized status/count evidence. See
+dispatch, proxy completion, or delivery. The shared account now has one active
+Production receive webhook; Preview dual-webhook evidence is historical and
+its Sendblue-specific bypass is revoked. Route probes, durable replay fixtures,
+inventories, and leak scans are recorded only as sanitized status/count
+evidence. The corrected topology is accepted: one bounded handset window had
+one Production inbound and delivered outbound, zero Preview requests, and a
+single Production tool-use turn whose broader Executor catalog was confirmed
+on the handset. See
 [`apps/agent/README.md`](./apps/agent/README.md) for configuration ownership,
 monitoring, and rollback. The earlier Preview proof remains historical.
 

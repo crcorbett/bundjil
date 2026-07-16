@@ -11,9 +11,10 @@ continuation, non-owner rejection, and replay-suppression evidence. Earlier
 adapter proofs remain distinct historical evidence for their own environments.
 
 This guide documents the committed Bundjil Eve app and the Effect package
-boundary it uses. Sendblue is a Production-verified app-owned channel with a
-retained Preview webhook. Cloudflare email, Vercel Connect, and Notion remain
-future boundaries.
+boundary it uses. Sendblue is a Production-verified app-owned channel with one
+active stable Production receive webhook. Preview proof is historical and has
+no active shared-line Sendblue ingress. Cloudflare email, Vercel Connect, and
+Notion remain future boundaries.
 
 ## Filesystem Layout
 
@@ -212,6 +213,14 @@ retained immutable deployment. Executor and Vercel inventories may provide
 sanitized status evidence, but no raw provider result, execution identifier, or
 credential belongs in Bundjil. A mode-`0600` ignored local credential copy is a
 trusted-workstation recovery aid only, never a package or runtime owner.
+
+For the shared Sendblue account, exactly one active receive webhook targets the
+stable Production route. The Preview receive entry and its dedicated Sendblue
+automation bypass were revoked on 2026-07-16 after provider readback. Earlier
+dual-webhook behavior is historical evidence of account-level fan-out, not a
+current environment-routing design. The next handset-originated proof must
+verify the complete Production path before this operational correction is
+accepted.
 
 ## Production Call Graph
 

@@ -186,8 +186,10 @@ The header verifier compares `sb-signing-secret` with the redacted configured
 shared secret before body decoding; it is not a body HMAC. Tests replace the
 provider and replay layers with deterministic memory layers. The CLI/local path
 starts `eve dev --no-ui` and exercises the same authored channel with local
-test configuration. Production is verified; Preview evidence and its
-independent route remain historical/retained.
+test configuration. The shared Sendblue account now has one active Production
+receive webhook; Preview dual-webhook evidence is historical and its dedicated
+Sendblue bypass is revoked. A fresh handset proof of the corrected topology
+remains pending.
 
 Schema boundary:
 

@@ -1,6 +1,6 @@
 # Sendblue Eve Channel Implementation Plan
 
-Status: Complete
+Status: Complete - corrective Production routing accepted
 
 Spec: `docs/product-specs/sendblue-eve-channel.md`  
 Task ledger: `docs/product-specs/sendblue-eve-channel.tasks.json`
@@ -17,11 +17,79 @@ Credentials remain in 1Password, executor-managed provider connections, and
 encrypted Vercel environment variables. Plans, tests, command output, commits,
 and proof artifacts contain only variable names and sanitized metadata.
 
+## Corrective Follow-up
+
+The 2026-07-16 live investigation supersedes the earlier operational conclusion
+that Preview and Production receive webhooks are independently routed. Sendblue
+fans each account event out to every registered receive webhook. The canonical
+accepted corrective task is `correct-account-level-sendblue-routing` in the
+sibling ledger.
+
+The corrective provider mutation is complete: the trusted pre-inventory found
+exactly the known Preview and stable Production receive hosts; the exact Preview
+receive entry was deleted; immediate readback found only stable Production; and
+only the dedicated Preview Sendblue bypass was revoked. Direct Production
+missing-secret and invalid-secret probes returned `401`; the bounded post-change
+window has no Preview runtime request or Agent Run. An ephemeral interactive
+shell supplied the labeled Production webhook secret and populated current
+Production bypass only to curl stdin config; its malformed authenticated probe
+returned `400` with curl exit `0`, discarded its response, unset both values,
+and exited. Production Executor MCP discovery still exposes only `skills`,
+`execute`, and `resume`; the historical four-GitHub result is now diagnosed as
+Production's accidental final catch-all block masking its configured catalog,
+not Preview endpoint binding. The completed Executor policy-scope correction
+removed Production `executor.*` and its final block, leaving 16 selected
+non-Executor namespaces, four GitHub overrides, and no Executor administration
+operations. A bounded handset window from 12:03:30Z through 12:09:30Z then
+proved one Production webhook request, one accepted turn, one received inbound,
+one delivered outbound, zero Preview requests, and no error/fatal agent or
+proxy logs. The single tool-use turn produced two successful proxy completions,
+which is the expected model/tool continuation sequence rather than duplicate
+dispatch. The user confirmed that the deployed reply found the broader tools.
+Historical two-webhook evidence below remains unchanged as a record of what was
+accepted at the time; it is not the desired current topology.
+
+The bounded post-request readback from 11:10Z through 11:21Z found zero
+Sendblue inbound/outbound records, zero Production/Preview runtime requests,
+zero Production/Preview Agent Runs, and zero Production proxy runtime logs.
+No handset evidence exists in that interval. The authenticated-malformed probe
+is accepted separately as the sanitized `400`/curl-exit-`0` evidence above;
+it does not establish the missing handset path.
+
+The final bounded readback from 11:21:00Z through 11:39:53Z also found zero
+Sendblue inbound/outbound records and zero Production/Preview Agent Runs. The
+Production agent runtime query contained only the accepted status-`400`
+authenticated-malformed probe; Preview agent and Production proxy runtime
+queries had zero activity. This remains historical no-traffic evidence before
+the later accepted 12:03:30Z through 12:09:30Z handset window.
+
+Three corrective parent audit passes are recorded in the task ledger: ownership/
+call graph confirmed an operational-only provider correction after returning
+and correcting stale current-state prose; implementation quality confirmed no
+runtime/helper/config/UI change and no protected-value leak; verification
+coverage accepted the bounded provider, Vercel, proxy, Executor, repository,
+and handset evidence.
+
+The expected tracked diff is documentation and ledger evidence only. Runtime
+TypeScript, TSX, package, lint, environment-contract, shared-package, or UI
+changes require a concrete failed acceptance criterion and a prior SPEC
+amendment. Any admitted code remains app-owned, Schema-derived, Layer-injected,
+flat and named in its primary Effect flow, free of helper sprawl, and subject to
+Effect language-service plus root lint/Knip verification. Any separately
+approved UI follows the frontend composition guide and requires leaf-owned
+states/commands and desktop/mobile Browser evidence.
+
+The compiled implementation is the naming and call-graph authority. Review must
+reject stale aspirational examples and retain the actual
+`SendblueChannelRuntimeLive` composition, `SendblueSessionRouter.route`,
+message-handle claim, canonical decision/client-error contracts, empty HTTP
+responses, and route-level `catchTags` mapping recorded in the SPEC.
+
 ## Rollout Status
 
-All five tasks are accepted. This plan is retained as a historical Preview-era
-execution record. Production promotion is accepted in the Vercel Production
-Promotion plan and does not alter this plan's dated evidence.
+The original five tasks and the corrective routing task are accepted. This plan
+retains the historical Preview-era execution record while the Production
+promotion plan retains its dated evidence.
 
 Completed scope:
 
@@ -367,8 +435,9 @@ checks.
 - Before the live inbound, a signed loop event returned `200` with no
   delivery path. The deterministic `503` storage and replay/concurrency
   fixtures remain green in the 51-test agent suite; root verification passed.
-  Provider inventory confirms Preview and Production receive webhooks and their
-  respective automation bypass records are retained.
+  Historical provider inventory confirmed Preview and Production receive
+  webhooks and their respective automation bypass records before the
+  2026-07-16 corrective removal.
 - The real Production inbound is provider-confirmed `RECEIVED`/iMessage and
   has exactly one subsequent `DELIVERED` outbound provider record. Only the
   sanitized timestamps and counts are retained; no content, phone identity,

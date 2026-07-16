@@ -1,8 +1,8 @@
 # Sendblue Eve Channel
 
-- Status: Production verified; Preview evidence retained as historical
+- Status: Complete - single Production ingress and handset path verified
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-14
+- Last reviewed: 2026-07-16
 
 ## Decision
 
@@ -24,16 +24,172 @@ is a shared secret copied into `sb-signing-secret`; it is not a body HMAC. The
 implementation must describe and test the real mechanism without claiming
 cryptographic body signing that the provider does not supply.
 
+## Corrective Routing Decision
+
+Sendblue receive webhooks are account-level fan-out destinations. They are not
+environment selectors and do not route one inbound message to only one Vercel
+target. A shared Sendblue account/line must therefore have exactly one active
+receive webhook for normal operation. Production owns that webhook at the
+stable `bundjil-agent.vercel.app` route. Preview may retain encrypted
+configuration and immutable historical proof, but it must not retain active
+provider ingress, a Sendblue-specific automation bypass, or any claim that it
+is independently live on the shared account/line.
+
+Live investigation on 2026-07-16 found both the immutable Preview deployment
+and stable Production route registered as receive webhooks. One handset
+message reached Preview and Production within two seconds and both returned
+`202`. Their separate replay stores correctly deduplicated only within each
+environment; they could not deduplicate across deployments. The deterministic
+sender/line continuation token also resumed an older Preview conversation,
+which made the reply appear to be routed to Preview.
+
+The corrective slice must:
+
+1. snapshot a sanitized provider inventory and bounded log/run baselines;
+2. delete only the Preview receive webhook by exact provider value without
+   printing or persisting the protected URL;
+3. revoke the dedicated Preview Sendblue automation bypass after provider
+   readback proves the Preview webhook is absent;
+4. retain the stable Production receive webhook, route secret, Production
+   bypass, durable replay configuration, and current deployment unchanged;
+5. prove one subsequent handset message reaches Production exactly once and
+   produces no Preview webhook request, Preview run update, Preview model/tool
+   execution, or duplicate outbound; and
+6. reconcile current docs while preserving the earlier two-webhook rollout
+   evidence explicitly as historical evidence, not an accepted invariant.
+
+### 2026-07-16 Corrective Execution Record
+
+- A trusted Executor Personal pre-mutation inventory found exactly two receive
+  entries: one known immutable Preview host and the stable Production host, with
+  no unknown receive host.
+- Inside the same provider execution, the exact Preview receive entry was
+  deleted with type `receive`. Its protected value was not retained. Immediate
+  readback found exactly one receive entry: `bundjil-agent.vercel.app`.
+- After that readback, Vercel revoked exactly one bypass labeled for the Preview
+  Sendblue receive webhook. The bypass inventory changed from six to five; the
+  distinct Production Sendblue bypass remains present.
+- Direct Production route probes after the mutation returned `401` for both a
+  missing signing secret and an invalid signing secret. An authenticated
+  malformed probe then returned `400` with curl exit `0` through one ephemeral
+  interactive shell: the labeled Production webhook secret and populated
+  current Production bypass field stayed in shell memory, curl received its
+  URL and signing-secret header only through stdin config, the response was
+  discarded, and the shell unset both values before exit. A bounded post-change
+  window contained the two `401` Production requests, no Preview runtime
+  request, and zero Agent Runs in either environment.
+- Production Executor MCP initialized and listed exactly `skills`, `execute`,
+  and `resume`. Historical readback exposed only the four reviewed GitHub
+  operations because Production's final catch-all block masked its separately
+  selected configured catalog; it was not evidence of Preview endpoint binding.
+  The completed Executor policy-scope correction removed Production's
+  `executor.*` connection pattern and final block, leaving 16 selected
+  non-Executor namespaces, four GitHub overrides, and no Executor
+  administration exposure.
+  Endpoint and credential values were not retained.
+- The accepted handset window from 12:03:30Z through 12:09:30Z contained one
+  `RECEIVED` iMessage inbound, one Production Sendblue webhook request, one
+  accepted Production turn, and one `DELIVERED` iMessage outbound. Production
+  made two successful proxy completions for the single tool-use turn: one
+  model step selected/discovered tools and the continuation produced the final
+  reply. Preview had zero requests, and the user confirmed the response found
+  the broader non-GitHub catalog. No content, number, handle, URL, credential,
+  provider body, prompt, tool output, or model output was retained.
+- A post-request bounded readback from 11:10Z through 11:21Z found zero
+  Sendblue inbound/outbound records, zero Production/Preview runtime requests,
+  zero Production/Preview Agent Runs, and zero Production proxy runtime logs.
+  It proves only that no new handset proof occurred in that interval.
+
+Future Preview channel testing requires a different Sendblue account/line. A
+temporary shared-line cutover is permitted only inside an explicit maintenance
+window that disables Production ingress before enabling Preview and restores
+the single Production webhook before the window closes. Simultaneous Preview
+and Production receive webhooks on one account/line are forbidden.
+
+### Corrective Rollback And Monitoring
+
+- Keep the pre-mutation provider inventory only as sanitized count/host
+  classification evidence. The exact protected values remain in their existing
+  provider and secret stores.
+- If deletion or immediate readback does not yield exactly one stable
+  Production receive webhook, stop before any handset proof. Restore the known
+  Production entry from its operator-owned secret record if it is absent; do
+  not add Preview while Production remains registered.
+- If Production route/model/outbound proof fails after Preview removal, keep
+  Preview disabled and investigate the Production path. An emergency Preview
+  cutover must first disable Production ingress and must be explicitly recorded
+  as a time-bounded maintenance state.
+- Revoke the Preview bypass only after successful webhook readback. Failure to
+  revoke it does not restore ingress, but it blocks task acceptance and requires
+  retry/rotation before completion.
+- After acceptance, provider inventory is an operational invariant: receive
+  count must equal one and the parsed host must equal the stable Production
+  host. Any count/host drift is an incident. Monitoring records only the count,
+  host classification, timestamp, and pass/fail result.
+
+## Governing Architecture And Change Admission
+
+The correction is governed by:
+
+- `docs/architecture/effect-patterns.md` for Schema ownership, tagged errors,
+  flat Effect control flow, Config/Redacted, Layers, executable edges, helper
+  admission, and the three-pass audit;
+- `docs/architecture/repo-structure.md` for the `apps/agent` Sendblue boundary
+  and prohibition on speculative workspace packages;
+- `docs/architecture/testing-and-quality.md` for targeted, live, leak-safe, and
+  repository verification; and
+- `docs/architecture/frontend-composition.md` if visible UI scope is ever
+  proposed.
+
+The expected corrective diff is provider state plus documentation and ledger
+evidence. It does not need a runtime source change, provider-admin package,
+generalized webhook router, cross-environment replay service, dashboard, or
+React route. Before editing TypeScript, TSX, package metadata, lint config, or
+runtime config, the implementer must identify a concrete failed acceptance
+criterion that cannot be resolved operationally and amend this SPEC first.
+
+If a committed proof command is justified after that amendment:
+
+- keep it at the `apps/agent` executable/operator edge and reuse the existing
+  Sendblue schemas, tagged errors, services, and config owner;
+- introduce a new Schema only for a genuinely new persisted or
+  boundary-crossing sanitized evidence contract, derive its type with
+  `typeof SchemaName.Type`, and reject raw provider DTO mirrors;
+- decode provider `unknown` once with `Schema.decodeUnknownEffect`, encode
+  stored/output evidence with Effect Schema, and never use `JSON.parse`,
+  `JSON.stringify`, structural assertions, or manual property readers;
+- implement the primary operation as one named `Effect.fn`/flat `Effect.gen`
+  success path: load redacted config -> acquire the existing dependency ->
+  decode -> validate invariant -> perform one mutation -> read back -> encode
+  sanitized evidence;
+- handle expected tagged failures once in the outer `.pipe(...)` with
+  `catchTag`, `catchTags`, or `mapError`, and attach one operation span there;
+- provide live or deterministic test Layers at the composition root; never
+  construct Layers, call `Effect.runPromise`, or read `process.env` inside a
+  domain operation; and
+- keep one-off target selection, host classification, and evidence projection
+  inline unless an abstraction passes the documented helper-admission test.
+
+The existing `SendblueChannel`, verifier, identity directory, session router,
+replay store, client, canonical Schemas, tagged errors, and live/memory Layers
+remain the runtime authority. Do not add a nominal `WebhookRoutingService`,
+`SendblueAdminService`, mapper layer, static-class namespace, or generic proof
+framework merely to make the operator sequence look architectural.
+
 ## Production Evidence Boundary
 
 The later Production promotion accepted the route matrix, provider ingress,
 one 15-event Eve replay through waiting, one private proxy completion, one
 `DELIVERED` outbound, and replay suppression without a second dispatch or
-delivery. Production and Preview retain independent receive webhooks and
-automation bypasses. Durable Upstash replay claims, Vercel platform bypass,
-and route-level `sb-signing-secret` authentication remain distinct boundaries.
-Only sanitized status/count evidence is retained. The earlier Preview proof in
-this SPEC is historical and is not rewritten as Production proof.
+delivery. That rollout retained separate Preview and Production webhook
+credentials, replay stores, and automation bypasses, but the provider delivered
+each account event to both registered receive URLs. The earlier conclusion that
+these were independently routable is superseded by the corrective routing
+decision above. Durable Upstash replay claims, Vercel platform bypass, and
+route-level `sb-signing-secret` authentication remain distinct security
+boundaries; none of them selects one provider webhook or deduplicates across
+deployments. Only sanitized status/count evidence is retained. The earlier
+Preview proof remains historical and is not rewritten as Production proof.
 
 ## Historical Implementation Inputs
 
@@ -103,7 +259,7 @@ identity/profile dependencies.
 
 ## Ownership And File Shape
 
-Expected app-owned shape:
+Verified app-owned shape:
 
 ```text
 apps/agent/agent/
@@ -118,6 +274,7 @@ apps/agent/agent/
       webhook-verifier.service.ts provider-authentication boundary
       identity-directory.service.ts sender -> Eve principal policy
       session-router.service.ts   deterministic conversation key
+      replay-claim-id-generator.service.ts deterministic/live claim-id boundary
       replay-store.service.ts     inbound and outbound atomic claims
       client.service.ts           Sendblue HTTP operations
       channel.service.ts          named inbound/outbound programs
@@ -125,12 +282,12 @@ apps/agent/agent/
       memory.layer.ts             deterministic tests
 ```
 
-This is a target shape, not permission to create one file per tiny function.
-During implementation, colocate closely related schemas/errors/services when
-that is clearer. Do not add `utils.ts`, `helpers.ts`, `mappers.ts`, `common.ts`,
+This verified shape is not permission to create another file per tiny function.
+Future work must colocate closely related contracts/errors/services when that
+is clearer. Do not add `utils.ts`, `helpers.ts`, `mappers.ts`, `common.ts`,
 pass-through services, or single-use wrappers. Each retained module/service
-must own a provider, security, persistence, serialization, identity, or
-multi-call policy boundary.
+must continue to own a provider, security, persistence, serialization,
+identity, deterministic-id, or multi-call policy boundary.
 
 `agent/lib/` is Eve's supported import-only authored-code boundary; do not put a
 direct `sendblue/` directory under the agent root because Eve will treat it as
@@ -141,9 +298,10 @@ expand the root model config into a global env bag.
 
 ## Canonical Contracts
 
-Effect Schema is the single source of truth. Expected contracts include:
+Effect Schema is the single source of truth. Current canonical contracts
+include:
 
-- `E164PhoneNumber`: branded, normalized E.164 value;
+- `E164PhoneNumber`: branded, validated E.164 value;
 - `SendblueMessageHandle`: branded non-empty provider identifier;
 - `SendblueWebhookSecret`: redacted config value, never a payload field;
 - `SendblueInboundMessage`: the minimal accepted receive-webhook schema;
@@ -154,14 +312,18 @@ Effect Schema is the single source of truth. Expected contracts include:
 - `SendblueChannelState`: only the durable fields needed for replies, including
   conversation key, sender number, Sendblue line number, and safe principal id;
 - `SendblueSendMessageInput` and `SendblueSendMessageSuccess`;
-- `SendblueInboundClaimKey`, `SendblueOutboundClaimKey`, `ReplayClaimStatus`;
-- `SendblueWebhookAcknowledgement` and sanitized proof/result schemas.
+- `SendblueInboundClaimKey`, `SendblueOutboundClaimKey`,
+  `SendblueReplayClaimId`, `SendblueReplayClaim`, and `ReplayClaimStatus`;
+- `SendblueInboundDecision`, including the canonical `Ignore`, `Duplicate`, and
+  `Dispatch` variants;
+- `SendblueCompletedMessage`, `SendblueCompletedMessageResult`,
+  `SendblueWebhookAcknowledgement`, and `SendblueProofResult`.
 
 Schema-derived types use `typeof SchemaName.Type`. No SDK DTO, webhook object,
 or Vercel response becomes a second domain type. Unknown provider fields are
 discarded by boundary decoding.
 
-Expected tagged errors include:
+Current tagged errors are:
 
 - `SendblueConfigError`;
 - `SendblueWebhookAuthenticationError`;
@@ -173,54 +335,39 @@ Expected tagged errors include:
 - `SendblueDeliveryUncertainError` for timeout/network outcomes where retrying
   could duplicate a message.
 
-Error payloads expose operation, safe reason, status family, and cause where
-appropriate. They never contain request headers, secrets, message content, raw
-provider bodies, or full phone numbers.
+Error payloads expose only the operation, a finite safe reason/status where the
+caller needs it, and a sanitized message. Runtime causes are deliberately
+discarded at provider/security boundaries when retaining them could expose
+headers, credentials, message content, raw provider bodies, or full phone
+numbers.
 
 ## Required Effect Code Shape
 
-Effect Schema owns the provider contract and all derived types. This is the
-required shape for the first implementation slice:
+Effect Schema owns the provider contract and all derived types. This abridged
+shape matches the verified current implementation; omitted identifiers are
+imports from the canonical local schema/error modules:
 
 ```ts
 import { Context, Effect, Layer, Schema } from "effect";
 
-export const E164PhoneNumber = Schema.String.check(
-  Schema.isPattern(/^\+[1-9]\d{7,14}$/)
-).pipe(Schema.brand("E164PhoneNumber"));
-
-export const SendblueMessageHandle = Schema.NonEmptyString.pipe(
-  Schema.brand("SendblueMessageHandle")
-);
-
-export const SendblueSendMessageInput = Schema.Struct({
-  number: E164PhoneNumber,
-  from_number: E164PhoneNumber,
-  content: Schema.NonEmptyString.check(Schema.isMaxLength(18_996)),
-});
-
-export type SendblueSendMessageInput = typeof SendblueSendMessageInput.Type;
-
-export const SendblueSendMessageSuccess = Schema.Struct({
-  status: Schema.Literals(["QUEUED", "SENT", "DELIVERED"]),
-  message_handle: SendblueMessageHandle,
-});
-
-export type SendblueSendMessageSuccess = typeof SendblueSendMessageSuccess.Type;
-
 export class SendblueRequestError extends Schema.TaggedErrorClass<SendblueRequestError>()(
   "SendblueRequestError",
   {
-    operation: Schema.Literal("sendMessage"),
     message: Schema.NonEmptyString,
-    cause: Schema.Defect,
+    operation: Schema.Literal("sendMessage"),
+    reason: Schema.Literal("requestEncoding"),
   }
 ) {}
 
+export type SendblueClientError =
+  | SendblueDeliveryUncertainError
+  | SendblueRequestError
+  | SendblueResponseError;
+
 export interface SendblueClientShape {
   readonly sendMessage: (
-    input: SendblueSendMessageInput
-  ) => Effect.Effect<SendblueSendMessageSuccess, SendblueRequestError>;
+    input: SendblueSendMessageInputType
+  ) => Effect.Effect<SendblueSendMessageSuccessType, SendblueClientError>;
 }
 
 export class SendblueClient extends Context.Service<
@@ -234,65 +381,40 @@ export const SendblueClientLive = Layer.effect(
 );
 ```
 
-`makeSendblueClient` is the Layer constructor for the concrete provider HTTP
-boundary. It owns client acquisition and operation construction beside the
-service; it must not become a generic factory or a wrapper around a single
-already-composable Effect.
+`makeSendblueClient` is the concrete `Effect.gen` Layer constructor beside the
+service. It acquires `SendblueConfigService` and `HttpClient.HttpClient`, returns
+`SendblueClient.of({ sendMessage: Effect.fn("SendblueClient.sendMessage")(...) })`,
+and attaches the `SendblueClientLive` span in the outer pipe. It must not become
+a generic factory or a wrapper around a single already-composable Effect.
 
-The live client must use `HttpClientRequest.schemaBodyJson` and
-`HttpClientResponse.schemaBodyJson` (or the equivalent installed Effect v4
-Schema HTTP APIs), not raw JSON encoding/decoding. Transport, timeout, status,
-and response-schema failures are translated once into app-owned tagged errors.
+The live client uses `HttpClientRequest.schemaBodyJson` and
+`HttpClientResponse.schemaBodyJson`, not raw JSON encoding/decoding. Transport,
+timeout, status, provider rejection, and response-schema failures are translated
+once into the canonical app-owned tagged errors.
 
-Inbound handling is deliberately two-phase because authentication/validation/
-atomic claim must finish before the HTTP acknowledgement, while Eve/model work
-continues under `waitUntil`:
+Inbound handling is deliberately two-phase because authentication, validation,
+and the atomic claim must finish before the HTTP acknowledgement, while
+Eve/model work continues under `waitUntil`. The authoritative implementation is
+`apps/agent/agent/lib/sendblue/channel.service.ts`; it is one named
+`Effect.fn("SendblueChannel.authorizeAndClaimInbound")` with this verified
+linear sequence:
 
-```ts
-export const authorizeAndClaimInbound = Effect.fn(
-  "SendblueChannel.authorizeAndClaimInbound"
-)(function* (request: Request) {
-  const verifier = yield* SendblueWebhookVerifier;
-  const identities = yield* SendblueIdentityDirectory;
-  const router = yield* SendblueSessionRouter;
-  const replay = yield* SendblueReplayStore;
-
-  yield* verifier.verify(request.headers);
-
-  const body = yield* Effect.tryPromise({
-    try: () => request.text(),
-    catch: (cause) =>
-      new SendblueWebhookSchemaError({
-        boundary: "SendblueInboundMessage",
-        message: "Unable to read the Sendblue webhook body.",
-        cause,
-      }),
-  });
-  const message = yield* Schema.decodeUnknownEffect(
-    Schema.fromJsonString(SendblueInboundMessage)
-  )(body).pipe(
-    Effect.mapError(
-      (cause) =>
-        new SendblueWebhookSchemaError({
-          boundary: "SendblueInboundMessage",
-          message: "Unable to decode the Sendblue webhook.",
-          cause,
-        })
-    )
-  );
-  const identity = yield* identities.resolve(message.from_number);
-  const continuationToken = yield* router.directConversation({
-    fromNumber: message.from_number,
-    sendblueNumber: message.to_number,
-  });
-
-  return yield* replay.claimInbound({
-    identity,
-    continuationToken,
-    message,
-  });
-});
+```text
+yield SendblueWebhookVerifier + SendblueConfigService +
+  SendblueIdentityDirectory + SendblueReplayStore + SendblueSessionRouter
+-> verify headers before reading the body
+-> Effect.tryPromise(request.text) with sanitized SendblueWebhookSchemaError
+-> reject body larger than 131072 bytes
+-> Schema.decodeUnknownEffect(Schema.fromJsonString(SendblueInboundMessage))
+-> Match-classify typing/direction/status/group/media/content/service/line/loop
+-> resolve allowlisted identity; convert only SenderNotAllowed to Ignore
+-> SendblueSessionRouter.route(sender, configuredLine)
+-> SendblueReplayStore.claimInbound(message_handle)
+-> return canonical Ignore | Duplicate | Dispatch decision
 ```
+
+Do not change the error payloads to retain Promise/Parse/provider causes. The
+sanitized boundary error is intentional.
 
 Classification of ignored direction/status/service/group/media cases stays in
 this linear operation through Schema unions and `Match`; do not extract a
@@ -309,52 +431,48 @@ authorizeAndClaimInbound
 Expected route errors are handled in one outer pipeline:
 
 ```ts
-export const SendblueRejectedDecision = Schema.Union([
-  Schema.Struct({
-    _tag: Schema.Literal("Unauthorized"),
-    status: Schema.Literal(401),
-  }),
-  Schema.Struct({
-    _tag: Schema.Literal("BadRequest"),
-    status: Schema.Literal(400),
-  }),
-  Schema.Struct({
-    _tag: Schema.Literal("Unavailable"),
-    status: Schema.Literal(503),
-  }),
-]);
-
-export type SendblueRejectedDecision = typeof SendblueRejectedDecision.Type;
-
-const decision = authorizeAndClaimInbound(request).pipe(
-  Effect.catchTags({
-    SendblueWebhookAuthenticationError: () =>
-      Effect.succeed({
-        _tag: "Unauthorized",
-        status: 401,
-      } satisfies SendblueRejectedDecision),
-    SendblueWebhookSchemaError: () =>
-      Effect.succeed({
-        _tag: "BadRequest",
-        status: 400,
-      } satisfies SendblueRejectedDecision),
-    SendblueReplayStoreError: () =>
-      Effect.succeed({
-        _tag: "Unavailable",
-        status: 503,
-      } satisfies SendblueRejectedDecision),
-  }),
-  Effect.provide(SendblueChannelLive)
+channelRuntime.runPromise(
+  Effect.gen(function* handleSendblueWebhook() {
+    const sendblue = yield* SendblueChannel;
+    const decision = yield* sendblue.authorizeAndClaimInbound(request);
+    if (decision._tag !== "Dispatch") {
+      return new Response(null, { status: 200 });
+    }
+    waitUntil(
+      channelRuntime.runPromise(
+        sendblue.dispatchAcceptedInbound(decision, () =>
+          send(decision.message, {
+            auth: decision.auth,
+            continuationToken: decision.continuationToken,
+            state: decision.state,
+          })
+        )
+      )
+    );
+    return new Response(null, { status: 202 });
+  }).pipe(
+    Effect.catchTags({
+      SendblueReplayStoreError: () =>
+        Effect.succeed(new Response(null, { status: 503 })),
+      SendblueRoutingError: () =>
+        Effect.succeed(new Response(null, { status: 503 })),
+      SendblueWebhookAuthenticationError: () =>
+        Effect.succeed(new Response(null, { status: 401 })),
+      SendblueWebhookSchemaError: () =>
+        Effect.succeed(new Response(null, { status: 400 })),
+    })
+  )
 );
 ```
 
 The complete decision union, including `Ignore`, `Duplicate`, and `Dispatch`,
-is a canonical app-owned Schema. Direct literals use `satisfies` to preserve
-their discriminants without asserting an unvalidated structural type, then are
-encoded at the response boundary. Do not create a static-class namespace or
-helper object merely to construct these values. The full client error union
-adds the already specified response and uncertain tagged errors; the excerpt
-keeps one error to make the service shape readable.
+is the canonical app-owned `SendblueInboundDecision` Schema. Internal literals
+use `satisfies SendblueInboundDecision` to preserve discriminants without
+asserting an unvalidated structural type. The route deliberately returns empty
+HTTP responses, so it does not invent a second JSON response DTO or schema.
+Do not create a static-class namespace or helper object merely to construct
+these values. The client exposes the canonical `SendblueClientError` union of
+request, response, and uncertain tagged errors.
 
 Provider wire Schemas deliberately retain documented names such as
 `from_number`, `to_number`, and `message_handle`. If the implementation needs a
@@ -368,10 +486,10 @@ primary operations.
 
 ## Historical Preview Configuration
 
-Load configuration with Effect `Config`, `ConfigProvider.fromEnv()`,
-`Config.redacted`, and Schema validation. At the historical implementation
-checkpoint, the accepted Preview channel used these variables and Production
-had no Sendblue variables:
+Load configuration with Effect `Config`, the runtime environment provider,
+`Config.redacted`, and Schema validation; tests inject a deterministic
+`ConfigProvider`. At the historical implementation checkpoint, the accepted
+Preview channel used these variables and Production had no Sendblue variables:
 
 - `BUNDJIL_SENDBLUE_API_KEY` (redacted);
 - `BUNDJIL_SENDBLUE_API_SECRET` (redacted);
@@ -566,9 +684,88 @@ message text, full phone numbers, protected URL, provider body, replay payload,
 credentials, and ciphertext. At this historical checkpoint, Production
 variables, deployment, aliases, storage, and webhooks remained untouched.
 
+## Corrective Acceptance Matrix
+
+The provider mutation is accepted only when all evidence below is captured in
+sanitized form. Baseline and post-change windows must be bounded by timestamp,
+deployment, and target. Do not infer absence from an unfiltered log query.
+
+| Check                            | Required result                                                                                                                                                                                                        |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pre-mutation provider inventory  | Exactly two receive entries: the known Preview host and stable Production host                                                                                                                                         |
+| Deletion selection               | Exact Preview entry selected inside the trusted provider execution; no URL, query credential, or secret emitted                                                                                                        |
+| Post-deletion provider inventory | Exactly one receive entry and its parsed host is `bundjil-agent.vercel.app`                                                                                                                                            |
+| Production route probes          | Existing `401`/`401`/`400` authentication/schema matrix remains unchanged                                                                                                                                              |
+| Preview ingress                  | Zero Sendblue webhook requests after the provider deletion timestamp                                                                                                                                                   |
+| Handset inbound                  | Exactly one Production webhook `2xx` and one accepted Production Eve dispatch                                                                                                                                          |
+| Agent/model execution            | Exactly one Production turn reaches terminal waiting/completed state; every proxy completion in its tool-use sequence is correlated (two successful completions in the accepted proof)                                 |
+| Executor authority               | Production endpoint is distinct from Preview; MCP exposes only `skills`, `execute`, `resume`; 16 selected non-Executor namespaces are visible, four GitHub overrides remain, and Executor administration count is zero |
+| Outbound delivery                | Exactly one subsequent Sendblue outbound reaches the accepted terminal provider state                                                                                                                                  |
+| Duplicate/race check             | No second webhook dispatch, unrelated model cycle, duplicate tool execution, or duplicate outbound appears; multiple model completions are allowed only inside the correlated single-turn tool loop                    |
+| Leak check                       | No content, full number, handle, protected URL, query credential, token, secret, prompt, or model output is retained                                                                                                   |
+| Repository gate                  | Focused agent checks and `bun run verification` pass from a clean tracked state                                                                                                                                        |
+
+The current Production Executor toolkit is a separate least-privilege boundary.
+The agent connection exposes Executor's `skills`, `execute`, and `resume` MCP
+methods; provider operations are discovered inside `execute`. This correction
+must verify the Production endpoint and policy-scope correction but must not
+copy Preview authority or treat a model's incomplete tool summary as provider
+inventory. Preview remains limited to its four GitHub operations plus a final
+catch-all block. Production retains its independent endpoint/key and selected
+configured catalog, has removed its `executor.*` connection pattern and
+accidental final catch-all block, and uses tool-declared defaults plus
+explicit reviewed overrides. That is an accepted temporary model-mode risk for
+other selected provider operations, not proof that unenumerated dangerous
+classes are hard-blocked. Executor toolkit, policy, key, credential, OAuth, and
+connection administration remain hard-denied through `executor.*` removal; a
+future operation-level policy-hardening SPEC is required for broader hard-block
+claims.
+
 ## Call Graphs
 
-### Preview Runtime
+### Corrected Production Runtime
+
+```text
+Sendblue account + shared iMessage line
+  -> exactly one receive webhook: stable Production host
+  -> Vercel Production automation bypass
+  -> apps/agent/agent/channels/sendblue.ts POST route
+  -> module-owned ManagedRuntime<SendblueChannel>
+  -> SendblueChannel.authorizeAndClaimInbound
+  -> SendblueWebhookVerifier -> SendblueConfigService -> Effect Schema decode
+  -> SendblueIdentityDirectory -> SendblueSessionRouter.route
+  -> SendblueReplayStore.claimInbound(message_handle)
+     -> SendblueReplayClaimIdGenerator -> Production Upstash atomic claim
+  -> Eve Production send(...) via waitUntil
+  -> Codex proxy model and Production Executor MCP connection
+  -> message.completed
+  -> SendblueReplayStore.claimOutbound
+  -> SendblueClient.sendMessage
+  -> one Sendblue outbound
+```
+
+### Corrective Provider Operation
+
+```text
+trusted operator -> Executor Personal Sendblue connection
+  -> getWebhooks
+  -> select exact receive entry by parsed Preview host inside execution
+  -> deleteWebhooks({ type: "receive", webhooks: [exactPreviewValue] })
+  -> getWebhooks
+  -> emit only count + parsed host + success/failure status
+  -> Vercel revoke dedicated Preview Sendblue automation bypass
+  -> bounded Production/Preview log and Agent Run verification
+```
+
+No committed provider-admin helper is expected. If implementation introduces a
+CLI or proof command, its provider responses and evidence are canonical Effect
+Schemas; Config/Redacted owns credentials; expected failures are tagged errors
+handled in `.pipe(...)`; and `Effect.runPromise` remains at the executable edge.
+One-off selection and redaction remain linear in that command rather than
+creating provider-admin services, DTO mirrors, readers, mappers, or helper
+modules.
+
+### Historical Preview Runtime
 
 ```text
 Sendblue receive webhook
@@ -593,14 +790,19 @@ Sendblue receive webhook
 Live Layer composition:
 
 ```text
-SendblueChannelLive
-  -> SendblueConfigLive (ConfigProvider.fromEnv + Config.redacted)
-  -> SendblueWebhookVerifierLive
-  -> SendblueIdentityDirectoryLive
-  -> SendblueSessionRouterLive
-  -> SendblueReplayStoreUpstashLive
-  -> SendblueClientLive
-  -> FetchHttpClient + Clock + platform constant-time crypto primitive
+SendblueChannelRuntimeLive
+  -> SendblueChannelLive
+  -> sendblueServicesLive = Layer.mergeAll(
+       SendblueWebhookVerifierLive,
+       SendblueIdentityDirectoryLive,
+       SendblueSessionRouterLive,
+       SendblueReplayStoreUpstashLive,
+       SendblueClientLive
+     )
+  -> Layer.provideMerge(SendblueConfigLive)
+  -> Layer.provideMerge(FetchHttpClient.layer)
+  -> SendblueReplayClaimIdGeneratorLive at replay-store composition
+  -> node:crypto timingSafeEqual at verifier implementation boundary
 ```
 
 ### Tests
@@ -613,7 +815,8 @@ Vitest signed webhook fixture
   -> SendblueWebhookVerifierLive with deterministic secret
   -> SendblueIdentityDirectoryLive over injected config
   -> SendblueSessionRouterLive with fixed key
-  -> SendblueReplayStoreMemory with atomic test semantics
+  -> SendblueReplayStoreMemory with injected SendblueReplayClaimIdGenerator
+     and atomic test semantics
   -> fake Eve send
   -> SendblueClientMemory / injected HttpClient
   -> captured sanitized outcomes
@@ -626,12 +829,13 @@ not hide races behind sequential test setup.
 ### Historical CLI And Preview Operations
 
 ```text
-No committed Sendblue provisioning CLI exists. Operator-only provider actions
-create or rotate the Preview webhook and its independent bypass/route secrets;
-they do not run inside the app. Local CLI verification starts `eve dev --no-ui`
-with ignored configuration and runs focused tests. The accepted provider proof
-used a temporary private operator surface and retained only the sanitized
-results stated above.
+No committed Sendblue provisioning CLI exists. Historical operator-only
+provider actions created or rotated the Preview webhook and its bypass/route
+secrets; they did not run inside the app. Those credentials were independent,
+but the webhook destination was not independently routed by Sendblue. Local CLI
+verification starts `eve dev --no-ui` with ignored configuration and runs
+focused tests. The accepted provider proof used a temporary private operator
+surface and retained only the sanitized results stated above.
 ```
 
 Any future CLI is an executable edge: it may run `Effect.runPromise` or a
@@ -715,13 +919,23 @@ layout and route context only. Do not prop-drill provider results, ids, loading
 flags, callbacks, or derived lists through nested feature wrappers; do not hide
 workflows in generic hooks merely to shorten JSX.
 
+Prefer explicit children/slots and domain-named composites over boolean-prop
+matrices. A component or hook is admitted only when it owns reusable rendering,
+interaction, accessibility, React lifecycle, or a real framework boundary;
+pass-through feature wrappers, single-use aliases, and workflow-hiding hooks are
+frontend helper sprawl. Hoist state only when siblings coordinate or the
+route/layout genuinely owns the workflow. Reusable URL/search/page state is
+Schema-owned and route-agnostic; app route APIs stay in the app boundary.
+
 Effect services, Layers, Config, Sendblue credentials, replay stores, and
 provider clients remain server-only. Route loaders/actions/RPC decode and
 encode canonical Schemas and translate tagged failures once into explicit UI
 states. React must not run Effects during render or duplicate provider/domain
-schemas as component DTOs. Visible work requires design-system typography,
-accessible controls, stable dimensions, desktop/mobile Browser screenshots,
-direct HTTP proof, and loading/empty/error/long-content overflow checks.
+schemas as component DTOs. Controls use the app design-system primitives and
+canonical typography roles, retain keyboard/focus/accessibility semantics, and
+keep stable dimensions across loading and settled states. Visible work requires
+desktop/mobile Browser screenshots, direct HTTP proof, and
+loading/empty/error/retry/long-content overflow checks.
 
 ## Lint, Tests, And Verification
 
@@ -797,13 +1011,19 @@ body signature, and that historical Preview proof did not authorize Production.
 
 ## Current Environment Ownership
 
-Production and retained Preview each have app-owned Sendblue configuration,
-receive-webhook, and automation-bypass records. Production replay storage uses
-the app-owned `BUNDJIL_SENDBLUE_REPLAY_STORE_*` URL/token bindings or the
+Production and Preview currently have app-owned Sendblue configuration,
+separate replay state, active receive webhooks, and dedicated automation
+bypasses, so the shared provider account currently fans out to both targets.
+The required corrective end state is one active Production receive webhook and
+one Production Sendblue automation bypass. Preview may retain encrypted values
+and immutable evidence for rollback/audit purposes, but its receive webhook and
+dedicated Sendblue bypass must become inactive before task acceptance.
+Production replay storage uses the app-owned
+`BUNDJIL_SENDBLUE_REPLAY_STORE_*` URL/token bindings or the
 configured-environment Marketplace fallback; those credentials are distinct
-from Codex OAuth/profile/cipher storage. 1Password and Vercel own credential
-values. The accepted Production evidence is recorded only in the promotion
-SPEC/plan; this SPEC retains the earlier Preview proof as historical evidence.
+from Codex OAuth/profile/cipher storage. 1Password and Vercel own credential values. The
+accepted Production evidence is recorded in the promotion SPEC/plan; this SPEC
+retains earlier Preview and two-webhook proof as historical evidence only.
 
 ## Risks And Tradeoffs
 
@@ -820,6 +1040,12 @@ SPEC/plan; this SPEC retains the earlier Preview proof as historical evidence.
   automatic resend and explicit operator reconciliation.
 - Upstash adds a stateful dependency to the agent app. Failing closed protects
   replay guarantees but can delay inbound replies during storage incidents.
+- Multiple account-level receive webhooks duplicate delivery across every
+  target. Per-environment secrets, continuation tokens, and replay stores do
+  not provide cross-environment routing or deduplication.
+- Removing Preview ingress reduces live pre-production channel coverage. Use a
+  separate account/line for concurrent Preview testing; do not restore dual
+  delivery as a convenience.
 
 ## Implementation Delegation Prompt
 

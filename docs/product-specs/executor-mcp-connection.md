@@ -1,8 +1,8 @@
 # Executor MCP Connection
 
-- Status: Complete - Production accepted and documented
+- Status: Complete - Production policy scope corrected and verified
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-15
+- Last reviewed: 2026-07-16
 
 ## Decision
 
@@ -28,14 +28,41 @@ toolkit. Least privilege comes from the toolkit-scoped endpoint, its selected
 connections and ordered policy, the Eve tool allowlist, and operationally
 isolating one dedicated account key per Bundjil environment.
 Each toolkit is implicit-deny and admits only explicitly selected downstream
-connections. Read-only operations may be approved automatically, mutations
-require an explicit later-turn owner decision while model mode is active, and
-destructive, administrative, credential, billing, policy-management, and
-irreversible operations are blocked for the first production slice.
+connections. Preview retains its explicit GitHub-only policies. After the
+Production correction, selected non-GitHub provider operations use their
+tool-declared `requiresApproval` metadata plus explicit reviewed overrides.
+This is an accepted temporary model-mode risk: it does not prove that every
+destructive, infrastructure, billing, credential, or irreversible provider
+operation is hard-blocked. Executor administration is hard-denied by removing
+the `executor.*` connection pattern; operation-level hardening for other
+provider classes requires a future SPEC.
 
 The broad personal Executor MCP endpoint and existing API key may be used for
 read-only discovery and connectivity proof only. They are not accepted as the
 Bundjil Production connection.
+
+### 2026-07-16 Production Policy-Scope Correction
+
+Authoritative Executor readback confirmed that Preview and Production have
+independent user-owned toolkit endpoints. Production is not bound to the
+Preview endpoint. Before correction, Production had 17 connection patterns,
+including exactly one `executor.*`, and five policies with one final catch-all
+`block`; Preview had one GitHub connection, five policies, and one final block.
+The Production final block hid all non-GitHub selected connections.
+
+The provider correction removed only Production's `executor.*` connection
+pattern and then only Production's final catch-all block. Production now has 16
+selected non-Executor connection patterns, four retained GitHub overrides, zero
+Executor administration connections, and zero wildcard blocks. Preview remains
+unchanged with one GitHub connection, five policies, and its final block.
+Production retains its independent endpoint/key and now uses connection
+selection plus each tool's declared default approval behavior for the selected
+non-Executor catalog. The direct MCP orchestration surface remains `skills`,
+`execute`, and `resume`; catalog discovery found positive operation counts in
+all 16 selected namespaces and zero Executor operations, without invoking a
+downstream provider operation. Bundjil cannot gain Executor toolkit, policy,
+key, credential, OAuth, or connection administration authority because
+`executor.*` is no longer selected.
 
 ## Why This Shape
 
@@ -124,8 +151,9 @@ provisioning because Executor and Eve are external, evolving systems.
 
 ## Goals
 
-- Let the Eve agent discover and invoke a deliberately small set of connected
-  services through Executor.
+- Let Preview discover and invoke only its deliberately small GitHub set, while
+  Production can use its independently selected personal integration catalog
+  after the policy-scope correction preserves the administration boundary.
 - Keep the Executor API key out of model context, conversation history,
   committed files, build logs, runtime logs, traces, and proof artifacts.
 - Preserve Effect Config, Schema, Redacted, tagged-error, Layer, and linear
@@ -152,7 +180,9 @@ provisioning because Executor and Eve are external, evolving systems.
 - Letting the model edit Executor toolkits, policies, API keys, credentials, or
   connected accounts.
 - User-scoped Executor linking or multi-user account selection.
-- Migrating every existing personal Executor integration into Bundjil.
+- Giving Bundjil Executor toolkit, policy, API-key, credential, or connection
+  administration authority, even when Production selects other personal
+  integrations.
 - Adding a Bundjil operator UI. Any later UI needs a separate SPEC following
   `docs/architecture/frontend-composition.md`.
 - Treating Eve's coarse connection-level approval as a replacement for
@@ -172,14 +202,23 @@ provisioning because Executor and Eve are external, evolving systems.
 3. Preview and Production have distinct toolkit slugs, dedicated account API
    keys, Vercel
    variables, and acceptance evidence.
-4. Toolkit connection patterns are implicit-deny. An operation is unavailable
-   unless both its connection and policy admit it.
-5. `approve` is limited to explicitly reviewed read-only operations.
-6. Create, update, send, publish, or other state-changing operations require
-   an explicit authenticated owner decision on a later turn unless blocked.
-7. Delete, purchase, billing, credential, account, infrastructure,
-   policy/toolkit administration, and irreversible operations are blocked in
-   the first Production slice.
+4. Toolkit connection patterns are implicit-deny. Preview selects only the
+   four reviewed GitHub operations and retains its final catch-all block.
+   Production may expose only operations from its separately selected
+   connections after its accidental final catch-all block is removed.
+5. Production keeps the four reviewed GitHub policies as explicit overrides;
+   other selected Production operations use their Executor-declared default
+   approval behavior unless a reviewed override blocks or changes them.
+6. Bundjil cannot administer Executor toolkits, policies, keys, credentials,
+   OAuth, or connections. Production removes the `executor.*` connection
+   pattern before removing its final catch-all block; that removal is the
+   hard-deny control for Executor administration.
+7. Other selected provider operations use the applicable Executor-declared
+   default approval behavior or an explicit reviewed override. In temporary
+   model mode this is an accepted risk, not proof that destructive,
+   infrastructure, billing, credential, or irreversible provider operations
+   are hard-blocked. A future operation-level policy-hardening SPEC is required
+   before making that claim.
 8. In temporary model mode, the turn that receives `user_approval_required`
    must stop at `session.waiting` without calling `resume`. Only a later message
    from the authenticated or allowlisted owner containing an unambiguous
@@ -203,18 +242,18 @@ provisioning because Executor and Eve are external, evolving systems.
 
 ## Threat Model
 
-| Threat                                                   | Required control                                                                                                                                                                                            |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Prompt injection asks for a destructive action           | Toolkit policy blocks destructive authority; reversible mutations pause and require a separate authenticated owner continuation.                                                                            |
-| Model attempts to approve its own action                 | Instructions require a two-turn stop/resume protocol, identity checks, one pending decision, and ambiguity/replay rejection; this is not a hard security boundary.                                          |
-| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                                                                            |
-| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                                                                        |
-| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared operational keys, and shared toolkit identities. Executor's key is account-level, so isolation is operational rather than a token-enforced toolkit scope. |
-| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                                                                                |
-| Approval request reaches an untrusted person             | Only authenticated Eve/API and allowlisted Sendblue owner continuations may decide; non-owner messages cannot resume and protected details are not retained.                                                |
-| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                                                                                  |
-| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                                                                       |
-| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions.                                                      |
+| Threat                                                   | Required control                                                                                                                                                                                                                  |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prompt injection asks for a selected provider action     | Executor administration is hard-denied by removing `executor.*`; other selected provider operations use declared default approval or reviewed overrides, an accepted temporary model-mode risk pending operation-level hardening. |
+| Model attempts to approve its own action                 | Instructions require a two-turn stop/resume protocol, identity checks, one pending decision, and ambiguity/replay rejection; this is not a hard security boundary.                                                                |
+| Executor adds a new MCP orchestration tool               | Eve's exact `tools.allow` list hides it until a reviewed change.                                                                                                                                                                  |
+| A selected integration later adds operations             | Toolkit implicit deny and explicit operation policy inventory prevent automatic authority expansion.                                                                                                                              |
+| Broad personal key or endpoint is copied into Production | Provisioning checks reject root endpoints, shared operational keys, and shared toolkit identities. Executor's key is account-level, so isolation is operational rather than a token-enforced toolkit scope.                       |
+| Build or runtime logs expose the bearer                  | Runtime-only `auth.getToken`, Redacted config, compiled-output scans, log scans, and synthetic-marker tests.                                                                                                                      |
+| Approval request reaches an untrusted person             | Only authenticated Eve/API and allowlisted Sendblue owner continuations may decide; non-owner messages cannot resume and protected details are not retained.                                                                      |
+| Preview policy changes affect Production                 | Separate toolkits and keys; promotion copies reviewed policy intent, not mutable identity.                                                                                                                                        |
+| Executor is unavailable or returns malformed MCP data    | Eve connection fails closed; no alternate direct-provider path or automatic fallback.                                                                                                                                             |
+| Key is compromised                                       | Revoke the environment-specific Executor key, disable its toolkit, restore the previous immutable Vercel deployment, and verify no further executions.                                                                            |
 
 ## Ownership And File Shape
 
@@ -702,12 +741,17 @@ or credentials.
 
 Initial policy rules:
 
-| Operation category                                                                                                                                              | Policy             |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| Search, list, get, inspect, or other explicitly reviewed read-only operations                                                                                   | `approve`          |
-| Create, update, send, publish, schedule, or state-changing operations that are reversible and appropriate for Bundjil                                           | `require_approval` |
-| Delete, purchase, billing, credential/account administration, domain/registrar, infrastructure mutation, policy/toolkit management, and irreversible operations | `block`            |
-| Unclassified operation or operation outside selected connections                                                                                                | implicit `block`   |
+| Operation category                                                     | Policy                                                                    |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Four reviewed GitHub operations                                        | explicit overrides                                                        |
+| Other selected non-Executor provider operations                        | tool-declared default approval behavior unless a reviewed override exists |
+| Executor toolkit/policy/key/credential/OAuth/connection administration | hard-denied by removing `executor.*` from Production selection            |
+| Operation outside selected connections                                 | implicit `block`                                                          |
+
+The Production default-approval posture is an accepted temporary model-mode
+risk. Do not describe unenumerated destructive, infrastructure, billing,
+credential, or irreversible provider operations as hard-blocked until a future
+SPEC inventories and hardens them at operation level.
 
 The first Preview toolkit should select only the smallest integrations needed
 for proof. A useful first capability is a read-only search/get integration plus

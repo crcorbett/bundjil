@@ -1,6 +1,6 @@
 # Executor MCP Connection Implementation Plan
 
-Status: Complete - Production accepted and documentation reconciled
+Status: Complete - Production policy scope corrected and verified
 
 Spec: `docs/product-specs/executor-mcp-connection.md`
 Task ledger: `docs/product-specs/executor-mcp-connection.tasks.json`
@@ -41,6 +41,8 @@ response, stream, and other proof captures after each proof.
 5. `prove-preview-eve-executor-and-chat-resume`: accepted; the earlier browser
    proof attempt and its hosted blocker are retained below as historical evidence.
 6. `promote-production-document-and-audit`: accepted.
+7. `correct-production-toolkit-policy-scope`: accepted after the amended SPEC,
+   guarded provider correction, direct catalog proof, and three parent audits.
 
 ## Current Baseline
 
@@ -62,9 +64,40 @@ response, stream, and other proof captures after each proof.
   Production-only Sensitive binding. The temporary handoff file is removed.
 - No Bundjil frontend work is in scope.
 
+### 2026-07-16 Policy-Scope Correction
+
+Executor readback established that Production uses its independent
+`bundjil-production` toolkit endpoint, not the Preview endpoint. Both toolkits
+are user-owned. The guarded pre-readback found Production with 17 connection
+patterns, exactly one `executor.*`, five policies, and exactly one final wildcard
+block; Preview had one connection, five policies, and one final wildcard block.
+
+The provider correction removed only Production `executor.*`, then only its
+final wildcard block. Production now has 16 connection patterns, zero Executor
+administration connections, four retained GitHub overrides, and zero wildcard
+blocks. Preview is unchanged: one GitHub connection, five policies, and one
+wildcard block. No endpoint, key, Vercel variable, Sendblue state, deployment,
+or app code changed. Direct Production MCP orchestration remains
+`skills`/`execute`/`resume`; execute catalog discovery found positive operation
+counts in all 16 selected namespaces and zero Executor operations, with no
+downstream provider invocation.
+
+Production now uses selected non-Executor connections, tool-declared default
+approval behavior, and explicit reviewed overrides. This is an accepted
+temporary model-mode risk: unenumerated destructive, infrastructure, billing,
+credential, or irreversible provider operations are not claimed hard-blocked
+until a future operation-level policy-hardening SPEC. Three parent audits
+accepted ownership and call graph, documentation-only implementation quality,
+and sanitized provider/MCP verification coverage.
+
 ### Task 6 Production Evidence
 
 Status: Accepted 2026-07-15.
+
+This remains historical acceptance evidence. Its one-selected-connection and
+five-policy conclusion is superseded for current Production by the 2026-07-16
+policy-scope correction above; it must not be used to claim that Production is
+intended to be GitHub-only.
 
 - Executor API readback confirms an independent Production toolkit in the
   Personal organization. It is distinct from the Preview toolkit; identifiers,
