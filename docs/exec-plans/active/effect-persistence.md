@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 4 corrected Preview redeploy
+Status: Active - task 4 proxy packaging correction
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -243,8 +243,20 @@ Status: Passed; clean commit and redeploy pending.
   tests, the contended-refresh case ten consecutive times, the forced uncached
   Turbo graph twice with `11/11` tasks, root verification, full build, Knip,
   static scans, and whitespace checks.
-- The next action is a fresh isolated Preview deployment from the pushed clean
-  correction SHA. Production and the shared Sendblue webhook remain unchanged.
+- A fresh isolated Preview at the first correction SHA was rejected before
+  authentication because the Vercel function artifact omitted the transitive
+  `@bundjil/effect-persistence` workspace runtime. Hosted Node resolution failed
+  from the emitted Codex OAuth adapter while local tests remained green.
+- The proxy now declares that deployment-owned runtime as a direct dependency,
+  and its Vercel build command emits persistence, OAuth, then proxy output in
+  dependency order. A structured Schema test owns both packaging assertions;
+  the Knip exception is scoped to this dependency because Vercel tracing, not a
+  source import, is its direct app-level consumer.
+- Parent verification passed frozen install, the `23/23` proxy suite, package
+  typecheck/build, root check and Knip, full verification, full build, static
+  scans, and whitespace checks. The next action is a fresh isolated Preview
+  from the pushed packaging-fix SHA. Production and the shared Sendblue webhook
+  remain unchanged.
 
 ### reconcile-persistence-documentation-and-final-audit
 

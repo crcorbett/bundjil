@@ -45,6 +45,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@bundjil/codex-oauth": "workspace:*",
+        "@bundjil/effect-persistence": "workspace:*",
         "@effect/platform-bun": "catalog:effect",
         "effect": "catalog:effect",
       },
