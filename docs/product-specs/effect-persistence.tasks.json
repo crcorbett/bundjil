@@ -213,7 +213,7 @@
     {
       "id": "verify-persistence-preview-and-production-rollout",
       "title": "Verify isolated Preview and approved Production rollout",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": [
         "migrate-codex-oauth-to-effect-persistence",
         "migrate-agent-delivery-idempotency-to-effect-persistence"
@@ -250,8 +250,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: the shared package remains provider-neutral; Codex and app retain domain policy, the app owns channel identity/routing, and the proxy owns hosted HTTP packaging. Isolated Preview and stable Production routing preserved personal bindings, clean-source metadata, immutable rollback readiness, and no provider-account, line, model, Executor, or OAuth protocol mutation.",
+          "Proof and helper quality: the proxy proof remains one linear Effect program over Config URL/redacted inputs, canonical Schemas, tagged errors, normalized SSE handling, and Schema codecs; request construction is reused and Promise boundaries are owned. Packaging assertions and build order are explicit; scans and retained evidence are privacy-safe.",
+          "Verification and rollback: Preview persistence, encryption, replay, protected-route, Eve, inventory, and log gates passed; Production direct and handset evidence proved one workflow and one proxy completion with no duplicate, Preview ingress, error, or leak finding. Focused and root checks passed with 23 persistence, 103 OAuth, 24 proxy, and 57 agent tests; rollback evidence was retained and no rollback was required."
+        ]
       },
       "commitAfterPassing": true
     },

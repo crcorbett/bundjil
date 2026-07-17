@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 4 Preview SSE proof correction
+Status: Active - task 5 documentation reconciliation pending
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -34,7 +34,7 @@ clean-source, explicit approval, bounded proof, and rollback requirements.
 1. `implement-effect-persistence-contract-and-adapters`: completed.
 2. `migrate-codex-oauth-to-effect-persistence`: completed.
 3. `migrate-agent-delivery-idempotency-to-effect-persistence`: completed.
-4. `verify-persistence-preview-and-production-rollout`: in progress.
+4. `verify-persistence-preview-and-production-rollout`: completed.
 5. `reconcile-persistence-documentation-and-final-audit`: pending.
 
 ## Baseline
@@ -215,14 +215,14 @@ Status: Passed
 
 ### verify-persistence-preview-and-production-rollout
 
-Status: In progress
+Status: Completed
 
 Subagent: one Terra Medium verification worker; parent review required three
 correction rounds before a new clean Preview source could be accepted.
 
 #### Corrected Preview Source Gate
 
-Status: Passed; clean commit and redeploy pending.
+Status: Passed; clean-source deployments accepted.
 
 - The first clean Preview deployments reached `READY`, but Vercel Deployment
   Protection redirected the public health probe. No authenticated stream,
@@ -279,6 +279,131 @@ Status: Passed; clean commit and redeploy pending.
   dependency graph and Eve `.vercel/output` behavior. A Schema-decoded agent
   packaging test protects that command. No deployment, binding, provider,
   webhook, or Production state changed during this correction.
+
+#### Accepted Preview And Production Evidence
+
+Status: Evidence accepted.
+
+- Personal Vercel scope, clean-source correlation, and readiness passed for
+  both Preview applications. The proxy acceptance is source-equivalent after
+  the direct packaging and SSE corrections.
+- The isolated Preview persistence proof recorded atomic apply, conflict,
+  bidirectional native/atomic visibility, all-or-nothing behavior, three
+  observed entries, and empty cleanup using only safe booleans and counts.
+- The encrypted-profile read-only proof recorded a present version-two
+  ciphertext envelope with no marker finding; one hosted completion confirmed
+  the existing encrypted profile remains decryptable.
+- The isolated replay proof recorded claim, duplicate suppression, retryable
+  cleanup, reclaim, and removal of its temporary claim. It did not invoke
+  Sendblue ingress or delivery.
+- The direct Preview Eve session and replay each passed their status gate and
+  recorded nine events with one completion, one waiting event, and zero
+  failures. The accepted proxy window recorded one authenticated completion,
+  proving the replay made no second model call. Agent request counts were one
+  session submission, two stream reads, and five workflow reads; error/fatal
+  and leak-query counts were zero.
+- A read-only Sendblue inventory recorded one receive webhook and zero Preview
+  deployment targets. No webhook registration or change occurred.
+- Immutable prior Production rollback deployments were captured as ready before
+  promotion. Required environment names and write-only sensitive bindings were
+  confirmed without values; a local auth attempt using pulled placeholders was
+  rejected as expected and was not accepted as credential evidence.
+- An initial Production proxy upload was rejected after a local Vercel link
+  side effect changed tracked `.gitignore` state. Its artifacts were removed
+  and the worktree restored before replacement deployments were built from a
+  separate clean checkout of the intended pushed source. Vercel deployment
+  metadata correlated both accepted Production deployments to pushed source
+  `93b0498` with no dirty marker. Both replacement Production deployments are
+  ready.
+- The bounded Production direct-session proof recorded one accepted submission,
+  one authenticated stream read that reached waiting, nine events, one
+  completion, one waiting event, and zero failures. The client interrupted the
+  durably parked stream after observing waiting, and temporary proof material
+  was removed. The proxy window recorded two health successes, six expected
+  authentication rejections, and one authenticated completion; the agent
+  window recorded one submission, one stream read, and five workflow reads.
+  Both windows had zero runtime error/fatal and leak-query findings.
+- The explicit agent Vercel build emitted warnings about app environment names
+  during upstream dependency tasks. Review confirms this is the intended
+  least-privilege graph: the three upstream packages have plain TypeScript
+  build scripts and no matching configuration reads, while `turbo.json`
+  declares the names only for `@bundjil/agent#build`. No source correction is
+  required; declaring those names upstream would expand sensitive build
+  exposure without changing behavior.
+
+#### Bounded Production Handset Evidence
+
+- The bounded post-promotion provider window recorded exactly one inbound and
+  one outbound. Delivered-or-sent outbound count was one; pending and error
+  counts were zero.
+- The configured receive inventory recorded exactly one route, classified as
+  the expected stable Production webhook path with zero Preview hosts and no
+  fragment. No URL or query data was retained.
+- The Production proxy window recorded exactly one additional authenticated
+  completion success during the handset window, with zero error, fatal, and
+  leak-query findings. The Production agent Workflow window recorded one
+  successful flow request and zero error, fatal, and leak-query findings.
+- The Preview Sendblue ingress query recorded zero requests. Together with the
+  isolated duplicate/replay proof, the bounded evidence establishes no
+  duplicate dispatch or send without injecting a synthetic personal replay.
+- The successful Production turn exercised compatibility for the retained
+  stored replay and encrypted profile state. No stored value, message content,
+  provider payload, phone number, timestamp, identifier, or protected URL was
+  retained.
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- The shared package remains provider-neutral; Codex and the agent retain their
+  domain codecs and policies, the agent owns channel identity and routing, and
+  the proxy owns its hosted HTTP boundary and direct runtime packaging
+  dependency.
+- Preview used isolated storage with no provider webhook. Production retained
+  one stable receive route, unchanged personal Vercel scope and bindings, and
+  ready immutable rollback deployments.
+- Accepted deployment metadata correlated the agent and proxy to clean pushed
+  source `93b0498`. The bounded Production turn exercised retained replay data
+  and the encrypted profile through one workflow and one private proxy
+  completion, without provider account, line, model, Executor, or OAuth
+  protocol mutation.
+
+#### Parent Audit Pass 2 - Proof And Helper Quality
+
+Status: Passed
+
+- The committed proxy proof is one linear Effect program using Config URL and
+  redacted inputs, canonical request/response Schemas, a tagged error,
+  normalized SSE media-type handling, and Schema JSON codecs. Its request
+  constructor is reused across four probes, while fetch and text helpers own
+  Promise error boundaries.
+- Packaging assertions use Schema, and the direct runtime dependency with its
+  build order is explicit. Static scans found no production direct environment
+  reads, raw JSON stringify, unsafe casts, suppression, switch, object-entry
+  helpers, or tracked local proof material.
+- Retained evidence is limited to statuses, counts, and booleans. Temporary
+  proof artifacts were mode-restricted and removed; log searches had zero
+  credential or content findings. The rejected tracked `.gitignore` mutation
+  was replaced from a separate clean checkout before promotion.
+
+#### Parent Audit Pass 3 - Verification And Rollback
+
+Status: Passed
+
+- Preview protected-route, SSE, native/atomic, encrypted-envelope, replay,
+  Eve replay, provider-inventory, and safe-log evidence passed. Production
+  health and auth-negative checks, direct session, bounded handset turn,
+  duplicate suppression, zero Preview ingress, and safe logs passed.
+- The environment-free repository test failed closed on required Executor
+  configuration, while a broad Preview environment exposed stale local
+  provider selection; neither was a source failure. The accepted restricted
+  local Executor environment passed full verification and the seven-workspace
+  build.
+- Accepted counts were persistence 23, OAuth 103, proxy 24, and agent 57.
+  Root fix, check, Knip, verification, build, and diff checks passed. Rollback
+  deployments and unchanged environment-name/prefix classifications were
+  captured before promotion; rollback was not required. Browser evidence is
+  not applicable because no visible or browser route changed.
 
 ### reconcile-persistence-documentation-and-final-audit
 
