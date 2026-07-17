@@ -11,6 +11,7 @@ import {
   CodexOAuthHttpClientLive,
   CodexSubscriptionAuthProtocolConfigLive,
 } from "../src/live.layer.js";
+import { CodexOAuthRedirectUri } from "../src/schemas.js";
 
 const makeTimeoutLayer = (started: Deferred.Deferred<null>) =>
   CodexOAuthHttpClientLive.pipe(
@@ -37,7 +38,9 @@ it.effect("classifies authorization-code exchange execution timeouts", () =>
         return yield* client.exchangeAuthorizationCode({
           code: Redacted.make("code-secret"),
           codeVerifier: Redacted.make("verifier-secret"),
-          redirectUri: "http://localhost:1455/auth/callback",
+          redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+            "http://localhost:1455/auth/callback"
+          ),
         });
       }).pipe(Effect.provide(makeTimeoutLayer(started)))
     );

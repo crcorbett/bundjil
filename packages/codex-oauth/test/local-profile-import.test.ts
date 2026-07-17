@@ -16,6 +16,7 @@ import {
 import { CodexOAuthProfileCipherTest } from "../src/mock.layer.js";
 import { getProfile } from "../src/profile-store.service.js";
 import {
+  CodexLocalAuthFile,
   CodexLocalProfileImportConfig,
   CodexOAuthProfileCipherConfig,
 } from "../src/schemas.js";
@@ -261,11 +262,17 @@ it.effect("maps an invalid local cache path to a safe source error", () =>
           Layer.effect(
             CodexLocalProfileImportConfigService,
             importConfig.pipe(
-              Effect.map((config) =>
-                CodexLocalProfileImportConfigService.of({
-                  ...config,
-                  localAuthFile: invalidLocalAuthFile,
-                })
+              Effect.flatMap((config) =>
+                Schema.decodeUnknownEffect(CodexLocalAuthFile)(
+                  invalidLocalAuthFile
+                ).pipe(
+                  Effect.map((localAuthFile) =>
+                    CodexLocalProfileImportConfigService.of({
+                      ...config,
+                      localAuthFile,
+                    })
+                  )
+                )
               )
             )
           )

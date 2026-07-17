@@ -4,6 +4,8 @@ import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   AtomicKeyValueStore,
+  AtomicKeyValueStoreCondition,
+  AtomicKeyValueStoreMutation,
   AtomicKeyValueStoreTransaction,
 } from "../src/index.js";
 import { PersistenceMemory } from "../src/memory.layer.js";
@@ -38,9 +40,16 @@ const transaction = Schema.decodeUnknownSync(AtomicKeyValueStoreTransaction)({
 });
 
 const transactionInput = (
-  conditions: AtomicKeyValueStoreTransaction["conditions"],
-  mutations: AtomicKeyValueStoreTransaction["mutations"]
-): AtomicKeyValueStoreTransaction => ({ conditions, mutations });
+  conditions: unknown,
+  mutations: unknown
+): AtomicKeyValueStoreTransaction => ({
+  conditions: Schema.decodeUnknownSync(
+    Schema.NonEmptyArray(AtomicKeyValueStoreCondition)
+  )(conditions),
+  mutations: Schema.decodeUnknownSync(
+    Schema.NonEmptyArray(AtomicKeyValueStoreMutation)
+  )(mutations),
+});
 
 it.effect("serializes one physical key per logical transaction key", () =>
   Effect.gen(function* serializationContract() {

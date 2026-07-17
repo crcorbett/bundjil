@@ -1,13 +1,17 @@
 import { Schema } from "effect";
 
-import { CodexOAuthProfileCommitOperation } from "../schemas.js";
+import {
+  CodexOAuthProfileCommitOperation,
+  CodexOAuthProfileId,
+  CodexOAuthSubjectHash,
+} from "../schemas.js";
 
 export class CodexOAuthProfileCommitConflict extends Schema.TaggedErrorClass<CodexOAuthProfileCommitConflict>()(
   "CodexOAuthProfileCommitConflict",
   {
     operation: CodexOAuthProfileCommitOperation,
-    profileId: Schema.NonEmptyString,
-    subjectHash: Schema.NonEmptyString,
+    profileId: CodexOAuthProfileId,
+    subjectHash: CodexOAuthSubjectHash,
     message: Schema.NonEmptyString,
   }
 ) {}

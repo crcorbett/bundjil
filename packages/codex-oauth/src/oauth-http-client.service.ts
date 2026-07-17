@@ -16,7 +16,9 @@ import {
 import { CodexSubscriptionAuthError } from "./errors.js";
 import {
   CodexOAuthProviderErrorResponse,
+  CodexOAuthRefreshToken,
   CodexOAuthRefreshResponse,
+  CodexSubscriptionClientId,
   CodexOAuthTokenResponse,
 } from "./schemas.js";
 import type {
@@ -42,9 +44,9 @@ export class CodexOAuthHttpClient extends Context.Service<
 >()("@bundjil/codex-oauth/CodexOAuthHttpClient") {}
 
 const RefreshRequest = Schema.Struct({
-  client_id: Schema.NonEmptyString,
+  client_id: CodexSubscriptionClientId,
   grant_type: Schema.Literal("refresh_token"),
-  refresh_token: Schema.NonEmptyString,
+  refresh_token: CodexOAuthRefreshToken,
 });
 
 const codexOAuthHttpExecutionTimeout = "30 seconds";

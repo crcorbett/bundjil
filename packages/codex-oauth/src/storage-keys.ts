@@ -1,6 +1,8 @@
-import { Effect } from "effect";
+import { AtomicKeyValueStoreKey } from "@bundjil/effect-persistence";
+import { Effect, Schema } from "effect";
 
 import { OAuthProfileStorageError } from "./errors.js";
+import { CodexOAuthSubjectHash } from "./schemas.js";
 import type { CodexOAuthSubject } from "./schemas.js";
 
 export const codexOAuthProfileStoragePrefix =
@@ -40,14 +42,35 @@ export const codexOAuthProfileSubjectHash = (subject: CodexOAuthSubject) =>
         message: "Unable to derive Codex OAuth profile storage key.",
         cause,
       }),
-  });
+  }).pipe(
+    Effect.flatMap(Schema.decodeUnknownEffect(CodexOAuthSubjectHash)),
+    Effect.mapError(
+      (cause) =>
+        new OAuthProfileStorageError({
+          operation: "deriveProfileStorageKey",
+          message: "Unable to derive Codex OAuth profile storage key.",
+          cause,
+        })
+    )
+  );
 
 export const codexOAuthProfileStorageKey = Effect.fn(
   "CodexOAuthProfileStorageKey.derive"
 )(function* (subject: CodexOAuthSubject) {
   const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
 
-  return `${codexOAuthProfileStoragePrefix}/${subjectHash}`;
+  return yield* Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
+    `${codexOAuthProfileStoragePrefix}/${subjectHash}`
+  ).pipe(
+    Effect.mapError(
+      (cause) =>
+        new OAuthProfileStorageError({
+          operation: "deriveProfileStorageKey",
+          message: "Unable to derive Codex OAuth profile storage key.",
+          cause,
+        })
+    )
+  );
 });
 
 export const codexOAuthRefreshLockStorageKey = Effect.fn(
@@ -55,7 +78,18 @@ export const codexOAuthRefreshLockStorageKey = Effect.fn(
 )(function* (subject: CodexOAuthSubject) {
   const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
 
-  return `${codexOAuthRefreshLockStoragePrefix}/${subjectHash}`;
+  return yield* Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
+    `${codexOAuthRefreshLockStoragePrefix}/${subjectHash}`
+  ).pipe(
+    Effect.mapError(
+      (cause) =>
+        new OAuthProfileStorageError({
+          operation: "deriveProfileStorageKey",
+          message: "Unable to derive Codex OAuth profile storage key.",
+          cause,
+        })
+    )
+  );
 });
 
 export const codexOAuthProfileRevisionStorageKey = Effect.fn(
@@ -63,5 +97,16 @@ export const codexOAuthProfileRevisionStorageKey = Effect.fn(
 )(function* (subject: CodexOAuthSubject) {
   const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
 
-  return `${codexOAuthProfileRevisionStoragePrefix}/${subjectHash}`;
+  return yield* Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
+    `${codexOAuthProfileRevisionStoragePrefix}/${subjectHash}`
+  ).pipe(
+    Effect.mapError(
+      (cause) =>
+        new OAuthProfileStorageError({
+          operation: "deriveProfileStorageKey",
+          message: "Unable to derive Codex OAuth profile storage key.",
+          cause,
+        })
+    )
+  );
 });

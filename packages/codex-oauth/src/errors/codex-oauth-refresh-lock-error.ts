@@ -1,5 +1,6 @@
 import { Schema } from "effect";
 
+import { CodexOAuthSubjectHash } from "../schemas.js";
 import {
   CodexOAuthRefreshLockFailureReason,
   CodexOAuthRefreshLockOperation,
@@ -10,7 +11,7 @@ export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAu
   {
     operation: CodexOAuthRefreshLockOperation,
     reason: CodexOAuthRefreshLockFailureReason,
-    subjectHash: Schema.optional(Schema.NonEmptyString),
+    subjectHash: Schema.optional(CodexOAuthSubjectHash),
     expiresAtEpochMillis: Schema.optional(
       Schema.Number.check(Schema.isFinite())
     ),

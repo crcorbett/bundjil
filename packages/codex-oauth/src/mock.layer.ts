@@ -118,7 +118,9 @@ export const CodexOAuthClientMock = (
     startLogin: () =>
       options.loginStart === undefined
         ? Effect.succeed({
-            authorizationUrl: "https://auth.openai.com/oauth/authorize",
+            authorizationUrl: Redacted.make(
+              "https://auth.openai.com/oauth/authorize"
+            ),
             state: Redacted.make("mock-state"),
             codeVerifier: Redacted.make("mock-code-verifier"),
           })

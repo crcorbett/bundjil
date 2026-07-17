@@ -29,10 +29,20 @@ export const CodexOAuthPrincipalType = Schema.Literals([
 
 export type CodexOAuthPrincipalType = typeof CodexOAuthPrincipalType.Type;
 
+export const CodexOAuthPrincipalId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthPrincipalId")
+);
+export type CodexOAuthPrincipalId = typeof CodexOAuthPrincipalId.Type;
+
+export const CodexOAuthIssuerUri = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthIssuerUri")
+);
+export type CodexOAuthIssuerUri = typeof CodexOAuthIssuerUri.Type;
+
 export const OAuthPrincipal = Schema.Struct({
   type: CodexOAuthPrincipalType,
-  id: Schema.NonEmptyString,
-  issuer: Schema.NonEmptyString,
+  id: CodexOAuthPrincipalId,
+  issuer: CodexOAuthIssuerUri,
 });
 
 export type OAuthPrincipal = typeof OAuthPrincipal.Type;
@@ -88,6 +98,49 @@ export const CodexOAuthAccountId = Schema.RedactedFromValue(
 );
 
 export type CodexOAuthAccountId = typeof CodexOAuthAccountId.Type;
+
+export const CodexOAuthScope = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthScope")
+);
+export type CodexOAuthScope = typeof CodexOAuthScope.Type;
+
+export const CodexOAuthSubjectHash = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthSubjectHash")
+);
+export type CodexOAuthSubjectHash = typeof CodexOAuthSubjectHash.Type;
+
+export const CodexOAuthRedirectUri = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthRedirectUri")
+);
+export type CodexOAuthRedirectUri = typeof CodexOAuthRedirectUri.Type;
+
+export const CodexOAuthCodeChallenge = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCodeChallenge")
+);
+export type CodexOAuthCodeChallenge = typeof CodexOAuthCodeChallenge.Type;
+
+export const CodexLocalAuthFile = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexLocalAuthFile")
+);
+export type CodexLocalAuthFile = typeof CodexLocalAuthFile.Type;
+
+export const CodexSubscriptionAuthorizationEndpoint =
+  Schema.NonEmptyString.pipe(
+    Schema.brand("CodexSubscriptionAuthorizationEndpoint")
+  );
+export type CodexSubscriptionAuthorizationEndpoint =
+  typeof CodexSubscriptionAuthorizationEndpoint.Type;
+
+export const CodexSubscriptionTokenEndpoint = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexSubscriptionTokenEndpoint")
+);
+export type CodexSubscriptionTokenEndpoint =
+  typeof CodexSubscriptionTokenEndpoint.Type;
+
+export const CodexSubscriptionClientId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexSubscriptionClientId")
+);
+export type CodexSubscriptionClientId = typeof CodexSubscriptionClientId.Type;
 
 export const CodexOAuthCredentialRevision = Schema.NonEmptyString.pipe(
   Schema.brand("CodexOAuthCredentialRevision")
@@ -148,7 +201,7 @@ export const CodexAccessTokenImportProfile = Schema.Struct({
   subject: CodexOAuthSubject,
   accessToken: CodexOAuthAccessToken,
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   requiresReauthentication: Schema.Boolean,
@@ -166,7 +219,7 @@ export const CodexSubscriptionProfile = Schema.Struct({
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   accountId: CodexOAuthAccountId,
   protocolScopeVersion: CodexOAuthProtocolScopeVersion,
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   lastRefreshedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
@@ -188,7 +241,7 @@ export const LegacyCodexOAuthProfileV1 = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   refreshToken: Schema.optional(CodexOAuthRefreshToken),
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   requiresReauthentication: Schema.Boolean,
@@ -211,7 +264,7 @@ export const CodexCliAuthCache = Schema.Struct({
 export type CodexCliAuthCache = typeof CodexCliAuthCache.Type;
 
 export const CodexLocalProfileImportConfig = Schema.Struct({
-  localAuthFile: Schema.NonEmptyString,
+  localAuthFile: CodexLocalAuthFile,
   subject: CodexOAuthSubject,
   accessTokenTtlMillis: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
 });
@@ -247,10 +300,16 @@ export const CodexOAuthProfileCipherKeyId = Schema.NonEmptyString.pipe(
 export type CodexOAuthProfileCipherKeyId =
   typeof CodexOAuthProfileCipherKeyId.Type;
 
+export const CodexOAuthProfileCipherKeyMaterial = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthProfileCipherKeyMaterial =
+  typeof CodexOAuthProfileCipherKeyMaterial.Type;
+
 export const CodexOAuthProfileCipherConfig = Schema.Struct({
   algorithm: CodexOAuthProfileCipherAlgorithm,
   keyId: CodexOAuthProfileCipherKeyId,
-  keyMaterial: Schema.RedactedFromValue(Schema.NonEmptyString),
+  keyMaterial: CodexOAuthProfileCipherKeyMaterial,
 });
 
 export type CodexOAuthProfileCipherConfig =
@@ -261,7 +320,7 @@ const EncryptedCodexOAuthProfileFields = {
   keyId: CodexOAuthProfileCipherKeyId,
   nonce: Schema.Uint8Array,
   ciphertext: Schema.Uint8Array,
-  subjectHash: Schema.NonEmptyString,
+  subjectHash: CodexOAuthSubjectHash,
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
 } as const;
@@ -322,7 +381,7 @@ export type CodexOAuthRefreshLockAcquireInput =
 
 export const CodexOAuthRefreshLockLease = Schema.Struct({
   subject: CodexOAuthSubject,
-  subjectHash: Schema.NonEmptyString,
+  subjectHash: CodexOAuthSubjectHash,
   owner: CodexOAuthRefreshLockOwner,
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
 });
@@ -333,23 +392,23 @@ export const CodexOAuthLoginStart = Schema.Struct({
   profileId: CodexOAuthProfileId,
   connectorId: CodexOAuthConnectorId,
   installationId: CodexOAuthInstallationId,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthLoginStart = typeof CodexOAuthLoginStart.Type;
 
 export const CodexOAuthLoginStartResult = Schema.Struct({
-  authorizationUrl: Schema.NonEmptyString,
-  state: Schema.RedactedFromValue(Schema.NonEmptyString),
-  codeVerifier: Schema.RedactedFromValue(Schema.NonEmptyString),
+  authorizationUrl: CodexOAuthAuthorizationUrl,
+  state: CodexOAuthState,
+  codeVerifier: CodexOAuthCodeVerifier,
 });
 
 export type CodexOAuthLoginStartResult = typeof CodexOAuthLoginStartResult.Type;
 
 export const CodexOAuthLoginCallback = Schema.Struct({
-  code: Schema.RedactedFromValue(Schema.NonEmptyString),
-  state: Schema.RedactedFromValue(Schema.NonEmptyString),
-  redirectUri: Schema.NonEmptyString,
+  code: CodexOAuthAuthorizationCode,
+  state: CodexOAuthState,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthLoginCallback = typeof CodexOAuthLoginCallback.Type;
@@ -413,10 +472,10 @@ export type CodexOAuthProfileCommitReauthenticationInput =
   typeof CodexOAuthProfileCommitReauthenticationInput.Type;
 
 export const CodexSubscriptionAuthProtocolConfig = Schema.Struct({
-  issuer: Schema.NonEmptyString,
-  authorizationEndpoint: Schema.NonEmptyString,
-  tokenEndpoint: Schema.NonEmptyString,
-  clientId: Schema.NonEmptyString,
+  issuer: CodexOAuthIssuerUri,
+  authorizationEndpoint: CodexSubscriptionAuthorizationEndpoint,
+  tokenEndpoint: CodexSubscriptionTokenEndpoint,
+  clientId: CodexSubscriptionClientId,
   callbackHost: Schema.Literal("127.0.0.1"),
   callbackPath: Schema.Literal("/auth/callback"),
   callbackPorts: Schema.Tuple([Schema.Literal(1455), Schema.Literal(1457)]),
@@ -438,7 +497,7 @@ export type CodexSubscriptionAuthProtocolConfig =
 export const CodexOAuthAuthorizationMaterial = Schema.Struct({
   state: CodexOAuthState,
   codeVerifier: CodexOAuthCodeVerifier,
-  codeChallenge: Schema.NonEmptyString,
+  codeChallenge: CodexOAuthCodeChallenge,
 });
 
 export type CodexOAuthAuthorizationMaterial =
@@ -447,9 +506,9 @@ export type CodexOAuthAuthorizationMaterial =
 export const CodexOAuthAuthorizationSession = Schema.Struct({
   state: CodexOAuthState,
   codeVerifier: CodexOAuthCodeVerifier,
-  codeChallenge: Schema.NonEmptyString,
+  codeChallenge: CodexOAuthCodeChallenge,
   authorizationUrl: CodexOAuthAuthorizationUrl,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthAuthorizationSession =
@@ -458,7 +517,7 @@ export type CodexOAuthAuthorizationSession =
 export const CodexOAuthAuthorizationCallback = Schema.Struct({
   code: CodexOAuthAuthorizationCode,
   state: CodexOAuthState,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthAuthorizationCallback =
@@ -483,7 +542,7 @@ export type CodexOAuthRefreshResponse = typeof CodexOAuthRefreshResponse.Type;
 export const CodexOAuthCodeExchangeInput = Schema.Struct({
   code: CodexOAuthAuthorizationCode,
   codeVerifier: CodexOAuthCodeVerifier,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthCodeExchangeInput =
@@ -608,9 +667,54 @@ export const CodexResponsesEndpoint = Schema.NonEmptyString.pipe(
 
 export type CodexResponsesEndpoint = typeof CodexResponsesEndpoint.Type;
 
+export const CodexResponsesContent = Schema.String;
+export type CodexResponsesContent = typeof CodexResponsesContent.Type;
+
+export const CodexResponsesNonEmptyContent = Schema.NonEmptyString;
+export type CodexResponsesNonEmptyContent =
+  typeof CodexResponsesNonEmptyContent.Type;
+
+export const CodexResponsesFunctionName = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesFunctionName")
+);
+export type CodexResponsesFunctionName = typeof CodexResponsesFunctionName.Type;
+
+export const CodexResponsesFunctionCallId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesFunctionCallId")
+);
+export type CodexResponsesFunctionCallId =
+  typeof CodexResponsesFunctionCallId.Type;
+
+export const CodexResponsesOutputItemId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesOutputItemId")
+);
+export type CodexResponsesOutputItemId = typeof CodexResponsesOutputItemId.Type;
+
+export const CodexResponsesFunctionArguments = Schema.String;
+export type CodexResponsesFunctionArguments =
+  typeof CodexResponsesFunctionArguments.Type;
+
+export const CodexResponsesStreamContentType = Schema.String;
+export type CodexResponsesStreamContentType =
+  typeof CodexResponsesStreamContentType.Type;
+
+export const CodexResponsesStreamEventKind = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesStreamEventKind")
+);
+export type CodexResponsesStreamEventKind =
+  typeof CodexResponsesStreamEventKind.Type;
+
+export const CodexResponsesRecognizedStreamEventType = Schema.Literals([
+  "response.output_text.delta",
+  "response.output_item.added",
+  "response.function_call_arguments.delta",
+]);
+export type CodexResponsesRecognizedStreamEventType =
+  typeof CodexResponsesRecognizedStreamEventType.Type;
+
 export const CodexResponsesInputTextContent = Schema.Struct({
   type: Schema.Literal("input_text"),
-  text: Schema.NonEmptyString,
+  text: CodexResponsesNonEmptyContent,
 });
 
 export type CodexResponsesInputTextContent =
@@ -618,7 +722,7 @@ export type CodexResponsesInputTextContent =
 
 export const CodexResponsesOutputTextContent = Schema.Struct({
   type: Schema.Literal("output_text"),
-  text: Schema.NonEmptyString,
+  text: CodexResponsesNonEmptyContent,
 });
 
 export type CodexResponsesOutputTextContent =
@@ -640,9 +744,9 @@ export type CodexResponsesInputMessage = typeof CodexResponsesInputMessage.Type;
 
 const CodexResponsesFunctionCallFields = {
   type: Schema.Literal("function_call"),
-  call_id: Schema.NonEmptyString,
-  name: Schema.NonEmptyString,
-  arguments: Schema.String,
+  call_id: CodexResponsesFunctionCallId,
+  name: CodexResponsesFunctionName,
+  arguments: CodexResponsesFunctionArguments,
 };
 
 export const CodexResponsesFunctionCall = Schema.Struct({
@@ -652,7 +756,7 @@ export const CodexResponsesFunctionCall = Schema.Struct({
 export type CodexResponsesFunctionCall = typeof CodexResponsesFunctionCall.Type;
 
 export const CodexResponsesFunctionCallOutputItem = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: CodexResponsesOutputItemId,
   ...CodexResponsesFunctionCallFields,
 });
 
@@ -661,8 +765,8 @@ export type CodexResponsesFunctionCallOutputItem =
 
 export const CodexResponsesFunctionCallOutput = Schema.Struct({
   type: Schema.Literal("function_call_output"),
-  call_id: Schema.NonEmptyString,
-  output: Schema.String,
+  call_id: CodexResponsesFunctionCallId,
+  output: CodexResponsesContent,
 });
 
 export type CodexResponsesFunctionCallOutput =
@@ -678,8 +782,8 @@ export type CodexResponsesInput = typeof CodexResponsesInput.Type;
 
 export const CodexResponsesFunctionTool = Schema.Struct({
   type: Schema.Literal("function"),
-  name: Schema.NonEmptyString,
-  description: Schema.optional(Schema.String),
+  name: CodexResponsesFunctionName,
+  description: Schema.optional(CodexResponsesContent),
   parameters: Schema.Unknown,
   strict: Schema.optional(Schema.Boolean),
 });
@@ -690,7 +794,7 @@ export const CodexResponsesToolChoice = Schema.Union([
   Schema.Literals(["auto", "none", "required"]),
   Schema.Struct({
     type: Schema.Literal("function"),
-    name: Schema.NonEmptyString,
+    name: CodexResponsesFunctionName,
   }),
 ]);
 
@@ -706,7 +810,7 @@ export const CodexResponsesRequest = Schema.Struct({
   model: CodexResponsesModelId,
   input: Schema.Array(CodexResponsesInput),
   store: Schema.Boolean,
-  instructions: Schema.optional(Schema.NonEmptyString),
+  instructions: Schema.optional(CodexResponsesNonEmptyContent),
   stream: Schema.Boolean,
   reasoning: Schema.optional(CodexResponsesReasoning),
   tools: Schema.optional(Schema.Array(CodexResponsesFunctionTool)),
@@ -722,23 +826,29 @@ export type CodexResponsesStreamBody = typeof CodexResponsesStreamBody.Type;
 
 export const CodexResponsesStreamResult = Schema.Struct({
   status: Schema.Number.check(Schema.isFinite()),
-  contentType: Schema.String,
+  contentType: CodexResponsesStreamContentType,
   body: CodexResponsesStreamBody,
 });
 
 export type CodexResponsesStreamResult = typeof CodexResponsesStreamResult.Type;
 
 export const CodexResponsesStreamEvent = Schema.Struct({
-  type: Schema.NonEmptyString,
-  delta: Schema.optional(Schema.String),
+  type: CodexResponsesStreamEventKind,
+  delta: Schema.optional(CodexResponsesContent),
   output_index: Schema.optional(Schema.Number.check(Schema.isFinite())),
   item: Schema.optional(Schema.Unknown),
 });
 
 export type CodexResponsesStreamEvent = typeof CodexResponsesStreamEvent.Type;
 
+export const CodexResponsesOutputItemKind = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexResponsesOutputItemKind")
+);
+export type CodexResponsesOutputItemKind =
+  typeof CodexResponsesOutputItemKind.Type;
+
 export const CodexResponsesOutputItemDiscriminator = Schema.Struct({
-  type: Schema.NonEmptyString,
+  type: CodexResponsesOutputItemKind,
 });
 
 export type CodexResponsesOutputItemDiscriminator =
@@ -756,7 +866,7 @@ export type CodexResponsesFunctionCallAddedEvent =
 export const CodexResponsesFunctionArgumentsDeltaEvent = Schema.Struct({
   type: Schema.Literal("response.function_call_arguments.delta"),
   output_index: Schema.Number.check(Schema.isFinite()),
-  delta: Schema.String,
+  delta: CodexResponsesFunctionArguments,
 });
 
 export type CodexResponsesFunctionArgumentsDeltaEvent =
@@ -772,7 +882,7 @@ export type CodexResponsesStreamMapInput =
 
 export const CodexResponsesPostInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
-  accountId: Schema.optional(Schema.NonEmptyString),
+  accountId: Schema.optional(CodexOAuthAccountId),
   request: CodexResponsesRequest,
 });
 
@@ -789,10 +899,10 @@ export type OpenAICompatibleChatRole = typeof OpenAICompatibleChatRole.Type;
 
 export const OpenAICompatibleMessageToolCall = Schema.Struct({
   type: Schema.Literal("function"),
-  id: Schema.NonEmptyString,
+  id: CodexResponsesFunctionCallId,
   function: Schema.Struct({
-    arguments: Schema.String,
-    name: Schema.NonEmptyString,
+    arguments: CodexResponsesFunctionArguments,
+    name: CodexResponsesFunctionName,
   }),
 });
 
@@ -802,21 +912,21 @@ export type OpenAICompatibleMessageToolCall =
 export const OpenAICompatibleChatMessage = Schema.Union([
   Schema.Struct({
     role: Schema.Literal("system"),
-    content: Schema.String,
+    content: CodexResponsesContent,
   }),
   Schema.Struct({
     role: Schema.Literal("user"),
-    content: Schema.String,
+    content: CodexResponsesContent,
   }),
   Schema.Struct({
     role: Schema.Literal("assistant"),
-    content: Schema.optional(Schema.NullOr(Schema.String)),
+    content: Schema.optional(Schema.NullOr(CodexResponsesContent)),
     tool_calls: Schema.optional(Schema.Array(OpenAICompatibleMessageToolCall)),
   }),
   Schema.Struct({
     role: Schema.Literal("tool"),
-    content: Schema.String,
-    tool_call_id: Schema.NonEmptyString,
+    content: CodexResponsesContent,
+    tool_call_id: CodexResponsesFunctionCallId,
   }),
 ]);
 
@@ -826,8 +936,8 @@ export type OpenAICompatibleChatMessage =
 export const OpenAICompatibleFunctionTool = Schema.Struct({
   type: Schema.Literal("function"),
   function: Schema.Struct({
-    name: Schema.NonEmptyString,
-    description: Schema.optional(Schema.String),
+    name: CodexResponsesFunctionName,
+    description: Schema.optional(CodexResponsesContent),
     parameters: Schema.Unknown,
     strict: Schema.optional(Schema.Boolean),
   }),
@@ -840,7 +950,7 @@ export const OpenAICompatibleToolChoice = Schema.Union([
   Schema.Literals(["auto", "none", "required"]),
   Schema.Struct({
     type: Schema.Literal("function"),
-    function: Schema.Struct({ name: Schema.NonEmptyString }),
+    function: Schema.Struct({ name: CodexResponsesFunctionName }),
   }),
 ]);
 
@@ -858,16 +968,16 @@ export type OpenAICompatibleChatCompletionRequest =
   typeof OpenAICompatibleChatCompletionRequest.Type;
 
 export const OpenAICompatibleChatCompletionDelta = Schema.Struct({
-  content: Schema.optional(Schema.String),
+  content: Schema.optional(CodexResponsesContent),
   tool_calls: Schema.optional(
     Schema.Array(
       Schema.Struct({
         index: Schema.Number.check(Schema.isFinite()),
-        id: Schema.optional(Schema.NonEmptyString),
+        id: Schema.optional(CodexResponsesFunctionCallId),
         type: Schema.optional(Schema.Literal("function")),
         function: Schema.Struct({
-          name: Schema.optional(Schema.NonEmptyString),
-          arguments: Schema.optional(Schema.String),
+          name: Schema.optional(CodexResponsesFunctionName),
+          arguments: Schema.optional(CodexResponsesFunctionArguments),
         }),
       })
     )
@@ -877,17 +987,32 @@ export const OpenAICompatibleChatCompletionDelta = Schema.Struct({
 export type OpenAICompatibleChatCompletionDelta =
   typeof OpenAICompatibleChatCompletionDelta.Type;
 
+export const OpenAICompatibleChatCompletionFinishReason = Schema.Literals([
+  "stop",
+  "tool_calls",
+]);
+export type OpenAICompatibleChatCompletionFinishReason =
+  typeof OpenAICompatibleChatCompletionFinishReason.Type;
+
 export const OpenAICompatibleChatCompletionChoice = Schema.Struct({
   index: Schema.Number.check(Schema.isFinite()),
   delta: OpenAICompatibleChatCompletionDelta,
-  finish_reason: Schema.optional(Schema.NullOr(Schema.String)),
+  finish_reason: Schema.optional(
+    Schema.NullOr(OpenAICompatibleChatCompletionFinishReason)
+  ),
 });
 
 export type OpenAICompatibleChatCompletionChoice =
   typeof OpenAICompatibleChatCompletionChoice.Type;
 
+export const OpenAICompatibleChatCompletionId = Schema.NonEmptyString.pipe(
+  Schema.brand("OpenAICompatibleChatCompletionId")
+);
+export type OpenAICompatibleChatCompletionId =
+  typeof OpenAICompatibleChatCompletionId.Type;
+
 export const OpenAICompatibleChatCompletionChunk = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: OpenAICompatibleChatCompletionId,
   object: Schema.Literal("chat.completion.chunk"),
   created: Schema.Number.check(Schema.isFinite()),
   model: CodexResponsesModelId,
@@ -897,9 +1022,13 @@ export const OpenAICompatibleChatCompletionChunk = Schema.Struct({
 export type OpenAICompatibleChatCompletionChunk =
   typeof OpenAICompatibleChatCompletionChunk.Type;
 
+export const OpenAICompatibleChatCompletionStreamBody = Schema.String;
+export type OpenAICompatibleChatCompletionStreamBody =
+  typeof OpenAICompatibleChatCompletionStreamBody.Type;
+
 export const OpenAICompatibleChatCompletionStream = Schema.Struct({
   contentType: Schema.Literal("text/event-stream"),
-  body: Schema.String,
+  body: OpenAICompatibleChatCompletionStreamBody,
 });
 
 export type OpenAICompatibleChatCompletionStream =
@@ -907,7 +1036,7 @@ export type OpenAICompatibleChatCompletionStream =
 
 export const CodexDirectProviderInput = Schema.Struct({
   subject: CodexOAuthSubject,
-  accountId: Schema.optional(Schema.NonEmptyString),
+  accountId: Schema.optional(CodexOAuthAccountId),
   request: OpenAICompatibleChatCompletionRequest,
 });
 
@@ -920,8 +1049,12 @@ export const OpenAICompatibleProxyInternalToken = Schema.RedactedFromValue(
 export type OpenAICompatibleProxyInternalToken =
   typeof OpenAICompatibleProxyInternalToken.Type;
 
+export const OpenAICompatibleProxyAuthorizationHeader = Schema.String;
+export type OpenAICompatibleProxyAuthorizationHeader =
+  typeof OpenAICompatibleProxyAuthorizationHeader.Type;
+
 export const OpenAICompatibleProxyInput = Schema.Struct({
-  authorization: Schema.optional(Schema.String),
+  authorization: Schema.optional(OpenAICompatibleProxyAuthorizationHeader),
   internalToken: OpenAICompatibleProxyInternalToken,
   completion: CodexDirectProviderInput,
 });
@@ -954,9 +1087,9 @@ export type UpstashRedisConfig = typeof UpstashRedisConfig.Type;
 
 export const CodexResponsesProofInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
-  accountId: Schema.optional(Schema.NonEmptyString),
+  accountId: Schema.optional(CodexOAuthAccountId),
   model: CodexResponsesModelId,
-  prompt: Schema.NonEmptyString,
+  prompt: CodexResponsesNonEmptyContent,
 });
 
 export type CodexResponsesProofInput = typeof CodexResponsesProofInput.Type;
@@ -965,7 +1098,7 @@ export const CodexResponsesProofResult = Schema.Struct({
   transport: Schema.Literal("direct-codex-responses"),
   endpoint: CodexResponsesEndpoint,
   status: Schema.Number.check(Schema.isFinite()),
-  contentType: Schema.String,
+  contentType: CodexResponsesStreamContentType,
   receivedBodyBytes: Schema.Number.check(Schema.isFinite()),
   receivedStreamLines: Schema.Number.check(Schema.isFinite()),
   usedAccountHeader: Schema.Boolean,

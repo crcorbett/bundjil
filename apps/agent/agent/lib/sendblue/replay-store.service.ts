@@ -1,10 +1,11 @@
 import {
   AtomicKeyValueStore,
   AtomicKeyValueStoreKey,
+  AtomicKeyValueStoreTransaction,
 } from "@bundjil/effect-persistence";
 import { PersistenceMemory } from "@bundjil/effect-persistence/memory";
 import type { Redacted } from "effect";
-import { Clock, Context, Duration, Effect, Layer, Match, Schema } from "effect";
+import { Clock, Context, Effect, Layer, Match, Schema } from "effect";
 
 import { SendblueConfigService } from "./config.js";
 import { SendblueReplayStoreError } from "./errors.js";
@@ -172,26 +173,34 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     ) {
       const replayClaim = yield* makeReplayClaim(claimIdGenerator, key);
       const encodedClaim = yield* encodeReplayRecord(claimRecord(replayClaim));
-      const outcome = yield* atomic
-        .transact({
-          conditions: [{ _tag: "Absent", key: logicalKey }],
-          mutations: [
-            {
-              _tag: "Set",
-              key: logicalKey,
-              ttl: Duration.millis(options.leaseSeconds * 1000),
-              value: encodedClaim,
-            },
-          ],
-        })
-        .pipe(
-          Effect.mapError(
-            () =>
-              new SendblueReplayStoreError({
-                message: "Unable to claim the Sendblue replay record.",
-              })
-          )
-        );
+      const transaction = yield* Schema.decodeUnknownEffect(
+        AtomicKeyValueStoreTransaction
+      )({
+        conditions: [{ _tag: "Absent", key: logicalKey }],
+        mutations: [
+          {
+            _tag: "Set",
+            key: logicalKey,
+            ttl: options.leaseSeconds * 1000,
+            value: encodedClaim,
+          },
+        ],
+      }).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to claim the Sendblue replay record.",
+            })
+        )
+      );
+      const outcome = yield* atomic.transact(transaction).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to claim the Sendblue replay record.",
+            })
+        )
+      );
       return yield* Match.value(outcome).pipe(
         Match.when("applied", () =>
           Effect.succeed({
@@ -216,17 +225,27 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
       const value = yield* encodeReplayRecord(
         terminalRecord(replayClaim, status, completedAtEpochMillis, completion)
       );
-      return yield* atomic.transact({
+      const transaction = yield* Schema.decodeUnknownEffect(
+        AtomicKeyValueStoreTransaction
+      )({
         conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
         mutations: [
           {
             _tag: "Set",
             key: logicalKey,
-            ttl: Duration.millis(options.ttlSeconds * 1000),
+            ttl: options.ttlSeconds * 1000,
             value,
           },
         ],
-      });
+      }).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to transition the Sendblue replay record.",
+            })
+        )
+      );
+      return yield* atomic.transact(transaction);
     });
     const transition = Effect.fn("SendblueReplayStore.transition")(function* (
       replayClaim: SendblueReplayClaim,
@@ -237,10 +256,10 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
       const expected = yield* encodeReplayRecord(claimRecord(replayClaim));
       const outcome = yield* Match.value(status).pipe(
         Match.when("retryable", () =>
-          atomic.transact({
+          Schema.decodeUnknownEffect(AtomicKeyValueStoreTransaction)({
             conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
             mutations: [{ _tag: "Remove", key: logicalKey }],
-          })
+          }).pipe(Effect.flatMap((transaction) => atomic.transact(transaction)))
         ),
         Match.when("complete", () =>
           retain(replayClaim, logicalKey, "complete", expected, completion)

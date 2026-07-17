@@ -1,15 +1,8 @@
-import { AtomicKeyValueStore } from "@bundjil/effect-persistence";
-import type { AtomicKeyValueStoreConditionType } from "@bundjil/effect-persistence";
 import {
-  Clock,
-  Duration,
-  Effect,
-  Layer,
-  Match,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+  AtomicKeyValueStore,
+  AtomicKeyValueStoreTransaction,
+} from "@bundjil/effect-persistence";
+import { Clock, Effect, Layer, Match, Option, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import { CodexOAuthProfileCommit } from "./commit.service.js";
@@ -37,6 +30,7 @@ import type {
   CodexOAuthProfileCommitRefreshInput,
   CodexOAuthProfileCommitReplacementInput,
   CodexSubscriptionProfile,
+  CodexOAuthSubjectHash,
 } from "./schemas.js";
 import {
   codexOAuthProfileRevisionStorageKey,
@@ -58,7 +52,7 @@ const codexAccessTokenImportProfileJson = Schema.fromJsonString(
 const profileCommitConflict = (
   operation: CodexOAuthProfileCommitOperation,
   profile: CodexSubscriptionProfile,
-  subjectHash: string
+  subjectHash: CodexOAuthSubjectHash
 ) =>
   new CodexOAuthProfileCommitConflict({
     operation,
@@ -71,7 +65,7 @@ const profileCommitConflict = (
 const profileCommitError = (
   operation: CodexOAuthProfileCommitOperation,
   profile: CodexSubscriptionProfile,
-  subjectHash: string,
+  subjectHash: CodexOAuthSubjectHash,
   message: string,
   cause: unknown
 ) =>
@@ -112,10 +106,7 @@ const transactProfileCommit = (
         )
       )
     );
-    const conditions: readonly [
-      AtomicKeyValueStoreConditionType,
-      ...AtomicKeyValueStoreConditionType[],
-    ] = Match.value(operation).pipe(
+    const conditions = Match.value(operation).pipe(
       Match.when(
         "initialWrite",
         () =>
@@ -171,18 +162,31 @@ const transactProfileCommit = (
       ),
       Match.exhaustive
     );
+    const transaction = yield* Schema.decodeUnknownEffect(
+      AtomicKeyValueStoreTransaction
+    )({
+      conditions,
+      mutations: [
+        { _tag: "Set", key: profileKey, value: encodedProfile },
+        {
+          _tag: "Set",
+          key: revisionKey,
+          value: profile.credentialRevision,
+        },
+      ],
+    }).pipe(
+      Effect.mapError((cause) =>
+        profileCommitError(
+          operation,
+          profile,
+          subjectHash,
+          "Unable to construct the fenced Codex OAuth profile commit.",
+          cause
+        )
+      )
+    );
     const outcome = yield* atomic
-      .transact({
-        conditions,
-        mutations: [
-          { _tag: "Set", key: profileKey, value: encodedProfile },
-          {
-            _tag: "Set",
-            key: revisionKey,
-            value: profile.credentialRevision,
-          },
-        ],
-      })
+      .transact(transaction)
       .pipe(
         Effect.mapError((cause) =>
           profileCommitError(
@@ -429,32 +433,43 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
               })
           )
         );
-        const outcome = yield* atomic
-          .transact({
-            conditions: [{ _tag: "Absent", key }],
-            mutations: [
-              {
-                _tag: "Set",
-                key,
-                value: Redacted.value(lease.owner),
-                ttl: Duration.millis(
-                  lease.expiresAtEpochMillis - nowEpochMillis
-                ),
-              },
-            ],
-          })
-          .pipe(
-            Effect.mapError(
-              (cause) =>
-                new CodexOAuthRefreshLockError({
-                  operation: "acquire",
-                  reason: "acquisition",
-                  subjectHash,
-                  message: "Unable to acquire the Codex OAuth refresh lock.",
-                  cause,
-                })
-            )
-          );
+        const transaction = yield* Schema.decodeUnknownEffect(
+          AtomicKeyValueStoreTransaction
+        )({
+          conditions: [{ _tag: "Absent", key }],
+          mutations: [
+            {
+              _tag: "Set",
+              key,
+              value: Redacted.value(lease.owner),
+              ttl: lease.expiresAtEpochMillis - nowEpochMillis,
+            },
+          ],
+        }).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexOAuthRefreshLockError({
+                operation: "acquire",
+                reason: "acquisition",
+                subjectHash,
+                message:
+                  "Unable to construct the Codex OAuth refresh-lock transaction.",
+                cause,
+              })
+          )
+        );
+        const outcome = yield* atomic.transact(transaction).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexOAuthRefreshLockError({
+                operation: "acquire",
+                reason: "acquisition",
+                subjectHash,
+                message: "Unable to acquire the Codex OAuth refresh lock.",
+                cause,
+              })
+          )
+        );
         if (outcome === "conflict") {
           return yield* new CodexOAuthRefreshLockError({
             operation: "acquire",
@@ -489,25 +504,38 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
               })
           )
         );
-        const outcome = yield* atomic
-          .transact({
-            conditions: [
-              { _tag: "Equals", key, value: Redacted.value(lease.owner) },
-            ],
-            mutations: [{ _tag: "Remove", key }],
-          })
-          .pipe(
-            Effect.mapError(
-              (cause) =>
-                new CodexOAuthRefreshLockError({
-                  operation: "release",
-                  reason: "release",
-                  subjectHash: lease.subjectHash,
-                  message: "Unable to release the Codex OAuth refresh lock.",
-                  cause,
-                })
-            )
-          );
+        const transaction = yield* Schema.decodeUnknownEffect(
+          AtomicKeyValueStoreTransaction
+        )({
+          conditions: [
+            { _tag: "Equals", key, value: Redacted.value(lease.owner) },
+          ],
+          mutations: [{ _tag: "Remove", key }],
+        }).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexOAuthRefreshLockError({
+                operation: "release",
+                reason: "release",
+                subjectHash: lease.subjectHash,
+                message:
+                  "Unable to construct the Codex OAuth refresh-lock release transaction.",
+                cause,
+              })
+          )
+        );
+        const outcome = yield* atomic.transact(transaction).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexOAuthRefreshLockError({
+                operation: "release",
+                reason: "release",
+                subjectHash: lease.subjectHash,
+                message: "Unable to release the Codex OAuth refresh lock.",
+                cause,
+              })
+          )
+        );
         if (outcome === "conflict") {
           return yield* new CodexOAuthRefreshLockError({
             operation: "release",

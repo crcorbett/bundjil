@@ -23,6 +23,7 @@ import {
   CodexOAuthMemory,
   CodexOAuthProfileCipherTest,
 } from "../src/mock.layer.js";
+import { CodexOAuthRedirectUri } from "../src/schemas.js";
 import { codexOAuthProfileSubjectHash } from "../src/storage-keys.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
@@ -264,7 +265,9 @@ it.effect("stores subscription logins through fenced initial write", () =>
       yield* completeLogin({
         code: Redacted.make("code-secret"),
         state: Redacted.make("state-secret"),
-        redirectUri: "http://localhost/callback",
+        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+          "http://localhost/callback"
+        ),
       });
 
       const storedProfile = yield* getProfile(subject);

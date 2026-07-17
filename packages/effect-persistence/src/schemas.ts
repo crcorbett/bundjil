@@ -1,9 +1,13 @@
 import { Duration, Schema } from "effect";
 
-export const AtomicKeyValueStoreKey = Schema.NonEmptyString;
+export const AtomicKeyValueStoreKey = Schema.NonEmptyString.pipe(
+  Schema.brand("AtomicKeyValueStoreKey")
+);
 export type AtomicKeyValueStoreKey = typeof AtomicKeyValueStoreKey.Type;
 
-export const AtomicKeyValueStoreValue = Schema.String;
+export const AtomicKeyValueStoreValue = Schema.String.pipe(
+  Schema.brand("AtomicKeyValueStoreValue")
+);
 export type AtomicKeyValueStoreValue = typeof AtomicKeyValueStoreValue.Type;
 
 export const AtomicKeyValueStoreTtl = Schema.Int.pipe(

@@ -1,26 +1,32 @@
 import { Config, Context, Duration, Effect, Layer, Schema } from "effect";
 
 import { CodexSubscriptionAuthError } from "./errors.js";
-import { CodexSubscriptionLoginInput } from "./schemas.js";
+import {
+  CodexOAuthConnectorId,
+  CodexOAuthInstallationId,
+  CodexOAuthPrincipalId,
+  CodexOAuthProfileId,
+  CodexSubscriptionLoginInput,
+} from "./schemas.js";
 import type { CodexSubscriptionLoginInput as CodexSubscriptionLoginInputType } from "./schemas.js";
 
 const principalIdConfig = Config.schema(
-  Schema.NonEmptyString,
+  CodexOAuthPrincipalId,
   "BUNDJIL_CODEX_PROFILE_PRINCIPAL_ID"
 );
 
 const connectorIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthConnectorId")),
+  CodexOAuthConnectorId,
   "BUNDJIL_CODEX_PROFILE_CONNECTOR_ID"
 ).pipe(Config.withDefault("bundjil-local"));
 
 const installationIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthInstallationId")),
+  CodexOAuthInstallationId,
   "BUNDJIL_CODEX_PROFILE_INSTALLATION_ID"
 ).pipe(Config.withDefault("agent-dev"));
 
 const profileIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthProfileId")),
+  CodexOAuthProfileId,
   "BUNDJIL_CODEX_PROFILE_ID"
 ).pipe(Config.withDefault("default"));
 
