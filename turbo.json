@@ -35,7 +35,8 @@
       ]
     },
     "@bundjil/agent#test": {
-      "env": ["BUNDJIL_EXECUTOR_MCP_URL"]
+      "dependsOn": ["^build"],
+      "env": ["BUNDJIL_EXECUTOR_MCP_URL", "BUNDJIL_EXECUTOR_API_KEY"]
     },
     "dev": {
       "cache": false,

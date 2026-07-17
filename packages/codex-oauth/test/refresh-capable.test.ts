@@ -213,6 +213,7 @@ it.effect(
           })
         );
         yield* Deferred.await(refreshStarted);
+        yield* Effect.yieldNow;
         yield* TestClock.adjust("1 second");
         const [winner, follower] = yield* Fiber.join(fiber);
         const observer = yield* getCodexOAuthObserverSnapshot;

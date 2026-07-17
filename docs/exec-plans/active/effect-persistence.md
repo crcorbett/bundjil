@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 3 accepted
+Status: Active - task 4 corrected Preview redeploy
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -34,7 +34,7 @@ clean-source, explicit approval, bounded proof, and rollback requirements.
 1. `implement-effect-persistence-contract-and-adapters`: completed.
 2. `migrate-codex-oauth-to-effect-persistence`: completed.
 3. `migrate-agent-delivery-idempotency-to-effect-persistence`: completed.
-4. `verify-persistence-preview-and-production-rollout`: pending.
+4. `verify-persistence-preview-and-production-rollout`: in progress.
 5. `reconcile-persistence-documentation-and-final-audit`: pending.
 
 ## Baseline
@@ -215,7 +215,36 @@ Status: Passed
 
 ### verify-persistence-preview-and-production-rollout
 
-Status: Pending
+Status: In progress
+
+Subagent: one Terra Medium verification worker; parent review required three
+correction rounds before a new clean Preview source could be accepted.
+
+#### Corrected Preview Source Gate
+
+Status: Passed; clean commit and redeploy pending.
+
+- The first clean Preview deployments reached `READY`, but Vercel Deployment
+  Protection redirected the public health probe. No authenticated stream,
+  provider write, Production promotion, handset turn, webhook change, or
+  synthetic replay was accepted from that attempt.
+- The Preview proof now loads the existing optional Vercel bypass through
+  redacted Effect Config, forwards it on every request, and records only the
+  existing Schema-encoded sanitized result. Success and blocked fixtures prove
+  that neither the internal bearer nor the bypass value is emitted.
+- The agent-specific Turbo test task now retains its upstream-build dependency
+  and declares both Executor configuration names. This prevents Eve from
+  resolving workspace output while those outputs are being rebuilt.
+- Parent review found a scheduler race in the contended-refresh test after the
+  graph fix. One Effect scheduler yield now lets the follower reach its
+  TestClock sleep before clock advancement; no timeout increase or live sleep
+  was added.
+- Parent verification passed the focused Preview proof suite with `22/22`
+  tests, the contended-refresh case ten consecutive times, the forced uncached
+  Turbo graph twice with `11/11` tasks, root verification, full build, Knip,
+  static scans, and whitespace checks.
+- The next action is a fresh isolated Preview deployment from the pushed clean
+  correction SHA. Production and the shared Sendblue webhook remain unchanged.
 
 ### reconcile-persistence-documentation-and-final-audit
 

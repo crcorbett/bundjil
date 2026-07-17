@@ -64,10 +64,18 @@ const fixtureSse = `data: ${encodeChatCompletionChunk(
   })
 )}\n\ndata: [DONE]\n\n`;
 
-const runProofFixture = async (authenticatedStatus: number) => {
+const runProofFixture = async (
+  authenticatedStatus: number,
+  protectionBypass?: string
+) => {
   const internalToken = "preview-proof-test-token";
+  const bypassHeaders: (string | undefined)[] = [];
   const server = createServer((request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
+    const bypassHeader = request.headers["x-vercel-protection-bypass"];
+    bypassHeaders.push(
+      Array.isArray(bypassHeader) ? bypassHeader.at(0) : bypassHeader
+    );
 
     if (url.pathname === "/health") {
       response.writeHead(200, { "content-type": "application/json" });
@@ -100,6 +108,16 @@ const runProofFixture = async (authenticatedStatus: number) => {
     throw new Error("Preview proof fixture did not bind a TCP port.");
   }
 
+  const env: typeof process.env = {
+    ...process.env,
+    BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: internalToken,
+    BUNDJIL_CODEX_PROXY_PREVIEW_URL: `http://127.0.0.1:${address.port}`,
+  };
+  delete env["BUNDJIL_CODEX_PROXY_VERCEL_BYPASS"];
+  if (protectionBypass !== undefined) {
+    env["BUNDJIL_CODEX_PROXY_VERCEL_BYPASS"] = protectionBypass;
+  }
+
   const child = spawn(
     "bun",
     [
@@ -107,11 +125,7 @@ const runProofFixture = async (authenticatedStatus: number) => {
       new URL("../scripts/prove-preview.ts", import.meta.url).pathname,
     ],
     {
-      env: {
-        ...process.env,
-        BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: internalToken,
-        BUNDJIL_CODEX_PROXY_PREVIEW_URL: `http://127.0.0.1:${address.port}`,
-      },
+      env,
     }
   );
   if (child.stderr === null || child.stdout === null) {
@@ -137,7 +151,7 @@ const runProofFixture = async (authenticatedStatus: number) => {
   server.close();
   await closed;
 
-  return { exitCode, stderr, stdout };
+  return { bypassHeaders, exitCode, stderr, stdout };
 };
 
 describe("preview proof", () => {
@@ -150,15 +164,38 @@ describe("preview proof", () => {
     assert.doesNotMatch(result.stdout, /Reply only: OK\./);
     assert.doesNotMatch(result.stdout, /fixture model body/);
     assert.equal(result.stderr, "");
+    assert.deepEqual(result.bypassHeaders, [
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("forwards the configured protection bypass without emitting it", async () => {
+    const result = await runProofFixture(200, "preview-proof-bypass-token");
+
+    assert.equal(result.exitCode, 0);
+    assert.deepEqual(result.bypassHeaders, [
+      "preview-proof-bypass-token",
+      "preview-proof-bypass-token",
+      "preview-proof-bypass-token",
+      "preview-proof-bypass-token",
+    ]);
+    assert.doesNotMatch(result.stdout, /preview-proof-bypass-token/);
+    assert.equal(result.stderr, "");
   });
 
   it("fails an unauthorized authenticated fixture instead of treating it as proof", async () => {
-    const result = await runProofFixture(401);
+    const protectionBypass = "preview-proof-blocked-bypass-token";
+    const result = await runProofFixture(401, protectionBypass);
 
     assert.equal(result.exitCode, 1);
     assert.equal(result.stdout, "");
     assert.match(result.stderr, /"status":"blocked"/);
     assert.doesNotMatch(result.stderr, /preview-proof-test-token/);
+    assert.doesNotMatch(result.stdout, /preview-proof-blocked-bypass-token/);
+    assert.doesNotMatch(result.stderr, /preview-proof-blocked-bypass-token/);
     assert.doesNotMatch(result.stderr, /fixture model body/);
   });
 });

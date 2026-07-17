@@ -213,7 +213,7 @@
     {
       "id": "verify-persistence-preview-and-production-rollout",
       "title": "Verify isolated Preview and approved Production rollout",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": [
         "migrate-codex-oauth-to-effect-persistence",
         "migrate-agent-delivery-idempotency-to-effect-persistence"

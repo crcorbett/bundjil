@@ -5,6 +5,7 @@ import {
   Data,
   Effect,
   Exit,
+  Option,
   Redacted,
   Schema,
 } from "effect";
@@ -21,6 +22,9 @@ declare const process: {
 const previewUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
 const internalTokenConfig = Config.redacted(
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
+);
+const protectionBypassConfig = Config.option(
+  Config.redacted("BUNDJIL_CODEX_PROXY_VERCEL_BYPASS")
 );
 
 const previewProofRequest = Schema.encodeSync(
@@ -100,29 +104,62 @@ const responseText = (response: Response) =>
 const program = Effect.gen(function* provePreview() {
   const previewUrl = yield* previewUrlConfig;
   const internalToken = yield* internalTokenConfig;
+  const protectionBypass = yield* protectionBypassConfig;
+  const makePreviewRequest = (
+    url: URL,
+    request: {
+      readonly authorization?: string;
+      readonly body?: string;
+      readonly method: "GET" | "POST";
+    }
+  ) => {
+    const headers = {
+      "content-type": "application/json",
+      ...(request.authorization === undefined
+        ? {}
+        : { authorization: request.authorization }),
+      ...(Option.isNone(protectionBypass)
+        ? {}
+        : {
+            "x-vercel-protection-bypass": Redacted.value(
+              protectionBypass.value
+            ),
+          }),
+    };
+
+    return new Request(url, {
+      headers,
+      method: request.method,
+      ...(request.body === undefined ? {} : { body: request.body }),
+    });
+  };
   const health = yield* fetchResponse(
-    new Request(new URL("/health", previewUrl))
+    makePreviewRequest(new URL("/health", previewUrl), { method: "GET" })
   );
   const healthBody = yield* responseText(health);
   const healthPayload = yield* Schema.decodeUnknownEffect(
     Schema.fromJsonString(CodexProxyHealthResponse)
   )(healthBody);
   const completionsUrl = new URL("/v1/chat/completions", previewUrl);
-  const makeCompletionRequest = (authorization?: string) =>
-    new Request(completionsUrl, {
+  const unauthenticated = yield* fetchResponse(
+    makePreviewRequest(completionsUrl, {
       body: previewProofRequest,
-      headers: {
-        "content-type": "application/json",
-        ...(authorization === undefined ? {} : { authorization }),
-      },
       method: "POST",
-    });
-  const unauthenticated = yield* fetchResponse(makeCompletionRequest());
+    })
+  );
   const invalid = yield* fetchResponse(
-    makeCompletionRequest("Bearer preview-proof-invalid")
+    makePreviewRequest(completionsUrl, {
+      authorization: "Bearer preview-proof-invalid",
+      body: previewProofRequest,
+      method: "POST",
+    })
   );
   const authenticated = yield* fetchResponse(
-    makeCompletionRequest(`Bearer ${Redacted.value(internalToken)}`)
+    makePreviewRequest(completionsUrl, {
+      authorization: `Bearer ${Redacted.value(internalToken)}`,
+      body: previewProofRequest,
+      method: "POST",
+    })
   );
   const authenticatedBody = yield* responseText(authenticated);
   const dataLines = authenticatedBody
@@ -151,7 +188,10 @@ const program = Effect.gen(function* provePreview() {
       authenticated.headers.get("content-type") === "text/event-stream",
     streamDataLines: dataLines.length,
     streamDone: authenticatedBody.includes("data: [DONE]"),
-    tokenLeak: authenticatedBody.includes(Redacted.value(internalToken)),
+    tokenLeak:
+      authenticatedBody.includes(Redacted.value(internalToken)) ||
+      (!Option.isNone(protectionBypass) &&
+        authenticatedBody.includes(Redacted.value(protectionBypass.value))),
     unauthenticatedStatus: unauthenticated.status,
   });
 
