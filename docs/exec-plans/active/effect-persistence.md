@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 2 accepted
+Status: Active - task 3 accepted
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -33,7 +33,7 @@ clean-source, explicit approval, bounded proof, and rollback requirements.
 
 1. `implement-effect-persistence-contract-and-adapters`: completed.
 2. `migrate-codex-oauth-to-effect-persistence`: completed.
-3. `migrate-agent-delivery-idempotency-to-effect-persistence`: pending.
+3. `migrate-agent-delivery-idempotency-to-effect-persistence`: completed.
 4. `verify-persistence-preview-and-production-rollout`: pending.
 5. `reconcile-persistence-documentation-and-final-audit`: pending.
 
@@ -168,7 +168,50 @@ Status: Passed
 
 ### migrate-agent-delivery-idempotency-to-effect-persistence
 
-Status: Pending
+Status: Completed
+
+Subagent: one Terra Medium implementation worker; parent acceptance required a
+correction pass to preserve historical prefixed claim keys and byte-exact
+stored replay records while using logical atomic keys.
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Replay keys, digests, claim IDs, record codecs, and delivery policy remain
+  app-owned. Redis construction, prefixing, provider commands, and failures now
+  belong only to the shared adapter composed once in `sendblue/live.layer.ts`.
+- Direct Redis imports, client interfaces, Lua, response decoders, and the
+  process-local production implementation were removed. Channel, route,
+  identity, webhook, model, Executor, and provider behavior did not change.
+
+#### Parent Audit Pass 2 - Effect Quality And Helper Admission
+
+Status: Passed
+
+- Claims and transitions are named linear Effects using exhaustive `Match`,
+  canonical Schema string encoding, positive Duration TTLs, and atomic
+  absent/equals plus set/remove transactions.
+- Historical full prefixed claim/record keys are preserved byte-for-byte;
+  validated logical suffixes alone cross into atomic persistence, so the shared
+  adapter applies the prefix exactly once.
+- Retained helpers own repeated record/key construction or the persisted-claim
+  compatibility boundary. Custom mutable memory state and provider helpers were
+  removed; static scans found no SDK, Lua, raw JSON, unsafe cast, suppression,
+  raw tag branch, switch, or local Effect execution in the changed domain.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Persistence passed 23/23 tests; agent passed typecheck, build, and 56/56
+  tests, including exact record strings, concurrent claims, lease/retention
+  expiry, retryable removal, uncertain retention, stale fencing, invalid-prefix
+  rejection, and unchanged channel/route outcomes.
+- Root check, Knip, full verification across seven workspaces, static ownership
+  scans, and whitespace checks passed with no actionable language-service
+  diagnostics. The direct environment-free agent test failed closed only on
+  required Executor config and passed with the ignored environment loaded.
 
 ### verify-persistence-preview-and-production-rollout
 

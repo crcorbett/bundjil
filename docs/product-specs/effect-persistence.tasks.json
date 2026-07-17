@@ -161,7 +161,7 @@
     {
       "id": "migrate-agent-delivery-idempotency-to-effect-persistence",
       "title": "Migrate agent delivery idempotency to the atomic persistence contract",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-effect-persistence-contract-and-adapters"],
       "description": "Keep the app-owned delivery state machine while replacing direct Upstash calls with AtomicKeyValueStore transactions and preserving every external behavior.",
       "implementationNotes": [
@@ -201,8 +201,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: replay keys, records, digests, claim IDs, and delivery policy remain app-owned; one shared adapter in sendblue live composition owns Redis construction, prefixing, commands, and failures; direct SDK, client interfaces, Lua, response decoders, and process-local production state were removed without channel, route, identity, webhook, model, or Executor changes.",
+          "Effect quality and helper admission: claim and transition operations are named linear Effects over canonical Schema strings, exhaustive Match, Duration TTLs, and atomic absent or equals transactions; historical prefixed claim and record keys remain byte-exact while validated logical suffixes prevent double prefixing; retained helpers own repeated construction or the compatibility boundary; forbidden-pattern scans are clean.",
+          "Verification and evidence: 23 persistence tests and 56 agent tests passed with focused typecheck and build; exact records, concurrency, expiry, retryable removal, uncertain retention, stale fencing, invalid prefixes, and route outcomes are covered; root check, Knip, full seven-workspace verification, static scans, and whitespace checks passed without actionable language-service diagnostics."
+        ]
       },
       "commitAfterPassing": true
     },

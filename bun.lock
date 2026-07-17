@@ -24,9 +24,9 @@
       "version": "0.1.0",
       "dependencies": {
         "@ai-sdk/openai-compatible": "^3.0.5",
+        "@bundjil/effect-persistence": "workspace:*",
         "@bundjil/eve-effect": "workspace:*",
         "@effect/platform-bun": "catalog:effect",
-        "@upstash/redis": "^1.38.0",
         "ai": "^7.0.16",
         "effect": "catalog:effect",
         "eve": "0.20.0",

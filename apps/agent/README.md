@@ -305,6 +305,10 @@ and otherwise uses the Vercel Marketplace `KV_REST_API_URL` and
 `BUNDJIL_SENDBLUE_TEST_API_BASE_URL` is restricted to tests/local fixtures.
 Never put values in commands, docs, test fixtures, or commits.
 
+The agent owns replay keys, records, claim IDs, and delivery policy. Its one
+configured shared persistence adapter owns the Upstash client, prefix
+application, atomic transaction execution, and provider failure boundary.
+
 ### Local Verification And Operations
 
 ```bash
