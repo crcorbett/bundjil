@@ -270,6 +270,15 @@ Status: Passed; clean commit and redeploy pending.
   verification, full build, Knip, and whitespace checks pass. A new clean
   Preview from the correction SHA is required before any agent Preview or
   Production action.
+- A later clean agent Preview redeploy did not auto-detect Turbo and instead
+  ran the app-local build, where Eve could not resolve an upstream workspace
+  artifact. An immediately preceding source-equivalent Preview that did detect
+  Turbo succeeded, so platform detection is not a reliable deployment graph.
+  The agent now owns an explicit Vercel build command that enters the workspace
+  root and runs the filtered Turbo build, preserving the existing upstream
+  dependency graph and Eve `.vercel/output` behavior. A Schema-decoded agent
+  packaging test protects that command. No deployment, binding, provider,
+  webhook, or Production state changed during this correction.
 
 ### reconcile-persistence-documentation-and-final-audit
 

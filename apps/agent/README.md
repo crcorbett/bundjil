@@ -396,6 +396,11 @@ tree and prewarm Eve sandbox templates on every Vercel build. A cached task can
 replay logs without restoring that deployment artifact, causing Vercel to fall
 back to the configured `public` directory and reject the deployment.
 
+`vercel.json` explicitly enters the workspace root and runs the filtered root
+Turbo build. This keeps the upstream workspace build graph deterministic before
+the app-local Eve build emits `.vercel/output`; hosted deployment must not rely
+on platform Turbo auto-detection.
+
 Use the encrypted Preview values already bound to the Vercel project. Do not
 pass bearer values through shell history, commit them, or add them to source.
 `eve deploy` targets production and `vercel deploy --prebuilt` skips Eve's
