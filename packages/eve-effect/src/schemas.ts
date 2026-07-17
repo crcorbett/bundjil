@@ -1,18 +1,14 @@
+import {
+  BundjilPackageName as CoreBundjilPackageName,
+  BundjilWorkspaceName as CoreBundjilWorkspaceName,
+} from "@bundjil/core";
 import { Schema } from "effect";
+
+export { BundjilPackageName, BundjilWorkspaceName } from "@bundjil/core";
 
 export const BundjilWorkspaceStatusQuestion = Schema.NonEmptyString;
 export type BundjilWorkspaceStatusQuestion =
   typeof BundjilWorkspaceStatusQuestion.Type;
-
-export const BundjilWorkspaceName = Schema.NonEmptyString.pipe(
-  Schema.brand("BundjilWorkspaceName")
-);
-export type BundjilWorkspaceName = typeof BundjilWorkspaceName.Type;
-
-export const BundjilPackageName = Schema.NonEmptyString.pipe(
-  Schema.brand("BundjilPackageName")
-);
-export type BundjilPackageName = typeof BundjilPackageName.Type;
 
 export const BundjilAgentSummary = Schema.NonEmptyString;
 export type BundjilAgentSummary = typeof BundjilAgentSummary.Type;
@@ -54,8 +50,8 @@ export const WorkspaceStatusInput = Schema.Struct({
 export type WorkspaceStatusInput = typeof WorkspaceStatusInput.Type;
 
 export const WorkspaceStatusSuccess = Schema.Struct({
-  workspaceName: BundjilWorkspaceName,
-  packageNames: Schema.Array(BundjilPackageName),
+  workspaceName: CoreBundjilWorkspaceName,
+  packageNames: Schema.Array(CoreBundjilPackageName),
   agentSummary: BundjilAgentSummary,
 });
 

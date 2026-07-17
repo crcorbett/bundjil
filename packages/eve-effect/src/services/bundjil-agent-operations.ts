@@ -27,7 +27,16 @@ export const BundjilAgentOperationsLive = Layer.effect(
       "BundjilAgentOperationsLive.getWorkspaceStatus"
     )((input: WorkspaceStatusInput) =>
       Effect.gen(function* getWorkspaceStatus() {
-        const workspace = yield* makeWorkspaceSummary();
+        const workspace = yield* makeWorkspaceSummary().pipe(
+          Effect.mapError(
+            (cause) =>
+              new BundjilAgentSchemaError({
+                boundary: "WorkspaceSummary",
+                message: "Unable to decode workspace summary.",
+                cause,
+              })
+          )
+        );
 
         return yield* Schema.decodeUnknownEffect(WorkspaceStatusSuccess)({
           workspaceName: workspace.name,

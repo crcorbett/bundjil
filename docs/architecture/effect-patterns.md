@@ -204,6 +204,15 @@ helpers merely to satisfy nominal types. A consumer imports the owner's Schema
 instead of redefining `id: string`, `type: string`, `status: string`, or an
 equivalent field.
 
+Do not create `common`, `utils`, or helper modules that collect unrelated
+Schemas or manufacture brands. A named Schema belongs with the owner of the
+concept; a parser-local transport fragment stays local to the one operation
+that decoded its enclosing boundary. Production Effect programs use
+`Schema.decodeUnknownEffect` or `Schema.decodeEffect`, not `decodeSync`.
+When a decoded literal or tagged union already exists, use `Match` for
+material branching rather than raw equality or discriminant checks. This does
+not replace framework-owned typed event maps with a manual dispatcher.
+
 Framework-owned event-map keys remain framework dispatch. For example,
 `"message.completed"` is a literal event discriminant, not a branded string;
 its projected payload and any persisted coordinates are decoded through the

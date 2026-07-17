@@ -24,6 +24,19 @@ Committed Vercel Eve app for the first Bundjil agent slice.
   Gateway by default and that Codex proxy mode sends private bearer auth only
   to the proxy.
 
+## String Contracts
+
+The app owns canonical Sendblue identities, replay coordinates, phone and
+provider values as checked brands; provider/channel states as named literals;
+message values as named content Schemas; and credentials as redacted secret
+Schemas. It reuses `@bundjil/eve-effect` and `@bundjil/codex-oauth` contracts
+instead of duplicating their fields. Decode complete webhook, config, and
+completed-event projections at their boundaries, encode outbound provider
+values, and use `Match` for material decoded unions. Tagged errors and the
+read-only deployment preflight retain checked diagnostic/transport strings.
+Do not add shared schema helpers, unsafe brand assertions, production
+`decodeSync`, or raw discriminant branching where a decoded union exists.
+
 ## Provider State
 
 Implemented:

@@ -27,8 +27,6 @@ export {
 } from "./schemas.js";
 export type {
   BundjilAgentSummary as BundjilAgentSummaryType,
-  BundjilPackageName as BundjilPackageNameType,
-  BundjilWorkspaceName as BundjilWorkspaceNameType,
   BundjilWorkspaceStatusQuestion as BundjilWorkspaceStatusQuestionType,
   EveAssistantMessageContent as EveAssistantMessageContentType,
   EveAssistantStepFinishReason as EveAssistantStepFinishReasonType,
@@ -40,6 +38,10 @@ export type {
   WorkspaceStatusToolInput as WorkspaceStatusToolInputType,
   WorkspaceStatusToolSuccess as WorkspaceStatusToolSuccessType,
 } from "./schemas.js";
+export type {
+  BundjilPackageName as BundjilPackageNameType,
+  BundjilWorkspaceName as BundjilWorkspaceNameType,
+} from "@bundjil/core";
 export {
   BundjilAgentOperations,
   BundjilAgentOperationsLive,

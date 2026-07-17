@@ -1,7 +1,7 @@
 {
   "title": "Effect Schema String Contracts Tasks",
   "spec": "docs/product-specs/effect-schema-string-contracts.md",
-  "status": "planned",
+  "status": "implemented",
   "principles": [
     "Every boundary string references a canonical owner-named Effect Schema.",
     "Open semantic values are branded; closed vocabularies are literal Schemas; content, secrets, transport primitives, and diagnostics are classified rather than mechanically branded.",
@@ -11,6 +11,10 @@
     "Forbid helper sprawl, DTO mirrors, unsafe casts, local brand constructors, and generic schema utility modules."
   ],
   "globalVerification": [
+    "bun run --filter @bundjil/core check-types",
+    "bun run --filter @bundjil/core test",
+    "bun run --filter @bundjil/effect-start check-types",
+    "bun run --filter @bundjil/effect-start test",
     "bun run --filter @bundjil/effect-persistence check-types",
     "bun run --filter @bundjil/effect-persistence test",
     "bun run --filter @bundjil/codex-oauth check-types",
@@ -143,14 +147,15 @@
     {
       "id": "reconcile-string-contract-docs-and-final-audit",
       "title": "Reconcile documentation and run the final string-contract audit",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "brand-persistence-and-codex-boundary-values",
         "type-eve-sendblue-and-proxy-boundaries"
       ],
-      "description": "Re-run the inventory, reconcile package/app docs, and prove the complete repository follows the accepted classification without behavior drift.",
+      "description": "Re-run the inventory, reconcile package/app docs, and prove the complete repository follows the accepted classification without behavior drift, including the core-owned WorkspaceSummary boundary.",
       "implementationNotes": [
         "Update package/app READMEs only where public contracts or boundary rules changed.",
+        "Record @bundjil/core as the owner of workspace/package contracts and state that @bundjil/effect-start owns no string-domain contracts.",
         "Record every remaining anonymous string exception with owner and category; remove stale duplicates.",
         "Run the complete repository gate and static scans.",
         "Do not perform live provider proof because runtime behavior and configuration are unchanged."
@@ -168,8 +173,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: the final seven-workspace inventory found and corrected core's exported raw WorkspaceSummary strings; core now owns workspace/package brands and the fixed package literal vocabulary, Eve reuses the exact contracts, Effect Start owns no domain strings, and every remaining anonymous string is classified as private transport or diagnostic data.",
+          "Effect quality and helper admission: complete structures decode through owner Schemas, material decoded unions use Match, the exported default package API remains readonly and Schema-typed, and final scans found no unsafe cast, suppression, as-const constructor, switch, raw JSON helper, production decodeSync, DTO mirror, or new helper/common/utils module.",
+          "Verification and evidence: focused and root gates passed with 3 core, 6 Effect Start, 23 persistence, 103 Codex OAuth, 4 Eve Effect, 60 agent, and 24 proxy tests; formatting/check across 421 files, Knip, seven-workspace typecheck, full verification, full build, task JSON parse, static scans, and whitespace checks all passed with no frontend or provider mutation."
+        ]
       },
       "commitAfterPassing": true
     }

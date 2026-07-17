@@ -37,6 +37,18 @@ WorkspaceStatusSuccess
 The package exports schema-derived TypeScript types. Consumers should import
 the schema or type from this package instead of defining DTO mirrors.
 
+## String Contracts
+
+`@bundjil/core` owns and this package re-exports the exact
+`BundjilWorkspaceName` and `BundjilPackageName` brands. `EveSessionId` and
+`EveTurnId` remain Eve-boundary brands. Questions, summaries, and assistant
+message content are named checked content Schemas, while completed-event and
+finish-reason values are named literals. Decode the complete tool or projected
+Eve payload once at the edge, encode outward, and use `Match` for material
+decoded-union branches. Keep Eve's typed event map framework-owned; do not add
+raw discriminant dispatch, helper/common schema modules, unsafe brand
+assertions, or production `decodeSync` constructors.
+
 ## Tagged Errors
 
 Current tagged errors:

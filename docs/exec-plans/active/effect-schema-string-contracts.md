@@ -1,6 +1,6 @@
 # Effect Schema String Contracts Implementation Plan
 
-Status: In progress
+Status: Completed
 
 Spec: `docs/product-specs/effect-schema-string-contracts.md`
 Task ledger: `docs/product-specs/effect-schema-string-contracts.tasks.json`
@@ -28,6 +28,7 @@ records at least three accepted passes before completing each task.
 
 | Owner                         | Contract family                                                                 | Current state                        | Required category                                                      |
 | ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------- |
+| `@bundjil/core`               | workspace/package identities and `WorkspaceSummary`                             | raw cross-package strings            | brand; fixed package vocabulary literal                                |
 | `@bundjil/effect-persistence` | atomic key, serialized value                                                    | anonymous string                     | brand                                                                  |
 | `@bundjil/effect-persistence` | outcome, operation, condition/mutation tags                                     | literals/tags                        | literal                                                                |
 | `@bundjil/codex-oauth`        | profile, connector, installation, revision, key ID, model, endpoint, prefix     | existing brands                      | brand; retain                                                          |
@@ -44,6 +45,7 @@ records at least three accepted passes before completing each task.
 | `apps/agent`                  | replay prefix/provider URL/media/group/status payload                           | anonymous strings                    | brand, named transport, or literal per provider authority              |
 | `apps/codex-proxy`            | mode/error/service                                                              | literals                             | literal; retain                                                        |
 | `apps/codex-proxy`            | local directory                                                                 | anonymous string                     | brand or named path contract                                           |
+| `@bundjil/effect-start`       | no Bundjil string-domain contract                                               | generic middleware glue              | none; import an owner contract when needed                             |
 | all owners                    | tagged error message/cause text                                                 | anonymous checked strings            | diagnostic; do not brand                                               |
 | parsers/adapters              | header values, JSON/SSE lines, serialized bytes                                 | strings                              | named boundary Schema where exported; parser-local transport otherwise |
 
@@ -176,4 +178,93 @@ Status: Passed
 
 ## Task 4 - Documentation And Final Audit
 
-Status: Pending
+Status: Completed
+
+### Final Inventory (2026-07-18)
+
+Inventory method: scanned actual non-test TypeScript Schema declarations,
+service/persistence structures, and app-owned config boundaries in the seven
+scoped owners. This is an ownership inventory, not a claim that every local
+prose or parser variable is branded.
+
+| Owner                         | Canonical contract families found                                                                                                                                                                                           | Categories                                             | Boundary treatment                                                                                                                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@bundjil/effect-persistence` | `AtomicKeyValueStoreKey`/`Value`; transaction outcome and operation; Upstash prefix/options                                                                                                                                 | brand, literal, secret, transport, diagnostic          | Complete atomic transactions decode before native/Upstash work; encoded key/value bytes remain unchanged.                                                                                           |
+| `@bundjil/codex-oauth`        | OAuth/profile/principal/URI/scope/cipher/model/function/call/completion identities; profile/request/stream vocabularies; redacted OAuth/cipher/proxy/Upstash credentials; response content, bodies, headers, and SSE values | brand, literal, content, secret, transport, diagnostic | Complete OAuth, provider, persistence, and proxy structures decode at their package boundary; recognized literal unions use `Match`; unknown provider kinds remain forward-compatible transport.    |
+| `@bundjil/core`               | workspace/package identities; `WorkspaceSummary`; fixed current package vocabulary                                                                                                                                          | brand, literal                                         | `makeWorkspaceSummary` decodes the complete default/custom-name summary; its parse failure crosses to Eve as the existing schema error.                                                             |
+| `@bundjil/effect-start`       | None                                                                                                                                                                                                                        | n/a                                                    | Generic TanStack Start middleware glue owns no Bundjil string-domain contract.                                                                                                                      |
+| `@bundjil/eve-effect`         | re-exported core workspace/package identities; session/turn identities; completed event and finish reasons; question, summary, and assistant content                                                                        | brand, literal, content, diagnostic                    | Complete tool and projected Eve payloads decode once; core summary parse failures translate to `BundjilAgentSchemaError`; the framework event map remains Eve-owned and decoded unions use `Match`. |
+| `apps/agent`                  | Sendblue phone/handle/principal/conversation/claim/replay/media/status values; channel/replay/result/status vocabularies; inbound/outbound content; webhook/API/replay/routing credentials                                  | brand, literal, content, secret, transport, diagnostic | Complete webhook, config, and Eve-completed projections decode before delivery/replay work; outbound provider values encode through their owner Schema and decoded unions use `Match`.              |
+| `apps/codex-proxy`            | local profile-store directory; mode/health/error vocabulary; diagnostic message; imported Codex subject/account/token/model/request/stream contracts                                                                        | brand, literal, diagnostic                             | Complete HTTP/config structures decode at the app boundary and canonical HTTP/SSE values encode outward; Codex semantics remain package-owned.                                                      |
+
+### Intentional Anonymous `Schema.String` Exceptions
+
+These are the remaining direct anonymous string declarations in scoped
+non-test code. They are deliberately local/private fields, not missing public
+semantic contracts.
+
+| Owner                         | Location / field family                                                                                                                                | Category              | Reason                                                                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@bundjil/core`               | None                                                                                                                                                   | n/a                   | Workspace/package contracts are owner-named Schemas; the fixed package input is decoded through the named literal vocabulary.                |
+| `@bundjil/effect-start`       | None                                                                                                                                                   | n/a                   | Generic middleware glue owns no Bundjil string-domain contract.                                                                              |
+| `@bundjil/effect-persistence` | `src/upstash-layer.internal.ts`: `UpstashGetResponse`, scan cursor/keys, atomic command `keys`/`args`                                                  | transport             | Private Upstash wire/script fragments after the enclosing atomic transaction has decoded; no exported domain identity exists.                |
+| `@bundjil/effect-persistence` | `src/errors.ts`: tagged-error `message`                                                                                                                | diagnostic            | Safe error text is checked but is not an identifier.                                                                                         |
+| `@bundjil/codex-oauth`        | `src/errors/*.ts`: tagged-error `message`; HTTP `statusText`/`contentType`; subscription `providerCode`                                                | diagnostic, transport | Sanitized failure text and provider response metadata are not reusable domain identities.                                                    |
+| `@bundjil/codex-oauth`        | `src/schemas.ts`: OAuth provider error response `error`, `error_description`, nested `code`/`message`                                                  | transport, diagnostic | Narrow provider-error decode is used only to validate/sanitize the wire response.                                                            |
+| `@bundjil/codex-oauth`        | `src/oauth-token-metadata.ts`: JWT compact-token segments                                                                                              | transport             | Parser-local JWT framing is decoded inside token metadata processing; token ownership remains redacted at the outer boundary.                |
+| `@bundjil/codex-oauth`        | `scripts/*.ts`: proof/import result `message` and `errorTag` fields                                                                                    | diagnostic            | Operator-only sanitized CLI result output is neither persisted nor part of a package service contract.                                       |
+| `@bundjil/eve-effect`         | `src/errors/schema-error.ts`, `gateway-config-error.ts`, and `operation-error.ts`: `message` and config `setting`                                      | diagnostic            | Tagged-error context is safe checked text, not a cross-boundary semantic value.                                                              |
+| `apps/agent`                  | `agent/lib/executor/config.ts` and `agent/lib/sendblue/errors/*.ts`: `message`, `reason`, and webhook `boundary`                                       | diagnostic            | Sanitized config/channel failure context is intentionally not branded.                                                                       |
+| `apps/agent`                  | `agent/production-preflight.ts`: read-only Vercel variable `name`, cipher key id, report `checks`/`rejected`; deployment/source/fingerprint validators | transport, diagnostic | Local proof/report parsing has no application service or persisted contract; checked values remain within the read-only preflight operation. |
+| `apps/codex-proxy`            | None                                                                                                                                                   | n/a                   | Its remaining direct string Schemas are owner-named `CodexProxyLocalProfileStoreDirectory` and `CodexProxyDiagnosticMessage`.                |
+
+The named but unbranded content, transport, secret, and diagnostic Schemas are
+intentional. The rule is owner-named checked contracts at exported or
+cross-boundary surfaces, not nominal brands for prose, encrypted values, wire
+fragments, or errors.
+
+### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed after one correction round
+
+- The repository-wide review expanded the original five-owner scope to all
+  seven workspaces. It found `@bundjil/core` exporting raw workspace/package
+  strings, corrected ownership there, and confirmed `@bundjil/effect-start`
+  owns no Bundjil string-domain contract.
+- Core now owns `BundjilWorkspaceName`, `BundjilPackageName`, the fixed package
+  literal vocabulary, and schema-derived `WorkspaceSummary`. Eve re-exports
+  and reuses those exact contracts and translates core parse failure into its
+  existing `BundjilAgentSchemaError` boundary.
+- Every remaining direct anonymous string declaration is listed above as a
+  private transport fragment or safe diagnostic, with no unexplained exported
+  or persisted semantic field.
+
+### Parent Audit Pass 2 - Effect Quality And Helper Admission
+
+Status: Passed after one correction round
+
+- `makeWorkspaceSummary` decodes the closed default package vocabulary and the
+  complete branded summary through Effect Schema. The existing exported
+  `defaultWorkspacePackages` API remains readonly and typed from the named
+  literal Schema.
+- Owner READMEs and architecture rules require boundary decode/encode,
+  canonical imports, and `Match` for material decoded unions while forbidding
+  constructor/helper sprawl, DTO mirrors, unsafe brands, production
+  `decodeSync`, and manual framework dispatch.
+- Final static scans found no new assertion, suppression, `as const`, raw JSON
+  helper, `switch`, production synchronous decoder, Promise escape, or
+  helper/common/utils module.
+
+### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Focused checks, tests, and builds passed for all changed owners: 3 core, 6
+  Effect Start, 23 persistence, 103 Codex OAuth, 4 Eve Effect, 60 agent, and 24
+  proxy tests.
+- Root formatting/type-aware check passed across 421 files with zero findings;
+  Knip, seven-workspace typecheck, full verification, full build, task-ledger
+  JSON parse, static scans, and `git diff --check` passed.
+- No frontend, route, deployment, provider, webhook, OAuth-profile,
+  persistence namespace, or Vercel configuration changed. Live-provider and
+  browser proof are therefore not applicable.

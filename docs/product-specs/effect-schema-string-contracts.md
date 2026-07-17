@@ -1,9 +1,10 @@
 # Effect Schema String Contracts
 
-- Status: Ready for implementation
-- Owners: `@bundjil/effect-persistence`, `@bundjil/codex-oauth`,
-  `@bundjil/eve-effect`, `apps/agent`, `apps/codex-proxy`
-- Last reviewed: 2026-07-17
+- Status: Implemented
+- Owners: `@bundjil/core`, `@bundjil/effect-persistence`,
+  `@bundjil/effect-start`, `@bundjil/codex-oauth`, `@bundjil/eve-effect`,
+  `apps/agent`, `apps/codex-proxy`
+- Last reviewed: 2026-07-18
 
 ## Decision
 
@@ -55,8 +56,9 @@ inconsistent:
   and content types are plain strings or duplicated redacted strings.
 - `AtomicKeyValueStoreKey` and `AtomicKeyValueStoreValue` are currently plain
   strings despite crossing the public persistence service boundary.
-- `@bundjil/eve-effect` exposes workspace names, package names, prompts, and
-  summaries as anonymous `Schema.NonEmptyString` fields.
+- `@bundjil/core` exposes `WorkspaceSummary` as raw `name: string` and
+  `packages: readonly string[]`, while Eve independently brands those
+  cross-package workspace semantics.
 - Several operations decode a canonical union and then branch with raw
   equality checks or `as const` results even where exhaustive `Match` over the
   decoded discriminant is clearer.
@@ -187,6 +189,18 @@ literal.
 
 ## Ownership
 
+### `@bundjil/core`
+
+Own reusable framework-neutral workspace and package identities and the
+schema-derived `WorkspaceSummary` boundary. The fixed current package set is a
+named closed literal vocabulary; `makeWorkspaceSummary` decodes its complete
+default/custom-name structure through Effect Schema.
+
+### `@bundjil/effect-start`
+
+Own no Bundjil string-domain contracts. It remains generic TanStack Start
+middleware glue and must import an owning boundary contract when one is needed.
+
 ### `@bundjil/effect-persistence`
 
 Own branded atomic keys and opaque serialized values. Branding is compile-time
@@ -206,7 +220,8 @@ wire-compatible.
 
 Own reusable Bundjil Eve operation input/output strings and any reusable Eve
 session, turn, message, or event contracts that are framework-neutral enough
-for more than one app boundary. It must not mirror Eve's entire protocol.
+for more than one app boundary. It re-exports core-owned workspace/package
+contracts for its tool boundary and must not mirror Eve's entire protocol.
 
 ### `apps/agent`
 
@@ -290,7 +305,8 @@ unknown fixture
 
 ## Verification
 
-- Focused typechecks/tests/builds for all five owners.
+- Focused typechecks/tests/builds for all seven scoped owners where they own
+  runtime code; `@bundjil/effect-start` has no string-domain change.
 - Schema round-trip tests for every new brand and extracted literal/content
   contract, including cross-brand compile-time separation where practical.
 - Compatibility fixtures for persisted keys/values, encrypted profiles,

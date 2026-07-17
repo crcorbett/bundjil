@@ -338,7 +338,7 @@ bun run --filter @bundjil/agent test
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspaceStatusTool.execute(...)
   -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
-  -> @bundjil/core defaultWorkspacePackages
+  -> @bundjil/core makeWorkspaceSummary -> WorkspaceSummary decode
 
 bun run --filter @bundjil/agent test
   -> apps/agent/test/model-provider.test.ts

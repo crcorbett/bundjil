@@ -7,6 +7,7 @@ export const BundjilAgentOperationName = Schema.Literals([
 export type BundjilAgentOperationName = typeof BundjilAgentOperationName.Type;
 
 export const BundjilAgentSchemaBoundary = Schema.Literals([
+  "WorkspaceSummary",
   "WorkspaceStatusInput",
   "WorkspaceStatusSuccess",
   "WorkspaceStatusToolInput",
