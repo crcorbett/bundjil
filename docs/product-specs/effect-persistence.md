@@ -1,6 +1,6 @@
 # Effect Persistence
 
-- Status: Draft
+- Status: Implemented
 - Proposed owner: `@bundjil/effect-persistence`
 - Consumers: `@bundjil/codex-oauth`, `apps/agent`
 - Last reviewed: 2026-07-17
@@ -844,6 +844,7 @@ proof are release blockers.
 Implementation must update:
 
 - root `README.md` and `ARCHITECTURE.md`;
+- `docs/README.md`;
 - `docs/architecture/effect-patterns.md`;
 - `docs/architecture/repo-structure.md`;
 - `docs/architecture/testing-and-quality.md`;
@@ -883,3 +884,21 @@ storage is not conversation history or Workflow persistence.
   passes for any unresolved ownership, implementation, or proof finding.
 - Isolated Preview proof passes before any approved Production promotion, and
   Production acceptance includes rollback and bounded live evidence.
+
+## Implementation Record
+
+Tasks 1 through 4 are completed with their preserved rollout evidence in the
+task ledger and active execution plan. Task 5 reconciles the current package
+and app ownership after those migrations; earlier Codex-owned Upstash adapter
+and pre-acceptance rollout statements are historical context, not current
+architecture. The shared package now owns native `KeyValueStore` composition,
+the atomic transaction contract, and its explicit `/memory` and `/upstash`
+subpaths. Codex and Sendblue retain logical keys, codecs, retention policy,
+and domain transitions.
+
+Compatibility means retaining the final physical Redis key, canonical encoded
+value, and TTL. Adapter prefixes are applied once at the provider boundary.
+Codex encrypted profile state and Sendblue replay/idempotency state are private
+durable records, not conversation history, Eve session streams, or Workflow
+storage. Monitoring and deployment proof remain sanitized; rollback restores
+the retained deployment or provider binding without namespace clearing.

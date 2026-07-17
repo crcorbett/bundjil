@@ -75,26 +75,27 @@ README.
 - Operating modes: `mock` is the default and never calls Codex; `local` is an
   access-token-only encrypted filesystem proof rejected by Vercel; `live` is
   the refresh-capable encrypted Upstash composition for the personal Vercel
-  preview project only.
-- Preview scope: `apps/codex-proxy` is linked to the
+  Preview and Production deployments.
+- Deployment scope: `apps/codex-proxy` is linked to the
   `bundjil-codex-proxy` project under Cooper's personal Vercel account, not
-  Tilt Legal. A combined Eve-to-hosted-live-proxy Preview session is accepted;
-  Bundjil did not configure or deploy production. Marketplace Upstash
-  credentials may nevertheless be auto-bound to production and must not be
-  treated as a production approval.
-- Storage: `@bundjil/codex-oauth/upstash-key-value-store.layer` provides an
-  opt-in Upstash Redis adapter behind Effect `KeyValueStore`. `live` stores a
-  versioned encrypted subscription profile, refreshes under a distributed
-  lock, and fenced-CAS commits credential generations. The ID token is decoded
-  during trusted-local login and is never persisted. The separate `local`
-  workaround stores only an encrypted short-lived access-token profile.
+  Tilt Legal. Preview proof is historical. Accepted Production evidence covers
+  one deployed Eve-to-live-proxy completion and the bounded Task 4 rollout;
+  it is not a standing provider probe or approval for later deployment changes.
+- Storage: `@bundjil/effect-persistence/upstash` provides native Effect
+  `KeyValueStore` plus `AtomicKeyValueStore` through one provider adapter.
+  `@bundjil/codex-oauth` owns profile keys, encrypted codecs, and refresh
+  policy. `live` stores a versioned encrypted subscription profile, refreshes
+  under a distributed lock, and fenced-CAS commits credential generations. The
+  ID token is decoded during trusted-local login and is never persisted. The
+  separate `local` workaround stores only an encrypted short-lived access-token
+  profile.
 - JSON boundaries: app and package code should use Effect Schema codecs such
   as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
 - Unsupported paths: do not treat Codex OAuth as an OpenAI Platform API key,
   do not route it through Vercel AI Gateway credentials, and do not expose the
   proxy publicly. Browser authorization and loopback callbacks remain
-  trusted-local only; the proxy exposes no hosted OAuth routes. The accepted
-  combined hosted Preview proof does not approve Production.
+  trusted-local only; the proxy exposes no hosted OAuth routes. Historical
+  Preview and accepted Production proof do not approve later changes.
 
 ## Planned Docs
 

@@ -1,7 +1,7 @@
 {
   "title": "Effect Persistence Tasks",
   "spec": "docs/product-specs/effect-persistence.md",
-  "status": "in_progress",
+  "status": "implemented",
   "principles": [
     "Use Effect v4 native KeyValueStore for ordinary persistence and one supplemental AtomicKeyValueStore service for atomic conditions, mutations, and TTL.",
     "Keep the shared package provider-, channel-, OAuth-, workflow-, and messaging-agnostic; domain policy remains with Codex OAuth and the agent channel.",
@@ -262,7 +262,7 @@
     {
       "id": "reconcile-persistence-documentation-and-final-audit",
       "title": "Reconcile documentation and complete the final Effect audit",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["verify-persistence-preview-and-production-rollout"],
       "description": "Update current architecture, package/app runbooks, SPEC evidence, and task status, then perform the mandatory repository-wide three-pass audit.",
       "implementationNotes": [
@@ -297,8 +297,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: current docs and source confirm the shared package owns provider-neutral atomic and coherent native/atomic Layers plus the only SDK/provider protocol; Codex owns encrypted profile keys/codecs/refresh/Effect Config composition, the proxy owns runtime/private HTTP config and hosted composition, and the agent owns replay config/keys/records/TTL/delivery/channel runtime. Current-doc stale scans are clean; no frontend, app-route, or provider mutation occurred.",
+          "Implementation quality and helper admission: the expanded ledger matches actual declarations, including corrected Upstash client/construction and Sendblue Layer ownership. Every new non-test Schema/type/error/service/function/Layer/export/subpath/CLI proof/package/deployment config has a named family and a multiple-use or material boundary admission reason. Static scans found no prohibited implementation patterns, helper sprawl, or stale compatibility export.",
+          "Verification, docs, and rollback: with the protected local Executor environment loaded, fix, check, Knip, verification, build, task JSON parse, and whitespace checks passed across all workspaces. Accepted suites were 23 persistence, 103 Codex OAuth, 24 proxy, and 57 agent tests. Current-doc ownership, coordination, config, and no-frontend scans passed; Task 4 retains rollout and rollback evidence. Browser and live-provider checks were not repeated because Task 5 is docs/status-only and provider mutation was prohibited."
+        ]
       },
       "commitAfterPassing": true
     }

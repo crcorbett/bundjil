@@ -4,10 +4,12 @@
 
 For the Codex subscription path, canonical schemas, tagged errors, Context
 services, explicit Layers, `Config`/`Redacted`, scoped loopback resources,
-`KeyValueStore`, refresh locking, and fenced commits remain package-owned in
-`@bundjil/codex-oauth`. `apps/codex-proxy` owns only app config and private HTTP
-composition. Do not recreate profile DTOs, token mappers, or OAuth routes in
-either app; Vercel must not host browser OAuth or account linking.
+native `KeyValueStore` composition, refresh locking, and fenced commits remain
+package-owned in `@bundjil/codex-oauth`; provider-neutral persistence contracts
+and adapters belong to `@bundjil/effect-persistence`. `apps/codex-proxy` owns
+only app config and private HTTP composition. Do not recreate profile DTOs,
+token mappers, or OAuth routes in either app; Vercel must not host browser OAuth
+or account linking.
 
 Bundjil uses Effect for code that can fail, cross an async boundary, depend on
 runtime services, read configuration, or form a durable integration contract.
@@ -106,6 +108,34 @@ local DTO converters, pass-through services, or generic `utils`, `helpers`,
 `common`, and `shared` modules. Do not abstract for possible future reuse. The
 implementation audit must inspect new abstractions and inline those without a
 clear owner and concrete value.
+
+## Persistence
+
+Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary
+string and binary persistence. Treat its unstable import path as a contract
+tested by `@bundjil/effect-persistence`; `KeyValueStore.modify` is not an
+atomic coordination operation. Claims, leases, fencing, compare-and-remove,
+and multi-key transitions use the canonical
+`AtomicKeyValueStore.transact` service instead.
+
+The root persistence contract is provider-neutral. Consumers opt into
+`@bundjil/effect-persistence/memory` for deterministic tests or
+`@bundjil/effect-persistence/upstash` for hosted storage. The `/upstash`
+subpath alone owns the SDK, prefix application, command syntax, response
+decoding, and safe provider errors. Composition owners decode bindings through
+Effect `Config`/`Config.redacted`: `@bundjil/codex-oauth` owns Codex
+profile/Upstash composition, `apps/codex-proxy` owns runtime mode/private HTTP
+config, and `apps/agent` owns replay/provider config. The shared persistence
+adapter receives schema-decoded redacted options and never reads process
+environment values.
+
+Logical key derivation belongs to the domain owner, while the adapter owns its
+prefix. Compatibility changes must prove the final physical key, canonical
+encoded value, and TTL before rollout. Persistence values are encrypted
+profiles or minimal opaque replay records, never conversation history, session
+streams, or Workflow state. Logs and proof output contain only safe metadata;
+rollback restores the retained deployment or provider binding and never uses
+namespace clearing as a coordination or recovery mechanism.
 
 ## Static Analysis
 

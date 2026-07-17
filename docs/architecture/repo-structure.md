@@ -12,7 +12,8 @@ apps/
 
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
-  codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and KV adapters.
+  codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and codecs.
+  effect-persistence/ Provider-neutral native/atomic persistence and adapters.
   effect-start/       Reusable TanStack Start middleware adapters for Effect.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
@@ -38,6 +39,9 @@ needs it.
 - `@bundjil/eve-effect` owns reusable Eve operation contracts and the Effect
   Schema bridge to Eve.
 - `@bundjil/effect-start` owns generic TanStack Start middleware glue only.
+- `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
+  supplemental `AtomicKeyValueStore`, and explicit memory/Upstash Layers. It
+  owns no OAuth, replay, or channel policy.
 
 Do not create broad shared packages to avoid choosing ownership. A second
 caller is a signal to inspect the concept, not automatic permission to invent
@@ -101,6 +105,12 @@ email, Vercel Connect, and Notion code should likewise start in app-owned
 boundaries. Move shared contracts into packages only after the shape has
 survived at least one real tool/channel implementation.
 
+`apps/agent` keeps Sendblue replay keys, record schemas, TTL policy, and
+delivery decisions app-owned. It composes the shared persistence `/upstash`
+Layer from app-owned redacted config. Replay/idempotency storage is not Eve
+conversation history, session-stream persistence, or a generic Workflow store;
+the adapter must preserve the pre-existing physical key, encoded value, and TTL.
+
 The Executor MCP connection is also app-owned: `agent/lib/executor/config.ts`
 owns its Effect Config endpoint policy and redacted bearer, while
 `agent/connections/executor.ts` is the thin Eve framework adapter. It does not
@@ -157,15 +167,14 @@ plane.
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;
-- owns explicit storage adapter subpaths such as
-  `@bundjil/codex-oauth/upstash-key-value-store.layer` when they provide
-  reusable Effect `KeyValueStore` implementations;
+- composes `@bundjil/effect-persistence` for native and atomic persistence;
+  it owns Codex logical keys, encrypted profile codecs, and refresh policy,
+  not the Upstash client or provider adapter;
 - owns the trusted-local access-token-only importer and encrypted filesystem
   adapter; that cache-reading boundary must stay out of app routes, Vercel,
   Eve, CI, and browser code;
 - may depend on Effect and Effect v4 `KeyValueStore` primitives;
-- may depend on provider SDKs such as `@upstash/redis` only behind explicit
-  adapter subpaths and Effect Config/Layer boundaries;
+- must not depend on `@upstash/redis` or reintroduce a provider adapter;
 - must not import Eve, app files, Vercel deployment code, Sendblue,
   Cloudflare, Notion, OpenClaw, or Goose implementations;
 - must keep live/mock layers on explicit package subpaths when provider

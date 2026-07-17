@@ -5,10 +5,10 @@
 Gateway remains the default Eve provider. `BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy`
 selects an app-owned Effect Config path that builds a private
 OpenAI-compatible `LanguageModel`. Production evidence verifies one deployed
-Eve request through the private live proxy. The current isolated Preview also
-has source-correlated live-proxy, Executor model-approval, Sendblue owner
-continuation, non-owner rejection, and replay-suppression evidence. Earlier
-adapter proofs remain distinct historical evidence for their own environments.
+Eve request through the private live proxy. The isolated Preview evidence and
+Task 4's accepted bounded Production handset evidence are historical rollout
+records, not standing provider probes. Earlier adapter proofs remain distinct
+historical evidence for their own environments.
 
 This guide documents the committed Bundjil Eve app and the Effect package
 boundary it uses. Sendblue is a Production-verified app-owned channel with one
@@ -115,9 +115,12 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
-`@bundjil/codex-oauth` and `apps/codex-proxy` now participate in the optional
-Codex proxy model path:
+`@bundjil/effect-persistence`, `@bundjil/codex-oauth`, and
+`apps/codex-proxy` now participate in the optional Codex proxy model path:
 
+- `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
+  `AtomicKeyValueStore`, and the explicit Upstash adapter. Native `modify` is
+  not used for coordination.
 - `@bundjil/codex-oauth` owns the direct Codex Responses package contracts,
   OpenAI-compatible request/stream schemas, direct provider service, private
   proxy service, and redacted internal-token schema.
@@ -218,9 +221,9 @@ For the shared Sendblue account, exactly one active receive webhook targets the
 stable Production route. The Preview receive entry and its dedicated Sendblue
 automation bypass were revoked on 2026-07-16 after provider readback. Earlier
 dual-webhook behavior is historical evidence of account-level fan-out, not a
-current environment-routing design. The next handset-originated proof must
-verify the complete Production path before this operational correction is
-accepted.
+current environment-routing design. Task 4's bounded handset-originated proof
+accepted the complete Production path; repeat proof is required only for a
+future deployment or routing change.
 
 ## Production Call Graph
 

@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 5 documentation reconciliation pending
+Status: Complete
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -35,7 +35,7 @@ clean-source, explicit approval, bounded proof, and rollback requirements.
 2. `migrate-codex-oauth-to-effect-persistence`: completed.
 3. `migrate-agent-delivery-idempotency-to-effect-persistence`: completed.
 4. `verify-persistence-preview-and-production-rollout`: completed.
-5. `reconcile-persistence-documentation-and-final-audit`: pending.
+5. `reconcile-persistence-documentation-and-final-audit`: completed.
 
 ## Baseline
 
@@ -407,4 +407,130 @@ Status: Passed
 
 ### reconcile-persistence-documentation-and-final-audit
 
-Status: Pending
+Status: Completed
+
+#### Subagent Review Input 1 - Ownership And Call Graph
+
+- Current documentation places native `KeyValueStore`, `AtomicKeyValueStore`,
+  explicit `/memory` and `/upstash` Layers, and the only Upstash SDK dependency
+  in `@bundjil/effect-persistence`.
+- `@bundjil/codex-oauth` owns Codex profile/Upstash Effect Config composition,
+  encrypted profile logical keys/codecs, and refresh policy.
+  `apps/codex-proxy` owns runtime mode and private HTTP config; `apps/agent`
+  owns replay/provider config, keys, records, TTL policy, and delivery
+  transitions. The shared adapter receives schema-decoded redacted options and
+  owns no environment reads.
+- The former Codex adapter and pre-acceptance rollout statements are preserved
+  as historical evidence, while Task 4's accepted proof supersedes pending
+  handset language. No route, hook, TSX, React, visible text, or provider
+  mutation was made.
+
+#### Subagent Review Input 2 - Implementation Quality And Helper Admission
+
+- Symbol-level review covered every new non-test abstraction introduced by this
+  SPEC: persistence Schemas/errors/services/Layers, Codex profile and refresh
+  services, proxy composition, and Sendblue replay domain services.
+- Each retained symbol either has multiple concrete consumers or owns a
+  material Schema, Layer, provider, crypto, or domain-policy boundary. No
+  concrete unresolved implementation defect was found; documentation-only
+  correction was therefore preferred and no abstraction was removed/inlined.
+- Current-source scans found no consumer `@upstash/redis` import, old Codex
+  adapter import, `KeyValueStore.modify` coordination, direct agent SDK
+  ownership, old dependency location, or current pending-rollout claim outside
+  preserved historical evidence.
+
+##### Symbol-Level Admission Ledger
+
+| Scope                                                                      | Named family reviewed                                                                                                                             | Admission or removal outcome                                                                                                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/effect-persistence/src/schemas.ts`, `errors.ts`                  | Public `AtomicKeyValueStoreKey`/`Value`/`Ttl`/condition/mutation/transaction/outcome/operation Schema and type family; `AtomicKeyValueStoreError` | Canonical public persistence contract and safe tagged error; admitted as the package boundary.                                                                           |
+| `atomic-key-value-store.service.ts`                                        | `AtomicKeyValueStoreShape`, service, internal/public transaction decode operations                                                                | One service contract plus boundary revalidation; admitted as the material atomic coordination boundary.                                                                  |
+| `memory.layer.ts`                                                          | Persistence state, expiry cleanup, native `get`, atomic `transact`, native adapter, `PersistenceMemory` Layer                                     | Coherent native/atomic test-store implementation; one-use internals admitted as state/expiry boundary, not generic helpers.                                              |
+| `upstash-options.ts`, `upstash-client.internal.ts`                         | Redacted options Schema, prefix validation, provider client interface/factory type                                                                | Provider configuration/client contract; adapter accepts decoded options and performs no environment read.                                                                |
+| `upstash-layer.internal.ts`                                                | Provider response/command Schemas, static transaction script, physical-key helper, serializer, scan/error/transact construction, internal factory | Admitted as the private validated provider protocol. Static script/serializer and one-use constructions own Redis safety and compatibility, not convenience abstraction. |
+| `upstash.layer.ts`, root/subpath exports                                   | Redis construction with telemetry/automatic-deserialization policy, `UpstashPersistenceLive`, package root, `/memory`, and `/upstash` exports     | Explicit consumer-selected Layer/subpath boundary; old Codex adapter compatibility export was removed in Task 2.                                                         |
+| `packages/codex-oauth/src/atomic-persistence.layer.ts`                     | Codex JSON codecs, conflict/error constructors, `transactProfileCommit`, profile and refresh Layers                                               | Material encrypted-profile, fencing, and refresh-policy boundary; admitted even where one-use because it owns crypto/domain correctness.                                 |
+| `upstash-persistence.layer.ts`                                             | Config constants, Effect Config loader, `CodexUpstashPersistenceLive` composition Layer                                                           | Codex owns profile/Upstash composition and passes decoded options to the shared adapter; no provider command wrapper remains.                                            |
+| `apps/agent/agent/lib/sendblue/replay-store.service.ts`                    | Replay record codec, key/record/claim/transition helpers, service factory, `SendblueReplayStoreLive`, and `SendblueReplayStoreMemory`             | App-owned idempotency and delivery domain boundary; no generic replay/persistence abstraction admitted.                                                                  |
+| `apps/agent/agent/lib/sendblue/live.layer.ts`, channel runtime composition | `SendbluePersistenceLive`, merged services, `SendblueChannelRuntimeLive`, and `ManagedRuntime` edge composition                                   | Provider wiring and app channel runtime boundary; no separate Sendblue memory-layer file exists.                                                                         |
+| `apps/codex-proxy/src/live.layer.ts`                                       | Proxy live composition symbols                                                                                                                    | App-owned private HTTP live composition; no new provider or persistence service added.                                                                                   |
+| `apps/codex-proxy/scripts/prove-preview.ts` and proof contracts            | Preview proof Config/Schemas/tagged error, fetch-text Promise boundaries, request constructor, Effect program, CLI exit boundary                  | One-use symbols admitted because they own the safe CLI/proof boundary; no generic HTTP/proof helper was introduced.                                                      |
+| Package root/subpath manifests and deployment config                       | `package.json` exports, Vercel/Turbo packaging config files                                                                                       | Material module-resolution and deployment packaging boundary; retained as explicit configuration, not runtime helper code.                                               |
+
+No ledger entry exposed a concrete implementation defect. The obsolete Codex
+adapter/export and its tests were removed during Task 2; this Task 5 review
+found no remaining one-call wrapper or stale compatibility export to inline.
+Modified Codex operational scripts were reviewed as Layer rewiring only; they
+added no generic helper. `packages/effect-persistence/README.md`,
+`apps/agent/README.md`, and `apps/codex-proxy/README.md` were reviewed and
+were already current, so Task 5 required no edit to them.
+
+#### Subagent Review Input 3 - Verification, Documentation, And Rollback
+
+- Root/docs/package/app runbooks now distinguish ordinary native persistence
+  from atomic coordination, identify config and provider-subpath ownership,
+  and state physical-key, encoded-value, and TTL compatibility requirements.
+- Documentation explicitly distinguishes encrypted profile and replay storage
+  from conversation/session/Workflow persistence, limits monitoring/proof to
+  sanitized metadata, and forbids namespace clearing as rollback.
+- Required Task 5 checks, task-ledger parse, stale-claim scans, and whitespace
+  checks are recorded with their results below. Browser screenshots are not
+  applicable because no frontend source changed. These are review inputs only;
+  the parent must perform and record acceptance after review.
+
+##### Subagent Command Record
+
+- Passed with `.local/secrets/executor-production.env` mode `0600` loaded:
+  `bun run fix`, `bun run check`, `bun run knip`, `bun run verification`, and
+  `bun run build`. Verification covered all seven workspaces; the persisted
+  suites report 23 persistence, 103 Codex OAuth, 24 proxy, and 57 agent tests.
+- Passed: task-ledger JSON parse, focused stale-ownership/path scans,
+  frontend-change invariant scan, and `git diff --check`.
+- Deliberately skipped: Browser screenshots and live/provider proof. This is a
+  documentation/status-only task with no TSX/React/route/hook/visible-text
+  change, and Task 5 must not mutate Vercel, Sendblue, Executor, OAuth,
+  storage, or another provider.
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Current docs and source confirm that the shared package owns the
+  provider-neutral atomic contract, coherent native/atomic Layers, and the
+  only SDK/provider protocol.
+- Codex owns encrypted profile keys/codecs, refresh, and Effect Config
+  composition; the proxy owns runtime/private HTTP config and hosted
+  composition; the agent owns replay config, keys, records, TTL, delivery, and
+  channel runtime.
+- Current-doc stale scans found no removed adapter path, Preview-only Production
+  statement, pending handset claim, or nonexistent test path. Only the shared
+  package imports and depends on `@upstash/redis`; no frontend, app route, or
+  provider mutation occurred.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- The expanded ledger was checked against actual declarations and corrected for
+  Upstash client versus construction ownership and Sendblue live/memory
+  locations.
+- Every new non-test Schema/type/error/service/function/Layer/export/subpath,
+  CLI proof, package, and deployment config has a named family and a
+  multiple-use or material Schema/provider/crypto/domain/CLI/packaging boundary
+  admission reason. Modified Codex scripts only rewire Layers.
+- Static scans found no prohibited implementation patterns, unresolved helper
+  sprawl, or stale compatibility export.
+
+#### Parent Audit Pass 3 - Verification, Documentation, And Rollback
+
+Status: Passed
+
+- With the protected local Executor environment loaded, fix, check, Knip,
+  verification, build, task JSON parse, and whitespace checks passed across all
+  workspaces. Accepted suites were 23 persistence, 103 Codex OAuth, 24 proxy,
+  and 57 agent tests.
+- Current-doc ownership, SDK/dependency, coordination, config, and no-frontend
+  scans passed. Task 4 retains accepted storage, stream/replay, handset,
+  safe-log, clean-source, and rollback evidence.
+- Browser and live-provider checks were not repeated because Task 5 is
+  docs/status-only and provider mutation was prohibited.

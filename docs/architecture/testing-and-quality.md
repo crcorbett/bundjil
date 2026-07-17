@@ -28,6 +28,8 @@ bun run --filter @bundjil/effect-start test
 bun run --filter @bundjil/eve-effect test
 bun run --filter @bundjil/codex-oauth test
 bun run --filter @bundjil/codex-oauth build
+bun run --filter @bundjil/effect-persistence test
+bun run --filter @bundjil/effect-persistence build
 bun run --filter @bundjil/codex-oauth proof:codex-responses
 bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy check-types
@@ -39,8 +41,10 @@ bun run --filter @bundjil/agent build
 
 ## Scope Rules
 
-- Docs-only change: run `bun run check` and targeted `rg` checks for links,
-  paths, and renamed files.
+- Docs-only change: run `bun run fix`, `bun run check`, focused link/path and
+  stale-ownership scans, and `git diff --check`. When a SPEC mandates the
+  repository closeout gate, also run `knip`, `verification`, and `build` with
+  the required ignored local environment loaded.
 - Package schema or export change: run that package's `check-types`, tests, and
   build, then root `bun run verification`.
 - Eve tool change: run `@bundjil/eve-effect` tests when contracts change,
@@ -73,10 +77,19 @@ config, deployment, or durable docs must record the 3-pass Effect TS audit:
    secrets, explicit layers, and no unsafe casts, DTO mirrors, manual object
    readers, or helper sprawl.
 3. Verification coverage: targeted commands, root commands, local/proxy/live
-   proof, preview-before-production evidence, leak scans, and docs updates.
+   proof, preview-before-production evidence, leak scans, docs updates, and
+   deliberately skipped checks with their reasons.
 
 Do not mark a task accepted just because three entries exist. If an audit pass
 finds a gap, fix it and record another pass.
+
+For persistence work, verify native `KeyValueStore` and
+`AtomicKeyValueStore.transact` independently, scan for
+`KeyValueStore.modify`/get-then-set coordination and consumer SDK imports, and
+assert physical-key, encoded-value, TTL, privacy, replay, and rollback claims.
+Replay records are not conversation/session/Workflow storage. Deployment proof
+and monitoring may retain only safe statuses, counts, source correlation, and
+leak booleans; do not use `clear` or `size` as coordination or recovery.
 
 ## Effect Test Patterns
 

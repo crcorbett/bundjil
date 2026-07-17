@@ -46,9 +46,13 @@ its earlier proofs are historical evidence, not the current Production state.
   tools.
 - `@bundjil/codex-oauth` owns the Codex subscription profile/token lifecycle,
   trusted-local loopback PKCE login, encrypted profile envelope, fenced
-  persistence and refresh services, direct Codex Responses proof surface, and
-  opt-in Upstash Redis `KeyValueStore` adapter. It does not own a hosted
-  browser OAuth callback or account-linking flow.
+  persistence and refresh services, and direct Codex Responses proof surface.
+  It composes shared persistence services; it does not own an Upstash adapter
+  or hosted browser OAuth callback/account-linking flow.
+- `@bundjil/effect-persistence` owns provider-neutral
+  `AtomicKeyValueStore` contracts plus coherent native Effect `KeyValueStore`
+  memory and Upstash Layers. Its `/memory` and `/upstash` subpaths keep
+  provider selection out of the root contract.
 - `@bundjil/codex-proxy` is the private Effect HTTP proxy app. It exposes
   `GET /health` and a bearer-token-protected
   `POST /v1/chat/completions` route with explicit mock, local, and live
@@ -228,6 +232,7 @@ apps/
 packages/
   core/              Framework-neutral Bundjil domain primitives.
   codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
+  effect-persistence/ Native and atomic persistence contracts/adapters.
   effect-start/      TanStack Start adapter for Effect HTTP programs.
   eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
@@ -256,6 +261,29 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
   ownership/call graph, implementation quality, and verification coverage.
 - JSON string boundaries in app/package code must use Effect Schema codecs such
   as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
+- Use native `KeyValueStore` only for ordinary persistence. Its `modify` is
+  not coordination: locks, claims, fences, and concurrent transitions use
+  `AtomicKeyValueStore.transact`.
+
+## Persistence Boundaries
+
+`@bundjil/effect-persistence` owns the provider-neutral atomic transaction
+contract and the only `@upstash/redis` dependency. `apps/codex-proxy` owns
+runtime mode selection; `@bundjil/codex-oauth` owns Codex
+profile/environment/key-policy composition; and `apps/agent` owns Sendblue
+replay config and delivery policy. The shared `/upstash` adapter owns
+schema-decoded redacted provider options, client construction, prefixing,
+commands, and provider failures. Codex profile keys and Sendblue replay-key
+suffixes remain domain-owned so existing physical Redis keys, encoded values,
+and TTLs stay compatible.
+
+Sendblue replay/idempotency records protect provider dispatch and delivery.
+They are not Eve conversation history, session streams, or Workflow storage.
+Store only encrypted profiles or minimal opaque replay records; monitoring and
+deployment proof retain statuses, counts, source/deployment correlation, and
+leak booleans, never values or message content. A persistence incident rolls
+back through the retained deployment/runbook and provider-managed bindings;
+it does not clear a namespace or rewrite durable records as recovery.
 
 ## Roadmap
 

@@ -30,7 +30,7 @@ Implemented:
   JSON boundaries.
 - Memory/mock layers for automated tests.
 - Opt-in direct Codex Responses proof with sanitized output.
-- Codex-owned hosted persistence configuration composed through
+- Codex-specific hosted persistence composition through
   `@bundjil/effect-persistence` native `KeyValueStore` and
   `AtomicKeyValueStore` services.
 - `CodexOAuthProfileCommit` with atomic create, replacement, refresh, and
@@ -89,10 +89,9 @@ Also implemented:
 - Separate refresh-capable and legacy direct-provider layers keep hosted
   `live` strict while preserving the trusted filesystem `local` path.
 
-Future:
-
-- Personal Vercel preview deployment and sanitized hosted proof.
-- Eve integration after the hosted proof is accepted.
+Historical note: the former Preview proof and the subsequent Production Eve
+integration are accepted rollout evidence. They do not make a retained
+deployment a standing test or change the package's ownership boundary.
 
 Unsupported:
 

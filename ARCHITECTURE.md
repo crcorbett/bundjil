@@ -21,7 +21,11 @@ Implemented:
   composition is proven through Production Eve.
 - `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
-  memory layers, and the opt-in Upstash Redis `KeyValueStore` adapter.
+  memory layers, and Codex-specific persistence composition over shared native
+  and atomic persistence services.
+- `@bundjil/effect-persistence` owns provider-neutral native Effect
+  `KeyValueStore` and supplemental `AtomicKeyValueStore` contracts, coherent
+  memory Layer, and explicit Upstash Layer.
 
 Future:
 
@@ -80,8 +84,12 @@ apps/agent
 @bundjil/codex-oauth
   -> effect
   -> effect/unstable/persistence/KeyValueStore
-  -> @upstash/redis only through explicit KeyValueStore adapter subpath
+  -> @bundjil/effect-persistence
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
+
+@bundjil/effect-persistence
+  -> effect/unstable/persistence/KeyValueStore
+  -> @upstash/redis only through its explicit /upstash subpath
 
 apps/codex-proxy
   -> effect/unstable/http
@@ -110,7 +118,9 @@ storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It also owns the explicit
-`upstash-key-value-store.layer` adapter for Vercel Marketplace Upstash Redis.
+shared `@bundjil/effect-persistence/upstash` composition for Vercel Marketplace
+Upstash Redis. The package owns profile keys and refresh policy, not provider
+commands, prefixing, or client construction.
 It owns the trusted-local loopback PKCE exchange and encrypted hosted
 subscription-profile lifecycle. Browser interaction is never composed into a
 Vercel function.
@@ -177,7 +187,8 @@ Sendblue receive webhook
   -> POST /eve/v1/sendblue/webhook
   -> apps/agent/agent/channels/sendblue.ts
   -> app-owned ManagedRuntime and SendblueChannel
-  -> header verification -> Schema decode -> identity -> opaque route -> Upstash claim
+  -> header verification -> Schema decode -> identity -> opaque route
+  -> AtomicKeyValueStore replay claim through the shared Upstash Layer
   -> Eve send under waitUntil
   -> message.completed -> outbound claim -> SendblueClient -> Sendblue API
 ```
@@ -188,8 +199,9 @@ provider and replay layers with deterministic memory layers. The CLI/local path
 starts `eve dev --no-ui` and exercises the same authored channel with local
 test configuration. The shared Sendblue account now has one active Production
 receive webhook; Preview dual-webhook evidence is historical and its dedicated
-Sendblue bypass is revoked. A fresh handset proof of the corrected topology
-remains pending.
+Sendblue bypass is revoked. Task 4's bounded Production handset proof accepted
+the corrected topology; it is historical rollout evidence, not a standing
+provider probe.
 
 Schema boundary:
 
@@ -235,11 +247,15 @@ Vitest
   -> injected fetch proof for bearer auth and no token body leak
 
 Vitest
-  -> packages/codex-oauth/test/upstash-key-value-store.test.ts
-  -> mocked Upstash-like client
-  -> @bundjil/codex-oauth/upstash-key-value-store.layer
-  -> effect/unstable/persistence/KeyValueStore
-  -> CodexProfileStoreKeyValueLive compatibility
+  -> packages/effect-persistence/test/upstash-key-value-store.test.ts
+  -> packages/effect-persistence/test/upstash-atomic-key-value-store.test.ts
+  -> mocked Upstash client through @bundjil/effect-persistence/upstash
+  -> native KeyValueStore + AtomicKeyValueStore compatibility
+
+Consumer suites
+  -> packages/codex-oauth/test/persistence.test.ts
+  -> apps/agent/test/sendblue-replay-store.test.ts
+  -> Codex profile and Sendblue replay compatibility
 ```
 
 Hosted preview proof path:
@@ -266,6 +282,15 @@ Vercel preview request
   Connect tokens or app-owned runtime bindings at the edge.
 - Preserve readback and replay paths. Channel webhooks should be observable and
   testable without needing to mutate live personal data.
+- Use native `KeyValueStore` for ordinary persistence only. Its `modify` is not
+  atomic coordination; use `AtomicKeyValueStore.transact` for claims, locks,
+  fencing, and concurrent transitions.
+- The adapter owns provider prefixing, clients, commands, and failures; Codex
+  and Sendblue own logical keys and policy. This preserves physical Redis keys,
+  canonical encoded values, and TTL behavior without double prefixing.
+- Replay records are delivery/idempotency state, not Eve conversation history,
+  session streams, or Workflow persistence. Monitor only safe statuses/counts
+  and roll back deployments or bindings without clearing durable namespaces.
 - Put app-specific framework code in `apps/*`; move shared logic into packages
   only when it is stable and reusable.
 
@@ -291,8 +316,10 @@ boundaries first. Move shared contracts into `@bundjil/core` or
 - `bun run --filter @bundjil/agent test` proves Gateway default selection and
   private proxy provider construction without live credentials.
 - `bun run --filter @bundjil/codex-oauth test` proves profile storage,
-  request/stream mapping, direct proof boundaries, and the mocked Upstash
-  `KeyValueStore` adapter.
+  request/stream mapping, direct proof boundaries, and shared persistence
+  composition.
+- `bun run --filter @bundjil/effect-persistence test` proves native/atomic
+  persistence compatibility and the mocked Upstash adapter.
 
 Every implementation task touching Effect runtime, provider, storage, or app
 boundaries must complete and record the mandatory 3-pass Effect TS audit:
