@@ -82,6 +82,19 @@
         "vitest": "catalog:testing",
       },
     },
+    "packages/effect-persistence": {
+      "name": "@bundjil/effect-persistence",
+      "version": "0.1.0",
+      "dependencies": {
+        "@upstash/redis": "^1.38.0",
+        "effect": "catalog:effect",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:effect",
+        "typescript": "catalog:typescript",
+        "vitest": "catalog:testing",
+      },
+    },
     "packages/effect-start": {
       "name": "@bundjil/effect-start",
       "version": "0.1.0",
@@ -179,6 +192,8 @@
     "@bundjil/codex-proxy": ["@bundjil/codex-proxy@workspace:apps/codex-proxy"],
 
     "@bundjil/core": ["@bundjil/core@workspace:packages/core"],
+
+    "@bundjil/effect-persistence": ["@bundjil/effect-persistence@workspace:packages/effect-persistence"],
 
     "@bundjil/effect-start": ["@bundjil/effect-start@workspace:packages/effect-start"],
 

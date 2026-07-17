@@ -1,0 +1,294 @@
+{
+  "title": "Effect Persistence Tasks",
+  "spec": "docs/product-specs/effect-persistence.md",
+  "status": "in_progress",
+  "principles": [
+    "Use Effect v4 native KeyValueStore for ordinary persistence and one supplemental AtomicKeyValueStore service for atomic conditions, mutations, and TTL.",
+    "Keep the shared package provider-, channel-, OAuth-, workflow-, and messaging-agnostic; domain policy remains with Codex OAuth and the agent channel.",
+    "Preserve physical Redis keys, canonical encoded values, namespace prefixes, TTL behavior, leases, conflict outcomes, and stale-owner fencing.",
+    "The Upstash SDK, Lua, command syntax, response decoding, and provider failures belong only to the explicit provider adapter subpath.",
+    "Consumer Config owns environment-variable names and passes schema-decoded redacted options to the provider Layer.",
+    "Primary operations are flat named Effects with tagged error translation in pipe; runtime execution and Layer construction stay at executable and composition edges.",
+    "Canonical Effect Schema contracts derive every boundary type; raw JSON, unsafe casts, DTO mirrors, manual object readers/mappers, and stringly operation states are forbidden.",
+    "Public persistence errors contain only stable operations and safe messages; provider causes, rejected transaction data, keys, values, and raw responses are discarded at the adapter boundary.",
+    "Helper sprawl is forbidden: do not add convenience claim/lock/replay/repository wrappers unless multiple concrete call sites remain clearer and the abstraction owns real policy.",
+    "No React, visible route, or operator dashboard is in scope; any frontend requires a separate SPEC following frontend-composition.md and Browser verification.",
+    "Do not log or retain keys, values, Redis arguments, credentials, OAuth subjects, phone numbers, message content, provider payloads, or protected URLs."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/effect-persistence check-types",
+    "bun run --filter @bundjil/effect-persistence test",
+    "bun run --filter @bundjil/effect-persistence build",
+    "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth build",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run check",
+    "bun run knip",
+    "bun run verification",
+    "bun run build",
+    "git diff --check",
+    "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
+    "Root oxlint.config.ts, oxfmt.config.ts, tsconfig.base.json, and knip.json remain authoritative; no package-local lint/format config, weakened compiler option, broad ignore, eslint-disable, oxlint-disable, @ts-ignore, @ts-nocheck, unexplained @ts-expect-error, as any, or double assertion is added",
+    "Every provider Promise is captured by Effect.tryPromise; no Promise is floated/discarded, no domain operation is async, Effect execution remains at framework, script, test, or app composition edges, and provider/Schema/persistence failures are not hidden with orDie, ignore, untyped catchAll, or fallback success values",
+    "Static scans find no direct @upstash/redis import outside @bundjil/effect-persistence, no coordination through KeyValueStore.modify/get-then-set, and no raw JSON, process.env provider package reads, unsafe casts, DTO mirrors, dynamic Lua, broad lint suppressions, or helper modules",
+    "Every new non-test helper/factory/mapper/adapter/service/Schema alias has multiple real call sites, owns a material boundary, or isolates a tested algorithm; otherwise it is inlined or removed",
+    "Compatibility tests prove exact physical keys, encoded values, TTL equivalence, namespace isolation, Codex profile fencing, refresh-lock ownership, and delivery replay transitions",
+    "No React/component/visible route files change; otherwise stop for a separate frontend SPEC and Browser verification",
+    "Isolated Preview proof precedes any Production rollout and registers no second webhook on the shared Sendblue account/line",
+    "Any approved Production rollout records clean-source deployment, protected-route checks, bounded Codex and handset proof, duplicate suppression, leak scans, and immutable rollback evidence"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record distinct parent passes for ownership/call graph, Effect implementation quality/helper admission, and verification/evidence coverage. Add passes while any atomicity, compatibility, privacy, Layer composition, deployment, or documentation finding remains unresolved."
+  },
+  "tasks": [
+    {
+      "id": "implement-effect-persistence-contract-and-adapters",
+      "title": "Implement the provider-neutral persistence package and adapters",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Create @bundjil/effect-persistence with the canonical AtomicKeyValueStore transaction contract, coherent memory Layer, and explicit Upstash Layer that also provides Effect's native KeyValueStore.",
+      "implementationNotes": [
+        "Scaffold the package with the repo's source export condition, build/typecheck/test scripts, strict tsconfig inheritance, Effect language-service support, and no app/framework dependency.",
+        "Define AtomicKeyValueStoreKey, Value, Ttl, Condition, Mutation, Transaction, Outcome, Operation, and AtomicKeyValueStoreError as canonical Effect Schemas/schema-derived types; TTL is a positive finite whole-millisecond Duration, and the Upstash subpath owns Schema.Redacted URL/token options plus a prefix that rejects Redis glob metacharacters.",
+        "Expose one AtomicKeyValueStore.transact operation and re-decode its canonical transaction Schema at the public operation boundary in memory and Upstash. Validate non-empty collections of at most 32 conditions and 32 mutations, unique condition keys, unique mutation keys, and positive finite integer millisecond TTL before state mutation or provider I/O.",
+        "Implement the public PersistenceMemory Layer backed by one SynchronizedRef state and Clock so native KeyValueStore and AtomicKeyValueStore observe the same values and expiries; every atomic transaction performs expiry cleanup, condition evaluation, and all mutations in one SynchronizedRef.modify snapshot.",
+        "Use Effect Array/HashSet or another justified Effect-native collection path for bounded duplicate-key validation instead of ad hoc mutable collection helpers.",
+        "Implement UpstashPersistenceLive(options), accepting schema-decoded redacted URL/token and prefix options; use one Layer.effectContext or one private backing-client Layer so a Layer build constructs exactly one telemetry-disabled, non-deserializing client and provides both services from it.",
+        "Implement prefix-scoped clear/size by decoding every SCAN page, de-duplicating keys with Effect HashSet, collecting before delete, and documenting weak consistency under concurrent writes; never use these maintenance operations for coordination.",
+        "Use one static provider transaction program with Schema-encoded or positional arguments. Never expose eval/client/Lua through public exports and never generate command source from user data.",
+        "Map provider and Schema failures to safe tagged errors without keys, values, arguments, payloads, credentials, rejected input, raw responses, or unknown causes; native KeyValueStoreError values omit optional key and cause fields.",
+        "Do not add claim/lock/replay/repository convenience services, generic helpers/common modules, pass-through wrappers, or env loading."
+      ],
+      "mandatoryVerification": [
+        "Primary operations are flat meaningful Effect.gen/Effect.fn programs; typed errors are handled in outer pipe with catchTag/catchTags/mapError.",
+        "All boundary contracts are canonical Effect Schemas with derived types; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, switch/instanceof protocol branching, or trivial helpers.",
+        "Provider unknown is decoded exactly once, Redacted.value appears only at final client construction, Layers are not built inside operations, one Layer build allocates exactly one client/state, and package code contains no Effect.runPromise.",
+        "Every provider Promise is returned from Effect.tryPromise; no Promise is floated/discarded, no domain operation is async, no new Promise coordination bypasses Effect, and provider/Schema/persistence failures are not hidden with orDie, ignore, untyped catchAll, or fallback success values.",
+        "Audit every new non-test abstraction by symbol and record its concrete owner/admission reason; inline one-call wrappers and remove generic utils/helpers/common/repository/manager modules.",
+        "Root lint/format/TypeScript/Knip config remains unchanged except a narrowly necessary workspace registration; no local config, ignore expansion, suppression, unsafe assertion, or unresolved Effect language-service diagnostic is accepted.",
+        "No TSX, React, route, hook, visible text, browser dependency, or frontend state file changes; if one becomes necessary, stop for a separate frontend SPEC with primitive -> composite -> layout -> route, leaf-owned states/commands, and Browser proof.",
+        "Record at least three parent audit passes with concrete ownership/call-graph, Effect implementation/helper-admission, and verification evidence; add passes until every finding is resolved.",
+        "Contract tests cover absent/equal conflicts, all-or-nothing set/remove, expiry under controlled time, persistent set clearing prior TTL, expired-value observations, exact 32-entry bounds, service-boundary revalidation with no state/provider call for 33-entry or duplicate-key typed values, one-winner concurrency, stale-owner rejection, multi-key commits, one-snapshot memory transactions, shared native/atomic state, namespace isolation, malformed responses, and provider failures.",
+        "Mocked Upstash tests prove exact command arguments, complete prefix-scoped SCAN pagination, duplicate-key de-duplication, delete-after-collection clear behavior, exactly one client allocation per Layer build, no FLUSHDB/global DBSIZE/unscoped scan, and safe response decoding without live credentials or retained values.",
+        "bun run --filter @bundjil/effect-persistence check-types",
+        "bun run --filter @bundjil/effect-persistence test",
+        "bun run --filter @bundjil/effect-persistence build",
+        "bun run fix",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "The package provides native KeyValueStore plus AtomicKeyValueStore through explicit memory and Upstash subpaths.",
+        "No consumer migration or compatibility shim is required to test the package contract, but this foundation commit is not independently mergeable or deployable before a production consumer migration passes.",
+        "The package README clearly distinguishes ordinary persistence from atomic coordination and documents the unstable Effect import path."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: the new package owns provider-neutral atomic contracts, coherent memory persistence, and an explicit Upstash adapter; root exports remain provider-neutral, provider internals remain unexported, both Layers provide native and atomic services over one backing store, and no consumer, app, route, React, OAuth, channel, or deployment source changed.",
+          "Effect quality and helper admission: canonical Schemas and tagged errors own every boundary; public transactions revalidate before mutation or provider I/O; memory commits through one SynchronizedRef.modify; Upstash uses one static positional transaction program; every non-test symbol has multiple call sites or owns a material boundary; the one-use Schema alias was removed; forbidden-pattern scans are clean in production source.",
+          "Verification and evidence: frozen install, package typecheck, 23 package tests, package build, root check, Knip, full seven-workspace verification, full build, static privacy/boundary scans, and whitespace checks passed; no actionable Effect language-service diagnostics remained."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "migrate-codex-oauth-to-effect-persistence",
+      "title": "Migrate Codex OAuth storage, refresh locking, and fenced commits",
+      "status": "pending",
+      "dependsOn": ["implement-effect-persistence-contract-and-adapters"],
+      "description": "Compose Codex domain services over the shared native and atomic persistence capabilities while preserving encryption, revisions, locks, config ownership, scripts, and hosted proxy behavior.",
+      "implementationNotes": [
+        "Keep Codex environment names, default namespace, profile schemas, storage keys, encryption, lock policy, profile-commit operations, observers, and domain errors in @bundjil/codex-oauth.",
+        "Replace the Codex-owned generic Upstash KeyValueStore adapter with @bundjil/effect-persistence/upstash and preserve KeyValueStore.toSchemaStore composition.",
+        "Express initial write, legacy replacement, revision-fenced replacement/refresh/reauthentication, lock acquire, and owner release through AtomicKeyValueStore.transact.",
+        "Keep profile encryption and canonical Schema encoding in the Codex operation before the generic transaction; generic errors map to existing Codex errors at the domain boundary.",
+        "Migrate apps/codex-proxy and trusted-local scripts to one shared Upstash Layer per composition. Remove old provider subpath exports instead of retaining pass-through compatibility aliases after all callers move.",
+        "Remove @upstash/redis from @bundjil/codex-oauth only after direct imports and provider client interfaces are gone.",
+        "Do not change OAuth protocol, profile versions, refresh timing, forced-401 recovery, filesystem mode, Vercel bindings, or Production data."
+      ],
+      "mandatoryVerification": [
+        "Primary profile/read/write/lock/commit flows remain flat meaningful Effect.gen/Effect.fn programs with domain-tagged catchTag/catchTags/mapError handling in the outer pipe.",
+        "Canonical Codex and persistence Schemas are reused; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, provider leakage, or wrapper/helper sprawl.",
+        "Every migrated provider Promise remains captured by Effect.tryPromise; domain services return Effects and do not introduce async operations, floating Promises, local Effect execution, or orDie/ignore/untyped catchAll/fallback-success handling for expected failures.",
+        "Audit every new or moved non-test abstraction by symbol; remove pass-through compatibility exports and one-call wrappers instead of preserving stale ownership.",
+        "Root lint/format/TypeScript/Knip config is not weakened; no local config, broad ignore, suppression, unsafe assertion, or unresolved Effect language-service diagnostic is accepted.",
+        "No TSX, React, route rendering, hook, visible text, or browser bundle changes; any discovered UI need stops for a separate frontend SPEC and leaf-component/Browser verification.",
+        "Record at least three parent audit passes with concrete ownership/call-graph, Effect implementation/helper-admission, and verification evidence; add passes until every finding is resolved.",
+        "Tests prove encrypted profile round trips, exact storage keys/values, initial/legacy/revision commit parity, stale worker rejection, concurrent refresh winner, lock expiry/owner release, shared ordinary/atomic state, and sanitized observers/errors.",
+        "All trusted-local scripts and apps/codex-proxy compile against explicit package exports with no old Upstash adapter subpath imports.",
+        "bun run --filter @bundjil/codex-oauth check-types",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/codex-oauth build",
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "bun run fix",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "Codex domain behavior and encrypted stored data remain compatible.",
+        "@bundjil/codex-oauth no longer owns generic Redis adaptation, Lua, scans, SDK interfaces, or direct Redis construction.",
+        "One persistence provider Layer supplies both native and atomic services to hosted live composition."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "migrate-agent-delivery-idempotency-to-effect-persistence",
+      "title": "Migrate agent delivery idempotency to the atomic persistence contract",
+      "status": "pending",
+      "dependsOn": ["implement-effect-persistence-contract-and-adapters"],
+      "description": "Keep the app-owned delivery state machine while replacing direct Upstash calls with AtomicKeyValueStore transactions and preserving every external behavior.",
+      "implementationNotes": [
+        "Keep SendblueReplayStore, message-handle/event-coordinate schemas, keyed digest derivation, claim IDs, complete/retryable/uncertain policy, and domain errors in apps/agent.",
+        "Move only generic prefixing, atomic condition/mutation execution, provider response decoding, Lua, and SDK construction into @bundjil/effect-persistence.",
+        "Derive the same logical key suffix and configure the adapter with the existing prefix so the final physical key is byte-for-byte unchanged and never double-prefixed.",
+        "Encode claimed and terminal records with the existing Effect Schema codec; do not introduce persistence DTOs or generic replay schemas.",
+        "Convert lease/retention durations through the canonical persistence TTL contract without changing effective expiry behavior.",
+        "Compose one provider Layer in sendblue/live.layer.ts and inject AtomicKeyValueStore into the replay domain Layer. Keep ManagedRuntime only at the Eve channel edge.",
+        "Remove @upstash/redis from @bundjil/agent only after no direct import remains.",
+        "Do not change webhook auth, routing, identity, HTTP statuses, Sendblue client behavior, shared-line provider state, model path, or Executor connection."
+      ],
+      "mandatoryVerification": [
+        "Primary claim/transition/channel operations remain flat meaningful Effect.gen/Effect.fn programs with typed domain catchTag/catchTags/mapError translation in the outer pipe.",
+        "Canonical app and persistence Schemas are reused; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON, direct SDK calls, or wrapper/helper sprawl.",
+        "Every remaining provider Promise is captured at the existing Effect client boundary; replay/domain services return Effects and introduce no async operations, floating Promises, local Effect execution, or orDie/ignore/untyped catchAll/fallback-success handling for expected failures.",
+        "Audit every new or moved non-test abstraction by symbol; keep Sendblue domain policy app-owned while removing one-call provider wrappers and stale SDK interfaces.",
+        "Root lint/format/TypeScript/Knip config is not weakened; no local config, broad ignore, suppression, unsafe assertion, or unresolved Effect language-service diagnostic is accepted.",
+        "No TSX, React, route rendering, hook, visible text, or browser bundle changes; any discovered UI need stops for a separate frontend SPEC and leaf-component/Browser verification.",
+        "Record at least three parent audit passes with concrete ownership/call-graph, Effect implementation/helper-admission, and verification evidence; add passes until every finding is resolved.",
+        "Compatibility fixtures prove exact physical keys, exact record strings, lease/retention expiry, one-winner concurrent claims, duplicate suppression, stale-owner fencing, retryable removal, uncertain retention, and unchanged route outcomes.",
+        "Agent tests use the shared coherent memory Layer or a narrowly justified domain memory Layer over AtomicKeyValueStore; no process-local production fallback exists.",
+        "bun run --filter @bundjil/effect-persistence test",
+        "bun run --filter @bundjil/agent check-types",
+        "bun run --filter @bundjil/agent test",
+        "bun run --filter @bundjil/agent build",
+        "bun run fix",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "The agent has no direct Upstash SDK dependency or provider command implementation.",
+        "Delivery replay behavior and current Production storage remain backward compatible.",
+        "The shared package contains no Sendblue, Eve, message, phone, or delivery-policy terminology."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "verify-persistence-preview-and-production-rollout",
+      "title": "Verify isolated Preview and approved Production rollout",
+      "status": "pending",
+      "dependsOn": [
+        "migrate-codex-oauth-to-effect-persistence",
+        "migrate-agent-delivery-idempotency-to-effect-persistence"
+      ],
+      "description": "Prove the refactor against isolated Preview storage first, then promote from a clean pushed SHA only after rollout approval and retain bounded rollback-safe evidence.",
+      "implementationNotes": [
+        "Use existing encrypted personal Vercel bindings and confirm personal scope. Do not access Tilt Legal resources.",
+        "Preview uses an isolated proof key/namespace and must not register a second receive webhook on the shared Sendblue account/line.",
+        "Prove protected route behavior, provider transaction apply/conflict/rollback, native/atomic shared visibility, ciphertext-only profile storage, and safe logs without recording values.",
+        "Before Production, record the current immutable agent/proxy rollback deployments, exact intended commit SHA, unchanged environment names, and prefix classifications without secrets.",
+        "Production proof uses one bounded handset turn and existing hosted Codex profile; inject no synthetic duplicate that could deliver a personal message unless the replay guard is proven before provider dispatch.",
+        "Correlate only sanitized counts/statuses across Sendblue, Vercel agent/proxy logs, Workflow events, and storage outcomes.",
+        "On any compatibility, refresh, duplicate, route, or leak failure, restore the immutable prior deployment and leave webhooks/variables unchanged."
+      ],
+      "mandatoryVerification": [
+        "Preview deployment is clean-source, READY, protected, isolated, and has no shared-line provider webhook.",
+        "Direct HTTP checks record exact health/auth status codes, content types, and machine-readable response behavior for affected agent/proxy routes; no browser-visible route changed, so Browser screenshots are not applicable.",
+        "Preview proof records atomic applied/conflict/all-or-nothing behavior and native KeyValueStore readback using only safe booleans/counts.",
+        "Production promotion has explicit approval, clean pushed SHA, immutable rollback references, unchanged encrypted bindings/prefixes, and READY health.",
+        "Bounded Production evidence proves one inbound/turn/outbound, no duplicate dispatch/send in the window, one hosted Codex completion through the encrypted profile, zero Preview ingress, and no error/fatal/leak findings; isolated contract proof owns synthetic duplicate and forced-fencing cases.",
+        "No values, credentials, phone numbers, message content, OAuth subjects, protected URLs, provider bodies, transaction arguments, or execution IDs are retained.",
+        "No runtime source, lint config, TSX, React, route rendering, or browser bundle change is made in this proof task unless a concrete failed criterion first amends the SPEC and reopens focused checks.",
+        "Record at least three parent audit passes for rollout ownership, proof-command/evidence quality, and verification/rollback coverage; add passes until every finding is resolved.",
+        "bun run fix",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "Preview and approved Production evidence demonstrate behavior parity and rollback readiness.",
+        "The existing production data remains readable without migration or rewrite.",
+        "No provider routing, account, line, model, Executor toolkit, or OAuth protocol state changed."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-persistence-documentation-and-final-audit",
+      "title": "Reconcile documentation and complete the final Effect audit",
+      "status": "pending",
+      "dependsOn": ["verify-persistence-preview-and-production-rollout"],
+      "description": "Update current architecture, package/app runbooks, SPEC evidence, and task status, then perform the mandatory repository-wide three-pass audit.",
+      "implementationNotes": [
+        "Update root README/ARCHITECTURE, Effect/repo/testing architecture guides, package/app READMEs, Eve architecture, this SPEC/task ledger, and active execution plans affected by current ownership claims.",
+        "Preserve completed historical task evidence and mark superseded current architecture claims explicitly; do not rewrite history as though the package existed earlier.",
+        "Document native KeyValueStore versus AtomicKeyValueStore, config ownership, provider subpaths, key compatibility, replay-versus-conversation storage, privacy, monitoring, and rollback.",
+        "Run a helper-admission review over every new function, service, schema, file, export, and subpath; inline or remove abstractions without a concrete owner and present value.",
+        "Run stale-claim scans for old Codex-owned Upstash adapter paths, direct agent SDK ownership, KeyValueStore.modify coordination, old dependency locations, and pending rollout language."
+      ],
+      "mandatoryVerification": [
+        "Audit pass 1 records package/app ownership, stable import direction, production/test/CLI call graphs, provider isolation, and unsupported paths.",
+        "Audit pass 2 records flat meaningful Effect.gen/Effect.fn programs, canonical Schemas/types, tagged errors, Config/Redacted boundaries, explicit Layers, Effect-native collections, no unsafe casts/DTOs/manual readers/raw JSON/direct env/helper sprawl/hidden expected failures, and clean Effect language-service hints.",
+        "Audit pass 3 records focused tests, full root verification, Preview/Production proof, compatibility fixtures, leak scans, rollback evidence, docs reconciliation, and deliberately skipped checks with reasons.",
+        "If any audit pass finds a gap, fix it and add another recorded pass rather than accepting the count alone.",
+        "A symbol-level helper-admission ledger records every new non-test abstraction and confirms that rejected one-call wrappers, pass-through services, stale compatibility exports, and generic helper modules were removed.",
+        "No TSX/React/route/hook/visible-text files changed. If that invariant fails, the task remains incomplete until a separate frontend SPEC proves primitive -> composite -> layout -> route, leaf-owned commands/states/skeletons/fallbacks, typography/accessibility, and desktop/mobile Browser evidence.",
+        "Root lint, formatter, TypeScript, and Knip authority files were not weakened; suppression/ignore/unsafe-assertion scans and Effect language-service diagnostics are clean.",
+        "bun run fix",
+        "bun run check",
+        "bun run knip",
+        "bun run check-types",
+        "bun run test",
+        "bun run verification",
+        "bun run build",
+        "git diff --check",
+        "This task ledger parses successfully and stale path/ownership scans return zero current matches outside preserved historical evidence"
+      ],
+      "completionCriteria": [
+        "Current documentation matches the implemented package, consumers, deployment, and rollback state.",
+        "Every task contains at least three accepted parent audit passes with concrete evidence and no unresolved finding.",
+        "The final worktree contains no dead exports, duplicate provider adapter, stale dependency, secret/content artifact, or uncommitted generated output."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 0,
+        "evidence": []
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}
