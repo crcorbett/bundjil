@@ -7,6 +7,7 @@ import {
   loadAgentModelProviderConfig,
 } from "../agent/config.js";
 import {
+  AgentModelId,
   createAgentModel,
   defaultAgentModel,
 } from "../agent/model-provider.js";
@@ -38,6 +39,10 @@ const encodeOpenAICompatibleGenerateResponse = Schema.encodeSync(
   Schema.fromJsonString(OpenAICompatibleGenerateResponse)
 );
 
+it.effect("rejects an invalid branded agent model boundary", () =>
+  Schema.decodeUnknownEffect(AgentModelId)("").pipe(Effect.flip, Effect.asVoid)
+);
+
 it.effect("selects the Gateway model string by default", () =>
   Effect.gen(function* testDefaultGatewayProvider() {
     const config = yield* loadAgentConfig().pipe(
@@ -51,10 +56,8 @@ it.effect("selects the Gateway model string by default", () =>
     );
 
     assert.strictEqual(config.model, defaultAgentModel);
-    assert.deepStrictEqual(config.modelProvider, {
-      model: defaultAgentModel,
-      provider: "gateway",
-    });
+    assert.strictEqual(config.modelProvider.provider, "gateway");
+    assert.strictEqual(config.modelProvider.model, defaultAgentModel);
   })
 );
 

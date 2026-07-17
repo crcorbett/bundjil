@@ -287,15 +287,19 @@ it.effect(
   () =>
     Effect.gen(function* testOutboundDelivery() {
       const sends = yield* Ref.make(0);
+      const sentContent = yield* Ref.make<string | null>(null);
       const client = SendblueClientMemory({
-        sendMessage: () =>
-          Ref.update(sends, (value) => value + 1).pipe(Effect.as(sendSuccess)),
+        sendMessage: (input) =>
+          Ref.set(sentContent, input.content).pipe(
+            Effect.andThen(Ref.update(sends, (value) => value + 1)),
+            Effect.as(sendSuccess)
+          ),
       });
       yield* Effect.gen(function* testVisibleOutboundDelivery() {
         const sendblue = yield* SendblueChannel;
         const completed = {
           finishReason: "stop",
-          message: "A visible reply.",
+          message: "  A visible reply.  ",
           sequence: 0,
           sessionId: "session-1",
           state: channelState,
@@ -336,8 +340,47 @@ it.effect(
           "ignored"
         );
         assert.strictEqual(yield* Ref.get(sends), 1);
+        assert.strictEqual(yield* Ref.get(sentContent), "A visible reply.");
       }).pipe(Effect.provide(channelLayer(client)));
     })
+);
+
+it.effect("dispatches inbound content beyond the Sendblue outbound limit", () =>
+  Effect.gen(function* testInboundDispatchContent() {
+    const sendblue = yield* SendblueChannel;
+    const content = "x".repeat(18_997);
+    const decision = yield* sendblue.authorizeAndClaimInbound(
+      request(inbound({ content, message_handle: "long-inbound-content" }))
+    );
+
+    assert.strictEqual(decision._tag, "Dispatch");
+    if (decision._tag === "Dispatch") {
+      assert.strictEqual(decision.message, content);
+    }
+  }).pipe(Effect.provide(channelLayer()))
+);
+
+it.effect("delivers non-tool completed finish reasons", () =>
+  Effect.gen(function* testTerminalFinishReason() {
+    const sendblue = yield* SendblueChannel;
+    const result = yield* sendblue.deliverCompletedMessage({
+      finishReason: "length",
+      message: "Truncated terminal reply.",
+      sequence: 99,
+      sessionId: "session-terminal-finish-reason",
+      state: channelState,
+      stepIndex: 0,
+      turnId: "turn-terminal-finish-reason",
+    });
+
+    assert.strictEqual(result, "delivered");
+  }).pipe(
+    Effect.provide(
+      channelLayer(
+        SendblueClientMemory({ sendMessage: () => Effect.succeed(sendSuccess) })
+      )
+    )
+  )
 );
 
 it.effect("marks an indeterminate outbound delivery as non-retryable", () =>

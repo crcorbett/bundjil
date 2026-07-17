@@ -1,4 +1,5 @@
 import {
+  CodexOAuthPrincipalId,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
   CodexOAuthProfileId,
@@ -18,6 +19,7 @@ import {
 import { CodexProxyRouteError } from "./errors.js";
 import {
   CodexProxyDevServerConfig,
+  CodexProxyLocalProfileStoreDirectory,
   CodexProxyMode,
   CodexProxyRuntimeConfig,
 } from "./schemas.js";
@@ -51,16 +53,19 @@ const installationIdConfig = Config.schema(
 ).pipe(Config.withDefault("local"));
 
 const subjectPrincipalIdConfig = Config.schema(
-  Schema.NonEmptyString,
+  CodexOAuthPrincipalId,
   "BUNDJIL_CODEX_SUBJECT_ID"
 ).pipe(Config.withDefault("default"));
 
 const accountIdConfig = Config.option(
-  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_ACCOUNT_ID")
+  Config.redacted("BUNDJIL_CODEX_ACCOUNT_ID")
 );
 
 const localProfileStoreDirectoryConfig = Config.option(
-  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR")
+  Config.schema(
+    CodexProxyLocalProfileStoreDirectory,
+    "BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR"
+  )
 );
 
 const vercelRuntimeMarkerConfig = Config.option(
@@ -146,7 +151,9 @@ export const loadCodexProxyConfig = Effect.gen(
       mode,
       internalToken: Redacted.value(internalToken),
       subject,
-      ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
+      ...(Option.isNone(accountId)
+        ? {}
+        : { accountId: Redacted.value(accountId.value) }),
       ...(Option.isNone(localProfileStoreDirectory)
         ? {}
         : { localProfileStoreDirectory: localProfileStoreDirectory.value }),

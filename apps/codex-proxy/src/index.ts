@@ -31,6 +31,8 @@ export {
   CodexProxyErrorCode,
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
+  CodexProxyHealthService,
+  CodexProxyLocalProfileStoreDirectory,
   CodexProxyMode,
   CodexProxyRuntimeConfig,
 } from "./schemas.js";
@@ -48,6 +50,8 @@ export type {
   CodexProxyErrorCode as CodexProxyErrorCodeType,
   CodexProxyErrorResponse as CodexProxyErrorResponseType,
   CodexProxyHealthResponse as CodexProxyHealthResponseType,
+  CodexProxyHealthService as CodexProxyHealthServiceType,
+  CodexProxyLocalProfileStoreDirectory as CodexProxyLocalProfileStoreDirectoryType,
   CodexProxyMode as CodexProxyModeType,
   CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType,
 } from "./schemas.js";

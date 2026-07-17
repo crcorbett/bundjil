@@ -33,6 +33,7 @@ import {
   CodexProxyConfigLayer,
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
+  CodexProxyLocalProfileStoreDirectory,
   CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
   makeCodexProxyProfileCipherConfigLayer,
   loadCodexProxyConfig,
@@ -329,14 +330,17 @@ const withLocalTestHandler = <A>(
   run: (handler: TestFetchHandler) => Effect.Effect<A>
 ) =>
   Effect.gen(function* makeLocalTestHandler() {
-    const config = yield* localTestConfig(directory);
+    const localProfileStoreDirectory = yield* Schema.decodeUnknownEffect(
+      CodexProxyLocalProfileStoreDirectory
+    )(directory);
+    const config = yield* localTestConfig(localProfileStoreDirectory);
     const profile = yield* makeLocalProfile(Date.now() + 60_000);
 
     yield* putProfile(profile).pipe(
-      Effect.provide(makeLocalEncryptedProfileStore(directory))
+      Effect.provide(makeLocalEncryptedProfileStore(localProfileStoreDirectory))
     );
     const localProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal(
-      directory,
+      localProfileStoreDirectory,
       localCipherConfigProvider,
       CodexResponsesFetchMock({
         fetch: () =>

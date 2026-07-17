@@ -1,6 +1,6 @@
 # Effect Schema String Contracts Implementation Plan
 
-Status: Completed
+Status: In progress
 
 Spec: `docs/product-specs/effect-schema-string-contracts.md`
 Task ledger: `docs/product-specs/effect-schema-string-contracts.tasks.json`
@@ -49,7 +49,7 @@ records at least three accepted passes before completing each task.
 
 ## Task 1 - Establish Audit And Rules
 
-Status: In progress
+Status: Completed
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
@@ -124,7 +124,55 @@ Status: Passed
 
 ## Task 3 - Eve, Sendblue, And Proxy
 
-Status: Pending
+Status: Completed
+
+### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- `@bundjil/eve-effect` owns reusable Eve session, turn, completion-event,
+  finish-reason, workspace, package, question, summary, and message-content
+  contracts without mirroring Eve's complete protocol.
+- `apps/agent` owns Sendblue provider identities, content constraints, replay
+  coordinates, statuses, secrets, and channel decisions. `apps/codex-proxy`
+  owns only its mode, health service, diagnostics, and local profile-store path
+  while reusing Codex account, principal, subject, and token contracts.
+- Unknown HTTP, webhook, Eve callback, config, and provider values decode into
+  complete canonical structures before service logic. Encoded Sendblue and
+  proxy wire values remain unchanged.
+
+### Parent Audit Pass 2 - Effect Quality And Helper Admission
+
+Status: Passed after one correction round
+
+- The canonical `message.completed` literal remains a framework event-map key;
+  decoded finish reasons, provider responses, replay outcomes, channel
+  decisions, status classification, and provider-mode selection use `Match`
+  where they materially direct behavior.
+- A correction round restored trimmed outbound content, separated unrestricted
+  inbound content from Sendblue's 18,996-character outbound limit, typed the
+  Eve authentication attributes, and closed anonymous workspace/package,
+  model, status, secret, path, and replay contracts.
+- Static diff scans found no unsafe cast, suppression, raw JSON helper,
+  `switch`, production `decodeSync`, manual DTO, or new helper/common/utils
+  module. Content and diagnostic strings remain intentionally named checked
+  Schemas rather than nominal brands.
+
+### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Focused checks, tests, and builds passed for `@bundjil/eve-effect` (4 tests),
+  `@bundjil/agent` (60 tests), and `@bundjil/codex-proxy` (24 tests).
+- Root type-aware check passed across 421 files with zero findings; Knip,
+  seven-workspace typecheck, full verification, full build, and
+  `git diff --check` passed with the protected local Executor environment.
+- Regression coverage proves trimmed outbound delivery, inbound messages above
+  the outbound provider limit, every installed Eve finish reason, invalid
+  model rejection, canonical workspace output, and branded local profile paths.
+- No frontend, deployment, provider, webhook, OAuth-profile, persistence
+  namespace, or Vercel configuration changed, so live-provider proof is not
+  applicable.
 
 ## Task 4 - Documentation And Final Audit
 

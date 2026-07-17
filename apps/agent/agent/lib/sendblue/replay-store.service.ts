@@ -26,6 +26,10 @@ import type {
   SendblueReplayClaimResult,
   SendblueReplayCompletion,
   SendblueReplayRecord as SendblueReplayRecordType,
+  SendblueReplayStorePrefix,
+  SendblueReplayTerminalStatus,
+  SendblueReplayTransitionStatus,
+  SendblueReplayKind,
 } from "./schemas.js";
 import { keyedSendblueDigest } from "./session-router.service.js";
 
@@ -55,7 +59,7 @@ export class SendblueReplayStore extends Context.Service<
 
 export type SendblueReplayStoreOptions = Readonly<{
   leaseSeconds: number;
-  prefix: string;
+  prefix: SendblueReplayStorePrefix;
   routingKey: Redacted.Redacted;
   ttlSeconds: number;
 }>;
@@ -71,7 +75,12 @@ const makeReplayClaim = Effect.fn("SendblueReplayStore.makeReplayClaim")(
   ) {
     const claimedAtEpochMillis = yield* Clock.currentTimeMillis;
     const claimId = yield* claimIdGenerator.next;
-    return { claimedAtEpochMillis, claimId, key, status: "claimed" as const };
+    return {
+      claimedAtEpochMillis,
+      claimId,
+      key,
+      status: "claimed",
+    } satisfies SendblueReplayClaim;
   }
 );
 
@@ -108,7 +117,7 @@ const terminalRecord = (
 
 const deriveReplayKeys = (
   options: SendblueReplayStoreOptions,
-  kind: "inbound" | "outbound",
+  kind: SendblueReplayKind,
   coordinates: readonly string[]
 ) =>
   keyedSendblueDigest(options.routingKey, [
@@ -118,16 +127,23 @@ const deriveReplayKeys = (
   ]).pipe(
     Effect.flatMap((digest) => {
       const logicalKey = `${kind}:${digest}`;
-      return Effect.all({
-        key: Schema.decodeUnknownEffect(
-          kind === "inbound"
-            ? SendblueInboundClaimKey
-            : SendblueOutboundClaimKey
-        )(`${options.prefix}${logicalKey}`),
-        logicalKey: Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
-          logicalKey
+      return Match.value(kind).pipe(
+        Match.when("inbound", () =>
+          Schema.decodeUnknownEffect(SendblueInboundClaimKey)(
+            `${options.prefix}${logicalKey}`
+          )
         ),
-      });
+        Match.when("outbound", () =>
+          Schema.decodeUnknownEffect(SendblueOutboundClaimKey)(
+            `${options.prefix}${logicalKey}`
+          )
+        ),
+        Match.exhaustive,
+        Effect.bindTo("key"),
+        Effect.bind("logicalKey", () =>
+          Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(logicalKey)
+        )
+      );
     }),
     Effect.mapError(
       () =>
@@ -205,11 +221,13 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
         Match.when("applied", () =>
           Effect.succeed({
             claim: replayClaim,
-            status: "claimed" as const,
-          })
+            status: "claimed",
+          } satisfies SendblueReplayClaimResult)
         ),
         Match.when("conflict", () =>
-          Effect.succeed({ status: "duplicate" as const })
+          Effect.succeed({
+            status: "duplicate",
+          } satisfies SendblueReplayClaimResult)
         ),
         Match.exhaustive
       );
@@ -217,7 +235,7 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     const retain = Effect.fn("SendblueReplayStore.retain")(function* (
       replayClaim: SendblueReplayClaim,
       logicalKey: typeof AtomicKeyValueStoreKey.Type,
-      status: "complete" | "uncertain",
+      status: SendblueReplayTerminalStatus,
       expected: string,
       completion?: SendblueReplayCompletion
     ) {
@@ -249,7 +267,7 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     });
     const transition = Effect.fn("SendblueReplayStore.transition")(function* (
       replayClaim: SendblueReplayClaim,
-      status: "complete" | "retryable" | "uncertain",
+      status: SendblueReplayTransitionStatus,
       completion?: SendblueReplayCompletion
     ) {
       const logicalKey = yield* logicalReplayKey(options, replayClaim.key);

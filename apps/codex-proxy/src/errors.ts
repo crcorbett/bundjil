@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-import { CodexProxyErrorCode } from "./schemas.js";
+import { CodexProxyDiagnosticMessage, CodexProxyErrorCode } from "./schemas.js";
 
 export const CodexProxySchemaBoundary = Schema.Literals([
   "CodexProxyRuntimeConfig",
@@ -16,8 +16,8 @@ export class CodexProxyRouteError extends Schema.TaggedErrorClass<CodexProxyRout
   {
     boundary: Schema.optional(CodexProxySchemaBoundary),
     code: CodexProxyErrorCode,
-    message: Schema.NonEmptyString,
-    responseMessage: Schema.NonEmptyString,
+    message: CodexProxyDiagnosticMessage,
+    responseMessage: CodexProxyDiagnosticMessage,
     status: Schema.Number.check(Schema.isFinite()),
     cause: Schema.optional(Schema.Defect),
   }

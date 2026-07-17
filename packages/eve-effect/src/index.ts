@@ -11,8 +11,30 @@ export type {
   BundjilAgentSchemaBoundaryType,
   WorkspaceStatusFailure as WorkspaceStatusFailureType,
 } from "./errors.js";
-export { WorkspaceStatusInput, WorkspaceStatusSuccess } from "./schemas.js";
+export {
+  BundjilAgentSummary,
+  BundjilPackageName,
+  BundjilWorkspaceName,
+  BundjilWorkspaceStatusQuestion,
+  EveAssistantMessageContent,
+  EveAssistantStepFinishReason,
+  EveMessageCompletedEventType,
+  EveMessageCompletedEventTypeValue,
+  EveSessionId,
+  EveTurnId,
+  WorkspaceStatusInput,
+  WorkspaceStatusSuccess,
+} from "./schemas.js";
 export type {
+  BundjilAgentSummary as BundjilAgentSummaryType,
+  BundjilPackageName as BundjilPackageNameType,
+  BundjilWorkspaceName as BundjilWorkspaceNameType,
+  BundjilWorkspaceStatusQuestion as BundjilWorkspaceStatusQuestionType,
+  EveAssistantMessageContent as EveAssistantMessageContentType,
+  EveAssistantStepFinishReason as EveAssistantStepFinishReasonType,
+  EveMessageCompletedEventType as EveMessageCompletedEventTypeType,
+  EveSessionId as EveSessionIdType,
+  EveTurnId as EveTurnIdType,
   WorkspaceStatusInput as WorkspaceStatusInputType,
   WorkspaceStatusSuccess as WorkspaceStatusSuccessType,
   WorkspaceStatusToolInput as WorkspaceStatusToolInputType,

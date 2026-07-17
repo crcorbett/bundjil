@@ -20,17 +20,25 @@ import {
   SendblueOutboundEventCoordinates,
   SendblueReplayClaimId,
   SendblueReplayRecord,
+  SendblueReplayStorePrefix,
   SendblueSenderIdentities,
 } from "../agent/lib/sendblue/schemas.js";
 import type { SendblueReplayClaimResult } from "../agent/lib/sendblue/schemas.js";
 import { keyedSendblueDigest } from "../agent/lib/sendblue/session-router.service.js";
 
-const replayOptions = {
+const replayOptions = Schema.decodeUnknownSync(
+  Schema.Struct({
+    leaseSeconds: Schema.Int,
+    prefix: SendblueReplayStorePrefix,
+    routingKey: Schema.Redacted(Schema.NonEmptyString),
+    ttlSeconds: Schema.Int,
+  })
+)({
   leaseSeconds: 60,
   prefix: "sendblue:test:",
   routingKey: Redacted.make("test-routing-key"),
   ttlSeconds: 86_400,
-};
+});
 const configLayer = Layer.succeed(
   SendblueConfigService,
   Schema.decodeUnknownSync(SendblueConfig)({

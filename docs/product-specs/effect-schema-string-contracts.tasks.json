@@ -108,7 +108,7 @@
     {
       "id": "type-eve-sendblue-and-proxy-boundaries",
       "title": "Type Eve, Sendblue, and proxy string boundaries",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["establish-string-contract-audit-and-rules"],
       "description": "Canonicalize Eve operation strings, Sendblue event coordinates/content/config values, and proxy app strings while retaining framework and provider behavior.",
       "implementationNotes": [
@@ -131,8 +131,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: eve-effect owns reusable session, turn, message-completed, finish-reason, workspace, package, content, and operation contracts; the agent owns Sendblue identities, content limits, replay, status, and secret contracts; the proxy owns app modes, health, diagnostics, and local paths while reusing Codex account, principal, subject, and token Schemas.",
+          "Effect quality and helper admission: one correction round restored outbound trimming, separated inbound and outbound content constraints, typed Eve auth attributes, and closed anonymous model, status, secret, path, and replay gaps; Match directs material decoded unions; scans found no unsafe cast, suppression, raw JSON, switch, production decodeSync, DTO mirror, or helper module.",
+          "Verification and evidence: focused checks, tests, and builds passed with 4 Eve Effect, 60 agent, and 24 proxy tests; root check across 421 files, Knip, seven-workspace typecheck, full verification, full build, and whitespace checks passed with no frontend or provider mutation."
+        ]
       },
       "commitAfterPassing": true
     },

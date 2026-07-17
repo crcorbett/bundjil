@@ -29,7 +29,7 @@ export const BundjilAgentOperationsLive = Layer.effect(
       Effect.gen(function* getWorkspaceStatus() {
         const workspace = yield* makeWorkspaceSummary();
 
-        return yield* Schema.encodeEffect(WorkspaceStatusSuccess)({
+        return yield* Schema.decodeUnknownEffect(WorkspaceStatusSuccess)({
           workspaceName: workspace.name,
           packageNames: workspace.packages,
           agentSummary: `Question: ${input.question}. Workspace ${workspace.name} exposes ${workspace.packages.length} packages: ${workspace.packages.join(", ")}.`,
@@ -38,7 +38,7 @@ export const BundjilAgentOperationsLive = Layer.effect(
             (cause) =>
               new BundjilAgentSchemaError({
                 boundary: "WorkspaceStatusSuccess",
-                message: "Unable to encode workspace status success.",
+                message: "Unable to decode workspace status success.",
                 cause,
               })
           )
