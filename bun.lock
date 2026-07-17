@@ -59,8 +59,8 @@
       "name": "@bundjil/codex-oauth",
       "version": "0.1.0",
       "dependencies": {
+        "@bundjil/effect-persistence": "workspace:*",
         "@effect/platform-bun": "catalog:effect",
-        "@upstash/redis": "^1.38.0",
         "effect": "catalog:effect",
       },
       "devDependencies": {

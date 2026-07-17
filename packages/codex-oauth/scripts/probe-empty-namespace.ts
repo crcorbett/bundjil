@@ -1,7 +1,7 @@
 import { Effect, Exit, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
-import { UpstashKeyValueStoreLive } from "../src/upstash-key-value-store.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -28,7 +28,7 @@ const program = Effect.gen(function* probeEmptyNamespace() {
   return NamespaceProbeOutput.make({
     namespaceEmpty: (yield* keyValueStore.size) === 0,
   });
-}).pipe(Effect.provide(UpstashKeyValueStoreLive));
+}).pipe(Effect.provide(CodexUpstashPersistenceLive));
 
 const exit = await Effect.runPromiseExit(program);
 

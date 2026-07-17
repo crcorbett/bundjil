@@ -177,13 +177,9 @@ export {
 export type { CodexOAuthProfileCipherShape } from "./profile-cipher.service.js";
 export {
   CodexOAuthRefreshLock,
-  makeCodexOAuthRefreshLock,
   withCodexOAuthRefreshLock,
 } from "./refresh-lock.service.js";
-export type {
-  CodexOAuthRefreshLockProvider,
-  CodexOAuthRefreshLockShape,
-} from "./refresh-lock.service.js";
+export type { CodexOAuthRefreshLockShape } from "./refresh-lock.service.js";
 export {
   CodexOAuthService,
   completeLogin,

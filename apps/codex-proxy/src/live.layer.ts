@@ -7,19 +7,17 @@ import {
   CodexHttpClientLive,
   CodexOAuthHttpClientLive,
   CodexOAuthProfileCipherLive,
+  CodexOAuthProfileCommitAtomicLive,
   CodexOAuthRefreshClientLive,
+  CodexOAuthRefreshLockAtomicLive,
   CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
   CodexResponsesFetchLive,
   CodexSubscriptionAuthProtocolConfigLive,
+  CodexUpstashPersistenceLive,
   OpenAICompatibleProxyLive,
 } from "@bundjil/codex-oauth/live.layer";
-import {
-  UpstashCodexOAuthProfileCommitLive,
-  UpstashCodexOAuthRefreshLockLive,
-  UpstashKeyValueStoreLive,
-} from "@bundjil/codex-oauth/upstash-key-value-store.layer";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
 
@@ -32,11 +30,12 @@ import {
 const CodexProxyProfileCipherLive = CodexOAuthProfileCipherLive.pipe(
   Layer.provide(CodexProxyProfileCipherConfigLive)
 );
+const CodexProxyPersistenceLive = CodexUpstashPersistenceLive;
 
 const CodexProxyEncryptedProfileStoreLive =
   CodexProfileStoreEncryptedKeyValueLive.pipe(
     Layer.provideMerge(
-      Layer.merge(CodexProxyProfileCipherLive, UpstashKeyValueStoreLive)
+      Layer.merge(CodexProxyProfileCipherLive, CodexProxyPersistenceLive)
     )
   );
 
@@ -44,10 +43,14 @@ const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
   Layer.provideMerge(
     Layer.mergeAll(
       CodexProxyEncryptedProfileStoreLive,
-      UpstashCodexOAuthProfileCommitLive.pipe(
-        Layer.provide(CodexProxyProfileCipherLive)
+      CodexOAuthProfileCommitAtomicLive.pipe(
+        Layer.provideMerge(
+          Layer.merge(CodexProxyProfileCipherLive, CodexProxyPersistenceLive)
+        )
       ),
-      UpstashCodexOAuthRefreshLockLive,
+      CodexOAuthRefreshLockAtomicLive.pipe(
+        Layer.provide(CodexProxyPersistenceLive)
+      ),
       CodexOAuthRefreshPolicyLive,
       CodexOAuthRefreshClientLive.pipe(
         Layer.provide(

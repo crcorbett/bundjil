@@ -30,8 +30,9 @@ Implemented:
   JSON boundaries.
 - Memory/mock layers for automated tests.
 - Opt-in direct Codex Responses proof with sanitized output.
-- Opt-in Vercel Marketplace Upstash Redis adapter behind Effect
-  `KeyValueStore`.
+- Codex-owned hosted persistence configuration composed through
+  `@bundjil/effect-persistence` native `KeyValueStore` and
+  `AtomicKeyValueStore` services.
 - `CodexOAuthProfileCommit` with atomic create, replacement, refresh, and
   reauthentication fences. Memory and Upstash layers reject stale profile
   generations without exposing revision values through observer events.
@@ -64,7 +65,7 @@ Implemented:
   whose JWT expiry is not in the future is rejected before persistence.
 - `CodexOAuthProfileCommit.replaceLegacy` atomically migrates an observed
   access-token import. Memory fencing compares the observed generation;
-  Upstash verifies the encrypted legacy envelope and fences the Lua swap
+  Atomic persistence verifies the encrypted legacy envelope and fences the swap
   against its exact ciphertext while installing the first subscription
   revision. Concurrent or delayed migrations cannot replace the winner.
 - Memory layers for callback, browser, and OAuth HTTP boundaries. Automated
@@ -145,8 +146,9 @@ Unsupported:
   access-token-only local proof without enabling refresh.
 - `OpenAICompatibleProxy` is a package-level private proxy contract that
   enforces an internal bearer token before delegating to the direct provider.
-- `UpstashKeyValueStoreLive` is an opt-in Vercel Marketplace / Upstash Redis
-  adapter for Effect `KeyValueStore`.
+- `CodexUpstashPersistenceLive` is the Codex-configured composition of the
+  shared Upstash adapter. It provides native and atomic persistence over one
+  client and one prefix.
 - `CodexFileSystemKeyValueStoreLive(directory)`, exported from
   `@bundjil/codex-oauth/filesystem-key-value-store.layer`, is an explicit
   local Bun filesystem adapter. The caller supplies its directory; the layer
@@ -209,10 +211,9 @@ token values, prompts, and OAuth responses are not included in storage keys.
   `CodexLoopbackCallbackBunLive`, `CodexBrowserLauncherCommandLive`,
   `CodexOAuthHttpClientLive`, and `CodexSubscriptionLoginLive` form the local
   production graph. Their `Test` or `Memory` counterparts form the mock graph.
-- `UpstashKeyValueStoreLive`, exported from
-  `@bundjil/codex-oauth/upstash-key-value-store.layer`, provides only the
-  Effect `KeyValueStore` service. It is not composed into `CodexOAuthLive` by
-  default.
+- `CodexUpstashPersistenceLive`, exported from the live-layer subpath, is not
+  composed into `CodexOAuthLive` by default. Hosted compositions provide it
+  once alongside the encrypted profile store, fenced commit, and refresh lock.
 
 The root export is reserved for schemas, errors, service tags, and pure
 operation helpers. Import live and mock layers from their explicit subpaths.
@@ -237,11 +238,13 @@ not read Upstash configuration, does not print the store path or token data,
 and stores only the current access token. Delete the directory to revoke the
 local profile.
 
-## Upstash Redis KeyValueStore Adapter
+## Upstash Persistence Composition
 
-Use Vercel Marketplace Upstash Redis for hosted KV. Do not use `@vercel/kv`;
-new storage work should use the Upstash SDK directly behind Effect
-`KeyValueStore`.
+Use Vercel Marketplace Upstash Redis for hosted KV. The shared
+`@bundjil/effect-persistence/upstash` adapter owns the SDK, provider commands,
+prefix application, scans, and atomic transaction program. Codex owns only its
+environment names, default namespace, encrypted profile encoding, revisions,
+and lock policy.
 
 The adapter parses config through Effect `Config`:
 
@@ -253,11 +256,10 @@ For compatibility with Vercel-provisioned aliases, the layer also accepts:
 - `KV_REST_API_URL`
 - `KV_REST_API_TOKEN`
 
-The token is loaded with `Config.redacted`, decoded through
-`UpstashRedisConfig`, and passed to `new Redis(...)` with
-`automaticDeserialization: false` so Effect Schema remains the JSON boundary.
-Automated tests use a mocked Redis-like client and never require live Upstash
-credentials.
+The token is loaded with `Config.redacted` and decoded through
+`UpstashRedisConfig`; it remains redacted until the shared adapter constructs
+its client. Automated tests use coherent memory persistence and never require
+live Upstash credentials.
 
 Provisioning flow:
 
@@ -272,7 +274,7 @@ the linked env vars locally. If Vercel injects only `KV_REST_API_*` aliases,
 either keep those aliases or map them to `UPSTASH_REDIS_REST_*` in project env
 settings.
 
-The adapter prefixes Redis keys before storage. The default prefix is:
+The shared adapter prefixes logical keys exactly once. The default prefix is:
 
 ```text
 bundjil:codex-oauth:
@@ -284,9 +286,9 @@ implemented by scanning this prefix, so they operate on Bundjil-owned keys
 rather than the whole Redis database.
 
 The proxy's explicit preview `live` composition applies the package-owned
-AES-GCM cipher before the Upstash adapter receives a refresh-capable
-subscription profile. Only the versioned encrypted envelope crosses the KV
-boundary; revision keys contain only the non-token CAS fence.
+AES-GCM cipher before a refresh-capable subscription profile crosses the KV
+boundary. Only the versioned encrypted envelope is stored; revision keys
+contain only the non-token CAS fence.
 
 Marketplace provisioning can auto-bind Upstash credentials to Vercel
 production as well as preview. Bundjil's proxy mode, cipher key, profile
@@ -295,7 +297,7 @@ binding is not a production activation or approval.
 
 Rollback for storage experiments:
 
-- Remove the `UpstashKeyValueStoreLive` layer from the app composition.
+- Remove the hosted persistence composition from the app graph.
 - Return tests and local proof to `CodexOAuthMemory` or
   `KeyValueStore.layerMemory`.
 - Leave Vercel/Upstash credentials in ignored env files or rotate them through
@@ -501,7 +503,8 @@ CodexOAuthService
   -> CodexProfileStore
   -> CodexProfileStoreKeyValueLive
   -> encrypted profile codec
-  -> UpstashKeyValueStoreLive
+  -> CodexUpstashPersistenceLive
+  -> native KeyValueStore + AtomicKeyValueStore
   -> Vercel Marketplace Upstash Redis
 ```
 
@@ -512,7 +515,7 @@ bun run --filter @bundjil/codex-oauth test
   -> schemas and storage-key tests
   -> KeyValueStore memory profile-store tests
   -> mocked fetch/direct provider tests
-  -> mocked Upstash-like client tests
+  -> coherent native and atomic persistence tests
 ```
 
 ## Verification

@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 1 accepted
+Status: Active - task 2 accepted
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -32,7 +32,7 @@ clean-source, explicit approval, bounded proof, and rollback requirements.
 ## Ordered Tasks
 
 1. `implement-effect-persistence-contract-and-adapters`: completed.
-2. `migrate-codex-oauth-to-effect-persistence`: pending.
+2. `migrate-codex-oauth-to-effect-persistence`: completed.
 3. `migrate-agent-delivery-idempotency-to-effect-persistence`: pending.
 4. `verify-persistence-preview-and-production-rollout`: pending.
 5. `reconcile-persistence-documentation-and-final-audit`: pending.
@@ -110,7 +110,61 @@ Status: Passed
 
 ### migrate-codex-oauth-to-effect-persistence
 
-Status: Pending
+Status: Completed
+
+Subagent: one Terra Medium implementation worker; parent acceptance required a
+correction pass for exhaustive commit-condition selection, legacy error-message
+compatibility, config safety coverage, and concurrent atomic replacement proof.
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Codex retains config names and aliases, default namespace, encrypted codecs,
+  storage-key derivation, revision policy, lock policy, observer behavior, and
+  domain errors. The shared package owns Redis construction, prefixing, scans,
+  provider responses, and atomic command execution.
+- The old Codex Upstash adapter subpath, SDK dependency, provider client
+  interfaces, Lua programs, scans, and provider-mock test suite were removed;
+  no compatibility alias remains.
+- Proxy and trusted-local hosted scripts reuse one configured persistence Layer
+  for encrypted native storage, atomic profile commits, and refresh locks.
+  Filesystem mode and Vercel bindings are unchanged.
+
+#### Parent Audit Pass 2 - Effect Quality And Helper Admission
+
+Status: Passed
+
+- Initial, legacy, revision replacement, refresh, reauthentication, lock
+  acquire, and owner release are linear named Effects over canonical Schemas
+  and `AtomicKeyValueStore.transact`; commit-condition selection is exhaustive
+  Effect `Match` without mutable control flow.
+- Encryption and canonical Schema string codecs remain before persistence.
+  Generic persistence failures map at the Codex boundary, while legacy
+  precondition and atomic-race conflicts preserve their distinct messages.
+- Codec aliases own serialization boundaries; conflict/error constructors have
+  repeated domain call sites; the shared commit operation owns all five fenced
+  commit paths; the two public Layers own distinct commit and lock capabilities.
+  The obsolete lock-provider abstraction and custom mutable lock store were
+  removed because all live and memory paths now share the atomic contract.
+- Changed production scans found no direct SDK import, raw JSON, unsafe cast,
+  suppression, dynamic provider command, raw tag branch, local Effect runner,
+  Promise construction, or generic helper module.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Persistence tests passed 23/23; Codex OAuth passed typecheck, build, and
+  103/103 tests; proxy passed typecheck, build, 21/21 tests, and smoke proof
+  with health 200, stream 200, and five stream lines.
+- Tests cover config aliases/redaction/errors, encrypted legacy migration,
+  initial and revision fences, direct concurrent atomic replacement, stale
+  rejection, shared native/atomic state, and atomic lock contention,
+  ownership, expiry, and release through the existing contract suites.
+- Root check, Knip, full verification, full seven-workspace build, static
+  ownership/privacy scans, and whitespace checks passed with no actionable
+  Effect language-service diagnostics.
 
 ### migrate-agent-delivery-idempotency-to-effect-persistence
 

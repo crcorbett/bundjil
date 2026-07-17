@@ -12,11 +12,11 @@ own a browser OAuth flow, a public gateway, or Eve model selection.
 
 `BUNDJIL_CODEX_PROXY_MODE` selects one complete composition:
 
-| Mode    | Purpose                               | Storage                                        | Deployment rule                                          |
-| ------- | ------------------------------------- | ---------------------------------------------- | -------------------------------------------------------- |
-| `mock`  | Default smoke test and rollback state | None                                           | Local; never calls Codex                                 |
-| `local` | Trusted Bun-only proof                | Encrypted filesystem `KeyValueStore`           | Vercel rejects it                                        |
-| `live`  | Hosted private provider path          | Encrypted profile over Upstash `KeyValueStore` | Production or Preview; never silently falls back to mock |
+| Mode    | Purpose                               | Storage                                                     | Deployment rule                                          |
+| ------- | ------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
+| `mock`  | Default smoke test and rollback state | None                                                        | Local; never calls Codex                                 |
+| `local` | Trusted Bun-only proof                | Encrypted filesystem `KeyValueStore`                        | Vercel rejects it                                        |
+| `live`  | Hosted private provider path          | Encrypted profile over shared native and atomic persistence | Production or Preview; never silently falls back to mock |
 
 All modes expose `GET /health`. `POST /v1/chat/completions` is private and
 requires `Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}`.
@@ -24,7 +24,7 @@ requires `Authorization: Bearer ${BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN}`.
 `live` reads an encrypted refresh-capable subscription profile. It returns one
 atomic access-token/account-id/revision credential, refreshes inside the
 configured skew under the distributed lock, and commits every rotated
-generation through the Upstash fenced-CAS boundary. It never accepts an API
+generation through the atomic persistence boundary. It never accepts an API
 key fallback or returns mock output after a live failure.
 
 Permanent credential failure returns HTTP 502 with

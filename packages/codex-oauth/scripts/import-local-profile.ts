@@ -12,7 +12,7 @@ import {
   importCodexLocalProfile,
 } from "../src/local-profile-import.service.js";
 import { CodexLocalProfileImportResult } from "../src/schemas.js";
-import { UpstashKeyValueStoreLive } from "../src/upstash-key-value-store.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -31,8 +31,9 @@ const cipherConfigLayer = CodexOAuthProfileCipherConfigLive.pipe(
 const cipherLayer = CodexOAuthProfileCipherLive.pipe(
   Layer.provide(cipherConfigLayer)
 );
+const persistenceLayer = CodexUpstashPersistenceLive;
 const storeLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
-  Layer.provideMerge(Layer.merge(cipherLayer, UpstashKeyValueStoreLive))
+  Layer.provideMerge(Layer.merge(cipherLayer, persistenceLayer))
 );
 const importLayer = CodexLocalProfileImportServiceLive.pipe(
   Layer.provideMerge(Layer.mergeAll(importConfigLayer, sourceLayer, storeLayer))

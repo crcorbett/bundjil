@@ -107,7 +107,7 @@
     {
       "id": "migrate-codex-oauth-to-effect-persistence",
       "title": "Migrate Codex OAuth storage, refresh locking, and fenced commits",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["implement-effect-persistence-contract-and-adapters"],
       "description": "Compose Codex domain services over the shared native and atomic persistence capabilities while preserving encryption, revisions, locks, config ownership, scripts, and hosted proxy behavior.",
       "implementationNotes": [
@@ -149,8 +149,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: Codex retains config, encrypted codecs, logical storage keys, revision and lock policy, observers, and domain errors; the shared package owns Redis construction, prefixing, scans, responses, and atomic commands; the old adapter subpath, SDK dependency, provider interfaces, Lua, and provider-mock suite were removed; proxy and scripts reuse one persistence Layer while filesystem mode and Vercel bindings remain unchanged.",
+          "Effect quality and helper admission: all profile and lock transitions are named linear Effects over canonical Schemas and AtomicKeyValueStore transactions; exhaustive Match selects commit conditions; encryption and Schema string codecs precede persistence; generic errors map at the Codex boundary; every retained helper has repeated call sites or owns a material codec, domain operation, or Layer boundary; the obsolete provider abstraction and mutable lock store were removed; forbidden-pattern scans are clean in changed production source.",
+          "Verification and evidence: 23 persistence tests, 103 Codex OAuth tests, 21 proxy tests, focused typechecks and builds, proxy smoke proof, root check, Knip, full verification, full seven-workspace build, static ownership and privacy scans, and whitespace checks passed with no actionable Effect language-service diagnostics."
+        ]
       },
       "commitAfterPassing": true
     },

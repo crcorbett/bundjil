@@ -32,11 +32,6 @@
       "types": "./dist/mock.layer.d.ts",
       "default": "./dist/mock.layer.js"
     },
-    "./upstash-key-value-store.layer": {
-      "@bundjil/source": "./src/upstash-key-value-store.layer.ts",
-      "types": "./dist/upstash-key-value-store.layer.d.ts",
-      "default": "./dist/upstash-key-value-store.layer.js"
-    },
     "./filesystem-key-value-store.layer": {
       "@bundjil/source": "./src/filesystem-key-value-store.layer.ts",
       "types": "./dist/filesystem-key-value-store.layer.d.ts",
@@ -61,10 +56,6 @@
         "types": "./dist/mock.layer.d.ts",
         "default": "./dist/mock.layer.js"
       },
-      "./upstash-key-value-store.layer": {
-        "types": "./dist/upstash-key-value-store.layer.d.ts",
-        "default": "./dist/upstash-key-value-store.layer.js"
-      },
       "./filesystem-key-value-store.layer": {
         "types": "./dist/filesystem-key-value-store.layer.d.ts",
         "default": "./dist/filesystem-key-value-store.layer.js"
@@ -85,8 +76,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@bundjil/effect-persistence": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
-    "@upstash/redis": "^1.38.0",
     "effect": "catalog:effect"
   },
   "devDependencies": {

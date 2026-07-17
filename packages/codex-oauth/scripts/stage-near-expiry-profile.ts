@@ -15,6 +15,7 @@ import { CodexSubscriptionAuthError } from "../src/errors.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
+  CodexOAuthProfileCommitAtomicLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/live.layer.js";
 import { generateCodexOAuthCredentialRevision } from "../src/profile-cipher.service.js";
@@ -24,10 +25,7 @@ import {
   CodexSubscriptionLoginConfigLive,
   CodexSubscriptionLoginConfigService,
 } from "../src/subscription-login.config.js";
-import {
-  UpstashCodexOAuthProfileCommitLive,
-  UpstashKeyValueStoreLive,
-} from "../src/upstash-key-value-store.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -40,11 +38,12 @@ const cipherConfigLayer = CodexOAuthProfileCipherConfigLive.pipe(
 const cipherLayer = CodexOAuthProfileCipherLive.pipe(
   Layer.provide(cipherConfigLayer)
 );
+const persistenceLayer = CodexUpstashPersistenceLive;
 const profileStoreLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
-  Layer.provideMerge(Layer.merge(cipherLayer, UpstashKeyValueStoreLive))
+  Layer.provideMerge(Layer.merge(cipherLayer, persistenceLayer))
 );
-const profileCommitLayer = UpstashCodexOAuthProfileCommitLive.pipe(
-  Layer.provide(cipherLayer)
+const profileCommitLayer = CodexOAuthProfileCommitAtomicLive.pipe(
+  Layer.provideMerge(Layer.merge(cipherLayer, persistenceLayer))
 );
 const loginConfigLayer = CodexSubscriptionLoginConfigLive.pipe(
   Layer.provide(configProviderLayer)

@@ -67,6 +67,11 @@ export { CodexOAuthRefreshClientLive } from "./oauth-refresh-client.service.js";
 export { CodexOAuthRefreshPolicyLive } from "./oauth-refresh.config.js";
 export { CodexSubscriptionAuthProtocolConfigLive } from "./subscription-auth-protocol.service.js";
 export { CodexSubscriptionLoginConfigLive } from "./subscription-login.config.js";
+export {
+  CodexOAuthProfileCommitAtomicLive,
+  CodexOAuthRefreshLockAtomicLive,
+} from "./atomic-persistence.layer.js";
+export { CodexUpstashPersistenceLive } from "./upstash-persistence.layer.js";
 
 export const CodexOAuthProfileCipherLive = Layer.effect(
   CodexOAuthProfileCipher,

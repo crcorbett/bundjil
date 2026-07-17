@@ -12,7 +12,7 @@ import {
   CodexSubscriptionLoginConfigLive,
   CodexSubscriptionLoginConfigService,
 } from "../src/subscription-login.config.js";
-import { UpstashKeyValueStoreLive } from "../src/upstash-key-value-store.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -25,11 +25,12 @@ const cipherConfigLayer = CodexOAuthProfileCipherConfigLive.pipe(
 const cipherLayer = CodexOAuthProfileCipherLive.pipe(
   Layer.provide(cipherConfigLayer)
 );
+const persistenceLayer = CodexUpstashPersistenceLive;
 const profileStoreLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
-  Layer.provideMerge(Layer.merge(cipherLayer, UpstashKeyValueStoreLive))
+  Layer.provideMerge(Layer.merge(cipherLayer, persistenceLayer))
 );
 const proofLayer = CodexStoredProfileProofLive.pipe(
-  Layer.provideMerge(Layer.merge(profileStoreLayer, UpstashKeyValueStoreLive))
+  Layer.provideMerge(Layer.merge(profileStoreLayer, persistenceLayer))
 );
 const proofConfigLayer = CodexSubscriptionLoginConfigLive.pipe(
   Layer.provide(configProviderLayer)
