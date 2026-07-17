@@ -1,6 +1,6 @@
 # Effect Persistence Implementation Plan
 
-Status: Active - task 4 proxy packaging correction
+Status: Active - task 4 Preview SSE proof correction
 
 Spec: `docs/product-specs/effect-persistence.md`
 Task ledger: `docs/product-specs/effect-persistence.tasks.json`
@@ -257,6 +257,19 @@ Status: Passed; clean commit and redeploy pending.
   scans, and whitespace checks. The next action is a fresh isolated Preview
   from the pushed packaging-fix SHA. Production and the shared Sendblue webhook
   remain unchanged.
+- The packaging-fix Preview then returned the expected `200` health and live
+  authenticated statuses plus both expected `401` bearer rejections. The proof
+  still blocked because the hosted response used the valid parameterized SSE
+  media type while the proof required byte-exact `text/event-stream`.
+- The proof now compares the normalized media-type essence and retains its
+  existing redacted Config, Schema-owned result, response-body privacy, and
+  complete-stream assertions. A parameterized-content-type fixture brings the
+  proxy suite to `24/24` tests.
+- Parent review found no runtime/provider, route, request, credential, model,
+  or environment change in this correction. Proxy typecheck/test/build, root
+  verification, full build, Knip, and whitespace checks pass. A new clean
+  Preview from the correction SHA is required before any agent Preview or
+  Production action.
 
 ### reconcile-persistence-documentation-and-final-audit
 

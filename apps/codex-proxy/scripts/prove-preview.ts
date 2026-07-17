@@ -185,7 +185,11 @@ const program = Effect.gen(function* provePreview() {
     invalidTokenStatus: invalid.status,
     rawPayloadLeak: authenticatedBody.includes("Reply only: OK."),
     streamContentTypeSse:
-      authenticated.headers.get("content-type") === "text/event-stream",
+      authenticated.headers
+        .get("content-type")
+        ?.split(";", 1)[0]
+        ?.trim()
+        .toLowerCase() === "text/event-stream",
     streamDataLines: dataLines.length,
     streamDone: authenticatedBody.includes("data: [DONE]"),
     tokenLeak:

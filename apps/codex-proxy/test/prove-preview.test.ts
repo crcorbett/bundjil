@@ -66,7 +66,8 @@ const fixtureSse = `data: ${encodeChatCompletionChunk(
 
 const runProofFixture = async (
   authenticatedStatus: number,
-  protectionBypass?: string
+  protectionBypass?: string,
+  authenticatedContentType = "text/event-stream"
 ) => {
   const internalToken = "preview-proof-test-token";
   const bypassHeaders: (string | undefined)[] = [];
@@ -96,7 +97,7 @@ const runProofFixture = async (
     }
 
     response.writeHead(authenticatedStatus, {
-      "content-type": "text/event-stream",
+      "content-type": authenticatedContentType,
     });
     response.end(fixtureSse);
   });
@@ -183,6 +184,18 @@ describe("preview proof", () => {
       "preview-proof-bypass-token",
     ]);
     assert.doesNotMatch(result.stdout, /preview-proof-bypass-token/);
+    assert.equal(result.stderr, "");
+  });
+
+  it("accepts an SSE content type with a charset parameter", async () => {
+    const result = await runProofFixture(
+      200,
+      undefined,
+      "text/event-stream; charset=utf-8"
+    );
+
+    assert.equal(result.exitCode, 0);
+    assert.match(result.stdout, /"streamContentTypeSse":true/);
     assert.equal(result.stderr, "");
   });
 
