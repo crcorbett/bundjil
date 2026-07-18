@@ -1,6 +1,6 @@
 # Effect Boundary Provenance Enforcement Execution Plan
 
-- Status: In progress
+- Status: Completed
 - Started: 2026-07-18
 - SPEC: `docs/product-specs/effect-boundary-provenance-enforcement.md`
 - Tasks: `docs/product-specs/effect-boundary-provenance-enforcement.tasks.json`
@@ -107,7 +107,7 @@
 
 - Status: Completed
 - Subagent: Singer (`019f765c-6317-7473-9279-20503b363620`)
-- Commit: recorded by the Task 3 commit
+- Commit: `07af417`
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
@@ -145,34 +145,60 @@
 
 ## Task 4 - Enable Hard Gates And Reconcile Documentation And Skills
 
-- Status: Pending
-- Subagent: pending
-- Commit: pending
+- Status: Completed
+- Subagent: Descartes (`019f767a-578d-7943-8138-fcdcbbbc8cf1`)
+- Commit: recorded by the Task 4 commit
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Root tooling owns Effect language-service setup, the compiler-API
+  boundary audit and exact 18-entry external-constraint registry, and the
+  ten-surface skill-policy audit. Domain packages own canonical codecs while
+  named host, framework, SDK, and persistence adapters alone own unknown or
+  encoded representations. Architecture docs and skills teach this same call
+  graph. `CLAUDE.md` remains the symlinked view of `AGENTS.md`.
 
 ### Parent Audit Pass 2 - Effect And Implementation Quality
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Reviewed all selected diagnostics, policy tooling, architecture
+  docs, and skills. Two parent correction rounds made the skill audit a named
+  Effect operation with a tagged error and outer-pipe handling, described the
+  registry as final external constraints, added `decodeEffect` and
+  Effect-wrapped SDK initialization to wrapper guidance, removed the final
+  synchronous codec example, and broadened the contradictory-guidance scan.
+  The final diff has no unsafe cast, suppression expansion, DTO mirror,
+  generic helper package, or helper/common/utils sprawl.
 
 ### Parent Audit Pass 3 - Verification And Evidence
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Root verification passed Effect language-service patch checks,
+  the zero-finding boundary audit with 18 exact external constraints, the
+  ten-surface skill audit, 23 boundary fixtures, Ultracite, Knip, seven
+  workspace typechecks, and 223 tests. All seven workspace builds passed with
+  safe non-secret configuration. Proxy smoke returned health 200, stream 200,
+  and five SSE lines. `git diff --check`, task-ledger JSON parsing, and the
+  synchronous-codec guidance scan passed. Browser and live-provider proof were
+  not applicable because the task changed no visible route, runtime
+  composition, provider state, credential, webhook, or deployment.
 
 ## Final Closeout
 
-- Status: Pending
-- Boundary audit: pending
-- Effect language-service setup and diagnostics: pending
-- Root verification: pending
-- Root build: pending
-- Diff and task-ledger validation: pending
-- Frontend/Browser proof: not applicable unless implementation changes a
-  visible route.
-- Live provider proof: not required unless implementation changes runtime
-  composition or wire output.
+- Status: Completed
+- Boundary audit: passed with zero unexplained findings and 18 exact
+  external/framework constraints.
+- Effect language-service setup and diagnostics: patch checks passed; eleven
+  selected diagnostics are errors, `deterministicKeys` remains excluded, and
+  the repository reports zero findings.
+- Root verification: passed 23 boundary fixtures, the ten-surface skill audit,
+  Ultracite, Knip, seven workspace typechecks, and 223 tests.
+- Root build: all seven workspace builds passed with safe non-secret
+  configuration; proxy smoke returned HTTP 200/200 and five SSE lines.
+- Diff and task-ledger validation: `git diff --check`, JSON parsing, and the
+  synchronous-codec guidance scan passed.
+- Frontend/Browser proof: not applicable; no visible route or React surface
+  changed.
+- Live provider proof: not applicable; runtime composition, wire output,
+  credentials, webhooks, provider state, and deployments were unchanged.

@@ -188,11 +188,18 @@ Unsupported paths:
 bun install
 bun run build
 bun run test
+bun run check:boundaries
+bun run check:effect-setup
+bun run check:skills
 bun run verification
 ```
 
 Use Bun from the repository root. During iteration, run the smallest useful
-check first, then run `bun run verification` before handing work back.
+check first, then run `bun run verification` before handing work back. The
+boundary, Effect setup, and skill-policy checks keep production contracts and
+agent instructions aligned: services receive decoded Schema types, outward
+writes are encoded, and provider wrappers expose named operations with private
+SDK clients and decoded outputs.
 
 For the local Eve app:
 

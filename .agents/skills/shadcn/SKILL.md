@@ -1,7 +1,6 @@
 ---
 name: shadcn
 description: Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for "shadcn init", "create an app with --preset", or "switch to --preset".
-user-invocable: false
 allowed-tools: Bash(npx shadcn@latest *), Bash(pnpm dlx shadcn@latest *), Bash(bunx --bun shadcn@latest *)
 ---
 
@@ -30,27 +29,19 @@ The JSON above contains the project config and installed components. Use `npx sh
    with `Heading`, `Text`, `CodeText`, semantic role classes, or package
    compact helpers before committing source.
 
-## Site Repo Design-System Rule
+## Bundjil Design-System Rule
 
-In this repo, committed UI package code is local source rather than shadcn
-registry output. Before changing durable design-system concepts such as token
-taxonomy, component catalogue structure, component documentation,
-accessibility expectations, governance, foundations, or `/design` route
-information architecture, query the Southleft Design Systems MCP documented in
-`docs/references/design-systems-mcp.md`.
+Bundjil does not currently define a shared shadcn design-system authority.
+Before adding one, create or update a SPEC that names component ownership,
+tokens, typography, accessibility, documentation, lint rules, and Browser
+evidence. Follow `docs/architecture/frontend-composition.md`; do not let
+registry defaults silently establish a second architecture.
 
-Use MCP results as reference material only. Preserve this repo's Base UI-backed
-component ownership, `@packages/ui` exports, Tailwind v4 token source, and
-`docs/DESIGN.md` visual direction unless a spec records a deliberate change.
+## Bundjil Typography Rule
 
-## Site Repo Typography Rule
-
-Typography is app-wide and owned by `@packages/ui`. New or updated shadcn-style
-components must consume `Heading`, `Text`, `CodeText`, semantic role classes,
-or role-backed compact helpers such as `type-label-compact` and
-`type-body-compact`. Do not commit registry defaults that create a local
-typography system with raw size, leading, tracking, family, or weight
-utilities.
+Use the typography contract named by the owning app/SPEC. Do not commit
+registry defaults that create route-local size, leading, tracking, family, or
+weight systems.
 
 When a shadcn import, update, or merge changes visible text, capture Browser
 screenshot evidence for the affected route or catalogue example, including

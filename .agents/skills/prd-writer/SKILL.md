@@ -37,6 +37,21 @@ Read in this order:
   boundaries must name the canonical schemas/types/service contracts/errors
   being reused and must require Effect-native primitives over plain TypeScript
   helpers unless an exception is explicitly justified.
+- Specs that cross config, HTTP, provider, persistence, framework, file,
+  command, RPC, or tool boundaries must name each canonical codec and both
+  `typeof Contract.Type` and `typeof Contract.Encoded`. Name the exact inbound
+  adapter that runs `Schema.decodeUnknownEffect`/`Schema.decodeEffect`, the
+  exact outbound adapter that runs `Schema.encodeEffect`, and every exact
+  third-party exception that may be required. Domain services accept decoded
+  types; provider DTOs, raw values, and encoded primitives stay inside the
+  named adapter.
+- Provider/SDK specs must require the repo-local
+  `.agents/skills/effect-client-wrapper`: named operations, schema-derived
+  inputs and branded identifiers, `Config.schema`, redacted secrets, encoded
+  requests, immediate provider-result decoding, safe Schema tagged errors,
+  flat sequential Effects, no helper sprawl, and live/mock Layers. Generic SDK
+  escape hatches, raw clients, public semantic primitives, native-class error
+  checks, and unchecked provider output are acceptance failures.
 - Specs that touch runtime, service, RPC, loader, route, command, middleware,
   package, provider, or boundary-crossing code must include fenced call graphs
   for the production path and test path, plus CLI/script paths when relevant.
@@ -77,6 +92,29 @@ Read in this order:
   the default acceptance floor, and state that the implementer may require more
   passes when ownership, Effect flow, frontend composition, browser proof, or
   verification evidence remains weak.
+- Use DeepWiki through Executor only for upstream packages or libraries when
+  current external guidance is necessary. Do not use it to inspect Bundjil;
+  the checked-out source, installed versions, repo docs, and tests are the
+  authority. Record any upstream/local version mismatch and adapt the decision
+  to the installed API.
+
+## Required Impact Ledger
+
+Before approving a SPEC, add a downstream-impact ledger that marks every
+surface `Change required` or `N/A` with a reason:
+
+- canonical architecture docs and product documentation;
+- the root README and every affected app/package README or runbook;
+- `AGENTS.md`, repo-local skills, and linked instruction surfaces;
+- schemas, public types, service contracts, live/mock Layers, and exports;
+- lint rules, Effect language-service diagnostics, boundary-audit rules and
+  exact exceptions, formatting, CI, and verification scripts;
+- tests, fixtures, compatibility assertions, Browser/HTTP/provider evidence,
+  observability, rollout, migration, and rollback artifacts; and
+- SPEC indexes, task ledgers, and active execution plans.
+
+Edit the SPEC and sibling task list as findings are identified. Do not return
+an advisory review while known requirements remain only in commentary.
 
 ## Prompt Block For Implementation Specs
 
@@ -94,6 +132,13 @@ Reuse canonical schemas, types, service contracts, errors, and branded
 identifiers from the owning package. Do not define standalone DTO mirrors or
 duplicate fields such as id: string, slug: string, status, or post metadata
 outside their canonical schema/type owner.
+
+For every boundary, name the canonical codec, its Type and Encoded sides, the
+single inbound decode adapter, the single outbound encode adapter, and any
+exact registered third-party exception. Services receive only decoded types.
+Provider/SDK wrappers expose named operations, encode requests, immediately
+decode provider outputs, use Config.schema with redacted secrets, and provide
+live and mock Layers. Reject a generic SDK callback/client escape hatch.
 
 Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
 mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
@@ -155,6 +200,12 @@ For Effect TS tasks, every task's `mandatoryVerification` or
   packages;
 - no unsafe casts, local DTO mirrors, manual object readers/mappers, or
   trivial wrappers/helpers.
+- `Schema.decodeUnknownEffect` only at unknown host/provider boundaries,
+  `Schema.decodeEffect` for statically encoded inputs, and
+  `Schema.encodeEffect` before outward writes;
+- zero unexplained boundary findings, zero stale exact exceptions, and passing
+  `bun run check:boundaries`, `bun run check:effect-setup`, and
+  `bun run check:skills`;
 - implementation-improvement audit passes for ownership/call graph,
   implementation quality, and verification coverage, with pass evidence
   recorded before task acceptance.

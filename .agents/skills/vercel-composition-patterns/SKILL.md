@@ -30,30 +30,20 @@ Reference these guidelines when:
 - Working with compound components or context providers
 - Composing route-visible layouts, composites, primitives, and leaf slots
 
-## Site Repo Composition Rule
+## Bundjil Composition Rule
 
-Before substantial frontend composition work in this repo, read:
+Before frontend composition work in Bundjil, read
+`docs/architecture/frontend-composition.md`.
 
-- `docs/architecture/frontend/component-composition.md`
-- `docs/architecture/frontend/leaf-components-and-skeletons.md`
-- `docs/architecture/frontend/url-state-and-page-params.md`
-- `docs/FRONTEND.md`
-
-The site-specific rule is: compose stable visible structure as high as possible,
-usually in the route, while leaves own the data, search/page params, commands,
-atoms, skeletons, and fallbacks for the exact UI they render. Avoid nested
-feature wrappers that only hide route JSX or pass data down. Reusable leaves
-that need URL state use schema-backed field URL atoms and read-only page-param
-atoms instead of importing app route APIs.
-
-Text-bearing composition must also use the canonical typography role layer:
-`Heading`, `Text`, `CodeText`, semantic role classes for allowed CSS/native
-surfaces, package compact helpers for dense controls, and `WEB_OG_TYPOGRAPHY`
-for OG inline rendering. Do not use local `text-*`, `leading-*`, `tracking-*`,
-`font-*`, or font-weight utility piles as a shortcut for visible text
-hierarchy. When a composition change affects visible text, capture Browser
-screenshot evidence for the affected route or component state, including
-mobile when text can wrap.
+Compose stable visible structure as high as practical through primitive ->
+composite -> layout -> route. Data-bearing leaves own the narrow read, command,
+loading, empty, error, retry, skeleton, and fallback states for the fragment
+they render. Avoid nested feature wrappers that only shorten route JSX and do
+not prop-drill leaf state. Keep the app router as the URL writer, use
+schema-owned URL and route-identity contracts, and keep app route APIs out of
+reusable packages. When visible UI exists and changes,
+follow the SPEC's design-system authority and capture Browser evidence for the
+affected desktop/mobile states.
 
 ## Rule Categories by Priority
 

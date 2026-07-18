@@ -1,7 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/Effect-TS/language-service/refs/heads/main/schema.json",
   "compilerOptions": {
-    "plugins": [{ "name": "@effect/language-service" }],
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "diagnosticSeverity": {
+          "anyUnknownInErrorContext": "error",
+          "floatingEffect": "error",
+          "globalFetchInEffect": "error",
+          "nestedEffectGenYield": "error",
+          "newPromise": "error",
+          "preferSchemaOverJson": "error",
+          "processEnv": "error",
+          "processEnvInEffect": "error",
+          "schemaSyncInEffect": "error",
+          "unknownInEffectCatch": "error",
+          "unsafeEffectTypeAssertion": "error"
+        }
+      }
+    ],
     "target": "ES2025",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

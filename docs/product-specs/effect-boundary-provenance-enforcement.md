@@ -1,6 +1,6 @@
 # Effect Boundary Provenance Enforcement
 
-- Status: Ready for implementation
+- Status: Implemented
 - Owners: `@bundjil/core`, `@bundjil/effect-persistence`,
   `@bundjil/codex-oauth`, `@bundjil/eve-effect`, `apps/agent`,
   `apps/codex-proxy`, root tooling

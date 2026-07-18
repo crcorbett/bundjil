@@ -23,9 +23,9 @@ docs/
 
 tooling/
   boundary-audit.ts       Root compiler-API boundary provenance audit.
-  boundary-exceptions.ts  Exact temporary adapter exception registry.
+  boundary-exceptions.ts  Exact external/framework adapter exception registry.
 
-.agents/skills/       Repo-local agent skills copied from the site workspace.
+.agents/skills/       Repo-owned agent skills aligned to Bundjil architecture.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
 ```

@@ -63,6 +63,49 @@ Implementation layers can be exported from the root while the package is small,
 but provider-heavy packages should eventually expose live/mock layers from
 explicit subpaths so callers choose the implementation deliberately.
 
+## Provider And SDK Client Boundaries
+
+A provider wrapper is a named adapter, not a general SDK capability. Its public
+service exposes owner-specific operations and only Schema-derived decoded
+inputs and outputs. The SDK instance, Promise API, raw failure, provider DTO,
+and any unavoidable primitive remain private to `*.live.layer.ts` or the exact
+owner adapter. A generic callback operation or exported raw client defeats the
+boundary and is forbidden.
+
+For every operation:
+
+1. Accept the canonical domain codec's `typeof Contract.Type`, including
+   owner-branded identifiers rather than raw semantic strings.
+2. Encode the outbound provider request with `Schema.encodeEffect` or the
+   framework-native `HttpClient` Schema body API immediately before the call.
+   Keep `typeof Contract.Encoded` inside the adapter.
+3. Wrap only the Promise call with `Effect.tryPromise` and map raw failure once
+   to an owner-named, safe `Schema.TaggedErrorClass` failure.
+4. Decode the complete provider response immediately with
+   `Schema.decodeUnknownEffect`; use `Schema.decodeEffect` instead when the SDK
+   statically returns the codec's `Encoded` type.
+5. Return only the decoded domain result. Never return an unconstrained generic
+   or provider-owned response type.
+
+Semantic config uses `Config.schema`; secrets use owner-named redacted Schemas
+and are revealed only at immediate SDK construction or header assignment.
+Tests use a scoped `ConfigProvider` when proving configuration and a
+deterministic mock/memory Layer for service behavior. Every provider service
+exports explicit live and mock/memory Layers.
+
+Keep each named operation flat and sequential. Keep its one-use encoding,
+decoding, and error mapping visible at the call site. A retry Schedule or other
+helper is justified only when reused or when it owns a non-trivial tested
+policy. Use `Match` and Effect tagged-error operators for typed branching;
+native-class error checks, unsafe casts, public raw causes, duplicated DTOs,
+and generic wrapper/helper modules are forbidden.
+
+If a third-party signature unavoidably requires a primitive, register the exact
+adapter symbol in `tooling/boundary-exceptions.ts`. Do not widen a public
+service contract or add a cast to satisfy it. Follow
+`.agents/skills/effect-client-wrapper/SKILL.md` when creating or reviewing the
+wrapper.
+
 ## Effect Control Flow
 
 Primary operations should read as flat `Effect.gen` programs:
@@ -225,30 +268,27 @@ Boundary JSON must go through Effect Schema so encoded values stay tied to the
 canonical contract:
 
 ```ts
-const encodeRequest = Schema.encodeSync(Schema.fromJsonString(RequestSchema));
-const body = encodeRequest(request);
-```
-
-For Effect programs, keep encoding in the program and surface typed failures:
-
-```ts
 const body =
   yield * Schema.encodeEffect(Schema.fromJsonString(RequestSchema))(request);
 ```
 
-For unknown values that are only being rendered for safe test assertions or
-sanitized diagnostics, use Effect's JSON schema rather than raw serialization:
+For unknown values rendered by an Effectful test, smoke script, or sanitized
+diagnostic, use Effect's JSON schema rather than raw serialization:
 
 ```ts
-const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
-);
+const body = yield * Schema.encodeEffect(Schema.UnknownFromJsonString)(value);
 ```
 
 Tests, smoke scripts, provider request bodies, SSE chunks, proof output, and
 leak checks all follow this rule. If a framework hands you an already encoded
 request body string, validate it with the owning schema at the receiving edge
 instead of manually decoding it in domain code.
+
+Synchronous Schema codec calls are prohibited in production code, operator
+scripts, and canonical examples. The sole exception is test-only fixture
+construction that deliberately supplies invalid source to prove the boundary
+audit; keep that source inside the test fixture and never use it as a boundary
+implementation pattern.
 
 ## Boundary Provenance Audit
 
@@ -262,10 +302,11 @@ and codec-based remediation.
 Third-party or framework constraints belong only in
 `tooling/boundary-exceptions.ts`. Every entry names one exact file and symbol,
 its owner, boundary kind, canonical codec/service, admitted syntax, and reason.
-The audit fails stale entries, so a migration must remove its exception rather
-than leave a baseline behind. Do not add counts, line-number allowlists, globs,
-or directory exemptions. `bun run test:boundaries` owns positive and negative
-source fixtures for the audit.
+The audit fails stale entries, so a change must remove an entry when its exact
+external/framework constraint no longer exists rather than leave an obsolete
+baseline behind. Do not add counts, line-number allowlists, globs, or directory
+exemptions. `bun run test:boundaries` owns positive and negative source fixtures
+for the audit.
 
 ## Implementation Audit
 
@@ -323,14 +364,15 @@ Current app-owned config lives in:
 apps/agent/agent/config.ts
 ```
 
-Use `Config.schema(...)` or the narrower `Config.nonEmptyString(...)`,
-`Config.redacted(...)`, `Config.url(...)`, and related constructors. Parse with
+Use `Config.schema(OwnerSchema, "ENV_NAME")` for semantic values, including
+owner-named redacted secret Schemas. Primitive Config constructors are limited
+to an exact adapter-private exception with a registered reason. Parse with
 `ConfigProvider.fromEnv()` for process/import-meta environment variables.
 
 Rules:
 
 - Keep server-only secrets out of browser bundles and committed files.
-- Use `Config.redacted` for credentials.
+- Use owner-named redacted Schemas for credentials.
 - Do not read `process.env` directly in package logic.
 - App bootstrap can read app-owned config, but provider packages should decode
   their own required config at their boundary.

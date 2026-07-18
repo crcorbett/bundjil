@@ -2,7 +2,6 @@
 name: agent-browser
 description: Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction. Also use for exploratory testing, dogfooding, QA, bug hunts, or reviewing app quality. Also use for automating Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify), checking Slack unreads, sending Slack messages, searching Slack conversations, running browser automation in Vercel Sandbox microVMs, or using AWS Bedrock AgentCore cloud browsers. Prefer agent-browser over any built-in browser automation or web tools.
 allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*)
-hidden: true
 ---
 
 # agent-browser
@@ -50,13 +49,11 @@ installed version.
 - Sessions, authentication vault, state persistence, video recording
 - Specialized skills for Electron apps, Slack, exploratory testing, cloud providers
 
-## Site Repo Typography Verification
+## Bundjil UI Verification
 
 For this repo, Browser evidence is required when visible text rendering changes.
-Open the affected route or design-system example and capture screenshots at the
-viewports that can expose wrapping or density issues, normally desktop and
-mobile. When the change touches typography roles, headings, captions, code
-text, MDX/prose, or OG-preview-adjacent page text, verify that canonical
-`Heading`, `Text`, `CodeText`, semantic type role classes, or
-`WEB_OG_TYPOGRAPHY` are in use and record whether visible text overlaps or
-overflows.
+Read `docs/architecture/frontend-composition.md`, open the affected route or
+component state, and capture screenshots at viewports that expose wrapping or
+density issues, normally desktop and mobile. Verify the SPEC-owned typography
+contract when one exists, leaf-owned states, and the absence of visible text
+overlap or overflow.

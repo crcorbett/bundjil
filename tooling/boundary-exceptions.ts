@@ -33,9 +33,9 @@ export type BoundaryRule =
   | "unsafe-boundary-syntax";
 
 /**
- * Exact temporary admissions for already-classified adapters. These entries
- * are migration work, not a count baseline. Removing or changing the named
- * syntax makes the entry stale and fails check:boundaries.
+ * Exact external/framework adapter exception registry. Each entry documents an
+ * unavoidable third-party constraint; removing or changing the named syntax
+ * makes the entry stale and fails check:boundaries.
  */
 export const boundaryExceptions = [
   {

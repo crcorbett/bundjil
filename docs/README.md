@@ -16,8 +16,8 @@ README.
   ownership, import/export rules, local references, and SPEC requirements.
 - [Testing And Quality](./architecture/testing-and-quality.md) defines
   verification scope, standard commands, Eve runtime checks, and documentation
-  quality rules, including the mandatory 3-pass Effect TS implementation
-  audit.
+  quality rules, including `check:boundaries`, `check:effect-setup`,
+  `check:skills`, and the mandatory 3-pass Effect TS implementation audit.
 - [Eve agent architecture](./architecture/eve-agent.md) documents the committed
   Eve app, Effect boundary, local HTTP endpoints, AI Gateway setup, and
   Codex proxy model-provider setup.

@@ -1,11 +1,11 @@
 {
   "title": "Effect Boundary Provenance Enforcement Tasks",
   "spec": "docs/product-specs/effect-boundary-provenance-enforcement.md",
-  "status": "in-progress",
+  "status": "completed",
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
     "minimumTotalPasses": 12,
-    "completedPasses": 9,
+    "completedPasses": 12,
     "rule": "Each parent task records ownership/call-graph, Effect/implementation-quality, and verification/evidence passes. Add more passes while any finding remains."
   },
   "principles": [
@@ -147,10 +147,15 @@
     {
       "id": "enable-hard-gates-and-reconcile-documentation",
       "title": "Enable hard gates and reconcile documentation and skills",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "migrate-codex-boundaries-end-to-end",
         "migrate-channel-proxy-and-persistence-boundaries"
+      ],
+      "preparatoryEvidence": [
+        "2026-07-18: Reconciled AGENTS.md, canonical architecture/testing docs, root README/docs index, prd-writer, prd-implementer, and effect-client-wrapper with the required codec/provenance policy.",
+        "2026-07-18: Added executable check:effect-setup and check:skills gates to root verification. The skill gate covers ten provenance and frontend instruction surfaces, including stale Site-specific overlay rejection.",
+        "2026-07-18: Both runtime migration dependencies completed; the approved diagnostics are errors, all hard gates pass, and the complete three-pass acceptance audit is recorded."
       ],
       "description": "Enable the selected Effect language-service diagnostics, place boundary and setup checks in root verification, remove resolved exceptions, and reconcile lint configuration, architecture/package/app documentation, AGENTS.md, and the relevant skills.",
       "implementationNotes": [
@@ -183,8 +188,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: root tooling owns Effect language-service setup, the TypeScript boundary audit, its exact 18-entry external-constraint registry, and the ten-surface skill-policy audit. Architecture and skill surfaces consistently assign codecs to domain owners and unknown/encoded values to named adapters; CLAUDE.md remains the AGENTS.md symlink.",
+          "Implementation quality: reviewed all selected diagnostics, documentation, skills, and policy tooling. Parent correction rounds made the skill audit an Effectful named operation with a tagged error and outer-pipe handling, made the registry language describe final external constraints, added typed decodeEffect and Effect-wrapped SDK initialization to the wrapper guidance, and removed the final synchronous codec example while broadening the contradictory-guidance scan. No unsafe cast, suppression expansion, DTO mirror, generic helper package, or helper/common/utils sprawl was introduced.",
+          "Verification: root verification passed Effect language-service patch checks, the zero-finding boundary audit with 18 exact external constraints, the ten-surface skill audit, 23 boundary fixtures, Ultracite, Knip, seven workspace typechecks, and 223 tests. All seven workspace builds passed with safe non-secret configuration; proxy smoke returned health 200, stream 200, and five SSE lines. Diff checks, task-ledger parsing, and synchronous-codec guidance scans passed. Browser and live-provider proof were not applicable because no visible route, runtime composition, provider state, credential, webhook, or deployment changed."
+        ]
       },
       "commitAfterPassing": true
     }
