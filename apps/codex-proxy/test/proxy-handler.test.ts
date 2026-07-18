@@ -1,15 +1,21 @@
 import {
   CodexAccessTokenImportProfile,
+  CodexAuthTemporarilyUnavailable,
   CodexHttpStatusError,
+  CodexOAuthOperationError,
+  CodexOAuthProfileId,
+  CodexOAuthSubjectHash,
   CodexOAuthProfileCipherConfigService,
-  CodexOAuthAuthTemporarilyUnavailable,
-  CodexOAuthReauthenticationRequired,
-  OpenAICompatibleProxy,
+  CodexProfileNotFound,
+  CodexProfileSchemaError,
+  CodexProfileStorageError,
   CodexSubscriptionProfile,
+  CodexReauthenticationRequired,
   OpenAICompatibleChatCompletionRequest,
+  OpenAICompatibleProxy,
   putProfile,
-} from "@bundjil/codex-oauth";
-import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex-oauth/filesystem-key-value-store.layer";
+} from "@bundjil/codex";
+import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
@@ -17,11 +23,11 @@ import {
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
   OpenAICompatibleProxyLive,
-} from "@bundjil/codex-oauth/live.layer";
+} from "@bundjil/codex/runtime";
 import {
   CodexOAuthMemory,
   CodexResponsesFetchMock,
-} from "@bundjil/codex-oauth/mock.layer";
+} from "@bundjil/codex/testing";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
@@ -254,8 +260,12 @@ const withLiveTestHandler = <A>(
 
 const makeFailureProxyLayer = (
   error:
-    | CodexOAuthReauthenticationRequired
-    | CodexOAuthAuthTemporarilyUnavailable
+    | CodexReauthenticationRequired
+    | CodexAuthTemporarilyUnavailable
+    | CodexOAuthOperationError
+    | CodexProfileNotFound
+    | CodexProfileSchemaError
+    | CodexProfileStorageError
     | CodexHttpStatusError
 ) =>
   Layer.merge(
@@ -270,8 +280,12 @@ const makeFailureProxyLayer = (
 
 const withFailureHandler = <A>(
   error:
-    | CodexOAuthReauthenticationRequired
-    | CodexOAuthAuthTemporarilyUnavailable
+    | CodexReauthenticationRequired
+    | CodexAuthTemporarilyUnavailable
+    | CodexOAuthOperationError
+    | CodexProfileNotFound
+    | CodexProfileSchemaError
+    | CodexProfileStorageError
     | CodexHttpStatusError,
   run: (handler: TestFetchHandler) => Effect.Effect<A>
 ) =>
@@ -290,6 +304,64 @@ const withFailureHandler = <A>(
       (handler) => Effect.promise(() => handler.dispose())
     );
   });
+
+const selectedFailureMappings = [
+  {
+    error: new CodexReauthenticationRequired({
+      profileId: Schema.decodeUnknownSync(CodexOAuthProfileId)("default"),
+      message: "Internal reauthentication detail.",
+    }),
+    status: 502,
+    body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
+  },
+  {
+    error: new CodexOAuthOperationError({
+      operation: "startLogin",
+      message: "Internal OAuth operation detail.",
+      cause: { defect: "fixture" },
+    }),
+    status: 502,
+    body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
+  },
+  {
+    error: new CodexProfileNotFound({
+      profileId: Schema.decodeUnknownSync(CodexOAuthProfileId)("default"),
+      subjectHash: Schema.decodeUnknownSync(CodexOAuthSubjectHash)(
+        "subject-hash"
+      ),
+      message: "Internal missing profile detail.",
+    }),
+    status: 502,
+    body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
+  },
+  {
+    error: new CodexProfileSchemaError({
+      boundary: "CodexOAuthProfile",
+      message: "Internal profile schema detail.",
+      cause: { defect: "fixture" },
+    }),
+    status: 502,
+    body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
+  },
+  {
+    error: new CodexAuthTemporarilyUnavailable({
+      reason: "providerUnavailable",
+      message: "Internal temporary auth detail.",
+    }),
+    status: 503,
+    body: '{"error":{"code":"codex_auth_temporarily_unavailable","message":"Codex authorization is temporarily unavailable."}}',
+  },
+  {
+    error: new CodexProfileStorageError({
+      operation: "getProfile",
+      key: "private-profile-key",
+      message: "Internal profile storage detail.",
+      cause: { defect: "fixture" },
+    }),
+    status: 503,
+    body: '{"error":{"code":"codex_auth_temporarily_unavailable","message":"Codex authorization is temporarily unavailable."}}',
+  },
+] as const;
 
 const withTemporaryDirectory = <A, E, R>(
   use: (directory: string) => Effect.Effect<A, E, R>
@@ -617,65 +689,22 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
       })
   );
 
-  it.effect(
-    "maps permanent credential failure to the stable reauthentication error",
-    () =>
-      Effect.gen(function* testReauthenticationError() {
-        const config = yield* liveTestConfig;
-
-        return yield* withFailureHandler(
-          new CodexOAuthReauthenticationRequired({
-            profileId: config.subject.profileId,
-            message: "Sanitized package failure.",
-          }),
-          (handler) =>
-            Effect.gen(function* assertReauthenticationResponse() {
-              const response = yield* Effect.promise(() =>
-                handler(chatCompletionRequest("Bearer test-internal-token"))
-              );
-              const body = yield* Effect.promise(() => response.text());
-              const payload = yield* Schema.decodeUnknownEffect(
-                Schema.fromJsonString(CodexProxyErrorResponse)
-              )(body).pipe(Effect.orDie);
-
-              assert.strictEqual(response.status, 502);
-              assert.strictEqual(
-                payload.error.code,
-                "codex_reauthentication_required"
-              );
-              assert.strictEqual(
-                body.includes("Sanitized package failure"),
-                false
-              );
-            })
-        );
-      })
-  );
-
-  it.effect("maps transient auth failure to the stable temporary error", () =>
-    withFailureHandler(
-      new CodexOAuthAuthTemporarilyUnavailable({
-        reason: "providerUnavailable",
-        message: "Sanitized package failure.",
-      }),
-      (handler) =>
-        Effect.gen(function* assertTemporaryResponse() {
+  it.effect.each(selectedFailureMappings)(
+    "maps $error._tag to its byte-stable public response",
+    (fixture) =>
+      withFailureHandler(fixture.error, (handler) =>
+        Effect.gen(function* assertSelectedFailureResponse() {
           const response = yield* Effect.promise(() =>
             handler(chatCompletionRequest("Bearer test-internal-token"))
           );
           const body = yield* Effect.promise(() => response.text());
-          const payload = yield* Schema.decodeUnknownEffect(
-            Schema.fromJsonString(CodexProxyErrorResponse)
-          )(body).pipe(Effect.orDie);
 
-          assert.strictEqual(response.status, 503);
-          assert.strictEqual(
-            payload.error.code,
-            "codex_auth_temporarily_unavailable"
-          );
-          assert.strictEqual(body.includes("Sanitized package failure"), false);
+          assert.strictEqual(response.status, fixture.status);
+          assert.strictEqual(body, fixture.body);
+          assert.strictEqual(body.includes(fixture.error._tag), false);
+          assert.strictEqual(body.includes(fixture.error.message), false);
         })
-    )
+      )
   );
 
   it.effect("keeps non-auth provider failures as sanitized 502 responses", () =>

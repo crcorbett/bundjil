@@ -16,7 +16,7 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 - `agent/lib/executor/config.ts`: app-owned Effect Config and endpoint policy
   for the scoped Executor MCP connection.
 - `agent/tools/workspace_status.ts`: Eve tool that delegates to
-  `@bundjil/eve-effect`.
+  `@bundjil/eve`.
 - `test/workspace-status-tool.test.ts`: app-level proof that the Eve tool
   execute path runs through the live Effect operation without starting Eve or
   calling a model.
@@ -29,7 +29,7 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 The app owns canonical Sendblue identities, replay coordinates, phone and
 provider values as checked brands; provider/channel states as named literals;
 message values as named content Schemas; and credentials as redacted secret
-Schemas. It reuses `@bundjil/eve-effect` and `@bundjil/codex-oauth` contracts
+Schemas. It reuses `@bundjil/eve` and `@bundjil/codex` contracts
 instead of duplicating their fields. Decode complete webhook, config, and
 completed-event projections at their boundaries, encode outbound provider
 values, and use `Match` for material decoded unions. Tagged errors and the
@@ -445,7 +445,7 @@ bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent test
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspace_status.execute(...)
-  -> @bundjil/eve-effect BundjilAgentOperationsLive
+  -> @bundjil/eve WorkspaceOperationsLive
 ```
 
 The Task 4 local HTTP proof had none of `AI_GATEWAY_API_KEY`,
@@ -458,8 +458,9 @@ Follow-up local proof created a personal Vercel AI Gateway key under the
 `cooper-corbetts-projects` scope and stored it only in ignored
 `apps/agent/.env.local`. With that key present, `/eve/v1/info` reports Gateway
 `connected: true`, the model selects `workspace_status`, the tool result
-completes, and the model summarizes the current packages:
-`@bundjil/core`, `@bundjil/effect-start`, and `@bundjil/eve-effect`.
+completes, and the model summarizes the package list returned by the tool. At
+the time of that historical proof, the tool output named `@bundjil/core`,
+`@bundjil/effect-start`, and `@bundjil/eve-effect`.
 
 Do not commit `.env.local` or any copied Gateway key. Before adding new
 runtime integrations or deployed app boundaries, create a SPEC through
@@ -522,7 +523,7 @@ proof adds that boundary: authenticated Eve info selected
 through `session.waiting`, and the private proxy logged one authenticated 200
 chat-completions request. This is preview evidence only, not production
 approval. Refresh, fencing, and proxy ownership remain in `apps/codex-proxy`
-and `@bundjil/codex-oauth`.
+and `@bundjil/codex`.
 
 ## Current Production Proof Boundary
 

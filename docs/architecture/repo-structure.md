@@ -11,17 +11,17 @@ apps/
   codex-proxy/        Private Effect HTTP proxy app for Codex provider proof.
 
 packages/
-  core/               Framework-neutral Bundjil domain primitives and programs.
-  codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and codecs.
-  effect-persistence/ Provider-neutral native/atomic persistence and adapters.
-  effect-start/       Reusable TanStack Start middleware adapters for Effect.
-  eve-effect/         Effect contracts, service layers, and Eve schema bridge.
+  store/              Provider-neutral native/atomic persistence and adapters.
+  codex/              Complete Codex integration and intent-based exports.
+  eve/                Eve contracts, workspace status, and schema bridge.
 
 docs/
   architecture/       Durable architecture and repo standards.
-  product-specs/      Specs and task ledgers for planned work.
+  product-specs/      Specs and task ledgers; completed records keep provenance.
+  exec-plans/active/  Plans for work that is actually in progress.
+  exec-plans/completed/  Accepted and superseded execution evidence.
 
-.agents/skills/       Repo-local agent skills copied from the site workspace.
+.agents/skills/       Repo-local authoring and implementation guidance.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
 ```
@@ -35,11 +35,16 @@ needs it.
   local config, authored instructions, and secret binding names.
 - Packages own reusable contracts, schemas, service APIs, pure programs, and
   provider wrappers once the boundary is stable.
-- `@bundjil/core` owns channel-neutral personal-agent concepts.
-- `@bundjil/eve-effect` owns reusable Eve operation contracts and the Effect
-  Schema bridge to Eve.
-- `@bundjil/effect-start` owns generic TanStack Start middleware glue only.
-- `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
+- Package names, public export paths, service names, and error names describe
+  the capability that owns them. Do not name a reusable boundary after Effect,
+  a Layer, a repository pattern, or another implementation mechanism.
+- Keep provider qualifiers only when the capability genuinely wraps that
+  provider boundary. Provider-specific adapters such as Codex, Eve, Sendblue,
+  Executor, and Upstash retain their owner names; provider-neutral contracts do
+  not inherit a provider qualifier from one implementation.
+- `@bundjil/eve` owns reusable Eve operation contracts and the Effect
+  Schema bridge to Eve, including the workspace-status feature.
+- `@bundjil/store` owns native `KeyValueStore` composition,
   supplemental `AtomicKeyValueStore`, and explicit memory/Upstash Layers. It
   owns no OAuth, replay, or channel policy.
 
@@ -70,6 +75,12 @@ apps/agent/
   README.md           app usage and verification guide
 ```
 
+Eve's `agent/lib` directory is the framework's import-only authored slot, not a
+general-purpose shared-code bucket. Its immediate children name owned
+integrations such as `sendblue` and `executor`. Discovery identities remain the
+direct `channels/sendblue.ts` and `connections/executor.ts` files; do not
+replace them with nested `index.ts` entrypoints.
+
 `apps/codex-proxy` owns the private Codex provider HTTP runtime:
 
 ```text
@@ -85,7 +96,7 @@ apps/codex-proxy/
   README.md           routes, env vars, Vercel proof, rollback.
 ```
 
-The proxy app may import `@bundjil/codex-oauth` service tags, schemas, and
+The proxy app may import `@bundjil/codex` service tags, schemas, and
 layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
 The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
@@ -95,8 +106,8 @@ The proxy composes mock, deprecated local diagnostic, and refresh-capable
 hosted `live` modes for Production and retained Preview. It never owns a
 hosted browser OAuth callback or an account-linking endpoint. Deployable apps
 import server-safe layers from
-`@bundjil/codex-oauth/live.layer`; trusted-local browser, loopback, and login
-composition is isolated behind `@bundjil/codex-oauth/trusted-local.layer`.
+`@bundjil/codex/runtime`; trusted-local browser, loopback, and login
+composition is isolated behind `@bundjil/codex/local`.
 
 The Production-verified Sendblue channel remains app-owned in
 `apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; retained
@@ -131,32 +142,24 @@ plane.
 
 ## Package Boundaries
 
-`@bundjil/core`:
-
-- owns stable, provider-neutral agent domain contracts;
-- can export pure functions and Effect-returning programs;
-- must not import Eve, Sendblue, Cloudflare, Vercel Connect, Notion SDKs,
-  TanStack Start, React, or app files.
-
-`@bundjil/eve-effect`:
+`@bundjil/eve`:
 
 - owns Effect Schema contracts for Eve tool inputs and outputs;
-- owns tagged errors and named agent operation services;
+- owns the deterministic workspace-status summary, its tagged Schema failure,
+  and named operation service;
 - owns live and memory layers for operation tests;
-- owns `toEveSchema(schema)` for the Eve Standard Schema boundary;
-- may depend on `@bundjil/core`, `effect`, and Standard Schema packages;
+- owns `toEveSchema(schema)` on the explicit `/schema` export for the Eve
+  Standard Schema boundary;
+- may depend on Effect and Standard Schema packages;
 - must not own Eve filesystem files, app model config, channel files, or
   provider secrets.
 
-`@bundjil/effect-start`:
+`@bundjil/codex`:
 
-- owns generic Effect HTTP to TanStack Start middleware adapters;
-- may depend on TanStack Start and Effect HTTP primitives;
-- must stay independent of the Bundjil agent runtime, channels, and domain
-  workflows.
-
-`@bundjil/codex-oauth`:
-
+- organizes implementation under feature-owned `src/auth`, `src/profiles`,
+  `src/provider`, `src/storage`, and `src/testing` paths while keeping the
+  root, `/runtime`, `/local`, `/testing`, and `/filesystem-store` exports as
+  the supported consumer API;
 - owns Codex OAuth subjects, profiles, redacted token schemas, safe tagged
   errors, deterministic storage keys, direct Codex Responses proof schemas,
   and service tags;
@@ -167,7 +170,7 @@ plane.
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;
-- composes `@bundjil/effect-persistence` for native and atomic persistence;
+- composes `@bundjil/store` for native and atomic persistence;
   it owns Codex logical keys, encrypted profile codecs, and refresh policy,
   not the Upstash client or provider adapter;
 - owns the trusted-local access-token-only importer and encrypted filesystem
@@ -193,7 +196,7 @@ plane.
 
 - owns private proxy deployment concerns, route auth, mock/local/live mode
   selection, local dev, Vercel fetch export, and app-owned env names;
-- may compose `@bundjil/codex-oauth` service tags and schemas;
+- may compose `@bundjil/codex` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
 - composes refresh-capable encrypted `live` mode for personal Production and
@@ -230,6 +233,10 @@ plane.
 Rules:
 
 - Prefer package subpath exports for durable boundaries.
+- Name subpaths for consumer intent and owned capability. Effect service and
+  Layer patterns do not require mechanism-only public names or `.service.ts`
+  and `.layer.ts` filenames when the containing feature and exported symbol
+  already make ownership clear.
 - Use `.js` extensions for local TypeScript ESM imports under NodeNext.
 - Import schemas and schema-derived types from the owning package.
 - Do not import app files from packages.

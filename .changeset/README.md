@@ -15,4 +15,4 @@ bun run changeset:version
 ```
 
 Changesets should describe user-visible package changes and use workspace names
-such as `@bundjil/core`.
+such as `@bundjil/eve`.

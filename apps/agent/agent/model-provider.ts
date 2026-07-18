@@ -1,6 +1,6 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { OpenAICompatibleProviderSettings } from "@ai-sdk/openai-compatible";
-import { OpenAICompatibleProxyInternalToken } from "@bundjil/codex-oauth";
+import { OpenAICompatibleProxyInternalToken } from "@bundjil/codex";
 import type { LanguageModel } from "ai";
 import { Match, Redacted, Schema } from "effect";
 

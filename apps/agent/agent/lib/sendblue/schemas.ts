@@ -3,7 +3,7 @@ import {
   EveAssistantStepFinishReason,
   EveSessionId,
   EveTurnId,
-} from "@bundjil/eve-effect";
+} from "@bundjil/eve";
 import { Schema } from "effect";
 
 export const E164PhoneNumber = Schema.String.check(

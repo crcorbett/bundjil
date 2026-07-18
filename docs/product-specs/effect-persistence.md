@@ -1,5 +1,10 @@
 # Effect Persistence
 
+> Historical specification. The accepted implementation was subsequently
+> renamed to `@bundjil/store` by
+> [Repository Naming And Structure Cleanup](./repo-naming-cleanup.md). Names and
+> evidence below are preserved as originally accepted.
+
 - Status: Implemented
 - Proposed owner: `@bundjil/effect-persistence`
 - Consumers: `@bundjil/codex-oauth`, `apps/agent`

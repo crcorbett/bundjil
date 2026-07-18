@@ -1,4 +1,4 @@
-import { PersistenceMemory } from "@bundjil/effect-persistence/memory";
+import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
 import { Clock, Effect, Layer, Match, Redacted, Ref, Schema } from "effect";
 import { TestClock } from "effect/testing";
@@ -6,13 +6,13 @@ import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import { SendblueConfigService } from "../agent/lib/sendblue/config.js";
 import { SendblueReplayStoreError } from "../agent/lib/sendblue/errors.js";
-import { SendblueReplayClaimIdGenerator } from "../agent/lib/sendblue/replay-claim-id-generator.service.js";
+import { SendblueReplayClaimIdGenerator } from "../agent/lib/sendblue/replay-claim-id-generator.js";
 import {
   makeSendblueReplayStore,
   SendblueReplayStore,
   SendblueReplayStoreLive,
   SendblueReplayStoreMemory,
-} from "../agent/lib/sendblue/replay-store.service.js";
+} from "../agent/lib/sendblue/replay-store.js";
 import {
   SendblueConfig,
   SendblueInboundClaimKey,
@@ -24,7 +24,7 @@ import {
   SendblueSenderIdentities,
 } from "../agent/lib/sendblue/schemas.js";
 import type { SendblueReplayClaimResult } from "../agent/lib/sendblue/schemas.js";
-import { keyedSendblueDigest } from "../agent/lib/sendblue/session-router.service.js";
+import { keyedSendblueDigest } from "../agent/lib/sendblue/session-router.js";
 
 const replayOptions = Schema.decodeUnknownSync(
   Schema.Struct({

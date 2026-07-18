@@ -7,7 +7,10 @@
   },
   "include": [],
   "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/effect-start" }
+    { "path": "./packages/store" },
+    { "path": "./packages/codex" },
+    { "path": "./packages/eve" },
+    { "path": "./apps/codex-proxy" },
+    { "path": "./apps/agent" }
   ]
 }

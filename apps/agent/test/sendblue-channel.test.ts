@@ -6,7 +6,7 @@ import { makeSendblueEveChannel } from "../agent/channels/sendblue.js";
 import {
   SendblueChannel,
   SendblueChannelLive,
-} from "../agent/lib/sendblue/channel.service.js";
+} from "../agent/lib/sendblue/channel.js";
 import { SendblueConfigService } from "../agent/lib/sendblue/config.js";
 import {
   SendblueDeliveryUncertainError,
@@ -17,12 +17,11 @@ import {
   SendblueWebhookAuthenticationError,
   SendblueWebhookSchemaError,
 } from "../agent/lib/sendblue/errors.js";
-import { SendblueIdentityDirectoryLive } from "../agent/lib/sendblue/identity-directory.service.js";
-import { SendblueClientMemory } from "../agent/lib/sendblue/memory.layer.js";
+import { SendblueIdentityDirectoryLive } from "../agent/lib/sendblue/identity-directory.js";
 import {
   SendblueReplayStore,
   SendblueReplayStoreMemory,
-} from "../agent/lib/sendblue/replay-store.service.js";
+} from "../agent/lib/sendblue/replay-store.js";
 import {
   SendblueChannelState,
   SendblueConfig,
@@ -30,8 +29,9 @@ import {
   SendblueSendMessageSuccess,
   SendblueSenderIdentities,
 } from "../agent/lib/sendblue/schemas.js";
-import { SendblueSessionRouterLive } from "../agent/lib/sendblue/session-router.service.js";
-import { SendblueWebhookVerifierLive } from "../agent/lib/sendblue/webhook-verifier.service.js";
+import { SendblueSessionRouterLive } from "../agent/lib/sendblue/session-router.js";
+import { SendblueClientMemory } from "../agent/lib/sendblue/testing.js";
+import { SendblueWebhookVerifierLive } from "../agent/lib/sendblue/webhook-verifier.js";
 
 const senderIdentities = Schema.decodeUnknownSync(SendblueSenderIdentities)({
   "+14155550100": "owner",

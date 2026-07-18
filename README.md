@@ -37,19 +37,15 @@ its earlier proofs are historical evidence, not the current Production state.
 
 ## Current Packages
 
-- `@bundjil/core` owns framework-neutral personal-agent domain primitives and
-  Effect programs.
-- `@bundjil/effect-start` owns reusable TanStack Start middleware glue for
-  running Effect HTTP programs.
-- `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
-  errors, named operation services, and the Standard Schema bridge used by Eve
-  tools.
-- `@bundjil/codex-oauth` owns the Codex subscription profile/token lifecycle,
+- `@bundjil/eve` owns Eve-facing Effect Schema contracts, the deterministic
+  workspace-status feature and operation service, and the `/schema` bridge used
+  by Eve tools.
+- `@bundjil/codex` owns the Codex subscription profile/token lifecycle,
   trusted-local loopback PKCE login, encrypted profile envelope, fenced
   persistence and refresh services, and direct Codex Responses proof surface.
   It composes shared persistence services; it does not own an Upstash adapter
   or hosted browser OAuth callback/account-linking flow.
-- `@bundjil/effect-persistence` owns provider-neutral
+- `@bundjil/store` owns provider-neutral
   `AtomicKeyValueStore` contracts plus coherent native Effect `KeyValueStore`
   memory and Upstash Layers. Its `/memory` and `/upstash` subpaths keep
   provider selection out of the root contract.
@@ -60,7 +56,7 @@ its earlier proofs are historical evidence, not the current Production state.
   personal Vercel account, not Tilt Legal.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, the `workspace_status` tool that delegates into
-  `@bundjil/eve-effect`, app-owned model-provider config, and its scoped
+  `@bundjil/eve`, app-owned model-provider config, and its scoped
   Executor MCP connection. Gateway is the default model path; Codex proxy mode
   is opt-in.
 
@@ -98,7 +94,7 @@ ran `connection_search` -> `executor__skills` -> `executor__execute` through
 the Codex subscription path, returned `succeeded`, and reached
 `session.waiting`. No Production write or approval was requested. Rollback,
 revocation, monitoring, and incident procedures are recorded in
-[`apps/agent/README.md`](./apps/agent/README.md) and the active Executor plan;
+[`apps/agent/README.md`](./apps/agent/README.md) and the completed Executor plan;
 no Production write is an acceptance step.
 
 ## Sendblue Channel State
@@ -230,11 +226,9 @@ apps/
   agent/             Vercel Eve app and workspace_status tool.
   codex-proxy/       Private Effect HTTP proxy for Codex provider proof.
 packages/
-  core/              Framework-neutral Bundjil domain primitives.
-  codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
-  effect-persistence/ Native and atomic persistence contracts/adapters.
-  effect-start/      TanStack Start adapter for Effect HTTP programs.
-  eve-effect/        Effect contracts and services for Eve tool boundaries.
+  store/             Native and atomic persistence contracts/adapters.
+  codex/             Complete Codex integration and intent-based exports.
+  eve/               Eve contracts, workspace status, and schema bridge.
 docs/
   README.md          Documentation index.
   architecture/
@@ -267,9 +261,9 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 ## Persistence Boundaries
 
-`@bundjil/effect-persistence` owns the provider-neutral atomic transaction
+`@bundjil/store` owns the provider-neutral atomic transaction
 contract and the only `@upstash/redis` dependency. `apps/codex-proxy` owns
-runtime mode selection; `@bundjil/codex-oauth` owns Codex
+runtime mode selection; `@bundjil/codex` owns Codex
 profile/environment/key-policy composition; and `apps/agent` owns Sendblue
 replay config and delivery policy. The shared `/upstash` adapter owns
 schema-decoded redacted provider options, client construction, prefixing,
@@ -291,8 +285,8 @@ it does not clear a namespace or rewrite durable records as recovery.
    opt-in.
 2. Keep Gateway as default unless app-owned configuration selects the
    Production-proven Codex proxy path.
-3. Define channel-neutral message, identity, consent, and task contracts in
-   `@bundjil/core`.
+3. Introduce capability-owned shared contracts only after a stable
+   multi-consumer boundary exists.
 4. Keep the Production Sendblue channel and its retained Preview counterpart
    healthy through route, replay, inventory, monitoring, and rollback checks.
 5. Add the Cloudflare email ingress path.

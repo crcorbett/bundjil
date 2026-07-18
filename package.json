@@ -27,9 +27,6 @@
       "typescript": {
         "typescript": "^6.0.3"
       },
-      "tanstack": {
-        "@tanstack/react-start": "1.168.26"
-      },
       "effect": {
         "effect": "^4.0.0-beta.74",
         "@effect/platform-bun": "4.0.0-beta.74",
@@ -48,7 +45,7 @@
     "check-types": "turbo run check-types",
     "fix": "ultracite fix --type-aware",
     "check": "ultracite check --type-aware",
-    "verification": "bun run check && bun run knip && bun run check-types && bun run test",
+    "verification": "bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
     "eve": "eve",
     "changeset": "changeset",
     "changeset:add": "changeset add",
@@ -56,6 +53,7 @@
     "changeset:status": "changeset status",
     "prepare": "effect-language-service patch",
     "test": "turbo run test",
+    "test:lint": "vitest run --config lint/vitest.config.ts",
     "knip": "knip"
   },
   "devDependencies": {

@@ -8,12 +8,12 @@ Start here for repo conventions.
 - `turbo.json` owns workspace task orchestration.
 - `tsconfig.base.json` owns strict TypeScript and Effect language-service
   settings.
-- `packages/core` owns framework-neutral Bundjil domain primitives and Effect
-  programs.
-- `packages/effect-start` owns reusable TanStack Start middleware glue for
-  running Effect HTTP programs.
-- `packages/eve-effect` owns Eve-facing Effect Schema contracts, tagged
-  errors, named operation services, and the Eve schema bridge.
+- `packages/store` owns provider-neutral native and atomic store contracts,
+  plus explicit memory and Upstash adapters.
+- `packages/codex` owns Codex auth, profiles, storage policy, provider
+  transport, proxy contracts, and intent-based public exports.
+- `packages/eve` owns Eve-facing Effect Schema contracts, the workspace-status
+  feature, its named operation service, and the Eve schema bridge.
 - `apps/agent` owns the committed Vercel Eve app, including the root agent,
   instructions, app-owned config, and Eve tools.
 - `apps/codex-proxy` owns the private Effect HTTP proxy app for Codex

@@ -3,10 +3,9 @@
 Bundjil is a Bun/Turbo monorepo for a personal agent built around Vercel Eve,
 Effect, and channel adapters for iMessage, email, and connected personal tools.
 
-The current codebase contains a deployed Eve app slice. It establishes the
-Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
-`@bundjil/eve-effect`, and keeps framework-neutral primitives in
-`@bundjil/core`. The private Codex proxy app now exists as a separate
+The current codebase contains a deployed Eve app slice. It establishes the Eve
+filesystem boundary in `apps/agent` and keeps the reusable workspace-status
+operation and schema bridge in `@bundjil/eve`. The private Codex proxy app is a separate
 deployment boundary. Eve uses AI Gateway by default and can opt into the
 private Codex proxy through app-owned Effect Config.
 
@@ -19,11 +18,11 @@ Implemented:
 - `apps/codex-proxy` exposes private Effect HTTP proxy routes locally and on
   personal Vercel Production and Preview deployments. Its refresh-capable live
   composition is proven through Production Eve.
-- `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
+- `@bundjil/codex` owns Codex OAuth profile/token contracts, direct
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
   memory layers, and Codex-specific persistence composition over shared native
   and atomic persistence services.
-- `@bundjil/effect-persistence` owns provider-neutral native Effect
+- `@bundjil/store` owns provider-neutral native Effect
   `KeyValueStore` and supplemental `AtomicKeyValueStore` contracts, coherent
   memory Layer, and explicit Upstash Layer.
 
@@ -47,14 +46,12 @@ Unsupported:
 iMessage
   -> Sendblue webhook
   -> apps/agent Sendblue Eve channel (Production verified; Preview retained)
-  -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 
 Email
   -> Cloudflare Email Routing Worker
   -> future Eve email channel/app boundary
-  -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 ```
@@ -68,57 +65,41 @@ subagents. Bundjil's committed app currently uses the root `agent.ts`,
 
 ```text
 apps/agent
-  -> @bundjil/eve-effect
+  -> @bundjil/eve
   -> @ai-sdk/openai-compatible when BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
   -> apps/codex-proxy over private HTTP when Codex proxy mode is enabled
 
-@bundjil/eve-effect
-  -> @bundjil/core
+@bundjil/eve
   -> effect
   -> @standard-schema/spec
 
-@bundjil/effect-start
-  -> effect
-  -> @tanstack/react-start
-
-@bundjil/codex-oauth
+@bundjil/codex
   -> effect
   -> effect/unstable/persistence/KeyValueStore
-  -> @bundjil/effect-persistence
+  -> @bundjil/store
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
 
-@bundjil/effect-persistence
+@bundjil/store
   -> effect/unstable/persistence/KeyValueStore
   -> @upstash/redis only through its explicit /upstash subpath
 
 apps/codex-proxy
   -> effect/unstable/http
-  -> @bundjil/codex-oauth
-
-@bundjil/core
-  -> effect
+  -> @bundjil/codex
 ```
 
-`@bundjil/core` stays framework-neutral. It can expose channel-neutral message
-types, identity and consent contracts, tool intent schemas, service contracts,
-and pure or Effect-returning programs.
+`@bundjil/eve` owns the Eve-facing Effect boundary: canonical Effect
+Schema contracts, `WorkspaceSchemaError`, the `WorkspaceOperations` service,
+the deterministic workspace summary, live and memory layers, and the
+`@bundjil/eve/schema` bridge for Eve `defineTool` schemas.
 
-`@bundjil/eve-effect` owns the Eve-facing Effect boundary: canonical Effect
-Schema contracts, schema-backed tagged errors, the `BundjilAgentOperations`
-service, live and memory layers, and `toEveSchema(schema)` for Eve
-`defineTool` schemas.
-
-`@bundjil/effect-start` is framework glue only. It adapts Effect HTTP programs
-to TanStack Start middleware and must not know about channel routing, product
-workflows, Eve runtime composition, or app-specific content.
-
-`@bundjil/codex-oauth` owns the Codex OAuth profile and token lifecycle
+`@bundjil/codex` owns the Codex OAuth profile and token lifecycle
 contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
 storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It also owns the explicit
-shared `@bundjil/effect-persistence/upstash` composition for Vercel Marketplace
+shared `@bundjil/store/upstash` composition for Vercel Marketplace
 Upstash Redis. The package owns profile keys and refresh policy, not provider
 commands, prefixing, or client construction.
 It owns the trusted-local loopback PKCE exchange and encrypted hosted
@@ -133,7 +114,7 @@ refresh-capable live providers. It exposes no browser OAuth route.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, channel files, and runtime secrets.
-It imports stable operations from `@bundjil/eve-effect` instead of duplicating
+It imports stable operations from `@bundjil/eve` instead of duplicating
 schemas or DTOs. For model selection, it owns only provider config and
 `LanguageModel` construction; it must not import Codex OAuth profile storage,
 token refresh, or direct Codex HTTP clients.
@@ -150,9 +131,9 @@ Eve HTTP API
   -> apps/agent/agent/agent.ts model config
   -> apps/agent/agent/instructions.md
   -> apps/agent/agent/tools/workspace_status.ts
-  -> @bundjil/eve-effect getWorkspaceStatus
-  -> @bundjil/eve-effect BundjilAgentOperationsLive
-  -> @bundjil/core makeWorkspaceSummary
+  -> @bundjil/eve getWorkspaceStatus
+  -> @bundjil/eve WorkspaceOperationsLive
+  -> @bundjil/eve makeWorkspaceSummary
 ```
 
 Gateway model path:
@@ -173,7 +154,7 @@ apps/agent/agent/agent.ts
   -> BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
   -> @ai-sdk/openai-compatible LanguageModel
   -> apps/codex-proxy /v1/chat/completions
-  -> @bundjil/codex-oauth OpenAICompatibleProxy
+  -> @bundjil/codex OpenAICompatibleProxy
 ```
 
 The deployed Production proof records this configured Eve -> proxy path through
@@ -206,7 +187,7 @@ provider probe.
 Schema boundary:
 
 ```text
-@bundjil/eve-effect WorkspaceStatusInput / WorkspaceStatusSuccess
+@bundjil/eve WorkspaceStatusInput / WorkspaceStatusSuccess
   -> toEveSchema(schema)
   -> Effect Schema Standard Schema validation
   -> Effect Schema Standard JSON Schema metadata
@@ -232,12 +213,12 @@ Test path:
 Vitest
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspace_status.execute(...)
-  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
-  -> @bundjil/core makeWorkspaceSummary
+  -> getWorkspaceStatus(...).pipe(Effect.provide(WorkspaceOperationsLive))
+  -> @bundjil/eve makeWorkspaceSummary
 
 Vitest
-  -> packages/eve-effect/test/bundjil-agent-operations.test.ts
-  -> BundjilAgentOperationsLive or BundjilAgentOperationsMemory
+  -> packages/eve/test/workspace-operations.test.ts
+  -> WorkspaceOperationsLive or WorkspaceOperationsMemory
   -> canonical WorkspaceStatus schemas and tagged errors
 
 Vitest
@@ -247,13 +228,13 @@ Vitest
   -> injected fetch proof for bearer auth and no token body leak
 
 Vitest
-  -> packages/effect-persistence/test/upstash-key-value-store.test.ts
-  -> packages/effect-persistence/test/upstash-atomic-key-value-store.test.ts
-  -> mocked Upstash client through @bundjil/effect-persistence/upstash
+  -> packages/store/test/upstash-key-value-store.test.ts
+  -> packages/store/test/upstash-atomic-key-value-store.test.ts
+  -> mocked Upstash client through @bundjil/store/upstash
   -> native KeyValueStore + AtomicKeyValueStore compatibility
 
 Consumer suites
-  -> packages/codex-oauth/test/persistence.test.ts
+  -> packages/codex/test/persistence.test.ts
   -> apps/agent/test/sendblue-replay-store.test.ts
   -> Codex profile and Sendblue replay compatibility
 ```
@@ -274,8 +255,8 @@ Vercel preview request
 
 ## Runtime Principles
 
-- Keep the agent core channel-neutral. iMessage, email, and future channels
-  should normalize into shared domain envelopes before workflow logic runs.
+- Keep app-owned integrations provider-specific. Introduce a shared domain
+  contract only after a stable multi-consumer boundary exists.
 - Use Effect for fallible, async, stateful, boundary-crossing, or
   dependency-injected code.
 - Keep provider credentials out of durable domain contracts. Prefer Vercel
@@ -297,15 +278,18 @@ Vercel preview request
 The Production-verified Sendblue channel belongs in its existing app-owned
 boundary. Retain Preview as an independent historical environment. Future
 Cloudflare email, Vercel Connect, and Notion code belongs in app-owned
-boundaries first. Move shared contracts into `@bundjil/core` or
-`@bundjil/eve-effect` only after the boundary is proven stable.
+boundaries first. Move a contract into a capability-owned package only after
+the boundary is proven stable.
 
 ## Quality Gates
 
 - `bun run build` compiles all packages through Turbo.
 - `bun run test` runs package test suites.
 - `bun run check-types` checks workspace TypeScript references.
-- `bun run check` runs Ultracite type-aware lint/format checks.
+- `bun run check` runs Ultracite type-aware lint/format checks, including the
+  `bundjil/tagged-error-name` equality rule for app and package TypeScript.
+- `bun run test:lint` proves the repository lint plugin accepts a matching
+  tagged error and rejects declaration, self-type, and literal-tag mismatches.
 - `bun run verification` runs lint, dependency hygiene, type checking, and
   tests.
 - `bun run --filter @bundjil/agent dev:no-ui` starts the local Eve app on port
@@ -315,10 +299,10 @@ boundaries first. Move shared contracts into `@bundjil/core` or
   mock SSE without Codex network calls.
 - `bun run --filter @bundjil/agent test` proves Gateway default selection and
   private proxy provider construction without live credentials.
-- `bun run --filter @bundjil/codex-oauth test` proves profile storage,
+- `bun run --filter @bundjil/codex test` proves profile storage,
   request/stream mapping, direct proof boundaries, and shared persistence
   composition.
-- `bun run --filter @bundjil/effect-persistence test` proves native/atomic
+- `bun run --filter @bundjil/store test` proves native/atomic
   persistence compatibility and the mocked Upstash adapter.
 
 Every implementation task touching Effect runtime, provider, storage, or app

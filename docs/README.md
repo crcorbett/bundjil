@@ -24,41 +24,12 @@ README.
 - [Frontend Composition](./architecture/frontend-composition.md) defines the
   conditional React hierarchy, leaf ownership, Effect/runtime boundary, and
   browser verification rules for future visible apps.
-- [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
-  describes the first planned Eve agent implementation and Effect wrapper
-  boundary.
-- [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
-  specifies the research-gated Codex OAuth service, Effect KeyValueStore
-  profile store, Eve model-provider wiring, and mandatory implementation audit.
-- [Personal Codex Subscription Auth And Hosted Proxy](./product-specs/codex-hosted-live-oauth-storage.md)
-  specifies trusted-local loopback PKCE sign-in, versioned encrypted
-  refresh-capable profiles, fenced rotation, personal Vercel preview proof,
-  and mandatory implementation audits without a hosted OAuth callback.
-- [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
-  preserves the historical access-token-only fallback. It is superseded for
-  normal hosted operation and remains only as a deprecated emergency/local
-  diagnostic path.
-- [Vercel Production Promotion](./product-specs/vercel-production-promotion.md)
-  gates production on a clean encrypted-variable Preview redeploy, then defines
-  target-separated auth, proxy URL, profile provisioning, monitoring, and
-  rollback.
-- [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) specifies the
-  app-owned iMessage channel, shared-secret webhook verification, sender
-  identity mapping, deterministic Eve routing, durable replay protection,
-  outbound delivery, and Vercel Preview proof.
-- [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
-  preserves the Parallel AI report that corrected the subscription-backed model
-  access plan.
 - [Reference repositories](./reference-repositories.md) explains the local
   `.local/references` setup for Vercel and Effect source lookup.
-- [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral
-  package for domain primitives and Effect programs.
-- [`@bundjil/effect-start`](../packages/effect-start/README.md) documents the
-  TanStack Start adapter package.
-- [`@bundjil/eve-effect`](../packages/eve-effect/README.md) documents the
-  Effect Schema contracts, tagged errors, service layers, Eve schema bridge,
+- [`@bundjil/eve`](../packages/eve/README.md) documents the
+  Effect Schema contracts, workspace-status operation, `/schema` Eve bridge,
   and verification commands for the Eve app operation boundary.
-- [`@bundjil/codex-oauth`](../packages/codex-oauth/README.md) documents the
+- [`@bundjil/codex`](../packages/codex/README.md) documents the
   Codex OAuth profile store, direct Codex Responses proof service, service
   tags, KeyValueStore layers, Upstash Redis adapter, and safe
   secret-handling rules.
@@ -66,6 +37,37 @@ README.
   private Effect HTTP proxy app, local mock and filesystem proof, personal
   Vercel preview live mode, fenced refresh and 401 recovery, safe self-tests,
   and rollback.
+
+## Historical Specifications And Plans
+
+Product specifications and task ledgers preserve the names and evidence that
+were current when each change was accepted. They are historical records, not
+current package or command guidance. Completed execution evidence lives in
+[`exec-plans/completed`](./exec-plans/completed/); only work that is actually in
+progress belongs in `exec-plans/active`.
+
+- [Repository Naming And Structure Cleanup](./product-specs/repo-naming-cleanup.md)
+  records the capability-based package migration and compatibility audit.
+- [Effect Persistence](./product-specs/effect-persistence.md) records the
+  original persistence package implementation and is explicitly superseded by
+  `@bundjil/store`.
+- [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md) records
+  the first Eve agent and Effect wrapper boundary.
+- [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
+  records the research-gated Codex provider and proxy rollout.
+- [Personal Codex Subscription Auth And Hosted Proxy](./product-specs/codex-hosted-live-oauth-storage.md)
+  records trusted-local PKCE sign-in and hosted encrypted profile storage.
+- [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
+  records the superseded access-token-only fallback.
+- [Vercel Production Promotion](./product-specs/vercel-production-promotion.md)
+  records the accepted Production promotion and corrected routing evidence.
+- [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) records the
+  app-owned iMessage channel rollout.
+- [Executor MCP Connection](./product-specs/executor-mcp-connection.md) records
+  the app-owned Executor connection and accepted Production policy evidence.
+- [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
+  preserves the research report that corrected the subscription-backed model
+  access plan.
 
 ## Codex Provider Documentation Map
 
@@ -81,9 +83,9 @@ README.
   Tilt Legal. Preview proof is historical. Accepted Production evidence covers
   one deployed Eve-to-live-proxy completion and the bounded Task 4 rollout;
   it is not a standing provider probe or approval for later deployment changes.
-- Storage: `@bundjil/effect-persistence/upstash` provides native Effect
+- Storage: `@bundjil/store/upstash` provides native Effect
   `KeyValueStore` plus `AtomicKeyValueStore` through one provider adapter.
-  `@bundjil/codex-oauth` owns profile keys, encrypted codecs, and refresh
+  `@bundjil/codex` owns profile keys, encrypted codecs, and refresh
   policy. `live` stores a versioned encrypted subscription profile, refreshes
   under a distributed lock, and fenced-CAS commits credential generations. The
   ID token is decoded during trusted-local login and is never persisted. The

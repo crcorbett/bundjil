@@ -40,6 +40,14 @@ Read in this order:
   and collection code.
 - Reuse canonical schemas, types, service contracts, branded identifiers, and
   typed errors from owning packages.
+- For an exported tagged-error migration, follow
+  `docs/architecture/effect-patterns.md` and
+  `docs/architecture/testing-and-quality.md`. Accept only an atomic change to
+  the class declaration, generic self-type, literal tag, constructors, failure
+  unions, catchers, guards, encoded tests, boundary mappings, and current docs.
+  Reject a partial consumer/catcher migration, an unplanned alias or dual
+  decoder, or a compatibility claim that does not check persisted/public/
+  independently deployed/external decoder boundaries.
 - For frontend design-system implementation tasks that change token taxonomy,
   component catalogue structure, accessibility expectations, documentation,
   governance, or foundations, follow the design-system authority named by the
@@ -150,6 +158,9 @@ Before accepting a task, audit for:
   carry the behavior
 - no duplicated standalone fields such as `id: string`, `slug: string`, status,
   or metadata outside the owning schema/type
+- exported tagged-error class/self-type/literal equality, exhaustive consumer
+  migration, exact target encode/decode plus old-tag rejection, stable public
+  mappings, and no unplanned alias or dual decoder
 - route loaders and runtime code use the app runtime/RPC client boundary rather
   than route-local server functions or import-time runtime branching
 - frontend routes compose visible structure as high as practical and do not add

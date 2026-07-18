@@ -10,7 +10,7 @@ const ProxyManifest = Schema.Struct({
 const VercelConfig = Schema.Struct({ buildCommand: Schema.String });
 
 describe("Vercel packaging", () => {
-  it("retains the persistence runtime dependency and builds workspace output in order", async () => {
+  it("builds the transitive store workspace output without a direct dependency", async () => {
     const [manifestSource, vercelConfigSource] = await Promise.all([
       readFile(new URL("package.json", appDirectory), "utf-8"),
       readFile(new URL("vercel.json", appDirectory), "utf-8"),
@@ -22,12 +22,10 @@ describe("Vercel packaging", () => {
       Schema.fromJsonString(VercelConfig)
     )(vercelConfigSource);
 
-    expect(manifest.dependencies["@bundjil/effect-persistence"]).toBe(
-      "workspace:*"
-    );
+    expect(manifest.dependencies["@bundjil/store"]).toBeUndefined();
     expect(vercelConfig.buildCommand.split(" && ")).toStrictEqual([
-      "bun run --filter @bundjil/effect-persistence build",
-      "bun run --filter @bundjil/codex-oauth build",
+      "bun run --filter @bundjil/store build",
+      "bun run --filter @bundjil/codex build",
       "bun run --filter @bundjil/codex-proxy build",
     ]);
   });

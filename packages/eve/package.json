@@ -1,0 +1,52 @@
+{
+  "name": "@bundjil/eve",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Effect Schema contracts and operations for the Bundjil Eve agent.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcorbett/bundjil.git",
+    "directory": "packages/eve"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "@bundjil/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "@bundjil/source": "./src/schema.ts",
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./schema": {
+        "types": "./dist/schema.d.ts",
+        "default": "./dist/schema.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
+    "effect": "catalog:effect"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:effect",
+    "typescript": "catalog:typescript",
+    "vitest": "catalog:testing"
+  }
+}

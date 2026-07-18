@@ -2,7 +2,8 @@ import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Redacted, Schema } from "effect";
 
 import {
-  ExecutorConnectionConfigError,
+  ExecutorConfigError,
+  ExecutorConfigOperation,
   ExecutorElicitationMode,
   ExecutorMcpEndpoint,
   loadExecutorApiKey,
@@ -14,6 +15,44 @@ const browserEndpoint =
 const modelEndpoint =
   "https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model";
 const syntheticKey = "executor-config-synthetic-secret";
+
+it.effect("encodes and decodes only the Executor config error target tag", () =>
+  Effect.sync(() => {
+    const expected = {
+      _tag: "ExecutorConfigError",
+      message: "ExecutorConfigError: loadApiKey",
+      operation: "loadApiKey",
+      reason: "Executor MCP credential configuration is invalid.",
+    } as const;
+    const encoded = Schema.encodeUnknownSync(ExecutorConfigError)(
+      new ExecutorConfigError({
+        message: expected.message,
+        operation: expected.operation,
+        reason: expected.reason,
+      })
+    );
+
+    assert.deepStrictEqual(encoded, expected);
+    assert.strictEqual(
+      Schema.is(ExecutorConfigOperation)("loadEndpoint"),
+      true
+    );
+    assert.strictEqual(Schema.is(ExecutorConfigOperation)("loadApiKey"), true);
+
+    const decoded = Schema.decodeUnknownSync(ExecutorConfigError)(expected);
+    assert.strictEqual(decoded._tag, "ExecutorConfigError");
+    assert.strictEqual(Schema.is(ExecutorConfigError)(decoded), true);
+
+    const oldEncoded = {
+      ...expected,
+      _tag: "ExecutorConnectionConfigError",
+    };
+    assert.strictEqual(Schema.is(ExecutorConfigError)(oldEncoded), false);
+    assert.throws(() => {
+      Schema.decodeUnknownSync(ExecutorConfigError)(oldEncoded);
+    });
+  })
+);
 
 it.effect(
   "loads explicit model and browser Executor toolkit endpoints and a redacted key",
@@ -84,10 +123,7 @@ it.effect(
           Effect.flip
         );
 
-        assert.strictEqual(
-          Schema.is(ExecutorConnectionConfigError)(error),
-          true
-        );
+        assert.strictEqual(Schema.is(ExecutorConfigError)(error), true);
         assert.strictEqual(error.operation, "loadEndpoint");
         assert.strictEqual(
           error.reason,
@@ -109,16 +145,10 @@ it.effect("sanitizes missing endpoint and credential failures", () =>
       Effect.flip
     );
 
-    assert.strictEqual(
-      Schema.is(ExecutorConnectionConfigError)(endpointError),
-      true
-    );
+    assert.strictEqual(Schema.is(ExecutorConfigError)(endpointError), true);
     assert.strictEqual(endpointError.operation, "loadEndpoint");
     assert.notInclude(String(endpointError), syntheticKey);
-    assert.strictEqual(
-      Schema.is(ExecutorConnectionConfigError)(keyError),
-      true
-    );
+    assert.strictEqual(Schema.is(ExecutorConfigError)(keyError), true);
     assert.strictEqual(keyError.operation, "loadApiKey");
     assert.notInclude(String(keyError), syntheticKey);
   })

@@ -1,0 +1,408 @@
+{
+  "title": "Repository Naming And Structure Cleanup Tasks",
+  "spec": "docs/product-specs/repo-naming-cleanup.md",
+  "status": "completed",
+  "principles": [
+    "Name reusable packages after the capability or external boundary they own, never after Effect as the implementation technology.",
+    "Keep @bundjil/agent and @bundjil/codex-proxy unchanged because they already identify real product and provider boundaries.",
+    "Remove unused or self-describing scaffolding instead of preserving it through forwarding packages or aliases.",
+    "Preserve every environment variable, physical storage key, encoded value, TTL, route, tool slug, provider URL, webhook, deployment project, and secret name.",
+    "Use intent-based public exports such as runtime, local, testing, filesystem-store, memory, upstash, and schema.",
+    "Keep provider-specific names only at genuine boundaries, including Codex, Eve, Sendblue, Executor, and Upstash adapters.",
+    "Do not create core, shared, common, utils, helpers, manager, or repository buckets; apps/agent/agent/lib is the documented Eve import-only slot and may contain only clearly owned integration directories.",
+    "Primary Effect operations remain flat named programs with tagged failures handled in pipe; a rename must not hide logic changes or helper sprawl.",
+    "Reuse canonical Effect Schemas, schema-derived types, service tags, errors, and branded identifiers from the owning package without DTO mirrors or unsafe casts.",
+    "Historical evidence may retain old names when clearly labeled; current code, commands, runbooks, architecture, and navigation must use only the target names.",
+    "Rename the exhaustive selected error contracts atomically across class symbols, literal _tags, associated Schemas, failure unions, constructors, catchers, guards, CLI diagnostics, tests, and current docs; preserve every non-selected tag and error field.",
+    "Carry the reusable tagged-error invariant into canonical architecture docs, repository-owned authoring and implementation skills, and a focused static rule; keep this cleanup's exhaustive old-to-new mapping only in the SPEC and ledger.",
+    "Treat Context.Service identifier strings as dependency identities that require an atomic tag, Layer, and consumer migration, not as telemetry-only labels.",
+    "No frontend, browser-visible state, provider mutation, deployment, package publication, or stored-data migration is in scope."
+  ],
+  "globalVerification": [
+    "export BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model'",
+    "export BUNDJIL_EXECUTOR_API_KEY='executor-ci-synthetic-key'",
+    "After workspace manifest changes, run bun install once to regenerate bun.lock before the frozen gate",
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/store check-types",
+    "bun run --filter @bundjil/store test",
+    "bun run --filter @bundjil/store build",
+    "bun run --filter @bundjil/codex check-types",
+    "bun run --filter @bundjil/codex test",
+    "bun run --filter @bundjil/codex build",
+    "bun run --filter @bundjil/eve check-types",
+    "bun run --filter @bundjil/eve test",
+    "bun run --filter @bundjil/eve build",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run test:lint",
+    "bun run check",
+    "bun run knip",
+    "bun run check-types",
+    "bun run test",
+    "bun run build",
+    "bun run verification",
+    "bun run changeset:status",
+    "git diff --check",
+    "jq empty docs/product-specs/repo-naming-cleanup.tasks.json",
+    "Current-source scans find no old package names or old package paths",
+    "Eve discovery and static scans prove channels/sendblue.ts and connections/executor.ts remain direct authored entrypoints, with no nested index.ts replacement",
+    "Historical occurrences of old names are confined to explicitly labeled specs, ledgers, completed plans, or compatibility assertions",
+    "Static scans prove @upstash/redis remains confined to @bundjil/store/upstash implementation files",
+    "Compatibility tests prove exact storage keys, encoded values, TTLs, Codex profile fencing and refresh locks, Sendblue replay transitions, target error tags and old-tag rejection, unchanged non-selected tags, stable proxy responses, Eve tool slug and schemas, and Vercel packaging",
+    "Current-source and current operational/architecture-doc scans find no selected old error symbol or literal outside this canonical SPEC/task migration table and focused old-tag rejection assertions; no compatibility alias or dual-tag decoder is exported",
+    "bundjil/tagged-error-name is enabled through oxlint.config.ts for apps and packages; its tests prove matching declarations pass and mismatched class, self-type, or literal-tag names fail",
+    "Package manifests keep exports and publishConfig.exports synchronized; root TypeScript references, Knip, CI synthetic Executor inputs, and Vercel build filters match the target graph exactly",
+    "No environment-variable, provider endpoint, webhook, Vercel project, deployment alias, external URL, tool slug, or secret name changes",
+    "Effect language-service diagnostics are reviewed for every changed TypeScript file with no unresolved actionable hints",
+    "No unsafe casts, DTO mirrors, manual object readers/mappers, trivial wrappers, broad barrels, process.env reads in provider-neutral packages, or weakened lint/compiler rules are introduced",
+    "No React, TSX, visible route, browser state, provider mutation, deployment, publication, or stored-data rewrite occurs"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record distinct parent passes for ownership and call graph, Effect implementation quality and helper admission, and verification and evidence coverage. Add more passes while any naming, compatibility, storage, packaging, documentation, or runtime finding remains unresolved."
+  },
+  "tasks": [
+    {
+      "id": "capture-compatibility-baseline-and-remove-effect-start",
+      "title": "Capture the compatibility baseline and remove the unused TanStack package",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Record the current package graph and compatibility fixtures, prove @bundjil/effect-start has no production consumer, then remove it without introducing a replacement package.",
+      "implementationNotes": [
+        "Baseline recorded seven original workspaces, effect-start exports and dependency/config edges, the original three-package workspace_status output, 39 pre-removal Schema.TaggedErrorClass declarations, selected error consumers, and the named storage/replay/tool/proxy compatibility owners.",
+        "No production effect-start import or persisted/public selected-error encoding was found. The proxy translates selected internal errors to stable public response codes and statuses.",
+        "Added the root bundjil/tagged-error-name Oxlint rule and focused tests, removed effect-start plus the TanStack catalog and lock closure, and left every selected error contract unchanged.",
+        "The environmentless agent test failed at the expected fail-closed Executor config boundary; the documented synthetic Executor values were then used for the passing task and parent verification gates."
+      ],
+      "mandatoryVerification": [
+        "Record the current workspace package names, dependency edges, public exports, Turbo filters, Knip entries, Vercel includeFiles, and workspace_status package output before mutation.",
+        "Record the existing compatibility owners before mutation: packages/codex-oauth/src/storage-keys.ts plus codex-oauth.test.ts and persistence.test.ts; apps/agent/test/sendblue-replay-store.test.ts; packages/eve-effect/test/tool-adapter.test.ts; apps/agent/test/workspace-status-tool.test.ts; and the proxy/agent Vercel packaging tests.",
+        "Inventory all exported Schema.TaggedErrorClass contracts and every selected symbol/tag consumer before mutation, including exports, failure unions, constructors, catchTag/catchTags keys, Schema.is checks, literal comparisons, the staging CLI errorTag field, sanitized rendered-name assertions, tests, and current docs.",
+        "Prove no selected error object is persisted or returned directly in a public provider/HTTP payload. If an external or persisted old-tag decoder is found, stop and amend the SPEC rather than adding an implicit compatibility alias.",
+        "Add lint/oxlint-plugin.ts with the bundjil/tagged-error-name rule, enable it in oxlint.config.ts for TypeScript source under apps and packages, and add lint/oxlint-plugin.test.ts cases proving matching declaration/self-type/literal names pass while each mismatch fails. Add the root test:lint script to verification; do not encode subjective capability vocabulary or migration-specific forbidden-name lists in the rule.",
+        "Prove @bundjil/effect-start has no production import or runtime consumer outside its own package, documentation, and self-describing workspace output.",
+        "Remove packages/effect-start, its manifest and lockfile entry, workspace output entry, current docs, root TypeScript reference, and configuration references; remove the now-unused root tanstack dependency catalog and lockfile closure; do not create @bundjil/tanstack-start or another forwarding package.",
+        "After manifest removal run bun install once to regenerate bun.lock, then use bun install --frozen-lockfile for validation; never hand-edit the lockfile.",
+        "Any touched Effect operation remains a flat meaningful Effect.gen or Effect.fn program with typed errors handled in pipe through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types remain owned and reused; no unsafe casts, DTO mirrors, manual readers/mappers, or trivial wrappers/helpers are introduced.",
+        "bun install --frozen-lockfile",
+        "bun run test:lint",
+        "bun run check",
+        "bun run knip",
+        "bun run check-types",
+        "bun run test",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "Compatibility fixtures and invariant owners are recorded before package renames begin.",
+        "bundjil/tagged-error-name runs through the normal check gate and its focused tests prove the durable class/self-type/literal equality invariant before any error migration begins.",
+        "@bundjil/effect-start and packages/effect-start no longer exist in current source or workspace metadata.",
+        "All remaining workspaces pass typechecks and tests.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: effect-start had no production consumer; removal was confined to its package, TanStack catalog/lock closure, root project reference, current docs, and workspace inventory. Six workspaces remain, selected error producers/consumers are unchanged, persistence still encodes domain profiles/replay records, and the proxy still translates internal failures to stable public responses.",
+          "Pass 2 - implementation quality and helper admission: bundjil/tagged-error-name is a root-owned Oxlint rule scoped to app/package TypeScript and checks only class/self-type/literal-tag equality. Installed Oxlint AST/RuleTester boundaries are used without capability vocabulary, stale-name lists, unsafe casts, DTOs, wrappers, provider changes, or Effect/domain logic changes.",
+          "Pass 3 - verification and evidence: parent frozen install, focused lint tests, check, Knip, six workspace typechecks, full verification, 212 tests, current-reference scans, and git diff --check passed with documented synthetic Executor config. Exact old package names remain only in explicitly historical proof/spec evidence; no Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "rename-effect-persistence-to-store",
+      "title": "Rename the shared persistence package to @bundjil/store",
+      "status": "completed",
+      "dependsOn": ["capture-compatibility-baseline-and-remove-effect-start"],
+      "description": "Move packages/effect-persistence to packages/store, migrate every consumer to @bundjil/store, atomically reconcile any changed Context identities, and preserve all native, atomic, memory, and Upstash behavior.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Rename the workspace directory, package metadata, repository directory, imports, manifests, lockfile, Turbo or Knip references, tests, commands, and current docs to @bundjil/store; keep package.json exports and publishConfig.exports synchronized.",
+        "Preserve root contracts plus @bundjil/store/memory and @bundjil/store/upstash intent-based exports without a compatibility alias.",
+        "Preserve Bundjil's AtomicKeyValueStore contract, its canonical transaction Schemas and schema-derived types, AtomicKeyValueStoreError, coherent memory state, one Upstash client per Layer build, and adapters/Layers that provide Effect's upstream KeyValueStore tag.",
+        "Inventory each changed Context.Service identifier and migrate its tag, every providing Layer, and every consumer atomically so old and new identities never coexist.",
+        "Prove exact physical prefixes, logical keys, encoded values, TTLs, atomic outcomes, namespace isolation, profile fences, refresh locks, and Sendblue replay transitions are unchanged.",
+        "Direct @upstash/redis imports, provider commands, response decoding, and key-prefix application remain confined to @bundjil/store/upstash implementation files.",
+        "Remove apps/codex-proxy's unused direct persistence/store dependency and the matching Knip ignore; preserve the explicit Vercel transitive build closure instead.",
+        "All primary store and consumer operations remain flat meaningful Effect.gen or Effect.fn programs; expected generic/provider/domain errors are translated in outer pipe with catchTag, catchTags, or mapError.",
+        "Canonical Effect Schema contracts and schema-derived types remain owned and reused; no unsafe casts, DTO mirrors, get-then-set coordination, KeyValueStore.modify coordination, manual readers/mappers, compatibility wrappers, or helper sprawl are introduced.",
+        "bun run --filter @bundjil/store check-types",
+        "bun run --filter @bundjil/store test",
+        "bun run --filter @bundjil/store build",
+        "bun run --filter @bundjil/codex-oauth test",
+        "bun run --filter @bundjil/agent test",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "@bundjil/store is the only provider-neutral persistence package and every consumer uses it.",
+        "No current source or configuration references @bundjil/effect-persistence or packages/effect-persistence.",
+        "Storage compatibility and provider-boundary scans pass.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the provider-neutral package, root contract, /memory and /upstash exports, AtomicKeyValueStore Context identity, memory and Upstash providers, Codex consumers, and Sendblue replay consumer moved atomically to @bundjil/store. The proxy's unused direct dependency and Knip exception were removed while its explicit transitive Vercel build closure was retained. No old/new service identities coexist.",
+          "Pass 2 - implementation quality and helper admission: a byte-level comparison of the old and new package confirmed implementation, Schema, error, test, and configuration files are unchanged except package metadata, README naming, and the required Context.Service identifier. Export maps remain symmetric, @upstash/redis remains confined to the store manifest and upstash implementation, and no compatibility alias, wrapper, DTO, unsafe cast, helper, provider behavior, selected error, or encoded contract was introduced or changed.",
+          "Pass 3 - verification and evidence: parent frozen install, 23 store tests and build, 103 Codex tests, 24 proxy tests including packaging, 57 agent tests, Knip, six workspace typechecks, full verification with 212 tests, export/provider/current-reference scans, and git diff --check passed under the documented synthetic Executor configuration. Exact keys, encoded values, TTLs, locks, fences, and replay transitions remain covered; no Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "rename-codex-oauth-to-codex",
+      "title": "Rename the complete Codex integration package to @bundjil/codex",
+      "status": "completed",
+      "dependsOn": ["rename-effect-persistence-to-store"],
+      "description": "Move packages/codex-oauth to packages/codex, rename the package and in-repo consumers, and replace mechanism-named public subpaths with intent-based exports while preserving the existing provider integration.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Rename the workspace directory, package metadata, repository directory, imports, manifests, lockfile, scripts, Vercel includeFiles, tests, commands, and current docs to @bundjil/codex; keep package.json exports and publishConfig.exports synchronized.",
+        "Replace /live.layer, /trusted-local.layer, /mock.layer, and /filesystem-key-value-store.layer with /runtime, /local, /testing, and /filesystem-store without forwarding aliases.",
+        "Preserve CodexOAuthSubject, profile and envelope Schemas, credentials, storage keys, profile store, commit, refresh lock, OAuth service/client, cipher, local login, direct provider, request/stream mapping, OpenAICompatibleProxy, proof contracts, and every non-selected tagged-error contract. Carry the selected old error contracts unchanged through this package-identity spike; migrate them atomically in the following source-organization task.",
+        "Preserve every environment variable, OAuth endpoint and parameter, account/profile subject rule, encrypted envelope encoding, storage key, refresh/fencing outcome, HTTP route contract, SSE mapping, and sanitized proof field.",
+        "Update apps/codex-proxy and trusted-local scripts to consume only the new package name and intent-based exports; apps/codex-proxy/vercel.json must build @bundjil/store, then @bundjil/codex, then @bundjil/codex-proxy; do not alter the app or deployed Vercel project name.",
+        "All primary Codex operations remain flat meaningful Effect.gen or Effect.fn programs with expected errors handled in outer pipe through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schemas and schema-derived types remain the single source of truth; no unsafe casts, DTO mirrors, manual object readers/mappers, compatibility wrappers, broad barrels, or trivial helpers are introduced.",
+        "bun run --filter @bundjil/codex check-types",
+        "bun run --filter @bundjil/codex test",
+        "bun run --filter @bundjil/codex build",
+        "bun run --filter @bundjil/codex-proxy check-types",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy build",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "@bundjil/codex is the canonical complete Codex integration package.",
+        "Every app and script imports the new intent-based public surface.",
+        "No current source or configuration references @bundjil/codex-oauth or packages/codex-oauth.",
+        "Codex, proxy, storage compatibility, packaging, and mock smoke tests pass.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the complete Codex integration moved to @bundjil/codex with root, /runtime, /local, /testing, and /filesystem-store exports; every proxy, script, manifest, test, current-doc, and Vercel consumer migrated without an alias. All 27 Context.Service identifiers changed only by package prefix and their declarations, Layers, and consumers moved together; persisted storage keys remain independently defined.",
+          "Pass 2 - implementation quality and helper admission: rename-aware diff review found all 24 error contract/barrel files, canonical schemas.ts, storage-keys.ts, codex-responses.config.ts, and oauth-token-metadata.ts byte-identical. The selected old tagged-error names and literal tags remain intentionally unchanged for the next atomic task, non-selected errors are exact, export maps are symmetric, and no wrapper, DTO, unsafe cast, helper, broad barrel, dual decoder, or runtime/provider behavior change was introduced.",
+          "Pass 3 - verification and evidence: parent frozen install, Codex check-types/build and 103 tests, proxy check-types/build and 24 tests, mock smoke health/stream 200 with five SSE lines, 23 store tests, 57 agent tests, Knip, six workspace typechecks, full verification with 212 tests, stale-reference/export/identity/error scans, and git diff --check passed with synthetic Executor config. One initial contention timeout passed focused and isolated reruns; no Browser OAuth, live provider, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "organize-codex-source-by-owned-feature",
+      "title": "Organize @bundjil/codex source by owned feature",
+      "status": "completed",
+      "dependsOn": ["rename-codex-oauth-to-codex"],
+      "description": "Group the large Codex package under auth, profiles, provider, storage, and testing paths, replace mechanism-only internal filenames, and perform the selected atomic Codex error-contract cutover while preserving public HTTP behavior and persisted data.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Move existing source into auth, profiles, provider, storage, and testing feature directories only where ownership is clearer; do not split the package or create pass-through modules solely to retain old internal paths.",
+        "Replace generic schemas.ts accumulation with feature-owned contract modules while retaining canonical Schema identities and schema-derived public types.",
+        "Prefer responsibility filenames such as profiles/store.ts, auth/refresh-client.ts, provider/stream-mapper.ts, storage/upstash.ts, and testing/index.ts over .service.ts or .layer.ts filenames.",
+        "Atomically rename class symbols and literal tags: CodexOAuthAuthTemporarilyUnavailable to CodexAuthTemporarilyUnavailable; CodexOAuthReauthenticationRequired to CodexReauthenticationRequired; CodexOAuthTokenProviderError to CodexOAuthOperationError; OAuthProfileNotFound to CodexProfileNotFound; OAuthProfileSchemaError to CodexProfileSchemaError; and OAuthProfileStorageError to CodexProfileStorageError.",
+        "Atomically rename associated Schema/type symbols: CodexOAuthTemporaryFailureReason to CodexAuthTemporaryFailureReason; CodexOAuthProfileSchemaBoundary to CodexProfileSchemaBoundary; and CodexOAuthProfileStorageOperation to CodexProfileStorageOperation. Preserve every reason, boundary, operation, field schema, cause, and retry classification.",
+        "Update every export, failure union, constructor, result-channel type, mock, Layer, catchTag/catchTags key, Schema.is check, literal comparison, test, script, package README, and current architecture reference. The staging CLI errorTag intentionally uses target tags while its field shape and redaction remain unchanged.",
+        "Add table-driven Schema tests for each target error proving class construction, exact encoded _tag and fields, target decode/Schema.is success, and old-tag decode/Schema.is rejection. Export no old symbol alias, old-tag union member, transform, or dual decoder.",
+        "Update proxy handler tests to construct the target errors and prove byte-for-byte equivalent public response bodies, the same HTTP statuses, stable codex_reauthentication_required/codex_auth_temporarily_unavailable codes, sanitized messages, and no internal tag leak.",
+        "Preserve every non-selected Codex, OpenAI-compatible, Upstash, store, app, and provider error symbol, literal tag, fields, and boundary mapping exactly.",
+        "Keep spans aligned with @bundjil/codex and the owned feature. Treat Context.Service identifiers as dependency identities: inventory and migrate each tag, providing Layer, and consumer atomically, and confirm no persisted or external identifier is derived from either string.",
+        "Every moved primary operation remains a flat meaningful Effect.gen or Effect.fn program with typed errors handled in outer pipe through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schemas and schema-derived types remain reused; no unsafe casts, DTO mirrors, manual readers/mappers, speculative factories, broad barrels, or trivial wrappers/helpers are introduced.",
+        "Use git diff --color-moved or equivalent review to distinguish path movement from logic changes.",
+        "bun run --filter @bundjil/codex check-types",
+        "bun run --filter @bundjil/codex test",
+        "bun run --filter @bundjil/codex build",
+        "bun run --filter @bundjil/codex-proxy test",
+        "bun run --filter @bundjil/codex-proxy smoke-test",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "The Codex package is navigable by owned feature rather than one flat mechanism-oriented source directory.",
+        "Public exports remain intentional and app consumers do not import internal files.",
+        "Only the target selected Codex error symbols and literal tags remain; old tags fail decoding, non-selected tags remain exact, and proxy HTTP responses are unchanged.",
+        "No behavior, storage, auth, proxy, or proof compatibility regression is present.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: Codex implementation and canonical Schemas now live under auth, profiles, provider, storage, and testing ownership paths with responsibility filenames and no forwarding modules. Root and supported subpath exports remain the consumer API. Six selected error declarations, unions, constructors, catchers, guards, scripts, proxy mappings, and tests migrated atomically; all 27 internal Context.Service identifiers remain unchanged with their providers and consumers.",
+          "Pass 2 - implementation quality and helper admission: rename-aware review separated path moves from the six intentional class/self-type/literal-tag and three Schema/type renames. Six table-driven fixtures prove exact encoded fields, target decode and Schema.is success, and old-tag rejection; 16 non-selected tagged-error bodies remain byte-identical, storage-key behavior is unchanged, and no alias, dual decoder, unsafe cast, DTO, manual mapper, speculative factory, broad compatibility barrel, or trivial wrapper was introduced.",
+          "Pass 3 - verification and evidence: parent frozen install, Codex check-types/build and 109 tests, proxy 28 tests with byte-exact 502/503 response fixtures, mock smoke health/stream 200 with five SSE lines, check, tagged-error lint, Knip, six workspace typechecks, full verification with 222 tests, selected-old/non-selected-tag/Context/storage scans, and git diff --check passed under synthetic Executor config. No external persisted decoder was found and no Browser, provider mutation, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "rename-eve-effect-and-remove-core",
+      "title": "Rename the Eve boundary to @bundjil/eve and remove @bundjil/core",
+      "status": "completed",
+      "dependsOn": ["organize-codex-source-by-owned-feature"],
+      "description": "Move packages/eve-effect to packages/eve, fold the workspace-summary scaffold into that boundary, remove packages/core, narrow broad operation names, and migrate the agent tool.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Rename the workspace directory, package metadata, repository directory, imports, manifests, lockfile, tests, commands, and current docs to @bundjil/eve; keep package.json exports and publishConfig.exports synchronized and atomically migrate any changed Context identities across tags, Layers, and consumers.",
+        "Export toEveSchema from @bundjil/eve/schema and remove the duplicated /eve/tool-adapter path.",
+        "Move WorkspaceSummary, defaultWorkspacePackages, and makeWorkspaceSummary into the workspace-status feature owned by @bundjil/eve, then delete @bundjil/core and packages/core without a replacement generic domain package.",
+        "Rename BundjilAgentOperations to WorkspaceOperations and BundjilAgentSchemaError to WorkspaceSchemaError, changing the class symbol and literal _tag together; rename BundjilAgentSchemaBoundary to WorkspaceSchemaBoundary while preserving its four literal boundary values.",
+        "Remove never-constructed BundjilAgentOperationError, BundjilAgentGatewayConfigError, BundjilAgentOperationName, and the redundant WorkspaceStatusFailure union. Use WorkspaceSchemaError directly in the workspace-status operation signature; do not add replacement speculative errors or compatibility aliases.",
+        "Update every Eve export, constructor, service error type, Schema reference, test, package README, current architecture example, and app tool expectation. Add Schema tests proving the WorkspaceSchemaError encoded tag/fields, target decode/Schema.is success, and old-tag rejection.",
+        "Preserve WorkspaceStatusInput, WorkspaceStatusSuccess, getWorkspaceStatus success behavior, tool slug, success Standard Schema metadata, and the app tool's rejected-promise behavior apart from the intentional error tag/name change.",
+        "Update workspace_status to report exactly [\"@bundjil/codex\", \"@bundjil/eve\", \"@bundjil/store\"] in that order and keep every other field plus the Eve filename/tool slug workspace_status unchanged.",
+        "After deleting core and effect-start, set root tsconfig.json references exactly to packages/store, packages/codex, packages/eve, apps/codex-proxy, and apps/agent.",
+        "All primary workspace operations remain flat meaningful Effect.gen or Effect.fn programs with expected tagged errors handled in outer pipe through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schemas and schema-derived types remain reused; no unsafe casts, DTO mirrors, manual readers/mappers, forwarding package, broad agent service, or trivial wrappers/helpers are introduced.",
+        "bun run --filter @bundjil/eve check-types",
+        "bun run --filter @bundjil/eve test",
+        "bun run --filter @bundjil/eve build",
+        "bun run --filter @bundjil/agent check-types",
+        "bun run --filter @bundjil/agent test",
+        "bun run --filter @bundjil/agent build",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "@bundjil/eve owns the reusable Eve schema and workspace-status boundary.",
+        "@bundjil/core and packages/core no longer exist in current source or workspace metadata.",
+        "WorkspaceSchemaError is the only workspace-status failure; the old BundjilAgent error symbols and tags, dead errors, supporting dead contracts, and redundant failure union are absent from current exports and code.",
+        "workspace_status success behavior, input/success schema metadata, tool slug, and Eve build remain unchanged apart from the reported package names; failure rejection uses the intentional WorkspaceSchemaError tag.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the Eve boundary moved to @bundjil/eve with root and /schema exports; workspace summary and status operations moved from the removed core package into Eve ownership. WorkspaceOperations, its live/memory Layers, accessor, and app consumer share the atomic @bundjil/eve/WorkspaceOperations identity; root references now contain exactly the five surviving projects.",
+          "Pass 2 - implementation quality and helper admission: WorkspaceSchemaError class/self-type/literal tag and WorkspaceSchemaBoundary migrated atomically with all four boundary literals intact. Dead gateway/operation errors, operation-name contract, redundant failure union, duplicated adapter path, core package, and old aliases are absent. Input/success Schemas and adapter remain byte-equivalent; package output is exactly codex, eve, store with no forwarding package or speculative replacement.",
+          "Pass 3 - verification and evidence: parent frozen install, Eve check-types/build and 6 tests, agent check-types/build and 57 tests, tagged-error lint, Knip, five workspace typechecks, full verification with 223 tests, exact export/tsconfig/package-list/stale-name/identity/discovery scans, and git diff --check passed under synthetic Executor config. No Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "clarify-agent-integration-ownership",
+      "title": "Clarify Sendblue and Executor ownership within Eve's authored slots",
+      "status": "completed",
+      "dependsOn": ["rename-eve-effect-and-remove-core"],
+      "description": "Retain the direct Eve discovery files and import-only agent/lib integration directories, normalize internal responsibility and Executor config-error names, and preserve discovery identities and provider behavior.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Retain apps/agent/agent/channels/sendblue.ts as the thin direct authored channel file and agent/lib/sendblue as import-only implementation; never replace the entrypoint with channels/sendblue/index.ts.",
+        "Retain apps/agent/agent/connections/executor.ts as the thin direct authored connection file and agent/lib/executor as import-only implementation; never replace the entrypoint with connections/executor/index.ts.",
+        "Within the two provider-owned lib directories, prefer responsibility filenames such as client.ts, replay-store.ts, identity-directory.ts, runtime.ts, config.ts, and testing.ts over .service.ts or .layer.ts when no ambiguity results.",
+        "Rename ExecutorConnectionConfigError to ExecutorConfigError and ExecutorConnectionConfigOperation to ExecutorConfigOperation, changing the class symbol, literal _tag, Schema/type symbol, constructors, sanitized message prefixes, Schema.is checks, rendered-name assertions, tests, and current docs together. Keep loadEndpoint/loadApiKey literals and failure fields unchanged.",
+        "Add focused Executor Schema tests proving the target encoded tag and fields, target decode/Schema.is success, old-tag rejection, and continued secret redaction. Export no old symbol alias or dual-tag decoder.",
+        "Preserve all nine Sendblue tagged-error symbols, literal tags, fields, catchers, HTTP mappings, replay-state discriminants, and encoded records exactly; they already name real provider/channel boundaries.",
+        "Update Knip entrypoints, tests, and docs only as needed without changing the direct entrypoint paths, channel slug, connection slug, routes, or Vercel packaging.",
+        "Preserve Sendblue webhook authentication, identity policy, routing, replay claims, TTLs, delivery outcomes, provider error mapping, and Executor endpoint policy exactly.",
+        "All touched primary operations remain flat meaningful Effect.gen or Effect.fn programs with typed errors handled in outer pipe through catchTag, catchTags, or mapError.",
+        "Canonical Effect Schemas and schema-derived types remain reused; no unsafe casts, DTO mirrors, manual readers/mappers, shared channel package, new provider abstraction, or trivial wrappers/helpers are introduced.",
+        "bun run --filter @bundjil/agent check-types",
+        "bun run --filter @bundjil/agent test",
+        "bun run --filter @bundjil/agent build",
+        "bun run check",
+        "bun run knip",
+        "bun run verification",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "apps/agent/agent/lib remains only as Eve's documented import-only slot, with sendblue and executor as clearly owned immediate children and no generic nested bucket.",
+        "Eve discovers sendblue and executor from the unchanged direct .ts entrypoints, while implementation stays import-only.",
+        "ExecutorConfigError and ExecutorConfigOperation are the only current config names; the old tag is rejected, redaction is unchanged, and every Sendblue error tag remains exact.",
+        "Eve build, provider behavior, replay compatibility, and endpoint policy tests pass.",
+        "Three implementation-improvement audit passes are recorded with evidence."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: direct Eve discovery files remain at channels/sendblue.ts and connections/executor.ts while import-only Sendblue implementation files use responsibility names. No nested discovery entrypoint or shared channel package was introduced; routes, slugs, runtime composition, and provider ownership remain app-owned.",
+          "Pass 2 - implementation quality and helper admission: ExecutorConfigError class/self-type/literal tag and ExecutorConfigOperation migrated atomically with loadEndpoint/loadApiKey, fields, endpoint policy, sanitized messages, guards, redaction, and tests. Exact encode/decode/Schema.is and old-tag rejection pass; all nine Sendblue error files and Schemas remain byte-identical and implementation moves are import-path-only.",
+          "Pass 3 - verification and evidence: parent agent check-types/build and 58 tests, tagged-error lint, Knip, five workspace typechecks, full verification with 224 tests, discovery/stale-name/mechanism-filename/Sendblue-tag/redaction/replay scans, and git diff --check passed under synthetic Executor config. No Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-documentation-and-final-verification",
+      "title": "Reconcile documentation taxonomy and run the final repository audit",
+      "status": "completed",
+      "dependsOn": ["clarify-agent-integration-ownership"],
+      "description": "Update all current architecture and runbooks, move completed plans out of active, label historical package evidence, run stale-name and compatibility scans, and close the cleanup with full verification.",
+      "implementationNotes": [],
+      "mandatoryVerification": [
+        "Update AGENTS.md, README.md, ARCHITECTURE.md, docs/README.md, docs/architecture, app and package READMEs, commands, call graphs, and package inventories to the target names and paths.",
+        "Create docs/exec-plans/completed and move every complete or superseded plan out of docs/exec-plans/active; leave only genuinely active plans in active.",
+        "Separate current architecture from historical specifications in docs/README.md.",
+        "Add a concise supersession notice to the historical effect-persistence SPEC and ledger pointing to this SPEC and @bundjil/store without rewriting accepted historical evidence.",
+        "Update docs/architecture/effect-patterns.md so exported Schema.TaggedErrorClass declaration, self-type, and literal _tag names agree; tagged-error renames migrate constructors, unions, catchers, guards, encoded tests, boundary mappings, and docs atomically; and speculative exported errors without a constructor or consumer are rejected.",
+        "Update docs/architecture/repo-structure.md so future packages, public exports, services, and errors are capability-owned; Eve's agent/lib slot is import-only with owned integration children; provider qualifiers remain only at genuine provider boundaries; and Effect service/layer guidance does not mandate mechanism-only names or filenames.",
+        "Update docs/architecture/testing-and-quality.md to require bundjil/tagged-error-name, exact Schema encode/decode and old-tag rejection tests for intentional migrations, stable public-boundary mappings, retained non-selected-tag fixtures, and scoped current-versus-historical stale-name scans.",
+        "Update .agents/skills/prd-writer/SKILL.md to require an exhaustive compatibility and encoded-contract plan for tagged-error renames, and .agents/skills/prd-implementer/SKILL.md to reject partial class/self-type/tag, consumer, test, mapping, or documentation migrations and unplanned aliases or dual decoders. Link both to canonical architecture guidance without copying this cleanup's rename table.",
+        "Update .agents/skills/effect-client-wrapper/SKILL.md to route tagged-error examples to the canonical Effect error rules and state the declaration/tag equality invariant, without copying this cleanup's rename table.",
+        "Remove the unreferenced .agents/skills/create-package skill, which targets the site repository, @packages/<name>, packages/core, and mechanism-named layer files. Do not replace it during this cleanup; any future Bundjil scaffolder requires a separate evidence-backed design.",
+        "Keep the user-global prd-review skill and unrelated repository skills unchanged: the former already mandates explicit docs, lint/static, skill, and adjacent-artifact impact classification, while the latter do not own SPEC authoring or tagged-error migration execution.",
+        "Verify oxlint.config.ts, lint/oxlint-plugin.ts, lint/oxlint-plugin.test.ts, package.json, and the verification script still enforce bundjil/tagged-error-name after all source moves; bun run test:lint and bun run check must fail on a mismatched class, self-type, or literal tag fixture.",
+        "Current-source and current operational/architecture-doc scans find no old package names, old workspace paths, or selected old error identifiers/literals outside this canonical SPEC/task migration table and focused old-tag rejection assertions; historical matches are reviewed and explicitly classified; Eve scans prove the direct sendblue.ts and executor.ts discovery files remain.",
+        "Review the exhaustive error inventory: target symbols and tags agree with their class definitions, exports, failure unions, constructors, catchers, guards, CLI diagnostics, tests, and current docs; no old alias/dual decoder exists; every non-selected error and state discriminant remains exact.",
+        "Verify each renamed package keeps exports and publishConfig.exports synchronized; root tsconfig references exactly the five surviving projects; the TanStack catalog is gone; proxy Knip and dependency state has no unused store edge; and proxy Vercel build filters are store, codex, proxy in order.",
+        "Add one minor changeset covering the three target private 0.x packages @bundjil/store, @bundjil/codex, and @bundjil/eve and describing the removed package names, public exports, and selected error tags; run bun run changeset:status without publishing or tagging.",
+        "Set the documented synthetic BUNDJIL_EXECUTOR_MCP_URL and BUNDJIL_EXECUTOR_API_KEY in the local final gate and CI build/verification job, proving build-time discovery makes no provider request while Production remains fail-closed.",
+        "Review every changed Effect operation for flat meaningful Effect.gen or Effect.fn control flow, typed errors in outer pipe, canonical Schema ownership, and no unsafe casts, DTO mirrors, manual readers/mappers, broad barrels, or trivial wrappers/helpers.",
+        "Run all globalVerification commands and record exact pass/fail evidence, deliberately skipped live/browser checks with reasons, package counts, test counts, and stale-name scan results.",
+        "Prove no environment variable, physical storage key, domain-record encoded value, TTL, route, provider endpoint, webhook, Vercel project, deployment alias, external URL, tool slug, or secret name changed; selected error encodings and CLI errorTag values are the only intentional encoded-name changes.",
+        "Confirm no frontend, Browser, provider mutation, deployment, publication, or stored-data migration occurred.",
+        "jq empty docs/product-specs/repo-naming-cleanup.tasks.json",
+        "bun install --frozen-lockfile",
+        "bun run test:lint",
+        "bun run check",
+        "bun run knip",
+        "bun run check-types",
+        "bun run test",
+        "bun run build",
+        "bun run verification",
+        "bun run changeset:status",
+        "git diff --check"
+      ],
+      "completionCriteria": [
+        "The workspace contains only @bundjil/store, @bundjil/codex, and @bundjil/eve as reusable packages.",
+        "Current code, configuration, commands, architecture, and runbooks use only target names and paths.",
+        "Historical uses of old names are explicitly labeled and current navigation does not present completed work as active.",
+        "Canonical architecture docs and repository-owned PRD and error-authoring skills contain the reusable naming and atomic tagged-error migration rule without duplicating the cleanup-specific rename table; the stale site create-package skill is removed.",
+        "The tagged-error lint rule and focused tests enforce declaration, self-type, and literal-tag equality through the normal verification gate.",
+        "All focused and root verification, compatibility, packaging, stale-name, privacy, and whitespace gates pass.",
+        "Three implementation-improvement audit passes are recorded with evidence and no unresolved finding remains."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: root, architecture, app, package, command, inventory, and call-graph docs use @bundjil/store, @bundjil/codex, and @bundjil/eve; current guidance is separated from historical specs and completed plans. Three package directories, symmetric export maps, exactly five TypeScript references, the store-to-Codex-to-proxy Vercel closure, and direct sendblue/executor discovery files were independently verified.",
+          "Pass 2 - implementation quality and helper admission: canonical architecture plus the repository PRD/error skills now own generic capability naming, tagged-error equality, atomic migration, external-decoder compatibility stops, speculative-error rejection, and scoped stale scans without copying the cleanup table. The final 34 exported Schema-backed errors agree across Store 1, Codex 22, Eve 1, Sendblue 9, and Executor 1; old literals occur only in eight rejection fixtures, no alias or dual decoder exists, and this docs/skill/CI task changed no runtime Effect operation, Schema, service, Layer, DTO, mapper, cast, helper, route, or provider composition.",
+          "Pass 3 - verification and evidence: frozen install passed with 506 installs across 692 packages unchanged; all five focused typechecks/builds, Store 23, Codex 109, Eve 6, proxy 28, and agent 58 tests, proxy mock smoke 200/200/five lines, test:lint, check, Knip, root typechecks/tests/build/verification, changeset status, JSON parsing, stale/package/error/export/project-reference/package-manager/provider-boundary/environment/URL/key/route/discovery scans, and diff check passed under synthetic Executor config. A temporary fixture proved normal check rejects declaration, self-type, and tag mismatches, then was removed. No Browser, frontend, live provider, deployment, publication, tag, stored-data rewrite, or provider mutation ran."
+        ]
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

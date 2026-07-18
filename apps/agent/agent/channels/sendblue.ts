@@ -1,9 +1,9 @@
-import { EveMessageCompletedEventTypeValue } from "@bundjil/eve-effect";
+import { EveMessageCompletedEventTypeValue } from "@bundjil/eve";
 import { Effect, ManagedRuntime } from "effect";
 import { defineChannel, POST } from "eve/channels";
 
-import { SendblueChannel } from "../lib/sendblue/channel.service.js";
-import { SendblueChannelRuntimeLive } from "../lib/sendblue/live.layer.js";
+import { SendblueChannel } from "../lib/sendblue/channel.js";
+import { SendblueChannelRuntimeLive } from "../lib/sendblue/runtime.js";
 import type { SendblueChannelState } from "../lib/sendblue/schemas.js";
 
 const runtime = ManagedRuntime.make(SendblueChannelRuntimeLive);

@@ -2,8 +2,8 @@ import {
   CodexOAuthProfileCommitUnsupported,
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
-} from "@bundjil/codex-oauth";
-import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex-oauth/filesystem-key-value-store.layer";
+} from "@bundjil/codex";
+import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
   CodexLegacyDirectProviderLive,
   CodexHttpClientLive,
@@ -15,8 +15,8 @@ import {
   CodexProfileStoreEncryptedKeyValueLive,
   CodexResponsesFetchLive,
   OpenAICompatibleProxyLive,
-} from "@bundjil/codex-oauth/live.layer";
-import { CodexOAuthRefreshLockMemory } from "@bundjil/codex-oauth/mock.layer";
+} from "@bundjil/codex/runtime";
+import { CodexOAuthRefreshLockMemory } from "@bundjil/codex/testing";
 import { ConfigProvider, Effect, Layer } from "effect";
 
 import {

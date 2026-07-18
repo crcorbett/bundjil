@@ -39,7 +39,7 @@ const runExecutorConnectionSubprocess = Effect.fn(
         'if (!auth || typeof auth === "function" || !("getToken" in auth)) throw new Error("expected static bearer authentication");',
         'const failure = await auth.getToken({ connection: { url: connection.url }, principal: { type: "app" } }).then(() => undefined, (error) => error);',
         "const renderedFailure = String(failure);",
-        'if (failure === undefined || !renderedFailure.includes("ExecutorConnectionConfigError") || !renderedFailure.includes("loadApiKey") || renderedFailure.includes("BUNDJIL_EXECUTOR_API_KEY")) throw new Error("expected sanitized missing-key error");',
+        'if (failure === undefined || !renderedFailure.includes("ExecutorConfigError") || !renderedFailure.includes("loadApiKey") || renderedFailure.includes("BUNDJIL_EXECUTOR_API_KEY")) throw new Error("expected sanitized missing-key error");',
       ].join("\n")
     ),
     Match.when("synthetic-key", () =>

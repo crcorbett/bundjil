@@ -5,8 +5,8 @@
 For the Codex subscription path, canonical schemas, tagged errors, Context
 services, explicit Layers, `Config`/`Redacted`, scoped loopback resources,
 native `KeyValueStore` composition, refresh locking, and fenced commits remain
-package-owned in `@bundjil/codex-oauth`; provider-neutral persistence contracts
-and adapters belong to `@bundjil/effect-persistence`. `apps/codex-proxy` owns
+package-owned in `@bundjil/codex`; provider-neutral persistence contracts
+and adapters belong to `@bundjil/store`. `apps/codex-proxy` owns
 only app config and private HTTP composition. Do not recreate profile DTOs,
 token mappers, or OAuth routes in either app; Vercel must not host browser OAuth
 or account linking.
@@ -54,8 +54,8 @@ src/
   index.ts          stable package contract
 ```
 
-Bundjil currently keeps the small `@bundjil/eve-effect` service in
-`src/services/bundjil-agent-operations.ts`. Split to the layout above when new
+Bundjil currently keeps the small `@bundjil/eve` service in
+`src/services/workspace-operations.ts`. Split to the layout above when new
 operations or providers make the combined file harder to scan.
 
 Root `index.ts` should export stable contracts and default operation helpers.
@@ -113,17 +113,17 @@ clear owner and concrete value.
 
 Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary
 string and binary persistence. Treat its unstable import path as a contract
-tested by `@bundjil/effect-persistence`; `KeyValueStore.modify` is not an
+tested by `@bundjil/store`; `KeyValueStore.modify` is not an
 atomic coordination operation. Claims, leases, fencing, compare-and-remove,
 and multi-key transitions use the canonical
 `AtomicKeyValueStore.transact` service instead.
 
 The root persistence contract is provider-neutral. Consumers opt into
-`@bundjil/effect-persistence/memory` for deterministic tests or
-`@bundjil/effect-persistence/upstash` for hosted storage. The `/upstash`
+`@bundjil/store/memory` for deterministic tests or
+`@bundjil/store/upstash` for hosted storage. The `/upstash`
 subpath alone owns the SDK, prefix application, command syntax, response
 decoding, and safe provider errors. Composition owners decode bindings through
-Effect `Config`/`Config.redacted`: `@bundjil/codex-oauth` owns Codex
+Effect `Config`/`Config.redacted`: `@bundjil/codex` owns Codex
 profile/Upstash composition, `apps/codex-proxy` owns runtime mode/private HTTP
 config, and `apps/agent` owns replay/provider config. The shared persistence
 adapter receives schema-decoded redacted options and never reads process
@@ -162,7 +162,7 @@ Schemas are the integration contract.
 - Reuse the owning schema from other packages instead of copying the shape.
 
 For Eve tools, keep Effect Schema as the source of truth and use
-`toEveSchema(schema)` from `@bundjil/eve-effect`:
+`toEveSchema(schema)` from `@bundjil/eve/schema`:
 
 ```ts
 Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
@@ -276,10 +276,10 @@ fix rather than treating the count as sufficient.
 Expected failures should be typed and tagged:
 
 ```ts
-export class BundjilAgentOperationError extends Schema.TaggedErrorClass<BundjilAgentOperationError>()(
-  "BundjilAgentOperationError",
+export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchemaError>()(
+  "WorkspaceSchemaError",
   {
-    operation: BundjilAgentOperationName,
+    boundary: WorkspaceSchemaBoundary,
     message: Schema.NonEmptyString,
     cause: Schema.Defect,
   }
@@ -288,6 +288,19 @@ export class BundjilAgentOperationError extends Schema.TaggedErrorClass<BundjilA
 
 Rules:
 
+- An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
+  and literal `_tag` must be the same capability-owned error name. The root
+  `bundjil/tagged-error-name` rule enforces this mechanical invariant.
+- Rename an exported tagged error as one atomic encoded-contract migration:
+  update the declaration, self-type, literal tag, constructors, failure
+  unions, `catchTag`/`catchTags` consumers, guards, Schema encode/decode tests,
+  public-boundary mappings, and current documentation together. Stop and make
+  an explicit compatibility decision before changing the tag when a persisted
+  value, public payload, independently deployed consumer, or external decoder
+  may observe it; do not add an alias or dual decoder without that plan.
+- Do not export speculative errors. A public tagged error needs a real
+  constructor or consumer in the owning capability; otherwise remove it until
+  a concrete failure boundary exists.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
 - Translate provider/framework errors at the app boundary. Packages should not
@@ -336,7 +349,7 @@ edge while the app is small:
 
 ```ts
 Effect.runPromise(
-  getWorkspaceStatus(input).pipe(Effect.provide(BundjilAgentOperationsLive))
+  getWorkspaceStatus(input).pipe(Effect.provide(WorkspaceOperationsLive))
 );
 ```
 

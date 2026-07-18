@@ -2,7 +2,7 @@ import {
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleProxy,
   OpenAICompatibleProxyInput,
-} from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
 import { Effect, Layer, Match, Redacted, Schema } from "effect";
 import type { HttpServerRequest } from "effect/unstable/http";
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
@@ -153,16 +153,14 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
       CodexResponsesStreamError: () =>
         errorResponse("proxy_error", "The proxy stream failed.", 502),
-      OAuthProfileNotFound: () => reauthenticationRequiredResponse,
-      OAuthProfileSchemaError: () => reauthenticationRequiredResponse,
-      OAuthProfileStorageError: () => authTemporarilyUnavailableResponse,
+      CodexProfileNotFound: () => reauthenticationRequiredResponse,
+      CodexProfileSchemaError: () => reauthenticationRequiredResponse,
+      CodexProfileStorageError: () => authTemporarilyUnavailableResponse,
       CodexOAuthTokenMissing: () => reauthenticationRequiredResponse,
       CodexOAuthTokenExpired: () => reauthenticationRequiredResponse,
-      CodexOAuthTokenProviderError: () => reauthenticationRequiredResponse,
-      CodexOAuthReauthenticationRequired: () =>
-        reauthenticationRequiredResponse,
-      CodexOAuthAuthTemporarilyUnavailable: () =>
-        authTemporarilyUnavailableResponse,
+      CodexOAuthOperationError: () => reauthenticationRequiredResponse,
+      CodexReauthenticationRequired: () => reauthenticationRequiredResponse,
+      CodexAuthTemporarilyUnavailable: () => authTemporarilyUnavailableResponse,
       CodexOAuthRefreshLockError: () => authTemporarilyUnavailableResponse,
       CodexSubscriptionAuthError: () => authTemporarilyUnavailableResponse,
       CodexOAuthProfileCommitConflict: () => authTemporarilyUnavailableResponse,

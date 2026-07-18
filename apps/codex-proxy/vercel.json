@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bun run --filter @bundjil/effect-persistence build && bun run --filter @bundjil/codex-oauth build && bun run --filter @bundjil/codex-proxy build",
+  "buildCommand": "bun run --filter @bundjil/store build && bun run --filter @bundjil/codex build && bun run --filter @bundjil/codex-proxy build",
   "framework": null,
   "installCommand": "bun install --frozen-lockfile",
   "functions": {

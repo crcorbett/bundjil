@@ -2,7 +2,7 @@ import {
   CodexOAuthAccountId,
   CodexOAuthSubject,
   OpenAICompatibleProxyInternalToken,
-} from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
 import { Schema } from "effect";
 
 export const CodexProxyMode = Schema.Literals(["mock", "local", "live"]);

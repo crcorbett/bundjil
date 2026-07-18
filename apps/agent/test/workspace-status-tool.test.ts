@@ -1,8 +1,8 @@
 import {
   BundjilDefaultWorkspacePackage,
   defaultWorkspacePackages,
-} from "@bundjil/core";
-import { WorkspaceStatusSuccess } from "@bundjil/eve-effect";
+  WorkspaceStatusSuccess,
+} from "@bundjil/eve";
 import { assert, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
 import type { ToolContext } from "eve/tools";
@@ -54,12 +54,15 @@ it.effect("executes the Eve tool through the live Effect named operation", () =>
       status.packageNames.join(","),
       defaultWorkspacePackages.join(",")
     );
+    assert.strictEqual(
+      status.packageNames.join(","),
+      "@bundjil/codex,@bundjil/eve,@bundjil/store"
+    );
     assert.isTrue(
       Schema.is(BundjilDefaultWorkspacePackage)(status.packageNames[0])
     );
-    assert.include(status.packageNames.join(","), "@bundjil/eve-effect");
     assert.include(status.agentSummary, "Which packages are available?");
-    assert.include(status.agentSummary, "@bundjil/eve-effect");
+    assert.include(status.agentSummary, "@bundjil/eve");
   })
 );
 

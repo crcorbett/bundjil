@@ -1,7 +1,7 @@
 import {
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
-} from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
 import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
@@ -17,7 +17,7 @@ import {
   CodexSubscriptionAuthProtocolConfigLive,
   CodexUpstashPersistenceLive,
   OpenAICompatibleProxyLive,
-} from "@bundjil/codex-oauth/live.layer";
+} from "@bundjil/codex/runtime";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
 
