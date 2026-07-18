@@ -7,6 +7,15 @@ description: Pattern for wrapping third-party SDK clients (Stripe, Resend, AWS, 
 
 Wrap third-party SDK clients with Effect using the "use" pattern for consistent error handling, tracing, and dependency injection.
 
+Before defining or renaming a tagged error, follow the canonical rules in
+`docs/architecture/effect-patterns.md` and the contract tests in
+`docs/architecture/testing-and-quality.md`. A `Schema.TaggedErrorClass`
+declaration, generic self-type, and literal `_tag` must use the same
+capability-owned name; every other tagged-error declaration and runtime tag
+must likewise agree. Keep a provider qualifier only when this wrapper
+genuinely owns that provider boundary; do not copy migration-specific rename
+tables into this skill.
+
 ## Pattern Structure
 
 ```typescript

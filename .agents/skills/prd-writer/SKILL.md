@@ -37,6 +37,16 @@ Read in this order:
   boundaries must name the canonical schemas/types/service contracts/errors
   being reused and must require Effect-native primitives over plain TypeScript
   helpers unless an exception is explicitly justified.
+- A SPEC that renames an exported tagged error must follow
+  `docs/architecture/effect-patterns.md` and
+  `docs/architecture/testing-and-quality.md`. It must state the compatibility
+  decision for persisted values, public payloads, independently deployed
+  consumers, and external decoders; enumerate the complete declaration,
+  self-type, literal tag, constructor, union, catcher, guard, mapping, test,
+  and documentation migration; and require exact target encode/decode,
+  old-tag rejection, stable public-boundary behavior, and retained
+  non-selected discriminants. Do not plan an alias or dual decoder unless the
+  compatibility boundary and its removal owner are explicit.
 - Specs that touch runtime, service, RPC, loader, route, command, middleware,
   package, provider, or boundary-crossing code must include fenced call graphs
   for the production path and test path, plus CLI/script paths when relevant.

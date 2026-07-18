@@ -10,6 +10,7 @@ Run from the repo root:
 
 ```bash
 bun run check
+bun run test:lint
 bun run knip
 bun run check-types
 bun run test
@@ -17,8 +18,11 @@ bun run build
 bun run verification
 ```
 
-`bun run verification` is the standard closeout gate. It runs Ultracite,
-dependency hygiene, workspace typechecks, and tests.
+`bun run verification` is the standard closeout gate. It runs Ultracite, the
+focused repository lint-rule tests, dependency hygiene, workspace typechecks,
+and tests. `bun run check` enables `bundjil/tagged-error-name` for app and
+package TypeScript; the rule rejects any `Schema.TaggedErrorClass` whose class
+declaration, generic self-type, and literal tag do not agree.
 
 Package-focused commands:
 
@@ -109,6 +113,13 @@ Rules:
 - Keep provider-network tests explicit and opt-in.
 - Validate schema failures, not only success paths, when a schema owns a public
   edge.
+- For an intentional tagged-error rename, assert the exact target `_tag`
+  through Schema encode and decode, and assert that the old tag is rejected.
+  Keep public HTTP/tool/CLI mappings under test so internal tag migration does
+  not change stable boundary status, code, message, or diagnostic shape.
+- Retain fixtures for all non-selected error and state discriminants during a
+  migration. They prove that the planned encoded-name changes were exhaustive
+  and that unrelated contracts stayed exact.
 - For Eve tools, test both `execute(...)` behavior and the Standard Schema /
   Standard JSON Schema metadata produced by `toEveSchema(...)`.
 
@@ -340,6 +351,13 @@ Use `rg` for docs checks:
 rg -n "old-path|old-package|old-command" README.md AGENTS.md docs apps packages
 rg -n "docs/architecture/(effect-patterns|repo-structure|testing-and-quality)" README.md AGENTS.md docs ARCHITECTURE.md
 ```
+
+Stale-name scans must be scoped by provenance. Current source, manifests,
+configuration, commands, architecture, runbooks, and navigation must use the
+current names. Historical specifications, completed task ledgers and plans may
+retain prior names when they are explicitly labeled; focused old-tag fixtures
+may retain a literal only to prove rejection. Review and classify those matches
+instead of weakening the current-source gate or blindly rewriting history.
 
 Docs should describe current behavior and exact verification commands. Avoid
 long aspirational sections unless they clearly mark future work.

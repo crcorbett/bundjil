@@ -286,7 +286,10 @@ the boundary is proven stable.
 - `bun run build` compiles all packages through Turbo.
 - `bun run test` runs package test suites.
 - `bun run check-types` checks workspace TypeScript references.
-- `bun run check` runs Ultracite type-aware lint/format checks.
+- `bun run check` runs Ultracite type-aware lint/format checks, including the
+  `bundjil/tagged-error-name` equality rule for app and package TypeScript.
+- `bun run test:lint` proves the repository lint plugin accepts a matching
+  tagged error and rejects declaration, self-type, and literal-tag mismatches.
 - `bun run verification` runs lint, dependency hygiene, type checking, and
   tests.
 - `bun run --filter @bundjil/agent dev:no-ui` starts the local Eve app on port

@@ -1,6 +1,6 @@
 # Repository Naming And Structure Cleanup Implementation Plan
 
-Status: In Progress
+Status: Completed
 
 Branch: `codex/repo-naming-cleanup`
 
@@ -38,7 +38,7 @@ mock or deterministic memory Layers.
 4. `organize-codex-source-by-owned-feature`: completed.
 5. `rename-eve-effect-and-remove-core`: completed.
 6. `clarify-agent-integration-ownership`: completed.
-7. `reconcile-documentation-and-final-verification`: pending.
+7. `reconcile-documentation-and-final-verification`: completed.
 
 ## Baseline
 
@@ -336,3 +336,73 @@ Status: Passed
   and diff scans passed under the synthetic Executor configuration.
 - No Browser, live provider, deployment, publication, or stored-data action was
   applicable or performed.
+
+### reconcile-documentation-and-final-verification
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Root, architecture, app, package, command, package-inventory, and call-graph
+  documentation now uses `@bundjil/store`, `@bundjil/codex`, and
+  `@bundjil/eve`; `docs/README.md` separates current guidance from historical
+  specifications and completed plans.
+- Seven plans whose own headers declared Complete or Superseded moved to
+  `docs/exec-plans/completed`. This cleanup plan remained the only active plan
+  until final evidence was recorded.
+- Package/export/TypeScript/Vercel scans prove three reusable packages,
+  symmetric export maps, exactly five project references, and the store ->
+  Codex -> proxy build closure. Direct Eve discovery remains
+  `channels/sendblue.ts` and `connections/executor.ts` with provider-owned
+  import-only children.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- Canonical architecture now owns capability naming, tagged-error declaration/
+  self-type/literal equality, atomic constructor/union/catcher/guard/encoded-
+  test/mapping/docs migration, external-decoder compatibility stops, rejection
+  of speculative errors, and current-versus-historical stale scans.
+- Repository `prd-writer`, `prd-implementer`, and `effect-client-wrapper`
+  skills link to those generic rules without duplicating the cleanup rename
+  table. The unrelated user-global review skill and unrelated repo skills are
+  unchanged; the stale site `create-package` skill was removed.
+- The final 34 exported Schema-backed errors have matching declarations and
+  tags: Store 1, Codex 22, Eve 1, Sendblue 9, and Executor 1. Eight selected
+  old literals occur only in focused rejection fixtures; no alias or dual
+  decoder exists. This task changed no Effect runtime operation, Schema,
+  service, Layer, DTO, mapper, cast, helper, route, or provider composition.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Frozen install passed with 506 installs across 692 packages and no changes.
+  All five package/app focused typechecks and builds passed; Store 23, Codex
+  109, Eve 6, proxy 28, and agent 58 tests passed, for 224 workspace tests.
+  Proxy mock smoke returned health 200, stream 200, and five SSE lines.
+- `bun run test:lint`, `bun run check`, Knip, root typechecks, root tests, root
+  build, `bun run verification`, `bun run changeset:status`, both JSON parses,
+  and `git diff --check` passed under the documented synthetic Executor
+  configuration. An ephemeral fixture made normal `bun run check` report all
+  three `bundjil/tagged-error-name` mismatch categories before removal.
+- Current-source/config/runbook/architecture scans found no old package or
+  path names. Selected old errors occur only in eight rejection assertions;
+  historical matches are confined to product specs, ledgers, completed plans,
+  and explicitly labeled historical proof. `bun pm ls` and `bun.lock` contain
+  only the five target workspaces; direct Upstash imports remain confined to
+  `packages/store/src/upstash.layer.ts`.
+- Environment/secret-name, provider/external-URL, and physical-key-prefix sets
+  are exact against the pre-cleanup baseline. Route, callback, webhook, tool,
+  channel, connection, and discovery literals remain present; prior task
+  compatibility audits prove encoded values, TTLs, transactions, fences,
+  replay behavior, public HTTP mappings, Vercel project/alias identity, and all
+  non-selected discriminants stayed exact.
+- The CI verification job supplies only the two documented non-secret
+  synthetic Executor build inputs. Build-time discovery made no provider call;
+  Production remains fail-closed. No Browser, frontend, live provider,
+  deployment, publication, package versioning/tagging, stored-data rewrite, or
+  provider mutation occurred.

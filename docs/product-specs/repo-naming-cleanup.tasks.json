@@ -1,7 +1,7 @@
 {
   "title": "Repository Naming And Structure Cleanup Tasks",
   "spec": "docs/product-specs/repo-naming-cleanup.md",
-  "status": "proposed",
+  "status": "completed",
   "principles": [
     "Name reusable packages after the capability or external boundary they own, never after Effect as the implementation technology.",
     "Keep @bundjil/agent and @bundjil/codex-proxy unchanged because they already identify real product and provider boundaries.",
@@ -346,7 +346,7 @@
     {
       "id": "reconcile-documentation-and-final-verification",
       "title": "Reconcile documentation taxonomy and run the final repository audit",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["clarify-agent-integration-ownership"],
       "description": "Update all current architecture and runbooks, move completed plans out of active, label historical package evidence, run stale-name and compatibility scans, and close the cleanup with full verification.",
       "implementationNotes": [],
@@ -395,8 +395,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: root, architecture, app, package, command, inventory, and call-graph docs use @bundjil/store, @bundjil/codex, and @bundjil/eve; current guidance is separated from historical specs and completed plans. Three package directories, symmetric export maps, exactly five TypeScript references, the store-to-Codex-to-proxy Vercel closure, and direct sendblue/executor discovery files were independently verified.",
+          "Pass 2 - implementation quality and helper admission: canonical architecture plus the repository PRD/error skills now own generic capability naming, tagged-error equality, atomic migration, external-decoder compatibility stops, speculative-error rejection, and scoped stale scans without copying the cleanup table. The final 34 exported Schema-backed errors agree across Store 1, Codex 22, Eve 1, Sendblue 9, and Executor 1; old literals occur only in eight rejection fixtures, no alias or dual decoder exists, and this docs/skill/CI task changed no runtime Effect operation, Schema, service, Layer, DTO, mapper, cast, helper, route, or provider composition.",
+          "Pass 3 - verification and evidence: frozen install passed with 506 installs across 692 packages unchanged; all five focused typechecks/builds, Store 23, Codex 109, Eve 6, proxy 28, and agent 58 tests, proxy mock smoke 200/200/five lines, test:lint, check, Knip, root typechecks/tests/build/verification, changeset status, JSON parsing, stale/package/error/export/project-reference/package-manager/provider-boundary/environment/URL/key/route/discovery scans, and diff check passed under synthetic Executor config. A temporary fixture proved normal check rejects declaration, self-type, and tag mismatches, then was removed. No Browser, frontend, live provider, deployment, publication, tag, stored-data rewrite, or provider mutation ran."
+        ]
       },
       "commitAfterPassing": true
     }

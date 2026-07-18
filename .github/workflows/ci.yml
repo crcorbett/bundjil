@@ -9,6 +9,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      BUNDJIL_EXECUTOR_MCP_URL: https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model
+      BUNDJIL_EXECUTOR_API_KEY: executor-ci-synthetic-key
 
     steps:
       - name: Checkout repository

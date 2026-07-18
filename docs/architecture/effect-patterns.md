@@ -241,6 +241,19 @@ export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchem
 
 Rules:
 
+- An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
+  and literal `_tag` must be the same capability-owned error name. The root
+  `bundjil/tagged-error-name` rule enforces this mechanical invariant.
+- Rename an exported tagged error as one atomic encoded-contract migration:
+  update the declaration, self-type, literal tag, constructors, failure
+  unions, `catchTag`/`catchTags` consumers, guards, Schema encode/decode tests,
+  public-boundary mappings, and current documentation together. Stop and make
+  an explicit compatibility decision before changing the tag when a persisted
+  value, public payload, independently deployed consumer, or external decoder
+  may observe it; do not add an alias or dual decoder without that plan.
+- Do not export speculative errors. A public tagged error needs a real
+  constructor or consumer in the owning capability; otherwise remove it until
+  a concrete failure boundary exists.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
 - Translate provider/framework errors at the app boundary. Packages should not

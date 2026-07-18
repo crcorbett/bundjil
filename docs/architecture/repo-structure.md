@@ -17,9 +17,11 @@ packages/
 
 docs/
   architecture/       Durable architecture and repo standards.
-  product-specs/      Specs and task ledgers for planned work.
+  product-specs/      Specs and task ledgers; completed records keep provenance.
+  exec-plans/active/  Plans for work that is actually in progress.
+  exec-plans/completed/  Accepted and superseded execution evidence.
 
-.agents/skills/       Repo-local agent skills copied from the site workspace.
+.agents/skills/       Repo-local authoring and implementation guidance.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
 ```
@@ -33,6 +35,13 @@ needs it.
   local config, authored instructions, and secret binding names.
 - Packages own reusable contracts, schemas, service APIs, pure programs, and
   provider wrappers once the boundary is stable.
+- Package names, public export paths, service names, and error names describe
+  the capability that owns them. Do not name a reusable boundary after Effect,
+  a Layer, a repository pattern, or another implementation mechanism.
+- Keep provider qualifiers only when the capability genuinely wraps that
+  provider boundary. Provider-specific adapters such as Codex, Eve, Sendblue,
+  Executor, and Upstash retain their owner names; provider-neutral contracts do
+  not inherit a provider qualifier from one implementation.
 - `@bundjil/eve` owns reusable Eve operation contracts and the Effect
   Schema bridge to Eve, including the workspace-status feature.
 - `@bundjil/store` owns native `KeyValueStore` composition,
@@ -65,6 +74,12 @@ apps/agent/
   test/               app-level tool and runtime-edge tests
   README.md           app usage and verification guide
 ```
+
+Eve's `agent/lib` directory is the framework's import-only authored slot, not a
+general-purpose shared-code bucket. Its immediate children name owned
+integrations such as `sendblue` and `executor`. Discovery identities remain the
+direct `channels/sendblue.ts` and `connections/executor.ts` files; do not
+replace them with nested `index.ts` entrypoints.
 
 `apps/codex-proxy` owns the private Codex provider HTTP runtime:
 
@@ -218,6 +233,10 @@ plane.
 Rules:
 
 - Prefer package subpath exports for durable boundaries.
+- Name subpaths for consumer intent and owned capability. Effect service and
+  Layer patterns do not require mechanism-only public names or `.service.ts`
+  and `.layer.ts` filenames when the containing feature and exported symbol
+  already make ownership clear.
 - Use `.js` extensions for local TypeScript ESM imports under NodeNext.
 - Import schemas and schema-derived types from the owning package.
 - Do not import app files from packages.

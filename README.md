@@ -94,7 +94,7 @@ ran `connection_search` -> `executor__skills` -> `executor__execute` through
 the Codex subscription path, returned `succeeded`, and reached
 `session.waiting`. No Production write or approval was requested. Rollback,
 revocation, monitoring, and incident procedures are recorded in
-[`apps/agent/README.md`](./apps/agent/README.md) and the active Executor plan;
+[`apps/agent/README.md`](./apps/agent/README.md) and the completed Executor plan;
 no Production write is an acceptance step.
 
 ## Sendblue Channel State

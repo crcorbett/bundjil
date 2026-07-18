@@ -1,5 +1,10 @@
 {
   "title": "Effect Persistence Tasks",
+  "supersededBy": {
+    "spec": "docs/product-specs/repo-naming-cleanup.md",
+    "package": "@bundjil/store",
+    "note": "Historical ledger; accepted task evidence retains the names used when it was recorded."
+  },
   "spec": "docs/product-specs/effect-persistence.md",
   "status": "implemented",
   "principles": [

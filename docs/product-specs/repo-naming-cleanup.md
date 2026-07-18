@@ -1,6 +1,6 @@
 # Repository Naming And Structure Cleanup
 
-- Status: Proposed
+- Status: Implemented
 - Owner: Bundjil workspace
 - Created: 2026-07-18
 - Scope: package names, source paths, public exports, documentation taxonomy,
