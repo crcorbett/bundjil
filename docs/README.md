@@ -24,6 +24,9 @@ README.
 - [Frontend Composition](./architecture/frontend-composition.md) defines the
   conditional React hierarchy, leaf ownership, Effect/runtime boundary, and
   browser verification rules for future visible apps.
+- [Repository Naming And Structure Cleanup](./product-specs/repo-naming-cleanup.md)
+  defines the capability-based package names, removal of unused scaffolding,
+  compatibility invariants, and staged verification for the repo cleanup.
 - [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md)
   describes the first planned Eve agent implementation and Effect wrapper
   boundary.
@@ -53,8 +56,6 @@ README.
   `.local/references` setup for Vercel and Effect source lookup.
 - [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral
   package for domain primitives and Effect programs.
-- [`@bundjil/effect-start`](../packages/effect-start/README.md) documents the
-  TanStack Start adapter package.
 - [`@bundjil/eve-effect`](../packages/eve-effect/README.md) documents the
   Effect Schema contracts, tagged errors, service layers, Eve schema bridge,
   and verification commands for the Eve app operation boundary.

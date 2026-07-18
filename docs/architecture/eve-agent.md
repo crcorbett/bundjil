@@ -486,9 +486,10 @@ Follow-up live Gateway proof:
 - `POST /eve/v1/session` returned `ok: true` for the workspace-status prompt.
 - The stream emitted `actions.requested` for `workspace_status`, followed by a
   completed `action.result`.
-- The tool output listed `@bundjil/core`, `@bundjil/effect-start`, and
-  `@bundjil/eve-effect`.
-- The model completed with a concise answer naming those three packages.
+- The historical tool output listed the then-current reusable packages:
+  `@bundjil/core`, `@bundjil/effect-start`, and `@bundjil/eve-effect`.
+- The model completed with a concise answer naming those three historical
+  package names.
 
 Follow-up local Codex proxy proof:
 

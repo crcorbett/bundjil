@@ -39,8 +39,6 @@ its earlier proofs are historical evidence, not the current Production state.
 
 - `@bundjil/core` owns framework-neutral personal-agent domain primitives and
   Effect programs.
-- `@bundjil/effect-start` owns reusable TanStack Start middleware glue for
-  running Effect HTTP programs.
 - `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
@@ -233,7 +231,6 @@ packages/
   core/              Framework-neutral Bundjil domain primitives.
   codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
   effect-persistence/ Native and atomic persistence contracts/adapters.
-  effect-start/      TanStack Start adapter for Effect HTTP programs.
   eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
   README.md          Documentation index.

@@ -14,7 +14,6 @@ packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
   codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and codecs.
   effect-persistence/ Provider-neutral native/atomic persistence and adapters.
-  effect-start/       Reusable TanStack Start middleware adapters for Effect.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
 docs/
@@ -38,7 +37,6 @@ needs it.
 - `@bundjil/core` owns channel-neutral personal-agent concepts.
 - `@bundjil/eve-effect` owns reusable Eve operation contracts and the Effect
   Schema bridge to Eve.
-- `@bundjil/effect-start` owns generic TanStack Start middleware glue only.
 - `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
   supplemental `AtomicKeyValueStore`, and explicit memory/Upstash Layers. It
   owns no OAuth, replay, or channel policy.
@@ -147,13 +145,6 @@ plane.
 - may depend on `@bundjil/core`, `effect`, and Standard Schema packages;
 - must not own Eve filesystem files, app model config, channel files, or
   provider secrets.
-
-`@bundjil/effect-start`:
-
-- owns generic Effect HTTP to TanStack Start middleware adapters;
-- may depend on TanStack Start and Effect HTTP primitives;
-- must stay independent of the Bundjil agent runtime, channels, and domain
-  workflows.
 
 `@bundjil/codex-oauth`:
 

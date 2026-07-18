@@ -77,10 +77,6 @@ apps/agent
   -> effect
   -> @standard-schema/spec
 
-@bundjil/effect-start
-  -> effect
-  -> @tanstack/react-start
-
 @bundjil/codex-oauth
   -> effect
   -> effect/unstable/persistence/KeyValueStore
@@ -107,10 +103,6 @@ and pure or Effect-returning programs.
 Schema contracts, schema-backed tagged errors, the `BundjilAgentOperations`
 service, live and memory layers, and `toEveSchema(schema)` for Eve
 `defineTool` schemas.
-
-`@bundjil/effect-start` is framework glue only. It adapts Effect HTTP programs
-to TanStack Start middleware and must not know about channel routing, product
-workflows, Eve runtime composition, or app-specific content.
 
 `@bundjil/codex-oauth` owns the Codex OAuth profile and token lifecycle
 contract: Effect Schema subjects/profiles, safe tagged errors, deterministic

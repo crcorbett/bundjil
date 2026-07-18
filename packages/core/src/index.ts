@@ -7,7 +7,6 @@ export interface WorkspaceSummary {
 
 export const defaultWorkspacePackages = [
   "@bundjil/core",
-  "@bundjil/effect-start",
   "@bundjil/eve-effect",
 ] as const;
 

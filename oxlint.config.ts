@@ -6,6 +6,24 @@ import vitest from "ultracite/oxlint/vitest";
 export default defineConfig({
   extends: [core, react, vitest],
   ignorePatterns: ["**/dist/**", "**/.turbo/**"],
+  jsPlugins: ["./lint/oxlint-plugin.ts"],
+  overrides: [
+    {
+      files: [
+        "apps/**/*.ts",
+        "apps/**/*.tsx",
+        "apps/**/*.mts",
+        "apps/**/*.cts",
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        "packages/**/*.mts",
+        "packages/**/*.cts",
+      ],
+      rules: {
+        "bundjil/tagged-error-name": "error",
+      },
+    },
+  ],
   rules: {
     "eslint/func-names": "off",
     "eslint/func-style": "off",

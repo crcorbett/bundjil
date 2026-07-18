@@ -6,8 +6,5 @@
     "strictNullChecks": true
   },
   "include": [],
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/effect-start" }
-  ]
+  "references": [{ "path": "./packages/core" }]
 }

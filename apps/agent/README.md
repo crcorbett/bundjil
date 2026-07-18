@@ -445,8 +445,9 @@ Follow-up local proof created a personal Vercel AI Gateway key under the
 `cooper-corbetts-projects` scope and stored it only in ignored
 `apps/agent/.env.local`. With that key present, `/eve/v1/info` reports Gateway
 `connected: true`, the model selects `workspace_status`, the tool result
-completes, and the model summarizes the current packages:
-`@bundjil/core`, `@bundjil/effect-start`, and `@bundjil/eve-effect`.
+completes, and the model summarizes the package list returned by the tool. At
+the time of that historical proof, the tool output named `@bundjil/core`,
+`@bundjil/effect-start`, and `@bundjil/eve-effect`.
 
 Do not commit `.env.local` or any copied Gateway key. Before adding new
 runtime integrations or deployed app boundaries, create a SPEC through

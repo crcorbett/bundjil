@@ -10,8 +10,6 @@ Start here for repo conventions.
   settings.
 - `packages/core` owns framework-neutral Bundjil domain primitives and Effect
   programs.
-- `packages/effect-start` owns reusable TanStack Start middleware glue for
-  running Effect HTTP programs.
 - `packages/eve-effect` owns Eve-facing Effect Schema contracts, tagged
   errors, named operation services, and the Eve schema bridge.
 - `apps/agent` owns the committed Vercel Eve app, including the root agent,
