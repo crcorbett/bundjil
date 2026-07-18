@@ -47,7 +47,7 @@ its earlier proofs are historical evidence, not the current Production state.
   persistence and refresh services, and direct Codex Responses proof surface.
   It composes shared persistence services; it does not own an Upstash adapter
   or hosted browser OAuth callback/account-linking flow.
-- `@bundjil/effect-persistence` owns provider-neutral
+- `@bundjil/store` owns provider-neutral
   `AtomicKeyValueStore` contracts plus coherent native Effect `KeyValueStore`
   memory and Upstash Layers. Its `/memory` and `/upstash` subpaths keep
   provider selection out of the root contract.
@@ -230,7 +230,7 @@ apps/
 packages/
   core/              Framework-neutral Bundjil domain primitives.
   codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
-  effect-persistence/ Native and atomic persistence contracts/adapters.
+  store/              Native and atomic persistence contracts/adapters.
   eve-effect/        Effect contracts and services for Eve tool boundaries.
 docs/
   README.md          Documentation index.
@@ -264,7 +264,7 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 ## Persistence Boundaries
 
-`@bundjil/effect-persistence` owns the provider-neutral atomic transaction
+`@bundjil/store` owns the provider-neutral atomic transaction
 contract and the only `@upstash/redis` dependency. `apps/codex-proxy` owns
 runtime mode selection; `@bundjil/codex-oauth` owns Codex
 profile/environment/key-policy composition; and `apps/agent` owns Sendblue

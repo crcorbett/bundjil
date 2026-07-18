@@ -115,10 +115,10 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
-`@bundjil/effect-persistence`, `@bundjil/codex-oauth`, and
+`@bundjil/store`, `@bundjil/codex-oauth`, and
 `apps/codex-proxy` now participate in the optional Codex proxy model path:
 
-- `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
+- `@bundjil/store` owns native `KeyValueStore` composition,
   `AtomicKeyValueStore`, and the explicit Upstash adapter. Native `modify` is
   not used for coordination.
 - `@bundjil/codex-oauth` owns the direct Codex Responses package contracts,

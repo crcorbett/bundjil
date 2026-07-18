@@ -23,7 +23,7 @@ Implemented:
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
   memory layers, and Codex-specific persistence composition over shared native
   and atomic persistence services.
-- `@bundjil/effect-persistence` owns provider-neutral native Effect
+- `@bundjil/store` owns provider-neutral native Effect
   `KeyValueStore` and supplemental `AtomicKeyValueStore` contracts, coherent
   memory Layer, and explicit Upstash Layer.
 
@@ -80,10 +80,10 @@ apps/agent
 @bundjil/codex-oauth
   -> effect
   -> effect/unstable/persistence/KeyValueStore
-  -> @bundjil/effect-persistence
+  -> @bundjil/store
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
 
-@bundjil/effect-persistence
+@bundjil/store
   -> effect/unstable/persistence/KeyValueStore
   -> @upstash/redis only through its explicit /upstash subpath
 
@@ -110,7 +110,7 @@ storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
 direct Codex Responses proof service, and the package-level
 OpenAI-compatible private proxy contract. It also owns the explicit
-shared `@bundjil/effect-persistence/upstash` composition for Vercel Marketplace
+shared `@bundjil/store/upstash` composition for Vercel Marketplace
 Upstash Redis. The package owns profile keys and refresh policy, not provider
 commands, prefixing, or client construction.
 It owns the trusted-local loopback PKCE exchange and encrypted hosted
@@ -239,9 +239,9 @@ Vitest
   -> injected fetch proof for bearer auth and no token body leak
 
 Vitest
-  -> packages/effect-persistence/test/upstash-key-value-store.test.ts
-  -> packages/effect-persistence/test/upstash-atomic-key-value-store.test.ts
-  -> mocked Upstash client through @bundjil/effect-persistence/upstash
+  -> packages/store/test/upstash-key-value-store.test.ts
+  -> packages/store/test/upstash-atomic-key-value-store.test.ts
+  -> mocked Upstash client through @bundjil/store/upstash
   -> native KeyValueStore + AtomicKeyValueStore compatibility
 
 Consumer suites
@@ -310,7 +310,7 @@ boundaries first. Move shared contracts into `@bundjil/core` or
 - `bun run --filter @bundjil/codex-oauth test` proves profile storage,
   request/stream mapping, direct proof boundaries, and shared persistence
   composition.
-- `bun run --filter @bundjil/effect-persistence test` proves native/atomic
+- `bun run --filter @bundjil/store test` proves native/atomic
   persistence compatibility and the mocked Upstash adapter.
 
 Every implementation task touching Effect runtime, provider, storage, or app

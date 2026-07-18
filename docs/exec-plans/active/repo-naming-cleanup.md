@@ -33,7 +33,7 @@ mock or deterministic memory Layers.
 ## Ordered Tasks
 
 1. `capture-compatibility-baseline-and-remove-effect-start`: completed.
-2. `rename-effect-persistence-to-store`: pending.
+2. `rename-effect-persistence-to-store`: completed.
 3. `rename-codex-oauth-to-codex`: pending.
 4. `organize-codex-source-by-owned-feature`: pending.
 5. `rename-eve-effect-and-remove-core`: pending.
@@ -118,3 +118,48 @@ Status: Passed
   Gateway proof; historical product specs and ledgers remain unchanged.
 - `git diff --check` passed. No Browser, live provider, deployment,
   publication, or stored-data proof was applicable or performed.
+
+### rename-effect-persistence-to-store
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- The package, manifest identity, repository directory, root contract, `/memory`
+  and `/upstash` exports, and the sole `AtomicKeyValueStore` Context identity
+  moved atomically to `@bundjil/store`.
+- Memory and Upstash providers, Codex persistence consumers, and Sendblue replay
+  consumers all use the same new service tag; no old/new identities coexist.
+- The proxy's unused direct dependency and Knip ignore were removed while its
+  explicit Vercel build closure remains store, Codex, then proxy.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- A byte-level comparison against the prior package found no implementation,
+  Schema, error, test, or configuration change beyond package metadata, README
+  naming, and the required Context identity.
+- Root, `/memory`, and `/upstash` export maps remain synchronized with
+  `publishConfig.exports`; no alias, wrapper, DTO, unsafe cast, helper, or
+  suppression was introduced.
+- `@upstash/redis` remains confined to the store manifest and Upstash
+  implementation; provider commands, prefixes, decoding, keys, values, TTLs,
+  transactions, locks, fences, and replay behavior remain unchanged.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Parent frozen install passed with 508 installs across 693 packages and no
+  changes.
+- Parent focused verification passed: store 23 tests plus build, Codex 103
+  tests, proxy 24 tests including packaging, and agent 57 tests.
+- Parent `bun run verification` passed: Ultracite, the tagged-error lint test,
+  Knip, six workspace typechecks, ten Turbo tasks, and all 212 workspace tests.
+- Current-source/configuration scans contain no old persistence package/path;
+  remaining occurrences are classified historical or migration evidence.
+- `git diff --check` passed. No Browser, live provider, deployment,
+  publication, or stored-data action was applicable or performed.

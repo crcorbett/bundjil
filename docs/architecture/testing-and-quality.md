@@ -27,8 +27,8 @@ bun run --filter @bundjil/core test
 bun run --filter @bundjil/eve-effect test
 bun run --filter @bundjil/codex-oauth test
 bun run --filter @bundjil/codex-oauth build
-bun run --filter @bundjil/effect-persistence test
-bun run --filter @bundjil/effect-persistence build
+bun run --filter @bundjil/store test
+bun run --filter @bundjil/store build
 bun run --filter @bundjil/codex-oauth proof:codex-responses
 bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy check-types

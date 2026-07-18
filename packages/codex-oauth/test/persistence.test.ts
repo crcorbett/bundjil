@@ -1,4 +1,4 @@
-import { PersistenceMemory } from "@bundjil/effect-persistence/memory";
+import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
 import {
   Array,

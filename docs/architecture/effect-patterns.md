@@ -6,7 +6,7 @@ For the Codex subscription path, canonical schemas, tagged errors, Context
 services, explicit Layers, `Config`/`Redacted`, scoped loopback resources,
 native `KeyValueStore` composition, refresh locking, and fenced commits remain
 package-owned in `@bundjil/codex-oauth`; provider-neutral persistence contracts
-and adapters belong to `@bundjil/effect-persistence`. `apps/codex-proxy` owns
+and adapters belong to `@bundjil/store`. `apps/codex-proxy` owns
 only app config and private HTTP composition. Do not recreate profile DTOs,
 token mappers, or OAuth routes in either app; Vercel must not host browser OAuth
 or account linking.
@@ -113,14 +113,14 @@ clear owner and concrete value.
 
 Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary
 string and binary persistence. Treat its unstable import path as a contract
-tested by `@bundjil/effect-persistence`; `KeyValueStore.modify` is not an
+tested by `@bundjil/store`; `KeyValueStore.modify` is not an
 atomic coordination operation. Claims, leases, fencing, compare-and-remove,
 and multi-key transitions use the canonical
 `AtomicKeyValueStore.transact` service instead.
 
 The root persistence contract is provider-neutral. Consumers opt into
-`@bundjil/effect-persistence/memory` for deterministic tests or
-`@bundjil/effect-persistence/upstash` for hosted storage. The `/upstash`
+`@bundjil/store/memory` for deterministic tests or
+`@bundjil/store/upstash` for hosted storage. The `/upstash`
 subpath alone owns the SDK, prefix application, command syntax, response
 decoding, and safe provider errors. Composition owners decode bindings through
 Effect `Config`/`Config.redacted`: `@bundjil/codex-oauth` owns Codex

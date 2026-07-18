@@ -1,4 +1,4 @@
-import { PersistenceMemory } from "@bundjil/effect-persistence/memory";
+import { PersistenceMemory } from "@bundjil/store/memory";
 import { Context, Effect, Layer, Option, Redacted, Ref, Schema } from "effect";
 
 import { CodexOAuthRefreshLockAtomicLive } from "./atomic-persistence.layer.js";

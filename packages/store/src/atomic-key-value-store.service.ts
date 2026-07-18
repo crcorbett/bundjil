@@ -19,7 +19,7 @@ export interface AtomicKeyValueStoreShape {
 export class AtomicKeyValueStore extends Context.Service<
   AtomicKeyValueStore,
   AtomicKeyValueStoreShape
->()("@bundjil/effect-persistence/AtomicKeyValueStore") {}
+>()("@bundjil/store/AtomicKeyValueStore") {}
 
 /** Internal shared public-boundary validation for both adapters. */
 const decodeAtomicKeyValueStoreTransactionEffect = Effect.fn(

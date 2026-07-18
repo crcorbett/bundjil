@@ -1,8 +1,5 @@
-import {
-  AtomicKeyValueStore,
-  AtomicKeyValueStoreKey,
-} from "@bundjil/effect-persistence";
-import { PersistenceMemory } from "@bundjil/effect-persistence/memory";
+import { AtomicKeyValueStore, AtomicKeyValueStoreKey } from "@bundjil/store";
+import { PersistenceMemory } from "@bundjil/store/memory";
 import type { Redacted } from "effect";
 import { Clock, Context, Duration, Effect, Layer, Match, Schema } from "effect";
 

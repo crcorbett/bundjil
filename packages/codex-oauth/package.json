@@ -76,7 +76,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bundjil/effect-persistence": "workspace:*",
+    "@bundjil/store": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
     "effect": "catalog:effect"
   },

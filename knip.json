@@ -13,7 +13,6 @@
     },
     "apps/codex-proxy": {
       "entry": ["api/**/*.ts", "scripts/**/*.ts", "test/**/*.test.ts"],
-      "ignoreDependencies": ["@bundjil/effect-persistence"],
       "project": [
         "api/**/*.ts",
         "src/**/*.ts",

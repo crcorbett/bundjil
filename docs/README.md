@@ -82,7 +82,7 @@ README.
   Tilt Legal. Preview proof is historical. Accepted Production evidence covers
   one deployed Eve-to-live-proxy completion and the bounded Task 4 rollout;
   it is not a standing provider probe or approval for later deployment changes.
-- Storage: `@bundjil/effect-persistence/upstash` provides native Effect
+- Storage: `@bundjil/store/upstash` provides native Effect
   `KeyValueStore` plus `AtomicKeyValueStore` through one provider adapter.
   `@bundjil/codex-oauth` owns profile keys, encrypted codecs, and refresh
   policy. `live` stores a versioned encrypted subscription profile, refreshes

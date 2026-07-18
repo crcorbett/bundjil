@@ -1,12 +1,12 @@
 {
-  "name": "@bundjil/effect-persistence",
+  "name": "@bundjil/store",
   "version": "0.1.0",
   "private": true,
-  "description": "Provider-neutral Effect persistence contracts with explicit adapters.",
+  "description": "Provider-neutral storage contracts with explicit adapters.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crcorbett/bundjil.git",
-    "directory": "packages/effect-persistence"
+    "directory": "packages/store"
   },
   "type": "module",
   "main": "./dist/index.js",

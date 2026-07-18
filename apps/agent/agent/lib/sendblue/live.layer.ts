@@ -1,7 +1,7 @@
 import {
   UpstashPersistenceLive,
   UpstashPersistenceOptions,
-} from "@bundjil/effect-persistence/upstash";
+} from "@bundjil/store/upstash";
 import { Effect, Layer, Schema } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 

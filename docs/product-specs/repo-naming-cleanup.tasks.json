@@ -119,7 +119,7 @@
     {
       "id": "rename-effect-persistence-to-store",
       "title": "Rename the shared persistence package to @bundjil/store",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["capture-compatibility-baseline-and-remove-effect-start"],
       "description": "Move packages/effect-persistence to packages/store, migrate every consumer to @bundjil/store, atomically reconcile any changed Context identities, and preserve all native, atomic, memory, and Upstash behavior.",
       "implementationNotes": [],
@@ -150,8 +150,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the provider-neutral package, root contract, /memory and /upstash exports, AtomicKeyValueStore Context identity, memory and Upstash providers, Codex consumers, and Sendblue replay consumer moved atomically to @bundjil/store. The proxy's unused direct dependency and Knip exception were removed while its explicit transitive Vercel build closure was retained. No old/new service identities coexist.",
+          "Pass 2 - implementation quality and helper admission: a byte-level comparison of the old and new package confirmed implementation, Schema, error, test, and configuration files are unchanged except package metadata, README naming, and the required Context.Service identifier. Export maps remain symmetric, @upstash/redis remains confined to the store manifest and upstash implementation, and no compatibility alias, wrapper, DTO, unsafe cast, helper, provider behavior, selected error, or encoded contract was introduced or changed.",
+          "Pass 3 - verification and evidence: parent frozen install, 23 store tests and build, 103 Codex tests, 24 proxy tests including packaging, 57 agent tests, Knip, six workspace typechecks, full verification with 212 tests, export/provider/current-reference scans, and git diff --check passed under the documented synthetic Executor configuration. Exact keys, encoded values, TTLs, locks, fences, and replay transitions remain covered; no Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
       },
       "commitAfterPassing": true
     },

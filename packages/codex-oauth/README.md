@@ -31,7 +31,7 @@ Implemented:
 - Memory/mock layers for automated tests.
 - Opt-in direct Codex Responses proof with sanitized output.
 - Codex-specific hosted persistence composition through
-  `@bundjil/effect-persistence` native `KeyValueStore` and
+  `@bundjil/store` native `KeyValueStore` and
   `AtomicKeyValueStore` services.
 - `CodexOAuthProfileCommit` with atomic create, replacement, refresh, and
   reauthentication fences. Memory and Upstash layers reject stale profile
@@ -240,7 +240,7 @@ local profile.
 ## Upstash Persistence Composition
 
 Use Vercel Marketplace Upstash Redis for hosted KV. The shared
-`@bundjil/effect-persistence/upstash` adapter owns the SDK, provider commands,
+`@bundjil/store/upstash` adapter owns the SDK, provider commands,
 prefix application, scans, and atomic transaction program. Codex owns only its
 environment names, default namespace, encrypted profile encoding, revisions,
 and lock policy.

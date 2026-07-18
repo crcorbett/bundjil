@@ -1,5 +1,5 @@
-import { AtomicKeyValueStore } from "@bundjil/effect-persistence";
-import type { AtomicKeyValueStoreConditionType } from "@bundjil/effect-persistence";
+import { AtomicKeyValueStore } from "@bundjil/store";
+import type { AtomicKeyValueStoreConditionType } from "@bundjil/store";
 import {
   Clock,
   Duration,

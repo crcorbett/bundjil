@@ -1,10 +1,10 @@
-# @bundjil/effect-persistence
+# @bundjil/store
 
-Provider-neutral persistence contracts for Bundjil Effect programs.
+Provider-neutral storage contracts for Bundjil Effect programs.
 
-- `@bundjil/effect-persistence` exports `AtomicKeyValueStore` and its canonical Schema contracts.
-- `@bundjil/effect-persistence/memory` exports `PersistenceMemory` for coherent deterministic tests.
-- `@bundjil/effect-persistence/upstash` exports `UpstashPersistenceLive(options)` and its redacted provider options.
+- `@bundjil/store` exports `AtomicKeyValueStore` and its canonical Schema contracts.
+- `@bundjil/store/memory` exports `PersistenceMemory` for coherent deterministic tests.
+- `@bundjil/store/upstash` exports `UpstashPersistenceLive(options)` and its redacted provider options.
 
 Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary string and binary persistence. Its import path is unstable and this package pins the behavior with contract tests. Native `KeyValueStore.modify` is not an atomic coordination primitive. Claims, locks, fencing, and concurrent transitions must use `AtomicKeyValueStore.transact`.
 

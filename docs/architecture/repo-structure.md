@@ -13,7 +13,7 @@ apps/
 packages/
   core/               Framework-neutral Bundjil domain primitives and programs.
   codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and codecs.
-  effect-persistence/ Provider-neutral native/atomic persistence and adapters.
+  store/              Provider-neutral native/atomic persistence and adapters.
   eve-effect/         Effect contracts, service layers, and Eve schema bridge.
 
 docs/
@@ -37,7 +37,7 @@ needs it.
 - `@bundjil/core` owns channel-neutral personal-agent concepts.
 - `@bundjil/eve-effect` owns reusable Eve operation contracts and the Effect
   Schema bridge to Eve.
-- `@bundjil/effect-persistence` owns native `KeyValueStore` composition,
+- `@bundjil/store` owns native `KeyValueStore` composition,
   supplemental `AtomicKeyValueStore`, and explicit memory/Upstash Layers. It
   owns no OAuth, replay, or channel policy.
 
@@ -158,7 +158,7 @@ plane.
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;
-- composes `@bundjil/effect-persistence` for native and atomic persistence;
+- composes `@bundjil/store` for native and atomic persistence;
   it owns Codex logical keys, encrypted profile codecs, and refresh policy,
   not the Upstash client or provider adapter;
 - owns the trusted-local access-token-only importer and encrypted filesystem

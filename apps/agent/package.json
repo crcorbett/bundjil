@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
-    "@bundjil/effect-persistence": "workspace:*",
     "@bundjil/eve-effect": "workspace:*",
+    "@bundjil/store": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
     "ai": "^7.0.16",
     "effect": "catalog:effect",
