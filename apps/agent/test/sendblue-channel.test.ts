@@ -51,6 +51,7 @@ const config = Schema.decodeUnknownSync(SendblueConfig)({
   },
   routingKey: Redacted.make("test-routing-key"),
   senderIdentities,
+  typingMaxDurationMillis: 120_000,
   webhookSecret: Redacted.make("test-webhook-secret"),
 });
 const channelState = Schema.decodeUnknownSync(SendblueChannelState)({

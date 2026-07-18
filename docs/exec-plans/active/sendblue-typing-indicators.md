@@ -81,13 +81,16 @@ Status: Completed
 
 ### 2. Typed provider operation
 
-Status: Planned
+Status: Completed
 
 - Add the discriminated start/stop request Schemas, provider response Schema,
   duration Config, existing error-operation extension, and live/memory client
   operation with a separate two-second timeout and no retry.
 - Prove the HTTP boundary independently before changing Eve events.
 - Record compatibility and leak-safe evidence.
+- Full verification discovered three other tests that decode the canonical
+  `SendblueConfig`; their synthetic fixtures add only the required `120000`
+  duration. No second Schema default or runtime scope was introduced.
 
 ### 3. Durable Eve lifecycle and observations
 
@@ -205,3 +208,14 @@ verify one normal Production message without typing before further work.
   absent passed the focused Executor Config suite, 7/7 root builds, formatting,
   Knip, 7/7 workspace typechecks, 11/11 test tasks, 13 agent test files and 60
   agent tests, plus `git diff --check`.
+- 2026-07-19: `implement-typed-sendblue-indicator-client` completed three
+  parent passes. Ownership remains in the app-owned Sendblue Schema, Config,
+  named client, and live/memory Layer boundary. Effect review accepted the
+  discriminated request union, explicit `Never` stop-duration prohibition,
+  branded bounds, redacted Config default, Schema HTTP codecs, existing tagged
+  errors, and separate two-second no-retry timeout; it rejected a generic raw
+  client wrapper. Verification restored all prior `sendMessage` coverage and
+  expanded three canonical test fixtures after the first root run exposed their
+  missing required Config field. Focused tests passed 14/14; frozen install,
+  formatting, Knip, 7/7 typechecks, 11/11 test tasks, 66/66 agent tests, 7/7
+  builds, static scans, and diff checks passed with no Executor API key.

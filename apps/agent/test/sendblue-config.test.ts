@@ -52,6 +52,7 @@ it.effect("loads required Sendblue config with redacted secrets", () =>
 
     assert.strictEqual(config.apiBaseUrl.href, "https://api.sendblue.com/");
     assert.deepStrictEqual(config.allowedServices, ["iMessage"]);
+    assert.strictEqual(config.typingMaxDurationMillis, 120_000);
     assert.strictEqual(Redacted.value(config.apiKey), "test-api-key");
     assert.strictEqual(
       Schema.is(Schema.Redacted(Schema.NonEmptyString))(config.apiKey),
@@ -213,6 +214,38 @@ it.effect(
         "SMS",
         "RCS",
       ]);
+
+      const typingDurationConfig = yield* loadSendblueConfig.pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({
+              env: {
+                ...environment,
+                BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS: "300000",
+              },
+            })
+          )
+        )
+      );
+      assert.strictEqual(typingDurationConfig.typingMaxDurationMillis, 300_000);
+
+      const invalidTypingDurationError = yield* loadSendblueConfig.pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({
+              env: {
+                ...environment,
+                BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS: "0",
+              },
+            })
+          )
+        ),
+        Effect.flip
+      );
+      assert.strictEqual(
+        Schema.is(SendblueConfigError)(invalidTypingDurationError),
+        true
+      );
 
       const invalidFromNumberError = yield* loadSendblueConfig.pipe(
         Effect.provide(

@@ -70,11 +70,11 @@
     {
       "id": "implement-typed-sendblue-indicator-client",
       "title": "Implement the typed Sendblue indicator client",
-      "status": "planned",
+      "status": "completed",
       "dependsOn": ["stabilize-agent-ci-fixture"],
       "description": "Extend the existing app-owned Sendblue Schemas, Config, client service, memory Layer, tests, and Turbo build environment with one Schema-encoded typing operation.",
       "implementationNotes": [
-        "Change apps/agent/agent/lib/sendblue/schemas.ts, config.ts, client.service.ts, memory.layer.ts, apps/agent/test/sendblue-config.test.ts, apps/agent/test/sendblue-client.test.ts, and turbo.json only; established error-class files change only if the extended operation Schema forces a mechanical import/format edit.",
+        "Change apps/agent/agent/lib/sendblue/schemas.ts, config.ts, client.service.ts, memory.layer.ts, apps/agent/test/sendblue-config.test.ts, apps/agent/test/sendblue-client.test.ts, and turbo.json; established error-class files change only if the extended operation Schema forces a mechanical import/format edit. The required SendblueConfig field also permits one synthetic fixture insertion in each of sendblue-channel.test.ts, sendblue-replay-store.test.ts, and sendblue-security-identity.test.ts because full verification proved those canonical decoders otherwise fail before tests run.",
         "Reuse E164PhoneNumber, SendblueConfigService, SendblueClient, FetchHttpClient, redacted credentials, and the three existing operation-discriminated client errors; do not add Sendblue or Chat SDK dependencies.",
         "Add a provider input union where start requires max_duration_ms and stop excludes it, with branded duration 1..300000. Require decoded SENT or ERROR status even though the provider response field is optional.",
         "Add BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS with Schema-decoded default 120000 and add the optional non-secret key to turbo.json @bundjil/agent#build.env in this task.",
@@ -97,8 +97,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "passEvidence": []
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: app-owned Schemas, Config, named client operation, and live/memory Layers remain inside agent/lib/sendblue; the provider task changes no Eve event, shared package, dependency, webhook, account setting, or runtime owner. Full verification justified three one-field synthetic Config fixture updates outside the initially named focused tests.",
+          "Effect quality and helper admission: setTypingIndicator is one named flat Effect operation over Effect HttpClient Schema codecs, redacted existing credentials, existing tagged errors, Match, a branded 1..300000 duration, Config default 120000, an explicit optional Never field that rejects stop durations under excess-key stripping, a separate two-second timeout, and no retry, raw client, generic use callback, unsafe cast, manual JSON, or new helper module.",
+          "Verification and evidence: pinned Sendblue generated source confirmed the optional response number is E.164; focused Config/client tests passed 14/14 and prove exact start/stop bodies and headers, SENT/missing/ERROR/malformed responses, 400/401/429/503, one transport attempt, two-second TestClock timeout, bounds, memory behavior, and preserved sendMessage coverage. Frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 66/66 agent tests, 7/7 builds, static scans, and diff checks passed with the Executor API key absent."
+        ]
       },
       "commitAfterPassing": true
     },

@@ -14,6 +14,7 @@ import {
   SendblueConfig,
   SendblueSenderIdentities,
   SendblueService,
+  SendblueTypingIndicatorDurationMillis,
 } from "./schemas.js";
 import type { SendblueConfig as SendblueConfigType } from "./schemas.js";
 
@@ -49,6 +50,10 @@ const allowedServicesConfig = Config.schema(
   Schema.Array(SendblueService),
   "BUNDJIL_SENDBLUE_ALLOWED_SERVICES"
 ).pipe(Config.withDefault(["iMessage"]));
+const typingMaxDurationMillisConfig = Config.schema(
+  SendblueTypingIndicatorDurationMillis,
+  "BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS"
+).pipe(Config.withDefault(120_000));
 const testModeConfig = Config.option(
   Config.literal("true", "BUNDJIL_SENDBLUE_TEST_MODE")
 );
@@ -77,6 +82,7 @@ export const loadSendblueConfig = Effect.gen(
       senderIdentities: senderIdentitiesConfig,
       testApiBaseUrl: testApiBaseUrlConfig,
       testMode: testModeConfig,
+      typingMaxDurationMillis: typingMaxDurationMillisConfig,
       webhookSecret: webhookSecretConfig,
     });
     const senderIdentities = yield* Schema.decodeUnknownEffect(
@@ -111,6 +117,7 @@ export const loadSendblueConfig = Effect.gen(
       },
       routingKey: values.routingKey,
       senderIdentities,
+      typingMaxDurationMillis: values.typingMaxDurationMillis,
       webhookSecret: values.webhookSecret,
     });
   }

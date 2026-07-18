@@ -58,6 +58,7 @@ const configLayer = Layer.succeed(
     senderIdentities: Schema.decodeUnknownSync(SendblueSenderIdentities)({
       "+14155550100": "owner",
     }),
+    typingMaxDurationMillis: 120_000,
     webhookSecret: Redacted.make("test-webhook-secret"),
   })
 );

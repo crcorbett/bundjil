@@ -137,7 +137,10 @@ export const SendblueResponseErrorReason = Schema.Literals([
 export type SendblueResponseErrorReason =
   typeof SendblueResponseErrorReason.Type;
 
-export const SendblueClientOperation = Schema.Literal("sendMessage");
+export const SendblueClientOperation = Schema.Literals([
+  "sendMessage",
+  "setTypingIndicator",
+]);
 export type SendblueClientOperation = typeof SendblueClientOperation.Type;
 
 export const SendblueRequestErrorReason = Schema.Literal("requestEncoding");
@@ -149,6 +152,16 @@ export const SendblueDeliveryUncertainReason = Schema.Literals([
 ]);
 export type SendblueDeliveryUncertainReason =
   typeof SendblueDeliveryUncertainReason.Type;
+
+export const SendblueTypingIndicatorState = Schema.Literals(["start", "stop"]);
+export type SendblueTypingIndicatorState =
+  typeof SendblueTypingIndicatorState.Type;
+
+export const SendblueTypingIndicatorDurationMillis = Schema.Int.check(
+  Schema.isBetween({ maximum: 300_000, minimum: 1 })
+).pipe(Schema.brand("SendblueTypingIndicatorDurationMillis"));
+export type SendblueTypingIndicatorDurationMillis =
+  typeof SendblueTypingIndicatorDurationMillis.Type;
 
 export const SendblueOutboundEventCoordinates = Schema.Struct({
   sequence: NonNegativeInt,
@@ -250,6 +263,54 @@ export const SendblueSendMessageProviderResponse = Schema.Union([
 ]);
 export type SendblueSendMessageProviderResponse =
   typeof SendblueSendMessageProviderResponse.Type;
+
+export const SendblueTypingIndicatorStart = Schema.Struct({
+  from_number: E164PhoneNumber,
+  max_duration_ms: SendblueTypingIndicatorDurationMillis,
+  number: E164PhoneNumber,
+  state: Schema.Literal("start"),
+});
+export type SendblueTypingIndicatorStart =
+  typeof SendblueTypingIndicatorStart.Type;
+
+export const SendblueTypingIndicatorStop = Schema.Struct({
+  from_number: E164PhoneNumber,
+  max_duration_ms: Schema.optional(Schema.Never),
+  number: E164PhoneNumber,
+  state: Schema.Literal("stop"),
+});
+export type SendblueTypingIndicatorStop =
+  typeof SendblueTypingIndicatorStop.Type;
+
+export const SendblueTypingIndicatorInput = Schema.Union([
+  SendblueTypingIndicatorStart,
+  SendblueTypingIndicatorStop,
+]);
+export type SendblueTypingIndicatorInput =
+  typeof SendblueTypingIndicatorInput.Type;
+
+export const SendblueTypingIndicatorSuccess = Schema.Struct({
+  error_message: Schema.optional(Schema.NullOr(Schema.String)),
+  number: Schema.optional(E164PhoneNumber),
+  status: Schema.Literal("SENT"),
+});
+export type SendblueTypingIndicatorSuccess =
+  typeof SendblueTypingIndicatorSuccess.Type;
+
+export const SendblueTypingIndicatorProviderRejected = Schema.Struct({
+  error_message: Schema.optional(Schema.NullOr(Schema.String)),
+  number: Schema.optional(E164PhoneNumber),
+  status: SendblueProviderRejectedStatus,
+});
+export type SendblueTypingIndicatorProviderRejected =
+  typeof SendblueTypingIndicatorProviderRejected.Type;
+
+export const SendblueTypingIndicatorProviderResponse = Schema.Union([
+  SendblueTypingIndicatorSuccess,
+  SendblueTypingIndicatorProviderRejected,
+]);
+export type SendblueTypingIndicatorProviderResponse =
+  typeof SendblueTypingIndicatorProviderResponse.Type;
 
 export const SendblueReplayClaimStatus = Schema.Literals([
   "claimed",
@@ -410,6 +471,7 @@ export const SendblueConfig = Schema.Struct({
   }),
   routingKey: SendblueRoutingKey,
   senderIdentities: SendblueSenderIdentities,
+  typingMaxDurationMillis: SendblueTypingIndicatorDurationMillis,
   webhookSecret: SendblueWebhookSecret,
 });
 export type SendblueConfig = typeof SendblueConfig.Type;

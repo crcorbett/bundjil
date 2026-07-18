@@ -14,11 +14,15 @@ import {
 import {
   SendblueSendMessageInput,
   SendblueSendMessageProviderResponse,
+  SendblueTypingIndicatorInput,
+  SendblueTypingIndicatorProviderResponse,
 } from "./schemas.js";
 import type {
+  SendblueResponseErrorReason,
   SendblueSendMessageInput as SendblueSendMessageInputType,
   SendblueSendMessageSuccess as SendblueSendMessageSuccessType,
-  SendblueResponseErrorReason,
+  SendblueTypingIndicatorInput as SendblueTypingIndicatorInputType,
+  SendblueTypingIndicatorSuccess as SendblueTypingIndicatorSuccessType,
 } from "./schemas.js";
 
 export type SendblueClientError =
@@ -30,6 +34,9 @@ export interface SendblueClientShape {
   readonly sendMessage: (
     input: SendblueSendMessageInputType
   ) => Effect.Effect<SendblueSendMessageSuccessType, SendblueClientError>;
+  readonly setTypingIndicator: (
+    input: SendblueTypingIndicatorInputType
+  ) => Effect.Effect<SendblueTypingIndicatorSuccessType, SendblueClientError>;
 }
 
 export class SendblueClient extends Context.Service<
@@ -38,6 +45,7 @@ export class SendblueClient extends Context.Service<
 >()("@bundjil/agent/SendblueClient") {}
 
 const executionTimeout = "30 seconds";
+const typingIndicatorExecutionTimeout = "2 seconds";
 
 export const makeSendblueClient = Effect.gen(
   function* makeSendblueClientOperation() {
@@ -148,6 +156,114 @@ export const makeSendblueClient = Effect.gen(
           Match.exhaustive
         );
       }),
+      setTypingIndicator: Effect.fn("SendblueClient.setTypingIndicator")(
+        function* (input) {
+          const request = yield* HttpClientRequest.post(
+            new URL("/api/send-typing-indicator", config.apiBaseUrl).href
+          ).pipe(
+            HttpClientRequest.setHeader(
+              "sb-api-key-id",
+              Redacted.value(config.apiKey)
+            ),
+            HttpClientRequest.setHeader(
+              "sb-api-secret-key",
+              Redacted.value(config.apiSecret)
+            ),
+            HttpClientRequest.schemaBodyJson(SendblueTypingIndicatorInput)(
+              input
+            ),
+            Effect.mapError(
+              () =>
+                new SendblueRequestError({
+                  message:
+                    "Unable to encode the Sendblue typing indicator request.",
+                  operation: "setTypingIndicator",
+                  reason: "requestEncoding",
+                })
+            )
+          );
+          const response = yield* client.execute(request).pipe(
+            Effect.mapError(
+              () =>
+                new SendblueDeliveryUncertainError({
+                  message:
+                    "The Sendblue typing indicator outcome is uncertain.",
+                  operation: "setTypingIndicator",
+                  reason: "transport",
+                })
+            ),
+            Effect.timeoutOption(typingIndicatorExecutionTimeout),
+            Effect.flatMap(
+              Option.match({
+                onNone: () =>
+                  Effect.fail(
+                    new SendblueDeliveryUncertainError({
+                      message:
+                        "The Sendblue typing indicator request timed out.",
+                      operation: "setTypingIndicator",
+                      reason: "timeout",
+                    })
+                  ),
+                onSome: Effect.succeed,
+              })
+            )
+          );
+
+          if (response.status < 200 || response.status >= 300) {
+            const reason: SendblueResponseErrorReason = Match.value(
+              response.status
+            ).pipe(
+              Match.when(
+                401,
+                (): SendblueResponseErrorReason => "unauthorized"
+              ),
+              Match.when(429, (): SendblueResponseErrorReason => "rateLimited"),
+              Match.when(
+                (status) => status >= 500,
+                (): SendblueResponseErrorReason => "serverRejected"
+              ),
+              Match.orElse((): SendblueResponseErrorReason => "clientRejected")
+            );
+            return yield* new SendblueResponseError({
+              message: "Sendblue rejected the typing indicator request.",
+              operation: "setTypingIndicator",
+              reason,
+              status: response.status,
+            });
+          }
+
+          const providerResponse = yield* HttpClientResponse.schemaBodyJson(
+            SendblueTypingIndicatorProviderResponse
+          )(response).pipe(
+            Effect.mapError(
+              () =>
+                new SendblueResponseError({
+                  message:
+                    "Sendblue returned an invalid typing indicator response.",
+                  operation: "setTypingIndicator",
+                  reason: "malformedResponse",
+                  status: response.status,
+                })
+            )
+          );
+          return yield* Match.value(providerResponse).pipe(
+            Match.when({ status: "ERROR" }, () =>
+              Effect.fail(
+                new SendblueResponseError({
+                  message: "Sendblue rejected the typing indicator request.",
+                  operation: "setTypingIndicator",
+                  reason: "providerRejected",
+                  status: response.status,
+                })
+              )
+            ),
+            Match.when({ status: "SENT" }, (success) =>
+              Effect.succeed<SendblueTypingIndicatorSuccessType>(success)
+            ),
+            Match.exhaustive
+          );
+        }
+      ),
     });
   }
 ).pipe(Effect.withSpan("SendblueClientLive"));
