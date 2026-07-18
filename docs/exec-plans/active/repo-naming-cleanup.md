@@ -35,7 +35,7 @@ mock or deterministic memory Layers.
 1. `capture-compatibility-baseline-and-remove-effect-start`: completed.
 2. `rename-effect-persistence-to-store`: completed.
 3. `rename-codex-oauth-to-codex`: completed.
-4. `organize-codex-source-by-owned-feature`: pending.
+4. `organize-codex-source-by-owned-feature`: completed.
 5. `rename-eve-effect-and-remove-core`: pending.
 6. `clarify-agent-integration-ownership`: pending.
 7. `reconcile-documentation-and-final-verification`: pending.
@@ -211,3 +211,50 @@ Status: Passed
 - Stale-reference, export-parity, Context-identity, error-preservation, and diff
   checks passed. No Browser OAuth, live provider, deployment, publication, or
   stored-data action was applicable or performed.
+
+### organize-codex-source-by-owned-feature
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Implementation and canonical Schemas are owned by `auth`, `profiles`,
+  `provider`, `storage`, and `testing`, with responsibility filenames and no
+  forwarding old-path modules.
+- Root and supported subpath exports remain the consumer API. All 27 internal
+  `Context.Service` identifiers remain exact with matching providers and
+  consumers.
+- The six selected errors and three associated Schema/type contracts migrated
+  atomically across declarations, unions, constructors, catchers, guards,
+  scripts, proxy mappings, and tests.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- Rename-aware diff review separated path movement from the intentional encoded
+  contract changes. Six table rows prove exact encoded fields, target decode and
+  `Schema.is` success, and old-tag rejection.
+- All 16 non-selected tagged-error bodies remain byte-identical; storage-key
+  logic and every reason, boundary, operation, field, cause, and retry
+  classification remain unchanged.
+- No old alias, transform, dual decoder, unsafe cast, DTO, manual mapper,
+  speculative factory, broad compatibility barrel, or trivial wrapper was
+  introduced.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Parent frozen install passed with 508 installs across 693 packages and no
+  changes.
+- Parent focused gates passed: Codex check-types/build and 109 tests; proxy 28
+  tests with byte-exact public responses; mock smoke health/stream 200 with five
+  SSE lines; check, tagged-error lint, and Knip.
+- Parent full verification passed six workspace typechecks, ten Turbo tasks,
+  and all 222 tests. Selected-old names occur only in six rejection fixtures;
+  non-selected tags, Context identities, storage keys, and diff checks passed.
+- No external persisted decoder was found. No Browser, provider mutation,
+  deployment, publication, or stored-data action was applicable or performed.

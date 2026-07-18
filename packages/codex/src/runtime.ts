@@ -2,76 +2,77 @@ import { Effect, Layer, Option } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
-  CodexDirectProvider,
-  makeCodexDirectProvider,
-  makeCodexLegacyDirectProvider,
-} from "./codex-direct-provider.service.js";
-import {
-  CodexHttpClient,
-  makeCodexHttpClient,
-} from "./codex-http-client.service.js";
-import {
-  CodexRequestMapper,
-  makeCodexRequestMapper,
-} from "./codex-request-mapper.js";
-import {
-  CodexResponsesFetch,
-  makeCodexResponsesFetch,
-} from "./codex-responses-fetch.service.js";
-import {
-  CodexResponsesProof,
-  makeCodexResponsesProof,
-} from "./codex-responses-proof.service.js";
-import {
-  CodexStreamMapper,
-  makeCodexStreamMapper,
-} from "./codex-stream-mapper.js";
-import { CodexOAuthProfileCommitUnsupported } from "./commit.service.js";
-import {
-  CodexOAuthProfileCipherError,
-  OAuthProfileNotFound,
-  OAuthProfileSchemaError,
-  OAuthProfileStorageError,
-} from "./errors.js";
-import {
   CodexOAuthClient,
   CodexOAuthClientUnsupported,
-} from "./oauth-client.service.js";
-import { CodexOAuthService, makeCodexOAuthService } from "./oauth.service.js";
-import {
-  makeOpenAICompatibleProxy,
-  OpenAICompatibleProxy,
-} from "./openai-compatible-proxy.service.js";
+} from "./auth/client.js";
+import type { CodexOAuthSubject } from "./auth/credentials.js";
+import { CodexOAuthService, makeCodexOAuthService } from "./auth/service.js";
 import {
   CodexOAuthProfileCipher,
   makeCodexOAuthProfileCipher,
-} from "./profile-cipher.service.js";
-import { CodexProfileStore } from "./profile-store.service.js";
-import { CodexOAuthProfile, EncryptedCodexOAuthProfile } from "./schemas.js";
-import type {
-  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
-  CodexOAuthSubject,
-} from "./schemas.js";
+} from "./profiles/cipher.js";
+import { CodexOAuthProfileCommitUnsupported } from "./profiles/commit.js";
+import {
+  CodexOAuthProfile,
+  EncryptedCodexOAuthProfile,
+} from "./profiles/contracts.js";
+import type { CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType } from "./profiles/contracts.js";
+import {
+  CodexOAuthProfileCipherError,
+  CodexProfileNotFound,
+  CodexProfileSchemaError,
+  CodexProfileStorageError,
+} from "./profiles/errors.js";
 import {
   codexOAuthProfileStorageKey,
   codexOAuthProfileSubjectHash,
-} from "./storage-keys.js";
+} from "./profiles/keys.js";
 import {
   CodexStoredProfileProof,
   makeCodexStoredProfileProof,
-} from "./stored-profile-proof.service.js";
+} from "./profiles/proof.js";
+import { CodexProfileStore } from "./profiles/store.js";
+import {
+  CodexDirectProvider,
+  makeCodexDirectProvider,
+  makeCodexLegacyDirectProvider,
+} from "./provider/direct.js";
+import {
+  CodexResponsesFetch,
+  makeCodexResponsesFetch,
+} from "./provider/fetch.js";
+import {
+  CodexHttpClient,
+  makeCodexHttpClient,
+} from "./provider/http-client.js";
+import {
+  makeOpenAICompatibleProxy,
+  OpenAICompatibleProxy,
+} from "./provider/openai-compatible-proxy.js";
+import {
+  CodexResponsesProof,
+  makeCodexResponsesProof,
+} from "./provider/proof.js";
+import {
+  CodexRequestMapper,
+  makeCodexRequestMapper,
+} from "./provider/request-mapper.js";
+import {
+  CodexStreamMapper,
+  makeCodexStreamMapper,
+} from "./provider/stream-mapper.js";
 
-export { CodexOAuthProfileCipherConfigLive } from "./profile-cipher.config.js";
-export { CodexOAuthHttpClientLive } from "./oauth-http-client.service.js";
-export { CodexOAuthRefreshClientLive } from "./oauth-refresh-client.service.js";
-export { CodexOAuthRefreshPolicyLive } from "./oauth-refresh.config.js";
-export { CodexSubscriptionAuthProtocolConfigLive } from "./subscription-auth-protocol.service.js";
-export { CodexSubscriptionLoginConfigLive } from "./subscription-login.config.js";
+export { CodexOAuthProfileCipherConfigLive } from "./profiles/cipher-config.js";
+export { CodexOAuthHttpClientLive } from "./auth/http-client.js";
+export { CodexOAuthRefreshClientLive } from "./auth/refresh-client.js";
+export { CodexOAuthRefreshPolicyLive } from "./auth/refresh-config.js";
+export { CodexSubscriptionAuthProtocolConfigLive } from "./auth/protocol.js";
+export { CodexSubscriptionLoginConfigLive } from "./auth/login-config.js";
 export {
   CodexOAuthProfileCommitAtomicLive,
   CodexOAuthRefreshLockAtomicLive,
-} from "./atomic-persistence.layer.js";
-export { CodexUpstashPersistenceLive } from "./upstash-persistence.layer.js";
+} from "./storage/atomic.js";
+export { CodexUpstashPersistenceLive } from "./storage/upstash.js";
 
 export const CodexOAuthProfileCipherLive = Layer.effect(
   CodexOAuthProfileCipher,
@@ -101,7 +102,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const profile = yield* schemaStore.get(key).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read Codex OAuth profile.",
@@ -111,7 +112,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
           ),
           Effect.catchTag("SchemaError", (cause) =>
             Effect.fail(
-              new OAuthProfileSchemaError({
+              new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode Codex OAuth profile.",
                 cause,
@@ -121,7 +122,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         );
 
         if (Option.isNone(profile)) {
-          return yield* new OAuthProfileNotFound({
+          return yield* new CodexProfileNotFound({
             profileId: subject.profileId,
             subjectHash,
             message: "Codex OAuth profile was not found.",
@@ -138,7 +139,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         yield* schemaStore.set(key, profile).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store Codex OAuth profile.",
@@ -148,7 +149,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
           ),
           Effect.catchTag("SchemaError", (cause) =>
             Effect.fail(
-              new OAuthProfileSchemaError({
+              new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode Codex OAuth profile.",
                 cause,
@@ -165,7 +166,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         yield* schemaStore.remove(key).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "removeProfile",
                 key,
                 message: "Unable to remove Codex OAuth profile.",
@@ -183,7 +184,7 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         return yield* schemaStore.has(key).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check Codex OAuth profile.",
@@ -216,7 +217,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const encryptedProfile = yield* encryptedProfileStore.get(key).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read encrypted Codex OAuth profile.",
@@ -226,7 +227,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
           ),
           Effect.catchTag("SchemaError", (cause) =>
             Effect.fail(
-              new OAuthProfileSchemaError({
+              new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode encrypted Codex OAuth profile.",
                 cause,
@@ -236,7 +237,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         );
 
         if (Option.isNone(encryptedProfile)) {
-          return yield* new OAuthProfileNotFound({
+          return yield* new CodexProfileNotFound({
             profileId: subject.profileId,
             subjectHash,
             message: "Codex OAuth profile was not found.",
@@ -264,7 +265,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         yield* encryptedProfileStore.set(key, encryptedProfile).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store encrypted Codex OAuth profile.",
@@ -274,7 +275,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
           ),
           Effect.catchTag("SchemaError", (cause) =>
             Effect.fail(
-              new OAuthProfileSchemaError({
+              new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode encrypted Codex OAuth profile.",
                 cause,
@@ -290,7 +291,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
           yield* encryptedProfileStore.remove(key).pipe(
             Effect.catchTag("KeyValueStoreError", (cause) =>
               Effect.fail(
-                new OAuthProfileStorageError({
+                new CodexProfileStorageError({
                   operation: "removeProfile",
                   key,
                   message: "Unable to remove encrypted Codex OAuth profile.",
@@ -309,7 +310,7 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         return yield* encryptedProfileStore.has(key).pipe(
           Effect.catchTag("KeyValueStoreError", (cause) =>
             Effect.fail(
-              new OAuthProfileStorageError({
+              new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check encrypted Codex OAuth profile.",

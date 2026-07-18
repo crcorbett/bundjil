@@ -9,6 +9,19 @@ command; it does not expose hosted OAuth routes, own Vercel deployment, or
 change the Eve app model. The deployable private proxy app lives in
 `apps/codex-proxy` and composes this package's service contracts.
 
+Source is organized by the capability that owns each contract and operation:
+`src/auth`, `src/profiles`, `src/provider`, `src/storage`, and `src/testing`.
+Canonical Schemas live with those features rather than in a package-wide
+schema bucket. Consumers use the root, `/runtime`, `/local`, `/testing`, or
+`/filesystem-store` exports and do not import these internal paths.
+
+The exported authorization and profile failures are
+`CodexAuthTemporarilyUnavailable`, `CodexReauthenticationRequired`,
+`CodexOAuthOperationError`, `CodexProfileNotFound`,
+`CodexProfileSchemaError`, and `CodexProfileStorageError`. Their class names,
+generic self types, and encoded `_tag` values match exactly; proxy routes map
+them to stable public response codes without exposing those internal tags.
+
 ## Current State
 
 Implemented:

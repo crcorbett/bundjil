@@ -18,7 +18,7 @@ import {
   CodexProfileStoreEncryptedKeyValueLive,
   CodexStoredProfileProofLive,
 } from "../src/runtime.js";
-import { CodexOAuthProfileCipherTest } from "../src/testing.js";
+import { CodexOAuthProfileCipherTest } from "../src/testing/index.js";
 
 const fixtureSubject = Schema.decodeUnknownSync(CodexOAuthSubject)({
   provider: "codex",

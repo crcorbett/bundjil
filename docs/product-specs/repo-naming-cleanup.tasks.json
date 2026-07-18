@@ -206,7 +206,7 @@
     {
       "id": "organize-codex-source-by-owned-feature",
       "title": "Organize @bundjil/codex source by owned feature",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["rename-codex-oauth-to-codex"],
       "description": "Group the large Codex package under auth, profiles, provider, storage, and testing paths, replace mechanism-only internal filenames, and perform the selected atomic Codex error-contract cutover while preserving public HTTP behavior and persisted data.",
       "implementationNotes": [],
@@ -243,8 +243,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: Codex implementation and canonical Schemas now live under auth, profiles, provider, storage, and testing ownership paths with responsibility filenames and no forwarding modules. Root and supported subpath exports remain the consumer API. Six selected error declarations, unions, constructors, catchers, guards, scripts, proxy mappings, and tests migrated atomically; all 27 internal Context.Service identifiers remain unchanged with their providers and consumers.",
+          "Pass 2 - implementation quality and helper admission: rename-aware review separated path moves from the six intentional class/self-type/literal-tag and three Schema/type renames. Six table-driven fixtures prove exact encoded fields, target decode and Schema.is success, and old-tag rejection; 16 non-selected tagged-error bodies remain byte-identical, storage-key behavior is unchanged, and no alias, dual decoder, unsafe cast, DTO, manual mapper, speculative factory, broad compatibility barrel, or trivial wrapper was introduced.",
+          "Pass 3 - verification and evidence: parent frozen install, Codex check-types/build and 109 tests, proxy 28 tests with byte-exact 502/503 response fixtures, mock smoke health/stream 200 with five SSE lines, check, tagged-error lint, Knip, six workspace typechecks, full verification with 222 tests, selected-old/non-selected-tag/Context/storage scans, and git diff --check passed under synthetic Executor config. No external persisted decoder was found and no Browser, provider mutation, deployment, publication, or stored-data action ran."
+        ]
       },
       "commitAfterPassing": true
     },

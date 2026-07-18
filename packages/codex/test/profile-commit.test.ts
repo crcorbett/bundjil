@@ -19,11 +19,11 @@ import {
   refreshAccessToken,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
-import { codexOAuthProfileSubjectHash } from "../src/storage-keys.js";
+import { codexOAuthProfileSubjectHash } from "../src/profiles/keys.js";
 import {
   CodexOAuthMemory,
   CodexOAuthProfileCipherTest,
-} from "../src/testing.js";
+} from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString
@@ -283,8 +283,8 @@ it.effect("rejects raw putProfile for subscription mutations", () =>
       Effect.flip
     );
 
-    assert.strictEqual(error._tag, "OAuthProfileStorageError");
-    if (error._tag !== "OAuthProfileStorageError") {
+    assert.strictEqual(error._tag, "CodexProfileStorageError");
+    if (error._tag !== "CodexProfileStorageError") {
       return;
     }
     assert.strictEqual(error.operation, "putLegacyProfile");

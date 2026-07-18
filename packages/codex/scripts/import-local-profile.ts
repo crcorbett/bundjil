@@ -1,18 +1,18 @@
 import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
 
-import { CodexLocalAuthCacheSourceLive } from "../src/local-auth-cache-source.service.js";
-import { CodexLocalProfileImportConfigLive } from "../src/local-profile-import.config.js";
+import { CodexLocalProfileImportResult } from "../src/auth/contracts.js";
+import { CodexLocalAuthCacheSourceLive } from "../src/auth/local-cache.js";
+import { CodexLocalProfileImportConfigLive } from "../src/auth/local-import-config.js";
 import {
   CodexLocalProfileImportServiceLive,
   importCodexLocalProfile,
-} from "../src/local-profile-import.service.js";
+} from "../src/auth/local-import.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/runtime.js";
-import { CodexLocalProfileImportResult } from "../src/schemas.js";
-import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 
 declare const process: {
   exitCode: number | undefined;

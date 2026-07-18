@@ -9,24 +9,24 @@ import {
   Schema,
 } from "effect";
 
-import {
-  CodexLocalProfileImportError,
-  CodexOAuthProfileCipherError,
-  OAuthProfileStorageError,
-} from "../src/errors.js";
-import { CodexFileSystemKeyValueStoreLive } from "../src/filesystem-store.js";
-import { CodexLocalAuthCacheSourceLive } from "../src/local-auth-cache-source.service.js";
-import { CodexLocalProfileImportConfigLive } from "../src/local-profile-import.config.js";
+import { CodexLocalProfileImportResult } from "../src/auth/contracts.js";
+import { CodexLocalProfileImportError } from "../src/auth/errors.js";
+import { CodexLocalAuthCacheSourceLive } from "../src/auth/local-cache.js";
+import { CodexLocalProfileImportConfigLive } from "../src/auth/local-import-config.js";
 import {
   CodexLocalProfileImportServiceLive,
   importCodexLocalProfile,
-} from "../src/local-profile-import.service.js";
+} from "../src/auth/local-import.js";
+import {
+  CodexOAuthProfileCipherError,
+  CodexProfileStorageError,
+} from "../src/profiles/errors.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/runtime.js";
-import { CodexLocalProfileImportResult } from "../src/schemas.js";
+import { CodexFileSystemKeyValueStoreLive } from "../src/storage/filesystem.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -115,7 +115,7 @@ if (Exit.isSuccess(exit)) {
           return "profileCipher";
         }
 
-        if (Schema.is(OAuthProfileStorageError)(failure)) {
+        if (Schema.is(CodexProfileStorageError)(failure)) {
           return "storage";
         }
 

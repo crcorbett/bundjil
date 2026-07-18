@@ -148,6 +148,10 @@ plane.
 
 `@bundjil/codex`:
 
+- organizes implementation under feature-owned `src/auth`, `src/profiles`,
+  `src/provider`, `src/storage`, and `src/testing` paths while keeping the
+  root, `/runtime`, `/local`, `/testing`, and `/filesystem-store` exports as
+  the supported consumer API;
 - owns Codex OAuth subjects, profiles, redacted token schemas, safe tagged
   errors, deterministic storage keys, direct Codex Responses proof schemas,
   and service tags;

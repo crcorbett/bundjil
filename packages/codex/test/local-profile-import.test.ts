@@ -2,24 +2,22 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
+import { CodexLocalProfileImportConfig } from "../src/auth/contracts.js";
 import {
   CodexLocalAuthCacheSource,
   CodexLocalAuthCacheSourceLive,
   CodexLocalAuthCacheSourceMemory,
-} from "../src/local-auth-cache-source.service.js";
-import { CodexLocalProfileImportConfigService } from "../src/local-profile-import.config.js";
+} from "../src/auth/local-cache.js";
+import { CodexLocalProfileImportConfigService } from "../src/auth/local-import-config.js";
 import {
   CodexLocalProfileImportServiceLive,
   importCodexLocalProfile,
-} from "../src/local-profile-import.service.js";
-import { getProfile } from "../src/profile-store.service.js";
+} from "../src/auth/local-import.js";
+import { CodexOAuthProfileCipherConfig } from "../src/profiles/contracts.js";
+import { codexOAuthProfileStorageKey } from "../src/profiles/keys.js";
+import { getProfile } from "../src/profiles/store.js";
 import { CodexProfileStoreEncryptedKeyValueLive } from "../src/runtime.js";
-import {
-  CodexLocalProfileImportConfig,
-  CodexOAuthProfileCipherConfig,
-} from "../src/schemas.js";
-import { codexOAuthProfileStorageKey } from "../src/storage-keys.js";
-import { CodexOAuthProfileCipherTest } from "../src/testing.js";
+import { CodexOAuthProfileCipherTest } from "../src/testing/index.js";
 
 const fixtureAccessToken = "fixture-access-token";
 const fixtureRefreshToken = "fixture-refresh-token";

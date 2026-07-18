@@ -1,18 +1,18 @@
 import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
 
 import {
+  CodexSubscriptionLoginConfigLive,
+  CodexSubscriptionLoginConfigService,
+} from "../src/auth/login-config.js";
+import { CodexStoredProfileProofResult } from "../src/profiles/contracts.js";
+import { proveCodexStoredProfile } from "../src/profiles/proof.js";
+import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
   CodexStoredProfileProofLive,
 } from "../src/runtime.js";
-import { CodexStoredProfileProofResult } from "../src/schemas.js";
-import { proveCodexStoredProfile } from "../src/stored-profile-proof.service.js";
-import {
-  CodexSubscriptionLoginConfigLive,
-  CodexSubscriptionLoginConfigService,
-} from "../src/subscription-login.config.js";
-import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 
 declare const process: {
   exitCode: number | undefined;

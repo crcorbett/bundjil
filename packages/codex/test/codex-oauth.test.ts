@@ -47,7 +47,7 @@ import {
   CodexOAuthProfileCipherTest,
   CodexOAuthRefreshLockMemory,
   CodexProfileStoreMemory,
-} from "../src/testing.js";
+} from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString
@@ -224,8 +224,8 @@ it.effect("returns a tagged missing-profile error", () =>
       Effect.flip
     );
 
-    assert.strictEqual(error._tag, "OAuthProfileNotFound");
-    if (error._tag !== "OAuthProfileNotFound") {
+    assert.strictEqual(error._tag, "CodexProfileNotFound");
+    if (error._tag !== "CodexProfileNotFound") {
       return;
     }
     assert.strictEqual(error.profileId, subject.profileId);
@@ -443,7 +443,7 @@ it.effect(
 
         const error = yield* getProfile(subject).pipe(Effect.flip);
 
-        assert.strictEqual(error._tag, "OAuthProfileNotFound");
+        assert.strictEqual(error._tag, "CodexProfileNotFound");
       }).pipe(Effect.provide(CodexOAuthMemory([profile])));
     })
 );
@@ -483,8 +483,8 @@ it.effect("maps KeyValueStore failures to safe storage errors", () =>
       Effect.flip
     );
 
-    assert.strictEqual(error._tag, "OAuthProfileStorageError");
-    if (error._tag !== "OAuthProfileStorageError") {
+    assert.strictEqual(error._tag, "CodexProfileStorageError");
+    if (error._tag !== "CodexProfileStorageError") {
       return;
     }
     assert.strictEqual(error.operation, "getProfile");

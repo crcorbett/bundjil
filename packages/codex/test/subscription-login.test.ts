@@ -54,7 +54,7 @@ import {
   CodexLoopbackCallbackMemory,
   CodexOAuthHttpClientMock,
   CodexOAuthMemory,
-} from "../src/testing.js";
+} from "../src/testing/index.js";
 
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",

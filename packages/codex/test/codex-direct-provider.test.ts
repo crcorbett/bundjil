@@ -23,13 +23,16 @@ import type { CodexOAuthSubjectType } from "../src/index.js";
 import {
   makeOpenAICompatibleProxy,
   OpenAICompatibleProxy,
-} from "../src/openai-compatible-proxy.service.js";
+} from "../src/provider/openai-compatible-proxy.js";
 import {
   CodexDirectProviderLive,
   CodexRequestMapperLive,
   CodexStreamMapperLive,
 } from "../src/runtime.js";
-import { CodexDirectProviderMock, CodexOAuthMemory } from "../src/testing.js";
+import {
+  CodexDirectProviderMock,
+  CodexOAuthMemory,
+} from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString

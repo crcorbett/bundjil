@@ -10,25 +10,23 @@ import {
   Schema,
 } from "effect";
 
-import { CodexOAuthProfileCommit } from "../src/commit.service.js";
-import { CodexSubscriptionAuthError } from "../src/errors.js";
-import { generateCodexOAuthCredentialRevision } from "../src/profile-cipher.service.js";
-import { CodexProfileStore } from "../src/profile-store.service.js";
+import { CodexSubscriptionAuthError } from "../src/auth/errors.js";
+import {
+  CodexSubscriptionLoginConfigLive,
+  CodexSubscriptionLoginConfigService,
+} from "../src/auth/login-config.js";
+import { generateCodexOAuthCredentialRevision } from "../src/profiles/cipher.js";
+import { CodexOAuthProfileCommit } from "../src/profiles/commit.js";
+import { CodexSubscriptionProfile } from "../src/profiles/contracts.js";
+import { CodexProfileStore } from "../src/profiles/store.js";
+import { OpenAICompatibleChatCompletionRequest } from "../src/provider/contracts.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexOAuthProfileCommitAtomicLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/runtime.js";
-import {
-  CodexSubscriptionProfile,
-  OpenAICompatibleChatCompletionRequest,
-} from "../src/schemas.js";
-import {
-  CodexSubscriptionLoginConfigLive,
-  CodexSubscriptionLoginConfigService,
-} from "../src/subscription-login.config.js";
-import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 
 declare const process: {
   exitCode: number | undefined;

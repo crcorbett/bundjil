@@ -26,16 +26,16 @@ import {
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
 import {
+  codexOAuthProfileRevisionStorageKey,
+  codexOAuthProfileStorageKey,
+} from "../src/profiles/keys.js";
+import {
   CodexOAuthProfileCommitAtomicLive,
   CodexOAuthRefreshLockAtomicLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/runtime.js";
-import {
-  codexOAuthProfileRevisionStorageKey,
-  codexOAuthProfileStorageKey,
-} from "../src/storage-keys.js";
-import { CodexOAuthProfileCipherTest } from "../src/testing.js";
-import { loadUpstashRedisConfig } from "../src/upstash-persistence.layer.js";
+import { loadUpstashRedisConfig } from "../src/storage/upstash.js";
+import { CodexOAuthProfileCipherTest } from "../src/testing/index.js";
 
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",

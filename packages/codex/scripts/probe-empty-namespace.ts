@@ -1,7 +1,7 @@
 import { Effect, Exit, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
-import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 
 declare const process: {
   exitCode: number | undefined;

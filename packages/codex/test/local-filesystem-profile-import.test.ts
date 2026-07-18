@@ -4,21 +4,19 @@ import { Effect, Layer, Redacted, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
-import { CodexFileSystemKeyValueStoreLive } from "../src/filesystem-store.js";
-import { CodexLocalAuthCacheSourceMemory } from "../src/local-auth-cache-source.service.js";
-import { CodexLocalProfileImportConfigService } from "../src/local-profile-import.config.js";
+import { CodexLocalProfileImportConfig } from "../src/auth/contracts.js";
+import { CodexLocalAuthCacheSourceMemory } from "../src/auth/local-cache.js";
+import { CodexLocalProfileImportConfigService } from "../src/auth/local-import-config.js";
 import {
   CodexLocalProfileImportServiceLive,
   importCodexLocalProfile,
-} from "../src/local-profile-import.service.js";
-import { getProfile } from "../src/profile-store.service.js";
+} from "../src/auth/local-import.js";
+import { CodexOAuthProfileCipherConfig } from "../src/profiles/contracts.js";
+import { codexOAuthProfileStorageKey } from "../src/profiles/keys.js";
+import { getProfile } from "../src/profiles/store.js";
 import { CodexProfileStoreEncryptedKeyValueLive } from "../src/runtime.js";
-import {
-  CodexLocalProfileImportConfig,
-  CodexOAuthProfileCipherConfig,
-} from "../src/schemas.js";
-import { codexOAuthProfileStorageKey } from "../src/storage-keys.js";
-import { CodexOAuthProfileCipherTest } from "../src/testing.js";
+import { CodexFileSystemKeyValueStoreLive } from "../src/storage/filesystem.js";
+import { CodexOAuthProfileCipherTest } from "../src/testing/index.js";
 
 const fixtureAccessToken = "filesystem-fixture-access-token";
 const fixtureRefreshToken = "filesystem-fixture-refresh-token";

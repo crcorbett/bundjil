@@ -30,7 +30,7 @@ import {
   CodexHttpClientMock,
   CodexOAuthHttpClientMock,
   CodexOAuthMemory,
-} from "../src/testing.js";
+} from "../src/testing/index.js";
 
 const subject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
@@ -272,7 +272,7 @@ it.effect(
         const error = yield* getValidCredential(value).pipe(Effect.flip);
         const stored = yield* getProfile(value);
 
-        assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+        assert.strictEqual(error._tag, "CodexReauthenticationRequired");
         assert.strictEqual(stored.profileKind, "subscription");
         if (stored.profileKind === "subscription") {
           assert.strictEqual(stored.credentialRevision, "revision-old-secret");
@@ -303,7 +303,7 @@ it.effect(
         const error = yield* getValidCredential(value).pipe(Effect.flip);
         const stored = yield* getProfile(value);
 
-        assert.strictEqual(error._tag, "CodexOAuthAuthTemporarilyUnavailable");
+        assert.strictEqual(error._tag, "CodexAuthTemporarilyUnavailable");
         assert.strictEqual(stored.profileKind, "subscription");
         if (stored.profileKind === "subscription") {
           assert.strictEqual(stored.credentialRevision, "revision-old-secret");
@@ -349,10 +349,7 @@ it.effect(
             const error = yield* getValidCredential(value).pipe(Effect.flip);
             const stored = yield* getProfile(value);
 
-            assert.strictEqual(
-              error._tag,
-              "CodexOAuthAuthTemporarilyUnavailable"
-            );
+            assert.strictEqual(error._tag, "CodexAuthTemporarilyUnavailable");
             assert.strictEqual(stored.profileKind, "subscription");
             if (stored.profileKind === "subscription") {
               assert.strictEqual(
@@ -388,7 +385,7 @@ it.effect("fenced-marks reauthentication after a permanent invalid grant", () =>
       const error = yield* getValidCredential(value).pipe(Effect.flip);
       const stored = yield* getProfile(value);
 
-      assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+      assert.strictEqual(error._tag, "CodexReauthenticationRequired");
       assert.strictEqual(stored.profileKind, "subscription");
       if (stored.profileKind === "subscription") {
         assert.notStrictEqual(stored.credentialRevision, "revision-old-secret");
@@ -411,7 +408,7 @@ it.effect("rejects an expired refreshed access token without mutation", () =>
       const error = yield* getValidCredential(value).pipe(Effect.flip);
       const stored = yield* getProfile(value);
 
-      assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+      assert.strictEqual(error._tag, "CodexReauthenticationRequired");
       assert.strictEqual(stored.profileKind, "subscription");
       if (stored.profileKind === "subscription") {
         assert.strictEqual(stored.credentialRevision, "revision-old-secret");
@@ -439,7 +436,7 @@ it.effect("rejects malformed refreshed token metadata without mutation", () =>
       const error = yield* getValidCredential(value).pipe(Effect.flip);
       const stored = yield* getProfile(value);
 
-      assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+      assert.strictEqual(error._tag, "CodexReauthenticationRequired");
       assert.strictEqual(stored.profileKind, "subscription");
       if (stored.profileKind === "subscription") {
         assert.strictEqual(stored.credentialRevision, "revision-old-secret");
@@ -470,7 +467,7 @@ it.effect("refuses legacy access-import profiles in refresh-capable mode", () =>
       Effect.flip
     );
 
-    assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+    assert.strictEqual(error._tag, "CodexReauthenticationRequired");
   })
 );
 
@@ -644,7 +641,7 @@ it.effect("stops after the second 401", () =>
     );
 
     assert.strictEqual(requests, 2);
-    assert.strictEqual(error._tag, "CodexOAuthReauthenticationRequired");
+    assert.strictEqual(error._tag, "CodexReauthenticationRequired");
   })
 );
 

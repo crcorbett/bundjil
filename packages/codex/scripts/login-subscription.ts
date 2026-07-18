@@ -2,26 +2,26 @@ import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
 
-import { CodexBrowserLauncherCommandLive } from "../src/browser-launcher.service.js";
-import { CodexLoopbackCallbackBunLive } from "../src/loopback-callback.service.js";
-import { CodexOAuthHttpClientLive } from "../src/oauth-http-client.service.js";
+import { CodexBrowserLauncherCommandLive } from "../src/auth/browser.js";
+import { CodexSubscriptionLoginResult } from "../src/auth/contracts.js";
+import { CodexOAuthHttpClientLive } from "../src/auth/http-client.js";
+import {
+  CodexSubscriptionLoginConfigLive,
+  CodexSubscriptionLoginConfigService,
+} from "../src/auth/login-config.js";
+import {
+  CodexSubscriptionLoginLive,
+  runCodexSubscriptionLogin,
+} from "../src/auth/login.js";
+import { CodexLoopbackCallbackBunLive } from "../src/auth/loopback-callback.js";
+import { CodexSubscriptionAuthProtocolConfigLive } from "../src/auth/protocol.js";
 import {
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexOAuthProfileCommitAtomicLive,
   CodexProfileStoreEncryptedKeyValueLive,
 } from "../src/runtime.js";
-import { CodexSubscriptionLoginResult } from "../src/schemas.js";
-import { CodexSubscriptionAuthProtocolConfigLive } from "../src/subscription-auth-protocol.service.js";
-import {
-  CodexSubscriptionLoginConfigLive,
-  CodexSubscriptionLoginConfigService,
-} from "../src/subscription-login.config.js";
-import {
-  CodexSubscriptionLoginLive,
-  runCodexSubscriptionLogin,
-} from "../src/subscription-login.service.js";
-import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
+import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 
 declare const process: {
   exitCode: number | undefined;

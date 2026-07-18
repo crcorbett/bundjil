@@ -28,14 +28,14 @@
       "default": "./dist/local.js"
     },
     "./testing": {
-      "@bundjil/source": "./src/testing.ts",
-      "types": "./dist/testing.d.ts",
-      "default": "./dist/testing.js"
+      "@bundjil/source": "./src/testing/index.ts",
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
     },
     "./filesystem-store": {
-      "@bundjil/source": "./src/filesystem-store.ts",
-      "types": "./dist/filesystem-store.d.ts",
-      "default": "./dist/filesystem-store.js"
+      "@bundjil/source": "./src/storage/filesystem.ts",
+      "types": "./dist/storage/filesystem.d.ts",
+      "default": "./dist/storage/filesystem.js"
     }
   },
   "publishConfig": {
@@ -53,12 +53,12 @@
         "default": "./dist/local.js"
       },
       "./testing": {
-        "types": "./dist/testing.d.ts",
-        "default": "./dist/testing.js"
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
       },
       "./filesystem-store": {
-        "types": "./dist/filesystem-store.d.ts",
-        "default": "./dist/filesystem-store.js"
+        "types": "./dist/storage/filesystem.d.ts",
+        "default": "./dist/storage/filesystem.js"
       }
     }
   },

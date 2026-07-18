@@ -1,11 +1,22 @@
 export {
-  CodexHttpClientOperation,
-  CodexHttpNetworkError,
-  CodexHttpStatusError,
   CodexLocalProfileImportError,
   CodexLocalProfileImportFailure,
   CodexLocalProfileImportOperation,
   CodexOAuthClientOperation,
+  CodexOAuthFailure,
+  CodexOAuthTokenExpired,
+  CodexOAuthTokenMissing,
+  CodexOAuthOperationError,
+  CodexAuthTemporarilyUnavailable,
+  CodexReauthenticationRequired,
+  CodexAuthTemporaryFailureReason,
+  CodexOAuthUnsupportedRuntimePath,
+  CodexSubscriptionAuthError,
+  CodexSubscriptionAuthFailure,
+  CodexSubscriptionAuthFailureReason,
+  CodexSubscriptionAuthOperation,
+} from "./auth/errors.js";
+export {
   CodexOAuthProfileCommitConflict,
   CodexOAuthProfileCommitError,
   CodexOAuthProfileCipherError,
@@ -14,112 +25,113 @@ export {
   CodexOAuthProfileCipherOperation,
   CodexOAuthRefreshLockFailureReason,
   CodexOAuthRefreshLockOperation,
-  CodexOAuthFailure,
-  CodexOAuthProfileSchemaBoundary,
-  CodexOAuthProfileStorageOperation,
-  CodexOAuthTokenExpired,
-  CodexOAuthTokenMissing,
-  CodexOAuthTokenProviderError,
-  CodexOAuthAuthTemporarilyUnavailable,
-  CodexOAuthReauthenticationRequired,
-  CodexOAuthTemporaryFailureReason,
-  CodexOAuthUnsupportedRuntimePath,
-  CodexRequestMapperOperation,
+  CodexProfileSchemaBoundary,
+  CodexProfileStorageOperation,
   CodexProfileStoreFailure,
+  CodexProfileNotFound,
+  CodexProfileSchemaError,
+  CodexProfileStorageError,
+} from "./profiles/errors.js";
+export {
+  CodexHttpClientOperation,
+  CodexHttpNetworkError,
+  CodexHttpStatusError,
+  CodexRequestMapperOperation,
   CodexResponsesFailure,
   CodexResponsesRequestError,
   CodexResponsesSchemaBoundary,
   CodexStreamMapperOperation,
   CodexResponsesStreamError,
-  CodexSubscriptionAuthError,
-  CodexSubscriptionAuthFailure,
-  CodexSubscriptionAuthFailureReason,
-  CodexSubscriptionAuthOperation,
   OpenAICompatibleProxyAuthError,
   OpenAICompatibleProxyFailure,
   OpenAICompatibleProxyOperation,
   OpenAICompatibleProxyRequestError,
-  OAuthProfileNotFound,
-  OAuthProfileSchemaError,
-  OAuthProfileStorageError,
+} from "./provider/errors.js";
+export {
   UpstashKeyValueStoreConfigBoundary,
   UpstashKeyValueStoreConfigError,
   UpstashKeyValueStoreFailure,
-} from "./errors.js";
+} from "./storage/errors.js";
 export type {
-  CodexHttpClientOperation as CodexHttpClientOperationType,
   CodexLocalProfileImportOperation as CodexLocalProfileImportOperationType,
   CodexOAuthClientOperation as CodexOAuthClientOperationType,
+  CodexOAuthFailure as CodexOAuthFailureType,
+} from "./auth/errors.js";
+export type {
   CodexOAuthProfileCommitFailure as CodexOAuthProfileCommitFailureType,
   CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
   CodexOAuthProfileCipherFailure as CodexOAuthProfileCipherFailureType,
   CodexOAuthRefreshLockFailure as CodexOAuthRefreshLockFailureType,
   CodexOAuthRefreshLockFailureReason as CodexOAuthRefreshLockFailureReasonType,
   CodexOAuthRefreshLockOperation as CodexOAuthRefreshLockOperationType,
-  CodexOAuthFailure as CodexOAuthFailureType,
-  CodexOAuthProfileSchemaBoundary as CodexOAuthProfileSchemaBoundaryType,
-  CodexOAuthProfileStorageOperation as CodexOAuthProfileStorageOperationType,
-  CodexRequestMapperOperation as CodexRequestMapperOperationType,
+  CodexProfileSchemaBoundary as CodexProfileSchemaBoundaryType,
+  CodexProfileStorageOperation as CodexProfileStorageOperationType,
   CodexProfileStoreFailure as CodexProfileStoreFailureType,
+} from "./profiles/errors.js";
+export type {
+  CodexHttpClientOperation as CodexHttpClientOperationType,
+  CodexRequestMapperOperation as CodexRequestMapperOperationType,
   CodexResponsesFailure as CodexResponsesFailureType,
   CodexResponsesSchemaBoundary as CodexResponsesSchemaBoundaryType,
   CodexStreamMapperOperation as CodexStreamMapperOperationType,
   OpenAICompatibleProxyFailure as OpenAICompatibleProxyFailureType,
   OpenAICompatibleProxyOperation as OpenAICompatibleProxyOperationType,
+} from "./provider/errors.js";
+export type {
   UpstashKeyValueStoreConfigBoundary as UpstashKeyValueStoreConfigBoundaryType,
   UpstashKeyValueStoreFailure as UpstashKeyValueStoreFailureType,
-} from "./errors.js";
+} from "./storage/errors.js";
 export {
   CodexBrowserLauncher,
   makeCodexBrowserCommand,
-} from "./browser-launcher.service.js";
-export type { CodexBrowserLauncherShape } from "./browser-launcher.service.js";
+} from "./auth/browser.js";
+export type { CodexBrowserLauncherShape } from "./auth/browser.js";
 export {
   CodexLoopbackCallback,
   bindFirstAvailableCodexCallbackPort,
   decodeCodexOAuthCallbackRequest,
-} from "./loopback-callback.service.js";
+} from "./auth/loopback-callback.js";
 export type {
   CodexLoopbackCallbackMemoryOptions,
   CodexLoopbackCallbackSession,
   CodexLoopbackCallbackShape,
   LoopbackServer,
-} from "./loopback-callback.service.js";
+} from "./auth/loopback-callback.js";
 export {
   CodexOAuthHttpClient,
   makeCodexOAuthHttpClient,
-} from "./oauth-http-client.service.js";
+} from "./auth/http-client.js";
 export type {
   CodexOAuthHttpClientMockOptions,
   CodexOAuthHttpClientShape,
-} from "./oauth-http-client.service.js";
+} from "./auth/http-client.js";
 export {
   decodeCodexAccessTokenExpiry,
   decodeCodexAccountMetadata,
   ensureCodexRefreshAccount,
-} from "./oauth-token-metadata.js";
+} from "./auth/token-metadata.js";
 export {
   CodexStoredProfileProof,
   makeCodexStoredProfileProof,
   proveCodexStoredProfile,
-} from "./stored-profile-proof.service.js";
-export type { CodexStoredProfileProofShape } from "./stored-profile-proof.service.js";
+} from "./profiles/proof.js";
+export type { CodexStoredProfileProofShape } from "./profiles/proof.js";
 export {
   buildCodexOAuthAuthorizationSession,
   CodexSubscriptionAuthProtocolConfigService,
   createCodexOAuthAuthorizationMaterial,
   createCodexOAuthAuthorizationSession,
-} from "./subscription-auth-protocol.service.js";
+} from "./auth/protocol.js";
 export {
   CodexSubscriptionLoginConfigService,
   loadCodexSubscriptionLoginConfig,
-} from "./subscription-login.config.js";
+} from "./auth/login-config.js";
 export {
   CodexSubscriptionLogin,
   makeCodexSubscriptionLogin,
   runCodexSubscriptionLogin,
-} from "./subscription-login.service.js";
-export type { CodexSubscriptionLoginShape } from "./subscription-login.service.js";
+} from "./auth/login.js";
+export type { CodexSubscriptionLoginShape } from "./auth/login.js";
 export {
   CodexOAuthProfileCommit,
   CodexOAuthProfileCommitUnsupported,
@@ -128,58 +140,58 @@ export {
   markCodexSubscriptionReauthenticationRequired,
   replaceCodexSubscriptionProfile,
   replaceLegacyCodexOAuthProfile,
-} from "./commit.service.js";
-export type { CodexOAuthProfileCommitShape } from "./commit.service.js";
+} from "./profiles/commit.js";
+export type { CodexOAuthProfileCommitShape } from "./profiles/commit.js";
 export {
   CodexHttpClient,
   makeCodexHttpClient,
   postResponses,
   postResponsesStream,
-} from "./codex-http-client.service.js";
+} from "./provider/http-client.js";
 export type {
   CodexHttpClientFailure,
   CodexHttpClientShape,
-} from "./codex-http-client.service.js";
+} from "./provider/http-client.js";
 export {
   CodexDirectProvider,
   makeCodexLegacyDirectProvider,
   makeCodexDirectProvider,
   streamChatCompletion,
-} from "./codex-direct-provider.service.js";
+} from "./provider/direct.js";
 export type {
   CodexDirectProviderFailure,
   CodexDirectProviderShape,
-} from "./codex-direct-provider.service.js";
+} from "./provider/direct.js";
 export {
   CodexOAuthClient,
   CodexOAuthClientUnsupported,
   unsupportedCodexOAuthClientOperation,
-} from "./oauth-client.service.js";
-export type { CodexOAuthClientShape } from "./oauth-client.service.js";
+} from "./auth/client.js";
+export type { CodexOAuthClientShape } from "./auth/client.js";
 export {
   CodexOAuthProfileCipherConfigService,
   loadCodexOAuthProfileCipherConfig,
-} from "./profile-cipher.config.js";
+} from "./profiles/cipher-config.js";
 export {
   CodexOAuthObserver,
   CodexOAuthObserverNoop,
   getCodexOAuthObserverSnapshot,
   recordCodexOAuthObserverEvent,
-} from "./observer.service.js";
-export type { CodexOAuthObserverShape } from "./observer.service.js";
+} from "./profiles/observer.js";
+export type { CodexOAuthObserverShape } from "./profiles/observer.js";
 export {
   CodexOAuthProfileCipher,
   decryptCodexOAuthProfile,
   encryptCodexOAuthProfile,
   generateCodexOAuthCredentialRevision,
   makeCodexOAuthProfileCipher,
-} from "./profile-cipher.service.js";
-export type { CodexOAuthProfileCipherShape } from "./profile-cipher.service.js";
+} from "./profiles/cipher.js";
+export type { CodexOAuthProfileCipherShape } from "./profiles/cipher.js";
 export {
   CodexOAuthRefreshLock,
   withCodexOAuthRefreshLock,
-} from "./refresh-lock.service.js";
-export type { CodexOAuthRefreshLockShape } from "./refresh-lock.service.js";
+} from "./profiles/refresh-lock.js";
+export type { CodexOAuthRefreshLockShape } from "./profiles/refresh-lock.js";
 export {
   CodexOAuthService,
   completeLogin,
@@ -190,95 +202,117 @@ export {
   recoverAfterUnauthorized,
   revokeToken,
   startLogin,
-} from "./oauth.service.js";
-export type { CodexOAuthServiceShape } from "./oauth.service.js";
+} from "./auth/service.js";
+export type { CodexOAuthServiceShape } from "./auth/service.js";
 export {
   CodexOAuthRefreshPolicyService,
   CodexOAuthRefreshPolicyTest,
   loadCodexOAuthRefreshPolicy,
-} from "./oauth-refresh.config.js";
-export { makeCodexOAuthRefreshClient } from "./oauth-refresh-client.service.js";
+} from "./auth/refresh-config.js";
+export { makeCodexOAuthRefreshClient } from "./auth/refresh-client.js";
 export {
   CodexLocalProfileImportService,
   importCodexLocalProfile,
   makeCodexLocalProfileImportService,
-} from "./local-profile-import.service.js";
-export type { CodexLocalProfileImportServiceShape } from "./local-profile-import.service.js";
+} from "./auth/local-import.js";
+export type { CodexLocalProfileImportServiceShape } from "./auth/local-import.js";
 export {
   CodexProfileStore,
   getProfile,
   hasProfile,
   putProfile,
   removeProfile,
-} from "./profile-store.service.js";
-export type { CodexProfileStoreShape } from "./profile-store.service.js";
+} from "./profiles/store.js";
+export type { CodexProfileStoreShape } from "./profiles/store.js";
 export {
   CodexRequestMapper,
   makeCodexRequestMapper,
   toCodexResponses,
-} from "./codex-request-mapper.js";
-export type { CodexRequestMapperShape } from "./codex-request-mapper.js";
+} from "./provider/request-mapper.js";
+export type { CodexRequestMapperShape } from "./provider/request-mapper.js";
 export {
   defaultCodexResponsesEndpoint,
   defaultCodexResponsesModel,
   loadCodexResponsesProofInput,
   loadCodexResponsesProofInputFromEnv,
-} from "./codex-responses.config.js";
+} from "./provider/config.js";
 export {
   CodexResponsesFetch,
   makeCodexResponsesFetch,
-} from "./codex-responses-fetch.service.js";
-export type { CodexResponsesFetchShape } from "./codex-responses-fetch.service.js";
+} from "./provider/fetch.js";
+export type { CodexResponsesFetchShape } from "./provider/fetch.js";
 export {
   CodexResponsesProof,
   makeCodexResponsesProof,
   runCodexResponsesProof,
-} from "./codex-responses-proof.service.js";
+} from "./provider/proof.js";
 export type {
   CodexResponsesProofFailure,
   CodexResponsesProofShape,
-} from "./codex-responses-proof.service.js";
+} from "./provider/proof.js";
 export {
   CodexStreamMapper,
   makeCodexStreamMapper,
   toOpenAICompatibleStream,
-} from "./codex-stream-mapper.js";
-export type { CodexStreamMapperShape } from "./codex-stream-mapper.js";
+} from "./provider/stream-mapper.js";
+export type { CodexStreamMapperShape } from "./provider/stream-mapper.js";
 export {
   handleChatCompletions,
   makeOpenAICompatibleProxy,
   OpenAICompatibleProxy,
-} from "./openai-compatible-proxy.service.js";
+} from "./provider/openai-compatible-proxy.js";
 export type {
   OpenAICompatibleProxyFailure as OpenAICompatibleProxyServiceFailure,
   OpenAICompatibleProxyShape,
-} from "./openai-compatible-proxy.service.js";
+} from "./provider/openai-compatible-proxy.js";
 export {
-  CodexAccessTokenImportProfile,
-  CodexCliAuthCache,
-  CodexCliAuthMode,
-  CodexLocalProfileImportConfig,
-  CodexLocalProfileImportExpiryStatus,
-  CodexLocalProfileImportResult,
   CodexOAuthAccountId,
-  CodexOAuthAccountMetadata,
   CodexOAuthAccessToken,
   CodexOAuthAuthorizationCode,
-  CodexOAuthAuthorizationCallback,
-  CodexOAuthAuthorizationMaterial,
-  CodexOAuthAuthorizationSession,
   CodexOAuthAuthorizationUrl,
   CodexOAuthCodeVerifier,
-  CodexOAuthCodeExchangeInput,
   CodexOAuthConnectorId,
   CodexOAuthCredential,
   CodexOAuthCredentialRevision,
   CodexOAuthInstallationId,
   CodexOAuthIdToken,
+  CodexOAuthPrincipalType,
+  CodexOAuthProtocolScopeVersion,
+  CodexOAuthProfileId,
+  CodexOAuthProvider,
+  CodexOAuthRecoverAfterUnauthorizedInput,
+  CodexOAuthRefreshToken,
+  CodexOAuthSubject,
+  CodexOAuthState,
+  CodexOAuthTokenRefreshResult,
+  OAuthPrincipal,
+} from "./auth/credentials.js";
+export {
+  CodexCliAuthCache,
+  CodexCliAuthMode,
+  CodexLocalProfileImportConfig,
+  CodexLocalProfileImportExpiryStatus,
+  CodexLocalProfileImportResult,
+  CodexOAuthAccountMetadata,
+  CodexOAuthAuthorizationCallback,
+  CodexOAuthAuthorizationMaterial,
+  CodexOAuthAuthorizationSession,
+  CodexOAuthCodeExchangeInput,
+  CodexOAuthProviderErrorResponse,
+  CodexOAuthRefreshResponse,
+  CodexOAuthRefreshTransportInput,
+  CodexOAuthTokenResponse,
+  CodexOAuthJwtExpiry,
+  CodexSubscriptionAuthProtocolConfig,
+  CodexSubscriptionLoginExpiryCategory,
+  CodexSubscriptionLoginInput,
+  CodexSubscriptionLoginResult,
+} from "./auth/contracts.js";
+export {
+  CodexAccessTokenImportProfile,
   CodexOAuthLoginCallback,
   CodexOAuthLoginStart,
   CodexOAuthLoginStartResult,
-  CodexOAuthPrincipalType,
   CodexOAuthProfile,
   CodexOAuthProfileCommitOperation,
   CodexOAuthProfileCommitLegacyReplacementInput,
@@ -287,23 +321,13 @@ export {
   CodexOAuthProfileCipherKeyId,
   CodexOAuthProfileKind,
   CodexOAuthProfileVersion,
-  CodexOAuthProtocolScopeVersion,
-  CodexOAuthProviderErrorResponse,
   CodexOAuthRefreshLockAcquireInput,
   CodexOAuthRefreshLockLease,
   CodexOAuthRefreshLockOwner,
   CodexOAuthRefreshLockTtlMillis,
-  CodexOAuthProfileId,
-  CodexOAuthProvider,
   CodexOAuthRefreshInput,
   CodexOAuthRefreshPolicy,
-  CodexOAuthRecoverAfterUnauthorizedInput,
-  CodexOAuthRefreshResponse,
-  CodexOAuthRefreshTransportInput,
-  CodexOAuthRefreshToken,
   CodexOAuthRevokeInput,
-  CodexOAuthSubject,
-  CodexOAuthState,
   CodexOAuthObserverCounters,
   CodexOAuthObserverEvent,
   CodexOAuthObserverEventType,
@@ -312,18 +336,13 @@ export {
   CodexOAuthProfileCommitReauthenticationInput,
   CodexOAuthProfileCommitRefreshInput,
   CodexSubscriptionProfile,
-  CodexOAuthTokenRefreshResult,
-  CodexOAuthTokenResponse,
-  CodexOAuthJwtExpiry,
-  CodexSubscriptionAuthProtocolConfig,
-  CodexSubscriptionLoginExpiryCategory,
-  CodexSubscriptionLoginInput,
-  CodexSubscriptionLoginResult,
   CodexStoredProfileProofResult,
   EncryptedCodexOAuthProfile,
   EncryptedCodexOAuthProfileV1,
   EncryptedCodexOAuthProfileV2,
   LegacyCodexOAuthProfileV1,
+} from "./profiles/contracts.js";
+export {
   CodexDirectProviderInput,
   CodexResponsesEndpoint,
   CodexResponsesInputMessage,
@@ -349,38 +368,58 @@ export {
   OpenAICompatibleChatRole,
   OpenAICompatibleProxyInput,
   OpenAICompatibleProxyInternalToken,
-  OAuthPrincipal,
   UpstashRedisKeyPrefix,
   UpstashRedisConfig,
   UpstashRedisRestToken,
   UpstashRedisRestUrl,
-} from "./schemas.js";
+} from "./provider/contracts.js";
 export type {
-  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
-  CodexCliAuthCache as CodexCliAuthCacheType,
-  CodexCliAuthMode as CodexCliAuthModeType,
-  CodexLocalProfileImportConfig as CodexLocalProfileImportConfigType,
-  CodexLocalProfileImportExpiryStatus as CodexLocalProfileImportExpiryStatusType,
-  CodexLocalProfileImportResult as CodexLocalProfileImportResultType,
   CodexOAuthAccountId as CodexOAuthAccountIdType,
-  CodexOAuthAccountMetadata as CodexOAuthAccountMetadataType,
   CodexOAuthAccessToken as CodexOAuthAccessTokenType,
   CodexOAuthAuthorizationCode as CodexOAuthAuthorizationCodeType,
-  CodexOAuthAuthorizationCallback as CodexOAuthAuthorizationCallbackType,
-  CodexOAuthAuthorizationMaterial as CodexOAuthAuthorizationMaterialType,
-  CodexOAuthAuthorizationSession as CodexOAuthAuthorizationSessionType,
   CodexOAuthAuthorizationUrl as CodexOAuthAuthorizationUrlType,
   CodexOAuthCodeVerifier as CodexOAuthCodeVerifierType,
-  CodexOAuthCodeExchangeInput as CodexOAuthCodeExchangeInputType,
   CodexOAuthConnectorId as CodexOAuthConnectorIdType,
   CodexOAuthCredential as CodexOAuthCredentialType,
   CodexOAuthCredentialRevision as CodexOAuthCredentialRevisionType,
   CodexOAuthInstallationId as CodexOAuthInstallationIdType,
   CodexOAuthIdToken as CodexOAuthIdTokenType,
+  CodexOAuthPrincipalType as CodexOAuthPrincipalTypeType,
+  CodexOAuthProtocolScopeVersion as CodexOAuthProtocolScopeVersionType,
+  CodexOAuthProfileId as CodexOAuthProfileIdType,
+  CodexOAuthProvider as CodexOAuthProviderType,
+  CodexOAuthRecoverAfterUnauthorizedInput as CodexOAuthRecoverAfterUnauthorizedInputType,
+  CodexOAuthRefreshToken as CodexOAuthRefreshTokenType,
+  CodexOAuthSubject as CodexOAuthSubjectType,
+  CodexOAuthState as CodexOAuthStateType,
+  CodexOAuthTokenRefreshResult as CodexOAuthTokenRefreshResultType,
+  OAuthPrincipal as OAuthPrincipalType,
+} from "./auth/credentials.js";
+export type {
+  CodexCliAuthCache as CodexCliAuthCacheType,
+  CodexCliAuthMode as CodexCliAuthModeType,
+  CodexLocalProfileImportConfig as CodexLocalProfileImportConfigType,
+  CodexLocalProfileImportExpiryStatus as CodexLocalProfileImportExpiryStatusType,
+  CodexLocalProfileImportResult as CodexLocalProfileImportResultType,
+  CodexOAuthAccountMetadata as CodexOAuthAccountMetadataType,
+  CodexOAuthAuthorizationCallback as CodexOAuthAuthorizationCallbackType,
+  CodexOAuthAuthorizationMaterial as CodexOAuthAuthorizationMaterialType,
+  CodexOAuthAuthorizationSession as CodexOAuthAuthorizationSessionType,
+  CodexOAuthCodeExchangeInput as CodexOAuthCodeExchangeInputType,
+  CodexOAuthProviderErrorResponse as CodexOAuthProviderErrorResponseType,
+  CodexOAuthRefreshResponse as CodexOAuthRefreshResponseType,
+  CodexOAuthRefreshTransportInput as CodexOAuthRefreshTransportInputType,
+  CodexOAuthTokenResponse as CodexOAuthTokenResponseType,
+  CodexOAuthJwtExpiry as CodexOAuthJwtExpiryType,
+  CodexSubscriptionAuthProtocolConfig as CodexSubscriptionAuthProtocolConfigType,
+  CodexSubscriptionLoginInput as CodexSubscriptionLoginInputType,
+  CodexSubscriptionLoginResult as CodexSubscriptionLoginResultType,
+} from "./auth/contracts.js";
+export type {
+  CodexAccessTokenImportProfile as CodexAccessTokenImportProfileType,
   CodexOAuthLoginCallback as CodexOAuthLoginCallbackType,
   CodexOAuthLoginStart as CodexOAuthLoginStartType,
   CodexOAuthLoginStartResult as CodexOAuthLoginStartResultType,
-  CodexOAuthPrincipalType as CodexOAuthPrincipalTypeType,
   CodexOAuthProfile as CodexOAuthProfileType,
   CodexOAuthProfileCommitOperation as CodexOAuthProfileCommitOperationType,
   CodexOAuthProfileCommitLegacyReplacementInput as CodexOAuthProfileCommitLegacyReplacementInputType,
@@ -389,23 +428,13 @@ export type {
   CodexOAuthProfileCipherKeyId as CodexOAuthProfileCipherKeyIdType,
   CodexOAuthProfileKind as CodexOAuthProfileKindType,
   CodexOAuthProfileVersion as CodexOAuthProfileVersionType,
-  CodexOAuthProtocolScopeVersion as CodexOAuthProtocolScopeVersionType,
-  CodexOAuthProviderErrorResponse as CodexOAuthProviderErrorResponseType,
   CodexOAuthRefreshLockAcquireInput as CodexOAuthRefreshLockAcquireInputType,
   CodexOAuthRefreshLockLease as CodexOAuthRefreshLockLeaseType,
   CodexOAuthRefreshLockOwner as CodexOAuthRefreshLockOwnerType,
   CodexOAuthRefreshLockTtlMillis as CodexOAuthRefreshLockTtlMillisType,
-  CodexOAuthProfileId as CodexOAuthProfileIdType,
-  CodexOAuthProvider as CodexOAuthProviderType,
   CodexOAuthRefreshInput as CodexOAuthRefreshInputType,
   CodexOAuthRefreshPolicy as CodexOAuthRefreshPolicyType,
-  CodexOAuthRecoverAfterUnauthorizedInput as CodexOAuthRecoverAfterUnauthorizedInputType,
-  CodexOAuthRefreshResponse as CodexOAuthRefreshResponseType,
-  CodexOAuthRefreshTransportInput as CodexOAuthRefreshTransportInputType,
-  CodexOAuthRefreshToken as CodexOAuthRefreshTokenType,
   CodexOAuthRevokeInput as CodexOAuthRevokeInputType,
-  CodexOAuthSubject as CodexOAuthSubjectType,
-  CodexOAuthState as CodexOAuthStateType,
   CodexOAuthObserverCounters as CodexOAuthObserverCountersType,
   CodexOAuthObserverEvent as CodexOAuthObserverEventSchemaType,
   CodexOAuthObserverEventType as CodexOAuthObserverEventTypeType,
@@ -414,17 +443,13 @@ export type {
   CodexOAuthProfileCommitReauthenticationInput as CodexOAuthProfileCommitReauthenticationInputType,
   CodexOAuthProfileCommitRefreshInput as CodexOAuthProfileCommitRefreshInputType,
   CodexSubscriptionProfile as CodexSubscriptionProfileType,
-  CodexOAuthTokenRefreshResult as CodexOAuthTokenRefreshResultType,
-  CodexOAuthTokenResponse as CodexOAuthTokenResponseType,
-  CodexOAuthJwtExpiry as CodexOAuthJwtExpiryType,
-  CodexSubscriptionAuthProtocolConfig as CodexSubscriptionAuthProtocolConfigType,
-  CodexSubscriptionLoginInput as CodexSubscriptionLoginInputType,
-  CodexSubscriptionLoginResult as CodexSubscriptionLoginResultType,
   CodexStoredProfileProofResult as CodexStoredProfileProofResultType,
   EncryptedCodexOAuthProfile as EncryptedCodexOAuthProfileType,
   EncryptedCodexOAuthProfileV1 as EncryptedCodexOAuthProfileV1Type,
   EncryptedCodexOAuthProfileV2 as EncryptedCodexOAuthProfileV2Type,
   LegacyCodexOAuthProfileV1 as LegacyCodexOAuthProfileV1Type,
+} from "./profiles/contracts.js";
+export type {
   CodexDirectProviderInput as CodexDirectProviderInputType,
   CodexResponsesEndpoint as CodexResponsesEndpointType,
   CodexResponsesInputMessage as CodexResponsesInputMessageType,
@@ -450,16 +475,15 @@ export type {
   OpenAICompatibleChatRole as OpenAICompatibleChatRoleType,
   OpenAICompatibleProxyInput as OpenAICompatibleProxyInputType,
   OpenAICompatibleProxyInternalToken as OpenAICompatibleProxyInternalTokenType,
-  OAuthPrincipal as OAuthPrincipalType,
   UpstashRedisKeyPrefix as UpstashRedisKeyPrefixType,
   UpstashRedisConfig as UpstashRedisConfigType,
   UpstashRedisRestToken as UpstashRedisRestTokenType,
   UpstashRedisRestUrl as UpstashRedisRestUrlType,
-} from "./schemas.js";
+} from "./provider/contracts.js";
 export {
   codexOAuthProfileStorageKey,
   codexOAuthProfileStoragePrefix,
   codexOAuthProfileSubjectHash,
   codexOAuthRefreshLockStorageKey,
   codexOAuthRefreshLockStoragePrefix,
-} from "./storage-keys.js";
+} from "./profiles/keys.js";
