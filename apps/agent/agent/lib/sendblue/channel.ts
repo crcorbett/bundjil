@@ -1,7 +1,7 @@
 import { Context, Effect, Layer, Match, Schema } from "effect";
 
-import { SendblueClient } from "./client.service.js";
-import type { SendblueClientError } from "./client.service.js";
+import { SendblueClient } from "./client.js";
+import type { SendblueClientError } from "./client.js";
 import { SendblueConfigService } from "./config.js";
 import {
   SendblueRequestError,
@@ -12,8 +12,8 @@ import type {
   SendblueReplayStoreError,
   SendblueWebhookAuthenticationError,
 } from "./errors.js";
-import { SendblueIdentityDirectory } from "./identity-directory.service.js";
-import { SendblueReplayStore } from "./replay-store.service.js";
+import { SendblueIdentityDirectory } from "./identity-directory.js";
+import { SendblueReplayStore } from "./replay-store.js";
 import {
   SendblueCompletedMessage,
   SendblueInboundMessage,
@@ -25,8 +25,8 @@ import type {
   SendblueInboundDecision,
   SendblueInboundDispatchDecision,
 } from "./schemas.js";
-import { SendblueSessionRouter } from "./session-router.service.js";
-import { SendblueWebhookVerifier } from "./webhook-verifier.service.js";
+import { SendblueSessionRouter } from "./session-router.js";
+import { SendblueWebhookVerifier } from "./webhook-verifier.js";
 
 export interface SendblueChannelShape {
   readonly authorizeAndClaimInbound: (

@@ -302,7 +302,7 @@
     {
       "id": "clarify-agent-integration-ownership",
       "title": "Clarify Sendblue and Executor ownership within Eve's authored slots",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["rename-eve-effect-and-remove-core"],
       "description": "Retain the direct Eve discovery files and import-only agent/lib integration directories, normalize internal responsibility and Executor config-error names, and preserve discovery identities and provider behavior.",
       "implementationNotes": [],
@@ -334,8 +334,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: direct Eve discovery files remain at channels/sendblue.ts and connections/executor.ts while import-only Sendblue implementation files use responsibility names. No nested discovery entrypoint or shared channel package was introduced; routes, slugs, runtime composition, and provider ownership remain app-owned.",
+          "Pass 2 - implementation quality and helper admission: ExecutorConfigError class/self-type/literal tag and ExecutorConfigOperation migrated atomically with loadEndpoint/loadApiKey, fields, endpoint policy, sanitized messages, guards, redaction, and tests. Exact encode/decode/Schema.is and old-tag rejection pass; all nine Sendblue error files and Schemas remain byte-identical and implementation moves are import-path-only.",
+          "Pass 3 - verification and evidence: parent agent check-types/build and 58 tests, tagged-error lint, Knip, five workspace typechecks, full verification with 224 tests, discovery/stale-name/mechanism-filename/Sendblue-tag/redaction/replay scans, and git diff --check passed under synthetic Executor config. No Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
       },
       "commitAfterPassing": true
     },

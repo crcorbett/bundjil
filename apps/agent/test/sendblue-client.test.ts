@@ -11,19 +11,19 @@ import {
 import {
   SendblueClient,
   SendblueClientLive,
-} from "../agent/lib/sendblue/client.service.js";
+} from "../agent/lib/sendblue/client.js";
 import { SendblueConfigService } from "../agent/lib/sendblue/config.js";
 import {
   SendblueDeliveryUncertainError,
   SendblueResponseError,
 } from "../agent/lib/sendblue/errors.js";
-import { SendblueClientMemory } from "../agent/lib/sendblue/memory.layer.js";
 import {
   SendblueConfig,
   SendblueSenderIdentities,
   SendblueSendMessageInput,
   SendblueSendMessageSuccess,
 } from "../agent/lib/sendblue/schemas.js";
+import { SendblueClientMemory } from "../agent/lib/sendblue/testing.js";
 
 const senderIdentities = Schema.decodeUnknownSync(SendblueSenderIdentities)({
   "+14155550100": "owner",

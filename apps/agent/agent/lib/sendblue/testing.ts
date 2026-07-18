@@ -1,7 +1,7 @@
 import { Effect, Layer } from "effect";
 
-import { SendblueClient } from "./client.service.js";
-import type { SendblueClientShape } from "./client.service.js";
+import { SendblueClient } from "./client.js";
+import type { SendblueClientShape } from "./client.js";
 import { SendblueDeliveryUncertainError } from "./errors.js";
 
 export interface SendblueClientMemoryOptions {

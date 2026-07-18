@@ -8,7 +8,7 @@ import { SendblueReplayStoreError } from "./errors.js";
 import {
   SendblueReplayClaimIdGenerator,
   SendblueReplayClaimIdGeneratorLive,
-} from "./replay-claim-id-generator.service.js";
+} from "./replay-claim-id-generator.js";
 import {
   SendblueInboundClaimKey,
   SendblueOutboundClaimKey,
@@ -23,7 +23,7 @@ import type {
   SendblueReplayCompletion,
   SendblueReplayRecord as SendblueReplayRecordType,
 } from "./schemas.js";
-import { keyedSendblueDigest } from "./session-router.service.js";
+import { keyedSendblueDigest } from "./session-router.js";
 
 export interface SendblueReplayStoreShape {
   readonly claimInbound: (

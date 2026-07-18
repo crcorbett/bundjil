@@ -5,14 +5,14 @@ import {
 import { Effect, Layer, Schema } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 
-import { SendblueChannelLive } from "./channel.service.js";
-import { SendblueClientLive } from "./client.service.js";
+import { SendblueChannelLive } from "./channel.js";
+import { SendblueClientLive } from "./client.js";
 import { SendblueConfigLive, SendblueConfigService } from "./config.js";
 import { SendblueConfigError } from "./errors.js";
-import { SendblueIdentityDirectoryLive } from "./identity-directory.service.js";
-import { SendblueReplayStoreLive } from "./replay-store.service.js";
-import { SendblueSessionRouterLive } from "./session-router.service.js";
-import { SendblueWebhookVerifierLive } from "./webhook-verifier.service.js";
+import { SendblueIdentityDirectoryLive } from "./identity-directory.js";
+import { SendblueReplayStoreLive } from "./replay-store.js";
+import { SendblueSessionRouterLive } from "./session-router.js";
+import { SendblueWebhookVerifierLive } from "./webhook-verifier.js";
 
 const SendbluePersistenceLive = Layer.unwrap(
   Effect.gen(function* makeSendbluePersistenceLive() {

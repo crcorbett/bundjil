@@ -35,9 +35,12 @@ apps/agent/
     lib/sendblue/
       config.ts
       schemas.ts
-      channel.service.ts
-      client.service.ts
-      live.layer.ts
+      channel.ts
+      client.ts
+      identity-directory.ts
+      replay-store.ts
+      runtime.ts
+      testing.ts
     tools/
       workspace_status.ts
   test/
@@ -94,8 +97,9 @@ Vercel-managed runtime configuration, never in committed source.
 - `agent/channels/sendblue.ts` is a thin Eve adapter only. It owns the
   absolute route, `waitUntil` scheduling, HTTP status mapping, and projection
   of `message.completed` into the app-owned channel service.
-- `agent/lib/sendblue/` owns canonical Schema contracts, tagged errors,
-  redacted Config, Context services, live/memory Layers, provider
+- `agent/lib/sendblue/` is Eve's import-only implementation slot for the
+  channel. It owns canonical Schema contracts, tagged errors, redacted Config,
+  Context services, runtime/testing Layers, provider
   authentication, sender policy, opaque routing, replay persistence, and the
   Sendblue HTTP client. It does not move into a shared package until a stable
   second-channel contract exists.
@@ -174,8 +178,11 @@ the Executor endpoint's explicit `elicitation_mode`: only `model` and
 `browser` are accepted. The app rejects an absent, duplicate, native, unknown,
 legacy model-resume, root, non-HTTPS, wrong-host, port, userinfo, fragment, or
 extra-query endpoint rather than inheriting Executor's default-to-model
-behavior. `apps/agent/agent/connections/executor.ts` remains the thin Eve
-adapter and exposes only `skills`, `execute`, and `resume`.
+behavior. `ExecutorConfigError` is the sanitized schema-backed config failure,
+with `loadEndpoint` and `loadApiKey` as its exact operations.
+`apps/agent/agent/lib/executor/` remains the import-only implementation slot;
+`apps/agent/agent/connections/executor.ts` remains the thin direct Eve adapter
+and exposes only `skills`, `execute`, and `resume`.
 
 Temporary model mode supports chat channels only through instructions. A
 `user_approval_required` execute result ends its turn without a resume call;

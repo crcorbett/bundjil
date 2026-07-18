@@ -1,17 +1,17 @@
 import { Config, ConfigProvider, Effect, Schema } from "effect";
 
-export const ExecutorConnectionConfigOperation = Schema.Literals([
+export const ExecutorConfigOperation = Schema.Literals([
   "loadEndpoint",
   "loadApiKey",
 ]);
 
 export const ExecutorElicitationMode = Schema.Literals(["model", "browser"]);
 
-export class ExecutorConnectionConfigError extends Schema.TaggedErrorClass<ExecutorConnectionConfigError>()(
-  "ExecutorConnectionConfigError",
+export class ExecutorConfigError extends Schema.TaggedErrorClass<ExecutorConfigError>()(
+  "ExecutorConfigError",
   {
     message: Schema.NonEmptyString,
-    operation: ExecutorConnectionConfigOperation,
+    operation: ExecutorConfigOperation,
     reason: Schema.NonEmptyString,
   }
 ) {}
@@ -75,8 +75,8 @@ export const loadExecutorEndpoint = Effect.fn("ExecutorConfig.loadEndpoint")(
     effect.pipe(
       Effect.mapError(
         () =>
-          new ExecutorConnectionConfigError({
-            message: "ExecutorConnectionConfigError: loadEndpoint",
+          new ExecutorConfigError({
+            message: "ExecutorConfigError: loadEndpoint",
             operation: "loadEndpoint",
             reason: "Executor MCP endpoint configuration is invalid.",
           })
@@ -92,8 +92,8 @@ export const loadExecutorApiKey = Effect.fn("ExecutorConfig.loadApiKey")(
     effect.pipe(
       Effect.mapError(
         () =>
-          new ExecutorConnectionConfigError({
-            message: "ExecutorConnectionConfigError: loadApiKey",
+          new ExecutorConfigError({
+            message: "ExecutorConfigError: loadApiKey",
             operation: "loadApiKey",
             reason: "Executor MCP credential configuration is invalid.",
           })

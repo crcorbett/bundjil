@@ -37,7 +37,7 @@ mock or deterministic memory Layers.
 3. `rename-codex-oauth-to-codex`: completed.
 4. `organize-codex-source-by-owned-feature`: completed.
 5. `rename-eve-effect-and-remove-core`: completed.
-6. `clarify-agent-integration-ownership`: pending.
+6. `clarify-agent-integration-ownership`: completed.
 7. `reconcile-documentation-and-final-verification`: pending.
 
 ## Baseline
@@ -298,5 +298,41 @@ Status: Passed
 - Parent full verification passed five workspace typechecks, eight Turbo tasks,
   and all 223 tests. Export, tsconfig, package-list, stale-name, identity,
   discovery-path, and diff checks passed.
+- No Browser, live provider, deployment, publication, or stored-data action was
+  applicable or performed.
+
+### clarify-agent-integration-ownership
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- Direct Eve discovery remains at `channels/sendblue.ts` and
+  `connections/executor.ts`; import-only Sendblue implementation files now use
+  responsibility names without nested entrypoints or a shared channel package.
+- Routes, slugs, runtime composition, endpoint policy, and provider ownership
+  remain app-owned and unchanged.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- `ExecutorConfigError` declaration/self-type/literal tag and
+  `ExecutorConfigOperation` migrated atomically with exact fields,
+  `loadEndpoint`/`loadApiKey`, guards, sanitized messages, and redaction.
+- Encode/decode/`Schema.is` and old-tag rejection tests pass. All nine Sendblue
+  error files and canonical Schemas remain byte-identical; implementation moves
+  are import-path-only.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Parent agent check-types/build and 58 tests, tagged-error lint, Knip, five
+  workspace typechecks, and full verification with 224 tests passed.
+- Discovery, stale-name, mechanism-filename, Sendblue-tag, redaction, replay,
+  and diff scans passed under the synthetic Executor configuration.
 - No Browser, live provider, deployment, publication, or stored-data action was
   applicable or performed.

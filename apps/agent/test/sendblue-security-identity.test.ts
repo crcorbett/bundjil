@@ -10,7 +10,7 @@ import {
   makeSendblueIdentityDirectory,
   SendblueIdentityDirectory,
   SendblueIdentityDirectoryLive,
-} from "../agent/lib/sendblue/identity-directory.service.js";
+} from "../agent/lib/sendblue/identity-directory.js";
 import {
   E164PhoneNumber,
   SendblueConfig,
@@ -20,12 +20,12 @@ import {
   makeSendblueSessionRouter,
   SendblueSessionRouter,
   SendblueSessionRouterLive,
-} from "../agent/lib/sendblue/session-router.service.js";
+} from "../agent/lib/sendblue/session-router.js";
 import {
   makeSendblueWebhookVerifier,
   SendblueWebhookVerifier,
   SendblueWebhookVerifierLive,
-} from "../agent/lib/sendblue/webhook-verifier.service.js";
+} from "../agent/lib/sendblue/webhook-verifier.js";
 
 const senderNumber = Schema.decodeUnknownSync(E164PhoneNumber)("+14155550100");
 const otherSenderNumber =
