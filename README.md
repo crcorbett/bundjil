@@ -37,11 +37,9 @@ its earlier proofs are historical evidence, not the current Production state.
 
 ## Current Packages
 
-- `@bundjil/core` owns framework-neutral personal-agent domain primitives and
-  Effect programs.
-- `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
-  errors, named operation services, and the Standard Schema bridge used by Eve
-  tools.
+- `@bundjil/eve` owns Eve-facing Effect Schema contracts, the deterministic
+  workspace-status feature and operation service, and the `/schema` bridge used
+  by Eve tools.
 - `@bundjil/codex` owns the Codex subscription profile/token lifecycle,
   trusted-local loopback PKCE login, encrypted profile envelope, fenced
   persistence and refresh services, and direct Codex Responses proof surface.
@@ -58,7 +56,7 @@ its earlier proofs are historical evidence, not the current Production state.
   personal Vercel account, not Tilt Legal.
 - `@bundjil/agent` is the committed Vercel Eve app. It defines the root agent,
   instructions, the `workspace_status` tool that delegates into
-  `@bundjil/eve-effect`, app-owned model-provider config, and its scoped
+  `@bundjil/eve`, app-owned model-provider config, and its scoped
   Executor MCP connection. Gateway is the default model path; Codex proxy mode
   is opt-in.
 
@@ -228,10 +226,9 @@ apps/
   agent/             Vercel Eve app and workspace_status tool.
   codex-proxy/       Private Effect HTTP proxy for Codex provider proof.
 packages/
-  core/              Framework-neutral Bundjil domain primitives.
-  codex-oauth/       Codex OAuth profiles and direct Codex Responses proof.
-  store/              Native and atomic persistence contracts/adapters.
-  eve-effect/        Effect contracts and services for Eve tool boundaries.
+  store/             Native and atomic persistence contracts/adapters.
+  codex/             Complete Codex integration and intent-based exports.
+  eve/               Eve contracts, workspace status, and schema bridge.
 docs/
   README.md          Documentation index.
   architecture/
@@ -288,8 +285,8 @@ it does not clear a namespace or rewrite durable records as recovery.
    opt-in.
 2. Keep Gateway as default unless app-owned configuration selects the
    Production-proven Codex proxy path.
-3. Define channel-neutral message, identity, consent, and task contracts in
-   `@bundjil/core`.
+3. Introduce capability-owned shared contracts only after a stable
+   multi-consumer boundary exists.
 4. Keep the Production Sendblue channel and its retained Preview counterpart
    healthy through route, replay, inventory, monitoring, and rollback checks.
 5. Add the Cloudflare email ingress path.

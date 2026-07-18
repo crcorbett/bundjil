@@ -1,14 +1,15 @@
 import { Effect } from "effect";
 
+export const defaultWorkspacePackages = [
+  "@bundjil/codex",
+  "@bundjil/eve",
+  "@bundjil/store",
+] as const;
+
 export interface WorkspaceSummary {
   readonly name: string;
-  readonly packages: readonly string[];
+  readonly packages: typeof defaultWorkspacePackages;
 }
-
-export const defaultWorkspacePackages = [
-  "@bundjil/core",
-  "@bundjil/eve-effect",
-] as const;
 
 export const makeWorkspaceSummary = (
   name = "bundjil"

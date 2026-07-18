@@ -3,10 +3,9 @@
 Bundjil is a Bun/Turbo monorepo for a personal agent built around Vercel Eve,
 Effect, and channel adapters for iMessage, email, and connected personal tools.
 
-The current codebase contains a deployed Eve app slice. It establishes the
-Eve filesystem boundary in `apps/agent`, keeps reusable operation contracts in
-`@bundjil/eve-effect`, and keeps framework-neutral primitives in
-`@bundjil/core`. The private Codex proxy app now exists as a separate
+The current codebase contains a deployed Eve app slice. It establishes the Eve
+filesystem boundary in `apps/agent` and keeps the reusable workspace-status
+operation and schema bridge in `@bundjil/eve`. The private Codex proxy app is a separate
 deployment boundary. Eve uses AI Gateway by default and can opt into the
 private Codex proxy through app-owned Effect Config.
 
@@ -47,14 +46,12 @@ Unsupported:
 iMessage
   -> Sendblue webhook
   -> apps/agent Sendblue Eve channel (Production verified; Preview retained)
-  -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 
 Email
   -> Cloudflare Email Routing Worker
   -> future Eve email channel/app boundary
-  -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
 ```
@@ -68,12 +65,11 @@ subagents. Bundjil's committed app currently uses the root `agent.ts`,
 
 ```text
 apps/agent
-  -> @bundjil/eve-effect
+  -> @bundjil/eve
   -> @ai-sdk/openai-compatible when BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
   -> apps/codex-proxy over private HTTP when Codex proxy mode is enabled
 
-@bundjil/eve-effect
-  -> @bundjil/core
+@bundjil/eve
   -> effect
   -> @standard-schema/spec
 
@@ -90,19 +86,12 @@ apps/agent
 apps/codex-proxy
   -> effect/unstable/http
   -> @bundjil/codex
-
-@bundjil/core
-  -> effect
 ```
 
-`@bundjil/core` stays framework-neutral. It can expose channel-neutral message
-types, identity and consent contracts, tool intent schemas, service contracts,
-and pure or Effect-returning programs.
-
-`@bundjil/eve-effect` owns the Eve-facing Effect boundary: canonical Effect
-Schema contracts, schema-backed tagged errors, the `BundjilAgentOperations`
-service, live and memory layers, and `toEveSchema(schema)` for Eve
-`defineTool` schemas.
+`@bundjil/eve` owns the Eve-facing Effect boundary: canonical Effect
+Schema contracts, `WorkspaceSchemaError`, the `WorkspaceOperations` service,
+the deterministic workspace summary, live and memory layers, and the
+`@bundjil/eve/schema` bridge for Eve `defineTool` schemas.
 
 `@bundjil/codex` owns the Codex OAuth profile and token lifecycle
 contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
@@ -125,7 +114,7 @@ refresh-capable live providers. It exposes no browser OAuth route.
 
 `apps/agent` owns deployment concerns: Eve directory structure, model config,
 instructions, authored tool files, channel files, and runtime secrets.
-It imports stable operations from `@bundjil/eve-effect` instead of duplicating
+It imports stable operations from `@bundjil/eve` instead of duplicating
 schemas or DTOs. For model selection, it owns only provider config and
 `LanguageModel` construction; it must not import Codex OAuth profile storage,
 token refresh, or direct Codex HTTP clients.
@@ -142,9 +131,9 @@ Eve HTTP API
   -> apps/agent/agent/agent.ts model config
   -> apps/agent/agent/instructions.md
   -> apps/agent/agent/tools/workspace_status.ts
-  -> @bundjil/eve-effect getWorkspaceStatus
-  -> @bundjil/eve-effect BundjilAgentOperationsLive
-  -> @bundjil/core makeWorkspaceSummary
+  -> @bundjil/eve getWorkspaceStatus
+  -> @bundjil/eve WorkspaceOperationsLive
+  -> @bundjil/eve makeWorkspaceSummary
 ```
 
 Gateway model path:
@@ -198,7 +187,7 @@ provider probe.
 Schema boundary:
 
 ```text
-@bundjil/eve-effect WorkspaceStatusInput / WorkspaceStatusSuccess
+@bundjil/eve WorkspaceStatusInput / WorkspaceStatusSuccess
   -> toEveSchema(schema)
   -> Effect Schema Standard Schema validation
   -> Effect Schema Standard JSON Schema metadata
@@ -224,12 +213,12 @@ Test path:
 Vitest
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspace_status.execute(...)
-  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
-  -> @bundjil/core makeWorkspaceSummary
+  -> getWorkspaceStatus(...).pipe(Effect.provide(WorkspaceOperationsLive))
+  -> @bundjil/eve makeWorkspaceSummary
 
 Vitest
-  -> packages/eve-effect/test/bundjil-agent-operations.test.ts
-  -> BundjilAgentOperationsLive or BundjilAgentOperationsMemory
+  -> packages/eve/test/workspace-operations.test.ts
+  -> WorkspaceOperationsLive or WorkspaceOperationsMemory
   -> canonical WorkspaceStatus schemas and tagged errors
 
 Vitest
@@ -266,8 +255,8 @@ Vercel preview request
 
 ## Runtime Principles
 
-- Keep the agent core channel-neutral. iMessage, email, and future channels
-  should normalize into shared domain envelopes before workflow logic runs.
+- Keep app-owned integrations provider-specific. Introduce a shared domain
+  contract only after a stable multi-consumer boundary exists.
 - Use Effect for fallible, async, stateful, boundary-crossing, or
   dependency-injected code.
 - Keep provider credentials out of durable domain contracts. Prefer Vercel
@@ -289,8 +278,8 @@ Vercel preview request
 The Production-verified Sendblue channel belongs in its existing app-owned
 boundary. Retain Preview as an independent historical environment. Future
 Cloudflare email, Vercel Connect, and Notion code belongs in app-owned
-boundaries first. Move shared contracts into `@bundjil/core` or
-`@bundjil/eve-effect` only after the boundary is proven stable.
+boundaries first. Move a contract into a capability-owned package only after
+the boundary is proven stable.
 
 ## Quality Gates
 

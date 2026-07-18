@@ -23,8 +23,7 @@ dependency hygiene, workspace typechecks, and tests.
 Package-focused commands:
 
 ```bash
-bun run --filter @bundjil/core test
-bun run --filter @bundjil/eve-effect test
+bun run --filter @bundjil/eve test
 bun run --filter @bundjil/codex test
 bun run --filter @bundjil/codex build
 bun run --filter @bundjil/store test
@@ -46,7 +45,7 @@ bun run --filter @bundjil/agent build
   the required ignored local environment loaded.
 - Package schema or export change: run that package's `check-types`, tests, and
   build, then root `bun run verification`.
-- Eve tool change: run `@bundjil/eve-effect` tests when contracts change,
+- Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and
   verification.

@@ -11,10 +11,9 @@ apps/
   codex-proxy/        Private Effect HTTP proxy app for Codex provider proof.
 
 packages/
-  core/               Framework-neutral Bundjil domain primitives and programs.
-  codex-oauth/        Codex OAuth profiles, local PKCE, refresh, and codecs.
   store/              Provider-neutral native/atomic persistence and adapters.
-  eve-effect/         Effect contracts, service layers, and Eve schema bridge.
+  codex/              Complete Codex integration and intent-based exports.
+  eve/                Eve contracts, workspace status, and schema bridge.
 
 docs/
   architecture/       Durable architecture and repo standards.
@@ -34,9 +33,8 @@ needs it.
   local config, authored instructions, and secret binding names.
 - Packages own reusable contracts, schemas, service APIs, pure programs, and
   provider wrappers once the boundary is stable.
-- `@bundjil/core` owns channel-neutral personal-agent concepts.
-- `@bundjil/eve-effect` owns reusable Eve operation contracts and the Effect
-  Schema bridge to Eve.
+- `@bundjil/eve` owns reusable Eve operation contracts and the Effect
+  Schema bridge to Eve, including the workspace-status feature.
 - `@bundjil/store` owns native `KeyValueStore` composition,
   supplemental `AtomicKeyValueStore`, and explicit memory/Upstash Layers. It
   owns no OAuth, replay, or channel policy.
@@ -129,20 +127,15 @@ plane.
 
 ## Package Boundaries
 
-`@bundjil/core`:
-
-- owns stable, provider-neutral agent domain contracts;
-- can export pure functions and Effect-returning programs;
-- must not import Eve, Sendblue, Cloudflare, Vercel Connect, Notion SDKs,
-  TanStack Start, React, or app files.
-
-`@bundjil/eve-effect`:
+`@bundjil/eve`:
 
 - owns Effect Schema contracts for Eve tool inputs and outputs;
-- owns tagged errors and named agent operation services;
+- owns the deterministic workspace-status summary, its tagged Schema failure,
+  and named operation service;
 - owns live and memory layers for operation tests;
-- owns `toEveSchema(schema)` for the Eve Standard Schema boundary;
-- may depend on `@bundjil/core`, `effect`, and Standard Schema packages;
+- owns `toEveSchema(schema)` on the explicit `/schema` export for the Eve
+  Standard Schema boundary;
+- may depend on Effect and Standard Schema packages;
 - must not own Eve filesystem files, app model config, channel files, or
   provider secrets.
 

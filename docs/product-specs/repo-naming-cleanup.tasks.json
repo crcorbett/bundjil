@@ -255,7 +255,7 @@
     {
       "id": "rename-eve-effect-and-remove-core",
       "title": "Rename the Eve boundary to @bundjil/eve and remove @bundjil/core",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["organize-codex-source-by-owned-feature"],
       "description": "Move packages/eve-effect to packages/eve, fold the workspace-summary scaffold into that boundary, remove packages/core, narrow broad operation names, and migrate the agent tool.",
       "implementationNotes": [],
@@ -290,8 +290,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the Eve boundary moved to @bundjil/eve with root and /schema exports; workspace summary and status operations moved from the removed core package into Eve ownership. WorkspaceOperations, its live/memory Layers, accessor, and app consumer share the atomic @bundjil/eve/WorkspaceOperations identity; root references now contain exactly the five surviving projects.",
+          "Pass 2 - implementation quality and helper admission: WorkspaceSchemaError class/self-type/literal tag and WorkspaceSchemaBoundary migrated atomically with all four boundary literals intact. Dead gateway/operation errors, operation-name contract, redundant failure union, duplicated adapter path, core package, and old aliases are absent. Input/success Schemas and adapter remain byte-equivalent; package output is exactly codex, eve, store with no forwarding package or speculative replacement.",
+          "Pass 3 - verification and evidence: parent frozen install, Eve check-types/build and 6 tests, agent check-types/build and 57 tests, tagged-error lint, Knip, five workspace typechecks, full verification with 223 tests, exact export/tsconfig/package-list/stale-name/identity/discovery scans, and git diff --check passed under synthetic Executor config. No Browser, live provider, deployment, publication, or stored-data action ran."
+        ]
       },
       "commitAfterPassing": true
     },

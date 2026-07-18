@@ -1,12 +1,12 @@
 {
-  "name": "@bundjil/core",
+  "name": "@bundjil/eve",
   "version": "0.1.0",
   "private": true,
-  "description": "Framework-neutral domain primitives and Effect programs for Bundjil.",
+  "description": "Effect Schema contracts and operations for the Bundjil Eve agent.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crcorbett/bundjil.git",
-    "directory": "packages/core"
+    "directory": "packages/eve"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -16,6 +16,11 @@
       "@bundjil/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./schema": {
+      "@bundjil/source": "./src/schema.ts",
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
     }
   },
   "publishConfig": {
@@ -23,6 +28,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./schema": {
+        "types": "./dist/schema.d.ts",
+        "default": "./dist/schema.js"
       }
     }
   },
@@ -32,6 +41,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
     "effect": "catalog:effect"
   },
   "devDependencies": {

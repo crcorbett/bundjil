@@ -1,8 +1,8 @@
 import { assert, it } from "@effect/vitest";
 import { Effect } from "effect";
 
-import { toEveSchema } from "../src/eve/tool-adapter.js";
 import { WorkspaceStatusInput, WorkspaceStatusSuccess } from "../src/index.js";
+import { toEveSchema } from "../src/schema.js";
 
 it.effect(
   "adds Standard Schema validation and Standard JSON Schema metadata",

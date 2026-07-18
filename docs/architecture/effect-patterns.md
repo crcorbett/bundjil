@@ -54,8 +54,8 @@ src/
   index.ts          stable package contract
 ```
 
-Bundjil currently keeps the small `@bundjil/eve-effect` service in
-`src/services/bundjil-agent-operations.ts`. Split to the layout above when new
+Bundjil currently keeps the small `@bundjil/eve` service in
+`src/services/workspace-operations.ts`. Split to the layout above when new
 operations or providers make the combined file harder to scan.
 
 Root `index.ts` should export stable contracts and default operation helpers.
@@ -162,7 +162,7 @@ Schemas are the integration contract.
 - Reuse the owning schema from other packages instead of copying the shape.
 
 For Eve tools, keep Effect Schema as the source of truth and use
-`toEveSchema(schema)` from `@bundjil/eve-effect`:
+`toEveSchema(schema)` from `@bundjil/eve/schema`:
 
 ```ts
 Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
@@ -229,10 +229,10 @@ fix rather than treating the count as sufficient.
 Expected failures should be typed and tagged:
 
 ```ts
-export class BundjilAgentOperationError extends Schema.TaggedErrorClass<BundjilAgentOperationError>()(
-  "BundjilAgentOperationError",
+export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchemaError>()(
+  "WorkspaceSchemaError",
   {
-    operation: BundjilAgentOperationName,
+    boundary: WorkspaceSchemaBoundary,
     message: Schema.NonEmptyString,
     cause: Schema.Defect,
   }
@@ -289,7 +289,7 @@ edge while the app is small:
 
 ```ts
 Effect.runPromise(
-  getWorkspaceStatus(input).pipe(Effect.provide(BundjilAgentOperationsLive))
+  getWorkspaceStatus(input).pipe(Effect.provide(WorkspaceOperationsLive))
 );
 ```
 

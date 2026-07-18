@@ -16,7 +16,7 @@ Committed Vercel Eve app for the first Bundjil agent slice.
 - `agent/lib/executor/config.ts`: app-owned Effect Config and endpoint policy
   for the scoped Executor MCP connection.
 - `agent/tools/workspace_status.ts`: Eve tool that delegates to
-  `@bundjil/eve-effect`.
+  `@bundjil/eve`.
 - `test/workspace-status-tool.test.ts`: app-level proof that the Eve tool
   execute path runs through the live Effect operation without starting Eve or
   calling a model.
@@ -432,7 +432,7 @@ bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent test
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspace_status.execute(...)
-  -> @bundjil/eve-effect BundjilAgentOperationsLive
+  -> @bundjil/eve WorkspaceOperationsLive
 ```
 
 The Task 4 local HTTP proof had none of `AI_GATEWAY_API_KEY`,

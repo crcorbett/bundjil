@@ -1,4 +1,4 @@
-import { defaultWorkspacePackages } from "@bundjil/core";
+import { defaultWorkspacePackages } from "@bundjil/eve";
 import { assert, it } from "@effect/vitest";
 import { Effect } from "effect";
 import type { ToolContext } from "eve/tools";
@@ -47,9 +47,13 @@ it.effect("executes the Eve tool through the live Effect named operation", () =>
 
     assert.strictEqual(status.workspaceName, "bundjil");
     assert.deepStrictEqual(status.packageNames, defaultWorkspacePackages);
-    assert.include(status.packageNames, "@bundjil/eve-effect");
+    assert.deepStrictEqual(status.packageNames, [
+      "@bundjil/codex",
+      "@bundjil/eve",
+      "@bundjil/store",
+    ]);
     assert.include(status.agentSummary, "Which packages are available?");
-    assert.include(status.agentSummary, "@bundjil/eve-effect");
+    assert.include(status.agentSummary, "@bundjil/eve");
   })
 );
 

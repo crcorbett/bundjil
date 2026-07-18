@@ -44,17 +44,18 @@ apps/agent/
     model-provider.test.ts
     workspace-status-tool.test.ts
 
-packages/eve-effect/
+packages/eve/
   src/
     schemas.ts
     errors.ts
+    schema.ts
+    workspace-status.ts
     services/
-      bundjil-agent-operations.ts
-    eve/
-      tool-adapter.ts
+      workspace-operations.ts
   test/
-    bundjil-agent-operations.test.ts
-    tool-adapter.test.ts
+    error-contracts.test.ts
+    workspace-operations.test.ts
+    schema.test.ts
 ```
 
 Ignored local/runtime files:
@@ -99,21 +100,18 @@ Vercel-managed runtime configuration, never in committed source.
   Sendblue HTTP client. It does not move into a shared package until a stable
   second-channel contract exists.
 
-`@bundjil/eve-effect` owns the reusable operation boundary:
+`@bundjil/eve` owns the reusable operation boundary:
 
 - `WorkspaceStatusInput` and `WorkspaceStatusSuccess` are canonical Effect
   Schema contracts.
-- `BundjilAgentOperationError`, `BundjilAgentSchemaError`, and
-  `BundjilAgentGatewayConfigError` are schema-backed tagged errors.
-- `BundjilAgentOperations` is the named Effect service.
-- `BundjilAgentOperationsLive` delegates deterministic workspace data to
-  `@bundjil/core`.
-- `BundjilAgentOperationsMemory` lets tests replace the operation without Eve
+- `WorkspaceSchemaError` is the schema-backed workspace-status failure.
+- `WorkspaceOperations` is the named Effect service.
+- `WorkspaceOperationsLive` uses the package-owned deterministic workspace
+  summary.
+- `WorkspaceOperationsMemory` lets tests replace the operation without Eve
   or model access.
-- `toEveSchema(schema)` adapts Effect Schema to Eve's tool schema boundary.
-
-`@bundjil/core` remains framework-neutral. The current live operation calls
-`makeWorkspaceSummary`, which returns the deterministic package list.
+- `@bundjil/eve/schema` exports `toEveSchema(schema)` for Eve's tool schema
+  boundary.
 
 `@bundjil/store`, `@bundjil/codex`, and
 `apps/codex-proxy` now participate in the optional Codex proxy model path:
@@ -167,7 +165,7 @@ Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
 The app does not define Zod mirrors or standalone DTOs for tool input/output.
 The `workspace_status` tool imports `WorkspaceStatusInput`,
 `WorkspaceStatusSuccess`, `getWorkspaceStatus`, and
-`BundjilAgentOperationsLive` from `@bundjil/eve-effect`.
+`WorkspaceOperationsLive` from `@bundjil/eve`.
 
 ## Executor MCP Approval Boundary
 
@@ -275,8 +273,8 @@ Eve HTTP/API
   -> apps/agent/agent/tools/workspace_status.ts
   -> toEveSchema(WorkspaceStatusInput / WorkspaceStatusSuccess)
   -> getWorkspaceStatus(input)
-  -> BundjilAgentOperationsLive
-  -> @bundjil/core makeWorkspaceSummary
+  -> WorkspaceOperationsLive
+  -> makeWorkspaceSummary
   -> Schema.encodeEffect(WorkspaceStatusSuccess)
   -> Eve tool result
 ```
@@ -285,7 +283,7 @@ Eve HTTP/API
 
 ```ts
 Effect.runPromise(
-  getWorkspaceStatus(input).pipe(Effect.provide(BundjilAgentOperationsLive))
+  getWorkspaceStatus(input).pipe(Effect.provide(WorkspaceOperationsLive))
 );
 ```
 
@@ -337,8 +335,8 @@ App test path:
 bun run --filter @bundjil/agent test
   -> apps/agent/test/workspace-status-tool.test.ts
   -> workspaceStatusTool.execute(...)
-  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
-  -> @bundjil/core defaultWorkspacePackages
+  -> getWorkspaceStatus(...).pipe(Effect.provide(WorkspaceOperationsLive))
+  -> @bundjil/eve defaultWorkspacePackages
 
 bun run --filter @bundjil/agent test
   -> apps/agent/test/model-provider.test.ts
@@ -356,11 +354,11 @@ bun run --filter @bundjil/agent test
 Package test path:
 
 ```text
-bun run --filter @bundjil/eve-effect test
-  -> packages/eve-effect/test/bundjil-agent-operations.test.ts
-  -> BundjilAgentOperationsLive
-  -> BundjilAgentOperationsMemory
-  -> packages/eve-effect/test/tool-adapter.test.ts
+bun run --filter @bundjil/eve test
+  -> packages/eve/test/workspace-operations.test.ts
+  -> WorkspaceOperationsLive
+  -> WorkspaceOperationsMemory
+  -> packages/eve/test/schema.test.ts
   -> toEveSchema(WorkspaceStatusInput / WorkspaceStatusSuccess)
 
 bun run --filter @bundjil/codex test
@@ -383,7 +381,7 @@ Run commands from the repo root:
 
 ```bash
 bun install --frozen-lockfile
-bun run --filter @bundjil/eve-effect test
+bun run --filter @bundjil/eve test
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 bun run check
@@ -663,5 +661,5 @@ These integrations are intentionally not implemented in the current slice:
 - Long-term memory persistence.
 
 Add them in `apps/agent` first unless the contract has become stable enough to
-move into `@bundjil/core` or `@bundjil/eve-effect`. Keep the existing Sendblue
+move into a capability-owned package. Keep the existing Sendblue
 boundary app-owned until a stable second-channel contract exists.

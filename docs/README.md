@@ -54,10 +54,8 @@ README.
   access plan.
 - [Reference repositories](./reference-repositories.md) explains the local
   `.local/references` setup for Vercel and Effect source lookup.
-- [`@bundjil/core`](../packages/core/README.md) documents the framework-neutral
-  package for domain primitives and Effect programs.
-- [`@bundjil/eve-effect`](../packages/eve-effect/README.md) documents the
-  Effect Schema contracts, tagged errors, service layers, Eve schema bridge,
+- [`@bundjil/eve`](../packages/eve/README.md) documents the
+  Effect Schema contracts, workspace-status operation, `/schema` Eve bridge,
   and verification commands for the Eve app operation boundary.
 - [`@bundjil/codex`](../packages/codex/README.md) documents the
   Codex OAuth profile store, direct Codex Responses proof service, service

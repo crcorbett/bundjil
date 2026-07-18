@@ -1,10 +1,10 @@
 import {
-  BundjilAgentOperationsLive,
+  WorkspaceOperationsLive,
   WorkspaceStatusInput,
   WorkspaceStatusSuccess,
   getWorkspaceStatus,
-} from "@bundjil/eve-effect";
-import { toEveSchema } from "@bundjil/eve-effect/eve/tool-adapter";
+} from "@bundjil/eve";
+import { toEveSchema } from "@bundjil/eve/schema";
 import { Effect } from "effect";
 import { defineTool } from "eve/tools";
 
@@ -18,7 +18,7 @@ const workspaceStatusTool = defineTool({
   outputSchema: workspaceStatusOutputSchema,
   execute(input) {
     return Effect.runPromise(
-      getWorkspaceStatus(input).pipe(Effect.provide(BundjilAgentOperationsLive))
+      getWorkspaceStatus(input).pipe(Effect.provide(WorkspaceOperationsLive))
     );
   },
 });

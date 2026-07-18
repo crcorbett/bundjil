@@ -36,7 +36,7 @@ mock or deterministic memory Layers.
 2. `rename-effect-persistence-to-store`: completed.
 3. `rename-codex-oauth-to-codex`: completed.
 4. `organize-codex-source-by-owned-feature`: completed.
-5. `rename-eve-effect-and-remove-core`: pending.
+5. `rename-eve-effect-and-remove-core`: completed.
 6. `clarify-agent-integration-ownership`: pending.
 7. `reconcile-documentation-and-final-verification`: pending.
 
@@ -258,3 +258,45 @@ Status: Passed
   non-selected tags, Context identities, storage keys, and diff checks passed.
 - No external persisted decoder was found. No Browser, provider mutation,
   deployment, publication, or stored-data action was applicable or performed.
+
+### rename-eve-effect-and-remove-core
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- The Eve boundary moved to `@bundjil/eve` with root and `/schema` exports;
+  workspace summary/status ownership moved into Eve and `@bundjil/core` was
+  removed without a generic replacement.
+- `WorkspaceOperations`, live/memory Layers, accessor, and app consumer use the
+  atomic `@bundjil/eve/WorkspaceOperations` identity.
+- Root TypeScript references now contain exactly store, Codex, Eve, proxy, and
+  agent.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- `WorkspaceSchemaError` declaration/self-type/literal tag and
+  `WorkspaceSchemaBoundary` migrated atomically with all four boundary literals
+  intact; exact encode/decode and old-tag rejection tests pass.
+- Dead gateway/operation errors, operation name, redundant failure union,
+  duplicated adapter path, aliases, and the core package are absent.
+- Input/success Schemas and adapter remain byte-equivalent; workspace output is
+  exactly Codex, Eve, Store with no forwarding package or speculative error.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Parent frozen install passed with 506 installs across 692 packages and no
+  changes.
+- Parent focused gates passed: Eve check-types/build and 6 tests; agent
+  check-types/build and 57 tests; tagged-error lint and Knip.
+- Parent full verification passed five workspace typechecks, eight Turbo tasks,
+  and all 223 tests. Export, tsconfig, package-list, stale-name, identity,
+  discovery-path, and diff checks passed.
+- No Browser, live provider, deployment, publication, or stored-data action was
+  applicable or performed.

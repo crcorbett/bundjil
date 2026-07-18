@@ -1,6 +1,7 @@
-# @bundjil/eve-effect
+# @bundjil/eve
 
-Effect Schema contracts and named operation layers for the Bundjil Eve agent.
+Eve-facing Effect Schema contracts and workspace-status operations for the
+Bundjil agent.
 
 This package owns the reusable operation boundary that `apps/agent` calls from
 Eve tools. Eve filesystem runtime files, channels, model configuration, and
@@ -10,17 +11,17 @@ provider secrets stay app-owned.
 
 - `WorkspaceStatusInput` and `WorkspaceStatusSuccess` are canonical Effect
   Schema contracts with schema-derived TypeScript types for tool edges.
-- `WorkspaceStatusFailure` is the tagged error union for the current operation.
-- `BundjilAgentOperationError`, `BundjilAgentSchemaError`, and
-  `BundjilAgentGatewayConfigError` are schema-backed tagged errors.
-- `BundjilAgentOperations` is the named `Context.Service` boundary.
+- `WorkspaceSchemaError` is the schema-backed failure for output encoding.
+- `WorkspaceOperations` is the named `Context.Service` boundary.
 - `getWorkspaceStatus(input)` is the current named operation.
-- `BundjilAgentOperationsLive` delegates deterministic workspace status data to
-  `@bundjil/core`.
-- `BundjilAgentOperationsMemory` provides a mock layer for tests without Eve or
+- `WorkspaceSummary`, `defaultWorkspacePackages`, and `makeWorkspaceSummary`
+  own the deterministic workspace-status data in this feature.
+- `WorkspaceOperationsLive` encodes that deterministic workspace status.
+- `WorkspaceOperationsMemory` provides a mock layer for tests without Eve or
   model access.
-- `toEveSchema(schema)` combines Effect's Standard JSON Schema and Standard
-  Schema adapters for Eve `defineTool` boundaries.
+- `@bundjil/eve/schema` exports `toEveSchema(schema)`, which combines Effect's
+  Standard JSON Schema and Standard Schema adapters for Eve `defineTool`
+  boundaries.
 
 Current schemas:
 
@@ -39,38 +40,31 @@ the schema or type from this package instead of defining DTO mirrors.
 
 ## Tagged Errors
 
-Current tagged errors:
-
-- `BundjilAgentOperationError`: operation-level failures.
-- `BundjilAgentSchemaError`: schema decode/encode failures, including the
-  `WorkspaceStatusSuccess` encode boundary used by the live layer.
-- `BundjilAgentGatewayConfigError`: Gateway configuration failures available to
-  the package boundary. The current `workspace_status` operation is
-  deterministic and does not read credentials.
-
-`WorkspaceStatusFailure` is the union of those tagged errors.
+`WorkspaceSchemaError` is the only workspace-status failure. Its `boundary`
+schema retains the four input, success, tool-input, and tool-success literals.
+The package does not export speculative operation or Gateway failures.
 
 ## Service Layers
 
-`BundjilAgentOperations` is a `Context.Service` with one named method:
+`WorkspaceOperations` is a `Context.Service` with one named method:
 
 ```text
 getWorkspaceStatus(input)
-  -> Effect<WorkspaceStatusSuccess, WorkspaceStatusFailure>
+  -> Effect<WorkspaceStatusSuccess, WorkspaceSchemaError>
 ```
 
 The live layer:
 
 ```text
-BundjilAgentOperationsLive
-  -> @bundjil/core makeWorkspaceSummary
+WorkspaceOperationsLive
+  -> makeWorkspaceSummary
   -> Schema.encodeEffect(WorkspaceStatusSuccess)
 ```
 
 The memory layer:
 
 ```text
-BundjilAgentOperationsMemory(workspaceStatus)
+WorkspaceOperationsMemory(workspaceStatus)
   -> returns caller-provided WorkspaceStatusSuccess for tests
 ```
 
@@ -83,7 +77,8 @@ Bundjil keeps Effect Schema as the source of truth and bridges it with:
 Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
 ```
 
-`toEveSchema(schema)` wraps that composition and returns a value with both:
+`@bundjil/eve/schema` exposes `toEveSchema(schema)` and returns a value with
+both:
 
 - `~standard.validate` for Standard Schema validation.
 - `~standard.jsonSchema.input/output` for Standard JSON Schema metadata.
@@ -98,23 +93,27 @@ apps/agent/agent/tools/workspace_status.ts
   -> toEveSchema(WorkspaceStatusInput)
   -> toEveSchema(WorkspaceStatusSuccess)
   -> getWorkspaceStatus(input)
-  -> Effect.provide(BundjilAgentOperationsLive)
-  -> @bundjil/core makeWorkspaceSummary
+  -> Effect.provide(WorkspaceOperationsLive)
+  -> makeWorkspaceSummary
   -> Schema.encodeEffect(WorkspaceStatusSuccess)
 ```
 
 ## Test Call Graph
 
 ```text
-packages/eve-effect/test/bundjil-agent-operations.test.ts
-  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsLive))
-  -> getWorkspaceStatus(...).pipe(Effect.provide(BundjilAgentOperationsMemory(...)))
+packages/eve/test/workspace-operations.test.ts
+  -> getWorkspaceStatus(...).pipe(Effect.provide(WorkspaceOperationsLive))
+  -> getWorkspaceStatus(...).pipe(Effect.provide(WorkspaceOperationsMemory(...)))
 
-packages/eve-effect/test/tool-adapter.test.ts
+packages/eve/test/schema.test.ts
   -> toEveSchema(WorkspaceStatusInput)
   -> toEveSchema(WorkspaceStatusSuccess)
   -> validate Standard Schema behavior
   -> inspect Standard JSON Schema metadata
+
+packages/eve/test/error-contracts.test.ts
+  -> encode and decode WorkspaceSchemaError
+  -> reject the historical tag
 ```
 
 The tests do not require Eve dev server, AI Gateway credentials, or provider
@@ -125,8 +124,8 @@ model access.
 Run from the repo root:
 
 ```bash
-bun run --filter @bundjil/eve-effect test
-bun run --filter @bundjil/eve-effect build
+bun run --filter @bundjil/eve test
+bun run --filter @bundjil/eve build
 bun run check-types
 bun run verification
 ```
