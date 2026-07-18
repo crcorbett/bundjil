@@ -5,7 +5,7 @@
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
     "minimumTotalPasses": 12,
-    "completedPasses": 3,
+    "completedPasses": 6,
     "rule": "Each parent task records ownership/call-graph, Effect/implementation-quality, and verification/evidence passes. Add more passes while any finding remains."
   },
   "principles": [
@@ -73,7 +73,7 @@
     {
       "id": "migrate-codex-boundaries-end-to-end",
       "title": "Migrate Codex boundaries end to end",
-      "status": "in-progress",
+      "status": "completed",
       "dependsOn": ["establish-boundary-provenance-audit"],
       "description": "Apply provenance enforcement across Codex OAuth, profiles, persistence, filesystem, provider HTTP, SSE, proxy authorization, and operator scripts while preserving exact behavior.",
       "implementationNotes": [
@@ -98,8 +98,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: @bundjil/codex-oauth owns OAuth, profile, filesystem, provider HTTP, SSE, and error contracts; apps/codex-proxy retains only its host-facing config adapter. Codex provider calls now flow through Effect HttpClient, and the Codex exception registry is empty.",
+          "Implementation quality: reviewed the complete Codex/proxy diff for owner Schemas, Config.schema, one-run Effectful operator programs, flat profile-cipher control flow, response.completed Match handling, typed outer-pipe errors, and absence of sync production codecs, global fetch, direct JSON APIs, unsafe casts, DTO mirrors, or helper sprawl.",
+          "Verification: boundary audit and 23 fixtures, Effect setup and skill-policy gates, Ultracite, Knip, seven workspace typechecks, 103 OAuth tests, 24 proxy tests, 60 agent tests, all other workspace tests, package builds, direct agent build, proxy smoke proof (HTTP 200/200 and five SSE lines), diff check, task-ledger parse, and root verification passed."
+        ]
       },
       "commitAfterPassing": true
     },

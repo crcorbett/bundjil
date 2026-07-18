@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import { CodexOAuthProfileId } from "../schemas.js";
+import { CodexErrorMessage } from "./contracts.js";
 
 export class CodexOAuthTokenExpired extends Schema.TaggedErrorClass<CodexOAuthTokenExpired>()(
   "CodexOAuthTokenExpired",
@@ -8,6 +9,6 @@ export class CodexOAuthTokenExpired extends Schema.TaggedErrorClass<CodexOAuthTo
     profileId: CodexOAuthProfileId,
     expiresAtEpochMillis: Schema.Number,
     nowEpochMillis: Schema.Number,
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
   }
 ) {}

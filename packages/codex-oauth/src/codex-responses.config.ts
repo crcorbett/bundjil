@@ -1,27 +1,24 @@
-import {
-  Config,
-  ConfigProvider,
-  Effect,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Config, ConfigProvider, Effect, Option } from "effect";
 
-import { CodexResponsesRequestError } from "./errors.js";
 import {
   CodexResponsesEndpoint,
   CodexResponsesModelId,
   CodexResponsesNonEmptyContent,
   CodexResponsesProofInput,
+  CodexOAuthAccessToken,
   CodexOAuthAccountId,
 } from "./schemas.js";
 
-export const defaultCodexResponsesEndpoint =
-  "https://chatgpt.com/backend-api/codex/responses";
+export const defaultCodexResponsesEndpoint = CodexResponsesEndpoint.make(
+  "https://chatgpt.com/backend-api/codex/responses"
+);
 
-export const defaultCodexResponsesModel = "gpt-5.5";
+export const defaultCodexResponsesModel = CodexResponsesModelId.make("gpt-5.5");
 
-const proofAccessTokenConfig = Config.redacted("CODEX_ACCESS_TOKEN");
+const proofAccessTokenConfig = Config.schema(
+  CodexOAuthAccessToken,
+  "CODEX_ACCESS_TOKEN"
+);
 
 const proofAccountIdConfig = Config.option(
   Config.schema(CodexOAuthAccountId, "BUNDJIL_CODEX_ACCOUNT_ID")
@@ -44,26 +41,17 @@ export const codexResponsesEndpointConfig = Config.schema(
 
 export const loadCodexResponsesProofInput = Effect.gen(
   function* loadCodexResponsesProofInputFromConfig() {
-    const rawAccessToken = yield* proofAccessTokenConfig;
+    const accessToken = yield* proofAccessTokenConfig;
     const accountId = yield* proofAccountIdConfig;
     const model = yield* proofModelConfig;
     const prompt = yield* proofPromptConfig;
 
-    return yield* Schema.decodeUnknownEffect(CodexResponsesProofInput)({
-      accessToken: Redacted.value(rawAccessToken),
+    return CodexResponsesProofInput.make({
+      accessToken,
       ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
       model,
       prompt,
-    }).pipe(
-      Effect.mapError(
-        (cause) =>
-          new CodexResponsesRequestError({
-            boundary: "CodexResponsesProofInput",
-            message: "Unable to decode Codex Responses proof config.",
-            cause,
-          })
-      )
-    );
+    });
   }
 );
 

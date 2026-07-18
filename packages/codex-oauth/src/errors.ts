@@ -24,7 +24,10 @@ import { OpenAICompatibleProxyRequestError } from "./errors/openai-compatible-pr
 import { UpstashKeyValueStoreConfigError } from "./errors/upstash-key-value-store-config-error.js";
 
 export {
+  CodexErrorMessage,
   CodexHttpClientOperation,
+  CodexHttpContentType,
+  CodexHttpStatusText,
   CodexLocalProfileImportOperation,
   CodexOAuthClientOperation,
   CodexOAuthProfileCipherOperation,

@@ -115,7 +115,7 @@ describe("boundary provenance audit", () => {
 
     const encoded = fixture(`
       export const send = Effect.gen(function* () {
-        const body = yield* Schema.encodeEffect(Payload)(value);
+        const body = yield* Schema.encodeEffect(Payload)(value).pipe(Effect.mapError(mapError));
         return HttpClientRequest.bodyText(body);
       });
     `);
@@ -128,6 +128,16 @@ describe("boundary provenance audit", () => {
     const { cwd, file } = fixture(
       "declare const Account: { readonly Type: unique symbol }; type Account = typeof Account.Type; export const send = (value: Account) => HttpClientRequest.schemaBodyJson(Account)(value);"
     );
+    expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("inspects the body rather than the optional bodyText content type", () => {
+    const { cwd, file } = fixture(`
+      export const send = Effect.gen(function* () {
+        const body = yield* Schema.encodeEffect(Payload)(value);
+        return HttpClientRequest.bodyText(body, "application/json");
+      });
+    `);
     expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
   });
 

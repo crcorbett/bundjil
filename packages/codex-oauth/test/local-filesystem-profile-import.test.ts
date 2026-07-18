@@ -15,9 +15,11 @@ import {
 import { CodexOAuthProfileCipherTest } from "../src/mock.layer.js";
 import { getProfile } from "../src/profile-store.service.js";
 import {
+  CodexFileSystemDirectory,
   CodexLocalProfileImportConfig,
   CodexOAuthProfileCipherConfig,
 } from "../src/schemas.js";
+import type { CodexCliAuthCacheEncoded } from "../src/schemas.js";
 import { codexOAuthProfileStorageKey } from "../src/storage-keys.js";
 
 const fixtureAccessToken = "filesystem-fixture-access-token";
@@ -46,7 +48,7 @@ const cipherConfig = Schema.decodeUnknownEffect(CodexOAuthProfileCipherConfig)({
   keyMaterial: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
 });
 
-const validCache = {
+const validCache: CodexCliAuthCacheEncoded = {
   auth_mode: "chatgpt",
   last_refresh: "2099-01-01T00:00:00.000Z",
   tokens: {
@@ -64,7 +66,9 @@ const filesystemStoreLayer = (directory: string) =>
       Layer.provideMerge(
         Layer.merge(
           CodexOAuthProfileCipherTest(cipher),
-          CodexFileSystemKeyValueStoreLive(directory)
+          CodexFileSystemKeyValueStoreLive(
+            CodexFileSystemDirectory.make(directory)
+          )
         )
       )
     );

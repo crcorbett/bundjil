@@ -19,9 +19,17 @@ import {
 } from "effect/unstable/http";
 
 import { CodexSubscriptionAuthError } from "./errors.js";
-import { CodexOAuthAuthorizationCallback } from "./schemas.js";
+import {
+  CodexOAuthAuthorizationCallback,
+  CodexOAuthCallbackRequest,
+  CodexOAuthRedirectUri,
+} from "./schemas.js";
 import type {
   CodexOAuthAuthorizationCallback as CodexOAuthAuthorizationCallbackType,
+  CodexOAuthCallbackPath,
+  CodexOAuthCallbackRequestMethod,
+  CodexOAuthCallbackRequestUrl,
+  CodexOAuthRedirectUri as CodexOAuthRedirectUriType,
   CodexOAuthState,
   CodexSubscriptionAuthProtocolConfig,
 } from "./schemas.js";
@@ -38,7 +46,7 @@ export interface CodexLoopbackCallbackShape {
 }
 
 export interface CodexLoopbackCallbackSession {
-  readonly redirectUri: string;
+  readonly redirectUri: CodexOAuthRedirectUriType;
   readonly awaitCallback: (
     timeoutMillis: number
   ) => Effect.Effect<
@@ -55,11 +63,11 @@ export class CodexLoopbackCallback extends Context.Service<
 export const decodeCodexOAuthCallbackRequest = Effect.fn(
   "CodexLoopbackCallback.decodeRequest"
 )(function* (
-  method: string,
-  requestUrl: string,
+  method: CodexOAuthCallbackRequestMethod,
+  requestUrl: CodexOAuthCallbackRequestUrl,
   expectedState: CodexOAuthState,
-  redirectUri: string,
-  callbackPath = "/auth/callback"
+  redirectUri: CodexOAuthRedirectUriType,
+  callbackPath: CodexOAuthCallbackPath = "/auth/callback"
 ) {
   const url = new URL(requestUrl, redirectUri);
 
@@ -116,6 +124,7 @@ export const decodeCodexOAuthCallbackRequest = Effect.fn(
 
 export interface LoopbackServer {
   readonly port: number;
+  readonly redirectUri: CodexOAuthRedirectUriType;
   readonly server: HttpServer.HttpServer["Service"];
 }
 
@@ -182,42 +191,66 @@ const bindCallbackServer = Effect.fn("CodexLoopbackCallback.bind")(function* (
 ) {
   return yield* bindFirstAvailableCodexCallbackPort(
     protocol.callbackPorts,
-    (port) => {
-      const redirectUri = `http://localhost:${port}${protocol.callbackPath}`;
-      const callbackApp = Effect.gen(function* handleCodexOAuthCallback() {
-        const request = yield* HttpServerRequest.HttpServerRequest;
-        const callback = decodeCodexOAuthCallbackRequest(
-          request.method,
-          request.url,
-          expectedState,
-          redirectUri,
-          protocol.callbackPath
+    (port) =>
+      Effect.gen(function* bindCodexCallbackPort() {
+        const redirectUri = yield* Schema.decodeUnknownEffect(
+          CodexOAuthRedirectUri
+        )(`http://localhost:${port}${protocol.callbackPath}`).pipe(
+          Effect.mapError(
+            () =>
+              new CodexSubscriptionAuthError({
+                operation: "bindCallback",
+                reason: "invalidCallback",
+                message: "Unable to construct the Codex callback redirect URI.",
+              })
+          )
         );
-        const exit = yield* Effect.exit(callback);
-        yield* Deferred.done(deferred, exit);
-
-        return HttpServerResponse.text(
-          Exit.isSuccess(exit)
-            ? "Codex authorization completed. You can close this window."
-            : "Codex authorization did not complete.",
-          { status: Exit.isSuccess(exit) ? 200 : 400 }
-        );
-      });
-
-      return mapExpectedBindConflict(
-        Effect.gen(function* bindEffectPlatformCallbackServer() {
-          const server = yield* BunHttpServer.make({
-            hostname: protocol.callbackHost,
-            port,
-          });
-          yield* HttpServer.serveEffect(callbackApp).pipe(
-            Effect.provideService(HttpServer.HttpServer, server)
+        const callbackApp = Effect.gen(function* handleCodexOAuthCallback() {
+          const request = yield* HttpServerRequest.HttpServerRequest;
+          const callbackRequest = yield* Schema.decodeEffect(
+            CodexOAuthCallbackRequest
+          )({ method: request.method, requestUrl: request.url }).pipe(
+            Effect.mapError(
+              () =>
+                new CodexSubscriptionAuthError({
+                  operation: "awaitCallback",
+                  reason: "invalidCallback",
+                  message: "The OAuth callback request is invalid.",
+                })
+            )
           );
+          const callback = decodeCodexOAuthCallbackRequest(
+            callbackRequest.method,
+            callbackRequest.requestUrl,
+            expectedState,
+            redirectUri,
+            protocol.callbackPath
+          );
+          const exit = yield* Effect.exit(callback);
+          yield* Deferred.done(deferred, exit);
 
-          return { port, server } satisfies LoopbackServer;
-        })
-      );
-    }
+          return HttpServerResponse.text(
+            Exit.isSuccess(exit)
+              ? "Codex authorization completed. You can close this window."
+              : "Codex authorization did not complete.",
+            { status: Exit.isSuccess(exit) ? 200 : 400 }
+          );
+        });
+
+        return yield* mapExpectedBindConflict(
+          Effect.gen(function* bindEffectPlatformCallbackServer() {
+            const server = yield* BunHttpServer.make({
+              hostname: protocol.callbackHost,
+              port,
+            });
+            yield* HttpServer.serveEffect(callbackApp).pipe(
+              Effect.provideService(HttpServer.HttpServer, server)
+            );
+
+            return { port, redirectUri, server } satisfies LoopbackServer;
+          })
+        );
+      })
   );
 });
 
@@ -237,10 +270,9 @@ export const CodexLoopbackCallbackBunLive = Layer.effect(
           expectedState,
           deferred
         );
-        const redirectUri = `http://localhost:${server.port}${protocol.config.callbackPath}`;
 
         return {
-          redirectUri,
+          redirectUri: server.redirectUri,
           awaitCallback: Effect.fn("CodexLoopbackCallbackSession.await")(
             function* (timeoutMillis) {
               const callback = yield* Deferred.await(deferred).pipe(
@@ -265,7 +297,7 @@ export const CodexLoopbackCallbackBunLive = Layer.effect(
 );
 
 export interface CodexLoopbackCallbackMemoryOptions {
-  readonly redirectUri?: string;
+  readonly redirectUri?: CodexOAuthRedirectUriType;
   readonly callback: Effect.Effect<
     CodexOAuthAuthorizationCallbackType,
     CodexSubscriptionAuthError
@@ -287,7 +319,8 @@ export const CodexLoopbackCallbackMemory = (
         ).pipe(
           Effect.as({
             redirectUri:
-              options.redirectUri ?? "http://localhost:1455/auth/callback",
+              options.redirectUri ??
+              CodexOAuthRedirectUri.make("http://localhost:1455/auth/callback"),
             awaitCallback: (timeoutMillis) =>
               options.callback.pipe(
                 Effect.timeoutOption(timeoutMillis),

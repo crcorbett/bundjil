@@ -1,5 +1,7 @@
 import { Schema } from "effect";
 
+import { CodexErrorMessage } from "./contracts.js";
+
 export const CodexSubscriptionAuthOperation = Schema.Literals([
   "createAuthorizationSession",
   "bindCallback",
@@ -39,7 +41,7 @@ export class CodexSubscriptionAuthError extends Schema.TaggedErrorClass<CodexSub
   {
     operation: CodexSubscriptionAuthOperation,
     reason: CodexSubscriptionAuthFailureReason,
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
     status: Schema.optional(Schema.Int),
     providerCode: Schema.optional(Schema.NonEmptyString),
   }

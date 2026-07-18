@@ -2,11 +2,11 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
+import { CodexLocalProfileImportError } from "../src/errors.js";
 import { CodexProfileStoreEncryptedKeyValueLive } from "../src/live.layer.js";
 import {
   CodexLocalAuthCacheSource,
   CodexLocalAuthCacheSourceLive,
-  CodexLocalAuthCacheSourceMemory,
 } from "../src/local-auth-cache-source.service.js";
 import { CodexLocalProfileImportConfigService } from "../src/local-profile-import.config.js";
 import {
@@ -17,6 +17,7 @@ import { CodexOAuthProfileCipherTest } from "../src/mock.layer.js";
 import { getProfile } from "../src/profile-store.service.js";
 import {
   CodexLocalAuthFile,
+  CodexCliAuthCache,
   CodexLocalProfileImportConfig,
   CodexOAuthProfileCipherConfig,
 } from "../src/schemas.js";
@@ -67,6 +68,20 @@ const validCache = {
   },
 };
 
+const localAuthCacheSourceTest = (cache: unknown) =>
+  Layer.succeed(CodexLocalAuthCacheSource, {
+    readCache: () =>
+      Schema.decodeUnknownEffect(CodexCliAuthCache)(cache).pipe(
+        Effect.mapError(
+          () =>
+            new CodexLocalProfileImportError({
+              operation: "decodeCache",
+              message: "Unable to decode the local Codex auth cache.",
+            })
+        )
+      ),
+  });
+
 const importLayer = (cache: unknown) =>
   Effect.gen(function* makeImportLayer() {
     const config = yield* importConfig;
@@ -87,7 +102,7 @@ const importLayer = (cache: unknown) =>
             CodexLocalProfileImportConfigService,
             CodexLocalProfileImportConfigService.of(config)
           ),
-          CodexLocalAuthCacheSourceMemory(cache),
+          localAuthCacheSourceTest(cache),
           encryptedStoreLayer
         )
       )

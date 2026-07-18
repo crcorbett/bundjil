@@ -15,10 +15,13 @@ import { UpstashKeyValueStoreConfigError } from "./errors.js";
 import {
   UpstashRedisConfig,
   UpstashRedisKeyPrefix,
+  UpstashRedisRestToken,
   UpstashRedisRestUrl,
 } from "./schemas.js";
 
-export const defaultUpstashRedisKeyPrefix = "bundjil:codex-oauth:";
+export const defaultUpstashRedisKeyPrefix = UpstashRedisKeyPrefix.make(
+  "bundjil:codex-oauth:"
+);
 
 const upstashRestUrlConfig = Config.schema(
   UpstashRedisRestUrl,
@@ -26,8 +29,11 @@ const upstashRestUrlConfig = Config.schema(
 ).pipe(
   Config.orElse(() => Config.schema(UpstashRedisRestUrl, "KV_REST_API_URL"))
 );
-const upstashRestTokenConfig = Config.redacted("UPSTASH_REDIS_REST_TOKEN").pipe(
-  Config.orElse(() => Config.redacted("KV_REST_API_TOKEN"))
+const upstashRestTokenConfig = Config.schema(
+  UpstashRedisRestToken,
+  "UPSTASH_REDIS_REST_TOKEN"
+).pipe(
+  Config.orElse(() => Config.schema(UpstashRedisRestToken, "KV_REST_API_TOKEN"))
 );
 const upstashKeyPrefixConfig = Config.schema(
   UpstashRedisKeyPrefix,
@@ -40,10 +46,10 @@ export const loadUpstashRedisConfig = Effect.gen(
     const restUrl = yield* upstashRestUrlConfig;
     const restToken = yield* upstashRestTokenConfig;
 
-    return yield* Schema.decodeUnknownEffect(UpstashRedisConfig)({
+    return UpstashRedisConfig.make({
       keyPrefix,
       restUrl,
-      restToken: Redacted.value(restToken),
+      restToken,
     });
   }
 ).pipe(

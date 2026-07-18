@@ -1,18 +1,27 @@
-import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
+import {
+  CodexResponsesModelId,
+  OpenAICompatibleChatCompletionRequest,
+  OpenAICompatibleProxyInternalToken,
+} from "@bundjil/codex-oauth";
+import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import {
   Config,
   ConfigProvider,
+  Console,
   Data,
   Effect,
   Exit,
+  Layer,
   Option,
   Redacted,
   Schema,
 } from "effect";
+import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
+  CodexProxyVercelProtectionBypass,
 } from "../src/schemas.js";
 
 declare const process: {
@@ -20,21 +29,15 @@ declare const process: {
 };
 
 const previewUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
-const internalTokenConfig = Config.redacted(
+const internalTokenConfig = Config.schema(
+  OpenAICompatibleProxyInternalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
 );
 const protectionBypassConfig = Config.option(
-  Config.redacted("BUNDJIL_CODEX_PROXY_VERCEL_BYPASS")
-);
-
-const previewProofRequest = Schema.encodeSync(
-  Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
-)(
-  Schema.decodeUnknownSync(OpenAICompatibleChatCompletionRequest)({
-    messages: [{ content: "Reply only: OK.", role: "user" }],
-    model: "gpt-5.5",
-    stream: true,
-  })
+  Config.schema(
+    CodexProxyVercelProtectionBypass,
+    "BUNDJIL_CODEX_PROXY_VERCEL_BYPASS"
+  )
 );
 
 const PreviewProofResult = Schema.Struct({
@@ -76,97 +79,77 @@ const PreviewProofContract = Schema.Struct({
   unauthenticatedStatus: Schema.Literal(401),
 });
 
-const encodePreviewProofSuccess = Schema.encodeSync(
-  Schema.fromJsonString(PreviewProofSuccess)
-);
-const encodePreviewProofBlocked = Schema.encodeSync(
-  Schema.fromJsonString(PreviewProofBlocked)
-);
-
 class PreviewProofError extends Data.TaggedError("PreviewProofError")<{
   readonly cause: unknown;
   readonly operation: "assert" | "request";
   readonly result?: typeof PreviewProofResult.Type;
 }> {}
 
-const fetchResponse = (request: Request) =>
-  Effect.tryPromise({
-    catch: (cause) => new PreviewProofError({ cause, operation: "request" }),
-    try: () => fetch(request),
-  });
-
-const responseText = (response: Response) =>
-  Effect.tryPromise({
-    catch: (cause) => new PreviewProofError({ cause, operation: "request" }),
-    try: () => response.text(),
-  });
-
 const program = Effect.gen(function* provePreview() {
   const previewUrl = yield* previewUrlConfig;
   const internalToken = yield* internalTokenConfig;
   const protectionBypass = yield* protectionBypassConfig;
-  const makePreviewRequest = (
-    url: URL,
-    request: {
-      readonly authorization?: string;
-      readonly body?: string;
-      readonly method: "GET" | "POST";
-    }
-  ) => {
-    const headers = {
-      "content-type": "application/json",
-      ...(request.authorization === undefined
-        ? {}
-        : { authorization: request.authorization }),
-      ...(Option.isNone(protectionBypass)
-        ? {}
-        : {
-            "x-vercel-protection-bypass": Redacted.value(
-              protectionBypass.value
-            ),
-          }),
-    };
-
-    return new Request(url, {
-      headers,
-      method: request.method,
-      ...(request.body === undefined ? {} : { body: request.body }),
-    });
-  };
-  const health = yield* fetchResponse(
-    makePreviewRequest(new URL("/health", previewUrl), { method: "GET" })
+  const client = yield* HttpClient.HttpClient;
+  const previewProofRequest = yield* Schema.encodeEffect(
+    Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+  )(
+    OpenAICompatibleChatCompletionRequest.make({
+      messages: [{ content: "Reply only: OK.", role: "user" }],
+      model: CodexResponsesModelId.make("gpt-5.5"),
+      stream: true,
+    })
   );
-  const healthBody = yield* responseText(health);
+  const bypassHeaders = Option.isNone(protectionBypass)
+    ? {}
+    : {
+        "x-vercel-protection-bypass": Redacted.value(protectionBypass.value),
+      };
+  const health = yield* client
+    .execute(
+      HttpClientRequest.get(new URL("/health", previewUrl)).pipe(
+        HttpClientRequest.setHeaders(bypassHeaders)
+      )
+    )
+    .pipe(
+      Effect.mapError(
+        (cause) => new PreviewProofError({ cause, operation: "request" })
+      )
+    );
+  const healthBody = yield* health.text.pipe(
+    Effect.mapError(
+      (cause) => new PreviewProofError({ cause, operation: "request" })
+    )
+  );
   const healthPayload = yield* Schema.decodeUnknownEffect(
     Schema.fromJsonString(CodexProxyHealthResponse)
   )(healthBody);
   const completionsUrl = new URL("/v1/chat/completions", previewUrl);
-  const unauthenticated = yield* fetchResponse(
-    makePreviewRequest(completionsUrl, {
-      body: previewProofRequest,
-      method: "POST",
-    })
-  );
-  const invalid = yield* fetchResponse(
-    makePreviewRequest(completionsUrl, {
-      authorization: "Bearer preview-proof-invalid",
-      body: previewProofRequest,
-      method: "POST",
-    })
-  );
-  const authenticated = yield* fetchResponse(
-    makePreviewRequest(completionsUrl, {
-      authorization: `Bearer ${Redacted.value(internalToken)}`,
-      body: previewProofRequest,
-      method: "POST",
-    })
-  );
-  const authenticatedBody = yield* responseText(authenticated);
+  const post = (authorization?: string) =>
+    client
+      .execute(
+        HttpClientRequest.post(completionsUrl).pipe(
+          HttpClientRequest.setHeaders({
+            "content-type": "application/json",
+            ...bypassHeaders,
+            ...(authorization === undefined ? {} : { authorization }),
+          }),
+          HttpClientRequest.bodyText(previewProofRequest, "application/json")
+        )
+      )
+      .pipe(
+        Effect.mapError(
+          (cause) => new PreviewProofError({ cause, operation: "request" })
+        )
+      );
+  const unauthenticated = yield* post();
+  const invalid = yield* post("Bearer preview-proof-invalid");
+  const authenticated = yield* post(`Bearer ${Redacted.value(internalToken)}`);
+  const authenticatedBody = yield* authenticated.text;
   const dataLines = authenticatedBody
     .split("\n")
     .filter((line) => line.startsWith("data: "));
-  const unauthorizedBody = yield* responseText(unauthenticated);
-  const invalidBody = yield* responseText(invalid);
+  const unauthorizedBody = yield* unauthenticated.text;
+  const invalidBody = yield* invalid.text;
   const decodeError = Schema.decodeUnknownEffect(
     Schema.fromJsonString(CodexProxyErrorResponse)
   );
@@ -185,8 +168,7 @@ const program = Effect.gen(function* provePreview() {
     invalidTokenStatus: invalid.status,
     rawPayloadLeak: authenticatedBody.includes("Reply only: OK."),
     streamContentTypeSse:
-      authenticated.headers
-        .get("content-type")
+      authenticated.headers["content-type"]
         ?.split(";", 1)[0]
         ?.trim()
         .toLowerCase() === "text/event-stream",
@@ -211,18 +193,37 @@ const program = Effect.gen(function* provePreview() {
   );
 
   return result;
-}).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));
+}).pipe(
+  Effect.provide(
+    Layer.merge(
+      BunHttpClient.layer,
+      ConfigProvider.layer(ConfigProvider.fromEnv())
+    )
+  )
+);
 
-const exit = await Effect.runPromiseExit(program);
+const main = Effect.gen(function* renderPreviewProof() {
+  const exit = yield* Effect.exit(program);
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodePreviewProofSuccess({
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(PreviewProofSuccess)
+    )({
       result: exit.value,
       status: "proved",
-    })
-  );
-} else {
-  console.error(encodePreviewProofBlocked({ status: "blocked" }));
-  process.exitCode = 1;
-}
+    });
+    return yield* Console.log(output);
+  }
+
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(PreviewProofBlocked)
+  )({
+    status: "blocked",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

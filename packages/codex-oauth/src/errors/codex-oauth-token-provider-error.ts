@@ -1,12 +1,12 @@
 import { Schema } from "effect";
 
-import { CodexOAuthClientOperation } from "./contracts.js";
+import { CodexErrorMessage, CodexOAuthClientOperation } from "./contracts.js";
 
 export class CodexOAuthTokenProviderError extends Schema.TaggedErrorClass<CodexOAuthTokenProviderError>()(
   "CodexOAuthTokenProviderError",
   {
     operation: CodexOAuthClientOperation,
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
     cause: Schema.Defect,
   }
 ) {}

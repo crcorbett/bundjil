@@ -2,8 +2,10 @@ import {
   CodexOAuthPrincipalId,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
+  CodexOAuthAccountId,
   CodexOAuthProfileId,
   CodexOAuthSubject,
+  OpenAICompatibleProxyInternalToken,
 } from "@bundjil/codex-oauth";
 import {
   Config,
@@ -22,6 +24,7 @@ import {
   CodexProxyLocalProfileStoreDirectory,
   CodexProxyMode,
   CodexProxyRuntimeConfig,
+  CodexProxyVercelRuntimeMarker,
 } from "./schemas.js";
 import type {
   CodexProxyDevServerConfig as CodexProxyDevServerConfigType,
@@ -33,7 +36,8 @@ const proxyModeConfig = Config.schema(
   "BUNDJIL_CODEX_PROXY_MODE"
 ).pipe(Config.withDefault("mock"));
 
-const internalTokenConfig = Config.redacted(
+const internalTokenConfig = Config.schema(
+  OpenAICompatibleProxyInternalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
 );
 
@@ -58,7 +62,7 @@ const subjectPrincipalIdConfig = Config.schema(
 ).pipe(Config.withDefault("default"));
 
 const accountIdConfig = Config.option(
-  Config.redacted("BUNDJIL_CODEX_ACCOUNT_ID")
+  Config.schema(CodexOAuthAccountId, "BUNDJIL_CODEX_ACCOUNT_ID")
 );
 
 const localProfileStoreDirectoryConfig = Config.option(
@@ -69,55 +73,55 @@ const localProfileStoreDirectoryConfig = Config.option(
 );
 
 const vercelRuntimeMarkerConfig = Config.option(
-  Config.nonEmptyString("VERCEL")
+  Config.schema(CodexProxyVercelRuntimeMarker, "VERCEL")
 );
 
 const portConfig = Config.port("PORT").pipe(Config.withDefault(8787));
 
-const SchemaDecode = {
-  codexOAuthSubject: (input: unknown) =>
-    CodexOAuthSubject.pipe(Schema.decodeUnknownEffect)(input).pipe(
-      Effect.mapError(
-        (cause) =>
-          new CodexProxyRouteError({
-            boundary: "CodexProxyRuntimeConfig",
-            cause,
-            code: "bad_request",
-            message: "Unable to decode Codex proxy OAuth subject config.",
-            responseMessage: "The Codex proxy config is invalid.",
-            status: 400,
-          })
-      )
-    ),
-  codexProxyDevServerConfig: (input: unknown) =>
-    CodexProxyDevServerConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
-      Effect.mapError(
-        (cause) =>
-          new CodexProxyRouteError({
-            boundary: "CodexProxyRuntimeConfig",
-            cause,
-            code: "bad_request",
-            message: "Unable to decode Codex proxy dev server config.",
-            responseMessage: "The Codex proxy config is invalid.",
-            status: 400,
-          })
-      )
-    ),
-  codexProxyRuntimeConfig: (input: unknown) =>
-    CodexProxyRuntimeConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
-      Effect.mapError(
-        (cause) =>
-          new CodexProxyRouteError({
-            boundary: "CodexProxyRuntimeConfig",
-            cause,
-            code: "bad_request",
-            message: "Unable to decode Codex proxy runtime config.",
-            responseMessage: "The Codex proxy config is invalid.",
-            status: 400,
-          })
-      )
-    ),
-} as const;
+const decodeCodexOAuthSubject = (input: unknown) =>
+  CodexOAuthSubject.pipe(Schema.decodeUnknownEffect)(input).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexProxyRouteError({
+          boundary: "CodexProxyRuntimeConfig",
+          cause,
+          code: "bad_request",
+          message: "Unable to decode Codex proxy OAuth subject config.",
+          responseMessage: "The Codex proxy config is invalid.",
+          status: 400,
+        })
+    )
+  );
+
+const decodeCodexProxyDevServerConfig = (input: unknown) =>
+  CodexProxyDevServerConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexProxyRouteError({
+          boundary: "CodexProxyRuntimeConfig",
+          cause,
+          code: "bad_request",
+          message: "Unable to decode Codex proxy dev server config.",
+          responseMessage: "The Codex proxy config is invalid.",
+          status: 400,
+        })
+    )
+  );
+
+const decodeCodexProxyRuntimeConfig = (input: unknown) =>
+  CodexProxyRuntimeConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
+    Effect.mapError(
+      (cause) =>
+        new CodexProxyRouteError({
+          boundary: "CodexProxyRuntimeConfig",
+          cause,
+          code: "bad_request",
+          message: "Unable to decode Codex proxy runtime config.",
+          responseMessage: "The Codex proxy config is invalid.",
+          status: 400,
+        })
+    )
+  );
 
 export class CodexProxyConfig extends Context.Service<
   CodexProxyConfig,
@@ -135,7 +139,7 @@ export const loadCodexProxyConfig = Effect.gen(
     const accountId = yield* accountIdConfig;
     const localProfileStoreDirectory = yield* localProfileStoreDirectoryConfig;
     const vercelRuntimeMarker = yield* vercelRuntimeMarkerConfig;
-    const subject = yield* SchemaDecode.codexOAuthSubject({
+    const subject = yield* decodeCodexOAuthSubject({
       connectorId,
       installationId,
       principal: {
@@ -147,7 +151,7 @@ export const loadCodexProxyConfig = Effect.gen(
       provider: "codex",
     });
 
-    const config = yield* SchemaDecode.codexProxyRuntimeConfig({
+    const config = yield* decodeCodexProxyRuntimeConfig({
       mode,
       internalToken: Redacted.value(internalToken),
       subject,
@@ -195,7 +199,7 @@ export const loadCodexProxyDevServerConfig = Effect.gen(
   function* loadCodexProxyDevServerConfigFromProvider() {
     const port = yield* portConfig;
 
-    return yield* SchemaDecode.codexProxyDevServerConfig({ port });
+    return yield* decodeCodexProxyDevServerConfig({ port });
   }
 ).pipe(Effect.withSpan("CodexProxyDevServerConfig.load"));
 
@@ -213,6 +217,6 @@ export const CodexProxyConfigLayer = (config: CodexProxyRuntimeConfigType) =>
   Layer.succeed(CodexProxyConfig, config);
 
 export const makeCodexProxyConfig = (input: unknown) =>
-  SchemaDecode.codexProxyRuntimeConfig(input);
+  decodeCodexProxyRuntimeConfig(input);
 
 export type { CodexProxyDevServerConfigType, CodexProxyRuntimeConfigType };

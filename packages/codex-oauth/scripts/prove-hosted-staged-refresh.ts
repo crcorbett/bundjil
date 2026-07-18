@@ -1,5 +1,7 @@
+import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import {
   Clock,
+  Console,
   Config,
   ConfigProvider,
   Data,
@@ -9,6 +11,7 @@ import {
   Redacted,
   Schema,
 } from "effect";
+import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import { CodexOAuthProfileCommit } from "../src/commit.service.js";
 import { CodexSubscriptionAuthError } from "../src/errors.js";
@@ -21,6 +24,8 @@ import {
 import { generateCodexOAuthCredentialRevision } from "../src/profile-cipher.service.js";
 import { CodexProfileStore } from "../src/profile-store.service.js";
 import {
+  OpenAICompatibleProxyInternalToken,
+  CodexResponsesModelId,
   CodexSubscriptionProfile,
   OpenAICompatibleChatCompletionRequest,
 } from "../src/schemas.js";
@@ -35,7 +40,8 @@ declare const process: {
 };
 
 const previewUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
-const internalTokenConfig = Config.redacted(
+const internalTokenConfig = Config.schema(
+  OpenAICompatibleProxyInternalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
 );
 
@@ -57,16 +63,6 @@ const loginConfigLayer = CodexSubscriptionLoginConfigLive.pipe(
   Layer.provide(configProviderLayer)
 );
 
-const requestBody = Schema.encodeSync(
-  Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
-)(
-  Schema.decodeUnknownSync(OpenAICompatibleChatCompletionRequest)({
-    messages: [{ content: "Reply only: OK.", role: "user" }],
-    model: "gpt-5.5",
-    stream: true,
-  })
-);
-
 const HostedStagedRefreshProof = Schema.Struct({
   concurrentAuthenticatedSuccess: Schema.Boolean,
   finalExpiryValid: Schema.Boolean,
@@ -86,35 +82,26 @@ const HostedStagedRefreshProofBlocked = Schema.Struct({
   status: Schema.Literal("blocked"),
 });
 
-const encodeProofSuccess = Schema.encodeSync(
-  Schema.fromJsonString(HostedStagedRefreshProofSuccess)
-);
-const encodeProofBlocked = Schema.encodeSync(
-  Schema.fromJsonString(HostedStagedRefreshProofBlocked)
-);
-
 class HostedProofRequestError extends Data.TaggedError(
   "HostedProofRequestError"
 )<{ readonly cause: unknown }> {}
-
-const fetchResponse = (request: Request) =>
-  Effect.tryPromise({
-    catch: (cause) => new HostedProofRequestError({ cause }),
-    try: () => fetch(request),
-  });
-
-const readResponse = (response: Response) =>
-  Effect.tryPromise({
-    catch: (cause) => new HostedProofRequestError({ cause }),
-    try: () => response.text(),
-  });
 
 const program = Effect.gen(function* proveHostedStagedRefresh() {
   const input = yield* CodexSubscriptionLoginConfigService;
   const previewUrl = yield* previewUrlConfig;
   const internalToken = yield* internalTokenConfig;
+  const requestBody = yield* Schema.encodeEffect(
+    Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+  )(
+    OpenAICompatibleChatCompletionRequest.make({
+      messages: [{ content: "Reply only: OK.", role: "user" }],
+      model: CodexResponsesModelId.make("gpt-5.5"),
+      stream: true,
+    })
+  );
   const store = yield* CodexProfileStore;
   const commit = yield* CodexOAuthProfileCommit;
+  const client = yield* HttpClient.HttpClient;
   const profile = yield* store.getProfile(input.subject);
 
   if (profile.profileKind !== "subscription") {
@@ -127,15 +114,13 @@ const program = Effect.gen(function* proveHostedStagedRefresh() {
 
   const now = yield* Clock.currentTimeMillis;
   const stagedRevision = yield* generateCodexOAuthCredentialRevision();
-  const stagedProfile = yield* Schema.decodeUnknownEffect(
-    CodexSubscriptionProfile
-  )({
+  const stagedProfile = CodexSubscriptionProfile.make({
     ...profile,
-    accessToken: Redacted.value(profile.accessToken),
-    accountId: Redacted.value(profile.accountId),
+    accessToken: profile.accessToken,
+    accountId: profile.accountId,
     credentialRevision: stagedRevision,
     expiresAtEpochMillis: now - 1,
-    refreshToken: Redacted.value(profile.refreshToken),
+    refreshToken: profile.refreshToken,
     updatedAtEpochMillis: now,
   });
 
@@ -145,22 +130,27 @@ const program = Effect.gen(function* proveHostedStagedRefresh() {
   });
 
   const completionUrl = new URL("/v1/chat/completions", previewUrl);
-  const request = () =>
-    new Request(completionUrl, {
-      body: requestBody,
-      headers: {
-        authorization: `Bearer ${Redacted.value(internalToken)}`,
-        "content-type": "application/json",
-      },
-      method: "POST",
-    });
+  const request = HttpClientRequest.post(completionUrl).pipe(
+    HttpClientRequest.setHeaders({
+      authorization: `Bearer ${Redacted.value(internalToken)}`,
+      "content-type": "application/json",
+    }),
+    HttpClientRequest.bodyText(requestBody, "application/json")
+  );
   const responses = yield* Effect.all(
-    [fetchResponse(request()), fetchResponse(request())],
+    [client.execute(request), client.execute(request)].map((response) =>
+      response.pipe(
+        Effect.mapError((cause) => new HostedProofRequestError({ cause }))
+      )
+    ),
     { concurrency: "unbounded" }
   );
-  const bodies = yield* Effect.all(responses.map(readResponse), {
-    concurrency: "unbounded",
-  });
+  const bodies = yield* Effect.all(
+    responses.map((response) => response.text),
+    {
+      concurrency: "unbounded",
+    }
+  );
   const finalProfile = yield* store.getProfile(input.subject);
   const after = yield* Clock.currentTimeMillis;
 
@@ -174,7 +164,7 @@ const program = Effect.gen(function* proveHostedStagedRefresh() {
       finalProfile.profileKind === "subscription" &&
       finalProfile.credentialRevision !== stagedRevision,
     responsesAreSse: responses.every(
-      (response) => response.headers.get("content-type") === "text/event-stream"
+      (response) => response.headers["content-type"] === "text/event-stream"
     ),
     responsesComplete: bodies.every((body) => body.includes("data: [DONE]")),
     stagedExpiry: stagedProfile.expiresAtEpochMillis <= now,
@@ -185,21 +175,29 @@ const program = Effect.gen(function* proveHostedStagedRefresh() {
       profileStoreLayer,
       profileCommitLayer,
       loginConfigLayer,
-      ConfigProvider.layer(ConfigProvider.fromEnv())
+      ConfigProvider.layer(ConfigProvider.fromEnv()),
+      BunHttpClient.layer
     )
   )
 );
 
-const exit = await Effect.runPromiseExit(program);
+const main = Effect.gen(function* renderHostedStagedRefreshProof() {
+  const exit = yield* Effect.exit(program);
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeProofSuccess({
-      result: exit.value,
-      status: "proved",
-    })
-  );
-} else {
-  console.error(encodeProofBlocked({ status: "blocked" }));
-  process.exitCode = 1;
-}
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(HostedStagedRefreshProofSuccess)
+    )({ result: exit.value, status: "proved" });
+    return yield* Console.log(output);
+  }
+
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(HostedStagedRefreshProofBlocked)
+  )({ status: "blocked" });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

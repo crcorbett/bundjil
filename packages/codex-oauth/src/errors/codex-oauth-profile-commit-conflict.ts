@@ -5,6 +5,7 @@ import {
   CodexOAuthProfileId,
   CodexOAuthSubjectHash,
 } from "../schemas.js";
+import { CodexErrorMessage } from "./contracts.js";
 
 export class CodexOAuthProfileCommitConflict extends Schema.TaggedErrorClass<CodexOAuthProfileCommitConflict>()(
   "CodexOAuthProfileCommitConflict",
@@ -12,6 +13,6 @@ export class CodexOAuthProfileCommitConflict extends Schema.TaggedErrorClass<Cod
     operation: CodexOAuthProfileCommitOperation,
     profileId: CodexOAuthProfileId,
     subjectHash: CodexOAuthSubjectHash,
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
   }
 ) {}

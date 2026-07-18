@@ -214,43 +214,39 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
             message: "Unable to decrypt the Codex OAuth profile.",
           }),
       });
-      const profile = yield* Effect.gen(function* decodeProfile() {
-        const plaintextJson = new TextDecoder().decode(plaintext);
-
-        if (encryptedProfile.version === 2) {
-          return yield* Schema.decodeUnknownEffect(codexOAuthProfileJson)(
-            plaintextJson
-          ).pipe(
-            Effect.mapError(
-              () =>
-                new CodexOAuthProfileCipherError({
-                  operation: "decode",
-                  keyId: encryptedProfile.keyId,
-                  version: encryptedProfile.version,
-                  message:
-                    "Unable to decode the decrypted Codex OAuth profile.",
-                })
+      const plaintextJson = new TextDecoder().decode(plaintext);
+      const profile =
+        encryptedProfile.version === 2
+          ? yield* Schema.decodeUnknownEffect(codexOAuthProfileJson)(
+              plaintextJson
+            ).pipe(
+              Effect.mapError(
+                () =>
+                  new CodexOAuthProfileCipherError({
+                    operation: "decode",
+                    keyId: encryptedProfile.keyId,
+                    version: encryptedProfile.version,
+                    message:
+                      "Unable to decode the decrypted Codex OAuth profile.",
+                  })
+              )
             )
-          );
-        }
-
-        const legacyProfile = yield* Schema.decodeUnknownEffect(
-          legacyCodexOAuthProfileJson
-        )(plaintextJson).pipe(
-          Effect.mapError(
-            () =>
-              new CodexOAuthProfileCipherError({
-                operation: "decode",
-                keyId: encryptedProfile.keyId,
-                version: encryptedProfile.version,
-                message:
-                  "Unable to decode the legacy decrypted Codex OAuth profile.",
-              })
-          )
-        );
-
-        return migrateLegacyCodexOAuthProfile(legacyProfile);
-      });
+          : migrateLegacyCodexOAuthProfile(
+              yield* Schema.decodeUnknownEffect(legacyCodexOAuthProfileJson)(
+                plaintextJson
+              ).pipe(
+                Effect.mapError(
+                  () =>
+                    new CodexOAuthProfileCipherError({
+                      operation: "decode",
+                      keyId: encryptedProfile.keyId,
+                      version: encryptedProfile.version,
+                      message:
+                        "Unable to decode the legacy decrypted Codex OAuth profile.",
+                    })
+                )
+              )
+            );
       const subjectHash = yield* codexOAuthProfileSubjectHash(
         profile.subject
       ).pipe(

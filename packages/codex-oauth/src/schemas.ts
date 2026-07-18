@@ -124,6 +124,37 @@ export const CodexLocalAuthFile = Schema.NonEmptyString.pipe(
 );
 export type CodexLocalAuthFile = typeof CodexLocalAuthFile.Type;
 
+export const CodexFileSystemDirectory = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexFileSystemDirectory")
+);
+export type CodexFileSystemDirectory = typeof CodexFileSystemDirectory.Type;
+
+export const CodexRuntimePlatform = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexRuntimePlatform")
+);
+export type CodexRuntimePlatform = typeof CodexRuntimePlatform.Type;
+
+export const CodexOAuthCallbackRequestMethod = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCallbackRequestMethod")
+);
+export type CodexOAuthCallbackRequestMethod =
+  typeof CodexOAuthCallbackRequestMethod.Type;
+
+export const CodexOAuthCallbackRequestUrl = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCallbackRequestUrl")
+);
+export type CodexOAuthCallbackRequestUrl =
+  typeof CodexOAuthCallbackRequestUrl.Type;
+
+export const CodexOAuthCallbackPath = Schema.Literal("/auth/callback");
+export type CodexOAuthCallbackPath = typeof CodexOAuthCallbackPath.Type;
+
+export const CodexOAuthCallbackRequest = Schema.Struct({
+  method: CodexOAuthCallbackRequestMethod,
+  requestUrl: CodexOAuthCallbackRequestUrl,
+});
+export type CodexOAuthCallbackRequest = typeof CodexOAuthCallbackRequest.Type;
+
 export const CodexSubscriptionAuthorizationEndpoint =
   Schema.NonEmptyString.pipe(
     Schema.brand("CodexSubscriptionAuthorizationEndpoint")
@@ -258,10 +289,14 @@ export const CodexCliAuthCache = Schema.Struct({
   last_refresh: Schema.DateFromString,
   tokens: Schema.Struct({
     access_token: CodexOAuthAccessToken,
+    refresh_token: Schema.optional(CodexOAuthRefreshToken),
+    id_token: Schema.optional(CodexOAuthIdToken),
+    account_id: Schema.optional(CodexOAuthAccountId),
   }),
 });
 
 export type CodexCliAuthCache = typeof CodexCliAuthCache.Type;
+export type CodexCliAuthCacheEncoded = typeof CodexCliAuthCache.Encoded;
 
 export const CodexLocalProfileImportConfig = Schema.Struct({
   localAuthFile: CodexLocalAuthFile,
@@ -555,15 +590,24 @@ export const CodexOAuthRefreshTransportInput = Schema.Struct({
 export type CodexOAuthRefreshTransportInput =
   typeof CodexOAuthRefreshTransportInput.Type;
 
+export const CodexOAuthProviderErrorCode = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthProviderErrorCode")
+);
+export type CodexOAuthProviderErrorCode =
+  typeof CodexOAuthProviderErrorCode.Type;
+
+export const CodexOAuthProviderErrorDescription = Schema.NonEmptyString;
+export const CodexOAuthProviderErrorMessage = Schema.NonEmptyString;
+
 export const CodexOAuthProviderErrorResponse = Schema.Union([
   Schema.Struct({
-    error: Schema.NonEmptyString,
-    error_description: Schema.optional(Schema.NonEmptyString),
+    error: CodexOAuthProviderErrorCode,
+    error_description: Schema.optional(CodexOAuthProviderErrorDescription),
   }),
   Schema.Struct({
     error: Schema.Struct({
-      code: Schema.optional(Schema.NonEmptyString),
-      message: Schema.optional(Schema.NonEmptyString),
+      code: Schema.optional(CodexOAuthProviderErrorCode),
+      message: Schema.optional(CodexOAuthProviderErrorMessage),
     }),
   }),
 ]);
@@ -708,6 +752,7 @@ export const CodexResponsesRecognizedStreamEventType = Schema.Literals([
   "response.output_text.delta",
   "response.output_item.added",
   "response.function_call_arguments.delta",
+  "response.completed",
 ]);
 export type CodexResponsesRecognizedStreamEventType =
   typeof CodexResponsesRecognizedStreamEventType.Type;

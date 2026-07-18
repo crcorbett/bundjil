@@ -11,6 +11,7 @@ import {
 import { CodexLocalProfileImportError } from "./errors.js";
 import {
   CodexLocalAuthFile,
+  CodexFileSystemDirectory,
   CodexLocalProfileImportConfig,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
@@ -23,7 +24,9 @@ const localAuthFileConfig = Config.option(
   Config.schema(CodexLocalAuthFile, "BUNDJIL_CODEX_LOCAL_AUTH_FILE")
 );
 
-const homeDirectoryConfig = Config.option(Config.nonEmptyString("HOME"));
+const homeDirectoryConfig = Config.option(
+  Config.schema(CodexFileSystemDirectory, "HOME")
+);
 
 const principalIdConfig = Config.schema(
   CodexOAuthPrincipalId,

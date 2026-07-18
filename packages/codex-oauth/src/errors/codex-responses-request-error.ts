@@ -1,12 +1,15 @@
 import { Schema } from "effect";
 
-import { CodexResponsesSchemaBoundary } from "./contracts.js";
+import {
+  CodexErrorMessage,
+  CodexResponsesSchemaBoundary,
+} from "./contracts.js";
 
 export class CodexResponsesRequestError extends Schema.TaggedErrorClass<CodexResponsesRequestError>()(
   "CodexResponsesRequestError",
   {
     boundary: CodexResponsesSchemaBoundary,
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
     cause: Schema.Defect,
   }
 ) {}

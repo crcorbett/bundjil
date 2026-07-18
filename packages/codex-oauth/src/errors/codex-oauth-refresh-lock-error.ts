@@ -2,6 +2,7 @@ import { Schema } from "effect";
 
 import { CodexOAuthSubjectHash } from "../schemas.js";
 import {
+  CodexErrorMessage,
   CodexOAuthRefreshLockFailureReason,
   CodexOAuthRefreshLockOperation,
 } from "./contracts.js";
@@ -16,7 +17,7 @@ export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAu
       Schema.Number.check(Schema.isFinite())
     ),
     nowEpochMillis: Schema.optional(Schema.Number.check(Schema.isFinite())),
-    message: Schema.NonEmptyString,
+    message: CodexErrorMessage,
     cause: Schema.optional(Schema.Defect),
   }
 ) {}

@@ -1,5 +1,9 @@
 import { Schema } from "effect";
 
+export const CodexErrorMessage = Schema.NonEmptyString;
+export const CodexHttpStatusText = Schema.String;
+export const CodexHttpContentType = Schema.String;
+
 export const CodexOAuthProfileSchemaBoundary = Schema.Literals([
   "CodexOAuthProfile",
   "CodexAccessTokenImportProfile",

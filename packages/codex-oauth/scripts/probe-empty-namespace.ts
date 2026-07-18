@@ -1,4 +1,4 @@
-import { Effect, Exit, Schema } from "effect";
+import { Console, Effect, Exit, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import { CodexUpstashPersistenceLive } from "../src/upstash-persistence.layer.js";
@@ -15,13 +15,6 @@ const NamespaceProbeBlockedOutput = Schema.Struct({
   status: Schema.Literal("blocked"),
 });
 
-const encodeNamespaceProbeOutput = Schema.encodeSync(
-  Schema.fromJsonString(NamespaceProbeOutput)
-);
-const encodeNamespaceProbeBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(NamespaceProbeBlockedOutput)
-);
-
 const program = Effect.gen(function* probeEmptyNamespace() {
   const keyValueStore = yield* KeyValueStore.KeyValueStore;
 
@@ -30,11 +23,25 @@ const program = Effect.gen(function* probeEmptyNamespace() {
   });
 }).pipe(Effect.provide(CodexUpstashPersistenceLive));
 
-const exit = await Effect.runPromiseExit(program);
+const main = Effect.gen(function* renderNamespaceProbe() {
+  const exit = yield* Effect.exit(program);
 
-if (Exit.isSuccess(exit)) {
-  console.log(encodeNamespaceProbeOutput(exit.value));
-} else {
-  console.error(encodeNamespaceProbeBlockedOutput({ status: "blocked" }));
-  process.exitCode = 1;
-}
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(NamespaceProbeOutput)
+    )(exit.value);
+    return yield* Console.log(output);
+  }
+
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(NamespaceProbeBlockedOutput)
+  )({
+    status: "blocked",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

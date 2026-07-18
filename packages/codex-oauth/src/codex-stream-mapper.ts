@@ -250,6 +250,7 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
                     return yield* Effect.void;
                   })
                 ),
+                Match.when("response.completed", () => Effect.void),
                 Match.exhaustive
               ),
           });

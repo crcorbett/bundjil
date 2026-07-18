@@ -27,7 +27,7 @@
 
 - Status: Completed
 - Subagent: Rawls (`019f75f4-f967-7923-bb06-d4854be00466`)
-- Commit: `337762d`
+- Commit: `55ca64f`
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
@@ -65,24 +65,43 @@
 
 ## Task 2 - Migrate Codex Boundaries End To End
 
-- Status: In progress
+- Status: Completed
 - Subagent: Halley (`019f7621-76df-75b0-a2f0-99b65fdd614b`)
-- Commit: pending
+- Commit: recorded by the Task 2 commit
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: `@bundjil/codex-oauth` owns OAuth, profile, filesystem, provider
+  HTTP, SSE, and tagged-error contracts. `apps/codex-proxy` retains one exact
+  host-facing unknown config adapter. Requests now flow from decoded Codex
+  contracts through Effect `HttpClientRequest` and `HttpClient`, while
+  responses are decoded before domain use. All Codex-specific registry entries
+  were removed; no raw provider value crosses a service boundary.
 
 ### Parent Audit Pass 2 - Effect And Implementation Quality
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Reviewed the complete Codex and proxy diff. Semantic paths,
+  runtime platforms, callback request fields, provider codes, config values,
+  and errors use owner Schemas. Operator scripts have one
+  `Effect.runPromise` entrypoint, the profile cipher is flat, and decoded
+  `response.completed` events use `Match`. Production and operator scans found
+  no sync Schema codec, global fetch, direct JSON API, unsafe cast, nested
+  generator, DTO mirror, or new helper/common/utils module.
 
 ### Parent Audit Pass 3 - Verification And Evidence
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: `bun --env-file=apps/agent/.env.preview.local run verification`
+  passed the boundary audit, 23 audit fixtures, Effect language-service setup,
+  ten-surface skill policy, Ultracite, Knip, seven workspace typechecks, 103
+  OAuth tests, 24 proxy tests, 60 agent tests, and all other workspace tests.
+  Package builds and a direct non-secret gateway-configured Eve build passed.
+  The proxy smoke test returned health 200, stream 200, and five SSE lines.
+  `git diff --check` and task-ledger JSON parsing passed. The preview env file's
+  intentionally redacted proxy URL cannot be used for a standalone Codex-mode
+  build, so no secret or live provider state was read or changed.
 
 ## Task 3 - Migrate Channel, Proxy, Config, And Persistence Boundaries
 

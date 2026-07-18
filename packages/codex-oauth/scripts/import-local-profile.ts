@@ -1,4 +1,4 @@
-import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
+import { ConfigProvider, Console, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   CodexOAuthProfileCipherConfigLive,
@@ -51,27 +51,30 @@ const ImportBlockedOutput = Schema.Struct({
   message: Schema.NonEmptyString,
 });
 
-const encodeImportSuccessOutput = Schema.encodeSync(
-  Schema.fromJsonString(ImportSuccessOutput)
-);
+const main = Effect.gen(function* renderImportLocalProfile() {
+  const exit = yield* Effect.exit(program);
 
-const encodeImportBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(ImportBlockedOutput)
-);
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ImportSuccessOutput)
+    )({
+      status: "imported",
+      result: exit.value,
+    });
+    return yield* Console.log(output);
+  }
 
-const exit = await Effect.runPromiseExit(program);
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ImportBlockedOutput)
+  )({
+    status: "blocked",
+    message:
+      "Codex local profile import requires valid local config, encrypted storage configuration, and a fresh ChatGPT-mode Codex login. No cache path, account id, token, or cache contents were printed.",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeImportSuccessOutput({ status: "imported", result: exit.value })
-  );
-} else {
-  console.error(
-    encodeImportBlockedOutput({
-      status: "blocked",
-      message:
-        "Codex local profile import requires valid local config, encrypted storage configuration, and a fresh ChatGPT-mode Codex login. No cache path, account id, token, or cache contents were printed.",
-    })
-  );
-  process.exitCode = 1;
-}
+await Effect.runPromise(main);

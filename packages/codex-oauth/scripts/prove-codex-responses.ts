@@ -1,6 +1,6 @@
 import process from "node:process";
 
-import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
+import { ConfigProvider, Console, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   CodexResponsesProofResult,
@@ -32,30 +32,30 @@ const ProofBlockedOutput = Schema.Struct({
   message: Schema.String,
 });
 
-const encodeProofSuccessOutput = Schema.encodeSync(
-  Schema.fromJsonString(ProofSuccessOutput)
-);
+const main = Effect.gen(function* renderCodexResponsesProof() {
+  const exit = yield* Effect.exit(program);
 
-const encodeProofBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(ProofBlockedOutput)
-);
-
-const exit = await Effect.runPromiseExit(program);
-
-if (Exit.isSuccess(exit)) {
-  process.stdout.write(
-    `${encodeProofSuccessOutput({
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ProofSuccessOutput)
+    )({
       status: "proved",
       result: exit.value,
-    })}\n`
-  );
-} else {
-  process.stderr.write(
-    `${encodeProofBlockedOutput({
-      status: "blocked",
-      message:
-        "Codex Responses live proof requires CODEX_ACCESS_TOKEN and a working subscription-backed Codex endpoint. No token, prompt, authorization code, or response body was printed.",
-    })}\n`
-  );
-  process.exitCode = 1;
-}
+    });
+    return yield* Console.log(output);
+  }
+
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ProofBlockedOutput)
+  )({
+    status: "blocked",
+    message:
+      "Codex Responses live proof requires CODEX_ACCESS_TOKEN and a working subscription-backed Codex endpoint. No token, prompt, authorization code, or response body was printed.",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

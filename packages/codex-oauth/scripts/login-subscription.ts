@@ -1,6 +1,6 @@
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
+import { ConfigProvider, Console, Effect, Exit, Layer, Schema } from "effect";
 
 import { CodexBrowserLauncherCommandLive } from "../src/browser-launcher.service.js";
 import {
@@ -83,27 +83,30 @@ const LoginBlockedOutput = Schema.Struct({
   message: Schema.NonEmptyString,
 });
 
-const encodeLoginSuccessOutput = Schema.encodeSync(
-  Schema.fromJsonString(LoginSuccessOutput)
-);
+const main = Effect.gen(function* renderSubscriptionLogin() {
+  const exit = yield* Effect.exit(program);
 
-const encodeLoginBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(LoginBlockedOutput)
-);
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(LoginSuccessOutput)
+    )({
+      status: "stored",
+      result: exit.value,
+    });
+    return yield* Console.log(output);
+  }
 
-const exit = await Effect.runPromiseExit(program);
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(LoginBlockedOutput)
+  )({
+    status: "blocked",
+    message:
+      "Codex subscription login did not complete. No callback URL, authorization code, OAuth state, verifier, token, account identifier, or provider response was printed.",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeLoginSuccessOutput({ status: "stored", result: exit.value })
-  );
-} else {
-  console.error(
-    encodeLoginBlockedOutput({
-      status: "blocked",
-      message:
-        "Codex subscription login did not complete. No callback URL, authorization code, OAuth state, verifier, token, account identifier, or provider response was printed.",
-    })
-  );
-  process.exitCode = 1;
-}
+await Effect.runPromise(main);

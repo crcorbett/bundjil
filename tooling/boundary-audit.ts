@@ -257,9 +257,18 @@ const isEncodedExpression = (
     return isEncodedExpression(checker, node.expression, seen);
   }
   if (ts.isYieldExpression(node) && node.expression !== undefined) {
+    if (!ts.isCallExpression(node.expression)) {
+      return false;
+    }
+    if (rootCallName(node.expression) === "Schema.encodeEffect") {
+      return true;
+    }
     return (
-      ts.isCallExpression(node.expression) &&
-      rootCallName(node.expression) === "Schema.encodeEffect"
+      ts.isPropertyAccessExpression(node.expression.expression) &&
+      node.expression.expression.name.text === "pipe" &&
+      ts.isCallExpression(node.expression.expression.expression) &&
+      rootCallName(node.expression.expression.expression) ===
+        "Schema.encodeEffect"
     );
   }
   if (!ts.isIdentifier(node)) {
@@ -295,7 +304,10 @@ const rawOutboundArgument = (
   if (name !== "HttpClientRequest.bodyText" && name !== "KeyValueStore.set") {
     return null;
   }
-  const value = node.arguments.at(-1);
+  const value =
+    name === "HttpClientRequest.bodyText"
+      ? node.arguments[0]
+      : node.arguments.at(-1);
   if (
     value === undefined ||
     isEncodedExpression(checker, value) ||

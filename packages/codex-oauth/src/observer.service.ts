@@ -9,7 +9,7 @@ import type {
   CodexOAuthObserverSnapshot as CodexOAuthObserverSnapshotType,
 } from "./schemas.js";
 
-const emptySnapshot = Schema.decodeUnknownSync(CodexOAuthObserverSnapshot)({
+const emptySnapshot = CodexOAuthObserverSnapshot.make({
   counters: {
     refreshStarted: 0,
     refreshSucceeded: 0,
