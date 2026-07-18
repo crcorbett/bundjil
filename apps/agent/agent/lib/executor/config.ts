@@ -7,12 +7,16 @@ export const ExecutorConnectionConfigOperation = Schema.Literals([
 
 export const ExecutorElicitationMode = Schema.Literals(["model", "browser"]);
 
+export const ExecutorConnectionConfigDiagnostic = Schema.NonEmptyString;
+export type ExecutorConnectionConfigDiagnostic =
+  typeof ExecutorConnectionConfigDiagnostic.Type;
+
 export class ExecutorConnectionConfigError extends Schema.TaggedErrorClass<ExecutorConnectionConfigError>()(
   "ExecutorConnectionConfigError",
   {
-    message: Schema.NonEmptyString,
+    message: ExecutorConnectionConfigDiagnostic,
     operation: ExecutorConnectionConfigOperation,
-    reason: Schema.NonEmptyString,
+    reason: ExecutorConnectionConfigDiagnostic,
   }
 ) {}
 

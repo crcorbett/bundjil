@@ -62,3 +62,7 @@ export type AtomicKeyValueStoreOutcome = typeof AtomicKeyValueStoreOutcome.Type;
 export const AtomicKeyValueStoreOperation = Schema.Literals(["transact"]);
 export type AtomicKeyValueStoreOperation =
   typeof AtomicKeyValueStoreOperation.Type;
+
+export const AtomicKeyValueStoreDiagnosticMessage = Schema.NonEmptyString;
+export type AtomicKeyValueStoreDiagnosticMessage =
+  typeof AtomicKeyValueStoreDiagnosticMessage.Type;

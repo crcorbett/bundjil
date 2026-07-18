@@ -216,7 +216,8 @@ export const CodexProxyConfigLive = Layer.effect(
 export const CodexProxyConfigLayer = (config: CodexProxyRuntimeConfigType) =>
   Layer.succeed(CodexProxyConfig, config);
 
-export const makeCodexProxyConfig = (input: unknown) =>
-  decodeCodexProxyRuntimeConfig(input);
+export const makeCodexProxyConfig = (
+  input: typeof CodexProxyRuntimeConfig.Encoded
+) => decodeCodexProxyRuntimeConfig(input);
 
 export type { CodexProxyDevServerConfigType, CodexProxyRuntimeConfigType };

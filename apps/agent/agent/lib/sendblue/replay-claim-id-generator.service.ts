@@ -26,7 +26,7 @@ export const SendblueReplayClaimIdGeneratorLive = Layer.succeed(
           message: "Unable to create the Sendblue replay claim.",
         }),
     }).pipe(
-      Effect.flatMap(Schema.decodeUnknownEffect(SendblueReplayClaimId)),
+      Effect.flatMap(Schema.decodeEffect(SendblueReplayClaimId)),
       Effect.mapError(
         () =>
           new SendblueReplayStoreError({

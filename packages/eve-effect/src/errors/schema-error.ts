@@ -1,12 +1,15 @@
 import { Schema } from "effect";
 
-import { BundjilAgentSchemaBoundary } from "./contracts.js";
+import {
+  BundjilAgentDiagnosticMessage,
+  BundjilAgentSchemaBoundary,
+} from "./contracts.js";
 
 export class BundjilAgentSchemaError extends Schema.TaggedErrorClass<BundjilAgentSchemaError>()(
   "BundjilAgentSchemaError",
   {
     boundary: BundjilAgentSchemaBoundary,
-    message: Schema.NonEmptyString,
+    message: BundjilAgentDiagnosticMessage,
     cause: Schema.Defect,
   }
 ) {}

@@ -129,19 +129,19 @@ const deriveReplayKeys = (
       const logicalKey = `${kind}:${digest}`;
       return Match.value(kind).pipe(
         Match.when("inbound", () =>
-          Schema.decodeUnknownEffect(SendblueInboundClaimKey)(
+          Schema.decodeEffect(SendblueInboundClaimKey)(
             `${options.prefix}${logicalKey}`
           )
         ),
         Match.when("outbound", () =>
-          Schema.decodeUnknownEffect(SendblueOutboundClaimKey)(
+          Schema.decodeEffect(SendblueOutboundClaimKey)(
             `${options.prefix}${logicalKey}`
           )
         ),
         Match.exhaustive,
         Effect.bindTo("key"),
         Effect.bind("logicalKey", () =>
-          Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(logicalKey)
+          Schema.decodeEffect(AtomicKeyValueStoreKey)(logicalKey)
         )
       );
     }),
@@ -159,7 +159,7 @@ const logicalReplayKey = (
 ) =>
   Match.value(key.startsWith(options.prefix)).pipe(
     Match.when(true, () =>
-      Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
+      Schema.decodeEffect(AtomicKeyValueStoreKey)(
         key.slice(options.prefix.length)
       )
     ),
@@ -189,19 +189,21 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     ) {
       const replayClaim = yield* makeReplayClaim(claimIdGenerator, key);
       const encodedClaim = yield* encodeReplayRecord(claimRecord(replayClaim));
-      const transaction = yield* Schema.decodeUnknownEffect(
+      const encodedTransaction: typeof AtomicKeyValueStoreTransaction.Encoded =
+        {
+          conditions: [{ _tag: "Absent", key: logicalKey }],
+          mutations: [
+            {
+              _tag: "Set",
+              key: logicalKey,
+              ttl: options.leaseSeconds * 1000,
+              value: encodedClaim,
+            },
+          ],
+        };
+      const transaction = yield* Schema.decodeEffect(
         AtomicKeyValueStoreTransaction
-      )({
-        conditions: [{ _tag: "Absent", key: logicalKey }],
-        mutations: [
-          {
-            _tag: "Set",
-            key: logicalKey,
-            ttl: options.leaseSeconds * 1000,
-            value: encodedClaim,
-          },
-        ],
-      }).pipe(
+      )(encodedTransaction).pipe(
         Effect.mapError(
           () =>
             new SendblueReplayStoreError({
@@ -236,26 +238,28 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
       replayClaim: SendblueReplayClaim,
       logicalKey: typeof AtomicKeyValueStoreKey.Type,
       status: SendblueReplayTerminalStatus,
-      expected: string,
+      expected: typeof replayRecordJson.Encoded,
       completion?: SendblueReplayCompletion
     ) {
       const completedAtEpochMillis = yield* Clock.currentTimeMillis;
       const value = yield* encodeReplayRecord(
         terminalRecord(replayClaim, status, completedAtEpochMillis, completion)
       );
-      const transaction = yield* Schema.decodeUnknownEffect(
+      const encodedTransaction: typeof AtomicKeyValueStoreTransaction.Encoded =
+        {
+          conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
+          mutations: [
+            {
+              _tag: "Set",
+              key: logicalKey,
+              ttl: options.ttlSeconds * 1000,
+              value,
+            },
+          ],
+        };
+      const transaction = yield* Schema.decodeEffect(
         AtomicKeyValueStoreTransaction
-      )({
-        conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
-        mutations: [
-          {
-            _tag: "Set",
-            key: logicalKey,
-            ttl: options.ttlSeconds * 1000,
-            value,
-          },
-        ],
-      }).pipe(
+      )(encodedTransaction).pipe(
         Effect.mapError(
           () =>
             new SendblueReplayStoreError({
@@ -272,12 +276,16 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     ) {
       const logicalKey = yield* logicalReplayKey(options, replayClaim.key);
       const expected = yield* encodeReplayRecord(claimRecord(replayClaim));
+      const retryableTransaction: typeof AtomicKeyValueStoreTransaction.Encoded =
+        {
+          conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
+          mutations: [{ _tag: "Remove", key: logicalKey }],
+        };
       const outcome = yield* Match.value(status).pipe(
         Match.when("retryable", () =>
-          Schema.decodeUnknownEffect(AtomicKeyValueStoreTransaction)({
-            conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
-            mutations: [{ _tag: "Remove", key: logicalKey }],
-          }).pipe(Effect.flatMap((transaction) => atomic.transact(transaction)))
+          Schema.decodeEffect(AtomicKeyValueStoreTransaction)(
+            retryableTransaction
+          ).pipe(Effect.flatMap((transaction) => atomic.transact(transaction)))
         ),
         Match.when("complete", () =>
           retain(replayClaim, logicalKey, "complete", expected, completion)

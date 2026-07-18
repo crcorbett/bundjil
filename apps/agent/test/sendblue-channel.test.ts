@@ -25,6 +25,7 @@ import {
 } from "../agent/lib/sendblue/replay-store.service.js";
 import {
   SendblueChannelState,
+  SendblueCompletedMessage,
   SendblueConfig,
   SendblueInboundMessage,
   SendblueSendMessageSuccess,
@@ -63,6 +64,7 @@ const sendSuccess = Schema.decodeUnknownSync(SendblueSendMessageSuccess)({
   message_handle: "outbound-provider-handle",
   status: "QUEUED",
 });
+const completedMessage = Schema.decodeUnknownSync(SendblueCompletedMessage);
 const encodeInbound = Schema.encodeSync(
   Schema.fromJsonString(SendblueInboundMessage)
 );
@@ -159,8 +161,9 @@ it.effect(
       if (decision._tag === "Dispatch") {
         assert.strictEqual(decision.auth.principalId, "owner");
         assert.notInclude(decision.continuationToken, "+14155550100");
-        yield* sendblue.dispatchAcceptedInbound(decision, () =>
-          Promise.resolve().then(() => {
+        yield* sendblue.dispatchAcceptedInbound(
+          decision,
+          Effect.sync(() => {
             sent += 1;
           })
         );
@@ -186,8 +189,13 @@ it.effect("releases an inbound claim when Eve rejects before acceptance", () =>
     assert.strictEqual(first._tag, "Dispatch");
     if (first._tag === "Dispatch") {
       const error = yield* sendblue
-        .dispatchAcceptedInbound(first, () =>
-          Promise.reject(new Error("Fake Eve rejection."))
+        .dispatchAcceptedInbound(
+          first,
+          Effect.fail(
+            new SendblueRoutingError({
+              message: "Unable to dispatch the Sendblue message to Eve.",
+            })
+          )
         )
         .pipe(Effect.flip);
       assert.strictEqual(Schema.is(SendblueRoutingError)(error), true);
@@ -297,7 +305,7 @@ it.effect(
       });
       yield* Effect.gen(function* testVisibleOutboundDelivery() {
         const sendblue = yield* SendblueChannel;
-        const completed = {
+        const completed = completedMessage({
           finishReason: "stop",
           message: "  A visible reply.  ",
           sequence: 0,
@@ -305,7 +313,7 @@ it.effect(
           state: channelState,
           stepIndex: 0,
           turnId: "turn-1",
-        };
+        });
         const outcomes = yield* Effect.all(
           [
             sendblue.deliverCompletedMessage(completed),
@@ -315,28 +323,34 @@ it.effect(
         );
         assert.deepStrictEqual(outcomes.toSorted(), ["delivered", "duplicate"]);
         assert.strictEqual(
-          yield* sendblue.deliverCompletedMessage({
-            ...completed,
-            message: "tool text",
-            finishReason: "tool-calls",
-            sequence: 1,
-          }),
+          yield* sendblue.deliverCompletedMessage(
+            completedMessage({
+              ...completed,
+              message: "tool text",
+              finishReason: "tool-calls",
+              sequence: 1,
+            })
+          ),
           "ignored"
         );
         assert.strictEqual(
-          yield* sendblue.deliverCompletedMessage({
-            ...completed,
-            message: null,
-            sequence: 2,
-          }),
+          yield* sendblue.deliverCompletedMessage(
+            completedMessage({
+              ...completed,
+              message: null,
+              sequence: 2,
+            })
+          ),
           "ignored"
         );
         assert.strictEqual(
-          yield* sendblue.deliverCompletedMessage({
-            ...completed,
-            message: "   ",
-            sequence: 3,
-          }),
+          yield* sendblue.deliverCompletedMessage(
+            completedMessage({
+              ...completed,
+              message: "   ",
+              sequence: 3,
+            })
+          ),
           "ignored"
         );
         assert.strictEqual(yield* Ref.get(sends), 1);
@@ -363,15 +377,17 @@ it.effect("dispatches inbound content beyond the Sendblue outbound limit", () =>
 it.effect("delivers non-tool completed finish reasons", () =>
   Effect.gen(function* testTerminalFinishReason() {
     const sendblue = yield* SendblueChannel;
-    const result = yield* sendblue.deliverCompletedMessage({
-      finishReason: "length",
-      message: "Truncated terminal reply.",
-      sequence: 99,
-      sessionId: "session-terminal-finish-reason",
-      state: channelState,
-      stepIndex: 0,
-      turnId: "turn-terminal-finish-reason",
-    });
+    const result = yield* sendblue.deliverCompletedMessage(
+      completedMessage({
+        finishReason: "length",
+        message: "Truncated terminal reply.",
+        sequence: 99,
+        sessionId: "session-terminal-finish-reason",
+        state: channelState,
+        stepIndex: 0,
+        turnId: "turn-terminal-finish-reason",
+      })
+    );
 
     assert.strictEqual(result, "delivered");
   }).pipe(
@@ -402,7 +418,7 @@ it.effect("marks an indeterminate outbound delivery as non-retryable", () =>
     });
     yield* Effect.gen(function* testUncertainNoResend() {
       const sendblue = yield* SendblueChannel;
-      const completed = {
+      const completed = completedMessage({
         finishReason: "stop",
         message: "A visible reply.",
         sequence: 0,
@@ -410,7 +426,7 @@ it.effect("marks an indeterminate outbound delivery as non-retryable", () =>
         state: channelState,
         stepIndex: 0,
         turnId: "turn-1",
-      };
+      });
       const error = yield* sendblue
         .deliverCompletedMessage(completed)
         .pipe(Effect.flip);
@@ -438,7 +454,7 @@ it.effect(
       });
       yield* Effect.gen(function* testOverLimitRetryableClaim() {
         const sendblue = yield* SendblueChannel;
-        const completed = {
+        const completed = completedMessage({
           finishReason: "stop",
           message: "x".repeat(18_997),
           sequence: 0,
@@ -446,7 +462,7 @@ it.effect(
           state: channelState,
           stepIndex: 0,
           turnId: "turn-1",
-        };
+        });
         const errors = yield* Effect.forEach([0, 1], () =>
           sendblue.deliverCompletedMessage(completed).pipe(Effect.flip)
         );
@@ -479,7 +495,7 @@ it.effect("releases a known provider rejection for a safe retry", () =>
     });
     yield* Effect.gen(function* testKnownFailureRetryableClaim() {
       const sendblue = yield* SendblueChannel;
-      const completed = {
+      const completed = completedMessage({
         finishReason: "stop",
         message: "A visible reply.",
         sequence: 0,
@@ -487,7 +503,7 @@ it.effect("releases a known provider rejection for a safe retry", () =>
         state: channelState,
         stepIndex: 0,
         turnId: "turn-1",
-      };
+      });
       const errors = yield* Effect.forEach([0, 1], () =>
         sendblue.deliverCompletedMessage(completed).pipe(Effect.flip)
       );
@@ -511,7 +527,7 @@ it.effect(
       });
       yield* Effect.gen(function* testAcceptedOutboundQuarantine() {
         const sendblue = yield* SendblueChannel;
-        const completed = {
+        const completed = completedMessage({
           finishReason: "stop",
           message: "A visible reply.",
           sequence: 0,
@@ -519,7 +535,7 @@ it.effect(
           state: channelState,
           stepIndex: 0,
           turnId: "turn-1",
-        };
+        });
         const error = yield* sendblue
           .deliverCompletedMessage(completed)
           .pipe(Effect.flip);
@@ -544,7 +560,7 @@ it.effect(
       assert.strictEqual(first._tag, "Dispatch");
       if (first._tag === "Dispatch") {
         const error = yield* sendblue
-          .dispatchAcceptedInbound(first, () => Promise.resolve())
+          .dispatchAcceptedInbound(first, Effect.void)
           .pipe(Effect.flip);
         assert.strictEqual(error.message, "completion unavailable");
       }
@@ -594,7 +610,7 @@ it.effect(
         assert.strictEqual(first._tag, "Dispatch");
         if (first._tag === "Dispatch") {
           const error = yield* sendblue
-            .dispatchAcceptedInbound(first, () => Promise.resolve())
+            .dispatchAcceptedInbound(first, Effect.void)
             .pipe(Effect.flip);
           assert.strictEqual(error.message, "quarantine unavailable");
         }

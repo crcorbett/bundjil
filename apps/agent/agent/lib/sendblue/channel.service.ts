@@ -3,19 +3,15 @@ import { Context, Effect, Layer, Match, Schema } from "effect";
 import { SendblueClient } from "./client.service.js";
 import type { SendblueClientError } from "./client.service.js";
 import { SendblueConfigService } from "./config.js";
-import {
-  SendblueRequestError,
-  SendblueRoutingError,
-  SendblueWebhookSchemaError,
-} from "./errors.js";
+import { SendblueRequestError, SendblueWebhookSchemaError } from "./errors.js";
 import type {
   SendblueReplayStoreError,
+  SendblueRoutingError,
   SendblueWebhookAuthenticationError,
 } from "./errors.js";
 import { SendblueIdentityDirectory } from "./identity-directory.service.js";
 import { SendblueReplayStore } from "./replay-store.service.js";
 import {
-  SendblueCompletedMessage,
   SendblueInboundMessage,
   SendblueReceivedStatusValue,
   SendblueSendMessageInput,
@@ -26,6 +22,7 @@ import type {
   SendblueInboundDecision,
   SendblueInboundDispatchDecision,
   SendblueIgnoredReason,
+  SendblueSendMessageInput as SendblueSendMessageInputType,
 } from "./schemas.js";
 import { SendblueSessionRouter } from "./session-router.service.js";
 import { SendblueWebhookVerifier } from "./webhook-verifier.service.js";
@@ -42,10 +39,10 @@ export interface SendblueChannelShape {
   >;
   readonly dispatchAcceptedInbound: (
     decision: SendblueInboundDispatchDecision,
-    send: () => Promise<unknown>
+    send: Effect.Effect<void, SendblueRoutingError>
   ) => Effect.Effect<void, SendblueReplayStoreError | SendblueRoutingError>;
   readonly deliverCompletedMessage: (
-    input: unknown
+    input: SendblueCompletedMessageType
   ) => Effect.Effect<
     SendblueCompletedMessageResult,
     SendblueClientError | SendblueReplayStoreError | SendblueRoutingError
@@ -190,16 +187,10 @@ export const dispatchAcceptedInbound = Effect.fn(
   "SendblueChannel.dispatchAcceptedInbound"
 )(function* (
   decision: SendblueInboundDispatchDecision,
-  send: () => Promise<unknown>
+  send: Effect.Effect<void, SendblueRoutingError>
 ) {
   const replay = yield* SendblueReplayStore;
-  yield* Effect.tryPromise({
-    try: send,
-    catch: () =>
-      new SendblueRoutingError({
-        message: "Unable to dispatch the Sendblue message to Eve.",
-      }),
-  }).pipe(
+  yield* send.pipe(
     Effect.catchTag("SendblueRoutingError", (error) =>
       replay.retryable(decision.claim).pipe(Effect.andThen(Effect.fail(error)))
     )
@@ -217,31 +208,30 @@ export const dispatchAcceptedInbound = Effect.fn(
 
 export const deliverCompletedMessage = Effect.fn(
   "SendblueChannel.deliverCompletedMessage"
-)(function* (input: unknown) {
-  const completed = yield* Schema.decodeUnknownEffect(SendblueCompletedMessage)(
-    input
-  ).pipe(
-    Effect.mapError(
-      () =>
-        new SendblueRoutingError({
-          message: "The completed Eve message is invalid.",
-        })
-    )
-  );
+)(function* (completed: SendblueCompletedMessageType) {
   return yield* Match.value(completed).pipe(
     Match.when({ finishReason: "tool-calls" }, () =>
       Effect.succeed<SendblueCompletedMessageResult>("ignored")
     ),
     Match.when(
-      (
-        completed
-      ): completed is SendblueCompletedMessageType & {
-        readonly message: string;
-      } => completed.message !== null && completed.message.trim().length > 0,
+      ({ message }) => message !== null && message.trim().length > 0,
       (completed) =>
         Effect.gen(function* deliverTerminalSendblueMessage() {
           const replay = yield* SendblueReplayStore;
           const client = yield* SendblueClient;
+          const content = yield* Schema.decodeEffect(
+            SendblueSendMessageInput.fields.content
+          )(completed.message?.trim() ?? "").pipe(
+            Effect.mapError(
+              () =>
+                new SendblueRequestError({
+                  message:
+                    "The completed Eve message cannot be sent by Sendblue.",
+                  operation: "sendMessage",
+                  reason: "requestEncoding",
+                })
+            )
+          );
           const claimed = yield* replay.claimOutbound({
             sequence: completed.sequence,
             sessionId: completed.sessionId,
@@ -253,57 +243,49 @@ export const deliverCompletedMessage = Effect.fn(
               Effect.succeed<SendblueCompletedMessageResult>("duplicate")
             ),
             Match.orElse(({ claim }) =>
-              Schema.decodeUnknownEffect(SendblueSendMessageInput)({
-                content: completed.message.trim(),
-                from_number: completed.state.sendblueNumber,
-                number: completed.state.senderNumber,
-              }).pipe(
-                Effect.mapError(
-                  () =>
-                    new SendblueRequestError({
-                      message:
-                        "The completed Eve message cannot be sent by Sendblue.",
-                      operation: "sendMessage",
-                      reason: "requestEncoding",
-                    })
-                ),
-                Effect.flatMap(client.sendMessage),
-                Effect.tap((success) =>
-                  replay
-                    .complete(claim, {
-                      providerMessageHandle: success.message_handle,
-                    })
-                    .pipe(
-                      Effect.catchTag(
-                        "SendblueReplayStoreError",
-                        (completeError) =>
-                          replay
-                            .uncertain(claim)
-                            .pipe(Effect.andThen(Effect.fail(completeError)))
+              client
+                .sendMessage({
+                  content,
+                  from_number: completed.state.sendblueNumber,
+                  number: completed.state.senderNumber,
+                } satisfies SendblueSendMessageInputType)
+                .pipe(
+                  Effect.tap((success) =>
+                    replay
+                      .complete(claim, {
+                        providerMessageHandle: success.message_handle,
+                      })
+                      .pipe(
+                        Effect.catchTag(
+                          "SendblueReplayStoreError",
+                          (completeError) =>
+                            replay
+                              .uncertain(claim)
+                              .pipe(Effect.andThen(Effect.fail(completeError)))
+                        )
                       )
+                  ),
+                  Effect.as<SendblueCompletedMessageResult>("delivered"),
+                  Effect.catchTag("SendblueDeliveryUncertainError", (error) =>
+                    replay
+                      .uncertain(claim)
+                      .pipe(Effect.andThen(Effect.fail(error)))
+                  ),
+                  Effect.catchTag("SendblueRequestError", (error) =>
+                    replay
+                      .retryable(claim)
+                      .pipe(Effect.andThen(Effect.fail(error)))
+                  ),
+                  Effect.catchTag("SendblueResponseError", (error) =>
+                    Match.value(error.reason).pipe(
+                      Match.when("malformedResponse", () =>
+                        replay.uncertain(claim)
+                      ),
+                      Match.orElse(() => replay.retryable(claim)),
+                      Effect.andThen(Effect.fail(error))
                     )
-                ),
-                Effect.as<SendblueCompletedMessageResult>("delivered"),
-                Effect.catchTag("SendblueDeliveryUncertainError", (error) =>
-                  replay
-                    .uncertain(claim)
-                    .pipe(Effect.andThen(Effect.fail(error)))
-                ),
-                Effect.catchTag("SendblueRequestError", (error) =>
-                  replay
-                    .retryable(claim)
-                    .pipe(Effect.andThen(Effect.fail(error)))
-                ),
-                Effect.catchTag("SendblueResponseError", (error) =>
-                  Match.value(error.reason).pipe(
-                    Match.when("malformedResponse", () =>
-                      replay.uncertain(claim)
-                    ),
-                    Match.orElse(() => replay.retryable(claim)),
-                    Effect.andThen(Effect.fail(error))
                   )
                 )
-              )
             )
           );
         })

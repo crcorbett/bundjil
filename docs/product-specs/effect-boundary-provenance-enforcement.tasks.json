@@ -5,7 +5,7 @@
   "implementationImprovementAuditCounter": {
     "requiredPassesPerTask": 3,
     "minimumTotalPasses": 12,
-    "completedPasses": 6,
+    "completedPasses": 9,
     "rule": "Each parent task records ownership/call-graph, Effect/implementation-quality, and verification/evidence passes. Add more passes while any finding remains."
   },
   "principles": [
@@ -110,7 +110,7 @@
     {
       "id": "migrate-channel-proxy-and-persistence-boundaries",
       "title": "Migrate channel, proxy, config, and persistence boundaries end to end",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["establish-boundary-provenance-audit"],
       "description": "Apply the same provenance model to Eve, the agent channel, Sendblue, the proxy app, runtime config, and shared persistence adapters without changing routing or wire behavior.",
       "implementationNotes": [
@@ -135,8 +135,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: the Eve channel adapter owns unknown event decoding and Promise bridging; Sendblue services accept decoded owner types and Effects; app Config.schema contracts feed decoded config; @bundjil/effect-persistence owns transaction codecs and the private Upstash facade; the proxy config factory accepts only CodexProxyRuntimeConfig.Encoded.",
+          "Implementation quality: a parent correction round replaced decodeUnknownEffect on known config, message, replay, transaction, preflight, Eve-success, and Upstash-command values with direct decoded construction or decodeEffect. Reviewed owner diagnostics, Redacted flow, Match branches, flat primary operations, and found no unsafe casts, sync production codecs, DTO mirrors, or helper/common/utils sprawl.",
+          "Verification: root verification passed the boundary audit, 23 fixtures, Effect setup, ten-surface skill policy, Ultracite, Knip, seven workspace typechecks, and 223 tests. All seven workspace builds passed with safe non-secret Gateway/Executor build config; proxy smoke returned HTTP 200/200 and five SSE lines; diff check and task-ledger parse passed."
+        ]
       },
       "commitAfterPassing": true
     },

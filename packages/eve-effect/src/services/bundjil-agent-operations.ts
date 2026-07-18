@@ -38,7 +38,7 @@ export const BundjilAgentOperationsLive = Layer.effect(
           )
         );
 
-        return yield* Schema.decodeUnknownEffect(WorkspaceStatusSuccess)({
+        return yield* Schema.decodeEffect(WorkspaceStatusSuccess)({
           workspaceName: workspace.name,
           packageNames: workspace.packages,
           agentSummary: `Question: ${input.question}. Workspace ${workspace.name} exposes ${workspace.packages.length} packages: ${workspace.packages.join(", ")}.`,

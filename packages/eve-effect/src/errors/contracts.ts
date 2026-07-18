@@ -15,3 +15,10 @@ export const BundjilAgentSchemaBoundary = Schema.Literals([
 ]);
 
 export type BundjilAgentSchemaBoundary = typeof BundjilAgentSchemaBoundary.Type;
+
+export const BundjilAgentDiagnosticMessage = Schema.NonEmptyString;
+export type BundjilAgentDiagnosticMessage =
+  typeof BundjilAgentDiagnosticMessage.Type;
+
+export const BundjilAgentGatewaySetting = Schema.NonEmptyString;
+export type BundjilAgentGatewaySetting = typeof BundjilAgentGatewaySetting.Type;

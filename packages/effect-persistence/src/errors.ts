@@ -1,11 +1,14 @@
 import { Schema } from "effect";
 
-import { AtomicKeyValueStoreOperation } from "./schemas.js";
+import {
+  AtomicKeyValueStoreDiagnosticMessage,
+  AtomicKeyValueStoreOperation,
+} from "./schemas.js";
 
 export class AtomicKeyValueStoreError extends Schema.TaggedErrorClass<AtomicKeyValueStoreError>()(
   "AtomicKeyValueStoreError",
   {
     operation: AtomicKeyValueStoreOperation,
-    message: Schema.NonEmptyString,
+    message: AtomicKeyValueStoreDiagnosticMessage,
   }
 ) {}

@@ -67,7 +67,7 @@
 
 - Status: Completed
 - Subagent: Halley (`019f7621-76df-75b0-a2f0-99b65fdd614b`)
-- Commit: recorded by the Task 2 commit
+- Commit: `a4728c4`
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
@@ -105,24 +105,43 @@
 
 ## Task 3 - Migrate Channel, Proxy, Config, And Persistence Boundaries
 
-- Status: Pending
-- Subagent: pending
-- Commit: pending
+- Status: Completed
+- Subagent: Singer (`019f765c-6317-7473-9279-20503b363620`)
+- Commit: recorded by the Task 3 commit
 
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Eve's channel adapter now owns unknown `message.completed` decoding
+  and the framework Promise bridge. `SendblueChannel` accepts decoded owner
+  values and Effects. App-owned `Config.schema` contracts feed decoded config;
+  `@bundjil/effect-persistence` owns transaction codecs and the private Upstash
+  facade; the proxy factory accepts only `CodexProxyRuntimeConfig.Encoded`.
+  Eighteen exact constraints remain: two Fetch/Web Crypto adapter entries,
+  fourteen private Upstash SDK primitive entries, and two Eve Standard Schema
+  generic entries.
 
 ### Parent Audit Pass 2 - Effect And Implementation Quality
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: The first parent review found known values still using
+  `decodeUnknownEffect`; the correction round moved config, message, replay,
+  transaction, preflight, Eve-success, and Upstash-command values to direct
+  decoded construction or `decodeEffect`. Reviewed owner diagnostics,
+  Redacted config flow, `Match` branches, and primary Effect operations. No
+  unsafe cast, sync production codec, DTO mirror, or helper/common/utils
+  module was introduced.
 
 ### Parent Audit Pass 3 - Verification And Evidence
 
-- Status: Pending
-- Evidence: pending
+- Status: Completed
+- Evidence: Root verification passed the boundary audit, 23 fixtures, Effect
+  setup, ten-surface skill policy, Ultracite, Knip, seven workspace
+  typechecks, and 223 tests. All seven workspace builds passed with safe
+  non-secret Gateway/Executor build configuration. Proxy smoke returned
+  health 200, stream 200, and five SSE lines. `git diff --check` and task-ledger
+  JSON parsing passed. Webhook settings, credentials, namespaces, TTLs,
+  serialized bytes, deployment state, and visible UI were unchanged.
 
 ## Task 4 - Enable Hard Gates And Reconcile Documentation And Skills
 
