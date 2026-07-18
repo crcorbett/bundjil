@@ -13,6 +13,8 @@ import {
 import {
   AgentModelProviderConfig,
   AgentModelProviderMode,
+  AgentModelId,
+  AgentVercelProtectionBypass,
   createAgentModel,
   defaultAgentModel,
 } from "./model-provider.js";
@@ -26,7 +28,7 @@ export class AgentModelProviderConfigError extends Data.TaggedError(
 }> {}
 
 const agentModelConfig = Config.schema(
-  Schema.NonEmptyString,
+  AgentModelId,
   "BUNDJIL_AGENT_MODEL"
 ).pipe(Config.withDefault(defaultAgentModel));
 
@@ -42,11 +44,14 @@ const codexProxyInternalTokenConfig = Config.redacted(
 );
 
 const codexProxyProtectionBypassConfig = Config.option(
-  Config.redacted("BUNDJIL_CODEX_PROXY_VERCEL_BYPASS")
+  Config.schema(
+    AgentVercelProtectionBypass,
+    "BUNDJIL_CODEX_PROXY_VERCEL_BYPASS"
+  )
 );
 
 const codexProxyModelConfig = Config.option(
-  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_PROXY_MODEL")
+  Config.schema(AgentModelId, "BUNDJIL_CODEX_PROXY_MODEL")
 );
 
 const codexProxyContextWindowTokensConfig = Config.schema(

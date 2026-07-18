@@ -1,3 +1,9 @@
+import {
+  EveAssistantMessageContent,
+  EveAssistantStepFinishReason,
+  EveSessionId,
+  EveTurnId,
+} from "@bundjil/eve";
 import { Schema } from "effect";
 
 export const E164PhoneNumber = Schema.String.check(
@@ -43,17 +49,133 @@ export const SendblueReplayClaimId = Schema.String.check(Schema.isUUID()).pipe(
 );
 export type SendblueReplayClaimId = typeof SendblueReplayClaimId.Type;
 
+export const SendblueReplayStorePrefix = Schema.NonEmptyString.pipe(
+  Schema.brand("SendblueReplayStorePrefix")
+);
+export type SendblueReplayStorePrefix = typeof SendblueReplayStorePrefix.Type;
+
+export const SendblueMessageContent = Schema.String;
+export type SendblueMessageContent = typeof SendblueMessageContent.Type;
+
+export const SendblueInboundDispatchContent = Schema.NonEmptyString;
+export type SendblueInboundDispatchContent =
+  typeof SendblueInboundDispatchContent.Type;
+
+export const SendblueOutboundMessageContent = Schema.NonEmptyString.check(
+  Schema.isMaxLength(18_996)
+);
+export type SendblueOutboundMessageContent =
+  typeof SendblueOutboundMessageContent.Type;
+
+export const SendblueGroupId = Schema.String.pipe(
+  Schema.brand("SendblueGroupId")
+);
+export type SendblueGroupId = typeof SendblueGroupId.Type;
+
+export const SendblueMediaUrl = Schema.String.pipe(
+  Schema.brand("SendblueMediaUrl")
+);
+export type SendblueMediaUrl = typeof SendblueMediaUrl.Type;
+
+export const SendblueInboundStatus = Schema.String.pipe(
+  Schema.brand("SendblueInboundStatus")
+);
+export type SendblueInboundStatus = typeof SendblueInboundStatus.Type;
+
+export const SendblueReceivedStatusValue = "RECEIVED";
+
+export const SendblueReceivedStatus = Schema.Literal(
+  SendblueReceivedStatusValue
+);
+export type SendblueReceivedStatus = typeof SendblueReceivedStatus.Type;
+
+export const SendblueInboundDeliveryStatus = Schema.Union([
+  SendblueReceivedStatus,
+  SendblueInboundStatus,
+]);
+export type SendblueInboundDeliveryStatus =
+  typeof SendblueInboundDeliveryStatus.Type;
+
+export const SendblueService = Schema.Literals(["iMessage", "SMS", "RCS"]);
+export type SendblueService = typeof SendblueService.Type;
+
+export const SendblueIgnoredReason = Schema.Literals([
+  "duplicate",
+  "empty",
+  "group",
+  "lineMismatch",
+  "loop",
+  "media",
+  "outbound",
+  "senderNotAllowed",
+  "serviceNotAllowed",
+  "statusNotReceived",
+  "typing",
+]);
+export type SendblueIgnoredReason = typeof SendblueIgnoredReason.Type;
+
+export const SendblueMessageDeliveryStatus = Schema.Literals([
+  "QUEUED",
+  "SENT",
+  "DELIVERED",
+]);
+export type SendblueMessageDeliveryStatus =
+  typeof SendblueMessageDeliveryStatus.Type;
+
+export const SendblueProviderRejectedStatus = Schema.Literal("ERROR");
+export type SendblueProviderRejectedStatus =
+  typeof SendblueProviderRejectedStatus.Type;
+
+export const SendblueResponseErrorReason = Schema.Literals([
+  "clientRejected",
+  "malformedResponse",
+  "providerRejected",
+  "rateLimited",
+  "serverRejected",
+  "unauthorized",
+]);
+export type SendblueResponseErrorReason =
+  typeof SendblueResponseErrorReason.Type;
+
+export const SendblueClientOperation = Schema.Literal("sendMessage");
+export type SendblueClientOperation = typeof SendblueClientOperation.Type;
+
+export const SendblueRequestErrorReason = Schema.Literal("requestEncoding");
+export type SendblueRequestErrorReason = typeof SendblueRequestErrorReason.Type;
+
+export const SendblueDeliveryUncertainReason = Schema.Literals([
+  "timeout",
+  "transport",
+]);
+export type SendblueDeliveryUncertainReason =
+  typeof SendblueDeliveryUncertainReason.Type;
+
 export const SendblueOutboundEventCoordinates = Schema.Struct({
   sequence: NonNegativeInt,
-  sessionId: Schema.NonEmptyString,
+  sessionId: EveSessionId,
   stepIndex: NonNegativeInt,
-  turnId: Schema.NonEmptyString,
+  turnId: EveTurnId,
 });
 export type SendblueOutboundEventCoordinates =
   typeof SendblueOutboundEventCoordinates.Type;
 
 export const SendblueWebhookSecret = Schema.Redacted(Schema.NonEmptyString);
 export type SendblueWebhookSecret = typeof SendblueWebhookSecret.Type;
+
+export const SendblueApiKey = Schema.Redacted(Schema.NonEmptyString);
+export type SendblueApiKey = typeof SendblueApiKey.Type;
+
+export const SendblueApiSecret = Schema.Redacted(Schema.NonEmptyString);
+export type SendblueApiSecret = typeof SendblueApiSecret.Type;
+
+export const SendblueReplayStoreToken = Schema.Redacted(Schema.NonEmptyString);
+export type SendblueReplayStoreToken = typeof SendblueReplayStoreToken.Type;
+
+export const SendblueReplayStoreUrl = Schema.Redacted(Schema.NonEmptyString);
+export type SendblueReplayStoreUrl = typeof SendblueReplayStoreUrl.Type;
+
+export const SendblueRoutingKey = Schema.Redacted(Schema.NonEmptyString);
+export type SendblueRoutingKey = typeof SendblueRoutingKey.Type;
 
 export const SendblueSenderIdentity = Schema.Struct({
   phoneNumber: E164PhoneNumber,
@@ -74,36 +196,24 @@ export const SendblueMessageDirection = Schema.Literals([
 export type SendblueMessageDirection = typeof SendblueMessageDirection.Type;
 
 export const SendblueInboundMessage = Schema.Struct({
-  content: Schema.String,
+  content: SendblueMessageContent,
   direction: Schema.optional(SendblueMessageDirection),
   from_number: E164PhoneNumber,
-  group_id: Schema.optional(Schema.String),
+  group_id: Schema.optional(SendblueGroupId),
   is_outbound: Schema.optional(Schema.Boolean),
   is_typing: Schema.optional(Schema.Boolean),
-  media_url: Schema.optional(Schema.String),
-  media_urls: Schema.optional(Schema.Array(Schema.String)),
+  media_url: Schema.optional(SendblueMediaUrl),
+  media_urls: Schema.optional(Schema.Array(SendblueMediaUrl)),
   message_handle: SendblueMessageHandle,
   sendblue_number: Schema.NullOr(E164PhoneNumber),
-  service: Schema.Literals(["iMessage", "SMS", "RCS"]),
-  status: Schema.String,
+  service: SendblueService,
+  status: SendblueInboundDeliveryStatus,
   to_number: E164PhoneNumber,
 });
 export type SendblueInboundMessage = typeof SendblueInboundMessage.Type;
 
 export const SendblueIgnoredEvent = Schema.Struct({
-  reason: Schema.Literals([
-    "duplicate",
-    "empty",
-    "group",
-    "lineMismatch",
-    "loop",
-    "media",
-    "outbound",
-    "senderNotAllowed",
-    "serviceNotAllowed",
-    "statusNotReceived",
-    "typing",
-  ]),
+  reason: SendblueIgnoredReason,
 });
 export type SendblueIgnoredEvent = typeof SendblueIgnoredEvent.Type;
 
@@ -116,7 +226,7 @@ export const SendblueChannelState = Schema.Struct({
 export type SendblueChannelState = typeof SendblueChannelState.Type;
 
 export const SendblueSendMessageInput = Schema.Struct({
-  content: Schema.NonEmptyString.check(Schema.isMaxLength(18_996)),
+  content: SendblueOutboundMessageContent,
   from_number: E164PhoneNumber,
   number: E164PhoneNumber,
 });
@@ -124,12 +234,12 @@ export type SendblueSendMessageInput = typeof SendblueSendMessageInput.Type;
 
 export const SendblueSendMessageSuccess = Schema.Struct({
   message_handle: SendblueMessageHandle,
-  status: Schema.Literals(["QUEUED", "SENT", "DELIVERED"]),
+  status: SendblueMessageDeliveryStatus,
 });
 export type SendblueSendMessageSuccess = typeof SendblueSendMessageSuccess.Type;
 
 export const SendblueSendMessageProviderRejected = Schema.Struct({
-  status: Schema.Literal("ERROR"),
+  status: SendblueProviderRejectedStatus,
 });
 export type SendblueSendMessageProviderRejected =
   typeof SendblueSendMessageProviderRejected.Type;
@@ -141,14 +251,40 @@ export const SendblueSendMessageProviderResponse = Schema.Union([
 export type SendblueSendMessageProviderResponse =
   typeof SendblueSendMessageProviderResponse.Type;
 
-export const ReplayClaimStatus = Schema.Literals([
+export const SendblueReplayClaimStatus = Schema.Literals([
   "claimed",
   "complete",
   "duplicate",
   "retryable",
   "uncertain",
 ]);
-export type ReplayClaimStatus = typeof ReplayClaimStatus.Type;
+export type SendblueReplayClaimStatus = typeof SendblueReplayClaimStatus.Type;
+
+export const SendblueReplayKind = Schema.Literals(["inbound", "outbound"]);
+export type SendblueReplayKind = typeof SendblueReplayKind.Type;
+
+export const SendblueReplayRecordStatus = Schema.Literals([
+  "claimed",
+  "complete",
+  "retryable",
+  "uncertain",
+]);
+export type SendblueReplayRecordStatus = typeof SendblueReplayRecordStatus.Type;
+
+export const SendblueReplayTerminalStatus = Schema.Literals([
+  "complete",
+  "uncertain",
+]);
+export type SendblueReplayTerminalStatus =
+  typeof SendblueReplayTerminalStatus.Type;
+
+export const SendblueReplayTransitionStatus = Schema.Literals([
+  "complete",
+  "retryable",
+  "uncertain",
+]);
+export type SendblueReplayTransitionStatus =
+  typeof SendblueReplayTransitionStatus.Type;
 
 export const SendblueReplayClaim = Schema.Struct({
   claimedAtEpochMillis: NonNegativeInt,
@@ -186,7 +322,7 @@ export const SendblueReplayRecord = Schema.Struct({
   completedAtEpochMillis: Schema.optional(NonNegativeInt),
   key: SendblueReplayClaimKey,
   providerMessageHandle: Schema.optional(SendblueMessageHandle),
-  status: Schema.Literals(["claimed", "complete", "retryable", "uncertain"]),
+  status: SendblueReplayRecordStatus,
 });
 export type SendblueReplayRecord = typeof SendblueReplayRecord.Type;
 
@@ -197,7 +333,7 @@ export type SendblueWebhookAcknowledgement =
   typeof SendblueWebhookAcknowledgement.Type;
 
 export const SendblueEveAuth = Schema.Struct({
-  attributes: Schema.Record(Schema.String, Schema.String),
+  attributes: Schema.Struct({ channel: Schema.Literal("sendblue") }),
   authenticator: Schema.Literal("sendblue"),
   principalId: SendbluePrincipalId,
   principalType: Schema.Literal("user"),
@@ -221,7 +357,7 @@ export const SendblueInboundDispatchDecision = Schema.TaggedStruct("Dispatch", {
   auth: SendblueEveAuth,
   claim: SendblueReplayClaim,
   continuationToken: SendblueConversationKey,
-  message: Schema.NonEmptyString,
+  message: SendblueInboundDispatchContent,
   state: SendblueChannelState,
 });
 export type SendblueInboundDispatchDecision =
@@ -235,13 +371,13 @@ export const SendblueInboundDecision = Schema.Union([
 export type SendblueInboundDecision = typeof SendblueInboundDecision.Type;
 
 export const SendblueCompletedMessage = Schema.Struct({
-  finishReason: Schema.String,
-  message: Schema.NullOr(Schema.String),
+  finishReason: EveAssistantStepFinishReason,
+  message: Schema.NullOr(EveAssistantMessageContent),
   sequence: NonNegativeInt,
-  sessionId: Schema.NonEmptyString,
+  sessionId: EveSessionId,
   state: SendblueChannelState,
   stepIndex: NonNegativeInt,
-  turnId: Schema.NonEmptyString,
+  turnId: EveTurnId,
 });
 export type SendblueCompletedMessage = typeof SendblueCompletedMessage.Type;
 
@@ -260,19 +396,19 @@ export const SendblueProofResult = Schema.Struct({
 export type SendblueProofResult = typeof SendblueProofResult.Type;
 
 export const SendblueConfig = Schema.Struct({
-  allowedServices: Schema.Array(Schema.Literals(["iMessage", "SMS", "RCS"])),
+  allowedServices: Schema.Array(SendblueService),
   apiBaseUrl: Schema.URL,
-  apiKey: Schema.Redacted(Schema.NonEmptyString),
-  apiSecret: Schema.Redacted(Schema.NonEmptyString),
+  apiKey: SendblueApiKey,
+  apiSecret: SendblueApiSecret,
   fromNumber: E164PhoneNumber,
   replayStore: Schema.Struct({
     leaseSeconds: Schema.Int.check(Schema.isGreaterThan(0)),
-    prefix: Schema.NonEmptyString,
-    token: Schema.Redacted(Schema.NonEmptyString),
+    prefix: SendblueReplayStorePrefix,
+    token: SendblueReplayStoreToken,
     ttlSeconds: Schema.Int.check(Schema.isGreaterThan(0)),
-    url: Schema.Redacted(Schema.NonEmptyString),
+    url: SendblueReplayStoreUrl,
   }),
-  routingKey: Schema.Redacted(Schema.NonEmptyString),
+  routingKey: SendblueRoutingKey,
   senderIdentities: SendblueSenderIdentities,
   webhookSecret: SendblueWebhookSecret,
 });

@@ -1,6 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Data, Effect, Fiber, Redacted, Result, Schema } from "effect";
 
+import { CodexOAuthRedirectUri } from "../src/auth/credentials.js";
 import {
   CodexOAuthObserverSnapshot,
   CodexAccessTokenImportProfile,
@@ -264,7 +265,9 @@ it.effect("stores subscription logins through fenced initial write", () =>
       yield* completeLogin({
         code: Redacted.make("code-secret"),
         state: Redacted.make("state-secret"),
-        redirectUri: "http://localhost/callback",
+        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+          "http://localhost/callback"
+        ),
       });
 
       const storedProfile = yield* getProfile(subject);

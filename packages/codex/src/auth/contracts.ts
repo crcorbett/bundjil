@@ -5,13 +5,19 @@ import {
   CodexOAuthAccountId,
   CodexOAuthAuthorizationCode,
   CodexOAuthAuthorizationUrl,
+  CodexOAuthCodeChallenge,
   CodexOAuthCodeVerifier,
   CodexOAuthIdToken,
+  CodexLocalAuthFile,
   CodexOAuthProfileId,
   CodexOAuthProtocolScopeVersion,
+  CodexOAuthRedirectUri,
   CodexOAuthRefreshToken,
   CodexOAuthState,
   CodexOAuthSubject,
+  CodexSubscriptionAuthorizationEndpoint,
+  CodexSubscriptionClientId,
+  CodexSubscriptionTokenEndpoint,
 } from "./credentials.js";
 
 export const CodexCliAuthMode = Schema.Literal("chatgpt");
@@ -29,7 +35,7 @@ export const CodexCliAuthCache = Schema.Struct({
 export type CodexCliAuthCache = typeof CodexCliAuthCache.Type;
 
 export const CodexLocalProfileImportConfig = Schema.Struct({
-  localAuthFile: Schema.NonEmptyString,
+  localAuthFile: CodexLocalAuthFile,
   subject: CodexOAuthSubject,
   accessTokenTtlMillis: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
 });
@@ -55,9 +61,9 @@ export type CodexLocalProfileImportResult =
 
 export const CodexSubscriptionAuthProtocolConfig = Schema.Struct({
   issuer: Schema.NonEmptyString,
-  authorizationEndpoint: Schema.NonEmptyString,
-  tokenEndpoint: Schema.NonEmptyString,
-  clientId: Schema.NonEmptyString,
+  authorizationEndpoint: CodexSubscriptionAuthorizationEndpoint,
+  tokenEndpoint: CodexSubscriptionTokenEndpoint,
+  clientId: CodexSubscriptionClientId,
   callbackHost: Schema.Literal("127.0.0.1"),
   callbackPath: Schema.Literal("/auth/callback"),
   callbackPorts: Schema.Tuple([Schema.Literal(1455), Schema.Literal(1457)]),
@@ -79,7 +85,7 @@ export type CodexSubscriptionAuthProtocolConfig =
 export const CodexOAuthAuthorizationMaterial = Schema.Struct({
   state: CodexOAuthState,
   codeVerifier: CodexOAuthCodeVerifier,
-  codeChallenge: Schema.NonEmptyString,
+  codeChallenge: CodexOAuthCodeChallenge,
 });
 
 export type CodexOAuthAuthorizationMaterial =
@@ -88,9 +94,9 @@ export type CodexOAuthAuthorizationMaterial =
 export const CodexOAuthAuthorizationSession = Schema.Struct({
   state: CodexOAuthState,
   codeVerifier: CodexOAuthCodeVerifier,
-  codeChallenge: Schema.NonEmptyString,
+  codeChallenge: CodexOAuthCodeChallenge,
   authorizationUrl: CodexOAuthAuthorizationUrl,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthAuthorizationSession =
@@ -99,7 +105,7 @@ export type CodexOAuthAuthorizationSession =
 export const CodexOAuthAuthorizationCallback = Schema.Struct({
   code: CodexOAuthAuthorizationCode,
   state: CodexOAuthState,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthAuthorizationCallback =
@@ -124,7 +130,7 @@ export type CodexOAuthRefreshResponse = typeof CodexOAuthRefreshResponse.Type;
 export const CodexOAuthCodeExchangeInput = Schema.Struct({
   code: CodexOAuthAuthorizationCode,
   codeVerifier: CodexOAuthCodeVerifier,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthCodeExchangeInput =

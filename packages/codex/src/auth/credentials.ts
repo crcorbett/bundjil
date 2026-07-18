@@ -29,10 +29,20 @@ export const CodexOAuthPrincipalType = Schema.Literals([
 
 export type CodexOAuthPrincipalType = typeof CodexOAuthPrincipalType.Type;
 
+export const CodexOAuthPrincipalId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthPrincipalId")
+);
+export type CodexOAuthPrincipalId = typeof CodexOAuthPrincipalId.Type;
+
+export const CodexOAuthIssuerUri = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthIssuerUri")
+);
+export type CodexOAuthIssuerUri = typeof CodexOAuthIssuerUri.Type;
+
 export const OAuthPrincipal = Schema.Struct({
   type: CodexOAuthPrincipalType,
-  id: Schema.NonEmptyString,
-  issuer: Schema.NonEmptyString,
+  id: CodexOAuthPrincipalId,
+  issuer: CodexOAuthIssuerUri,
 });
 
 export type OAuthPrincipal = typeof OAuthPrincipal.Type;
@@ -88,6 +98,49 @@ export const CodexOAuthAccountId = Schema.RedactedFromValue(
 );
 
 export type CodexOAuthAccountId = typeof CodexOAuthAccountId.Type;
+
+export const CodexOAuthScope = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthScope")
+);
+export type CodexOAuthScope = typeof CodexOAuthScope.Type;
+
+export const CodexOAuthSubjectHash = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthSubjectHash")
+);
+export type CodexOAuthSubjectHash = typeof CodexOAuthSubjectHash.Type;
+
+export const CodexOAuthRedirectUri = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthRedirectUri")
+);
+export type CodexOAuthRedirectUri = typeof CodexOAuthRedirectUri.Type;
+
+export const CodexOAuthCodeChallenge = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCodeChallenge")
+);
+export type CodexOAuthCodeChallenge = typeof CodexOAuthCodeChallenge.Type;
+
+export const CodexLocalAuthFile = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexLocalAuthFile")
+);
+export type CodexLocalAuthFile = typeof CodexLocalAuthFile.Type;
+
+export const CodexSubscriptionAuthorizationEndpoint =
+  Schema.NonEmptyString.pipe(
+    Schema.brand("CodexSubscriptionAuthorizationEndpoint")
+  );
+export type CodexSubscriptionAuthorizationEndpoint =
+  typeof CodexSubscriptionAuthorizationEndpoint.Type;
+
+export const CodexSubscriptionTokenEndpoint = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexSubscriptionTokenEndpoint")
+);
+export type CodexSubscriptionTokenEndpoint =
+  typeof CodexSubscriptionTokenEndpoint.Type;
+
+export const CodexSubscriptionClientId = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexSubscriptionClientId")
+);
+export type CodexSubscriptionClientId = typeof CodexSubscriptionClientId.Type;
 
 export const CodexOAuthCredentialRevision = Schema.NonEmptyString.pipe(
   Schema.brand("CodexOAuthCredentialRevision")

@@ -1,10 +1,15 @@
 import { Schema } from "effect";
 
+import {
+  SendblueClientOperation,
+  SendblueDeliveryUncertainReason,
+} from "../schemas.js";
+
 export class SendblueDeliveryUncertainError extends Schema.TaggedErrorClass<SendblueDeliveryUncertainError>()(
   "SendblueDeliveryUncertainError",
   {
     message: Schema.NonEmptyString,
-    operation: Schema.Literal("sendMessage"),
-    reason: Schema.Literals(["timeout", "transport"]),
+    operation: SendblueClientOperation,
+    reason: SendblueDeliveryUncertainReason,
   }
 ) {}

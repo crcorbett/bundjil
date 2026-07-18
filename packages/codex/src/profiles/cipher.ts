@@ -4,6 +4,7 @@ import { CodexOAuthCredentialRevision } from "../auth/credentials.js";
 import { CodexOAuthProfileCipherConfigService } from "./cipher-config.js";
 import {
   CodexOAuthProfile,
+  CodexOAuthProfileCipherKeyId,
   EncryptedCodexOAuthProfileV2,
   LegacyCodexOAuthProfileV1,
 } from "./contracts.js";
@@ -298,6 +299,18 @@ export const decryptCodexOAuthProfile = (
 export const generateCodexOAuthCredentialRevision = Effect.fn(
   "CodexOAuthCredentialRevision.generate"
 )(function* generateCodexOAuthCredentialRevisionOperation() {
+  const generatedKeyId = yield* Schema.decodeUnknownEffect(
+    CodexOAuthProfileCipherKeyId
+  )("generated").pipe(
+    Effect.mapError(
+      () =>
+        new CodexOAuthProfileCipherError({
+          operation: "encode",
+          message: "Unable to generate a Codex OAuth credential revision.",
+        })
+    )
+  );
+
   return yield* Schema.decodeUnknownEffect(CodexOAuthCredentialRevision)(
     globalThis.crypto.randomUUID()
   ).pipe(
@@ -305,7 +318,7 @@ export const generateCodexOAuthCredentialRevision = Effect.fn(
       () =>
         new CodexOAuthProfileCipherError({
           operation: "encode",
-          keyId: "generated",
+          keyId: generatedKeyId,
           message: "Unable to generate a Codex OAuth credential revision.",
         })
     )

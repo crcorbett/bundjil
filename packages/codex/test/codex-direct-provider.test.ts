@@ -11,6 +11,7 @@ import {
   CodexResponsesRequest,
   CodexResponsesStreamMapInput,
   OpenAICompatibleChatCompletionChunk,
+  OpenAICompatibleChatCompletionDelta,
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleChatCompletionStream,
   OpenAICompatibleProxyInput,
@@ -295,14 +296,22 @@ it.effect("maps Codex function calls to OpenAI-compatible tool chunks", () =>
         )(line.slice("data: ".length))
     );
 
-    assert.deepStrictEqual(chunks[0]?.choices[0]?.delta.tool_calls, [
-      {
-        index: 0,
-        id: "call_executor",
-        type: "function",
-        function: { name: "connection_search", arguments: "" },
-      },
-    ]);
+    const expectedFunctionCallDelta = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleChatCompletionDelta
+    )({
+      tool_calls: [
+        {
+          index: 0,
+          id: "call_executor",
+          type: "function",
+          function: { name: "connection_search", arguments: "" },
+        },
+      ],
+    });
+    assert.deepStrictEqual(
+      chunks[0]?.choices[0]?.delta,
+      expectedFunctionCallDelta
+    );
     assert.strictEqual(
       chunks[1]?.choices[0]?.delta.tool_calls?.[0]?.function.arguments,
       '{"query":"Executor'

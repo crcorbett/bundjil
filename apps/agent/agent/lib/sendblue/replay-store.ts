@@ -1,7 +1,11 @@
-import { AtomicKeyValueStore, AtomicKeyValueStoreKey } from "@bundjil/store";
+import {
+  AtomicKeyValueStore,
+  AtomicKeyValueStoreKey,
+  AtomicKeyValueStoreTransaction,
+} from "@bundjil/store";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import type { Redacted } from "effect";
-import { Clock, Context, Duration, Effect, Layer, Match, Schema } from "effect";
+import { Clock, Context, Effect, Layer, Match, Schema } from "effect";
 
 import { SendblueConfigService } from "./config.js";
 import { SendblueReplayStoreError } from "./errors.js";
@@ -22,6 +26,10 @@ import type {
   SendblueReplayClaimResult,
   SendblueReplayCompletion,
   SendblueReplayRecord as SendblueReplayRecordType,
+  SendblueReplayStorePrefix,
+  SendblueReplayTerminalStatus,
+  SendblueReplayTransitionStatus,
+  SendblueReplayKind,
 } from "./schemas.js";
 import { keyedSendblueDigest } from "./session-router.js";
 
@@ -51,7 +59,7 @@ export class SendblueReplayStore extends Context.Service<
 
 export type SendblueReplayStoreOptions = Readonly<{
   leaseSeconds: number;
-  prefix: string;
+  prefix: SendblueReplayStorePrefix;
   routingKey: Redacted.Redacted;
   ttlSeconds: number;
 }>;
@@ -67,7 +75,12 @@ const makeReplayClaim = Effect.fn("SendblueReplayStore.makeReplayClaim")(
   ) {
     const claimedAtEpochMillis = yield* Clock.currentTimeMillis;
     const claimId = yield* claimIdGenerator.next;
-    return { claimedAtEpochMillis, claimId, key, status: "claimed" as const };
+    return {
+      claimedAtEpochMillis,
+      claimId,
+      key,
+      status: "claimed",
+    } satisfies SendblueReplayClaim;
   }
 );
 
@@ -104,7 +117,7 @@ const terminalRecord = (
 
 const deriveReplayKeys = (
   options: SendblueReplayStoreOptions,
-  kind: "inbound" | "outbound",
+  kind: SendblueReplayKind,
   coordinates: readonly string[]
 ) =>
   keyedSendblueDigest(options.routingKey, [
@@ -114,16 +127,23 @@ const deriveReplayKeys = (
   ]).pipe(
     Effect.flatMap((digest) => {
       const logicalKey = `${kind}:${digest}`;
-      return Effect.all({
-        key: Schema.decodeUnknownEffect(
-          kind === "inbound"
-            ? SendblueInboundClaimKey
-            : SendblueOutboundClaimKey
-        )(`${options.prefix}${logicalKey}`),
-        logicalKey: Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(
-          logicalKey
+      return Match.value(kind).pipe(
+        Match.when("inbound", () =>
+          Schema.decodeUnknownEffect(SendblueInboundClaimKey)(
+            `${options.prefix}${logicalKey}`
+          )
         ),
-      });
+        Match.when("outbound", () =>
+          Schema.decodeUnknownEffect(SendblueOutboundClaimKey)(
+            `${options.prefix}${logicalKey}`
+          )
+        ),
+        Match.exhaustive,
+        Effect.bindTo("key"),
+        Effect.bind("logicalKey", () =>
+          Schema.decodeUnknownEffect(AtomicKeyValueStoreKey)(logicalKey)
+        )
+      );
     }),
     Effect.mapError(
       () =>
@@ -169,35 +189,45 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     ) {
       const replayClaim = yield* makeReplayClaim(claimIdGenerator, key);
       const encodedClaim = yield* encodeReplayRecord(claimRecord(replayClaim));
-      const outcome = yield* atomic
-        .transact({
-          conditions: [{ _tag: "Absent", key: logicalKey }],
-          mutations: [
-            {
-              _tag: "Set",
-              key: logicalKey,
-              ttl: Duration.millis(options.leaseSeconds * 1000),
-              value: encodedClaim,
-            },
-          ],
-        })
-        .pipe(
-          Effect.mapError(
-            () =>
-              new SendblueReplayStoreError({
-                message: "Unable to claim the Sendblue replay record.",
-              })
-          )
-        );
+      const transaction = yield* Schema.decodeUnknownEffect(
+        AtomicKeyValueStoreTransaction
+      )({
+        conditions: [{ _tag: "Absent", key: logicalKey }],
+        mutations: [
+          {
+            _tag: "Set",
+            key: logicalKey,
+            ttl: options.leaseSeconds * 1000,
+            value: encodedClaim,
+          },
+        ],
+      }).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to claim the Sendblue replay record.",
+            })
+        )
+      );
+      const outcome = yield* atomic.transact(transaction).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to claim the Sendblue replay record.",
+            })
+        )
+      );
       return yield* Match.value(outcome).pipe(
         Match.when("applied", () =>
           Effect.succeed({
             claim: replayClaim,
-            status: "claimed" as const,
-          })
+            status: "claimed",
+          } satisfies SendblueReplayClaimResult)
         ),
         Match.when("conflict", () =>
-          Effect.succeed({ status: "duplicate" as const })
+          Effect.succeed({
+            status: "duplicate",
+          } satisfies SendblueReplayClaimResult)
         ),
         Match.exhaustive
       );
@@ -205,7 +235,7 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
     const retain = Effect.fn("SendblueReplayStore.retain")(function* (
       replayClaim: SendblueReplayClaim,
       logicalKey: typeof AtomicKeyValueStoreKey.Type,
-      status: "complete" | "uncertain",
+      status: SendblueReplayTerminalStatus,
       expected: string,
       completion?: SendblueReplayCompletion
     ) {
@@ -213,31 +243,41 @@ export const makeSendblueReplayStore = Effect.fn("SendblueReplayStore.make")(
       const value = yield* encodeReplayRecord(
         terminalRecord(replayClaim, status, completedAtEpochMillis, completion)
       );
-      return yield* atomic.transact({
+      const transaction = yield* Schema.decodeUnknownEffect(
+        AtomicKeyValueStoreTransaction
+      )({
         conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
         mutations: [
           {
             _tag: "Set",
             key: logicalKey,
-            ttl: Duration.millis(options.ttlSeconds * 1000),
+            ttl: options.ttlSeconds * 1000,
             value,
           },
         ],
-      });
+      }).pipe(
+        Effect.mapError(
+          () =>
+            new SendblueReplayStoreError({
+              message: "Unable to transition the Sendblue replay record.",
+            })
+        )
+      );
+      return yield* atomic.transact(transaction);
     });
     const transition = Effect.fn("SendblueReplayStore.transition")(function* (
       replayClaim: SendblueReplayClaim,
-      status: "complete" | "retryable" | "uncertain",
+      status: SendblueReplayTransitionStatus,
       completion?: SendblueReplayCompletion
     ) {
       const logicalKey = yield* logicalReplayKey(options, replayClaim.key);
       const expected = yield* encodeReplayRecord(claimRecord(replayClaim));
       const outcome = yield* Match.value(status).pipe(
         Match.when("retryable", () =>
-          atomic.transact({
+          Schema.decodeUnknownEffect(AtomicKeyValueStoreTransaction)({
             conditions: [{ _tag: "Equals", key: logicalKey, value: expected }],
             mutations: [{ _tag: "Remove", key: logicalKey }],
-          })
+          }).pipe(Effect.flatMap((transaction) => atomic.transact(transaction)))
         ),
         Match.when("complete", () =>
           retain(replayClaim, logicalKey, "complete", expected, completion)

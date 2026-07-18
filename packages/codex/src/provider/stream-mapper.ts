@@ -1,11 +1,21 @@
-import { Context, Effect, HashMap, Option, Redacted, Schema } from "effect";
+import {
+  Context,
+  Effect,
+  HashMap,
+  Match,
+  Option,
+  Redacted,
+  Schema,
+} from "effect";
 
 import {
   CodexResponsesFunctionArgumentsDeltaEvent,
   CodexResponsesFunctionCallAddedEvent,
   CodexResponsesOutputItemDiscriminator,
+  CodexResponsesRecognizedStreamEventType,
   CodexResponsesStreamEvent,
   OpenAICompatibleChatCompletionChunk,
+  OpenAICompatibleChatCompletionId,
   OpenAICompatibleChatCompletionStream,
 } from "./contracts.js";
 import type {
@@ -61,157 +71,195 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
         .filter((line) => line.trim().length > 0),
       decodeCodexStreamLine
     );
+    const completionId = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleChatCompletionId
+    )("bundjil-codex").pipe(
+      Effect.mapError(
+        (cause) =>
+          new CodexResponsesStreamError({
+            operation: "toOpenAICompatibleStream",
+            message: "Unable to construct OpenAI-compatible completion ID.",
+            cause,
+          })
+      )
+    );
     const chunks: OpenAICompatibleChatCompletionChunkType[] = [];
     let functionCallIndexes = HashMap.empty<number, number>();
     let nextFunctionCallIndex = 0;
     let hasFunctionCall = false;
 
-    for (const decodedEvent of decodedEvents) {
-      if (Option.isNone(decodedEvent)) {
-        continue;
-      }
+    yield* Effect.all(
+      decodedEvents.map((decodedEvent) =>
+        Effect.gen(function* mapCodexStreamEvent() {
+          if (Option.isNone(decodedEvent)) {
+            return yield* Effect.void;
+          }
 
-      const event = decodedEvent.value;
+          const event = decodedEvent.value;
 
-      if (
-        event.type === "response.output_text.delta" &&
-        event.delta !== undefined
-      ) {
-        chunks.push({
-          id: "bundjil-codex",
-          object: "chat.completion.chunk",
-          created: 0,
-          model: input.model,
-          choices: [
-            {
-              index: 0,
-              delta: { content: event.delta },
-              finish_reason: null,
-            },
-          ],
-        });
-        continue;
-      }
+          const recognizedEventType = yield* Schema.decodeUnknownEffect(
+            CodexResponsesRecognizedStreamEventType
+          )(event.type).pipe(Effect.option);
+          return yield* Option.match(recognizedEventType, {
+            onNone: () => Effect.void,
+            onSome: (eventType) =>
+              Match.value(eventType).pipe(
+                Match.when("response.output_text.delta", () =>
+                  event.delta === undefined
+                    ? Effect.void
+                    : Effect.sync(() => {
+                        chunks.push({
+                          id: completionId,
+                          object: "chat.completion.chunk",
+                          created: 0,
+                          model: input.model,
+                          choices: [
+                            {
+                              index: 0,
+                              delta: { content: event.delta },
+                              finish_reason: null,
+                            },
+                          ],
+                        });
+                      })
+                ),
+                Match.when("response.output_item.added", () =>
+                  Effect.gen(function* mapFunctionCallOutputItem() {
+                    const item = yield* Schema.decodeUnknownEffect(
+                      CodexResponsesOutputItemDiscriminator
+                    )(event.item).pipe(
+                      Effect.mapError(
+                        (cause) =>
+                          new CodexResponsesStreamError({
+                            operation: "toOpenAICompatibleStream",
+                            message:
+                              "Unable to decode Codex Responses output item.",
+                            cause,
+                          })
+                      )
+                    );
 
-      if (event.type === "response.output_item.added") {
-        const item = yield* Schema.decodeUnknownEffect(
-          CodexResponsesOutputItemDiscriminator
-        )(event.item).pipe(
-          Effect.mapError(
-            (cause) =>
-              new CodexResponsesStreamError({
-                operation: "toOpenAICompatibleStream",
-                message: "Unable to decode Codex Responses output item.",
-                cause,
-              })
-          )
-        );
+                    return yield* Match.value(item.type).pipe(
+                      Match.when("function_call", () =>
+                        Effect.gen(function* mapFunctionCall() {
+                          const functionCall =
+                            yield* Schema.decodeUnknownEffect(
+                              CodexResponsesFunctionCallAddedEvent
+                            )(event).pipe(
+                              Effect.mapError(
+                                (cause) =>
+                                  new CodexResponsesStreamError({
+                                    operation: "toOpenAICompatibleStream",
+                                    message:
+                                      "Unable to decode Codex function-call output item.",
+                                    cause,
+                                  })
+                              )
+                            );
+                          hasFunctionCall = true;
+                          const functionCallIndex = nextFunctionCallIndex;
+                          functionCallIndexes = HashMap.set(
+                            functionCallIndexes,
+                            functionCall.output_index,
+                            functionCallIndex
+                          );
+                          nextFunctionCallIndex += 1;
+                          chunks.push({
+                            id: completionId,
+                            object: "chat.completion.chunk",
+                            created: 0,
+                            model: input.model,
+                            choices: [
+                              {
+                                index: 0,
+                                delta: {
+                                  tool_calls: [
+                                    {
+                                      index: functionCallIndex,
+                                      id: functionCall.item.call_id,
+                                      type: "function",
+                                      function: {
+                                        name: functionCall.item.name,
+                                        arguments: functionCall.item.arguments,
+                                      },
+                                    },
+                                  ],
+                                },
+                                finish_reason: null,
+                              },
+                            ],
+                          });
+                        })
+                      ),
+                      Match.orElse(() => Effect.void)
+                    );
+                  })
+                ),
+                Match.when("response.function_call_arguments.delta", () =>
+                  Effect.gen(function* mapFunctionCallArguments() {
+                    const functionArguments = yield* Schema.decodeUnknownEffect(
+                      CodexResponsesFunctionArgumentsDeltaEvent
+                    )(event).pipe(
+                      Effect.mapError(
+                        (cause) =>
+                          new CodexResponsesStreamError({
+                            operation: "toOpenAICompatibleStream",
+                            message:
+                              "Unable to decode Codex function-call arguments.",
+                            cause,
+                          })
+                      )
+                    );
+                    const functionCallIndex = HashMap.get(
+                      functionCallIndexes,
+                      functionArguments.output_index
+                    );
 
-        if (item.type !== "function_call") {
-          continue;
-        }
+                    if (Option.isNone(functionCallIndex)) {
+                      return yield* new CodexResponsesStreamError({
+                        operation: "toOpenAICompatibleStream",
+                        message:
+                          "Codex function-call arguments arrived before their output item.",
+                        cause: "Missing function-call output index.",
+                      });
+                    }
 
-        const functionCall = yield* Schema.decodeUnknownEffect(
-          CodexResponsesFunctionCallAddedEvent
-        )(event).pipe(
-          Effect.mapError(
-            (cause) =>
-              new CodexResponsesStreamError({
-                operation: "toOpenAICompatibleStream",
-                message: "Unable to decode Codex function-call output item.",
-                cause,
-              })
-          )
-        );
-        hasFunctionCall = true;
-        const functionCallIndex = nextFunctionCallIndex;
-        functionCallIndexes = HashMap.set(
-          functionCallIndexes,
-          functionCall.output_index,
-          functionCallIndex
-        );
-        nextFunctionCallIndex += 1;
-        chunks.push({
-          id: "bundjil-codex",
-          object: "chat.completion.chunk",
-          created: 0,
-          model: input.model,
-          choices: [
-            {
-              index: 0,
-              delta: {
-                tool_calls: [
-                  {
-                    index: functionCallIndex,
-                    id: functionCall.item.call_id,
-                    type: "function",
-                    function: {
-                      name: functionCall.item.name,
-                      arguments: functionCall.item.arguments,
-                    },
-                  },
-                ],
-              },
-              finish_reason: null,
-            },
-          ],
-        });
-        continue;
-      }
-
-      if (event.type === "response.function_call_arguments.delta") {
-        const functionArguments = yield* Schema.decodeUnknownEffect(
-          CodexResponsesFunctionArgumentsDeltaEvent
-        )(event).pipe(
-          Effect.mapError(
-            (cause) =>
-              new CodexResponsesStreamError({
-                operation: "toOpenAICompatibleStream",
-                message: "Unable to decode Codex function-call arguments.",
-                cause,
-              })
-          )
-        );
-        const functionCallIndex = HashMap.get(
-          functionCallIndexes,
-          functionArguments.output_index
-        );
-
-        if (Option.isNone(functionCallIndex)) {
-          return yield* new CodexResponsesStreamError({
-            operation: "toOpenAICompatibleStream",
-            message:
-              "Codex function-call arguments arrived before their output item.",
-            cause: "Missing function-call output index.",
+                    hasFunctionCall = true;
+                    chunks.push({
+                      id: completionId,
+                      object: "chat.completion.chunk",
+                      created: 0,
+                      model: input.model,
+                      choices: [
+                        {
+                          index: 0,
+                          delta: {
+                            tool_calls: [
+                              {
+                                index: functionCallIndex.value,
+                                function: {
+                                  arguments: functionArguments.delta,
+                                },
+                              },
+                            ],
+                          },
+                          finish_reason: null,
+                        },
+                      ],
+                    });
+                    return yield* Effect.void;
+                  })
+                ),
+                Match.exhaustive
+              ),
           });
-        }
-
-        hasFunctionCall = true;
-        chunks.push({
-          id: "bundjil-codex",
-          object: "chat.completion.chunk",
-          created: 0,
-          model: input.model,
-          choices: [
-            {
-              index: 0,
-              delta: {
-                tool_calls: [
-                  {
-                    index: functionCallIndex.value,
-                    function: { arguments: functionArguments.delta },
-                  },
-                ],
-              },
-              finish_reason: null,
-            },
-          ],
-        });
-      }
-    }
+        })
+      ),
+      { concurrency: 1 }
+    );
 
     chunks.push({
-      id: "bundjil-codex",
+      id: completionId,
       object: "chat.completion.chunk",
       created: 0,
       model: input.model,

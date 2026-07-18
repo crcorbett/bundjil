@@ -16,6 +16,7 @@ import {
   HttpServer,
 } from "effect/unstable/http";
 
+import { CodexOAuthRedirectUri } from "../src/auth/credentials.js";
 import {
   CodexAccessTokenImportProfile,
   CodexLoopbackCallback,
@@ -177,7 +178,9 @@ const makeLoginLayer = (
       Effect.succeed({
         code: Redacted.make("authorization-code-secret"),
         state: material.state,
-        redirectUri: "http://localhost:1455/auth/callback",
+        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+          "http://localhost:1455/auth/callback"
+        ),
       });
     const dependencies = Layer.mergeAll(
       CodexOAuthMemory(options.profiles ?? []),
@@ -468,7 +471,9 @@ it.effect("uses form encoding for exchange and JSON for refresh", () =>
       yield* client.exchangeAuthorizationCode({
         code: Redacted.make("code secret"),
         codeVerifier: Redacted.make("verifier secret"),
-        redirectUri: "http://localhost:1455/auth/callback",
+        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+          "http://localhost:1455/auth/callback"
+        ),
       });
       yield* client.refresh({ refreshToken: Redacted.make("refresh secret") });
 
@@ -531,7 +536,9 @@ it.effect(
           .exchangeAuthorizationCode({
             code: Redacted.make("code-secret"),
             codeVerifier: Redacted.make("verifier-secret"),
-            redirectUri: "http://localhost:1455/auth/callback",
+            redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+              "http://localhost:1455/auth/callback"
+            ),
           })
           .pipe(Effect.flip);
       }).pipe(Effect.provide(makeErrorLayer(validProviderError)));

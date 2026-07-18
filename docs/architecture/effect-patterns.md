@@ -171,6 +171,53 @@ Schema.toStandardJSONSchemaV1(Schema.toStandardSchemaV1(schema));
 This provides both Standard Schema validation and Standard JSON Schema metadata
 for Eve `defineTool` boundaries.
 
+### String Contracts
+
+Do not treat every string-shaped value as the same TypeScript `string`, and do
+not mechanically brand every string. Every exported, configured, persisted, or
+provider-facing string field must reference a canonical owner-named Schema and
+use the category that matches its semantics:
+
+- **Open semantic values** such as IDs, keys, opaque handles, model names, and
+  event coordinates use a checked string Schema plus `Schema.brand`.
+- **Closed vocabularies** such as event kinds, statuses, modes, roles, and
+  operations use a named `Schema.Literal` or `Schema.Literals` contract. Use
+  `Match` over the decoded discriminant for material control flow.
+- **Secrets** use owner-named `Schema.Redacted` or
+  `Schema.RedactedFromValue` contracts. Do not reveal a secret merely to add a
+  brand.
+- **Content** such as prompts, messages, instructions, descriptions, and tool
+  output uses an owner-named checked text Schema. Brand content only when two
+  independently valid content domains cross the same call boundary and mixing
+  them would be a real defect.
+- **Transport primitives** such as headers, serialized JSON, SSE lines,
+  provider payload fragments, and filesystem paths use named boundary Schemas
+  when exported. Parser-local strings may remain `string` inside the one
+  operation that decoded their enclosing boundary.
+- **Diagnostics** such as safe tagged-error messages remain checked strings.
+  They are not identifiers and must not require unsafe brand construction.
+
+Decode the complete canonical request, event, config, or persisted record once
+at the incoming boundary and encode it at the outgoing boundary. Do not add
+`decodeSync` constructors, assertions, DTO mirrors, or generic brand/schema
+helpers merely to satisfy nominal types. A consumer imports the owner's Schema
+instead of redefining `id: string`, `type: string`, `status: string`, or an
+equivalent field.
+
+Do not create `common`, `utils`, or helper modules that collect unrelated
+Schemas or manufacture brands. A named Schema belongs with the owner of the
+concept; a parser-local transport fragment stays local to the one operation
+that decoded its enclosing boundary. Production Effect programs use
+`Schema.decodeUnknownEffect` or `Schema.decodeEffect`, not `decodeSync`.
+When a decoded literal or tagged union already exists, use `Match` for
+material branching rather than raw equality or discriminant checks. This does
+not replace framework-owned typed event maps with a manual dispatcher.
+
+Framework-owned event-map keys remain framework dispatch. For example,
+`"message.completed"` is a literal event discriminant, not a branded string;
+its projected payload and any persisted coordinates are decoded through the
+owning Bundjil Schema before domain decisions run.
+
 ## Schema JSON Boundaries
 
 Do not use ad hoc JSON string assembly in committed app or package code.

@@ -3,13 +3,20 @@ import { Schema } from "effect";
 import {
   CodexOAuthAccessToken,
   CodexOAuthAccountId,
+  CodexOAuthAuthorizationCode,
+  CodexOAuthAuthorizationUrl,
+  CodexOAuthCodeVerifier,
   CodexOAuthCredentialRevision,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
   CodexOAuthProfileId,
   CodexOAuthProtocolScopeVersion,
+  CodexOAuthRedirectUri,
   CodexOAuthRefreshToken,
+  CodexOAuthScope,
+  CodexOAuthState,
   CodexOAuthSubject,
+  CodexOAuthSubjectHash,
 } from "../auth/credentials.js";
 
 export const CodexOAuthProfileVersion = Schema.Literal(2);
@@ -29,7 +36,7 @@ export const CodexAccessTokenImportProfile = Schema.Struct({
   subject: CodexOAuthSubject,
   accessToken: CodexOAuthAccessToken,
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   requiresReauthentication: Schema.Boolean,
@@ -47,7 +54,7 @@ export const CodexSubscriptionProfile = Schema.Struct({
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   accountId: CodexOAuthAccountId,
   protocolScopeVersion: CodexOAuthProtocolScopeVersion,
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   lastRefreshedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
@@ -69,7 +76,7 @@ export const LegacyCodexOAuthProfileV1 = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   refreshToken: Schema.optional(CodexOAuthRefreshToken),
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
-  scopes: Schema.Array(Schema.NonEmptyString),
+  scopes: Schema.Array(CodexOAuthScope),
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   requiresReauthentication: Schema.Boolean,
@@ -89,10 +96,16 @@ export const CodexOAuthProfileCipherKeyId = Schema.NonEmptyString.pipe(
 export type CodexOAuthProfileCipherKeyId =
   typeof CodexOAuthProfileCipherKeyId.Type;
 
+export const CodexOAuthProfileCipherKeyMaterial = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexOAuthProfileCipherKeyMaterial =
+  typeof CodexOAuthProfileCipherKeyMaterial.Type;
+
 export const CodexOAuthProfileCipherConfig = Schema.Struct({
   algorithm: CodexOAuthProfileCipherAlgorithm,
   keyId: CodexOAuthProfileCipherKeyId,
-  keyMaterial: Schema.RedactedFromValue(Schema.NonEmptyString),
+  keyMaterial: CodexOAuthProfileCipherKeyMaterial,
 });
 
 export type CodexOAuthProfileCipherConfig =
@@ -103,7 +116,7 @@ const EncryptedCodexOAuthProfileFields = {
   keyId: CodexOAuthProfileCipherKeyId,
   nonce: Schema.Uint8Array,
   ciphertext: Schema.Uint8Array,
-  subjectHash: Schema.NonEmptyString,
+  subjectHash: CodexOAuthSubjectHash,
   createdAtEpochMillis: Schema.Number.check(Schema.isFinite()),
   updatedAtEpochMillis: Schema.Number.check(Schema.isFinite()),
 } as const;
@@ -164,7 +177,7 @@ export type CodexOAuthRefreshLockAcquireInput =
 
 export const CodexOAuthRefreshLockLease = Schema.Struct({
   subject: CodexOAuthSubject,
-  subjectHash: Schema.NonEmptyString,
+  subjectHash: CodexOAuthSubjectHash,
   owner: CodexOAuthRefreshLockOwner,
   expiresAtEpochMillis: Schema.Number.check(Schema.isFinite()),
 });
@@ -175,23 +188,23 @@ export const CodexOAuthLoginStart = Schema.Struct({
   profileId: CodexOAuthProfileId,
   connectorId: CodexOAuthConnectorId,
   installationId: CodexOAuthInstallationId,
-  redirectUri: Schema.NonEmptyString,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthLoginStart = typeof CodexOAuthLoginStart.Type;
 
 export const CodexOAuthLoginStartResult = Schema.Struct({
-  authorizationUrl: Schema.NonEmptyString,
-  state: Schema.RedactedFromValue(Schema.NonEmptyString),
-  codeVerifier: Schema.RedactedFromValue(Schema.NonEmptyString),
+  authorizationUrl: CodexOAuthAuthorizationUrl,
+  state: CodexOAuthState,
+  codeVerifier: CodexOAuthCodeVerifier,
 });
 
 export type CodexOAuthLoginStartResult = typeof CodexOAuthLoginStartResult.Type;
 
 export const CodexOAuthLoginCallback = Schema.Struct({
-  code: Schema.RedactedFromValue(Schema.NonEmptyString),
-  state: Schema.RedactedFromValue(Schema.NonEmptyString),
-  redirectUri: Schema.NonEmptyString,
+  code: CodexOAuthAuthorizationCode,
+  state: CodexOAuthState,
+  redirectUri: CodexOAuthRedirectUri,
 });
 
 export type CodexOAuthLoginCallback = typeof CodexOAuthLoginCallback.Type;

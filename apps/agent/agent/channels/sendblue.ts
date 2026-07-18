@@ -1,3 +1,4 @@
+import { EveMessageCompletedEventTypeValue } from "@bundjil/eve";
 import { Effect, ManagedRuntime } from "effect";
 import { defineChannel, POST } from "eve/channels";
 
@@ -16,7 +17,7 @@ export const makeSendblueEveChannel = <E>(
         return { state };
       },
       events: {
-        "message.completed"(event, channel, ctx) {
+        [EveMessageCompletedEventTypeValue](event, channel, ctx) {
           return channelRuntime.runPromise(
             Effect.gen(function* deliverSendblueCompletedMessage() {
               const sendblue = yield* SendblueChannel;

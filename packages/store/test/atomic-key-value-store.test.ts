@@ -5,15 +5,33 @@ import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   AtomicKeyValueStore,
+  AtomicKeyValueStoreCondition,
+  AtomicKeyValueStoreMutation,
   AtomicKeyValueStoreTransaction,
   AtomicKeyValueStoreTtl,
 } from "../src/index.js";
 import { PersistenceMemory } from "../src/memory.layer.js";
 
 const transaction = (
-  conditions: AtomicKeyValueStoreTransaction["conditions"],
-  mutations: AtomicKeyValueStoreTransaction["mutations"]
-): AtomicKeyValueStoreTransaction => ({ conditions, mutations });
+  conditions: unknown,
+  mutations: unknown
+): AtomicKeyValueStoreTransaction =>
+  Schema.decodeUnknownSync(AtomicKeyValueStoreTransaction)({
+    conditions,
+    mutations,
+  });
+
+const uncheckedTransaction = (
+  conditions: unknown,
+  mutations: unknown
+): AtomicKeyValueStoreTransaction => ({
+  conditions: Schema.decodeUnknownSync(
+    Schema.NonEmptyArray(AtomicKeyValueStoreCondition)
+  )(conditions),
+  mutations: Schema.decodeUnknownSync(
+    Schema.NonEmptyArray(AtomicKeyValueStoreMutation)
+  )(mutations),
+});
 
 it.effect(
   "shares state between native persistence and atomic transactions",
@@ -100,7 +118,7 @@ it.effect("expires atomic TTL values and persistent sets remove expiry", () =>
             _tag: "Set",
             key: "ttl",
             value: "temporary",
-            ttl: Duration.millis(1),
+            ttl: 1,
           },
         ]
       )
@@ -177,7 +195,7 @@ it.effect("clears TTLs through native and atomic persistent sets", () =>
             _tag: "Set",
             key: "native",
             value: "short",
-            ttl: Duration.millis(10),
+            ttl: 10,
           },
         ]
       )
@@ -193,7 +211,7 @@ it.effect("clears TTLs through native and atomic persistent sets", () =>
             _tag: "Set",
             key: "atomic",
             value: "short",
-            ttl: Duration.millis(10),
+            ttl: 10,
           },
         ]
       )
@@ -221,7 +239,7 @@ it.effect("expires values from get, has, and size", () =>
             _tag: "Set",
             key: "expires",
             value: "value",
-            ttl: Duration.millis(1),
+            ttl: 1,
           },
         ]
       )
@@ -255,7 +273,7 @@ it.effect(
       assert.strictEqual(yield* native.size, 32);
       yield* atomic
         .transact(
-          transaction(
+          uncheckedTransaction(
             Array.makeBy(33, (index) => ({
               _tag: "Absent" as const,
               key: `too-many-${index}`,
@@ -366,7 +384,7 @@ it.effect(
             _tag: "Set",
             key: "round-trip",
             value: "value",
-            ttl: Duration.millis(25),
+            ttl: 25,
           },
         ]
       );

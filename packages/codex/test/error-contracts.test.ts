@@ -5,6 +5,7 @@ import {
   CodexAuthTemporarilyUnavailable,
   CodexOAuthOperationError,
   CodexOAuthProfileId,
+  CodexOAuthSubjectHash,
   CodexProfileNotFound,
   CodexProfileSchemaError,
   CodexProfileStorageError,
@@ -12,6 +13,9 @@ import {
 } from "../src/index.js";
 
 const profileId = Schema.decodeUnknownSync(CodexOAuthProfileId)("default");
+const subjectHash = Schema.decodeUnknownSync(CodexOAuthSubjectHash)(
+  "subject-hash"
+);
 
 const selectedErrorFixtures = [
   {
@@ -85,8 +89,8 @@ const selectedErrorFixtures = [
     encode: () =>
       Schema.encodeUnknownSync(CodexProfileNotFound)(
         new CodexProfileNotFound({
-          profileId: "default",
-          subjectHash: "subject-hash",
+          profileId,
+          subjectHash,
           message: "Codex profile was not found.",
         })
       ),

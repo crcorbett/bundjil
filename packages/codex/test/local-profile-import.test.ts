@@ -3,6 +3,7 @@ import { Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import { CodexLocalProfileImportConfig } from "../src/auth/contracts.js";
+import { CodexLocalAuthFile } from "../src/auth/credentials.js";
 import {
   CodexLocalAuthCacheSource,
   CodexLocalAuthCacheSourceLive,
@@ -259,11 +260,17 @@ it.effect("maps an invalid local cache path to a safe source error", () =>
           Layer.effect(
             CodexLocalProfileImportConfigService,
             importConfig.pipe(
-              Effect.map((config) =>
-                CodexLocalProfileImportConfigService.of({
-                  ...config,
-                  localAuthFile: invalidLocalAuthFile,
-                })
+              Effect.flatMap((config) =>
+                Schema.decodeUnknownEffect(CodexLocalAuthFile)(
+                  invalidLocalAuthFile
+                ).pipe(
+                  Effect.map((localAuthFile) =>
+                    CodexLocalProfileImportConfigService.of({
+                      ...config,
+                      localAuthFile,
+                    })
+                  )
+                )
               )
             )
           )

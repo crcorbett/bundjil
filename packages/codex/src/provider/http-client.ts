@@ -64,7 +64,7 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
       });
 
       if (input.accountId !== undefined) {
-        headers.set("chatgpt-account-id", input.accountId);
+        headers.set("chatgpt-account-id", Redacted.value(input.accountId));
       }
 
       const upstreamRequest = new Request(endpoint, {
@@ -138,7 +138,7 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         });
 
         if (input.accountId !== undefined) {
-          headers.set("chatgpt-account-id", input.accountId);
+          headers.set("chatgpt-account-id", Redacted.value(input.accountId));
         }
 
         const upstreamRequest = new Request(endpoint, {

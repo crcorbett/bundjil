@@ -87,6 +87,17 @@ diagnostics use the owning Effect Schema JSON codecs, including
 `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`; do not add
 manual JSON parsing or stringification to this boundary.
 
+## String Contracts
+
+The proxy owns its mode and health literals, checked local profile-store path,
+and diagnostic message Schema. It reuses Codex account, subject, token, model,
+request, stream, and authorization contracts from `@bundjil/codex`.
+Decode complete HTTP/config boundaries once and encode canonical HTTP/SSE
+values outward; use `Match` for material decoded mode or result unions. Do not
+introduce DTO mirrors, schema helpers/common modules, unsafe brand assertions,
+production `decodeSync`, or raw string branching when the owning decoded union
+is available.
+
 ## Operator Runbook
 
 Run all commands from the repository root. Source an ignored env file that

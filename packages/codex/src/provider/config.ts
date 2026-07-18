@@ -7,9 +7,11 @@ import {
   Schema,
 } from "effect";
 
+import { CodexOAuthAccountId } from "../auth/credentials.js";
 import {
   CodexResponsesEndpoint,
   CodexResponsesModelId,
+  CodexResponsesNonEmptyContent,
   CodexResponsesProofInput,
 } from "./contracts.js";
 import { CodexResponsesRequestError } from "./errors.js";
@@ -22,7 +24,7 @@ export const defaultCodexResponsesModel = "gpt-5.5";
 const proofAccessTokenConfig = Config.redacted("CODEX_ACCESS_TOKEN");
 
 const proofAccountIdConfig = Config.option(
-  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_ACCOUNT_ID")
+  Config.schema(CodexOAuthAccountId, "BUNDJIL_CODEX_ACCOUNT_ID")
 );
 
 const proofModelConfig = Config.schema(
@@ -31,7 +33,7 @@ const proofModelConfig = Config.schema(
 ).pipe(Config.withDefault(defaultCodexResponsesModel));
 
 const proofPromptConfig = Config.schema(
-  Schema.NonEmptyString,
+  CodexResponsesNonEmptyContent,
   "BUNDJIL_CODEX_PROOF_PROMPT"
 ).pipe(Config.withDefault("Reply with OK."));
 

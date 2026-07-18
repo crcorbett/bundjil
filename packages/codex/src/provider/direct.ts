@@ -1,4 +1,4 @@
-import { Context, Effect, Redacted } from "effect";
+import { Context, Effect } from "effect";
 
 import { CodexReauthenticationRequired } from "../auth/errors.js";
 import type { CodexOAuthFailure } from "../auth/errors.js";
@@ -52,7 +52,7 @@ export const makeCodexDirectProvider = Effect.gen(
         const response = yield* httpClient
           .postResponsesStream({
             accessToken: credential.accessToken,
-            accountId: Redacted.value(credential.accountId),
+            accountId: credential.accountId,
             request,
           })
           .pipe(
@@ -70,7 +70,7 @@ export const makeCodexDirectProvider = Effect.gen(
                       return yield* httpClient
                         .postResponsesStream({
                           accessToken: recovered.accessToken,
-                          accountId: Redacted.value(recovered.accountId),
+                          accountId: recovered.accountId,
                           request,
                         })
                         .pipe(

@@ -1,0 +1,186 @@
+{
+  "title": "Effect Schema String Contracts Tasks",
+  "spec": "docs/product-specs/effect-schema-string-contracts.md",
+  "status": "implemented",
+  "principles": [
+    "Every boundary string references a canonical owner-named Effect Schema.",
+    "Open semantic values are branded; closed vocabularies are literal Schemas; content, secrets, transport primitives, and diagnostics are classified rather than mechanically branded.",
+    "Decode complete structures once at boundaries and encode canonical values outward; never assert a brand.",
+    "Use Match over decoded literal or tagged unions for material branching while preserving framework-owned event maps.",
+    "Preserve all wire values, Redis bytes, encrypted profiles, routes, runtime configuration, and provider behavior.",
+    "Forbid helper sprawl, DTO mirrors, unsafe casts, local brand constructors, and generic schema utility modules."
+  ],
+  "globalVerification": [
+    "bun run --filter @bundjil/core check-types",
+    "bun run --filter @bundjil/core test",
+    "bun run --filter @bundjil/effect-start check-types",
+    "bun run --filter @bundjil/effect-start test",
+    "bun run --filter @bundjil/effect-persistence check-types",
+    "bun run --filter @bundjil/effect-persistence test",
+    "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/eve-effect check-types",
+    "bun run --filter @bundjil/eve-effect test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run fix",
+    "bun run check",
+    "bun run knip",
+    "bun run verification",
+    "bun run build",
+    "git diff --check",
+    "Review Effect language-service diagnostics for every changed TypeScript file",
+    "Static scans find no unsafe casts, local brand constructors, switch statements, raw JSON helpers, DTO mirrors, or new utils/helpers/common modules",
+    "No TSX, React, route, visible-text, deployment, provider, webhook, OAuth-profile, namespace, or Vercel configuration change"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record parent passes for ownership/call graph, Effect implementation/helper admission, and verification/evidence. Add passes until every finding is resolved."
+  },
+  "tasks": [
+    {
+      "id": "establish-string-contract-audit-and-rules",
+      "title": "Establish the canonical string-contract audit and rules",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Record every exported and persisted boundary string by owner and classify it as brand, literal, content, secret, transport, or diagnostic before changing public types.",
+      "implementationNotes": [
+        "Build the audit from actual Schema declarations and service signatures, not only text search counts.",
+        "Record existing brands, duplicate inline contracts, framework-owned event literals, and compatibility-sensitive persisted strings.",
+        "Update docs/architecture/effect-patterns.md with the classification and boundary decode/encode rule.",
+        "Do not create a global schema package or generic branded-string factory."
+      ],
+      "mandatoryVerification": [
+        "The audit classifies every exported or persisted string field in the scoped owners and names its canonical Schema owner.",
+        "The audit explicitly rejects brands for diagnostics, arbitrary prose, and parser-local transport fragments.",
+        "The plan records the installed Eve message.completed and finish-reason authority.",
+        "No production source changes in this task.",
+        "Record three parent audit passes with concrete evidence."
+      ],
+      "completionCriteria": [
+        "The source migration can proceed without deciding type ownership ad hoc.",
+        "The architecture rule is specific enough to review mechanically."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: every audited string family is assigned to its semantic package/app owner, installed Eve remains the message.completed protocol authority, and the SPEC records production/test decode-Match-encode paths without adding a common-schema package.",
+          "Effect quality and helper admission: the six-category rule distinguishes brands, literals, content, secrets, transport, and diagnostics; it forbids mechanical branding, assertions, decodeSync constructors, DTO mirrors, and generic helpers; no production source changed.",
+          "Verification and evidence: repository formatting/type-aware lint passed across 421 files with zero findings, task JSON parsed, the authority scan found 38 relevant source/declaration references, whitespace checks passed, and the diff contains documentation only."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "brand-persistence-and-codex-boundary-values",
+      "title": "Brand persistence and Codex boundary values",
+      "status": "completed",
+      "dependsOn": ["establish-string-contract-audit-and-rules"],
+      "description": "Add canonical brands and named literal/content/transport Schemas to persistence and Codex OAuth without changing encoded data.",
+      "implementationNotes": [
+        "Brand AtomicKeyValueStoreKey and AtomicKeyValueStoreValue and migrate callers through whole-transaction Schema decoding.",
+        "Consolidate Codex principal/account/URI/hash/scope/tool/call/completion/event/content-type contracts under canonical owner-named Schemas.",
+        "Keep broad forward-compatible provider event decoding while matching recognized literal event variants.",
+        "Do not brand provider prose, JSON fragments, SSE lines, diagnostic messages, or parser-local strings."
+      ],
+      "mandatoryVerification": [
+        "Primary operations remain flat meaningful Effect.gen/Effect.fn programs with errors translated in outer pipe.",
+        "No unsafe cast, decodeSync constructor, DTO mirror, one-call wrapper, or helper module is introduced.",
+        "Match replaces material raw discriminant branching where a canonical union exists.",
+        "Persistence and Codex compatibility fixtures prove unchanged keys, values, envelopes, requests, and streams.",
+        "Focused package checks and tests pass with no actionable language-service hints.",
+        "Record three parent audit passes with concrete evidence."
+      ],
+      "completionCriteria": [
+        "Persistence and Codex exported semantic strings follow the classification rule.",
+        "No production caller can interchange distinct valid IDs or opaque values without Schema decoding."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: effect-persistence owns branded atomic keys/serialized values; Codex owns its principal, URI, scope, subject-hash, protocol, function/call, event, completion, content, secret, and transport contracts; consumers decode whole transactions and encoded Redis/OAuth/SSE data remains unchanged.",
+          "Effect quality and helper admission: two parent correction rounds removed a lint suppression and closed anonymous completion/event/output-item/finish-reason/stream/protocol/header/cipher gaps; Match handles recognized literals while broad branded provider kinds remain forward-compatible; static scans found no unsafe cast, raw JSON, switch, production decodeSync, DTO mirror, or helper module.",
+          "Verification and evidence: with the protected local Executor environment loaded, 23 persistence, 103 Codex OAuth, 57 agent, and 24 proxy tests passed; root check, Knip, all-workspace typecheck, full verification, full build, and whitespace checks passed with no frontend or provider mutation."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "type-eve-sendblue-and-proxy-boundaries",
+      "title": "Type Eve, Sendblue, and proxy string boundaries",
+      "status": "completed",
+      "dependsOn": ["establish-string-contract-audit-and-rules"],
+      "description": "Canonicalize Eve operation strings, Sendblue event coordinates/content/config values, and proxy app strings while retaining framework and provider behavior.",
+      "implementationNotes": [
+        "Define the canonical message.completed literal and installed Eve finish-reason vocabulary without mirroring the full Eve protocol.",
+        "Brand reused session/turn/continuation/message/replay identities and name Sendblue content, status, prefix, secret, and provider transport Schemas.",
+        "Decode the projected Eve completed payload once and Match terminal versus tool-call behavior and replay outcomes.",
+        "Reuse Codex-owned subject/account/model/token Schemas in the proxy and keep app-only modes/paths app-owned."
+      ],
+      "mandatoryVerification": [
+        "The Eve event map remains framework-owned; no string-indexed manual dispatcher is added.",
+        "All changed control flow uses canonical literal/tagged unions and Match where material.",
+        "No unsafe cast, local brand constructor, DTO mirror, helper module, or duplicated Schema is introduced.",
+        "Sendblue route/status/provider fixtures and Eve completed-event fixtures remain behaviorally compatible.",
+        "Focused app/package checks and tests pass with no actionable language-service hints.",
+        "Record three parent audit passes with concrete evidence."
+      ],
+      "completionCriteria": [
+        "Eve, Sendblue, and proxy exported or persisted semantic strings follow the classification rule.",
+        "message.completed and finish-reason handling is Schema-owned and Match-driven at the Bundjil boundary."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: eve-effect owns reusable session, turn, message-completed, finish-reason, workspace, package, content, and operation contracts; the agent owns Sendblue identities, content limits, replay, status, and secret contracts; the proxy owns app modes, health, diagnostics, and local paths while reusing Codex account, principal, subject, and token Schemas.",
+          "Effect quality and helper admission: one correction round restored outbound trimming, separated inbound and outbound content constraints, typed Eve auth attributes, and closed anonymous model, status, secret, path, and replay gaps; Match directs material decoded unions; scans found no unsafe cast, suppression, raw JSON, switch, production decodeSync, DTO mirror, or helper module.",
+          "Verification and evidence: focused checks, tests, and builds passed with 4 Eve Effect, 60 agent, and 24 proxy tests; root check across 421 files, Knip, seven-workspace typecheck, full verification, full build, and whitespace checks passed with no frontend or provider mutation."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-string-contract-docs-and-final-audit",
+      "title": "Reconcile documentation and run the final string-contract audit",
+      "status": "completed",
+      "dependsOn": [
+        "brand-persistence-and-codex-boundary-values",
+        "type-eve-sendblue-and-proxy-boundaries"
+      ],
+      "description": "Re-run the inventory, reconcile package/app docs, and prove the complete repository follows the accepted classification without behavior drift, including the core-owned WorkspaceSummary boundary.",
+      "implementationNotes": [
+        "Update package/app READMEs only where public contracts or boundary rules changed.",
+        "Record @bundjil/core as the owner of workspace/package contracts and state that @bundjil/effect-start owns no string-domain contracts.",
+        "Record every remaining anonymous string exception with owner and category; remove stale duplicates.",
+        "Run the complete repository gate and static scans.",
+        "Do not perform live provider proof because runtime behavior and configuration are unchanged."
+      ],
+      "mandatoryVerification": [
+        "The final audit has no unexplained exported or persisted semantic string field.",
+        "Every new Schema/type/helper/export has a concrete owner and admission reason.",
+        "Root fix, check, Knip, verification, build, JSON parse, and diff checks pass.",
+        "No frontend or provider configuration changed; Browser/live proof remains not applicable.",
+        "Record three parent audit passes with concrete evidence."
+      ],
+      "completionCriteria": [
+        "Source, tests, audit table, architecture docs, and runbooks agree.",
+        "The SPEC and ledger are marked implemented only after all audit findings are resolved."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership and call graph: the final seven-workspace inventory found and corrected core's exported raw WorkspaceSummary strings; core now owns workspace/package brands and the fixed package literal vocabulary, Eve reuses the exact contracts, Effect Start owns no domain strings, and every remaining anonymous string is classified as private transport or diagnostic data.",
+          "Effect quality and helper admission: complete structures decode through owner Schemas, material decoded unions use Match, the exported default package API remains readonly and Schema-typed, and final scans found no unsafe cast, suppression, as-const constructor, switch, raw JSON helper, production decodeSync, DTO mirror, or new helper/common/utils module.",
+          "Verification and evidence: focused and root gates passed with 3 core, 6 Effect Start, 23 persistence, 103 Codex OAuth, 4 Eve Effect, 60 agent, and 24 proxy tests; formatting/check across 421 files, Knip, seven-workspace typecheck, full verification, full build, task JSON parse, static scans, and whitespace checks all passed with no frontend or provider mutation."
+        ]
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

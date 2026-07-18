@@ -10,31 +10,38 @@ import {
 
 import { CodexLocalProfileImportConfig } from "./contracts.js";
 import type { CodexLocalProfileImportConfig as CodexLocalProfileImportConfigType } from "./contracts.js";
+import {
+  CodexLocalAuthFile,
+  CodexOAuthConnectorId,
+  CodexOAuthInstallationId,
+  CodexOAuthPrincipalId,
+  CodexOAuthProfileId,
+} from "./credentials.js";
 import { CodexLocalProfileImportError } from "./errors.js";
 
 const localAuthFileConfig = Config.option(
-  Config.schema(Schema.NonEmptyString, "BUNDJIL_CODEX_LOCAL_AUTH_FILE")
+  Config.schema(CodexLocalAuthFile, "BUNDJIL_CODEX_LOCAL_AUTH_FILE")
 );
 
 const homeDirectoryConfig = Config.option(Config.nonEmptyString("HOME"));
 
 const principalIdConfig = Config.schema(
-  Schema.NonEmptyString,
+  CodexOAuthPrincipalId,
   "BUNDJIL_CODEX_PROFILE_PRINCIPAL_ID"
 );
 
 const connectorIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthConnectorId")),
+  CodexOAuthConnectorId,
   "BUNDJIL_CODEX_PROFILE_CONNECTOR_ID"
 );
 
 const installationIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthInstallationId")),
+  CodexOAuthInstallationId,
   "BUNDJIL_CODEX_PROFILE_INSTALLATION_ID"
 );
 
 const profileIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthProfileId")),
+  CodexOAuthProfileId,
   "BUNDJIL_CODEX_PROFILE_ID"
 );
 

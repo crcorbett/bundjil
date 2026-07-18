@@ -3,6 +3,7 @@ import { Deferred, Effect, Fiber, Layer, Redacted, Schema } from "effect";
 import { TestClock } from "effect/testing";
 import { HttpClient } from "effect/unstable/http";
 
+import { CodexOAuthRedirectUri } from "../src/auth/credentials.js";
 import {
   CodexOAuthHttpClient,
   CodexSubscriptionAuthError,
@@ -37,7 +38,9 @@ it.effect("classifies authorization-code exchange execution timeouts", () =>
         return yield* client.exchangeAuthorizationCode({
           code: Redacted.make("code-secret"),
           codeVerifier: Redacted.make("verifier-secret"),
-          redirectUri: "http://localhost:1455/auth/callback",
+          redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+            "http://localhost:1455/auth/callback"
+          ),
         });
       }).pipe(Effect.provide(makeTimeoutLayer(started)))
     );

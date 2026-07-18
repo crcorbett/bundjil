@@ -1,6 +1,10 @@
-import { defaultWorkspacePackages } from "@bundjil/eve";
+import {
+  BundjilDefaultWorkspacePackage,
+  defaultWorkspacePackages,
+  WorkspaceStatusSuccess,
+} from "@bundjil/eve";
 import { assert, it } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import type { ToolContext } from "eve/tools";
 
 import workspaceStatusTool, {
@@ -46,12 +50,17 @@ it.effect("executes the Eve tool through the live Effect named operation", () =>
     );
 
     assert.strictEqual(status.workspaceName, "bundjil");
-    assert.deepStrictEqual(status.packageNames, defaultWorkspacePackages);
-    assert.deepStrictEqual(status.packageNames, [
-      "@bundjil/codex",
-      "@bundjil/eve",
-      "@bundjil/store",
-    ]);
+    assert.strictEqual(
+      status.packageNames.join(","),
+      defaultWorkspacePackages.join(",")
+    );
+    assert.strictEqual(
+      status.packageNames.join(","),
+      "@bundjil/codex,@bundjil/eve,@bundjil/store"
+    );
+    assert.isTrue(
+      Schema.is(BundjilDefaultWorkspacePackage)(status.packageNames[0])
+    );
     assert.include(status.agentSummary, "Which packages are available?");
     assert.include(status.agentSummary, "@bundjil/eve");
   })
@@ -91,6 +100,14 @@ it.effect(
         }
       );
 
+      const expectedWorkspaceStatus = Schema.decodeUnknownSync(
+        WorkspaceStatusSuccess
+      )({
+        workspaceName: "bundjil",
+        packageNames: defaultWorkspacePackages,
+        agentSummary: "Workspace status.",
+      });
+
       assert.deepStrictEqual(
         workspaceStatusOutputSchema["~standard"].validate({
           workspaceName: "bundjil",
@@ -99,9 +116,7 @@ it.effect(
         }),
         {
           value: {
-            workspaceName: "bundjil",
-            packageNames: defaultWorkspacePackages,
-            agentSummary: "Workspace status.",
+            ...expectedWorkspaceStatus,
           },
         }
       );

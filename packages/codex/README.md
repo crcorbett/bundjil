@@ -170,6 +170,18 @@ Token schemas use Effect `Schema.RedactedFromValue`. Decoded values print and
 serialize as redacted placeholders, while the KeyValueStore JSON codec can
 persist the token value inside the approved storage boundary.
 
+## String Contracts
+
+The package owns canonical checked brands for Codex identities, endpoints,
+scopes, keys, model and call identifiers; named literals for OAuth/profile,
+request, and stream vocabularies; redacted secret contracts; and named content
+or transport Schemas for provider bodies, headers, and SSE values. Decode a
+complete provider/config/persistence structure at its boundary and encode the
+canonical result outward. Use `Match` for recognized decoded stream and role
+unions; forward-compatible provider fragments stay transport values. Do not
+copy schema fields downstream, add common/helper schema factories, construct
+brands with assertions, or use production `decodeSync`.
+
 ## Schema JSON Boundaries
 
 Provider request bodies, provider stream chunks, proof output, smoke-test

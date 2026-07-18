@@ -2,6 +2,7 @@ import { Effect, Equal, Redacted, Schema } from "effect";
 
 import { CodexOAuthAccountMetadata, CodexOAuthJwtExpiry } from "./contracts.js";
 import type { CodexOAuthAccountMetadata as CodexOAuthAccountMetadataType } from "./contracts.js";
+import { CodexOAuthAccountId } from "./credentials.js";
 import type {
   CodexOAuthAccessToken,
   CodexOAuthIdToken,
@@ -22,7 +23,7 @@ const JwtExpiryClaims = Schema.Struct({
 
 const IdTokenClaims = Schema.Struct({
   "https://api.openai.com/auth": Schema.Struct({
-    chatgpt_account_id: Schema.NonEmptyString,
+    chatgpt_account_id: CodexOAuthAccountId,
   }),
 });
 
@@ -115,7 +116,9 @@ export const decodeCodexAccountMetadata = Effect.fn(
   );
 
   return yield* Schema.decodeUnknownEffect(CodexOAuthAccountMetadata)({
-    accountId: claims["https://api.openai.com/auth"].chatgpt_account_id,
+    accountId: Redacted.value(
+      claims["https://api.openai.com/auth"].chatgpt_account_id
+    ),
   }).pipe(
     Effect.mapError(
       () =>

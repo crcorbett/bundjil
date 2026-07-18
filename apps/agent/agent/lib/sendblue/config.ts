@@ -13,6 +13,7 @@ import {
   E164PhoneNumber,
   SendblueConfig,
   SendblueSenderIdentities,
+  SendblueService,
 } from "./schemas.js";
 import type { SendblueConfig as SendblueConfigType } from "./schemas.js";
 
@@ -45,7 +46,7 @@ const replayStoreLeaseSecondsConfig = Config.schema(
   "BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS"
 );
 const allowedServicesConfig = Config.schema(
-  Schema.Array(Schema.Literals(["iMessage", "SMS", "RCS"])),
+  Schema.Array(SendblueService),
   "BUNDJIL_SENDBLUE_ALLOWED_SERVICES"
 ).pipe(Config.withDefault(["iMessage"]));
 const testModeConfig = Config.option(

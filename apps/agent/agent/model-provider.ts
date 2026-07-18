@@ -1,9 +1,21 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { OpenAICompatibleProviderSettings } from "@ai-sdk/openai-compatible";
+import { OpenAICompatibleProxyInternalToken } from "@bundjil/codex";
 import type { LanguageModel } from "ai";
 import { Match, Redacted, Schema } from "effect";
 
+export const AgentModelId = Schema.NonEmptyString.pipe(
+  Schema.brand("AgentModelId")
+);
+export type AgentModelId = typeof AgentModelId.Type;
+
 export const defaultAgentModel = "google/gemini-2.5-flash";
+
+export const AgentVercelProtectionBypass = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type AgentVercelProtectionBypass =
+  typeof AgentVercelProtectionBypass.Type;
 
 export const AgentModelProviderMode = Schema.Literals([
   "gateway",
@@ -13,7 +25,7 @@ export const AgentModelProviderMode = Schema.Literals([
 export type AgentModelProviderMode = typeof AgentModelProviderMode.Type;
 
 export const AgentGatewayModelProviderConfig = Schema.Struct({
-  model: Schema.NonEmptyString,
+  model: AgentModelId,
   provider: Schema.Literal("gateway"),
 });
 
@@ -22,12 +34,10 @@ export type AgentGatewayModelProviderConfig =
 
 export const AgentCodexProxyModelProviderConfig = Schema.Struct({
   baseURL: Schema.URL,
-  internalToken: Schema.RedactedFromValue(Schema.NonEmptyString),
-  model: Schema.NonEmptyString,
+  internalToken: OpenAICompatibleProxyInternalToken,
+  model: AgentModelId,
   modelContextWindowTokens: Schema.Int.check(Schema.isGreaterThan(0)),
-  protectionBypass: Schema.optional(
-    Schema.RedactedFromValue(Schema.NonEmptyString)
-  ),
+  protectionBypass: Schema.optional(AgentVercelProtectionBypass),
   provider: Schema.Literal("codex-proxy"),
 });
 

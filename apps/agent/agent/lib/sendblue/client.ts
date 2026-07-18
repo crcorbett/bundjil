@@ -18,6 +18,7 @@ import {
 import type {
   SendblueSendMessageInput as SendblueSendMessageInputType,
   SendblueSendMessageSuccess as SendblueSendMessageSuccessType,
+  SendblueResponseErrorReason,
 } from "./schemas.js";
 
 export type SendblueClientError =
@@ -92,18 +93,21 @@ export const makeSendblueClient = Effect.gen(
         );
 
         if (response.status < 200 || response.status >= 300) {
+          const reason: SendblueResponseErrorReason = Match.value(
+            response.status
+          ).pipe(
+            Match.when(401, (): SendblueResponseErrorReason => "unauthorized"),
+            Match.when(429, (): SendblueResponseErrorReason => "rateLimited"),
+            Match.when(
+              (status) => status >= 500,
+              (): SendblueResponseErrorReason => "serverRejected"
+            ),
+            Match.orElse((): SendblueResponseErrorReason => "clientRejected")
+          );
           return yield* new SendblueResponseError({
             message: "Sendblue rejected the message request.",
             operation: "sendMessage",
-            reason: Match.value(response.status).pipe(
-              Match.when(401, () => "unauthorized" as const),
-              Match.when(429, () => "rateLimited" as const),
-              Match.when(
-                (status) => status >= 500,
-                () => "serverRejected" as const
-              ),
-              Match.orElse(() => "clientRejected" as const)
-            ),
+            reason,
             status: response.status,
           });
         }
@@ -121,16 +125,28 @@ export const makeSendblueClient = Effect.gen(
               })
           )
         );
-        if (providerResponse.status === "ERROR") {
-          return yield* new SendblueResponseError({
-            message: "Sendblue rejected the message request.",
-            operation: "sendMessage",
-            reason: "providerRejected",
-            status: response.status,
-          });
-        }
-
-        return providerResponse;
+        return yield* Match.value(providerResponse).pipe(
+          Match.when({ status: "ERROR" }, () =>
+            Effect.fail(
+              new SendblueResponseError({
+                message: "Sendblue rejected the message request.",
+                operation: "sendMessage",
+                reason: "providerRejected",
+                status: response.status,
+              })
+            )
+          ),
+          Match.when({ status: "QUEUED" }, (success) =>
+            Effect.succeed<SendblueSendMessageSuccessType>(success)
+          ),
+          Match.when({ status: "SENT" }, (success) =>
+            Effect.succeed<SendblueSendMessageSuccessType>(success)
+          ),
+          Match.when({ status: "DELIVERED" }, (success) =>
+            Effect.succeed<SendblueSendMessageSuccessType>(success)
+          ),
+          Match.exhaustive
+        );
       }),
     });
   }

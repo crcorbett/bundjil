@@ -23,6 +23,7 @@ import {
   CodexProxyReadyLive,
   CodexProxyUnavailableLive,
 } from "./readiness.service.js";
+import type { CodexProxyLocalProfileStoreDirectory } from "./schemas.js";
 
 export const CodexProxyOpenAICompatibleProxyLocalUnavailableLive =
   Layer.succeed(
@@ -40,7 +41,7 @@ export const CodexProxyOpenAICompatibleProxyLocalUnavailableLive =
   ).pipe(Layer.merge(CodexProxyUnavailableLive));
 
 const makeCodexProxyEncryptedFileSystemProfileStoreLive = (
-  directory: string,
+  directory: CodexProxyLocalProfileStoreDirectory,
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv())
 ) =>
   CodexProfileStoreEncryptedKeyValueLive.pipe(
@@ -59,7 +60,7 @@ const makeCodexProxyEncryptedFileSystemProfileStoreLive = (
   );
 
 const makeCodexProxyOAuthServiceLocal = (
-  directory: string,
+  directory: CodexProxyLocalProfileStoreDirectory,
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv())
 ) =>
   CodexOAuthServiceLive.pipe(
@@ -78,7 +79,7 @@ const makeCodexProxyOAuthServiceLocal = (
   );
 
 export const makeCodexProxyOpenAICompatibleProxyLocal = (
-  directory: string,
+  directory: CodexProxyLocalProfileStoreDirectory,
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv()),
   responsesFetchLayer = CodexResponsesFetchLive
 ) =>

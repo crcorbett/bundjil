@@ -1,5 +1,9 @@
 import { Config, Context, Effect, Layer, Schema } from "effect";
 
+import {
+  CodexOAuthProfileCipherKeyId,
+  CodexOAuthProfileCipherKeyMaterial,
+} from "./contracts.js";
 import type { CodexOAuthProfileCipherConfig } from "./contracts.js";
 import { CodexOAuthProfileCipherError } from "./errors.js";
 
@@ -9,11 +13,12 @@ const encryptionAlgorithmConfig = Config.schema(
 ).pipe(Config.withDefault("AES-GCM"));
 
 const encryptionKeyIdConfig = Config.schema(
-  Schema.NonEmptyString.pipe(Schema.brand("CodexOAuthProfileCipherKeyId")),
+  CodexOAuthProfileCipherKeyId,
   "BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID"
 );
 
-const encryptionKeyMaterialConfig = Config.redacted(
+const encryptionKeyMaterialConfig = Config.schema(
+  CodexOAuthProfileCipherKeyMaterial,
   "BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY"
 );
 

@@ -17,6 +17,7 @@ import { SendblueReplayStore } from "./replay-store.js";
 import {
   SendblueCompletedMessage,
   SendblueInboundMessage,
+  SendblueReceivedStatusValue,
   SendblueSendMessageInput,
 } from "./schemas.js";
 import type {
@@ -24,6 +25,7 @@ import type {
   SendblueCompletedMessageResult,
   SendblueInboundDecision,
   SendblueInboundDispatchDecision,
+  SendblueIgnoredReason,
 } from "./schemas.js";
 import { SendblueSessionRouter } from "./session-router.js";
 import { SendblueWebhookVerifier } from "./webhook-verifier.js";
@@ -43,7 +45,7 @@ export interface SendblueChannelShape {
     send: () => Promise<unknown>
   ) => Effect.Effect<void, SendblueReplayStoreError | SendblueRoutingError>;
   readonly deliverCompletedMessage: (
-    input: SendblueCompletedMessageType
+    input: unknown
   ) => Effect.Effect<
     SendblueCompletedMessageResult,
     SendblueClientError | SendblueReplayStoreError | SendblueRoutingError
@@ -91,41 +93,48 @@ export const authorizeAndClaimInbound = Effect.fn(
     )
   );
 
-  const ignored = Match.value(inbound).pipe(
-    Match.when({ is_typing: true }, () => "typing" as const),
-    Match.when({ direction: "outbound" }, () => "outbound" as const),
-    Match.when({ is_outbound: true }, () => "outbound" as const),
+  const receivedStatus = Match.value(inbound.status).pipe(
+    Match.when(SendblueReceivedStatusValue, () => true),
+    Match.orElse(() => false)
+  );
+  const ignored: SendblueIgnoredReason | null = Match.value(inbound).pipe(
+    Match.when({ is_typing: true }, (): SendblueIgnoredReason => "typing"),
     Match.when(
-      ({ status }) => status !== "RECEIVED",
-      () => "statusNotReceived" as const
+      { direction: "outbound" },
+      (): SendblueIgnoredReason => "outbound"
+    ),
+    Match.when({ is_outbound: true }, (): SendblueIgnoredReason => "outbound"),
+    Match.when(
+      () => !receivedStatus,
+      (): SendblueIgnoredReason => "statusNotReceived"
     ),
     Match.when(
       ({ group_id }) => group_id !== undefined && group_id.length > 0,
-      () => "group" as const
+      (): SendblueIgnoredReason => "group"
     ),
     Match.when(
       ({ media_url, media_urls }) =>
         (media_url !== undefined && media_url.length > 0) ||
         (media_urls !== undefined && media_urls.length > 0),
-      () => "media" as const
+      (): SendblueIgnoredReason => "media"
     ),
     Match.when(
       ({ content }) => content.trim().length === 0,
-      () => "empty" as const
+      (): SendblueIgnoredReason => "empty"
     ),
     Match.when(
       ({ service }) => !config.allowedServices.includes(service),
-      () => "serviceNotAllowed" as const
+      (): SendblueIgnoredReason => "serviceNotAllowed"
     ),
     Match.when(
       ({ sendblue_number, to_number }) =>
         sendblue_number !== config.fromNumber &&
         to_number !== config.fromNumber,
-      () => "lineMismatch" as const
+      (): SendblueIgnoredReason => "lineMismatch"
     ),
     Match.when(
       ({ from_number }) => from_number === config.fromNumber,
-      () => "loop" as const
+      (): SendblueIgnoredReason => "loop"
     ),
     Match.orElse(() => null)
   );
@@ -150,27 +159,31 @@ export const authorizeAndClaimInbound = Effect.fn(
     config.fromNumber
   );
   const claimed = yield* replay.claimInbound(inbound.message_handle);
-  if (claimed.status === "duplicate") {
-    return { _tag: "Duplicate" } satisfies SendblueInboundDecision;
-  }
-  return {
-    _tag: "Dispatch",
-    auth: {
-      attributes: { channel: "sendblue" },
-      authenticator: "sendblue",
-      principalId: identity.principalId,
-      principalType: "user",
-    },
-    claim: claimed.claim,
-    continuationToken,
-    message: inbound.content.trim(),
-    state: {
-      conversationKey: continuationToken,
-      principalId: identity.principalId,
-      sendblueNumber: config.fromNumber,
-      senderNumber: inbound.from_number,
-    },
-  } satisfies SendblueInboundDecision;
+  return yield* Match.value(claimed).pipe(
+    Match.when({ status: "duplicate" }, () =>
+      Effect.succeed<SendblueInboundDecision>({ _tag: "Duplicate" })
+    ),
+    Match.orElse(({ claim }) =>
+      Effect.succeed<SendblueInboundDecision>({
+        _tag: "Dispatch",
+        auth: {
+          attributes: { channel: "sendblue" },
+          authenticator: "sendblue",
+          principalId: identity.principalId,
+          principalType: "user",
+        },
+        claim,
+        continuationToken,
+        message: inbound.content.trim(),
+        state: {
+          conversationKey: continuationToken,
+          principalId: identity.principalId,
+          sendblueNumber: config.fromNumber,
+          senderNumber: inbound.from_number,
+        },
+      })
+    )
+  );
 });
 
 export const dispatchAcceptedInbound = Effect.fn(
@@ -204,7 +217,7 @@ export const dispatchAcceptedInbound = Effect.fn(
 
 export const deliverCompletedMessage = Effect.fn(
   "SendblueChannel.deliverCompletedMessage"
-)(function* (input: SendblueCompletedMessageType) {
+)(function* (input: unknown) {
   const completed = yield* Schema.decodeUnknownEffect(SendblueCompletedMessage)(
     input
   ).pipe(
@@ -215,63 +228,88 @@ export const deliverCompletedMessage = Effect.fn(
         })
     )
   );
-  if (
-    completed.finishReason === "tool-calls" ||
-    completed.message === null ||
-    completed.message.trim().length === 0
-  ) {
-    return "ignored";
-  }
-  const replay = yield* SendblueReplayStore;
-  const client = yield* SendblueClient;
-  const claimed = yield* replay.claimOutbound({
-    sequence: completed.sequence,
-    sessionId: completed.sessionId,
-    stepIndex: completed.stepIndex,
-    turnId: completed.turnId,
-  });
-  if (claimed.status === "duplicate") {
-    return "duplicate";
-  }
-  return yield* Schema.decodeUnknownEffect(SendblueSendMessageInput)({
-    content: completed.message.trim(),
-    from_number: completed.state.sendblueNumber,
-    number: completed.state.senderNumber,
-  }).pipe(
-    Effect.mapError(
-      () =>
-        new SendblueRequestError({
-          message: "The completed Eve message cannot be sent by Sendblue.",
-          operation: "sendMessage",
-          reason: "requestEncoding",
+  return yield* Match.value(completed).pipe(
+    Match.when({ finishReason: "tool-calls" }, () =>
+      Effect.succeed<SendblueCompletedMessageResult>("ignored")
+    ),
+    Match.when(
+      (
+        completed
+      ): completed is SendblueCompletedMessageType & {
+        readonly message: string;
+      } => completed.message !== null && completed.message.trim().length > 0,
+      (completed) =>
+        Effect.gen(function* deliverTerminalSendblueMessage() {
+          const replay = yield* SendblueReplayStore;
+          const client = yield* SendblueClient;
+          const claimed = yield* replay.claimOutbound({
+            sequence: completed.sequence,
+            sessionId: completed.sessionId,
+            stepIndex: completed.stepIndex,
+            turnId: completed.turnId,
+          });
+          return yield* Match.value(claimed).pipe(
+            Match.when({ status: "duplicate" }, () =>
+              Effect.succeed<SendblueCompletedMessageResult>("duplicate")
+            ),
+            Match.orElse(({ claim }) =>
+              Schema.decodeUnknownEffect(SendblueSendMessageInput)({
+                content: completed.message.trim(),
+                from_number: completed.state.sendblueNumber,
+                number: completed.state.senderNumber,
+              }).pipe(
+                Effect.mapError(
+                  () =>
+                    new SendblueRequestError({
+                      message:
+                        "The completed Eve message cannot be sent by Sendblue.",
+                      operation: "sendMessage",
+                      reason: "requestEncoding",
+                    })
+                ),
+                Effect.flatMap(client.sendMessage),
+                Effect.tap((success) =>
+                  replay
+                    .complete(claim, {
+                      providerMessageHandle: success.message_handle,
+                    })
+                    .pipe(
+                      Effect.catchTag(
+                        "SendblueReplayStoreError",
+                        (completeError) =>
+                          replay
+                            .uncertain(claim)
+                            .pipe(Effect.andThen(Effect.fail(completeError)))
+                      )
+                    )
+                ),
+                Effect.as<SendblueCompletedMessageResult>("delivered"),
+                Effect.catchTag("SendblueDeliveryUncertainError", (error) =>
+                  replay
+                    .uncertain(claim)
+                    .pipe(Effect.andThen(Effect.fail(error)))
+                ),
+                Effect.catchTag("SendblueRequestError", (error) =>
+                  replay
+                    .retryable(claim)
+                    .pipe(Effect.andThen(Effect.fail(error)))
+                ),
+                Effect.catchTag("SendblueResponseError", (error) =>
+                  Match.value(error.reason).pipe(
+                    Match.when("malformedResponse", () =>
+                      replay.uncertain(claim)
+                    ),
+                    Match.orElse(() => replay.retryable(claim)),
+                    Effect.andThen(Effect.fail(error))
+                  )
+                )
+              )
+            )
+          );
         })
     ),
-    Effect.flatMap(client.sendMessage),
-    Effect.tap((success) =>
-      replay
-        .complete(claimed.claim, {
-          providerMessageHandle: success.message_handle,
-        })
-        .pipe(
-          Effect.catchTag("SendblueReplayStoreError", (completeError) =>
-            replay
-              .uncertain(claimed.claim)
-              .pipe(Effect.andThen(Effect.fail(completeError)))
-          )
-        )
-    ),
-    Effect.as("delivered" as const),
-    Effect.catchTag("SendblueDeliveryUncertainError", (error) =>
-      replay.uncertain(claimed.claim).pipe(Effect.andThen(Effect.fail(error)))
-    ),
-    Effect.catchTag("SendblueRequestError", (error) =>
-      replay.retryable(claimed.claim).pipe(Effect.andThen(Effect.fail(error)))
-    ),
-    Effect.catchTag("SendblueResponseError", (error) =>
-      (error.reason === "malformedResponse"
-        ? replay.uncertain(claimed.claim)
-        : replay.retryable(claimed.claim)
-      ).pipe(Effect.andThen(Effect.fail(error)))
+    Match.orElse(() =>
+      Effect.succeed<SendblueCompletedMessageResult>("ignored")
     )
   );
 });
