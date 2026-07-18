@@ -94,7 +94,7 @@ Status: Completed
 
 ### 3. Durable Eve lifecycle and observations
 
-Status: Planned
+Status: Completed
 
 - Split core conversation state from auxiliary channel typing state so corrupt
   typing data cannot block final-message delivery.
@@ -219,3 +219,17 @@ verify one normal Production message without typing before further work.
   missing required Config field. Focused tests passed 14/14; frozen install,
   formatting, Knip, 7/7 typechecks, 11/11 test tasks, 66/66 agent tests, 7/7
   builds, static scans, and diff checks passed with no Executor API key.
+- 2026-07-19: `wire-durable-eve-typing-lifecycle` completed three parent
+  passes. Ownership remains in the app-owned Sendblue Schemas, channel policy,
+  encoded Eve adapter, and tests; all 15 installed Eve event keys are projected
+  without changing live Layer composition, shared packages, dependencies, or
+  provider topology. Effect review accepted the missing-key-only migration,
+  separate core/full state decoding, exhaustive command/lifecycle matching,
+  conservative cleanup obligation, encoded in-place state mutation, and
+  Schema-valid Clock/logger observations. Parent review rejected a mutable DTO
+  mirror, unknown command input, raw lifecycle branching, synchronous
+  production decoding, one unreachable nested test, and incomplete corrupt
+  adapter proof; all findings were corrected. Focused lifecycle/build-route
+  tests passed 27/27, all 75 agent tests passed, fresh Eve discovery passed,
+  and formatting, Knip, 7/7 typechecks, 11/11 root test tasks, 7/7 builds,
+  static/leak/JSON/diff checks passed with the Executor API key absent.

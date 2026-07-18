@@ -1,8 +1,21 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, ManagedRuntime, Redacted, Ref, Schema } from "effect";
+import {
+  Effect,
+  Fiber,
+  Layer,
+  Logger,
+  ManagedRuntime,
+  Redacted,
+  Ref,
+  Schema,
+} from "effect";
+import { TestClock } from "effect/testing";
 import type { RouteHandlerArgs, Session } from "eve/channels";
 
-import { makeSendblueEveChannel } from "../agent/channels/sendblue.js";
+import {
+  makeSendblueEveChannel,
+  makeSendblueEveEvents,
+} from "../agent/channels/sendblue.js";
 import {
   SendblueChannel,
   SendblueChannelLive,
@@ -25,10 +38,15 @@ import {
 } from "../agent/lib/sendblue/replay-store.service.js";
 import {
   SendblueChannelState,
+  SendblueConversationState,
   SendblueConfig,
   SendblueInboundMessage,
   SendblueSendMessageSuccess,
   SendblueSenderIdentities,
+  SendblueTypingIndicatorSuccess,
+  SendblueTypingLifecycle,
+  SendblueTypingObservation,
+  SendblueTypingTransitionInput,
 } from "../agent/lib/sendblue/schemas.js";
 import { SendblueSessionRouterLive } from "../agent/lib/sendblue/session-router.service.js";
 import { SendblueWebhookVerifierLive } from "../agent/lib/sendblue/webhook-verifier.service.js";
@@ -64,6 +82,12 @@ const sendSuccess = Schema.decodeUnknownSync(SendblueSendMessageSuccess)({
   message_handle: "outbound-provider-handle",
   status: "QUEUED",
 });
+const typingSuccess = Schema.decodeUnknownSync(SendblueTypingIndicatorSuccess)({
+  number: "+14155550100",
+  status: "SENT",
+});
+const typingInput = (state: unknown, command: unknown) =>
+  Schema.decodeUnknownSync(SendblueTypingTransitionInput)({ command, state });
 const encodeInbound = Schema.encodeSync(
   Schema.fromJsonString(SendblueInboundMessage)
 );
@@ -787,4 +811,858 @@ it.effect("fails closed when inbound replay storage cannot claim", () =>
   }).pipe(
     Effect.provide(channelLayer(SendblueClientMemory(), replayUnavailable))
   )
+);
+
+it.effect("migrates and rolls back the encoded typing lifecycle", () =>
+  Effect.gen(function* testTypingStateMigration() {
+    const legacy = {
+      conversationKey: "sendblue:conversation:migration",
+      principalId: "owner",
+      sendblueNumber: "+14155550177",
+      senderNumber: "+14155550100",
+    };
+    const migrated =
+      yield* Schema.decodeUnknownEffect(SendblueChannelState)(legacy);
+    assert.deepStrictEqual(migrated.typing, { _tag: "Idle" });
+
+    const explicitUndefined = yield* Schema.decodeUnknownEffect(
+      SendblueChannelState
+    )({ ...legacy, typing: undefined }).pipe(Effect.flip);
+    assert.strictEqual(explicitUndefined._tag, "SchemaError");
+
+    const encoded = yield* Schema.encodeEffect(SendblueChannelState)({
+      ...migrated,
+      typing: Schema.decodeUnknownSync(SendblueTypingLifecycle)({
+        _tag: "Active",
+        turnId: "turn-migration",
+      }),
+    });
+    assert.deepStrictEqual(encoded.typing, {
+      _tag: "Active",
+      turnId: "turn-migration",
+    });
+    assert.deepStrictEqual(
+      yield* Schema.decodeUnknownEffect(SendblueConversationState)(encoded),
+      legacy
+    );
+  })
+);
+
+it.effect(
+  "starts once, supersedes older turns, and rejects stale cleanup",
+  () =>
+    Effect.gen(function* testReplaySafeTypingLifecycle() {
+      const requests = yield* Ref.make<readonly string[]>([]);
+      const client = SendblueClientMemory({
+        setTypingIndicator: (input) =>
+          Ref.update(requests, (values) => [...values, input.state]).pipe(
+            Effect.as(typingSuccess)
+          ),
+      });
+      yield* Effect.gen(function* assertReplaySafeTransitions() {
+        const sendblue = yield* SendblueChannel;
+        const first = yield* sendblue.transitionTyping(
+          typingInput(channelState, {
+            _tag: "StartTurn",
+            turnId: "turn-old",
+          })
+        );
+        assert.strictEqual(first.outcome, "started");
+        assert.strictEqual(first.lifecycle._tag, "Active");
+
+        const replay = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: first.lifecycle },
+            { _tag: "StartTurn", turnId: "turn-old" }
+          )
+        );
+        assert.strictEqual(replay.outcome, "unchanged");
+
+        const newer = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: first.lifecycle },
+            { _tag: "StartTurn", turnId: "turn-new" }
+          )
+        );
+        assert.strictEqual(newer.outcome, "started");
+        assert.strictEqual(newer.lifecycle._tag, "Active");
+        if (newer.lifecycle._tag === "Active") {
+          assert.strictEqual(newer.lifecycle.turnId, "turn-new");
+        }
+
+        const resumed = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: newer.lifecycle },
+            { _tag: "ResumeTurn", turnId: "turn-new" }
+          )
+        );
+        assert.strictEqual(resumed.outcome, "started");
+
+        const stale = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: newer.lifecycle },
+            { _tag: "StopTurn", expectedTurnId: "turn-old" }
+          )
+        );
+        assert.strictEqual(stale.outcome, "unchanged");
+
+        const stopped = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: newer.lifecycle },
+            { _tag: "StopTurn", expectedTurnId: "turn-new" }
+          )
+        );
+        assert.strictEqual(stopped.outcome, "stopped");
+        assert.deepStrictEqual(stopped.lifecycle, { _tag: "Idle" });
+        assert.deepStrictEqual(yield* Ref.get(requests), [
+          "start",
+          "start",
+          "start",
+          "stop",
+        ]);
+      }).pipe(Effect.provide(channelLayer(client)));
+    })
+);
+
+it.effect(
+  "retains uncertain cleanup obligations until a successful retry",
+  () =>
+    Effect.gen(function* testUncertainTypingTransitions() {
+      const attempts = yield* Ref.make(0);
+      const client = SendblueClientMemory({
+        setTypingIndicator: () =>
+          Ref.getAndUpdate(attempts, (value) => value + 1).pipe(
+            Effect.flatMap((attempt) =>
+              attempt < 2
+                ? Effect.fail(
+                    new SendblueDeliveryUncertainError({
+                      message: "Typing outcome uncertain.",
+                      operation: "setTypingIndicator",
+                      reason: "transport",
+                    })
+                  )
+                : Effect.succeed(typingSuccess)
+            )
+          ),
+      });
+      yield* Effect.gen(function* assertConservativeTypingState() {
+        const sendblue = yield* SendblueChannel;
+        const uncertainStart = yield* sendblue.transitionTyping(
+          typingInput(channelState, {
+            _tag: "StartTurn",
+            turnId: "turn-uncertain",
+          })
+        );
+        assert.strictEqual(uncertainStart.outcome, "unavailable");
+        assert.strictEqual(uncertainStart.lifecycle._tag, "Active");
+        if (uncertainStart.lifecycle._tag === "Active") {
+          assert.strictEqual(uncertainStart.lifecycle.turnId, "turn-uncertain");
+        }
+
+        const uncertainStop = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: uncertainStart.lifecycle },
+            { _tag: "StopTurn", expectedTurnId: "turn-uncertain" }
+          )
+        );
+        assert.strictEqual(uncertainStop.outcome, "unavailable");
+        assert.deepStrictEqual(
+          uncertainStop.lifecycle,
+          uncertainStart.lifecycle
+        );
+
+        const retry = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: uncertainStop.lifecycle },
+            { _tag: "StopTurn", expectedTurnId: "turn-uncertain" }
+          )
+        );
+        assert.strictEqual(retry.outcome, "stopped");
+        assert.deepStrictEqual(retry.lifecycle, { _tag: "Idle" });
+        assert.strictEqual(yield* Ref.get(attempts), 3);
+      }).pipe(Effect.provide(channelLayer(client)));
+    })
+);
+
+it.effect(
+  "repairs corrupt auxiliary state without blocking valid final delivery",
+  () =>
+    Effect.gen(function* testTypingStateRepair() {
+      const typingAttempts = yield* Ref.make(0);
+      const messageAttempts = yield* Ref.make(0);
+      const client = SendblueClientMemory({
+        sendMessage: () =>
+          Ref.update(messageAttempts, (value) => value + 1).pipe(
+            Effect.as(sendSuccess)
+          ),
+        setTypingIndicator: () =>
+          Ref.update(typingAttempts, (value) => value + 1).pipe(
+            Effect.as(typingSuccess)
+          ),
+      });
+      yield* Effect.gen(function* assertAuxiliaryRepair() {
+        const sendblue = yield* SendblueChannel;
+        const corrupt = { ...channelState, typing: { _tag: "Corrupt" } };
+        const transition = yield* sendblue.transitionTyping(
+          typingInput(corrupt, {
+            _tag: "StartTurn",
+            turnId: "turn-corrupt",
+          })
+        );
+        assert.strictEqual(transition.outcome, "unavailable");
+        if (transition._tag === "Unavailable") {
+          assert.strictEqual(transition.reason, "stateInvalid");
+        }
+        assert.deepStrictEqual(transition.lifecycle, { _tag: "Idle" });
+        assert.strictEqual(yield* Ref.get(typingAttempts), 0);
+
+        assert.strictEqual(
+          yield* sendblue.deliverCompletedMessage({
+            finishReason: "stop",
+            message: "Delivery survives auxiliary corruption.",
+            sequence: 0,
+            sessionId: "session-corrupt-auxiliary",
+            state: corrupt,
+            stepIndex: 0,
+            turnId: "turn-corrupt",
+          }),
+          "delivered"
+        );
+        assert.strictEqual(yield* Ref.get(messageAttempts), 1);
+
+        const corruptCore = {
+          ...corrupt,
+          senderNumber: "not-a-phone-number",
+        };
+        const coreTransition = yield* sendblue.transitionTyping(
+          typingInput(corruptCore, {
+            _tag: "StartTurn",
+            turnId: "turn-corrupt-core",
+          })
+        );
+        assert.strictEqual(coreTransition.outcome, "unavailable");
+        const deliveryError = yield* sendblue
+          .deliverCompletedMessage({
+            finishReason: "stop",
+            message: "Invalid routing must fail.",
+            sequence: 0,
+            sessionId: "session-corrupt-core",
+            state: corruptCore,
+            stepIndex: 0,
+            turnId: "turn-corrupt-core",
+          })
+          .pipe(Effect.flip);
+        assert.strictEqual(
+          Schema.is(SendblueRoutingError)(deliveryError),
+          true
+        );
+        assert.strictEqual(yield* Ref.get(typingAttempts), 0);
+      }).pipe(Effect.provide(channelLayer(client)));
+    })
+);
+
+it.effect(
+  "emits one private Schema-valid observation with exact TestClock timing",
+  () => {
+    const observations: unknown[] = [];
+    const levels: string[] = [];
+    const logger = Logger.make(
+      ({ logLevel, message }: Logger.Options<unknown>) => {
+        const messages = Array.isArray(message) ? message : [message];
+        for (const candidate of messages) {
+          if (Schema.is(SendblueTypingObservation)(candidate)) {
+            observations.push(candidate);
+            levels.push(logLevel);
+          }
+        }
+      }
+    );
+    const client = SendblueClientMemory({
+      setTypingIndicator: () =>
+        Effect.sleep("2 seconds").pipe(Effect.as(typingSuccess)),
+    });
+    return Effect.gen(function* testTypingObservation() {
+      const sendblue = yield* SendblueChannel;
+      const fiber = yield* Effect.forkChild(
+        sendblue.transitionTyping(
+          typingInput(channelState, {
+            _tag: "StartTurn",
+            turnId: "protected-turn-id",
+          })
+        )
+      );
+      yield* TestClock.adjust("2 seconds");
+      const started = yield* Fiber.join(fiber);
+      assert.strictEqual(started.outcome, "started");
+      const replay = yield* sendblue.transitionTyping(
+        typingInput(
+          { ...channelState, typing: started.lifecycle },
+          { _tag: "StartTurn", turnId: "protected-turn-id" }
+        )
+      );
+      assert.strictEqual(replay.outcome, "unchanged");
+      assert.strictEqual(observations.length, 1);
+      assert.deepStrictEqual(levels, ["Info"]);
+      assert.deepStrictEqual(observations[0], {
+        command: "StartTurn",
+        elapsedMillis: 2000,
+        operation: "setTypingIndicator",
+        outcome: "started",
+        providerAttempted: true,
+      });
+      const serialized = JSON.stringify(observations);
+      for (const protectedValue of [
+        "protected-turn-id",
+        "+14155550100",
+        "+14155550177",
+        "test-api-key",
+        "test-api-secret",
+      ]) {
+        assert.notInclude(serialized, protectedValue);
+      }
+    }).pipe(
+      Effect.provide(Layer.merge(channelLayer(client), Logger.layer([logger])))
+    );
+  }
+);
+
+it.effect("observes state repair without claiming a provider attempt", () => {
+  const observations: unknown[] = [];
+  const levels: string[] = [];
+  const logger = Logger.make(
+    ({ logLevel, message }: Logger.Options<unknown>) => {
+      const messages = Array.isArray(message) ? message : [message];
+      for (const candidate of messages) {
+        if (Schema.is(SendblueTypingObservation)(candidate)) {
+          observations.push(candidate);
+          levels.push(logLevel);
+        }
+      }
+    }
+  );
+  return Effect.gen(function* testStateRepairObservation() {
+    const sendblue = yield* SendblueChannel;
+    const result = yield* sendblue.transitionTyping(
+      typingInput(
+        { ...channelState, typing: { _tag: "Invalid" } },
+        { _tag: "StartTurn", turnId: "protected-state-invalid-turn" }
+      )
+    );
+    assert.strictEqual(result.outcome, "unavailable");
+    assert.deepStrictEqual(observations, [
+      {
+        command: "StartTurn",
+        elapsedMillis: 0,
+        operation: "setTypingIndicator",
+        outcome: "unavailable",
+        providerAttempted: false,
+        reason: "stateInvalid",
+      },
+    ]);
+    assert.deepStrictEqual(levels, ["Warn"]);
+    assert.notInclude(
+      JSON.stringify(observations),
+      "protected-state-invalid-turn"
+    );
+  }).pipe(
+    Effect.provide(
+      Layer.merge(channelLayer(SendblueClientMemory()), Logger.layer([logger]))
+    )
+  );
+});
+
+it.effect("never calls typing for rejected or replayed inbound paths", () =>
+  Effect.gen(function* testNoTypingBeforeAcceptedTurn() {
+    const typingAttempts = yield* Ref.make(0);
+    const client = SendblueClientMemory({
+      setTypingIndicator: () =>
+        Ref.update(typingAttempts, (value) => value + 1).pipe(
+          Effect.as(typingSuccess)
+        ),
+    });
+    yield* Effect.gen(function* assertInboundPathsDoNotType() {
+      const sendblue = yield* SendblueChannel;
+      const cases = [
+        { is_typing: true },
+        { group_id: "group-no-typing" },
+        { media_urls: ["https://example.test/no-typing"] },
+        { service: "SMS" },
+        { service: "RCS" },
+        { from_number: "+14155550101" },
+      ];
+      for (const [index, changes] of cases.entries()) {
+        yield* sendblue.authorizeAndClaimInbound(
+          request(inbound({ ...changes, message_handle: `no-typing-${index}` }))
+        );
+      }
+      const replayed = inbound({ message_handle: "no-typing-replay" });
+      yield* sendblue.authorizeAndClaimInbound(request(replayed));
+      yield* sendblue.authorizeAndClaimInbound(request(replayed));
+      yield* sendblue
+        .authorizeAndClaimInbound(request(inbound(), "wrong-secret"))
+        .pipe(Effect.ignore);
+      yield* sendblue
+        .authorizeAndClaimInbound(
+          new Request("https://agent.test/eve/v1/sendblue/webhook", {
+            body: "not-json",
+            headers: { "sb-signing-secret": "test-webhook-secret" },
+            method: "POST",
+          })
+        )
+        .pipe(Effect.ignore);
+      assert.strictEqual(yield* Ref.get(typingAttempts), 0);
+    }).pipe(Effect.provide(channelLayer(client)));
+  })
+);
+
+it.effect(
+  "projects every installed Eve event and stops before terminal delivery",
+  () =>
+    Effect.gen(function* testEveTypingProjection() {
+      const operations: string[] = [];
+      let failStop = false;
+      const client = SendblueClientMemory({
+        sendMessage: () =>
+          Effect.sync(() => {
+            operations.push("message");
+            return sendSuccess;
+          }),
+        setTypingIndicator: (input) =>
+          Effect.sync(() => {
+            operations.push(`typing:${input.state}`);
+          }).pipe(
+            Effect.flatMap(() =>
+              failStop && input.state === "stop"
+                ? Effect.fail(
+                    new SendblueDeliveryUncertainError({
+                      message: "Bounded typing stop timed out.",
+                      operation: "setTypingIndicator",
+                      reason: "timeout",
+                    })
+                  )
+                : Effect.succeed(typingSuccess)
+            )
+          ),
+      });
+      const managed = yield* Effect.acquireRelease(
+        Effect.sync(() => ManagedRuntime.make(channelLayer(client))),
+        (activeRuntime) => activeRuntime.disposeEffect
+      );
+      const events = makeSendblueEveEvents(managed);
+      assert.deepStrictEqual(Object.keys(events).toSorted(), [
+        "action.result",
+        "actions.requested",
+        "authorization.completed",
+        "authorization.required",
+        "input.requested",
+        "message.appended",
+        "message.completed",
+        "reasoning.appended",
+        "reasoning.completed",
+        "session.completed",
+        "session.failed",
+        "session.waiting",
+        "turn.completed",
+        "turn.failed",
+        "turn.started",
+      ]);
+      const state = Schema.encodeSync(SendblueChannelState)(channelState);
+      const eventChannel = {
+        continuationToken: "sendblue:conversation:test",
+        setContinuationToken() {},
+        state,
+      };
+      const ctx = {
+        getSandbox: () => Promise.reject(new Error("unused")),
+        getSkill: () => {
+          throw new Error("unused");
+        },
+        session: {
+          auth: { current: null, initiator: null },
+          id: "session-eve-events",
+          turn: { id: "turn-eve-events", sequence: 0 },
+        },
+      };
+      const started = events["turn.started"];
+      const completed = events["message.completed"];
+      if (started === undefined || completed === undefined) {
+        return yield* Effect.die("Required Sendblue Eve events are missing.");
+      }
+
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          started({ sequence: 0, turnId: "turn-eve-events" }, eventChannel, ctx)
+        )
+      );
+      assert.deepStrictEqual(state.typing, {
+        _tag: "Active",
+        turnId: "turn-eve-events",
+      });
+
+      events["message.appended"]?.(
+        {
+          messageDelta: "delta",
+          messageSoFar: "delta",
+          sequence: 0,
+          stepIndex: 0,
+          turnId: "turn-eve-events",
+        },
+        eventChannel,
+        ctx
+      );
+      events["reasoning.appended"]?.(
+        {
+          reasoningDelta: "private reasoning delta",
+          reasoningSoFar: "private reasoning delta",
+          sequence: 0,
+          stepIndex: 0,
+          turnId: "turn-eve-events",
+        },
+        eventChannel,
+        ctx
+      );
+      events["reasoning.completed"]?.(
+        {
+          reasoning: "private reasoning",
+          sequence: 0,
+          stepIndex: 0,
+          turnId: "turn-eve-events",
+        },
+        eventChannel,
+        ctx
+      );
+      assert.deepStrictEqual(operations, ["typing:start"]);
+
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          completed(
+            {
+              finishReason: "tool-calls",
+              message: "Intermediate tool text.",
+              sequence: 0,
+              stepIndex: 0,
+              turnId: "turn-eve-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.deepStrictEqual(operations, ["typing:start"]);
+
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          completed(
+            {
+              finishReason: "stop",
+              message: "Visible final reply.",
+              sequence: 1,
+              stepIndex: 1,
+              turnId: "turn-eve-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.deepStrictEqual(operations, [
+        "typing:start",
+        "typing:stop",
+        "message",
+      ]);
+      assert.deepStrictEqual(state.typing, { _tag: "Idle" });
+
+      operations.length = 0;
+      failStop = true;
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          started(
+            { sequence: 1, turnId: "turn-fail-open-delivery" },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          completed(
+            {
+              finishReason: "stop",
+              message: "Delivered after typing timeout.",
+              sequence: 2,
+              stepIndex: 0,
+              turnId: "turn-fail-open-delivery",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.deepStrictEqual(operations, [
+        "typing:start",
+        "typing:stop",
+        "message",
+      ]);
+      assert.deepStrictEqual(state.typing, {
+        _tag: "Active",
+        turnId: "turn-fail-open-delivery",
+      });
+
+      operations.length = 0;
+      failStop = false;
+      Object.assign(state, { typing: { _tag: "Corrupt" } });
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          started(
+            { sequence: 2, turnId: "turn-corrupt-adapter" },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.deepStrictEqual(operations, []);
+      assert.deepStrictEqual(state.typing, { _tag: "Idle" });
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          completed(
+            {
+              finishReason: "stop",
+              message: "Core delivery survives adapter state repair.",
+              sequence: 3,
+              stepIndex: 0,
+              turnId: "turn-corrupt-adapter",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.deepStrictEqual(operations, ["message"]);
+      assert.deepStrictEqual(state.typing, { _tag: "Idle" });
+      return yield* Effect.void;
+    })
+);
+
+it.effect(
+  "maps wait, authorization, terminal, and failed-session cleanup",
+  () =>
+    Effect.gen(function* testEveCleanupEvents() {
+      const operations: string[] = [];
+      const client = SendblueClientMemory({
+        setTypingIndicator: (input) =>
+          Effect.sync(() => {
+            operations.push(input.state);
+            return typingSuccess;
+          }),
+      });
+      const managed = yield* Effect.acquireRelease(
+        Effect.sync(() => ManagedRuntime.make(channelLayer(client))),
+        (activeRuntime) => activeRuntime.disposeEffect
+      );
+      const events = makeSendblueEveEvents(managed);
+      const state = Schema.encodeSync(SendblueChannelState)(channelState);
+      const eventChannel = {
+        continuationToken: "sendblue:conversation:test",
+        setContinuationToken() {},
+        state,
+      };
+      const ctx = {
+        getSandbox: () => Promise.reject(new Error("unused")),
+        getSkill: () => {
+          throw new Error("unused");
+        },
+        session: {
+          auth: { current: null, initiator: null },
+          id: "session-cleanup-events",
+          turn: { id: "turn-cleanup-events", sequence: 0 },
+        },
+      };
+      const started = events["turn.started"];
+      const inputRequested = events["input.requested"];
+      const authorizationRequired = events["authorization.required"];
+      const authorizationCompleted = events["authorization.completed"];
+      const turnFailed = events["turn.failed"];
+      const turnCompleted = events["turn.completed"];
+      const sessionWaiting = events["session.waiting"];
+      const sessionCompleted = events["session.completed"];
+      const sessionFailed = events["session.failed"];
+      if (
+        started === undefined ||
+        inputRequested === undefined ||
+        authorizationRequired === undefined ||
+        authorizationCompleted === undefined ||
+        turnFailed === undefined ||
+        turnCompleted === undefined ||
+        sessionWaiting === undefined ||
+        sessionCompleted === undefined ||
+        sessionFailed === undefined
+      ) {
+        return yield* Effect.die(
+          "Required Sendblue cleanup events are missing."
+        );
+      }
+      const start = () =>
+        Promise.resolve(
+          started(
+            { sequence: 0, turnId: "turn-cleanup-events" },
+            eventChannel,
+            ctx
+          )
+        );
+
+      yield* Effect.promise(start);
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          inputRequested(
+            {
+              requests: [],
+              sequence: 0,
+              stepIndex: 0,
+              turnId: "turn-cleanup-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      yield* Effect.promise(start);
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          authorizationRequired(
+            {
+              description: "Authorize",
+              name: "provider",
+              sequence: 0,
+              stepIndex: 0,
+              turnId: "turn-cleanup-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          authorizationCompleted(
+            {
+              name: "provider",
+              outcome: "declined",
+              sequence: 0,
+              stepIndex: 0,
+              turnId: "turn-cleanup-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      const beforeResume = operations.length;
+      for (const outcome of ["failed", "timed-out"] as const) {
+        yield* Effect.promise(() =>
+          Promise.resolve(
+            authorizationCompleted(
+              {
+                name: "provider",
+                outcome,
+                sequence: 0,
+                stepIndex: 0,
+                turnId: "turn-cleanup-events",
+              },
+              eventChannel,
+              ctx
+            )
+          )
+        );
+      }
+      assert.strictEqual(operations.length, beforeResume);
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          authorizationCompleted(
+            {
+              name: "provider",
+              outcome: "authorized",
+              sequence: 0,
+              stepIndex: 0,
+              turnId: "turn-cleanup-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      assert.strictEqual(operations.length, beforeResume + 1);
+
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          turnFailed(
+            {
+              code: "failed",
+              message: "failed",
+              sequence: 0,
+              turnId: "turn-cleanup-events",
+            },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      yield* Effect.promise(start);
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          turnCompleted(
+            { sequence: 0, turnId: "turn-cleanup-events" },
+            eventChannel,
+            ctx
+          )
+        )
+      );
+      yield* Effect.promise(start);
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          sessionWaiting({ wait: "next-user-message" }, eventChannel, ctx)
+        )
+      );
+      yield* Effect.promise(start);
+      yield* Effect.promise(() =>
+        Promise.resolve(sessionCompleted(undefined, eventChannel, ctx))
+      );
+      yield* Effect.promise(start);
+      assert.deepStrictEqual(state.typing, {
+        _tag: "Active",
+        turnId: "turn-cleanup-events",
+      });
+      yield* Effect.promise(() =>
+        Promise.resolve(
+          sessionFailed(
+            {
+              code: "failed",
+              message: "failed",
+              sessionId: "session-cleanup-events",
+            },
+            eventChannel
+          )
+        )
+      );
+      assert.deepStrictEqual(state.typing, {
+        _tag: "Active",
+        turnId: "turn-cleanup-events",
+      });
+      assert.deepStrictEqual(operations, [
+        "start",
+        "stop",
+        "start",
+        "stop",
+        "start",
+        "stop",
+        "start",
+        "stop",
+        "start",
+        "stop",
+        "start",
+        "stop",
+        "start",
+        "stop",
+      ]);
+      return yield* Effect.void;
+    })
 );

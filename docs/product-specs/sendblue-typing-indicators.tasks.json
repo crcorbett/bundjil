@@ -109,7 +109,7 @@
     {
       "id": "wire-durable-eve-typing-lifecycle",
       "title": "Wire the durable Eve typing lifecycle and observations",
-      "status": "planned",
+      "status": "completed",
       "dependsOn": ["implement-typed-sendblue-indicator-client"],
       "description": "Add corruption-safe durable transitions, countable sanitized observations, and installed Eve 0.20.0 event projection to the existing Sendblue channel.",
       "implementationNotes": [
@@ -143,8 +143,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "passEvidence": []
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: apps/agent remains the sole owner of the Sendblue conversation/typing Schemas, transition policy, encoded Eve adapter seam, observations, and tests. makeSendblueEveEvents covers all 15 installed Eve 0.20.0 events, only session.failed omits durable state writeback, and no shared package, live Layer composition, webhook, provider account, dependency, or generic presence abstraction changed.",
+          "Effect quality and helper admission: the parent review required and verified one Schema.Codec.Encoded channel-state type with narrow Object.assign mutation, Schema-derived commands, separate core/full state decoding, exhaustive Match over commands and lifecycle, conservative Active cleanup obligations, tagged existing provider failures, Effect Clock/logger observations, and no cast, production decodeSync, duplicate DTO, manual JSON, timer, scoped resource/fiber, Ref/Map, helper module, exporter, or raw cause. The same review found and corrected one unreachable nested test plus the missing direct corrupt-state adapter repair proof.",
+          "Verification and evidence: focused lifecycle/build-route tests passed 27/27; full agent tests passed 75/75; a fresh Eve build and post-build route-discovery test passed. Tests cover legacy/new/rollback state, explicit undefined rejection, encoded mutation and repair, replay/stale/newer-turn behavior, uncertain start/stop retry, authorization and terminal events, session.failed best effort, stop-before-send fail-open delivery, observations/timing/privacy, ignored inbound paths, all event keys, and build output. Formatting, Knip, 7/7 typechecks, 11/11 root test tasks, 7/7 builds, JSON/static/leak/diff checks passed with the Executor API key absent."
+        ]
       },
       "commitAfterPassing": true
     },
