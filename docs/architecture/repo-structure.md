@@ -21,6 +21,10 @@ docs/
   architecture/       Durable architecture and repo standards.
   product-specs/      Specs and task ledgers for planned work.
 
+tooling/
+  boundary-audit.ts       Root compiler-API boundary provenance audit.
+  boundary-exceptions.ts  Exact temporary adapter exception registry.
+
 .agents/skills/       Repo-local agent skills copied from the site workspace.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
@@ -46,6 +50,10 @@ needs it.
 Do not create broad shared packages to avoid choosing ownership. A second
 caller is a signal to inspect the concept, not automatic permission to invent
 `shared`.
+
+Root tooling may inspect TypeScript source but must not import app/package
+runtime modules. Boundary exceptions remain beside this root audit rather than
+moving adapter-specific primitives into a generic helper package.
 
 ## App Boundaries
 

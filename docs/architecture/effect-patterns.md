@@ -250,6 +250,23 @@ leak checks all follow this rule. If a framework hands you an already encoded
 request body string, validate it with the owning schema at the receiving edge
 instead of manually decoding it in domain code.
 
+## Boundary Provenance Audit
+
+`bun run check:boundaries` is the root TypeScript compiler-API audit for
+handwritten app/package production source and operator scripts. It checks
+exported boundary signatures and named adapters for raw primitives, primitive
+semantic config, synchronous codecs, direct JSON, raw fetch/response readers,
+and unsafe boundary assertions. Diagnostics name the file, line, rule, symbol,
+and codec-based remediation.
+
+Third-party or framework constraints belong only in
+`tooling/boundary-exceptions.ts`. Every entry names one exact file and symbol,
+its owner, boundary kind, canonical codec/service, admitted syntax, and reason.
+The audit fails stale entries, so a migration must remove its exception rather
+than leave a baseline behind. Do not add counts, line-number allowlists, globs,
+or directory exemptions. `bun run test:boundaries` owns positive and negative
+source fixtures for the audit.
+
 ## Implementation Audit
 
 Every implementation task that touches Effect runtime, provider, storage, app

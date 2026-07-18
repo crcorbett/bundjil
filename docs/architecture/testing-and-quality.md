@@ -9,6 +9,8 @@ docs navigation.
 Run from the repo root:
 
 ```bash
+bun run check:boundaries
+bun run test:boundaries
 bun run check
 bun run knip
 bun run check-types
@@ -17,8 +19,11 @@ bun run build
 bun run verification
 ```
 
-`bun run verification` is the standard closeout gate. It runs Ultracite,
-dependency hygiene, workspace typechecks, and tests.
+`bun run check:boundaries` runs the TypeScript compiler-API provenance audit;
+`bun run test:boundaries` proves its positive/negative fixtures and stale
+exception behavior. `bun run verification` is the standard closeout gate. It
+runs those boundary checks, Ultracite, dependency hygiene, workspace
+typechecks, and tests.
 
 Package-focused commands:
 

@@ -2,6 +2,10 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreExportsUsedInFile": true,
   "workspaces": {
+    ".": {
+      "entry": ["tooling/codec-provenance.fixture.ts"],
+      "project": ["tooling/**/*.ts"]
+    },
     "apps/agent": {
       "entry": [
         "agent/agent.ts",
