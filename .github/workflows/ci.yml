@@ -9,6 +9,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      BUNDJIL_EXECUTOR_MCP_URL: https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model
 
     steps:
       - name: Checkout repository

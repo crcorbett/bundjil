@@ -1,0 +1,207 @@
+# Sendblue Typing Indicators Implementation Plan
+
+Status: In Progress
+
+Spec: `docs/product-specs/sendblue-typing-indicators.md`
+Task ledger: `docs/product-specs/sendblue-typing-indicators.tasks.json`
+
+## Execution Rule
+
+Implement the ledger sequentially. After each working end-to-end slice, review
+the actual diff, run focused checks, perform the required ownership/call-graph,
+Effect-quality/helper-admission, and verification/evidence audits, record at
+least three accepted passes in `passEvidence`, and commit only after the slice
+passes.
+
+Credentials stay in 1Password, Vercel encrypted bindings, and the existing
+Sendblue Config boundary. Plans, tests, output, commits, logs, and proof retain
+no message content, full phone number, credential, protected URL, provider
+handle, raw provider body, or raw exception.
+
+## Baseline
+
+- Started 2026-07-18 in the Bundjil worktree.
+- The tracked worktree was clean before spec authoring.
+- `apps/agent` owns the current Production-verified Sendblue custom channel,
+  typed client, identity/routing policy, replay store, and live/memory Layers.
+- The shared account has exactly one active receive webhook at the stable
+  Production route; Preview has no active shared-line ingress or dedicated
+  Sendblue bypass.
+- Current behavior sends only terminal visible `message.completed` text and
+  has no outbound typing operation.
+- Installed Eve is `0.20.0`; its typed channel events include the complete
+  lifecycle required by the SPEC.
+
+## Research Record
+
+DeepWiki research was run against:
+
+- `vercel/eve` for channel events, turn timing, state persistence, and
+  serverless callback durability;
+- `vercel/chat` for the adapter-level `startTyping()` contract and Eve's Chat
+  SDK behavior;
+- `Effect-TS/effect` for scoped resource, fiber, Layer, Schema, and tagged-error
+  patterns; and
+- `sendblue-api/sendblue-ts` for the typing resource.
+
+Direct source review then pinned the exact installed Eve tag and corrected the
+provider details from the current generated SDK/OpenAPI. Review queries also
+rejected stale DeepWiki claims that Eve's Chat SDK channel begins after the
+installed version, channel callbacks share one process, Sendblue omits
+`from_number`/`state`/`max_duration_ms`, or Effect `DurableQueue` should replace
+Eve durable state. The accepted facts and query links are recorded in the
+SPEC. Sendblue supports explicit start and stop, the pinned generated contract
+requires the sending line and recipient, and duration is bounded to 1..300000.
+
+The third review query was also reconciled against installed/pinned source: its
+claims that `session.failed` state persists, Effect Structs reject excess keys
+by default, and the current Sendblue typing request has only `number` are
+incorrect for the pinned versions. The plan relies on Eve's actual terminal
+failure path, Effect's default excess-key stripping, and the generated
+Sendblue request/response types recorded in the SPEC.
+
+The Effect design conclusion is deliberate: a typing bubble is not a single
+scoped resource in Bundjil because Eve invokes lifecycle handlers as separate
+durable callbacks that can cross Vercel processes. Eve durable channel state
+and Sendblue's expiring provider state span those callbacks; each callback runs
+one ordinary typed Effect command.
+
+## Planned Slices
+
+### 1. Reproducible CI fixture
+
+Status: Completed
+
+- Add only the public synthetic model-mode Executor endpoint to the CI job so
+  existing `build` and `verification` commands can import the Eve connection.
+- Add no Executor API key, application fallback, or hosted configuration
+  mutation.
+- Prove root build and verification with the exact public fixture before typing
+  implementation starts.
+
+### 2. Typed provider operation
+
+Status: Planned
+
+- Add the discriminated start/stop request Schemas, provider response Schema,
+  duration Config, existing error-operation extension, and live/memory client
+  operation with a separate two-second timeout and no retry.
+- Prove the HTTP boundary independently before changing Eve events.
+- Record compatibility and leak-safe evidence.
+
+### 3. Durable Eve lifecycle and observations
+
+Status: Planned
+
+- Split core conversation state from auxiliary channel typing state so corrupt
+  typing data cannot block final-message delivery.
+- Add `Idle | Active(turnId)` with an encoded-side Effect decoding default for
+  existing continuations and keep the raw Eve adapter explicitly typed as the
+  Schema encoded form.
+- Treat `Active` as a conservative cleanup obligation: failed start/stop
+  outcomes remain eligible for later terminal cleanup, and only a successful
+  stop records `Idle`.
+- Project events through one public typed event-map seam and one exhaustive
+  `StartTurn | ResumeTurn | StopTurn` domain transition Effect.
+- Stop for authorization wait, force a same-turn resume only after an
+  `authorized` completion, and treat `session.failed` cleanup as best effort
+  without a durable-state assertion.
+- Prove replay behavior, stale-event protection, stop-before-send ordering, and
+  fail-open delivery.
+- Recover malformed auxiliary typing state to encoded `Idle` without provider
+  work or final-delivery coupling; prove new-to-old rollback decoding.
+- Emit exactly one Schema-valid sanitized Effect log observation for each
+  provider attempt and none for replay no-ops.
+
+### 4. Immutable Preview proof
+
+Status: Planned
+
+- Deploy from the root with the canonical `vercel deploy` command, never
+  `eve deploy` or `--prebuilt`.
+- Use fresh protected access and one ephemeral stdin fixture; retain no text or
+  replay handle.
+- Accept exact event/observation/provider counts without registering Preview
+  ingress.
+
+### 5. Bounded Production proof
+
+Status: Planned
+
+- Promote only from accepted clean Preview source.
+- Retain the sole Production webhook and all existing routing/config policy.
+- Reconcile one handset observation against sanitized provider/runtime counts;
+  stop and record rollback if the window fails.
+
+### 6. Documentation and closure
+
+Status: Planned
+
+- Update `ARCHITECTURE.md`, root/app READMEs, docs index, Eve architecture, and
+  historical Sendblue SPEC only after Production acceptance.
+- Reconcile the root/app/docs indexes, architecture and historical SPEC docs,
+  ledger, and active plan; the Turbo binding belongs to provider slice 2.
+- Explicitly retain N/A decisions for package/proxy READMEs, rule docs,
+  lint/static configs, skills, production preflight, Vercel variable mutation,
+  manifests/lock/changesets, generated output, React, database, webhook, and
+  provider-account surfaces.
+
+## Production Call Graph Target
+
+```text
+accepted Sendblue inbound
+  -> Eve turn.started
+  -> SendblueChannel.transitionTyping(StartTurn)
+  -> SendblueClient.setTypingIndicator(Start, bounded duration)
+  -> Sendblue provider expiring typing state
+  -> Eve model/tool work
+  -> terminal message.completed
+  -> SendblueChannel.transitionTyping(StopTurn)
+  -> SendblueClient.setTypingIndicator(Stop)
+  -> existing replay-protected Sendblue final message delivery
+```
+
+Terminal fallback events call `transitionTyping(StopTurn)` but never block Eve.
+Same-turn start replay, idle stop replay, and stale prior-turn terminal events
+perform no provider call. Authorization completion with `authorized` calls
+`ResumeTurn` and reissues start even for the same conservatively active turn.
+Any typing attempt is capped at two seconds, so final delivery proceeds after
+that bound. `session.failed` attempts provider cleanup but cannot promise a
+durable `Idle` write.
+
+## Verification Target
+
+- Focused Schema, Config, client, lifecycle, ordering, replay, authorization
+  resume, corrupt-auxiliary-state recovery, runtime observation, failure,
+  bidirectional migration, and exact TestClock timeout tests.
+- Agent and Eve Effect typechecks/tests/builds.
+- Root check, Knip, verification, build, JSON parse, stale scans, leak scans,
+  language-service diagnostics, and diff checks.
+- Agent/root commands use the repository-documented gitignored Executor config
+  or a sanitized CI-safe synthetic fixture; missing binding is reported as an
+  environment precondition and no protected value is printed or committed.
+- Immutable Preview direct proof with zero registered Preview webhook.
+- Clean Production rollout plus one bounded handset observation and zero
+  Preview/duplicate side effects.
+- Current architecture/README/index reconciliation with stale-graph, link,
+  status, and `passEvidence` scans.
+
+## Rollback Target
+
+If Preview typing proof fails, do not deploy Production. If Production typing
+fails but final replies remain healthy, restore the retained prior immutable
+agent deployment; do not change the webhook topology, replay store, identity
+map, model provider, or Sendblue account setting. A failed stop is bounded by
+`max_duration_ms`. If final reply behavior regresses, restore immediately and
+verify one normal Production message without typing before further work.
+
+## Audit Log
+
+- 2026-07-19: `stabilize-agent-ci-fixture` completed three parent passes.
+  Ownership confirmed the job-level public endpoint is the only required
+  prerequisite and reaches the existing Build and Verify steps. Quality and
+  security review found exactly one non-secret binding with no API key,
+  fallback, or hosted mutation. Verification with the API key explicitly
+  absent passed the focused Executor Config suite, 7/7 root builds, formatting,
+  Knip, 7/7 workspace typechecks, 11/11 test tasks, 13 agent test files and 60
+  agent tests, plus `git diff --check`.
