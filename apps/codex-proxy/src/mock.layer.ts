@@ -5,8 +5,8 @@ import {
   OpenAICompatibleChatCompletionChunk,
   OpenAICompatibleChatCompletionStream,
   OpenAICompatibleProxy,
-} from "@bundjil/codex-oauth";
-import type { CodexDirectProviderInputType } from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
+import type { CodexDirectProviderInputType } from "@bundjil/codex";
 import { Effect, Layer, Schema } from "effect";
 
 import { CodexProxyReadyLive } from "./readiness.service.js";

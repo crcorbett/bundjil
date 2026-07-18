@@ -162,7 +162,7 @@
     {
       "id": "rename-codex-oauth-to-codex",
       "title": "Rename the complete Codex integration package to @bundjil/codex",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["rename-effect-persistence-to-store"],
       "description": "Move packages/codex-oauth to packages/codex, rename the package and in-repo consumers, and replace mechanism-named public subpaths with intent-based exports while preserving the existing provider integration.",
       "implementationNotes": [],
@@ -194,8 +194,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "evidence": []
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: the complete Codex integration moved to @bundjil/codex with root, /runtime, /local, /testing, and /filesystem-store exports; every proxy, script, manifest, test, current-doc, and Vercel consumer migrated without an alias. All 27 Context.Service identifiers changed only by package prefix and their declarations, Layers, and consumers moved together; persisted storage keys remain independently defined.",
+          "Pass 2 - implementation quality and helper admission: rename-aware diff review found all 24 error contract/barrel files, canonical schemas.ts, storage-keys.ts, codex-responses.config.ts, and oauth-token-metadata.ts byte-identical. The selected old tagged-error names and literal tags remain intentionally unchanged for the next atomic task, non-selected errors are exact, export maps are symmetric, and no wrapper, DTO, unsafe cast, helper, broad barrel, dual decoder, or runtime/provider behavior change was introduced.",
+          "Pass 3 - verification and evidence: parent frozen install, Codex check-types/build and 103 tests, proxy check-types/build and 24 tests, mock smoke health/stream 200 with five SSE lines, 23 store tests, 57 agent tests, Knip, six workspace typechecks, full verification with 212 tests, stale-reference/export/identity/error scans, and git diff --check passed with synthetic Executor config. One initial contention timeout passed focused and isolated reruns; no Browser OAuth, live provider, deployment, publication, or stored-data action ran."
+        ]
       },
       "commitAfterPassing": true
     },

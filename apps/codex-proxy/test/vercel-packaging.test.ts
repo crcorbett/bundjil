@@ -25,7 +25,7 @@ describe("Vercel packaging", () => {
     expect(manifest.dependencies["@bundjil/store"]).toBeUndefined();
     expect(vercelConfig.buildCommand.split(" && ")).toStrictEqual([
       "bun run --filter @bundjil/store build",
-      "bun run --filter @bundjil/codex-oauth build",
+      "bun run --filter @bundjil/codex build",
       "bun run --filter @bundjil/codex-proxy build",
     ]);
   });

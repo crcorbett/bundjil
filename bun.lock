@@ -44,7 +44,7 @@
       "name": "@bundjil/codex-proxy",
       "version": "0.1.0",
       "dependencies": {
-        "@bundjil/codex-oauth": "workspace:*",
+        "@bundjil/codex": "workspace:*",
         "@effect/platform-bun": "catalog:effect",
         "effect": "catalog:effect",
       },
@@ -55,8 +55,8 @@
         "vitest": "catalog:testing",
       },
     },
-    "packages/codex-oauth": {
-      "name": "@bundjil/codex-oauth",
+    "packages/codex": {
+      "name": "@bundjil/codex",
       "version": "0.1.0",
       "dependencies": {
         "@bundjil/store": "workspace:*",
@@ -143,7 +143,7 @@
 
     "@bundjil/agent": ["@bundjil/agent@workspace:apps/agent"],
 
-    "@bundjil/codex-oauth": ["@bundjil/codex-oauth@workspace:packages/codex-oauth"],
+    "@bundjil/codex": ["@bundjil/codex@workspace:packages/codex"],
 
     "@bundjil/codex-proxy": ["@bundjil/codex-proxy@workspace:apps/codex-proxy"],
 

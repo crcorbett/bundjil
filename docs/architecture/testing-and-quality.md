@@ -25,11 +25,11 @@ Package-focused commands:
 ```bash
 bun run --filter @bundjil/core test
 bun run --filter @bundjil/eve-effect test
-bun run --filter @bundjil/codex-oauth test
-bun run --filter @bundjil/codex-oauth build
+bun run --filter @bundjil/codex test
+bun run --filter @bundjil/codex build
 bun run --filter @bundjil/store test
 bun run --filter @bundjil/store build
-bun run --filter @bundjil/codex-oauth proof:codex-responses
+bun run --filter @bundjil/codex proof:codex-responses
 bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy check-types
 bun run --filter @bundjil/codex-proxy build
@@ -52,7 +52,7 @@ bun run --filter @bundjil/agent build
   verification.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
-- Codex subscription proof change: run `@bundjil/codex-oauth` tests,
+- Codex subscription proof change: run `@bundjil/codex` tests,
   typecheck/build, and the opt-in `proof:codex-responses` command only with a
   private `CODEX_ACCESS_TOKEN` source. Proof output must contain only status,
   endpoint, byte/line counts, and safe booleans.

@@ -115,13 +115,13 @@ Vercel-managed runtime configuration, never in committed source.
 `@bundjil/core` remains framework-neutral. The current live operation calls
 `makeWorkspaceSummary`, which returns the deterministic package list.
 
-`@bundjil/store`, `@bundjil/codex-oauth`, and
+`@bundjil/store`, `@bundjil/codex`, and
 `apps/codex-proxy` now participate in the optional Codex proxy model path:
 
 - `@bundjil/store` owns native `KeyValueStore` composition,
   `AtomicKeyValueStore`, and the explicit Upstash adapter. Native `modify` is
   not used for coordination.
-- `@bundjil/codex-oauth` owns the direct Codex Responses package contracts,
+- `@bundjil/codex` owns the direct Codex Responses package contracts,
   OpenAI-compatible request/stream schemas, direct provider service, private
   proxy service, and redacted internal-token schema.
 - `apps/codex-proxy` owns the deployable private Effect HTTP proxy app,
@@ -363,7 +363,7 @@ bun run --filter @bundjil/eve-effect test
   -> packages/eve-effect/test/tool-adapter.test.ts
   -> toEveSchema(WorkspaceStatusInput / WorkspaceStatusSuccess)
 
-bun run --filter @bundjil/codex-oauth test
+bun run --filter @bundjil/codex test
   -> profile store, token service, request/stream mappers
   -> mocked Codex fetch/direct provider layers
   -> mocked Upstash-like client through Effect KeyValueStore

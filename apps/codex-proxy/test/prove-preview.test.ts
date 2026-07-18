@@ -5,7 +5,7 @@ import { once } from "node:events";
 import { createServer } from "node:http";
 import process from "node:process";
 
-import { OpenAICompatibleChatCompletionChunk } from "@bundjil/codex-oauth";
+import { OpenAICompatibleChatCompletionChunk } from "@bundjil/codex";
 import { Schema } from "effect";
 import { describe, it } from "vitest";
 

@@ -1,4 +1,4 @@
-import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
+import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex";
 import {
   Config,
   ConfigProvider,

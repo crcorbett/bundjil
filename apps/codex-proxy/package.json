@@ -27,7 +27,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bundjil/codex-oauth": "workspace:*",
+    "@bundjil/codex": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
     "effect": "catalog:effect"
   },

@@ -19,7 +19,7 @@ Implemented:
 - `apps/codex-proxy` exposes private Effect HTTP proxy routes locally and on
   personal Vercel Production and Preview deployments. Its refresh-capable live
   composition is proven through Production Eve.
-- `@bundjil/codex-oauth` owns Codex OAuth profile/token contracts, direct
+- `@bundjil/codex` owns Codex OAuth profile/token contracts, direct
   Codex Responses proof services, OpenAI-compatible provider/proxy contracts,
   memory layers, and Codex-specific persistence composition over shared native
   and atomic persistence services.
@@ -77,7 +77,7 @@ apps/agent
   -> effect
   -> @standard-schema/spec
 
-@bundjil/codex-oauth
+@bundjil/codex
   -> effect
   -> effect/unstable/persistence/KeyValueStore
   -> @bundjil/store
@@ -89,7 +89,7 @@ apps/agent
 
 apps/codex-proxy
   -> effect/unstable/http
-  -> @bundjil/codex-oauth
+  -> @bundjil/codex
 
 @bundjil/core
   -> effect
@@ -104,7 +104,7 @@ Schema contracts, schema-backed tagged errors, the `BundjilAgentOperations`
 service, live and memory layers, and `toEveSchema(schema)` for Eve
 `defineTool` schemas.
 
-`@bundjil/codex-oauth` owns the Codex OAuth profile and token lifecycle
+`@bundjil/codex` owns the Codex OAuth profile and token lifecycle
 contract: Effect Schema subjects/profiles, safe tagged errors, deterministic
 storage-key derivation, `CodexProfileStore`, `CodexOAuthService`,
 `CodexOAuthClient`, KeyValueStore-backed live/memory layers, the opt-in
@@ -165,7 +165,7 @@ apps/agent/agent/agent.ts
   -> BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy
   -> @ai-sdk/openai-compatible LanguageModel
   -> apps/codex-proxy /v1/chat/completions
-  -> @bundjil/codex-oauth OpenAICompatibleProxy
+  -> @bundjil/codex OpenAICompatibleProxy
 ```
 
 The deployed Production proof records this configured Eve -> proxy path through
@@ -245,7 +245,7 @@ Vitest
   -> native KeyValueStore + AtomicKeyValueStore compatibility
 
 Consumer suites
-  -> packages/codex-oauth/test/persistence.test.ts
+  -> packages/codex/test/persistence.test.ts
   -> apps/agent/test/sendblue-replay-store.test.ts
   -> Codex profile and Sendblue replay compatibility
 ```
@@ -307,7 +307,7 @@ boundaries first. Move shared contracts into `@bundjil/core` or
   mock SSE without Codex network calls.
 - `bun run --filter @bundjil/agent test` proves Gateway default selection and
   private proxy provider construction without live credentials.
-- `bun run --filter @bundjil/codex-oauth test` proves profile storage,
+- `bun run --filter @bundjil/codex test` proves profile storage,
   request/stream mapping, direct proof boundaries, and shared persistence
   composition.
 - `bun run --filter @bundjil/store test` proves native/atomic

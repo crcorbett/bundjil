@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex-oauth";
+import { OpenAICompatibleChatCompletionRequest } from "@bundjil/codex";
 import { Effect, Schema } from "effect";
 
 import {

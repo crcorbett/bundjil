@@ -59,7 +59,7 @@ README.
 - [`@bundjil/eve-effect`](../packages/eve-effect/README.md) documents the
   Effect Schema contracts, tagged errors, service layers, Eve schema bridge,
   and verification commands for the Eve app operation boundary.
-- [`@bundjil/codex-oauth`](../packages/codex-oauth/README.md) documents the
+- [`@bundjil/codex`](../packages/codex/README.md) documents the
   Codex OAuth profile store, direct Codex Responses proof service, service
   tags, KeyValueStore layers, Upstash Redis adapter, and safe
   secret-handling rules.
@@ -84,7 +84,7 @@ README.
   it is not a standing provider probe or approval for later deployment changes.
 - Storage: `@bundjil/store/upstash` provides native Effect
   `KeyValueStore` plus `AtomicKeyValueStore` through one provider adapter.
-  `@bundjil/codex-oauth` owns profile keys, encrypted codecs, and refresh
+  `@bundjil/codex` owns profile keys, encrypted codecs, and refresh
   policy. `live` stores a versioned encrypted subscription profile, refreshes
   under a distributed lock, and fenced-CAS commits credential generations. The
   ID token is decoded during trusted-local login and is never persisted. The

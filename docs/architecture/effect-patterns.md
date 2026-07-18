@@ -5,7 +5,7 @@
 For the Codex subscription path, canonical schemas, tagged errors, Context
 services, explicit Layers, `Config`/`Redacted`, scoped loopback resources,
 native `KeyValueStore` composition, refresh locking, and fenced commits remain
-package-owned in `@bundjil/codex-oauth`; provider-neutral persistence contracts
+package-owned in `@bundjil/codex`; provider-neutral persistence contracts
 and adapters belong to `@bundjil/store`. `apps/codex-proxy` owns
 only app config and private HTTP composition. Do not recreate profile DTOs,
 token mappers, or OAuth routes in either app; Vercel must not host browser OAuth
@@ -123,7 +123,7 @@ The root persistence contract is provider-neutral. Consumers opt into
 `@bundjil/store/upstash` for hosted storage. The `/upstash`
 subpath alone owns the SDK, prefix application, command syntax, response
 decoding, and safe provider errors. Composition owners decode bindings through
-Effect `Config`/`Config.redacted`: `@bundjil/codex-oauth` owns Codex
+Effect `Config`/`Config.redacted`: `@bundjil/codex` owns Codex
 profile/Upstash composition, `apps/codex-proxy` owns runtime mode/private HTTP
 config, and `apps/agent` owns replay/provider config. The shared persistence
 adapter receives schema-decoded redacted options and never reads process

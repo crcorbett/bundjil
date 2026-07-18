@@ -42,7 +42,7 @@ its earlier proofs are historical evidence, not the current Production state.
 - `@bundjil/eve-effect` owns Eve-facing Effect Schema contracts, tagged
   errors, named operation services, and the Standard Schema bridge used by Eve
   tools.
-- `@bundjil/codex-oauth` owns the Codex subscription profile/token lifecycle,
+- `@bundjil/codex` owns the Codex subscription profile/token lifecycle,
   trusted-local loopback PKCE login, encrypted profile envelope, fenced
   persistence and refresh services, and direct Codex Responses proof surface.
   It composes shared persistence services; it does not own an Upstash adapter
@@ -266,7 +266,7 @@ ARCHITECTURE.md      Agent architecture and package boundary overview.
 
 `@bundjil/store` owns the provider-neutral atomic transaction
 contract and the only `@upstash/redis` dependency. `apps/codex-proxy` owns
-runtime mode selection; `@bundjil/codex-oauth` owns Codex
+runtime mode selection; `@bundjil/codex` owns Codex
 profile/environment/key-policy composition; and `apps/agent` owns Sendblue
 replay config and delivery policy. The shared `/upstash` adapter owns
 schema-decoded redacted provider options, client construction, prefixing,

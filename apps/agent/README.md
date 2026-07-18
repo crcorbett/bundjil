@@ -510,7 +510,7 @@ proof adds that boundary: authenticated Eve info selected
 through `session.waiting`, and the private proxy logged one authenticated 200
 chat-completions request. This is preview evidence only, not production
 approval. Refresh, fencing, and proxy ownership remain in `apps/codex-proxy`
-and `@bundjil/codex-oauth`.
+and `@bundjil/codex`.
 
 ## Current Production Proof Boundary
 

@@ -2,7 +2,7 @@ import {
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleProxy,
   OpenAICompatibleProxyInput,
-} from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
 import { Effect, Layer, Match, Redacted, Schema } from "effect";
 import type { HttpServerRequest } from "effect/unstable/http";
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http";

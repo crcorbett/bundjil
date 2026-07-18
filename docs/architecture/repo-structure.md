@@ -83,7 +83,7 @@ apps/codex-proxy/
   README.md           routes, env vars, Vercel proof, rollback.
 ```
 
-The proxy app may import `@bundjil/codex-oauth` service tags, schemas, and
+The proxy app may import `@bundjil/codex` service tags, schemas, and
 layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
 The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
@@ -93,8 +93,8 @@ The proxy composes mock, deprecated local diagnostic, and refresh-capable
 hosted `live` modes for Production and retained Preview. It never owns a
 hosted browser OAuth callback or an account-linking endpoint. Deployable apps
 import server-safe layers from
-`@bundjil/codex-oauth/live.layer`; trusted-local browser, loopback, and login
-composition is isolated behind `@bundjil/codex-oauth/trusted-local.layer`.
+`@bundjil/codex/runtime`; trusted-local browser, loopback, and login
+composition is isolated behind `@bundjil/codex/local`.
 
 The Production-verified Sendblue channel remains app-owned in
 `apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; retained
@@ -146,7 +146,7 @@ plane.
 - must not own Eve filesystem files, app model config, channel files, or
   provider secrets.
 
-`@bundjil/codex-oauth`:
+`@bundjil/codex`:
 
 - owns Codex OAuth subjects, profiles, redacted token schemas, safe tagged
   errors, deterministic storage keys, direct Codex Responses proof schemas,
@@ -184,7 +184,7 @@ plane.
 
 - owns private proxy deployment concerns, route auth, mock/local/live mode
   selection, local dev, Vercel fetch export, and app-owned env names;
-- may compose `@bundjil/codex-oauth` service tags and schemas;
+- may compose `@bundjil/codex` service tags and schemas;
 - must keep Eve model-provider selection out of this app;
 - must not read `OPENAI_API_KEY` or `CODEX_API_KEY`;
 - composes refresh-capable encrypted `live` mode for personal Production and

@@ -3,7 +3,7 @@ import {
   CodexOAuthInstallationId,
   CodexOAuthProfileId,
   CodexOAuthSubject,
-} from "@bundjil/codex-oauth";
+} from "@bundjil/codex";
 import {
   Config,
   ConfigProvider,

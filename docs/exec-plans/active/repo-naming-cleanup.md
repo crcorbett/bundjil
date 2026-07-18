@@ -34,7 +34,7 @@ mock or deterministic memory Layers.
 
 1. `capture-compatibility-baseline-and-remove-effect-start`: completed.
 2. `rename-effect-persistence-to-store`: completed.
-3. `rename-codex-oauth-to-codex`: pending.
+3. `rename-codex-oauth-to-codex`: completed.
 4. `organize-codex-source-by-owned-feature`: pending.
 5. `rename-eve-effect-and-remove-core`: pending.
 6. `clarify-agent-integration-ownership`: pending.
@@ -163,3 +163,51 @@ Status: Passed
   remaining occurrences are classified historical or migration evidence.
 - `git diff --check` passed. No Browser, live provider, deployment,
   publication, or stored-data action was applicable or performed.
+
+### rename-codex-oauth-to-codex
+
+Status: Passed
+
+#### Parent Audit Pass 1 - Ownership And Call Graph
+
+Status: Passed
+
+- The complete integration moved to `@bundjil/codex`, with intentional root,
+  `/runtime`, `/local`, `/testing`, and `/filesystem-store` exports and no
+  forwarding aliases.
+- All proxy, script, manifest, test, current-documentation, and Vercel consumers
+  use the new package and public subpaths; the build closure is store, Codex,
+  then proxy.
+- All 27 `Context.Service` identifiers changed only by package prefix, with
+  declarations, providers, and consumers migrated together; storage keys remain
+  independently defined.
+
+#### Parent Audit Pass 2 - Implementation Quality And Helper Admission
+
+Status: Passed
+
+- Rename-aware review found all 24 error contract/barrel files and the canonical
+  Schema, storage-key, response-config, and token-metadata modules byte-identical.
+- Selected old tagged-error classes, self-types, literal tags, fields, unions,
+  catchers, and mappings remain unchanged for the following atomic migration;
+  every non-selected error remains exact.
+- Export and `publishConfig.exports` keys and paths are symmetric. No wrapper,
+  alias, dual decoder, DTO, unsafe cast, helper, broad barrel, or runtime/provider
+  behavior change was introduced.
+
+#### Parent Audit Pass 3 - Verification And Evidence
+
+Status: Passed
+
+- Parent frozen install passed with 508 installs across 693 packages and no
+  changes.
+- Parent focused gates passed: Codex check-types/build and 103 tests; proxy
+  check-types/build and 24 tests; mock smoke health/stream 200 with five SSE
+  lines; store 23 tests; agent 57 tests; and Knip.
+- Parent full verification passed the tagged-error lint test, six workspace
+  typechecks, ten Turbo tasks, and all 212 workspace tests. One initial Codex
+  contention timeout passed a focused 17-test rerun and later isolated/full
+  103-test runs.
+- Stale-reference, export-parity, Context-identity, error-preservation, and diff
+  checks passed. No Browser OAuth, live provider, deployment, publication, or
+  stored-data action was applicable or performed.

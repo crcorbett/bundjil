@@ -5,7 +5,7 @@ Private Effect HTTP proxy for Bundjil Codex subscription model access.
 The app owns the HTTP routes, Vercel entrypoint, app config, mode selection,
 private bearer authentication, local host, and deployment runbook. It composes
 the canonical Effect Schema contracts and explicit Layers from
-[`@bundjil/codex-oauth`](../../packages/codex-oauth/README.md). It does not
+[`@bundjil/codex`](../../packages/codex/README.md). It does not
 own a browser OAuth flow, a public gateway, or Eve model selection.
 
 ## Operating Modes
@@ -99,7 +99,7 @@ Configure `BUNDJIL_CODEX_PROXY_MODE=local`,
 cipher variables. On the trusted machine with an active Codex ChatGPT login:
 
 ```bash
-bun run --filter @bundjil/codex-oauth import:local-profile:filesystem
+bun run --filter @bundjil/codex import:local-profile:filesystem
 BUNDJIL_CODEX_PROXY_MODE=local bun run --filter @bundjil/codex-proxy dev
 ```
 
@@ -147,7 +147,7 @@ complete subscription login on the trusted local machine before the Preview
 deployment selects `live` mode:
 
 ```bash
-bun run --filter @bundjil/codex-oauth login:subscription
+bun run --filter @bundjil/codex login:subscription
 vercel env add BUNDJIL_CODEX_PROXY_MODE preview
 vercel deploy
 ```

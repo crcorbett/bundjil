@@ -8,8 +8,8 @@ import {
   CodexSubscriptionProfile,
   OpenAICompatibleChatCompletionRequest,
   putProfile,
-} from "@bundjil/codex-oauth";
-import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex-oauth/filesystem-key-value-store.layer";
+} from "@bundjil/codex";
+import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
   CodexDirectProviderLive,
   CodexHttpClientLive,
@@ -17,11 +17,11 @@ import {
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
   OpenAICompatibleProxyLive,
-} from "@bundjil/codex-oauth/live.layer";
+} from "@bundjil/codex/runtime";
 import {
   CodexOAuthMemory,
   CodexResponsesFetchMock,
-} from "@bundjil/codex-oauth/mock.layer";
+} from "@bundjil/codex/testing";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";

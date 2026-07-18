@@ -1,8 +1,8 @@
 import {
   CodexOAuthProfileCipherConfig,
   CodexOAuthProfileCipherConfigService,
-} from "@bundjil/codex-oauth";
-import { CodexOAuthProfileCipherConfigLive } from "@bundjil/codex-oauth/live.layer";
+} from "@bundjil/codex";
+import { CodexOAuthProfileCipherConfigLive } from "@bundjil/codex/runtime";
 import {
   Config,
   ConfigProvider,
