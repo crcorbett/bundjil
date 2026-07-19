@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
-    "@bundjil/codex-oauth": "workspace:*",
     "@bundjil/effect-persistence": "workspace:*",
     "@bundjil/eve-effect": "workspace:*",
     "@effect/platform-bun": "catalog:effect",

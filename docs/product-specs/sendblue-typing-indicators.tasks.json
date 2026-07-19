@@ -221,10 +221,43 @@
       "commitAfterPassing": true
     },
     {
+      "id": "stabilize-production-codex-proxy-build",
+      "title": "Stabilize the existing Production Codex proxy build",
+      "status": "in_progress",
+      "dependsOn": ["prove-sendblue-typing-preview"],
+      "description": "Remove the cross-package Effect Redacted registry boundary exposed when Eve evaluates the existing Production Codex proxy model configuration during build, without changing provider topology or credentials.",
+      "implementationNotes": [
+        "The first Production deployment dpl_DaSfscJFEVopBdvVzFiopZquwzGq failed during eve build before traffic replacement with Effect's Unable to get redacted value guard; retained deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y remains live.",
+        "A synthetic local Eve build reproduces the failure only with BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy. The app decodes the secret through a RedactedFromValue Schema imported from @bundjil/codex-oauth, then reads it through the app bundle's Effect Redacted registry.",
+        "Keep the model-provider input Schema app-owned by defining the non-empty redacted proxy token beside AgentModelProviderConfig, and remove the now-unused app dependency on @bundjil/codex-oauth. Do not change the provider selection, URL, token, bypass, model, context window, Vercel variables, proxy package runtime contract, or Sendblue topology.",
+        "Do not weaken the secret to a plain string, add a cast, bypass Schema decoding, or expose a value in source, tests, logs, or evidence."
+      ],
+      "mandatoryVerification": [
+        "A synthetic local codex-proxy Eve build succeeds with non-secret fixture values and the public Executor endpoint.",
+        "Focused model-provider tests prove the local redacted contract still rejects empty credentials and produces the existing Codex proxy model configuration.",
+        "Agent checks and all root verification gates pass; static scans find no cross-package proxy-token Schema import, plain-text secret contract, cast, direct process.env, or protected value.",
+        "A new clean Production deployment becomes READY under the unchanged existing Production configuration before any handset fixture is sent.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The accepted source builds for both gateway Preview and existing Codex proxy Production modes.",
+        "Production traffic is replaced only by a READY deployment with no provider or credential topology change."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 2,
+        "passEvidence": [
+          "Ownership and call graph: synthetic Eve builds isolate the failure to the existing codex-proxy provider branch. AgentModelProviderConfig now owns its non-empty redacted proxy token beside its other app-owned model Config Schemas, the unused @bundjil/codex-oauth app dependency is removed, and the proxy app/package runtime, provider selection, Vercel variables, Sendblue topology, webhook, and retained live Production deployment remain unchanged.",
+          "Effect quality and local verification: the remediation preserves Schema.RedactedFromValue and Schema-derived typing, rejects an empty token, retains exhaustive provider matching, and adds no cast, plain secret string contract, direct process.env, decoder bypass, helper, or protected fixture. The previously failing synthetic codex-proxy Eve build and the gateway Eve build both pass; focused model-provider tests pass 4/4, all 77 agent tests pass, frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 7/7 builds, JSON, static, and diff checks pass."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "prove-sendblue-typing-production",
       "title": "Prove one bounded Production handset lifecycle",
       "status": "planned",
-      "dependsOn": ["prove-sendblue-typing-preview"],
+      "dependsOn": ["stabilize-production-codex-proxy-build"],
       "description": "Promote accepted clean source without changing topology, then reconcile provider, runtime, and handset evidence for one bounded Production turn.",
       "implementationNotes": [
         "Do not change the sole Production webhook, route secret, bypass, replay namespace, identity map, model provider, Executor policy, Vercel Sendblue variables, or account auto-typing.",

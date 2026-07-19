@@ -150,6 +150,15 @@ Status: Completed
 
 Status: In Progress
 
+- The first Production deployment failed during `eve build` before traffic
+  replacement because the existing Codex proxy path decoded a redacted token
+  with a cross-package Effect Schema and read it through the app bundle's
+  separate `Redacted` registry. The retained prior Production deployment
+  remains live and no handset fixture has been sent.
+- Complete the inserted `stabilize-production-codex-proxy-build` remediation
+  slice first: keep the redacted non-empty token contract app-owned, prove both
+  gateway and Codex proxy builds, and deploy with the existing Production
+  provider/config topology unchanged.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;
