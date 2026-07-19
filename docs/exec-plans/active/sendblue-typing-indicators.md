@@ -137,7 +137,7 @@ Status: Completed
 
 ### 5. Immutable Preview proof
 
-Status: Planned
+Status: Completed
 
 - Deploy from the root with the canonical `vercel deploy` command, never
   `eve deploy` or `--prebuilt`.
@@ -148,7 +148,7 @@ Status: Planned
 
 ### 6. Bounded Production proof
 
-Status: Planned
+Status: In Progress
 
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
@@ -274,3 +274,16 @@ verify one normal Production message without typing before further work.
   7/7 builds, JSON, and diff checks passed. The next Preview deployment will
   snapshot a fresh ephemeral Preview routing key, after which the exact prior
   project value is restored before the single fixture.
+- 2026-07-19: `prove-sendblue-typing-preview` completed three parent passes.
+  Clean pushed revision `cc2265f99a23ce8999aa5def7a4a4eb32239b07b`
+  produced READY deployment `dpl_J5mAzdxh5gxfGV4xV9x1tgfobYk7` with a fresh
+  Preview-only conversation namespace; all temporary shared Preview values were
+  restored and Production/provider topology remained untouched. One protected
+  health request returned 200 and the sole accepted-route fixture returned 202.
+  Candidate Workflow run `wrun_01KXX9DNGCX7QCQRHFAYJ7RHB0` completed with the
+  canonical five-field adapter state at every inspected boundary and exactly
+  one successful `StartTurn` plus one successful `StopTurn` observation.
+  Sendblue readback found one DELIVERED outbound, zero inbound, zero duplicate,
+  and zero error; candidate logs had zero warning/error/fatal records and the
+  Production proof window had zero webhook/error records. No protected or
+  generated artifact remained in the tracked worktree.

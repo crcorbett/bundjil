@@ -188,7 +188,7 @@
     {
       "id": "prove-sendblue-typing-preview",
       "title": "Prove typing on an immutable Preview",
-      "status": "planned",
+      "status": "completed",
       "dependsOn": ["establish-preview-workflow-version-boundary"],
       "description": "Deploy clean source to Preview without provider ingress and prove the protected direct accepted-route lifecycle as an independent stop/go gate.",
       "implementationNotes": [
@@ -211,8 +211,12 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 0,
-        "passEvidence": []
+        "completedPasses": 3,
+        "passEvidence": [
+          "Deployment and topology: clean pushed revision cc2265f99a23ce8999aa5def7a4a4eb32239b07b produced READY Preview deployment dpl_J5mAzdxh5gxfGV4xV9x1tgfobYk7 through the canonical root vercel deploy command. The immutable deployment snapshotted a fresh Preview-only routing namespace and gateway model; the prior shared Preview provider/model/routing configuration was restored, the temporary gateway key was removed, Production was untouched, and no Preview Sendblue webhook was registered.",
+          "Lifecycle and provider proof: one protected health request returned 200 and the sole stdin fixture returned 202. New Workflow runs workflowEntry wrun_01KXX9DJP4VR1HYV2HGG5SBNGY and completed turnWorkflow wrun_01KXX9DNGCX7QCQRHFAYJ7RHB0 executed Eve 0.20.0 candidate steps. Decrypted safe projections show the canonical five-field adapter state with typing Idle at input, output, and turn-control handoff; runtime logs contain exactly one successful StartTurn and one successful StopTurn setTypingIndicator observation with no unavailable outcome.",
+          "Delivery, privacy, and negative evidence: bounded Sendblue readback returned exactly one matching outbound, status DELIVERED, zero inbound, zero duplicate outbound, and zero provider errors. Candidate logs contain one health 200, one webhook 202, five Workflow 200 requests, zero warnings/errors/fatals, and exactly the two sanitized typing observations. Production showed zero webhook and zero error records in the proof window; temporary env, fixture, link, and response files were removed and the tracked worktree remained clean."
+        ]
       },
       "commitAfterPassing": true
     },
