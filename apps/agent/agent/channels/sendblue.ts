@@ -182,11 +182,11 @@ export const makeSendblueEveChannel = <E>(
             }
             waitUntil(
               channelRuntime.runPromise(
-                sendblue.dispatchAcceptedInbound(decision, () =>
+                sendblue.dispatchAcceptedInbound(decision, (state) =>
                   send(decision.message, {
                     auth: decision.auth,
                     continuationToken: decision.continuationToken,
-                    state: decision.state,
+                    state,
                   })
                 )
               )

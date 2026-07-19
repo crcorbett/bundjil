@@ -9,21 +9,27 @@
 Add an app-owned, Effect-typed Sendblue typing-indicator lifecycle to the
 existing Production-verified custom Eve channel.
 
-Start the indicator on Eve `turn.started`, after the inbound message has passed
-Sendblue authentication, Schema decoding, sender allowlisting, durable replay
-claiming, and Eve dispatch. Stop it immediately before a terminal visible reply
-is sent. Also stop it on terminal, failed, waiting, and user-input-required Eve
-events as a fail-safe. A provider maximum duration guarantees eventual cleanup
-when a stop callback cannot run.
+Start the indicator after the inbound message has passed Sendblue
+authentication, Schema decoding, event classification, sender allowlisting,
+routing, and durable replay claiming, immediately before Eve dispatch. Persist
+that pre-turn obligation as `Pending`, then adopt it as `Active(turnId)` when Eve
+emits `turn.started` without sending a duplicate provider request. Stop it
+immediately before a terminal visible reply is sent. Also stop it on terminal,
+failed, waiting, and user-input-required Eve events as a fail-safe. A provider
+maximum duration guarantees eventual cleanup when a stop callback cannot run.
 
-Do not start on the raw webhook and do not wait for the first
-`message.appended` delta:
+Do not start on the untrusted raw webhook and do not wait for Eve workflow
+startup or the first `message.appended` delta:
 
-- raw-webhook start would expose activity to ignored, duplicate, malformed, or
-  unapproved senders before Bundjil policy accepts the message;
+- untrusted raw-webhook start would expose activity to ignored, duplicate,
+  malformed, or unapproved senders before Bundjil policy accepts the message;
+- accepted-inbound start removes the observed Workflow startup delay while
+  preserving authentication, identity, routing, and replay policy;
 - first-delta start is too late for a channel that sends only completed text;
-- `turn.started` is Eve's earliest typed event after accepted dispatch and is
-  the hook used by Eve's own Chat SDK channel in installed Eve `0.20.0`.
+- `turn.started` remains the earliest typed Eve event and supplies the durable
+  turn id, but installed Eve emits it only after Workflow startup. It is emitted
+  before model resolution and streaming, so the previous behavior was not
+  first-token-triggered.
 
 Keep the existing custom channel and `SendblueClient`. Chat SDK is a verified
 behavioral reference, not a runtime dependency. Adding `chat` or
@@ -39,8 +45,9 @@ accepted Bundjil turn is running model or tool work. The only visible signal is
 the completed reply, so a healthy long-running turn is indistinguishable from
 a stalled webhook.
 
-This slice succeeds when an accepted turn begins one bounded typing indicator
-near `turn.started`, waiting events remove it, an authorized continuation
+This slice succeeds when an accepted inbound begins one bounded typing
+indicator before Eve dispatch, `turn.started` adopts it without a duplicate,
+waiting events remove it, an authorized continuation
 restarts it, and terminal delivery attempts a stop before the existing final
 message. Duplicate events must not create a typing storm, stale events must not
 stop a newer turn, and typing work may delay final delivery by at most the
@@ -100,7 +107,8 @@ shared account and is not controlled by the repository's typed lifecycle.
 
 ## Goals
 
-- Show the iMessage typing bubble as soon as an accepted Eve turn starts.
+- Show the iMessage typing bubble as soon as an inbound is accepted for Eve
+  dispatch.
 - Stop the bubble before the final visible Sendblue reply is sent.
 - Ensure the indicator expires even if Eve, Vercel, or Sendblue loses a later
   callback.
@@ -236,17 +244,19 @@ without `typing`, and `SendblueConversationState`—the same four-field shape
 owned by the prior deployment—decodes newly encoded state while ignoring the
 extra typing key under installed Effect's default Struct parse options.
 
-`Active` means that Bundjil owes the provider a matching cleanup attempt; it
-does not claim that the best-effort bubble is visible. After a start request is
-attempted, both `started` and `unavailable` transitions conservatively carry
-`Active(turnId)`. A failed matching stop returns `unavailable` and retains that
-same `Active` lifecycle so later terminal Eve events can retry. Only a
-successful stop returns `Idle`. `StartTurn` is replay-safe for the same active
-turn. `ResumeTurn` deliberately reissues a bounded start for the same turn,
-including after a failed authorization stop, while stale `StopTurn` commands
-remain no-ops. This removes false certainty at the network
-boundary while the provider duration still bounds cleanup if every retry is
-lost.
+`Pending` and `Active` both mean that Bundjil owes the provider a matching
+cleanup attempt; neither claims that the best-effort bubble is visible.
+`StartInbound` carries both `started` and `unavailable` transitions as
+`Pending`. The next `StartTurn` adopts `Pending` as `Active(turnId)` without a
+provider call. A legacy `Idle` state at `turn.started` retains the prior direct
+start behavior for migration and rollback safety. A failed stop returns
+`unavailable` and retains the same engaged lifecycle so later terminal Eve
+events can retry. Only a successful stop returns `Idle`. `StartTurn` is
+replay-safe for the same active turn. `ResumeTurn` deliberately reissues a
+bounded start for the same turn, including after a failed authorization stop,
+while stale `StopTurn` commands remain no-ops. This removes false certainty at
+the network boundary while the provider duration still bounds cleanup if every
+retry is lost.
 
 ## Effect Lifecycle Design
 
@@ -285,14 +295,16 @@ SendblueChannel.transitionTyping
   -> decode SendblueTypingTransitionInput
   -> decode SendblueConversationState and migrated SendblueChannelState
   -> repair malformed auxiliary state to Idle without provider work
-  -> Match StartTurn | ResumeTurn | StopTurn exhaustively
-  -> Match Idle | Active lifecycle inside the command branch
+  -> Match StartInbound | StartTurn | ResumeTurn | StopTurn exhaustively
+  -> Match Idle | Pending | Active lifecycle inside the command branch
   -> construct the only valid provider start or stop request for that branch
-  -> no-op for same-turn StartTurn, Idle StopTurn, or stale StopTurn
+  -> adopt Pending at StartTurn without a second provider request
+  -> no-op for duplicate StartInbound, same-turn StartTurn, Idle StopTurn, or
+     stale StopTurn
   -> always reissue start for ResumeTurn when its turn is current
   -> SendblueClient.setTypingIndicator
-  -> return Active on start attempt, Idle on successful stop, or retain Active
-     on fail-open Unavailable stop
+  -> return Pending or Active on start attempt, Idle on successful stop, or
+     retain the engaged lifecycle on fail-open Unavailable stop
 ```
 
 The client exposes the typed provider failure. The channel policy converts it
@@ -335,9 +347,14 @@ existing send continues.
 The typed event map in `defineChannel` remains the dispatcher; do not create a
 manual event-name parser or mirror Eve's full event protocol.
 
+Immediately before Eve dispatch, `dispatchAcceptedInbound` runs
+`StartInbound`, passes the returned encoded `Pending` state to `send(...)`, and
+attempts `StopTurn` before releasing the replay claim if Eve rejects. Ignored,
+unauthorized, malformed, and duplicate inbound paths never reach this boundary.
+
 | Eve event                                     | Typing behavior                                                      |
 | --------------------------------------------- | -------------------------------------------------------------------- |
-| `turn.started`                                | `StartTurn` once for decoded `turnId` with configured duration.      |
+| `turn.started`                                | Adopt `Pending`; start only for a legacy `Idle`; persist `Active`.   |
 | `message.appended`                            | No provider call; per-token calls are forbidden.                     |
 | `message.completed` with `tool-calls`         | Keep active; do not send intermediate text.                          |
 | terminal visible `message.completed`          | Attempt `StopTurn`, persist returned state, then deliver regardless. |
@@ -389,12 +406,15 @@ which is safer than an unbounded indicator or a serverless timer.
 
 ```text
 authenticated allowlisted Sendblue inbound
-  -> existing replay claim and Eve send(...) under waitUntil
+  -> existing routing and replay claim
+  -> SendblueChannel.transitionTyping(StartInbound)
+  -> SendblueClient.setTypingIndicator(Start)
+  -> channel.state.typing = Pending
+  -> Eve send(...) with Pending state under waitUntil
   -> Eve turn.started(event, channel, ctx)
   -> module-owned ManagedRuntime<SendblueChannel>
   -> SendblueChannel.transitionTyping(StartTurn)
-  -> SendblueClient.setTypingIndicator(Start)
-  -> Effect HttpClient POST /api/send-typing-indicator
+  -> adopt Pending without another provider request
   -> channel.state.typing = Active(turnId)
   -> Eve model/tool loop
   -> terminal message.completed

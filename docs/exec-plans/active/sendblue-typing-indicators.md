@@ -182,7 +182,7 @@ Status: In Progress
   `dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y` at the stable Production alias before any
   fix-forward work; keep the sole Production webhook and all account, routing,
   identity, replay, model, secret, and Preview topology unchanged.
-- The diagnosis is complete. Production was restored to the retained READY
+- The initial diagnosis is complete. Production was restored to the retained READY
   deployment and its health probe returns 200 ready; Sendblue still has one
   unique signed receive webhook at the stable alias and no Preview or immutable
   target. A direct legacy start, omitting both `state` and `max_duration_ms`,
@@ -190,10 +190,9 @@ Status: In Progress
   through about +12.1 seconds; its explicit cleanup stop returned `SENT`.
   Sendblue independently evaluates the recipient and recent one-to-one message
   as iMessage with no downgrade. Its current documentation defines `SENT` as
-  best-effort acceptance that may not deliver a bubble. No evidence-backed code
-  correction remains, so Production proof is paused at the provider boundary.
-  Do not enable account-global auto typing or claim Production acceptance
-  without a reviewed scope change or Sendblue-side resolution.
+  best-effort acceptance that may not deliver a bubble. At that point no
+  evidence-backed correction was available, so Production proof paused without
+  claiming handset support.
 - After the user explicitly approved that scope change, a reversible direct-API
   auto-typing experiment also failed. Sendblue accepted the setting, then
   recorded one healthy `RECEIVED` iMessage and one `DELIVERED` reply on the same
@@ -201,8 +200,21 @@ Status: In Progress
   window from about +1.2 seconds through +28.7 seconds showed no bubble. The
   account setting was immediately restored to `false`; generated screenshots
   and the temporary contact sheet were moved to Trash. This rules out the
-  provider-native auto path as a rollout substitute and leaves Sendblue-side
-  delivery resolution as the only remaining acceptance unblocker.
+  provider-native auto path as a rollout substitute.
+- A later user-run long-response test visibly proved that the manual indicator
+  works. Sendblue recorded one RECEIVED iMessage at
+  `2026-07-19T21:26:06.168Z` and one DELIVERED reply at
+  `2026-07-19T21:26:50.126Z`; runtime recorded StartTurn at
+  `2026-07-19T21:26:16.559Z` and StopTurn at
+  `2026-07-19T21:26:48.082Z`. This supersedes the provider-failure hypothesis:
+  the visible bubble needed a longer window, and the current start waits about
+  10.4 seconds after provider receipt for Workflow turn startup.
+- `start-typing-at-accepted-inbound` is in progress. It moves the first request
+  to the authenticated, allowlisted, routed, replay-claimed boundary and uses
+  `Idle -> Pending -> Active(turnId) -> Idle` so `turn.started` adopts the
+  provider obligation without a duplicate request. Eve 0.20.0 emits
+  `turn.started` before model resolution and streaming, so the old behavior was
+  not first-token-triggered; it was Workflow-startup-triggered.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;

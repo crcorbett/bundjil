@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/sendblue-typing-indicators.md",
   "status": "in_progress",
   "principles": [
-    "Start typing only after an authenticated, allowlisted, replay-claimed inbound has produced Eve turn.started.",
+    "Start typing immediately after an inbound is authenticated, allowlisted, routed, and replay-claimed; adopt that pending lifecycle when Eve later produces turn.started.",
     "Keep Chat SDK as a behavior reference; retain the app-owned Sendblue custom channel, client, Config, identity, and replay boundaries.",
     "Model provider start/stop and domain StartTurn/ResumeTurn/StopTurn as separate canonical Effect Schema unions so method-command mismatches are unrepresentable.",
     "Use Eve durable encoded channel state plus Sendblue's expiring provider state; never span serverless callbacks with a Ref, timer, Fiber, Resource, or scoped finalizer.",
@@ -290,7 +290,7 @@
     },
     {
       "id": "diagnose-production-sendblue-typing-visibility",
-      "title": "Diagnose the failed Production typing visibility boundary",
+      "title": "Diagnose the apparently failed Production typing visibility boundary",
       "status": "completed",
       "dependsOn": ["establish-production-handset-observation-window"],
       "description": "Record the continuously observed Production failure, restore the retained healthy deployment, and isolate whether Sendblue accepted but did not render the manual typing lifecycle before attempting a narrow fix-forward.",
@@ -303,9 +303,10 @@
         "Production was rolled back successfully to READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y. The stable alias returned Eve health 200 ready, and Sendblue readback retained exactly one unique HTTPS receive webhook at the stable Production alias with one per-webhook secret and zero Preview or immutable targets.",
         "A direct legacy start request against the same recent conversation omitted state and max_duration_ms, returned HTTP 200 with provider status SENT, and was observed continuously for 16 samples from about +0.5 seconds to +12.1 seconds. Accessibility and representative visual inspection found no bubble. A following explicit stop also returned HTTP 200 SENT.",
         "Sendblue live evaluation and message metadata independently identify the recipient and recent one-to-one message as iMessage with no downgrade. The pinned and current official TypeScript client encode the same from_number, number, optional state, and optional max_duration_ms contract used locally.",
-        "Current official Sendblue guidance defines manual typing as best effort and states that SENT can occur without handset delivery. With v2 and legacy requests both accepted but invisible and every documented eligibility signal passing, no repository correction is supported by evidence. Stop the rollout at this provider boundary; do not accept Production or enable the separate account-global auto-typing feature without a reviewed scope change.",
+        "Current official Sendblue guidance defines manual typing as best effort and states that SENT can occur without handset delivery. The initial bounded observations therefore stopped the rollout without claiming handset support or making a speculative repository correction.",
         "After explicit user approval of that scope change, a reversible provider-native auto-typing experiment enabled the account setting through the direct API, sent one fresh one-to-one iMessage, and observed the complete handset window. Sendblue recorded one RECEIVED inbound at 2026-07-19T17:31:23.853Z and one DELIVERED outbound at 2026-07-19T17:31:41.264Z on the same contact and line with no error or downgrade, but all 36 frames from about +1.2 seconds through +28.7 seconds showed no typing bubble. The account setting was immediately restored to false with HTTP 200 OK, and all generated screenshots plus the temporary contact sheet were moved to Trash and removed from the observation path.",
-        "A sanitized, ignored support escalation packet is ready under .local/evidence/sendblue-typing-support.md. The connected Gmail API requires OAuth reauthentication, so no support draft or message was created; browser fallback requires separate approval under the browser-control policy."
+        "A later user-run long-response test visibly showed the iMessage typing bubble. Sendblue recorded one RECEIVED iMessage at 2026-07-19T21:26:06.168Z and one DELIVERED reply at 2026-07-19T21:26:50.126Z with no error or downgrade. Runtime recorded StartTurn started at 2026-07-19T21:26:16.559Z and StopTurn stopped at 2026-07-19T21:26:48.082Z. This supersedes the provider-failure hypothesis: the earlier tests were too short or sampled before the delayed lifecycle became visible.",
+        "The ignored support escalation packet under .local/evidence/sendblue-typing-support.md is superseded and must not be sent. The account-level auto-typing setting remains restored to false."
       ],
       "mandatoryVerification": [
         "The failed window records continuous handset observation, one inbound, one webhook acceptance, one successful start attempt, one successful stop attempt, one delivered final reply, zero duplicates, zero Preview ingress, and zero provider/runtime errors without protected content.",
@@ -324,7 +325,42 @@
         "passEvidence": [
           "Failure and rollback boundary: continuous Messages observation and direct user observation reject the candidate despite successful Effect observations and final delivery. The stable Production alias now resolves to the retained pre-typing READY deployment, Eve health returns 200 ready, and the sole signed Sendblue receive webhook remains unchanged with zero Preview or immutable targets.",
           "Provider isolation: one direct legacy start removed Eve, Workflow, state, and max-duration variables yet returned HTTP 200 SENT without a visible bubble across 16 samples through +12.1 seconds; the safe stop also returned SENT. A separately approved provider-native auto-typing experiment likewise produced one healthy iMessage inbound and delivered reply but no bubble across the complete 36-frame window. Live Sendblue evaluation and route reconciliation confirm a one-to-one iMessage conversation, the same contact and line, and no downgrade, so neither the local lifecycle nor the manual request variant is the failing boundary.",
-          "Contract and scope audit: current official documentation plus pinned/current sendblue-ts source agree with the local encoded request fields and explicitly define SENT as best-effort rather than delivery proof. The reversible auto-typing experiment restored the setting to false, generated screenshots were moved to Trash, and no speculative code change, retained account mutation, webhook drift, protected evidence, or false Production acceptance was introduced. Further acceptance requires Sendblue-side resolution."
+          "Corrected conclusion: the later user-run long-response test visibly proved the bubble while runtime and provider readback reconciled one inbound, StartTurn, StopTurn, and delivered final reply. The missing-bubble diagnosis is superseded by an observation-duration and delayed-start diagnosis; the reversible auto-typing experiment remains restored to false and no support escalation is warranted."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "start-typing-at-accepted-inbound",
+      "title": "Start typing at the accepted inbound boundary",
+      "status": "in_progress",
+      "dependsOn": ["diagnose-production-sendblue-typing-visibility"],
+      "description": "Move the first typing request from Eve turn.started to the authenticated, allowlisted, routed, replay-claimed inbound boundary so the handset receives it before Workflow startup and model resolution.",
+      "implementationNotes": [
+        "Installed Eve 0.20.0 emits turn.started in emitTurnPreamble before message.received, model resolution, step.started, and model streaming. The current implementation therefore starts before first token, but the successful Production run shows about 10.4 seconds from Sendblue inbound receipt to StartTurn.",
+        "Extend the durable lifecycle to Idle | Pending | Active(turnId). StartInbound moves Idle to Pending with one provider start; turn.started adopts Pending as Active(turnId) without a second provider request. Legacy Idle at turn.started retains the existing direct start for persisted or rolled-back state.",
+        "Run StartInbound only after webhook authentication, event classification, sender authorization, routing, and replay claim succeed. Ignored, unauthorized, malformed, and duplicate events must make no provider call.",
+        "Pass the typed Pending state into Eve. If Eve rejects before acceptance, attempt a fail-open stop before releasing the replay claim for retry. Replay completion failure after Eve acceptance must not stop an active turn.",
+        "Keep provider max duration, stop-before-final-delivery, authorization resume, sanitized observations, sole Production webhook, and account-level auto-typing=false unchanged."
+      ],
+      "mandatoryVerification": [
+        "Schema and transition tests prove Pending encoding, StartInbound idempotence, Pending-to-Active adoption without a provider call, legacy Idle turn start, newer-turn supersession, and stop from Pending or Active.",
+        "Dispatch tests prove provider start occurs before Eve send, Eve receives Pending, rejected Eve dispatch attempts stop and releases the claim, and ignored/duplicate paths remain provider-silent.",
+        "Focused agent tests, full agent tests, build, root verification, static scans, Effect diagnostics, and git diff checks pass.",
+        "A fresh hosted proof shows the StartInbound observation near webhook acceptance, no duplicate StartTurn provider attempt, a visible handset bubble, one bounded stop, one delivered reply, and no topology or account-setting drift.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The typing request begins at accepted inbound rather than waiting for Workflow turn startup.",
+        "The durable lifecycle makes pre-turn ownership, turn adoption, and cleanup exhaustive without duplicate start requests.",
+        "Typing remains fail-open and cannot block Eve dispatch or final delivery."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 2,
+        "passEvidence": [
+          "Evidence and call graph: the successful user-run long-response window disproves provider failure. Installed Eve source emits turn.started before model resolution and streaming, while runtime timing shows the event about 10.4 seconds after provider receipt; the correct narrow seam is accepted inbound after authentication, allowlisting, routing, and replay claim.",
+          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, typed state passed into Eve, no duplicate provider start on turn adoption, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added."
         ]
       },
       "commitAfterPassing": true
@@ -333,7 +369,7 @@
       "id": "prove-sendblue-typing-production",
       "title": "Prove one bounded Production handset lifecycle",
       "status": "planned",
-      "dependsOn": ["diagnose-production-sendblue-typing-visibility"],
+      "dependsOn": ["start-typing-at-accepted-inbound"],
       "description": "Promote accepted clean source without changing topology, then reconcile provider, runtime, and handset evidence for one bounded Production turn.",
       "implementationNotes": [
         "Do not change the sole Production webhook, route secret, bypass, replay namespace, identity map, model provider, Executor policy, Vercel Sendblue variables, or account auto-typing.",

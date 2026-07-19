@@ -241,14 +241,23 @@ export type SendblueConversationState = typeof SendblueConversationState.Type;
 export const SendblueTypingIdle = Schema.TaggedStruct("Idle", {});
 export type SendblueTypingIdle = typeof SendblueTypingIdle.Type;
 
+export const SendblueTypingPending = Schema.TaggedStruct("Pending", {});
+export type SendblueTypingPending = typeof SendblueTypingPending.Type;
+
 export const SendblueTypingActive = Schema.TaggedStruct("Active", {
   turnId: EveTurnId,
 });
 export type SendblueTypingActive = typeof SendblueTypingActive.Type;
 
+export const SendblueTypingEngaged = Schema.Union([
+  SendblueTypingPending,
+  SendblueTypingActive,
+]);
+export type SendblueTypingEngaged = typeof SendblueTypingEngaged.Type;
+
 export const SendblueTypingLifecycle = Schema.Union([
   SendblueTypingIdle,
-  SendblueTypingActive,
+  SendblueTypingEngaged,
 ]);
 export type SendblueTypingLifecycle = typeof SendblueTypingLifecycle.Type;
 
@@ -272,10 +281,16 @@ export type SendblueTypingUnavailableReason =
   typeof SendblueTypingUnavailableReason.Type;
 
 export const SendblueTypingStarted = Schema.TaggedStruct("Started", {
-  lifecycle: SendblueTypingActive,
+  lifecycle: SendblueTypingEngaged,
   outcome: Schema.Literal("started"),
 });
 export type SendblueTypingStarted = typeof SendblueTypingStarted.Type;
+
+export const SendblueTypingAdopted = Schema.TaggedStruct("Adopted", {
+  lifecycle: SendblueTypingActive,
+  outcome: Schema.Literal("adopted"),
+});
+export type SendblueTypingAdopted = typeof SendblueTypingAdopted.Type;
 
 export const SendblueTypingStopped = Schema.TaggedStruct("Stopped", {
   lifecycle: SendblueTypingIdle,
@@ -298,11 +313,15 @@ export type SendblueTypingUnavailable = typeof SendblueTypingUnavailable.Type;
 
 export const SendblueTypingTransition = Schema.Union([
   SendblueTypingStarted,
+  SendblueTypingAdopted,
   SendblueTypingStopped,
   SendblueTypingUnchanged,
   SendblueTypingUnavailable,
 ]);
 export type SendblueTypingTransition = typeof SendblueTypingTransition.Type;
+
+export const SendblueStartInbound = Schema.TaggedStruct("StartInbound", {});
+export type SendblueStartInbound = typeof SendblueStartInbound.Type;
 
 export const SendblueStartTurn = Schema.TaggedStruct("StartTurn", {
   turnId: EveTurnId,
@@ -320,6 +339,7 @@ export const SendblueStopTurn = Schema.TaggedStruct("StopTurn", {
 export type SendblueStopTurn = typeof SendblueStopTurn.Type;
 
 export const SendblueTypingLifecycleCommand = Schema.Union([
+  SendblueStartInbound,
   SendblueStartTurn,
   SendblueResumeTurn,
   SendblueStopTurn,
@@ -335,7 +355,12 @@ export type SendblueTypingTransitionInput =
   typeof SendblueTypingTransitionInput.Type;
 
 export const SendblueTypingObservation = Schema.Struct({
-  command: Schema.Literals(["StartTurn", "ResumeTurn", "StopTurn"]),
+  command: Schema.Literals([
+    "StartInbound",
+    "StartTurn",
+    "ResumeTurn",
+    "StopTurn",
+  ]),
   elapsedMillis: NonNegativeInt,
   operation: Schema.Literal("setTypingIndicator"),
   outcome: Schema.Literals(["started", "stopped", "unavailable"]),

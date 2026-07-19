@@ -170,11 +170,18 @@ const replayCompletionFailure = Layer.effect(
   })
 ).pipe(Layer.provide(SendblueReplayStoreMemory));
 
-it.effect(
-  "authenticates, dispatches one direct text, and suppresses replay",
-  () =>
-    Effect.gen(function* testInboundDispatch() {
-      let sent = 0;
+it.effect("starts typing before Eve dispatch and suppresses replay", () =>
+  Effect.gen(function* testInboundDispatch() {
+    let sent = 0;
+    const operations: string[] = [];
+    const client = SendblueClientMemory({
+      setTypingIndicator: (input) =>
+        Effect.sync(() => {
+          operations.push(`typing:${input.state}`);
+          return typingSuccess;
+        }),
+    });
+    yield* Effect.gen(function* assertEarlyTypingDispatch() {
       const sendblue = yield* SendblueChannel;
       const decision = yield* sendblue.authorizeAndClaimInbound(
         request(inbound())
@@ -184,45 +191,61 @@ it.effect(
       if (decision._tag === "Dispatch") {
         assert.strictEqual(decision.auth.principalId, "owner");
         assert.notInclude(decision.continuationToken, "+14155550100");
-        yield* sendblue.dispatchAcceptedInbound(decision, () =>
+        yield* sendblue.dispatchAcceptedInbound(decision, (state) =>
           Promise.resolve().then(() => {
+            operations.push(`eve:${state.typing._tag}`);
+            assert.deepStrictEqual(state.typing, { _tag: "Pending" });
             sent += 1;
           })
         );
       }
       assert.strictEqual(sent, 1);
+      assert.deepStrictEqual(operations, ["typing:start", "eve:Pending"]);
       assert.strictEqual(
         (yield* sendblue.authorizeAndClaimInbound(request(inbound())))._tag,
         "Duplicate"
       );
-    }).pipe(Effect.provide(channelLayer()))
+    }).pipe(Effect.provide(channelLayer(client)));
+  })
 );
 
 it.effect("releases an inbound claim when Eve rejects before acceptance", () =>
   Effect.gen(function* testRejectedInboundDispatch() {
-    const sendblue = yield* SendblueChannel;
-    const providerMessage = inbound({
-      message_handle: "eve-rejected-message",
+    const operations: string[] = [];
+    const client = SendblueClientMemory({
+      setTypingIndicator: (input) =>
+        Effect.sync(() => {
+          operations.push(input.state);
+          return typingSuccess;
+        }),
     });
-    const first = yield* sendblue.authorizeAndClaimInbound(
-      request(providerMessage)
-    );
+    yield* Effect.gen(function* assertRejectedDispatchCleanup() {
+      const sendblue = yield* SendblueChannel;
+      const providerMessage = inbound({
+        message_handle: "eve-rejected-message",
+      });
+      const first = yield* sendblue.authorizeAndClaimInbound(
+        request(providerMessage)
+      );
 
-    assert.strictEqual(first._tag, "Dispatch");
-    if (first._tag === "Dispatch") {
-      const error = yield* sendblue
-        .dispatchAcceptedInbound(first, () =>
-          Promise.reject(new Error("Fake Eve rejection."))
-        )
-        .pipe(Effect.flip);
-      assert.strictEqual(Schema.is(SendblueRoutingError)(error), true);
-    }
+      assert.strictEqual(first._tag, "Dispatch");
+      if (first._tag === "Dispatch") {
+        const error = yield* sendblue
+          .dispatchAcceptedInbound(first, () =>
+            Promise.reject(new Error("Fake Eve rejection."))
+          )
+          .pipe(Effect.flip);
+        assert.strictEqual(Schema.is(SendblueRoutingError)(error), true);
+      }
 
-    assert.strictEqual(
-      (yield* sendblue.authorizeAndClaimInbound(request(providerMessage)))._tag,
-      "Dispatch"
-    );
-  }).pipe(Effect.provide(channelLayer()))
+      assert.deepStrictEqual(operations, ["start", "stop"]);
+      assert.strictEqual(
+        (yield* sendblue.authorizeAndClaimInbound(request(providerMessage)))
+          ._tag,
+        "Dispatch"
+      );
+    }).pipe(Effect.provide(channelLayer(client)));
+  })
 );
 
 it.effect(
@@ -841,6 +864,13 @@ it.effect("migrates and rolls back the encoded typing lifecycle", () =>
       _tag: "Active",
       turnId: "turn-migration",
     });
+    const pending = yield* Schema.encodeEffect(SendblueChannelState)({
+      ...migrated,
+      typing: Schema.decodeUnknownSync(SendblueTypingLifecycle)({
+        _tag: "Pending",
+      }),
+    });
+    assert.deepStrictEqual(pending.typing, { _tag: "Pending" });
     assert.deepStrictEqual(
       yield* Schema.decodeUnknownEffect(SendblueConversationState)(encoded),
       legacy
@@ -849,7 +879,7 @@ it.effect("migrates and rolls back the encoded typing lifecycle", () =>
 );
 
 it.effect(
-  "starts once, supersedes older turns, and rejects stale cleanup",
+  "starts before the turn, adopts once, supersedes, and rejects stale cleanup",
   () =>
     Effect.gen(function* testReplaySafeTypingLifecycle() {
       const requests = yield* Ref.make<readonly string[]>([]);
@@ -861,14 +891,34 @@ it.effect(
       });
       yield* Effect.gen(function* assertReplaySafeTransitions() {
         const sendblue = yield* SendblueChannel;
-        const first = yield* sendblue.transitionTyping(
-          typingInput(channelState, {
-            _tag: "StartTurn",
-            turnId: "turn-old",
-          })
+        const pending = yield* sendblue.transitionTyping(
+          typingInput(channelState, { _tag: "StartInbound" })
         );
-        assert.strictEqual(first.outcome, "started");
+        assert.strictEqual(pending.outcome, "started");
+        assert.deepStrictEqual(pending.lifecycle, { _tag: "Pending" });
+
+        const first = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: pending.lifecycle },
+            {
+              _tag: "StartTurn",
+              turnId: "turn-old",
+            }
+          )
+        );
+        assert.strictEqual(first.outcome, "adopted");
         assert.strictEqual(first.lifecycle._tag, "Active");
+        if (first.lifecycle._tag === "Active") {
+          assert.strictEqual(first.lifecycle.turnId, "turn-old");
+        }
+
+        const duplicateInbound = yield* sendblue.transitionTyping(
+          typingInput(
+            { ...channelState, typing: pending.lifecycle },
+            { _tag: "StartInbound" }
+          )
+        );
+        assert.strictEqual(duplicateInbound.outcome, "unchanged");
 
         const replay = yield* sendblue.transitionTyping(
           typingInput(
@@ -1441,6 +1491,66 @@ it.effect(
       assert.deepStrictEqual(state.typing, { _tag: "Idle" });
       return yield* Effect.void;
     })
+);
+
+it.effect("adopts pre-turn typing without a duplicate provider start", () =>
+  Effect.gen(function* testPendingEveTypingAdoption() {
+    const operations: string[] = [];
+    const client = SendblueClientMemory({
+      setTypingIndicator: (input) =>
+        Effect.sync(() => {
+          operations.push(input.state);
+          return typingSuccess;
+        }),
+    });
+    const managed = yield* Effect.acquireRelease(
+      Effect.sync(() => ManagedRuntime.make(channelLayer(client))),
+      (activeRuntime) => activeRuntime.disposeEffect
+    );
+    const events = makeSendblueEveEvents(managed);
+    const state = Schema.encodeSync(SendblueChannelState)({
+      ...channelState,
+      typing: Schema.decodeUnknownSync(SendblueTypingLifecycle)({
+        _tag: "Pending",
+      }),
+    });
+    const eventChannel = {
+      continuationToken: "sendblue:conversation:test",
+      setContinuationToken() {},
+      state,
+    };
+    const ctx = {
+      getSandbox: () => Promise.reject(new Error("unused")),
+      getSkill: () => {
+        throw new Error("unused");
+      },
+      session: {
+        auth: { current: null, initiator: null },
+        id: "session-pending-eve-state",
+        turn: { id: "turn-pending-eve-state", sequence: 0 },
+      },
+    };
+    const started = events["turn.started"];
+    if (started === undefined) {
+      return yield* Effect.die("Required Sendblue Eve event is missing.");
+    }
+
+    yield* Effect.promise(() =>
+      Promise.resolve(
+        started(
+          { sequence: 0, turnId: "turn-pending-eve-state" },
+          eventChannel,
+          ctx
+        )
+      )
+    );
+    assert.deepStrictEqual(operations, []);
+    assert.deepStrictEqual(state.typing, {
+      _tag: "Active",
+      turnId: "turn-pending-eve-state",
+    });
+    return yield* Effect.void;
+  })
 );
 
 it.effect("upgrades a persisted legacy adapter state through Eve events", () =>
