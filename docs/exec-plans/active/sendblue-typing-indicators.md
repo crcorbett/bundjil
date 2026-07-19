@@ -215,6 +215,21 @@ Status: In Progress
   provider obligation without a duplicate request. Eve 0.20.0 emits
   `turn.started` before model resolution and streaming, so the old behavior was
   not first-token-triggered; it was Workflow-startup-triggered.
+- The first hosted draft on READY deployment
+  `dpl_HxM6y9A53XZEHj7C4Wy5NPrTPDJ3` proved `StartInbound` about 0.85 seconds
+  after direct authenticated ingress, but also exposed one duplicate
+  `StartTurn` provider request about 6.2 seconds later because the existing Eve
+  continuation retained its prior `Idle` state. That deployment is rejected.
+- The corrected transition makes `turn.started` provider-silent for
+  `Pending`, retained `Idle`, and older `Active` states. Clean commit `5baa362`
+  produced READY deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb`, which is now
+  the stable Production target. A direct authenticated fixture returned 202 at
+  `2026-07-19T21:53:54.944Z`; `StartInbound` started in 60 ms at
+  `21:53:55.746Z`, no `StartTurn` provider observation appeared, and
+  `StopTurn` stopped in 78 ms at `21:54:25.548Z`. Sendblue readback shows one
+  final `DELIVERED` iMessage with no downgrade or error. Runtime/provider proof
+  is accepted; direct handset visibility of this earlier window remains the
+  final user-observation gate.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;

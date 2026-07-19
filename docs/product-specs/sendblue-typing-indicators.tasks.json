@@ -357,10 +357,11 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 2,
+        "completedPasses": 3,
         "passEvidence": [
           "Evidence and call graph: the successful user-run long-response window disproves provider failure. Installed Eve source emits turn.started before model resolution and streaming, while runtime timing shows the event about 10.4 seconds after provider receipt; the correct narrow seam is accepted inbound after authentication, allowlisting, routing, and replay claim.",
-          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, a typed handoff state for new Eve conversations, provider-silent turn binding for both new and resumed conversations, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added. Hosted proof corrected the first draft after an existing Eve continuation retained Idle and exposed a duplicate StartTurn request."
+          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, a typed handoff state for new Eve conversations, provider-silent turn binding for both new and resumed conversations, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added. Hosted proof corrected the first draft after an existing Eve continuation retained Idle and exposed a duplicate StartTurn request.",
+          "Verification and hosted evidence: root formatting, Knip, 7/7 typechecks, 11/11 test tasks, 78/78 agent tests, JSON/static/diff checks, and clean Vercel builds passed. Corrected READY deployment dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb became the stable Production target. A direct authenticated fixture returned 202 at 2026-07-19T21:53:54.944Z; StartInbound started in 60 ms at 21:53:55.746Z, no StartTurn provider observation appeared, StopTurn stopped in 78 ms at 21:54:25.548Z, and one final iMessage reached DELIVERED with no downgrade or error. Direct handset visibility remains the final acceptance observation."
         ]
       },
       "commitAfterPassing": true
