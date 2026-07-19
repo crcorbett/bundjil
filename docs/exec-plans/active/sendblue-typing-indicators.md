@@ -194,6 +194,15 @@ Status: In Progress
   correction remains, so Production proof is paused at the provider boundary.
   Do not enable account-global auto typing or claim Production acceptance
   without a reviewed scope change or Sendblue-side resolution.
+- After the user explicitly approved that scope change, a reversible direct-API
+  auto-typing experiment also failed. Sendblue accepted the setting, then
+  recorded one healthy `RECEIVED` iMessage and one `DELIVERED` reply on the same
+  contact and line with no error or downgrade, but the complete 36-frame handset
+  window from about +1.2 seconds through +28.7 seconds showed no bubble. The
+  account setting was immediately restored to `false`; generated screenshots
+  and the temporary contact sheet were moved to Trash. This rules out the
+  provider-native auto path as a rollout substitute and leaves Sendblue-side
+  delivery resolution as the only remaining acceptance unblocker.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;
