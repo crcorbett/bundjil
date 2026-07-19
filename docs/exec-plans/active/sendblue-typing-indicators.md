@@ -171,6 +171,29 @@ Status: In Progress
   decision and requires a fresh user-confirmed message with continuous UI
   observation from Return through final reply. The READY deployment, sole
   Production webhook, and retained rollback candidate remain unchanged.
+- The continuously observed retry is a failed Product acceptance case. From
+  about +1.1 seconds through the final reply at about +19.7 seconds, 31 fresh
+  Messages samples and direct user observation showed no typing bubble even
+  though Sendblue recorded one RECEIVED inbound and one DELIVERED outbound and
+  Production recorded successful 65 ms start and 72 ms stop attempts with zero
+  provider/runtime errors.
+- `diagnose-production-sendblue-typing-visibility` now owns rollback and
+  provider-boundary diagnosis. Restore retained deployment
+  `dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y` at the stable Production alias before any
+  fix-forward work; keep the sole Production webhook and all account, routing,
+  identity, replay, model, secret, and Preview topology unchanged.
+- The diagnosis is complete. Production was restored to the retained READY
+  deployment and its health probe returns 200 ready; Sendblue still has one
+  unique signed receive webhook at the stable alias and no Preview or immutable
+  target. A direct legacy start, omitting both `state` and `max_duration_ms`,
+  also returned `SENT` but showed no handset bubble across 16 continuous samples
+  through about +12.1 seconds; its explicit cleanup stop returned `SENT`.
+  Sendblue independently evaluates the recipient and recent one-to-one message
+  as iMessage with no downgrade. Its current documentation defines `SENT` as
+  best-effort acceptance that may not deliver a bubble. No evidence-backed code
+  correction remains, so Production proof is paused at the provider boundary.
+  Do not enable account-global auto typing or claim Production acceptance
+  without a reviewed scope change or Sendblue-side resolution.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;

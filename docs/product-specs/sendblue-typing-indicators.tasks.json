@@ -289,10 +289,49 @@
       "commitAfterPassing": true
     },
     {
+      "id": "diagnose-production-sendblue-typing-visibility",
+      "title": "Diagnose the failed Production typing visibility boundary",
+      "status": "completed",
+      "dependsOn": ["establish-production-handset-observation-window"],
+      "description": "Record the continuously observed Production failure, restore the retained healthy deployment, and isolate whether Sendblue accepted but did not render the manual typing lifecycle before attempting a narrow fix-forward.",
+      "implementationNotes": [
+        "The second confirmed Production message was sent at 2026-07-19T16:51:04.966Z and observed continuously in Messages from about +1.1 seconds until the final reply at about +19.7 seconds. Thirty-one samples and direct user observation found no typing bubble.",
+        "Sendblue readback reconciled one RECEIVED iMessage inbound at 2026-07-19T16:51:06.489Z and one DELIVERED iMessage outbound at 2026-07-19T16:51:23.223Z with zero errors. Production runtime reconciled one webhook 202, Workflow 200s, StartTurn started in 65 ms, StopTurn stopped in 72 ms, providerAttempted true for both operations, and zero warning/error observations.",
+        "This is a failed Product acceptance case rather than another observation gap: provider acceptance, runtime completion, and final delivery do not substitute for the missing visible handset bubble.",
+        "Restore retained READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y through the stable Production alias before fix-forward work. Keep the sole Production webhook and all routing, secrets, model, replay, identity, Preview, and Sendblue account settings unchanged.",
+        "Use current official Sendblue documentation, installed source/types, sanitized provider readback, and bounded diagnostics to identify the narrowest supported correction. Do not enable account auto-typing or retain message, contact, number, URL, or screenshot content.",
+        "Production was rolled back successfully to READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y. The stable alias returned Eve health 200 ready, and Sendblue readback retained exactly one unique HTTPS receive webhook at the stable Production alias with one per-webhook secret and zero Preview or immutable targets.",
+        "A direct legacy start request against the same recent conversation omitted state and max_duration_ms, returned HTTP 200 with provider status SENT, and was observed continuously for 16 samples from about +0.5 seconds to +12.1 seconds. Accessibility and representative visual inspection found no bubble. A following explicit stop also returned HTTP 200 SENT.",
+        "Sendblue live evaluation and message metadata independently identify the recipient and recent one-to-one message as iMessage with no downgrade. The pinned and current official TypeScript client encode the same from_number, number, optional state, and optional max_duration_ms contract used locally.",
+        "Current official Sendblue guidance defines manual typing as best effort and states that SENT can occur without handset delivery. With v2 and legacy requests both accepted but invisible and every documented eligibility signal passing, no repository correction is supported by evidence. Stop the rollout at this provider boundary; do not accept Production or enable the separate account-global auto-typing feature without a reviewed scope change."
+      ],
+      "mandatoryVerification": [
+        "The failed window records continuous handset observation, one inbound, one webhook acceptance, one successful start attempt, one successful stop attempt, one delivered final reply, zero duplicates, zero Preview ingress, and zero provider/runtime errors without protected content.",
+        "The retained prior deployment becomes the stable Production target and returns healthy before further fix-forward testing; the sole Production webhook remains unchanged.",
+        "Provider-boundary diagnosis distinguishes API acceptance from handset rendering and is verified against current authoritative documentation and the exact local request encoder.",
+        "Any fix-forward remains Schema-encoded, Effect-typed, bounded, fail-open for final delivery, and covered by focused plus repository verification.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "Production is safely restored to the retained healthy deployment while the failed candidate remains available for evidence.",
+        "A supported root cause and verified narrow correction are ready for a fresh Production proof, or the rollout is explicitly stopped without claiming typing support."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Failure and rollback boundary: continuous Messages observation and direct user observation reject the candidate despite successful Effect observations and final delivery. The stable Production alias now resolves to the retained pre-typing READY deployment, Eve health returns 200 ready, and the sole signed Sendblue receive webhook remains unchanged with zero Preview or immutable targets.",
+          "Provider isolation: one direct legacy start removed Eve, Workflow, state, and max-duration variables yet returned HTTP 200 SENT without a visible bubble across 16 samples through +12.1 seconds; the safe stop also returned SENT. Live Sendblue evaluation confirms a one-to-one iMessage conversation with no downgrade, so the local lifecycle and request variant are not the failing boundary.",
+          "Contract and scope audit: current official documentation plus pinned/current sendblue-ts source agree with the local encoded request fields and explicitly define SENT as best-effort rather than delivery proof. No speculative code change, account auto-typing mutation, webhook drift, protected evidence, or false Production acceptance was introduced; further acceptance requires provider-side resolution or a separately reviewed product change."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "prove-sendblue-typing-production",
       "title": "Prove one bounded Production handset lifecycle",
       "status": "planned",
-      "dependsOn": ["establish-production-handset-observation-window"],
+      "dependsOn": ["diagnose-production-sendblue-typing-visibility"],
       "description": "Promote accepted clean source without changing topology, then reconcile provider, runtime, and handset evidence for one bounded Production turn.",
       "implementationNotes": [
         "Do not change the sole Production webhook, route secret, bypass, replay namespace, identity map, model provider, Executor policy, Vercel Sendblue variables, or account auto-typing.",
