@@ -155,10 +155,11 @@ Status: In Progress
   with a cross-package Effect Schema and read it through the app bundle's
   separate `Redacted` registry. The retained prior Production deployment
   remains live and no handset fixture has been sent.
-- Complete the inserted `stabilize-production-codex-proxy-build` remediation
-  slice first: keep the redacted non-empty token contract app-owned, prove both
-  gateway and Codex proxy builds, and deploy with the existing Production
-  provider/config topology unchanged.
+- The inserted `stabilize-production-codex-proxy-build` remediation is
+  complete. The redacted non-empty token contract is app-owned, both Gateway
+  and Codex proxy builds pass, and clean revision `057e77b` produced READY
+  Production deployment `dpl_JpF6mZqGXK1q4Dyd3L9Pf5xdccKi` under the existing
+  provider/config topology.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;

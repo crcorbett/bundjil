@@ -223,7 +223,7 @@
     {
       "id": "stabilize-production-codex-proxy-build",
       "title": "Stabilize the existing Production Codex proxy build",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["prove-sendblue-typing-preview"],
       "description": "Remove the cross-package Effect Redacted registry boundary exposed when Eve evaluates the existing Production Codex proxy model configuration during build, without changing provider topology or credentials.",
       "implementationNotes": [
@@ -245,10 +245,11 @@
       ],
       "implementationImprovementAudit": {
         "requiredPasses": 3,
-        "completedPasses": 2,
+        "completedPasses": 3,
         "passEvidence": [
           "Ownership and call graph: synthetic Eve builds isolate the failure to the existing codex-proxy provider branch. AgentModelProviderConfig now owns its non-empty redacted proxy token beside its other app-owned model Config Schemas, the unused @bundjil/codex-oauth app dependency is removed, and the proxy app/package runtime, provider selection, Vercel variables, Sendblue topology, webhook, and retained live Production deployment remain unchanged.",
-          "Effect quality and local verification: the remediation preserves Schema.RedactedFromValue and Schema-derived typing, rejects an empty token, retains exhaustive provider matching, and adds no cast, plain secret string contract, direct process.env, decoder bypass, helper, or protected fixture. The previously failing synthetic codex-proxy Eve build and the gateway Eve build both pass; focused model-provider tests pass 4/4, all 77 agent tests pass, frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 7/7 builds, JSON, static, and diff checks pass."
+          "Effect quality and local verification: the remediation preserves Schema.RedactedFromValue and Schema-derived typing, rejects an empty token, retains exhaustive provider matching, and adds no cast, plain secret string contract, direct process.env, decoder bypass, helper, or protected fixture. The previously failing synthetic codex-proxy Eve build and the gateway Eve build both pass; focused model-provider tests pass 4/4, all 77 agent tests pass, frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 7/7 builds, JSON, static, and diff checks pass.",
+          "Hosted deployment and rollback: clean pushed revision 057e77bbd2b05edaa53eef1e714cb41bc316bf4f produced READY Production deployment dpl_JpF6mZqGXK1q4Dyd3L9Pf5xdccKi through the canonical root deploy command under the unchanged encrypted Production configuration. Vercel successfully built both app and Workflow surfaces, aliased the stable Production hostname only after READY, retained prior READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y as rollback, and no handset fixture was sent during remediation."
         ]
       },
       "commitAfterPassing": true
