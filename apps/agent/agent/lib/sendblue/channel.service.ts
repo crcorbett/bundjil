@@ -408,18 +408,17 @@ export const transitionTyping = Effect.fn("SendblueChannel.transitionTyping")(
       }),
       Match.when({ _tag: "StartTurn" }, (command): SendblueTypingAttempt => {
         const active = SendblueTypingActive.make({ turnId: command.turnId });
-        const start: SendblueTypingAttempt = {
-          _tag: "AttemptStart",
-          lifecycle: active,
-          request: {
-            from_number: core.sendblueNumber,
-            max_duration_ms: config.typingMaxDurationMillis,
-            number: core.senderNumber,
-            state: "start",
-          },
-        };
         return Match.value(lifecycle).pipe(
-          Match.when({ _tag: "Idle" }, (): SendblueTypingAttempt => start),
+          Match.when(
+            { _tag: "Idle" },
+            (): SendblueTypingAttempt => ({
+              _tag: "Noop",
+              transition: SendblueTypingAdopted.make({
+                lifecycle: active,
+                outcome: "adopted",
+              }),
+            })
+          ),
           Match.when(
             { _tag: "Pending" },
             (): SendblueTypingAttempt => ({
@@ -441,7 +440,13 @@ export const transitionTyping = Effect.fn("SendblueChannel.transitionTyping")(
                       outcome: "unchanged",
                     }),
                   }
-                : start
+                : {
+                    _tag: "Noop",
+                    transition: SendblueTypingAdopted.make({
+                      lifecycle: active,
+                      outcome: "adopted",
+                    }),
+                  }
           ),
           Match.exhaustive
         );

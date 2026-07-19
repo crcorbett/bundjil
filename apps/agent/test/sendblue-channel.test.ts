@@ -934,7 +934,7 @@ it.effect(
             { _tag: "StartTurn", turnId: "turn-new" }
           )
         );
-        assert.strictEqual(newer.outcome, "started");
+        assert.strictEqual(newer.outcome, "adopted");
         assert.strictEqual(newer.lifecycle._tag, "Active");
         if (newer.lifecycle._tag === "Active") {
           assert.strictEqual(newer.lifecycle.turnId, "turn-new");
@@ -967,7 +967,6 @@ it.effect(
         assert.deepStrictEqual(yield* Ref.get(requests), [
           "start",
           "start",
-          "start",
           "stop",
         ]);
       }).pipe(Effect.provide(channelLayer(client)));
@@ -998,21 +997,15 @@ it.effect(
       yield* Effect.gen(function* assertConservativeTypingState() {
         const sendblue = yield* SendblueChannel;
         const uncertainStart = yield* sendblue.transitionTyping(
-          typingInput(channelState, {
-            _tag: "StartTurn",
-            turnId: "turn-uncertain",
-          })
+          typingInput(channelState, { _tag: "StartInbound" })
         );
         assert.strictEqual(uncertainStart.outcome, "unavailable");
-        assert.strictEqual(uncertainStart.lifecycle._tag, "Active");
-        if (uncertainStart.lifecycle._tag === "Active") {
-          assert.strictEqual(uncertainStart.lifecycle.turnId, "turn-uncertain");
-        }
+        assert.deepStrictEqual(uncertainStart.lifecycle, { _tag: "Pending" });
 
         const uncertainStop = yield* sendblue.transitionTyping(
           typingInput(
             { ...channelState, typing: uncertainStart.lifecycle },
-            { _tag: "StopTurn", expectedTurnId: "turn-uncertain" }
+            { _tag: "StopTurn" }
           )
         );
         assert.strictEqual(uncertainStop.outcome, "unavailable");
@@ -1024,7 +1017,7 @@ it.effect(
         const retry = yield* sendblue.transitionTyping(
           typingInput(
             { ...channelState, typing: uncertainStop.lifecycle },
-            { _tag: "StopTurn", expectedTurnId: "turn-uncertain" }
+            { _tag: "StopTurn" }
           )
         );
         assert.strictEqual(retry.outcome, "stopped");
@@ -1135,10 +1128,7 @@ it.effect(
       const sendblue = yield* SendblueChannel;
       const fiber = yield* Effect.forkChild(
         sendblue.transitionTyping(
-          typingInput(channelState, {
-            _tag: "StartTurn",
-            turnId: "protected-turn-id",
-          })
+          typingInput(channelState, { _tag: "StartInbound" })
         )
       );
       yield* TestClock.adjust("2 seconds");
@@ -1147,14 +1137,14 @@ it.effect(
       const replay = yield* sendblue.transitionTyping(
         typingInput(
           { ...channelState, typing: started.lifecycle },
-          { _tag: "StartTurn", turnId: "protected-turn-id" }
+          { _tag: "StartInbound" }
         )
       );
       assert.strictEqual(replay.outcome, "unchanged");
       assert.strictEqual(observations.length, 1);
       assert.deepStrictEqual(levels, ["Info"]);
       assert.deepStrictEqual(observations[0], {
-        command: "StartTurn",
+        command: "StartInbound",
         elapsedMillis: 2000,
         operation: "setTypingIndicator",
         outcome: "started",
@@ -1381,7 +1371,7 @@ it.effect(
         eventChannel,
         ctx
       );
-      assert.deepStrictEqual(operations, ["typing:start"]);
+      assert.deepStrictEqual(operations, []);
 
       yield* Effect.promise(() =>
         Promise.resolve(
@@ -1398,7 +1388,7 @@ it.effect(
           )
         )
       );
-      assert.deepStrictEqual(operations, ["typing:start"]);
+      assert.deepStrictEqual(operations, []);
 
       yield* Effect.promise(() =>
         Promise.resolve(
@@ -1415,11 +1405,7 @@ it.effect(
           )
         )
       );
-      assert.deepStrictEqual(operations, [
-        "typing:start",
-        "typing:stop",
-        "message",
-      ]);
+      assert.deepStrictEqual(operations, ["typing:stop", "message"]);
       assert.deepStrictEqual(state.typing, { _tag: "Idle" });
 
       operations.length = 0;
@@ -1448,11 +1434,7 @@ it.effect(
           )
         )
       );
-      assert.deepStrictEqual(operations, [
-        "typing:start",
-        "typing:stop",
-        "message",
-      ]);
+      assert.deepStrictEqual(operations, ["typing:stop", "message"]);
       assert.deepStrictEqual(state.typing, {
         _tag: "Active",
         turnId: "turn-fail-open-delivery",
@@ -1612,7 +1594,7 @@ it.effect("upgrades a persisted legacy adapter state through Eve events", () =>
         )
       )
     );
-    assert.deepStrictEqual(operations, ["typing:start"]);
+    assert.deepStrictEqual(operations, []);
     assert.deepStrictEqual(state.typing, {
       _tag: "Active",
       turnId: "turn-legacy-eve-state",
@@ -1633,11 +1615,7 @@ it.effect("upgrades a persisted legacy adapter state through Eve events", () =>
         )
       )
     );
-    assert.deepStrictEqual(operations, [
-      "typing:start",
-      "typing:stop",
-      "message",
-    ]);
+    assert.deepStrictEqual(operations, ["typing:stop", "message"]);
     assert.deepStrictEqual(state.typing, { _tag: "Idle" });
     return yield* Effect.void;
   })
@@ -1848,19 +1826,13 @@ it.effect(
         turnId: "turn-cleanup-events",
       });
       assert.deepStrictEqual(operations, [
-        "start",
+        "stop",
         "stop",
         "start",
         "stop",
-        "start",
         "stop",
-        "start",
         "stop",
-        "start",
         "stop",
-        "start",
-        "stop",
-        "start",
         "stop",
       ]);
       return yield* Effect.void;

@@ -338,13 +338,13 @@
       "description": "Move the first typing request from Eve turn.started to the authenticated, allowlisted, routed, replay-claimed inbound boundary so the handset receives it before Workflow startup and model resolution.",
       "implementationNotes": [
         "Installed Eve 0.20.0 emits turn.started in emitTurnPreamble before message.received, model resolution, step.started, and model streaming. The current implementation therefore starts before first token, but the successful Production run shows about 10.4 seconds from Sendblue inbound receipt to StartTurn.",
-        "Extend the durable lifecycle to Idle | Pending | Active(turnId). StartInbound moves Idle to Pending with one provider start; turn.started adopts Pending as Active(turnId) without a second provider request. Legacy Idle at turn.started retains the existing direct start for persisted or rolled-back state.",
+        "Extend the lifecycle to Idle | Pending | Active(turnId). StartInbound moves Idle to Pending with one provider start. Eve uses supplied state for a new conversation but retains its durable state on an existing continuation, so turn.started binds Pending, retained Idle, or an older Active value to Active(turnId) without any provider request.",
         "Run StartInbound only after webhook authentication, event classification, sender authorization, routing, and replay claim succeed. Ignored, unauthorized, malformed, and duplicate events must make no provider call.",
         "Pass the typed Pending state into Eve. If Eve rejects before acceptance, attempt a fail-open stop before releasing the replay claim for retry. Replay completion failure after Eve acceptance must not stop an active turn.",
         "Keep provider max duration, stop-before-final-delivery, authorization resume, sanitized observations, sole Production webhook, and account-level auto-typing=false unchanged."
       ],
       "mandatoryVerification": [
-        "Schema and transition tests prove Pending encoding, StartInbound idempotence, Pending-to-Active adoption without a provider call, legacy Idle turn start, newer-turn supersession, and stop from Pending or Active.",
+        "Schema and transition tests prove Pending encoding, StartInbound idempotence, Pending/Idle/older-Active binding to the current turn without a provider call, same-turn replay, and stop from Pending or Active.",
         "Dispatch tests prove provider start occurs before Eve send, Eve receives Pending, rejected Eve dispatch attempts stop and releases the claim, and ignored/duplicate paths remain provider-silent.",
         "Focused agent tests, full agent tests, build, root verification, static scans, Effect diagnostics, and git diff checks pass.",
         "A fresh hosted proof shows the StartInbound observation near webhook acceptance, no duplicate StartTurn provider attempt, a visible handset bubble, one bounded stop, one delivered reply, and no topology or account-setting drift.",
@@ -360,7 +360,7 @@
         "completedPasses": 2,
         "passEvidence": [
           "Evidence and call graph: the successful user-run long-response window disproves provider failure. Installed Eve source emits turn.started before model resolution and streaming, while runtime timing shows the event about 10.4 seconds after provider receipt; the correct narrow seam is accepted inbound after authentication, allowlisting, routing, and replay claim.",
-          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, typed state passed into Eve, no duplicate provider start on turn adoption, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added."
+          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, a typed handoff state for new Eve conversations, provider-silent turn binding for both new and resumed conversations, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added. Hosted proof corrected the first draft after an existing Eve continuation retained Idle and exposed a duplicate StartTurn request."
         ]
       },
       "commitAfterPassing": true

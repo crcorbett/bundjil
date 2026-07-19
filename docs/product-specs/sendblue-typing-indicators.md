@@ -247,9 +247,11 @@ extra typing key under installed Effect's default Struct parse options.
 `Pending` and `Active` both mean that Bundjil owes the provider a matching
 cleanup attempt; neither claims that the best-effort bubble is visible.
 `StartInbound` carries both `started` and `unavailable` transitions as
-`Pending`. The next `StartTurn` adopts `Pending` as `Active(turnId)` without a
-provider call. A legacy `Idle` state at `turn.started` retains the prior direct
-start behavior for migration and rollback safety. A failed stop returns
+`Pending`. The next `StartTurn` binds `Pending`, existing-workflow `Idle`, or a
+stale older `Active` lifecycle to `Active(turnId)` without a provider call.
+This is required because Eve uses the supplied state for a new conversation
+but retains durable state when resuming an existing conversation. The accepted
+inbound boundary is therefore the only initial provider-start owner. A failed stop returns
 `unavailable` and retains the same engaged lifecycle so later terminal Eve
 events can retry. Only a successful stop returns `Idle`. `StartTurn` is
 replay-safe for the same active turn. `ResumeTurn` deliberately reissues a
@@ -298,7 +300,9 @@ SendblueChannel.transitionTyping
   -> Match StartInbound | StartTurn | ResumeTurn | StopTurn exhaustively
   -> Match Idle | Pending | Active lifecycle inside the command branch
   -> construct the only valid provider start or stop request for that branch
-  -> adopt Pending at StartTurn without a second provider request
+  -> bind the accepted-inbound obligation to Active(turnId) at StartTurn
+     without any provider request, including when a resumed workflow retained
+     Idle or an older Active value
   -> no-op for duplicate StartInbound, same-turn StartTurn, Idle StopTurn, or
      stale StopTurn
   -> always reissue start for ResumeTurn when its turn is current
@@ -354,7 +358,7 @@ unauthorized, malformed, and duplicate inbound paths never reach this boundary.
 
 | Eve event                                     | Typing behavior                                                      |
 | --------------------------------------------- | -------------------------------------------------------------------- |
-| `turn.started`                                | Adopt `Pending`; start only for a legacy `Idle`; persist `Active`.   |
+| `turn.started`                                | Bind to `Active(turnId)` with no provider request.                   |
 | `message.appended`                            | No provider call; per-token calls are forbidden.                     |
 | `message.completed` with `tool-calls`         | Keep active; do not send intermediate text.                          |
 | terminal visible `message.completed`          | Attempt `StopTurn`, persist returned state, then deliver regardless. |
@@ -414,7 +418,7 @@ authenticated allowlisted Sendblue inbound
   -> Eve turn.started(event, channel, ctx)
   -> module-owned ManagedRuntime<SendblueChannel>
   -> SendblueChannel.transitionTyping(StartTurn)
-  -> adopt Pending without another provider request
+  -> bind the accepted-inbound obligation without another provider request
   -> channel.state.typing = Active(turnId)
   -> Eve model/tool loop
   -> terminal message.completed
