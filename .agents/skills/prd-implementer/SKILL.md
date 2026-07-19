@@ -21,17 +21,14 @@ Read in this order:
 ## Default Rules
 
 - Implement in small, end-to-end slices.
-- When a task list exists, implement it one task at a time with one sequential
-  subagent per task.
-- Create or set one comprehensive active goal before task-list execution. The
-  goal must state that subagents implement tasks sequentially and that the
-  parent agent reviews, audits, verifies, and accepts each task before
-  delegating the next one.
-- When the task list includes `implementationImprovementAuditCounter`, treat
-  its pass count as a floor. Run and record the required parent audit turns
-  before accepting the task, and require more turns when ownership, Effect
-  flow, frontend composition, browser proof, or verification evidence remains
-  weak.
+- When a task list exists, keep one primary trajectory accountable and
+  implement one accepted task at a time. Delegate only an independently
+  provable slice, fresh/adversarial review, or explicitly disjoint work.
+- Use a goal only when the user explicitly requests one. A goal or subagent
+  count is coordination state, never acceptance proof.
+- Treat any historical `implementationImprovementAuditCounter` as a set of risk
+  lenses, not a fixed pass floor. Ownership, implementation quality, and proof
+  must pass regardless of turn count.
 - Start with a tracer bullet before broadening.
 - Verify after each meaningful slice with typechecks, targeted tests, and builds where relevant.
 - Keep the active execution plan current while code moves.
@@ -141,26 +138,25 @@ reusable packages.
 
 For each task:
 
-1. Delegate exactly that task to a subagent with the task object, spec,
-   task-list path, relevant files, and architecture docs.
-2. Tell the subagent to edit files directly, run the task's verification gates,
-   run `bun run verification` as the final gate when practical, and report
-   changed files plus evidence.
-3. Review the subagent diff, run any needed local verification, and audit the
-   work against the spec, task, and architecture docs.
-4. Run the task's `implementationImprovementAudit` passes when present:
+1. Keep the primary owner on the task. Delegate a bounded slice only under the
+   independent-evidence rule, with the task object, spec, paths, and gates.
+2. Implement directly, or tell a bounded delegated owner to edit files and run
+   the task's verification gates. Run `bun run verification` as the final gate
+   when practical and retain changed-file plus evidence records.
+3. Review the complete diff, independently run needed verification, and audit
+   the work against the spec, task, and architecture docs.
+4. Apply the task's `implementationImprovementAudit` risk lenses when present:
    ownership/call graph, implementation quality, and verification coverage.
    Record pass evidence in the active execution plan and task list.
-5. Send the task back to the same subagent if the slice is incomplete or below
-   the quality bar.
-6. Mark the task complete only after the parent agent is satisfied. Three audit
-   passes are not enough if they uncovered unresolved gaps.
+5. Correct incomplete work directly or return a delegated slice to the same
+   owner with exact failed evidence.
+6. Mark the task complete only after the parent agent is satisfied and every
+   required risk lens and proof passes.
 7. Commit the coherent slice when `commitAfterPassing` requires it.
-8. Delegate the next task only after the current task is accepted.
+8. Begin the next task only after the current task is accepted.
 
-Default to serial delegation. Do not parallelize task-list implementation unless
-the task list explicitly says the tasks are independent and write scopes are
-disjoint.
+Default to serial task execution. Parallelize only when the task list proves
+independent dependencies and disjoint write scopes.
 
 ## Review Bar
 
@@ -216,13 +212,13 @@ Before accepting a task, audit for:
   plus direct HTTP evidence for redirects and machine-readable responses where
   relevant
 - leaf-component frontend composition when UI is touched
-- completed `implementationImprovementAudit.passEvidence` when the task list
-  requires repeated parent audit turns
+- completed evidence for each applicable ownership, implementation-quality,
+  and verification-coverage risk lens
 
 ## Implementation Improvement Audits
 
-When a task has an `implementationImprovementAudit` object, the parent agent
-must complete the recorded audit loop before acceptance:
+When a historical task has an `implementationImprovementAudit` object, treat
+its entries as risk lenses and complete them before acceptance:
 
 1. Ownership and call graph: confirm the right package owns the behavior,
    canonical schemas/types/service contracts are reused, and production/test
@@ -235,9 +231,9 @@ must complete the recorded audit loop before acceptance:
    `bun run check:skills`, stale-pattern scans, downstream-impact ledger, docs
    and README updates, and rendered evidence prove the exact task.
 
-Update `completedPasses` and `passEvidence` only after a distinct pass has
-been performed and recorded. Require additional passes beyond the configured
-count when the audit finds unresolved architecture or verification gaps.
+Record evidence only after the corresponding lens has been checked. Do not
+equate a configured count with acceptance while architecture or proof gaps
+remain.
 
 ## Verification Baseline
 

@@ -73,6 +73,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["writer", "Schema.encodeEffect"],
     ["writer", "inbound"],
     ["writer", "outbound"],
+    ["writer", "Do not encode a fixed audit-pass or subagent count"],
     ["implementer", ".agents/skills/effect-client-wrapper"],
     ["implementer", "Change required"],
     ["implementer", "typeof Contract.Type"],
@@ -84,15 +85,15 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["implementer", "unencoded outward writes"],
     ["implementer", "stale exceptions"],
     ["implementer", "helper sprawl"],
-    [
-      "packageStructure",
-      "/Users/cooper/.codex/skills/package-structure/SKILL.md",
-    ],
+    ["implementer", "Use a goal only when the user explicitly requests one"],
+    ["packageStructure", "Use this skill directly"],
+    ["packageStructure", "Required separation"],
     ["packageStructure", "helper sprawl"],
     ["packageProfile", "@bundjil/source"],
-    ["reviewer", "/Users/cooper/.codex/skills/prd-review/SKILL.md"],
+    ["reviewer", "Use this repository-owned contract directly"],
     ["reviewer", "DeepWiki"],
     ["reviewer", "Change required"],
+    ["reviewer", "use one primary reviewer"],
     ["wrapper", "Config.schema"],
     ["wrapper", "ConfigProvider"],
     ["wrapper", "Schema.encodeEffect"],
@@ -175,6 +176,12 @@ const runSkillPolicyAudit = Effect.fn("SkillPolicyAudit.run")(function* () {
       ? []
       : [`${policyFiles[file]}: missing required policy fragment ${fragment}`]
   );
+  const personalRoot = ["", "Users", "cooper"].join("/");
+  for (const [file, content] of Object.entries(contents)) {
+    if (content.includes(personalRoot)) {
+      findings.push(`${file}: contains a personal absolute path`);
+    }
+  }
   const executableExamples = Array.from(
     contents.wrapper.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g),
     (match) => match[1] ?? ""

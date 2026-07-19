@@ -92,12 +92,9 @@ Read in this order:
 - Do not allow a single top-level quality reminder to cover implementation
   style. Each code task must explicitly verify Effect TS control flow, schema
   ownership, unsafe casts, manual mappers/readers, and wrapper/helper sprawl.
-- Substantial implementation task lists must include an
-  `implementationImprovementAuditCounter` and per-task
-  `implementationImprovementAudit` entries. Use three parent audit passes as
-  the default acceptance floor, and state that the implementer may require more
-  passes when ownership, Effect flow, frontend composition, browser proof, or
-  verification evidence remains weak.
+- Substantial implementation task lists must name the applicable ownership,
+  Effect flow, frontend composition, browser, and verification risk lenses.
+  Do not encode a fixed audit-pass or subagent count as acceptance proof.
 - Use DeepWiki through Executor only for upstream packages or libraries when
   current external guidance is necessary. Do not use it to inspect Bundjil;
   the checked-out source, installed versions, repo docs, and tests are the
@@ -187,9 +184,9 @@ principles, global verification, ordered tasks, mandatory verification,
 browser verification where relevant, completion criteria, and
 `commitAfterPassing` for each implementation spike. Use `bun run verification`
 as the default final task gate unless the task explicitly records a narrower
-reasoned exception. For substantial implementation or verification work, also
-include `implementationImprovementAuditCounter` plus per-task
-`implementationImprovementAudit` evidence counters.
+reasoned exception. For substantial implementation or verification work, name
+the applicable ownership/call-graph, implementation-quality, and
+verification-coverage risk lenses without fixed counters.
 
 For visible route/runtime task lists, add Browser evidence to
 `browserVerification` for each changed state. Direct HTTP checks should prove
@@ -212,9 +209,8 @@ For Effect TS tasks, every task's `mandatoryVerification` or
 - zero unexplained boundary findings, zero stale exact exceptions, and passing
   `bun run check:boundaries`, `bun run check:effect-setup`, and
   `bun run check:skills`;
-- implementation-improvement audit passes for ownership/call graph,
-  implementation quality, and verification coverage, with pass evidence
-  recorded before task acceptance.
+- ownership/call-graph, implementation-quality, and verification-coverage risk
+  lenses, with evidence recorded before task acceptance.
 
 For frontend tasks that affect visible text, every task's
 `mandatoryVerification` or `browserVerification` must also require canonical
