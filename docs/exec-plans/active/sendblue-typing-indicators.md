@@ -116,7 +116,26 @@ Status: Completed
 - Emit exactly one Schema-valid sanitized Effect log observation for each
   provider attempt and none for replay no-ops.
 
-### 4. Immutable Preview proof
+### 4. Preview workflow version boundary
+
+Status: Completed
+
+- The first immutable Preview attempt resumed a workflow pinned to its
+  pre-feature deployment. The turn and final outbound completed, but its
+  four-field adapter snapshot and one Sendblue external-API call prove the
+  fixture exercised old code rather than the candidate deployment.
+- Pinned Eve `0.20.0` source routes nested turns to `deploymentId: "latest"`
+  only in Production. Current Vercel Workflow documentation independently says
+  existing runs continue on their original deployment.
+- Prove the literal four-field legacy state through `makeSendblueEveEvents`.
+  For the next immutable Preview, derive a fresh continuation namespace with an
+  ephemeral Preview-only routing key, restore the exact prior project value
+  immediately after deployment, and retain all provider topology.
+- Run no second fixture on the rejected deployment. A new clean source commit,
+  full verification, and new immutable deployment are required before another
+  acceptance attempt.
+
+### 5. Immutable Preview proof
 
 Status: Planned
 
@@ -127,7 +146,7 @@ Status: Planned
 - Accept exact event/observation/provider counts without registering Preview
   ingress.
 
-### 5. Bounded Production proof
+### 6. Bounded Production proof
 
 Status: Planned
 
@@ -136,7 +155,7 @@ Status: Planned
 - Reconcile one handset observation against sanitized provider/runtime counts;
   stop and record rollback if the window fails.
 
-### 6. Documentation and closure
+### 7. Documentation and closure
 
 Status: Planned
 
@@ -233,3 +252,25 @@ verify one normal Production message without typing before further work.
   tests passed 27/27, all 75 agent tests passed, fresh Eve discovery passed,
   and formatting, Knip, 7/7 typechecks, 11/11 root test tasks, 7/7 builds,
   static/leak/JSON/diff checks passed with the Executor API key absent.
+- 2026-07-19: the first `prove-sendblue-typing-preview` attempt was rejected.
+  Deployment `dpl_58yvrpZMntTL6124tfduq3rqfoYo` completed one accepted Eve
+  workflow and delivered exactly one final outbound with no duplicate, but its
+  decrypted adapter snapshots retained the pre-feature four-field state and
+  Preview external-API telemetry recorded one Sendblue call rather than the
+  required start, stop, and message calls. Production remained untouched, no
+  Preview webhook was registered, and remediation task
+  `establish-preview-workflow-version-boundary` was inserted before a new
+  immutable Preview attempt. Pinned Eve source then confirmed that Preview
+  nested turns remain on the originating deployment while Production opts into
+  latest-deployment routing; the failed attempt is therefore invalid proof
+  against old code, not a typing transition failure.
+- 2026-07-19: `establish-preview-workflow-version-boundary` completed three
+  parent passes. Pinned Eve source and current Vercel Workflow documentation
+  independently confirmed Preview version pinning and the Production-only
+  latest-deployment branch. A direct legacy encoded-state event test proved
+  start, stop, final delivery, and Active-to-Idle persistence through the typed
+  Eve seam without a runtime workaround. Focused tests passed 27/27, all 76
+  agent tests passed, and formatting, Knip, 7/7 typechecks, 11/11 test tasks,
+  7/7 builds, JSON, and diff checks passed. The next Preview deployment will
+  snapshot a fresh ephemeral Preview routing key, after which the exact prior
+  project value is restored before the single fixture.

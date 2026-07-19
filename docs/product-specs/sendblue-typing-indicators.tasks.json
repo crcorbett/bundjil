@@ -153,16 +153,50 @@
       "commitAfterPassing": true
     },
     {
+      "id": "establish-preview-workflow-version-boundary",
+      "title": "Establish a fresh Preview workflow version boundary",
+      "status": "completed",
+      "dependsOn": ["wire-durable-eve-typing-lifecycle"],
+      "description": "Correct the Preview acceptance procedure after the first fixture resumed a workflow pinned to its pre-feature deployment, then prove the literal legacy adapter state remains compatible with the new event seam.",
+      "implementationNotes": [
+        "Pinned Eve 0.20.0 source routes nested turn workflows to the latest deployment only when VERCEL_ENV is production; official Vercel Workflow versioning keeps Preview resumes on the deployment that started them.",
+        "Exercise the literal persisted four-field encoded adapter state through makeSendblueEveEvents, not only through direct Schema decoding or a freshly encoded SendblueChannelState fixture.",
+        "For the next immutable Preview only, replace the Preview routing key with a fresh ephemeral value before deployment so the allowlisted sender and line derive a continuation token that cannot resume an older workflow. Restore the exact prior project value immediately after deployment; the immutable deployment retains its snapshot.",
+        "Do not change Production configuration, the receive webhook, identity policy, replay service, or provider settings. Do not run a second fixture against the rejected deployment."
+      ],
+      "mandatoryVerification": [
+        "A focused regression test starts from the exact legacy four-field encoded state and proves start -> stop -> final message ordering plus persisted Active -> Idle transitions through the Eve event seam.",
+        "Pinned Eve source and current Vercel Workflow documentation independently confirm the Preview deployment-version boundary and Production latest-routing distinction.",
+        "Agent focused checks and all root verification gates pass with no protected value, fixture material, generated deployment output, or provider-topology change.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The rejected result is classified as an invalid Preview proof against old workflow code, not as a typing implementation failure.",
+        "The next immutable Preview procedure establishes an isolated fresh continuation namespace before its one acceptance fixture."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: decrypted hosted snapshots, one final Sendblue call, pinned Eve 0.20.0 workflow-runtime source, and current Vercel Workflow versioning agree that the rejected fixture resumed old Preview code. Eve's production-only deploymentId latest branch remains unchanged, and no Sendblue provider, webhook, identity, replay, or Production surface changed.",
+          "Effect quality and compatibility: the existing missing-key Effect Schema migration remains canonical. A new direct makeSendblueEveEvents regression removes typing from the encoded adapter state without a cast, then proves typed StartTurn and StopTurn provider operations, persisted Active then Idle state, and final-message ordering; no runtime workaround, DTO, unsafe decoder, helper, dependency, or source behavior was added.",
+          "Verification and evidence: focused agent typecheck and Sendblue channel tests passed 27/27; full verification passed formatting, Knip, 7/7 typechecks, and 11/11 test tasks; all 76 agent tests and 7/7 root builds passed. JSON and diff checks passed, generated output remained ignored, and the revised Preview procedure retains no credential or fixture material."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "prove-sendblue-typing-preview",
       "title": "Prove typing on an immutable Preview",
       "status": "planned",
-      "dependsOn": ["wire-durable-eve-typing-lifecycle"],
+      "dependsOn": ["establish-preview-workflow-version-boundary"],
       "description": "Deploy clean source to Preview without provider ingress and prove the protected direct accepted-route lifecycle as an independent stop/go gate.",
       "implementationNotes": [
         "From the repository root run vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes; do not use eve deploy or --prebuilt.",
         "Use retained encrypted Preview Config, no Sendblue receive webhook, a fresh project token, and vercel curl for protected /eve/v1 checks.",
         "Create the minimal text and unique replay handle ephemerally in a trusted shell, pass the synthetic accepted-route body via stdin, discard it, and never print, retain, commit, or place it in shell history.",
-        "Update only this ledger and active plan with sanitized acceptance evidence after the gate passes."
+        "Update only this ledger and active plan with sanitized acceptance evidence after the gate passes.",
+        "The first immutable attempt on deployment dpl_58yvrpZMntTL6124tfduq3rqfoYo is rejected: one accepted turn completed and exactly one final outbound was delivered, but the continuation resumed a Preview workflow pinned to its pre-feature deployment. The four-field adapter snapshot and one Sendblue external-API call are evidence that the fixture exercised old code, not the candidate deployment."
       ],
       "mandatoryVerification": [
         "Deployment is clean/source-correlated and no Preview webhook, dedicated bypass, account auto-typing, Production config, or protected output changes.",

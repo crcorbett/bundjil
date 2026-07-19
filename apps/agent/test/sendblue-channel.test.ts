@@ -1443,6 +1443,96 @@ it.effect(
     })
 );
 
+it.effect("upgrades a persisted legacy adapter state through Eve events", () =>
+  Effect.gen(function* testLegacyEveAdapterStateUpgrade() {
+    const operations: string[] = [];
+    const client = SendblueClientMemory({
+      sendMessage: () =>
+        Effect.sync(() => {
+          operations.push("message");
+          return sendSuccess;
+        }),
+      setTypingIndicator: (input) =>
+        Effect.sync(() => {
+          operations.push(`typing:${input.state}`);
+          return typingSuccess;
+        }),
+    });
+    const managed = yield* Effect.acquireRelease(
+      Effect.sync(() => ManagedRuntime.make(channelLayer(client))),
+      (activeRuntime) => activeRuntime.disposeEffect
+    );
+    const events = makeSendblueEveEvents(managed);
+    const state = Schema.encodeSync(SendblueChannelState)(channelState);
+    assert.strictEqual(Reflect.deleteProperty(state, "typing"), true);
+    assert.deepStrictEqual(Object.keys(state).toSorted(), [
+      "conversationKey",
+      "principalId",
+      "sendblueNumber",
+      "senderNumber",
+    ]);
+    const eventChannel = {
+      continuationToken: "sendblue:conversation:test",
+      setContinuationToken() {},
+      state,
+    };
+    const ctx = {
+      getSandbox: () => Promise.reject(new Error("unused")),
+      getSkill: () => {
+        throw new Error("unused");
+      },
+      session: {
+        auth: { current: null, initiator: null },
+        id: "session-legacy-eve-state",
+        turn: { id: "turn-legacy-eve-state", sequence: 0 },
+      },
+    };
+    const started = events["turn.started"];
+    const completed = events["message.completed"];
+    if (started === undefined || completed === undefined) {
+      return yield* Effect.die("Required Sendblue Eve events are missing.");
+    }
+
+    yield* Effect.promise(() =>
+      Promise.resolve(
+        started(
+          { sequence: 0, turnId: "turn-legacy-eve-state" },
+          eventChannel,
+          ctx
+        )
+      )
+    );
+    assert.deepStrictEqual(operations, ["typing:start"]);
+    assert.deepStrictEqual(state.typing, {
+      _tag: "Active",
+      turnId: "turn-legacy-eve-state",
+    });
+
+    yield* Effect.promise(() =>
+      Promise.resolve(
+        completed(
+          {
+            finishReason: "stop",
+            message: "Legacy adapter state upgraded.",
+            sequence: 1,
+            stepIndex: 0,
+            turnId: "turn-legacy-eve-state",
+          },
+          eventChannel,
+          ctx
+        )
+      )
+    );
+    assert.deepStrictEqual(operations, [
+      "typing:start",
+      "typing:stop",
+      "message",
+    ]);
+    assert.deepStrictEqual(state.typing, { _tag: "Idle" });
+    return yield* Effect.void;
+  })
+);
+
 it.effect(
   "maps wait, authorization, terminal, and failed-session cleanup",
   () =>
