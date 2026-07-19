@@ -1,5 +1,11 @@
 import { Schema } from "effect";
 
+import {
+  CodexAuthErrorMessage,
+  CodexSubscriptionAuthProviderCode,
+  CodexSubscriptionAuthStatus,
+} from "../error-contracts.js";
+
 export const CodexSubscriptionAuthOperation = Schema.Literals([
   "createAuthorizationSession",
   "bindCallback",
@@ -39,8 +45,8 @@ export class CodexSubscriptionAuthError extends Schema.TaggedErrorClass<CodexSub
   {
     operation: CodexSubscriptionAuthOperation,
     reason: CodexSubscriptionAuthFailureReason,
-    message: Schema.NonEmptyString,
-    status: Schema.optional(Schema.Int),
-    providerCode: Schema.optional(Schema.NonEmptyString),
+    message: CodexAuthErrorMessage,
+    status: Schema.optional(CodexSubscriptionAuthStatus),
+    providerCode: Schema.optional(CodexSubscriptionAuthProviderCode),
   }
 ) {}

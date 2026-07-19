@@ -17,24 +17,54 @@ import {
 } from "./schemas.js";
 import type { SendblueConfig as SendblueConfigType } from "./schemas.js";
 
-const apiKeyConfig = Config.redacted("BUNDJIL_SENDBLUE_API_KEY");
-const apiSecretConfig = Config.redacted("BUNDJIL_SENDBLUE_API_SECRET");
-const webhookSecretConfig = Config.redacted("BUNDJIL_SENDBLUE_WEBHOOK_SECRET");
-const routingKeyConfig = Config.redacted("BUNDJIL_SENDBLUE_ROUTING_KEY");
+const apiKeyConfig = Config.schema(
+  SendblueConfig.fields.apiKey,
+  "BUNDJIL_SENDBLUE_API_KEY"
+);
+const apiSecretConfig = Config.schema(
+  SendblueConfig.fields.apiSecret,
+  "BUNDJIL_SENDBLUE_API_SECRET"
+);
+const webhookSecretConfig = Config.schema(
+  SendblueConfig.fields.webhookSecret,
+  "BUNDJIL_SENDBLUE_WEBHOOK_SECRET"
+);
+const routingKeyConfig = Config.schema(
+  SendblueConfig.fields.routingKey,
+  "BUNDJIL_SENDBLUE_ROUTING_KEY"
+);
 const fromNumberConfig = Config.schema(
   E164PhoneNumber,
   "BUNDJIL_SENDBLUE_FROM_NUMBER"
 );
-const senderIdentitiesConfig = Config.redacted(
+const senderIdentitiesConfig = Config.schema(
+  Schema.RedactedFromValue(Schema.fromJsonString(SendblueSenderIdentities)),
   "BUNDJIL_SENDBLUE_SENDER_IDENTITIES"
 );
-const replayStoreUrlConfig = Config.redacted(
+const replayStoreUrlConfig = Config.schema(
+  SendblueConfig.fields.replayStore.fields.url,
   "BUNDJIL_SENDBLUE_REPLAY_STORE_URL"
-).pipe(Config.orElse(() => Config.redacted("KV_REST_API_URL")));
-const replayStoreTokenConfig = Config.redacted(
+).pipe(
+  Config.orElse(() =>
+    Config.schema(
+      SendblueConfig.fields.replayStore.fields.url,
+      "KV_REST_API_URL"
+    )
+  )
+);
+const replayStoreTokenConfig = Config.schema(
+  SendblueConfig.fields.replayStore.fields.token,
   "BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN"
-).pipe(Config.orElse(() => Config.redacted("KV_REST_API_TOKEN")));
-const replayStorePrefixConfig = Config.nonEmptyString(
+).pipe(
+  Config.orElse(() =>
+    Config.schema(
+      SendblueConfig.fields.replayStore.fields.token,
+      "KV_REST_API_TOKEN"
+    )
+  )
+);
+const replayStorePrefixConfig = Config.schema(
+  SendblueConfig.fields.replayStore.fields.prefix,
   "BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX"
 );
 const replayStoreTtlSecondsConfig = Config.schema(
@@ -79,9 +109,7 @@ export const loadSendblueConfig = Effect.gen(
       testMode: testModeConfig,
       webhookSecret: webhookSecretConfig,
     });
-    const senderIdentities = yield* Schema.decodeUnknownEffect(
-      Schema.fromJsonString(SendblueSenderIdentities)
-    )(Redacted.value(values.senderIdentities));
+    const senderIdentities = Redacted.value(values.senderIdentities);
     const apiBaseUrl = yield* Option.match(values.testApiBaseUrl, {
       onNone: () => Effect.succeed(new URL("https://api.sendblue.com")),
       onSome: (url) =>
@@ -96,7 +124,7 @@ export const loadSendblueConfig = Effect.gen(
         }),
     });
 
-    return yield* Schema.decodeUnknownEffect(SendblueConfig)({
+    return {
       allowedServices: values.allowedServices,
       apiBaseUrl,
       apiKey: values.apiKey,
@@ -112,7 +140,7 @@ export const loadSendblueConfig = Effect.gen(
       routingKey: values.routingKey,
       senderIdentities,
       webhookSecret: values.webhookSecret,
-    });
+    } satisfies SendblueConfigType;
   }
 ).pipe(
   Effect.mapError(

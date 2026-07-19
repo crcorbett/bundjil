@@ -9,6 +9,10 @@ docs navigation.
 Run from the repo root:
 
 ```bash
+bun run check:boundaries
+bun run check:effect-setup
+bun run check:skills
+bun run test:boundaries
 bun run check
 bun run test:lint
 bun run knip
@@ -18,11 +22,19 @@ bun run build
 bun run verification
 ```
 
-`bun run verification` is the standard closeout gate. It runs Ultracite, the
-focused repository lint-rule tests, dependency hygiene, workspace typechecks,
-and tests. `bun run check` enables `bundjil/tagged-error-name` for app and
-package TypeScript; the rule rejects any `Schema.TaggedErrorClass` whose class
-declaration, generic self-type, and literal tag do not agree.
+`bun run check:boundaries` runs the TypeScript compiler-API provenance audit;
+`bun run test:boundaries` proves its positive/negative fixtures and stale
+exception behavior. `bun run check:effect-setup` proves the installed
+TypeScript compiler is patched with the configured Effect language service.
+`bun run check:skills` rejects contradictory executable examples and stale
+Site-specific overlays in the relevant repo-owned skills, and confirms the
+required provenance and frontend-composition policy is present in instruction
+surfaces. `bun run verification` is the standard closeout gate. It runs those
+policy checks, Ultracite, focused repository lint-rule tests, dependency
+hygiene, workspace typechecks, and tests. `bun run check` enables
+`bundjil/tagged-error-name` for app and package TypeScript; the rule rejects
+any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
+literal tag do not agree.
 
 Package-focused commands:
 
@@ -75,12 +87,14 @@ config, deployment, or durable docs must record the 3-pass Effect TS audit:
 1. Ownership and call graph: right app/package owner, stable imports/exports,
    production call graph, test call graph, and unsupported paths.
 2. Implementation quality: flat primary `Effect.gen` programs, Effect Schema
-   contracts, schema-derived types, tagged errors, `Config.redacted` for
-   secrets, explicit layers, and no unsafe casts, DTO mirrors, manual object
-   readers, or helper sprawl.
+   contracts, explicit `Type`/`Encoded` provenance, schema-derived types,
+   tagged errors, `Config.schema` with redacted secrets, encoded outward
+   writes, immediately decoded provider outputs, explicit live/mock Layers,
+   and no unsafe casts, DTO mirrors, manual object readers, or helper sprawl.
 3. Verification coverage: targeted commands, root commands, local/proxy/live
-   proof, preview-before-production evidence, leak scans, docs updates, and
-   deliberately skipped checks with their reasons.
+   proof, `check:boundaries`, `check:effect-setup`, `check:skills`,
+   preview-before-production evidence, leak scans, docs/README/skill updates,
+   and deliberately skipped checks with their reasons.
 
 Do not mark a task accepted just because three entries exist. If an audit pass
 finds a gap, fix it and record another pass.
@@ -345,11 +359,19 @@ Every durable feature should leave behind:
 - a SPEC and task ledger for new apps, channels, providers, or package
   boundaries.
 
+Every SPEC and implementation review must also maintain a downstream-impact
+ledger. Mark docs, affected READMEs/runbooks, agent instructions and skills,
+schemas/contracts/exports, lint and boundary rules, Effect diagnostics,
+CI/scripts, tests/fixtures/evidence, observability, rollout/rollback, the SPEC,
+task ledger, and active plan as `Change required` or `N/A` with a reason. Edit
+all required artifacts before accepting the slice.
+
 Use `rg` for docs checks:
 
 ```bash
 rg -n "old-path|old-package|old-command" README.md AGENTS.md docs apps packages
 rg -n "docs/architecture/(effect-patterns|repo-structure|testing-and-quality)" README.md AGENTS.md docs ARCHITECTURE.md
+bun run check:skills
 ```
 
 Stale-name scans must be scoped by provenance. Current source, manifests,

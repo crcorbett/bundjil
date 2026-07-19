@@ -1,12 +1,15 @@
 import { Schema } from "effect";
 
-import { CodexProfileSchemaBoundary } from "../error-contracts.js";
+import {
+  CodexProfileErrorMessage,
+  CodexProfileSchemaBoundary,
+} from "../error-contracts.js";
 
 export class CodexProfileSchemaError extends Schema.TaggedErrorClass<CodexProfileSchemaError>()(
   "CodexProfileSchemaError",
   {
     boundary: CodexProfileSchemaBoundary,
-    message: Schema.NonEmptyString,
+    message: CodexProfileErrorMessage,
     cause: Schema.Defect,
   }
 ) {}

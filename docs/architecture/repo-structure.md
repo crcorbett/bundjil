@@ -21,7 +21,14 @@ docs/
   exec-plans/active/  Plans for work that is actually in progress.
   exec-plans/completed/  Accepted and superseded execution evidence.
 
-.agents/skills/       Repo-local authoring and implementation guidance.
+lint/
+  oxlint-plugin.ts        Repository-owned structural lint rules.
+
+tooling/
+  boundary-audit.ts       Root compiler-API boundary provenance audit.
+  boundary-exceptions.ts  Exact external/framework adapter exception registry.
+
+.agents/skills/       Repo-owned agent skills aligned to Bundjil architecture.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
 ```
@@ -51,6 +58,10 @@ needs it.
 Do not create broad shared packages to avoid choosing ownership. A second
 caller is a signal to inspect the concept, not automatic permission to invent
 `shared`.
+
+Root tooling may inspect TypeScript source but must not import app/package
+runtime modules. Boundary exceptions remain beside this root audit rather than
+moving adapter-specific primitives into a generic helper package.
 
 ## App Boundaries
 

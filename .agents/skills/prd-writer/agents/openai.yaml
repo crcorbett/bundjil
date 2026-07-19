@@ -1,0 +1,4 @@
+interface:
+  display_name: "PRD Writer"
+  short_description: "Write implementation-ready repository specifications"
+  default_prompt: "Use $prd-writer to write or revise a repository SPEC and task list against current evidence."

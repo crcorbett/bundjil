@@ -4,6 +4,8 @@ import { CodexOAuthSubjectHash } from "../../auth/credentials.js";
 import {
   CodexOAuthRefreshLockFailureReason,
   CodexOAuthRefreshLockOperation,
+  CodexProfileEpochMillis,
+  CodexProfileErrorMessage,
 } from "../error-contracts.js";
 
 export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAuthRefreshLockError>()(
@@ -12,11 +14,9 @@ export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAu
     operation: CodexOAuthRefreshLockOperation,
     reason: CodexOAuthRefreshLockFailureReason,
     subjectHash: Schema.optional(CodexOAuthSubjectHash),
-    expiresAtEpochMillis: Schema.optional(
-      Schema.Number.check(Schema.isFinite())
-    ),
-    nowEpochMillis: Schema.optional(Schema.Number.check(Schema.isFinite())),
-    message: Schema.NonEmptyString,
+    expiresAtEpochMillis: Schema.optional(CodexProfileEpochMillis),
+    nowEpochMillis: Schema.optional(CodexProfileEpochMillis),
+    message: CodexProfileErrorMessage,
     cause: Schema.optional(Schema.Defect),
   }
 ) {}

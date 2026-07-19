@@ -1,0 +1,214 @@
+{
+  "title": "Effect Boundary Provenance Enforcement Tasks",
+  "spec": "docs/product-specs/effect-boundary-provenance-enforcement.md",
+  "status": "completed",
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "minimumTotalPasses": 12,
+    "completedPasses": 12,
+    "rule": "Each parent task records ownership/call-graph, Effect/implementation-quality, and verification/evidence passes. Add more passes while any finding remains."
+  },
+  "postImplementationIntegration": {
+    "date": "2026-07-19",
+    "reason": "Reconciled the completed implementation with the parallel repository naming cleanup merged at d9e1b54.",
+    "currentOwners": [
+      "@bundjil/store",
+      "@bundjil/codex",
+      "@bundjil/eve",
+      "apps/agent",
+      "apps/codex-proxy",
+      "root tooling"
+    ],
+    "verification": "The committed integration candidate passed the zero-finding boundary audit with 18 exact external constraints, 24 boundary fixtures, the ten-surface skill audit, the repository tagged-error lint test, Ultracite, Knip, five workspace typechecks, 228 workspace tests, five workspace builds, and proxy smoke proof with HTTP 200/200 and five SSE lines."
+  },
+  "principles": [
+    "Canonical Effect Schema codecs own both Type and Encoded representations.",
+    "Unknown and encoded primitives are confined to exact adapters; services accept decoded owner types.",
+    "Use Effect-native Schema, Config, HttpClient, Match, Service, Layer, and tagged errors before plain TypeScript boundary helpers.",
+    "Keep primary operations flat and linear; expected error handling belongs in the outer pipe.",
+    "Do not add unsafe casts, sync production codecs, local DTO mirrors, manual readers/mappers, or helper/common/utils sprawl.",
+    "Preserve wire values, persistent bytes, environment names, provider behavior, and framework dispatch.",
+    "Lint configuration, architecture docs, AGENTS.md, prd-writer, prd-implementer, and effect-client-wrapper must teach the same boundary provenance policy."
+  ],
+  "globalVerification": [
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check",
+    "bun run knip",
+    "bun run check-types",
+    "bun run test",
+    "bun run build",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "browserVerification": {
+    "required": false,
+    "reason": "The SPEC changes no visible route or React surface. Direct HTTP contract proof is required for changed webhook and proxy routes."
+  },
+  "tasks": [
+    {
+      "id": "establish-boundary-provenance-audit",
+      "title": "Establish the boundary provenance audit and exact exception registry",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Add one TypeScript compiler-API audit, source fixtures, exact current exception entries, root commands, and architecture rules without changing runtime behavior.",
+      "implementationNotes": [
+        "Inspect public/exported signatures and encode/decode argument types with the TypeScript type checker; do not use a regex-only implementation.",
+        "Fail on raw public semantic primitives, inline exported string Schemas, anonymous semantic Config primitives, sync production codecs, direct JSON APIs, unsafe assertions, unregistered raw text/fetch boundaries, and outbound values that bypass canonical encoding.",
+        "Represent exceptions by exact file and symbol with owner, boundary kind, canonical codec/service, admitted syntax, and concrete third-party reason.",
+        "Fail stale exceptions. Do not use line numbers, counts, broad globs, or permanent debt baselines.",
+        "Keep the audit purpose-built in root tooling; do not introduce a generic lint, DTO, Schema helper, or common package."
+      ],
+      "mandatoryVerification": [
+        "Positive and negative source fixtures cover every audit rule and stale exception behavior.",
+        "The initial report classifies every finding and admits only exact adapter constraints.",
+        "Primary Effectful tooling operations are flat meaningful Effect programs with typed errors handled in the outer pipe.",
+        "No unsafe casts, DTO mirrors, manual readers/mappers, trivial wrappers, or helper sprawl are introduced.",
+        "Focused tooling tests, check-types, Ultracite, Knip, and root verification pass.",
+        "Record three parent audit passes with concrete evidence in the active plan."
+      ],
+      "completionCriteria": [
+        "A new unregistered raw public boundary fails with file, line, rule, owner guidance, and remediation guidance.",
+        "All current exceptions are exact, justified, and mechanically checked for staleness.",
+        "Runtime output and provider state are unchanged."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: root tooling owns the compiler-API audit and exact registry without importing application runtime modules.",
+          "Implementation quality: reviewed the audit and registry for exact file/symbol/rule matching, stale-entry failure, no generic lint framework, and no runtime behavior changes.",
+          "Verification: 22 positive and negative source fixture tests, tooling TypeScript check, check:boundaries, Ultracite, Knip, all seven workspace typechecks, 223 existing package/app tests, and root verification passed with the ignored Preview environment loaded."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "migrate-codex-boundaries-end-to-end",
+      "title": "Migrate Codex boundaries end to end",
+      "status": "completed",
+      "dependsOn": ["establish-boundary-provenance-audit"],
+      "description": "Apply provenance enforcement across Codex OAuth, profiles, persistence, filesystem, provider HTTP, SSE, proxy authorization, and operator scripts while preserving exact behavior.",
+      "implementationNotes": [
+        "Use existing Codex owner Schemas for profile IDs, revisions, redirect URIs, paths, tokens, accounts, model IDs, requests, events, and responses; add a Schema only for a real missing owner.",
+        "Use decodeUnknownEffect only at host/provider unknown boundaries, decodeEffect for typed encoded data, and encodeEffect for outbound and persisted data.",
+        "Keep SSE fragments parser-local, decode completed events before Match, and preserve frames byte for byte.",
+        "Move Effectful provider/proof HTTP calls to Effect HttpClient, remove sync codecs from src and scripts, and flatten the profile-cipher nested generator.",
+        "Remove audit exceptions as each raw annotation is eliminated; retain only proven third-party constraints."
+      ],
+      "mandatoryVerification": [
+        "Codex service APIs expose only canonical Schema-derived decoded types and typed tagged errors.",
+        "Profile storage round trips, encrypted values, physical keys, revisions, TTL/locks, OAuth payloads, authorization headers, requests, and SSE frames remain compatible.",
+        "Production and operator flows contain no sync Schema calls, global fetch in Effect programs, unsafe casts, local DTO mirrors, manual readers/mappers, or helper sprawl.",
+        "Primary operations remain flat Effect.gen/Effect.fn programs and typed errors are handled in the outer pipe.",
+        "Focused Codex OAuth, persistence, proxy HTTP, proof-script, typecheck, build, and static audit gates pass.",
+        "Record three parent audit passes with concrete evidence in the active plan."
+      ],
+      "completionCriteria": [
+        "Codex unknown and encoded values are confined to named adapters from login/import through hosted model streaming.",
+        "No Codex-specific raw primitive remains unexplained by an exact third-party constraint.",
+        "No production credential, provider account, deployment, or namespace is mutated."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: @bundjil/codex-oauth owns OAuth, profile, filesystem, provider HTTP, SSE, and error contracts; apps/codex-proxy retains only its host-facing config adapter. Codex provider calls now flow through Effect HttpClient, and the Codex exception registry is empty.",
+          "Implementation quality: reviewed the complete Codex/proxy diff for owner Schemas, Config.schema, one-run Effectful operator programs, flat profile-cipher control flow, response.completed Match handling, typed outer-pipe errors, and absence of sync production codecs, global fetch, direct JSON APIs, unsafe casts, DTO mirrors, or helper sprawl.",
+          "Verification: boundary audit and 23 fixtures, Effect setup and skill-policy gates, Ultracite, Knip, seven workspace typechecks, 103 OAuth tests, 24 proxy tests, 60 agent tests, all other workspace tests, package builds, direct agent build, proxy smoke proof (HTTP 200/200 and five SSE lines), diff check, task-ledger parse, and root verification passed."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "migrate-channel-proxy-and-persistence-boundaries",
+      "title": "Migrate channel, proxy, config, and persistence boundaries end to end",
+      "status": "completed",
+      "dependsOn": ["establish-boundary-provenance-audit"],
+      "description": "Apply the same provenance model to Eve, the agent channel, Sendblue, the proxy app, runtime config, and shared persistence adapters without changing routing or wire behavior.",
+      "implementationNotes": [
+        "Confine Eve callback unknown/Promise primitives to the framework adapter and keep Eve's typed event map as dispatch authority.",
+        "Use app/channel-owned Schemas for config, preflight, inbound/outbound content, coordinates, replay values, and safe diagnostics.",
+        "Use Config.schema for semantic configuration and preserve Redacted secrets without unwrap/redecode cycles.",
+        "Keep native KeyValueStore and Upstash primitives private; decode SDK unknown results and encode all domain records through their owner codecs.",
+        "Use Effect HttpClient in proxy proof/smoke programs and canonical response/SSE codecs in handlers."
+      ],
+      "mandatoryVerification": [
+        "Signed webhook verification, sender mapping, session routing, replay claims, outbound delivery, and message.completed behavior remain unchanged.",
+        "Proxy authorization, status codes, content types, error responses, streaming output, and Vercel fetch composition pass direct HTTP tests.",
+        "Persistent replay/claim keys, values, prefixes, TTLs, and atomic transaction behavior are byte-compatible.",
+        "All changed APIs use owner Schema-derived types, Match for material decoded unions, flat Effect control flow, and typed errors in the outer pipe.",
+        "No unsafe casts, sync production codecs, local DTO mirrors, manual readers/mappers, trivial wrappers, or helper sprawl remain.",
+        "Record three parent audit passes with concrete evidence in the active plan."
+      ],
+      "completionCriteria": [
+        "All agent, channel, proxy, config, and persistence raw values are decoded/encoded at exact adapters or registered as unavoidable constraints.",
+        "Focused app/package tests, direct HTTP checks, builds, typechecks, and the boundary audit pass.",
+        "No frontend, webhook, provider, credential, deployment, or namespace state is changed."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: the Eve channel adapter owns unknown event decoding and Promise bridging; Sendblue services accept decoded owner types and Effects; app Config.schema contracts feed decoded config; @bundjil/effect-persistence owns transaction codecs and the private Upstash facade; the proxy config factory accepts only CodexProxyRuntimeConfig.Encoded.",
+          "Implementation quality: a parent correction round replaced decodeUnknownEffect on known config, message, replay, transaction, preflight, Eve-success, and Upstash-command values with direct decoded construction or decodeEffect. Reviewed owner diagnostics, Redacted flow, Match branches, flat primary operations, and found no unsafe casts, sync production codecs, DTO mirrors, or helper/common/utils sprawl.",
+          "Verification: root verification passed the boundary audit, 23 fixtures, Effect setup, ten-surface skill policy, Ultracite, Knip, seven workspace typechecks, and 223 tests. All seven workspace builds passed with safe non-secret Gateway/Executor build config; proxy smoke returned HTTP 200/200 and five SSE lines; diff check and task-ledger parse passed."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "enable-hard-gates-and-reconcile-documentation",
+      "title": "Enable hard gates and reconcile documentation and skills",
+      "status": "completed",
+      "dependsOn": [
+        "migrate-codex-boundaries-end-to-end",
+        "migrate-channel-proxy-and-persistence-boundaries"
+      ],
+      "preparatoryEvidence": [
+        "2026-07-18: Reconciled AGENTS.md, canonical architecture/testing docs, root README/docs index, prd-writer, prd-implementer, and effect-client-wrapper with the required codec/provenance policy.",
+        "2026-07-18: Added executable check:effect-setup and check:skills gates to root verification. The skill gate covers ten provenance and frontend instruction surfaces, including stale Site-specific overlay rejection.",
+        "2026-07-18: Both runtime migration dependencies completed; the approved diagnostics are errors, all hard gates pass, and the complete three-pass acceptance audit is recorded."
+      ],
+      "description": "Enable the selected Effect language-service diagnostics, place boundary and setup checks in root verification, remove resolved exceptions, and reconcile lint configuration, architecture/package/app documentation, AGENTS.md, and the relevant skills.",
+      "implementationNotes": [
+        "Configure diagnosticSeverity in tsconfig.base.json for the approved provenance and Effect-flow rules; do not enable deterministicKeys in this migration.",
+        "Make CI prove that TypeScript is patched with the Effect language service before relying on diagnostics.",
+        "Reduce the exception registry to unavoidable third-party/framework constraints and fail stale entries.",
+        "Update Effect patterns with Type/Encoded, codec, adapter-exception, Config, HTTP, persistence, error, Match, and helper-admission rules; update testing/quality with the executable commands, fixtures, compatibility proof, and stale-pattern scans.",
+        "Update repo structure and AGENTS.md with concise ownership and boundary defaults; CLAUDE.md remains the symlinked view and is not edited independently.",
+        "Update prd-writer so boundary-crossing specs must name canonical codecs, decoded/encoded sides, adapters, exception needs, and inbound/outbound call graphs.",
+        "Update prd-implementer so its mandatory prompt, review bar, and audit loop reject raw public primitives, unsafe construction, unencoded outward writes, stale exceptions, and missing boundary-audit evidence.",
+        "Rewrite effect-client-wrapper examples around named operations, Config.schema, request encoding, provider-result decoding, Schema tagged errors, and live/mock Layers; remove generic public use callbacks, raw id strings, primitive semantic config, instanceof branching, and unchecked SDK result escape.",
+        "Update package READMEs and app runbooks only where public ownership or verification changed.",
+        "Record final production/test/CLI call graphs and exact verification evidence in the active plan."
+      ],
+      "mandatoryVerification": [
+        "The boundary audit reports zero unexplained findings across production source and operator scripts.",
+        "Effect diagnostics report zero errors with the selected rules configured as errors.",
+        "Final changed operations retain flat meaningful Effect.gen/Effect.fn control flow with typed errors handled in the outer pipe.",
+        "No broad suppression, ignore expansion, numeric debt baseline, unsafe cast, DTO mirror, manual mapper/reader, or helper sprawl was used.",
+        "Stale-pattern scans prove AGENTS.md, Effect architecture docs, prd-writer, prd-implementer, and effect-client-wrapper contain no contradictory boundary guidance or obsolete code examples.",
+        "Root formatting/check, Knip, all-workspace typecheck, tests, builds, task JSON parse, diff check, and bun run verification pass.",
+        "Docs, source contracts, exception registry, call graphs, and verification commands agree.",
+        "Record three parent audit passes with concrete evidence in the active plan."
+      ],
+      "completionCriteria": [
+        "CI prevents new raw or unencoded boundary data from entering the repository.",
+        "Every remaining primitive exception is exact, external-interface-driven, and enclosed by a canonical codec/service.",
+        "Repository instructions and skills cause future specs, implementation prompts, reviews, and provider wrappers to apply the same enforced provenance model.",
+        "The SPEC and task ledger are marked implemented only after all evidence is recorded."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Ownership/call graph: root tooling owns Effect language-service setup, the TypeScript boundary audit, its exact 18-entry external-constraint registry, and the ten-surface skill-policy audit. Architecture and skill surfaces consistently assign codecs to domain owners and unknown/encoded values to named adapters; CLAUDE.md remains the AGENTS.md symlink.",
+          "Implementation quality: reviewed all selected diagnostics, documentation, skills, and policy tooling. Parent correction rounds made the skill audit an Effectful named operation with a tagged error and outer-pipe handling, made the registry language describe final external constraints, added typed decodeEffect and Effect-wrapped SDK initialization to the wrapper guidance, and removed the final synchronous codec example while broadening the contradictory-guidance scan. No unsafe cast, suppression expansion, DTO mirror, generic helper package, or helper/common/utils sprawl was introduced.",
+          "Verification: root verification passed Effect language-service patch checks, the zero-finding boundary audit with 18 exact external constraints, the ten-surface skill audit, 23 boundary fixtures, Ultracite, Knip, seven workspace typechecks, and 223 tests. All seven workspace builds passed with safe non-secret configuration; proxy smoke returned health 200, stream 200, and five SSE lines. Diff checks, task-ledger parsing, and synchronous-codec guidance scans passed. Browser and live-provider proof were not applicable because no visible route, runtime composition, provider state, credential, webhook, or deployment changed."
+        ]
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

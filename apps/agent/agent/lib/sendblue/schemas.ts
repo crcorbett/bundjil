@@ -57,6 +57,15 @@ export type SendblueReplayStorePrefix = typeof SendblueReplayStorePrefix.Type;
 export const SendblueMessageContent = Schema.String;
 export type SendblueMessageContent = typeof SendblueMessageContent.Type;
 
+export const SendblueDiagnosticMessage = Schema.NonEmptyString;
+export type SendblueDiagnosticMessage = typeof SendblueDiagnosticMessage.Type;
+
+export const SendblueWebhookSchemaBoundary = Schema.Literals([
+  "SendblueInboundMessage",
+]);
+export type SendblueWebhookSchemaBoundary =
+  typeof SendblueWebhookSchemaBoundary.Type;
+
 export const SendblueInboundDispatchContent = Schema.NonEmptyString;
 export type SendblueInboundDispatchContent =
   typeof SendblueInboundDispatchContent.Type;

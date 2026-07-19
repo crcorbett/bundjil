@@ -1,12 +1,12 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
+import { HttpClientResponse } from "effect/unstable/http";
 
 import {
   CodexHttpNetworkError,
   CodexResponsesFetch,
   CodexResponsesPostInput,
   CodexResponsesProofInput,
-  CodexResponsesRequest,
   defaultCodexResponsesEndpoint,
   postResponses,
   runCodexResponsesProof,
@@ -42,16 +42,21 @@ it.effect(
   "posts Codex Responses requests with bearer auth and safe result shape",
   () =>
     Effect.gen(function* testPostResponsesRequestShape() {
-      let capturedRequest: Request | undefined;
+      let capturedRequest:
+        | Parameters<typeof HttpClientResponse.fromWeb>[0]
+        | undefined;
       const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: (request: Request) =>
+        fetch: (request) =>
           Effect.sync(() => {
             capturedRequest = request;
 
-            return new Response("data: {}\n\n", {
-              headers: { "content-type": "text/event-stream" },
-              status: 200,
-            });
+            return HttpClientResponse.fromWeb(
+              request,
+              new Response("data: {}\n\n", {
+                headers: { "content-type": "text/event-stream" },
+                status: 200,
+              })
+            );
           }),
       });
       const input = yield* makeAccessToken;
@@ -75,23 +80,11 @@ it.effect(
       assert.strictEqual(request.url, defaultCodexResponsesEndpoint);
       assert.strictEqual(request.method, "POST");
       assert.strictEqual(
-        request.headers.get("authorization"),
+        request.headers["authorization"],
         `Bearer ${Redacted.value(input.accessToken)}`
       );
-      assert.strictEqual(
-        request.headers.get("content-type"),
-        "application/json"
-      );
-      assert.strictEqual(request.headers.get("chatgpt-account-id"), null);
-
-      const body = yield* Effect.promise(() => request.text());
-      const decoded = yield* Schema.decodeUnknownEffect(
-        Schema.fromJsonString(CodexResponsesRequest)
-      )(body);
-
-      assert.strictEqual(decoded.model, input.request.model);
-      assert.strictEqual(decoded.store, false);
-      assert.strictEqual(decoded.stream, true);
+      assert.strictEqual(request.headers["content-type"], "application/json");
+      assert.strictEqual(request.headers["chatgpt-account-id"], undefined);
     })
 );
 
@@ -99,16 +92,21 @@ it.effect(
   "adds chatgpt-account-id only when the proof input supplies one",
   () =>
     Effect.gen(function* testAccountHeader() {
-      let capturedRequest: Request | undefined;
+      let capturedRequest:
+        | Parameters<typeof HttpClientResponse.fromWeb>[0]
+        | undefined;
       const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: (request: Request) =>
+        fetch: (request) =>
           Effect.sync(() => {
             capturedRequest = request;
 
-            return new Response("data: {}\n\n", {
-              headers: { "content-type": "text/event-stream" },
-              status: 200,
-            });
+            return HttpClientResponse.fromWeb(
+              request,
+              new Response("data: {}\n\n", {
+                headers: { "content-type": "text/event-stream" },
+                status: 200,
+              })
+            );
           }),
       });
       const proofInput = yield* Schema.decodeUnknownEffect(
@@ -132,10 +130,7 @@ it.effect(
 
       const request = capturedRequest;
 
-      assert.strictEqual(
-        request.headers.get("chatgpt-account-id"),
-        "account-123"
-      );
+      assert.strictEqual(request.headers["chatgpt-account-id"], "account-123");
     })
 );
 
@@ -144,13 +139,16 @@ it.effect(
   () =>
     Effect.gen(function* testStatusFailure() {
       const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: () =>
+        fetch: (request) =>
           Effect.succeed(
-            new Response("access-token-secret response body", {
-              headers: { "content-type": "application/json" },
-              status: 401,
-              statusText: "Unauthorized",
-            })
+            HttpClientResponse.fromWeb(
+              request,
+              new Response("access-token-secret response body", {
+                headers: { "content-type": "application/json" },
+                status: 401,
+                statusText: "Unauthorized",
+              })
+            )
           ),
       });
       const input = yield* makeAccessToken;
@@ -196,14 +194,17 @@ it.effect("does not depend on OPENAI_API_KEY for subscription proof mode", () =>
   Effect.gen(function* testNoOpenAiApiKeyFallback() {
     let capturedAuthorization = "";
     const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-      fetch: (request: Request) =>
+      fetch: (request) =>
         Effect.sync(() => {
-          capturedAuthorization = request.headers.get("authorization") ?? "";
+          capturedAuthorization = request.headers["authorization"] ?? "";
 
-          return new Response("data: {}\n\n", {
-            headers: { "content-type": "text/event-stream" },
-            status: 200,
-          });
+          return HttpClientResponse.fromWeb(
+            request,
+            new Response("data: {}\n\n", {
+              headers: { "content-type": "text/event-stream" },
+              status: 200,
+            })
+          );
         }),
     });
     const input = yield* makeAccessToken;

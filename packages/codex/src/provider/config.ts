@@ -7,7 +7,10 @@ import {
   Schema,
 } from "effect";
 
-import { CodexOAuthAccountId } from "../auth/credentials.js";
+import {
+  CodexOAuthAccessToken,
+  CodexOAuthAccountId,
+} from "../auth/credentials.js";
 import {
   CodexResponsesEndpoint,
   CodexResponsesModelId,
@@ -21,7 +24,10 @@ export const defaultCodexResponsesEndpoint =
 
 export const defaultCodexResponsesModel = "gpt-5.5";
 
-const proofAccessTokenConfig = Config.redacted("CODEX_ACCESS_TOKEN");
+const proofAccessTokenConfig = Config.schema(
+  CodexOAuthAccessToken,
+  "CODEX_ACCESS_TOKEN"
+);
 
 const proofAccountIdConfig = Config.option(
   Config.schema(CodexOAuthAccountId, "BUNDJIL_CODEX_ACCOUNT_ID")

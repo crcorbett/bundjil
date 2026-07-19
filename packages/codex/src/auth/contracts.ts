@@ -5,6 +5,8 @@ import {
   CodexOAuthAccountId,
   CodexOAuthAuthorizationCode,
   CodexOAuthAuthorizationUrl,
+  CodexOAuthCallbackRequestMethod,
+  CodexOAuthCallbackRequestUrl,
   CodexOAuthCodeChallenge,
   CodexOAuthCodeVerifier,
   CodexOAuthIdToken,
@@ -20,6 +22,13 @@ import {
   CodexSubscriptionTokenEndpoint,
 } from "./credentials.js";
 
+export const CodexOAuthIssuer = Schema.NonEmptyString;
+export const CodexOAuthProviderErrorCode = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthProviderErrorCode")
+);
+export const CodexOAuthProviderErrorDescription = Schema.NonEmptyString;
+export const CodexOAuthProviderErrorMessage = Schema.NonEmptyString;
+
 export const CodexCliAuthMode = Schema.Literal("chatgpt");
 
 export type CodexCliAuthMode = typeof CodexCliAuthMode.Type;
@@ -29,6 +38,9 @@ export const CodexCliAuthCache = Schema.Struct({
   last_refresh: Schema.DateFromString,
   tokens: Schema.Struct({
     access_token: CodexOAuthAccessToken,
+    refresh_token: Schema.optional(CodexOAuthRefreshToken),
+    id_token: Schema.optional(CodexOAuthIdToken),
+    account_id: Schema.optional(CodexOAuthAccountId),
   }),
 });
 
@@ -60,7 +72,7 @@ export type CodexLocalProfileImportResult =
   typeof CodexLocalProfileImportResult.Type;
 
 export const CodexSubscriptionAuthProtocolConfig = Schema.Struct({
-  issuer: Schema.NonEmptyString,
+  issuer: CodexOAuthIssuer,
   authorizationEndpoint: CodexSubscriptionAuthorizationEndpoint,
   tokenEndpoint: CodexSubscriptionTokenEndpoint,
   clientId: CodexSubscriptionClientId,
@@ -111,6 +123,12 @@ export const CodexOAuthAuthorizationCallback = Schema.Struct({
 export type CodexOAuthAuthorizationCallback =
   typeof CodexOAuthAuthorizationCallback.Type;
 
+export const CodexOAuthCallbackRequest = Schema.Struct({
+  method: CodexOAuthCallbackRequestMethod,
+  requestUrl: CodexOAuthCallbackRequestUrl,
+});
+export type CodexOAuthCallbackRequest = typeof CodexOAuthCallbackRequest.Type;
+
 export const CodexOAuthTokenResponse = Schema.Struct({
   id_token: CodexOAuthIdToken,
   access_token: CodexOAuthAccessToken,
@@ -145,13 +163,13 @@ export type CodexOAuthRefreshTransportInput =
 
 export const CodexOAuthProviderErrorResponse = Schema.Union([
   Schema.Struct({
-    error: Schema.NonEmptyString,
-    error_description: Schema.optional(Schema.NonEmptyString),
+    error: CodexOAuthProviderErrorCode,
+    error_description: Schema.optional(CodexOAuthProviderErrorDescription),
   }),
   Schema.Struct({
     error: Schema.Struct({
-      code: Schema.optional(Schema.NonEmptyString),
-      message: Schema.optional(Schema.NonEmptyString),
+      code: Schema.optional(CodexOAuthProviderErrorCode),
+      message: Schema.optional(CodexOAuthProviderErrorMessage),
     }),
   }),
 ]);

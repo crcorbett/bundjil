@@ -17,13 +17,9 @@ import { SendblueWebhookVerifierLive } from "./webhook-verifier.js";
 const SendbluePersistenceLive = Layer.unwrap(
   Effect.gen(function* makeSendbluePersistenceLive() {
     const config = yield* SendblueConfigService;
-    const options = yield* Schema.decodeUnknownEffect(
-      UpstashPersistenceOptions
-    )({
-      keyPrefix: config.replayStore.prefix,
-      restToken: config.replayStore.token,
-      restUrl: config.replayStore.url,
-    }).pipe(
+    const keyPrefix = yield* Schema.decodeEffect(
+      UpstashPersistenceOptions.fields.keyPrefix
+    )(config.replayStore.prefix).pipe(
       Effect.mapError(
         () =>
           new SendblueConfigError({
@@ -31,6 +27,11 @@ const SendbluePersistenceLive = Layer.unwrap(
           })
       )
     );
+    const options = {
+      keyPrefix,
+      restToken: config.replayStore.token,
+      restUrl: config.replayStore.url,
+    } satisfies UpstashPersistenceOptions;
     return UpstashPersistenceLive(options);
   })
 ).pipe(Layer.provide(SendblueConfigLive));

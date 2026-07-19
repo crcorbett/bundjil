@@ -21,18 +21,15 @@ Reference these guidelines when:
 - Refactoring existing React/Next.js code
 - Optimizing bundle size or load times
 
-## Site Repo Frontend Rule
+## Bundjil Frontend Rule
 
-Before writing or reviewing React UI in this repo, read `docs/FRONTEND.md` and
-`docs/DESIGN.md`. Visible text must use the canonical typography role layer:
-`Heading`, `Text`, `CodeText`, semantic role classes for allowed CSS/native
-surfaces, package compact helpers for dense controls, and `WEB_OG_TYPOGRAPHY`
-for OG inline rendering. Do not optimize by inlining local `text-*`,
-`leading-*`, `tracking-*`, `font-*`, or font-weight utility piles.
-
-When a React change affects visible text, capture Browser screenshot evidence
-for the affected route or component state, including mobile when text can wrap
-or dense UI can shift.
+Before writing or reviewing React UI in this repo, read
+`docs/architecture/frontend-composition.md`. Compose visible structure high,
+let data-bearing leaves own narrow state and fallbacks, and avoid prop drilling
+or wrapper-only components. If a SPEC introduces a visible app or design
+system, use the authority and typography contract named there. Capture Browser
+evidence for affected visible states, including mobile when text can wrap or
+density can shift.
 
 ## Rule Categories by Priority
 

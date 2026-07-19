@@ -28,9 +28,9 @@ const decodeAtomicKeyValueStoreTransactionEffect = Effect.fn(
   const encoded = yield* Schema.encodeEffect(AtomicKeyValueStoreTransaction)(
     transaction
   );
-  const decoded = yield* Schema.decodeUnknownEffect(
-    AtomicKeyValueStoreTransaction
-  )(encoded);
+  const decoded = yield* Schema.decodeEffect(AtomicKeyValueStoreTransaction)(
+    encoded
+  );
   const conditionKeys = HashSet.map(
     HashSet.fromIterable(decoded.conditions),
     (condition) => condition.key

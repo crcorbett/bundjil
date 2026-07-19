@@ -1,5 +1,10 @@
 import { Schema } from "effect";
 
+export const CodexProfileErrorMessage = Schema.NonEmptyString;
+export const CodexProfileErrorKey = Schema.NonEmptyString;
+export const CodexProfileEpochMillis = Schema.Number.check(Schema.isFinite());
+export const CodexProfileCipherVersion = Schema.Number.check(Schema.isFinite());
+
 export const CodexProfileSchemaBoundary = Schema.Literals([
   "CodexOAuthProfile",
   "CodexAccessTokenImportProfile",

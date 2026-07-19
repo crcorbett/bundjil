@@ -1,5 +1,7 @@
 import { Schema } from "effect";
 
+import { CodexAuthErrorMessage } from "../error-contracts.js";
+
 export const CodexAuthTemporaryFailureReason = Schema.Literals([
   "lockContended",
   "network",
@@ -15,6 +17,6 @@ export class CodexAuthTemporarilyUnavailable extends Schema.TaggedErrorClass<Cod
   "CodexAuthTemporarilyUnavailable",
   {
     reason: CodexAuthTemporaryFailureReason,
-    message: Schema.NonEmptyString,
+    message: CodexAuthErrorMessage,
   }
 ) {}

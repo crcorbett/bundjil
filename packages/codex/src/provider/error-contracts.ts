@@ -1,5 +1,10 @@
 import { Schema } from "effect";
 
+export const CodexProviderErrorMessage = Schema.NonEmptyString;
+export const CodexHttpStatus = Schema.Number.check(Schema.isFinite());
+export const CodexHttpStatusText = Schema.String;
+export const CodexHttpContentType = Schema.String;
+
 export const CodexResponsesSchemaBoundary = Schema.Literals([
   "CodexResponsesRequest",
   "CodexResponsesProofInput",

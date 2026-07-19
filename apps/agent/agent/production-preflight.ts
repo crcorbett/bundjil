@@ -1,8 +1,18 @@
-import { Data, Effect, Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import { AgentModelProviderMode } from "./model-provider.js";
 
 const VercelVariableType = Schema.Literals(["encrypted", "plain", "sensitive"]);
+
+export const ProductionPreflightDiagnostic = Schema.NonEmptyString;
+export type ProductionPreflightDiagnostic =
+  typeof ProductionPreflightDiagnostic.Type;
+
+export const ProductionPreflightSnapshotPath = Schema.NonEmptyString.pipe(
+  Schema.brand("ProductionPreflightSnapshotPath")
+);
+export type ProductionPreflightSnapshotPath =
+  typeof ProductionPreflightSnapshotPath.Type;
 
 type VercelVariableKind = typeof VercelVariableType.Type;
 type ExpectedVariableBinding = readonly [
@@ -238,9 +248,10 @@ export const ProductionPreflightEvidence = Schema.Struct({
 export type ProductionPreflightEvidence =
   typeof ProductionPreflightEvidence.Type;
 
-export class ProductionPreflightError extends Data.TaggedError(
-  "ProductionPreflightError"
-)<{ readonly message: string }> {}
+export class ProductionPreflightError extends Schema.TaggedErrorClass<ProductionPreflightError>()(
+  "ProductionPreflightError",
+  { message: ProductionPreflightDiagnostic }
+) {}
 
 const expectedAgentVariables = [
   ["BUNDJIL_AGENT_MODEL_PROVIDER", ["encrypted", "sensitive"]],
@@ -342,7 +353,7 @@ export const preflightProductionPromotion = Effect.fn(
               ]),
         ];
 
-  return yield* ProductionPreflightEvidence.pipe(Schema.decodeUnknownEffect)({
+  return yield* ProductionPreflightEvidence.pipe(Schema.decodeEffect)({
     checks: ["read-only-adapter", "ordered-staged-preflight", snapshot.stage],
     go: rejected.length === 0,
     rejected,

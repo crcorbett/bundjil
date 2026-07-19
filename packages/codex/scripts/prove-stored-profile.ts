@@ -1,4 +1,4 @@
-import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
+import { ConfigProvider, Console, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   CodexSubscriptionLoginConfigLive,
@@ -52,26 +52,27 @@ const ProofBlockedOutput = Schema.Struct({
   message: Schema.NonEmptyString,
 });
 
-const encodeProofSuccessOutput = Schema.encodeSync(
-  Schema.fromJsonString(ProofSuccessOutput)
-);
-const encodeProofBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(ProofBlockedOutput)
-);
+const main = Effect.gen(function* renderStoredProfileProof() {
+  const exit = yield* Effect.exit(program);
 
-const exit = await Effect.runPromiseExit(program);
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ProofSuccessOutput)
+    )({ status: "proved", result: exit.value });
+    return yield* Console.log(output);
+  }
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeProofSuccessOutput({ status: "proved", result: exit.value })
-  );
-} else {
-  console.error(
-    encodeProofBlockedOutput({
-      status: "blocked",
-      message:
-        "Stored Codex profile proof did not complete. No storage key, subject hash, revision, timestamp, ciphertext, credential, account identifier, claim, or raw payload was printed.",
-    })
-  );
-  process.exitCode = 1;
-}
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ProofBlockedOutput)
+  )({
+    status: "blocked",
+    message:
+      "Stored Codex profile proof did not complete. No storage key, subject hash, revision, timestamp, ciphertext, credential, account identifier, claim, or raw payload was printed.",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

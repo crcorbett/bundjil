@@ -9,6 +9,10 @@ export const AgentModelId = Schema.NonEmptyString.pipe(
 );
 export type AgentModelId = typeof AgentModelId.Type;
 
+export const AgentModelProviderDiagnostic = Schema.NonEmptyString;
+export type AgentModelProviderDiagnostic =
+  typeof AgentModelProviderDiagnostic.Type;
+
 export const defaultAgentModel = "google/gemini-2.5-flash";
 
 export const AgentVercelProtectionBypass = Schema.RedactedFromValue(

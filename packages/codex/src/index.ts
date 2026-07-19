@@ -266,7 +266,11 @@ export type {
   OpenAICompatibleProxyShape,
 } from "./provider/openai-compatible-proxy.js";
 export {
+  CodexFileSystemDirectory,
   CodexLocalAuthFile,
+  CodexOAuthCallbackPath,
+  CodexOAuthCallbackRequestMethod,
+  CodexOAuthCallbackRequestUrl,
   CodexOAuthAccountId,
   CodexOAuthAccessToken,
   CodexOAuthAuthorizationCode,
@@ -287,6 +291,7 @@ export {
   CodexOAuthRecoverAfterUnauthorizedInput,
   CodexOAuthRedirectUri,
   CodexOAuthRefreshToken,
+  CodexRuntimePlatform,
   CodexOAuthScope,
   CodexOAuthSubject,
   CodexOAuthSubjectHash,
@@ -396,7 +401,11 @@ export {
   UpstashRedisRestUrl,
 } from "./provider/contracts.js";
 export type {
+  CodexFileSystemDirectory as CodexFileSystemDirectoryType,
   CodexLocalAuthFile as CodexLocalAuthFileType,
+  CodexOAuthCallbackPath as CodexOAuthCallbackPathType,
+  CodexOAuthCallbackRequestMethod as CodexOAuthCallbackRequestMethodType,
+  CodexOAuthCallbackRequestUrl as CodexOAuthCallbackRequestUrlType,
   CodexOAuthAccountId as CodexOAuthAccountIdType,
   CodexOAuthAccessToken as CodexOAuthAccessTokenType,
   CodexOAuthAuthorizationCode as CodexOAuthAuthorizationCodeType,
@@ -417,6 +426,7 @@ export type {
   CodexOAuthRecoverAfterUnauthorizedInput as CodexOAuthRecoverAfterUnauthorizedInputType,
   CodexOAuthRedirectUri as CodexOAuthRedirectUriType,
   CodexOAuthRefreshToken as CodexOAuthRefreshTokenType,
+  CodexRuntimePlatform as CodexRuntimePlatformType,
   CodexOAuthScope as CodexOAuthScopeType,
   CodexOAuthSubject as CodexOAuthSubjectType,
   CodexOAuthSubjectHash as CodexOAuthSubjectHashType,

@@ -1,5 +1,6 @@
 import {
   Cause,
+  Console,
   Config,
   ConfigProvider,
   Effect,
@@ -10,6 +11,7 @@ import {
 } from "effect";
 
 import { CodexLocalProfileImportResult } from "../src/auth/contracts.js";
+import { CodexFileSystemDirectory } from "../src/auth/credentials.js";
 import { CodexLocalProfileImportError } from "../src/auth/errors.js";
 import { CodexLocalAuthCacheSourceLive } from "../src/auth/local-cache.js";
 import { CodexLocalProfileImportConfigLive } from "../src/auth/local-import-config.js";
@@ -32,7 +34,8 @@ declare const process: {
   exitCode: number | undefined;
 };
 
-const localProfileStoreDirectoryConfig = Config.nonEmptyString(
+const localProfileStoreDirectoryConfig = Config.schema(
+  CodexFileSystemDirectory,
   "BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR"
 );
 
@@ -57,14 +60,6 @@ const ImportBlockedOutput = Schema.Struct({
   ]),
   message: Schema.NonEmptyString,
 });
-
-const encodeImportSuccessOutput = Schema.encodeSync(
-  Schema.fromJsonString(ImportSuccessOutput)
-);
-
-const encodeImportBlockedOutput = Schema.encodeSync(
-  Schema.fromJsonString(ImportBlockedOutput)
-);
 
 const configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv());
 
@@ -96,13 +91,16 @@ const program = Effect.gen(function* importLocalProfileToFileSystem() {
   return yield* importCodexLocalProfile.pipe(Effect.provide(importLayer));
 }).pipe(Effect.provide(configProviderLayer));
 
-const exit = await Effect.runPromiseExit(program);
+const main = Effect.gen(function* renderImportLocalProfileToFileSystem() {
+  const exit = yield* Effect.exit(program);
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeImportSuccessOutput({ status: "imported", result: exit.value })
-  );
-} else {
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ImportSuccessOutput)
+    )({ status: "imported", result: exit.value });
+    return yield* Console.log(output);
+  }
+
   const operation: (typeof ImportBlockedOutput.Type)["operation"] =
     Option.match(Cause.findErrorOption(exit.cause), {
       onNone: () => "unavailable",
@@ -123,13 +121,18 @@ if (Exit.isSuccess(exit)) {
       },
     });
 
-  console.error(
-    encodeImportBlockedOutput({
-      status: "blocked",
-      operation,
-      message:
-        "Codex filesystem profile import requires valid local config, an encrypted local store directory, and a fresh ChatGPT-mode Codex login. No cache path, account id, token, or cache contents were printed.",
-    })
-  );
-  process.exitCode = 1;
-}
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ImportBlockedOutput)
+  )({
+    status: "blocked",
+    operation,
+    message:
+      "Codex filesystem profile import requires valid local config, an encrypted local store directory, and a fresh ChatGPT-mode Codex login. No cache path, account id, token, or cache contents were printed.",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

@@ -16,7 +16,13 @@ import {
   HttpServer,
 } from "effect/unstable/http";
 
-import { CodexOAuthRedirectUri } from "../src/auth/credentials.js";
+import { CodexOAuthProviderErrorCode } from "../src/auth/contracts.js";
+import {
+  CodexOAuthCallbackRequestMethod,
+  CodexOAuthCallbackRequestUrl,
+  CodexOAuthRedirectUri,
+  CodexRuntimePlatform,
+} from "../src/auth/credentials.js";
 import {
   CodexAccessTokenImportProfile,
   CodexLoopbackCallback,
@@ -76,9 +82,18 @@ it.effect(
       const authorizationUrl = Redacted.make(
         "https://auth.openai.com/oauth/authorize?fixture=redacted"
       );
-      const mac = makeCodexBrowserCommand(authorizationUrl, "MacIntel");
-      const windows = makeCodexBrowserCommand(authorizationUrl, "Win32");
-      const linux = makeCodexBrowserCommand(authorizationUrl, "Linux x86_64");
+      const mac = makeCodexBrowserCommand(
+        authorizationUrl,
+        CodexRuntimePlatform.make("MacIntel")
+      );
+      const windows = makeCodexBrowserCommand(
+        authorizationUrl,
+        CodexRuntimePlatform.make("Win32")
+      );
+      const linux = makeCodexBrowserCommand(
+        authorizationUrl,
+        CodexRuntimePlatform.make("Linux x86_64")
+      );
 
       assert.strictEqual(mac.command, "osascript");
       assert.deepStrictEqual(mac.args.slice(0, -1), [
@@ -218,7 +233,7 @@ it.effect(
       const second = yield* createCodexOAuthAuthorizationMaterial();
       const session = yield* buildCodexOAuthAuthorizationSession(
         first,
-        "http://localhost:1455/auth/callback"
+        CodexOAuthRedirectUri.make("http://localhost:1455/auth/callback")
       );
       const url = new URL(Redacted.value(session.authorizationUrl));
 
@@ -295,20 +310,22 @@ it.effect(
 
       for (const [request, reason] of cases) {
         const error = yield* decodeCodexOAuthCallbackRequest(
-          request.method,
-          request.url,
+          CodexOAuthCallbackRequestMethod.make(request.method),
+          CodexOAuthCallbackRequestUrl.make(request.url),
           expected,
-          "http://localhost:1455/auth/callback"
+          CodexOAuthRedirectUri.make("http://localhost:1455/auth/callback")
         ).pipe(Effect.flip);
         assert.strictEqual(error.reason, reason);
         assert.strictEqual(String(error).includes(request.url), false);
       }
 
       const callback = yield* decodeCodexOAuthCallbackRequest(
-        "GET",
-        "http://localhost:1455/auth/callback?code=authorization-code&state=expected-state",
+        CodexOAuthCallbackRequestMethod.make("GET"),
+        CodexOAuthCallbackRequestUrl.make(
+          "http://localhost:1455/auth/callback?code=authorization-code&state=expected-state"
+        ),
         expected,
-        "http://localhost:1455/auth/callback"
+        CodexOAuthRedirectUri.make("http://localhost:1455/auth/callback")
       );
       assert.strictEqual(Redacted.value(callback.code), "authorization-code");
       assert.strictEqual(Redacted.value(callback.state), "expected-state");
@@ -335,6 +352,9 @@ it.effect(
                   )
                 : Effect.succeed({
                     port,
+                    redirectUri: CodexOAuthRedirectUri.make(
+                      `http://localhost:${port}/auth/callback`
+                    ),
                     server: HttpServer.make({
                       address: {
                         _tag: "TcpAddress",
@@ -504,7 +524,7 @@ it.effect(
       const validProviderError = Schema.encodeSync(
         Schema.fromJsonString(CodexOAuthProviderErrorResponse)
       )({
-        error: "invalid_grant",
+        error: CodexOAuthProviderErrorCode.make("invalid_grant"),
         error_description: "provider-secret-description",
       });
       const makeErrorLayer = (body: string, status = 400) => {

@@ -1,31 +1,24 @@
 import type { LanguageModel } from "ai";
-import {
-  Config,
-  ConfigProvider,
-  Data,
-  Effect,
-  Match,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Config, ConfigProvider, Effect, Match, Option, Schema } from "effect";
 
 import {
-  AgentModelProviderConfig,
+  AgentCodexProxyModelProviderConfig,
+  AgentModelProviderDiagnostic,
   AgentModelProviderMode,
   AgentModelId,
   AgentVercelProtectionBypass,
   createAgentModel,
   defaultAgentModel,
 } from "./model-provider.js";
-import type { AgentModelProviderDeps } from "./model-provider.js";
+import type {
+  AgentModelProviderDeps,
+  AgentModelProviderConfig,
+} from "./model-provider.js";
 
-export class AgentModelProviderConfigError extends Data.TaggedError(
-  "AgentModelProviderConfigError"
-)<{
-  cause: unknown;
-  message: string;
-}> {}
+export class AgentModelProviderConfigError extends Schema.TaggedErrorClass<AgentModelProviderConfigError>()(
+  "AgentModelProviderConfigError",
+  { message: AgentModelProviderDiagnostic }
+) {}
 
 const agentModelConfig = Config.schema(
   AgentModelId,
@@ -39,7 +32,8 @@ const agentModelProviderModeConfig = Config.schema(
 
 const codexProxyBaseUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_BASE_URL");
 
-const codexProxyInternalTokenConfig = Config.redacted(
+const codexProxyInternalTokenConfig = Config.schema(
+  AgentCodexProxyModelProviderConfig.fields.internalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
 );
 
@@ -63,12 +57,13 @@ export const loadAgentModelProviderConfig = Effect.gen(
   function* loadAgentModelProviderConfigFromProvider() {
     const provider = yield* agentModelProviderModeConfig;
     const gatewayModel = yield* agentModelConfig;
-    const providerConfigUnknown = yield* Match.value(provider).pipe(
+    const model = yield* Schema.decodeEffect(AgentModelId)(gatewayModel);
+    const providerConfig = yield* Match.value(provider).pipe(
       Match.when("gateway", () =>
-        Effect.succeed({
-          model: gatewayModel,
-          provider,
-        } as const)
+        Effect.succeed<AgentModelProviderConfig>({
+          model,
+          provider: "gateway",
+        })
       ),
       Match.when("codex-proxy", () =>
         Effect.all({
@@ -88,33 +83,27 @@ export const loadAgentModelProviderConfig = Effect.gen(
             }) =>
               ({
                 baseURL,
-                internalToken: Redacted.value(internalToken),
-                model: Option.isNone(proxyModel)
-                  ? gatewayModel
-                  : proxyModel.value,
+                internalToken,
+                model: Option.isNone(proxyModel) ? model : proxyModel.value,
                 modelContextWindowTokens,
                 ...(Option.isNone(protectionBypass)
                   ? {}
                   : {
-                      protectionBypass: Redacted.value(protectionBypass.value),
+                      protectionBypass: protectionBypass.value,
                     }),
-                provider,
-              }) as const
+                provider: "codex-proxy",
+              }) satisfies AgentCodexProxyModelProviderConfig
           )
         )
       ),
       Match.exhaustive
     );
-
-    return yield* AgentModelProviderConfig.pipe(Schema.decodeUnknownEffect)(
-      providerConfigUnknown
-    );
+    return providerConfig;
   }
 ).pipe(
   Effect.mapError(
-    (cause) =>
+    () =>
       new AgentModelProviderConfigError({
-        cause,
         message: "Unable to load Bundjil agent model provider config.",
       })
   ),

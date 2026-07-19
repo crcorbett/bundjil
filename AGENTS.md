@@ -28,12 +28,24 @@ Start here for repo conventions.
 - Prefer workspace packages over app-local shared logic.
 - Use Effect for fallible, async, stateful, boundary-crossing, or
   dependency-injected code.
+- Decode unknown host/provider data once with the owning Schema, pass only its
+  decoded `typeof Contract.Type` to services, and encode its decoded value
+  before every outward write. Keep `typeof Contract.Encoded` values, provider
+  DTOs, SDK instances, and exact third-party primitives inside named adapters.
+- Provider clients expose named operations with schema-derived inputs/outputs,
+  `Config.schema` plus redacted secrets, safe Schema tagged errors, and
+  live/mock Layers. Do not expose generic SDK callbacks or raw clients, use
+  public raw semantic identifiers, branch on native error classes, or let
+  unchecked SDK outputs escape.
+- Keep primary Effect operations flat and sequential. Keep one-use mapping,
+  decoding, and error logic inline; do not create helper/common/utils sprawl.
 - Keep app code out of packages unless the package explicitly owns that
   framework boundary.
 - Keep channel-specific Sendblue, Cloudflare, Eve, Vercel Connect, and Notion
   code in app-owned boundaries until a shared contract is proven stable.
-- Run the smallest useful check during iteration, then `bun run verification`
-  before handing work back.
+- Run the smallest useful check during iteration. Boundary/provider work must
+  run `bun run check:boundaries`, `bun run check:effect-setup`, and
+  `bun run check:skills`; run `bun run verification` before handing work back.
 - Before adding a new app, channel, provider integration, or durable package
   boundary, create a SPEC through `prd-writer` and execute it through
   `prd-implementer`.

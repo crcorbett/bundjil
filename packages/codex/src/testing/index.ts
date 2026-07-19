@@ -1,5 +1,9 @@
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { Context, Effect, Layer, Option, Redacted, Ref, Schema } from "effect";
+import type {
+  HttpClientRequest,
+  HttpClientResponse,
+} from "effect/unstable/http";
 
 import { CodexOAuthClient } from "../auth/client.js";
 import type { CodexOAuthTokenRefreshResult } from "../auth/credentials.js";
@@ -60,7 +64,9 @@ export interface CodexOAuthClientMockOptions {
 }
 
 export interface CodexResponsesFetchMockOptions {
-  readonly fetch: (request: Request) => Effect.Effect<Response>;
+  readonly fetch: (
+    request: HttpClientRequest.HttpClientRequest
+  ) => Effect.Effect<HttpClientResponse.HttpClientResponse>;
 }
 
 export const CodexResponsesFetchMock = (
@@ -387,7 +393,7 @@ export const CodexOAuthObserverMemory = Layer.effect(
   CodexOAuthObserver,
   Effect.gen(function* makeCodexOAuthObserverMemory() {
     const state = yield* Ref.make(
-      Schema.decodeUnknownSync(CodexOAuthObserverSnapshot)({
+      CodexOAuthObserverSnapshot.make({
         counters: {
           refreshStarted: 0,
           refreshSucceeded: 0,

@@ -1,5 +1,30 @@
 import { Schema } from "effect";
 
+export const CodexFileSystemDirectory = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexFileSystemDirectory")
+);
+export type CodexFileSystemDirectory = typeof CodexFileSystemDirectory.Type;
+
+export const CodexRuntimePlatform = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexRuntimePlatform")
+);
+export type CodexRuntimePlatform = typeof CodexRuntimePlatform.Type;
+
+export const CodexOAuthCallbackRequestMethod = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCallbackRequestMethod")
+);
+export type CodexOAuthCallbackRequestMethod =
+  typeof CodexOAuthCallbackRequestMethod.Type;
+
+export const CodexOAuthCallbackRequestUrl = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexOAuthCallbackRequestUrl")
+);
+export type CodexOAuthCallbackRequestUrl =
+  typeof CodexOAuthCallbackRequestUrl.Type;
+
+export const CodexOAuthCallbackPath = Schema.Literal("/auth/callback");
+export type CodexOAuthCallbackPath = typeof CodexOAuthCallbackPath.Type;
+
 export const CodexOAuthProvider = Schema.Literal("codex");
 
 export type CodexOAuthProvider = typeof CodexOAuthProvider.Type;

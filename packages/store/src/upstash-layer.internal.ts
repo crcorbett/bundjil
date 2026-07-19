@@ -38,6 +38,7 @@ const UpstashAtomicCommand = Schema.Struct({
   args: Schema.Array(Schema.String),
 });
 type UpstashAtomicCommand = typeof UpstashAtomicCommand.Type;
+type UpstashAtomicCommandEncoded = typeof UpstashAtomicCommand.Encoded;
 
 export const upstashAtomicTransactionScript =
   "local n=tonumber(ARGV[1]); local i=2; for c=1,n do local t=ARGV[i]; local k=KEYS[tonumber(ARGV[i+1])]; if (t=='a' and redis.call('get',k)~=false) or (t=='e' and redis.call('get',k)~=ARGV[i+2]) then return 0 end; i=i+(t=='a' and 2 or 3) end; local m=tonumber(ARGV[i]); i=i+1; for c=1,m do local t=ARGV[i]; local k=KEYS[tonumber(ARGV[i+1])]; if t=='r' then redis.call('del',k); i=i+2 else local v=ARGV[i+2]; local ttl=ARGV[i+3]; if ttl=='' then redis.call('set',k,v) else redis.call('set',k,v,'PX',ttl) end; i=i+4 end end; return 1";
@@ -117,7 +118,7 @@ export const serializeUpstashAtomicCommand = Effect.fn(
       )
     )
   );
-  return yield* Schema.decodeUnknownEffect(UpstashAtomicCommand)({
+  const command: UpstashAtomicCommandEncoded = {
     keys: pipe(
       logicalKeys,
       Array.map((key) => toPhysicalKey(prefix, key))
@@ -130,7 +131,8 @@ export const serializeUpstashAtomicCommand = Effect.fn(
       ],
       Array.flatten(mutationArgs)
     ),
-  });
+  };
+  return yield* Schema.decodeEffect(UpstashAtomicCommand)(command);
 });
 
 export const makeUpstashPersistenceLayer = (

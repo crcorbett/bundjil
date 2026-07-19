@@ -1,6 +1,7 @@
 import {
   CodexOAuthAccountId,
   CodexOAuthSubject,
+  CodexFileSystemDirectory,
   OpenAICompatibleProxyInternalToken,
 } from "@bundjil/codex";
 import { Schema } from "effect";
@@ -9,11 +10,21 @@ export const CodexProxyMode = Schema.Literals(["mock", "local", "live"]);
 
 export type CodexProxyMode = typeof CodexProxyMode.Type;
 
-export const CodexProxyLocalProfileStoreDirectory = Schema.NonEmptyString.pipe(
-  Schema.brand("CodexProxyLocalProfileStoreDirectory")
-);
+export const CodexProxyLocalProfileStoreDirectory = CodexFileSystemDirectory;
 export type CodexProxyLocalProfileStoreDirectory =
   typeof CodexProxyLocalProfileStoreDirectory.Type;
+
+export const CodexProxyVercelRuntimeMarker = Schema.NonEmptyString.pipe(
+  Schema.brand("CodexProxyVercelRuntimeMarker")
+);
+export type CodexProxyVercelRuntimeMarker =
+  typeof CodexProxyVercelRuntimeMarker.Type;
+
+export const CodexProxyVercelProtectionBypass = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type CodexProxyVercelProtectionBypass =
+  typeof CodexProxyVercelProtectionBypass.Type;
 
 export const CodexProxyHealthService = Schema.Literal("bundjil-codex-proxy");
 export type CodexProxyHealthService = typeof CodexProxyHealthService.Type;

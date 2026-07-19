@@ -5,6 +5,8 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
 import { CodexLocalProfileImportConfig } from "../src/auth/contracts.js";
+import type { CodexCliAuthCache } from "../src/auth/contracts.js";
+import { CodexFileSystemDirectory } from "../src/auth/credentials.js";
 import { CodexLocalAuthCacheSourceMemory } from "../src/auth/local-cache.js";
 import { CodexLocalProfileImportConfigService } from "../src/auth/local-import-config.js";
 import {
@@ -44,7 +46,7 @@ const cipherConfig = Schema.decodeUnknownEffect(CodexOAuthProfileCipherConfig)({
   keyMaterial: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
 });
 
-const validCache = {
+const validCache: typeof CodexCliAuthCache.Encoded = {
   auth_mode: "chatgpt",
   last_refresh: "2099-01-01T00:00:00.000Z",
   tokens: {
@@ -62,7 +64,9 @@ const filesystemStoreLayer = (directory: string) =>
       Layer.provideMerge(
         Layer.merge(
           CodexOAuthProfileCipherTest(cipher),
-          CodexFileSystemKeyValueStoreLive(directory)
+          CodexFileSystemKeyValueStoreLive(
+            CodexFileSystemDirectory.make(directory)
+          )
         )
       )
     );

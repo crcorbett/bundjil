@@ -13,9 +13,11 @@ import {
   ProductionPreflightEvidence,
   ProductionPreflightError,
   ProductionPreflightSnapshot,
+  ProductionPreflightSnapshotPath,
 } from "../agent/production-preflight.js";
 
-const snapshotPath = Config.nonEmptyString(
+const snapshotPath = Config.schema(
+  ProductionPreflightSnapshotPath,
   "BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT"
 );
 

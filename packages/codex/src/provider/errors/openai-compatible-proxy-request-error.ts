@@ -1,12 +1,15 @@
 import { Schema } from "effect";
 
-import { OpenAICompatibleProxyOperation } from "../error-contracts.js";
+import {
+  CodexProviderErrorMessage,
+  OpenAICompatibleProxyOperation,
+} from "../error-contracts.js";
 
 export class OpenAICompatibleProxyRequestError extends Schema.TaggedErrorClass<OpenAICompatibleProxyRequestError>()(
   "OpenAICompatibleProxyRequestError",
   {
     operation: OpenAICompatibleProxyOperation,
-    message: Schema.NonEmptyString,
+    message: CodexProviderErrorMessage,
     cause: Schema.Defect,
   }
 ) {}

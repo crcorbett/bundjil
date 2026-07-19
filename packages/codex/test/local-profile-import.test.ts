@@ -2,12 +2,15 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
-import { CodexLocalProfileImportConfig } from "../src/auth/contracts.js";
+import {
+  CodexCliAuthCache,
+  CodexLocalProfileImportConfig,
+} from "../src/auth/contracts.js";
 import { CodexLocalAuthFile } from "../src/auth/credentials.js";
+import { CodexLocalProfileImportError } from "../src/auth/errors.js";
 import {
   CodexLocalAuthCacheSource,
   CodexLocalAuthCacheSourceLive,
-  CodexLocalAuthCacheSourceMemory,
 } from "../src/auth/local-cache.js";
 import { CodexLocalProfileImportConfigService } from "../src/auth/local-import-config.js";
 import {
@@ -85,7 +88,18 @@ const importLayer = (cache: unknown) =>
             CodexLocalProfileImportConfigService,
             CodexLocalProfileImportConfigService.of(config)
           ),
-          CodexLocalAuthCacheSourceMemory(cache),
+          Layer.succeed(CodexLocalAuthCacheSource, {
+            readCache: () =>
+              Schema.decodeUnknownEffect(CodexCliAuthCache)(cache).pipe(
+                Effect.mapError(
+                  () =>
+                    new CodexLocalProfileImportError({
+                      operation: "decodeCache",
+                      message: "Unable to decode the local Codex auth cache.",
+                    })
+                )
+              ),
+          }),
           encryptedStoreLayer
         )
       )

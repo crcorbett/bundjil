@@ -9,3 +9,7 @@ export const WorkspaceSchemaBoundary = Schema.Literals([
 ]);
 
 export type WorkspaceSchemaBoundary = typeof WorkspaceSchemaBoundary.Type;
+
+export const WorkspaceSchemaErrorMessage = Schema.NonEmptyString;
+export type WorkspaceSchemaErrorMessage =
+  typeof WorkspaceSchemaErrorMessage.Type;

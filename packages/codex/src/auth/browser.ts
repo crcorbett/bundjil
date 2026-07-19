@@ -1,7 +1,11 @@
-import { Context, Effect, Layer, Redacted } from "effect";
+import { Context, Effect, Layer, Redacted, Schema } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
-import type { CodexOAuthAuthorizationUrl } from "./credentials.js";
+import { CodexRuntimePlatform } from "./credentials.js";
+import type {
+  CodexOAuthAuthorizationUrl,
+  CodexRuntimePlatform as CodexRuntimePlatformType,
+} from "./credentials.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 
 export interface CodexBrowserLauncherShape {
@@ -17,7 +21,7 @@ export class CodexBrowserLauncher extends Context.Service<
 
 export const makeCodexBrowserCommand = (
   authorizationUrl: CodexOAuthAuthorizationUrl,
-  platform: string
+  platform: CodexRuntimePlatformType
 ) => {
   const url = Redacted.value(authorizationUrl);
 
@@ -44,35 +48,46 @@ export const CodexBrowserLauncherCommandLive = Layer.effect(
     const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
 
     return CodexBrowserLauncher.of({
-      open: Effect.fn("CodexBrowserLauncher.open")((authorizationUrl) =>
-        spawner
-          .exitCode(
-            makeCodexBrowserCommand(
-              authorizationUrl,
-              globalThis.navigator.platform
-            )
-          )
-          .pipe(
-            Effect.flatMap((exitCode) =>
-              exitCode === 0
-                ? Effect.void
-                : Effect.fail(
-                    new CodexSubscriptionAuthError({
-                      operation: "launchBrowser",
-                      reason: "browserFailure",
-                      message: "The system browser command did not succeed.",
-                    })
-                  )
-            ),
+      open: Effect.fn("CodexBrowserLauncher.open")(
+        function* (authorizationUrl) {
+          const platform = yield* Schema.decodeEffect(CodexRuntimePlatform)(
+            globalThis.navigator.platform
+          ).pipe(
             Effect.mapError(
               () =>
                 new CodexSubscriptionAuthError({
                   operation: "launchBrowser",
                   reason: "browserFailure",
-                  message: "Unable to open the system browser for Codex login.",
+                  message: "Unable to identify the runtime browser platform.",
                 })
             )
-          )
+          );
+
+          return yield* spawner
+            .exitCode(makeCodexBrowserCommand(authorizationUrl, platform))
+            .pipe(
+              Effect.flatMap((exitCode) =>
+                exitCode === 0
+                  ? Effect.void
+                  : Effect.fail(
+                      new CodexSubscriptionAuthError({
+                        operation: "launchBrowser",
+                        reason: "browserFailure",
+                        message: "The system browser command did not succeed.",
+                      })
+                    )
+              ),
+              Effect.mapError(
+                () =>
+                  new CodexSubscriptionAuthError({
+                    operation: "launchBrowser",
+                    reason: "browserFailure",
+                    message:
+                      "Unable to open the system browser for Codex login.",
+                  })
+              )
+            );
+        }
       ),
     });
   })

@@ -1,4 +1,5 @@
 import { Context, Effect, Redacted, Schema } from "effect";
+import { HttpClientRequest } from "effect/unstable/http";
 
 import { codexResponsesEndpointConfig } from "./config.js";
 import {
@@ -67,33 +68,33 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         headers.set("chatgpt-account-id", Redacted.value(input.accountId));
       }
 
-      const upstreamRequest = new Request(endpoint, {
-        body: encodedRequestBody,
-        headers,
-        method: "POST",
-      });
+      const upstreamRequest = HttpClientRequest.post(endpoint).pipe(
+        HttpClientRequest.setHeaders(headers),
+        HttpClientRequest.bodyText(encodedRequestBody, "application/json")
+      );
       const response = yield* fetcher.fetch(upstreamRequest);
-      const contentType = response.headers.get("content-type") ?? "";
+      const contentType = response.headers["content-type"] ?? "";
 
-      if (!response.ok) {
+      if (response.status < 200 || response.status >= 300) {
         return yield* new CodexHttpStatusError({
           operation: "postResponses",
           status: response.status,
-          statusText: response.statusText,
+          statusText: "",
           contentType,
           message: "Codex Responses endpoint returned an unsuccessful status.",
         });
       }
 
-      const body = yield* Effect.tryPromise({
-        try: () => response.text(),
-        catch: (cause) =>
-          new CodexResponsesStreamError({
-            operation: "readResponseBody",
-            message: "Unable to read Codex Responses body.",
-            cause,
-          }),
-      });
+      const body = yield* response.text.pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexResponsesStreamError({
+              operation: "readResponseBody",
+              message: "Unable to read Codex Responses body.",
+              cause,
+            })
+        )
+      );
       const receivedStreamLines =
         body.length === 0
           ? 0
@@ -141,34 +142,34 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           headers.set("chatgpt-account-id", Redacted.value(input.accountId));
         }
 
-        const upstreamRequest = new Request(endpoint, {
-          body: encodedRequestBody,
-          headers,
-          method: "POST",
-        });
+        const upstreamRequest = HttpClientRequest.post(endpoint).pipe(
+          HttpClientRequest.setHeaders(headers),
+          HttpClientRequest.bodyText(encodedRequestBody, "application/json")
+        );
         const response = yield* fetcher.fetch(upstreamRequest);
-        const contentType = response.headers.get("content-type") ?? "";
+        const contentType = response.headers["content-type"] ?? "";
 
-        if (!response.ok) {
+        if (response.status < 200 || response.status >= 300) {
           return yield* new CodexHttpStatusError({
             operation: "postResponsesStream",
             status: response.status,
-            statusText: response.statusText,
+            statusText: "",
             contentType,
             message:
               "Codex Responses endpoint returned an unsuccessful status.",
           });
         }
 
-        const body = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (cause) =>
-            new CodexResponsesStreamError({
-              operation: "readResponseBody",
-              message: "Unable to read Codex Responses body.",
-              cause,
-            }),
-        });
+        const body = yield* response.text.pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexResponsesStreamError({
+                operation: "readResponseBody",
+                message: "Unable to read Codex Responses body.",
+                cause,
+              })
+          )
+        );
 
         return {
           status: response.status,

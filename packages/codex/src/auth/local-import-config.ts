@@ -12,6 +12,7 @@ import { CodexLocalProfileImportConfig } from "./contracts.js";
 import type { CodexLocalProfileImportConfig as CodexLocalProfileImportConfigType } from "./contracts.js";
 import {
   CodexLocalAuthFile,
+  CodexFileSystemDirectory,
   CodexOAuthConnectorId,
   CodexOAuthInstallationId,
   CodexOAuthPrincipalId,
@@ -23,7 +24,9 @@ const localAuthFileConfig = Config.option(
   Config.schema(CodexLocalAuthFile, "BUNDJIL_CODEX_LOCAL_AUTH_FILE")
 );
 
-const homeDirectoryConfig = Config.option(Config.nonEmptyString("HOME"));
+const homeDirectoryConfig = Config.option(
+  Config.schema(CodexFileSystemDirectory, "HOME")
+);
 
 const principalIdConfig = Config.schema(
   CodexOAuthPrincipalId,

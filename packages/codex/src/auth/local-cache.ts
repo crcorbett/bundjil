@@ -1,20 +1,15 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Context, Effect, FileSystem, Layer, Schema } from "effect";
 
 import { CodexCliAuthCache } from "./contracts.js";
 import type { CodexCliAuthCache as CodexCliAuthCacheType } from "./contracts.js";
 import { CodexLocalProfileImportError } from "./errors.js";
 import { CodexLocalProfileImportConfigService } from "./local-import-config.js";
 
-declare const Bun: {
-  readonly file: (path: string) => {
-    readonly text: () => Promise<string>;
-  };
-};
-
 const codexCliAuthCacheJson = Schema.fromJsonString(CodexCliAuthCache);
 
-const decodeCodexCliAuthCache = (input: unknown) =>
-  Schema.decodeUnknownEffect(CodexCliAuthCache)(input).pipe(
+const decodeCodexCliAuthCache = (input: typeof CodexCliAuthCache.Encoded) =>
+  Schema.decodeEffect(CodexCliAuthCache)(input).pipe(
     Effect.mapError(
       () =>
         new CodexLocalProfileImportError({
@@ -40,18 +35,22 @@ export const CodexLocalAuthCacheSourceLive = Layer.effect(
   CodexLocalAuthCacheSource,
   Effect.gen(function* makeCodexLocalAuthCacheSource() {
     const config = yield* CodexLocalProfileImportConfigService;
+    const fileSystem = yield* FileSystem.FileSystem;
 
     return CodexLocalAuthCacheSource.of({
       readCache: Effect.fn("CodexLocalAuthCacheSource.readCache")(
         function* readCache() {
-          const content = yield* Effect.tryPromise({
-            try: () => Bun.file(config.localAuthFile).text(),
-            catch: () =>
-              new CodexLocalProfileImportError({
-                operation: "readCache",
-                message: "Unable to read the local Codex auth cache.",
-              }),
-          });
+          const content = yield* fileSystem
+            .readFileString(config.localAuthFile)
+            .pipe(
+              Effect.mapError(
+                () =>
+                  new CodexLocalProfileImportError({
+                    operation: "readCache",
+                    message: "Unable to read the local Codex auth cache.",
+                  })
+              )
+            );
 
           return yield* Schema.decodeUnknownEffect(codexCliAuthCacheJson)(
             content
@@ -68,9 +67,11 @@ export const CodexLocalAuthCacheSourceLive = Layer.effect(
       ),
     });
   }).pipe(Effect.withSpan("CodexLocalAuthCacheSourceLive"))
-);
+).pipe(Layer.provide(BunServices.layer));
 
-export const CodexLocalAuthCacheSourceMemory = (cache: unknown) =>
+export const CodexLocalAuthCacheSourceMemory = (
+  cache: typeof CodexCliAuthCache.Encoded
+) =>
   Layer.succeed(CodexLocalAuthCacheSource, {
     readCache: () => decodeCodexCliAuthCache(cache),
   });

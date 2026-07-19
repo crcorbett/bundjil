@@ -9,6 +9,7 @@ import type {
   CodexOAuthAuthorizationMaterial as CodexOAuthAuthorizationMaterialType,
   CodexSubscriptionAuthProtocolConfig as CodexSubscriptionAuthProtocolConfigType,
 } from "./contracts.js";
+import type { CodexOAuthRedirectUri } from "./credentials.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 
 export interface CodexSubscriptionAuthProtocolConfigShape {
@@ -137,7 +138,7 @@ export const buildCodexOAuthAuthorizationSession = Effect.fn(
   "CodexSubscriptionAuth.buildAuthorizationSession"
 )(function* (
   material: CodexOAuthAuthorizationMaterialType,
-  redirectUri: string
+  redirectUri: CodexOAuthRedirectUri
 ) {
   const protocol = yield* CodexSubscriptionAuthProtocolConfigService;
   const authorizationUrl = new URL(protocol.config.authorizationEndpoint);
@@ -173,7 +174,7 @@ export const buildCodexOAuthAuthorizationSession = Effect.fn(
 
 export const createCodexOAuthAuthorizationSession = Effect.fn(
   "CodexSubscriptionAuth.createAuthorizationSession"
-)(function* (redirectUri: string) {
+)(function* (redirectUri: CodexOAuthRedirectUri) {
   const material = yield* createCodexOAuthAuthorizationMaterial();
 
   return yield* buildCodexOAuthAuthorizationSession(material, redirectUri);

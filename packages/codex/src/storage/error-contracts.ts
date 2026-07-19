@@ -1,5 +1,7 @@
 import { Schema } from "effect";
 
+export const UpstashKeyValueStoreErrorMessage = Schema.NonEmptyString;
+
 export const UpstashKeyValueStoreConfigBoundary = Schema.Literals([
   "UpstashRedisConfig",
 ]);

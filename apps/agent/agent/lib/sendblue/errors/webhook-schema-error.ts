@@ -1,6 +1,14 @@
 import { Schema } from "effect";
 
+import {
+  SendblueDiagnosticMessage,
+  SendblueWebhookSchemaBoundary,
+} from "../schemas.js";
+
 export class SendblueWebhookSchemaError extends Schema.TaggedErrorClass<SendblueWebhookSchemaError>()(
   "SendblueWebhookSchemaError",
-  { boundary: Schema.NonEmptyString, message: Schema.NonEmptyString }
+  {
+    boundary: SendblueWebhookSchemaBoundary,
+    message: SendblueDiagnosticMessage,
+  }
 ) {}

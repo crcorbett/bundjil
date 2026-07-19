@@ -1,4 +1,4 @@
-import { Context, Effect, Schema } from "effect";
+import { Context, Effect } from "effect";
 
 import { CodexOAuthRefreshLockTtlMillis } from "./contracts.js";
 import type {
@@ -24,9 +24,8 @@ export class CodexOAuthRefreshLock extends Context.Service<
   CodexOAuthRefreshLockShape
 >()("@bundjil/codex/CodexOAuthRefreshLock") {}
 
-export const defaultCodexOAuthRefreshLockTtlMillis = Schema.decodeUnknownSync(
-  CodexOAuthRefreshLockTtlMillis
-)(5000);
+export const defaultCodexOAuthRefreshLockTtlMillis =
+  CodexOAuthRefreshLockTtlMillis.make(5000);
 
 export const withCodexOAuthRefreshLock = Effect.fn(
   "CodexOAuthRefreshLock.withLock"

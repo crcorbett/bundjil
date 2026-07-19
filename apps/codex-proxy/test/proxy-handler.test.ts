@@ -32,6 +32,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
+import { HttpClientResponse } from "effect/unstable/http";
 import { describe, it as vitestIt } from "vitest";
 
 import { CodexProxyRouteError } from "../src/errors.js";
@@ -183,18 +184,21 @@ const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
     const httpClient = CodexHttpClientLive.pipe(
       Layer.provide(
         CodexResponsesFetchMock({
-          fetch: () =>
+          fetch: (request) =>
             Effect.succeed(
-              new Response(
-                [
-                  'data: {"type":"response.output_text.delta","delta":"Live OK."}',
-                  'data: {"type":"response.completed"}',
-                  "",
-                ].join("\n"),
-                {
-                  headers: { "content-type": "text/event-stream" },
-                  status: 200,
-                }
+              HttpClientResponse.fromWeb(
+                request,
+                new Response(
+                  [
+                    'data: {"type":"response.output_text.delta","delta":"Live OK."}',
+                    'data: {"type":"response.completed"}',
+                    "",
+                  ].join("\n"),
+                  {
+                    headers: { "content-type": "text/event-stream" },
+                    status: 200,
+                  }
+                )
               )
             ),
         })
@@ -392,7 +396,9 @@ const makeLocalEncryptedProfileStore = (directory: string) =>
             )
           )
         ),
-        CodexFileSystemKeyValueStoreLive(directory)
+        CodexFileSystemKeyValueStoreLive(
+          CodexProxyLocalProfileStoreDirectory.make(directory)
+        )
       )
     )
   );
@@ -415,18 +421,21 @@ const withLocalTestHandler = <A>(
       localProfileStoreDirectory,
       localCipherConfigProvider,
       CodexResponsesFetchMock({
-        fetch: () =>
+        fetch: (request) =>
           Effect.succeed(
-            new Response(
-              [
-                'data: {"type":"response.output_text.delta","delta":"Local OK."}',
-                'data: {"type":"response.completed"}',
-                "",
-              ].join("\n"),
-              {
-                headers: { "content-type": "text/event-stream" },
-                status: 200,
-              }
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(
+                [
+                  'data: {"type":"response.output_text.delta","delta":"Local OK."}',
+                  'data: {"type":"response.completed"}',
+                  "",
+                ].join("\n"),
+                {
+                  headers: { "content-type": "text/event-stream" },
+                  status: 200,
+                }
+              )
             )
           ),
       })

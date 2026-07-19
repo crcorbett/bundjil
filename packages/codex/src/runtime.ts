@@ -1,3 +1,4 @@
+import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer, Option } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
@@ -348,10 +349,10 @@ export const CodexOAuthMemoryKeyValueLive = CodexOAuthLive.pipe(
   Layer.provide(KeyValueStore.layerMemory)
 );
 
-export const CodexResponsesFetchLive = Layer.succeed(
+export const CodexResponsesFetchLive = Layer.effect(
   CodexResponsesFetch,
   makeCodexResponsesFetch
-);
+).pipe(Layer.provide(BunHttpClient.layer));
 
 export const CodexHttpClientLive = Layer.effect(
   CodexHttpClient,

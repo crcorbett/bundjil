@@ -1,6 +1,7 @@
 import {
   Cause,
   Clock,
+  Console,
   ConfigProvider,
   Effect,
   Exit,
@@ -65,13 +66,6 @@ const NearExpiryProfileStageBlocked = Schema.Struct({
   status: Schema.Literal("blocked"),
 });
 
-const encodeStageSuccess = Schema.encodeSync(
-  Schema.fromJsonString(NearExpiryProfileStageSuccess)
-);
-const encodeStageBlocked = Schema.encodeSync(
-  Schema.fromJsonString(NearExpiryProfileStageBlocked)
-);
-
 const program = Effect.gen(function* stageNearExpiryProfile() {
   const input = yield* CodexSubscriptionLoginConfigService;
   const store = yield* CodexProfileStore;
@@ -116,16 +110,19 @@ const program = Effect.gen(function* stageNearExpiryProfile() {
   )
 );
 
-const exit = await Effect.runPromiseExit(program);
+const main = Effect.gen(function* renderNearExpiryProfileStage() {
+  const exit = yield* Effect.exit(program);
 
-if (Exit.isSuccess(exit)) {
-  console.log(
-    encodeStageSuccess({
+  if (Exit.isSuccess(exit)) {
+    const output = yield* Schema.encodeEffect(
+      Schema.fromJsonString(NearExpiryProfileStageSuccess)
+    )({
       result: exit.value,
       status: "staged",
-    })
-  );
-} else {
+    });
+    return yield* Console.log(output);
+  }
+
   const failure = Cause.findErrorOption(exit.cause);
   const errorTag = Option.match(failure, {
     onNone: () => "UnknownCause",
@@ -138,11 +135,16 @@ if (Exit.isSuccess(exit)) {
         : "UnknownFailure",
   });
 
-  console.error(
-    encodeStageBlocked({
-      errorTag,
-      status: "blocked",
-    })
-  );
-  process.exitCode = 1;
-}
+  const output = yield* Schema.encodeEffect(
+    Schema.fromJsonString(NearExpiryProfileStageBlocked)
+  )({
+    errorTag,
+    status: "blocked",
+  });
+  yield* Console.error(output);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

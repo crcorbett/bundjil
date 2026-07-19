@@ -1,4 +1,6 @@
 import {
+  CodexOAuthProfileCipherKeyId,
+  CodexOAuthProfileCipherKeyMaterial,
   CodexOAuthProfileCipherConfig,
   CodexOAuthProfileCipherConfigService,
 } from "@bundjil/codex";
@@ -17,11 +19,13 @@ const proofModeConfig = Config.schema(
   "BUNDJIL_CODEX_PROXY_PROOF_MODE"
 ).pipe(Config.withDefault(false));
 
-const proofCipherKeyConfig = Config.redacted(
+const proofCipherKeyConfig = Config.schema(
+  CodexOAuthProfileCipherKeyMaterial,
   "BUNDJIL_CODEX_PROOF_PROFILE_ENCRYPTION_KEY"
 );
 
-const proofCipherKeyIdConfig = Config.nonEmptyString(
+const proofCipherKeyIdConfig = Config.schema(
+  CodexOAuthProfileCipherKeyId,
   "BUNDJIL_CODEX_PROOF_PROFILE_ENCRYPTION_KEY_ID"
 );
 

@@ -59,7 +59,7 @@ export const makeSendblueSessionRouter = (routingKey: Redacted.Redacted) =>
         senderNumber,
         sendblueNumber,
       ]);
-      return yield* Schema.decodeUnknownEffect(SendblueConversationKey)(
+      return yield* Schema.decodeEffect(SendblueConversationKey)(
         `sendblue:conversation:${digest}`
       ).pipe(
         Effect.mapError(
