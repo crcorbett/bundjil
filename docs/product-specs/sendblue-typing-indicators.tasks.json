@@ -255,10 +255,44 @@
       "commitAfterPassing": true
     },
     {
+      "id": "establish-production-handset-observation-window",
+      "title": "Establish a continuous Production handset observation window",
+      "status": "completed",
+      "dependsOn": ["stabilize-production-codex-proxy-build"],
+      "description": "Reject the first otherwise healthy Production turn as handset-visibility evidence because the UI observer sampled before and after the transient bubble, then require continuous observation for one fresh user-confirmed turn.",
+      "implementationNotes": [
+        "The first confirmed Production message was sent at 2026-07-19T15:56:10.415Z. Messages showed the outgoing iMessage delivered and the final reply visible about 21889 ms later, while Sendblue readback showed one RECEIVED inbound and one DELIVERED outbound with zero errors.",
+        "Production runtime recorded one successful StartTurn provider attempt in 65 ms and one successful StopTurn provider attempt in 75 ms with no unavailable outcome, warning, error, fatal, or protected-field observation.",
+        "The automated UI snapshots landed around one second after send and at final reply, so no snapshot directly observed the transient bubble. Do not infer handset visibility from runtime/provider success and do not accept this window.",
+        "Retain the READY deployment and rollback candidate because runtime, provider, delivery, and topology evidence all passed; the rejection is an observation gap rather than a product or final-reply failure.",
+        "For the next user-confirmed message, begin one in-call Messages polling loop immediately after Return, inspect every fresh accessibility/screenshot state until reply, record only safe booleans and elapsed timing, and retain no screenshot or content."
+      ],
+      "mandatoryVerification": [
+        "The rejected window reconciles exactly one inbound, one accepted webhook, one successful start, one successful stop, one delivered outbound, one visible final reply, zero duplicates, zero errors, and zero Preview ingress.",
+        "The next observation procedure has no gap between confirmed send and final reply and keeps provider acceptance distinct from direct handset visibility.",
+        "No second message is sent without a fresh action-time user confirmation; no webhook, routing, replay, model, Executor, account, or Vercel variable changes.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The first window is explicitly rejected only as visible-bubble evidence and cannot be misreported as Production acceptance.",
+        "A continuous, privacy-safe observer is ready for the next bounded Production proof without a deployment or topology change."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Evidence and call graph: Sendblue readback, Vercel request logs, sanitized Effect observations, and Messages UI agree on one inbound, one webhook 202, Workflow 200s, StartTurn started in 65 ms, StopTurn stopped in 75 ms, one DELIVERED outbound, and one visible final reply at about 21889 ms. No provider/runtime/delivery failure or duplicate occurred.",
+          "Observation quality and privacy: the parent review rejects the first window because accessibility and screenshot states sampled around +1 s and +21.9 s but not continuously between them. Runtime success is not substituted for a visible bubble. The revised observer polls from the confirmed Return action through reply and records only visibility booleans and elapsed timing without retaining content, numbers, handles, URLs, or screenshots.",
+          "Rollback and topology: the READY deployment remains active because the only failure is missing direct UI evidence; final reply, provider operations, runtime status, and Sendblue delivery all passed. The prior READY deployment remains retained, the sole stable Production receive webhook is unchanged, Preview ingress is zero, and a fresh explicit user confirmation is required before the retry."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
       "id": "prove-sendblue-typing-production",
       "title": "Prove one bounded Production handset lifecycle",
       "status": "planned",
-      "dependsOn": ["stabilize-production-codex-proxy-build"],
+      "dependsOn": ["establish-production-handset-observation-window"],
       "description": "Promote accepted clean source without changing topology, then reconcile provider, runtime, and handset evidence for one bounded Production turn.",
       "implementationNotes": [
         "Do not change the sole Production webhook, route secret, bypass, replay namespace, identity map, model provider, Executor policy, Vercel Sendblue variables, or account auto-typing.",

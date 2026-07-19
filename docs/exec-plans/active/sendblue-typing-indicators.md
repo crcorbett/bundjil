@@ -160,6 +160,17 @@ Status: In Progress
   and Codex proxy builds pass, and clean revision `057e77b` produced READY
   Production deployment `dpl_JpF6mZqGXK1q4Dyd3L9Pf5xdccKi` under the existing
   provider/config topology.
+- The first confirmed handset turn is rejected only as visible-bubble evidence.
+  It produced one received iMessage, one webhook acceptance, successful typed
+  start and stop attempts in 65 ms and 75 ms, one delivered outbound, and a
+  visible final reply at about 21.9 seconds with zero runtime/provider errors.
+  The UI observer sampled around +1 second and again at final reply, leaving the
+  transient bubble interval unobserved. Runtime success is not being used as a
+  substitute for direct handset visibility.
+- `establish-production-handset-observation-window` records the no-rollback
+  decision and requires a fresh user-confirmed message with continuous UI
+  observation from Return through final reply. The READY deployment, sole
+  Production webhook, and retained rollback candidate remain unchanged.
 - Promote only from accepted clean Preview source.
 - Retain the sole Production webhook and all existing routing/config policy.
 - Reconcile one handset observation against sanitized provider/runtime counts;
