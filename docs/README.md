@@ -45,7 +45,11 @@ README.
 - [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) specifies the
   app-owned iMessage channel, shared-secret webhook verification, sender
   identity mapping, deterministic Eve routing, durable replay protection,
-  outbound delivery, and Vercel Preview proof.
+  outbound delivery, and historical Vercel Preview proof.
+- [Sendblue Typing Indicators](./product-specs/sendblue-typing-indicators.md)
+  records the completed Effect-typed accepted-inbound typing lifecycle,
+  durable `Idle | Pending | Active` state, bounded cleanup, sanitized runtime
+  observations, sole-Production-ingress topology, and direct handset proof.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
   preserves the Parallel AI report that corrected the subscription-backed model
   access plan.

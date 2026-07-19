@@ -91,13 +91,14 @@ Vercel-managed runtime configuration, never in committed source.
   current repo/package questions and not to claim live channels or integrations.
 - `agent/tools/workspace_status.ts` is the model-facing Eve tool slug.
 - `agent/channels/sendblue.ts` is a thin Eve adapter only. It owns the
-  absolute route, `waitUntil` scheduling, HTTP status mapping, and projection
-  of `message.completed` into the app-owned channel service.
+  absolute route, `waitUntil` scheduling, HTTP status mapping, the typed
+  `ChannelEvents` projection, and encoded lifecycle-state mutation at the
+  framework boundary.
 - `agent/lib/sendblue/` owns canonical Schema contracts, tagged errors,
   redacted Config, Context services, live/memory Layers, provider
-  authentication, sender policy, opaque routing, replay persistence, and the
-  Sendblue HTTP client. It does not move into a shared package until a stable
-  second-channel contract exists.
+  authentication, sender policy, opaque routing, replay persistence, typing
+  policy and observations, and the Sendblue HTTP client. It does not move into
+  a shared package until a stable second-channel contract exists.
 
 `@bundjil/eve-effect` owns the reusable operation boundary:
 
@@ -221,9 +222,13 @@ For the shared Sendblue account, exactly one active receive webhook targets the
 stable Production route. The Preview receive entry and its dedicated Sendblue
 automation bypass were revoked on 2026-07-16 after provider readback. Earlier
 dual-webhook behavior is historical evidence of account-level fan-out, not a
-current environment-routing design. Task 4's bounded handset-originated proof
-accepted the complete Production path; repeat proof is required only for a
-future deployment or routing change.
+current environment-routing design. The accepted typing rollout on READY
+deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb` recorded one early
+`StartInbound`, no duplicate `StartTurn` provider request, one bounded stop,
+one delivered iMessage without error or downgrade, and direct user confirmation
+of the visible bubble. Provider `SENT` remains API acceptance rather than
+handset proof. Repeat proof is required only for a future deployment or routing
+change.
 
 ## Production Call Graph
 
@@ -291,7 +296,7 @@ Effect.runPromise(
 
 ## Sendblue Channel Call Graphs
 
-Preview production-style ingress is:
+Current Production ingress is:
 
 ```text
 Sendblue receive webhook
@@ -302,6 +307,9 @@ Sendblue receive webhook
   -> constant-time shared sb-signing-secret verification
   -> Schema JSON decode and ignored-event classification
   -> allowlisted identity + opaque keyed continuation token + atomic Upstash claim
+  -> SendblueChannel.transitionTyping(StartInbound)
+  -> SendblueClient.setTypingIndicator(start, bounded duration)
+  -> encoded channel.state.typing = Pending
   -> Eve send under waitUntil
 ```
 
@@ -311,10 +319,17 @@ Authentication failures return `401`, authenticated malformed input returns
 shared header secret, not a body HMAC. The Vercel bypass is only platform
 authentication and never substitutes for route authentication.
 
-Outbound delivery is:
+Typing adoption and outbound delivery are:
 
 ```text
+Eve turn.started
+  -> makeSendblueEveEvents typed event seam
+  -> SendblueChannel.transitionTyping(StartTurn)
+  -> provider-silent adoption as Active(turnId)
+  -> Eve model/tool loop
 Eve message.completed
+  -> SendblueChannel.transitionTyping(StopTurn)
+  -> SendblueClient.setTypingIndicator(stop), bounded to two seconds
   -> SendblueChannel.deliverCompletedMessage
   -> stable event-coordinate replay claim
   -> SendblueClient.sendMessage
@@ -328,6 +343,24 @@ is implemented. Timeout, transport, malformed provider response, and
 completion-persistence failures become uncertain and are not automatically
 resent. This limits duplicate personal messages but cannot establish exactly-once
 delivery after an indeterminate provider outcome.
+
+The encoded lifecycle is `Idle | Pending | Active(turnId)`. A missing typing
+field from a pre-feature conversation decodes to `Idle`; corrupt auxiliary
+typing state is repaired without coupling it to final-message decoding.
+Duplicate accepted-inbound starts, same-turn starts, idle stops, and stale
+terminal events make no provider request. Authorization wait stops typing;
+`authorization.completed(outcome=authorized)` reissues a bounded start before
+continuation. Turn/session completion, failure, waiting, and input events are
+cleanup fallbacks. `session.failed` can attempt cleanup but cannot claim durable
+state persistence.
+
+Every provider attempt emits one app-owned `SendblueTypingObservation` through
+Effect's logger and Clock. The observation carries only the command, outcome,
+provider-attempted flag, safe reason/status, and elapsed time. A start or stop
+failure is fail-open for Eve and final delivery, and Sendblue's configured
+maximum duration bounds cleanup. `BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS`
+defaults to `120000` and is Schema-constrained to `1..300000`; the auxiliary
+HTTP timeout is two seconds with no automatic retry.
 
 ## Test Call Graph
 
@@ -349,8 +382,11 @@ bun run --filter @bundjil/agent test
 
 bun run --filter @bundjil/agent test
   -> apps/agent/test/sendblue-*.test.ts
-  -> injected Config, memory replay/client Layers, and direct Eve route factory
-  -> auth/status/replay/outbound behavior without provider access
+  -> injected Config, memory replay/client Layers, and typed Eve event factory
+  -> provider request codecs and TestClock timeout
+  -> auth/status/replay plus Idle | Pending | Active lifecycle transitions
+  -> stop-before-send ordering and sanitized observation privacy
+  -> behavior without provider access
 ```
 
 Package test path:

@@ -1,8 +1,8 @@
 # Sendblue Typing Indicators
 
-- Status: In progress
+- Status: Complete - accepted-inbound Production lifecycle and handset proof verified
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-19
+- Last reviewed: 2026-07-20
 
 ## Decision
 
@@ -172,15 +172,16 @@ Add app-owned Schemas with domain types derived through
 - `SendblueTypingIndicatorProviderResponse`, requiring a decoded
   `SENT | ERROR` status while safely accepting the documented optional number
   and nullable error message;
-- `SendblueTypingIdle` and `SendblueTypingActive`, tagged structs combined as
+- `SendblueTypingIdle`, `SendblueTypingPending`, and
+  `SendblueTypingActive`, tagged structs combined as
   `SendblueTypingLifecycle`;
 - `SendblueTypingUnavailableReason`, composed from the existing Sendblue client
   reason Schemas plus `stateInvalid` rather than mirroring their literals;
 - `SendblueTypingTransition`, a tagged result carrying the next lifecycle, one
-  finite outcome (`started | stopped | unchanged | unavailable`), and a safe
-  reason only when unavailable;
+  finite outcome (`started | adopted | stopped | unchanged | unavailable`),
+  and a safe reason only when unavailable;
 - `SendblueTypingLifecycleCommand`, an exhaustive tagged union of
-  `StartTurn { turnId }`, `ResumeTurn { turnId }`, and
+  `StartInbound`, `StartTurn { turnId }`, `ResumeTurn { turnId }`, and
   `StopTurn { expectedTurnId?: turnId }`; and
 - `SendblueTypingTransitionInput`, carrying raw Eve state as `Schema.Unknown`
   and one lifecycle command. The domain service separately decodes the core
@@ -424,7 +425,7 @@ authenticated allowlisted Sendblue inbound
   -> terminal message.completed
   -> SendblueChannel.transitionTyping(StopTurn)
   -> Effect HttpClient POST /api/send-typing-indicator state=stop
-  -> channel.state.typing = returned Idle | Active
+  -> channel.state.typing = returned Idle | Pending | Active
   -> existing SendblueChannel.deliverCompletedMessage
   -> existing outbound replay claim
   -> existing SendblueClient.sendMessage
@@ -502,7 +503,8 @@ Focused tests must prove:
   transport failure, and timeout classification;
 - timeout tests use `@effect/vitest` and `TestClock.adjust("2 seconds")`, not
   wall-clock sleeps;
-- start on one typed `turn.started` event only after accepted Eve dispatch;
+- start once at accepted inbound before Eve dispatch, then adopt the lifecycle
+  on `turn.started` without a second provider request;
 - no typing for ignored, duplicate, malformed, unauthorized, unknown-sender,
   group, SMS/RCS, or media-only inbound events;
 - same-turn start replay and idle stop replay make no second provider call;
@@ -585,6 +587,24 @@ observations, and absence of shared-line ingress. Only then may Production be
 deployed. Production acceptance requires the one handset observation and
 provider/runtime count reconciliation; a failed or unobservable Production
 window blocks documentation closure and triggers the rollback decision.
+
+## Accepted Production Evidence
+
+Clean revision `5baa362` produced READY Production deployment
+`dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb`, which became the stable Production target.
+The corrected authenticated fixture returned `202` at
+`2026-07-19T21:53:54.944Z`; the sanitized `StartInbound` observation began
+about 0.8 seconds after ingress and completed in 60 ms, no `StartTurn` provider
+attempt occurred, and `StopTurn` completed in 78 ms before one final
+`DELIVERED` iMessage. Provider readback showed no error or service downgrade.
+
+The user then directly confirmed that the earlier typing bubble was visible on
+the handset. That observation is the handset-rendering evidence and is kept
+separate from Sendblue's `SENT` acceptance. Provider inventory readback
+retained exactly one signed receive webhook at the stable Production route,
+zero Preview targets, and account-level auto typing remained disabled. No
+message text, phone number, handle, protected URL, credential, provider body,
+or screenshot is retained in repository evidence.
 
 ## Risks And Tradeoffs
 

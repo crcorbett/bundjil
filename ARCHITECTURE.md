@@ -46,7 +46,7 @@ Unsupported:
 ```text
 iMessage
   -> Sendblue webhook
-  -> apps/agent Sendblue Eve channel (Production verified; Preview retained)
+  -> apps/agent Sendblue Eve channel (Production verified; Preview historical)
   -> @bundjil/core
   -> Vercel Connect
   -> Notion and other connected systems
@@ -189,8 +189,15 @@ Sendblue receive webhook
   -> app-owned ManagedRuntime and SendblueChannel
   -> header verification -> Schema decode -> identity -> opaque route
   -> AtomicKeyValueStore replay claim through the shared Upstash Layer
+  -> transitionTyping(StartInbound)
+  -> SendblueClient.setTypingIndicator(start, bounded duration)
+  -> encoded channel.state.typing = Pending
   -> Eve send under waitUntil
-  -> message.completed -> outbound claim -> SendblueClient -> Sendblue API
+  -> turn.started -> provider-silent adoption as Active(turnId)
+  -> model/tool loop
+  -> terminal message.completed
+  -> transitionTyping(StopTurn), bounded to two seconds
+  -> outbound claim -> SendblueClient.sendMessage -> Sendblue API
 ```
 
 The header verifier compares `sb-signing-secret` with the redacted configured
@@ -199,8 +206,11 @@ provider and replay layers with deterministic memory layers. The CLI/local path
 starts `eve dev --no-ui` and exercises the same authored channel with local
 test configuration. The shared Sendblue account now has one active Production
 receive webhook; Preview dual-webhook evidence is historical and its dedicated
-Sendblue bypass is revoked. Task 4's bounded Production handset proof accepted
-the corrected topology; it is historical rollout evidence, not a standing
+Sendblue bypass is revoked. The accepted typing rollout additionally verifies
+one early `StartInbound`, no duplicate `StartTurn` provider request, one bounded
+stop, one delivered final iMessage, and direct handset visibility on READY
+deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb`. Provider `SENT` remains distinct
+from handset rendering, and this is rollout evidence rather than a standing
 provider probe.
 
 Schema boundary:
@@ -256,6 +266,13 @@ Consumer suites
   -> packages/codex-oauth/test/persistence.test.ts
   -> apps/agent/test/sendblue-replay-store.test.ts
   -> Codex profile and Sendblue replay compatibility
+
+Sendblue lifecycle suite
+  -> apps/agent/test/sendblue-{config,client,channel,build-route}.test.ts
+  -> Effect Schema request/config/state decoding
+  -> memory client + typed Eve ChannelEvents seam
+  -> Idle | Pending | Active transitions and ordered provider operations
+  -> sanitized Effect observations and stop-before-send proof
 ```
 
 Hosted preview proof path:

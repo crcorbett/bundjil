@@ -253,10 +253,10 @@ The app has an app-owned Sendblue custom channel. The shared Sendblue account
 has one active receive webhook at the stable Production route. Preview
 configuration and prior dual-webhook evidence are historical only; Preview has
 no active shared-line receive webhook or dedicated Sendblue automation bypass.
-The accepted bounded handset proof recorded one Production inbound and
-delivered outbound, zero Preview requests, and the expected two-completion
-model/tool continuation for one Production turn. The handset response confirmed
-the broader Production Executor catalog.
+The accepted typing proof records a bounded accepted-inbound start, a
+provider-silent Eve turn adoption, a stop before one delivered final reply,
+zero Preview ingress, and direct user confirmation that the handset rendered
+the typing bubble.
 
 - Route: `POST /eve/v1/sendblue/webhook`. The build test rejects `/webhook`.
 - Authentication: Sendblue sends the configured shared secret in the
@@ -289,6 +289,41 @@ uncertain and are not automatically resent. This protects against duplicate
 personal messages; it does not promise exactly-once delivery after an
 indeterminate provider outcome.
 
+### Sendblue Typing Lifecycle
+
+Typing is an app-owned, durable Effect lifecycle rather than a process-local
+timer or scoped resource:
+
+```text
+authenticated + decoded + allowlisted + routed + replay-claimed inbound
+  -> SendblueChannel.transitionTyping(StartInbound)
+  -> SendblueClient.setTypingIndicator(state=start, bounded duration)
+  -> channel.state.typing = Pending
+  -> Eve send(...)
+  -> turn.started
+  -> provider-silent adoption as Active(turnId)
+  -> model/tool work
+  -> terminal visible message.completed
+  -> transitionTyping(StopTurn), bounded to two seconds
+  -> existing replay-protected SendblueClient.sendMessage
+```
+
+`channel.state.typing` is the encoded `Idle | Pending | Active(turnId)`
+lifecycle. A missing field from a legacy conversation decodes to `Idle`;
+malformed auxiliary state is repaired without blocking final-message decoding.
+Same-turn replay, duplicate accepted-inbound start, idle stop, and stale
+terminal events are provider-silent. Authorization wait stops typing and an
+authorized continuation explicitly resumes it. Waiting, turn/session terminal,
+failure, and input events attempt cleanup; `session.failed` is best effort
+because Eve does not persist that callback's state mutation.
+
+Every real provider attempt emits one Schema-valid Effect observation with
+only command, outcome, attempted flag, safe reason/status, and elapsed time.
+No id, number, content, handle, URL, credential, provider body, or raw cause is
+logged. Sendblue `SENT` is API acceptance, not proof that the handset rendered
+the bubble. A failed typing call is fail-open for Eve and final delivery, and
+the provider maximum duration bounds cleanup if later callbacks do not run.
+
 ### Sendblue Configuration
 
 All values are app-owned Effect `Config`; secrets use `Config.redacted` and
@@ -310,7 +345,12 @@ BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX
 BUNDJIL_SENDBLUE_REPLAY_STORE_TTL_SECONDS
 BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS
 BUNDJIL_SENDBLUE_ALLOWED_SERVICES
+BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS
 ```
+
+`BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS` is non-secret, defaults to
+`120000`, and must decode as an integer from `1` through `300000`. Typing HTTP
+operations use a separate two-second timeout and no automatic retry.
 
 Replay storage prefers the two `BUNDJIL_SENDBLUE_REPLAY_STORE_*` credentials
 and otherwise uses the Vercel Marketplace `KV_REST_API_URL` and
@@ -331,19 +371,35 @@ bun run --filter @bundjil/agent build
 ```
 
 Production proof recorded the route matrix, a fail-closed `503` replay-store
-fixture, one provider-originated inbound to one `DELIVERED` outbound, a
-15-event replay through waiting, one private proxy completion, and real-provider
-replay suppression. It retained only sanitized status/count evidence and had
-no sensitive-value or credential-marker log hits. The Preview proof is retained
-as historical evidence.
+fixture, real-provider replay suppression, and the accepted typing lifecycle on
+READY deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb`. One authenticated
+fixture returned `202`; `StartInbound` began about 0.8 seconds after ingress and
+completed in 60 ms, `turn.started` made no duplicate provider request,
+`StopTurn` completed in 78 ms, and one final iMessage reached `DELIVERED`
+without downgrade or error. The user separately confirmed the visible handset
+bubble. Evidence retains only sanitized statuses, counts, timings, and leak
+booleans. The Preview lifecycle proof is retained as historical evidence and
+Preview has no provider ingress.
+
+Monitor counts of `StartInbound`, `ResumeTurn`, `StopTurn`, `started`,
+`stopped`, and `unavailable` observations, plus their safe reasons and elapsed
+times. A rise in `unavailable`, missing stops, final-message errors, duplicate
+outbound delivery, Preview ingress, or more than one registered receive webhook
+is an incident. Do not inspect message content or identifiers to establish
+typing health.
 
 Rotate the Vercel bypass and Sendblue webhook secret independently in their
 provider/operator stores, update the corresponding encrypted environment
-values, redeploy, then update the provider webhook. Production rollback order
-is: remove the Production receive webhook, revoke its dedicated automation
-bypass, restore the retained agent deployment, then remove Production Sendblue
-variables. Do not restore Preview ingress on the shared account/line; an
-emergency cutover first disables Production ingress and is time-bounded.
+values, redeploy, then update the provider webhook. For a typing-only
+regression with healthy final delivery, restore the retained pre-typing READY
+agent deployment at the stable alias; the provider maximum duration bounds any
+outstanding bubble. Do not change the receive webhook, route secret, replay
+namespace, or account auto-typing setting for that rollback. Full channel
+deactivation order remains: remove the Production receive webhook, revoke its
+dedicated automation bypass, restore the retained agent deployment, then remove
+Production Sendblue variables. Do not restore Preview ingress on the shared
+account/line; an emergency cutover first disables Production ingress and is
+time-bounded.
 
 ## Environment
 

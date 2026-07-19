@@ -1,6 +1,6 @@
 # Sendblue Typing Indicators Implementation Plan
 
-Status: In Progress
+Status: Complete
 
 Spec: `docs/product-specs/sendblue-typing-indicators.md`
 Task ledger: `docs/product-specs/sendblue-typing-indicators.tasks.json`
@@ -13,10 +13,11 @@ Effect-quality/helper-admission, and verification/evidence audits, record at
 least three accepted passes in `passEvidence`, and commit only after the slice
 passes.
 
-Credentials stay in 1Password, Vercel encrypted bindings, and the existing
-Sendblue Config boundary. Plans, tests, output, commits, logs, and proof retain
-no message content, full phone number, credential, protected URL, provider
-handle, raw provider body, or raw exception.
+Credentials stay in provider/operator stores, Vercel encrypted bindings,
+gitignored local operator configuration, and the existing Sendblue Config
+boundary. Plans, tests, output, commits, logs, and proof retain no message
+content, full phone number, credential, protected URL, provider handle, raw
+provider body, or raw exception.
 
 ## Baseline
 
@@ -27,8 +28,9 @@ handle, raw provider body, or raw exception.
 - The shared account has exactly one active receive webhook at the stable
   Production route; Preview has no active shared-line ingress or dedicated
   Sendblue bypass.
-- Current behavior sends only terminal visible `message.completed` text and
-  has no outbound typing operation.
+- Baseline behavior sent only terminal visible `message.completed` text. The
+  completed rollout now starts one bounded indicator at accepted inbound,
+  adopts it on `turn.started`, and attempts cleanup before final delivery.
 - Installed Eve is `0.20.0`; its typed channel events include the complete
   lifecycle required by the SPEC.
 
@@ -98,14 +100,14 @@ Status: Completed
 
 - Split core conversation state from auxiliary channel typing state so corrupt
   typing data cannot block final-message delivery.
-- Add `Idle | Active(turnId)` with an encoded-side Effect decoding default for
-  existing continuations and keep the raw Eve adapter explicitly typed as the
-  Schema encoded form.
+- Add `Idle | Pending | Active(turnId)` with an encoded-side Effect decoding
+  default for existing continuations and keep the raw Eve adapter explicitly
+  typed as the Schema encoded form.
 - Treat `Active` as a conservative cleanup obligation: failed start/stop
   outcomes remain eligible for later terminal cleanup, and only a successful
   stop records `Idle`.
 - Project events through one public typed event-map seam and one exhaustive
-  `StartTurn | ResumeTurn | StopTurn` domain transition Effect.
+  `StartInbound | StartTurn | ResumeTurn | StopTurn` domain transition Effect.
 - Stop for authorization wait, force a same-turn resume only after an
   `authorized` completion, and treat `session.failed` cleanup as best effort
   without a durable-state assertion.
@@ -148,7 +150,7 @@ Status: Completed
 
 ### 6. Bounded Production proof
 
-Status: In Progress
+Status: Completed
 
 - The first Production deployment failed during `eve build` before traffic
   replacement because the existing Codex proxy path decoded a redacted token
@@ -227,17 +229,18 @@ Status: In Progress
   `2026-07-19T21:53:54.944Z`; `StartInbound` started in 60 ms at
   `21:53:55.746Z`, no `StartTurn` provider observation appeared, and
   `StopTurn` stopped in 78 ms at `21:54:25.548Z`. Sendblue readback shows one
-  final `DELIVERED` iMessage with no downgrade or error. Runtime/provider proof
-  is accepted; direct handset visibility of this earlier window remains the
-  final user-observation gate.
-- Promote only from accepted clean Preview source.
-- Retain the sole Production webhook and all existing routing/config policy.
-- Reconcile one handset observation against sanitized provider/runtime counts;
-  stop and record rollback if the window fails.
+  final `DELIVERED` iMessage with no downgrade or error.
+- The user directly confirmed that the earlier typing bubble was visible on the
+  handset. This closes the distinct rendering gate; visibility is not inferred
+  from provider `SENT`.
+- Provider inventory retained one signed receive webhook at the stable
+  Production route, zero Preview or immutable targets, and account-level auto
+  typing remained false. The retained prior READY deployment remains the
+  rollback target.
 
 ### 7. Documentation and closure
 
-Status: Planned
+Status: Completed
 
 - Update `ARCHITECTURE.md`, root/app READMEs, docs index, Eve architecture, and
   historical Sendblue SPEC only after Production acceptance.
@@ -247,15 +250,23 @@ Status: Planned
   lint/static configs, skills, production preflight, Vercel variable mutation,
   manifests/lock/changesets, generated output, React, database, webhook, and
   provider-account surfaces.
+- Final Effect review found no production `any`, unsafe cast, DTO mirror,
+  manual JSON, direct `process.env`, raw `fetch`, `instanceof`, timer, Ref,
+  module Map, provider SDK leakage, broad suppression, pass-through service, or
+  unowned helper. The app-owned Schema/Context/Layer/Config/Match boundaries
+  remain the only implementation owners.
 
 ## Production Call Graph Target
 
 ```text
 accepted Sendblue inbound
+  -> SendblueChannel.transitionTyping(StartInbound)
+  -> SendblueClient.setTypingIndicator(Start, bounded duration)
+  -> channel.state.typing = Pending
+  -> Eve send(...)
   -> Eve turn.started
   -> SendblueChannel.transitionTyping(StartTurn)
-  -> SendblueClient.setTypingIndicator(Start, bounded duration)
-  -> Sendblue provider expiring typing state
+  -> provider-silent adoption as Active(turnId)
   -> Eve model/tool work
   -> terminal message.completed
   -> SendblueChannel.transitionTyping(StopTurn)
@@ -367,3 +378,43 @@ verify one normal Production message without typing before further work.
   and zero error; candidate logs had zero warning/error/fatal records and the
   Production proof window had zero webhook/error records. No protected or
   generated artifact remained in the tracked worktree.
+- 2026-07-19: `stabilize-production-codex-proxy-build` completed three parent
+  passes after a pre-traffic Eve build exposed a cross-bundle Effect Redacted
+  registry boundary. The app now owns the redacted proxy-token Schema; both
+  model modes, focused tests, all root gates, and a clean READY Production
+  deployment passed without provider, credential, or Sendblue topology change.
+- 2026-07-19: `establish-production-handset-observation-window` and
+  `diagnose-production-sendblue-typing-visibility` completed three passes each.
+  Two short observations and one reversible account-auto-typing experiment did
+  not show a bubble even though runtime/provider/final delivery were healthy;
+  all were correctly rejected as handset proof. A later long user-run turn
+  visibly showed the bubble, proving that delayed Workflow startup and short
+  observation duration—not first-token timing or provider incompatibility—were
+  the relevant boundary. Account auto typing was restored to false and the
+  ignored support packet was superseded.
+- 2026-07-19: `start-typing-at-accepted-inbound` completed three parent passes.
+  The first hosted draft exposed one duplicate provider start when an existing
+  Eve continuation retained `Idle`; that deployment was rejected. The corrected
+  exhaustive transition makes accepted inbound the sole initial start owner and
+  makes `turn.started` provider-silent for `Pending`, retained `Idle`, and older
+  `Active`. Root verification passed with 78 agent tests. Clean revision
+  `5baa362` produced READY deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb`;
+  one authenticated `202` produced `StartInbound` in 60 ms about 0.8 seconds
+  after ingress, no `StartTurn` provider attempt, `StopTurn` in 78 ms, and one
+  final `DELIVERED` iMessage without error or downgrade.
+- 2026-07-20: `prove-sendblue-typing-production` completed three parent passes.
+  The user directly confirmed that the earlier handset bubble was visible,
+  closing the evidence gate independently of Sendblue `SENT`. Provider
+  inventory retained exactly one signed stable Production receive webhook,
+  zero Preview targets, and account-level auto typing disabled. The retained
+  prior READY deployment remains the rollback candidate.
+- 2026-07-20: `reconcile-sendblue-typing-documentation` completed its ownership
+  Effect-quality, and verification passes. Current architecture, root/app
+  READMEs, docs index, historical channel SPEC, this SPEC, ledger, and plan agree on
+  accepted-inbound start, encoded `Idle | Pending | Active` state,
+  provider-silent turn adoption, authorization resume, sanitized observations,
+  two-second fail-open operations, stop-before-send ordering, and distinct
+  provider/runtime/handset evidence. Focused typecheck, 43 Sendblue tests, and
+  an Eve build passed; final check and Knip passed, verification passed 7/7
+  typechecks plus 11/11 test tasks including 78 agent tests, and build passed
+  7/7 workspaces. JSON/status/stale/static/leak/code-fence/diff checks passed.

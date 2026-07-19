@@ -1150,7 +1150,9 @@ it.effect(
         outcome: "started",
         providerAttempted: true,
       });
-      const serialized = JSON.stringify(observations);
+      const serialized = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
+        observations
+      );
       for (const protectedValue of [
         "protected-turn-id",
         "+14155550100",
@@ -1201,7 +1203,7 @@ it.effect("observes state repair without claiming a provider attempt", () => {
     ]);
     assert.deepStrictEqual(levels, ["Warn"]);
     assert.notInclude(
-      JSON.stringify(observations),
+      Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(observations),
       "protected-state-invalid-turn"
     );
   }).pipe(

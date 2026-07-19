@@ -105,9 +105,10 @@ no Production write is an acceptance step.
 
 `apps/agent` owns the Sendblue custom Eve channel, including its Effect Schema
 contracts, redacted Config, explicit Layers, authentication, identity policy,
-opaque routing, replay claims, and provider client. The one active shared-line
-route is `POST /eve/v1/sendblue/webhook` on stable Production. The Preview
-deployment remains only as historical evidence and has no Sendblue ingress.
+opaque routing, replay claims, bounded typing lifecycle, and provider client.
+The one active shared-line route is `POST /eve/v1/sendblue/webhook` on stable
+Production. The Preview deployment remains only as historical evidence and has
+no Sendblue ingress.
 
 Sendblue authenticates at the route with its shared `sb-signing-secret` header,
 not a body HMAC. Vercel's bypass is separate platform authentication and does
@@ -116,17 +117,25 @@ dispatched; ignored or duplicate events receive `200`, malformed authenticated
 input gets `400`, failed route authentication gets `401`, unavailable durable
 claims get `503`, and accepted dispatch gets `202`.
 
-Production evidence records one provider-originated inbound, a 15-event Eve
-replay through `session.waiting`, one private proxy completion, and one
-`DELIVERED` outbound. A provider replay was suppressed without another
-dispatch, proxy completion, or delivery. The shared account now has one active
-Production receive webhook; Preview dual-webhook evidence is historical and
-its Sendblue-specific bypass is revoked. Route probes, durable replay fixtures,
-inventories, and leak scans are recorded only as sanitized status/count
-evidence. The corrected topology is accepted: one bounded handset window had
-one Production inbound and delivered outbound, zero Preview requests, and a
-single Production tool-use turn whose broader Executor catalog was confirmed
-on the handset. See
+After an inbound is authenticated, decoded, allowlisted, routed, and durably
+claimed, the channel sends one bounded typing start before Eve dispatch and
+persists `Pending`. Eve `turn.started` adopts that obligation as
+`Active(turnId)` without another provider request. Terminal visible delivery
+attempts a bounded stop before the existing replay-protected final message;
+waiting, failure, completion, input, and authorization events provide cleanup
+or resume behavior. Typing is best-effort and cannot block Eve work or the
+final reply.
+
+Accepted Production evidence for clean deployment
+`dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb` records one authenticated `202`, one
+successful `StartInbound` about 0.8 seconds after ingress, no duplicate
+`StartTurn` provider call, one successful `StopTurn`, and one `DELIVERED`
+iMessage without downgrade or error. The user separately confirmed the
+typing bubble was visible; provider `SENT` alone is not treated as handset
+proof. The shared account has one active Production receive webhook,
+account-level auto typing remains disabled, and Preview dual-webhook evidence
+is historical. Route probes, durable replay fixtures, inventories, and leak
+scans retain only sanitized status/count evidence. See
 [`apps/agent/README.md`](./apps/agent/README.md) for configuration ownership,
 monitoring, and rollback. The earlier Preview proof remains historical.
 
