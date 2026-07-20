@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "taskId": "HGI-300",
   "sliceId": "HGI-300-S2",
-  "status": "accepted-pending-git-receipt",
+  "status": "accepted",
   "observedAt": "2026-07-21T00:30:57+01:00",
   "baseCommit": "8ae65faecddffeffa227cc473c8eaf28533691cb",
   "authority": "local Bundjil documentation writes and read-only local checks; no provider access, external planning, commit, or push",
@@ -87,10 +87,10 @@
   "rollback": "Restore only the bounded S2 README, routing, and audit changes; retain S1 routing, historical plans/ledgers, research, and provider state.",
   "limitations": [
     "No docs/runbooks/**, workflow/provider-authority, or docs/verification/** owner exists yet; S2 intentionally does not create those dependency-gated classes.",
-    "A scoped Git receipt and remote readback remain required before HGI-300 closes."
+    "The receipt proves documentation and Git publication only; later runbook, authority, verification, provider, and runtime claims require their own owners and evidence."
   ],
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is changed or proved."
   ],
-  "nextTrigger": "Commit the accepted HGI-300 semantic slice, record its exact Git identity and remote readback, then begin HGI-301."
+  "nextTrigger": "Use HGI-300-validation.json as the Git/readback receipt and begin HGI-301."
 }

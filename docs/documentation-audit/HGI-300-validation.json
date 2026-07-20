@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-300",
+  "status": "accepted",
+  "observedAt": "2026-07-21T00:39:41+01:00",
+  "authority": "local Bundjil documentation, Git commit, push to main, and read-only remote ref readback; no provider operation",
+  "baseCommit": "8ae65faecddffeffa227cc473c8eaf28533691cb",
+  "semanticCommit": "66b46834d19af671f4f1a93fcb928d5e463b36c4",
+  "semanticTree": "f7d4a32308722e04e94554d46ecd9cd486b67743",
+  "changedPathCount": 15,
+  "sortedChangedPathSha256": "e2f308a4714b65cb7ccfb9f17d2fa1106cfad9074556959433d118fca7ccd02f",
+  "changedPaths": [
+    "AGENTS.md",
+    "apps/agent/README.md",
+    "apps/codex-proxy/README.md",
+    "docs/README.md",
+    "docs/documentation-audit/HGI-300-S1-receipt.json",
+    "docs/documentation-audit/HGI-300-S2-receipt.json",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/corpus-inventory.json",
+    "docs/documentation-audit/link-report.json",
+    "docs/exec-plans/active/harness-governance-documentation.md",
+    "docs/product-specs/codex-terra-high-reasoning.md",
+    "docs/product-specs/harness-governance-documentation.md",
+    "packages/codex/README.md",
+    "packages/eve/README.md",
+    "packages/store/README.md"
+  ],
+  "checks": [
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "Two independent workers found one lifecycle router, truthful history/current/research separation and ledger provenance, concise tracked root/app/package READMEs, correct HGI-301 through HGI-310 routing, and explicit runbook, authority, and verification gaps."
+    },
+    {
+      "check": "corpus and link reproduction",
+      "status": "passed",
+      "result": "60 docs paths and 15 README paths reproduced the declared digests; 81 focused relative links resolved with zero missing targets."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "The accepted candidate passed the configured full bun run verification gate; the integrated docs-only corrections then passed bun run check, bun run check:skills, and git diff --check."
+    },
+    {
+      "check": "semantic commit identity",
+      "status": "passed",
+      "result": "Commit 66b4683 has parent 8ae65fa, tree f7d4a32, 15 declared paths, and the reproduced sorted-path digest."
+    },
+    {
+      "check": "remote readback",
+      "status": "passed",
+      "result": "After push and fetch, local HEAD and origin/main both resolved to 66b46834d19af671f4f1a93fcb928d5e463b36c4."
+    }
+  ],
+  "postcondition": "Bundjil HGI-300 has accepted semantic owners and immutable local/remote Git identity; HGI-301 is the next dependency-ready slice.",
+  "rollback": "Revert the closeout evidence commit, then semantic commit 66b46834d19af671f4f1a93fcb928d5e463b36c4; preserve research, completed history, and provider state.",
+  "limitations": [
+    "This receipt proves repository documentation and Git publication only.",
+    "HGI-303 runbooks, HGI-304 authority, and HGI-305 verification owners remain intentionally absent until their dependencies are satisfied."
+  ],
+  "nonClaims": [
+    "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is proved or changed."
+  ]
+}
