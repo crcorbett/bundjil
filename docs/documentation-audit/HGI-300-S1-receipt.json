@@ -56,14 +56,19 @@
   ],
   "checks": [
     {
+      "check": "scoped Git receipt",
+      "status": "passed",
+      "result": "Semantic commit 7b8fd35e0c54733a7960e7f7528e34f6c9a60d81 records the bounded route and move; correction commit 7a2adc81595bd798944389e1ac68bdbf8693f1f3 changes only the product-spec index to preserve distinct ledger/approval provenance. The Git receipt records both trees and path digests."
+    },
+    {
       "check": "fresh-context route retrieval",
       "status": "passed",
-      "result": "Reader found the sole lifecycle and architecture owners, active SPEC/plan, 11 completed plans, 12 completed ledgers, research/reference route, and explicit HGI-303/HGI-304 gaps; refused README/atlas provider actuality."
+      "result": "Reader found the sole lifecycle and architecture owners, active SPEC/plan, 11 completed plans, 12 historical ledgers whose task entries are completed but whose ledger/approval provenance remains distinct, research/reference route, and explicit HGI-303/HGI-304 gaps; refused README/atlas provider actuality."
     },
     {
       "check": "focused relative-link resolution",
       "status": "passed",
-      "result": "59 relative links across changed current routes; 0 missing targets."
+      "result": "60 relative links across changed current routes; 0 missing targets."
     },
     {
       "check": "receipt JSON parsing",
@@ -89,11 +94,11 @@
   "artifacts": [
     {
       "path": "corpus-inventory.json",
-      "sha256": "7cba4ddca2bdb4940ac4884f06322abf9cdc69e412056f43097dab37075a02fc"
+      "sha256": "c202ea96b639243677ba710d134fd4944d647f25206ed066a6cd5cae5e1faee3"
     },
     {
       "path": "link-report.json",
-      "sha256": "2a158cb2e30e01e231dfbdecf22e5308da287e22acf4bac4909e65c75bcd2c05"
+      "sha256": "d6486a97cb97faacb23c103dae39db5c2c2781bbe7fb62274fd68f30945c6442"
     }
   ],
   "rollback": "Revert only the bounded HGI-300-S1 commits; retain the historical atlas, completed plans/ledgers, research, and unrelated history.",
@@ -104,5 +109,5 @@
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is changed or proved."
   ],
-  "nextTrigger": "Commit the bounded semantic slice, record its immutable identity in an evidence-only follow-up, then push and read back origin/main."
+  "nextTrigger": "Commit the evidence-only receipt reconciliation, push both bounded commits, read back origin/main, and continue later HGI-300 semantic-owner slices."
 }

@@ -7,26 +7,29 @@
   "preChange": {
     "docsFiles": 44,
     "readmePaths": 11,
-    "completedTaskLedgers": 12,
+    "taskLedgersWithAllTaskEntriesCompleted": 12,
     "completedPlanInActiveRoute": 1
   },
   "postSlice": {
-    "docsFiles": 55,
+    "docsFiles": 56,
     "readmePaths": 15,
-    "readableDocsFiles": 55,
-    "sortedDocsPathSha256": "c48af2521394e9dad7940add19ab7fa116ecf705efea2dc421427df4f7e92aef",
+    "readableDocsFiles": 56,
+    "sortedDocsPathSha256": "8b61d9e5be32afbd48343defee0a0cf840ef3f81b906f59a63efe405aa851723",
     "sortedReadmePathSha256": "d1763ea57125e7e52af834b3396adc4bdbeb77f0e735585dfef73707a54497ef"
   },
   "docsByTopLevelBucket": {
     "README.md": 1,
     "architecture": 7,
-    "documentation-audit": 4,
+    "documentation-audit": 5,
     "exec-plans": 14,
     "product-specs": 27,
     "reference-repositories.md": 1,
     "research": 1
   },
-  "docsByExtension": { "json": 15, "md": 40 },
+  "docsByExtension": {
+    "json": 16,
+    "md": 40
+  },
   "classification": {
     "maintainerRouter": "docs/README.md",
     "architectureRoute": "docs/architecture/README.md",
@@ -35,7 +38,7 @@
     "activeSpec": "docs/product-specs/harness-governance-documentation.md",
     "activePlan": "docs/exec-plans/active/harness-governance-documentation.md",
     "completedPlans": "docs/exec-plans/completed/README.md; 11 retained completed plan files",
-    "completedLedgers": "12 sibling *.tasks.json ledgers contain only completed tasks and are inventoried by docs/product-specs/index.md",
+    "completedLedgers": "All task entries in 12 sibling *.tasks.json ledgers are completed; two ledger-level statuses are implemented and the Vercel ledger retains a historical granted approval, as inventoried by docs/product-specs/index.md.",
     "researchRoute": "docs/research/README.md",
     "rootReadmePolicy": "Product purpose, stable repo shape, routes, and local commands only; mutable provider/deployment proof removed.",
     "knownMissingOwners": [
@@ -50,5 +53,9 @@
   ],
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is proved."
-  ]
+  ],
+  "pathDigestProcedures": {
+    "docs": "find ./docs -type f | LC_ALL=C sort | shasum -a 256",
+    "readmes": "Union git ls-files and git ls-files --others --exclude-standard; retain existing README.md or */README.md paths; prefix ./; LC_ALL=C sort; shasum -a 256"
+  }
 }

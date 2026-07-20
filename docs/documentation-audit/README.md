@@ -17,6 +17,7 @@ Current HGI-300-S1 receipts:
 - [`corpus-inventory.json`](corpus-inventory.json)
 - [`link-report.json`](link-report.json)
 - [`HGI-300-S1-receipt.json`](HGI-300-S1-receipt.json)
+- [`HGI-300-S1-git-receipt.json`](HGI-300-S1-git-receipt.json)
 
 Counts prove path accounting only. Fresh-context retrieval and the semantic
 owner must support current-document claims.

@@ -17,7 +17,7 @@
     "docs/research/README.md",
     "docs/documentation-audit/README.md"
   ],
-  "relativeLinksChecked": 59,
+  "relativeLinksChecked": 60,
   "missingRelativeTargets": [],
   "successorChecks": [
     {
@@ -37,7 +37,7 @@
       "status": "explicit-gap"
     }
   ],
-  "postcondition": "All 59 relative links in changed current routes resolve; active/current, completed/history, research/reference, architecture, operations/proof gaps, and external actuality are distinctly routed.",
+  "postcondition": "All 60 relative links in changed current routes resolve; active/current, completed/history, research/reference, architecture, operations/proof gaps, and external actuality are distinctly routed.",
   "limitations": [
     "Focused changed-route checks do not prove every historical link or app/package runtime."
   ],
