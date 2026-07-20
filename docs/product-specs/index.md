@@ -18,14 +18,18 @@ context.
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
   HGI-300 is in progress.
+- [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
+  proposed; implementation and Preview subscription-endpoint proof are pending.
 
 ## Implemented or superseded history
 
-All entries in the twelve sibling ledgers' `tasks` arrays are `completed`.
-That does not flatten other fields: the Effect persistence and Effect Schema
-string-contract ledgers use ledger-level `status: implemented`, while the
-Vercel promotion ledger retains a historical `approval.status: granted` under
-its recorded scope. Those fields are provenance, not standing authority.
+Each of the twelve sibling ledger documents records a `tasks` array whose
+entries are `completed`. That array-level result does not mean the ledgers
+contain only task-completion fields: ten use ledger-level `status: completed`,
+the Effect persistence and Effect Schema string-contract ledgers use
+`status: implemented`, and the Vercel promotion ledger retains a historical,
+scoped `approval.status: granted`. These historical lifecycle and approval
+fields are provenance, not standing authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |

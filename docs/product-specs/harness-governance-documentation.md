@@ -35,16 +35,16 @@ bounded evidence, limitations, rollback, and exact Git identity.
 
 ## Tasks
 
-| Task                                                                                                                | State       | Acceptance owner                                                                          |
-| ------------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------- |
-| HGI-300 — lifecycle/router, current architecture, current intent, active/history correction, and root-proof removal | In progress | This SPEC, active plan, accepted receipts, fresh retrieval, verification, and Git receipt |
-| HGI-301 — retained corpus and decision reconciliation                                                               | Pending     | Explicit lifecycle/retention decisions                                                    |
-| HGI-302 — docs/lint/CI controls                                                                                     | Pending     | Executable checks with positive/negative fixtures                                         |
-| HGI-307 — local skill reconciliation                                                                                | Pending     | Repo skill source and policy tests                                                        |
-| HGI-303 — critical journeys and proof owners                                                                        | Pending     | `docs/verification/**` and artifact-matched evidence                                      |
-| HGI-304 — target-owned operational runbooks                                                                         | Pending     | `docs/runbooks/**`, authority, rollback, and escalation proof                             |
-| HGI-305 — docs-maintenance embedding                                                                                | Pending     | PRD/docs-maintainer change-impact contract                                                |
-| HGI-306 — repository closeout                                                                                       | Pending     | Accepted receipts and pushed commit identity                                              |
+| Task                                                                                                                                          | State       | Acceptance owner                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------- |
+| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and root-proof removal | In progress | This SPEC, active plan, accepted receipts, fresh retrieval, verification, and Git receipt |
+| HGI-301 — retained corpus and decision reconciliation                                                                                         | Pending     | Explicit lifecycle/retention decisions                                                    |
+| HGI-302 — docs/lint/CI controls                                                                                                               | Pending     | Executable checks with positive/negative fixtures                                         |
+| HGI-307 — local skill reconciliation                                                                                                          | Pending     | Repo skill source and policy tests                                                        |
+| HGI-303 — critical journeys and proof owners                                                                                                  | Pending     | `docs/verification/**` and artifact-matched evidence                                      |
+| HGI-304 — target-owned operational runbooks                                                                                                   | Pending     | `docs/runbooks/**`, authority, rollback, and escalation proof                             |
+| HGI-305 — docs-maintenance embedding                                                                                                          | Pending     | PRD/docs-maintainer change-impact contract                                                |
+| HGI-306 — repository closeout                                                                                                                 | Pending     | Accepted receipts and pushed commit identity                                              |
 
 ## Non-goals and authority
 
