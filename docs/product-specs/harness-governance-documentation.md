@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-documentation-owner
 last_reviewed: 2026-07-20
-review_trigger: acceptance or scope change in Bundjil HGI-300 through HGI-306
+review_trigger: acceptance or scope change in Bundjil HGI-300 through HGI-310
 ---
 
 # Harness-governance documentation
@@ -35,16 +35,19 @@ bounded evidence, limitations, rollback, and exact Git identity.
 
 ## Tasks
 
-| Task                                                                                                                                          | State       | Acceptance owner                                                                          |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------- |
-| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and root-proof removal | In progress | This SPEC, active plan, accepted receipts, fresh retrieval, verification, and Git receipt |
-| HGI-301 — retained corpus and decision reconciliation                                                                                         | Pending     | Explicit lifecycle/retention decisions                                                    |
-| HGI-302 — docs/lint/CI controls                                                                                                               | Pending     | Executable checks with positive/negative fixtures                                         |
-| HGI-307 — local skill reconciliation                                                                                                          | Pending     | Repo skill source and policy tests                                                        |
-| HGI-303 — critical journeys and proof owners                                                                                                  | Pending     | `docs/verification/**` and artifact-matched evidence                                      |
-| HGI-304 — target-owned operational runbooks                                                                                                   | Pending     | `docs/runbooks/**`, authority, rollback, and escalation proof                             |
-| HGI-305 — docs-maintenance embedding                                                                                                          | Pending     | PRD/docs-maintainer change-impact contract                                                |
-| HGI-306 — repository closeout                                                                                                                 | Pending     | Accepted receipts and pushed commit identity                                              |
+| Task                                                                                                                                    | State       | Acceptance owner                                                                               |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and README scope | In progress | This SPEC, active plan, bounded S1/S2 receipts, fresh retrieval, verification, and Git receipt |
+| HGI-301 — architecture reconciliation and fixed-ritual removal                                                                          | Pending     | Current architecture owners, contradiction checks, and fresh-context retrieval                 |
+| HGI-308 — provider, review, and control decisions                                                                                       | Pending     | Schema-valid decision records with explicit deferrals and inherited non-claims                 |
+| HGI-302 — docs policy and skill-mirror controls                                                                                         | Pending     | Executable docs/skill checks with positive and negative fixtures                               |
+| HGI-310 — documentation-maintenance skill                                                                                               | Pending     | Thin repo-local skill, semantic fixtures, and clean-clone validation                           |
+| HGI-303 — app-owned operational runbooks                                                                                                | Pending     | `docs/runbooks/**` with preconditions, authority, steps, evidence, rollback, and escalation    |
+| HGI-304 — workflow and provider authority                                                                                               | Pending     | Identity, operation, target, environment, duration, approval boundary, audit receipt, rollback |
+| HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Pending     | `docs/verification/**`, artifact-matched evidence, and context-legible commands                |
+| HGI-306 — feedback, controls, and continuous automation                                                                                 | Pending     | Earliest-owner enforcement, automation admission, durable state, proof, and escalation         |
+| HGI-307 — harness requalification and repository closeout                                                                               | Pending     | Fresh-worker evaluation, accepted receipts, and pushed commit identity                         |
+| HGI-309 — external-authority application                                                                                                | Deferred    | Separately approved provider operations and external readback                                  |
 
 ## Non-goals and authority
 
@@ -52,3 +55,9 @@ This campaign does not itself change or prove Vercel, Executor, Sendblue,
 Upstash, AI Gateway, deployment, webhook, credential, release, production, or
 external-consumer state. Those claims require current external readback under
 explicit authority and the target-owned runbook.
+
+HGI-300-S2 removes operator procedure and dated provider/deployment proof from
+app and package READMEs without creating premature runbook or verification
+owners. The retained completed SPEC/plan corpus preserves rollout provenance;
+it is not a substitute for the pending HGI-303 runbook, HGI-304 authority, or
+HGI-305 verification owners.
