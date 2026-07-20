@@ -21,7 +21,11 @@ context.
 
 ## Implemented or superseded history
 
-All twelve sibling task ledgers below contain only `completed` tasks.
+All entries in the twelve sibling ledgers' `tasks` arrays are `completed`.
+That does not flatten other fields: the Effect persistence and Effect Schema
+string-contract ledgers use ledger-level `status: implemented`, while the
+Vercel promotion ledger retains a historical `approval.status: granted` under
+its recorded scope. Those fields are provenance, not standing authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
