@@ -48,6 +48,7 @@ const configLayer = Layer.succeed(
     },
     routingKey: Redacted.make("routing-secret"),
     senderIdentities: { "+14155550100": "owner" },
+    typingMaxDurationMillis: 120_000,
     webhookSecret: Redacted.make("expected-secret"),
   })
 );

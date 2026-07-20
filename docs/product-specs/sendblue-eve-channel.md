@@ -2,7 +2,7 @@
 
 - Status: Complete - single Production ingress and handset path verified
 - Owner: `apps/agent`
-- Last reviewed: 2026-07-16
+- Last reviewed: 2026-07-20
 
 ## Decision
 
@@ -23,6 +23,20 @@ Sendblue calls its header value a signing secret, but the documented protocol
 is a shared secret copied into `sb-signing-secret`; it is not a body HMAC. The
 implementation must describe and test the real mechanism without claiming
 cryptographic body signing that the provider does not supply.
+
+## Later Typing Extension
+
+This document preserves the historical first channel slice, whose visible
+output was completed assistant text only. The completed follow-on
+[Sendblue Typing Indicators](./sendblue-typing-indicators.md) SPEC adds an
+app-owned Effect-typed lifecycle without changing this channel's authentication,
+identity, routing, replay, delivery, or single-Production-webhook ownership.
+After accepted inbound policy and replay claiming, the current channel starts a
+bounded provider indicator, persists `Pending`, adopts it as `Active(turnId)`
+on Eve `turn.started` without a duplicate request, and attempts a stop before
+terminal visible delivery. Provider `SENT` remains distinct from direct handset
+visibility; both runtime/provider evidence and explicit handset observation are
+recorded in the follow-on SPEC.
 
 ## Corrective Routing Decision
 
@@ -1011,14 +1025,11 @@ body signature, and that historical Preview proof did not authorize Production.
 
 ## Current Environment Ownership
 
-Production and Preview currently have app-owned Sendblue configuration,
-separate replay state, active receive webhooks, and dedicated automation
-bypasses, so the shared provider account currently fans out to both targets.
-The required corrective end state is one active Production receive webhook and
-one Production Sendblue automation bypass. Preview may retain encrypted values
-and immutable evidence for rollback/audit purposes, but its receive webhook and
-dedicated Sendblue bypass must become inactive before task acceptance.
-Production replay storage uses the app-owned
+Production and Preview retain app-owned Sendblue configuration and separate
+replay state, but the shared provider account has exactly one active receive
+webhook at the stable Production route and one Production Sendblue automation
+bypass. Preview retains immutable historical evidence only; its receive webhook
+and dedicated Sendblue bypass are inactive. Production replay storage uses the app-owned
 `BUNDJIL_SENDBLUE_REPLAY_STORE_*` URL/token bindings or the
 configured-environment Marketplace fallback; those credentials are distinct
 from Codex OAuth/profile/cipher storage. 1Password and Vercel own credential values. The

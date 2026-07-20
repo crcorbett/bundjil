@@ -7,6 +7,7 @@ import {
   loadAgentModelProviderConfig,
 } from "../agent/config.js";
 import {
+  AgentCodexProxyInternalToken,
   AgentModelId,
   createAgentModel,
   defaultAgentModel,
@@ -41,6 +42,13 @@ const encodeOpenAICompatibleGenerateResponse = Schema.encodeSync(
 
 it.effect("rejects an invalid branded agent model boundary", () =>
   Schema.decodeUnknownEffect(AgentModelId)("").pipe(Effect.flip, Effect.asVoid)
+);
+
+it.effect("rejects an empty Codex proxy internal token", () =>
+  Schema.decodeUnknownEffect(AgentCodexProxyInternalToken)("").pipe(
+    Effect.flip,
+    Effect.asVoid
+  )
 );
 
 it.effect("selects the Gateway model string by default", () =>

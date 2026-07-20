@@ -1,0 +1,442 @@
+{
+  "title": "Sendblue Typing Indicators Tasks",
+  "spec": "docs/product-specs/sendblue-typing-indicators.md",
+  "status": "completed",
+  "principles": [
+    "Start typing immediately after an inbound is authenticated, allowlisted, routed, and replay-claimed; adopt that pending lifecycle when Eve later produces turn.started.",
+    "Keep Chat SDK as a behavior reference; retain the app-owned Sendblue custom channel, client, Config, identity, and replay boundaries.",
+    "Model provider start/stop and domain StartInbound/StartTurn/ResumeTurn/StopTurn as separate canonical Effect Schema unions so method-command mismatches are unrepresentable.",
+    "Use Eve durable encoded channel state plus Sendblue's expiring provider state; never span serverless callbacks with a Ref, timer, Fiber, Resource, or scoped finalizer.",
+    "Typing failure is observable but fail-open: it never blocks model/tool work or the final replay-protected reply.",
+    "Do not enable account-level auto typing, register a Preview webhook, stream partial text, or add a generic presence abstraction.",
+    "Keep source and evidence free of retained content, full phone numbers, credentials, protected URLs, provider bodies, raw exceptions, and generated runtime artifacts."
+  ],
+  "globalVerification": [
+    "bun install --frozen-lockfile",
+    "bun run --filter @bundjil/eve-effect check-types",
+    "bun run --filter @bundjil/eve-effect test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run check",
+    "bun run knip",
+    "bun run verification",
+    "bun run build",
+    "git diff --check",
+    "Run agent build/test and root gates with the checked-in public synthetic Executor endpoint, the repository-documented ignored local config, or an equivalent sanitized CI fixture; classify a missing binding as an environment precondition and never print or commit protected values",
+    "Review Effect language-service diagnostics for every changed TypeScript file",
+    "Static scans find no unsafe casts, any, manual JSON, DTO mirrors, direct process.env, raw fetch, instanceof branching, module timers/fibers/Refs, provider SDK leakage, generic helpers, pass-through services, broad lint suppressions, or committed generated output",
+    "No React, TSX, visible route, provider webhook, account-level auto-typing, database migration, dependency/lockfile, shared package, or cross-channel abstraction change",
+    "Preview-first hosted proof uses no registered Preview Sendblue webhook; Production proof preserves the sole stable Production receive webhook",
+    "Sanitized leak scans cover source, tests, build output, runtime observations, provider proof, and documentation"
+  ],
+  "implementationImprovementAuditCounter": {
+    "requiredPassesPerTask": 3,
+    "description": "Before accepting each task, record distinct parent passes for ownership/call graph, Effect implementation/helper admission, and verification/evidence. Add passes until every lifecycle, durability, failure, privacy, Preview, or Production finding is resolved."
+  },
+  "tasks": [
+    {
+      "id": "stabilize-agent-ci-fixture",
+      "title": "Make the existing agent CI build reproducible",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Supply the public synthetic Executor endpoint required by Eve's synchronous connection import so the checked-in CI build and verification commands are executable without a credential.",
+      "implementationNotes": [
+        "Update only .github/workflows/ci.yml with job-level BUNDJIL_EXECUTOR_MCP_URL=https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model.",
+        "Do not add BUNDJIL_EXECUTOR_API_KEY, a GitHub secret, a real toolkit endpoint, or a fallback in application code.",
+        "Keep focused Executor Config tests rejecting missing, root, non-HTTPS, wrong-host, extra-query, and unsupported-mode endpoints."
+      ],
+      "mandatoryVerification": [
+        "With only the public synthetic endpoint set, bun run build and bun run verification pass from the repository root.",
+        "Workflow inspection proves Build and Verify inherit the public endpoint and no Executor credential is present.",
+        "bun run --filter @bundjil/agent test still proves invalid endpoint shapes fail closed.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The exact commands in .github/workflows/ci.yml are locally reproducible without a secret.",
+        "No runtime policy or Production/Preview configuration changes."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: the only runtime prerequisite change is job-level env in .github/workflows/ci.yml; the existing Build and Verify steps inherit the public endpoint, while Executor Config and application fallback policy remain unchanged.",
+          "Implementation quality and security: the diff adds exactly BUNDJIL_EXECUTOR_MCP_URL=https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model; it adds no API key, GitHub secret, real toolkit endpoint, application fallback, provider mutation, or unrelated helper.",
+          "Verification and evidence: with BUNDJIL_EXECUTOR_API_KEY explicitly absent, the focused executor Config suite passed 3/3, root build passed 7/7, root verification passed formatting, Knip, 7/7 typechecks and 11/11 test tasks, agent tests passed 13 files and 60 tests, and git diff --check passed."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "implement-typed-sendblue-indicator-client",
+      "title": "Implement the typed Sendblue indicator client",
+      "status": "completed",
+      "dependsOn": ["stabilize-agent-ci-fixture"],
+      "description": "Extend the existing app-owned Sendblue Schemas, Config, client service, memory Layer, tests, and Turbo build environment with one Schema-encoded typing operation.",
+      "implementationNotes": [
+        "Change apps/agent/agent/lib/sendblue/schemas.ts, config.ts, client.service.ts, memory.layer.ts, apps/agent/test/sendblue-config.test.ts, apps/agent/test/sendblue-client.test.ts, and turbo.json; established error-class files change only if the extended operation Schema forces a mechanical import/format edit. The required SendblueConfig field also permits one synthetic fixture insertion in each of sendblue-channel.test.ts, sendblue-replay-store.test.ts, and sendblue-security-identity.test.ts because full verification proved those canonical decoders otherwise fail before tests run.",
+        "Reuse E164PhoneNumber, SendblueConfigService, SendblueClient, FetchHttpClient, redacted credentials, and the three existing operation-discriminated client errors; do not add Sendblue or Chat SDK dependencies.",
+        "Add a provider input union where start requires max_duration_ms and stop excludes it, with branded duration 1..300000. Require decoded SENT or ERROR status even though the provider response field is optional.",
+        "Add BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS with Schema-decoded default 120000 and add the optional non-secret key to turbo.json @bundjil/agent#build.env in this task.",
+        "Implement SendblueClient.setTypingIndicator as one named flat Effect.fn operation using Effect HTTP Schema codecs, a separate two-second timeout, and no automatic retry.",
+        "Extend SendblueClientOperation with setTypingIndicator and reuse finite request, response, and delivery-uncertain reasons without retaining raw cause/body.",
+        "Extend the existing memory client; do not add a pass-through service, mapper, SDK wrapper, utility module, or barrel."
+      ],
+      "mandatoryVerification": [
+        "All contracts are app-owned Effect Schemas with types derived through typeof SchemaName.Type; no unsafe cast, DTO mirror, raw JSON, direct process.env, raw fetch, or wrapper is added.",
+        "Schema tests reject start without duration, stop with duration, arbitrary states, invalid E.164, 0, and 300001 while accepting 1 and 300000.",
+        "Client tests prove exact headers/bodies, SENT, missing status, ERROR, malformed response, 400/401/429/5xx, transport, and no retry.",
+        "The timeout test uses @effect/vitest TestClock.adjust(\"2 seconds\") and proves completion immediately after the bound without wall-clock sleep.",
+        "rg confirms the Config key in schemas/config/turbo; focused agent typecheck/test/build and root gates pass with no actionable Effect diagnostics.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "SendblueClient exposes one typed setTypingIndicator operation through live and memory Layers.",
+        "Invalid provider start/stop requests are unrepresentable after boundary decoding.",
+        "No new runtime dependency, provider/account mutation, or helper module is introduced."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: app-owned Schemas, Config, named client operation, and live/memory Layers remain inside agent/lib/sendblue; the provider task changes no Eve event, shared package, dependency, webhook, account setting, or runtime owner. Full verification justified three one-field synthetic Config fixture updates outside the initially named focused tests.",
+          "Effect quality and helper admission: setTypingIndicator is one named flat Effect operation over Effect HttpClient Schema codecs, redacted existing credentials, existing tagged errors, Match, a branded 1..300000 duration, Config default 120000, an explicit optional Never field that rejects stop durations under excess-key stripping, a separate two-second timeout, and no retry, raw client, generic use callback, unsafe cast, manual JSON, or new helper module.",
+          "Verification and evidence: pinned Sendblue generated source confirmed the optional response number is E.164; focused Config/client tests passed 14/14 and prove exact start/stop bodies and headers, SENT/missing/ERROR/malformed responses, 400/401/429/503, one transport attempt, two-second TestClock timeout, bounds, memory behavior, and preserved sendMessage coverage. Frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 66/66 agent tests, 7/7 builds, static scans, and diff checks passed with the Executor API key absent."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "wire-durable-eve-typing-lifecycle",
+      "title": "Wire the durable Eve typing lifecycle and observations",
+      "status": "completed",
+      "dependsOn": ["implement-typed-sendblue-indicator-client"],
+      "description": "Add corruption-safe durable transitions, countable sanitized observations, and installed Eve 0.20.0 event projection to the existing Sendblue channel.",
+      "implementationNotes": [
+        "Change apps/agent/agent/lib/sendblue/schemas.ts, channel.service.ts, apps/agent/agent/channels/sendblue.ts, apps/agent/test/sendblue-channel.test.ts, and apps/agent/test/sendblue-build-route.test.ts. Change live.layer.ts only if actual Layer composition changes.",
+        "Extract SendblueConversationState for the four routing fields and keep SendblueCompletedMessage.state on it so auxiliary corruption cannot block final delivery.",
+        "Add SendblueTypingIdle/Pending/Active and use Schema.withDecodingDefaultTypeKey(Effect.succeed(SendblueTypingIdle.make({}))). Type the Eve boundary as Schema.Codec.Encoded<typeof SendblueChannelState>.",
+        "Define SendblueTypingTransitionInput with raw state as Schema.Unknown plus a StartInbound | StartTurn | ResumeTurn | StopTurn command. Domain policy decodes core and full state separately, then constructs the provider request internally.",
+        "A missing typing key decodes to Idle. Malformed typing performs no provider call, returns Unavailable(stateInvalid, Idle), and is repaired by encoding/persisting Idle. Core corruption remains final delivery's independent routing failure.",
+        "Implement one flat SendblueChannel.transitionTyping Effect. Active is a conservative cleanup obligation; failed matching stop retains Active; successful stop returns Idle; same-turn StartTurn and idle/stale StopTurn are no-ops; ResumeTurn reissues start.",
+        "Create makeSendblueEveEvents(runtime) satisfying public ChannelEvents, pass it to defineChannel, and test it directly without a cast.",
+        "Map authorization.completed authorized to ResumeTurn; declined, failed, and timed-out do not restart. session.failed attempts non-throwing cleanup but never claims durable Idle persistence.",
+        "Attempt stop before final delivery and continue after success, failure, or two-second timeout. Tool-call completion remains active; deltas/reasoning make no provider call.",
+        "Define SendblueTypingObservation and emit exactly one Effect log observation per provider attempt with operation, command, outcome, providerAttempted, safe reason/status, and Clock elapsedMillis. StateInvalid emits providerAttempted=false; replay no-ops emit none. Never include ids, numbers, content, handles, URLs, credentials, bodies, or raw causes.",
+        "Do not use acquireRelease, Resource, forkScoped, Ref, timers, Maps, module fibers, observability services, exporters, dashboards, generic helpers, or new barrels."
+      ],
+      "mandatoryVerification": [
+        "Tests prove old missing-key decode, explicit undefined rejection, new encoding, encoded adapter mutation, and new-state decode through SendblueConversationState with typing stripped for rollback compatibility.",
+        "Tests prove malformed auxiliary state repairs to Idle without provider work and cannot block valid core final delivery; only malformed core state rejects delivery.",
+        "Tests prove start timing, replay behavior, stale protection, stop-before-send after timeout, tool continuation, terminal/wait/input cleanup, authorization stop/resume outcomes, and session.failed best effort.",
+        "Tests prove uncertain start/stop cleanup obligations, successful retry, and newer-turn supersession without stale cleanup stopping the new turn.",
+        "Logger substitution captures one Schema-valid observation per provider attempt, zero for replay no-op, stateInvalid with providerAttempted=false, exact TestClock timing, and no protected values.",
+        "Tests prove ignored, duplicate, malformed, unauthorized, unknown-sender, group, SMS/RCS, media-only, delta, and reasoning paths make no provider call.",
+        "Unit tests assert the exported event-map keys; bun run --filter @bundjil/agent build proves Eve discovery without claiming private handler metadata from /info.",
+        "Focused agent checks, root gates, static scans, and Effect language-service diagnostics pass.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "A deterministic accepted turn produces start -> bounded stop attempt -> final message in order.",
+        "Every lifecycle/replay path has an explicit typed transition and observation contract.",
+        "Typing or auxiliary-state failure cannot prevent the existing final reply."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: apps/agent remains the sole owner of the Sendblue conversation/typing Schemas, transition policy, encoded Eve adapter seam, observations, and tests. makeSendblueEveEvents covers all 15 installed Eve 0.20.0 events, only session.failed omits durable state writeback, and no shared package, live Layer composition, webhook, provider account, dependency, or generic presence abstraction changed.",
+          "Effect quality and helper admission: the parent review required and verified one Schema.Codec.Encoded channel-state type with narrow Object.assign mutation, Schema-derived commands, separate core/full state decoding, exhaustive Match over commands and lifecycle, conservative Active cleanup obligations, tagged existing provider failures, Effect Clock/logger observations, and no cast, production decodeSync, duplicate DTO, manual JSON, timer, scoped resource/fiber, Ref/Map, helper module, exporter, or raw cause. The same review found and corrected one unreachable nested test plus the missing direct corrupt-state adapter repair proof.",
+          "Verification and evidence: focused lifecycle/build-route tests passed 27/27; full agent tests passed 75/75; a fresh Eve build and post-build route-discovery test passed. Tests cover legacy/new/rollback state, explicit undefined rejection, encoded mutation and repair, replay/stale/newer-turn behavior, uncertain start/stop retry, authorization and terminal events, session.failed best effort, stop-before-send fail-open delivery, observations/timing/privacy, ignored inbound paths, all event keys, and build output. Formatting, Knip, 7/7 typechecks, 11/11 root test tasks, 7/7 builds, JSON/static/leak/diff checks passed with the Executor API key absent."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "establish-preview-workflow-version-boundary",
+      "title": "Establish a fresh Preview workflow version boundary",
+      "status": "completed",
+      "dependsOn": ["wire-durable-eve-typing-lifecycle"],
+      "description": "Correct the Preview acceptance procedure after the first fixture resumed a workflow pinned to its pre-feature deployment, then prove the literal legacy adapter state remains compatible with the new event seam.",
+      "implementationNotes": [
+        "Pinned Eve 0.20.0 source routes nested turn workflows to the latest deployment only when VERCEL_ENV is production; official Vercel Workflow versioning keeps Preview resumes on the deployment that started them.",
+        "Exercise the literal persisted four-field encoded adapter state through makeSendblueEveEvents, not only through direct Schema decoding or a freshly encoded SendblueChannelState fixture.",
+        "For the next immutable Preview only, replace the Preview routing key with a fresh ephemeral value before deployment so the allowlisted sender and line derive a continuation token that cannot resume an older workflow. Restore the exact prior project value immediately after deployment; the immutable deployment retains its snapshot.",
+        "Do not change Production configuration, the receive webhook, identity policy, replay service, or provider settings. Do not run a second fixture against the rejected deployment."
+      ],
+      "mandatoryVerification": [
+        "A focused regression test starts from the exact legacy four-field encoded state and proves start -> stop -> final message ordering plus persisted Active -> Idle transitions through the Eve event seam.",
+        "Pinned Eve source and current Vercel Workflow documentation independently confirm the Preview deployment-version boundary and Production latest-routing distinction.",
+        "Agent focused checks and all root verification gates pass with no protected value, fixture material, generated deployment output, or provider-topology change.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The rejected result is classified as an invalid Preview proof against old workflow code, not as a typing implementation failure.",
+        "The next immutable Preview procedure establishes an isolated fresh continuation namespace before its one acceptance fixture."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: decrypted hosted snapshots, one final Sendblue call, pinned Eve 0.20.0 workflow-runtime source, and current Vercel Workflow versioning agree that the rejected fixture resumed old Preview code. Eve's production-only deploymentId latest branch remains unchanged, and no Sendblue provider, webhook, identity, replay, or Production surface changed.",
+          "Effect quality and compatibility: the existing missing-key Effect Schema migration remains canonical. A new direct makeSendblueEveEvents regression removes typing from the encoded adapter state without a cast, then proves typed StartTurn and StopTurn provider operations, persisted Active then Idle state, and final-message ordering; no runtime workaround, DTO, unsafe decoder, helper, dependency, or source behavior was added.",
+          "Verification and evidence: focused agent typecheck and Sendblue channel tests passed 27/27; full verification passed formatting, Knip, 7/7 typechecks, and 11/11 test tasks; all 76 agent tests and 7/7 root builds passed. JSON and diff checks passed, generated output remained ignored, and the revised Preview procedure retains no credential or fixture material."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-sendblue-typing-preview",
+      "title": "Prove typing on an immutable Preview",
+      "status": "completed",
+      "dependsOn": ["establish-preview-workflow-version-boundary"],
+      "description": "Deploy clean source to Preview without provider ingress and prove the protected direct accepted-route lifecycle as an independent stop/go gate.",
+      "implementationNotes": [
+        "From the repository root run vercel deploy . --project bundjil-agent --scope cooper-corbetts-projects --yes; do not use eve deploy or --prebuilt.",
+        "Use retained encrypted Preview Config, no Sendblue receive webhook, a fresh project token, and vercel curl for protected /eve/v1 checks.",
+        "Create the minimal text and unique replay handle ephemerally in a trusted shell, pass the synthetic accepted-route body via stdin, discard it, and never print, retain, commit, or place it in shell history.",
+        "Update only this ledger and active plan with sanitized acceptance evidence after the gate passes.",
+        "The first immutable attempt on deployment dpl_58yvrpZMntTL6124tfduq3rqfoYo is rejected: one accepted turn completed and exactly one final outbound was delivered, but the continuation resumed a Preview workflow pinned to its pre-feature deployment. The four-field adapter snapshot and one Sendblue external-API call are evidence that the fixture exercised old code, not the candidate deployment."
+      ],
+      "mandatoryVerification": [
+        "Deployment is clean/source-correlated and no Preview webhook, dedicated bypass, account auto-typing, Production config, or protected output changes.",
+        "One Preview turn shows ordered Eve event kinds, exactly one start, one bounded stop, one final outbound, countable safe observations/timings, zero Production inbound, and no duplicate reply.",
+        "Provider SENT is recorded only as API acceptance; visible handset behavior is not claimed from Preview.",
+        "Fixture material and generated deployment output are absent from git status and leak scans.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "Preview acceptance is independently recorded before any Production deployment.",
+        "Preview retains zero shared-line provider ingress."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Deployment and topology: clean pushed revision cc2265f99a23ce8999aa5def7a4a4eb32239b07b produced READY Preview deployment dpl_J5mAzdxh5gxfGV4xV9x1tgfobYk7 through the canonical root vercel deploy command. The immutable deployment snapshotted a fresh Preview-only routing namespace and gateway model; the prior shared Preview provider/model/routing configuration was restored, the temporary gateway key was removed, Production was untouched, and no Preview Sendblue webhook was registered.",
+          "Lifecycle and provider proof: one protected health request returned 200 and the sole stdin fixture returned 202. New Workflow runs workflowEntry wrun_01KXX9DJP4VR1HYV2HGG5SBNGY and completed turnWorkflow wrun_01KXX9DNGCX7QCQRHFAYJ7RHB0 executed Eve 0.20.0 candidate steps. Decrypted safe projections show the canonical five-field adapter state with typing Idle at input, output, and turn-control handoff; runtime logs contain exactly one successful StartTurn and one successful StopTurn setTypingIndicator observation with no unavailable outcome.",
+          "Delivery, privacy, and negative evidence: bounded Sendblue readback returned exactly one matching outbound, status DELIVERED, zero inbound, zero duplicate outbound, and zero provider errors. Candidate logs contain one health 200, one webhook 202, five Workflow 200 requests, zero warnings/errors/fatals, and exactly the two sanitized typing observations. Production showed zero webhook and zero error records in the proof window; temporary env, fixture, link, and response files were removed and the tracked worktree remained clean."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "stabilize-production-codex-proxy-build",
+      "title": "Stabilize the existing Production Codex proxy build",
+      "status": "completed",
+      "dependsOn": ["prove-sendblue-typing-preview"],
+      "description": "Remove the cross-package Effect Redacted registry boundary exposed when Eve evaluates the existing Production Codex proxy model configuration during build, without changing provider topology or credentials.",
+      "implementationNotes": [
+        "The first Production deployment dpl_DaSfscJFEVopBdvVzFiopZquwzGq failed during eve build before traffic replacement with Effect's Unable to get redacted value guard; retained deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y remains live.",
+        "A synthetic local Eve build reproduces the failure only with BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy. The app decodes the secret through a RedactedFromValue Schema imported from @bundjil/codex-oauth, then reads it through the app bundle's Effect Redacted registry.",
+        "Keep the model-provider input Schema app-owned by defining the non-empty redacted proxy token beside AgentModelProviderConfig, and remove the now-unused app dependency on @bundjil/codex-oauth. Do not change the provider selection, URL, token, bypass, model, context window, Vercel variables, proxy package runtime contract, or Sendblue topology.",
+        "Do not weaken the secret to a plain string, add a cast, bypass Schema decoding, or expose a value in source, tests, logs, or evidence."
+      ],
+      "mandatoryVerification": [
+        "A synthetic local codex-proxy Eve build succeeds with non-secret fixture values and the public Executor endpoint.",
+        "Focused model-provider tests prove the local redacted contract still rejects empty credentials and produces the existing Codex proxy model configuration.",
+        "Agent checks and all root verification gates pass; static scans find no cross-package proxy-token Schema import, plain-text secret contract, cast, direct process.env, or protected value.",
+        "A new clean Production deployment becomes READY under the unchanged existing Production configuration before any handset fixture is sent.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The accepted source builds for both gateway Preview and existing Codex proxy Production modes.",
+        "Production traffic is replaced only by a READY deployment with no provider or credential topology change."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and call graph: synthetic Eve builds isolate the failure to the existing codex-proxy provider branch. AgentModelProviderConfig now owns its non-empty redacted proxy token beside its other app-owned model Config Schemas, the unused @bundjil/codex-oauth app dependency is removed, and the proxy app/package runtime, provider selection, Vercel variables, Sendblue topology, webhook, and retained live Production deployment remain unchanged.",
+          "Effect quality and local verification: the remediation preserves Schema.RedactedFromValue and Schema-derived typing, rejects an empty token, retains exhaustive provider matching, and adds no cast, plain secret string contract, direct process.env, decoder bypass, helper, or protected fixture. The previously failing synthetic codex-proxy Eve build and the gateway Eve build both pass; focused model-provider tests pass 4/4, all 77 agent tests pass, frozen install, formatting, Knip, 7/7 typechecks, 11/11 test tasks, 7/7 builds, JSON, static, and diff checks pass.",
+          "Hosted deployment and rollback: clean pushed revision 057e77bbd2b05edaa53eef1e714cb41bc316bf4f produced READY Production deployment dpl_JpF6mZqGXK1q4Dyd3L9Pf5xdccKi through the canonical root deploy command under the unchanged encrypted Production configuration. Vercel successfully built both app and Workflow surfaces, aliased the stable Production hostname only after READY, retained prior READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y as rollback, and no handset fixture was sent during remediation."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "establish-production-handset-observation-window",
+      "title": "Establish a continuous Production handset observation window",
+      "status": "completed",
+      "dependsOn": ["stabilize-production-codex-proxy-build"],
+      "description": "Reject the first otherwise healthy Production turn as handset-visibility evidence because the UI observer sampled before and after the transient bubble, then require continuous observation for one fresh user-confirmed turn.",
+      "implementationNotes": [
+        "The first confirmed Production message was sent at 2026-07-19T15:56:10.415Z. Messages showed the outgoing iMessage delivered and the final reply visible about 21889 ms later, while Sendblue readback showed one RECEIVED inbound and one DELIVERED outbound with zero errors.",
+        "Production runtime recorded one successful StartTurn provider attempt in 65 ms and one successful StopTurn provider attempt in 75 ms with no unavailable outcome, warning, error, fatal, or protected-field observation.",
+        "The automated UI snapshots landed around one second after send and at final reply, so no snapshot directly observed the transient bubble. Do not infer handset visibility from runtime/provider success and do not accept this window.",
+        "Retain the READY deployment and rollback candidate because runtime, provider, delivery, and topology evidence all passed; the rejection is an observation gap rather than a product or final-reply failure.",
+        "For the next user-confirmed message, begin one in-call Messages polling loop immediately after Return, inspect every fresh accessibility/screenshot state until reply, record only safe booleans and elapsed timing, and retain no screenshot or content."
+      ],
+      "mandatoryVerification": [
+        "The rejected window reconciles exactly one inbound, one accepted webhook, one successful start, one successful stop, one delivered outbound, one visible final reply, zero duplicates, zero errors, and zero Preview ingress.",
+        "The next observation procedure has no gap between confirmed send and final reply and keeps provider acceptance distinct from direct handset visibility.",
+        "No second message is sent without a fresh action-time user confirmation; no webhook, routing, replay, model, Executor, account, or Vercel variable changes.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The first window is explicitly rejected only as visible-bubble evidence and cannot be misreported as Production acceptance.",
+        "A continuous, privacy-safe observer is ready for the next bounded Production proof without a deployment or topology change."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Evidence and call graph: Sendblue readback, Vercel request logs, sanitized Effect observations, and Messages UI agree on one inbound, one webhook 202, Workflow 200s, StartTurn started in 65 ms, StopTurn stopped in 75 ms, one DELIVERED outbound, and one visible final reply at about 21889 ms. No provider/runtime/delivery failure or duplicate occurred.",
+          "Observation quality and privacy: the parent review rejects the first window because accessibility and screenshot states sampled around +1 s and +21.9 s but not continuously between them. Runtime success is not substituted for a visible bubble. The revised observer polls from the confirmed Return action through reply and records only visibility booleans and elapsed timing without retaining content, numbers, handles, URLs, or screenshots.",
+          "Rollback and topology: the READY deployment remains active because the only failure is missing direct UI evidence; final reply, provider operations, runtime status, and Sendblue delivery all passed. The prior READY deployment remains retained, the sole stable Production receive webhook is unchanged, Preview ingress is zero, and a fresh explicit user confirmation is required before the retry."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "diagnose-production-sendblue-typing-visibility",
+      "title": "Diagnose the apparently failed Production typing visibility boundary",
+      "status": "completed",
+      "dependsOn": ["establish-production-handset-observation-window"],
+      "description": "Record the continuously observed Production failure, restore the retained healthy deployment, and isolate whether Sendblue accepted but did not render the manual typing lifecycle before attempting a narrow fix-forward.",
+      "implementationNotes": [
+        "The second confirmed Production message was sent at 2026-07-19T16:51:04.966Z and observed continuously in Messages from about +1.1 seconds until the final reply at about +19.7 seconds. Thirty-one samples and direct user observation found no typing bubble.",
+        "Sendblue readback reconciled one RECEIVED iMessage inbound at 2026-07-19T16:51:06.489Z and one DELIVERED iMessage outbound at 2026-07-19T16:51:23.223Z with zero errors. Production runtime reconciled one webhook 202, Workflow 200s, StartTurn started in 65 ms, StopTurn stopped in 72 ms, providerAttempted true for both operations, and zero warning/error observations.",
+        "This is a failed Product acceptance case rather than another observation gap: provider acceptance, runtime completion, and final delivery do not substitute for the missing visible handset bubble.",
+        "Restore retained READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y through the stable Production alias before fix-forward work. Keep the sole Production webhook and all routing, secrets, model, replay, identity, Preview, and Sendblue account settings unchanged.",
+        "Use current official Sendblue documentation, installed source/types, sanitized provider readback, and bounded diagnostics to identify the narrowest supported correction. Do not enable account auto-typing or retain message, contact, number, URL, or screenshot content.",
+        "Production was rolled back successfully to READY deployment dpl_AzkNzhmEYL78PGcFUont8gVSjN4Y. The stable alias returned Eve health 200 ready, and Sendblue readback retained exactly one unique HTTPS receive webhook at the stable Production alias with one per-webhook secret and zero Preview or immutable targets.",
+        "A direct legacy start request against the same recent conversation omitted state and max_duration_ms, returned HTTP 200 with provider status SENT, and was observed continuously for 16 samples from about +0.5 seconds to +12.1 seconds. Accessibility and representative visual inspection found no bubble. A following explicit stop also returned HTTP 200 SENT.",
+        "Sendblue live evaluation and message metadata independently identify the recipient and recent one-to-one message as iMessage with no downgrade. The pinned and current official TypeScript client encode the same from_number, number, optional state, and optional max_duration_ms contract used locally.",
+        "Current official Sendblue guidance defines manual typing as best effort and states that SENT can occur without handset delivery. The initial bounded observations therefore stopped the rollout without claiming handset support or making a speculative repository correction.",
+        "After explicit user approval of that scope change, a reversible provider-native auto-typing experiment enabled the account setting through the direct API, sent one fresh one-to-one iMessage, and observed the complete handset window. Sendblue recorded one RECEIVED inbound at 2026-07-19T17:31:23.853Z and one DELIVERED outbound at 2026-07-19T17:31:41.264Z on the same contact and line with no error or downgrade, but all 36 frames from about +1.2 seconds through +28.7 seconds showed no typing bubble. The account setting was immediately restored to false with HTTP 200 OK, and all generated screenshots plus the temporary contact sheet were moved to Trash and removed from the observation path.",
+        "A later user-run long-response test visibly showed the iMessage typing bubble. Sendblue recorded one RECEIVED iMessage at 2026-07-19T21:26:06.168Z and one DELIVERED reply at 2026-07-19T21:26:50.126Z with no error or downgrade. Runtime recorded StartTurn started at 2026-07-19T21:26:16.559Z and StopTurn stopped at 2026-07-19T21:26:48.082Z. This supersedes the provider-failure hypothesis: the earlier tests were too short or sampled before the delayed lifecycle became visible.",
+        "The ignored support escalation packet under .local/evidence/sendblue-typing-support.md is superseded and must not be sent. The account-level auto-typing setting remains restored to false."
+      ],
+      "mandatoryVerification": [
+        "The failed window records continuous handset observation, one inbound, one webhook acceptance, one successful start attempt, one successful stop attempt, one delivered final reply, zero duplicates, zero Preview ingress, and zero provider/runtime errors without protected content.",
+        "The retained prior deployment becomes the stable Production target and returns healthy before further fix-forward testing; the sole Production webhook remains unchanged.",
+        "Provider-boundary diagnosis distinguishes API acceptance from handset rendering and is verified against current authoritative documentation and the exact local request encoder.",
+        "Any fix-forward remains Schema-encoded, Effect-typed, bounded, fail-open for final delivery, and covered by focused plus repository verification.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "Production is safely restored to the retained healthy deployment while the failed candidate remains available for evidence.",
+        "A supported root cause and verified narrow correction are ready for a fresh Production proof, or the rollout is explicitly stopped without claiming typing support."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Failure and rollback boundary: continuous Messages observation and direct user observation reject the candidate despite successful Effect observations and final delivery. The stable Production alias now resolves to the retained pre-typing READY deployment, Eve health returns 200 ready, and the sole signed Sendblue receive webhook remains unchanged with zero Preview or immutable targets.",
+          "Provider isolation: one direct legacy start removed Eve, Workflow, state, and max-duration variables yet returned HTTP 200 SENT without a visible bubble across 16 samples through +12.1 seconds; the safe stop also returned SENT. A separately approved provider-native auto-typing experiment likewise produced one healthy iMessage inbound and delivered reply but no bubble across the complete 36-frame window. Live Sendblue evaluation and route reconciliation confirm a one-to-one iMessage conversation, the same contact and line, and no downgrade, so neither the local lifecycle nor the manual request variant is the failing boundary.",
+          "Corrected conclusion: the later user-run long-response test visibly proved the bubble while runtime and provider readback reconciled one inbound, StartTurn, StopTurn, and delivered final reply. The missing-bubble diagnosis is superseded by an observation-duration and delayed-start diagnosis; the reversible auto-typing experiment remains restored to false and no support escalation is warranted."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "start-typing-at-accepted-inbound",
+      "title": "Start typing at the accepted inbound boundary",
+      "status": "completed",
+      "dependsOn": ["diagnose-production-sendblue-typing-visibility"],
+      "description": "Move the first typing request from Eve turn.started to the authenticated, allowlisted, routed, replay-claimed inbound boundary so the handset receives it before Workflow startup and model resolution.",
+      "implementationNotes": [
+        "Installed Eve 0.20.0 emits turn.started in emitTurnPreamble before message.received, model resolution, step.started, and model streaming. The current implementation therefore starts before first token, but the successful Production run shows about 10.4 seconds from Sendblue inbound receipt to StartTurn.",
+        "Extend the lifecycle to Idle | Pending | Active(turnId). StartInbound moves Idle to Pending with one provider start. Eve uses supplied state for a new conversation but retains its durable state on an existing continuation, so turn.started binds Pending, retained Idle, or an older Active value to Active(turnId) without any provider request.",
+        "Run StartInbound only after webhook authentication, event classification, sender authorization, routing, and replay claim succeed. Ignored, unauthorized, malformed, and duplicate events must make no provider call.",
+        "Pass the typed Pending state into Eve. If Eve rejects before acceptance, attempt a fail-open stop before releasing the replay claim for retry. Replay completion failure after Eve acceptance must not stop an active turn.",
+        "Keep provider max duration, stop-before-final-delivery, authorization resume, sanitized observations, sole Production webhook, and account-level auto-typing=false unchanged."
+      ],
+      "mandatoryVerification": [
+        "Schema and transition tests prove Pending encoding, StartInbound idempotence, Pending/Idle/older-Active binding to the current turn without a provider call, same-turn replay, and stop from Pending or Active.",
+        "Dispatch tests prove provider start occurs before Eve send, Eve receives Pending, rejected Eve dispatch attempts stop and releases the claim, and ignored/duplicate paths remain provider-silent.",
+        "Focused agent tests, full agent tests, build, root verification, static scans, Effect diagnostics, and git diff checks pass.",
+        "A fresh hosted proof shows the StartInbound observation near webhook acceptance, no duplicate StartTurn provider attempt, a visible handset bubble, one bounded stop, one delivered reply, and no topology or account-setting drift.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The typing request begins at accepted inbound rather than waiting for Workflow turn startup.",
+        "The durable lifecycle makes pre-turn ownership, turn adoption, and cleanup exhaustive without duplicate start requests.",
+        "Typing remains fail-open and cannot block Eve dispatch or final delivery."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Evidence and call graph: the successful user-run long-response window disproves provider failure. Installed Eve source emits turn.started before model resolution and streaming, while runtime timing shows the event about 10.4 seconds after provider receipt; the correct narrow seam is accepted inbound after authentication, allowlisting, routing, and replay claim.",
+          "Effect and state design: the implementation adds explicit Pending and StartInbound Schema variants, an Adopted transition, exhaustive Match branches, a typed handoff state for new Eve conversations, provider-silent turn binding for both new and resumed conversations, conservative cleanup obligations, and best-effort stop plus claim release if Eve rejects. No timer, Ref, raw fetch, unsafe cast, account setting, webhook, dependency, or shared abstraction is added. Hosted proof corrected the first draft after an existing Eve continuation retained Idle and exposed a duplicate StartTurn request.",
+          "Verification and hosted evidence: root formatting, Knip, 7/7 typechecks, 11/11 test tasks, 78/78 agent tests, JSON/static/diff checks, and clean Vercel builds passed. Corrected READY deployment dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb became the stable Production target. A direct authenticated fixture returned 202 at 2026-07-19T21:53:54.944Z; StartInbound started in 60 ms at 21:53:55.746Z, no StartTurn provider observation appeared, StopTurn stopped in 78 ms at 21:54:25.548Z, and one final iMessage reached DELIVERED with no downgrade or error. The user directly confirmed the earlier typing bubble was visible on the handset, closing the distinct rendering gate."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-sendblue-typing-production",
+      "title": "Prove one bounded Production handset lifecycle",
+      "status": "completed",
+      "dependsOn": ["start-typing-at-accepted-inbound"],
+      "description": "Promote accepted clean source without changing topology, then reconcile provider, runtime, and handset evidence for one bounded Production turn.",
+      "implementationNotes": [
+        "Do not change the sole Production webhook, route secret, bypass, replay namespace, identity map, model provider, Executor policy, Vercel Sendblue variables, or account auto-typing.",
+        "Send one minimal handset message and record only environment, deployment id, event kinds, counts, safe outcomes/statuses, timing, and leak booleans.",
+        "Separate provider API acceptance from explicit user observation of the visible bubble; retain no screenshot content, message text, number, or handle.",
+        "If the window fails or cannot be observed, record the rollback decision and do not start documentation closure. Update only ledger/plan evidence after acceptance."
+      ],
+      "mandatoryVerification": [
+        "Production remains the sole stable receive target and shows one inbound, one accepted turn, at least one start, at least one stop or bounded expiry, one final outbound, zero Preview ingress, and no duplicate/error/leak.",
+        "Runtime structured observations reconcile with provider counts and timings; handset observation is explicit and distinct from SENT.",
+        "A failed or unavailable stop never blocks the final reply and is bounded by max_duration_ms.",
+        "Rollback candidate remains retained and no protected value or generated artifact enters source/evidence.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "The Production handset shows a bounded typing bubble and receives exactly one final reply.",
+        "Provider/runtime/handset evidence agrees and Preview remains inactive."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Topology and call graph: clean revision 5baa362 produced READY deployment dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb at the stable Production alias. Provider inventory retained exactly one signed receive webhook at that stable route, no Preview or immutable target, and account-level auto typing remained false; no route, identity, replay, model, Executor, credential, or provider setting drift occurred.",
+          "Runtime, provider, and handset reconciliation: the authenticated fixture returned 202 at 2026-07-19T21:53:54.944Z, StartInbound began about 0.8 seconds after ingress and completed in 60 ms, turn.started produced no provider request, StopTurn completed in 78 ms, and Sendblue recorded exactly one final DELIVERED iMessage with no error or downgrade. The user separately and directly confirmed that the earlier typing bubble was visible, so handset rendering is not inferred from SENT.",
+          "Rollback, privacy, and verification: the retained prior READY deployment remains a rollback candidate, typing calls remain bounded and fail-open, Preview ingress stayed zero, and no message text, phone number, handle, protected URL, credential, provider body, screenshot, or generated deployment output entered tracked evidence. Focused tests and the full root verification/build gates passed before the accepted deployment."
+        ]
+      },
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-sendblue-typing-documentation",
+      "title": "Reconcile all current documentation and close the rollout",
+      "status": "completed",
+      "dependsOn": ["prove-sendblue-typing-production"],
+      "description": "Update every Change-required documentation surface from accepted implementation and hosted evidence, then close the SPEC, ledger, and plan.",
+      "implementationNotes": [
+        "Update ARCHITECTURE.md and docs/architecture/eve-agent.md current Production/test graphs with the typed seam, encoded state, authorization resume, observation, timeout, and stop-before-send behavior.",
+        "Index this SPEC and final status in docs/README.md. Add only a later-extension note to docs/product-specs/sendblue-eve-channel.md and preserve its first-slice history.",
+        "Update README.md Sendblue current state and apps/agent/README.md Config/default, lifecycle, runtime observation, hosted proof, monitoring, and rollback.",
+        "Finalize this SPEC, this ledger, and docs/exec-plans/active/sendblue-typing-indicators.md with sanitized evidence and statuses.",
+        "Do not edit package/proxy READMEs, architecture rule docs, lint configs, skills, production preflight, manifests, lockfile, changesets, generated output, React/UI, migrations, webhook, or provider-account settings unless the implementation produced contrary evidence."
+      ],
+      "mandatoryVerification": [
+        "Run rg -n 'Sendblue Typing Indicators|BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS' docs/README.md README.md apps/agent/README.md docs/product-specs and inspect every match for current or explicitly historical language.",
+        "Run rg -n 'message\\.completed.*outbound claim.*SendblueClient|Preview.*active.*Sendblue' ARCHITECTURE.md README.md apps/agent/README.md docs/architecture/eve-agent.md docs/product-specs/sendblue-eve-channel.md; update every current terminal-only or Preview-live claim and preserve only explicitly historical matches.",
+        "Run rg -n 'implementationImprovementAudit|passEvidence' docs/product-specs/sendblue-typing-indicators.tasks.json docs/exec-plans/active/sendblue-typing-indicators.md; implementationImprovementAudit may name the audit object, but evidence is stored only under passEvidence.",
+        "Docs distinguish historical first-slice/Preview evidence from current Production behavior and provider SENT from handset observation.",
+        "bun run check, bun run knip, bun run verification, bun run build, jq empty, link/code-fence inspection, stale scans, leak scans, git diff --check, and generated-artifact status checks pass.",
+        "All implementation tasks have completedPasses >= requiredPasses with distinct passEvidence and dependency/status consistency.",
+        "Record at least three parent audit passes in passEvidence."
+      ],
+      "completionCriteria": [
+        "Every Change-required surface matches accepted behavior and every N/A surface remains unchanged unless evidence is recorded.",
+        "The SPEC, ledger, and active plan close with no stale or protected evidence.",
+        "Current docs describe the verified bounded lifecycle and rollback."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "passEvidence": [
+          "Ownership and documentation graph: ARCHITECTURE.md, README.md, apps/agent/README.md, docs/README.md, docs/architecture/eve-agent.md, this SPEC/ledger/plan, and the historical Sendblue channel SPEC now describe accepted-inbound start, Pending-to-Active adoption, bounded stop-before-send, sanitized observations, sole Production ingress, and historical Preview evidence. Package/proxy READMEs, rule docs, lint config, skills, preflight, manifests, lockfile, UI, database, and provider topology remain unchanged.",
+          "Effect implementation audit: the final source keeps app-owned Schema-derived request, response, lifecycle, command, observation, and Config contracts; a named SendblueClient operation behind Context/Layer; an exhaustive Match transition; redacted credentials; Effect HTTP Schema codecs; Clock/logger observations; an encoded Eve adapter seam; and a two-second auxiliary timeout. Static review found no production any, unsafe cast, manual JSON, direct process.env, raw fetch, instanceof branch, timer, Ref, module Map, provider SDK leakage, DTO mirror, broad suppression, pass-through service, or unowned helper. Privacy assertions now encode unknown diagnostic values through Schema.UnknownFromJsonString rather than manual JSON.",
+          "Verification and closure: focused agent typecheck, four Sendblue suites with 43 tests, and a fresh Eve build passed. Final bun run check reported zero warnings/errors, bun run knip passed, bun run verification passed 7/7 typechecks and 11/11 test tasks including 13 agent files and 78 tests, and bun run build passed 7/7 workspaces. JSON parsing, dependency/status audit, stale scans, code-fence inspection, static/leak/generated-artifact checks, and git diff --check passed."
+        ]
+      },
+      "commitAfterPassing": true
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { Context, Effect, Layer, Match, Schema } from "effect";
+import { Clock, Context, Effect, Layer, Match, Option, Schema } from "effect";
 
 import { SendblueClient } from "./client.js";
 import type { SendblueClientError } from "./client.js";
@@ -12,9 +12,21 @@ import type {
 import { SendblueIdentityDirectory } from "./identity-directory.js";
 import { SendblueReplayStore } from "./replay-store.js";
 import {
+  SendblueChannelState,
+  SendblueConversationState,
   SendblueInboundMessage,
   SendblueReceivedStatusValue,
   SendblueSendMessageInput,
+  SendblueTypingActive,
+  SendblueTypingAdopted,
+  SendblueTypingIdle,
+  SendblueTypingObservation,
+  SendblueTypingPending,
+  SendblueTypingStarted,
+  SendblueTypingStopped,
+  SendblueTypingTransitionInput,
+  SendblueTypingUnchanged,
+  SendblueTypingUnavailable,
 } from "./schemas.js";
 import type {
   SendblueCompletedMessage as SendblueCompletedMessageType,
@@ -23,6 +35,11 @@ import type {
   SendblueInboundDispatchDecision,
   SendblueIgnoredReason,
   SendblueSendMessageInput as SendblueSendMessageInputType,
+  SendblueTypingEngaged as SendblueTypingEngagedType,
+  SendblueTypingIndicatorInput,
+  SendblueTypingTransition,
+  SendblueTypingTransitionInput as SendblueTypingTransitionInputType,
+  SendblueTypingUnavailableReason,
 } from "./schemas.js";
 import { SendblueSessionRouter } from "./session-router.js";
 import { SendblueWebhookVerifier } from "./webhook-verifier.js";
@@ -39,8 +56,13 @@ export interface SendblueChannelShape {
   >;
   readonly dispatchAcceptedInbound: (
     decision: SendblueInboundDispatchDecision,
-    send: Effect.Effect<void, SendblueRoutingError>
+    send: (
+      state: SendblueChannelState
+    ) => Effect.Effect<void, SendblueRoutingError>
   ) => Effect.Effect<void, SendblueReplayStoreError | SendblueRoutingError>;
+  readonly transitionTyping: (
+    input: SendblueTypingTransitionInputType
+  ) => Effect.Effect<SendblueTypingTransition>;
   readonly deliverCompletedMessage: (
     input: SendblueCompletedMessageType
   ) => Effect.Effect<
@@ -177,33 +199,11 @@ export const authorizeAndClaimInbound = Effect.fn(
           principalId: identity.principalId,
           sendblueNumber: config.fromNumber,
           senderNumber: inbound.from_number,
+          typing: SendblueTypingIdle.make({}),
         },
       })
     )
   );
-});
-
-export const dispatchAcceptedInbound = Effect.fn(
-  "SendblueChannel.dispatchAcceptedInbound"
-)(function* (
-  decision: SendblueInboundDispatchDecision,
-  send: Effect.Effect<void, SendblueRoutingError>
-) {
-  const replay = yield* SendblueReplayStore;
-  yield* send.pipe(
-    Effect.catchTag("SendblueRoutingError", (error) =>
-      replay.retryable(decision.claim).pipe(Effect.andThen(Effect.fail(error)))
-    )
-  );
-  return yield* replay
-    .complete(decision.claim)
-    .pipe(
-      Effect.catchTag("SendblueReplayStoreError", (completeError) =>
-        replay
-          .uncertain(decision.claim)
-          .pipe(Effect.andThen(Effect.fail(completeError)))
-      )
-    );
 });
 
 export const deliverCompletedMessage = Effect.fn(
@@ -296,6 +296,360 @@ export const deliverCompletedMessage = Effect.fn(
   );
 });
 
+type SendblueTypingAttempt =
+  | {
+      readonly _tag: "AttemptStart";
+      readonly lifecycle: SendblueTypingEngagedType;
+      readonly request: SendblueTypingIndicatorInput;
+    }
+  | {
+      readonly _tag: "AttemptStop";
+      readonly lifecycle: SendblueTypingEngagedType;
+      readonly request: SendblueTypingIndicatorInput;
+    }
+  | {
+      readonly _tag: "Noop";
+      readonly transition: SendblueTypingTransition;
+    };
+
+type SendblueTypingProviderOutcome =
+  | { readonly _tag: "Accepted" }
+  | {
+      readonly _tag: "Unavailable";
+      readonly reason: SendblueTypingUnavailableReason;
+      readonly status?: number;
+    };
+
+export const transitionTyping = Effect.fn("SendblueChannel.transitionTyping")(
+  function* (rawInput: SendblueTypingTransitionInputType) {
+    const input = yield* Schema.decodeUnknownEffect(
+      SendblueTypingTransitionInput
+    )(rawInput).pipe(Effect.orDie);
+    const idle = SendblueTypingIdle.make({});
+    const conversation = yield* Schema.decodeUnknownEffect(
+      SendblueConversationState
+    )(input.state).pipe(Effect.option);
+    const channelState = yield* Schema.decodeUnknownEffect(
+      SendblueChannelState
+    )(input.state).pipe(Effect.option);
+
+    if (Option.isNone(conversation) || Option.isNone(channelState)) {
+      const transition = SendblueTypingUnavailable.make({
+        lifecycle: idle,
+        outcome: "unavailable",
+        reason: "stateInvalid",
+      });
+      const observation = yield* Schema.decodeUnknownEffect(
+        SendblueTypingObservation
+      )({
+        command: input.command._tag,
+        elapsedMillis: 0,
+        operation: "setTypingIndicator",
+        outcome: transition.outcome,
+        providerAttempted: false,
+        reason: transition.reason,
+      }).pipe(Effect.orDie);
+      yield* Effect.logWarning(observation).pipe(
+        Effect.annotateLogs({ ...observation })
+      );
+      return transition;
+    }
+
+    const core = conversation.value;
+    const lifecycle = channelState.value.typing;
+    const config = yield* SendblueConfigService;
+    const attempt = Match.value(input.command).pipe(
+      Match.when({ _tag: "StartInbound" }, (): SendblueTypingAttempt => {
+        const pending = SendblueTypingPending.make({});
+        const start: SendblueTypingAttempt = {
+          _tag: "AttemptStart",
+          lifecycle: pending,
+          request: {
+            from_number: core.sendblueNumber,
+            max_duration_ms: config.typingMaxDurationMillis,
+            number: core.senderNumber,
+            state: "start",
+          },
+        };
+        return Match.value(lifecycle).pipe(
+          Match.when({ _tag: "Idle" }, (): SendblueTypingAttempt => start),
+          Match.when(
+            { _tag: "Pending" },
+            (current): SendblueTypingAttempt => ({
+              _tag: "Noop",
+              transition: SendblueTypingUnchanged.make({
+                lifecycle: current,
+                outcome: "unchanged",
+              }),
+            })
+          ),
+          Match.when(
+            { _tag: "Active" },
+            (current): SendblueTypingAttempt => ({
+              _tag: "Noop",
+              transition: SendblueTypingUnchanged.make({
+                lifecycle: current,
+                outcome: "unchanged",
+              }),
+            })
+          ),
+          Match.exhaustive
+        );
+      }),
+      Match.when({ _tag: "StartTurn" }, (command): SendblueTypingAttempt => {
+        const active = SendblueTypingActive.make({ turnId: command.turnId });
+        return Match.value(lifecycle).pipe(
+          Match.when(
+            { _tag: "Idle" },
+            (): SendblueTypingAttempt => ({
+              _tag: "Noop",
+              transition: SendblueTypingAdopted.make({
+                lifecycle: active,
+                outcome: "adopted",
+              }),
+            })
+          ),
+          Match.when(
+            { _tag: "Pending" },
+            (): SendblueTypingAttempt => ({
+              _tag: "Noop",
+              transition: SendblueTypingAdopted.make({
+                lifecycle: active,
+                outcome: "adopted",
+              }),
+            })
+          ),
+          Match.when(
+            { _tag: "Active" },
+            (current): SendblueTypingAttempt =>
+              current.turnId === command.turnId
+                ? {
+                    _tag: "Noop",
+                    transition: SendblueTypingUnchanged.make({
+                      lifecycle: current,
+                      outcome: "unchanged",
+                    }),
+                  }
+                : {
+                    _tag: "Noop",
+                    transition: SendblueTypingAdopted.make({
+                      lifecycle: active,
+                      outcome: "adopted",
+                    }),
+                  }
+          ),
+          Match.exhaustive
+        );
+      }),
+      Match.when({ _tag: "ResumeTurn" }, (command): SendblueTypingAttempt => {
+        const active = SendblueTypingActive.make({ turnId: command.turnId });
+        const resume: SendblueTypingAttempt = {
+          _tag: "AttemptStart",
+          lifecycle: active,
+          request: {
+            from_number: core.sendblueNumber,
+            max_duration_ms: config.typingMaxDurationMillis,
+            number: core.senderNumber,
+            state: "start",
+          },
+        };
+        return Match.value(lifecycle).pipe(
+          Match.when({ _tag: "Idle" }, (): SendblueTypingAttempt => resume),
+          Match.when({ _tag: "Pending" }, (): SendblueTypingAttempt => resume),
+          Match.when(
+            { _tag: "Active" },
+            (current): SendblueTypingAttempt =>
+              current.turnId === command.turnId
+                ? resume
+                : {
+                    _tag: "Noop",
+                    transition: SendblueTypingUnchanged.make({
+                      lifecycle: current,
+                      outcome: "unchanged",
+                    }),
+                  }
+          ),
+          Match.exhaustive
+        );
+      }),
+      Match.when(
+        { _tag: "StopTurn" },
+        (command): SendblueTypingAttempt =>
+          Match.value(lifecycle).pipe(
+            Match.when(
+              { _tag: "Idle" },
+              (current): SendblueTypingAttempt => ({
+                _tag: "Noop",
+                transition: SendblueTypingUnchanged.make({
+                  lifecycle: current,
+                  outcome: "unchanged",
+                }),
+              })
+            ),
+            Match.when(
+              { _tag: "Pending" },
+              (current): SendblueTypingAttempt => ({
+                _tag: "AttemptStop",
+                lifecycle: current,
+                request: {
+                  from_number: core.sendblueNumber,
+                  number: core.senderNumber,
+                  state: "stop",
+                },
+              })
+            ),
+            Match.when(
+              { _tag: "Active" },
+              (current): SendblueTypingAttempt =>
+                command.expectedTurnId !== undefined &&
+                command.expectedTurnId !== current.turnId
+                  ? {
+                      _tag: "Noop",
+                      transition: SendblueTypingUnchanged.make({
+                        lifecycle: current,
+                        outcome: "unchanged",
+                      }),
+                    }
+                  : {
+                      _tag: "AttemptStop",
+                      lifecycle: current,
+                      request: {
+                        from_number: core.sendblueNumber,
+                        number: core.senderNumber,
+                        state: "stop",
+                      },
+                    }
+            ),
+            Match.exhaustive
+          )
+      ),
+      Match.exhaustive
+    );
+
+    if (attempt._tag === "Noop") {
+      return attempt.transition;
+    }
+
+    const client = yield* SendblueClient;
+    const startedAt = yield* Clock.currentTimeMillis;
+    const providerOutcome = yield* client
+      .setTypingIndicator(attempt.request)
+      .pipe(
+        Effect.as<SendblueTypingProviderOutcome>({ _tag: "Accepted" }),
+        Effect.catchTags({
+          SendblueDeliveryUncertainError: (error) =>
+            Effect.succeed<SendblueTypingProviderOutcome>({
+              _tag: "Unavailable",
+              reason: error.reason,
+            }),
+          SendblueRequestError: (error) =>
+            Effect.succeed<SendblueTypingProviderOutcome>({
+              _tag: "Unavailable",
+              reason: error.reason,
+            }),
+          SendblueResponseError: (error) =>
+            Effect.succeed<SendblueTypingProviderOutcome>({
+              _tag: "Unavailable",
+              reason: error.reason,
+              status: error.status,
+            }),
+        })
+      );
+    const elapsedMillis = (yield* Clock.currentTimeMillis) - startedAt;
+    const transition = Match.value(providerOutcome).pipe(
+      Match.when({ _tag: "Unavailable" }, (unavailable) =>
+        SendblueTypingUnavailable.make({
+          lifecycle: attempt.lifecycle,
+          outcome: "unavailable",
+          reason: unavailable.reason,
+        })
+      ),
+      Match.when(
+        { _tag: "Accepted" },
+        (): SendblueTypingTransition =>
+          Match.value(attempt).pipe(
+            Match.when({ _tag: "AttemptStart" }, (start) =>
+              SendblueTypingStarted.make({
+                lifecycle: start.lifecycle,
+                outcome: "started",
+              })
+            ),
+            Match.when({ _tag: "AttemptStop" }, () =>
+              SendblueTypingStopped.make({
+                lifecycle: idle,
+                outcome: "stopped",
+              })
+            ),
+            Match.exhaustive
+          )
+      ),
+      Match.exhaustive
+    );
+    const observation = yield* Schema.decodeUnknownEffect(
+      SendblueTypingObservation
+    )({
+      command: input.command._tag,
+      elapsedMillis,
+      operation: "setTypingIndicator",
+      outcome: transition.outcome,
+      providerAttempted: true,
+      ...(transition._tag === "Unavailable"
+        ? { reason: transition.reason }
+        : {}),
+      ...(providerOutcome._tag === "Unavailable" &&
+      providerOutcome.status !== undefined
+        ? { status: providerOutcome.status }
+        : {}),
+    }).pipe(Effect.orDie);
+    yield* (
+      transition._tag === "Unavailable"
+        ? Effect.logWarning(observation)
+        : Effect.logInfo(observation)
+    ).pipe(Effect.annotateLogs({ ...observation }));
+    return transition;
+  }
+);
+
+export const dispatchAcceptedInbound = Effect.fn(
+  "SendblueChannel.dispatchAcceptedInbound"
+)(function* (
+  decision: SendblueInboundDispatchDecision,
+  send: (
+    state: SendblueChannelState
+  ) => Effect.Effect<void, SendblueRoutingError>
+) {
+  const replay = yield* SendblueReplayStore;
+  const typing = yield* transitionTyping({
+    command: { _tag: "StartInbound" },
+    state: decision.state,
+  });
+  const state = SendblueChannelState.make({
+    ...decision.state,
+    typing: typing.lifecycle,
+  });
+  yield* send(state).pipe(
+    Effect.catchTag("SendblueRoutingError", (error) =>
+      transitionTyping({
+        command: { _tag: "StopTurn" },
+        state,
+      }).pipe(
+        Effect.catchCause(() => Effect.void),
+        Effect.andThen(replay.retryable(decision.claim)),
+        Effect.andThen(Effect.fail(error))
+      )
+    )
+  );
+  return yield* replay
+    .complete(decision.claim)
+    .pipe(
+      Effect.catchTag("SendblueReplayStoreError", (completeError) =>
+        replay
+          .uncertain(decision.claim)
+          .pipe(Effect.andThen(Effect.fail(completeError)))
+      )
+    );
+});
+
 export const SendblueChannelLive = Layer.effect(
   SendblueChannel,
   Effect.gen(function* makeSendblueChannel() {
@@ -321,7 +675,14 @@ export const SendblueChannelLive = Layer.effect(
         ),
       dispatchAcceptedInbound: (decision, send) =>
         dispatchAcceptedInbound(decision, send).pipe(
+          Effect.provideService(SendblueClient, client),
+          Effect.provideService(SendblueConfigService, config),
           Effect.provideService(SendblueReplayStore, replay)
+        ),
+      transitionTyping: (input) =>
+        transitionTyping(input).pipe(
+          Effect.provideService(SendblueClient, client),
+          Effect.provideService(SendblueConfigService, config)
         ),
     });
   })

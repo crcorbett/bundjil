@@ -63,6 +63,10 @@ progress belongs in `exec-plans/active`.
   records the accepted Production promotion and corrected routing evidence.
 - [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) records the
   app-owned iMessage channel rollout.
+- [Sendblue Typing Indicators](./product-specs/sendblue-typing-indicators.md)
+  records the completed Effect-typed accepted-inbound lifecycle, durable
+  `Idle | Pending | Active` state, bounded cleanup, sanitized observations,
+  sole-Production-ingress topology, and direct handset proof.
 - [Executor MCP Connection](./product-specs/executor-mcp-connection.md) records
   the app-owned Executor connection and accepted Production policy evidence.
 - [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)

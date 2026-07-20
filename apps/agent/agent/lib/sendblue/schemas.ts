@@ -4,7 +4,7 @@ import {
   EveSessionId,
   EveTurnId,
 } from "@bundjil/eve";
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 export const E164PhoneNumber = Schema.String.check(
   Schema.isPattern(/^\+[1-9]\d{7,14}$/)
@@ -146,7 +146,10 @@ export const SendblueResponseErrorReason = Schema.Literals([
 export type SendblueResponseErrorReason =
   typeof SendblueResponseErrorReason.Type;
 
-export const SendblueClientOperation = Schema.Literal("sendMessage");
+export const SendblueClientOperation = Schema.Literals([
+  "sendMessage",
+  "setTypingIndicator",
+]);
 export type SendblueClientOperation = typeof SendblueClientOperation.Type;
 
 export const SendblueRequestErrorReason = Schema.Literal("requestEncoding");
@@ -158,6 +161,16 @@ export const SendblueDeliveryUncertainReason = Schema.Literals([
 ]);
 export type SendblueDeliveryUncertainReason =
   typeof SendblueDeliveryUncertainReason.Type;
+
+export const SendblueTypingIndicatorState = Schema.Literals(["start", "stop"]);
+export type SendblueTypingIndicatorState =
+  typeof SendblueTypingIndicatorState.Type;
+
+export const SendblueTypingIndicatorDurationMillis = Schema.Int.check(
+  Schema.isBetween({ maximum: 300_000, minimum: 1 })
+).pipe(Schema.brand("SendblueTypingIndicatorDurationMillis"));
+export type SendblueTypingIndicatorDurationMillis =
+  typeof SendblueTypingIndicatorDurationMillis.Type;
 
 export const SendblueOutboundEventCoordinates = Schema.Struct({
   sequence: NonNegativeInt,
@@ -226,13 +239,147 @@ export const SendblueIgnoredEvent = Schema.Struct({
 });
 export type SendblueIgnoredEvent = typeof SendblueIgnoredEvent.Type;
 
-export const SendblueChannelState = Schema.Struct({
+export const SendblueConversationState = Schema.Struct({
   conversationKey: SendblueConversationKey,
   principalId: SendbluePrincipalId,
   sendblueNumber: E164PhoneNumber,
   senderNumber: E164PhoneNumber,
 });
+export type SendblueConversationState = typeof SendblueConversationState.Type;
+
+export const SendblueTypingIdle = Schema.TaggedStruct("Idle", {});
+export type SendblueTypingIdle = typeof SendblueTypingIdle.Type;
+
+export const SendblueTypingPending = Schema.TaggedStruct("Pending", {});
+export type SendblueTypingPending = typeof SendblueTypingPending.Type;
+
+export const SendblueTypingActive = Schema.TaggedStruct("Active", {
+  turnId: EveTurnId,
+});
+export type SendblueTypingActive = typeof SendblueTypingActive.Type;
+
+export const SendblueTypingEngaged = Schema.Union([
+  SendblueTypingPending,
+  SendblueTypingActive,
+]);
+export type SendblueTypingEngaged = typeof SendblueTypingEngaged.Type;
+
+export const SendblueTypingLifecycle = Schema.Union([
+  SendblueTypingIdle,
+  SendblueTypingEngaged,
+]);
+export type SendblueTypingLifecycle = typeof SendblueTypingLifecycle.Type;
+
+export const SendblueChannelState = Schema.Struct({
+  ...SendblueConversationState.fields,
+  typing: SendblueTypingLifecycle.pipe(
+    Schema.withDecodingDefaultTypeKey(
+      Effect.succeed(SendblueTypingIdle.make({}))
+    )
+  ),
+});
 export type SendblueChannelState = typeof SendblueChannelState.Type;
+
+export const SendblueTypingUnavailableReason = Schema.Union([
+  SendblueRequestErrorReason,
+  SendblueResponseErrorReason,
+  SendblueDeliveryUncertainReason,
+  Schema.Literal("stateInvalid"),
+]);
+export type SendblueTypingUnavailableReason =
+  typeof SendblueTypingUnavailableReason.Type;
+
+export const SendblueTypingStarted = Schema.TaggedStruct("Started", {
+  lifecycle: SendblueTypingEngaged,
+  outcome: Schema.Literal("started"),
+});
+export type SendblueTypingStarted = typeof SendblueTypingStarted.Type;
+
+export const SendblueTypingAdopted = Schema.TaggedStruct("Adopted", {
+  lifecycle: SendblueTypingActive,
+  outcome: Schema.Literal("adopted"),
+});
+export type SendblueTypingAdopted = typeof SendblueTypingAdopted.Type;
+
+export const SendblueTypingStopped = Schema.TaggedStruct("Stopped", {
+  lifecycle: SendblueTypingIdle,
+  outcome: Schema.Literal("stopped"),
+});
+export type SendblueTypingStopped = typeof SendblueTypingStopped.Type;
+
+export const SendblueTypingUnchanged = Schema.TaggedStruct("Unchanged", {
+  lifecycle: SendblueTypingLifecycle,
+  outcome: Schema.Literal("unchanged"),
+});
+export type SendblueTypingUnchanged = typeof SendblueTypingUnchanged.Type;
+
+export const SendblueTypingUnavailable = Schema.TaggedStruct("Unavailable", {
+  lifecycle: SendblueTypingLifecycle,
+  outcome: Schema.Literal("unavailable"),
+  reason: SendblueTypingUnavailableReason,
+});
+export type SendblueTypingUnavailable = typeof SendblueTypingUnavailable.Type;
+
+export const SendblueTypingTransition = Schema.Union([
+  SendblueTypingStarted,
+  SendblueTypingAdopted,
+  SendblueTypingStopped,
+  SendblueTypingUnchanged,
+  SendblueTypingUnavailable,
+]);
+export type SendblueTypingTransition = typeof SendblueTypingTransition.Type;
+
+export const SendblueStartInbound = Schema.TaggedStruct("StartInbound", {});
+export type SendblueStartInbound = typeof SendblueStartInbound.Type;
+
+export const SendblueStartTurn = Schema.TaggedStruct("StartTurn", {
+  turnId: EveTurnId,
+});
+export type SendblueStartTurn = typeof SendblueStartTurn.Type;
+
+export const SendblueResumeTurn = Schema.TaggedStruct("ResumeTurn", {
+  turnId: EveTurnId,
+});
+export type SendblueResumeTurn = typeof SendblueResumeTurn.Type;
+
+export const SendblueStopTurn = Schema.TaggedStruct("StopTurn", {
+  expectedTurnId: Schema.optional(EveTurnId),
+});
+export type SendblueStopTurn = typeof SendblueStopTurn.Type;
+
+export const SendblueTypingLifecycleCommand = Schema.Union([
+  SendblueStartInbound,
+  SendblueStartTurn,
+  SendblueResumeTurn,
+  SendblueStopTurn,
+]);
+export type SendblueTypingLifecycleCommand =
+  typeof SendblueTypingLifecycleCommand.Type;
+
+export const SendblueTypingTransitionInput = Schema.Struct({
+  command: SendblueTypingLifecycleCommand,
+  state: Schema.Unknown,
+});
+export type SendblueTypingTransitionInput =
+  typeof SendblueTypingTransitionInput.Type;
+
+export const SendblueTypingObservation = Schema.Struct({
+  command: Schema.Literals([
+    "StartInbound",
+    "StartTurn",
+    "ResumeTurn",
+    "StopTurn",
+  ]),
+  elapsedMillis: NonNegativeInt,
+  operation: Schema.Literal("setTypingIndicator"),
+  outcome: Schema.Literals(["started", "stopped", "unavailable"]),
+  providerAttempted: Schema.Boolean,
+  reason: Schema.optional(SendblueTypingUnavailableReason),
+  status: Schema.optional(
+    Schema.Int.check(Schema.isBetween({ maximum: 599, minimum: 100 }))
+  ),
+});
+export type SendblueTypingObservation = typeof SendblueTypingObservation.Type;
 
 export const SendblueSendMessageInput = Schema.Struct({
   content: SendblueOutboundMessageContent,
@@ -259,6 +406,54 @@ export const SendblueSendMessageProviderResponse = Schema.Union([
 ]);
 export type SendblueSendMessageProviderResponse =
   typeof SendblueSendMessageProviderResponse.Type;
+
+export const SendblueTypingIndicatorStart = Schema.Struct({
+  from_number: E164PhoneNumber,
+  max_duration_ms: SendblueTypingIndicatorDurationMillis,
+  number: E164PhoneNumber,
+  state: Schema.Literal("start"),
+});
+export type SendblueTypingIndicatorStart =
+  typeof SendblueTypingIndicatorStart.Type;
+
+export const SendblueTypingIndicatorStop = Schema.Struct({
+  from_number: E164PhoneNumber,
+  max_duration_ms: Schema.optional(Schema.Never),
+  number: E164PhoneNumber,
+  state: Schema.Literal("stop"),
+});
+export type SendblueTypingIndicatorStop =
+  typeof SendblueTypingIndicatorStop.Type;
+
+export const SendblueTypingIndicatorInput = Schema.Union([
+  SendblueTypingIndicatorStart,
+  SendblueTypingIndicatorStop,
+]);
+export type SendblueTypingIndicatorInput =
+  typeof SendblueTypingIndicatorInput.Type;
+
+export const SendblueTypingIndicatorSuccess = Schema.Struct({
+  error_message: Schema.optional(Schema.NullOr(Schema.String)),
+  number: Schema.optional(E164PhoneNumber),
+  status: Schema.Literal("SENT"),
+});
+export type SendblueTypingIndicatorSuccess =
+  typeof SendblueTypingIndicatorSuccess.Type;
+
+export const SendblueTypingIndicatorProviderRejected = Schema.Struct({
+  error_message: Schema.optional(Schema.NullOr(Schema.String)),
+  number: Schema.optional(E164PhoneNumber),
+  status: SendblueProviderRejectedStatus,
+});
+export type SendblueTypingIndicatorProviderRejected =
+  typeof SendblueTypingIndicatorProviderRejected.Type;
+
+export const SendblueTypingIndicatorProviderResponse = Schema.Union([
+  SendblueTypingIndicatorSuccess,
+  SendblueTypingIndicatorProviderRejected,
+]);
+export type SendblueTypingIndicatorProviderResponse =
+  typeof SendblueTypingIndicatorProviderResponse.Type;
 
 export const SendblueReplayClaimStatus = Schema.Literals([
   "claimed",
@@ -384,7 +579,7 @@ export const SendblueCompletedMessage = Schema.Struct({
   message: Schema.NullOr(EveAssistantMessageContent),
   sequence: NonNegativeInt,
   sessionId: EveSessionId,
-  state: SendblueChannelState,
+  state: SendblueConversationState,
   stepIndex: NonNegativeInt,
   turnId: EveTurnId,
 });
@@ -419,6 +614,7 @@ export const SendblueConfig = Schema.Struct({
   }),
   routingKey: SendblueRoutingKey,
   senderIdentities: SendblueSenderIdentities,
+  typingMaxDurationMillis: SendblueTypingIndicatorDurationMillis,
   webhookSecret: SendblueWebhookSecret,
 });
 export type SendblueConfig = typeof SendblueConfig.Type;

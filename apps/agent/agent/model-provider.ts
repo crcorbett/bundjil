@@ -1,6 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { OpenAICompatibleProviderSettings } from "@ai-sdk/openai-compatible";
-import { OpenAICompatibleProxyInternalToken } from "@bundjil/codex";
 import type { LanguageModel } from "ai";
 import { Match, Redacted, Schema } from "effect";
 
@@ -21,6 +20,15 @@ export const AgentVercelProtectionBypass = Schema.RedactedFromValue(
 export type AgentVercelProtectionBypass =
   typeof AgentVercelProtectionBypass.Type;
 
+// Eve evaluates this configuration inside the agent bundle. Keeping the
+// Redacted schema app-owned avoids crossing Effect registry instances during
+// hosted builds.
+export const AgentCodexProxyInternalToken = Schema.RedactedFromValue(
+  Schema.NonEmptyString
+);
+export type AgentCodexProxyInternalToken =
+  typeof AgentCodexProxyInternalToken.Type;
+
 export const AgentModelProviderMode = Schema.Literals([
   "gateway",
   "codex-proxy",
@@ -38,7 +46,7 @@ export type AgentGatewayModelProviderConfig =
 
 export const AgentCodexProxyModelProviderConfig = Schema.Struct({
   baseURL: Schema.URL,
-  internalToken: OpenAICompatibleProxyInternalToken,
+  internalToken: AgentCodexProxyInternalToken,
   model: AgentModelId,
   modelContextWindowTokens: Schema.Int.check(Schema.isGreaterThan(0)),
   protectionBypass: Schema.optional(AgentVercelProtectionBypass),
