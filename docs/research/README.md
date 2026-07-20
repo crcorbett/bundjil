@@ -19,10 +19,11 @@ runbook, or SPEC owner rather than copying the report.
 - [Local reference repositories](../reference-repositories.md) describes
   ignored source checkouts. Those checkouts are references, never repository
   or provider authority.
-- [Alchemy ownership for Vercel and Sendblue](alchemy-vercel-sendblue-decision-report.md)
-  separates current repository evidence, upstream capability research, and the
-  seven bounded spikes and live read-only checks required before any
-  infrastructure SPEC or migration.
+- [Alchemy ownership for Vercel and messaging providers](alchemy-vercel-sendblue-decision-report.md)
+  separates repository, upstream, and live-provider truth; compares the
+  Sendblue and Photon lifecycle surfaces; and defines eight bounded spikes plus
+  the two-stage `prd-writer` boundary required before infrastructure ownership
+  or a messaging-provider migration.
 
 Failed or inconclusive research retains provenance, last successful step,
 observed state, limitations, non-claims, escalation, and resume trigger outside

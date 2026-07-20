@@ -4,15 +4,15 @@ lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
 last_reviewed: 2026-07-20
-review_trigger: Alchemy provider support, Vercel or Sendblue API, Bundjil deployment topology, or infrastructure SPEC changes
+review_trigger: Alchemy provider support, Vercel, Sendblue, or Photon API changes, Bundjil deployment topology, messaging-provider selection, or infrastructure SPEC changes
 ---
 
-# Alchemy ownership for Vercel and Sendblue
+# Alchemy ownership for Vercel and messaging providers
 
 ## Decision
 
-Adopt a **hybrid Alchemy model** after a dedicated infrastructure SPEC is
-accepted:
+Adopt a **hybrid Alchemy model** after an infrastructure proof SPEC and a
+messaging-provider decision are accepted:
 
 - Alchemy owns stable Vercel project configuration, domains, environment
   variable metadata and values, explicitly adopted Marketplace bindings, and
@@ -20,21 +20,29 @@ accepted:
 - Vercel Git integration continues to create immutable Preview and Production
   deployments. Promotion and rollback remain explicit CI/runbook operations;
   they are not ordinary convergent resources.
-- Alchemy owns one production-only Sendblue account webhook set after an
-  import-only proof. It defaults to retain and deletion protection. Preview
-  Sendblue ingress remains absent until it has a separate provider account and
-  line. A second line in the shared account is insufficient because webhooks
-  are account-level.
-- The Sendblue line inventory is read-only. Purchasing or provisioning a line
-  is outside the first implementation because the API uses a preview/confirm
-  flow and creates an account resource with cost and weak deletion semantics.
+- The current Sendblue runtime and production-only ingress remain unchanged
+  while the proof compares two provider paths. If Sendblue is retained,
+  Alchemy may own one adopted account webhook set, with retain and deletion
+  protection, while line/account lifecycle remains provider-owned. If Photon
+  is selected, separate production and preview Spectrum projects may support
+  project-scoped webhooks, lines, users, platform configuration, and billing
+  readback through custom resources.
+- Photon exposes materially stronger documented management lifecycles than
+  Sendblue, including stable line and webhook IDs and documented deletion. It
+  is the preferred provider candidate for a bounded spike, not an accepted
+  architecture decision. Its billable line creation lacks a documented
+  idempotency key, project deletion/secret rotation are currently CLI
+  contracts rather than complete public API contracts, and its runtime uses
+  the Spectrum SDK/webhook model rather than the current Sendblue HTTP channel.
 - A dedicated, remotely persisted Alchemy state backend is bootstrapped under
   separate authority. The site repository proves `Cloudflare.state()` works,
   but Bundjil must not silently share the site's stack identity or credentials.
 
 This report authorizes no provider operation. It is supporting research, not
-current implementation intent or live provider truth. Any implementation must
-begin with the `prd-writer` flow and then use `prd-implementer`.
+current implementation intent, provider selection, or live provider truth.
+Infrastructure proof must begin with `prd-writer`; a Photon migration would
+require a second provider-selection/channel-migration SPEC. Accepted SPECs are
+then implemented through `prd-implementer`.
 
 ## Truth and evidence boundaries
 
@@ -42,11 +50,12 @@ begin with the `prd-writer` flow and then use `prd-implementer`.
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | Bundjil repository            | Git `b38e39e2b3b2b93c611e58d34828c5c00fc8c06f` inspected on 2026-07-20; this report is a subsequent uncommitted documentation change | Declared routes, config contracts, package boundaries, historical provider notes, and verification ownership | Current Vercel, Sendblue, Upstash, DNS, secret, webhook, deployment, or alert state                        |
 | Site reference implementation | `/Users/cooper/Projects/site` at Git `93d48948efcea5e39fdcd7e934705cc1f7fcf577`, with an already-dirty working tree                  | Concrete Alchemy 2.0.0-beta.62 and Effect patterns in the files cited below                                  | A clean reproducible snapshot of unrelated dirty documentation/tooling, or a Bundjil-ready custom provider |
-| Upstream documentation        | Alchemy v2, Vercel, and Sendblue primary documentation read on 2026-07-20                                                            | Documented provider/resource and API capability at research time                                             | Tenant-specific availability, permissions, billing, IDs, quotas, or observed live values                   |
+| Upstream documentation        | Alchemy v2, Vercel, Sendblue, and Photon primary documentation and published OpenAPI read on 2026-07-20                              | Documented provider/resource and API capability at research time                                             | Tenant-specific availability, permissions, billing, IDs, quotas, or observed live values                   |
 | Live provider truth           | Not queried                                                                                                                          | Nothing                                                                                                      | Every current provider claim requiring readback                                                            |
 
-No Vercel, Sendblue, DNS, Upstash, secret, webhook, deployment, or other
-provider mutation was performed.
+No Vercel, Sendblue, Photon, DNS, Upstash, secret, webhook, deployment, or
+other provider mutation was performed. Photon findings are public-documentation
+truth only; no Photon tenant was queried.
 
 ## 1. Current Bundjil call graph and ownership
 
@@ -203,14 +212,14 @@ reads or idempotent writes.
 Reusable code should initially be copied with ownership-specific names and
 adapted, not imported from the site repository. Specifically reusable:
 
-| Site owner                                                                             | Bundjil adaptation                                                         |
-| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `alchemy.run.ts`                                                                       | root stack router and stage gate                                           |
-| `apps/web/src/lib/build/cloudflare-stack.ts`                                           | stable Bundjil stack/resource IDs and outputs                              |
-| `stacks/github.ts`                                                                     | separate bootstrap stack                                                   |
-| `packages/scripts/src/cloudflare/{service,live.layer,memory.layer,output.boundary}.ts` | Vercel/Sendblue API service, live/fake Layers, decoded response boundaries |
-| `packages/scripts/src/cloudflare-{preview,production}`                                 | target-specific config, deploy program, tests, readback proof              |
-| Cloudflare workflows                                                                   | concurrency, immutable ref, least-secret CI, verification artifacts        |
+| Site owner                                                                             | Bundjil adaptation                                                                    |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `alchemy.run.ts`                                                                       | root stack router and stage gate                                                      |
+| `apps/web/src/lib/build/cloudflare-stack.ts`                                           | stable Bundjil stack/resource IDs and outputs                                         |
+| `stacks/github.ts`                                                                     | separate bootstrap stack                                                              |
+| `packages/scripts/src/cloudflare/{service,live.layer,memory.layer,output.boundary}.ts` | Vercel/messaging-provider API services, live/fake Layers, decoded response boundaries |
+| `packages/scripts/src/cloudflare-{preview,production}`                                 | target-specific config, deploy program, tests, readback proof                         |
+| Cloudflare workflows                                                                   | concurrency, immutable ref, least-secret CI, verification artifacts                   |
 
 Do not reuse provider-specific Cloudflare resource definitions, command names,
 or route policy. Do not create `common`, `utils`, or `helpers`; the site pattern
@@ -219,22 +228,25 @@ works because each service and policy has a narrow owner.
 ## 3. Native-support gap analysis
 
 Alchemy v2 documents native AWS and Cloudflare coverage and its source tree has
-provider directories for those and selected integrations, but no Vercel or
-Sendblue directory ([Alchemy repository](https://github.com/alchemy-run/alchemy),
+provider directories for those and selected integrations, but no Vercel,
+Sendblue, or Photon directory ([Alchemy repository](https://github.com/alchemy-run/alchemy),
 [provider source tree](https://github.com/alchemy-run/alchemy/tree/main/packages/alchemy/src)).
 The installed site dependency, Alchemy `2.0.0-beta.62`, has the same absence.
 
-| Capability                                | Alchemy native on 2026-07-20 | Upstream API exists                                                              | Decision                                                     |
-| ----------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Vercel project CRUD/settings              | No                           | Yes; Projects are a documented REST category                                     | Custom resource, after adoption proof                        |
-| Vercel project domains                    | No                           | Yes; add, list, verify, and remove endpoints                                     | Custom child resource                                        |
-| Vercel environment variables              | No                           | Yes; project environment CRUD and sensitive values                               | Custom child resource with external secret resolution        |
-| Vercel deployments                        | No                           | Yes; deploy, inspect, events, promote, rollback                                  | Keep Vercel Git/CI; model only read/proof or explicit action |
-| Vercel Marketplace/Upstash binding        | No                           | Marketplace and integration APIs exist; Upstash is a native Marketplace resource | Adopt/read first; mutation waits for exact tenant/API proof  |
-| Vercel webhooks/drains                    | No                           | REST webhooks and drains endpoints exist                                         | Optional custom monitoring resource                          |
-| Sendblue webhook set                      | No                           | GET/POST/PUT/DELETE account webhook API exists                                   | App-owned custom singleton, production only                  |
-| Sendblue lines                            | No                           | List and two-step provision endpoints exist                                      | Read-only data source first; no provision in initial scope   |
-| Sendblue accounts, phone deletion, alerts | No                           | No complete documented IaC-safe lifecycle found                                  | Keep imperative/provider-owned; record as unresolved         |
+| Capability                         | Alchemy native on 2026-07-20 | Upstream API exists                                                                                                   | Decision                                                     |
+| ---------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Vercel project CRUD/settings       | No                           | Yes; Projects are a documented REST category                                                                          | Custom resource, after adoption proof                        |
+| Vercel project domains             | No                           | Yes; add, list, verify, and remove endpoints                                                                          | Custom child resource                                        |
+| Vercel environment variables       | No                           | Yes; project environment CRUD and sensitive values                                                                    | Custom child resource with external secret resolution        |
+| Vercel deployments                 | No                           | Yes; deploy, inspect, events, promote, rollback                                                                       | Keep Vercel Git/CI; model only read/proof or explicit action |
+| Vercel Marketplace/Upstash binding | No                           | Marketplace and integration APIs exist; Upstash is a native Marketplace resource                                      | Adopt/read first; mutation waits for exact tenant/API proof  |
+| Vercel webhooks/drains             | No                           | REST webhooks and drains endpoints exist                                                                              | Optional custom monitoring resource                          |
+| Sendblue webhook set               | No                           | GET/POST/PUT/DELETE account webhook API exists                                                                        | App-owned custom singleton only if Sendblue is retained      |
+| Sendblue lines                     | No                           | List and two-step provision endpoints exist                                                                           | Read-only data source first; no provision in initial scope   |
+| Sendblue subaccounts and seats     | No                           | Account/member operations exist, but no complete adopt/delete contract was established from the public lifecycle docs | Keep imperative/provider-owned; verify with support          |
+| Sendblue phone-number deletion     | No                           | Provision/list is documented; no complete deprovision and number-release lifecycle was found                          | Retain; do not model destructive reconciliation              |
+| Sendblue alerts                    | No                           | Limits and delivery errors are documented, but no first-class alert-policy lifecycle was found                        | Bundjil monitoring owns alerts; provider state is read-only  |
+| Photon Spectrum management         | No                           | Projects, project webhooks, platforms, lines, users, billing, voice, WhatsApp, and Slack operations are published     | App-owned custom resources only after provider selection     |
 
 Vercel's REST API explicitly covers projects, deployments, domains,
 environment variables, Marketplace, and webhooks, and publishes per-endpoint
@@ -268,6 +280,66 @@ Sendblue v2 documents line listing plus preview/confirm provisioning
 10 messages per second and excess traffic returns `429`
 ([Sendblue limits](https://docs.sendblue.com/limits/)).
 
+### Photon Spectrum alternative
+
+Photon's published Spectrum API covers substantially more of the desired
+management plane than the Sendblue lifecycle established above. The management
+API is project-scoped; runtime messaging is a separate Spectrum SDK and signed
+webhook integration, so management coverage does not make Photon a drop-in
+replacement for Bundjil's current Sendblue channel.
+
+| Requirement                    | Documented Photon coverage                                                                                              | IaC assessment                                                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Project bootstrap              | Dashboard API creates and lists projects and can return a Spectrum project ID and one-time project secret               | Partial: stable identity exists, but public Dashboard OpenAPI is intentionally incomplete; delete and secret rotation are CLI-only today |
+| Webhook lifecycle              | Project-scoped list/register/delete; stable webhook UUID; one-time 64-hex signing secret; same active URL returns `409` | Strong custom-resource candidate with external/write-only secret custody and replacement on URL or secret rotation                       |
+| Dedicated iMessage lines       | Project-scoped list/create/profile/route/delete; stable line UUID; create/delete report billing/proration               | Stronger than Sendblue, but create is billable and has no documented idempotency key; retain/protect and never blindly retry             |
+| Users                          | Create/list/get/soft-delete; shared creation is idempotent by phone and dedicated creation by phone plus assigned line  | Viable custom resource after exact upsert and soft-delete semantics are fixture-tested                                                   |
+| Platform configuration         | Get/toggle platforms and update platform metadata                                                                       | Viable in-place project child resource                                                                                                   |
+| Billing and convergence        | Subscription details and billing-sync status expose `in_sync`, `syncing`, and `failed`, including proration results     | Read-only observation can close eventual-consistency loops after authorized line mutations                                               |
+| Delivery operations and alerts | Six webhook attempts with exponential backoff and jitter; 30-second attempts; retry on network, `408`, `429`, and `5xx` | Useful runtime contract, but no persistent queue, DLQ, self-service delivery log, or first-class alert-policy API                        |
+| Runtime send/receive           | `spectrum-ts` handles signed inbound webhooks and messaging                                                             | Requires a new app-owned channel adapter and cutover SPEC; the management REST API is not the runtime send API                           |
+
+Primary contracts are the published
+[Spectrum API introduction](https://photon.codes/docs/api-reference/introduction),
+[Spectrum OpenAPI](https://spectrum.photon.codes/openapi/json), and
+[Dashboard OpenAPI](https://photon.codes/docs/api-reference/dashboard-openapi.json).
+Line deletion is documented, unlike the unresolved Sendblue deprovision path
+([remove a dedicated line](https://photon.codes/docs/api-reference/lines/remove-a-dedicated-line)),
+and billing convergence is observable
+([billing sync status](https://photon.codes/docs/api-reference/billing/get-billing-sync-status)).
+However, the create endpoint is billable and does not document an idempotency
+key ([add a dedicated line](https://photon.codes/docs/api-reference/lines/add-a-dedicated-imessage-line)).
+That gap overrides the general statement that retrying `5xx` is safe: a timed-
+out create is `OutcomeUncertain` until list/billing observation or provider
+support establishes a safe recovery key.
+
+The CLI documents permanent project deletion and immediate invalidation of the
+old project secret on rotation, but those operations are not both exposed by
+the intentionally limited public Dashboard OpenAPI
+([project CLI](https://photon.codes/docs/cli/projects),
+[Dashboard OpenAPI](https://photon.codes/docs/api-reference/dashboard-openapi.json)).
+Project lifecycle should therefore remain bootstrap/retain rather than an
+Alchemy CRUD resource until Photon publishes a stable API contract. User
+creation has documented semantic idempotency and deletion is soft-delete
+([create user](https://photon.codes/docs/api-reference/users/create-user),
+[delete user](https://photon.codes/docs/api-reference/users/delete-user));
+platform state has explicit get/toggle/metadata operations
+([get platforms](https://photon.codes/docs/api-reference/platforms/get-platforms),
+[toggle platform](https://photon.codes/docs/api-reference/platforms/toggle-platform),
+[update metadata](https://photon.codes/docs/api-reference/platforms/update-platform-metadata)).
+
+Webhook registration has a better ownership surface than Sendblue's
+account-wide document: Photon returns a stable UUID and a signing secret only
+once, while list returns metadata without the secret
+([register](https://photon.codes/docs/api-reference/webhooks/register-webhook),
+[list](https://photon.codes/docs/api-reference/webhooks/list-webhooks),
+[delete](https://photon.codes/docs/api-reference/webhooks/delete-webhook)).
+Delivery remains at-least-once and is dropped after the final retry, with no
+self-service delivery log
+([delivery](https://photon.codes/docs/webhooks/delivery),
+[troubleshooting](https://photon.codes/docs/webhooks/troubleshooting)).
+Bundjil therefore still owns replay, durable processing, metrics, and alerts.
+
 ## 4. Recommended project structure and topology
 
 ### Proposed owners
@@ -281,7 +353,8 @@ packages/vercel/
   src/api/                   # Vercel schemas, errors, named service, live/fake Layers
   src/resources/             # project, domain, env, binding, webhook/readback
 apps/agent/infrastructure/
-  sendblue/                  # app-owned API service and webhook-set resource
+  sendblue/                  # retained-provider API and webhook-set resource
+  photon/                    # selected only by a later provider-migration SPEC
   desired.ts                 # agent project/env desired state
 apps/codex-proxy/infrastructure/
   desired.ts                 # proxy project/env desired state
@@ -293,9 +366,12 @@ docs/verification/           # sanitized current proof owner added with implemen
 ```
 
 `packages/vercel` is justified only because both deployed applications consume
-one stable provider contract. Sendblue remains under the agent because it has
-one application consumer. Provider-neutral lifecycle policy stays inline in
-each resource unless a second real provider demonstrates reuse.
+one stable provider contract. Sendblue or Photon remains under the agent because
+the messaging provider has one application consumer. The provider-selection
+SPEC chooses one owner; it must not instantiate both. Do not introduce a
+provider-neutral messaging abstraction until a stable contract has proved
+multiple consumers. Lifecycle policy stays inline in each provider resource
+unless demonstrated reuse justifies extraction.
 
 ### Stack topology
 
@@ -307,16 +383,21 @@ flowchart TB
   State --> Prod["BundjilVercel / prod"]
   Prod --> AgentProject["agent Vercel project"]
   Prod --> ProxyProject["codex-proxy Vercel project"]
-  Prod --> SendblueStack["BundjilSendblue / prod"]
+  Prod --> MessagingStack["selected messaging provider / prod"]
   Preview --> PreviewProjects["Vercel Preview settings and readback"]
-  SendblueStack --> WebhookSet["one retained account webhook set"]
+  MessagingStack --> SendbluePath["Sendblue: one retained account webhook set"]
+  MessagingStack --> PhotonPath["Photon: isolated project resources"]
 ```
 
 Use one Vercel stack with `prod` and `pr-N` state isolation, but do not create a
 new Vercel project per PR. The existing two projects own their Vercel Preview
 environment; PR stages own only branch-scoped desired env metadata and proof.
-Use a separate `BundjilSendblue` stack because a shared account webhook is not
-PR-scoped. It has only `prod` until provider isolation is real.
+If Sendblue is retained, use a separate `BundjilSendblue` stack because a shared
+account webhook is not PR-scoped; it has only `prod` until provider isolation is
+real. If Photon is selected, use separate Spectrum projects and stack stages for
+Production and Preview. Preview must not receive a billable dedicated line by
+default; that is a separately authorized resource, not a consequence of stage
+creation.
 
 A dedicated `Cloudflare.state()` backend is the lowest-risk reuse of the site
 pattern if Bundjil can receive a separately scoped Cloudflare token. Its
@@ -336,7 +417,7 @@ sequenceDiagram
   participant Config as Effect Config.schema
   participant Stack as Alchemy stack
   participant Provider as custom Provider Layer
-  participant API as Vercel/Sendblue API service
+  participant API as Vercel/messaging-provider API service
   participant Remote as provider API
   participant State as Alchemy state
 
@@ -351,6 +432,27 @@ sequenceDiagram
   Stack-->>State: encrypted, redacted state
   Stack-->>CI: sanitized plan/readback summary
 ```
+
+### Conditional Photon management and runtime paths
+
+```mermaid
+flowchart LR
+  Desired["decoded Photon desired state"] --> Resources["Alchemy Photon resources"]
+  Resources --> Service["named Photon management service"]
+  Service --> Management["Spectrum management API"]
+  Management --> Observe["decoded IDs, config, billing status"]
+  Observe --> Resources
+
+  Delivery["Photon at-least-once webhook"] --> Ingress["agent Photon ingress"]
+  Ingress --> Verify["HMAC timestamp/signature + replay claim"]
+  Verify --> Durable["durable Bundjil-owned processing"]
+  Durable --> Runtime["Spectrum SDK reply/send"]
+```
+
+The management and runtime paths share branded project/line identities and
+secret references, not raw clients or generic helpers. Alchemy never sends
+messages; the runtime adapter never mutates management resources. A Photon
+selection SPEC owns both contracts and their cutover ordering in the agent.
 
 ### Runtime URL and secret binding
 
@@ -438,6 +540,18 @@ live read-only inventory.
 | Domains                             | Vercel-generated Preview deployment URLs; no production custom-domain writes                        | PR cleanup removes only PR-owned metadata, not projects/deployments                                |
 | Proof                               | project/env/domain plan, deployment URL health, proxy auth denial/acceptance, zero Sendblue ingress | Sanitized PR artifact/comment, no secrets or message identifiers                                   |
 
+### Conditional Photon inventory
+
+This inventory applies only if a later provider-selection SPEC chooses Photon.
+It does not coexist with an Alchemy-owned Sendblue webhook resource.
+
+| Stage      | Resource inventory                                                                                                                 | Isolation and mutation posture                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Production | Spectrum project, enabled platforms and metadata, project webhook, adopted/dedicated lines, users, subscription and billing status | Separate project and project secret; webhook and lines retain/protect; users soft-delete only by explicit policy; billing read-only |
+| Preview    | Separate Spectrum project, platform metadata, project webhook, synthetic users, billing status                                     | Separate secret and webhook signing key; no dedicated billable iMessage line unless separately authorized                           |
+| Both       | Vercel env bindings for project secret, webhook signing secret/revision, runtime URL, platform/line identities, replay namespace   | Values stay in external secret custody; state records only stable IDs, references, revisions, booleans, and sanitized status        |
+| Proof      | Project/line/webhook/user/platform IDs, config digest, billing sync state, signed ingress/replay result, delivery limitations      | No phone number, message body, project secret, webhook secret, or end-user identity in ordinary artifacts                           |
+
 `turbo.json:10-40` currently enumerates many agent build variables but omits the
 Executor API key from the agent build task while including it for tests. This
 report does not classify that as a bug: whether it is required at build time
@@ -487,10 +601,13 @@ Every reconcile observes first, applies the minimal idempotent change, then
 reads until the documented condition is visible. Missing-on-delete is success.
 Retry only `429`, documented transient `5xx`, timeouts before a response, and
 eventual-consistency reads; use bounded exponential backoff with jitter and the
-provider reset header. Vercel publishes `X-RateLimit-*` headers and per-endpoint
-limits ([REST API](https://vercel.com/docs/rest-api),
-[limits](https://vercel.com/docs/limits)). A timed-out non-idempotent write is an
-`OutcomeUncertain` error followed by observe/reconcile, never blind replay.
+provider reset header when available. Vercel publishes `X-RateLimit-*` headers
+and per-endpoint limits ([REST API](https://vercel.com/docs/rest-api),
+[limits](https://vercel.com/docs/limits)); Photon documents five management API
+requests per second per project and `429`
+([Photon rate limit](https://photon.codes/docs/api-reference/rate-limit)). A
+timed-out non-idempotent write is an `OutcomeUncertain` error followed by
+observe/reconcile, never blind replay.
 
 ### Per-resource contracts
 
@@ -506,6 +623,22 @@ limits ([REST API](https://vercel.com/docs/rest-api),
 | `SendblueAccountWebhookSet`        | account identity + singleton logical ID; observed canonical type/URL set. Because Sendblue exposes no ownership tags, any existing match is `Unowned` until an adoption manifest is approved. | GET all. Targeted POST/DELETE manages only declared URLs. PUT is forbidden unless `ownsEntireAccountWebhookDocument` is explicitly true and a fresh GET was captured in the same operation. Secret rotation behavior for an unchanged URL must be proven before mutation. | `retain` and deletion protection are mandatory for Production. Explicit delete removes only the exact adopted type/URL after agent ingress is disabled. |
 | `SendblueLineInventory`            | line provider ID/number from paginated GET.                                                                                                                                                   | Read/list only; no desired mutation.                                                                                                                                                                                                                                      | No-op.                                                                                                                                                  |
 | `SendblueLine` (future)            | confirmed provider line ID, never a guessed number.                                                                                                                                           | Create is replacement-only and requires an approved preview token from the two-step flow. It may not run during normal reconcile.                                                                                                                                         | Retain; no documented safe delete lifecycle was established.                                                                                            |
+
+Photon resources are conditional on provider selection:
+
+| Resource                      | Physical ID and read/import                                                                     | Diff and reconcile                                                                                                                             | Delete/replacement                                                                                                              |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `PhotonProject`               | Dashboard project ID plus Spectrum project ID; adopt by exact reviewed IDs, never display name  | Bootstrap/create is an explicit action because the project secret is returned once; routine reconcile reads profile/config and stable identity | Retain/protect. Do not implement Alchemy delete until the lifecycle is a stable public API contract rather than a CLI-only path |
+| `PhotonWebhook`               | Project ID plus webhook UUID; list exposes URL and timestamps but not the signing secret        | Register exact URL; treat same-URL `409` as an adoption decision, not success; URL or secret rotation creates a replacement                    | Retain Production; explicit delete by UUID after new endpoint proof, then tolerate `404` and in-flight final deliveries         |
+| `PhotonLine`                  | Project ID plus stable line UUID; observe list, routing/profile, subscription, and billing sync | Create is replacement-only, billable, explicitly authorized, and never blindly retried after timeout; poll billing until not `syncing`         | Retain/protect by default. Explicit delete by UUID only after traffic drain and cost/number-release confirmation                |
+| `PhotonUser`                  | Project ID plus user UUID and the documented semantic phone/assigned-line key                   | Use the documented idempotent shared or dedicated upsert; read back the stable UUID                                                            | Soft-delete only. Replacement must preserve the chosen semantic key and routing contract                                        |
+| `PhotonPlatformConfiguration` | Project ID plus branded platform literal                                                        | Read current enablement/metadata; apply only decoded canonical field changes in place                                                          | Restore prior metadata/enablement; no project deletion                                                                          |
+| `PhotonBillingObservation`    | Project ID                                                                                      | Read-only subscription and billing-sync status; `reconcile` rejects writes                                                                     | No-op retain                                                                                                                    |
+
+There is no `PhotonAlertPolicy` resource in this design because the published
+surface does not expose one. Bundjil-owned monitoring consumes sanitized
+billing/profile status, webhook registration drift, runtime attempt/outcome
+metrics, and provider delivery limitations.
 
 ### Sendblue webhook pseudocode
 
@@ -534,6 +667,15 @@ the safer contract keeps actual secret material in the deploy-time Config
 provider and stores only a revision/digest. The same rule applies to Vercel
 sensitive environment values.
 
+Photon uses the same secret boundary. A project secret grants project-wide
+management access and does not expire; a webhook signing secret is returned
+once on registration. Neither belongs in Alchemy output/state. The resource
+stores an external reference, revision, and `secretConfigured` boolean. A
+failed state write after successful webhook registration is a partial failure:
+observe by URL, retain the remote webhook, quarantine the just-returned secret
+in the approved secret store if possible, and require an explicit rotation/
+replacement decision instead of creating another endpoint.
+
 ### Testing contract
 
 For every resource:
@@ -555,16 +697,18 @@ For every resource:
 
 1. **Freeze identities.** Record Git SHA, Vercel team/project IDs, root
    directories, domain attachments, env keys/types/targets, Marketplace
-   configuration and Upstash database IDs, Sendblue account/line identity,
-   canonical webhook entries, and key prefixes. Record values only in the
-   existing secret manager.
+   configuration and Upstash database IDs, current Sendblue account/line
+   identity, canonical webhook entries, and key prefixes. If Photon is selected,
+   separately record its exact project, platform, webhook, line, and user IDs.
+   Record values only in the existing secret manager.
 2. **Build read/import providers first.** A first plan may call GET/list but its
    `reconcile` rejects writes. Existing resources return `Unowned`; adoption
    requires `--adopt` or `.pipe(adopt(true))` plus a reviewed manifest.
 3. **Seed remote state without mutation.** Adopt one resource class at a time,
    beginning with Vercel projects, then domains, env metadata, Marketplace
-   bindings, and finally Sendblue webhooks. Stop on any create, replace, or
-   delete plan.
+   bindings, and finally the selected provider's existing webhook. Photon
+   project/line adoption is a separate manifest; never infer it from a phone
+   number or webhook URL. Stop on any create, replace, or delete plan.
 4. **Keep production resources retained.** Project, domain, database/binding,
    webhook, and line resources begin with `deletionPolicy: "retain"`. Logical
    IDs are never renamed during migration.
@@ -577,7 +721,9 @@ For every resource:
    to both projects, create/verify deployments, promote the proxy and agent in
    dependency order, then revoke the old token. For Sendblue, make the agent
    accept the new secret before changing the provider webhook, verify ingress,
-   then remove the old path.
+   then remove the old path. For Photon, first escrow the one-time project or
+   webhook secret, update the Vercel env revision, verify a new deployment, and
+   only then retire the prior endpoint/credential.
 7. **Preserve storage.** Adopt Marketplace/database IDs and both key prefixes.
    Never create a new Upstash database because an env alias is missing.
 8. **Prove and only then enable writes.** Each resource class moves from
@@ -601,7 +747,8 @@ forcing a new review rather than taking over drift silently.
 5. Let Vercel Git create immutable Preview deployments.
 6. Read deployment IDs/status, prove proxy `/health`, prove authorized and
    unauthorized agent-to-proxy paths with synthetic content, and assert zero
-   Sendblue shared-account ingress.
+   shared-account Sendblue ingress or use only an explicitly isolated Photon
+   Preview project.
 7. Upload a sanitized plan and proof artifact; destroy only PR-owned Alchemy
    state on close.
 
@@ -633,6 +780,11 @@ require rebuilding with the old revision rather than only rerouting traffic.
 - Sendblue webhook rollback first restores/keeps a known-good agent deployment
   and credential, then adjusts the webhook. Never delete the last production
   receive endpoint as an automatic compensating action.
+- Photon rollback retains the current Sendblue channel until the new runtime
+  path and signed webhook have passed cutover proof. A failed Photon webhook
+  replacement retains the observed endpoint; a failed or uncertain line create
+  is reconciled through line/billing reads and never compensated by an
+  automatic delete.
 - State-store failure after provider success resumes from intermediate state;
   providers must use deterministic identity and idempotent read/reconcile/delete
   ([resource lifecycle](https://v2.alchemy.run/infrastructure-as-code/resource-lifecycle/)).
@@ -654,6 +806,12 @@ require rebuilding with the old revision rather than only rerouting traffic.
   than one shared-account receive webhook, missing Production URL, any Preview
   URL, unexpected line, `429`, unavailable typing/delivery attempts, or replay
   store failures. Do not inspect message content or phone identifiers in alerts.
+- If Photon is selected, read project webhook IDs/URLs, platform configuration,
+  line IDs/profile status, subscription quantity, and billing sync state. Alert
+  through Bundjil-owned monitoring on missing/unexpected registration,
+  `syncing` beyond a bounded window, `failed`, signed-ingress failures, replay
+  failure, and exhausted runtime delivery. Photon does not supply a declarative
+  alert policy, persistent queue, DLQ, or self-service delivery log.
 - Prefer a Vercel drain/webhook only after its endpoint/auth resource is adopted;
   until then, CI readback and existing provider observability remain authoritative.
 
@@ -678,6 +836,22 @@ objects into a convergent lifecycle. The current setup is simple but leaves
 configuration and drift outside repository review. Hybrid wins because it
 declaratively owns stable state while preserving the providers' safer native
 deployment and account workflows.
+
+Messaging-provider suitability is a separate decision from the Alchemy
+ownership model:
+
+| Criterion                         | Sendblue retained | Photon candidate | Evidence boundary                                                                |
+| --------------------------------- | ----------------: | ---------------: | -------------------------------------------------------------------------------- |
+| Management lifecycle completeness |                 2 |                4 | Photon publishes stable IDs and delete/read contracts for webhooks, lines, users |
+| Current Bundjil runtime fit       |                 5 |                2 | Sendblue is implemented; Photon requires an SDK/webhook channel migration        |
+| Preview/Production isolation      |                 2 |                4 | Photon resources are project-scoped; current Sendblue webhook is account-wide    |
+| Destructive/write safety          |                 2 |                3 | Photon line delete exists, but billable create lacks documented idempotency      |
+| Operations and alert coverage     |                 2 |                3 | Photon exposes status/retry behavior, but neither provides full alert ownership  |
+
+These unweighted research scores rank Photon as the stronger management-plane
+candidate, not the automatic migration winner. Runtime migration cost, product
+behavior, account/plan truth, and a disposable lifecycle spike remain decision
+gates.
 
 ## 11. Proof of concept and migration plan
 
@@ -711,6 +885,7 @@ until a later target-owned runbook and current provider readback do so.
 |     5 | Secret and agent-to-proxy rotation        | Two disposable Vercel projects; synthetic secret               | Coordinated revision rotates without disclosure or an unrecoverable mismatch                                 |
 |     6 | Hybrid pull-request deployment            | Disposable or approved Preview projects; no Production         | Alchemy config and Vercel Git deployment coexist; cleanup touches only PR-owned state                        |
 |     7 | Sendblue singleton and recovery lifecycle | Separate disposable Sendblue account; explicit write authority | Append/read/rotate/delete/retain/recover behavior avoids duplicate or dropped ingress                        |
+|     8 | Photon management and runtime viability   | Local fakes first; isolated Photon project; explicit writes    | Project-scoped lifecycle and signed runtime path work without unsafe billable retries or Sendblue cutover    |
 
 #### Spike 1 — offline provider lifecycle harness
 
@@ -888,6 +1063,46 @@ inventory. If same-URL rotation requires unsafe whole-account replacement, or
 transition ordering cannot avoid duplicate/dropped ingress, keep Sendblue
 mutation imperative and Alchemy read-only.
 
+#### Spike 8 — Photon management and runtime viability
+
+**Question:** Does Photon close enough Sendblue lifecycle gaps to justify a
+separate channel-migration SPEC?
+
+Start locally from the published Spectrum and Dashboard OpenAPI contracts. Add
+Effect Schema fixtures and fake Layers for project, webhook, platform, line,
+user, billing, `409`, `429`, malformed output, timeout-after-write, and delayed
+billing convergence. Then, only with an isolated Photon project and explicit
+authority:
+
+1. read project profile, platforms, lines, users, webhooks, subscription, and
+   billing status without writing;
+2. register a disposable project webhook, escrow the one-time signing secret,
+   verify list/readback, receive one signed synthetic event, and delete by UUID;
+3. prove Vercel request-scoped webhook handling returns promptly while durable
+   replay/processing remains Bundjil-owned;
+4. exercise user upsert/soft-delete and platform metadata only if they are
+   disposable and authorized; and
+5. do not create or delete a dedicated line until Photon confirms safe
+   idempotency/timeout recovery and separate billable authority is granted.
+
+Record stable IDs, sanitized call classes, webhook retry/duplicate behavior,
+latency to acknowledgement, queue/replay outcome, billing status, recovery
+decisions, and every limitation. The proof must not contain project secrets,
+signing secrets, phone numbers, message bodies, or user identities.
+
+**Acceptance:** a second read/reconcile is no-op; webhook register/list/delete
+converges by stable UUID; the signing secret exists only in approved secret
+custody; inbound HMAC timestamp/signature verification and replay denial pass;
+runtime work is durable despite provider at-least-once delivery; a timed-out
+billable create cannot be blindly retried; Production Sendblue remains
+untouched and available for rollback.
+
+**Stop:** keep Photon at research status if project lifecycle remains CLI-only
+where the resource needs API ownership, Vercel runtime behavior cannot satisfy
+the webhook contract, safe line-create recovery cannot be established, or the
+channel migration does not improve isolation/operations enough to justify its
+cost.
+
 ### Cross-spike effectiveness scorecard
 
 The programme is successful only when all applicable thresholds hold:
@@ -898,7 +1113,7 @@ The programme is successful only when all applicable thresholds hold:
 - ordinary drift is detected in one scheduled/read-only run and repaired with
   one minimal update plus bounded reads;
 - uncertain writes are observed before retry and never blindly replayed;
-- no secret value or protected Sendblue identifier appears in any artifact;
+- no secret value or protected Sendblue/Photon identifier appears in any artifact;
 - Preview jobs cannot address Production targets;
 - physical IDs survive adoption, update, retain, and recovery;
 - the prior deployment and secret revision remain usable through the recorded
@@ -906,27 +1121,41 @@ The programme is successful only when all applicable thresholds hold:
 - the hybrid PR spike reduces or holds steady time-to-preview, manual steps,
   credentials, and recovery time compared with the recorded current baseline.
 
-The minimum decision set is spikes 1 through 6 plus the fake-provider portion
-of spike 7. A live Sendblue mutation spike is conditional on a genuinely
-separate disposable account. Failure of one resource class does not invalidate
-the hybrid model; it keeps that class under its existing provider/runbook owner.
+The minimum Alchemy decision set is spikes 1 through 6. Messaging-provider
+selection additionally requires the fake-provider portions of spikes 7 and 8,
+then at least one authorized isolated webhook lifecycle. A live Sendblue
+mutation requires a genuinely separate disposable account. A live Photon line
+mutation additionally requires provider-confirmed idempotency/recovery and
+billable authority. Failure of one resource class does not invalidate the
+hybrid model; it keeps that class under its existing provider/runbook owner.
 
 ### Phase 0 — SPEC and inventory contract
 
-Use `prd-writer` to create a new active SPEC with the exact boundary:
+Use `prd-writer` to create a first active SPEC with the exact boundary:
 
-> **Bundjil Alchemy infrastructure ownership:** introduce a dedicated Alchemy
-> stack/state boundary, an Effect-native custom Vercel provider for adoption and
-> stable project/domain/environment/Marketplace metadata, and an app-owned
-> production Sendblue webhook-set provider. Preserve Vercel Git deployment
-> ownership, existing projects/domains/databases/webhooks/lines, Production-only
-> shared-account Sendblue ingress, and all current runtime contracts. Exclude
-> DNS mutation, project/database/line creation or deletion, Sendblue line
-> provisioning, deployment creation/promotion/rollback automation, secret value
-> generation, and any provider write until resource-specific adoption proof is
-> accepted.
+> **Bundjil Alchemy infrastructure proof and messaging-provider selection:**
+> introduce a dedicated local/fake Alchemy stack boundary, Effect-native Vercel
+> and messaging-provider read/import contracts, sanitized inventory schemas,
+> and spikes 1–8. Preserve Vercel Git deployment ownership, current Vercel
+> projects/domains/databases, the current Production-only Sendblue runtime and
+> account webhook, and all existing secret/storage identities. Exclude DNS
+> mutation, live provider writes by default, Production apply, project/database/
+> line creation or deletion, provider cutover, deployment promotion/rollback
+> automation, and secret value generation. Any disposable read/write spike must
+> have resource-specific authority, isolation, rollback, and proof acceptance.
 
-The SPEC must add a task ledger, active exec plan, runbook/proof owners, exact
+After that evidence selects a provider, use `prd-writer` again for exactly one
+implementation boundary:
+
+- **Sendblue-retained path:** adopt only the production account webhook set;
+  keep account, seat, line, phone deletion, and alert ownership imperative or
+  read-only until complete lifecycles are proven.
+- **Photon-selected path:** implement an app-owned Photon channel migration and
+  the accepted project/webhook/platform/user/line/billing resources; preserve
+  Sendblue unchanged until cutover proof and rollback acceptance. Billable line
+  mutation remains separately authorized.
+
+Each SPEC must add a task ledger, active exec plan, runbook/proof owners, exact
 resource identities, deletion policy, rollback, credential scopes, and separate
 approvals for bootstrap, adoption, and writes. Only then use `prd-implementer`.
 
@@ -947,8 +1176,9 @@ plan; sanitized inventory schema and provider fake contracts accepted.
 
 Implement schemas, branded IDs, tagged errors, named services, live read
 operations, fake Layers, and provider lifecycle tests for one disposable
-`VercelProject` fixture and `SendblueAccountWebhookSet` fixture. Reconcile/delete
-fail closed in read-only mode.
+`VercelProject` fixture, one `SendblueAccountWebhookSet` fixture, and the
+conditional Photon project/webhook/line/user/platform/billing fixtures.
+Reconcile/delete fail closed in read-only mode.
 
 No provider-package or app-infrastructure test command exists yet. The future
 SPEC must name the real owners and add their runnable focused checks in the same
@@ -998,44 +1228,58 @@ Acceptance: second plan is no-op; a fake drift is detected and repaired in a
 disposable fixture; Production domains/projects/databases remain the same
 physical IDs; new env revisions are verified through new deployments.
 
-### Phase 5 — Sendblue webhook adoption and ownership
+### Phase 5 — selected messaging-provider adoption and ownership
 
-Keep `retain` and protection enabled. Import the exact production account
-webhook set. First mutation, if ever authorized, is a reversible secret rotation
-with a known-good agent deployment and readback.
+Take only the provider path selected by the second SPEC:
 
-Acceptance: one Production receive webhook, zero Preview receive webhooks,
-authenticated fixture accepted once, duplicate suppressed, invalid signature
-denied, no message/phone/secret leakage, and rollback restores the prior known-
-good path without deleting the only endpoint.
+- for Sendblue, keep `retain` and protection enabled, import the exact
+  production account webhook set, and make the first authorized mutation a
+  reversible secret rotation with a known-good agent deployment and readback;
+- for Photon, establish separate project identities and secret custody, migrate
+  the app-owned channel behind signed synthetic proof, then adopt only the
+  accepted webhook/platform/user/line resources. Keep Sendblue operating until
+  explicit cutover and rollback acceptance.
+
+Acceptance: exactly one intended Production ingress path after cutover, an
+isolated Preview path only when selected, authenticated fixture accepted once,
+duplicate suppressed, invalid signature denied, no message/phone/secret
+leakage, and rollback restores the prior known-good path without automatically
+deleting the only endpoint or a billable line.
 
 ### Phase 6 — scheduled drift and proof
 
 Add read-only scheduled plans and sanitized evidence retention.
 
 Acceptance: alert fixture fires on project/env/domain/webhook drift, duplicate
-or Preview Sendblue ingress, deployment mismatch, and unavailable storage; a
-no-drift run is quiet; proof records exact Git and provider resource identities.
+or unisolated messaging ingress, Photon billing/profile failure when applicable,
+deployment mismatch, and unavailable storage; a no-drift run is quiet; proof
+records exact Git and provider resource identities.
 
 ## 12. Risks, unresolved questions, and live checks
 
-| Risk or unknown                                                              | Why it matters                                                         | Read-only check that closes it                                                    |
-| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Exact Vercel team/project IDs, roots, framework/settings                     | Adoption by name alone can target the wrong project                    | GET/list projects and compare repo/root/linkage                                   |
-| Production/Preview domain and alias inventory                                | A domain move can cut traffic                                          | List project domains, deployments, aliases, verification status                   |
-| Environment key types/targets/branches and sensitive support                 | Wrong target leaks or breaks credentials                               | List env metadata only; never request/print values                                |
-| Agent build-time Executor API key requirement                                | `turbo.json` and runtime config do not establish Vercel build behavior | Inspect Vercel build settings/log variable names only, then contract-test         |
-| Marketplace integration/configuration and Upstash database IDs               | Recreating a database or binding risks state loss                      | List Marketplace installations/resources/connections and project attachments      |
-| Whether replay and Codex use one physical DB or separate DBs                 | Prefix preservation and blast radius depend on it                      | Compare redacted connection/resource IDs and key prefixes, not tokens             |
-| Current Sendblue account webhook document                                    | Historical repository notes may be stale                               | GET account webhooks; sanitize URLs to approved route labels and secret presence  |
-| Sendblue GET secret exposure and same-URL rotation behavior                  | State leakage or PUT could remove unrelated hooks                      | Read API response shape safely; ask Sendblue support or test disposable account   |
-| Sendblue account/line IDs, capabilities, and provisioning deletion semantics | Prevents a safe resource lifecycle                                     | GET lines/account limits; obtain provider documentation for deprovision/retain    |
-| Sendblue webhook duplicate/ordering behavior under POST/DELETE               | Reconcile could briefly double-deliver or drop ingress                 | Disposable-account targeted lifecycle test only after authorization               |
-| Vercel API update idempotency and conflict semantics per endpoint            | Determines safe retry after timeout                                    | Inspect official endpoint schemas/headers; disposable fixture fault test          |
-| Vercel Marketplace mutation API available to this integration/plan           | Public Marketplace APIs may be partner-oriented                        | List accessible endpoints/scopes with read-only token; do not infer from docs     |
-| Dedicated remote state credentials and recovery                              | State custody and locking are infrastructure dependencies              | Inspect chosen state backend, token scopes, encryption, backup/recovery procedure |
-| Current monitoring/drains/webhooks and alert destinations                    | Duplicate or missing monitoring creates noise/blindness                | List Vercel webhooks/drains and current sanitized alert policy                    |
-| DNS authority and desired ownership                                          | Domain verification is not DNS ownership                               | Read authoritative DNS provider and records; keep mutation out of initial SPEC    |
+| Risk or unknown                                                              | Why it matters                                                          | Read-only check that closes it                                                         |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Exact Vercel team/project IDs, roots, framework/settings                     | Adoption by name alone can target the wrong project                     | GET/list projects and compare repo/root/linkage                                        |
+| Production/Preview domain and alias inventory                                | A domain move can cut traffic                                           | List project domains, deployments, aliases, verification status                        |
+| Environment key types/targets/branches and sensitive support                 | Wrong target leaks or breaks credentials                                | List env metadata only; never request/print values                                     |
+| Agent build-time Executor API key requirement                                | `turbo.json` and runtime config do not establish Vercel build behavior  | Inspect Vercel build settings/log variable names only, then contract-test              |
+| Marketplace integration/configuration and Upstash database IDs               | Recreating a database or binding risks state loss                       | List Marketplace installations/resources/connections and project attachments           |
+| Whether replay and Codex use one physical DB or separate DBs                 | Prefix preservation and blast radius depend on it                       | Compare redacted connection/resource IDs and key prefixes, not tokens                  |
+| Current Sendblue account webhook document                                    | Historical repository notes may be stale                                | GET account webhooks; sanitize URLs to approved route labels and secret presence       |
+| Sendblue GET secret exposure and same-URL rotation behavior                  | State leakage or PUT could remove unrelated hooks                       | Read API response shape safely; ask Sendblue support or test disposable account        |
+| Sendblue account/line IDs, capabilities, and provisioning deletion semantics | Prevents a safe resource lifecycle                                      | GET lines/account limits; obtain provider documentation for deprovision/retain         |
+| Sendblue webhook duplicate/ordering behavior under POST/DELETE               | Reconcile could briefly double-deliver or drop ingress                  | Disposable-account targeted lifecycle test only after authorization                    |
+| Vercel API update idempotency and conflict semantics per endpoint            | Determines safe retry after timeout                                     | Inspect official endpoint schemas/headers; disposable fixture fault test               |
+| Vercel Marketplace mutation API available to this integration/plan           | Public Marketplace APIs may be partner-oriented                         | List accessible endpoints/scopes with read-only token; do not infer from docs          |
+| Dedicated remote state credentials and recovery                              | State custody and locking are infrastructure dependencies               | Inspect chosen state backend, token scopes, encryption, backup/recovery procedure      |
+| Current monitoring/drains/webhooks and alert destinations                    | Duplicate or missing monitoring creates noise/blindness                 | List Vercel webhooks/drains and current sanitized alert policy                         |
+| DNS authority and desired ownership                                          | Domain verification is not DNS ownership                                | Read authoritative DNS provider and records; keep mutation out of initial SPEC         |
+| Photon tenant, project IDs, enabled plan/platforms, and credential scope     | Public docs do not prove Bundjil access, limits, cost, or isolation     | List projects/profile/platforms/subscription with scoped read-only credentials         |
+| Photon line-create timeout and idempotency semantics                         | A blind retry can create a second billable line                         | Obtain provider confirmation, then fault-test only in an authorized disposable project |
+| Photon line deletion finality and number reuse                               | API deletion and billing decrement do not prove number release/recovery | Ask Photon support; observe disposable delete, billing sync, and post-delete list      |
+| Photon project delete/secret rotation API stability                          | CLI-only lifecycle is a weak custom-resource contract                   | Obtain a documented API contract/version or keep project lifecycle bootstrap-only      |
+| Photon Vercel runtime and outbound-message fit                               | Management API coverage does not prove channel compatibility            | Preview-only signed-webhook/SDK journey with synthetic messages and exact timing       |
+| Photon delivery log, DLQ, and alert gaps                                     | Final delivery loss can be operationally invisible                      | Confirm support/dashboard capability; prove Bundjil-owned attempt/outcome alerts       |
 
 Additional risks:
 
@@ -1047,6 +1291,9 @@ Additional risks:
   ([Alchemy nuke](https://v2.alchemy.run/cli/nuke/)).
 - Account-wide Sendblue webhook ownership couples every line. The resource must
   fail if it sees an unadopted entry rather than overwriting it.
+- Photon line creation combines an ambiguous write retry boundary with immediate
+  commercial effect. Treat any uncertain response as `OutcomeUncertain`; do not
+  generalize the documented `5xx` retry guidance over this resource.
 - Provider schemas can drift. Persist provider version and decoded contract
   version in proof; treat unknown enum variants as safe typed failures.
 - A full desired-state environment inventory can reveal operational topology
@@ -1060,16 +1307,16 @@ harness-governance campaign.
 
 | Surface                                    | Decision         | Owner and reason                                                                                                                                             | Verification or non-claim                                                                                         |
 | ------------------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| This decision report                       | Change required  | `docs/research/alchemy-vercel-sendblue-decision-report.md` owns supporting research, proposed spike charters, and the explicit future SPEC boundary          | Research is not executable policy, current provider truth, or authority                                           |
+| This decision report                       | Change required  | `docs/research/alchemy-vercel-sendblue-decision-report.md` owns supporting Vercel/Sendblue/Photon research, spike charters, and the two-stage SPEC boundary  | Research is not executable policy, provider selection, current provider truth, or authority                       |
 | Research index                             | Change required  | `docs/research/README.md` is the necessary pointer from the sole docs router's existing research route                                                       | Pointer resolves to this report                                                                                   |
 | Root `README.md`                           | Preserve         | Public repository entry point already routes to `docs/README.md`; spike detail and mutable provider questions do not belong there                            | No public setup, package shape, or supported command changed                                                      |
 | `docs/README.md`                           | Preserve         | It already owns lifecycle/truth layers and routes supporting research to `docs/research/README.md`                                                           | No document class, lifecycle vocabulary, or route changed                                                         |
-| Architecture and standards                 | Preserve         | Recommendations are not accepted durable design; promotion waits for a new infrastructure SPEC and implementation evidence                                   | No current architecture claim is made                                                                             |
+| Architecture and standards                 | Preserve         | Hybrid ownership and Photon are recommendations, not accepted durable design; promotion waits for provider-selection SPEC and implementation evidence        | No current architecture or provider-selection claim is made                                                       |
 | App and package READMEs                    | Preserve         | No runtime, public command, export, app boundary, or package contract changed                                                                                | Historical provider observations there remain non-current and are not copied                                      |
 | Public API and generated references        | N/A              | No public API, generated document, source Schema, export, or generator changed; Bundjil has no generated owner for this research                             | No generated output is edited and no regeneration command is claimed                                              |
 | Active SPEC/tasks and execution plans      | Preserve         | Current intent remains HGI-300 only; infrastructure work must begin with `prd-writer`, a new indexed SPEC/task ledger, and a matching active plan            | This report neither opens nor advances an implementation task                                                     |
 | Runbooks                                   | N/A for research | No provider operation is authorized; HGI-304 still owns creation of canonical `docs/runbooks/**` routes, and the future infrastructure SPEC must add targets | Proposed commands are explicitly unexecuted; no operational authority, receipt, rollback execution, or readback   |
-| Critical journeys and proof                | N/A for research | No spike has run; HGI-303 still owns canonical `docs/verification/**`, and a future SPEC must define artifact/environment/authority receipts                 | Local documentation checks cannot prove Vercel, Sendblue, Upstash, DNS, deployment, or Production state           |
+| Critical journeys and proof                | N/A for research | No spike has run; HGI-303 still owns canonical `docs/verification/**`, and a future SPEC must define artifact/environment/authority receipts                 | Local documentation checks cannot prove Vercel, Sendblue, Photon, Upstash, DNS, deployment, or Production state   |
 | Skills and agent instructions              | N/A              | This slice follows existing `docs-maintainer`, `prd-writer`, and `prd-implementer` contracts without changing their behavior                                 | `bun run check:skills` verifies existing instruction surfaces only                                                |
 | Code, config, Schemas, CI, lint, and tests | N/A              | No implementation or executable policy changed                                                                                                               | Repository verification proves the documentation slice does not regress the checked repository, not spike success |
 | Migration and release notes                | N/A              | No data migration, compatibility transition, package version, release, publication, or deployment occurred                                                   | No changelog, Changeset, release note, migration guide, or release proof is created                               |
@@ -1101,7 +1348,31 @@ Primary upstream sources read 2026-07-20:
 - [Sendblue webhooks](https://docs.sendblue.com/getting-started/webhooks/)
 - [Sendblue API v2](https://docs.sendblue.com/api-v2/)
 - [Sendblue limits](https://docs.sendblue.com/limits/)
+- [Photon Spectrum API introduction](https://photon.codes/docs/api-reference/introduction)
+- [Photon Spectrum OpenAPI](https://spectrum.photon.codes/openapi/json)
+- [Photon Dashboard OpenAPI](https://photon.codes/docs/api-reference/dashboard-openapi.json)
+- [Photon project lifecycle CLI](https://photon.codes/docs/cli/projects)
+- [Photon project creation](https://photon.codes/docs/api-reference/projects/create-project)
+- [Photon line inventory](https://photon.codes/docs/api-reference/lines/list-project-lines)
+- [Photon dedicated-line creation](https://photon.codes/docs/api-reference/lines/add-a-dedicated-imessage-line)
+- [Photon dedicated-line deletion](https://photon.codes/docs/api-reference/lines/remove-a-dedicated-line)
+- [Photon subscription details](https://photon.codes/docs/api-reference/billing/get-subscription-details)
+- [Photon billing-sync status](https://photon.codes/docs/api-reference/billing/get-billing-sync-status)
+- [Photon webhook management](https://photon.codes/docs/webhooks/managing-webhooks)
+- [Photon webhook registration](https://photon.codes/docs/api-reference/webhooks/register-webhook)
+- [Photon webhook listing](https://photon.codes/docs/api-reference/webhooks/list-webhooks)
+- [Photon webhook deletion](https://photon.codes/docs/api-reference/webhooks/delete-webhook)
+- [Photon webhook delivery](https://photon.codes/docs/webhooks/delivery)
+- [Photon webhook troubleshooting](https://photon.codes/docs/webhooks/troubleshooting)
+- [Photon user creation](https://photon.codes/docs/api-reference/users/create-user)
+- [Photon user deletion](https://photon.codes/docs/api-reference/users/delete-user)
+- [Photon platform inventory](https://photon.codes/docs/api-reference/platforms/get-platforms)
+- [Photon platform toggle](https://photon.codes/docs/api-reference/platforms/toggle-platform)
+- [Photon platform metadata](https://photon.codes/docs/api-reference/platforms/update-platform-metadata)
+- [Photon Spectrum TypeScript getting started](https://photon.codes/docs/spectrum-ts/getting-started)
+- [Photon Spectrum TypeScript webhooks](https://photon.codes/docs/spectrum-ts/webhooks)
+- [Photon API rate limit](https://photon.codes/docs/api-reference/rate-limit)
 
 Research also used Executor Personal DeepWiki and Parallel search for discovery
 and cross-checking. Conclusions above cite primary sources. No live provider
-connector or provider CLI was used.
+connector, provider API credential, or provider CLI was used.
