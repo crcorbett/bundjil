@@ -38,7 +38,27 @@
     "activeSpec": "docs/product-specs/harness-governance-documentation.md",
     "activePlan": "docs/exec-plans/active/harness-governance-documentation.md",
     "completedPlans": "docs/exec-plans/completed/README.md; 11 retained completed plan files",
-    "completedLedgers": "All task entries in 12 sibling *.tasks.json ledgers are completed; two ledger-level statuses are implemented and the Vercel ledger retains a historical granted approval, as inventoried by docs/product-specs/index.md.",
+    "historicalLedgers": {
+      "total": 12,
+      "taskArraysWithAllEntriesCompleted": 12,
+      "ledgerStatusCounts": {
+        "completed": 10,
+        "implemented": 2
+      },
+      "implementedStatusLedgers": [
+        "docs/product-specs/effect-persistence.tasks.json",
+        "docs/product-specs/effect-schema-string-contracts.tasks.json"
+      ],
+      "historicalApprovals": [
+        {
+          "ledger": "docs/product-specs/vercel-production-promotion.tasks.json",
+          "status": "granted",
+          "scope": "Production provisioning and deployment",
+          "recordedAt": "2026-07-14"
+        }
+      ],
+      "classification": "Task-array completion does not erase retained ledger-level lifecycle or recorded approval provenance; see docs/product-specs/index.md."
+    },
     "researchRoute": "docs/research/README.md",
     "rootReadmePolicy": "Product purpose, stable repo shape, routes, and local commands only; mutable provider/deployment proof removed.",
     "knownMissingOwners": [

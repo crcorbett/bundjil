@@ -63,7 +63,7 @@
     {
       "check": "fresh-context route retrieval",
       "status": "passed",
-      "result": "Reader found the sole lifecycle and architecture owners, active SPEC/plan, 11 completed plans, 12 historical ledgers whose task entries are completed but whose ledger/approval provenance remains distinct, research/reference route, and explicit HGI-303/HGI-304 gaps; refused README/atlas provider actuality."
+      "result": "Reader found the sole lifecycle and architecture owners, active SPEC/plan, 11 completed plans, and 12 historical ledger documents: every task array is completed, 10 ledger statuses are completed, 2 are implemented, and the Vercel ledger retains one historical scoped granted approval. The reader treated those distinct fields as provenance, not standing authority; it also found the research/reference route and explicit HGI-303/HGI-304 gaps, and refused README/atlas provider actuality."
     },
     {
       "check": "focused relative-link resolution",
@@ -94,7 +94,7 @@
   "artifacts": [
     {
       "path": "corpus-inventory.json",
-      "sha256": "c202ea96b639243677ba710d134fd4944d647f25206ed066a6cd5cae5e1faee3"
+      "sha256": "87af750d9d5ed62eba9ce874feb6f111b2987465de7e10e1b188ed3a965b9967"
     },
     {
       "path": "link-report.json",
