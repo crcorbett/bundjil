@@ -58,7 +58,7 @@
     {
       "check": "scoped Git receipt",
       "status": "passed",
-      "result": "Semantic commit 7b8fd35e0c54733a7960e7f7528e34f6c9a60d81 records the bounded route and move; correction commit 7a2adc81595bd798944389e1ac68bdbf8693f1f3 changes only the product-spec index to preserve distinct ledger/approval provenance. The Git receipt records both trees and path digests."
+      "result": "Semantic commit 7b8fd35e0c54733a7960e7f7528e34f6c9a60d81 records the bounded route and move; correction commit 7a2adc81595bd798944389e1ac68bdbf8693f1f3 preserves distinct ledger/approval provenance; classification repair 58523b7f1c33f2a3eac4613f09c23c40379a1b9f makes the index, SPEC, plan, corpus receipt, and acceptance receipt agree on all three historical field layers."
     },
     {
       "check": "fresh-context route retrieval",
@@ -109,5 +109,5 @@
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is changed or proved."
   ],
-  "nextTrigger": "Commit the evidence-only receipt reconciliation, push both bounded commits, read back origin/main, and continue later HGI-300 semantic-owner slices."
+  "nextTrigger": "Continue the next bounded HGI-300 semantic-owner slice from classification repair 58523b7f1c33f2a3eac4613f09c23c40379a1b9f; keep package runbook/proof extraction under HGI-303 and HGI-304."
 }
