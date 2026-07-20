@@ -5,6 +5,7 @@ import {
   CodexOAuthAccountId,
   CodexOAuthProfileId,
   CodexOAuthSubject,
+  CodexResponsesReasoningEffort,
   OpenAICompatibleProxyInternalToken,
 } from "@bundjil/codex";
 import {
@@ -35,6 +36,17 @@ const proxyModeConfig = Config.schema(
   CodexProxyMode,
   "BUNDJIL_CODEX_PROXY_MODE"
 ).pipe(Config.withDefault("mock"));
+
+const reasoningEffortConfig = Config.schema(
+  CodexResponsesReasoningEffort,
+  "BUNDJIL_CODEX_PROXY_REASONING_EFFORT"
+);
+
+const codexProxyConfigDefaults = ConfigProvider.fromEnv({
+  env: {
+    BUNDJIL_CODEX_PROXY_REASONING_EFFORT: "low",
+  },
+});
 
 const internalTokenConfig = Config.schema(
   OpenAICompatibleProxyInternalToken,
@@ -131,6 +143,7 @@ export class CodexProxyConfig extends Context.Service<
 export const loadCodexProxyConfig = Effect.gen(
   function* loadCodexProxyConfigFromProvider() {
     const mode = yield* proxyModeConfig;
+    const reasoningEffort = yield* reasoningEffortConfig;
     const internalToken = yield* internalTokenConfig;
     const profileId = yield* profileIdConfig;
     const connectorId = yield* connectorIdConfig;
@@ -153,6 +166,7 @@ export const loadCodexProxyConfig = Effect.gen(
 
     const config = yield* decodeCodexProxyRuntimeConfig({
       mode,
+      reasoningEffort,
       internalToken: Redacted.value(internalToken),
       subject,
       ...(Option.isNone(accountId)
@@ -189,7 +203,10 @@ export const loadCodexProxyConfig = Effect.gen(
 
     return config;
   }
-).pipe(Effect.withSpan("CodexProxyConfig.load"));
+).pipe(
+  Effect.withSpan("CodexProxyConfig.load"),
+  Effect.provide(ConfigProvider.layerAdd(codexProxyConfigDefaults))
+);
 
 export const loadCodexProxyConfigFromEnv = loadCodexProxyConfig.pipe(
   Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv()))

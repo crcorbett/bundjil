@@ -432,9 +432,10 @@ Codex proxy mode is opt-in:
   Example: `http://127.0.0.1:8788/v1`.
 - `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`: required internal bearer token.
 - `BUNDJIL_CODEX_PROXY_MODEL`: optional proxy model id override. If omitted,
-  `BUNDJIL_AGENT_MODEL` is used as the proxy model id.
+  `BUNDJIL_AGENT_MODEL` is used as the proxy model id. The coordinated Terra
+  rollout value is `gpt-5.6-terra`.
 - `BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS`: optional positive integer.
-  Defaults to `200000`.
+  Defaults to `200000`; the coordinated Terra rollout value is `1050000`.
 
 The Eve app does not know about Codex OAuth profiles, refresh tokens, or the
 direct `chatgpt.com` Responses endpoint. In Codex proxy mode it only receives
@@ -450,7 +451,7 @@ Upstash credentials, or envelope cipher keys. App-owned Sendblue replay-store
 Upstash URL/token bindings are legitimate agent configuration and remain
 separate from the Codex profile, cipher, lock, and fence material.
 
-The root [`turbo.json`](../../turbo.json) declares those five provider values
+The root [`turbo.json`](../../turbo.json) declares these provider values
 only for `@bundjil/agent#build`. Eve resolves the model manifest during
 `eve build`; without that scoped Turbo environment contract, a Vercel build can
 silently compile the Gateway default instead of the selected proxy model.
@@ -537,15 +538,15 @@ bun run --filter @bundjil/codex-proxy dev
 ```bash
 PORT=2101 \
 BUNDJIL_AGENT_MODEL_PROVIDER=codex-proxy \
-BUNDJIL_AGENT_MODEL=codex-default-model \
+BUNDJIL_CODEX_PROXY_MODEL=gpt-5.6-terra \
 BUNDJIL_CODEX_PROXY_BASE_URL=http://127.0.0.1:8788/v1 \
 BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN=local-proof-token \
-BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=123456 \
+BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=1050000 \
 bun run --filter @bundjil/agent dev:no-ui
 ```
 
 With those two local processes running, `GET /eve/v1/info` reports model id
-`bundjil-codex-proxy/codex-default-model` and context window `123456`.
+`bundjil-codex-proxy/gpt-5.6-terra` and context window `1050000`.
 `POST /eve/v1/session` plus `GET /eve/v1/session/<sessionId>/stream` emits a
 mock model response through the private proxy. The proof output should include
 event type, model id, and status only; do not print bearer tokens, OAuth

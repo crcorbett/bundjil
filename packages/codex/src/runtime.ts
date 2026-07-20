@@ -61,6 +61,7 @@ import {
 } from "./provider/request-mapper.js";
 import {
   CodexResponsesRequestPolicyLowLive,
+  defaultCodexResponsesRequestPolicy,
   makeCodexResponsesRequestPolicyLayer,
 } from "./provider/request-policy.js";
 import {
@@ -385,7 +386,7 @@ export const makeCodexRequestMapperLive = (
   );
 
 export const CodexRequestMapperLive = makeCodexRequestMapperLive({
-  reasoningEffort: "low",
+  ...defaultCodexResponsesRequestPolicy,
 });
 
 export const CodexStreamMapperLive = Layer.succeed(
@@ -393,18 +394,30 @@ export const CodexStreamMapperLive = Layer.succeed(
   makeCodexStreamMapper
 );
 
-export const CodexDirectProviderLive = Layer.effect(
-  CodexDirectProvider,
-  makeCodexDirectProvider
-).pipe(
-  Layer.provideMerge(Layer.merge(CodexRequestMapperLive, CodexStreamMapperLive))
+export const makeCodexDirectProviderLive = (
+  policy: CodexResponsesRequestPolicy
+) =>
+  Layer.effect(CodexDirectProvider, makeCodexDirectProvider).pipe(
+    Layer.provideMerge(
+      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    )
+  );
+
+export const CodexDirectProviderLive = makeCodexDirectProviderLive(
+  defaultCodexResponsesRequestPolicy
 );
 
-export const CodexLegacyDirectProviderLive = Layer.effect(
-  CodexDirectProvider,
-  makeCodexLegacyDirectProvider
-).pipe(
-  Layer.provideMerge(Layer.merge(CodexRequestMapperLive, CodexStreamMapperLive))
+export const makeCodexLegacyDirectProviderLive = (
+  policy: CodexResponsesRequestPolicy
+) =>
+  Layer.effect(CodexDirectProvider, makeCodexLegacyDirectProvider).pipe(
+    Layer.provideMerge(
+      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    )
+  );
+
+export const CodexLegacyDirectProviderLive = makeCodexLegacyDirectProviderLive(
+  defaultCodexResponsesRequestPolicy
 );
 
 export const OpenAICompatibleProxyLive = Layer.effect(

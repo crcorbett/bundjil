@@ -1,9 +1,10 @@
+import type { CodexResponsesRequestPolicy } from "@bundjil/codex";
 import {
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
 } from "@bundjil/codex";
 import {
-  CodexDirectProviderLive,
+  makeCodexDirectProviderLive,
   CodexHttpClientLive,
   CodexOAuthHttpClientLive,
   CodexOAuthProfileCipherLive,
@@ -21,6 +22,7 @@ import {
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
 
+import { CodexProxyConfig } from "./env.js";
 import { CodexProxyProfileCipherConfigLive } from "./proof-cipher-config.layer.js";
 import {
   CodexProxyReadyLive,
@@ -72,15 +74,30 @@ const CodexProxyHttpClientLive = CodexHttpClientLive.pipe(
   Layer.provide(CodexResponsesFetchLive)
 );
 
-const CodexProxyDirectProviderLive = CodexDirectProviderLive.pipe(
-  Layer.provideMerge(
-    Layer.merge(CodexProxyOAuthServiceLive, CodexProxyHttpClientLive)
-  )
-);
+const makeCodexProxyDirectProviderLive = (
+  policy: CodexResponsesRequestPolicy
+) =>
+  makeCodexDirectProviderLive(policy).pipe(
+    Layer.provideMerge(
+      Layer.merge(CodexProxyOAuthServiceLive, CodexProxyHttpClientLive)
+    )
+  );
 
-export const CodexProxyOpenAICompatibleProxyLive = Layer.merge(
-  OpenAICompatibleProxyLive.pipe(Layer.provide(CodexProxyDirectProviderLive)),
-  CodexProxyReadyLive
+export const CodexProxyOpenAICompatibleProxyLive = Layer.unwrap(
+  Effect.gen(function* makeCodexProxyOpenAICompatibleProxyLive() {
+    const config = yield* CodexProxyConfig;
+
+    return Layer.merge(
+      OpenAICompatibleProxyLive.pipe(
+        Layer.provide(
+          makeCodexProxyDirectProviderLive({
+            reasoningEffort: config.reasoningEffort,
+          })
+        )
+      ),
+      CodexProxyReadyLive
+    );
+  })
 );
 
 export const CodexProxyOpenAICompatibleProxyUnavailableLive = Layer.succeed(

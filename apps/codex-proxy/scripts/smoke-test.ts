@@ -24,6 +24,7 @@ const SmokeTestResult = Schema.Struct({
 const smokeConfig = makeCodexProxyConfig({
   internalToken: "smoke-test-token",
   mode: "mock",
+  reasoningEffort: "low",
   subject: {
     connectorId: "bundjil-codex-proxy",
     installationId: "smoke-test",

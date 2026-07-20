@@ -233,6 +233,7 @@ export type { CodexRequestMapperShape } from "./provider/request-mapper.js";
 export {
   CodexResponsesRequestPolicyLowLive,
   CodexResponsesRequestPolicyService,
+  defaultCodexResponsesRequestPolicy,
   makeCodexResponsesRequestPolicyLayer,
 } from "./provider/request-policy.js";
 export type { CodexResponsesRequestPolicyServiceShape } from "./provider/request-policy.js";

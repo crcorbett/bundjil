@@ -5,7 +5,10 @@ import { once } from "node:events";
 import { createServer } from "node:http";
 import process from "node:process";
 
-import { OpenAICompatibleChatCompletionChunk } from "@bundjil/codex";
+import {
+  OpenAICompatibleChatCompletionChunk,
+  OpenAICompatibleChatCompletionRequest,
+} from "@bundjil/codex";
 import { Schema } from "effect";
 import { describe, it } from "vitest";
 
@@ -23,11 +26,15 @@ const encodeErrorResponse = Schema.encodeSync(
 const encodeChatCompletionChunk = Schema.encodeSync(
   Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
 );
+const decodeChatCompletionRequest = Schema.decodeUnknownSync(
+  Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+);
 
 const liveHealthResponse = encodeHealthResponse(
   CodexProxyHealthResponse.make({
     mode: "live",
     ok: true,
+    reasoningEffort: "high",
     service: "bundjil-codex-proxy",
   })
 );
@@ -71,35 +78,43 @@ const runProofFixture = async (
 ) => {
   const internalToken = "preview-proof-test-token";
   const bypassHeaders: (string | undefined)[] = [];
+  const requestBodies: string[] = [];
   const server = createServer((request, response) => {
-    const url = new URL(request.url ?? "/", "http://127.0.0.1");
-    const bypassHeader = request.headers["x-vercel-protection-bypass"];
-    bypassHeaders.push(
-      Array.isArray(bypassHeader) ? bypassHeader.at(0) : bypassHeader
-    );
-
-    if (url.pathname === "/health") {
-      response.writeHead(200, { "content-type": "application/json" });
-      response.end(liveHealthResponse);
-      return;
-    }
-
-    if (request.headers.authorization === undefined) {
-      response.writeHead(401, { "content-type": "application/json" });
-      response.end(missingBearerResponse);
-      return;
-    }
-
-    if (request.headers.authorization === "Bearer preview-proof-invalid") {
-      response.writeHead(401, { "content-type": "application/json" });
-      response.end(invalidBearerResponse);
-      return;
-    }
-
-    response.writeHead(authenticatedStatus, {
-      "content-type": authenticatedContentType,
+    const chunks: Buffer[] = [];
+    request.on("data", (chunk: Buffer) => {
+      chunks.push(chunk);
     });
-    response.end(fixtureSse);
+    request.on("end", () => {
+      const url = new URL(request.url ?? "/", "http://127.0.0.1");
+      const bypassHeader = request.headers["x-vercel-protection-bypass"];
+      bypassHeaders.push(
+        Array.isArray(bypassHeader) ? bypassHeader.at(0) : bypassHeader
+      );
+      requestBodies.push(Buffer.concat(chunks).toString());
+
+      if (url.pathname === "/health") {
+        response.writeHead(200, { "content-type": "application/json" });
+        response.end(liveHealthResponse);
+        return;
+      }
+
+      if (request.headers.authorization === undefined) {
+        response.writeHead(401, { "content-type": "application/json" });
+        response.end(missingBearerResponse);
+        return;
+      }
+
+      if (request.headers.authorization === "Bearer preview-proof-invalid") {
+        response.writeHead(401, { "content-type": "application/json" });
+        response.end(invalidBearerResponse);
+        return;
+      }
+
+      response.writeHead(authenticatedStatus, {
+        "content-type": authenticatedContentType,
+      });
+      response.end(fixtureSse);
+    });
   });
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
@@ -152,7 +167,7 @@ const runProofFixture = async (
   server.close();
   await closed;
 
-  return { bypassHeaders, exitCode, stderr, stdout };
+  return { bypassHeaders, exitCode, requestBodies, stderr, stdout };
 };
 
 describe("preview proof", () => {
@@ -161,6 +176,8 @@ describe("preview proof", () => {
 
     assert.equal(result.exitCode, 0);
     assert.match(result.stdout, /"status":"proved"/);
+    assert.match(result.stdout, /"healthReasoningEffortHigh":true/);
+    assert.match(result.stdout, /"requestedModelTerra":true/);
     assert.doesNotMatch(result.stdout, /preview-proof-test-token/);
     assert.doesNotMatch(result.stdout, /Reply only: OK\./);
     assert.doesNotMatch(result.stdout, /fixture model body/);
@@ -171,6 +188,12 @@ describe("preview proof", () => {
       undefined,
       undefined,
     ]);
+    assert.equal(result.requestBodies.length, 4);
+    for (const body of result.requestBodies.slice(1)) {
+      const payload = decodeChatCompletionRequest(body);
+      assert.equal(payload.model, "gpt-5.6-terra");
+      assert.doesNotMatch(body, /"reasoning"/);
+    }
   });
 
   it("forwards the configured protection bypass without emitting it", async () => {

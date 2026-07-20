@@ -592,9 +592,17 @@ BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=<optional-positive-integer>
 
 Rules:
 
-- Keep Gateway mode as the default. Implementing refresh-capable `live` proxy
+- Keep Gateway mode as the default. The current unproved Terra rollout target
+  is `BUNDJIL_CODEX_PROXY_MODEL=gpt-5.6-terra`,
+  `BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=1050000`. The separate proxy
+  project owns `BUNDJIL_CODEX_PROXY_REASONING_EFFORT=high`; it defaults effort
+  to `low` only when that variable is absent and exposes only its safe
+  effective effort in health. Eve never sends a reasoning control. Implementing
+  refresh-capable `live` proxy
   behavior does not authorize production. The accepted hosted-preview proof
-  uses `bundjil-codex-proxy/gpt-5.5`; production still requires an explicit
+  used `bundjil-codex-proxy/gpt-5.5`; it is historical evidence, not Terra
+  acceptance. The required Terra Preview identity is exactly
+  `bundjil-codex-proxy/gpt-5.6-terra`; production still requires an explicit
   approval, stable production proxy URL, and separate credentials.
 - Put the internal proxy token only in ignored env files or Vercel env vars.
 - Keep `BUNDJIL_CODEX_PROXY_BASE_URL` pointed at the private proxy `/v1`

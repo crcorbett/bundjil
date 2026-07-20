@@ -40,14 +40,18 @@ const protectionBypassConfig = Config.option(
   )
 );
 
+const previewProofModel = CodexResponsesModelId.make("gpt-5.6-terra");
+
 const PreviewProofResult = Schema.Struct({
   authenticatedStatus: Schema.Number,
   authorizationCodeLeak: Schema.Boolean,
   healthModeLive: Schema.Boolean,
   healthReady: Schema.Boolean,
+  healthReasoningEffortHigh: Schema.Boolean,
   healthStatus: Schema.Number,
   invalidTokenStatus: Schema.Number,
   rawPayloadLeak: Schema.Boolean,
+  requestedModelTerra: Schema.Boolean,
   streamContentTypeSse: Schema.Boolean,
   streamDataLines: Schema.Int,
   streamDone: Schema.Boolean,
@@ -69,9 +73,11 @@ const PreviewProofContract = Schema.Struct({
   authorizationCodeLeak: Schema.Literal(false),
   healthModeLive: Schema.Literal(true),
   healthReady: Schema.Literal(true),
+  healthReasoningEffortHigh: Schema.Literal(true),
   healthStatus: Schema.Literal(200),
   invalidTokenStatus: Schema.Literal(401),
   rawPayloadLeak: Schema.Literal(false),
+  requestedModelTerra: Schema.Literal(true),
   streamContentTypeSse: Schema.Literal(true),
   streamDataLines: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(1))),
   streamDone: Schema.Literal(true),
@@ -95,7 +101,7 @@ const program = Effect.gen(function* provePreview() {
   )(
     OpenAICompatibleChatCompletionRequest.make({
       messages: [{ content: "Reply only: OK.", role: "user" }],
-      model: CodexResponsesModelId.make("gpt-5.5"),
+      model: previewProofModel,
       stream: true,
     })
   );
@@ -164,9 +170,11 @@ const program = Effect.gen(function* provePreview() {
       authenticatedBody.includes("code_verifier"),
     healthModeLive: healthPayload.mode === "live",
     healthReady: healthPayload.ok,
+    healthReasoningEffortHigh: healthPayload.reasoningEffort === "high",
     healthStatus: health.status,
     invalidTokenStatus: invalid.status,
     rawPayloadLeak: authenticatedBody.includes("Reply only: OK."),
+    requestedModelTerra: previewProofRequest.includes("gpt-5.6-terra"),
     streamContentTypeSse:
       authenticated.headers["content-type"]
         ?.split(";", 1)[0]

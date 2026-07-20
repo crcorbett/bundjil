@@ -63,6 +63,10 @@ browser bundle, committed file, command transcript, or docs.
 
 - `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`: required private bearer token.
 - `BUNDJIL_CODEX_PROXY_MODE`: `mock`, `local`, or `live`; default `mock`.
+- `BUNDJIL_CODEX_PROXY_REASONING_EFFORT`: non-secret Responses reasoning
+  policy: `low` or `high`. It defaults to `low` only when unset; malformed
+  present values fail configuration decoding. The coordinated Terra rollout
+  sets `high` alongside Eve's `gpt-5.6-terra` model and `1050000` context.
 - `BUNDJIL_CODEX_PROFILE_ID`, `BUNDJIL_CODEX_CONNECTOR_ID`,
   `BUNDJIL_CODEX_INSTALLATION_ID`, and `BUNDJIL_CODEX_SUBJECT_ID`: explicit
   non-secret profile subject fields shared by importer and proxy.
@@ -178,6 +182,7 @@ sanitized result shape:
 ```text
 healthStatus: 200
 healthMode: live
+healthReasoningEffortHigh: true
 unauthenticatedStatus: 401
 invalidTokenStatus: 401
 streamStatus: 200
@@ -192,11 +197,14 @@ rawPayloadLeak: false
 black-box check when its preview URL and internal bearer are supplied through
 ignored environment state. It emits only the documented statuses, booleans, and
 SSE data-line count inside a `status: "proved"` result, and exits zero only
-when health is ready/live, both rejected bearer checks return `401`, the
+when health is ready/live, health safely reports `high`, the request safely
+asserts `gpt-5.6-terra`, both rejected bearer checks return `401`, the
 authenticated response is complete SSE with at least two data lines, and every
 leak predicate is false. A `status: "blocked"` result means the command was an
 attempted probe, not passing proof. It never prints the bearer, request body,
-or stream body.
+or stream body. This is still only the operator-side prerequisite: a real
+source-built Preview subscription-endpoint request and protected Eve identity
+readback remain separate required evidence.
 This command does not force a refresh; use the separate isolated-profile
 refresh proof before using a new profile/cipher pair. The accepted proof uses a
 trusted-local isolated profile, stages only that profile near expiry, makes two
@@ -214,8 +222,13 @@ The proxy refreshes proactively and may replay exactly once after a provider 401
 login again. On `codex_auth_temporarily_unavailable`, do not mutate credentials
 or add an app retry loop; retry the original caller operation later.
 
-For a retained Preview rollback, set the preview mode back to `mock` and deploy
-a new Preview:
+For the Terra rollout rollback, restore the retained Preview values
+`BUNDJIL_CODEX_PROXY_REASONING_EFFORT=low`,
+`BUNDJIL_CODEX_PROXY_MODEL=gpt-5.5`, and
+`BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=200000`, then deploy a new Preview
+and repeat the sanitized health/auth/Eve checks. Setting the proxy mode back to
+`mock` is a separate incident containment action, not evidence of a live
+subscription rollback:
 
 ```bash
 vercel env add BUNDJIL_CODEX_PROXY_MODE preview

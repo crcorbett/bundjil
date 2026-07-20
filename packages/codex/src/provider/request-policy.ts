@@ -19,7 +19,7 @@ export const makeCodexResponsesRequestPolicyLayer = (
     CodexResponsesRequestPolicyService.of({ policy })
   );
 
-const defaultCodexResponsesRequestPolicy = {
+export const defaultCodexResponsesRequestPolicy = {
   reasoningEffort: "low",
 } satisfies CodexResponsesRequestPolicy;
 

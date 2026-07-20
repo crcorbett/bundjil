@@ -78,11 +78,12 @@ it.effect(
           ConfigProvider.layer(
             ConfigProvider.fromEnv({
               env: {
-                BUNDJIL_AGENT_MODEL: "codex-default-model",
+                BUNDJIL_AGENT_MODEL: "gateway-fixture-model",
                 BUNDJIL_AGENT_MODEL_PROVIDER: "codex-proxy",
                 BUNDJIL_CODEX_PROXY_BASE_URL: "http://127.0.0.1:8787/v1",
-                BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS: "123456",
+                BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS: "1050000",
                 BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                BUNDJIL_CODEX_PROXY_MODEL: "gpt-5.6-terra",
                 BUNDJIL_CODEX_PROXY_VERCEL_BYPASS: "test-protection-bypass",
               },
             })
@@ -132,7 +133,7 @@ it.effect(
                 ],
                 created: 1_700_000_000,
                 id: "chatcmpl-bundjil-agent-test",
-                model: "codex-default-model",
+                model: "gpt-5.6-terra",
                 object: "chat.completion",
                 usage: {
                   completion_tokens: 1,
@@ -165,10 +166,10 @@ it.effect(
         throw new Error("Expected Codex proxy model provider config.");
       }
 
-      assert.strictEqual(config.model, "codex-default-model");
+      assert.strictEqual(config.model, "gpt-5.6-terra");
       assert.strictEqual(config.baseURL.href, "http://127.0.0.1:8787/v1");
-      assert.strictEqual(config.modelContextWindowTokens, 123_456);
-      assert.strictEqual(model.modelId, "codex-default-model");
+      assert.strictEqual(config.modelContextWindowTokens, 1_050_000);
+      assert.strictEqual(model.modelId, "gpt-5.6-terra");
       assert.strictEqual(model.provider, "bundjil-codex-proxy.chat");
       assert.strictEqual(model.specificationVersion, "v4");
 
@@ -194,5 +195,6 @@ it.effect(
       assert.strictEqual(result.text, "OK");
       assert.notInclude(request.body ?? "", "test-internal-token");
       assert.notInclude(request.body ?? "", "test-protection-bypass");
+      assert.notInclude(request.body ?? "", '"reasoning"');
     })
 );

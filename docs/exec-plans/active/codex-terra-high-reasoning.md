@@ -19,15 +19,17 @@ does not authorize Vercel deployment or environment mutation.
 
 ## Current task
 
-`proxy-config-and-layer-injection` — in progress.
+Repository tasks 1–3 and 5 are complete. Task
+`authorized-preview-subscription-proof` remains pending explicit deployment
+authority.
 
 ## Evidence record
 
-| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                        |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ownership and call graph | Accepted Task 1 establishes `@bundjil/codex` as the owner of the Responses effort vocabulary, decoded request policy, mapper, proof policy, and request encoding. The current task adds app-owned config and provides that decoded policy into proxy live/local/mock composition; `apps/agent` retains model selection. |
-| Implementation quality   | Task 1 uses schema-derived Type/Encoded contracts and a named policy service/layer; its mapper/proof operations remain flat and typed. Task 2 must keep Config parsing solely in `apps/codex-proxy/src/env.ts`, expose no raw option or environment read to the package, and preserve explicit Layer composition.       |
-| Verification coverage    | Task 1 passed store build, focused Codex typecheck/tests (110), Effect setup, boundary, skill, and full verification gates. Task 2 adds config, handler, and proxy build/smoke checks. Live Preview proof is pending explicit deployment authority.                                                                     |
+| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve model/context selection.                                                                                                                                                                                        |
+| Implementation quality   | Tasks 1–3 use schema-derived Type/Encoded contracts, named policy/config services, typed errors, and explicit live/local/test Layers. Proxy configuration is decoded solely in `apps/codex-proxy/src/env.ts`; a fallback provider preserves absent-key `low` without masking invalid input.                                                                                                                                                              |
+| Verification coverage    | Task 1 passed store build, focused Codex typecheck/tests (110), Effect setup, boundary, skill, and full verification gates. Task 2 passed proxy typechecking/tests (31), including captured Terra/high outbound payload. Task 3 passed agent tests (79) with synthetic explicit Executor mode, proxy build/smoke checks, and proof fixtures. Task 5 reran full `bun run verification`; Live Preview proof remains pending explicit deployment authority. |
 
 ## Downstream-impact ledger
 
