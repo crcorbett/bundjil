@@ -1,0 +1,149 @@
+{
+  "title": "Codex Proxy GPT-5.6 Terra High Reasoning Tasks",
+  "status": "proposed",
+  "spec": "docs/product-specs/codex-terra-high-reasoning.md",
+  "principles": [
+    "Preview subscription-endpoint proof is required; direct public API, local Codex, mock, and repository-only results are insufficient.",
+    "The Codex package owns the Responses effort vocabulary and decoded request policy; apps/codex-proxy owns the environment key and Layer injection; apps/agent owns Eve model selection.",
+    "Keep the existing low behavior when the new proxy effort setting is absent, then make high an explicit coordinated Terra rollout setting.",
+    "Never log, commit, retain, or display credentials, prompts, provider request or response bodies, account ids, tool values, reasoning text, or chain-of-thought."
+  ],
+  "globalVerification": [
+    "bun run check:effect-setup",
+    "bun run check:boundaries",
+    "bun run check:skills",
+    "bun run --filter @bundjil/codex check-types",
+    "bun run --filter @bundjil/codex test",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "Effect language-service diagnostics for changed TypeScript files",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "riskLenses": [
+    "Ownership and call graph: package provider vocabulary/policy, proxy config/Layer composition, agent model selection, and Preview deployment boundaries remain separate.",
+    "Implementation quality: flat meaningful Effect.gen operations, typed .pipe error handling, schema Type/Encoded provenance, named services, safe tagged errors, explicit live/mock Layers, and no unsafe casts/manual readers/helper sprawl.",
+    "Verification coverage: focused schemas/config/mapper/handler/agent tests, direct HTTP and Preview/Eve live evidence, boundary and skill checks, safe observability and rollback readback."
+  ],
+  "tasks": [
+    {
+      "id": "codex-responses-reasoning-policy-contract",
+      "title": "Create the canonical decoded Responses reasoning policy",
+      "status": "pending",
+      "description": "Extract the named literal-union effort schema and add the package-owned decoded request-policy service and explicit live/test policy layers. Make CodexRequestMapper consume that policy instead of hard-coding low; do not add raw options or new provider surface area.",
+      "implementationNotes": [
+        "Own CodexResponsesReasoningEffort and CodexResponsesRequestPolicy in packages/codex/src/provider/contracts.ts or an adjacent feature-owned provider contract file, with Type and Encoded exports.",
+        "Use a literal union, not a brand, because effort is a closed upstream protocol enum. Reuse it inside CodexResponsesReasoning.",
+        "Add named Context service operation/layers with decoded policy input. Keep CodexRequestMapper.toCodexResponses named and package-owned.",
+        "Encode CodexResponsesRequest immediately at the existing HTTP adapter; provider results remain immediately decoded in CodexHttpClient.",
+        "Review CodexResponsesProof so it receives explicit policy or is clearly separately schema-configured; do not retain an unexplained low hard-code."
+      ],
+      "mandatoryVerification": [
+        "Focused @effect/vitest tests encode a target request with model gpt-5.6-terra and reasoning.effort high, and retain an explicit low compatibility-policy test.",
+        "Assert mapper/schema failure is CodexResponsesRequestError and no manual object parser, unsafe cast, generic options bag, raw string service input, or one-use helper/common/utils module was introduced.",
+        "Run Effect language-service diagnostics plus bun run --filter @bundjil/codex check-types and test.",
+        "Record ownership/call-graph, implementation-quality, and verification-coverage lenses: flat meaningful Effect.gen, typed catchTag/catchTags/mapError in .pipe, Type/Encoded boundary ownership, named service operations, explicit live/mock Layers, and zero unexplained boundary findings."
+      ],
+      "completionCriteria": [
+        "The mapper has no hard-coded reasoning low and accepts only decoded policy through the named service Layer.",
+        "Public package exports and test fixtures expose the canonical contract without DTO duplication."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "proxy-config-and-layer-injection",
+      "title": "Decode proxy reasoning configuration and inject it into every proxy composition",
+      "status": "pending",
+      "description": "Add BUNDJIL_CODEX_PROXY_REASONING_EFFORT to the app-owned Effect Config boundary with default low, validation, decoded runtime schema field, and policy Layer composition for live, local, and test paths.",
+      "implementationNotes": [
+        "Use Config.schema(CodexResponsesReasoningEffort, BUNDJIL_CODEX_PROXY_REASONING_EFFORT).pipe(Config.withDefault(low)) only in apps/codex-proxy/src/env.ts.",
+        "Keep this setting non-redacted; retain redaction for bearer, OAuth, cipher, and all private data.",
+        "Decode the whole CodexProxyRuntimeConfig once with Schema.decodeUnknownEffect, use Type in CodexProxyConfig, Encoded in fixture construction, and map safe app config failures without exposing causes to HTTP.",
+        "Provide the decoded policy Layer into CodexDirectProviderLive/Legacy and mock composition. Do not read process.env in packages/codex or the route and do not bypass policy in local mode."
+      ],
+      "mandatoryVerification": [
+        "Focused app tests cover absent effort defaults to low, high decodes, every invalid effort is rejected, fixture Encoded input is decoded, and live/local/mock layer composition has the intended policy.",
+        "Handler integration captures the encoded outbound CodexResponsesRequest via a mock fetch and asserts high, not only a mocked SSE result.",
+        "Run Effect language-service diagnostics, proxy check-types/test/build/smoke-test, bun run check:boundaries, bun run check:effect-setup, and bun run check:skills.",
+        "Record all three risk lenses with explicit checks for flat Effect flow, typed .pipe error handling, canonical schema/provenance, named operations/tagged errors, no casts/manual mappers/process-env leakage, no helper sprawl, live/mock Layers, and clean boundary policy evidence."
+      ],
+      "completionCriteria": [
+        "Existing deployments with no effort variable preserve low; malformed values fail closed; the explicit high configuration reaches the package mapper as a decoded value.",
+        "No configuration field is accepted from the HTTP request or Eve adapter."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "terra-agent-build-and-proof-contract",
+      "title": "Align Eve model metadata, fixtures, safe proof contract, and documentation",
+      "status": "pending",
+      "description": "Set the target model/context in agent configuration fixtures and Turbo build ownership, update the Preview proof contract to assert Terra/high safely, and update all durable docs/environment samples/runbooks without rewriting historical records.",
+      "implementationNotes": [
+        "Add BUNDJIL_CODEX_PROXY_MODEL to @bundjil/agent#build env so eve build observes the selected override; use gpt-5.6-terra and 1050000 in target fixtures.",
+        "Keep the exact Eve provider identity assertion bundjil-codex-proxy/gpt-5.6-terra and add context-window assertions.",
+        "Update prove-preview to issue gpt-5.6-terra, require configured/observed high evidence, retain status:block on failures, and emit only safe booleans/counters/statuses.",
+        "Update root/package/proxy/agent READMEs, .env.example, docs/architecture/eve-agent.md, and docs/product-specs/index.md. Preserve labeled gpt-5.5 historical evidence."
+      ],
+      "mandatoryVerification": [
+        "Agent injected-fetch test asserts target model identity, 1050000 context window, private bearer non-leak, and no raw reasoning control is sent by the agent request.",
+        "Preview-proof fixture tests assert target request, success only when the target high predicate is present, blocked exit for failure, and no token/prompt/body/reasoning leak.",
+        "Run focused agent/proxy tests and builds, documentation stale-claim scans scoped to current surfaces, git diff --check, Effect language-service diagnostics, check:boundaries, check:effect-setup, and check:skills.",
+        "Record risk lenses for ownership/call graph, Effect/schema/Layer/error quality, and verification coverage; confirm no generic callback, raw DTO, unsafe cast, manual codec, or helper sprawl was introduced. Browser verification is N/A because no visible route changes."
+      ],
+      "completionCriteria": [
+        "Current documentation states the Terra/high target, configuration owner, proof boundary, monitoring fields, and rollback; historical claims remain clearly historical.",
+        "Preview proof remains unable to treat 200-only, local, direct endpoint, or mock output as subscription-proxy acceptance."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "authorized-preview-subscription-proof",
+      "title": "Perform an authorized live Preview subscription-endpoint proof",
+      "status": "pending",
+      "description": "After code is accepted and explicit deployment authority is supplied, deploy source-built personal Preview proxy and agent changes, read back the intended configuration, and make one minimal protected Eve request through the live subscription proxy.",
+      "implementationNotes": [
+        "Do not use this task as authority to deploy, mutate Vercel variables, rotate credentials, or perform Production work; obtain target-owned authority first.",
+        "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
+        "Read back only environment names/safe target values where authorized: proxy high effort, agent Terra model, and 1050000 context. Do not capture secret values.",
+        "Use the hardened proof command plus an OIDC-protected Eve request/replay. Correlate safe modelId/reasoningEffort/mode/status/SSE-completed evidence with Vercel logs."
+      ],
+      "mandatoryVerification": [
+        "Preview proxy health is live/ready; unauthenticated and invalid bearer checks remain 401; authenticated minimal request returns HTTP 200 text/event-stream with [DONE].",
+        "Safe proxy observation says gpt-5.6-terra and high, the request uses live subscription composition, and Vercel runtime evidence contains no credentials, prompts, response payloads, account ids, tool data, reasoning text, or chain-of-thought.",
+        "Protected Eve info reports exactly bundjil-codex-proxy/gpt-5.6-terra and context window 1050000; one minimal session reaches completion/waiting and replay does not create a duplicate provider call.",
+        "Record the ownership/call-graph, implementation-quality, and verification-coverage lenses against the deployed artifact; distinguish repository, local, Vercel, and subscription-endpoint proof."
+      ],
+      "completionCriteria": [
+        "The proof artifact records only deployment identity, safe configuration names/values, HTTP statuses, exact model identity, context, high predicate, event kinds/counts, and leak booleans.",
+        "Any rejection, missing correlation, model mismatch, or leak is recorded as blocked; no Production promotion follows."
+      ],
+      "commitAfterPassing": false
+    },
+    {
+      "id": "closeout-and-rollback-readiness",
+      "title": "Complete repository verification and record rollback readiness",
+      "status": "pending",
+      "description": "Run the full repository closeout, reconcile docs and evidence with the accepted Preview state, and prove the rollback instructions restore the previous model/effort configuration without making Production changes.",
+      "implementationNotes": [
+        "Use the previously retained Preview deployment/configuration for gpt-5.5/200000/low (or absent effort) as the rollback target; never use mock or API-key fallback as evidence.",
+        "Record source SHA, deployment identity, environment key names, result statuses, and whether the safe observability fields were present. Keep values secret-safe.",
+        "Move/create an active execution plan only if work is actually in progress under the repository documentation lifecycle."
+      ],
+      "mandatoryVerification": [
+        "Run all global verification commands, including focused package/app tests, Effect language-service diagnostics, bun run check:boundaries, bun run check:effect-setup, bun run check:skills, and bun run verification.",
+        "Re-audit each changed implementation task for flat meaningful Effect.gen, typed .pipe error handling, canonical schemas/Type/Encoded, named tagged service errors, live/mock Layers, immediate provider decode/outward encode, no unsafe casts/manual readers/raw env/helper sprawl, and zero unexplained boundary findings.",
+        "Run scoped documentation, environment, export, fixture, model-id, low-hard-code, and leak scans; run git diff --check.",
+        "If the authorized Preview rollback is exercised, repeat safe health/auth/Eve identity proof and distinguish it from Production. Otherwise document why it was not exercised and preserve the exact procedure."
+      ],
+      "completionCriteria": [
+        "All impact-ledger surfaces are changed or explicitly N/A with evidence, and the acceptance criteria in the SPEC are met.",
+        "No deployment/provider action has been represented as complete without source and safe readback evidence."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
