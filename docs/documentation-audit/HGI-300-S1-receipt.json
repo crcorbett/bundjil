@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-300",
+  "sliceId": "HGI-300-S1",
+  "status": "accepted",
+  "observedAt": "2026-07-20T19:08:00+02:00",
+  "baseCommit": "527fc344dfe2629f54912d63f74dad19850ed348",
+  "authority": "local Bundjil documentation writes and read-only local checks; Git push only after acceptance",
+  "acceptedOutcome": "Bundjil has one lifecycle router, one current architecture successor with retained historical atlas, truthful current SPEC/plan and completed-history routes, a concise root README without mutable provider actuality, and retained-path accounting.",
+  "changedSemanticOwners": [
+    "AGENTS.md",
+    "README.md",
+    "ARCHITECTURE.md -> docs/architecture/README.md",
+    "docs/README.md",
+    "docs/product-specs/**",
+    "docs/exec-plans/**",
+    "docs/research/README.md",
+    "docs/documentation-audit/**"
+  ],
+  "impactLedger": [
+    {
+      "surface": "maintainer lifecycle/truth layers",
+      "decision": "Change required",
+      "owner": "docs/README.md"
+    },
+    {
+      "surface": "root public entry and task map",
+      "decision": "Change required",
+      "owner": "README.md and AGENTS.md"
+    },
+    {
+      "surface": "mixed root architecture atlas",
+      "decision": "Change required",
+      "owner": "ARCHITECTURE.md tombstone, current architecture router, retained legacy atlas"
+    },
+    {
+      "surface": "current intent and completed history",
+      "decision": "Change required",
+      "owner": "product-spec and execution-plan indexes"
+    },
+    {
+      "surface": "research",
+      "decision": "Preserve and route outside default context",
+      "owner": "docs/research/README.md"
+    },
+    {
+      "surface": "package operations and proof",
+      "decision": "Preserve as named extraction gap",
+      "owner": "HGI-303 and HGI-304"
+    },
+    {
+      "surface": "code, packages, lint, config, CI, tests, providers",
+      "decision": "N/A",
+      "owner": "unchanged"
+    }
+  ],
+  "checks": [
+    {
+      "check": "fresh-context route retrieval",
+      "status": "passed",
+      "result": "Reader found the sole lifecycle and architecture owners, active SPEC/plan, 11 completed plans, 12 completed ledgers, research/reference route, and explicit HGI-303/HGI-304 gaps; refused README/atlas provider actuality."
+    },
+    {
+      "check": "focused relative-link resolution",
+      "status": "passed",
+      "result": "59 relative links across changed current routes; 0 missing targets."
+    },
+    {
+      "check": "receipt JSON parsing",
+      "status": "passed",
+      "result": "Three HGI-300 JSON receipts parse successfully."
+    },
+    {
+      "check": "bun run check:skills",
+      "status": "passed",
+      "result": "Skill policy audit passed for 13 instruction surfaces after restoring its exact required Effect contract fragments."
+    },
+    {
+      "check": "bun run verification",
+      "status": "passed",
+      "result": "The unconfigured agent build first failed closed on missing Executor config; with the existing mode-0600 ignored test environment loaded, Effect setup, boundaries, 24 boundary tests, skill audit, formatting/lint, lint fixture, Knip, five package typechecks, and all workspace tests passed."
+    },
+    {
+      "check": "git diff --check",
+      "status": "passed",
+      "result": "No whitespace errors."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "corpus-inventory.json",
+      "sha256": "7cba4ddca2bdb4940ac4884f06322abf9cdc69e412056f43097dab37075a02fc"
+    },
+    {
+      "path": "link-report.json",
+      "sha256": "2a158cb2e30e01e231dfbdecf22e5308da287e22acf4bac4909e65c75bcd2c05"
+    }
+  ],
+  "rollback": "Revert only the bounded HGI-300-S1 commits; retain the historical atlas, completed plans/ledgers, research, and unrelated history.",
+  "limitations": [
+    "HGI-300 parent remains in progress after S1.",
+    "Counts and routing do not prove complete corpus semantics."
+  ],
+  "nonClaims": [
+    "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is changed or proved."
+  ],
+  "nextTrigger": "Commit the bounded semantic slice, record its immutable identity in an evidence-only follow-up, then push and read back origin/main."
+}

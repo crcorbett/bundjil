@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-300-S1",
+  "observedAt": "2026-07-20T19:08:00+02:00",
+  "baseCommit": "527fc344dfe2629f54912d63f74dad19850ed348",
+  "scope": "tracked repository-owned docs/** and README.md paths; deleted pre-move paths excluded and retained successors included",
+  "preChange": {
+    "docsFiles": 44,
+    "readmePaths": 11,
+    "completedTaskLedgers": 12,
+    "completedPlanInActiveRoute": 1
+  },
+  "postSlice": {
+    "docsFiles": 55,
+    "readmePaths": 15,
+    "readableDocsFiles": 55,
+    "sortedDocsPathSha256": "c48af2521394e9dad7940add19ab7fa116ecf705efea2dc421427df4f7e92aef",
+    "sortedReadmePathSha256": "d1763ea57125e7e52af834b3396adc4bdbeb77f0e735585dfef73707a54497ef"
+  },
+  "docsByTopLevelBucket": {
+    "README.md": 1,
+    "architecture": 7,
+    "documentation-audit": 4,
+    "exec-plans": 14,
+    "product-specs": 27,
+    "reference-repositories.md": 1,
+    "research": 1
+  },
+  "docsByExtension": { "json": 15, "md": 40 },
+  "classification": {
+    "maintainerRouter": "docs/README.md",
+    "architectureRoute": "docs/architecture/README.md",
+    "architectureTombstone": "ARCHITECTURE.md",
+    "retainedMixedAtlas": "docs/architecture/legacy-atlas.md",
+    "activeSpec": "docs/product-specs/harness-governance-documentation.md",
+    "activePlan": "docs/exec-plans/active/harness-governance-documentation.md",
+    "completedPlans": "docs/exec-plans/completed/README.md; 11 retained completed plan files",
+    "completedLedgers": "12 sibling *.tasks.json ledgers contain only completed tasks and are inventoried by docs/product-specs/index.md",
+    "researchRoute": "docs/research/README.md",
+    "rootReadmePolicy": "Product purpose, stable repo shape, routes, and local commands only; mutable provider/deployment proof removed.",
+    "knownMissingOwners": [
+      "docs/runbooks/** target-owned operations (HGI-304)",
+      "docs/verification/** critical journeys and proof (HGI-303)"
+    ]
+  },
+  "postcondition": "All retained paths contribute to deterministic digests; completed plans/ledgers and research remain reachable outside default current context; no historical content was deleted.",
+  "limitations": [
+    "Path counts do not prove semantic correctness.",
+    "App/package README runbook and proof extraction continues in later HGI-300 slices."
+  ],
+  "nonClaims": [
+    "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is proved."
+  ]
+}

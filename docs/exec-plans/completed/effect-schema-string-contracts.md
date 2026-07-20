@@ -1,3 +1,12 @@
+---
+document_type: execution-plan
+lifecycle: implemented
+authority: supporting
+owner: bundjil-architecture-owner
+successor: ../../architecture/effect-patterns.md
+last_reviewed: 2026-07-20
+---
+
 # Effect Schema String Contracts Implementation Plan
 
 Status: Completed

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-300-S1",
+  "observedAt": "2026-07-20T19:08:00+02:00",
+  "baseCommit": "527fc344dfe2629f54912d63f74dad19850ed348",
+  "checkedFiles": [
+    "AGENTS.md",
+    "README.md",
+    "ARCHITECTURE.md",
+    "docs/README.md",
+    "docs/architecture/README.md",
+    "docs/product-specs/index.md",
+    "docs/product-specs/harness-governance-documentation.md",
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/active/harness-governance-documentation.md",
+    "docs/exec-plans/completed/README.md",
+    "docs/research/README.md",
+    "docs/documentation-audit/README.md"
+  ],
+  "relativeLinksChecked": 59,
+  "missingRelativeTargets": [],
+  "successorChecks": [
+    {
+      "oldRoute": "ARCHITECTURE.md",
+      "successor": "docs/architecture/README.md",
+      "retainedHistory": "docs/architecture/legacy-atlas.md",
+      "status": "resolved"
+    },
+    {
+      "oldRoute": "docs/exec-plans/active/effect-schema-string-contracts.md",
+      "successor": "docs/exec-plans/completed/effect-schema-string-contracts.md",
+      "status": "resolved"
+    },
+    {
+      "oldRoute": "root mutable provider/deployment prose",
+      "successor": "external readback plus future docs/runbooks/** and docs/verification/** owners",
+      "status": "explicit-gap"
+    }
+  ],
+  "postcondition": "All 59 relative links in changed current routes resolve; active/current, completed/history, research/reference, architecture, operations/proof gaps, and external actuality are distinctly routed.",
+  "limitations": [
+    "Focused changed-route checks do not prove every historical link or app/package runtime."
+  ],
+  "nonClaims": [
+    "No provider, deployment, production, credential, release, webhook, or external-consumer behavior is proved."
+  ]
+}

@@ -1,110 +1,74 @@
-# Docs
+---
+document_type: documentation-router
+lifecycle: current
+authority: canonical
+owner: bundjil-documentation-owner
+last_reviewed: 2026-07-20
+review_trigger: any docs class, root route, SPEC, plan, runbook, proof, research, provider, app, package, or lifecycle change
+---
 
-This directory holds project documentation that is more detailed than the root
-README.
+# Bundjil documentation
 
-## Start Here
+This is the sole maintainer-document lifecycle and truth-layer router.
+`README.md` is the public repository entry point; `AGENTS.md` is the terse
+task map; `docs/architecture/README.md` owns current durable architecture.
 
-- [Project README](../README.md) explains the product direction, current
-  packages, setup, and roadmap.
-- [Architecture](../ARCHITECTURE.md) explains the planned agent runtime shape,
-  package boundaries, and quality gates.
-- [Effect Patterns](./architecture/effect-patterns.md) defines the repo's
-  Effect TS rules for schemas, services, config, layers, errors, and control
-  flow.
-- [Repo Structure](./architecture/repo-structure.md) defines app/package
-  ownership, import/export rules, local references, and SPEC requirements.
-- [Testing And Quality](./architecture/testing-and-quality.md) defines
-  verification scope, standard commands, Eve runtime checks, and documentation
-  quality rules, including `check:boundaries`, `check:effect-setup`,
-  `check:skills`, and the mandatory 3-pass Effect TS implementation audit.
-- [Eve agent architecture](./architecture/eve-agent.md) documents the committed
-  Eve app, Effect boundary, local HTTP endpoints, AI Gateway setup, and
-  Codex proxy model-provider setup.
-- [Frontend Composition](./architecture/frontend-composition.md) defines the
-  conditional React hierarchy, leaf ownership, Effect/runtime boundary, and
-  browser verification rules for future visible apps.
-- [Reference repositories](./reference-repositories.md) explains the local
-  `.local/references` setup for Vercel and Effect source lookup.
-- [`@bundjil/eve`](../packages/eve/README.md) documents the
-  Effect Schema contracts, workspace-status operation, `/schema` Eve bridge,
-  and verification commands for the Eve app operation boundary.
-- [`@bundjil/codex`](../packages/codex/README.md) documents the
-  Codex OAuth profile store, direct Codex Responses proof service, service
-  tags, KeyValueStore layers, Upstash Redis adapter, and safe
-  secret-handling rules.
-- [`@bundjil/codex-proxy`](../apps/codex-proxy/README.md) documents the
-  private Effect HTTP proxy app, local mock and filesystem proof, personal
-  Vercel preview live mode, fenced refresh and 401 recovery, safe self-tests,
-  and rollback.
+## Truth layers
 
-## Historical Specifications And Plans
+Use the strongest applicable owner and link rather than copy:
 
-Product specifications and task ledgers preserve the names and evidence that
-were current when each change was accepted. They are historical records, not
-current package or command guidance. Completed execution evidence lives in
-[`exec-plans/completed`](./exec-plans/completed/); only work that is actually in
-progress belongs in `exec-plans/active`.
+1. External systems own their current external state at readback time.
+2. Code, configuration, Schemas, package exports, workflows, and generated
+   sources own executable state.
+3. Current architecture and enforced standards own durable boundaries.
+4. Target-owned runbooks own repeatable consequential operations.
+5. Dated proof/evidence owns one artifact/environment/authority observation,
+   its limitations, and its rollback identity.
+6. Active SPEC/tasks and execution plans own current implementation intent.
 
-- [Repository Naming And Structure Cleanup](./product-specs/repo-naming-cleanup.md)
-  records the capability-based package migration and compatibility audit.
-- [Effect Persistence](./product-specs/effect-persistence.md) records the
-  original persistence package implementation and is explicitly superseded by
-  `@bundjil/store`.
-- [Eve + Effect Agent Spike](./product-specs/eve-effect-agent-spike.md) records
-  the first Eve agent and Effect wrapper boundary.
-- [Codex OAuth Eve Model Provider](./product-specs/codex-oauth-eve-model-provider.md)
-  records the research-gated Codex provider and proxy rollout.
-- [Personal Codex Subscription Auth And Hosted Proxy](./product-specs/codex-hosted-live-oauth-storage.md)
-  records trusted-local PKCE sign-in and hosted encrypted profile storage.
-- [Codex Local Profile Import Workaround](./product-specs/codex-local-profile-import-workaround.md)
-  records the superseded access-token-only fallback.
-- [Vercel Production Promotion](./product-specs/vercel-production-promotion.md)
-  records the accepted Production promotion and corrected routing evidence.
-- [Sendblue Eve Channel](./product-specs/sendblue-eve-channel.md) records the
-  app-owned iMessage channel rollout.
-- [Sendblue Typing Indicators](./product-specs/sendblue-typing-indicators.md)
-  records the completed Effect-typed accepted-inbound lifecycle, durable
-  `Idle | Pending | Active` state, bounded cleanup, sanitized observations,
-  sole-Production-ingress topology, and direct handset proof.
-- [Executor MCP Connection](./product-specs/executor-mcp-connection.md) records
-  the app-owned Executor connection and accepted Production policy evidence.
-- [Codex OAuth Parallel research](./product-specs/codex-oauth-subscription-model-access.parallel-research.md)
-  preserves the research report that corrected the subscription-backed model
-  access plan.
+A deployment ID, readiness assertion, webhook observation, provider response,
+or completed plan is not standing current truth. Repository proof cannot grant
+authority for a later provider action.
 
-## Codex Provider Documentation Map
+## Metadata and lifecycle
 
-- Current behavior: Gateway is the default Eve model path; Codex proxy mode is
-  opt-in and calls the private proxy through an AI SDK OpenAI-compatible
-  `LanguageModel`.
-- Operating modes: `mock` is the default and never calls Codex; `local` is an
-  access-token-only encrypted filesystem proof rejected by Vercel; `live` is
-  the refresh-capable encrypted Upstash composition for the personal Vercel
-  Preview and Production deployments.
-- Deployment scope: `apps/codex-proxy` is linked to the
-  `bundjil-codex-proxy` project under Cooper's personal Vercel account, not
-  Tilt Legal. Preview proof is historical. Accepted Production evidence covers
-  one deployed Eve-to-live-proxy completion and the bounded Task 4 rollout;
-  it is not a standing provider probe or approval for later deployment changes.
-- Storage: `@bundjil/store/upstash` provides native Effect
-  `KeyValueStore` plus `AtomicKeyValueStore` through one provider adapter.
-  `@bundjil/codex` owns profile keys, encrypted codecs, and refresh
-  policy. `live` stores a versioned encrypted subscription profile, refreshes
-  under a distributed lock, and fenced-CAS commits credential generations. The
-  ID token is decoded during trusted-local login and is never persisted. The
-  separate `local` workaround stores only an encrypted short-lived access-token
-  profile.
-- JSON boundaries: app and package code should use Effect Schema codecs such
-  as `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
-- Unsupported paths: do not treat Codex OAuth as an OpenAI Platform API key,
-  do not route it through Vercel AI Gateway credentials, and do not expose the
-  proxy publicly. Browser authorization and loopback callbacks remain
-  trusted-local only; the proxy exposes no hosted OAuth routes. Historical
-  Preview and accepted Production proof do not approve later changes.
+New or materially revised maintainer docs separate `document_type`,
+`lifecycle`, `authority`, and `owner`. Current durable docs also record
+`last_reviewed` and `review_trigger`; superseded/tombstone docs record a
+successor and reason.
 
-## Planned Docs
+Lifecycle values are `proposed`, `current`, `implemented`,
+`superseded`, `historical`, `evidence`, `reference`, `failed`,
+`inconclusive`, `tombstone`, and `archived`. Authority values are
+`canonical`, `supporting`, `generated`, and `external`.
 
-- Agent identity, consent, and memory model.
-- Email ingress through Cloudflare Email Routing Workers.
-- Vercel Connect setup for Notion and future integrations.
+## Routes
+
+| Need                          | Owner                                                                                                                                                                                                                    | Use                                                                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Current architecture          | [`architecture/README.md`](architecture/README.md)                                                                                                                                                                       | Durable architecture route. Root `ARCHITECTURE.md` is a tombstone; the retained mixed atlas is historical.       |
+| Effect and code rules         | [`architecture/effect-patterns.md`](architecture/effect-patterns.md), [`architecture/repo-structure.md`](architecture/repo-structure.md), [`architecture/frontend-composition.md`](architecture/frontend-composition.md) | Current enforced design rules.                                                                                   |
+| Verification commands         | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md)                                                                                                                                             | Current local checks; not release/provider proof.                                                                |
+| Current intent                | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md)                                                                                                      | Only genuinely active SPEC/tasks and plans.                                                                      |
+| Completed plans and ledgers   | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) and the implemented inventory in [`product-specs/index.md`](product-specs/index.md)                                                                   | Retained provenance, never default policy.                                                                       |
+| Research and local references | [`research/README.md`](research/README.md) and [`reference-repositories.md`](reference-repositories.md)                                                                                                                  | Supporting context; revalidate mutable upstreams.                                                                |
+| Agent app                     | [`../apps/agent/README.md`](../apps/agent/README.md)                                                                                                                                                                     | App boundary and current public commands. Its combined runbook/proof prose is an HGI-304/HGI-303 extraction gap. |
+| Codex proxy app               | [`../apps/codex-proxy/README.md`](../apps/codex-proxy/README.md)                                                                                                                                                         | App boundary and current public commands. Its combined runbook/proof prose is an HGI-304/HGI-303 extraction gap. |
+| Package contracts             | [`../packages/eve/README.md`](../packages/eve/README.md), [`../packages/codex/README.md`](../packages/codex/README.md), [`../packages/store/README.md`](../packages/store/README.md)                                     | Package purpose, exports, and public commands.                                                                   |
+| Target-owned runbooks         | No canonical `docs/runbooks/**` route yet                                                                                                                                                                                | HGI-304 extracts authority, steps, evidence, rollback, and escalation from app/package prose.                    |
+| Critical journeys and proof   | No canonical `docs/verification/**` route yet                                                                                                                                                                            | HGI-303 creates bounded artifact/environment proof owners.                                                       |
+| Audit/accounting              | [`documentation-audit/README.md`](documentation-audit/README.md)                                                                                                                                                         | Dated evidence and inventories, not policy.                                                                      |
+
+Failed/inconclusive work retains provenance, last successful step, observed
+state, escalation, resume trigger, recovery, limitations, and non-claims
+outside default current routes. Do not delete or move completed history,
+research, or raw evidence without an approved retention manifest.
+
+## Maintenance
+
+Every material slice decides `Change required`, `Preserve`, or `N/A` for
+docs, READMEs, architecture, public/generated references, runbooks,
+proof/evidence, skills, lint/config/CI, and active SPEC/tasks. Update the
+earliest durable owner and necessary pointers in the same slice. Counts prove
+accounting only; semantic, consumer, runtime, and provider claims require
+boundary-matched evidence.
