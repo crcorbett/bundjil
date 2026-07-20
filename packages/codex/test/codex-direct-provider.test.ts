@@ -9,6 +9,7 @@ import {
   CodexHttpStatusError,
   CodexOAuthSubject,
   CodexResponsesRequest,
+  CodexResponsesRequestPolicy,
   CodexResponsesStreamMapInput,
   OpenAICompatibleChatCompletionChunk,
   OpenAICompatibleChatCompletionDelta,
@@ -29,6 +30,7 @@ import {
   CodexDirectProviderLive,
   CodexRequestMapperLive,
   CodexStreamMapperLive,
+  makeCodexRequestMapperLive,
 } from "../src/runtime.js";
 import {
   CodexDirectProviderMock,
@@ -110,6 +112,7 @@ it.effect("maps OpenAI-compatible requests into Codex Responses payloads", () =>
     assert.strictEqual(encoded.model, "gpt-5.5");
     assert.strictEqual(encoded.store, false);
     assert.strictEqual(encoded.stream, true);
+    assert.deepStrictEqual(encoded.reasoning, { effort: "low" });
     assert.strictEqual(encoded.instructions, "Be brief.");
     assert.strictEqual(encoded.input.length, 2);
     assert.deepStrictEqual(encoded.input[0], {
@@ -120,6 +123,30 @@ it.effect("maps OpenAI-compatible requests into Codex Responses payloads", () =>
       role: "assistant",
       content: [{ type: "output_text", text: "Hello." }],
     });
+  })
+);
+
+it.effect("maps the decoded high reasoning policy into Terra requests", () =>
+  Effect.gen(function* testHighReasoningPolicy() {
+    const request = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleChatCompletionRequest
+    )({
+      model: "gpt-5.6-terra",
+      messages: [{ role: "user", content: "Reply with OK." }],
+      stream: true,
+    });
+    const policy = yield* Schema.decodeUnknownEffect(
+      CodexResponsesRequestPolicy
+    )({ reasoningEffort: "high" });
+    const codexRequest = yield* toCodexResponses(request).pipe(
+      Effect.provide(makeCodexRequestMapperLive(policy))
+    );
+    const encoded = yield* Schema.encodeEffect(CodexResponsesRequest)(
+      codexRequest
+    );
+
+    assert.strictEqual(encoded.model, "gpt-5.6-terra");
+    assert.deepStrictEqual(encoded.reasoning, { effort: "high" });
   })
 );
 

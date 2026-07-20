@@ -95,7 +95,10 @@ Extract the current effort literal into:
 
 ```ts
 export const CodexResponsesReasoningEffort = Schema.Literals([
-  "low", "medium", "high", "xhigh",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
 ]);
 export type CodexResponsesReasoningEffort =
   typeof CodexResponsesReasoningEffort.Type;
@@ -164,15 +167,15 @@ substitutable.
 
 ### Boundary ledger
 
-| Boundary | Owning codec and decoded domain value | Required operation |
-| --- | --- | --- |
-| Proxy environment | `CodexResponsesReasoningEffort`, `CodexProxyRuntimeConfig`; `Type` in `CodexProxyConfig` | `Config.schema` then one `Schema.decodeUnknownEffect` in `env.ts` |
-| Package policy injection | `CodexResponsesRequestPolicy`; `Type` in the named policy service | decoded app config to explicit live/test Layer; no raw string crosses |
-| Proxy HTTP ingress | `OpenAICompatibleChatCompletionRequest`; `Type` | existing `Schema.fromJsonString(...)` then `Schema.decodeUnknownEffect` in `server.ts` |
-| Mapper output | `CodexResponsesRequest`; `Type` | mapper builds only decoded request and maps schema failures to `CodexResponsesRequestError` |
-| Subscription HTTP egress | `CodexResponsesRequest.Encoded` | `Schema.encodeEffect(CodexResponsesRequest)` immediately before `CodexHttpClient` writes the request |
-| Provider response | immediate stream/result codec in `CodexHttpClient` | decode status/body/result immediately; keep raw provider data inside the adapter |
-| Proxy SSE egress | OpenAI-compatible stream/chunk encoded form | existing stream mapper and HTTP response adapter encode only at the outward boundary |
+| Boundary                 | Owning codec and decoded domain value                                                    | Required operation                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Proxy environment        | `CodexResponsesReasoningEffort`, `CodexProxyRuntimeConfig`; `Type` in `CodexProxyConfig` | `Config.schema` then one `Schema.decodeUnknownEffect` in `env.ts`                                    |
+| Package policy injection | `CodexResponsesRequestPolicy`; `Type` in the named policy service                        | decoded app config to explicit live/test Layer; no raw string crosses                                |
+| Proxy HTTP ingress       | `OpenAICompatibleChatCompletionRequest`; `Type`                                          | existing `Schema.fromJsonString(...)` then `Schema.decodeUnknownEffect` in `server.ts`               |
+| Mapper output            | `CodexResponsesRequest`; `Type`                                                          | mapper builds only decoded request and maps schema failures to `CodexResponsesRequestError`          |
+| Subscription HTTP egress | `CodexResponsesRequest.Encoded`                                                          | `Schema.encodeEffect(CodexResponsesRequest)` immediately before `CodexHttpClient` writes the request |
+| Provider response        | immediate stream/result codec in `CodexHttpClient`                                       | decode status/body/result immediately; keep raw provider data inside the adapter                     |
+| Proxy SSE egress         | OpenAI-compatible stream/chunk encoded form                                              | existing stream mapper and HTTP response adapter encode only at the outward boundary                 |
 
 `CodexRequestMapper`, `CodexDirectProvider`, `CodexHttpClient`, and
 `OpenAICompatibleProxy` keep named operations and safe tagged errors.
@@ -281,12 +284,12 @@ configuration names, result statuses, and rollback result without values.
 Repository proof, local proof, Vercel deployment proof, and subscription
 endpoint proof are distinct:
 
-| Evidence class | It proves | It does not prove |
-| --- | --- | --- |
-| Repository proof | schemas, config decoding, Layer composition, mapper encoding, tests | a deployed proxy or endpoint acceptance |
-| Local proxy proof | private HTTP/SSE wiring using mock or local composition | Vercel or hosted subscription acceptance |
-| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity | that an upstream request used high unless correlated runtime proof confirms it |
-| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response | Production approval or general public API support |
+| Evidence class          | It proves                                                                                    | It does not prove                                                              |
+| ----------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Repository proof        | schemas, config decoding, Layer composition, mapper encoding, tests                          | a deployed proxy or endpoint acceptance                                        |
+| Local proxy proof       | private HTTP/SSE wiring using mock or local composition                                      | Vercel or hosted subscription acceptance                                       |
+| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity                  | that an upstream request used high unless correlated runtime proof confirms it |
+| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response | Production approval or general public API support                              |
 
 Add a sanitized, request-correlatable observation at the mapper/provider
 boundary (for example Effect span attributes or the established deployment
@@ -336,16 +339,16 @@ SSE response. The command must continue to exit nonzero with `status:
 
 ## Downstream impact ledger
 
-| Surface | Status | Reason |
-| --- | --- | --- |
-| Canonical architecture and product docs | Change required | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth. |
-| Root README and affected app/package READMEs/runbooks | Change required | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits. |
-| `AGENTS.md`, repo skills, instruction surfaces | N/A | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction. |
-| Schemas, public types, service contracts, Layers, exports | Change required | Name effort/policy schema, decoded services, live/test Layers, runtime/index exports. |
-| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts | Change required | Exercise language service and existing policy scripts; update Turbo's build environment contract and Preview proof script/tests. No boundary exception is expected. |
-| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required | Test low-default compatibility and high-target encoding; Preview HTTP/Eve proof must be live and sanitized. Browser evidence is N/A because this changes no visible browser UI. |
-| Observability, rollout, migration, rollback artifacts | Change required | Add safe model/effort/status evidence, Preview progression, and exact rollback procedure. |
-| SPEC index, task ledger, active execution plan | Change required / N/A | Add this current SPEC and sibling ledger now; do not create an active execution plan until implementation begins. |
+| Surface                                                                   | Status                | Reason                                                                                                                                                                          |
+| ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canonical architecture and product docs                                   | Change required       | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth.                                              |
+| Root README and affected app/package READMEs/runbooks                     | Change required       | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits.                                                                        |
+| `AGENTS.md`, repo skills, instruction surfaces                            | N/A                   | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction.                                  |
+| Schemas, public types, service contracts, Layers, exports                 | Change required       | Name effort/policy schema, decoded services, live/test Layers, runtime/index exports.                                                                                           |
+| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts         | Change required       | Exercise language service and existing policy scripts; update Turbo's build environment contract and Preview proof script/tests. No boundary exception is expected.             |
+| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required       | Test low-default compatibility and high-target encoding; Preview HTTP/Eve proof must be live and sanitized. Browser evidence is N/A because this changes no visible browser UI. |
+| Observability, rollout, migration, rollback artifacts                     | Change required       | Add safe model/effort/status evidence, Preview progression, and exact rollback procedure.                                                                                       |
+| SPEC index, task ledger, active execution plan                            | Change required / N/A | Add this current SPEC and sibling ledger now; do not create an active execution plan until implementation begins.                                                               |
 
 ## Risks and unresolved questions
 

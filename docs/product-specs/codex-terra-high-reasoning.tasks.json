@@ -1,6 +1,6 @@
 {
   "title": "Codex Proxy GPT-5.6 Terra High Reasoning Tasks",
-  "status": "proposed",
+  "status": "in_progress",
   "spec": "docs/product-specs/codex-terra-high-reasoning.md",
   "principles": [
     "Preview subscription-endpoint proof is required; direct public API, local Codex, mock, and repository-only results are insufficient.",
@@ -33,7 +33,7 @@
     {
       "id": "codex-responses-reasoning-policy-contract",
       "title": "Create the canonical decoded Responses reasoning policy",
-      "status": "pending",
+      "status": "completed",
       "description": "Extract the named literal-union effort schema and add the package-owned decoded request-policy service and explicit live/test policy layers. Make CodexRequestMapper consume that policy instead of hard-coding low; do not add raw options or new provider surface area.",
       "implementationNotes": [
         "Own CodexResponsesReasoningEffort and CodexResponsesRequestPolicy in packages/codex/src/provider/contracts.ts or an adjacent feature-owned provider contract file, with Type and Encoded exports.",
@@ -52,12 +52,19 @@
         "The mapper has no hard-coded reasoning low and accepts only decoded policy through the named service Layer.",
         "Public package exports and test fixtures expose the canonical contract without DTO duplication."
       ],
+      "acceptedEvidence": [
+        "CodexResponsesReasoningEffort is a canonical closed literal schema with explicit Type and Encoded aliases; CodexResponsesRequestPolicy is the decoded package policy contract.",
+        "CodexRequestMapper and CodexResponsesProof consume CodexResponsesRequestPolicyService. The default explicit low layer preserves current behavior while the exported layer factory accepts only a decoded policy.",
+        "Focused checks passed: bun run --filter @bundjil/store build; bun run --filter @bundjil/codex check-types; bun run --filter @bundjil/codex test (110 tests).",
+        "Repository checks passed after formatting: bun run check:effect-setup, bun run check:boundaries, bun run check:skills, and bun run verification.",
+        "Ownership/call graph: provider vocabulary, policy, mapper, proof, and default Layers remain in @bundjil/codex. Implementation quality: flat named Effect operations, schema-derived Type/Encoded use, no raw config, casts, DTO mirrors, or helper module. Verification coverage: high-target and low-compatibility encoded mapper assertions plus root policy and test gates."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "proxy-config-and-layer-injection",
       "title": "Decode proxy reasoning configuration and inject it into every proxy composition",
-      "status": "pending",
+      "status": "in_progress",
       "description": "Add BUNDJIL_CODEX_PROXY_REASONING_EFFORT to the app-owned Effect Config boundary with default low, validation, decoded runtime schema field, and policy Layer composition for live, local, and test paths.",
       "implementationNotes": [
         "Use Config.schema(CodexResponsesReasoningEffort, BUNDJIL_CODEX_PROXY_REASONING_EFFORT).pipe(Config.withDefault(low)) only in apps/codex-proxy/src/env.ts.",

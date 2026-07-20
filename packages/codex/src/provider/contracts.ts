@@ -151,11 +151,32 @@ export const CodexResponsesToolChoice = Schema.Union([
 
 export type CodexResponsesToolChoice = typeof CodexResponsesToolChoice.Type;
 
+export const CodexResponsesReasoningEffort = Schema.Literals([
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+]);
+
+export type CodexResponsesReasoningEffort =
+  typeof CodexResponsesReasoningEffort.Type;
+export type CodexResponsesReasoningEffortEncoded =
+  typeof CodexResponsesReasoningEffort.Encoded;
+
 export const CodexResponsesReasoning = Schema.Struct({
-  effort: Schema.Literals(["low", "medium", "high", "xhigh"]),
+  effort: CodexResponsesReasoningEffort,
 });
 
 export type CodexResponsesReasoning = typeof CodexResponsesReasoning.Type;
+
+export const CodexResponsesRequestPolicy = Schema.Struct({
+  reasoningEffort: CodexResponsesReasoningEffort,
+});
+
+export type CodexResponsesRequestPolicy =
+  typeof CodexResponsesRequestPolicy.Type;
+export type CodexResponsesRequestPolicyEncoded =
+  typeof CodexResponsesRequestPolicy.Encoded;
 
 export const CodexResponsesRequest = Schema.Struct({
   model: CodexResponsesModelId,

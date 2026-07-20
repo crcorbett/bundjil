@@ -14,3 +14,6 @@ Accepted and superseded plans live in [`../completed`](../completed/).
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
   HGI-300 is in progress.
+- [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
+  implementation is in progress; Preview subscription proof is pending
+  deployment authority.
