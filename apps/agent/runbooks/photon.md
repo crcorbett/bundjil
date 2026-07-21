@@ -162,6 +162,10 @@ observation at that time. It never substitutes for the hosted procedure below.
    variable metadata, and delete the temporary file. Never print either value.
    The command blocks an existing target rather than adopting a lost
    write-only secret and reconciles an uncertain create by exact URL inventory.
+   Replace an isolated zero-traffic callback by running
+   `delete:environment-webhook` against the exact old URL, proving zero exact
+   matches, then registering the exact new URL. Never delete by hostname or
+   count alone.
 5. Read back service, platform, shared-user, and webhook topology. The accepted
    desired state is service type `shared`, zero dedicated lines, one exact
    approved shared user, and one exact environment webhook. Do not delete

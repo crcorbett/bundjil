@@ -1,7 +1,10 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
-import { registerPhotonEnvironmentWebhook } from "../src/environment-webhook.js";
+import {
+  deletePhotonEnvironmentWebhook,
+  registerPhotonEnvironmentWebhook,
+} from "../src/environment-webhook.js";
 import { PhotonManagement } from "../src/management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { PhotonWebhookId, PhotonWebhookSecret } from "../src/schemas.js";
@@ -87,4 +90,30 @@ it.effect(
       assert.strictEqual(Schema.is(PhotonProviderProofError)(error), true);
       assert.strictEqual(error.reason, "resourceConflict");
     })
+);
+
+it.effect("deletes exactly one target and proves its absence", () =>
+  Effect.gen(function* deleteEnvironmentWebhook() {
+    const fixture = yield* fixtures;
+    const webhookUrl = new URL("https://preview.example.invalid/webhook");
+    let webhooks = [{ id: fixture.webhookId, webhookUrl }];
+    const management = PhotonManagement.of({
+      ...unusedOperations,
+      deleteWebhook: (webhookId) =>
+        Effect.sync(() => {
+          webhooks = webhooks.filter((webhook) => webhook.id !== webhookId);
+        }),
+      listWebhooks: () => Effect.sync(() => webhooks),
+      registerWebhook: () => Effect.die("unexpected register"),
+    });
+
+    const receipt = yield* deletePhotonEnvironmentWebhook(webhookUrl).pipe(
+      Effect.provide(Layer.succeed(PhotonManagement, management))
+    );
+
+    assert.strictEqual(receipt.status, "deleted");
+    assert.strictEqual(receipt.preexistingMatchingWebhookCount, 1);
+    assert.strictEqual(receipt.finalMatchingWebhookCount, 0);
+    assert.strictEqual(webhooks.length, 0);
+  })
 );

@@ -92,6 +92,11 @@ artifact directly to the approved environment and remove it after readback; an
 existing target or lost write-only secret blocks instead of replacing or
 adopting it.
 
+`bun run --filter @bundjil/photon delete:environment-webhook` deletes only one
+exact `BUNDJIL_PHOTON_WEBHOOK_URL` and requires zero matching records on
+readback. Zero or multiple matches block; it never selects by list order,
+creation time, partial ID, or hostname alone.
+
 Production shared-user, platform, webhook, and deployment reconciliation
 follows the same runbook but remains a distinct promotion workflow. Repository tests and
 the provider-only proof cannot stand in for immutable deployment, signed

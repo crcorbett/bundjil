@@ -26,6 +26,51 @@ export const PhotonEnvironmentWebhookReceipt = Schema.Struct({
 export type PhotonEnvironmentWebhookReceipt =
   typeof PhotonEnvironmentWebhookReceipt.Type;
 
+export const PhotonEnvironmentWebhookDeletionReceipt = Schema.Struct({
+  finalMatchingWebhookCount: Schema.Literal(0),
+  managementAuthenticated: Schema.Literal(true),
+  preexistingMatchingWebhookCount: Schema.Literal(1),
+  status: Schema.Literal("deleted"),
+  webhookDeleted: Schema.Literal(true),
+});
+export type PhotonEnvironmentWebhookDeletionReceipt =
+  typeof PhotonEnvironmentWebhookDeletionReceipt.Type;
+
+export const deletePhotonEnvironmentWebhook = Effect.fn(
+  "PhotonEnvironmentWebhook.delete"
+)(function* (webhookUrl: URL) {
+  const management = yield* PhotonManagement;
+  const baseline = yield* management.listWebhooks();
+  const target = baseline.find(
+    (webhook) => webhook.webhookUrl.href === webhookUrl.href
+  );
+  const duplicate = baseline.find(
+    (webhook) =>
+      webhook.id !== target?.id && webhook.webhookUrl.href === webhookUrl.href
+  );
+  if (target === undefined || duplicate !== undefined) {
+    return yield* new PhotonProviderProofError({
+      operation: "assert",
+      reason: "resourceConflict",
+    });
+  }
+  yield* management.deleteWebhook(target.id);
+  const final = yield* management.listWebhooks();
+  if (final.some((webhook) => webhook.webhookUrl.href === webhookUrl.href)) {
+    return yield* new PhotonProviderProofError({
+      operation: "assert",
+      reason: "resourceConflict",
+    });
+  }
+  return PhotonEnvironmentWebhookDeletionReceipt.make({
+    finalMatchingWebhookCount: 0,
+    managementAuthenticated: true,
+    preexistingMatchingWebhookCount: 1,
+    status: "deleted",
+    webhookDeleted: true,
+  });
+});
+
 export const registerPhotonEnvironmentWebhook = Effect.fn(
   "PhotonEnvironmentWebhook.register"
 )(function* (webhookUrl: URL) {
