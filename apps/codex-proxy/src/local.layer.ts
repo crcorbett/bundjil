@@ -3,9 +3,10 @@ import {
   CodexOAuthUnsupportedRuntimePath,
   OpenAICompatibleProxy,
 } from "@bundjil/codex";
+import type { CodexResponsesRequestPolicy } from "@bundjil/codex";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
-  CodexLegacyDirectProviderLive,
+  makeCodexLegacyDirectProviderLive,
   CodexHttpClientLive,
   CodexOAuthClientLive,
   CodexOAuthProfileCipherConfigLive,
@@ -80,13 +81,14 @@ const makeCodexProxyOAuthServiceLocal = (
 
 export const makeCodexProxyOpenAICompatibleProxyLocal = (
   directory: CodexProxyLocalProfileStoreDirectory,
+  policy: CodexResponsesRequestPolicy,
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv()),
   responsesFetchLayer = CodexResponsesFetchLive
 ) =>
   Layer.merge(
     OpenAICompatibleProxyLive.pipe(
       Layer.provide(
-        CodexLegacyDirectProviderLive.pipe(
+        makeCodexLegacyDirectProviderLive(policy).pipe(
           Layer.provideMerge(
             Layer.merge(
               makeCodexProxyOAuthServiceLocal(directory, configProviderLayer),

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-308",
+  "status": "accepted",
+  "observedAt": "2026-07-21T12:17:28+01:00",
+  "authority": "local Bundjil decision/routing writes, read-only GitHub repository-settings readback, Git commit and push to main, and remote-ref readback; no provider, workflow, secret, deployment, or GitHub-setting mutation",
+  "baseCommit": "11708ff396b935b92cd8846b6999c19847317869",
+  "semanticCommit": "42b4ab15438dd5d6c736564c1cd9a88e932d61b6",
+  "semanticTree": "46b57162bed8a69a6c5a3c9ccb8a4703e6b010dc",
+  "changedPathCount": 10,
+  "sortedChangedPathSha256": "06d3ec670f54cfc8037884794faddda8f87dc2387107abe74182fc2f1f6cd16e",
+  "candidateReceiptSha256": "e71c7130a0a51386d77d9a9d51530c8f5f86aaaef37aaa0243bee0979cca02f1",
+  "sourceReceiptSha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb",
+  "checks": [
+    {
+      "check": "decision schema, source provenance, and provider inventory",
+      "status": "passed",
+      "result": "Five records pass the canonical Draft 2020 schema, exact task-map equality, instance-relative receipt linkage, and five base-source digests; read-only GitHub Actions settings reproduced with explicit limitations."
+    },
+    {
+      "check": "boundary-registry comparison",
+      "status": "passed",
+      "result": "Twenty-four focused tests preserve exact admission, occurrence isolation, duplicate rejection, and stale-entry detection; no replacement was admitted."
+    },
+    {
+      "check": "fresh-context correction and final acceptance",
+      "status": "passed",
+      "result": "The evaluator exposed one-way consumer mapping, a self-deadlocking Eve deferral, wrong runbook paths, and understated Claude mutation risk. Corrected central dependencies/scopes and local records then received PASS."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundary and skill audits, 29 tooling tests, Ultracite, lint fixtures, Knip, five workspace typechecks, and 250 package/app tests passed with a schema-valid synthetic Executor test configuration and no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "After push and fetch, local HEAD and origin/main both resolved to 42b4ab15438dd5d6c736564c1cd9a88e932d61b6."
+    }
+  ],
+  "postcondition": "Bundjil HGI-308 has four accepted reversible local defaults and one nonblocking Eve live-state deferral; HGI-302 through HGI-306 directly name the records they implement.",
+  "rollback": "Revert the validation-receipt commit, then semantic commit 42b4ab15438dd5d6c736564c1cd9a88e932d61b6; revert the matching central HGI-302 through HGI-306 pointers while preserving HGI-300/HGI-301.",
+  "limitations": [
+    "GitHub Actions settings do not prove workflow execution, token issuance, PR-comment authority, effectiveness, cost, or convergence.",
+    "Vercel, Executor, Sendblue, Upstash, and secret-binding readbacks remain unavailable or intentionally unattempted pending target-owned authority.",
+    "HGI-308 commits use the disclosed per-command unsigned fallback because the configured 1Password signing agent remained unavailable; content, tree, ancestry, push, and remote identity are verified."
+  ],
+  "nonClaims": [
+    "No provider, workflow, GitHub setting, secret, deployment, webhook, message, credential, production, release, or publication state was mutated.",
+    "The Eve live-state deferral and current Claude workflow are not accepted evidence of provider actuality or safe automation."
+  ]
+}

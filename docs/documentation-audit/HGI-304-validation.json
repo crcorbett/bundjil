@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "status": "accepted",
+  "observedAt": "2026-07-21T15:04:00+01:00",
+  "authority": "repository workflow, documentation, policy, test, Git commit, main push, and remote-ref readback plus public upstream Git-ref identity reads; no authenticated GitHub setting, workflow-run, provider, environment-value, secret, deployment, message, release, approval-resume, or Production operation",
+  "baseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "implementationCommit": "a1604f084073d1b379e594de36522169548e3f8d",
+  "implementationTree": "dbc420bd9a03236e224144a3149f329672b65747",
+  "changedPathCount": 37,
+  "sortedChangedPathSha256": "b73bbe85c2a2fb3373615804eded8256390ac29d7576dc4533736dbc2d28ee06",
+  "candidateReceiptSha256": "54a9fac0fdddb459b648b582357291d4936df8fc7fd2f3ed8851179b81bca4c4",
+  "sourceInventorySha256": "2c171abce0c27d99fea58e281288b0adfa471b5d6e5af6fdccdfa35322bdf922",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "scenarioResults": [
+    {
+      "id": "HGI304-CLAUDE-ACTOR-01",
+      "sha256": "326fb08c1f199566171b12852e9cda0513440b0094917dd2617254f2978298b5"
+    },
+    {
+      "id": "HGI304-RELEASE-EPOCH-01",
+      "sha256": "7717fa5d47356d0fc47f8aec20f9a00398c20e8deb2525157d00a4988845b37b"
+    },
+    {
+      "id": "HGI304-AUTO-REVIEW-01",
+      "sha256": "2b39ac3710de6aff12e38af595d5afd6c44aaa77c3646903045cd1f9a534fd1f"
+    },
+    {
+      "id": "HGI304-OBSERVATION-AUTHORITY-01",
+      "sha256": "0efd0f1f2cec8d5037662d7213a2d0cdcf5e9a8f464b7cc774576ded452e6ee7"
+    },
+    {
+      "id": "HGI304-CONTAINMENT-01",
+      "sha256": "d08e314f8e10e78ed9e8938c6e97bc6e39845d7abbcb3f78fe08cc90c11e6fe3"
+    },
+    {
+      "id": "HGI304-ACTION-PIN-01",
+      "sha256": "3cfb9c93568a256f18208d9b734b31a6be066641b94ea34ce3b7cc01eb168f26"
+    }
+  ],
+  "checks": [
+    {
+      "check": "workflow and authority policy",
+      "status": "passed",
+      "result": "Exactly three workflows, five immutable action pins, and 15 exact authority identity/surface/target/status contracts passed; negative fixtures reject direct-invocation, inventory, permission, timeout, convergence, target, epoch, pin, readback, secret, tool-authority, classification, and containment drift."
+    },
+    {
+      "check": "documentation and skill routes",
+      "status": "passed",
+      "result": "check:docs passed 220 files and check:skills passed 167 files with 16 mirrors; current docs, READMEs, SPEC, plan, and local docs-maintainer profile route to the authority and automation owners."
+    },
+    {
+      "check": "fresh-context authority scenarios",
+      "status": "passed",
+      "result": "A fresh Terra evaluator found and caused correction of three coherence gaps, recomputed every declared source hash, and then accepted all six actor, release, auto-review, observation-authority, emergency-containment, and action-pin scenarios."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, docs, skills, authority, 48 tooling tests, Ultracite, lint fixture, Knip, five package typechecks, and 250 app/package tests passed with schema-valid synthetic Executor configuration and no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Semantic commit a1604f084073d1b379e594de36522169548e3f8d was pushed; after fetch, local HEAD and origin/main both resolved to that commit with tree dbc420bd9a03236e224144a3149f329672b65747."
+    }
+  ],
+  "postcondition": "Bundjil now has bounded desired-source workflows, a complete machine-readable authority inventory, an automation admission register, immutable GitHub Action ownership, emergency containment limits, executable semantic controls, and fresh-context evidence without claiming provider actuality.",
+  "rollback": "Revert this closeout and a1604f084073d1b379e594de36522169548e3f8d together while preserving HGI-300 through HGI-303, HGI-308, and HGI-310 evidence and unchanged runtime implementation.",
+  "limitations": [
+    "Repository source, public Git refs, local checks, and fresh-context acceptance do not prove GitHub settings, variables, tokens, OIDC, secret availability, hosted action behavior, workflow runs, comments, pull requests, or provider state.",
+    "Release remains disabled_pending_proof; HGI-309 owns authenticated external setting/application readback, HGI-305 owns critical-journey proof, and HGI-306 owns continuous-automation admission.",
+    "The semantic and closeout commits are unsigned because the configured 1Password signing agent remains unavailable; content, tree, ancestry, push, and remote identity are independently verified."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored local file, GitHub setting, workflow run, credential, secret, deployment, webhook, message, approval resume, pull request, release, or Production system was read or changed.",
+    "A policy pass, action pin, workflow source, public ref, old receipt, model/tool output, or unavailable readback grants no external-operation authority."
+  ]
+}

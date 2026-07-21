@@ -18,6 +18,7 @@
         "typescript": "catalog:typescript",
         "ultracite": "7.6.1",
         "vitest": "catalog:testing",
+        "yaml": "^2.9.0",
       },
     },
     "apps/agent": {
@@ -108,6 +109,7 @@
         "effect": "catalog:effect",
       },
       "devDependencies": {
+        "@effect/platform-bun": "catalog:effect",
         "@effect/vitest": "catalog:effect",
         "typescript": "catalog:typescript",
         "vitest": "catalog:testing",

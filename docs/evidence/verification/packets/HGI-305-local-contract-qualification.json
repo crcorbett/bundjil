@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "kind": "local",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": {
+    "state": "accepted"
+  },
+  "externalConsequence": {
+    "outcome": "none",
+    "target": "no external target"
+  },
+  "candidate": {
+    "repositoryCommit": "21341fa205a265f47401191e6cd471b6ea62ba0d",
+    "sourceDigest": "d151f051c26f00dae93336161d8ce735db740a85af1272e41004d0b1cd6b49ec",
+    "artifactDigest": "6137e8393b86aeec7e3dcdea167b39cd3868a75ee97053180b3568c081e7316c"
+  },
+  "authority": {
+    "principal": "local repository maintainer",
+    "identitySource": "local Git and test process",
+    "externalAccess": "none",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil repository maintainer"
+  },
+  "environment": {
+    "tier": "local",
+    "target": "Bundjil repository commit 21341fa205a265f47401191e6cd471b6ea62ba0d"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J01-workspace-status",
+      "status": "passed",
+      "oracle": "The deterministic local workspace-status contract passed."
+    },
+    {
+      "journeyId": "BND-J02-gateway-session-recovery",
+      "status": "inconclusive",
+      "oracle": "No deterministic session creation and interrupted-stream recovery fixture exists."
+    },
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "passed",
+      "oracle": "The loopback mock health, auth, SSE, interruption, pipe-close, and rerun fixtures passed."
+    },
+    {
+      "journeyId": "BND-J04-local-reauthentication",
+      "status": "inconclusive",
+      "oracle": "Local auth contracts passed, but no real login or profile operation ran."
+    },
+    {
+      "journeyId": "BND-J05-sendblue-accepted-message",
+      "status": "inconclusive",
+      "oracle": "Local fixtures preserve accepted scheduling, but no send or delivery was observed."
+    },
+    {
+      "journeyId": "BND-J06-sendblue-auth-provider-rejection",
+      "status": "inconclusive",
+      "oracle": "Local rejection fixtures passed, but no provider rejection was observed."
+    },
+    {
+      "journeyId": "BND-J07-executor-read-only",
+      "status": "inconclusive",
+      "oracle": "Source protocol checks passed, but no external Executor operation ran."
+    },
+    {
+      "journeyId": "BND-J08-executor-approval-resume",
+      "status": "inconclusive",
+      "oracle": "Approval protocol checks passed, but no pending call or resume was observed."
+    },
+    {
+      "journeyId": "BND-J09-deployment-promotion-readback",
+      "status": "inconclusive",
+      "oracle": "The local synthetic snapshot preflight passed, but no Vercel state was read or changed."
+    },
+    {
+      "journeyId": "BND-J10-incident-revocation-recovery",
+      "status": "inconclusive",
+      "oracle": "Runbook routing is present, but no external containment, revocation, rollback, or recovery ran."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "bun run verification with the documented public synthetic Executor endpoint",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "The HGI-305 local proof contracts, receipts, routes, policies, and fixtures pass without upgrading any external journey.",
+    "target": "Bundjil repository commit 21341fa205a265f47401191e6cd471b6ea62ba0d",
+    "recoveryHint": "Inspect the retained detail and exact failed owner before changing any claim; use HGI-309 for approved external qualification.",
+    "detailPath": "docs/evidence/verification/details/HGI-305-local-contract-qualification.json",
+    "detailSha256": "22f09968bd66ba70c06279db7a1f1a880fc1c69052ddd6627fb2b80e5c26a545",
+    "postcondition": "The semantic commit is locally qualified and remotely identified; external journeys retain their declared limits."
+  },
+  "externalReadback": {
+    "required": false,
+    "outcome": "not_required",
+    "receipt": "not required for this exact local contract claim"
+  },
+  "postconditions": [
+    "The semantic commit and remote main resolve to the same commit and tree.",
+    "All repository gates and eight fresh-context scenarios pass for the exact local contract claim."
+  ],
+  "limitations": [
+    "Gateway session recovery remains deferred and all provider consequences remain partial or approval_gated.",
+    "The public synthetic Executor endpoint satisfied build-time discovery only; no API key or provider request was used."
+  ],
+  "nonClaims": [
+    "No Preview, Production, provider, delivery, approval, rollback, recovery, or health actuality is claimed.",
+    "This packet does not authorize or qualify an external operation."
+  ],
+  "rollback": {
+    "identity": "revert the HGI-305 semantic and closeout commits together",
+    "outcome": "not_needed",
+    "owner": "Bundjil repository maintainer"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HGI-305-local-contract-qualification.json",
+      "sha256": "22f09968bd66ba70c06279db7a1f1a880fc1c69052ddd6627fb2b80e5c26a545",
+      "provenance": "local verification, Git readback, and final fresh Terra acceptance"
+    }
+  ],
+  "observedAt": "2026-07-21T15:22:00.000Z"
+}

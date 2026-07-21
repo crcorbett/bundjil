@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "status": "accepted",
+  "observedAt": "2026-07-21T16:23:00+01:00",
+  "authority": "repository source, documentation, policy, local fixtures, tests, evidence, Git commit, main push, and remote-ref readback only; no provider, deployment, environment-value, secret, message, approval-resume, delivery, rollback, or Production readback or mutation",
+  "baseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "implementationCommit": "21341fa205a265f47401191e6cd471b6ea62ba0d",
+  "implementationTree": "3c74eb29cfb5cb149dc32dea59080c7cdb003efb",
+  "changedPathCount": 51,
+  "sortedChangedPathSha256": "d151f051c26f00dae93336161d8ce735db740a85af1272e41004d0b1cd6b49ec",
+  "candidateReceiptSha256": "6137e8393b86aeec7e3dcdea167b39cd3868a75ee97053180b3568c081e7316c",
+  "sourceInventorySha256": "a005739954509c25b1ce29393963bc59350c70b1706611aa7f2de3411c3346ab",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "proofPacket": {
+    "path": "docs/evidence/verification/packets/HGI-305-local-contract-qualification.json",
+    "sha256": "e5cbc8effb7373595b52b849e6653883ed29c6516d62cb99a91272825613e564",
+    "claim": "exact local HGI-305 contract qualification only"
+  },
+  "proofDetail": {
+    "path": "docs/evidence/verification/details/HGI-305-local-contract-qualification.json",
+    "sha256": "22f09968bd66ba70c06279db7a1f1a880fc1c69052ddd6627fb2b80e5c26a545"
+  },
+  "scenarioResults": [
+    {
+      "id": "HGI305-JOURNEY-SCOPE-01",
+      "sha256": "a118170b74fd828d471d59dc073ab09befde4b548a0b34b264fa17c83fa118b0"
+    },
+    {
+      "id": "HGI305-PREVIEW-RERUN-01",
+      "sha256": "f89448804ea7453424a5708ad933cf399ed553789ecbc5a2b591a15edaa19bf1"
+    },
+    {
+      "id": "HGI305-PREFLIGHT-AUTHORITY-01",
+      "sha256": "a71fe2810c2d739a4069a78540ae99ad8e247e201470c063a33e7f642d26ebe3"
+    },
+    {
+      "id": "HGI305-SENDBLUE-DELIVERY-01",
+      "sha256": "57bae44b2038e534904f77d114ab01a5b7f5f47c270bb036c2b5bd1defb5aff6"
+    },
+    {
+      "id": "HGI305-EXECUTOR-RESUME-01",
+      "sha256": "ffeef7dc58e551293050985da3f64e595e00f91ca0d0efc4edf2bc6f39a790bb"
+    },
+    {
+      "id": "HGI305-EVIDENCE-TAMPER-01",
+      "sha256": "7bb81904f7f9f4f98480f37e94bb64669fe35759225de8c1046f496e0f208ce1"
+    },
+    {
+      "id": "HGI305-READBACK-UNAVAILABLE-01",
+      "sha256": "d96ec90c515fd2ed163b60580dfc9cdbefcd65ddd78bd8a2ccd84503e5efd62f"
+    },
+    {
+      "id": "HGI305-EFFECT-BOUNDARY-01",
+      "sha256": "ce2cc017d9f1f89ceedd0aa7b7ed7b7224e4526c720269bd3f81e8a5bcebec38"
+    }
+  ],
+  "checks": [
+    {
+      "check": "verification policy and contracts",
+      "status": "passed",
+      "result": "Exactly ten journeys, five packet templates, strict Effect and interoperable schemas, bounded retained-detail roots, lifecycle/status/outcome, authority, readback, consequence, digest, and output semantics passed 59 tooling tests."
+    },
+    {
+      "check": "Preview and production receipt producers",
+      "status": "passed",
+      "result": "Ten Preview and 16 production-preflight fixtures passed; rerun_avoided byte-preserves prior detail, output_closed links a separate sidecar, interruption remains nonzero, and local preflight grants no external authority."
+    },
+    {
+      "check": "documentation, skills, and fresh-context acceptance",
+      "status": "passed",
+      "result": "Docs, skill mirrors, authority, and verification policies passed. Three fresh Terra audits caused correction of four evidence-lifecycle/coherence defects; the final audit passed all eight scenarios and all 15 source hashes."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, 59 tooling tests, type-aware Ultracite, lint fixture, Knip, five typechecks, and 262 app/package tests passed using the documented public synthetic Executor endpoint with no API key or provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Semantic commit 21341fa205a265f47401191e6cd471b6ea62ba0d was pushed; after fetch, local HEAD and origin/main resolved to that commit with tree 3c74eb29cfb5cb149dc32dea59080c7cdb003efb and the declared 51-path digest."
+    }
+  ],
+  "postcondition": "Bundjil now owns ten critical journeys, honest qualification scope, typed proof packets, immutable evidence lifecycle, bounded legible receipts, strict local verification policy, and safe Preview/preflight producers without claiming external actuality.",
+  "rollback": "Revert this closeout and 21341fa205a265f47401191e6cd471b6ea62ba0d together while preserving HGI-300 through HGI-304, HGI-308, and HGI-310 evidence and all unchanged provider state.",
+  "limitations": [
+    "The accepted packet proves the exact local HGI-305 contract qualification only; Gateway recovery remains deferred and external journeys retain their partial or approval_gated scope pending HGI-309.",
+    "Repository source, local fixtures, synthetic metadata, Git readback, and fresh-context acceptance do not prove Preview, Production, provider, delivery, approval, rollback, recovery, or health actuality.",
+    "The semantic commit is unsigned because the configured 1Password signing agent remains unavailable; content, tree, ancestry, push, and remote identity are independently verified."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored operational artifact, credential, secret, deployment, alias, webhook, message, delivery, approval resume, rollback, recovery, or Production system was read or changed.",
+    "A local test, packet schema, passed preflight, command owner, model output, or unavailable readback is not external proof or operation authority."
+  ]
+}

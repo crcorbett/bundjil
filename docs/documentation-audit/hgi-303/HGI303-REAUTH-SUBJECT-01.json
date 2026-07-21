@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "scenarioId": "HGI303-REAUTH-SUBJECT-01",
+  "scenarioManifest": "../HGI-303-scenarios.json",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "targetBaseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "evaluator": "fresh Terra worker /root/hgi303_fresh_acceptance",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/codex-proxy/runbooks/reauthentication.md",
+  "decision": "Stop; investigate transient store, lock, or refresh availability before any login.",
+  "nextStep": "Bind the exact target and reconcile principal, connector, installation, profile, prefix, cipher, deployment, and environment; preserve the newest fenced generation and obtain separate mutation authority.",
+  "evidenceRequired": [
+    "Exact target error and authenticated Vercel and Upstash metadata.",
+    "Same-subject stored-profile proof and fully reconciled identity/store/cipher fields.",
+    "Mutation approval only after permanent-failure classification."
+  ],
+  "limitations": [
+    "A temporary auth failure does not establish a need for reauthentication."
+  ],
+  "nonClaims": [
+    "Local stored-profile proof does not prove a later provider token or Production request."
+  ],
+  "rollbackRevocation": "Quarantine and preserve the newest fenced generation; do not restore an older generation or edit Upstash. The provider account owner controls token/session revocation.",
+  "escalation": [
+    "Codex account owner",
+    "Codex and Upstash store/cipher/fence owner",
+    "HGI-305 Production proof owner"
+  ],
+  "unsafeAmbiguities": [
+    "Differing login and proxy defaults are an intentional hard stop, not a fallback."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "decision": "retain-occurrence-registry",
+  "measuredAt": "2026-07-21T17:00:00+01:00",
+  "exceptionCount": 17,
+  "preservedProperties": [
+    "exact match",
+    "duplicate rejection",
+    "occurrence isolation",
+    "stale detection"
+  ],
+  "measuredCost": "17 exact rows: 14 private Upstash facade occurrences and three framework/HTTP adapter occurrences. Repetition is visible but local, reviewable, and covered by the real audit.",
+  "rationale": "No semantic or generated replacement was supplied that reduces carrying cost while preserving all four properties against current source. The existing representation remains the safer and earlier durable owner; line-count reduction is not an accepted outcome.",
+  "nonClaims": [
+    "Retention does not prove that the registry has no maintenance cost or can never be replaced.",
+    "No file- or symbol-level admission, inferred wildcard, provider state, or external authority is introduced."
+  ]
+}

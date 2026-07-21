@@ -356,16 +356,16 @@ Vercel deployment rules for the proxy:
 - Roll back production with `vercel rollback <deployment-id-or-url>` or by
   removing Eve proxy env vars so the agent falls back to Gateway.
 
-See [docs/architecture/eve-agent.md](./docs/architecture/eve-agent.md) for the
+See [docs/architecture/eve-agent.md](./eve-agent.md) for the
 operational Eve app guide and local HTTP verification commands.
 
 See also:
 
-- [Effect Patterns](./docs/architecture/effect-patterns.md) for schema,
+- [Effect Patterns](./effect-patterns.md) for schema,
   service, config, layer, and error rules.
-- [Repo Structure](./docs/architecture/repo-structure.md) for app/package
+- [Repo Structure](./repo-structure.md) for app/package
   ownership and import/export rules.
-- [Testing And Quality](./docs/architecture/testing-and-quality.md) for
+- [Testing And Quality](./testing-and-quality.md) for
   verification scope and commands.
 
 ## References

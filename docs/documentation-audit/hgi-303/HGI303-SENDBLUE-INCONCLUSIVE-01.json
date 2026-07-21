@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "scenarioId": "HGI303-SENDBLUE-INCONCLUSIVE-01",
+  "scenarioManifest": "../HGI-303-scenarios.json",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "targetBaseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "evaluator": "fresh Terra worker /root/hgi303_fresh_acceptance",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/agent/runbooks/sendblue.md",
+  "decision": "Stop and classify current webhook, replay store, Eve processing, and handset delivery as separate inconclusive dimensions.",
+  "nextStep": "Obtain authenticated Sendblue account/webhook metadata, independent deployment identity, credential-hidden Upstash metadata, and separately authorized journey evidence.",
+  "evidenceRequired": [
+    "Authenticated account and complete receive-webhook metadata with secrets and path/query data removed.",
+    "Independent app deployment/environment identity and credential-hidden Upstash database metadata.",
+    "Separate provider acceptance, Eve processing, and handset-delivery observations."
+  ],
+  "limitations": [
+    "Historical HTTP 202 establishes accepted dispatch scheduling only."
+  ],
+  "nonClaims": [
+    "No current webhook, replay-store, Eve-processing, handset-delivery, or Production health is established and no retry is justified."
+  ],
+  "rollbackRevocation": "The provider owner restores the complete prior webhook inventory and revokes affected credential, webhook, routing, or replay material with immediate metadata readback.",
+  "escalation": [
+    "Sendblue account and delivery owner",
+    "Upstash database and access owner",
+    "Agent routing and replay maintainer"
+  ],
+  "unsafeAmbiguities": []
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "HGI-306-report-only-example",
+  "lifecycle": "report_only",
+  "generatorIdentity": "hgi-306-local-freshness-fixture",
+  "generatedAt": "2026-07-21T17:00:00+01:00",
+  "source": {
+    "path": "docs/documentation-audit/HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb",
+    "observedAt": "2026-07-21T17:00:00+01:00",
+    "targetRevision": "534076e68d663d98fa53f46004397b617282a4a9"
+  },
+  "finding": {
+    "classification": "fixture-only documentation freshness candidate",
+    "audience": "Bundjil documentation owner",
+    "summary": "Demonstrate the report-only contract without asserting that the observed source is stale."
+  },
+  "proposedOwnerPaths": ["docs/standards/controls.md"],
+  "freshness": {
+    "expiresAt": "2026-08-21T17:00:00+01:00",
+    "resumeTrigger": "A documentation owner chooses to evaluate the fixture against a changed candidate contract."
+  },
+  "contradictions": [],
+  "review": {
+    "decision": "pending",
+    "reviewerIdentity": null,
+    "receipt": null
+  },
+  "publication": {
+    "status": "not_authorized",
+    "approvalReceipt": null,
+    "publisherIdentity": null,
+    "publishedRevision": null,
+    "atomicReadbackReceipt": null
+  },
+  "recovery": {
+    "quarantine": "Move only the candidate to the retained quarantine route and preserve its identity.",
+    "revocation": "Revoke any later publication approval if target revision or owner truth changes.",
+    "lastKnownGood": "Repository state 534076e68d663d98fa53f46004397b617282a4a9 before HGI-306 changes.",
+    "rollback": "Remove no current owner; discard or quarantine this report-only fixture."
+  },
+  "limitations": [
+    "This candidate is a local contract fixture, not an observed stale-document claim."
+  ],
+  "nonClaims": [
+    "It grants no edit, review, approval, publication, provider, or external-state authority."
+  ]
+}

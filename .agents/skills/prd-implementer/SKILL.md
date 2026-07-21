@@ -11,12 +11,13 @@ This skill is intentionally thin. It routes implementation work into the canonic
 
 Read in this order:
 
-1. the target spec
-2. the sibling task list when the spec has one
-3. the matching active plan in `docs/exec-plans/active/`, if implementation
+1. `AGENTS.md`
+2. `docs/README.md`
+3. `.agents/skills/docs-maintainer/SKILL.md` and its repository profile
+4. the target spec and sibling task list when it has one
+5. the matching active plan in `docs/exec-plans/active/`, if implementation
    has started
-4. `AGENTS.md`
-5. the relevant files in `docs/architecture/`
+6. the relevant routed files in `docs/architecture/`
 
 ## Default Rules
 
@@ -86,11 +87,17 @@ Read in this order:
   fixtures, evidence, observability, rollout/rollback, SPECs, task ledgers, and
   active plans as `Change required` or `N/A` with a reason. Edit required
   artifacts in the same slice instead of reporting them as follow-up advice.
+- Invoke `.agents/skills/docs-maintainer` before and after every material
+  implementation slice. Reconcile `Change required`, `Preserve`, and evidenced
+  `N/A` decisions against the actual diff, then invoke it again at task
+  closeout for lifecycle, execution-packet, receipt, and archive routing.
 
-## Mandatory Subagent Prompt Block
+## Delegation reference
 
-Include this block in every implementation subagent prompt, then add the
-specific task object, spec path, relevant files, and verification gates:
+When a bounded, independently provable slice needs delegation, include the
+relevant parts of this reference with the task object, routed owner paths, and
+verification gates. Delegation is optional; the primary trajectory remains
+accountable for integration and acceptance:
 
 ```text
 Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
@@ -152,8 +159,10 @@ For each task:
    owner with exact failed evidence.
 6. Mark the task complete only after the parent agent is satisfied and every
    required risk lens and proof passes.
-7. Commit the coherent slice when `commitAfterPassing` requires it.
-8. Begin the next task only after the current task is accepted.
+7. Reconcile the repo-local docs-maintainer ledger and run `bun run check:docs`
+   plus `bun run check:skills` before accepting the slice.
+8. Commit the coherent slice when `commitAfterPassing` requires it.
+9. Begin the next task only after the current task is accepted.
 
 Default to serial task execution. Parallelize only when the task list proves
 independent dependencies and disjoint write scopes.

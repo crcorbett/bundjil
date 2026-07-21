@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-METRICS-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "control and automation metric plans plus review and retirement triggers",
+  "decision": "Reject activity as effectiveness. Retention requires accepted outcomes plus separate false-positive, feedback-latency, synchronous-human-attention, worker-duration, carrying-cost, review, and retirement evidence.",
+  "evidenceRequired": [
+    "Every control and automation record includes the five required metric dimensions.",
+    "Each record names carrying cost, review trigger, and retirement condition."
+  ],
+  "limitations": [
+    "HGI-306 defines measurement plans but does not fabricate historical outcome or cost data."
+  ],
+  "nonClaims": [
+    "Run, command, or finding volume is not value, convergence, or safe continuous maintenance."
+  ],
+  "rollbackRevocation": "Retire or foreground the loop if accepted outcomes do not justify its carrying cost or human attention.",
+  "escalation": ["Control owner", "Automation owner", "Repository owner"],
+  "unsafeAmbiguities": []
+}

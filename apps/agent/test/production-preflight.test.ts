@@ -18,7 +18,7 @@ const beforeFirstMutation = {
     stableDomain: "bundjil-agent.vercel.app",
     teamId: "team_1LX7ZujbijowTv8J9k0aU7nD",
   },
-  approval: "granted",
+  operationAuthority: "external-receipt-required",
   inventory: {
     previewIdentityReuse: false,
     productionAgentActivation: "absent",
@@ -99,12 +99,12 @@ const proxyProvisioned = {
         type: "sensitive",
       },
       {
-        name: "BUNDJIL_UPSTASH_REDIS_REST_URL",
+        name: "KV_REST_API_URL",
         target: "production",
         type: "sensitive",
       },
       {
-        name: "BUNDJIL_UPSTASH_REDIS_REST_TOKEN",
+        name: "KV_REST_API_TOKEN",
         target: "production",
         type: "sensitive",
       },
@@ -249,10 +249,17 @@ describe("Production promotion preflight", () => {
       decode(beforeFirstMutation).pipe(Effect.runSync)
     ).not.toThrow();
     expect(() =>
-      decode({ ...beforeFirstMutation, approval: undefined }).pipe(
+      decode({ ...beforeFirstMutation, operationAuthority: undefined }).pipe(
         Effect.runSync
       )
     ).toThrow("Expected");
+    expect(() =>
+      decode({
+        ...beforeFirstMutation,
+        approval: "granted",
+        operationAuthority: undefined,
+      }).pipe(Effect.runSync)
+    ).toThrow("Unexpected key");
     expect(() =>
       decode({ ...proxyProvisioned, storedProfileProof: undefined }).pipe(
         Effect.runSync
@@ -366,6 +373,55 @@ describe("Production promotion preflight", () => {
             "missing-production-variable:BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
           ]);
         }
+      })
+  );
+
+  it.effect(
+    "accepts exactly one runtime Upstash alias family and rejects ambiguous aliases",
+    () =>
+      Effect.gen(function* () {
+        const directRuntime = yield* decode({
+          ...proxyProvisioned,
+          proxy: {
+            ...proxyProvisioned.proxy,
+            variables: proxyProvisioned.proxy.variables.map((variable) => {
+              if (variable.name === "KV_REST_API_URL") {
+                return { ...variable, name: "UPSTASH_REDIS_REST_URL" };
+              }
+              if (variable.name === "KV_REST_API_TOKEN") {
+                return { ...variable, name: "UPSTASH_REDIS_REST_TOKEN" };
+              }
+              return variable;
+            }),
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.strictEqual(directRuntime.go, true);
+
+        const ambiguous = yield* decode({
+          ...proxyProvisioned,
+          proxy: {
+            ...proxyProvisioned.proxy,
+            variables: [
+              ...proxyProvisioned.proxy.variables,
+              {
+                name: "UPSTASH_REDIS_REST_URL",
+                target: "production",
+                type: "sensitive",
+              },
+              {
+                name: "UPSTASH_REDIS_REST_TOKEN",
+                target: "production",
+                type: "sensitive",
+              },
+            ],
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.deepStrictEqual(ambiguous.rejected, [
+          "ambiguous-production-variable:UPSTASH_REDIS_REST_URL|KV_REST_API_URL",
+          "ambiguous-production-variable:UPSTASH_REDIS_REST_TOKEN|KV_REST_API_TOKEN",
+        ]);
       })
   );
 

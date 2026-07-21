@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "status": "candidate",
+  "observedAt": "2026-07-21T13:27:02+01:00",
+  "authority": "repository-local skill, documentation, policy, test, and validation writes only; forward evaluators were read-only; no provider, workflow, deployment, credential, release, or publication operation",
+  "baseCommit": "734c719145b3d70414afd8f5a18085f28883f7e4",
+  "candidatePathCount": 16,
+  "sortedCandidatePathSha256": "a3cd1c79e10005c917b977add48482f54b651b35b1dacbeeca75e8e0a023130c",
+  "artifacts": [
+    {
+      "path": ".agents/skills/docs-maintainer/SKILL.md",
+      "sha256": "b0ec16ccef759c25c0c30c07fb04680e393a305f342abbf1fbbd3acd97b7e613"
+    },
+    {
+      "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
+      "sha256": "417347495503da8baf917d5771fb94214ace5d8312517e8bce6a3e01937582ce"
+    },
+    {
+      "path": ".agents/skills/docs-maintainer/agents/openai.yaml",
+      "sha256": "398ef82179e2164e418ca6c6ad500aa6d7842dadd15e65eec093f8cbc2a95265"
+    },
+    {
+      "path": "tooling/quick_validate.py",
+      "sha256": "0cd10e1cd0a692842617a7dd69429e0136cc4f87cd7dd136902ddf8798e061ec"
+    }
+  ],
+  "checks": [
+    {
+      "check": "portable structural validation",
+      "status": "passed",
+      "result": "The repository-owned dependency-free quick_validate.py accepted docs-maintainer and all three changed PRD skills."
+    },
+    {
+      "check": "skill and documentation policy",
+      "status": "passed",
+      "result": "check:skills passed 167 files and 16 mirrors; check:docs passed 206 selected files; bounded detail receipts were written under ignored tmp/."
+    },
+    {
+      "check": "structured negative fixtures",
+      "status": "passed",
+      "result": "Forty-two tooling tests include failures for missing ordinary-change and PRD-phase routes, app-owned runbooks, metadata/mirror, portability, background publication controls, tool-authority separation, and undated provider actuality."
+    },
+    {
+      "check": "fresh Effect and service contract scenario",
+      "status": "passed",
+      "result": "A fresh worker selected canonical @bundjil/eve Schemas, errors, WorkspaceOperations, live/memory Layers, tool boundary, selective architecture/README decisions, active SPEC/tasks, and exact focused plus aggregate checks without inventing provider proof."
+    },
+    {
+      "check": "fresh provider runbook and authority scenario",
+      "status": "passed",
+      "result": "A fresh worker treated Executor/Sendblue responses as observations, stopped before consequential operations, routed future procedures to apps/agent/runbooks under HGI-303, authority to HGI-304, and proof to HGI-305."
+    },
+    {
+      "check": "fresh ordinary and background scenario",
+      "status": "passed",
+      "result": "A fresh worker scoped an attached Claude-workflow edit to repository owners while keeping an unverified README finding in a report-only candidate with reviewer, publisher, quarantine, recovery, and readback requirements."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, docs/skills, 42 tooling tests, Ultracite, lint fixture, Knip, five typechecks, and 250 package/app tests passed with schema-valid synthetic Executor test configuration and no provider call."
+    }
+  ],
+  "limitations": [
+    "Fresh scenarios prove worker routing and judgment against the candidate checkout; they do not prove provider, workflow, deployment, credential, message, release, or production behavior.",
+    "HGI-303, HGI-304, and HGI-305 remain the owners for app runbooks, consequential authority, and critical-journey proof; the skill preserves those gaps rather than implementing them.",
+    "Clean-clone validation remains required against the immutable semantic commit before acceptance."
+  ],
+  "nonClaims": [
+    "No provider, workflow, GitHub setting, secret, deployment, webhook, message, credential, production, release, or publication system was read or changed.",
+    "A tool result, passing local check, or fresh evaluator response does not grant external operation authority."
+  ],
+  "rollback": "Remove the local docs-maintainer skill, mirror, portable validator, PRD/root invocations, HGI-310 policy fixtures, and candidate status updates together while preserving accepted HGI-302 controls."
+}

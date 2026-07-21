@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-AUTO-REVIEW-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": "HGI-308 Claude-review decision, HGI-304 retired record, and HGI-306 automation-admission owner",
+  "decision": "Reject restoration; HGI-304 applies HGI-308's retirement branch because comment identity, write authority, convergence, cost, and effectiveness proof are unavailable.",
+  "evidenceRequired": [
+    "A separately accepted SPEC and complete authority envelope.",
+    "One-comment-per-head convergence, stopping, escalation, cost, false-positive, and accepted-outcome evidence owned by HGI-306."
+  ],
+  "limitations": [
+    "Source absence does not prove historical runs or external integrations are disabled."
+  ],
+  "nonClaims": [
+    "Retirement is not proof that automatic review was ineffective; it records that admission evidence is absent."
+  ],
+  "rollbackRevocation": "Restoration is a new governed capability, not rollback; keep the former workflow absent until newly accepted.",
+  "escalation": [
+    "Bundjil security and automation maintainer",
+    "HGI-306 acceptance owner"
+  ],
+  "unsafeAmbiguities": []
+}

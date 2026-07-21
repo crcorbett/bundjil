@@ -63,10 +63,12 @@ bun run --filter @bundjil/agent dev:no-ui
 bun run --filter @bundjil/agent check-types
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
+bun run --filter @bundjil/agent preflight:production
 ```
 
 `preflight:production` is a deliberately explicit read-only gate command. It
-does not grant deployment authority or establish current provider state.
+emits one bounded receipt plus an integrity-checked sanitized detail artifact;
+it does not grant deployment authority or establish current provider state.
 
 ## Documentation routes
 
@@ -77,13 +79,23 @@ does not grant deployment authority or establish current provider state.
 - Local commands and proof levels:
   [`docs/architecture/testing-and-quality.md`](../../docs/architecture/testing-and-quality.md).
 - Photon provider-only operation:
-  [`docs/runbooks/photon-provider-proof.md`](../../docs/runbooks/photon-provider-proof.md).
+  [`runbooks/photon.md`](runbooks/photon.md).
 - Dated Photon lifecycle evidence:
   [`docs/verification/photon-provider-proof-2026-07-21.md`](../../docs/verification/photon-provider-proof-2026-07-21.md).
 - Historical Eve, Executor, legacy Sendblue, and model-provider rollout
   provenance: [`docs/product-specs/`](../../docs/product-specs/index.md) and
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
+- Repeatable local, deployment/promotion, Executor, Sendblue, incident,
+  rollback, and recovery procedures are owned by
+  [`runbooks/`](runbooks/README.md). They require just-in-time target readback
+  and an explicit authority envelope before consequential steps.
+- Critical journeys, proof packets, bounded command receipts, and retained
+  evidence are owned by
+  [`docs/verification/`](../../docs/verification/README.md). External systems
+  remain authoritative for current state; a packet proves only its exact
+  candidate, target, authority, observation, and stated postcondition.
 
 Do not add provider actuality, deployment identifiers, credentials,
-provisioning sequences, incident steps, rollback procedures, or dated proof
-records here.
+provisioning sequences, incident steps, rollback procedures, or proof records
+here; update the target-owned runbook and only this pointer when routing
+changes.

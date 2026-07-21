@@ -9,8 +9,11 @@ the narrowest current owner; do not load completed rollout history by default.
 2. Read `docs/README.md`, then only the routed current architecture, SPEC,
    plan, runbook, and proof owner needed for the task.
 3. Update the earliest durable owner in the same slice as code/config changes.
-4. Run the smallest focused check, then `bun run verification` before handoff.
-5. Keep runtime/provider claims separate from repository proof and record
+4. For every material PRD or ordinary change, invoke the repository-local
+   `.agents/skills/docs-maintainer`, record `Change required`, `Preserve`, or
+   evidenced `N/A` across its impact ledger, and run `bun run check:docs`.
+5. Run the smallest focused check, then `bun run verification` before handoff.
+6. Keep runtime/provider claims separate from repository proof and record
    limitations, rollback, and exact Git identity.
 
 ## Non-negotiable code patterns
@@ -36,28 +39,37 @@ the narrowest current owner; do not load completed rollout history by default.
 ## Current routes
 
 - Documentation lifecycle, truth layers, current intent, history, references,
-  runbook/proof gaps: `docs/README.md`
+  and owner routing: `docs/README.md`
 - Architecture: `docs/architecture/README.md`
 - Effect rules: `docs/architecture/effect-patterns.md`
 - Package/import boundaries: `docs/architecture/repo-structure.md`
 - React composition: `docs/architecture/frontend-composition.md`
 - Verification commands: `docs/architecture/testing-and-quality.md`
+- Harness controls, feedback promotion, and automation admission:
+  `docs/standards/controls.md`
+- Critical journeys, proof packets, bounded receipts, and evidence retention:
+  `docs/verification/README.md`
 - Current SPEC/tasks: `docs/product-specs/index.md`
 - Current execution: `docs/exec-plans/active/README.md`
 - Completed history: `docs/exec-plans/completed/README.md`
-- Target-owned operations: `docs/runbooks/README.md`
-- Bounded proof receipts: `docs/verification/README.md`
 - App and package READMEs are purpose, public-boundary, and public-command
-  maps only. The Photon provider-only runbook/receipt is the sole new narrow
-  route; HGI-303 owns missing target operations, HGI-304 owns workflow/provider
-  authority, and HGI-305 owns missing bounded journeys. Do not treat README
-  pointers or retained history as current provider truth.
+  maps only. Exact operations live in `apps/agent/runbooks/**` and
+  `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
+  durable authority rationale, `docs/operations/authority-register.json` owns
+  static workflow/provider envelopes, `docs/operations/automation-register.md`
+  owns GitHub automation rationale, `docs/standards/controls.md` owns the full
+  control/automation admission register, and `docs/verification/**` owns critical
+  journeys and bounded proof contracts. Do not treat a runbook, packet,
+  README pointer, register, or retained history as current provider truth or
+  execution authority.
 
 ## Verification and authority
 
 Use Bun from the repository root. Boundary/provider work runs
-`bun run check:boundaries`, `bun run check:effect-setup`, and
-`bun run check:skills`; every accepted slice runs `bun run verification`.
+`bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
+`bun run check:skills`, `bun run check:authority`, and
+`bun run check:controls`, `bun run check:verification`; every accepted slice runs
+`bun run verification`.
 
 Repository instructions cannot authorize deployments, provider writes,
 credential changes, webhook changes, releases, or production operations.

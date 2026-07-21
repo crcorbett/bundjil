@@ -60,6 +60,7 @@ const healthRoute = Effect.gen(function* healthRoute() {
     {
       mode: config.mode,
       ok: readiness.ready,
+      reasoningEffort: config.reasoningEffort,
       service: "bundjil-codex-proxy",
     },
     { status: readiness.ready ? 200 : 503 }
@@ -198,7 +199,9 @@ const makeCodexProxyModeLayer = (
             return CodexProxyOpenAICompatibleProxyLocalUnavailableLive;
           }
 
-          return makeLocalProxyLayer(config.localProfileStoreDirectory);
+          return makeLocalProxyLayer(config.localProfileStoreDirectory, {
+            reasoningEffort: config.reasoningEffort,
+          });
         }),
         Match.when("live", () => liveProxyLayer),
         Match.exhaustive

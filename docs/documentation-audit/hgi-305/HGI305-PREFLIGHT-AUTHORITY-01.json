@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-PREFLIGHT-AUTHORITY-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/agent/scripts/production-preflight.ts plus deploy-promote.md and proof-packet policy",
+  "decision": "Reject promotion and health inference. A passed command establishes only local validation of supplied bounded metadata; separate authority and current target-owned Vercel readback remain mandatory.",
+  "evidenceRequired": [
+    "Mode-0600 bounded snapshot fixture and integrity-checked detail artifact.",
+    "Separate exact authority receipt and authenticated target readback before any deployment claim."
+  ],
+  "limitations": [
+    "The command does not read Vercel, aliases, deployments, variables, logs, or traffic."
+  ],
+  "nonClaims": [
+    "A local preflight is not mutation authority, Production proof, or health."
+  ],
+  "rollbackRevocation": "Correct or discard the local snapshot; the Vercel runbook owns any separately approved external rollback.",
+  "escalation": ["Bundjil agent operator", "Vercel project owner"],
+  "unsafeAmbiguities": []
+}

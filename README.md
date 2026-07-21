@@ -33,8 +33,9 @@ current architecture—not this overview.
 - [Current architecture](./docs/architecture/README.md)
 - [Current SPEC/tasks](./docs/product-specs/index.md)
 - [Current execution plans](./docs/exec-plans/active/README.md)
+- [Critical journeys and proof packets](./docs/verification/README.md)
 - [Completed history](./docs/exec-plans/completed/README.md)
-- [Target-owned runbooks](./docs/runbooks/README.md)
+- [Target-owned agent runbooks](./apps/agent/runbooks/README.md)
 - [Bounded verification evidence](./docs/verification/README.md)
 - [App and package READMEs](./docs/README.md#routes) for local public commands
   and boundaries
@@ -52,7 +53,11 @@ bun run build
 bun run test
 bun run check:boundaries
 bun run check:effect-setup
+bun run check:docs
 bun run check:skills
+bun run check:authority
+bun run check:controls
+bun run check:verification
 bun run verification
 ```
 

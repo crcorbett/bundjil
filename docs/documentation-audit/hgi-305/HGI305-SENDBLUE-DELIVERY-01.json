@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-SENDBLUE-DELIVERY-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "BND-J05 and BND-J06 plus Sendblue tests and runbooks",
+  "decision": "Record fixture HTTP 202 as accepted scheduling only. Do not claim processing or handset delivery and do not blindly retry an uncertain external consequence.",
+  "evidenceRequired": [
+    "Typed local fixture for acceptance, rejection, replay, and uncertain consequence.",
+    "Provider-owned webhook/account readback before a delivery claim."
+  ],
+  "limitations": [
+    "No Sendblue account, webhook, message, recipient, or handset was observed."
+  ],
+  "nonClaims": [
+    "HTTP acceptance is not provider processing or recipient delivery."
+  ],
+  "rollbackRevocation": "Stop automatic retry; the Sendblue account owner owns any external cancellation or remediation.",
+  "escalation": ["Bundjil agent operator", "Sendblue account owner"],
+  "unsafeAmbiguities": []
+}

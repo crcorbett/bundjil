@@ -231,6 +231,13 @@ export {
 } from "./provider/request-mapper.js";
 export type { CodexRequestMapperShape } from "./provider/request-mapper.js";
 export {
+  CodexResponsesRequestPolicyLowLive,
+  CodexResponsesRequestPolicyService,
+  defaultCodexResponsesRequestPolicy,
+  makeCodexResponsesRequestPolicyLayer,
+} from "./provider/request-policy.js";
+export type { CodexResponsesRequestPolicyServiceShape } from "./provider/request-policy.js";
+export {
   defaultCodexResponsesEndpoint,
   defaultCodexResponsesModel,
   loadCodexResponsesProofInput,
@@ -375,6 +382,8 @@ export {
   CodexResponsesProofInput,
   CodexResponsesProofResult,
   CodexResponsesReasoning,
+  CodexResponsesReasoningEffort,
+  CodexResponsesRequestPolicy,
   CodexResponsesRequest,
   CodexResponsesStreamBody,
   CodexResponsesStreamContentType,
@@ -509,6 +518,10 @@ export type {
   CodexResponsesProofInput as CodexResponsesProofInputType,
   CodexResponsesProofResult as CodexResponsesProofResultType,
   CodexResponsesReasoning as CodexResponsesReasoningType,
+  CodexResponsesReasoningEffort as CodexResponsesReasoningEffortType,
+  CodexResponsesReasoningEffortEncoded,
+  CodexResponsesRequestPolicy as CodexResponsesRequestPolicyType,
+  CodexResponsesRequestPolicyEncoded,
   CodexResponsesRequest as CodexResponsesRequestType,
   CodexResponsesStreamBody as CodexResponsesStreamBodyType,
   CodexResponsesStreamContentType as CodexResponsesStreamContentTypeType,

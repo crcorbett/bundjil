@@ -4,7 +4,9 @@ import { AgentModelProviderMode } from "./model-provider.js";
 
 const VercelVariableType = Schema.Literals(["encrypted", "plain", "sensitive"]);
 
-export const ProductionPreflightDiagnostic = Schema.NonEmptyString;
+export const ProductionPreflightDiagnostic = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isMaxLength(240))
+);
 export type ProductionPreflightDiagnostic =
   typeof ProductionPreflightDiagnostic.Type;
 
@@ -16,7 +18,7 @@ export type ProductionPreflightSnapshotPath =
 
 type VercelVariableKind = typeof VercelVariableType.Type;
 type ExpectedVariableBinding = readonly [
-  name: string,
+  names: readonly string[],
   allowedTypes: readonly VercelVariableKind[],
 ];
 
@@ -72,7 +74,7 @@ const ProductionIdentity = Schema.Struct({
 const commonSnapshotFields = {
   adapter: Schema.Literal("vercel-readonly-metadata-v1"),
   agent: Schema.Struct(agentProjectFields),
-  approval: Schema.Literal("granted"),
+  operationAuthority: Schema.Literal("external-receipt-required"),
   proxy: Schema.Struct(proxyProjectFields),
   readOnly: Schema.Literal(true),
   source: Schema.Struct({
@@ -248,29 +250,102 @@ export const ProductionPreflightEvidence = Schema.Struct({
 export type ProductionPreflightEvidence =
   typeof ProductionPreflightEvidence.Type;
 
+export const ProductionPreflightFailureCode = Schema.Literals([
+  "configuration-unavailable",
+  "detail-artifact-unavailable",
+  "snapshot-invalid",
+  "snapshot-permission-invalid",
+  "snapshot-too-large",
+  "snapshot-unavailable",
+]);
+
+export type ProductionPreflightFailureCode =
+  typeof ProductionPreflightFailureCode.Type;
+
+export const ProductionPreflightClassification = Schema.Union([
+  ProductionPreflightFailureCode,
+  Schema.Literals(["passed", "staged-invariant-rejected"]),
+]);
+
+export type ProductionPreflightClassification =
+  typeof ProductionPreflightClassification.Type;
+
+const ProductionPreflightDetailArtifact = Schema.Struct({
+  path: Schema.NonEmptyString,
+  sha256: Schema.NullOr(
+    Schema.String.pipe(Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)))
+  ),
+  state: Schema.Literals(["available", "unavailable"]),
+});
+
+export const ProductionPreflightReceipt = Schema.Struct({
+  candidateCommit: Schema.Union([
+    ImmutableSourceReference,
+    Schema.Literal("unresolved"),
+  ]),
+  classification: ProductionPreflightClassification,
+  command: Schema.Literal("production-preflight"),
+  detailArtifact: ProductionPreflightDetailArtifact,
+  exitCode: Schema.Literals([0, 1, 2]),
+  invariant: ProductionPreflightDiagnostic,
+  journeyId: Schema.Literal("BND-J09-deployment-promotion-readback"),
+  limitation: ProductionPreflightDiagnostic,
+  nonClaim: ProductionPreflightDiagnostic,
+  observedAt: ProductionPreflightDiagnostic,
+  postcondition: ProductionPreflightDiagnostic,
+  recoveryHint: ProductionPreflightDiagnostic,
+  rejected: Schema.Array(Schema.NonEmptyString),
+  schemaVersion: Schema.Literal(1),
+  stage: Schema.Union([
+    ProductionPreflightEvidence.fields.stage,
+    Schema.Literal("unresolved"),
+  ]),
+  status: Schema.Literals(["passed", "blocked", "inconclusive"]),
+  target: Schema.Literal("bundjil-agent+codex-proxy:production"),
+});
+
+export type ProductionPreflightReceipt = typeof ProductionPreflightReceipt.Type;
+
+export const ProductionPreflightDetail = Schema.Struct({
+  candidateCommit: Schema.Union([
+    ImmutableSourceReference,
+    Schema.Literal("unresolved"),
+  ]),
+  evidence: Schema.NullOr(ProductionPreflightEvidence),
+  failureCode: Schema.NullOr(ProductionPreflightFailureCode),
+  observedAt: ProductionPreflightDiagnostic,
+  schemaVersion: Schema.Literal(1),
+  target: Schema.Literal("bundjil-agent+codex-proxy:production"),
+});
+
+export type ProductionPreflightDetail = typeof ProductionPreflightDetail.Type;
+
 export class ProductionPreflightError extends Schema.TaggedErrorClass<ProductionPreflightError>()(
   "ProductionPreflightError",
-  { message: ProductionPreflightDiagnostic }
+  {
+    failureCode: ProductionPreflightFailureCode,
+    message: ProductionPreflightDiagnostic,
+  }
 ) {}
 
 const expectedAgentVariables = [
-  ["BUNDJIL_AGENT_MODEL_PROVIDER", ["encrypted", "sensitive"]],
-  ["BUNDJIL_CODEX_PROXY_BASE_URL", ["encrypted", "sensitive"]],
-  ["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN", ["sensitive"]],
+  [["BUNDJIL_AGENT_MODEL_PROVIDER"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CODEX_PROXY_BASE_URL"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"], ["sensitive"]],
 ] as const;
 
 const expectedProxyVariables = [
-  ["BUNDJIL_CODEX_PROXY_MODE", ["encrypted", "sensitive"]],
-  ["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN", ["sensitive"]],
-  ["BUNDJIL_CODEX_PROFILE_ID", ["plain"]],
-  ["BUNDJIL_CODEX_CONNECTOR_ID", ["plain"]],
-  ["BUNDJIL_CODEX_INSTALLATION_ID", ["plain"]],
-  ["BUNDJIL_CODEX_SUBJECT_ID", ["plain"]],
-  ["BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY", ["sensitive"]],
-  ["BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID", ["encrypted", "sensitive"]],
-  ["BUNDJIL_UPSTASH_REDIS_REST_URL", ["sensitive"]],
-  ["BUNDJIL_UPSTASH_REDIS_REST_TOKEN", ["sensitive"]],
-  ["BUNDJIL_UPSTASH_REDIS_KEY_PREFIX", ["encrypted", "sensitive"]],
+  [["BUNDJIL_CODEX_PROXY_MODE"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"], ["sensitive"]],
+  [["BUNDJIL_CODEX_PROFILE_ID"], ["plain"]],
+  [["BUNDJIL_CODEX_CONNECTOR_ID"], ["plain"]],
+  [["BUNDJIL_CODEX_INSTALLATION_ID"], ["plain"]],
+  [["BUNDJIL_CODEX_SUBJECT_ID"], ["plain"]],
+  [["BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY"], ["sensitive"]],
+  [["BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID"], ["encrypted", "sensitive"]],
+  [["UPSTASH_REDIS_REST_URL", "KV_REST_API_URL"], ["sensitive"]],
+  [["UPSTASH_REDIS_REST_TOKEN", "KV_REST_API_TOKEN"], ["sensitive"]],
+  [["BUNDJIL_UPSTASH_REDIS_KEY_PREFIX"], ["encrypted", "sensitive"]],
 ] as const;
 
 const sameIdentity = (
@@ -289,14 +364,18 @@ const missingVariableBindings = (
   variables: readonly (typeof VercelProductionVariable.Type)[],
   expected: readonly ExpectedVariableBinding[]
 ) =>
-  expected.flatMap(([name, allowedTypes]) =>
-    variables.some(
+  expected.flatMap(([names, allowedTypes]) => {
+    const matches = variables.filter(
       (variable) =>
-        variable.name === name && allowedTypes.includes(variable.type)
-    )
+        names.includes(variable.name) && allowedTypes.includes(variable.type)
+    );
+    if (matches.length === 0) {
+      return [`missing-production-variable:${names.join("|")}`];
+    }
+    return matches.length === 1
       ? []
-      : [`missing-production-variable:${name}`]
-  );
+      : [`ambiguous-production-variable:${names.join("|")}`];
+  });
 
 export const preflightProductionPromotion = Effect.fn(
   "ProductionPromotion.preflight"
@@ -362,6 +441,7 @@ export const preflightProductionPromotion = Effect.fn(
     Effect.mapError(
       () =>
         new ProductionPreflightError({
+          failureCode: "snapshot-invalid",
           message: "Unable to encode sanitized Production preflight evidence.",
         })
     )

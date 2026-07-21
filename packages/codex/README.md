@@ -40,8 +40,10 @@ target-owned procedures and are not general setup instructions.
 - Historical Codex OAuth, storage, local-import, and model-provider decisions:
   [`docs/product-specs/`](../../docs/product-specs/index.md) and retained
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
-- Repeatable login, import, credential, storage, and recovery procedures have
-  no canonical repository owner yet; HGI-303 must create target-owned runbooks.
+- Repeatable trusted-local login, stored-profile, reauthentication, credential,
+  storage, and recovery procedures are owned by the Codex proxy
+  [`runbooks/`](../../apps/codex-proxy/runbooks/README.md). This package owns
+  their executable contracts, not provider authority or current state.
 - Dated provider responses, deployment observations, and journey proof have no
   canonical repository owner yet; HGI-305 must create bounded verification
   owners. External systems own current state.

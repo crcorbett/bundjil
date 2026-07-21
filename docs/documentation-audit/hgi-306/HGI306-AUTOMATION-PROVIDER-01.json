@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-AUTOMATION-PROVIDER-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "typed automation register, authority register, target-owned runbooks, and HGI-309",
+  "decision": "Reject scheduling or mutation. Vercel, Executor, Sendblue outbound, AI Gateway, and Codex-proxy work stays foreground or disabled with exact authority, readback, stopping, recovery, and no blind retry of uncertain consequences.",
+  "evidenceRequired": [
+    "Each provider loop records signal, durable state, authority, proof, stopping, rollback, and escalation.",
+    "External readback is explicitly unavailable and inconclusive in HGI-306."
+  ],
+  "limitations": [
+    "HGI-309 retains authenticated provider and deployment qualification."
+  ],
+  "nonClaims": [
+    "A runbook, preflight, packet, or local test is not current provider state or mutation authority."
+  ],
+  "rollbackRevocation": "Stop the exact foreground operation, preserve consequence evidence, and use the target-owned rollback under separate authority.",
+  "escalation": ["Target owner", "Provider owner", "Incident owner"],
+  "unsafeAmbiguities": []
+}

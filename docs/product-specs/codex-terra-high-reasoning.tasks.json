@@ -1,6 +1,6 @@
 {
   "title": "Codex Proxy GPT-5.6 Terra High Reasoning Tasks",
-  "status": "proposed",
+  "status": "in_progress",
   "spec": "docs/product-specs/codex-terra-high-reasoning.md",
   "principles": [
     "Preview subscription-endpoint proof is required; direct public API, local Codex, mock, and repository-only results are insufficient.",
@@ -33,7 +33,7 @@
     {
       "id": "codex-responses-reasoning-policy-contract",
       "title": "Create the canonical decoded Responses reasoning policy",
-      "status": "pending",
+      "status": "completed",
       "description": "Extract the named literal-union effort schema and add the package-owned decoded request-policy service and explicit live/test policy layers. Make CodexRequestMapper consume that policy instead of hard-coding low; do not add raw options or new provider surface area.",
       "implementationNotes": [
         "Own CodexResponsesReasoningEffort and CodexResponsesRequestPolicy in packages/codex/src/provider/contracts.ts or an adjacent feature-owned provider contract file, with Type and Encoded exports.",
@@ -52,15 +52,22 @@
         "The mapper has no hard-coded reasoning low and accepts only decoded policy through the named service Layer.",
         "Public package exports and test fixtures expose the canonical contract without DTO duplication."
       ],
+      "acceptedEvidence": [
+        "CodexResponsesReasoningEffort is a canonical closed literal schema with explicit Type and Encoded aliases; CodexResponsesRequestPolicy is the decoded package policy contract.",
+        "CodexRequestMapper and CodexResponsesProof consume CodexResponsesRequestPolicyService. The default explicit low layer preserves current behavior while the exported layer factory accepts only a decoded policy.",
+        "Focused checks passed: bun run --filter @bundjil/store build; bun run --filter @bundjil/codex check-types; bun run --filter @bundjil/codex test (110 tests).",
+        "Repository checks passed after formatting: bun run check:effect-setup, bun run check:boundaries, bun run check:skills, and bun run verification.",
+        "Ownership/call graph: provider vocabulary, policy, mapper, proof, and default Layers remain in @bundjil/codex. Implementation quality: flat named Effect operations, schema-derived Type/Encoded use, no raw config, casts, DTO mirrors, or helper module. Verification coverage: high-target and low-compatibility encoded mapper assertions plus root policy and test gates."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "proxy-config-and-layer-injection",
       "title": "Decode proxy reasoning configuration and inject it into every proxy composition",
-      "status": "pending",
+      "status": "completed",
       "description": "Add BUNDJIL_CODEX_PROXY_REASONING_EFFORT to the app-owned Effect Config boundary with default low, validation, decoded runtime schema field, and policy Layer composition for live, local, and test paths.",
       "implementationNotes": [
-        "Use Config.schema(CodexResponsesReasoningEffort, BUNDJIL_CODEX_PROXY_REASONING_EFFORT).pipe(Config.withDefault(low)) only in apps/codex-proxy/src/env.ts.",
+        "Use Config.schema(CodexResponsesReasoningEffort, BUNDJIL_CODEX_PROXY_REASONING_EFFORT) only in apps/codex-proxy/src/env.ts. Supply the compatibility low only from a fallback ConfigProvider so an invalid present value fails schema decoding rather than being masked.",
         "Keep this setting non-redacted; retain redaction for bearer, OAuth, cipher, and all private data.",
         "Decode the whole CodexProxyRuntimeConfig once with Schema.decodeUnknownEffect, use Type in CodexProxyConfig, Encoded in fixture construction, and map safe app config failures without exposing causes to HTTP.",
         "Provide the decoded policy Layer into CodexDirectProviderLive/Legacy and mock composition. Do not read process.env in packages/codex or the route and do not bypass policy in local mode."
@@ -75,18 +82,25 @@
         "Existing deployments with no effort variable preserve low; malformed values fail closed; the explicit high configuration reaches the package mapper as a decoded value.",
         "No configuration field is accepted from the HTTP request or Eve adapter."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "acceptedEvidence": [
+        "apps/codex-proxy/src/env.ts owns BUNDJIL_CODEX_PROXY_REASONING_EFFORT as a non-redacted Config.schema(CodexResponsesReasoningEffort, ...) boundary. Its fallback ConfigProvider supplies low only when the key is absent; an invalid present value reaches the schema and fails closed.",
+        "CodexProxyRuntimeConfig carries the decoded reasoningEffort. The live, local, and test proxy compositions construct only the decoded CodexResponsesRequestPolicy and provide it to explicit direct-provider Layer factories; no route, package, or request body reads environment configuration.",
+        "Focused checks passed: bun run --filter @bundjil/codex-proxy check-types; bun run --filter @bundjil/codex build; bun run --filter @bundjil/codex-proxy test (31 tests). The handler test captures the encoded outbound CodexResponsesRequest and proves gpt-5.6-terra/high.",
+        "Repository checks passed: bun run check:effect-setup; bun run check:boundaries; bun run check:skills.",
+        "Ownership/call graph: @bundjil/codex owns the policy contract and direct-provider factories; apps/codex-proxy owns Config and Layer composition. Implementation quality: schema-derived values, named tagged config errors, flat Effect flow, and no casts, raw process environment reads, generic options bag, or helper sprawl. Verification coverage: absent-low, high, malformed-rejection, and outbound high-payload cases are deterministic."
+      ]
     },
     {
       "id": "terra-agent-build-and-proof-contract",
       "title": "Align Eve model metadata, fixtures, safe proof contract, and documentation",
-      "status": "pending",
+      "status": "completed",
       "description": "Set the target model/context in agent configuration fixtures and Turbo build ownership, update the Preview proof contract to assert Terra/high safely, and update all durable docs/environment samples/runbooks without rewriting historical records.",
       "implementationNotes": [
         "Add BUNDJIL_CODEX_PROXY_MODEL to @bundjil/agent#build env so eve build observes the selected override; use gpt-5.6-terra and 1050000 in target fixtures.",
         "Keep the exact Eve provider identity assertion bundjil-codex-proxy/gpt-5.6-terra and add context-window assertions.",
         "Update prove-preview to issue gpt-5.6-terra, require configured/observed high evidence, retain status:block on failures, and emit only safe booleans/counters/statuses.",
-        "Update root/package/proxy/agent READMEs, .env.example, docs/architecture/eve-agent.md, and docs/product-specs/index.md. Preserve labeled gpt-5.5 historical evidence."
+        "Update the environment sample, docs/architecture/eve-agent.md, docs/product-specs/index.md, and the canonical SPEC/task owners. Preserve labeled gpt-5.5 historical evidence; app READMEs are governed by HGI-300 and must not retain provider actuality or runbook content."
       ],
       "mandatoryVerification": [
         "Agent injected-fetch test asserts target model identity, 1050000 context window, private bearer non-leak, and no raw reasoning control is sent by the agent request.",
@@ -98,7 +112,14 @@
         "Current documentation states the Terra/high target, configuration owner, proof boundary, monitoring fields, and rollback; historical claims remain clearly historical.",
         "Preview proof remains unable to treat 200-only, local, direct endpoint, or mock output as subscription-proxy acceptance."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "acceptedEvidence": [
+        "turbo.json now admits BUNDJIL_CODEX_PROXY_MODEL to @bundjil/agent#build. The agent's injected-fetch test selects gpt-5.6-terra, asserts the exact bundjil-codex-proxy model identity, uses context 1050000, and proves neither bearer nor a reasoning control enters the adapter request.",
+        "The proxy health schema exposes only the safe effective reasoning effort. proof:preview requests gpt-5.6-terra and succeeds only for live/ready/high health, authenticated SSE completion, both 401 bearer controls, and all safe leak predicates. Its fixture captures schema-decoded chat requests and proves Terra plus no client reasoning field.",
+        "Updated .env.example, the Eve architecture guide, active plan, and product-spec index state configuration owners, the target values, proof limits, monitoring field, and gpt-5.5/200000/low rollback. HGI-300's current README boundaries intentionally omit provider actuality and runbooks. Historical gpt-5.5 claims remain labeled historical.",
+        "Focused verification passed: bun run --filter @bundjil/codex-proxy test (31), check-types, build, and smoke-test; BUNDJIL_EXECUTOR_MCP_URL=https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model bun run --filter @bundjil/agent test (79) and check-types; git diff --check. Browser verification is N/A: no visible route changed.",
+        "Ownership/call graph: apps/agent owns model/context and the proxy owns effort/health; @bundjil/codex remains the Responses mapper boundary. Implementation quality: no raw semantic input, cast, generic callback, manual runtime codec, or helper sprawl. Verification coverage separates fixture/local proof from the still-pending subscription endpoint proof."
+      ]
     },
     {
       "id": "authorized-preview-subscription-proof",
@@ -113,7 +134,7 @@
       ],
       "mandatoryVerification": [
         "Preview proxy health is live/ready; unauthenticated and invalid bearer checks remain 401; authenticated minimal request returns HTTP 200 text/event-stream with [DONE].",
-        "Safe proxy observation says gpt-5.6-terra and high, the request uses live subscription composition, and Vercel runtime evidence contains no credentials, prompts, response payloads, account ids, tool data, reasoning text, or chain-of-thought.",
+        "The safe proxy observation says high, the proof request is gpt-5.6-terra through live subscription composition, and Vercel runtime evidence contains no credentials, prompts, response payloads, account ids, tool data, reasoning text, or chain-of-thought.",
         "Protected Eve info reports exactly bundjil-codex-proxy/gpt-5.6-terra and context window 1050000; one minimal session reaches completion/waiting and replay does not create a duplicate provider call.",
         "Record the ownership/call-graph, implementation-quality, and verification-coverage lenses against the deployed artifact; distinguish repository, local, Vercel, and subscription-endpoint proof."
       ],
@@ -126,7 +147,7 @@
     {
       "id": "closeout-and-rollback-readiness",
       "title": "Complete repository verification and record rollback readiness",
-      "status": "pending",
+      "status": "completed",
       "description": "Run the full repository closeout, reconcile docs and evidence with the accepted Preview state, and prove the rollback instructions restore the previous model/effort configuration without making Production changes.",
       "implementationNotes": [
         "Use the previously retained Preview deployment/configuration for gpt-5.5/200000/low (or absent effort) as the rollback target; never use mock or API-key fallback as evidence.",
@@ -143,7 +164,13 @@
         "All impact-ledger surfaces are changed or explicitly N/A with evidence, and the acceptance criteria in the SPEC are met.",
         "No deployment/provider action has been represented as complete without source and safe readback evidence."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "acceptedEvidence": [
+        "Repository closeout passed with BUNDJIL_EXECUTOR_MCP_URL=https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model: bun run check:effect-setup, bun run check:boundaries, bun run check:skills, and bun run verification. The verification suite includes formatting, boundary tests, lint, Knip, all package typechecks, and all package tests.",
+        "Focused evidence remains current: @bundjil/codex test (110), @bundjil/codex-proxy test (31), build, and smoke-test; @bundjil/agent test (79) and check-types. git diff --check passed. The synthetic Executor URL exists only to satisfy the repository's build-time config contract and performs no provider request.",
+        "The rollback runbook preserves the preceding gpt-5.5/200000/low Preview values and requires repeat safe health/auth/Eve proof. It was not exercised because that requires separate Preview deployment authority; no Vercel configuration, deployment, subscription request, credential mutation, or Production action occurred.",
+        "Re-audit result: @bundjil/codex retains canonical Schema Type/Encoded ownership and immediate provider encoding/decoding; proxy Config has no raw environment leak; live/local/test Layers receive decoded policy; agent retains model metadata only; all new error handling stays typed and primary Effect flows are linear. No casts, manual runtime codecs, generic options escape hatch, or helper/common/utils sprawl were introduced."
+      ]
     }
   ]
 }

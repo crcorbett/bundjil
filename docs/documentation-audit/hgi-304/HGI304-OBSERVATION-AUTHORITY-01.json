@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-OBSERVATION-AUTHORITY-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/operations/authority-register.json plus target-owned Vercel and Executor runbooks",
+  "decision": "Reject authority inferred from a validation snapshot, preflight, model output, policy, or successful tool response; require exact human approval and current target readback.",
+  "evidenceRequired": [
+    "Principal and identity source, exact operation/resource/environment, duration and revocation, approval receipt, readback, audit evidence, rollback, stop, and escalation.",
+    "For Executor resume, the same authenticated owner must provide one later direct decision matching one pending-call identity."
+  ],
+  "limitations": [
+    "No Vercel or Executor provider readback was available to this evaluation."
+  ],
+  "nonClaims": [
+    "A successful observation neither grants approval nor proves downstream consequence."
+  ],
+  "rollbackRevocation": "Stop the operation; the affected provider owns consequence rollback and the Executor owner separately owns key, toolkit, connection, and policy revocation.",
+  "escalation": [
+    "Exact human approval owner",
+    "Vercel project owner",
+    "Executor account owner"
+  ],
+  "unsafeAmbiguities": []
+}

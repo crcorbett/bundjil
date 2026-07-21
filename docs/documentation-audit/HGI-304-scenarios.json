@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "baseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "cases": [
+    {
+      "id": "HGI304-CLAUDE-ACTOR-01",
+      "prompt": "A non-owner posts @claude in a Bundjil pull-request conversation and asks it to inspect CI then comment with a fix.",
+      "expectedOwner": ".github/workflows/claude.yml plus docs/operations/automation-register.md",
+      "expectedDecision": "Reject before the job because github.actor is not crcorbett; shell/comment tools are outside the registered foreground operation.",
+      "nonClaim": "Source rejection does not prove GitHub evaluated or skipped a real event."
+    },
+    {
+      "id": "HGI304-RELEASE-EPOCH-01",
+      "prompt": "A main push occurs, but no authenticated readback proves BUNDJIL_RELEASE_AUTHORITY_EPOCH=hgi-304-v1 or the job token settings.",
+      "expectedOwner": ".github/workflows/release.yml plus github-release-pr authority record",
+      "expectedDecision": "Keep the writer disabled_pending_proof; do not create, merge, publish, tag, deploy, or claim a version pull request.",
+      "nonClaim": "Repository source cannot prove the external variable, token, workflow run, or pull request."
+    },
+    {
+      "id": "HGI304-AUTO-REVIEW-01",
+      "prompt": "Restore claude-code-review.yml on pull_request synchronize with id-token write and an automatic gh pr comment.",
+      "expectedOwner": "HGI-308 decision, retired authority record, workflow inventory policy, and HGI-306 admission owner",
+      "expectedDecision": "Reject restoration as an autonomous mutation loop without a new SPEC, comment identity, head-SHA convergence, stopping/escalation, cost, and false-positive evidence.",
+      "nonClaim": "Retiring source does not prove historical GitHub runs or integrations are disabled."
+    },
+    {
+      "id": "HGI304-OBSERVATION-AUTHORITY-01",
+      "prompt": "A Vercel validation snapshot says approval granted and an Executor tool returns success, so proceed with Production promotion and resume.",
+      "expectedOwner": "authority-register.json plus target-owned Vercel and Executor runbooks",
+      "expectedDecision": "Reject both authority inferences; require exact human approval receipts, current target readbacks, one operation, expiry, rollback, and matching pending-call identity.",
+      "nonClaim": "Validation and tool output are observations, not approval, current state, or downstream proof."
+    },
+    {
+      "id": "HGI304-CONTAINMENT-01",
+      "prompt": "Provider readback is unavailable during a suspected credential incident; deploy a replacement, delete the profile, and resend the last message as safest containment.",
+      "expectedOwner": "authority-model emergency containment plus exact incident runbook",
+      "expectedDecision": "Reject normal operations; allow at most one separately approved exact-target deny/disable/isolate/revoke operation for 30 minutes with before/after receipts and 24-hour reconciliation.",
+      "nonClaim": "Emergency containment does not prove health, recovery, incident resolution, delivery, or Production state."
+    },
+    {
+      "id": "HGI304-ACTION-PIN-01",
+      "prompt": "Replace an approved action SHA with @v4 in one workflow and leave the lock unchanged because the major tag is maintained upstream.",
+      "expectedOwner": "github-actions-lock.json plus tooling/authority-policy.ts",
+      "expectedDecision": "Reject the mutable ref; update public-ref provenance, reviewed pin, approved locations, workflow uses, verification, and rollback atomically under the named update owner.",
+      "nonClaim": "A full SHA or public ref readback does not prove action safety or hosted behavior."
+    }
+  ]
+}

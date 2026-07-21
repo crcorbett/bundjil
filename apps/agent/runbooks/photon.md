@@ -2,12 +2,12 @@
 document_type: runbook
 lifecycle: current
 authority: canonical
-owner: bundjil-photon-provider-owner
+owner: bundjil-agent-operator
 last_reviewed: 2026-07-21
 review_trigger: Photon API, SDK pin, credential path, proof command, authority, resource lifecycle, or output contract change
 ---
 
-# Photon provider-only proof
+# Operate Photon provider lifecycle proof
 
 This runbook proves authenticated Photon management access, one isolated
 webhook create/read/delete lifecycle, write-only signing-secret receipt, and
@@ -20,7 +20,8 @@ replay, Eve dispatch, outbound messaging, handset delivery, or Production.
 - Authority: the user explicitly approved all Photon actions against the
   internal project and supplied ignored project credentials.
 - Target resolution: the project scoped by `PHOTON_PROJECT_ID` and
-  `PHOTON_PROJECT_SECRET` in `/Users/cooper/Projects/bundjil/.env.photon`.
+  `PHOTON_PROJECT_SECRET` in the ignored file named by
+  `BUNDJIL_PHOTON_ENV_FILE`.
 - Permitted writes: only the fixed, non-routable proof webhook owned by this
   command. An exact stale record at that proof URL may be recovered first.
 - Forbidden writes: dedicated lines, phone numbers, platform/billing state,
@@ -60,15 +61,17 @@ Sources: [API introduction](https://photon.codes/docs/api-reference/introduction
 
 ## Procedure
 
-From `/Users/cooper/.codex/worktrees/17b6/bundjil`:
+Set `BUNDJIL_PHOTON_ENV_FILE` to the operator-owned ignored credential file,
+then run from the root returned by `git rev-parse --show-toplevel`:
 
 ```sh
 bun run --filter @bundjil/photon check-types
 bun run --filter @bundjil/photon test
-awk -F= '/^[A-Za-z_][A-Za-z0-9_]*=/{print $1}' /Users/cooper/Projects/bundjil/.env.photon
-test "$(stat -f '%Lp' /Users/cooper/Projects/bundjil/.env.photon)" = 600
+test -n "$BUNDJIL_PHOTON_ENV_FILE"
+awk -F= '/^[A-Za-z_][A-Za-z0-9_]*=/{print $1}' "$BUNDJIL_PHOTON_ENV_FILE"
+test "$(stat -f '%Lp' "$BUNDJIL_PHOTON_ENV_FILE")" = 600
 set -a
-source /Users/cooper/Projects/bundjil/.env.photon
+source "$BUNDJIL_PHOTON_ENV_FILE"
 set +a
 bun run --filter @bundjil/photon proof:provider
 unset PHOTON_PROJECT_ID PHOTON_PROJECT_SECRET

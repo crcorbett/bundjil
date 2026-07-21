@@ -25,10 +25,12 @@ bun run --filter @bundjil/codex-proxy check-types
 bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy build
 bun run --filter @bundjil/codex-proxy smoke-test
+bun run --filter @bundjil/codex-proxy proof:preview
 ```
 
 `proof:preview` is a deliberately explicit, private probe command; it is not a
-standing deployment assertion or an operating procedure.
+standing deployment assertion or an operating procedure. It emits one bounded
+receipt and stores only integrity-checked sanitized detail.
 
 ## Documentation routes
 
@@ -37,13 +39,17 @@ standing deployment assertion or an operating procedure.
 - Historical Codex provider, storage, and proxy rollout provenance:
   [`docs/product-specs/`](../../docs/product-specs/index.md) and
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
-- Repeatable deployment, credential, incident, rollback, and recovery
-  procedures have no canonical repository owner yet; HGI-303 must create the
-  target-owned runbooks before such operations are performed from repository
-  documentation.
-- Dated provider/deployment observations have no canonical repository owner
-  yet; HGI-305 must create bounded verification owners. External systems remain
-  authoritative for current state.
+- Repeatable local-authentication, Preview/Production proof,
+  reauthentication, deployment, credential, incident, rollback, and recovery
+  procedures are owned by [`runbooks/`](runbooks/README.md). They require
+  just-in-time target readback and an explicit authority envelope before
+  consequential steps.
+- Critical journeys, proof packets, bounded command receipts, and retained
+  evidence are owned by
+  [`docs/verification/`](../../docs/verification/README.md). External systems
+  remain authoritative for current state; a packet proves only its exact
+  candidate, target, authority, observation, and stated postcondition.
 
 Do not add provider actuality, provisioning sequences, credentials, deployment
-identities, incident steps, rollback procedures, or proof records here.
+identities, incident steps, rollback procedures, or proof records here; update
+the target-owned runbook and only this pointer when routing changes.

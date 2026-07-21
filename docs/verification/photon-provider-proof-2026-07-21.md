@@ -15,7 +15,7 @@ review_trigger: do not refresh; create a new dated receipt for a later observati
 
 The user authorised all Photon actions against the internal project. From the
 isolated worktree on branch `codex/photon-channel-provider-spec`, the operator
-ran the target-owned [Photon proof runbook](../runbooks/photon-provider-proof.md)
+ran the target-owned [Photon proof runbook](../../apps/agent/runbooks/photon.md)
 after focused Photon typecheck, 13 tests, package build, Effect setup,
 boundaries, skills, and diff checks passed.
 

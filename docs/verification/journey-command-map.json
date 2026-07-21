@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "owner": "bundjil-verification-owner",
+  "lastReviewed": "2026-07-21",
+  "reviewTrigger": "critical journey, app command, runbook, environment, or authority change",
+  "commands": [
+    {
+      "journeyId": "BND-J01-workspace-status",
+      "environment": "local synthetic configuration",
+      "command": "bun run --filter @bundjil/agent test",
+      "claimScope": "proved",
+      "procedureOwner": "apps/agent/runbooks/local-development.md",
+      "externalReadback": "not required"
+    },
+    {
+      "journeyId": "BND-J02-gateway-session-recovery",
+      "environment": "local development only",
+      "command": "bun run --filter @bundjil/agent test",
+      "claimScope": "deferred",
+      "procedureOwner": "apps/agent/runbooks/local-development.md",
+      "externalReadback": "not required"
+    },
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "environment": "local mock mode",
+      "command": "bun run --filter @bundjil/codex-proxy smoke-test",
+      "claimScope": "proved",
+      "procedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
+      "externalReadback": "not required"
+    },
+    {
+      "journeyId": "BND-J04-local-reauthentication",
+      "environment": "local private shell",
+      "command": "bun run --filter @bundjil/codex proof:stored-profile",
+      "claimScope": "partial",
+      "procedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
+      "externalReadback": "not required; local proof only"
+    },
+    {
+      "journeyId": "BND-J05-sendblue-accepted-message",
+      "environment": "approval-gated external target",
+      "command": "run the named Sendblue procedure only after its authority gate",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/sendblue.md",
+      "externalReadback": "required for a proved external packet; otherwise inconclusive"
+    },
+    {
+      "journeyId": "BND-J06-sendblue-auth-provider-rejection",
+      "environment": "local fixtures or approval-gated external target",
+      "command": "bun run --filter @bundjil/agent test && bun run --filter @bundjil/codex-proxy test",
+      "claimScope": "partial",
+      "procedureOwner": "apps/agent/runbooks/sendblue.md and apps/codex-proxy/runbooks/reauthentication.md",
+      "externalReadback": "required only for a claimed external condition"
+    },
+    {
+      "journeyId": "BND-J07-executor-read-only",
+      "environment": "approval-gated external Executor target",
+      "command": "run the named Executor read-only procedure only after its authority gate",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/executor.md",
+      "externalReadback": "required for a proved external packet; unavailable is inconclusive"
+    },
+    {
+      "journeyId": "BND-J08-executor-approval-resume",
+      "environment": "approval-gated external target",
+      "command": "run the named Executor resume only after its authority gate",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/executor.md",
+      "externalReadback": "required for Executor and downstream target"
+    },
+    {
+      "journeyId": "BND-J09-deployment-promotion-readback",
+      "environment": "local synthetic snapshot; external Preview or Production work remains approval-gated",
+      "command": "bun run --filter @bundjil/agent preflight:production",
+      "claimScope": "partial",
+      "procedureOwner": "apps/agent/runbooks/deploy-promote.md and apps/codex-proxy/runbooks/production-proof.md",
+      "externalReadback": "required for Preview or Production claim; Preview never establishes Production"
+    },
+    {
+      "journeyId": "BND-J10-incident-revocation-recovery",
+      "environment": "approval-gated incident target",
+      "command": "bun run --filter @bundjil/agent test && bun run --filter @bundjil/codex-proxy test",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/incident-revocation.md and apps/codex-proxy/runbooks/incident-revocation.md",
+      "externalReadback": "required before and after an external containment/recovery claim"
+    }
+  ]
+}

@@ -1,3 +1,12 @@
+---
+document_type: architecture-standard
+lifecycle: current
+authority: canonical
+owner: bundjil-frontend-owner
+last_reviewed: 2026-07-21
+review_trigger: React, route, component, state, URL, accessibility, or frontend-skill change
+---
+
 # Frontend Composition
 
 Bundjil currently has no committed React operator interface. These rules apply

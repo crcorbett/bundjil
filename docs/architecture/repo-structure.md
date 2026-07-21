@@ -1,10 +1,10 @@
 ---
-document_type: architecture
+document_type: architecture-standard
 lifecycle: current
 authority: canonical
-owner: bundjil-architecture-owner
+owner: bundjil-repository-owner
 last_reviewed: 2026-07-21
-review_trigger: app, package, import, export, provider, channel, or repository-layout change
+review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
 # Repo Structure

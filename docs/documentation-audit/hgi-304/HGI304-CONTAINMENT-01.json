@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-CONTAINMENT-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/operations/authority-model.md emergency containment contract plus the exact app incident runbook",
+  "decision": "Reject deployment, promotion, release, message, login, profile/data deletion, provider switching, approval resume, and normal operations; permit at most one separately approved exact-target deny, disable, isolate, or revoke containment action.",
+  "evidenceRequired": [
+    "Named principal, separate approver, exact target and containment operation, maximum 30-minute expiry, and before/after sanitized receipts.",
+    "Mandatory reconciliation within 24 hours before normal authority may resume."
+  ],
+  "limitations": [
+    "Unavailable target readback remains inconclusive before and after containment."
+  ],
+  "nonClaims": [
+    "Emergency containment does not prove health, recovery, incident resolution, delivery, or Production state."
+  ],
+  "rollbackRevocation": "End the one-shot authority at 30 minutes or use; preserve receipts, reconcile the exact target within 24 hours, and obtain ordinary authority separately for any recovery operation.",
+  "escalation": [
+    "Affected provider owner",
+    "Separate emergency approver",
+    "Bundjil incident owner"
+  ],
+  "unsafeAmbiguities": []
+}

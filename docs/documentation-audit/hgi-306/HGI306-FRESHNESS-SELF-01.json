@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-FRESHNESS-SELF-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "freshness candidate source and owner exclusions plus current-owner policy",
+  "decision": "Reject candidate self-source and candidate-root ownership. Candidate evidence stays outside default current context and cannot feed a later scan.",
+  "evidenceRequired": [
+    "Self-source and candidate-owner semantic checks pass.",
+    "Current-owner policy rejects candidate-root routing."
+  ],
+  "limitations": [
+    "A future scanner must still prove that its input selection implements these exclusions."
+  ],
+  "nonClaims": [
+    "Retained evidence is not current policy merely because it is machine-readable."
+  ],
+  "rollbackRevocation": "Remove candidate paths from current-owner routing and quarantine any self-fed candidate chain.",
+  "escalation": ["Documentation owner", "Automation maintainer"],
+  "unsafeAmbiguities": []
+}

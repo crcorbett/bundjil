@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-EFFECT-BOUNDARY-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/architecture/effect-patterns.md plus prove-preview.ts and boundary policy",
+  "decision": "Reject synchronous filesystem, raw unknown JSON, sync production decoding, and helper-sprawl changes. Keep Effect FileSystem, owning Schema codecs, flat sequential flow, and the justified reused atomic-write policy.",
+  "evidenceRequired": [
+    "Effect language-service and boundary-policy pass.",
+    "Focused fixtures for bounded I/O, interruption, pipe close, rerun, and retained artifact integrity."
+  ],
+  "limitations": [
+    "Passing runtime fixtures alone does not establish Effect implementation quality."
+  ],
+  "nonClaims": [
+    "A lint pass does not prove ownership, composition, or helper admission without source review."
+  ],
+  "rollbackRevocation": "Revert the Effect boundary and its tests/docs atomically; no external revocation applies.",
+  "escalation": ["Owning app maintainer", "Bundjil architecture owner"],
+  "unsafeAmbiguities": []
+}

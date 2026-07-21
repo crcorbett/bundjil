@@ -1,6 +1,7 @@
 import {
   CodexOAuthAccountId,
   CodexOAuthSubject,
+  CodexResponsesReasoningEffort,
   CodexFileSystemDirectory,
   OpenAICompatibleProxyInternalToken,
 } from "@bundjil/codex";
@@ -35,6 +36,7 @@ export type CodexProxyDiagnosticMessage =
 
 export const CodexProxyRuntimeConfig = Schema.Struct({
   mode: CodexProxyMode,
+  reasoningEffort: CodexResponsesReasoningEffort,
   internalToken: OpenAICompatibleProxyInternalToken,
   subject: CodexOAuthSubject,
   accountId: Schema.optional(CodexOAuthAccountId),
@@ -49,6 +51,7 @@ export const CodexProxyHealthResponse = Schema.Struct({
   ok: Schema.Boolean,
   service: CodexProxyHealthService,
   mode: CodexProxyMode,
+  reasoningEffort: CodexResponsesReasoningEffort,
 });
 
 export type CodexProxyHealthResponse = typeof CodexProxyHealthResponse.Type;

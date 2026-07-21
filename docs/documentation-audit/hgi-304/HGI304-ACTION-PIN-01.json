@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-ACTION-PIN-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/operations/github-actions-lock.json and tooling/authority-policy.ts",
+  "decision": "Reject a mutable action ref or lock/workflow mismatch; update the reviewed full SHA, provenance, approved locations, tests, verification, and rollback atomically.",
+  "evidenceRequired": [
+    "Public upstream ref-to-commit observation, reviewed release and diff, exact 40-character pin, approved workflow locations, update owner, and repository verification.",
+    "A preserved previous pin and source receipt for rollback."
+  ],
+  "limitations": [
+    "Public Git refs establish identity at observation time only, not source safety, OIDC behavior, credential scope, or hosted execution."
+  ],
+  "nonClaims": [
+    "A full SHA is necessary source control but does not prove safe or successful action behavior."
+  ],
+  "rollbackRevocation": "Restore the previous reviewed pin and matching lock entry across every approved workflow, then rerun the same policy and repository verification.",
+  "escalation": [
+    "Bundjil security and automation maintainer",
+    "Affected action owner"
+  ],
+  "unsafeAmbiguities": []
+}

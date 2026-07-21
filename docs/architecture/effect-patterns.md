@@ -1,10 +1,10 @@
 ---
-document_type: architecture
+document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
 last_reviewed: 2026-07-21
-review_trigger: Effect, Schema, Config, service, Layer, error, resource, or boundary pattern change
+review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
 # Effect Patterns
@@ -25,8 +25,8 @@ runtime services, read configuration, or form a durable integration contract.
 Plain TypeScript is still fine for simple framework glue and local rendering,
 but package and boundary code should stay in the Effect model.
 
-This guide adapts the Effect service rules used in `~/Projects/site` and
-`~/Projects/Mobius` to Bundjil's smaller Eve-first repo shape.
+This guide applies Bundjil's Effect service rules to its smaller Eve-first repo
+shape.
 
 ## Default Rule
 
@@ -200,7 +200,8 @@ Do not weaken the root lint config, add broad suppressions, introduce unsafe
 casts, or expand ignore patterns to land a change. A narrow suppression needs
 an adjacent reason and cannot hide Effect, promise, hook, accessibility, or
 Schema failures. Lint does not prove ownership, linear Effect control flow, or
-helper quality, so the manual 3-pass audit remains mandatory.
+helper quality, so review those risks in proportion to the changed boundary and
+retain the evidence that establishes the specific acceptance claim.
 
 ## Schemas
 
@@ -317,26 +318,15 @@ baseline behind. Do not add counts, line-number allowlists, globs, or directory
 exemptions. `bun run test:boundaries` owns positive and negative source fixtures
 for the audit.
 
-## Implementation Audit
+## Implementation review
 
-Every implementation task that touches Effect runtime, provider, storage, app
-config, or deployment behavior must finish with the mandatory 3-pass Effect TS
-audit before acceptance:
-
-1. Ownership and call graph: confirm the right app or package owns the
-   behavior, imports point inward through stable exports, and production/test
-   call graphs match the SPEC.
-2. Implementation quality: inspect the diff for flat primary `Effect.gen`
-   programs, schema-derived types, tagged errors, `Config.redacted` for
-   secrets, explicit layers, no unsafe casts, no DTO mirrors, no manual object
-   readers, and no helper sprawl.
-3. Verification coverage: record targeted checks, root verification, proof
-   commands, log/leak scans, docs updates, and any deliberately skipped live
-   proof with the reason.
-
-The audit evidence belongs in the task ledger and active execution plan for
-SPEC-driven work. If a pass finds an unresolved gap, do another pass after the
-fix rather than treating the count as sufficient.
+Use risk-matched review, not a fixed audit-pass or subagent ritual. For work
+that changes Effect runtime, provider, storage, app config, or deployment
+behavior, assess the applicable ownership/call graph, implementation quality,
+and verification coverage risks. Evidence belongs in the task ledger and active
+execution plan for SPEC-driven work. A finding requires a repair and the
+smallest check that proves it; a count of passes or reviewers is never
+acceptance evidence.
 
 ## Errors
 

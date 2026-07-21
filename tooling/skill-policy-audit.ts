@@ -1,232 +1,202 @@
+import { lstatSync } from "node:fs";
+import { lstat, mkdir, readlink, stat } from "node:fs/promises";
+import { dirname, posix, resolve } from "node:path";
+
 import { Console, Effect, Schema } from "effect";
 
-const policyFiles = {
-  agents: "AGENTS.md",
-  browser: ".agents/skills/agent-browser/SKILL.md",
-  buildingComponents: ".agents/skills/building-components/SKILL.md",
-  compositionPatterns: ".agents/skills/vercel-composition-patterns/SKILL.md",
-  effectPatterns: "docs/architecture/effect-patterns.md",
-  implementer: ".agents/skills/prd-implementer/SKILL.md",
-  packageStructure: ".agents/skills/package-structure/SKILL.md",
-  packageProfile:
-    ".agents/skills/package-structure/references/repository-profile.md",
-  reactPractices: ".agents/skills/vercel-react-best-practices/SKILL.md",
-  reviewer: ".agents/skills/prd-review/SKILL.md",
-  shadcn: ".agents/skills/shadcn/SKILL.md",
-  wrapper: ".agents/skills/effect-client-wrapper/SKILL.md",
-  writer: ".agents/skills/prd-writer/SKILL.md",
-} as const;
+import {
+  auditSkills,
+  boundedSkillFindings,
+  SkillPolicyReportJson,
+} from "./skill-policy.js";
+import type { SkillFile, SkillLink } from "./skill-policy.js";
 
-type PolicyFile = (typeof policyFiles)[keyof typeof policyFiles];
+const repositoryRoot = resolve(import.meta.dirname, "..");
+const detailPath = "tmp/skill-policy-report.json";
+const maximumConsoleFindings = 20;
 
-const SkillPolicyAuditOperation = Schema.Literals([
-  "readPolicyFile",
-  "validatePolicy",
+const pathEntryExists = (path: string) => {
+  try {
+    lstatSync(resolve(repositoryRoot, path));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const AuditOperation = Schema.Literals([
+  "discover",
+  "inspect-link",
+  "read",
+  "encode",
+  "write",
 ]);
-const SkillPolicyAuditDiagnostic = Schema.NonEmptyString;
 
-class SkillPolicyAuditError extends Schema.TaggedErrorClass<SkillPolicyAuditError>()(
-  "SkillPolicyAuditError",
+class SkillAuditError extends Schema.TaggedErrorClass<SkillAuditError>()(
+  "SkillAuditError",
   {
-    operation: SkillPolicyAuditOperation,
-    message: SkillPolicyAuditDiagnostic,
+    detail: Schema.NonEmptyString,
+    operation: AuditOperation,
+    target: Schema.NonEmptyString,
   }
 ) {}
 
-const readPolicyFile = Effect.fn("SkillPolicyAudit.readPolicyFile")(function* (
-  path: PolicyFile
-) {
-  return yield* Effect.tryPromise({
-    try: () => Bun.file(new URL(`../${path}`, import.meta.url)).text(),
-    catch: () =>
-      new SkillPolicyAuditError({
-        operation: "readPolicyFile",
-        message: `Unable to read ${path}.`,
+const discoverRepositoryPaths = Effect.fn("SkillAudit.discoverRepositoryPaths")(
+  () =>
+    Effect.tryPromise({
+      try: async () => {
+        const process = Bun.spawn(
+          [
+            "git",
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "-z",
+          ],
+          { cwd: repositoryRoot, stderr: "pipe", stdout: "pipe" }
+        );
+        const [stdout, stderr, exitCode] = await Promise.all([
+          new Response(process.stdout).text(),
+          new Response(process.stderr).text(),
+          process.exited,
+        ]);
+        if (exitCode !== 0) {
+          throw new Error(stderr || `git ls-files exited ${exitCode}`);
+        }
+        return stdout.split("\0").filter(Boolean).toSorted();
+      },
+      catch: (cause) =>
+        new SkillAuditError({
+          detail: String(cause),
+          operation: "discover",
+          target: repositoryRoot,
+        }),
+    })
+);
+
+const selectedPolicyFile = (path: string) =>
+  path === "AGENTS.md" ||
+  path === "docs/architecture/effect-patterns.md" ||
+  (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/.test(path));
+
+const readPolicyFile = Effect.fn("SkillAudit.readPolicyFile")((path: string) =>
+  Effect.tryPromise({
+    try: () => Bun.file(resolve(repositoryRoot, path)).text(),
+    catch: (cause) =>
+      new SkillAuditError({
+        detail: String(cause),
+        operation: "read",
+        target: path,
+      }),
+  }).pipe(Effect.map((content): SkillFile => ({ content, path })))
+);
+
+const inspectLink = Effect.fn("SkillAudit.inspectLink")((path: string) =>
+  Effect.tryPromise({
+    try: async (): Promise<SkillLink> => {
+      const absolutePath = resolve(repositoryRoot, path);
+      const linkStatus = await lstat(absolutePath);
+      const isSymbolicLink = linkStatus.isSymbolicLink();
+      const target = isSymbolicLink
+        ? await readlink(absolutePath)
+        : "not-a-link";
+      const resolvedPath = isSymbolicLink
+        ? posix.normalize(posix.join(posix.dirname(path), target))
+        : path;
+      const targetExists = await stat(resolve(repositoryRoot, resolvedPath))
+        .then(() => true)
+        .catch(() => false);
+      return { isSymbolicLink, path, resolvedPath, target, targetExists };
+    },
+    catch: (cause) =>
+      new SkillAuditError({
+        detail: String(cause),
+        operation: "inspect-link",
+        target: path,
+      }),
+  })
+);
+
+const program = Effect.gen(function* () {
+  const discoveredPaths = yield* discoverRepositoryPaths();
+  const repositoryPaths = discoveredPaths.filter(pathEntryExists);
+  const files = yield* Effect.forEach(
+    repositoryPaths.filter(selectedPolicyFile),
+    readPolicyFile,
+    { concurrency: 24 }
+  );
+  const links = yield* Effect.forEach(
+    repositoryPaths.filter((path) => /^\.claude\/skills\/[^/]+$/.test(path)),
+    inspectLink,
+    { concurrency: 16 }
+  );
+  const report = auditSkills(
+    { files, links, repositoryPaths },
+    {
+      detailPath,
+      generatedAt: new Date().toISOString(),
+      maxFindings: maximumConsoleFindings,
+    }
+  );
+  const encoded = yield* Schema.encodeEffect(SkillPolicyReportJson)(
+    report
+  ).pipe(
+    Effect.mapError(
+      (cause) =>
+        new SkillAuditError({
+          detail: String(cause),
+          operation: "encode",
+          target: detailPath,
+        })
+    )
+  );
+  const absoluteDetailPath = resolve(repositoryRoot, detailPath);
+  yield* Effect.tryPromise({
+    try: async () => {
+      await mkdir(dirname(absoluteDetailPath), { recursive: true });
+      await Bun.write(absoluteDetailPath, `${encoded}\n`);
+    },
+    catch: (cause) =>
+      new SkillAuditError({
+        detail: String(cause),
+        operation: "write",
+        target: detailPath,
       }),
   });
-});
 
-const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
-  [
-    ["agents", "bun run check:skills"],
-    ["agents", "typeof Contract.Type"],
-    ["agents", "typeof Contract.Encoded"],
-    ["agents", "Config.schema"],
-    ["agents", "named operations"],
-    ["agents", "live/mock Layers"],
-    ["effectPatterns", "typeof Contract.Type"],
-    ["effectPatterns", "typeof Contract.Encoded"],
-    ["effectPatterns", "Schema.decodeUnknownEffect"],
-    ["effectPatterns", "Schema.decodeEffect"],
-    ["effectPatterns", "Schema.encodeEffect"],
-    ["effectPatterns", "Config.schema"],
-    ["effectPatterns", "HttpClient"],
-    ["effectPatterns", "Schema.TaggedErrorClass"],
-    ["effectPatterns", "Match"],
-    ["effectPatterns", "Helper Admission"],
-    ["writer", "## Required Impact Ledger"],
-    ["writer", ".agents/skills/effect-client-wrapper"],
-    ["writer", "typeof Contract.Type"],
-    ["writer", "typeof Contract.Encoded"],
-    ["writer", "Schema.decodeUnknownEffect"],
-    ["writer", "Schema.decodeEffect"],
-    ["writer", "Schema.encodeEffect"],
-    ["writer", "inbound"],
-    ["writer", "outbound"],
-    ["writer", "Do not encode a fixed audit-pass or subagent count"],
-    ["implementer", ".agents/skills/effect-client-wrapper"],
-    ["implementer", "Change required"],
-    ["implementer", "typeof Contract.Type"],
-    ["implementer", "typeof Contract.Encoded"],
-    ["implementer", "Schema.decodeUnknownEffect"],
-    ["implementer", "Schema.decodeEffect"],
-    ["implementer", "Schema.encodeEffect"],
-    ["implementer", "raw public primitives"],
-    ["implementer", "unencoded outward writes"],
-    ["implementer", "stale exceptions"],
-    ["implementer", "helper sprawl"],
-    ["implementer", "Use a goal only when the user explicitly requests one"],
-    ["packageStructure", "Use this skill directly"],
-    ["packageStructure", "Required separation"],
-    ["packageStructure", "helper sprawl"],
-    ["packageProfile", "@bundjil/source"],
-    ["reviewer", "Use this repository-owned contract directly"],
-    ["reviewer", "DeepWiki"],
-    ["reviewer", "Change required"],
-    ["reviewer", "use one primary reviewer"],
-    ["wrapper", "Config.schema"],
-    ["wrapper", "ConfigProvider"],
-    ["wrapper", "Schema.encodeEffect"],
-    ["wrapper", "Schema.decodeUnknownEffect"],
-    ["wrapper", "Schema.decodeEffect"],
-    ["wrapper", "codec's `Encoded` type, use `Schema.decodeEffect` instead"],
-    ["wrapper", "Schema.TaggedErrorClass"],
-    ["wrapper", "layerLive"],
-    ["wrapper", "layerMock"],
-    ["browser", "docs/architecture/frontend-composition.md"],
-    ["buildingComponents", "docs/architecture/frontend-composition.md"],
-    ["buildingComponents", "primitive -> composite -> layout -> route"],
-    ["buildingComponents", "schema-owned URL"],
-    ["compositionPatterns", "docs/architecture/frontend-composition.md"],
-    ["compositionPatterns", "schema-owned URL"],
-    ["reactPractices", "docs/architecture/frontend-composition.md"],
-    ["reactPractices", "data-bearing leaves"],
-    ["shadcn", "docs/architecture/frontend-composition.md"],
-  ];
+  if (report.ok) {
+    yield* Console.log(
+      `check:skills passed: ${report.checkedFiles} files, ${report.checkedLinks} mirrors; receipt ${report.detailPath}`
+    );
+    return yield* Effect.void;
+  }
 
-const forbiddenExamples: readonly (readonly [string, RegExp])[] = [
-  ["generic SDK callback field", /\buse\s*:\s*</u],
-  ["generic SDK callback invocation", /\.use\s*\(/u],
-  ["raw semantic identifier", /\b(?:id|identifier)\s*:\s*string\b/iu],
-  [
-    "primitive semantic Config",
-    /Config\.(?:string|nonEmptyString|redacted)\s*\(/u,
-  ],
-  ["native-class error branch", /\binstanceof\b/u],
-  ["unchecked generic SDK result", /Effect\.Effect<\s*A(?:\s*,|>)/u],
-];
-
-const contradictoryPolicy: readonly (readonly [
-  keyof typeof policyFiles,
-  string,
-  RegExp,
-])[] = [
-  [
-    "effectPatterns",
-    "synchronous codec example",
-    /Schema\.(?:decode|encode)(?:Unknown)?Sync\s*\(/u,
-  ],
-  [
-    "effectPatterns",
-    "unknown outbound encoder",
-    /Schema\.encodeUnknownEffect/u,
-  ],
-  ["writer", "unknown outbound encoder", /Schema\.encodeUnknownEffect/u],
-  ["implementer", "unknown outbound encoder", /Schema\.encodeUnknownEffect/u],
-];
-
-const frontendSkillFiles = [
-  "browser",
-  "buildingComponents",
-  "compositionPatterns",
-  "reactPractices",
-  "shadcn",
-] as const;
-const staleSitePolicy =
-  /Site Repo|docs\/(?:DESIGN|FRONTEND)\.md|docs\/architecture\/frontend\/|@packages\/ui|WEB_OG_TYPOGRAPHY/u;
-
-const runSkillPolicyAudit = Effect.fn("SkillPolicyAudit.run")(function* () {
-  const contents = yield* Effect.all({
-    agents: readPolicyFile(policyFiles.agents),
-    browser: readPolicyFile(policyFiles.browser),
-    buildingComponents: readPolicyFile(policyFiles.buildingComponents),
-    compositionPatterns: readPolicyFile(policyFiles.compositionPatterns),
-    effectPatterns: readPolicyFile(policyFiles.effectPatterns),
-    implementer: readPolicyFile(policyFiles.implementer),
-    packageStructure: readPolicyFile(policyFiles.packageStructure),
-    packageProfile: readPolicyFile(policyFiles.packageProfile),
-    reactPractices: readPolicyFile(policyFiles.reactPractices),
-    reviewer: readPolicyFile(policyFiles.reviewer),
-    shadcn: readPolicyFile(policyFiles.shadcn),
-    wrapper: readPolicyFile(policyFiles.wrapper),
-    writer: readPolicyFile(policyFiles.writer),
+  yield* Console.error(
+    `check:skills failed: ${report.findings.length} invariant violation(s)`
+  );
+  for (const issue of boundedSkillFindings(report)) {
+    yield* Console.error(
+      `[${issue.code}] ${issue.invariant}\n  owner: ${issue.owner}\n  target: ${issue.target}\n  repair: ${issue.repairHint}\n  detail: ${issue.detail}`
+    );
+  }
+  yield* Console.error(
+    report.omittedFindings > 0
+      ? `${report.omittedFindings} finding(s) omitted; full detail: ${report.detailPath}`
+      : `full detail: ${report.detailPath}`
+  );
+  return yield* new SkillAuditError({
+    detail: `${report.findings.length} invariant violation(s)`,
+    operation: "write",
+    target: report.detailPath,
   });
-  const findings = requiredPolicy.flatMap(([file, fragment]) =>
-    contents[file].includes(fragment)
-      ? []
-      : [`${policyFiles[file]}: missing required policy fragment ${fragment}`]
-  );
-  const personalRoot = ["", "Users", "cooper"].join("/");
-  for (const [file, content] of Object.entries(contents)) {
-    if (content.includes(personalRoot)) {
-      findings.push(`${file}: contains a personal absolute path`);
-    }
-  }
-  const executableExamples = Array.from(
-    contents.wrapper.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g),
-    (match) => match[1] ?? ""
-  ).join("\n");
-
-  for (const [label, pattern] of forbiddenExamples) {
-    if (pattern.test(executableExamples)) {
-      findings.push(
-        `${policyFiles.wrapper}: executable example contains ${label}`
-      );
-    }
-  }
-
-  for (const [file, label, pattern] of contradictoryPolicy) {
-    if (pattern.test(contents[file])) {
-      findings.push(`${policyFiles[file]}: contains contradictory ${label}`);
-    }
-  }
-
-  for (const file of frontendSkillFiles) {
-    if (staleSitePolicy.test(contents[file])) {
-      findings.push(
-        `${policyFiles[file]}: contains stale Site-specific frontend policy`
-      );
-    }
-  }
-
-  if (findings.length > 0) {
-    return yield* new SkillPolicyAuditError({
-      operation: "validatePolicy",
-      message: `Skill policy audit failed:\n${findings.join("\n")}`,
-    });
-  }
-
-  return yield* Console.log(
-    `Skill policy audit passed for ${Object.keys(policyFiles).length} instruction surfaces.`
-  );
 });
 
 if (import.meta.main) {
-  await Effect.runPromise(
-    runSkillPolicyAudit().pipe(
-      Effect.catchTag("SkillPolicyAuditError", (error) =>
-        Console.error(error.message).pipe(Effect.andThen(Effect.fail(error)))
-      )
-    )
-  );
+  try {
+    await Effect.runPromise(program);
+  } catch (error) {
+    console.error(`check:skills stopped: ${String(error)}`);
+    process.exitCode = 1;
+  }
 }

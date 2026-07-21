@@ -5,6 +5,7 @@ import {
   CodexOAuthOperationError,
   CodexOAuthProfileId,
   CodexOAuthSubjectHash,
+  CodexResponsesRequest,
   CodexOAuthProfileCipherConfigService,
   CodexProfileNotFound,
   CodexProfileSchemaError,
@@ -17,7 +18,7 @@ import {
 } from "@bundjil/codex";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
-  CodexDirectProviderLive,
+  makeCodexDirectProviderLive,
   CodexHttpClientLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
@@ -59,6 +60,7 @@ const encodeChatCompletionRequest = Schema.encodeUnknownSync(
 const testConfig = makeCodexProxyConfig({
   internalToken: "test-internal-token",
   mode: "mock",
+  reasoningEffort: "low",
   subject: {
     connectorId: "bundjil-codex-proxy",
     installationId: "test",
@@ -75,6 +77,7 @@ const testConfig = makeCodexProxyConfig({
 const liveTestConfig = makeCodexProxyConfig({
   internalToken: "test-internal-token",
   mode: "live",
+  reasoningEffort: "low",
   subject: {
     connectorId: "bundjil-codex-proxy",
     installationId: "test",
@@ -118,6 +121,7 @@ const localTestConfig = (directory: string) =>
     internalToken: "test-internal-token",
     localProfileStoreDirectory: directory,
     mode: "local",
+    reasoningEffort: "low",
     subject: {
       connectorId: "bundjil-codex-proxy",
       installationId: "test",
@@ -204,7 +208,9 @@ const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
         })
       )
     );
-    const directProvider = CodexDirectProviderLive.pipe(
+    const directProvider = makeCodexDirectProviderLive({
+      reasoningEffort: "low",
+    }).pipe(
       Layer.provideMerge(Layer.merge(CodexOAuthMemory([profile]), httpClient))
     );
 
@@ -227,11 +233,11 @@ const liveTestWebHandler = (expiresAtEpochMillis: number) =>
     );
   });
 
-const chatCompletionRequest = (authorization?: string) =>
+const chatCompletionRequest = (authorization?: string, model = "gpt-5.5") =>
   new Request("https://bundjil.local/v1/chat/completions", {
     body: encodeChatCompletionRequest({
       messages: [{ content: "Say OK.", role: "user" }],
-      model: "gpt-5.5",
+      model,
       stream: true,
     }),
     headers:
@@ -419,6 +425,7 @@ const withLocalTestHandler = <A>(
     );
     const localProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal(
       localProfileStoreDirectory,
+      { reasoningEffort: config.reasoningEffort },
       localCipherConfigProvider,
       CodexResponsesFetchMock({
         fetch: (request) =>
@@ -456,6 +463,154 @@ const withLocalTestHandler = <A>(
   });
 
 describe("@bundjil/codex-proxy Effect HTTP handler", () => {
+  it.effect("defaults proxy reasoning effort to low", () =>
+    Effect.gen(function* testDefaultReasoningEffort() {
+      const config = yield* loadCodexProxyConfig.pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({
+              env: {
+                BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+              },
+            })
+          )
+        )
+      );
+
+      assert.strictEqual(config.reasoningEffort, "low");
+    })
+  );
+
+  it.effect(
+    "decodes high proxy reasoning effort and rejects unknown values",
+    () =>
+      Effect.gen(function* testReasoningEffortConfigBoundary() {
+        const high = yield* loadCodexProxyConfig.pipe(
+          Effect.provide(
+            ConfigProvider.layer(
+              ConfigProvider.fromEnv({
+                env: {
+                  BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                  BUNDJIL_CODEX_PROXY_REASONING_EFFORT: "high",
+                },
+              })
+            )
+          )
+        );
+        const invalid = yield* loadCodexProxyConfig.pipe(
+          Effect.provide(
+            ConfigProvider.layer(
+              ConfigProvider.fromEnv({
+                env: {
+                  BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
+                  BUNDJIL_CODEX_PROXY_REASONING_EFFORT: "terra-high",
+                },
+              })
+            )
+          ),
+          Effect.flip
+        );
+
+        assert.strictEqual(high.reasoningEffort, "high");
+        assert.notInclude(String(invalid), "test-internal-token");
+      })
+  );
+
+  it.effect(
+    "encodes configured high reasoning in the live proxy provider request",
+    () =>
+      Effect.gen(function* testHighReasoningProviderRequest() {
+        const config = yield* makeCodexProxyConfig({
+          internalToken: "test-internal-token",
+          mode: "live",
+          reasoningEffort: "high",
+          subject: {
+            connectorId: "bundjil-codex-proxy",
+            installationId: "test",
+            principal: {
+              id: "test",
+              issuer: "https://auth.openai.com",
+              type: "chatgpt-user",
+            },
+            profileId: "default",
+            provider: "codex",
+          },
+        });
+        const profile = yield* makeLiveProfile(Date.now() + 60_000);
+        let captured: typeof CodexResponsesRequest.Type | undefined;
+        const httpClient = CodexHttpClientLive.pipe(
+          Layer.provide(
+            CodexResponsesFetchMock({
+              fetch: (request) =>
+                Effect.gen(function* captureEncodedProviderRequest() {
+                  if (request.body._tag !== "Uint8Array") {
+                    return yield* Effect.die(
+                      "Expected the Codex provider request to have an encoded JSON body."
+                    );
+                  }
+
+                  captured = yield* Schema.decodeUnknownEffect(
+                    Schema.fromJsonString(CodexResponsesRequest)
+                  )(new TextDecoder().decode(request.body.body)).pipe(
+                    Effect.orDie
+                  );
+
+                  return HttpClientResponse.fromWeb(
+                    request,
+                    new Response(
+                      [
+                        'data: {"type":"response.output_text.delta","delta":"Live OK."}',
+                        'data: {"type":"response.completed"}',
+                        "",
+                      ].join("\n"),
+                      {
+                        headers: { "content-type": "text/event-stream" },
+                        status: 200,
+                      }
+                    )
+                  );
+                }),
+            })
+          )
+        );
+        const directProvider = makeCodexDirectProviderLive({
+          reasoningEffort: config.reasoningEffort,
+        }).pipe(
+          Layer.provideMerge(
+            Layer.merge(CodexOAuthMemory([profile]), httpClient)
+          )
+        );
+        const proxyLayer = Layer.merge(
+          OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider)),
+          CodexProxyReadyLive
+        );
+        const webHandler = makeCodexProxyWebHandler(
+          makeCodexProxyAppLayer(
+            CodexProxyConfigLayer(config),
+            proxyLayer.pipe(Layer.orDie)
+          )
+        );
+
+        const response = yield* Effect.acquireUseRelease(
+          Effect.succeed(webHandler),
+          (handler) =>
+            Effect.promise(() =>
+              handler.handler(
+                chatCompletionRequest(
+                  "Bearer test-internal-token",
+                  "gpt-5.6-terra"
+                )
+              )
+            ),
+          (handler) => Effect.promise(() => handler.dispose())
+        );
+
+        assert.strictEqual(response.status, 200);
+        assert.strictEqual(captured?.model, "gpt-5.6-terra");
+        assert.deepStrictEqual(captured?.reasoning, { effort: "high" });
+      })
+  );
+
   it.effect(
     "uses the normal package cipher config when proof mode is disabled",
     () =>
@@ -519,6 +674,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         assert.strictEqual(payload.ok, true);
         assert.strictEqual(payload.service, "bundjil-codex-proxy");
         assert.strictEqual(payload.mode, "mock");
+        assert.strictEqual(payload.reasoningEffort, "low");
       })
     )
   );

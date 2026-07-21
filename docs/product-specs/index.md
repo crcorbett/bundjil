@@ -18,9 +18,11 @@ context.
 ## Current
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
-  HGI-300 is in progress.
+  HGI-300 through HGI-305, HGI-308, and HGI-310 are complete; HGI-306 feedback
+  and continuous-automation controls are in progress.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  proposed; implementation and Preview subscription-endpoint proof are pending.
+  implementation in progress; Preview subscription-endpoint proof remains
+  pending explicit deployment authority.
 
 ## Implemented or superseded history
 

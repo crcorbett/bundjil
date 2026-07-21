@@ -1,0 +1,78 @@
+{
+  "documentType": "harness-decision-source-receipt",
+  "lifecycle": "inconclusive",
+  "authority": "supporting",
+  "owner": "bundjil-harness-maintainer",
+  "taskId": "HGI-308",
+  "observedAt": "2026-07-21T12:03:22+01:00",
+  "baseCommit": "11708ff396b935b92cd8846b6999c19847317869",
+  "sourceReceipts": [
+    {
+      "path": "docs/documentation-audit/HGI-301-eve-reconciliation.json",
+      "sha256": "e7355b1a24e5f4d2bc15508eae29fafe9c2e0329dbb9d2f6bdb57bf255cae375",
+      "finding": "The accepted HGI-301 source trace establishes deployable adapter topology only; its Vercel/provider readback was unavailable and it makes no production, webhook, credential, or handset claim."
+    },
+    {
+      "path": ".github/workflows/claude-code-review.yml",
+      "sha256": "64aebeb978eb523728f63890fb52eddda06085936c0d0969bbf2b3fa3f140ede",
+      "finding": "Automatic Claude review runs for opened and synchronized pull requests, has read permissions plus id-token write, allows gh pr comment, and has no declared severity, deduplication, convergence, stopping, escalation, or cost contract."
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "sha256": "35e8f97589de82402a5d5b3e571aa07e9f6fc0ffc7d3d168d0d1bef35f55a5c6",
+      "finding": "Interactive Claude is mention-triggered and read-scoped in repository YAML; it is a distinct workflow from automatic review."
+    },
+    {
+      "path": "tooling/boundary-audit.ts",
+      "sha256": "2780ffb228bf38d14f38ac76ef0adaa8b79aeaad4abb664ec680fe4f0201281b",
+      "finding": "The audit matches exceptions by file, symbol, occurrence, and rule, records use, and reports unused entries as stale."
+    },
+    {
+      "path": "tooling/boundary-exceptions.ts",
+      "sha256": "9cacc9378a7d16260a6dd9947072534c96dc05e05162b1b48d4f234336e85a0a",
+      "finding": "The registry is occurrence-based and includes multiple exact entries for one Upstash symbol; duplicate detection is covered by the focused tests."
+    }
+  ],
+  "providerReadback": {
+    "github": {
+      "status": "available-read-only",
+      "command": "gh api repos/crcorbett/bundjil/actions/permissions",
+      "result": "Actions enabled; allowed_actions=all; sha_pinning_required=false.",
+      "limitation": "This confirms repository Actions settings only, not workflow execution, token issuance, secrets, or Claude effectiveness."
+    },
+    "vercel": {
+      "status": "unavailable",
+      "finding": "No local Vercel CLI or connected Vercel readback capability was available.",
+      "fallback": "HGI-303 records a target-owned, authenticated read-only Vercel readback before any deployment claim; until then retain HGI-301's non-claim."
+    },
+    "executor": {
+      "status": "unavailable",
+      "finding": "No local Executor CLI or connected readback capability was available.",
+      "fallback": "HGI-303 records connection-owned skills/status readback through the authenticated app connection; no alternate provider path is implied."
+    },
+    "sendblue": {
+      "status": "unavailable",
+      "finding": "No local Sendblue CLI or authenticated readback capability was available.",
+      "fallback": "HGI-303 records an authenticated Sendblue account/webhook readback; source and tests remain topology evidence only."
+    },
+    "upstash": {
+      "status": "unavailable",
+      "finding": "No local Upstash CLI or authenticated readback capability was available.",
+      "fallback": "HGI-303 records an authenticated database/configuration metadata readback; no value, key, or live persistence claim follows from source."
+    },
+    "secrets": {
+      "status": "intentionally-not-attempted",
+      "finding": "A local 1Password CLI exists, but no named vault/item, target-owned procedure, or authority was supplied for this decision task.",
+      "fallback": "HGI-303 records a metadata-only, redacted secret-binding readback under an approved target-owned runbook; never read or print secret values."
+    }
+  },
+  "limitations": [
+    "All provider findings are read-only capability observations at observedAt and grant neither approval nor mutation authority.",
+    "No provider, GitHub setting, secret, deployment, webhook, message, or credential was mutated.",
+    "GitHub repository settings cannot establish Eve Production state or long-term automated-review effectiveness."
+  ],
+  "nonClaims": [
+    "Eve is not claimed live, deployed, configured, webhook-registered, credential-bound, or production-ready.",
+    "No Claude review conclusion, secret presence, provider binding, or external operation success is established."
+  ]
+}

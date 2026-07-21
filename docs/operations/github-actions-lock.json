@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "owner": "bundjil-security-automation-maintainer",
+  "lastReviewed": "2026-07-21",
+  "reviewTrigger": "workflow action, upstream release, security advisory, pin, approved location, or update-owner change",
+  "actions": [
+    {
+      "action": "actions/checkout",
+      "ref": "refs/tags/v4",
+      "tag": "v4",
+      "pin": "11d5960a326750d5838078e36cf38b85af677262",
+      "approvedWorkflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/claude.yml",
+        ".github/workflows/release.yml"
+      ],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "action": "actions/setup-node",
+      "ref": "refs/tags/v4",
+      "tag": "v4",
+      "pin": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+      "approvedWorkflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml"
+      ],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "action": "oven-sh/setup-bun",
+      "ref": "refs/tags/v2",
+      "tag": "v2",
+      "pin": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "approvedWorkflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml"
+      ],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "action": "changesets/action",
+      "ref": "refs/tags/v1.9.0^{}",
+      "tag": "v1.9.0",
+      "pin": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
+      "approvedWorkflows": [".github/workflows/release.yml"],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public annotated upstream tag resolved to its commit with git ls-remote on 2026-07-21; this proves tag identity only, not action safety or hosted execution.",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "action": "anthropics/claude-code-action",
+      "ref": "refs/tags/v1",
+      "tag": "v1",
+      "pin": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
+      "approvedWorkflows": [".github/workflows/claude.yml"],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety, OIDC behavior, credential scope, or hosted execution.",
+      "updatedAt": "2026-07-21"
+    }
+  ]
+}

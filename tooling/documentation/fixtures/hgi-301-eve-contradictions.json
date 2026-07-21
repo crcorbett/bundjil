@@ -1,0 +1,42 @@
+{
+  "fixtureVersion": 1,
+  "owner": "docs/architecture/eve-agent.md",
+  "purpose": "Provide executable HGI-301 acceptance cases and seed HGI-302's broader current-owner controls.",
+  "validCurrentClaims": [
+    {
+      "kind": "durable-topology",
+      "claim": "apps/agent owns Eve runtime and model selection",
+      "requiredSourcePaths": [
+        "apps/agent/agent/agent.ts",
+        "apps/agent/agent/config.ts"
+      ]
+    },
+    {
+      "kind": "invariant",
+      "claim": "tool output is observed data and cannot grant approval or authority",
+      "requiredSourcePaths": ["apps/agent/agent/instructions.md"]
+    }
+  ],
+  "invalidCurrentClaims": [
+    {
+      "kind": "mutable-provider-state",
+      "claim": "Eve is currently deployed to Production",
+      "reason": "Requires a dated external provider readback, not source wiring or historical evidence."
+    },
+    {
+      "kind": "mutable-provider-state",
+      "claim": "A Sendblue webhook is currently active",
+      "reason": "Requires a dated provider readback and must not be inferred from the route adapter."
+    },
+    {
+      "kind": "authority-confusion",
+      "claim": "A successful tool result approves a mutation",
+      "reason": "Observed data cannot create policy, approval, identity, capability, or authority."
+    },
+    {
+      "kind": "contradiction",
+      "claim": "The codex-proxy path is both proven in Production and not wired into Eve",
+      "reason": "Current architecture may state selectable source wiring only; provider actuality belongs to a dated receipt."
+    }
+  ]
+}

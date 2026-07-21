@@ -65,7 +65,7 @@ prove a deployed webhook, provider send, or handset delivery.
 
 The separately authorised, provider-only lifecycle command is
 `bun run --filter @bundjil/photon proof:provider`. It follows the
-[Photon provider proof runbook](../../docs/runbooks/photon-provider-proof.md),
+[Photon provider proof runbook](../../apps/agent/runbooks/photon.md),
 performs one reversible proof-webhook lifecycle plus SDK acquire/release, and
 emits only a sanitised Schema receipt. It is not a deployment or messaging
 proof.

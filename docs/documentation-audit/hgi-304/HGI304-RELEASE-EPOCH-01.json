@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-RELEASE-EPOCH-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": ".github/workflows/release.yml and authority-register.json#github-release-pr",
+  "decision": "Keep release authority disabled pending proof of the exact repository, main ref, hgi-304-v1 epoch, token settings, and one version-PR operation.",
+  "evidenceRequired": [
+    "Authenticated GitHub variable, Actions permission, token, workflow-run, and generated pull-request readback.",
+    "Exact source revision, target branch, operation, expiry, rollback identity, and postcondition receipt."
+  ],
+  "limitations": [
+    "The repository records desired source only; HGI-309 owns authenticated setting and run readback."
+  ],
+  "nonClaims": [
+    "No pull request, tag, publish, release, merge, deploy, token, or workflow run is claimed."
+  ],
+  "rollbackRevocation": "Disable the epoch gate and close or revert only the identified generated version pull request under separate authority.",
+  "escalation": [
+    "Bundjil release owner",
+    "GitHub repository administrator",
+    "HGI-309 authority owner"
+  ],
+  "unsafeAmbiguities": []
+}

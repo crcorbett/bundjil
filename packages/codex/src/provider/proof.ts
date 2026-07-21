@@ -8,6 +8,7 @@ import type {
 import { CodexResponsesRequestError } from "./errors.js";
 import type { CodexHttpClientFailure } from "./http-client.js";
 import { CodexHttpClient } from "./http-client.js";
+import { CodexResponsesRequestPolicyService } from "./request-policy.js";
 
 export type CodexResponsesProofFailure =
   | CodexResponsesRequestError
@@ -27,6 +28,7 @@ export class CodexResponsesProof extends Context.Service<
 export const makeCodexResponsesProof = Effect.gen(
   function* makeCodexResponsesProofService() {
     const httpClient = yield* CodexHttpClient;
+    const requestPolicy = yield* CodexResponsesRequestPolicyService;
 
     return CodexResponsesProof.of({
       run: Effect.fn("CodexResponsesProof.run")(function* (
@@ -45,7 +47,7 @@ export const makeCodexResponsesProof = Effect.gen(
           store: false,
           instructions: "Return a concise confirmation.",
           stream: true,
-          reasoning: { effort: "low" },
+          reasoning: { effort: requestPolicy.policy.reasoningEffort },
         }).pipe(
           Effect.mapError(
             (cause) =>

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "observedAt": "2026-07-21T16:22:00+01:00",
+  "candidate": {
+    "repositoryCommit": "21341fa205a265f47401191e6cd471b6ea62ba0d",
+    "repositoryTree": "3c74eb29cfb5cb149dc32dea59080c7cdb003efb",
+    "parentCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+    "changedPathCount": 51,
+    "sortedChangedPathSha256": "d151f051c26f00dae93336161d8ce735db740a85af1272e41004d0b1cd6b49ec",
+    "candidateReceiptSha256": "6137e8393b86aeec7e3dcdea167b39cd3868a75ee97053180b3568c081e7316c",
+    "sourceInventorySha256": "a005739954509c25b1ce29393963bc59350c70b1706611aa7f2de3411c3346ab"
+  },
+  "command": "env BUNDJIL_EXECUTOR_MCP_URL=<public-synthetic-endpoint> bun run verification",
+  "outcome": "passed",
+  "checks": [
+    "Effect language service and repository boundary policy passed.",
+    "Documentation, skill mirror, authority, and verification policies passed.",
+    "Fifty-nine tooling tests and the type-aware Ultracite and lint-fixture gates passed.",
+    "Knip and all five workspace typechecks passed.",
+    "Thirty-seven proxy, eighty-five agent, one hundred ten Codex, twenty-three Store, and seven Eve tests passed.",
+    "Three fresh Terra audits corrected four defects; final recheck passed all eight adversarial scenarios and all fifteen source hashes."
+  ],
+  "journeyQualification": [
+    {
+      "journeyId": "BND-J01-workspace-status",
+      "localOutcome": "passed",
+      "scope": "proved local contract"
+    },
+    {
+      "journeyId": "BND-J02-gateway-session-recovery",
+      "localOutcome": "inconclusive",
+      "scope": "deferred pending deterministic session/recovery fixture"
+    },
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "localOutcome": "passed",
+      "scope": "proved loopback mock contract only"
+    },
+    {
+      "journeyId": "BND-J04-local-reauthentication",
+      "localOutcome": "inconclusive",
+      "scope": "partial local contract; real login remains gated"
+    },
+    {
+      "journeyId": "BND-J05-sendblue-accepted-message",
+      "localOutcome": "inconclusive",
+      "scope": "fixture contract only; send and delivery remain gated"
+    },
+    {
+      "journeyId": "BND-J06-sendblue-auth-provider-rejection",
+      "localOutcome": "inconclusive",
+      "scope": "partial local rejection contract only"
+    },
+    {
+      "journeyId": "BND-J07-executor-read-only",
+      "localOutcome": "inconclusive",
+      "scope": "source protocol only; external read remains gated"
+    },
+    {
+      "journeyId": "BND-J08-executor-approval-resume",
+      "localOutcome": "inconclusive",
+      "scope": "source protocol only; resume remains gated"
+    },
+    {
+      "journeyId": "BND-J09-deployment-promotion-readback",
+      "localOutcome": "inconclusive",
+      "scope": "partial local snapshot preflight only"
+    },
+    {
+      "journeyId": "BND-J10-incident-revocation-recovery",
+      "localOutcome": "inconclusive",
+      "scope": "runbook routing only; external consequence remains gated"
+    }
+  ],
+  "gitReadback": {
+    "localHead": "21341fa205a265f47401191e6cd471b6ea62ba0d",
+    "originMain": "21341fa205a265f47401191e6cd471b6ea62ba0d",
+    "remoteTree": "3c74eb29cfb5cb149dc32dea59080c7cdb003efb",
+    "changedPathCount": 51,
+    "sortedChangedPathSha256": "d151f051c26f00dae93336161d8ce735db740a85af1272e41004d0b1cd6b49ec"
+  },
+  "limitations": [
+    "The public synthetic Executor endpoint satisfied build-time discovery only; no API key or provider request was used.",
+    "Local fixtures and repository readback do not establish Preview, Production, provider, delivery, approval, rollback, or recovery actuality."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored operational artifact, credential, secret, deployment, alias, webhook, message, delivery, approval resume, rollback, recovery, or Production system was read or changed.",
+    "This detail proves the named local contract qualification only; it does not upgrade any partial, deferred, or approval_gated journey."
+  ]
+}

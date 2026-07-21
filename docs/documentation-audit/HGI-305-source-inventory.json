@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "status": "candidate",
+  "observedAt": "2026-07-21T16:06:00+01:00",
+  "baseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "authority": "repository source, documentation, policy, local fixtures, tests, and evidence writes plus local process and loopback HTTP execution only; no provider, deployment, environment-value, secret, message, approval-resume, or Production readback or mutation",
+  "sources": [
+    {
+      "path": "docs/verification/README.md",
+      "sha256": "220096f57af02142878a3f1c81e5638f3a2630048fe40c9bafe3d482921bffb7",
+      "owner": "critical-journey and proof route"
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "6fa49b2f623311e9288413f8e65b2487d190708a39b44b8ea9bb45e779ab2085",
+      "owner": "ten canonical consumer-visible journeys"
+    },
+    {
+      "path": "docs/verification/journey-command-map.json",
+      "sha256": "09126825dbba54f6387115fe25dc5bd3e054b9715cac650648d1c00a7fcc9921",
+      "owner": "command, environment, procedure, and claim-scope map"
+    },
+    {
+      "path": "docs/verification/evidence-index.json",
+      "sha256": "4d27be08cf166b30191456389284d80192db6143047bcddd5bd140e07ccdd007",
+      "owner": "evidence routing, provenance, redaction, and lifecycle"
+    },
+    {
+      "path": "docs/verification/proof-packet.schema.json",
+      "sha256": "0263d6b6d8fab1cdc13286a36fc02df6f63385f060e4c4350833060d8a2483c8",
+      "owner": "interoperable proof-packet boundary"
+    },
+    {
+      "path": "tooling/verification-policy.ts",
+      "sha256": "488c1b157bf7dbf9fe8924fb7b46586f4833a2b009200dfc10b8df5d6ab8f42a",
+      "owner": "Effect Schema and semantic verification policy"
+    },
+    {
+      "path": "tooling/verification-policy-audit.ts",
+      "sha256": "07e7e9360e6a31c01359421eea6af9ea20b6eb2afa6b4755b95fafabcbbca7e5",
+      "owner": "bounded repository audit command"
+    },
+    {
+      "path": "tooling/verification-policy-audit.test.ts",
+      "sha256": "19fa8a08be6644fcf80ec0306d20bdcda35e395b643efa46c0bde4aaf374eb89",
+      "owner": "negative proof and lifecycle fixtures"
+    },
+    {
+      "path": "apps/codex-proxy/scripts/prove-preview.ts",
+      "sha256": "975f4dc7cb914f5436aea7da2322d9c4451bf5b63c69b110df752dee0c4d233d",
+      "owner": "authority-gated Preview receipt producer"
+    },
+    {
+      "path": "apps/codex-proxy/test/prove-preview.test.ts",
+      "sha256": "fda2afbbd586972df46ef002bbf4803fb2c7f757b26e903e45c30690f67060db",
+      "owner": "loopback Preview receipt fixtures"
+    },
+    {
+      "path": "apps/agent/agent/production-preflight.ts",
+      "sha256": "8dcab4c218a57a677376b5c0d028f6e60bf7f3c19d7ec86ea9ae116a61585323",
+      "owner": "production snapshot and receipt contracts"
+    },
+    {
+      "path": "apps/agent/scripts/production-preflight.ts",
+      "sha256": "731e5a800afbe16a969a74e957bb144bc7e79623f3bf81ff2e1f9e9a3721cebc",
+      "owner": "local production-preflight receipt producer"
+    },
+    {
+      "path": "apps/agent/test/production-preflight.test.ts",
+      "sha256": "1e3c55062000473ffeac93657d3c154337170827927ef8f7b9d339f30fb931af",
+      "owner": "staged production snapshot fixtures"
+    },
+    {
+      "path": "apps/agent/test/production-preflight-cli.test.ts",
+      "sha256": "37a1b6f738a09f5d873ed26d0f7290b28cd72238785e526556a0dc94c6f5576b",
+      "owner": "bounded production receipt fixtures"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "sha256": "f8378cdc1b05859c796a8e0ae75ae2da84dda804fce1f3996eca9124c31cb924",
+      "owner": "retained packet/detail route"
+    }
+  ],
+  "checks": {
+    "fullVerification": "passed with the documented public synthetic Executor endpoint; 59 tooling tests, 37 proxy tests, 85 agent tests, 110 Codex tests, 23 Store tests, and 7 Eve tests; no provider request",
+    "focusedReceipts": "10 Preview and 16 production-preflight cases passed",
+    "effectBoundary": "Effect language service and repository boundary policy passed"
+  },
+  "externalReadbacks": [
+    {
+      "target": "Vercel Preview and Production deployments, aliases, variables, logs, and traffic",
+      "availability": "unavailable",
+      "outcome": "inconclusive"
+    },
+    {
+      "target": "Executor, Sendblue, Upstash, AI Gateway, Codex account, deployed Eve, delivery, and approval state",
+      "availability": "unavailable",
+      "outcome": "inconclusive"
+    }
+  ],
+  "nonClaims": [
+    "No provider, deployment, live route, environment value, secret, message, approval resume, delivery, rollback, or Production state was read or changed.",
+    "Local fixtures, a passed preflight, a receipt schema, and unavailable readback do not prove external consequence or health."
+  ]
+}

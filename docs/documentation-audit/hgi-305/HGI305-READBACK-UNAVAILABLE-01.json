@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-READBACK-UNAVAILABLE-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "proof-packet policy plus production-proof.md and HGI-308 readback fallback decisions",
+  "decision": "Require an inconclusive packet with unavailable readback, exact target, observation time, limitations, recovery, and no mutation path; never proved, passed, healthy, or current.",
+  "evidenceRequired": [
+    "Sanitized unavailable-readback receipt tied to exact candidate and target.",
+    "Stop/escalation and target-owned readback route without a fallback mutation."
+  ],
+  "limitations": [
+    "Local tests establish no Vercel, provider, delivery, or Production actuality."
+  ],
+  "nonClaims": [
+    "Unavailable observation is not healthy and cannot be replaced by source or old evidence."
+  ],
+  "rollbackRevocation": "Keep the operation stopped; the target owner owns any later approved rollback or revocation.",
+  "escalation": ["Bundjil verification owner", "Exact provider target owner"],
+  "unsafeAmbiguities": []
+}

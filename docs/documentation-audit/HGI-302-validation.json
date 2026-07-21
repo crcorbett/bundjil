@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-302",
+  "status": "accepted",
+  "observedAt": "2026-07-21T13:04:38+01:00",
+  "authority": "repository-local docs, skill-mirror, policy, dependency, test, Git commit, main push, and remote-ref readback only; no provider or external-runtime access or mutation",
+  "baseCommit": "feaf14d9821280fb617d7c526221b708f17e2228",
+  "semanticCommit": "aa61e36a19248122efb3a8461252b1dd036f69e8",
+  "semanticTree": "c640991a0ad8745b1dbeba67e8bf2fed6b549fc9",
+  "changedPathCount": 29,
+  "sortedChangedPathSha256": "fb0b041b6c9b26caee96e33f0390e619febfeccd013e7829b38a41d5d25f0972",
+  "candidateReceiptSha256": "b00d19d03fb05ba08121b4052cc803229c2ca17db8cf06b9a2cbef739dad480a",
+  "checks": [
+    {
+      "check": "bounded documentation policy",
+      "status": "passed",
+      "result": "check:docs passed 204 selected files and wrote a zero-finding JSON receipt; negative fixtures cover metadata, links, inventories, lifecycle, commands, package README ownership, successor/tombstone routing, portability, semantic claim paraphrases, accepted-task states, and occurrence-control weakening."
+    },
+    {
+      "check": "complete skill and mirror policy",
+      "status": "passed",
+      "result": "check:skills passed 164 instruction/reference files and 15 mirrors; package-structure and prd-review replace the broken create-package route, YAML plus Effect Schema validates skill/UI metadata, all local TypeScript examples are inspected, and negative mirror/reference/portability/example fixtures pass."
+    },
+    {
+      "check": "fresh-context rejection, correction, and acceptance",
+      "status": "passed",
+      "result": "The evaluator rejected finite phrase matching plus weak YAML/example coverage. Structured claim types, semantic term groups, non-claim terms, accepted-task comparison, Schema-decoded YAML, all-local-skill example scanning, and paraphrase fixtures then received strict PASS."
+    },
+    {
+      "check": "occurrence-control preservation",
+      "status": "passed",
+      "result": "The accepted HGI-308 record is mechanically required and 24 focused boundary tests retain exact matching, duplicate rejection, occurrence isolation, and stale-entry detection."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundary/docs/skill audits, 38 tooling tests, Ultracite, lint fixtures, Knip, five typechecks, and 250 package/app tests passed with schema-valid synthetic Executor test configuration and no provider call."
+    },
+    {
+      "check": "semantic Git publication and readback",
+      "status": "passed",
+      "result": "The accepted semantic commit was pushed; after fetch, local HEAD and origin/main both resolved to aa61e36a19248122efb3a8461252b1dd036f69e8."
+    }
+  ],
+  "postcondition": "Bundjil mechanically rejects documentation, current-owner, command, lifecycle, skill-mirror, metadata, reference, portability, and forbidden-example drift with bounded owner-aware receipts; HGI-310 may build the local docs-maintainer skill on this enforced baseline.",
+  "rollback": "Revert the validation closeout, then semantic aa61e36a19248122efb3a8461252b1dd036f69e8; preserve HGI-300/HGI-301/HGI-308 and the accepted occurrence-control decision.",
+  "limitations": [
+    "Repository structure and semantic policy do not prove provider, workflow, deployment, credential, release, or application-runtime actuality.",
+    "Semantic claim vocabulary is an explicit maintained control; a new claim domain requires an owner-reviewed rule and positive/negative fixtures.",
+    "The semantic commit is unsigned because the configured 1Password signing agent remained unavailable; content, tree, ancestry, push, and remote identity are verified."
+  ],
+  "nonClaims": [
+    "No provider, deployment, workflow, GitHub setting, secret, webhook, message, credential, production, release, or publication system was read or changed.",
+    "Passing docs and skill checks does not grant external operation authority or prove runtime behavior."
+  ]
+}

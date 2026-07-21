@@ -1,0 +1,43 @@
+{
+  "id": "HGI-308-readback-fallbacks",
+  "state": "accepted",
+  "semanticOwner": "apps/agent/runbooks/** and apps/codex-proxy/runbooks/** fallback procedures to be created by HGI-303",
+  "evidence": [
+    "HGI-308 source receipt records unavailable Vercel, Executor, Sendblue, and Upstash connectors and a deliberately unattempted secrets readback because no target-owned authority was supplied.",
+    "GitHub CLI readback is available but limited to repository settings."
+  ],
+  "rejectedAlternatives": [
+    "Invent a universal connector policy or use an alternate provider path after the preferred path is unavailable.",
+    "Treat local source, environment names, historical proof, or a secret CLI presence as current provider state."
+  ],
+  "acceptedOrDefaultBehavior": "Use per-target fallback readbacks: Vercel authenticated project/deployment metadata; Executor authenticated connection skills/status; Sendblue authenticated account/webhook metadata; Upstash authenticated database/configuration metadata; secrets metadata-only/redacted binding inventory; and GitHub gh/API settings readback. Each procedure must record identity, target, observedAt, sanitized result shape, limitation, stop condition, escalation, and no mutation path. Unavailable means inconclusive, never healthy.",
+  "affectedTasks": ["HGI-303", "HGI-304", "HGI-305"],
+  "taskBlocking": [
+    {
+      "taskId": "HGI-303",
+      "blocks": false,
+      "inheritedNonClaim": "Each app runbook needs a target-specific fallback before it can direct provider preflight."
+    },
+    {
+      "taskId": "HGI-304",
+      "blocks": false,
+      "inheritedNonClaim": "Authority records must name the external readback and failure path, not assume connector availability."
+    },
+    {
+      "taskId": "HGI-305",
+      "blocks": false,
+      "inheritedNonClaim": "External proof packets cannot claim a result without their matching readback or an explicit inconclusive receipt."
+    }
+  ],
+  "authorityImpact": "Fallbacks are read-only designs only. They do not authorize secret reads, provider changes, message sends, deployments, GitHub setting changes, or approval resume.",
+  "nonClaims": [
+    "No Vercel, Executor, Sendblue, Upstash, secret, or GitHub operational state beyond the recorded GitHub Actions setting is established.",
+    "No fallback procedure is executed by this candidate."
+  ],
+  "carryingCost": "Keep provider-specific readbacks current with app/provider/auth changes and retain sanitized inconclusive receipts when capability is unavailable.",
+  "reviewOrResumeTrigger": "Review or supersede when HGI-303 app-owned runbooks or provider authentication capabilities change the accepted fallback routes.",
+  "receipt": {
+    "path": "./HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb"
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "status": "candidate",
+  "observedAt": "2026-07-21T17:11:00+01:00",
+  "authority": "repository source, documentation, policy, local fixtures, tests, evidence, Git commit, main push, and remote-ref readback only; no provider, deployment, environment-value, secret, message, approval-resume, delivery, rollback, or Production readback or mutation",
+  "baseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "candidatePathCount": 37,
+  "sortedCandidatePathSha256": "f5d20793ebd7c21c3c7e73fc7caf9710707ce94c3b01c880d52cb8d69a706459",
+  "artifacts": [
+    {
+      "path": "docs/standards/controls.md",
+      "sha256": "7fee55826ee932462e3d03dbf53caf96f82f241d973acdb80b1e4c4349e5903d"
+    },
+    {
+      "path": "docs/standards/control-register.json",
+      "sha256": "a77d4d2f5b4d918ef945dfbc9e42a8d547b65939711bc4c6339158623630eac0"
+    },
+    {
+      "path": "docs/standards/automation-register.json",
+      "sha256": "da1b14fcc7d3077fa9357822390db0f1eb02f78b8b08347ede059a83a0800abf"
+    },
+    {
+      "path": "tooling/control-policy.ts",
+      "sha256": "2763b735a49ab4b0d0b5a72d28f5531b6949166cab284a255d7752b1d12d6733"
+    },
+    {
+      "path": "tooling/control-policy-audit.ts",
+      "sha256": "379881df54467215827f270eb76a8119e852c51c566c4be7231683dc1ec57477"
+    },
+    {
+      "path": "tooling/documentation/freshness-candidate.ts",
+      "sha256": "6d429c29acfebaf5fc94496a07e5ead4b2bb78eaf683a4a761bc0493ea06bb7c"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-306-source-inventory.json",
+      "sha256": "91f988c3a279b466bb7590e2a6d46898e3ff478fbe2519b588d0f3c03208bff0"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-306-scenarios.json",
+      "sha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1"
+    }
+  ],
+  "scenarioPackets": [
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-FRESHNESS-REPORT-01.json",
+      "sha256": "74e3fe30a6637e6d4a9fc050a039c066b9cc38d16178698958e6a4ab39aa683d"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-FRESHNESS-PUBLISH-01.json",
+      "sha256": "f35499a03eb3931c0c8361b84f6d53a25a0b6bd4db7b3b09ac53c90bf69c65eb"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-FRESHNESS-SELF-01.json",
+      "sha256": "9933407dd7c35a1e733b3d712a4731fe9c79bf20321304d14cc629b24e911457"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-CONTROL-OWNER-01.json",
+      "sha256": "3aedefc3a0a0bad0208ab33e25cfb74df5d035524c7639fb50ed681181c3f432"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-BOUNDARY-EQUIVALENCE-01.json",
+      "sha256": "1ed6ce6b976c30c0ff3649183637c55bdfc2acb71121a07b667c9880306b52fe"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-AUTOMATION-STATE-01.json",
+      "sha256": "cd35ae9df2bbb85925898ec04b72f3d56e206cea8cdc018743c605515ba9e3fa"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-AUTOMATION-PROVIDER-01.json",
+      "sha256": "5fc1ac163049d06580c00ae8efba8843bb16745414326b1a53cb7909f9a39798"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-306/HGI306-METRICS-01.json",
+      "sha256": "0a2d4cd6f533cf16596e09c88654f22339341b5947727c6c778bc0fffb395dbc"
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "Control inventory and earliest durable owners",
+      "decision": "change-required",
+      "owners": [
+        "docs/standards/controls.md",
+        "docs/standards/control-register.json",
+        "tooling/control-policy.ts"
+      ],
+      "result": "Eight retained controls bind failure class, invariant, earliest owner, command, positive/adversarial fixtures, false-positive and repair cost, five outcome/attention metrics, review, retirement, rollback, admission evidence, and non-claims."
+    },
+    {
+      "surface": "Continuous and foreground automation",
+      "decision": "change-required",
+      "owners": [
+        "docs/standards/automation-register.json",
+        "docs/operations/automation-register.md",
+        "tooling/control-policy.ts"
+      ],
+      "result": "Eleven loops retain exact admitted, foreground-only, disabled-pending-proof, retired, or report-only states with two addressable fixtures each and complete authority, convergence, proof, cost, metrics, stopping, rollback, escalation, review, and retirement contracts."
+    },
+    {
+      "surface": "Documentation freshness and feedback",
+      "decision": "change-required",
+      "owners": [
+        "tooling/documentation/freshness-candidate.ts",
+        "docs/documentation-audit/HGI-306-feedback-promotion.json",
+        ".agents/skills/docs-maintainer/SKILL.md"
+      ],
+      "result": "Freshness remains report-only and self-excluding; generator, reviewer, and publisher are separated; publication and recovery require their own receipts; the repeated field-list reminder moved into typed policy and weaker prose was retired."
+    },
+    {
+      "surface": "Boundary exception representation",
+      "decision": "retained-after-measurement",
+      "owners": [
+        "docs/documentation-audit/HGI-306-boundary-exceptions.decision.json",
+        "tooling/boundary-exceptions.ts",
+        "tooling/boundary-audit.ts"
+      ],
+      "result": "The measured 18-row occurrence registry remains because no smaller candidate yet preserves exact matching, duplicate rejection, occurrence isolation, and stale detection."
+    },
+    {
+      "surface": "External provider and deployment actuality",
+      "decision": "not-applicable-to-execution",
+      "owners": ["HGI-309", "target-owned runbooks", "authority register"],
+      "result": "No provider readback or mutation occurred. External state, identity, operation, delivery, deployment, rollback, and Production claims remain inconclusive."
+    }
+  ],
+  "checks": [
+    {
+      "check": "control policy and semantic fixtures",
+      "status": "passed",
+      "result": "check:controls passed eight controls, eleven automations, and one freshness candidate; 17 focused tests cover missing owners/fixtures, state drift, self-feedback/publication, distinct identities, boundary equivalence, feedback promotion, source digest, and metric decoding."
+    },
+    {
+      "check": "boundary and authority parity",
+      "status": "passed",
+      "result": "Boundary policy and its 74-test tooling suite passed; authority policy retained its three-workflow bounded result."
+    },
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "A fresh Terra reviewer recomputed all 25 declared source hashes, verified the candidate source digest, caused correction of missing automation fixtures, and then passed all eight adversarial scenarios with 17 focused tests."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, 224-file docs policy, 167-file/16-mirror skill policy, three-workflow authority policy, controls, ten journeys, 76 tooling tests, type-aware Ultracite, lint fixture, Knip, five typechecks, and 262 app/package tests passed with the documented public synthetic Executor endpoint and no provider call."
+    }
+  ],
+  "limitations": [
+    "The slice defines local control, automation, feedback, and measurement contracts; it does not fabricate historical accepted-outcome, false-positive, latency, attention, duration, or cost observations.",
+    "Repository source and local fixtures do not prove GitHub, Vercel, Executor, Sendblue, Upstash, AI Gateway, Codex, deployed Eve, delivery, approval, rollback, recovery, or Production actuality.",
+    "HGI-309 retains separately approved external qualification. The final campaign five-pass audit is reserved for HGI-307 closeout."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored operational artifact, credential, secret, deployment, alias, webhook, message, delivery, approval resume, rollback, recovery, or Production system was read or changed.",
+    "A local register, test, runbook, candidate, model review, or unavailable readback is not external proof or operation authority."
+  ],
+  "rollback": "Revert the controls, typed registers/policy/tests, freshness candidate contract, feedback promotion, boundary decision, documentation/skill routes, and HGI-306 evidence together while preserving accepted HGI-300 through HGI-305, HGI-308, and HGI-310 evidence."
+}

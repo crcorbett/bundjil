@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "inconclusive",
+  "outcome": "inconclusive",
+  "lifecycle": { "state": "inconclusive" },
+  "externalConsequence": {
+    "outcome": "unavailable",
+    "target": "replace with immutable Preview deployment"
+  },
+  "candidate": {
+    "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sourceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "artifactDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "authority": {
+    "principal": "approved preview reader",
+    "identitySource": "target-owned approval",
+    "externalAccess": "read_only",
+    "approvalReceipt": "replace with approval receipt",
+    "rollbackOwner": "Vercel deployment owner"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "replace with immutable Preview deployment"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J09-deployment-promotion-readback",
+      "status": "inconclusive",
+      "oracle": "Replace with the Preview-specific oracle."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "run the target-owned preview procedure",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Preview must identify one immutable candidate.",
+    "target": "replace with Preview deployment",
+    "recoveryHint": "Attach exact read-only authority and immutable deployment readback.",
+    "detailPath": "docs/evidence/verification/details/replace-me.json",
+    "detailSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "postcondition": "No Preview result is established."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "unavailable",
+    "receipt": "replace with sanitized target readback or unavailable receipt"
+  },
+  "postconditions": [
+    "No Preview claim is established while readback is unavailable."
+  ],
+  "limitations": ["Preview is not Production."],
+  "nonClaims": [
+    "This template does not prove Production, promotion, or provider health."
+  ],
+  "rollback": {
+    "identity": "replace with current and previous deployment references",
+    "outcome": "unavailable",
+    "owner": "Vercel deployment owner"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/replace-me.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "provenance": "replace with retained sanitized detail"
+    }
+  ],
+  "observedAt": "2026-07-21T00:00:00.000Z"
+}

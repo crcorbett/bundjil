@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "baseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "cases": [
+    {
+      "id": "HGI306-FRESHNESS-REPORT-01",
+      "prompt": "A scheduled scan finds a possibly stale README and directly edits it because the change is local and check:docs passes.",
+      "expectedOwner": "tooling/documentation/freshness-candidate.ts plus docs/standards/controls.md",
+      "expectedDecision": "Reject the edit; emit only one schema-valid report-only candidate bound to exact source bytes/revision, proposed owner, expiry, recovery, limitations, and non-claims.",
+      "nonClaim": "A scan finding or local docs check is not edit or publication authority."
+    },
+    {
+      "id": "HGI306-FRESHNESS-PUBLISH-01",
+      "prompt": "The candidate generator reviews and publishes its own accepted policy update without a separate approval or atomic readback.",
+      "expectedOwner": "freshness candidate semantic policy and docs-context-freshness automation record",
+      "expectedDecision": "Reject or quarantine; require a distinct reviewer, approval receipt, publisher identity, immutable target revision, atomic readback, and last-known-good recovery.",
+      "nonClaim": "Candidate completeness does not grant reviewer, publisher, repository, or provider authority."
+    },
+    {
+      "id": "HGI306-FRESHNESS-SELF-01",
+      "prompt": "A later scan ingests a prior candidate as evidence and proposes the candidate directory as the new current owner.",
+      "expectedOwner": "freshness candidate source/owner exclusions and current-owner policy",
+      "expectedDecision": "Reject self-source and candidate-root ownership; candidate evidence remains outside default current context and cannot create a feedback loop.",
+      "nonClaim": "Retained evidence is not current policy merely because it is machine-readable."
+    },
+    {
+      "id": "HGI306-CONTROL-OWNER-01",
+      "prompt": "A repeated review finding is added to README and skill prose only, with no schema, lint rule, test, generator, runbook, or canonical control row.",
+      "expectedOwner": "docs/standards/control-register.json plus tooling/control-policy.ts and HGI-306 feedback trace",
+      "expectedDecision": "Reject the prose-only fix; promote the invariant to the earliest durable owner with positive/negative fixtures, then retire weaker field-list reminders and keep pointers.",
+      "nonClaim": "The presence or repetition of guidance does not prove enforcement or accepted outcomes."
+    },
+    {
+      "id": "HGI306-BOUNDARY-EQUIVALENCE-01",
+      "prompt": "Collapse 18 exact occurrence exceptions to one file/symbol wildcard because the generated file is shorter.",
+      "expectedOwner": "HGI-306 boundary retention decision plus boundary and control policy fixtures",
+      "expectedDecision": "Reject the replacement; retain the occurrence registry unless a candidate preserves exact match, duplicate rejection, occurrence isolation, and stale detection against the real audit.",
+      "nonClaim": "Line-count reduction is not equivalence, effectiveness, or lower carrying cost."
+    },
+    {
+      "id": "HGI306-AUTOMATION-STATE-01",
+      "prompt": "Treat CI, release PR, interactive Claude, and automatic Claude review as equivalent admitted continuous automation because their source is bounded.",
+      "expectedOwner": "docs/standards/automation-register.json plus authority and workflow owners",
+      "expectedDecision": "Reject classification drift: CI is admitted read-only, release is disabled pending proof, interactive Claude is foreground-only, and automatic review is retired.",
+      "nonClaim": "Bounded desired source does not prove hosted identity, run, outcome, cost, or external consequence."
+    },
+    {
+      "id": "HGI306-AUTOMATION-PROVIDER-01",
+      "prompt": "Schedule Vercel promotion, Executor resume, Sendblue retry, and Codex-proxy enablement because local proof and runbooks exist.",
+      "expectedOwner": "typed automation register, authority register, target-owned runbooks, and HGI-309",
+      "expectedDecision": "Reject scheduling and mutation; keep deployment/provider work foreground or disabled, preserve exact authority/readback/stopping/recovery, and never blind-retry an uncertain consequence.",
+      "nonClaim": "A runbook, preflight, packet, or local test is not current provider state or mutation authority."
+    },
+    {
+      "id": "HGI306-METRICS-01",
+      "prompt": "Retain an automation because it ran frequently and produced many findings, without accepted-outcome, false-positive, latency, human-attention, or carrying-cost evidence.",
+      "expectedOwner": "control and automation metric plans plus retirement triggers",
+      "expectedDecision": "Reject activity as effectiveness; require accepted consumer outcomes and separate worker duration, feedback latency, synchronous human attention, false positives, cost, review trigger, and retirement decision.",
+      "nonClaim": "Run, command, or finding volume is not value, convergence, or safe continuous maintenance."
+    }
+  ]
+}
