@@ -11,6 +11,7 @@ import {
   PhotonLineId,
   PhotonProjectId,
   PhotonProjectSecret,
+  PhotonSubscriptionTier,
 } from "../src/schemas.js";
 
 const fixtures = Effect.gen(function* decodeManagementFixtures() {
@@ -21,6 +22,9 @@ const fixtures = Effect.gen(function* decodeManagementFixtures() {
     projectId: yield* Schema.decodeEffect(PhotonProjectId)("test-project"),
     projectSecret: yield* Schema.decodeEffect(PhotonProjectSecret)(
       Redacted.make("test-project-secret")
+    ),
+    subscriptionTier: yield* Schema.decodeEffect(PhotonSubscriptionTier)(
+      "business"
     ),
   };
 });
@@ -62,6 +66,21 @@ it.effect(
         const response = (() => {
           if (request.url.endsWith("platforms/") && request.method === "GET") {
             return { succeed: true, data: { imessage: { enabled: false } } };
+          }
+          if (
+            request.url.endsWith("billing/subscription") &&
+            request.method === "GET"
+          ) {
+            return {
+              succeed: true,
+              data: {
+                tier: "business",
+                status: "active",
+                cancel_at_period_end: false,
+                subscription_id: "subscription-secret",
+                customer_id: "customer-secret",
+              },
+            };
           }
           if (
             request.url.endsWith("platforms/") &&
@@ -113,16 +132,21 @@ it.effect(
       const result = yield* Effect.gen(function* runManagementOperations() {
         const management = yield* PhotonManagement;
         const before = yield* management.getIMessagePlatform();
+        const subscription = yield* management.getSubscription();
         const enabled = yield* management.setIMessagePlatformEnabled(true);
         const listed = yield* management.listDedicatedLines();
         const created = yield* management.createDedicatedLine();
         const deleted = yield* management.deleteDedicatedLine(fixture.lineId);
-        return { before, created, deleted, enabled, listed };
+        return { before, created, deleted, enabled, listed, subscription };
       }).pipe(
         Effect.provide(layer(client, fixture.projectId, fixture.projectSecret))
       );
 
       assert.deepStrictEqual(result.before, { enabled: false });
+      assert.deepStrictEqual(result.subscription, {
+        status: "active",
+        tier: fixture.subscriptionTier,
+      });
       assert.deepStrictEqual(result.enabled, { enabled: true });
       assert.deepStrictEqual(result.listed, [
         { id: fixture.lineId, status: "available" },
@@ -139,6 +163,11 @@ it.effect(
         {
           method: "GET",
           url: "https://spectrum.photon.codes/projects/test-project/platforms/",
+          urlParams: [],
+        },
+        {
+          method: "GET",
+          url: "https://spectrum.photon.codes/projects/test-project/billing/subscription",
           urlParams: [],
         },
         {

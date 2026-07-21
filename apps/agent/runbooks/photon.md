@@ -65,6 +65,12 @@ Sources: [API introduction](https://photon.codes/docs/api-reference/introduction
    Photon documents create/delete as a Business-plan subscription quantity and
    prorated billing consequence; record that classification and stop on an
    ambiguous write or billing mismatch.
+6. Read `/billing/subscription` before any line create. A new line is eligible
+   only when the decoded tier is `business` and subscription status is
+   `active`. A Free, canceled, past-due, missing, or unknown subscription is a
+   terminal stop. The management API documents subscription readback but no
+   subscription-upgrade operation, so do not infer authority or attempt to
+   change billing through another surface.
 
 ## Procedure
 
@@ -81,6 +87,7 @@ set -a
 source "$BUNDJIL_PHOTON_ENV_FILE"
 set +a
 bun run --filter @bundjil/photon proof:provider
+BUNDJIL_PHOTON_RESOURCE_MODE=inspect bun run --filter @bundjil/photon reconcile:resources
 unset PHOTON_PROJECT_ID PHOTON_PROJECT_SECRET
 ```
 
@@ -126,14 +133,16 @@ observation at that time. It never substitutes for the hosted procedure below.
    credential file is mode `0600`, load it without printing values, and run the
    focused/full local gates.
 2. Use authenticated management reads to decode the project, platform,
-   dedicated-line, and complete webhook inventories. Retain only sanitized
-   counts/state and protected stable-ID fingerprints. Never infer an owned
-   resource from list order, creation time, phone identity, or partial ID.
+   subscription, dedicated-line, and complete webhook inventories. Retain only
+   sanitized counts/state, tier/status, eligibility, and protected stable-ID
+   fingerprints. Never infer an owned resource from list order, creation time,
+   phone identity, or partial ID.
 3. Require iMessage enabled. If exactly one approved healthy dedicated line is
    present, adopt it. If none is present, create once, immediately list and
-   identify the new stable ID, and record the prorated billing consequence. If
-   the response is lost, list and reconcile before any retry. More than one
-   adoptable line or an unhealthy line is a stop.
+   identify the new stable ID, and record the prorated billing consequence—but
+   only after subscription readback proves active Business eligibility. If the
+   response is lost, list and reconcile before any retry. More than one
+   adoptable line, an unhealthy line, or an ineligible subscription is a stop.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only

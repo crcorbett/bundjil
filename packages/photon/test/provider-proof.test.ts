@@ -27,6 +27,7 @@ const unusedProvisioningOperations = {
   createDedicatedLine: () => Effect.die("unused createDedicatedLine"),
   deleteDedicatedLine: () => Effect.die("unused deleteDedicatedLine"),
   getIMessagePlatform: () => Effect.die("unused getIMessagePlatform"),
+  getSubscription: () => Effect.die("unused getSubscription"),
   listDedicatedLines: () => Effect.die("unused listDedicatedLines"),
   setIMessagePlatformEnabled: () =>
     Effect.die("unused setIMessagePlatformEnabled"),

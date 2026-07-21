@@ -9,6 +9,7 @@ import type { PhotonProviderProofOperation } from "./provider-proof.error.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
 import {
   PhotonLineId,
+  PhotonSubscriptionTier,
   PhotonWebhookId,
   PhotonWebhookSecret,
 } from "./schemas.js";
@@ -93,6 +94,24 @@ const PhotonPlatformsResponse = Schema.Struct({
   }),
 });
 
+const PhotonSubscriptionStatus = Schema.NullOr(
+  Schema.Literals(["active", "canceled", "past_due"])
+);
+
+const PhotonSubscriptionResponse = Schema.Struct({
+  status: Schema.Literal(200),
+  body: Schema.Struct({
+    succeed: Schema.Literal(true),
+    data: Schema.Struct({
+      tier: PhotonSubscriptionTier,
+      status: PhotonSubscriptionStatus,
+      cancel_at_period_end: Schema.Boolean,
+      subscription_id: Schema.NullOr(Schema.String),
+      customer_id: Schema.NullOr(Schema.String),
+    }),
+  }),
+});
+
 const PhotonListDedicatedLinesResponse = Schema.Struct({
   status: Schema.Literal(200),
   body: Schema.Struct({
@@ -172,6 +191,13 @@ interface PhotonManagementShape {
   >;
   readonly getIMessagePlatform: () => Effect.Effect<
     { readonly enabled: boolean },
+    PhotonProviderProofError
+  >;
+  readonly getSubscription: () => Effect.Effect<
+    {
+      readonly tier: typeof PhotonSubscriptionTier.Type;
+      readonly status: typeof PhotonSubscriptionStatus.Type;
+    },
     PhotonProviderProofError
   >;
   readonly listDedicatedLines: () => Effect.Effect<
@@ -313,6 +339,21 @@ export const layerPhotonManagementLive = (
               });
             }
             return { enabled: response.body.data.imessage.enabled };
+          }
+        ),
+        getSubscription: Effect.fn("PhotonManagement.getSubscription")(
+          function* () {
+            const response = yield* execute(
+              "getSubscription",
+              HttpClientRequest.get(
+                managementUrl(projectId, "billing/subscription")
+              ).pipe(HttpClientRequest.basicAuth(projectId, projectSecret)),
+              PhotonSubscriptionResponse
+            );
+            return {
+              status: response.body.data.status,
+              tier: response.body.data.tier,
+            };
           }
         ),
         listDedicatedLines: Effect.fn("PhotonManagement.listDedicatedLines")(

@@ -5,6 +5,7 @@ export const PhotonProviderProofOperation = Schema.Literals([
   "createDedicatedLine",
   "deleteDedicatedLine",
   "deleteWebhook",
+  "getSubscription",
   "getPlatforms",
   "listDedicatedLines",
   "listWebhooks",

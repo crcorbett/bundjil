@@ -74,6 +74,13 @@ performs one reversible proof-webhook lifecycle plus SDK acquire/release, and
 emits only a sanitised Schema receipt. It is not a deployment or messaging
 proof.
 
+`bun run --filter @bundjil/photon reconcile:resources` is the bounded hosted
+inventory edge. It defaults to read-only `inspect`; setting
+`BUNDJIL_PHOTON_RESOURCE_MODE=reconcile-line` may enable iMessage and adopt or
+create exactly one healthy dedicated line after active Business-subscription
+readback. Its Schema receipt contains counts, actions, tier/status eligibility,
+and billing-sync classification only.
+
 Production line, platform, webhook, and deployment reconciliation follows the
 same runbook but remains a distinct promotion workflow. Repository tests and
 the provider-only proof cannot stand in for immutable deployment, signed

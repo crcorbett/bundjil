@@ -279,7 +279,7 @@
     {
       "id": "reconcile-photon-resources-and-preview",
       "title": "Reconcile Photon resources and prove the hosted Preview",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["build-production-promotion-contracts"],
       "description": "Authenticate the approved Photon project, adopt or create one dedicated iMessage line, register an isolated Preview webhook, bind new Preview configuration, deploy the pushed candidate, and prove the clean Photon journey without Production traffic.",
       "implementationNotes": [
@@ -298,7 +298,11 @@
         "The Photon Preview journey and both typing transitions are proved, or the task records a terminal target-specific stop without claiming success.",
         "Production and Sendblue provider state remain unchanged in this task."
       ],
-      "evidence": [],
+      "evidence": [
+        "Safety and repository boundary: the ignored credential source was restricted from mode 0644 to 0600 without changing its contents. A new named Photon resource reconciler defaults to inspect-only, decodes subscription/platform/line/webhook responses through complete Schemas, exposes only sanitized counts/actions/tier-status eligibility, and permits one line create only after active Business readback. Four Photon suites now contain 19 tests for read-only inventory, active-Business create, unhealthy inventory stops, provider response decoding, provider proof, and transport behavior. Formatting, docs/skills/authority/controls/verification policies, Effect setup, boundaries and 76 boundary/control tests, lint, Knip, eight workspace typechecks, 239 workspace tests, Photon build, full verification, and diff checks passed.",
+        "Authenticated provider truth at 2026-07-21T17:02:52Z: iMessage was enabled, subscription tier was Free with no active subscription, dedicated-line count was zero, and webhook count was zero. Before the subscription eligibility guard was added, one create request returned the safe blocked result; it was not retried. Immediate and later authenticated readbacks both proved zero lines, zero webhooks, and no ambiguous resource or billing mutation.",
+        "Terminal Preview stop: Photon's current line contract is Business-plan-only and its management OpenAPI exposes subscription readback but no subscription-upgrade operation. Billing-policy activation is outside the accepted runbook. Therefore no Preview webhook, Vercel secret binding/deployment, inbound/outbound message, Photon typing transition, Sendblue/Upstash change, Production stage, or promotion followed. The dated sanitized owner is docs/verification/photon-resource-reconciliation-2026-07-21.md against pushed commit 130cb896fda27d493da8d3789552c9cf3b72541b. Reopen this task only after authenticated active-Business readback."
+      ],
       "commitAfterPassing": true
     },
     {

@@ -225,14 +225,14 @@ internal state/status/test structure:
 
 ### Promotion task progress
 
-| Task                               | Status    | Acceptance receipt                                                                                                         |
-| ---------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation |
-| Build promotion contracts          | Pending   | —                                                                                                                          |
-| Reconcile Photon and prove Preview | Pending   | —                                                                                                                          |
-| Stage dual-provider Production     | Pending   | —                                                                                                                          |
-| Promote and prove Production       | Pending   | —                                                                                                                          |
-| Reconcile docs and final audit     | Pending   | —                                                                                                                          |
+| Task                               | Status    | Acceptance receipt                                                                                                                                 |
+| ---------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                         |
+| Build promotion contracts          | Completed | Dual-provider preflight, authority, proof/runbook, line/platform management, 12 journeys, 236 tests, and full gate passed                          |
+| Reconcile Photon and prove Preview | Stopped   | Authenticated readback proved Free tier, active iMessage, zero lines/webhooks; one rejected create left zero lines; no Preview deployment followed |
+| Stage dual-provider Production     | Pending   | —                                                                                                                                                  |
+| Promote and prove Production       | Pending   | —                                                                                                                                                  |
+| Reconcile docs and final audit     | Pending   | —                                                                                                                                                  |
 
 ## Downstream-impact ledger
 
@@ -255,6 +255,23 @@ internal state/status/test structure:
 | AGENTS/skills                     | Preserve unless routing becomes incomplete             | Current task map and skills already route provider/package work                                           |
 | Frontend/browser/generated audits | N/A                                                    | No visible UI or generated documentation surface changes                                                  |
 | Codex/store/eve public contracts  | Preserve                                               | Store is consumed through its existing public atomic service; no other public package contract changes    |
+
+## Current external stop
+
+Task 3 reached a target-specific terminal stop on 2026-07-21. The ignored
+credential source was restricted from mode `0644` to `0600`. Authenticated
+Photon readback then proved iMessage enabled, zero dedicated lines, zero
+webhooks, Free tier, no active subscription, and line-creation ineligibility.
+One line-create request was rejected; immediate and later readback both proved
+zero lines, so no ambiguous provider resource or billing mutation remains.
+
+Photon's current OpenAPI describes dedicated line creation as Business-plan
+only and exposes subscription readback but no subscription-upgrade operation.
+The user must activate an eligible Business subscription in Photon before this
+task can be reopened. No Preview webhook, Vercel binding/deployment, message,
+typing operation, Sendblue change, Upstash change, or Production operation
+followed the stop. See the dated
+[`Photon resource reconciliation receipt`](../../verification/photon-resource-reconciliation-2026-07-21.md).
 
 ### Task 6 docs-maintainer accounting
 
