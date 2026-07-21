@@ -21,12 +21,13 @@ and task state.
   independent acceptance, full verification, and pushed Git identity are
   recorded in
   [`HGI-300-validation.json`](../../documentation-audit/HGI-300-validation.json).
-- **HGI-301 — acceptance pending:** the candidate Eve architecture distinguishes durable
+- **HGI-301 — completed:** the accepted Eve architecture distinguishes durable
   source topology from mutable provider state, and the dated reconciliation
   receipt records the unavailable provider readback rather than a production
   inference. Current implementation guidance is risk-based; tool data,
   policy, and approval are explicitly separate; executable semantic fixtures
-  are under fresh-context review.
+  and exact Git identity are recorded in
+  [`HGI-301-validation.json`](../../documentation-audit/HGI-301-validation.json).
 - HGI-308, HGI-302, HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307
   remain pending in dependency order. HGI-309 remains deferred until
   separately approved external authority exists.

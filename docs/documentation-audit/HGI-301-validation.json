@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-301",
+  "status": "accepted",
+  "observedAt": "2026-07-21T11:56:10+01:00",
+  "authority": "local Bundjil documentation, skill-policy, instruction, and test writes; Git commit and push to main; read-only local capability and remote-ref readback; no provider or deployment operation",
+  "baseCommit": "56fd1b972ede348872af6c2cf6e35843e53eba28",
+  "semanticCommit": "79e5b3239e0ce18889386cac47671e62e039de98",
+  "semanticTree": "fc06690a059bdd45f671718cb702fb44b1f5fa9f",
+  "changedPathCount": 13,
+  "sortedChangedPathSha256": "de79e0c4c6819f2f4a198030bac593be53caf624d8f644315ae7e5509fc5b10b",
+  "candidateReceiptSha256": "f545dcc0e9bf039928cabef61e01d85d23da55ad290ea5aec06cf0fd50a02ac6",
+  "sourceReceiptSha256": "e7355b1a24e5f4d2bc15508eae29fafe9c2e0329dbb9d2f6bdb57bf255cae375",
+  "contradictionFixtureSha256": "469f81d4cd5138ad8b0f631715669653ac538b379a6927570c80a3ee55be1b73",
+  "checks": [
+    {
+      "check": "source and capability reconciliation",
+      "status": "passed",
+      "result": "Code proves Gateway-default and conditional codex-proxy construction plus deployable app-owned adapters; unavailable Vercel/provider readback is dated and no production, webhook, credential, or handset actuality is inferred."
+    },
+    {
+      "check": "evaluator-driven correction and final acceptance",
+      "status": "passed",
+      "result": "Fresh evaluation exposed premature completion, residual three-pass ritual, an inert fixture, and a classifier that did not scan actual owners. After two correction rounds, the evaluator accepted the complete candidate."
+    },
+    {
+      "check": "semantic contradiction and current-owner policy",
+      "status": "passed",
+      "result": "Twenty-nine tooling tests reject seeded mutable-state, authority-confusion, and contradictory claims; scan actual Eve truth owners and fixed-ritual owners; and prove repository routing plus the primary trajectory."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "With a schema-valid synthetic Executor test configuration, Effect setup, boundary/skill audits, tooling tests, Ultracite, lint fixtures, Knip, five workspace typechecks, and 250 package/app tests passed without a provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "After push and fetch, local HEAD and origin/main both resolved to 79e5b3239e0ce18889386cac47671e62e039de98."
+    }
+  ],
+  "postcondition": "Bundjil HGI-301 has one truthful Eve architecture, risk-based current implementation guidance, an explicit tool-data trust boundary, executable contradiction controls, and immutable Git identity; HGI-308 is next.",
+  "rollback": "Revert the validation-receipt commit, then semantic commit 79e5b3239e0ce18889386cac47671e62e039de98; preserve HGI-300 and unrelated Codex reasoning/proxy work in base 56fd1b9.",
+  "limitations": [
+    "Local source, tests, and Git readback do not prove a Vercel deployment, provider connection, webhook registration, credential binding, handset outcome, or production behavior.",
+    "The configured 1Password signing agent failed to create commit objects, so HGI-301 commits used a per-command unsigned fallback; their content hashes, trees, ancestry, pushes, and remote readbacks are verified.",
+    "A target-owned fresh provider receipt remains required before any current external-state claim."
+  ],
+  "nonClaims": [
+    "No provider, deployment, webhook, credential, release, publication, production, or external system was read or mutated.",
+    "Tool output and successful local verification grant no approval or mutation authority."
+  ]
+}

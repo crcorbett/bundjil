@@ -35,19 +35,19 @@ bounded evidence, limitations, rollback, and exact Git identity.
 
 ## Tasks
 
-| Task                                                                                                                                    | State              | Acceptance owner                                                                                                             |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and README scope | Completed          | S1/S2 receipts, independent retrieval, verification, and `HGI-300-validation.json` Git receipt                               |
-| HGI-301 — architecture reconciliation and fixed-ritual removal                                                                          | Acceptance pending | Current architecture owners, reconciliation receipt, executable semantic contradiction fixtures, and fresh-context retrieval |
-| HGI-308 — provider, review, and control decisions                                                                                       | Pending            | Schema-valid decision records with explicit deferrals and inherited non-claims                                               |
-| HGI-302 — docs policy and skill-mirror controls                                                                                         | Pending            | Executable docs/skill checks with positive and negative fixtures                                                             |
-| HGI-310 — documentation-maintenance skill                                                                                               | Pending            | Thin repo-local skill, semantic fixtures, and clean-clone validation                                                         |
-| HGI-303 — app-owned operational runbooks                                                                                                | Pending            | `docs/runbooks/**` with preconditions, authority, steps, evidence, rollback, and escalation                                  |
-| HGI-304 — workflow and provider authority                                                                                               | Pending            | Identity, operation, target, environment, duration, approval boundary, audit receipt, rollback                               |
-| HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Pending            | `docs/verification/**`, artifact-matched evidence, and context-legible commands                                              |
-| HGI-306 — feedback, controls, and continuous automation                                                                                 | Pending            | Earliest-owner enforcement, automation admission, durable state, proof, and escalation                                       |
-| HGI-307 — harness requalification and repository closeout                                                                               | Pending            | Fresh-worker evaluation, accepted receipts, and pushed commit identity                                                       |
-| HGI-309 — external-authority application                                                                                                | Deferred           | Separately approved provider operations and external readback                                                                |
+| Task                                                                                                                                    | State     | Acceptance owner                                                                                                                 |
+| --------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and README scope | Completed | S1/S2 receipts, independent retrieval, verification, and `HGI-300-validation.json` Git receipt                                   |
+| HGI-301 — architecture reconciliation and fixed-ritual removal                                                                          | Completed | `HGI-301-validation.json`, current architecture owners, executable semantic contradiction fixtures, and fresh-context acceptance |
+| HGI-308 — provider, review, and control decisions                                                                                       | Pending   | Schema-valid decision records with explicit deferrals and inherited non-claims                                                   |
+| HGI-302 — docs policy and skill-mirror controls                                                                                         | Pending   | Executable docs/skill checks with positive and negative fixtures                                                                 |
+| HGI-310 — documentation-maintenance skill                                                                                               | Pending   | Thin repo-local skill, semantic fixtures, and clean-clone validation                                                             |
+| HGI-303 — app-owned operational runbooks                                                                                                | Pending   | `docs/runbooks/**` with preconditions, authority, steps, evidence, rollback, and escalation                                      |
+| HGI-304 — workflow and provider authority                                                                                               | Pending   | Identity, operation, target, environment, duration, approval boundary, audit receipt, rollback                                   |
+| HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Pending   | `docs/verification/**`, artifact-matched evidence, and context-legible commands                                                  |
+| HGI-306 — feedback, controls, and continuous automation                                                                                 | Pending   | Earliest-owner enforcement, automation admission, durable state, proof, and escalation                                           |
+| HGI-307 — harness requalification and repository closeout                                                                               | Pending   | Fresh-worker evaluation, accepted receipts, and pushed commit identity                                                           |
+| HGI-309 — external-authority application                                                                                                | Deferred  | Separately approved provider operations and external readback                                                                    |
 
 ## Non-goals and authority
 
@@ -62,7 +62,7 @@ owners. The retained completed SPEC/plan corpus preserves rollout provenance;
 it is not a substitute for the pending HGI-303 runbook, HGI-304 authority, or
 HGI-305 verification owners.
 
-The HGI-301 candidate reconciles the current Eve architecture to source-backed topology and
+HGI-301 reconciles the current Eve architecture to source-backed topology and
 invariants. Its dated read-only reconciliation is addressable at
 [`HGI-301-eve-reconciliation.json`](../documentation-audit/HGI-301-eve-reconciliation.json);
 it records that provider readback was unavailable in this implementation
