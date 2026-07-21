@@ -251,8 +251,10 @@ packages/photon/
 
 The package owns Photon signature/body codecs, the private Spectrum SDK and
 Space lifecycle, SDK result decoding, safe provider errors, and
-`ChannelTransport` Layers. It exposes no SDK client, Zod type, raw callback,
-management operation, or unchecked SDK result.
+`ChannelTransport` Layers. Webhook authentication/decoding must construct
+without acquiring Spectrum; send and presence each acquire and release one
+operation-scoped SDK resource. It exposes no SDK client, Zod type, raw
+callback, management operation, or unchecked SDK result.
 
 All three packages use `@bundjil/source` plus explicit `types` and `default`
 exports. Provider packages depend inward on `@bundjil/channel`; none depends on
@@ -523,9 +525,15 @@ Eve framework event callback
 POST /eve/v1/photon/webhook
   -> equivalent thin Eve adapter
   -> Channel.layerLive
-       -> @bundjil/photon ChannelTransport.layerLive
+       -> @bundjil/photon ChannelTransport.layerLive (no SDK acquisition)
        -> same app identity/replay/orchestration services
   -> decoded common message -> claim -> Eve dispatch -> provider send
+       -> PhotonClient.sendMessage
+            -> acquire Spectrum -> resolve opaque Space -> send -> stop
+
+Eve presence event
+  -> PhotonClient.setPresence
+       -> acquire Spectrum -> resolve opaque Space -> start/stop typing -> stop
 ```
 
 Provider choice exists only in the composition-root Layer. Domain operations
@@ -742,7 +750,9 @@ domain and retain previous deployment/config references for rollback.
 - Which precise new Sendblue config values are required, and can an isolated
   Preview account/line prove them without touching the shared Production line?
 - Can Photon deterministically finish webhook work under Eve `waitUntil`, and
-  does its SDK release resources in the Vercel runtime?
+  do the operation-scoped send and presence SDK resources release in the
+  Vercel runtime? Hosted signed-webhook authentication must not acquire the
+  outbound SDK.
 - What stable Space identity is required after cold start, and how is an
   ambiguous send prevented from being retried?
 - Can the existing Sendblue receive webhook be replaced atomically enough to

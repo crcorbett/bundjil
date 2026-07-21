@@ -43,14 +43,17 @@ authored modules so Nitro traces this dependency graph into the server output.
 
 `Spectrum(...)` acquires the app asynchronously; `imessage(app).space.get(id)`
 resolves a cold Space; Space send and typing operations return Promises; and
-`app.stop()` releases the SDK. The live Layer brackets those operations with
-`Effect.acquireRelease`. Its finalizer emits only a safe lifecycle tag if
+`app.stop()` releases the SDK. The live Layer is construction-safe for a
+serverless webhook: signature verification and payload decoding do not acquire
+Spectrum. Each outbound send or presence operation brackets one SDK resource
+with `Effect.acquireUseRelease`, then emits only a safe lifecycle tag if final
 cleanup fails. The SDK's webhook helper is deliberately not used because its
 handler is fire-and-forget. Bundjil instead follows Photon's documented raw-
 body HMAC contract and keeps deterministic completion in the Eve `waitUntil`
 program.
 
 Upstream references: [lean Spectrum installation](https://photon.codes/docs/spectrum-ts/getting-started),
+[serverless webhook guidance](https://photon.codes/docs/webhooks/overview),
 [webhook wire format](https://photon.codes/docs/webhooks/events),
 [signature verification](https://photon.codes/docs/webhooks/verifying-signatures),
 and [iMessage routing](https://photon.codes/docs/spectrum-ts/providers/imessage/connection-and-routing).

@@ -26,7 +26,6 @@ import * as TestClock from "effect/testing/TestClock";
 
 import { layerClient, PhotonClient } from "../src/client.js";
 import type { PhotonClientShape, PhotonSdkFactory } from "../src/client.js";
-import { PhotonLifecycleError } from "../src/errors.js";
 import {
   PhotonConfig,
   PhotonMessagesWebhook,
@@ -478,23 +477,63 @@ it.effect(
     })
 );
 
-it.effect("models acquisition failure with a safe tagged error", () =>
-  Effect.gen(function* testPhotonAcquisitionFailure() {
+it.effect(
+  "models operation-scoped acquisition failure without eager setup",
+  () =>
+    Effect.gen(function* testPhotonAcquisitionFailure() {
+      const fixture = yield* fixtures;
+      let acquisitions = 0;
+      const clientLayer = layerClient(fixture.config, {
+        acquire: async () => {
+          acquisitions += 1;
+          throw new Error("private acquisition detail");
+        },
+      });
+      const client = yield* PhotonClient.pipe(Effect.provide(clientLayer));
+
+      assert.strictEqual(acquisitions, 0);
+
+      const result = yield* client
+        .sendMessage(fixture.conversation.conversationId, fixture.text)
+        .pipe(Effect.result);
+
+      assert.strictEqual(Result.isFailure(result), true);
+      const error = Option.getOrThrow(Result.getFailure(result));
+      assert.strictEqual(Schema.is(ChannelUnavailableError)(error), true);
+      assert.strictEqual(acquisitions, 1);
+      assert.notInclude(String(error), "private acquisition detail");
+    })
+);
+
+it.effect("verifies webhooks without acquiring the outbound SDK", () =>
+  Effect.gen(function* testLazyPhotonWebhookBoundary() {
     const fixture = yield* fixtures;
-    const result = yield* PhotonClient.pipe(
-      Effect.provide(
+    let acquisitions = 0;
+    const transportLayer = layerTransport(fixture.config).pipe(
+      Layer.provide(
         layerClient(fixture.config, {
           acquire: async () => {
-            throw new Error("private acquisition detail");
+            acquisitions += 1;
+            throw new Error("outbound SDK must stay lazy");
           },
         })
-      ),
-      Effect.result
+      )
+    );
+    const transport = yield* ChannelTransport.pipe(
+      Effect.provide(transportLayer)
     );
 
-    assert.strictEqual(Result.isFailure(result), true);
-    const error = Option.getOrThrow(Result.getFailure(result));
-    assert.strictEqual(Schema.is(PhotonLifecycleError)(error), true);
-    assert.notInclude(String(error), "private acquisition detail");
+    const unsupportedBody = '{"event":"health"}';
+    const result = yield* transport.decodeWebhook(
+      request(unsupportedBody, {
+        event: "health",
+      })
+    );
+
+    assert.deepStrictEqual(result, {
+      _tag: "Ignored",
+      reason: "unsupportedEvent",
+    });
+    assert.strictEqual(acquisitions, 0);
   })
 );

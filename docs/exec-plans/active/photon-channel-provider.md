@@ -303,6 +303,28 @@ those corrected contracts pass. See the retained
   documentation. The bootstrap Preview has no alias and establishes no
   Production, message, delivery, or typing claim.
 
+### Task 3 serverless-runtime correction
+
+The first configured Preview reached the application through Vercel's
+task-scoped automation bypass, but webhook POSTs failed during eager Spectrum
+Layer acquisition before signature verification. Photon documents webhooks as
+the serverless ingress boundary and the SDK as the runtime boundary for
+outbound control. The package now constructs its live transport without SDK
+I/O; `sendMessage` and `setPresence` each own an operation-scoped
+`Effect.acquireUseRelease` lifecycle. A contract test proves that a valid
+signed ignored event performs zero SDK acquisitions. The hosted 401/204
+readback remains pending on the corrected immutable deployment.
+
+- **Change required:** `@bundjil/photon` client lifecycle and contract tests;
+  package README; SPEC runtime call graph and unresolved lifecycle boundary;
+  this active execution record.
+- **Preserve:** Channel schemas/state/replay, Photon wire Schemas and HMAC
+  verification, Sendblue behavior, management reconciliation, Vercel binding,
+  authority/controls, historical receipts, and unrelated documentation.
+- **N/A:** frontend, DNS, public release, data migration, generated API docs,
+  and Production evidence. The failed Preview requests sent no provider
+  message and establish no outbound, typing, handset, or Production claim.
+
 ### Task 6 docs-maintainer accounting
 
 - **Changed:** root README; agent README; docs/architecture/research routers;

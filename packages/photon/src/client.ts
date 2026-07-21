@@ -107,40 +107,53 @@ export const provePhotonSdkLifecycle = (config: PhotonConfig) =>
       })
   );
 
-export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
-  Layer.effect(
-    PhotonClient,
-    Effect.acquireRelease(
-      Effect.tryPromise({
-        try: () => factory.acquire(config),
-        catch: () =>
-          new PhotonLifecycleError({
-            operation: "acquire",
-            reason: "unavailable",
-          }),
+const releasePhotonResource = (resource: PhotonSdkResource) =>
+  Effect.tryPromise({
+    try: () => resource.stop(),
+    catch: () =>
+      new PhotonLifecycleError({
+        operation: "release",
+        reason: "unavailable",
       }),
-      (resource) =>
-        Effect.tryPromise({
-          try: () => resource.stop(),
-          catch: () =>
-            new PhotonLifecycleError({
-              operation: "release",
-              reason: "unavailable",
-            }),
-        }).pipe(
-          Effect.tapError(() =>
-            Effect.logError("PhotonLifecycleError", {
-              operation: "release",
-              reason: "unavailable",
-            })
-          ),
-          Effect.ignore
-        )
-    ).pipe(
-      Effect.map((resource) =>
-        PhotonClient.of({
-          sendMessage: Effect.fn("PhotonClient.sendMessage")(
-            function* (conversationId, text) {
+  }).pipe(
+    Effect.tapError(() =>
+      Effect.logError("PhotonLifecycleError", {
+        operation: "release",
+        reason: "unavailable",
+      })
+    ),
+    Effect.ignore
+  );
+
+const withPhotonResource = <A, E>(
+  config: PhotonConfig,
+  factory: PhotonSdkFactory,
+  operation: "sendMessage" | "setPresence",
+  use: (resource: PhotonSdkResource) => Effect.Effect<A, E>
+) =>
+  Effect.acquireUseRelease(
+    Effect.tryPromise({
+      try: () => factory.acquire(config),
+      catch: () =>
+        new ChannelUnavailableError({
+          provider: "photon",
+          operation,
+          reason: "transport",
+          retry: "backoff",
+        }),
+    }),
+    use,
+    releasePhotonResource
+  );
+
+export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
+  Layer.succeed(
+    PhotonClient,
+    PhotonClient.of({
+      sendMessage: Effect.fn("PhotonClient.sendMessage")(
+        (conversationId, text) =>
+          withPhotonResource(config, factory, "sendMessage", (resource) =>
+            Effect.gen(function* sendPhotonMessage() {
               const space = yield* Effect.tryPromise({
                 try: () => resource.resolveSpace(conversationId),
                 catch: () =>
@@ -174,10 +187,13 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     })
                 )
               );
-            }
-          ),
-          setPresence: Effect.fn("PhotonClient.setPresence")(
-            function* (conversationId, action) {
+            })
+          )
+      ),
+      setPresence: Effect.fn("PhotonClient.setPresence")(
+        (conversationId, action) =>
+          withPhotonResource(config, factory, "setPresence", (resource) =>
+            Effect.gen(function* setPhotonPresence() {
               const space = yield* Effect.tryPromise({
                 try: () => resource.resolveSpace(conversationId),
                 catch: () =>
@@ -198,11 +214,10 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     retry: "backoff",
                   }),
               });
-            }
-          ),
-        })
-      )
-    )
+            })
+          )
+      ),
+    })
   );
 
 export const layerClientLive = (config: PhotonConfig) =>
