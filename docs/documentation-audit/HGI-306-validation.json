@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "status": "accepted",
+  "observedAt": "2026-07-21T17:14:00+01:00",
+  "authority": "repository source, documentation, policy, local fixtures, tests, evidence, Git commit, main push, and remote-ref readback only; no provider, deployment, environment-value, secret, message, approval-resume, delivery, rollback, or Production readback or mutation",
+  "baseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "implementationCommit": "0b33ba2412a7fb07f69f67b2b972bfadefa7a214",
+  "implementationTree": "f004b4f434f42a8784a552cca5d513875fc46685",
+  "changedPathCount": 37,
+  "sortedChangedPathSha256": "f5d20793ebd7c21c3c7e73fc7caf9710707ce94c3b01c880d52cb8d69a706459",
+  "candidateReceiptSha256": "8c9813cce30824d51e827c0b7ea75062f273c95603d5ede2fdec221dc993821b",
+  "sourceInventorySha256": "91f988c3a279b466bb7590e2a6d46898e3ff478fbe2519b588d0f3c03208bff0",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "scenarioResults": [
+    {
+      "id": "HGI306-FRESHNESS-REPORT-01",
+      "sha256": "74e3fe30a6637e6d4a9fc050a039c066b9cc38d16178698958e6a4ab39aa683d"
+    },
+    {
+      "id": "HGI306-FRESHNESS-PUBLISH-01",
+      "sha256": "f35499a03eb3931c0c8361b84f6d53a25a0b6bd4db7b3b09ac53c90bf69c65eb"
+    },
+    {
+      "id": "HGI306-FRESHNESS-SELF-01",
+      "sha256": "9933407dd7c35a1e733b3d712a4731fe9c79bf20321304d14cc629b24e911457"
+    },
+    {
+      "id": "HGI306-CONTROL-OWNER-01",
+      "sha256": "3aedefc3a0a0bad0208ab33e25cfb74df5d035524c7639fb50ed681181c3f432"
+    },
+    {
+      "id": "HGI306-BOUNDARY-EQUIVALENCE-01",
+      "sha256": "1ed6ce6b976c30c0ff3649183637c55bdfc2acb71121a07b667c9880306b52fe"
+    },
+    {
+      "id": "HGI306-AUTOMATION-STATE-01",
+      "sha256": "cd35ae9df2bbb85925898ec04b72f3d56e206cea8cdc018743c605515ba9e3fa"
+    },
+    {
+      "id": "HGI306-AUTOMATION-PROVIDER-01",
+      "sha256": "5fc1ac163049d06580c00ae8efba8843bb16745414326b1a53cb7909f9a39798"
+    },
+    {
+      "id": "HGI306-METRICS-01",
+      "sha256": "0a2d4cd6f533cf16596e09c88654f22339341b5947727c6c778bc0fffb395dbc"
+    }
+  ],
+  "checks": [
+    {
+      "check": "control and automation policy",
+      "status": "passed",
+      "result": "Eight controls, eleven automations, one report-only freshness candidate, and 17 focused semantic fixtures passed; every control and automation row has addressable fixtures plus owner, cost, metrics, review, and retirement data."
+    },
+    {
+      "check": "feedback, boundary equivalence, and freshness isolation",
+      "status": "passed",
+      "result": "The repeated freshness rule moved to its typed owner, weaker skill prose was retired, the measured 18-row boundary registry retained all four required properties, and generator/reviewer/publisher and candidate-context separations are enforced."
+    },
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "A fresh Terra reviewer recomputed all 25 source hashes and the referenced source digest, found the missing automation-fixture contract, and passed all eight scenarios after the schema, register, audit, and negative fixture were corrected."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, 224-file docs policy, 167-file/16-mirror skill policy, three-workflow authority policy, controls, ten journeys, 76 tooling tests, type-aware Ultracite, lint fixture, Knip, five typechecks, and 262 app/package tests passed with the public synthetic Executor endpoint and no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Semantic commit 0b33ba2412a7fb07f69f67b2b972bfadefa7a214 was pushed; after fetch, local HEAD and origin/main resolved to that commit with tree f004b4f434f42a8784a552cca5d513875fc46685 and the declared 37-path digest."
+    }
+  ],
+  "postcondition": "Bundjil now owns a routed, typed, fixture-backed control and automation system that promotes repeated feedback to earlier durable owners, keeps exploratory and consequential work foregrounded, isolates report-only freshness evidence, measures outcomes and human attention, and states external limits honestly.",
+  "rollback": "Revert this closeout and 0b33ba2412a7fb07f69f67b2b972bfadefa7a214 together while preserving HGI-300 through HGI-305, HGI-308, and HGI-310 evidence and all unchanged provider state.",
+  "limitations": [
+    "HGI-306 defines measurement plans but does not fabricate historical accepted-outcome, false-positive, latency, attention, duration, or cost observations.",
+    "Repository source, local fixtures, fresh-context review, and Git readback do not prove hosted workflows, provider state, deployment, delivery, approval, rollback, recovery, health, or Production actuality.",
+    "The semantic commit is unsigned because the configured 1Password signing agent remains unavailable; content, tree, ancestry, push, and remote identity are independently verified."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored operational artifact, credential, secret, deployment, alias, webhook, message, delivery, approval resume, rollback, recovery, or Production system was read or changed.",
+    "A local register, test, runbook, candidate, model review, successful command, or unavailable readback is not external proof or operation authority."
+  ]
+}

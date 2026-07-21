@@ -66,13 +66,14 @@ and task state.
   receipts, false-success fixtures, honest deferred/inconclusive routes,
   accepted local proof, and fresh-context evidence are recorded in
   [`HGI-305-validation.json`](../../documentation-audit/HGI-305-validation.json).
-- **HGI-306 — in progress:** the routed control standard, eight typed controls,
-  eleven automation/provider-loop states, measured occurrence-registry
-  retention, report-only freshness candidate, feedback promotion, and
-  adversarial policy fixtures are implemented locally. Acceptance still
-  requires full verification, fresh-context scenario review, exact evidence,
-  and Git publication/readback.
-- HGI-307 remains pending. HGI-309 remains deferred until separately approved
+- **HGI-306 — completed:** the routed control standard, eight typed controls,
+  eleven fixture-backed automation/provider-loop states, measured
+  occurrence-registry retention, report-only freshness candidate, feedback
+  promotion, outcome/attention metrics, full verification, fresh-context
+  acceptance, and semantic Git readback are recorded in
+  [`HGI-306-validation.json`](../../documentation-audit/HGI-306-validation.json).
+- **HGI-307 — next:** requalify the harness and close the repository campaign.
+  HGI-309 remains deferred until separately approved
   external authority exists.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,
