@@ -1,22 +1,29 @@
 # @bundjil/store
 
-Provider-neutral storage contracts for Bundjil Effect programs.
+Provider-neutral persistence contracts and explicit test/provider Layers for
+Bundjil Effect programs.
 
-- `@bundjil/store` exports `AtomicKeyValueStore` and its canonical Schema contracts.
-- `@bundjil/store/memory` exports `PersistenceMemory` for coherent deterministic tests.
-- `@bundjil/store/upstash` exports `UpstashPersistenceLive(options)` and its redacted provider options.
+## Public boundary
 
-Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary string and binary persistence. Its import path is unstable and this package pins the behavior with contract tests. Native `KeyValueStore.modify` is not an atomic coordination primitive. Claims, locks, fencing, and concurrent transitions must use `AtomicKeyValueStore.transact`.
+- `@bundjil/store` exposes the package-owned persistence contracts.
+- `@bundjil/store/memory` exposes deterministic test composition.
+- `@bundjil/store/upstash` exposes the hosted-provider Layer.
 
-The Upstash adapter scopes all ordinary operations to its supplied prefix. `clear` and `size` scan that namespace and are weakly consistent under concurrent writes; they must never be used for coordination.
+The package export map and source are authoritative for the exact API. Storage
+semantics and coordination rules belong to the architecture owner, not a
+README copy.
 
-## String Contracts
+## Supported commands
 
-`AtomicKeyValueStoreKey` and `AtomicKeyValueStoreValue` are this package's
-canonical checked brands. Decode the complete transaction at the persistence
-boundary and retain the encoded Redis bytes unchanged. `AtomicKeyValueStore`
-outcomes and operations are named literals and callers use `Match` for
-material outcomes. Upstash command arguments and response fragments remain
-private transport strings; tagged-error messages remain diagnostics. Do not
-add shared schema helpers, unsafe brand assertions, or production `decodeSync`
-constructors.
+Run from the repository root:
+
+```bash
+bun run --filter @bundjil/store test
+bun run --filter @bundjil/store build
+```
+
+## Durable routes
+
+- [Effect patterns](../../docs/architecture/effect-patterns.md)
+- [Testing and quality](../../docs/architecture/testing-and-quality.md)
+- [Repository structure](../../docs/architecture/repo-structure.md)

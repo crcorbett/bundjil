@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "taskId": "HGI-300-S1",
-  "observedAt": "2026-07-20T19:08:00+02:00",
-  "baseCommit": "527fc344dfe2629f54912d63f74dad19850ed348",
+  "taskId": "HGI-300-S2",
+  "observedAt": "2026-07-21T00:30:57+01:00",
+  "baseCommit": "8ae65faecddffeffa227cc473c8eaf28533691cb",
   "scope": "tracked repository-owned docs/** and README.md paths; deleted pre-move paths excluded and retained successors included",
   "preChange": {
     "docsFiles": 44,
@@ -11,24 +11,24 @@
     "completedPlanInActiveRoute": 1
   },
   "postSlice": {
-    "docsFiles": 56,
+    "docsFiles": 60,
     "readmePaths": 15,
-    "readableDocsFiles": 56,
-    "sortedDocsPathSha256": "8b61d9e5be32afbd48343defee0a0cf840ef3f81b906f59a63efe405aa851723",
+    "readableDocsFiles": 60,
+    "sortedDocsPathSha256": "661f1f90c6274da1d731058f556c836c12e03404208f6c21a6af63da0cd9045f",
     "sortedReadmePathSha256": "d1763ea57125e7e52af834b3396adc4bdbeb77f0e735585dfef73707a54497ef"
   },
   "docsByTopLevelBucket": {
     "README.md": 1,
     "architecture": 7,
-    "documentation-audit": 5,
+    "documentation-audit": 6,
     "exec-plans": 14,
-    "product-specs": 27,
+    "product-specs": 29,
     "reference-repositories.md": 1,
-    "research": 1
+    "research": 2
   },
   "docsByExtension": {
-    "json": 16,
-    "md": 40
+    "json": 18,
+    "md": 42
   },
   "classification": {
     "maintainerRouter": "docs/README.md",
@@ -61,15 +61,18 @@
     },
     "researchRoute": "docs/research/README.md",
     "rootReadmePolicy": "Product purpose, stable repo shape, routes, and local commands only; mutable provider/deployment proof removed.",
+    "readmeScope": "Root, app, and package READMEs contain purpose, public boundaries, public commands, and durable routes only; operator procedure and dated provider/deployment proof were removed in S2.",
     "knownMissingOwners": [
-      "docs/runbooks/** target-owned operations (HGI-304)",
-      "docs/verification/** critical journeys and proof (HGI-303)"
+      "docs/runbooks/** target-owned operations (HGI-303)",
+      "workflow and provider authority (HGI-304)",
+      "docs/verification/** critical journeys and proof (HGI-305)"
     ]
   },
   "postcondition": "All retained paths contribute to deterministic digests; completed plans/ledgers and research remain reachable outside default current context; no historical content was deleted.",
   "limitations": [
     "Path counts do not prove semantic correctness.",
-    "App/package README runbook and proof extraction continues in later HGI-300 slices."
+    "HGI-300-S2 leaves no operator procedure or dated provider/deployment proof in root, app, or package READMEs.",
+    "HGI-303 runbook, HGI-304 authority, and HGI-305 verification owners do not yet exist; their absence is an explicit dependency-gated gap rather than a README-owned procedure."
   ],
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is proved."

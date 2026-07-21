@@ -100,7 +100,7 @@
         "Add BUNDJIL_CODEX_PROXY_MODEL to @bundjil/agent#build env so eve build observes the selected override; use gpt-5.6-terra and 1050000 in target fixtures.",
         "Keep the exact Eve provider identity assertion bundjil-codex-proxy/gpt-5.6-terra and add context-window assertions.",
         "Update prove-preview to issue gpt-5.6-terra, require configured/observed high evidence, retain status:block on failures, and emit only safe booleans/counters/statuses.",
-        "Update root/package/proxy/agent READMEs, .env.example, docs/architecture/eve-agent.md, and docs/product-specs/index.md. Preserve labeled gpt-5.5 historical evidence."
+        "Update the environment sample, docs/architecture/eve-agent.md, docs/product-specs/index.md, and the canonical SPEC/task owners. Preserve labeled gpt-5.5 historical evidence; app READMEs are governed by HGI-300 and must not retain provider actuality or runbook content."
       ],
       "mandatoryVerification": [
         "Agent injected-fetch test asserts target model identity, 1050000 context window, private bearer non-leak, and no raw reasoning control is sent by the agent request.",
@@ -116,7 +116,7 @@
       "acceptedEvidence": [
         "turbo.json now admits BUNDJIL_CODEX_PROXY_MODEL to @bundjil/agent#build. The agent's injected-fetch test selects gpt-5.6-terra, asserts the exact bundjil-codex-proxy model identity, uses context 1050000, and proves neither bearer nor a reasoning control enters the adapter request.",
         "The proxy health schema exposes only the safe effective reasoning effort. proof:preview requests gpt-5.6-terra and succeeds only for live/ready/high health, authenticated SSE completion, both 401 bearer controls, and all safe leak predicates. Its fixture captures schema-decoded chat requests and proves Terra plus no client reasoning field.",
-        "Updated .env.example, the agent/proxy READMEs, Eve architecture guide, active plan, and product-spec index state configuration owners, the target values, proof limits, monitoring field, and gpt-5.5/200000/low rollback. Historical gpt-5.5 claims remain labeled historical.",
+        "Updated .env.example, the Eve architecture guide, active plan, and product-spec index state configuration owners, the target values, proof limits, monitoring field, and gpt-5.5/200000/low rollback. HGI-300's current README boundaries intentionally omit provider actuality and runbooks. Historical gpt-5.5 claims remain labeled historical.",
         "Focused verification passed: bun run --filter @bundjil/codex-proxy test (31), check-types, build, and smoke-test; BUNDJIL_EXECUTOR_MCP_URL=https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model bun run --filter @bundjil/agent test (79) and check-types; git diff --check. Browser verification is N/A: no visible route changed.",
         "Ownership/call graph: apps/agent owns model/context and the proxy owns effort/health; @bundjil/codex remains the Responses mapper boundary. Implementation quality: no raw semantic input, cast, generic callback, manual runtime codec, or helper sprawl. Verification coverage separates fixture/local proof from the still-pending subscription endpoint proof."
       ]

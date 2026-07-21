@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "taskId": "HGI-300-S1",
-  "observedAt": "2026-07-20T19:08:00+02:00",
-  "baseCommit": "527fc344dfe2629f54912d63f74dad19850ed348",
+  "taskId": "HGI-300-S2",
+  "observedAt": "2026-07-21T00:30:57+01:00",
+  "baseCommit": "8ae65faecddffeffa227cc473c8eaf28533691cb",
   "checkedFiles": [
     "AGENTS.md",
     "README.md",
@@ -15,9 +15,14 @@
     "docs/exec-plans/active/harness-governance-documentation.md",
     "docs/exec-plans/completed/README.md",
     "docs/research/README.md",
-    "docs/documentation-audit/README.md"
+    "docs/documentation-audit/README.md",
+    "apps/agent/README.md",
+    "apps/codex-proxy/README.md",
+    "packages/codex/README.md",
+    "packages/eve/README.md",
+    "packages/store/README.md"
   ],
-  "relativeLinksChecked": 60,
+  "relativeLinksChecked": 81,
   "missingRelativeTargets": [],
   "successorChecks": [
     {
@@ -32,12 +37,12 @@
       "status": "resolved"
     },
     {
-      "oldRoute": "root mutable provider/deployment prose",
-      "successor": "external readback plus future docs/runbooks/** and docs/verification/** owners",
+      "oldRoute": "README operator procedure and dated provider/deployment proof",
+      "successor": "retained completed provenance plus future docs/runbooks/** and docs/verification/** owners",
       "status": "explicit-gap"
     }
   ],
-  "postcondition": "All 60 relative links in changed current routes resolve; active/current, completed/history, research/reference, architecture, operations/proof gaps, and external actuality are distinctly routed.",
+  "postcondition": "All 81 relative links in S2 changed current routes resolve; active/current, completed/history, research/reference, architecture, future operations/proof gaps, and external actuality are distinctly routed.",
   "limitations": [
     "Focused changed-route checks do not prove every historical link or app/package runtime."
   ],

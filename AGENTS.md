@@ -45,9 +45,11 @@ the narrowest current owner; do not load completed rollout history by default.
 - Current SPEC/tasks: `docs/product-specs/index.md`
 - Current execution: `docs/exec-plans/active/README.md`
 - Completed history: `docs/exec-plans/completed/README.md`
-- Package/provider operations currently embedded in package READMEs are an
-  explicit HGI-304 extraction gap; do not treat dated proof there as current
-  provider truth.
+- App and package READMEs are purpose, public-boundary, and public-command
+  maps only. HGI-303 owns the still-missing target-owned operation routes,
+  HGI-304 owns workflow/provider authority, and HGI-305 owns bounded proof
+  routes; do not treat README pointers or retained history as current provider
+  truth.
 
 ## Verification and authority
 

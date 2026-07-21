@@ -33,16 +33,16 @@ authority.
 
 ## Downstream-impact ledger
 
-| Surface                                       | Status          | Reason                                                                                                                                      |
-| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture/product docs                     | Change required | Update the SPEC/task state and current runbooks as implementation completes; retain historical gpt-5.5 proof labels.                        |
-| Root, package, and app READMEs/runbooks       | Change required | Target configuration, proof boundary, and rollback documentation changes in the agent/proxy alignment slice.                                |
-| `AGENTS.md` and skills                        | N/A             | Current instructions already own this provider/config pattern; no contradiction found.                                                      |
-| Schemas, types, services, Layers, exports     | Change required | Add the provider effort/policy contract and explicit live/test wiring.                                                                      |
-| Lint, diagnostics, boundary rules, CI/scripts | Change required | Test the new source with the existing language-service, boundary, skill, and verification gates; change Turbo/proof script in later slices. |
-| Tests, fixtures, HTTP/provider evidence       | Change required | Add deterministic mapper/config/handler tests; Preview proof requires separate authority.                                                   |
-| Observability, rollout, migration, rollback   | Change required | Define safe policy observation and target/rollback documentation before any deployment task.                                                |
-| SPEC, task ledger, active-plan index          | Change required | This active plan and the sibling ledger record accepted task evidence.                                                                      |
+| Surface                                       | Status          | Reason                                                                                                                                                                                            |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture/product docs                     | Change required | Update the SPEC/task state and current runbooks as implementation completes; retain historical gpt-5.5 proof labels.                                                                              |
+| Root, package, and app READMEs/runbooks       | N/A by HGI-300  | Current app README owners intentionally exclude provider actuality and operator runbooks; the SPEC, task ledger, environment sample, and architecture owner retain the target and proof boundary. |
+| `AGENTS.md` and skills                        | N/A             | Current instructions already own this provider/config pattern; no contradiction found.                                                                                                            |
+| Schemas, types, services, Layers, exports     | Change required | Add the provider effort/policy contract and explicit live/test wiring.                                                                                                                            |
+| Lint, diagnostics, boundary rules, CI/scripts | Change required | Test the new source with the existing language-service, boundary, skill, and verification gates; change Turbo/proof script in later slices.                                                       |
+| Tests, fixtures, HTTP/provider evidence       | Change required | Add deterministic mapper/config/handler tests; Preview proof requires separate authority.                                                                                                         |
+| Observability, rollout, migration, rollback   | Change required | Define safe policy observation and target/rollback documentation before any deployment task.                                                                                                      |
+| SPEC, task ledger, active-plan index          | Change required | This active plan and the sibling ledger record accepted task evidence.                                                                                                                            |
 
 ## Deferred external work
 
