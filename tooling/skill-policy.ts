@@ -288,6 +288,26 @@ const documentationMaintenanceContracts: readonly DocumentationMaintenanceContra
       repairHint:
         "Keep the local skill and profile complete from a clean clone without global filesystem dependencies.",
     },
+    {
+      id: "proof-lifecycle",
+      ownerPath: policyFiles.docsMaintainer,
+      requiredTermGroups: [
+        ["lifecycle transition"],
+        ["successor"],
+        ["reason"],
+        ["retained identity"],
+        ["artifact"],
+        ["environment"],
+        ["actor/authority"],
+        ["observedAt"],
+        ["digest"],
+        ["limitations"],
+        ["non-claims"],
+        ["rollback identity"],
+      ],
+      repairHint:
+        "Require complete proof identity and successor/reason/provenance evidence for lifecycle transitions.",
+    },
   ];
 
 const prohibitedDocumentationClaims = [

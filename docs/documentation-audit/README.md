@@ -46,6 +46,7 @@ HGI-302 control evidence:
 HGI-310 skill evidence:
 
 - [`HGI-310-candidate.json`](HGI-310-candidate.json)
+- [`HGI-310-scenarios.json`](HGI-310-scenarios.json)
 
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state

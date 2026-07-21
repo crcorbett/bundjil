@@ -222,6 +222,11 @@ describe("HGI-310 documentation-maintenance policy", () => {
         pattern: /clean clone/g,
         replacement: "checkout",
       },
+      {
+        path: ".agents/skills/docs-maintainer/SKILL.md",
+        pattern: /lifecycle transition/g,
+        replacement: "document move",
+      },
     ];
     let broken = base;
     for (const mutation of mutations) {
@@ -245,6 +250,7 @@ describe("HGI-310 documentation-maintenance policy", () => {
         "tool-data-authority",
         "background-report-only",
         "clean-clone-portability",
+        "proof-lifecycle",
       ])
     );
   });

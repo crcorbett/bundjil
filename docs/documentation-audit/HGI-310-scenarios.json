@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "authority": "read-only repository inspection and local validation only; no provider, workflow, deployment, credential, release, publication, commit, or push operation",
+  "cases": [
+    {
+      "id": "HGI310-EFFECT-01",
+      "prompt": "Use the repo-local docs-maintainer for a planned public input Schema and tagged-error change to WorkspaceOperations in @bundjil/eve, including live/memory Layers and an outward-compatible Eve tool payload. Produce the impact ledger and exact implementation/verification route.",
+      "requiredSurfaces": [
+        "Effect boundary",
+        "service and Layers",
+        "package/app README decision",
+        "SPEC/tasks",
+        "proof and nonclaims"
+      ]
+    },
+    {
+      "id": "HGI310-PROXY-AUTH-01",
+      "prompt": "Use the repo-local docs-maintainer for a planned apps/codex-proxy bearer-auth and provider-error mapping change that affects local, preview, and production proof routes. Produce the impact ledger, owner selection, authority stops, and exact checks without accessing a provider.",
+      "requiredSurfaces": [
+        "proxy HTTP/auth boundary",
+        "package contract",
+        "future app runbook",
+        "authority",
+        "claim-matched proof"
+      ]
+    },
+    {
+      "id": "HGI310-PROVIDER-01",
+      "prompt": "Use the repo-local docs-maintainer when a tool response says Executor is healthy and a Sendblue webhook appears active, while proposed work would rotate credentials, redeploy Eve, and roll back delivery failures. Produce the impact ledger, authority decision, owners, stops, and proof route.",
+      "requiredSurfaces": [
+        "observed data",
+        "app-owned runbook",
+        "authority",
+        "inconclusive fallback",
+        "provider nonclaims"
+      ]
+    },
+    {
+      "id": "HGI310-WORKFLOW-01",
+      "prompt": "Use the repo-local docs-maintainer outside a PRD for a Claude review workflow concurrency change while a scheduled documentation scan reports a possibly stale README pointer. Distinguish attached edits from background publication and provide exact checks and evidence limits.",
+      "requiredSurfaces": [
+        "ordinary change",
+        "workflow owner",
+        "report-only candidate",
+        "publisher separation",
+        "verification"
+      ]
+    },
+    {
+      "id": "HGI310-PROOF-LIFECYCLE-01",
+      "prompt": "Use the repo-local docs-maintainer to close a task whose proof passed locally, whose active plan must leave the current route, and whose earlier provider check was inconclusive. Produce the impact ledger, lifecycle transition, retained evidence fields, rollback, and explicit claims not established.",
+      "requiredSurfaces": [
+        "proof packet",
+        "lifecycle",
+        "successor and reason",
+        "failed/inconclusive preservation",
+        "active/archive pointers"
+      ]
+    },
+    {
+      "id": "HGI310-PORTABLE-01",
+      "prompt": "Validate docs-maintainer, PRD integration, metadata, mirrors, semantic fixtures, and exact docs/skill checks from a clean clone without a global skill installation.",
+      "requiredSurfaces": [
+        "clean-clone root",
+        "repository-owned validator",
+        "relative mirror",
+        "bounded receipts",
+        "nonclaims"
+      ]
+    }
+  ]
+}
