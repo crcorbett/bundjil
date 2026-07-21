@@ -226,14 +226,14 @@ internal state/status/test structure:
 
 ### Promotion task progress
 
-| Task                               | Status      | Acceptance receipt                                                                                                                               |
-| ---------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                       |
-| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed |
-| Reconcile Photon and prove Preview | In progress | Authenticated service/shared-user/platform/webhook inventory and hosted Preview proof are active                                                 |
-| Stage dual-provider Production     | Pending     | —                                                                                                                                                |
-| Promote and prove Production       | Pending     | —                                                                                                                                                |
-| Reconcile docs and final audit     | Pending     | —                                                                                                                                                |
+| Task                               | Status      | Acceptance receipt                                                                                                                                   |
+| ---------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                           |
+| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed     |
+| Reconcile Photon and prove Preview | In progress | READY deployment, clean Marketplace binding, protection, and signed HTTP ingress proved; outbound/typing stopped on one unretried uncertain SDK send |
+| Stage dual-provider Production     | Pending     | —                                                                                                                                                    |
+| Promote and prove Production       | Pending     | —                                                                                                                                                    |
+| Reconcile docs and final audit     | Pending     | —                                                                                                                                                    |
 
 ## Downstream-impact ledger
 
@@ -352,6 +352,32 @@ copied replay names plus unprefixed `KV_*`/Redis aliases.
   release, generated API docs, and Production proof. The failed request sent no
   provider message and proves no outbound, typing, handset, or Production
   behavior.
+
+### Task 3 hosted proof readback
+
+Pushed source `855f71acd678873fdc7b65bafbc2709a4233bbea` produced READY Preview
+deployment `dpl_E5P3pYaEMXxWxfRzgDecrNspkpZo`. The dedicated Preview alias
+resolved to it. Protection returned `302` without the task bypass and an
+application `404` with it; the Photon route returned `401` for an unsigned POST
+and `204` for a correctly signed ignored event. The latter performed no SDK
+acquisition, dispatch, replay write, or message send.
+
+The first bounded SDK bootstrap stopped at provider `typing-start` before send.
+The message-first attempt then threw during its single send with no acceptance
+identity. Because that outcome is uncertain, it was not retried. The exact
+Preview webhook and bypass remain active pending handset or provider-supported
+readback. The retained
+[`partial Preview receipt`](../../verification/photon-preview-2026-07-21.md)
+owns the proof/non-claim boundary.
+
+- **Change required:** active task evidence, this execution record, verification
+  router, and a new dated partial receipt.
+- **Preserve:** source/runtime contracts, provider resources, clean Preview
+  bindings, Production and Sendblue state, Upstash data, prior receipts, and
+  unrelated documentation.
+- **N/A:** current architecture changes, frontend, DNS, public release, data
+  migration, generated API docs, and Production proof. Task 3 remains in
+  progress; no acceptance or typing claim is promoted from the uncertain send.
 
 ### Task 6 docs-maintainer accounting
 

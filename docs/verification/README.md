@@ -35,6 +35,10 @@ operation nor asserts present provider state.
   retains the bounded dedicated-line attempt and zero-mutation readback. Its
   Business-upgrade conclusion is superseded by the current Free managed-shared
   topology; it proves no Preview, message, typing, Sendblue, or Production result.
+- [`photon-preview-2026-07-21.md`](photon-preview-2026-07-21.md) retains the
+  current hosted Preview deployment, Marketplace binding, protection, and
+  signed-ingress proof plus the inconclusive first messaging attempt. It is not
+  outbound, handset, duplicate, Eve-completion, or Production proof.
 
 ## Claim boundaries
 
