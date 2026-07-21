@@ -154,8 +154,14 @@ observation at that time. It never substitutes for the hosted procedure below.
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
    signing secret is already present in the approved secret store; otherwise
-   register once, bind the returned secret and ID directly to the target, and
-   never persist or print them. Reconcile an ambiguous create by URL inventory.
+   set the absolute mode-`0600` temporary
+   `BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH` and exact
+   `BUNDJIL_PHOTON_WEBHOOK_URL`, then run
+   `bun run --filter @bundjil/photon register:environment-webhook`. Bind the
+   returned file's ID and secret directly to the target through stdin, verify
+   variable metadata, and delete the temporary file. Never print either value.
+   The command blocks an existing target rather than adopting a lost
+   write-only secret and reconciles an uncertain create by exact URL inventory.
 5. Read back service, platform, shared-user, and webhook topology. The accepted
    desired state is service type `shared`, zero dedicated lines, one exact
    approved shared user, and one exact environment webhook. Do not delete

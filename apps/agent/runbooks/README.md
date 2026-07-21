@@ -25,7 +25,7 @@ command, and routing map.
 - [Sendblue](sendblue.md) — inspect webhook and replay-store topology, then
   bound any separately approved ingress or delivery operation.
 - [Photon](photon.md) — prove bounded management/SDK lifecycle and own Photon
-  line, webhook, typing, delivery, rollback, and recovery procedures.
+  managed-shared user, webhook, typing, delivery, rollback, and recovery procedures.
 - [Incident and revocation](incident-revocation.md) — contain agent incidents,
   route revocation to the owning provider, and prove recovery without exposing
   secrets.

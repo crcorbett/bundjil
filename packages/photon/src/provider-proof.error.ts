@@ -13,6 +13,7 @@ export const PhotonProviderProofOperation = Schema.Literals([
   "registerWebhook",
   "sdkLifecycle",
   "setIMessagePlatformEnabled",
+  "writeWebhookBinding",
 ]);
 
 const PhotonProviderProofReason = Schema.Literals([

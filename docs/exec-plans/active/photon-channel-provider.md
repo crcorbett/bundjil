@@ -289,6 +289,20 @@ those corrected contracts pass. See the retained
   not yet changed any provider, secret, webhook, deployment, traffic, or
   Production state.
 
+### Task 3 operator-boundary docs-maintainer accounting
+
+- **Change required:** the Photon package command, private environment-webhook
+  operation and tests, package README, Photon runbook, runbook index, active
+  task evidence, and this plan. They now own create-only signing-secret handoff
+  through a mode-`0600` temporary binding artifact and fail closed on an
+  existing target whose secret cannot be recovered.
+- **Preserve:** runtime Channel/Photon/Sendblue contracts, app composition,
+  architecture rules, authority envelopes, critical journeys, historical
+  receipts, and unrelated READMEs.
+- **N/A:** frontend, DNS, release/publication, data migration, and generated API
+  documentation. The bootstrap Preview has no alias and establishes no
+  Production, message, delivery, or typing claim.
+
 ### Task 6 docs-maintainer accounting
 
 - **Changed:** root README; agent README; docs/architecture/research routers;

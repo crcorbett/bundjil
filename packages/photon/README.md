@@ -83,6 +83,15 @@ idempotently create the exact approved Free managed-shared user. The accepted
 topology has service type `shared` and zero dedicated lines. Its Schema receipt
 contains only counts, actions, service type, and assignment presence.
 
+`bun run --filter @bundjil/photon register:environment-webhook` registers one
+new exact `BUNDJIL_PHOTON_WEBHOOK_URL` only when no matching webhook exists. It
+writes the create-only ID and signing secret to the absolute
+`BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH` with mode `0600`, verifies provider and
+file readback, and emits only a sanitized receipt. The operator must bind the
+artifact directly to the approved environment and remove it after readback; an
+existing target or lost write-only secret blocks instead of replacing or
+adopting it.
+
 Production shared-user, platform, webhook, and deployment reconciliation
 follows the same runbook but remains a distinct promotion workflow. Repository tests and
 the provider-only proof cannot stand in for immutable deployment, signed
