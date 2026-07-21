@@ -174,3 +174,63 @@ it.effect(
       assert.deepStrictEqual(webhooks, [unrelated]);
     })
 );
+
+it.effect("rejects unrelated same-count topology drift", () =>
+  Effect.gen(function* rejectSameCountDrift() {
+    const fixture = yield* fixtures;
+    const originalId = yield* Schema.decodeEffect(PhotonWebhookId)(
+      "11111111-1111-4111-8111-111111111111"
+    );
+    const replacementId = yield* Schema.decodeEffect(PhotonWebhookId)(
+      "22222222-2222-4222-8222-222222222222"
+    );
+    const original = {
+      id: originalId,
+      webhookUrl: new URL("https://original.example.test/webhook"),
+    };
+    const replacement = {
+      id: replacementId,
+      webhookUrl: new URL("https://replacement.example.test/webhook"),
+    };
+    let webhooks = [original];
+    const management = PhotonManagement.of({
+      deleteWebhook: (webhookId) =>
+        Effect.sync(() => {
+          webhooks =
+            webhookId === fixture.webhookId
+              ? [replacement]
+              : webhooks.filter((webhook) => webhook.id !== webhookId);
+        }),
+      listWebhooks: () => Effect.sync(() => webhooks),
+      registerWebhook: (webhookUrl) =>
+        Effect.sync(() => {
+          webhooks = [...webhooks, { id: fixture.webhookId, webhookUrl }];
+          return {
+            id: fixture.webhookId,
+            signingSecret: fixture.webhookSecret,
+            webhookUrl,
+          };
+        }),
+    });
+    const lifecycle = PhotonLifecycleProbe.of({ run: () => Effect.void });
+    const failure = yield* provePhotonProvider(
+      fixture.projectId,
+      fixture.projectSecret,
+      proofWebhookUrl
+    ).pipe(
+      Effect.provide(
+        Layer.merge(
+          Layer.succeed(PhotonManagement, management),
+          Layer.succeed(PhotonLifecycleProbe, lifecycle)
+        )
+      ),
+      Effect.flip
+    );
+
+    const providerFailure = yield* Schema.decodeUnknownEffect(
+      PhotonProviderProofError
+    )(failure);
+    assert.strictEqual(providerFailure.reason, "topologyNotRestored");
+    assert.deepStrictEqual(webhooks, [replacement]);
+  })
+);

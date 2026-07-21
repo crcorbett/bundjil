@@ -257,3 +257,36 @@ identity, and recovery route.
   resource cleanup failure, provider drift outside the authorised project,
   missing rollback identity, or any request for Vercel/Production/Sendblue
   mutation without fresh authority.
+
+## Final five-pass closeout audit
+
+The audit ran only after all six tasks were terminal. Its five passes covered:
+
+1. ownership, declared exports/imports, and production/test/proof call graphs;
+2. Effect, Schema, Config, Layer, error, resource, and helper quality;
+3. contract, failure, timeout, concurrency, build-route, boundary, and
+   regression coverage;
+4. documentation, authority, proof levels, continuity, rollback, and the later
+   Production SPEC gate;
+5. adversarial legacy, secret, unsafe-boundary, topology-drift, and unsupported-
+   claim scans.
+
+Pass 5 reopened Task 5. The provider proof had compared only final webhook
+count and absence of the reserved proof URL, so unrelated same-count topology
+drift could be misreported as restoration. The corrected proof compares the
+complete baseline and final topology by stable webhook ID and URL in both
+directions. A fourth provider-proof test now simulates replacement of an
+unrelated webhook at the same count and requires `topologyNotRestored`.
+
+After correction, focused Channel, Sendblue, Photon, agent, boundary, Effect,
+skill, docs, leak, stale-pattern, and build-route checks pass. The final full
+repository gate contains 233 tests. Current and changed documentation passes
+relative-link and frontmatter checks. The whole historical corpus still has
+four pre-existing relative-link errors in `legacy-atlas.md` and two historical
+documents without `review_trigger`; those retained history defects are not
+current architecture or provider truth.
+
+No credential value is tracked. The ignored Photon credential file remains
+mode `0644`, so the runbook blocks another provider action until mode `0600`.
+Hosted Vercel Preview, live messaging, handset delivery, and Production remain
+unproved and unauthorised.

@@ -215,5 +215,22 @@
       ],
       "commitAfterPassing": true
     }
-  ]
+  ],
+  "closeoutAudit": {
+    "status": "completed",
+    "completedAt": "2026-07-21",
+    "passes": [
+      "Ownership/import/export and production/test/proof call graphs match the neutral Channel package, independent provider Layers, app-owned orchestration, and private Photon proof boundary; the repository boundary audit passes.",
+      "Effect, Schema, Config, Layer, tagged-error, resource, and helper review found no unsafe assertion, raw environment/provider client escape, fatal decode, swallowed cause, state mutation helper, or generic common/utils/helpers owner in the replacement slice.",
+      "Contract, failure, timeout, concurrency, build-route, package, boundary, and regression coverage passes for both providers and the agent; the final repository suite contains 233 tests.",
+      "Current documentation separates repository, local, provider, Preview, handset, and Production truth; accepted is not delivered; the continuity break, authority stops, cleanup, rollback, and separate Production SPEC boundary are routed canonically.",
+      "Adversarial legacy, secret, unsafe-boundary, drift, and unsupported-claim scans found no tracked Photon credential value, legacy source tree/config consumer, unsafe cast, raw fetch/process environment access, or unsupported live claim."
+    ],
+    "findingAndResolution": "The audit reopened Task 5 because final Photon cleanup compared only webhook count and proof-URL absence. The provider proof now compares the complete baseline and final webhook topology by stable ID and URL in both directions; a new adversarial test rejects unrelated same-count drift.",
+    "limitations": [
+      "The ignored Photon credential file remains mode 0644, so the canonical runbook blocks any future provider execution until it is 0600.",
+      "Hosted Vercel Preview, live messaging, handset delivery, and Production remain unproved and unauthorised.",
+      "The whole historical documentation corpus retains four broken relative links in docs/architecture/legacy-atlas.md and two missing review_trigger fields in historical documents; current and changed documentation surfaces pass link and frontmatter checks."
+    ]
+  }
 }

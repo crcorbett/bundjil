@@ -121,8 +121,19 @@ export const provePhotonProvider = (
     const final = yield* management.listWebhooks();
     const topologyRestored =
       final.length === baseline.length &&
-      final.every(
-        (webhook) => webhook.webhookUrl.href !== proofWebhookUrl.href
+      final.every((observed) =>
+        baseline.some(
+          (desired) =>
+            desired.id === observed.id &&
+            desired.webhookUrl.href === observed.webhookUrl.href
+        )
+      ) &&
+      baseline.every((desired) =>
+        final.some(
+          (observed) =>
+            observed.id === desired.id &&
+            observed.webhookUrl.href === desired.webhookUrl.href
+        )
       );
     if (!topologyRestored) {
       return yield* new PhotonProviderProofError({

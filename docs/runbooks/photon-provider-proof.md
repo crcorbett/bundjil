@@ -87,7 +87,7 @@ The command reserves one exact proof URL, removes an exact stale proof record,
 captures a baseline, creates one webhook, verifies it by ID and URL in memory,
 and brackets use with deletion. After any normal or ambiguous outcome it lists
 webhooks again, deletes only records matching the reserved proof URL, and
-requires the final count to equal the post-recovery baseline.
+requires the final ID-and-URL topology to equal the post-recovery baseline.
 
 If the process is interrupted, rerun the same command: the fixed proof URL is
 the recovery identity and the first step deletes only that exact record. Never
