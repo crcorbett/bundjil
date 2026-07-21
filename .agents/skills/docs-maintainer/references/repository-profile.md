@@ -35,7 +35,7 @@ work. Durable output uses repository-relative paths only.
 
 ## Runbook and authority boundaries
 
-HGI-303 establishes the app-local runbook trees:
+HGI-303 established the app-local runbook trees:
 
 - `apps/agent/runbooks/**` for Eve, Sendblue, Executor, Vercel app deployment,
   configuration, incident, rollback, and recovery operations;

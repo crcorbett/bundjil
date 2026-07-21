@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "status": "accepted",
+  "observedAt": "2026-07-21T14:31:00+01:00",
+  "authority": "repository-local runbook, documentation, policy, test, Git commit, main push, and remote-ref readback only; no provider, workflow, deployment, credential, message, approval-resume, release, or production operation",
+  "baseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "implementationCommit": "9803c307d5ed8b1ad097270b34fb55ef5876b2bb",
+  "implementationTree": "c7218be4f4c1f10b50ffd696f53114ff056a6452",
+  "changedPathCount": 37,
+  "sortedChangedPathSha256": "3f16305b9e9d23e44c744c4fe92a86aee37e24b5210aff0c7dd50b1c01b9e31e",
+  "candidateReceiptSha256": "75694d03e16bdcfef0f5a5403f995c624e1eae73ff018764aae7f488a39b46b2",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "scenarioResults": [
+    {
+      "id": "HGI303-DEPLOY-STOP-01",
+      "sha256": "7ca3ac687d1f9a814764db1b096288097cb234cef44b583888513f500d8f9c99"
+    },
+    {
+      "id": "HGI303-EXECUTOR-RESUME-01",
+      "sha256": "13f82716a8e62331f1e4bae7beb9b32ad9badeebd3c709e10654d1ab6b33e2a3"
+    },
+    {
+      "id": "HGI303-PROOF-BOUNDARY-01",
+      "sha256": "f2c37a922f03faa4b179597a2f1028c6a2cde4c64eb9c16f2fef43b5b494bb02"
+    },
+    {
+      "id": "HGI303-REAUTH-SUBJECT-01",
+      "sha256": "beadb6317bbee67f5c0f277b5c6810b780091cf244e65c45c4f8e42746ade31f"
+    },
+    {
+      "id": "HGI303-REVOCATION-NO-COMMAND-01",
+      "sha256": "a63f2fbcc51139e37775d508775a36e329d38280220ee783ee12a897f7c53e65"
+    },
+    {
+      "id": "HGI303-SENDBLUE-INCONCLUSIVE-01",
+      "sha256": "52454b823ed84cb866b28624787472bafb19dd8a4f0d1fc409bc32916a591c31"
+    }
+  ],
+  "checks": [
+    {
+      "check": "app-owned inventory and semantic policy",
+      "status": "passed",
+      "result": "Two app indexes route exactly ten canonical runbooks. check:docs passed 219 files; all 43 tooling tests reject missing inventory or sections, embedded secrets, mutable provider actuality, and tool-derived authority."
+    },
+    {
+      "check": "documentation and skill routes",
+      "status": "passed",
+      "result": "Root, app, package, SPEC, plan, audit, docs-maintainer, and research routes resolve to the app owners; check:skills passed 167 files and 16 mirrors."
+    },
+    {
+      "check": "fresh-context authority scenarios",
+      "status": "passed",
+      "result": "A fresh Terra evaluator selected the correct owner and safe stop in all six deployment, Executor, Sendblue, proof-boundary, reauthentication, and unsupported-revocation scenarios."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, docs and skills, 43 tooling tests, Ultracite, lint, Knip, five typechecks, and 250 package/app tests passed with schema-valid synthetic Executor configuration and no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Semantic commit 9803c307d5ed8b1ad097270b34fb55ef5876b2bb was pushed; after fetch, local HEAD and origin/main both resolved to that commit with tree c7218be4f4c1f10b50ffd696f53114ff056a6452."
+    }
+  ],
+  "postcondition": "Bundjil now routes local development, deployment, Executor, Sendblue, proxy authentication, proof, reauthentication, incident, rollback, and revocation work through ten target-owned procedures with explicit authority, readback, stop, rollback, escalation, limitations, and non-claims.",
+  "rollback": "Revert the HGI-303 closeout and 9803c307d5ed8b1ad097270b34fb55ef5876b2bb together while preserving HGI-300 through HGI-302, HGI-308, and HGI-310 evidence and all implementation source.",
+  "limitations": [
+    "Runbook, source, local-check, and fresh-context success do not prove Vercel, Executor, Sendblue, Upstash, Codex-account, secret, deployment, webhook, message, credential, approval, release, or production state.",
+    "The current Production preflight requires BUNDJIL_UPSTASH_REDIS_REST metadata while runtime reads UPSTASH_REDIS_REST or KV aliases; the Production runbook stops on this ambiguity and HGI-305 must resolve it before a positive Production packet.",
+    "HGI-304 still owns workflow and provider authority; HGI-305 still owns bounded critical-journey proof and improved blocked/preflight receipts.",
+    "The semantic and closeout commits are unsigned because the configured 1Password signing agent remains unavailable; content, tree, ancestry, push, and remote identity are independently verified."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored local file, workflow, deployment, credential, secret, webhook, message, approval resume, profile, database, release, or production system was read or changed.",
+    "A runbook, tool result, passing preflight, local check, fresh evaluator, or historical receipt grants no external-operation authority."
+  ]
+}

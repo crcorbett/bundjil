@@ -57,6 +57,7 @@ HGI-310 skill evidence:
 
 HGI-303 runbook and authority evidence:
 
+- [`HGI-303-validation.json`](HGI-303-validation.json)
 - [`HGI-303-candidate.json`](HGI-303-candidate.json)
 - [`HGI-303-scenarios.json`](HGI-303-scenarios.json)
 - [`hgi-303/HGI303-DEPLOY-STOP-01.json`](hgi-303/HGI303-DEPLOY-STOP-01.json)

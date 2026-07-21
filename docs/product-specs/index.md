@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -17,8 +17,7 @@ context.
 ## Current
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
-  HGI-300, HGI-301, HGI-308, HGI-302, and HGI-310 are complete; HGI-303 is in
-  progress.
+  HGI-300 through HGI-303, HGI-308, and HGI-310 are complete; HGI-304 is next.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.

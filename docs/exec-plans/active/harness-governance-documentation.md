@@ -46,11 +46,12 @@ and task state.
   fixtures, six addressable fresh-context scenarios, clean-clone validation,
   and strict correction/re-acceptance are recorded in
   [`HGI-310-validation.json`](../../documentation-audit/HGI-310-validation.json).
-- **HGI-303 — in progress:** ten target-owned app runbooks and the durable
+- **HGI-303 — completed:** ten target-owned app runbooks and the durable
   authority model now route local, deployment, Executor, Sendblue, proxy auth,
   proof, reauthentication, incident, rollback, and revocation work. Structural
-  policy checks, dry-run receipts, and fresh-context acceptance remain before
-  completion.
+  policy checks, six dry-run receipts, full repository verification, fresh-context
+  acceptance, and pushed semantic identity are recorded in
+  [`HGI-303-validation.json`](../../documentation-audit/HGI-303-validation.json).
 - HGI-304, HGI-305, HGI-306, and HGI-307 remain pending in dependency order.
   HGI-309 remains deferred until separately approved external authority exists.
 
