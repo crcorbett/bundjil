@@ -3,14 +3,15 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
 # Product specifications
 
-Current implementation intent requires both an active SPEC/task here and an
-entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
+Implementation work requires both a current SPEC/task here and an entry under
+[`../exec-plans/active/`](../exec-plans/active/). Proposed specifications may
+remain here without an active plan until implementation begins. Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
 
@@ -20,16 +21,20 @@ context.
   HGI-300 is in progress.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   proposed; implementation and Preview subscription-endpoint proof are pending.
+- [Schema-driven Channels and Photon Preview proof](photon-channel-provider.md) —
+  active; clean Channel architecture, Sendblue replacement, and authorised
+  Photon proof are in progress. No legacy state or behavior is migrated, and
+  Vercel/Production remain outside current authority.
 
 ## Implemented or superseded history
 
-Each of the twelve sibling ledger documents records a `tasks` array whose
-entries are `completed`. That array-level result does not mean the ledgers
-contain only task-completion fields: ten use ledger-level `status: completed`,
-the Effect persistence and Effect Schema string-contract ledgers use
-`status: implemented`, and the Vercel promotion ledger retains a historical,
-scoped `approval.status: granted`. These historical lifecycle and approval
-fields are provenance, not standing authority.
+Each of the twelve historical sibling ledger documents listed below records a
+`tasks` array whose entries are `completed`. That array-level result does not
+mean the ledgers contain only task-completion fields: ten use ledger-level
+`status: completed`, the Effect persistence and Effect Schema string-contract
+ledgers use `status: implemented`, and the Vercel promotion ledger retains a
+historical, scoped `approval.status: granted`. These historical lifecycle and
+approval fields are provenance, not standing authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |

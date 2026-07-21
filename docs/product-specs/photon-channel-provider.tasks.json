@@ -1,0 +1,194 @@
+{
+  "title": "Schema-Driven Channels And Photon Preview Proof Tasks",
+  "spec": "docs/product-specs/photon-channel-provider.md",
+  "status": "active",
+  "principles": [
+    "Build the channel path cleanly from canonical Effect Schemas, Context.Service contracts, and explicit live/memory Layers; do not extract, wrap, migrate, or preserve the current Sendblue implementation.",
+    "@bundjil/channel owns one narrow provider-neutral ChannelTransport; @bundjil/sendblue and @bundjil/photon provide it through separate Layers; apps/agent owns Eve, identity, fresh replay, dispatch, and composition.",
+    "Decode unknown only at host/provider ingress, decode statically encoded values with Schema.decodeEffect, encode immediately before outward writes, and pass decoded Schema-derived Types between services.",
+    "Use a fresh versioned state, replay namespace, and environment namespace; import no legacy state, keys, continuation, typing lifecycle, config namespace, modules, or tests.",
+    "One module-edge ManagedRuntime and one runPromise per Eve callback are allowed; nested runtime execution, Effect.orDie, swallowed causes, Object.assign state updates, callback escape hatches, and method-local dependency re-provisioning are acceptance failures.",
+    "Photon remains Preview-only and conditional on exact published pins, deterministic serverless lifecycle, signed-webhook/replay proof, isolated resources, and separate authority.",
+    "Repository, local, Preview, provider, handset, and Production proof are distinct; protected values and message/identity content never enter evidence."
+  ],
+  "riskLenses": [
+    "ownership and production/test call graph",
+    "clean replacement and legacy-pattern exclusion",
+    "Effect control flow and helper admission",
+    "Schema Type/Encoded boundary provenance",
+    "service requirements and Layer composition",
+    "safe tagged errors and uncertain delivery",
+    "fresh state/replay and continuity break",
+    "secret/config redaction",
+    "provider/runtime isolation",
+    "verification and proof authority",
+    "observability, cutover, and rollback"
+  ],
+  "globalVerification": [
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:skills",
+    "bun run --filter @bundjil/channel check-types",
+    "bun run --filter @bundjil/channel test",
+    "bun run --filter @bundjil/sendblue check-types",
+    "bun run --filter @bundjil/sendblue test",
+    "bun run --filter @bundjil/photon check-types",
+    "bun run --filter @bundjil/photon test",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "Effect language-service diagnostics for changed TypeScript files",
+    "narrow scans for forbidden legacy imports, Effect.orDie, swallowed catchCause, Object.assign state writes, nested runPromise, raw callbacks, DTO mirrors, and helper sprawl",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "tasks": [
+    {
+      "id": "plan-clean-channel-replacement",
+      "title": "Create the active plan and lock the clean replacement boundary",
+      "status": "completed",
+      "description": "Create the active plan, inventory exact files to replace/remove and external journeys to re-prove, and record the old implementation solely as rejected-pattern and rollback evidence.",
+      "implementationNotes": [
+        "Link the plan from docs/exec-plans/active/README.md and record base commit, branch, environment authority, immutable Production rollback deployment, no-migration decision, ingress drain requirement, and proof boundaries.",
+        "List apps/agent/agent/channels/sendblue.ts and every apps/agent/agent/lib/sendblue file as replace/remove targets; do not create a legacy or compatibility directory.",
+        "Define new package/app file owners, new environment namespace, fresh state/replay schemas and prefix, exact third-party boundary exceptions, and the removal order.",
+        "Identify consumer journeys from current docs without treating old internal tests, status values, state, or replay keys as compatibility requirements."
+      ],
+      "mandatoryVerification": [
+        "The plan distinguishes current repository/deployment truth from replacement intent and names the intentional session/replay continuity break.",
+        "No live provider/deployment state is read or mutated and no secret/identity content is captured.",
+        "Review every planned operation for flat Effect flow, canonical Schema Type/Encoded ownership, named Context.Service operations, explicit Layers, typed pipe error handling, and zero unsafe casts/manual readers/DTO mirrors/helpers.",
+        "Run boundary/effect/skill checks, docs formatting/link/frontmatter checks, verification with required ignored synthetic env, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Implementation has an active plan whose source target is a clean replacement, not a compatibility refactor.",
+        "Removal, cutover, rollback, and non-authority boundaries are explicit."
+      ],
+      "evidence": [
+        "Ownership and call graph: the active plan records the exact three package owners, app-owned service and Eve boundaries, complete legacy removal inventory/order, fresh namespaces, dated Git/deployment rollback identities, intentional continuity break, Photon-only authority, and Vercel/Production stop condition.",
+        "Implementation quality: plan review confirms decoded Schema Types between named services, encoded values only at persistence/framework/provider egress, raw Request and SDK primitives confined to exact adapters, explicit live/memory Layers, flat Effect operations, and no compatibility/helper/DTO/manual-reader design.",
+        "Verification coverage: jq, routed-link and naming scans, Ultracite formatting, check:boundaries, check:effect-setup, check:skills, Knip, five-workspace typechecks, 246 workspace tests including the 79-test legacy agent baseline, full verification, and git diff --check passed. No provider or deployment operation ran."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-clean-channel-vertical-slice",
+      "title": "Build the canonical channel package and clean app vertical slice",
+      "status": "in_progress",
+      "dependsOn": ["plan-clean-channel-replacement"],
+      "description": "Implement @bundjil/channel plus app-owned Channel, replay, identity, routing, and Eve dispatch services using only deterministic Layers, proving an HTTP-to-Eve-to-outbound journey before either provider exists.",
+      "implementationNotes": [
+        "Export canonical provider/conversation/message/send/presence Schemas with named Type/Encoded aliases, safe tagged errors, ChannelTransport Context.Service, and layerMemory.",
+        "Add app-owned ChannelStateV1 with only a conversation snapshot, new replay contracts/prefix through AtomicKeyValueStore, fresh branded continuation routing, ChannelIdentity, ChannelRouter, ChannelReplay, Channel, and request-scoped EveChannelDispatch services.",
+        "Project Eve events into one canonical tagged Schema; domain operations return immutable decoded state and explicit outcomes.",
+        "Use one test composition root and no import from apps/agent/agent/lib/sendblue."
+      ],
+      "mandatoryVerification": [
+        "@effect/vitest proves accepted/ignored ingress, identity rejection, fresh deterministic routing, concurrent duplicate claims, Eve dispatch completion/failure, outbound claim/send outcomes, stateless presence, immutable next state, and encoded snapshot round trips.",
+        "All primary operations are named flat Effect.fn/Effect.gen programs with expected catchTag/catchTags/mapError in outer pipes; dependencies come from Context.Service/Layer requirements, never method-local provideService chains.",
+        "Assert decodeUnknown occurs only at synthetic host/provider ingress, decodeEffect handles encoded fixtures, encodeEffect owns persistence/framework egress, and there are no unsafe casts/manual readers/DTO mirrors/raw callbacks/trivial helpers.",
+        "Run common/agent focused checks, boundary/effect/skill checks, Effect diagnostics, negative legacy-pattern scans, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "A full clean journey passes entirely through memory Layers and canonical contracts.",
+        "The slice contains no provider or legacy dependency."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-clean-sendblue-provider-and-rewrite-edge",
+      "title": "Build @bundjil/sendblue and replace the legacy Eve edge",
+      "status": "pending",
+      "dependsOn": ["build-clean-channel-vertical-slice"],
+      "description": "Implement a new Sendblue ChannelTransport from protocol documentation, rewrite the Eve adapter around the clean services, replace old tests, and remove the old app-owned Sendblue implementation.",
+      "implementationNotes": [
+        "Create private provider Schemas, Config input Schema, constant-time webhook verification, Effect HTTP request/response adapters, safe tagged errors, and explicit live/memory Layers without copying old app code.",
+        "Rewrite channels/sendblue.ts with one module-edge runtime, one runPromise per callback, request-scoped EveChannelDispatch Layer, waitUntil at the edge, Schema decode/encode, and one exact complete snapshot assignment.",
+        "Use new BUNDJIL_CHANNEL_SENDBLUE_*, BUNDJIL_CHANNEL_REPLAY_*, and BUNDJIL_CHANNEL_ROUTING_* config; do not read old BUNDJIL_SENDBLUE_* values or old stored state/claims.",
+        "After the new provider and app journey pass, remove apps/agent/agent/lib/sendblue/** and replace old implementation-structured tests with new contract/journey tests."
+      ],
+      "mandatoryVerification": [
+        "Provider tests prove auth before body trust, body limits, valid/ignored/malformed cases, outbound encoding, complete response decoding, known rejection, timeout/uncertain delivery, presence accepted/no-op/failure, and secret-safe errors.",
+        "Direct Request/Response tests prove the new 202 accepted, 204 ignored/duplicate, 400 invalid payload, 401 authentication failure, and 503 pre-claim dependency failure semantics plus one waitUntil dispatch without importing old modules or comparing old internal state/status fixtures.",
+        "Scans in the replacement slice find no agent/lib/sendblue import, Effect.orDie, catchCause swallow, Object.assign state mutation, nested runPromise, public callback, hand-written provider attempt union, method-local dependency re-provisioning, unsafe cast, DTO mirror, manual reader, raw JSON, or helper sprawl.",
+        "Run common/Sendblue/agent checks and builds, boundary/effect/skill checks, Effect diagnostics, Knip, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "The current source tree contains only the clean Sendblue package and thin Eve adapter; the old app-owned Sendblue tree is absent.",
+        "No provider/deployment mutation occurred and the retained immutable Production deployment remains rollback truth."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-and-conform-photon-provider",
+      "title": "Build @bundjil/photon and prove dual conformance locally",
+      "status": "pending",
+      "dependsOn": ["build-clean-sendblue-provider-and-rewrite-edge"],
+      "description": "Pin the exact published Spectrum boundary, implement Photon ChannelTransport, resolve signature/resource/Space uncertainties locally, and run both providers through the same contract and app journey.",
+      "implementationNotes": [
+        "Record exact npm package names, versions, integrity, exports, dependency boundary, Promise behavior, and release semantics; never target unpublished main.",
+        "Keep SDK/Zod types, client, Space, callbacks, and raw failures private; decode every unknown complete SDK result before returning a common Type.",
+        "Compare the SDK webhook helper with direct documented HMAC verification using fixed Clock/raw-body fixtures; retain only one deterministic adapter.",
+        "Use scoped Layer resource acquire/release and fault-test malformed output, rejection, timeout/uncertain send, cold Space/line ambiguity, presence no-op, and cleanup failure."
+      ],
+      "mandatoryVerification": [
+        "Signed fixtures cover missing/invalid/stale/valid signatures, malformed/unsupported events, stable retry IDs, and deterministic handler completion without a callback escape hatch.",
+        "The same ChannelTransport conformance and clean app vertical suites pass with Sendblue and Photon Layers; provider selection exists only at composition roots.",
+        "Review every operation for Schema Type/Encoded boundaries, Config Schema/Redacted inputs, named Context.Service operations, scoped live/memory Layers, flat Effects, safe tagged pipe errors, and no unsafe casts/DTO mirrors/manual readers/generic callbacks/helper sprawl.",
+        "Run all package/agent checks and builds, boundary/effect/skill checks, Effect diagnostics, dependency/leak/legacy scans, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Both providers satisfy one nominal contract without leaking provider-specific types or behavior into the app.",
+        "Any unresolved SDK lifecycle, Space, line, or uncertain-send issue stops live proof."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-photon-isolated-preview",
+      "title": "Prove the clean Photon path in an isolated Preview",
+      "status": "pending",
+      "dependsOn": ["build-and-conform-photon-provider"],
+      "description": "Only with separate provider/deployment authority, configure the new Photon path in an isolated Preview and prove signed ingress, fresh replay, Eve dispatch, outbound acceptance, presence, and resource cleanup.",
+      "implementationNotes": [
+        "Create/follow a target-owned runbook with exact actor, project/deployment identities, permitted operations, new config/replay namespace, rollback, rotation, evidence redaction, and stop conditions.",
+        "Use only BUNDJIL_CHANNEL_PHOTON_* and BUNDJIL_CHANNEL_REPLAY_* Preview values in an isolated Photon project; Production and Sendblue state remain unchanged.",
+        "Prove one synthetic inbound/outbound journey, stable-ID retry suppression, cold Space resolution, presence outcome, waitUntil completion, and Layer release.",
+        "Do not create/delete a dedicated line without separate authority and confirmed ambiguous-write/deletion semantics."
+      ],
+      "mandatoryVerification": [
+        "Exact commit, Preview deployment, Photon project/webhook, new replay namespace, actor/authority, and rollback receipt are recorded with protected values omitted.",
+        "One signed inbound yields one fresh claim, one Eve turn, one outbound accepted result, and zero duplicate; no old state, replay key, continuation, or config value is used.",
+        "No secret, content, full identity, raw body, URL, project/message/Space ID, SDK object, prompt, tool value, or model output appears in code, logs, errors, spans, fixtures, or evidence.",
+        "Run full package/agent/build checks, boundary/effect/skill checks, Effect diagnostics, verification, diff checks, sanitized provider/runtime readback, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "An isolated Preview proves the clean Photon journey or records a terminal candidate stop with exact evidence.",
+        "No Production or Sendblue provider state changed."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-clean-channel-docs-and-promotion-gate",
+      "title": "Reconcile durable docs and define the later promotion gate",
+      "status": "pending",
+      "dependsOn": ["prove-photon-isolated-preview"],
+      "description": "Update durable architecture and README owners to the verified clean implementation, close the plan, and state whether a later Production SPEC should select clean Sendblue or Photon.",
+      "implementationNotes": [
+        "Update repo-structure, Eve architecture, testing, root/app/package READMEs, package tree, new config, routes, state/replay, boundary exceptions, proof, monitoring, and cutover/rollback pointers only to verified truth.",
+        "Keep completed Sendblue SPECs/plans as historical evidence and mark them non-authoritative for the replacement; do not rewrite their old proof as current behavior.",
+        "Record local and Preview proof separately and keep provider accepted distinct from handset delivered.",
+        "If promotion advances, create a new provider-selection/Production SPEC with prd-writer. It must own ingress drain, intentional continuity break, new secret binding, cutover, observation, rollback quarantine, and old-deployment retirement."
+      ],
+      "mandatoryVerification": [
+        "Docs-maintainer audit accounts for every repository docs/README class: affected owners change, historical/unrelated owners are explicitly preserved or N/A, and generated audit receipts are not hand-edited.",
+        "All production/test/CLI call graphs, Type/Encoded boundaries, service/Layer exports, commands, state/replay/config claims, and proof levels match source and dated evidence.",
+        "Final source scan proves no legacy Sendblue tree/import/config/state/replay/typing/callback pattern, unsafe cast, DTO mirror, manual reader, raw JSON, deep import, raw provider client, or helper sprawl remains in the replacement.",
+        "Run all global verification, docs formatting/link/frontmatter checks, task-ledger consistency, leak/stale scans, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Current docs route directly to the clean contracts, providers, operations, proof, continuity break, and promotion gate.",
+        "Photon and clean Sendblue remain non-Production until a separately accepted promotion SPEC exists."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
