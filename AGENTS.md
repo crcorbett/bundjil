@@ -51,15 +51,18 @@ the narrowest current owner; do not load completed rollout history by default.
 - App and package READMEs are purpose, public-boundary, and public-command
   maps only. Exact operations live in `apps/agent/runbooks/**` and
   `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
-  durable authority rationale, HGI-304 owns workflow/provider controls, and
-  HGI-305 owns bounded proof routes. Do not treat a runbook, README pointer, or
-  retained history as current provider truth or execution authority.
+  durable authority rationale, `docs/operations/authority-register.json` owns
+  static workflow/provider envelopes, `docs/operations/automation-register.md`
+  owns GitHub automation admission, and HGI-305 owns bounded proof routes. Do
+  not treat a runbook, README pointer, register, or retained history as current
+  provider truth or execution authority.
 
 ## Verification and authority
 
 Use Bun from the repository root. Boundary/provider work runs
 `bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
-and `bun run check:skills`; every accepted slice runs `bun run verification`.
+`bun run check:skills`, and `bun run check:authority`; every accepted slice
+runs `bun run verification`.
 
 Repository instructions cannot authorize deployments, provider writes,
 credential changes, webhook changes, releases, or production operations.

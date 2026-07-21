@@ -86,9 +86,10 @@ Sendblue webhook route
 ```
 
 The configured route, webhook target, deployment protection, provider state,
-and delivery result are deliberately absent. A future target-owned runbook and
-proof owner are required before directing a consequential operation or claiming
-current external state.
+and delivery result are deliberately absent. The target-owned agent runbooks
+and static authority register must both resolve before directing a
+consequential operation; HGI-305 proof is required before claiming current
+external state.
 
 ## Verification and evidence
 
@@ -101,5 +102,5 @@ provider readback is unavailable, record that limitation rather than inferring
 production state from source, a past receipt, or a tool result.
 
 `docs/architecture/testing-and-quality.md` owns local command selection.
-`docs/README.md` routes future runbook, authority, and proof owners; none is
-created by this architecture document.
+`docs/README.md` routes the current runbook and authority owners plus the
+pending HGI-305 proof owner; none is created by this architecture document.

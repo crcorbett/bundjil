@@ -124,9 +124,13 @@ and to the security/automation maintainer for break-glass reconciliation.
 
 Use only the approved provider-authenticated metadata path for the exact
 target. When unavailable, retain an `inconclusive` receipt with the last proved
-postcondition and choose no mutation except an explicitly approved safest
-containment. Source, old receipts, local headers, and alternate credentials are
-not fallbacks; unavailable is never healthy.
+postcondition and choose no normal mutation. The sole emergency exception is
+the one-shot, exact-target containment contract in
+[`docs/operations/authority-model.md`](../../../docs/operations/authority-model.md#emergency-containment);
+stop unless every required identity, approver, operation, expiry, rollback,
+receipt, and reconciliation field is present. Source, old receipts, local
+headers, and alternate credentials are not fallbacks. The unavailable outcome
+is `inconclusive`: never healthy.
 
 ## Maintenance
 

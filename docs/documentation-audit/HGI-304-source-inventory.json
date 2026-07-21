@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "status": "candidate",
+  "observedAt": "2026-07-21T14:52:00+01:00",
+  "baseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "authority": "repository source/config/documentation/test writes, public upstream Git-ref reads, and read-only source audits only; no authenticated GitHub setting, workflow-run, provider, environment-value, secret, deployment, message, release, approval-resume, or production access",
+  "workflows": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "7bcf0c111dceb005c57d821492f2f3610f8b28a3039b975f29cd9bbe3500d2d8",
+      "state": "bounded-source",
+      "principal": "ephemeral GitHub Actions job token",
+      "staticAuthority": "contents read only; no OIDC, secret, or external mutation",
+      "convergence": "one 30-minute run per pull request or ref; newer candidate cancels stale run"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "sha256": "f91026d73e58ba913d1ad15eb90a6ed9854491cf0267c7ec4783bcabe17db8aa",
+      "state": "foreground-source",
+      "principal": "exact repository owner actor crcorbett",
+      "staticAuthority": "contents/issues/pull-requests read plus Anthropic OIDC exchange; built-in Read/Glob/Grep tools only",
+      "convergence": "one owner-authored issue-comment invocation, 15-minute timeout, stale run cancelled"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "sha256": "e0414aed6ff5d86f52fec69fd2b05b71e8e5752cc022db6fafc5dff85b3a8ba2",
+      "state": "disabled-pending-proof",
+      "principal": "job-scoped GITHUB_TOKEN",
+      "staticAuthority": "contents and pull-request write only for one Changesets version pull request; no publish, merge, approve, tag, deploy, or release",
+      "convergence": "exact repository/main/authority-epoch gate, 20-minute timeout, serialized non-cancelling writer"
+    },
+    {
+      "path": ".github/workflows/claude-code-review.yml",
+      "sha256": null,
+      "state": "retired-source-absent",
+      "principal": "none",
+      "staticAuthority": "none",
+      "convergence": "restoration requires a new accepted SPEC and HGI-306 automation evidence"
+    }
+  ],
+  "authorityRegister": {
+    "path": "docs/operations/authority-register.json",
+    "sha256": "f0bf0d5fca76c4b8fa037219dd5f3f2a26ff4d4faeb41c9a08428114e8dc1687",
+    "recordCount": 15,
+    "recordIds": [
+      "github-ci",
+      "github-release-pr",
+      "github-claude-interactive",
+      "github-claude-auto-review-retired",
+      "vercel-agent",
+      "vercel-codex-proxy",
+      "executor-agent",
+      "sendblue-inbound",
+      "sendblue-outbound",
+      "upstash-sendblue-replay",
+      "upstash-codex-profile",
+      "secret-store",
+      "ai-gateway",
+      "codex-model-proxy",
+      "eve-interaction"
+    ],
+    "emergencyContainment": "one-shot exact-target deny/disable/isolate/revoke only; maximum 30 minutes; separate approver; before/after receipt; reconciliation within 24 hours; normal operations forbidden"
+  },
+  "actionLock": {
+    "path": "docs/operations/github-actions-lock.json",
+    "sha256": "157bfd6678b8527d2494e4ca9c5a7abca7b2849196eeb82ba966bec774ad5801",
+    "publicRefReadback": [
+      {
+        "action": "actions/checkout",
+        "ref": "refs/tags/v4",
+        "pin": "11d5960a326750d5838078e36cf38b85af677262"
+      },
+      {
+        "action": "actions/setup-node",
+        "ref": "refs/tags/v4",
+        "pin": "49933ea5288caeca8642d1e84afbd3f7d6820020"
+      },
+      {
+        "action": "oven-sh/setup-bun",
+        "ref": "refs/tags/v2",
+        "pin": "0c5077e51419868618aeaa5fe8019c62421857d6"
+      },
+      {
+        "action": "changesets/action",
+        "ref": "refs/tags/v1.9.0^{}",
+        "pin": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d"
+      },
+      {
+        "action": "anthropics/claude-code-action",
+        "ref": "refs/tags/v1",
+        "pin": "855c772a30bf1a423d6ff9a0db600098226c2cfc"
+      }
+    ],
+    "limitation": "Public Git refs establish only upstream ref-to-commit identity at observation time, not source safety, OIDC behavior, credential scope, hosted execution, or current GitHub settings."
+  },
+  "checks": {
+    "authorityPolicy": {
+      "detailPath": "tmp/authority-policy-report.json",
+      "status": "passed",
+      "checkedWorkflows": 3
+    },
+    "semanticFixtures": {
+      "status": "passed",
+      "testFiles": 5,
+      "tests": 48
+    }
+  },
+  "externalReadbacks": [
+    {
+      "target": "GitHub authenticated settings, workflow runs, tokens, OIDC, variables, secrets, comments, and pull requests",
+      "availability": "unavailable",
+      "outcome": "inconclusive"
+    },
+    {
+      "target": "Vercel, Executor, Sendblue, Upstash, secret store, AI Gateway, Codex account, deployed Eve, messaging, and delivery",
+      "availability": "unavailable",
+      "outcome": "inconclusive"
+    }
+  ],
+  "nonClaims": [
+    "No workflow is claimed to have run, skipped, issued a token, obtained a secret, created a comment or pull request, changed a setting, deployed, released, called a provider, sent a message, or affected Production.",
+    "Static authority records, workflow source, action pins, local checks, public Git refs, and old receipts grant no one-run external-operation authority."
+  ]
+}

@@ -25,9 +25,12 @@ state.
 
 Repository instructions, a passing preflight, provider output, historical
 approval, and an available credential do not authorize a consequential action.
-HGI-304 owns the remaining workflow and provider authority controls; until
-that slice is accepted, each runbook must stop at its explicit mutation gate
-unless a separately recorded approval names the complete envelope.
+The machine-readable envelopes in
+[`authority-register.json`](authority-register.json) own the allowed static
+boundary for each workflow, provider, and interaction surface. Each runbook
+must still stop at its explicit mutation gate unless a one-run approval names
+the complete envelope. HGI-309 owns any separately approved external-setting
+change or current provider-bound proof.
 
 ## Required envelope
 
@@ -57,13 +60,51 @@ confirmed, or rollback/revocation cannot be named.
 | Sendblue and agent replay store   | [Sendblue runbook](../../apps/agent/runbooks/sendblue.md)                                                                            | Authenticated account/webhook metadata and Upstash database metadata with credentials hidden                   | Webhook, line, message, replay data, credential, or routing change                              |
 | Codex proxy and Vercel deployment | [`apps/codex-proxy/runbooks/`](../../apps/codex-proxy/runbooks/README.md)                                                            | Authenticated Vercel project/deployment metadata plus the target-matched app proof                             | Deploy, promote, profile login/write, environment, bearer, cipher, alias, or rollback change    |
 | Codex OAuth profile and Upstash   | [Local auth](../../apps/codex-proxy/runbooks/local-auth.md), [reauthentication](../../apps/codex-proxy/runbooks/reauthentication.md) | Sanitized stored-profile proof and authenticated database metadata; never raw keys, ciphertext, or tokens      | Login, import, profile write/delete, refresh staging, token revoke, key/namespace/cipher change |
-| GitHub workflows and settings     | HGI-304 authority owner; no app runbook substitutes for it                                                                           | Authenticated `gh`/API repository, workflow, permission, environment, and rule metadata                        | Workflow/settings write, release, review loop, approval resume, token/OIDC permission change    |
+| GitHub workflows and settings     | [`automation-register.md`](automation-register.md) and `.github/workflows/**`; no app runbook substitutes for them                   | Authenticated `gh`/API repository, workflow, permission, variable, environment, run, and rule metadata         | Workflow/settings write, release-PR write, review response, token/OIDC permission change        |
 | Secrets and 1Password             | Runbook for the consuming target plus the secret-store owner                                                                         | Metadata-only binding/name/version/access inventory; never a value readback                                    | Create, reveal, copy, rotate, revoke, or rebind secret material                                 |
+| AI Gateway and model providers    | `apps/agent/agent/config.ts`, `apps/agent/agent/model-provider.ts`, proxy runbooks, and `authority-register.json`                    | Authenticated account/project/model/usage metadata and target-matched proxy proof; never prompt or output data | Remote model invocation, provider/model switch, quota/billing change, bypass, or credential use |
 
 If the preferred readback is unavailable, retain an `inconclusive` receipt with
 the attempted identity, target, `observedAt`, failure shape, last proved
 postcondition, limitation, escalation owner, and resume trigger. Do not switch
 to an unapproved alternate account, connector, secret path, or mutation API.
+
+## Static records and one-run authority
+
+[`authority-register.json`](authority-register.json) contains one complete
+record for every GitHub workflow, Vercel app, Executor boundary, Sendblue
+inbound/outbound boundary, Upstash use, secret store, model provider, and Eve
+interaction in scope. The register records desired policy only. Its
+`available` or `unavailable` readback field describes the accepted evidence
+state of this repository slice; an unavailable readback must be
+`inconclusive`.
+
+A `bounded` or `foreground_only` record does not create a reusable approval.
+The operator must still bind the record to the current principal, exact
+operation/resource/environment, start and expiry, approval receipt, current
+readback, rollback identity, and evidence receipt. A
+`disabled_pending_proof` record remains stopped until HGI-309 proves and, when
+separately authorized, changes its external gate. A `retired` record must have
+no executable workflow owner.
+
+## Emergency containment
+
+Unavailable readback invalidates normal mutation authority. The only exception
+is one explicitly approved, target-specific emergency containment operation
+whose purpose is to reduce exposure while current truth is unavailable.
+Containment is not a deployment, promotion, release, message, login, profile or
+data deletion, provider switch, approval resume, or business operation.
+
+Before containment, record an incident ID, authenticated incident principal,
+separate approver, exact target and environment, one allowed deny/disable/
+isolate/revoke operation, no-more-than-30-minute authority, the last proved
+state, an `inconclusive` before receipt, rollback/revocation owner, and named
+escalation. Stop if the target, identity, approver, rollback, or operation is
+unknown. Afterward, obtain provider readback when available, attach the result
+without erasing the failure, revoke the emergency authority, and complete the
+registered reconciliation within 24 hours. The exact allowed and forbidden
+classes are enforced by the emergency contract in
+[`authority-register.json`](authority-register.json).
 
 ## Receipt and lifecycle
 

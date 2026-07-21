@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "status": "candidate",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "authority": "repository source, workflow, documentation, policy, test, scenario, and evidence writes; public upstream Git-ref identity reads; read-only source audits; no authenticated GitHub setting, workflow-run, provider, environment-value, secret, deployment, message, release, approval-resume, or Production access",
+  "baseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "candidatePathCount": 37,
+  "sortedCandidatePathSha256": "b73bbe85c2a2fb3373615804eded8256390ac29d7576dc4533736dbc2d28ee06",
+  "artifacts": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "7bcf0c111dceb005c57d821492f2f3610f8b28a3039b975f29cd9bbe3500d2d8"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "sha256": "f91026d73e58ba913d1ad15eb90a6ed9854491cf0267c7ec4783bcabe17db8aa"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "sha256": "e0414aed6ff5d86f52fec69fd2b05b71e8e5752cc022db6fafc5dff85b3a8ba2"
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "sha256": "0f605a54bdad560102bc32eb5762622de29128c39be4886a3b75c9adcded0701"
+    },
+    {
+      "path": "docs/operations/authority-register.json",
+      "sha256": "f0bf0d5fca76c4b8fa037219dd5f3f2a26ff4d4faeb41c9a08428114e8dc1687"
+    },
+    {
+      "path": "docs/operations/automation-register.md",
+      "sha256": "cd8d3f991e09b14f077ba55dffcf311bb79ab512614e8c204070d5dd89f74a01"
+    },
+    {
+      "path": "docs/operations/github-actions-lock.json",
+      "sha256": "157bfd6678b8527d2494e4ca9c5a7abca7b2849196eeb82ba966bec774ad5801"
+    },
+    {
+      "path": "tooling/authority-policy.ts",
+      "sha256": "2bf1040134a2172a260678d0f5c625bfd84c889d8a14834472dc37c6eda45007"
+    },
+    {
+      "path": "tooling/authority-policy-audit.ts",
+      "sha256": "3c905339550400ef1c88fd828ec3246e4d28028a5b38cac28c8024fe34107d90"
+    },
+    {
+      "path": "tooling/authority-policy-audit.test.ts",
+      "sha256": "f28cf2e377af6bd9d8c426b4505dbfd43e700f540ed97488ab77963b2571e38c"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-304-source-inventory.json",
+      "sha256": "2c171abce0c27d99fea58e281288b0adfa471b5d6e5af6fdccdfa35322bdf922"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-304-scenarios.json",
+      "sha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b"
+    }
+  ],
+  "scenarioPackets": [
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-CLAUDE-ACTOR-01.json",
+      "sha256": "326fb08c1f199566171b12852e9cda0513440b0094917dd2617254f2978298b5"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-RELEASE-EPOCH-01.json",
+      "sha256": "7717fa5d47356d0fc47f8aec20f9a00398c20e8deb2525157d00a4988845b37b"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-AUTO-REVIEW-01.json",
+      "sha256": "2b39ac3710de6aff12e38af595d5afd6c44aaa77c3646903045cd1f9a534fd1f"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-OBSERVATION-AUTHORITY-01.json",
+      "sha256": "0efd0f1f2cec8d5037662d7213a2d0cdcf5e9a8f464b7cc774576ded452e6ee7"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-CONTAINMENT-01.json",
+      "sha256": "d08e314f8e10e78ed9e8938c6e97bc6e39845d7abbcb3f78fe08cc90c11e6fe3"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-304/HGI304-ACTION-PIN-01.json",
+      "sha256": "3cfb9c93568a256f18208d9b734b31a6be066641b94ea34ce3b7cc01eb168f26"
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "GitHub workflow desired source",
+      "decision": "change-required",
+      "owners": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/claude.yml",
+        ".github/workflows/release.yml"
+      ],
+      "result": "CI is bounded read-only, interactive Claude requires one exact owner comment beginning with @claude and read-only tools, release is a serialized version-PR writer disabled pending the exact authority epoch, and autonomous Claude review is retired."
+    },
+    {
+      "surface": "Workflow and provider authority",
+      "decision": "change-required",
+      "owners": [
+        "docs/operations/authority-model.md",
+        "docs/operations/authority-register.json",
+        "docs/operations/automation-register.md"
+      ],
+      "result": "Fifteen exact workflow, provider, and interaction records preserve principal, operation, resource, environment, duration/revocation, approval, readback, evidence, rollback, stop, escalation, and non-claim; unavailable readback remains inconclusive."
+    },
+    {
+      "surface": "Immutable third-party action ownership",
+      "decision": "change-required",
+      "owners": [
+        "docs/operations/github-actions-lock.json",
+        "tooling/authority-policy.ts"
+      ],
+      "result": "Every local action use has an exact reviewed 40-character pin, approved workflow locations, public-ref provenance, update owner, and atomic rollback requirement."
+    },
+    {
+      "surface": "Executable workflow and authority controls",
+      "decision": "change-required",
+      "owners": [
+        "tooling/authority-policy.ts",
+        "tooling/authority-policy-audit.ts",
+        "tooling/authority-policy-audit.test.ts",
+        "package.json"
+      ],
+      "result": "The verification gate rejects inventory, permission, timeout, convergence, target, epoch, pin, direct-invocation, 15-record classification, readback, secret, tool-authority, and emergency-containment drift with bounded diagnostics."
+    },
+    {
+      "surface": "Docs, READMEs, repository skill, SPEC, and active plan",
+      "decision": "change-required",
+      "owners": [
+        "AGENTS.md",
+        "README.md",
+        "docs/**",
+        ".agents/skills/docs-maintainer/references/repository-profile.md"
+      ],
+      "result": "Current routes point to the authority and automation owners; HGI-308 provenance, HGI-304 retirement, and HGI-306 restoration/admission ownership are coherent and maintained by executable policy."
+    },
+    {
+      "surface": "App and package runtime contracts, exports, React, and APIs",
+      "decision": "preserve",
+      "owners": ["apps/**", "packages/**"],
+      "result": "Runtime implementation, package exports, React, Schemas, services, Layers, HTTP APIs, and provider adapters are unchanged except for authority wording in the agent instruction and incident-runbook stop paths."
+    },
+    {
+      "surface": "External GitHub settings and provider state",
+      "decision": "not-applicable-to-execution",
+      "owners": [
+        "GitHub",
+        "Vercel",
+        "Executor",
+        "Sendblue",
+        "Upstash",
+        "secret store",
+        "AI Gateway",
+        "Codex account",
+        "deployed Eve"
+      ],
+      "result": "No authenticated readback or mutation occurred. HGI-309 retains external-setting and provider application/proof; repository source makes no runtime or Production claim."
+    }
+  ],
+  "checks": [
+    {
+      "check": "authority source and semantic policy",
+      "status": "passed",
+      "result": "check:authority passed exactly three workflows; all 15 authority classifications, exact action pins, direct invocation, negative drift fixtures, and emergency containment were accepted."
+    },
+    {
+      "check": "documentation and skills",
+      "status": "passed",
+      "result": "check:docs passed 220 files and check:skills passed 167 files with 16 mirrors."
+    },
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "A fresh Terra evaluator initially rejected three coherence gaps, accepted their source/test corrections, recomputed every inventory hash, and passed all six bounded scenarios."
+    },
+    {
+      "check": "formatting, type-aware analysis, and lint fixtures",
+      "status": "passed",
+      "result": "Ultracite checked 528 formatting files and 203 type-aware lint files with zero findings; the lint fixture and Knip passed."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundary/docs/skills/authority gates, 48 tooling tests, five package typechecks, and 250 app/package tests passed using only a schema-valid synthetic Executor configuration."
+    }
+  ],
+  "limitations": [
+    "Repository source, public Git refs, local tests, and fresh-context review do not prove GitHub settings, variables, tokens, OIDC, secret availability, hosted action behavior, workflow runs, comments, pull requests, or provider state.",
+    "Release remains disabled_pending_proof; HGI-309 owns authenticated external application/readback and HGI-305 owns critical-journey proof.",
+    "HGI-306 owns continuous-automation admission and any future attempt to restore automatic review."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored local file, GitHub setting, workflow run, credential, secret, deployment, webhook, message, approval resume, pull request, release, or Production system was read or changed.",
+    "A policy pass, action pin, workflow source, public ref, old receipt, model/tool output, or unavailable readback grants no external-operation authority."
+  ],
+  "rollback": "Revert workflow desired source, the three authority/automation/action owners, policy/tests/config, README/skill routes, current SPEC/plan state, and HGI-304 evidence together; preserve every previously accepted HGI receipt and all unchanged runtime implementation."
+}

@@ -126,9 +126,13 @@ and to HGI-304/HGI-305 for authority/proof gaps.
 
 Use only authenticated metadata and the boundary-matched app proof for the
 exact target. If unavailable, retain an `inconclusive` receipt and choose no
-mutation except an explicitly approved safest containment. Source, historical
-evidence, local headers, old profile proof, or alternate credentials are not
-fallbacks; unavailable is never healthy.
+normal mutation. The sole emergency exception is the one-shot, exact-target
+containment contract in
+[`docs/operations/authority-model.md`](../../../docs/operations/authority-model.md#emergency-containment);
+stop unless every required identity, approver, operation, expiry, rollback,
+receipt, and reconciliation field is present. Source, historical evidence,
+local headers, old profile proof, or alternate credentials are not fallbacks.
+The unavailable outcome is `inconclusive`: never healthy.
 
 ## Maintenance
 

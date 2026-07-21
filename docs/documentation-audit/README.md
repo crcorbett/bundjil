@@ -67,6 +67,17 @@ HGI-303 runbook and authority evidence:
 - [`hgi-303/HGI303-REAUTH-SUBJECT-01.json`](hgi-303/HGI303-REAUTH-SUBJECT-01.json)
 - [`hgi-303/HGI303-REVOCATION-NO-COMMAND-01.json`](hgi-303/HGI303-REVOCATION-NO-COMMAND-01.json)
 
+HGI-304 workflow and provider-authority evidence:
+
+- [`HGI-304-source-inventory.json`](HGI-304-source-inventory.json)
+- [`HGI-304-scenarios.json`](HGI-304-scenarios.json)
+- [`hgi-304/HGI304-CLAUDE-ACTOR-01.json`](hgi-304/HGI304-CLAUDE-ACTOR-01.json)
+- [`hgi-304/HGI304-RELEASE-EPOCH-01.json`](hgi-304/HGI304-RELEASE-EPOCH-01.json)
+- [`hgi-304/HGI304-AUTO-REVIEW-01.json`](hgi-304/HGI304-AUTO-REVIEW-01.json)
+- [`hgi-304/HGI304-OBSERVATION-AUTHORITY-01.json`](hgi-304/HGI304-OBSERVATION-AUTHORITY-01.json)
+- [`hgi-304/HGI304-CONTAINMENT-01.json`](hgi-304/HGI304-CONTAINMENT-01.json)
+- [`hgi-304/HGI304-ACTION-PIN-01.json`](hgi-304/HGI304-ACTION-PIN-01.json)
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

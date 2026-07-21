@@ -236,6 +236,25 @@ model output. Any hosted or provider observation belongs in a dated,
 target-owned proof receipt with a source identity, `observedAt`, limitations,
 and non-claims. It never grants deployment or mutation authority.
 
+## Workflow and authority policy
+
+Workflow or provider-authority changes run the machine-readable register,
+action-lock, and workflow semantic gate:
+
+```bash
+bun run check:authority
+bun run test:boundaries
+```
+
+The gate rejects missing authority-envelope fields, unavailable readback
+reported as healthy, tool/preflight-derived authority, secret-bearing records,
+unsafe emergency containment, mutable or mismatched action pins, widened
+permissions, target mismatch, unbounded jobs, repeated review loops,
+unapproved mutation, release publication, and restoration of retired automatic
+Claude review. It proves source desired state only. GitHub and each provider
+remain authoritative for current identity, settings, credentials, runs, and
+consequences.
+
 ## Documentation Quality
 
 Every durable feature should leave behind:
@@ -260,6 +279,7 @@ rg -n "old-path|old-package|old-command" README.md AGENTS.md docs apps packages
 rg -n "docs/architecture/(effect-patterns|repo-structure|testing-and-quality)" README.md AGENTS.md docs ARCHITECTURE.md
 bun run check:skills
 bun run check:docs
+bun run check:authority
 ```
 
 Stale-name scans must be scoped by provenance. Current source, manifests,

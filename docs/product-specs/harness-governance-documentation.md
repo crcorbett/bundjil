@@ -35,19 +35,19 @@ bounded evidence, limitations, rollback, and exact Git identity.
 
 ## Tasks
 
-| Task                                                                                                                                    | State     | Acceptance owner                                                                                                                     |
-| --------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and README scope | Completed | S1/S2 receipts, independent retrieval, verification, and `HGI-300-validation.json` Git receipt                                       |
-| HGI-301 — architecture reconciliation and fixed-ritual removal                                                                          | Completed | `HGI-301-validation.json`, current architecture owners, executable semantic contradiction fixtures, and fresh-context acceptance     |
-| HGI-308 — provider, review, and control decisions                                                                                       | Completed | `HGI-308-validation.json`, direct schema/task-map proof, read-only GitHub receipt, boundary comparison, and fresh-context acceptance |
-| HGI-302 — docs policy and skill-mirror controls                                                                                         | Completed | `HGI-302-validation.json`, bounded JSON diagnostics, semantic owner fixtures, complete mirrors, and repository verification          |
-| HGI-310 — documentation-maintenance skill                                                                                               | Completed | `HGI-310-validation.json`, portable local skill/mirror, semantic fixtures, six fresh scenarios, and clean-clone acceptance           |
-| HGI-303 — app-owned operational runbooks                                                                                                | Completed | `HGI-303-validation.json`, ten app-owned runbooks, structural checks, six bounded receipts, and fresh-context acceptance             |
-| HGI-304 — workflow and provider authority                                                                                               | Pending   | Identity, operation, target, environment, duration, approval boundary, audit receipt, rollback                                       |
-| HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Pending   | `docs/verification/**`, artifact-matched evidence, and context-legible commands                                                      |
-| HGI-306 — feedback, controls, and continuous automation                                                                                 | Pending   | Earliest-owner enforcement, automation admission, durable state, proof, and escalation                                               |
-| HGI-307 — harness requalification and repository closeout                                                                               | Pending   | Fresh-worker evaluation, accepted receipts, and pushed commit identity                                                               |
-| HGI-309 — external-authority application                                                                                                | Deferred  | Separately approved provider operations and external readback                                                                        |
+| Task                                                                                                                                    | State       | Acceptance owner                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| HGI-300 — lifecycle/router, current architecture, current intent, active/history and historical-ledger classification, and README scope | Completed   | S1/S2 receipts, independent retrieval, verification, and `HGI-300-validation.json` Git receipt                                       |
+| HGI-301 — architecture reconciliation and fixed-ritual removal                                                                          | Completed   | `HGI-301-validation.json`, current architecture owners, executable semantic contradiction fixtures, and fresh-context acceptance     |
+| HGI-308 — provider, review, and control decisions                                                                                       | Completed   | `HGI-308-validation.json`, direct schema/task-map proof, read-only GitHub receipt, boundary comparison, and fresh-context acceptance |
+| HGI-302 — docs policy and skill-mirror controls                                                                                         | Completed   | `HGI-302-validation.json`, bounded JSON diagnostics, semantic owner fixtures, complete mirrors, and repository verification          |
+| HGI-310 — documentation-maintenance skill                                                                                               | Completed   | `HGI-310-validation.json`, portable local skill/mirror, semantic fixtures, six fresh scenarios, and clean-clone acceptance           |
+| HGI-303 — app-owned operational runbooks                                                                                                | Completed   | `HGI-303-validation.json`, ten app-owned runbooks, structural checks, six bounded receipts, and fresh-context acceptance             |
+| HGI-304 — workflow and provider authority                                                                                               | In progress | Hardened workflows, machine authority/action registers, semantic fixtures, bounded source evidence, and fresh-context acceptance     |
+| HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Pending     | `docs/verification/**`, artifact-matched evidence, and context-legible commands                                                      |
+| HGI-306 — feedback, controls, and continuous automation                                                                                 | Pending     | Earliest-owner enforcement, automation admission, durable state, proof, and escalation                                               |
+| HGI-307 — harness requalification and repository closeout                                                                               | Pending     | Fresh-worker evaluation, accepted receipts, and pushed commit identity                                                               |
+| HGI-309 — external-authority application                                                                                                | Deferred    | Separately approved provider operations and external readback                                                                        |
 
 ## Non-goals and authority
 
@@ -74,9 +74,13 @@ HGI-308 has accepted decision evidence at
 [`HGI-308-validation.json`](../documentation-audit/HGI-308-validation.json)
 and its five schema-valid decision records. It defers the Eve Production claim,
 accepts app-owned runbooks and target-specific fallback readbacks, retains
-occurrence-based boundary exceptions pending equivalent fixtures, and retains
-Claude automatic review only as a bounded experimental signal. That
-tighten-or-retire policy is the accepted default. It is not an
-accepted authority, provider receipt, runbook, workflow change, or proof of
-automated-review effectiveness. HGI-302 through HGI-306 implement only their
-applicable accepted records and claim-specific non-claims.
+occurrence-based boundary exceptions pending equivalent fixtures, and accepts
+a tighten-or-retire decision for automatic Claude review. HGI-304 found that
+the required comment identity, least-privilege write path, convergence, and
+effectiveness proof were unavailable, so the workflow is retired rather than
+admitted as a bounded experiment. HGI-308 remains the decision provenance; any
+future restoration is a new capability owned by HGI-306 automation-admission
+evidence and a separately accepted SPEC. Neither decision establishes provider
+authority, runtime behavior, or automated-review effectiveness. HGI-302 through
+HGI-306 implement only their applicable accepted records and claim-specific
+non-claims.

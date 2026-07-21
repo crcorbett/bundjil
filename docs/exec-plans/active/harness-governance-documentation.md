@@ -30,9 +30,12 @@ and task state.
   [`HGI-301-validation.json`](../../documentation-audit/HGI-301-validation.json).
 - **HGI-308 — completed:** local decision records defer
   the Eve Production claim, accept app-owned runbook ownership, retain
-  occurrence-based boundary exceptions pending equivalent fixtures, bound
-  automatic Claude review as experimental, and accept provider readback
-  fallbacks. Acceptance and exact Git identity are recorded in
+  occurrence-based boundary exceptions pending equivalent fixtures, establish
+  a tighten-or-retire decision for automatic Claude review, and accept provider
+  readback fallbacks. HGI-304 applied the retirement branch because authority,
+  convergence, and effectiveness proof were unavailable; HGI-306 owns any
+  future restoration and automation-admission evidence. Acceptance and exact
+  Git identity are recorded in
   [`HGI-308-validation.json`](../../documentation-audit/HGI-308-validation.json);
   the records do not establish provider state or operation authority.
 - **HGI-302 — completed:** bounded documentation and skill-mirror controls now
@@ -52,7 +55,11 @@ and task state.
   policy checks, six dry-run receipts, full repository verification, fresh-context
   acceptance, and pushed semantic identity are recorded in
   [`HGI-303-validation.json`](../../documentation-audit/HGI-303-validation.json).
-- HGI-304, HGI-305, HGI-306, and HGI-307 remain pending in dependency order.
+- **HGI-304 — in progress:** harden CI, release-PR, and interactive-Claude
+  desired state; retire ungoverned automatic review; add complete provider and
+  interaction authority envelopes, immutable action ownership, emergency
+  containment, and executable negative controls without accessing providers.
+- HGI-305, HGI-306, and HGI-307 remain pending in dependency order.
   HGI-309 remains deferred until separately approved external authority exists.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,

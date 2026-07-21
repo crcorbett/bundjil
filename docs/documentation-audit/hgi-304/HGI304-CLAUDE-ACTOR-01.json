@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-304",
+  "scenarioId": "HGI304-CLAUDE-ACTOR-01",
+  "scenarioManifest": "../HGI-304-scenarios.json",
+  "scenarioManifestSha256": "bd4d5588fe33b927b5668b1609d6888e9489f9bda4f3da89dedd8921659a6b7b",
+  "targetBaseCommit": "053044d95109c339a97b22f4f57e698ef2956051",
+  "evaluator": "fresh Terra worker /root/hgi304_fresh_acceptance",
+  "observedAt": "2026-07-21T15:00:00+01:00",
+  "status": "passed",
+  "selectedOwner": ".github/workflows/claude.yml and docs/operations/automation-register.md",
+  "decision": "Reject before execution unless github.actor is crcorbett and the comment begins exactly with @claude; retain read-only tools only.",
+  "evidenceRequired": [
+    "Exact event actor, conversation, source revision, and invocation classification.",
+    "Static owner and startsWith gates plus bounded permissions, timeout, concurrency, and tool allowlist."
+  ],
+  "limitations": [
+    "Repository source cannot prove GitHub event evaluation, OIDC exchange, secret availability, external action behavior, or a workflow run."
+  ],
+  "nonClaims": [
+    "A matching source predicate does not establish external authority or runtime behavior."
+  ],
+  "rollbackRevocation": "Cancel or disable the workflow and revoke the Anthropic integration under separate authority; preserve sanitized failed-run evidence if any.",
+  "escalation": ["Bundjil repository owner", "Anthropic integration owner"],
+  "unsafeAmbiguities": []
+}

@@ -7,6 +7,7 @@ export default defineConfig({
       "tooling/documentation-policy-audit.test.ts",
       "tooling/documentation-policy.test.ts",
       "tooling/skill-policy-audit.test.ts",
+      "tooling/authority-policy-audit.test.ts",
     ],
   },
 });
