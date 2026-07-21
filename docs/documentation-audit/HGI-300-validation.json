@@ -7,6 +7,12 @@
   "baseCommit": "8ae65faecddffeffa227cc473c8eaf28533691cb",
   "semanticCommit": "66b46834d19af671f4f1a93fcb928d5e463b36c4",
   "semanticTree": "f7d4a32308722e04e94554d46ecd9cd486b67743",
+  "truthCorrectionObservedAt": "2026-07-21T22:32:29Z",
+  "truthCorrectionCommit": "85f3e804193e6179c1bcec925230cbd46cacf878",
+  "truthCorrectionParent": "fb86815bd7fba59e4cabc07e4275432b26a474e8",
+  "truthCorrectionTree": "a4c094a15b3f752dbea5f5da38fd74e5cf3053f4",
+  "truthCorrectionChangedPathCount": 3,
+  "truthCorrectionSortedChangedPathSha256": "14c839d5327b403fa8d2d6c863bda20db1a6efdcc6162c75ce2e4f6bd7c1f339",
   "changedPathCount": 15,
   "sortedChangedPathSha256": "e2f308a4714b65cb7ccfb9f17d2fa1106cfad9074556959433d118fca7ccd02f",
   "changedPaths": [
@@ -30,7 +36,7 @@
     {
       "check": "fresh-context acceptance",
       "status": "passed",
-      "result": "Two independent workers found one lifecycle router, truthful history/current/research separation and ledger provenance, concise tracked root/app/package READMEs, correct HGI-301 through HGI-310 routing, and explicit runbook, authority, and verification gaps."
+      "result": "The truth-correction reviewer independently reproduced 12 historical ledgers, every completed task entry, 10 completed ledger statuses, 2 implemented ledger statuses, and one scoped historical granted approval. It found the semantic correction sound and required immutable correction identity before acceptance."
     },
     {
       "check": "corpus and link reproduction",
@@ -51,13 +57,18 @@
       "check": "remote readback",
       "status": "passed",
       "result": "After push and fetch, local HEAD and origin/main both resolved to 66b46834d19af671f4f1a93fcb928d5e463b36c4."
+    },
+    {
+      "check": "historical-ledger truth correction",
+      "status": "passed",
+      "result": "Correction commit 85f3e804193e6179c1bcec925230cbd46cacf878 has parent fb86815bd7fba59e4cabc07e4275432b26a474e8, tree a4c094a15b3f752dbea5f5da38fd74e5cf3053f4, three declared paths, sorted-path digest 14c839d5327b403fa8d2d6c863bda20db1a6efdcc6162c75ce2e4f6bd7c1f339, and matched origin/main after push and fetch."
     }
   ],
-  "postcondition": "Bundjil HGI-300 has accepted semantic owners and immutable local/remote Git identity; HGI-301 is the next dependency-ready slice.",
-  "rollback": "Revert the closeout evidence commit, then semantic commit 66b46834d19af671f4f1a93fcb928d5e463b36c4; preserve research, completed history, and provider state.",
+  "postcondition": "Bundjil HGI-300 has accepted semantic owners, immutable local/remote Git identity, and a published correction that preserves heterogeneous historical ledger and approval provenance.",
+  "rollback": "Revert the truth-correction closeout, then correction commit 85f3e804193e6179c1bcec925230cbd46cacf878 if needed; retain the original HGI-300 semantic receipt and historical ledgers.",
   "limitations": [
     "This receipt proves repository documentation and Git publication only.",
-    "HGI-303 runbooks, HGI-304 authority, and HGI-305 verification owners remain intentionally absent until their dependencies are satisfied."
+    "HGI-303/HGI-304 were absent at the dated HGI-300 boundary and now have later completed current owners; this receipt does not back-project those later outcomes into HGI-300-era evidence."
   ],
   "nonClaims": [
     "No Vercel, Executor, Sendblue, Upstash, AI Gateway, deployment, webhook, credential, release, production, or external-consumer state is proved or changed."
