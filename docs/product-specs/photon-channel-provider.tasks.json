@@ -160,7 +160,7 @@
     {
       "id": "prove-photon-isolated-preview",
       "title": "Prove the clean Photon path in an isolated Preview",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["build-and-conform-photon-provider"],
       "description": "Only with separate provider/deployment authority, configure the new Photon path in an isolated Preview and prove signed ingress, fresh replay, Eve dispatch, outbound acceptance, presence, and resource cleanup.",
       "implementationNotes": [
@@ -178,6 +178,11 @@
       "completionCriteria": [
         "An isolated Preview proves the clean Photon journey or records a terminal candidate stop with exact evidence.",
         "No Production or Sendblue provider state changed."
+      ],
+      "evidence": [
+        "Provider-only proof: the user-authorized Photon command decoded project credentials through Config.schema and Redacted, authenticated the management plane, recovered no stale proof record, created and listed one fixed non-routable proof webhook, observed its create-only signing secret only in Redacted memory, acquired and released the pinned Spectrum SDK, deleted the exact proof webhook, and read back the original zero-webhook topology. The sanitized receipt contained only booleans and counts; no line, billing, message, user, platform, Vercel, DNS, environment, deployment, Sendblue, Upstash, Preview-runtime, or Production mutation ran.",
+        "Lifecycle safety and verification: @bundjil/photon now owns internal named PhotonManagement and PhotonLifecycleProbe services, Effect HTTP and Bun live Layers, strict management response Schemas, a Config/Redacted executable edge, bounded request/lifecycle timeouts, create-without-retry semantics, exact reserved-URL adoption, acquireUseRelease cleanup, post-failure readback, and a sanitized receipt. Three new tests prove success, cleanup after SDK failure, and ambiguous-create recovery without deleting an unrelated webhook. The first final gate found one consistent-return lint issue in deleteWebhook; it was corrected, then Effect setup, boundaries, skills, 24 boundary fixtures, formatting, lint, Knip, eight workspace typechecks, 232 workspace tests, both Photon and agent builds, full verification, stale-pattern scans, and diff checks passed.",
+        "Terminal candidate stop: Vercel deployment authority, a hosted Preview identity/config binding, and a known live inbound Photon Space or approved synthetic recipient were absent. Hosted ingress, replay, Eve dispatch, cold live Space resolution, outbound acceptance, presence, waitUntil, retry suppression, and handset behavior therefore remain explicitly unproved. The dated receipt is docs/verification/photon-provider-proof-2026-07-21.md against accepted runtime commit c7bed88338e50e5177489fecca8d89968605728e. The ignored credential file was mode 0644; no value was emitted or copied, but the runbook now blocks future execution until it is 0600. No Production or Sendblue provider state changed."
       ],
       "commitAfterPassing": true
     },

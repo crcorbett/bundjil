@@ -85,6 +85,28 @@ const liveFactory: PhotonSdkFactory = {
   },
 };
 
+export const provePhotonSdkLifecycle = (config: PhotonConfig) =>
+  Effect.acquireUseRelease(
+    Effect.tryPromise({
+      try: () => liveFactory.acquire(config),
+      catch: () =>
+        new PhotonLifecycleError({
+          operation: "acquire",
+          reason: "unavailable",
+        }),
+    }),
+    () => Effect.void,
+    (resource) =>
+      Effect.tryPromise({
+        try: () => resource.stop(),
+        catch: () =>
+          new PhotonLifecycleError({
+            operation: "release",
+            reason: "unavailable",
+          }),
+      })
+  );
+
 export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
   Layer.effect(
     PhotonClient,

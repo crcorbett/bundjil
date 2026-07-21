@@ -62,3 +62,10 @@ bun run --filter @bundjil/photon build
 
 These commands are repository proof only. They do not configure Photon or
 prove a deployed webhook, provider send, or handset delivery.
+
+The separately authorised, provider-only lifecycle command is
+`bun run --filter @bundjil/photon proof:provider`. It follows the
+[Photon provider proof runbook](../../docs/runbooks/photon-provider-proof.md),
+performs one reversible proof-webhook lifecycle plus SDK acquire/release, and
+emits only a sanitised Schema receipt. It is not a deployment or messaging
+proof.

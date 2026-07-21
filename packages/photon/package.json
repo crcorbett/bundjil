@@ -36,6 +36,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
+    "proof:provider": "bun run scripts/prove-provider.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
     "effect": "catalog:effect"
   },
   "devDependencies": {
+    "@effect/platform-bun": "catalog:effect",
     "@effect/vitest": "catalog:effect",
     "typescript": "catalog:typescript",
     "vitest": "catalog:testing"
