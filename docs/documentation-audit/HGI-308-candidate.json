@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-308",
+  "status": "accepted",
+  "observedAt": "2026-07-21T12:15:06+01:00",
+  "baseCommit": "11708ff396b935b92cd8846b6999c19847317869",
+  "authority": "local Bundjil decision and routing writes, read-only GitHub repository-settings readback, and local capability inspection only; no provider, workflow, secret, deployment, or GitHub mutation",
+  "acceptedOutcome": "Four reversible local defaults and one claim-specific Eve live-state deferral govern Bundjil's runbook ownership, Claude review containment, boundary exceptions, provider fallbacks, and external-state nonclaims before HGI-302 through HGI-306 implement them.",
+  "sourceReceiptSha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb",
+  "decisions": [
+    {
+      "path": "HGI-308-eve-live-state.decision.json",
+      "state": "deferred",
+      "outcome": "No Eve Production claim is accepted; HGI-303 may obtain the readback and HGI-305 may retain inconclusive proof without a task-wide block."
+    },
+    {
+      "path": "HGI-308-runbook-ownership.decision.json",
+      "state": "accepted",
+      "outcome": "Operational procedures live in apps/agent/runbooks and apps/codex-proxy/runbooks; central docs only route and explain durable authority rationale."
+    },
+    {
+      "path": "HGI-308-claude-review.decision.json",
+      "state": "accepted",
+      "outcome": "The current automatic review is an ungoverned mutation-capable experiment; HGI-304 must prove and tighten comment authority and convergence or retire it, while HGI-306 must prove cost and false-positive admission."
+    },
+    {
+      "path": "HGI-308-boundary-exceptions.decision.json",
+      "state": "accepted",
+      "outcome": "Retain occurrence-based exceptions unless a semantic/generated replacement proves exact matching, duplicate rejection, occurrence isolation, and stale detection."
+    },
+    {
+      "path": "HGI-308-readback-fallbacks.decision.json",
+      "state": "accepted",
+      "outcome": "Use target-owned read-only fallbacks with identity, target, observedAt, sanitized shape, limitation, stop, escalation, and no mutation path; unavailable means inconclusive."
+    }
+  ],
+  "verification": [
+    {
+      "check": "direct decision-record schema and receipt validation",
+      "status": "passed",
+      "result": "All five records pass the canonical Draft 2020 decision schema, use instance-relative receipt paths, match the content-addressed receipt, and have exact affectedTasks/taskBlocking equality."
+    },
+    {
+      "check": "source and provider inventory",
+      "status": "passed",
+      "result": "All five source hashes reproduce from base 11708ff; GitHub readback reproduced Actions enabled, allowed_actions=all, and sha_pinning_required=false, with no inference about tokens, comments, effectiveness, or Eve state."
+    },
+    {
+      "check": "boundary-control comparison",
+      "status": "passed",
+      "result": "Twenty-four focused tests prove exact admission, occurrence isolation, duplicate rejection, and stale-entry detection; boundary and skill audits pass."
+    },
+    {
+      "check": "fresh-context rejection, correction, and acceptance",
+      "status": "passed",
+      "result": "The evaluator exposed one-way task mapping, a self-deadlocking deferral, wrong runbook path ownership, and understated Claude mutation risk. Corrected central dependencies/scopes and local records then received PASS."
+    },
+    {
+      "check": "focused repository checks",
+      "status": "passed",
+      "result": "Ultracite format/lint, boundary tests, boundary audit, skill audit, and git diff --check pass."
+    },
+    {
+      "check": "fully staged bun run verification",
+      "status": "passed",
+      "result": "Effect setup, boundary and skill audits, 29 tooling tests, Ultracite, lint fixtures, Knip, five workspace typechecks, and 250 package/app tests passed with a schema-valid synthetic Executor test configuration and no provider call."
+    }
+  ],
+  "limitations": [
+    "GitHub Actions settings do not prove workflow execution, token issuance, comment authority, review quality, cost, or convergence.",
+    "Vercel, Executor, Sendblue, Upstash, and secret-binding readbacks remain unavailable or intentionally unattempted pending target-owned authority.",
+    "The Eve live-state deferral prohibits claims but does not block HGI-303 runbook/readback work or HGI-305 inconclusive proof design."
+  ],
+  "nonClaims": [
+    "No provider, workflow, GitHub setting, secret, deployment, webhook, message, credential, production, release, or publication state was mutated.",
+    "No accepted local default grants external authority or establishes provider actuality."
+  ],
+  "rollback": "Revert this bounded HGI-308 candidate slice and the corresponding central task pointers together; preserve HGI-300, HGI-301, and their immutable receipts.",
+  "nextTrigger": "Use the final Git/readback receipt to close HGI-308, then implement HGI-302 and HGI-310 before the app-owned HGI-303 runbooks."
+}

@@ -27,5 +27,19 @@ Current HGI-301 candidate evidence:
 - [`HGI-301-candidate.json`](HGI-301-candidate.json)
 - [`HGI-301-validation.json`](HGI-301-validation.json)
 
+HGI-308 candidate decision evidence (acceptance pending):
+
+- [`HGI-308-source-receipt.json`](HGI-308-source-receipt.json)
+- [`HGI-308-candidate.json`](HGI-308-candidate.json)
+- [`HGI-308-eve-live-state.decision.json`](HGI-308-eve-live-state.decision.json)
+- [`HGI-308-runbook-ownership.decision.json`](HGI-308-runbook-ownership.decision.json)
+- [`HGI-308-claude-review.decision.json`](HGI-308-claude-review.decision.json)
+- [`HGI-308-boundary-exceptions.decision.json`](HGI-308-boundary-exceptions.decision.json)
+- [`HGI-308-readback-fallbacks.decision.json`](HGI-308-readback-fallbacks.decision.json)
+
+These are local decision candidates, not accepted policy, provider truth, or
+operation authority. The source receipt is content-addressed by every decision
+record; an unavailable readback is inconclusive rather than healthy.
+
 Counts prove path accounting only. Fresh-context retrieval and the semantic
 owner must support current-document claims.

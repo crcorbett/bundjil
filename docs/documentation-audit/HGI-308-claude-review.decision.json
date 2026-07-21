@@ -1,0 +1,41 @@
+{
+  "id": "HGI-308-claude-review",
+  "state": "accepted",
+  "semanticOwner": ".github/workflows/claude-code-review.yml with authority and automation registers to be created by HGI-304 and HGI-306",
+  "evidence": [
+    "The automatic review workflow triggers on opened and synchronized pull requests and grants read permissions plus id-token write while allowing gh pr comment.",
+    "Repository YAML provides no severity taxonomy, deduplication key, convergence condition, stopping rule, escalation route, budget, or measured false-positive/cost evidence.",
+    "GitHub readback confirms Actions are enabled and SHA pinning is not required; it does not establish review effectiveness."
+  ],
+  "rejectedAlternatives": [
+    "Retain automatic review unchanged and describe it as settled or effective.",
+    "Retire automatic review without first preserving the evidence and a replacement decision.",
+    "Treat interactive @claude workflow behavior as evidence for automatic review convergence."
+  ],
+  "acceptedOrDefaultBehavior": "Treat the current automatic Claude review as an ungoverned, mutation-capable experiment, not an accepted automation. HGI-304 may retain it only after establishing the actual comment credential and tightening least privilege, timeouts, concurrency, one-comment-per-PR/head-SHA deduplication, stop-after-one-run convergence, and named escalation; HGI-306 must add cost and false-positive evidence. If those controls and readbacks cannot be implemented, retire the automatic workflow in HGI-304 rather than claim safe automation.",
+  "affectedTasks": ["HGI-304", "HGI-306"],
+  "taskBlocking": [
+    {
+      "taskId": "HGI-304",
+      "blocks": false,
+      "inheritedNonClaim": "Do not retain automatic review as a governed capability without explicit authority and convergence controls."
+    },
+    {
+      "taskId": "HGI-306",
+      "blocks": false,
+      "inheritedNonClaim": "Do not admit the loop to continuous automation without severity, deduplication, stopping, escalation, and cost evidence."
+    }
+  ],
+  "authorityImpact": "PR comments are external GitHub mutations. This record authorizes none, does not establish which action/OIDC/token path can comment, and does not accept the current workflow as governed. Only separately authorized HGI-304 workflow changes may constrain or retire it; it must never merge, deploy, release, or approve.",
+  "nonClaims": [
+    "Automatic Claude review is not accepted as non-mutating, authorized, effective, convergent, low-cost, or safe for consequential action.",
+    "Repository YAML and Actions settings do not establish the actual PR-comment credential, token issuance, permission at run time, or a successful comment.",
+    "No GitHub workflow or provider setting was changed."
+  ],
+  "carryingCost": "Track run count, duplicate comments, escalation, reviewer disposition, false positives, elapsed time, and token/cost receipt per review epoch.",
+  "reviewOrResumeTrigger": "Resume in HGI-304 only with actual comment-authority readback and a bounded workflow diff; retire there if least privilege, timeout, concurrency, deduplication, stopping, and escalation cannot be proved. HGI-306 may admit the retained loop only after cost and false-positive evidence.",
+  "receipt": {
+    "path": "./HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb"
+  }
+}

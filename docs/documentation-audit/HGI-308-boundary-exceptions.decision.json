@@ -1,0 +1,38 @@
+{
+  "id": "HGI-308-boundary-exceptions",
+  "state": "accepted",
+  "semanticOwner": "tooling/boundary-exceptions.ts and tooling/boundary-audit.ts",
+  "evidence": [
+    "The current audit matches file, symbol, occurrence, and rule, detects unused exceptions as stale, and focused tests cover exact admission, one-occurrence isolation, and duplicate rejection.",
+    "The registry has repeated exact occurrence entries for one Upstash facade; its current representation is verbose but preserves the relevant identity."
+  ],
+  "rejectedAlternatives": [
+    "Simplify to a symbol-only or file-only exception registry.",
+    "Replace the registry with a semantic/generated representation before it demonstrably preserves exact, duplicate, occurrence, and stale detection."
+  ],
+  "acceptedOrDefaultBehavior": "Retain the occurrence-based registry as the default. HGI-302/HGI-306 may propose a semantic/generated representation only with equivalent positive and negative fixtures proving exact match, duplicate rejection, occurrence isolation, and stale-entry detection against the real audit.",
+  "affectedTasks": ["HGI-302", "HGI-306"],
+  "taskBlocking": [
+    {
+      "taskId": "HGI-302",
+      "blocks": false,
+      "inheritedNonClaim": "No replacement boundary control may land without equivalent negative fixtures."
+    },
+    {
+      "taskId": "HGI-306",
+      "blocks": false,
+      "inheritedNonClaim": "Control admission/retirement must preserve current exact, duplicate, occurrence, and stale detection."
+    }
+  ],
+  "authorityImpact": "This is a repository-local control decision and grants no provider or workflow authority.",
+  "nonClaims": [
+    "No semantic/generated replacement is implemented or proven equivalent.",
+    "Registry line-count reduction is not a success criterion."
+  ],
+  "carryingCost": "Maintain occurrence entries and their fixtures; review only when a repeated exception pattern has a candidate canonical owner and comparison evidence.",
+  "reviewOrResumeTrigger": "Resume when HGI-302 or HGI-306 supplies a candidate representation plus real-audit fixture comparison covering all four preserved properties.",
+  "receipt": {
+    "path": "./HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb"
+  }
+}

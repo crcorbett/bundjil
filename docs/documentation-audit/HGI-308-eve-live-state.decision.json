@@ -1,0 +1,39 @@
+{
+  "id": "HGI-308-eve-live-state",
+  "state": "deferred",
+  "semanticOwner": "Bundjil agent operations maintainer through the future apps/agent runbook and proof owners",
+  "evidence": [
+    "HGI-301's accepted source receipt is content-addressed by the HGI-308 source receipt and explicitly records unavailable provider readback.",
+    "No Vercel CLI or connected provider-readback capability was available on 2026-07-21.",
+    "GitHub Actions readback is unrelated to Eve deployment state."
+  ],
+  "rejectedAlternatives": [
+    "Infer Production from deployable Eve, Sendblue, or codex-proxy source.",
+    "Treat repository, historical proof, or GitHub workflow settings as a Vercel deployment receipt."
+  ],
+  "acceptedOrDefaultBehavior": "Defer the Eve live Production claim. Current architecture remains source-topology only; a fresh, target-owned Vercel read-only receipt is required before any current deployment, provider, webhook, credential, or handset assertion.",
+  "affectedTasks": ["HGI-303", "HGI-305"],
+  "taskBlocking": [
+    {
+      "taskId": "HGI-303",
+      "blocks": false,
+      "inheritedNonClaim": "Runbook drafting must not claim Production until its Vercel readback is recorded."
+    },
+    {
+      "taskId": "HGI-305",
+      "blocks": false,
+      "inheritedNonClaim": "No production journey packet may claim an external consequence without fresh target readback."
+    }
+  ],
+  "authorityImpact": "No external authority is granted. A later target-owned read-only operation requires its own identity, target, redaction, receipt, and stop condition.",
+  "nonClaims": [
+    "No Eve Production, deployment, provider connection, webhook, credential binding, handset outcome, or production readiness is established.",
+    "No Eve or Vercel provider operation was attempted or authorized; the read-only GitHub Actions setting is unrelated to Eve live state."
+  ],
+  "carryingCost": "Re-read Vercel state only when an app/runbook/proof task has an approved target and use the dated receipt rather than copying mutable state into durable docs.",
+  "reviewOrResumeTrigger": "Resume when HGI-303 supplies an authenticated, target-owned Vercel read-only receipt or when Eve deployment topology changes.",
+  "receipt": {
+    "path": "./HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "HGI-308-runbook-ownership",
+  "state": "accepted",
+  "semanticOwner": "apps/agent/runbooks/** and apps/codex-proxy/runbooks/**, to be created by HGI-303",
+  "evidence": [
+    "docs/README.md identifies no canonical central docs/runbooks tree and assigns HGI-303 the missing target-owned operation routes.",
+    "The canonical HGI-303 task names app-owned runbook paths and requires provider fallback readback there."
+  ],
+  "rejectedAlternatives": [
+    "Create a competing central docs/runbooks tree for agent and codex-proxy procedures.",
+    "Keep consequential procedure in READMEs, skills, architecture, or dated receipts."
+  ],
+  "acceptedOrDefaultBehavior": "Use one app-owned runbook tree per operational target: apps/agent/runbooks for agent, deployment, Executor, Sendblue, and incident work; apps/codex-proxy/runbooks for proxy auth and proof work. Central docs route to them and retain only durable authority rationale.",
+  "affectedTasks": ["HGI-303"],
+  "taskBlocking": [
+    {
+      "taskId": "HGI-303",
+      "blocks": false,
+      "inheritedNonClaim": "No app operation is owned until target-owned runbooks exist with authority, rollback, and escalation."
+    }
+  ],
+  "authorityImpact": "Ownership routing grants no provider authority; every consequential step remains approval-gated by its app-owned runbook and external target.",
+  "nonClaims": [
+    "No runbook, provider procedure, or external recovery path is implemented by this record.",
+    "Central documentation is not declared an operational owner."
+  ],
+  "carryingCost": "Maintain pointers and review each app runbook when its app, provider, authentication, deployment, or incident boundary changes.",
+  "reviewOrResumeTrigger": "Review or supersede when HGI-303 changes the accepted app-owned runbook inventory or a new operational target appears.",
+  "receipt": {
+    "path": "./HGI-308-source-receipt.json",
+    "sha256": "10629764423fb128f34043a886eb9f0d60f4e6b72561d24d6fcdc8064903acdb"
+  }
+}
