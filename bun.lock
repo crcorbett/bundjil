@@ -27,6 +27,7 @@
         "@ai-sdk/openai-compatible": "^3.0.5",
         "@bundjil/channel": "workspace:*",
         "@bundjil/eve": "workspace:*",
+        "@bundjil/sendblue": "workspace:*",
         "@bundjil/store": "workspace:*",
         "@effect/platform-bun": "catalog:effect",
         "ai": "^7.0.16",
@@ -96,6 +97,19 @@
         "vitest": "catalog:testing",
       },
     },
+    "packages/sendblue": {
+      "name": "@bundjil/sendblue",
+      "version": "0.1.0",
+      "dependencies": {
+        "@bundjil/channel": "workspace:*",
+        "effect": "catalog:effect",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:effect",
+        "typescript": "catalog:typescript",
+        "vitest": "catalog:testing",
+      },
+    },
     "packages/store": {
       "name": "@bundjil/store",
       "version": "0.1.0",
@@ -150,6 +164,8 @@
     "@bundjil/codex-proxy": ["@bundjil/codex-proxy@workspace:apps/codex-proxy"],
 
     "@bundjil/eve": ["@bundjil/eve@workspace:packages/eve"],
+
+    "@bundjil/sendblue": ["@bundjil/sendblue@workspace:packages/sendblue"],
 
     "@bundjil/store": ["@bundjil/store@workspace:packages/store"],
 

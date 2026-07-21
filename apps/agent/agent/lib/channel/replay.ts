@@ -43,7 +43,7 @@ const replayRecordJson = Schema.fromJsonString(
   Schema.toCodecJson(ChannelReplayRecord)
 );
 
-export const layerMemory = (options: ChannelReplayOptions) =>
+const makeLayer = (options: ChannelReplayOptions) =>
   Layer.effect(
     ChannelReplay,
     Effect.gen(function* makeChannelReplay() {
@@ -206,3 +206,8 @@ export const layerMemory = (options: ChannelReplayOptions) =>
       });
     })
   );
+
+export const layerMemory = (options: ChannelReplayOptions) =>
+  makeLayer(options);
+
+export const layerLive = (options: ChannelReplayOptions) => makeLayer(options);

@@ -25,6 +25,9 @@ export const ChannelReplayPrefix = Schema.NonEmptyString.pipe(
 );
 export type ChannelReplayPrefix = typeof ChannelReplayPrefix.Type;
 
+export const ChannelRoutingSecret = Schema.Redacted(Schema.NonEmptyString);
+export type ChannelRoutingSecret = typeof ChannelRoutingSecret.Type;
+
 export const ChannelReplayKey = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/agent/ChannelReplayKey")
 );
@@ -78,6 +81,9 @@ export type ChannelStateV1 = typeof ChannelStateV1.Type;
 export const ChannelAdapterState = Schema.Struct({ snapshot: ChannelStateV1 });
 export type ChannelAdapterState = typeof ChannelAdapterState.Type;
 export type ChannelAdapterStateEncoded = typeof ChannelAdapterState.Encoded;
+export interface ChannelMutableAdapterStateEncoded {
+  snapshot: ChannelAdapterStateEncoded["snapshot"];
+}
 
 export const ChannelPreparedInbound = Schema.Struct({
   claim: ChannelReplayClaim,

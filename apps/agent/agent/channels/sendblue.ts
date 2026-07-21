@@ -2,232 +2,185 @@ import { Effect, ManagedRuntime, Schema } from "effect";
 import { defineChannel, POST } from "eve/channels";
 import type { ChannelEvents } from "eve/channels";
 
-import { SendblueChannel } from "../lib/sendblue/channel.js";
-import { SendblueRoutingError } from "../lib/sendblue/errors.js";
-import { SendblueChannelRuntimeLive } from "../lib/sendblue/runtime.js";
-import type {
-  SendblueChannelState,
-  SendblueTypingLifecycleCommand,
-} from "../lib/sendblue/schemas.js";
 import {
-  SendblueCompletedMessage,
-  SendblueTypingLifecycle,
-  SendblueTypingTransitionInput,
-} from "../lib/sendblue/schemas.js";
+  Channel,
+  ChannelAdapterState,
+  ChannelEvent,
+  EveChannelDispatch,
+  EveChannelDispatchEve,
+} from "../lib/channel/index.js";
+import { ChannelRuntimeLive } from "../lib/channel/runtime.js";
+import type { ChannelMutableAdapterStateEncoded } from "../lib/channel/schemas.js";
 
-type SendblueEncodedChannelState = Schema.Codec.Encoded<
-  typeof SendblueChannelState
->;
-
-interface SendblueEveEventContext {
-  readonly state: SendblueEncodedChannelState;
+interface ChannelEveContext {
+  readonly state: ChannelMutableAdapterStateEncoded;
 }
 
-const runtime = ManagedRuntime.make(SendblueChannelRuntimeLive);
+const runtime = ManagedRuntime.make(ChannelRuntimeLive);
 
-export const makeSendblueEveEvents = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<SendblueChannel, E>
-): ChannelEvents<SendblueEveEventContext> => {
-  const transitionTyping = (
-    state: SendblueEncodedChannelState,
-    command: Schema.Codec.Encoded<typeof SendblueTypingLifecycleCommand>
+export const makeChannelEveEvents = <E>(
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>
+): ChannelEvents<ChannelEveContext> => {
+  const presence = (
+    state: ChannelMutableAdapterStateEncoded,
+    action: "start" | "stop"
   ) =>
     channelRuntime.runPromise(
-      Effect.gen(function* transitionSendblueTyping() {
-        const sendblue = yield* SendblueChannel;
-        const input = yield* Schema.decodeUnknownEffect(
-          SendblueTypingTransitionInput
-        )({ command, state }).pipe(Effect.orDie);
-        const transition = yield* sendblue.transitionTyping(input);
-        const typing = yield* Schema.encodeEffect(SendblueTypingLifecycle)(
-          transition.lifecycle
-        ).pipe(Effect.orDie);
-        Object.assign(state, { typing });
-        return yield* Effect.void;
+      Effect.gen(function* handleChannelPresence() {
+        const channel = yield* Channel;
+        const decodedState =
+          yield* Schema.decodeEffect(ChannelAdapterState)(state);
+        const event = yield* Schema.decodeUnknownEffect(ChannelEvent)({
+          _tag: "PresenceRequested",
+          action,
+          conversation: decodedState.snapshot.conversation,
+        });
+        const result = yield* channel.handleEvent(event);
+        const encoded = yield* Schema.encodeEffect(ChannelAdapterState)({
+          snapshot: result.state,
+        });
+        state.snapshot = encoded.snapshot;
       })
     );
 
   return {
-    "action.result"() {
-      return Promise.resolve();
-    },
-    "actions.requested"() {
-      return Promise.resolve();
-    },
     "authorization.completed"(event, channel) {
-      if (event.outcome !== "authorized") {
-        return Promise.resolve();
-      }
-      return transitionTyping(channel.state, {
-        _tag: "ResumeTurn",
-        turnId: event.turnId,
-      });
+      return event.outcome === "authorized"
+        ? presence(channel.state, "start")
+        : Promise.resolve();
     },
-    "authorization.required"(event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-        expectedTurnId: event.turnId,
-      });
+    "authorization.required"(_event, channel) {
+      return presence(channel.state, "stop");
     },
-    "input.requested"(event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-        expectedTurnId: event.turnId,
-      });
+    "input.requested"(_event, channel) {
+      return presence(channel.state, "stop");
     },
-    "message.appended"() {
-      return Promise.resolve();
-    },
-    "message.completed"(event, channel, ctx) {
+    "message.completed"(event, channel, context) {
       return channelRuntime.runPromise(
-        Effect.gen(function* completeSendblueMessage() {
-          const sendblue = yield* SendblueChannel;
-          if (event.finishReason === "tool-calls") {
+        Effect.gen(function* handleCompletedChannelMessage() {
+          if (
+            event.finishReason === "tool-calls" ||
+            event.message === null ||
+            event.message.trim().length === 0
+          ) {
             return;
           }
-          if (event.message !== null && event.message.trim().length > 0) {
-            const input = yield* Schema.decodeUnknownEffect(
-              SendblueTypingTransitionInput
-            )({
-              command: {
-                _tag: "StopTurn",
-                expectedTurnId: event.turnId,
-              },
-              state: channel.state,
-            }).pipe(Effect.orDie);
-            const transition = yield* sendblue.transitionTyping(input);
-            const typing = yield* Schema.encodeEffect(SendblueTypingLifecycle)(
-              transition.lifecycle
-            ).pipe(Effect.orDie);
-            Object.assign(channel.state, { typing });
-          }
-          const completed = yield* Schema.decodeUnknownEffect(
-            SendblueCompletedMessage
-          )({
-            finishReason: event.finishReason,
-            message: event.message,
-            sequence: event.sequence,
-            sessionId: ctx.session.id,
-            state: channel.state,
-            stepIndex: event.stepIndex,
-            turnId: event.turnId,
-          }).pipe(
-            Effect.mapError(
-              () =>
-                new SendblueRoutingError({
-                  message: "The completed Eve message is invalid.",
-                })
-            )
+          const service = yield* Channel;
+          const decodedState = yield* Schema.decodeEffect(ChannelAdapterState)(
+            channel.state
           );
-          yield* sendblue.deliverCompletedMessage(completed);
-        }).pipe(Effect.asVoid)
+          const outbound = yield* Schema.decodeUnknownEffect(ChannelEvent)({
+            _tag: "OutboundTextReady",
+            conversation: decodedState.snapshot.conversation,
+            coordinates: {
+              sequence: event.sequence,
+              sessionId: context.session.id,
+              turnId: event.turnId,
+            },
+            text: event.message.trim(),
+          });
+          const result = yield* service.handleEvent(outbound);
+          const encoded = yield* Schema.encodeEffect(ChannelAdapterState)({
+            snapshot: result.state,
+          });
+          channel.state.snapshot = encoded.snapshot;
+        })
       );
-    },
-    "reasoning.appended"() {
-      return Promise.resolve();
-    },
-    "reasoning.completed"() {
-      return Promise.resolve();
     },
     "session.completed"(_event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-      });
+      return presence(channel.state, "stop");
     },
     "session.failed"(_event, channel) {
-      return channelRuntime.runPromise(
-        Effect.gen(function* cleanupFailedSendblueSession() {
-          const sendblue = yield* SendblueChannel;
-          const input = yield* Schema.decodeUnknownEffect(
-            SendblueTypingTransitionInput
-          )({
-            command: { _tag: "StopTurn" },
-            state: channel.state,
-          }).pipe(Effect.orDie);
-          yield* sendblue.transitionTyping(input);
-        }).pipe(Effect.catchCause(() => Effect.void))
-      );
+      return presence(channel.state, "stop");
     },
     "session.waiting"(_event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-      });
+      return presence(channel.state, "stop");
     },
-    "turn.completed"(event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-        expectedTurnId: event.turnId,
-      });
+    "turn.completed"(_event, channel) {
+      return presence(channel.state, "stop");
     },
-    "turn.failed"(event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StopTurn",
-        expectedTurnId: event.turnId,
-      });
+    "turn.failed"(_event, channel) {
+      return presence(channel.state, "stop");
     },
-    "turn.started"(event, channel) {
-      return transitionTyping(channel.state, {
-        _tag: "StartTurn",
-        turnId: event.turnId,
-      });
+    "turn.started"(_event, channel) {
+      return presence(channel.state, "start");
     },
-  } satisfies ChannelEvents<SendblueEveEventContext>;
+  };
 };
 
 export const makeSendblueEveChannel = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<SendblueChannel, E>
-) => {
-  const events = makeSendblueEveEvents(channelRuntime);
-  return defineChannel<SendblueEncodedChannelState, SendblueEveEventContext>({
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>
+) =>
+  defineChannel<ChannelMutableAdapterStateEncoded, ChannelEveContext>({
     context(state) {
       return { state };
     },
-    events,
+    events: makeChannelEveEvents(channelRuntime),
     routes: [
-      POST("/eve/v1/sendblue/webhook", async (request, { send, waitUntil }) =>
-        channelRuntime.runPromise(
-          Effect.gen(function* handleSendblueWebhook() {
-            const sendblue = yield* SendblueChannel;
-            const decision = yield* sendblue.authorizeAndClaimInbound(request);
-            if (decision._tag !== "Dispatch") {
-              return new Response(null, { status: 200 });
+      POST("/eve/v1/sendblue/webhook", async (request, { send, waitUntil }) => {
+        const result = await channelRuntime.runPromise(
+          Effect.gen(function* handleChannelWebhook() {
+            const channel = yield* Channel;
+            const decoded = yield* channel.decodeWebhook(request);
+            if (decoded._tag === "Ignored") {
+              return { response: new Response(null, { status: 204 }) };
             }
-            waitUntil(
-              channelRuntime.runPromise(
-                sendblue.dispatchAcceptedInbound(decision, (state) =>
-                  Effect.tryPromise({
-                    try: () =>
-                      send(decision.message, {
-                        auth: decision.auth,
-                        continuationToken: decision.continuationToken,
-                        state,
-                      }),
-                    catch: () =>
-                      new SendblueRoutingError({
-                        message:
-                          "Unable to dispatch the Sendblue message to Eve.",
-                      }),
-                  })
-                )
-              )
+            const prepared = yield* channel.prepareInbound(decoded.message);
+            if (prepared._tag === "Duplicate") {
+              return { response: new Response(null, { status: 204 }) };
+            }
+            const background = Effect.gen(function* dispatchChannelInbound() {
+              const dispatch = yield* EveChannelDispatch;
+              yield* dispatch.dispatch(prepared.prepared);
+              yield* channel.completeInbound(prepared.prepared.claim);
+            }).pipe(
+              Effect.tapError((error) =>
+                Effect.logError(`Channel inbound failed: ${error._tag}`)
+              ),
+              Effect.provide(EveChannelDispatchEve(send))
             );
-            return new Response(null, { status: 202 });
+            const fiber = yield* Effect.forkDetach(background, {
+              startImmediately: true,
+            });
+            return {
+              fiber,
+              response: new Response(null, { status: 202 }),
+            };
           }).pipe(
             Effect.catchTags({
-              SendblueReplayStoreError: () =>
-                Effect.succeed(new Response(null, { status: 503 })),
-              SendblueRoutingError: () =>
-                Effect.succeed(new Response(null, { status: 503 })),
-              SendblueWebhookAuthenticationError: () =>
-                Effect.succeed(new Response(null, { status: 401 })),
-              SendblueWebhookSchemaError: () =>
-                Effect.succeed(new Response(null, { status: 400 })),
+              ChannelIdentityError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 204 }),
+                }),
+              ChannelReplayError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 503 }),
+                }),
+              ChannelRoutingError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 503 }),
+                }),
+              ChannelWebhookAuthenticationError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 401 }),
+                }),
+              ChannelWebhookSchemaError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 400 }),
+                }),
             })
           )
-        )
-      ),
+        );
+        if ("fiber" in result) {
+          const completion = Promise.withResolvers<undefined>();
+          result.fiber.addObserver(() => {
+            completion.resolve();
+          });
+          waitUntil(completion.promise);
+        }
+        return result.response;
+      }),
     ],
   });
-};
 
 export default makeSendblueEveChannel(runtime);

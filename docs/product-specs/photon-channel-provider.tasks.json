@@ -102,7 +102,7 @@
     {
       "id": "build-clean-sendblue-provider-and-rewrite-edge",
       "title": "Build @bundjil/sendblue and replace the legacy Eve edge",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["build-clean-channel-vertical-slice"],
       "description": "Implement a new Sendblue ChannelTransport from protocol documentation, rewrite the Eve adapter around the clean services, replace old tests, and remove the old app-owned Sendblue implementation.",
       "implementationNotes": [
@@ -120,6 +120,11 @@
       "completionCriteria": [
         "The current source tree contains only the clean Sendblue package and thin Eve adapter; the old app-owned Sendblue tree is absent.",
         "No provider/deployment mutation occurred and the retained immutable Production deployment remains rollback truth."
+      ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/sendblue owns private webhook and HTTP wire Schemas plus one nominal ChannelTransport live Layer; apps/agent owns Config.schema loading, redacted identities/secrets, HMAC continuation routing, atomic replay, the request-scoped Eve dispatch Layer, one module-edge ManagedRuntime, and the thin authored route/events. The old apps/agent/agent/lib/sendblue tree and its four implementation-shaped suites are absent; no compatibility import or old state/replay/config reader remains.",
+        "Implementation quality: provider ingress authenticates the documented sb-signing-secret before one bounded body read and complete Schema decode; outbound and presence use Effect HttpClient request/response Schemas and safe common tagged errors. The route performs one runPromise per Eve callback, forks dispatch in that same runtime for one waitUntil Promise, observes/logs only a safe error tag, assigns one encoded snapshot field, and contains no Effect.orDie, swallowed cause, Object.assign, nested runtime execution, unsafe cast, DTO mirror, direct JSON, raw client export, callback-bearing domain service, method-local dependency re-provisioning outside the required request Layer, or helper sprawl.",
+        "Verification coverage: @bundjil/sendblue typecheck, build and 8 tests passed for authentication ordering, bounded/malformed/ignored ingress, request and response codecs, known rejection, uncertain transport/timeout, presence and safe errors. The agent build and 39 tests passed, including fresh Config rejection of legacy variables and direct 202/204/400/401/503 plus single-waitUntil dispatch semantics. Boundary/effect/skill checks, 24 boundary fixtures, formatting, lint, Knip, seven workspace typechecks, 216 workspace tests, negative scans, full verification and git diff --check passed with only documented synthetic Executor inputs. No Sendblue, Photon, Vercel, DNS, secret, webhook, deployment or Production operation ran."
       ],
       "commitAfterPassing": true
     },

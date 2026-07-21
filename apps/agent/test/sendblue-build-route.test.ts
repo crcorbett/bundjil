@@ -15,8 +15,8 @@ describe("Sendblue build route", () => {
     const eveOutput = await readFile(eveOutputFile, "utf-8");
     assert.include(output, 'route: "/eve/v1/sendblue/webhook"');
     assert.notInclude(output, 'route: "/webhook"');
-    assert.include(eveOutput, "SendblueChannel.transitionTyping");
-    assert.include(eveOutput, "setTypingIndicator");
-    assert.include(eveOutput, "stateInvalid");
+    assert.include(eveOutput, "Channel.prepareInbound");
+    assert.include(eveOutput, "SendblueTransport.sendMessage");
+    assert.include(eveOutput, "ChannelReplay.claimInbound");
   });
 });

@@ -15,7 +15,7 @@ export class ChannelIdentity extends Context.Service<
   ChannelIdentityShape
 >()("@bundjil/agent/ChannelIdentity") {}
 
-export const layerMemory = (records: ChannelIdentityRecords) =>
+const makeLayer = (records: ChannelIdentityRecords) =>
   Layer.succeed(
     ChannelIdentity,
     ChannelIdentity.of({
@@ -34,3 +34,9 @@ export const layerMemory = (records: ChannelIdentityRecords) =>
       }),
     })
   );
+
+export const layerMemory = (records: ChannelIdentityRecords) =>
+  makeLayer(records);
+
+export const layerLive = (records: ChannelIdentityRecords) =>
+  makeLayer(records);
