@@ -265,7 +265,7 @@ export const deliverCompletedMessage = Effect.fn(
                         )
                       )
                   ),
-                  Effect.as<SendblueCompletedMessageResult>("delivered"),
+                  Effect.as<SendblueCompletedMessageResult>("accepted"),
                   Effect.catchTag("SendblueDeliveryUncertainError", (error) =>
                     replay
                       .uncertain(claim)

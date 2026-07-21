@@ -25,6 +25,7 @@ bun run check:skills
 bun run check:authority
 bun run check:controls
 bun run check:verification
+bun run eval:hgi-307
 bun run test:boundaries
 bun run check
 bun run test:lint
@@ -71,6 +72,16 @@ detail is retained at `tmp/control-policy-report.json`; `bun run test:controls`
 owns positive and adversarial fixtures. The gate is repository-only and grants
 no workflow, deployment, provider, message, or Production authority.
 
+`bun run eval:hgi-307` validates the current recorded harness epoch: all twelve
+fresh-context scenario receipts, the exact scenario-manifest digest, distinct
+four-clock fields, intervention decisions, every docs/README path inventory,
+and the full docs/README/lint/skills/config/tests/CI/runbooks/rollback impact
+ledger. It reads repository evidence only, writes bounded detail to
+`tmp/harness-evaluation-report.json`, and grants no provider or mutation
+authority. Epoch identity and metric interpretation are owned by
+[`../verification/harness-epochs.md`](../verification/harness-epochs.md) and
+[`../verification/effectiveness.md`](../verification/effectiveness.md).
+
 Package-focused commands:
 
 ```bash
@@ -108,6 +119,11 @@ bun run --filter @bundjil/agent preflight:production
 - Control, automation, feedback-promotion, boundary-decision, or freshness
   candidate change: run `bun run check:controls`, `bun run test:controls`, the
   affected earlier-owner fixture, then root verification.
+- Worker, tool, runtime, skill, scenario, context-projection, or harness-policy
+  change: start a new epoch, run `bun run test:harness`, collect fresh scenario
+  receipts, run `bun run eval:hgi-307`, then root verification. Never copy
+  timing values between the four clocks or preserve a stale qualification
+  silently.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex` tests,

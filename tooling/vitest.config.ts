@@ -10,6 +10,7 @@ export default defineConfig({
       "tooling/authority-policy-audit.test.ts",
       "tooling/verification-policy-audit.test.ts",
       "tooling/control-policy.test.ts",
+      "tooling/evals/harness-evaluation.test.ts",
     ],
   },
 });

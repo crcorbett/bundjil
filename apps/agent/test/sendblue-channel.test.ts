@@ -337,7 +337,7 @@ it.effect("atomically elects one concurrent inbound claim", () =>
 );
 
 it.effect(
-  "delivers only visible completed text once and quarantines uncertainty",
+  "submits only visible completed text once and quarantines uncertainty",
   () =>
     Effect.gen(function* testOutboundDelivery() {
       const sends = yield* Ref.make(0);
@@ -367,7 +367,7 @@ it.effect(
           ],
           { concurrency: "unbounded" }
         );
-        assert.deepStrictEqual(outcomes.toSorted(), ["delivered", "duplicate"]);
+        assert.deepStrictEqual(outcomes.toSorted(), ["accepted", "duplicate"]);
         assert.strictEqual(
           yield* sendblue.deliverCompletedMessage(
             completedMessage({
@@ -420,7 +420,7 @@ it.effect("dispatches inbound content beyond the Sendblue outbound limit", () =>
   }).pipe(Effect.provide(channelLayer()))
 );
 
-it.effect("delivers non-tool completed finish reasons", () =>
+it.effect("submits non-tool completed finish reasons", () =>
   Effect.gen(function* testTerminalFinishReason() {
     const sendblue = yield* SendblueChannel;
     const result = yield* sendblue.deliverCompletedMessage(
@@ -435,7 +435,7 @@ it.effect("delivers non-tool completed finish reasons", () =>
       })
     );
 
-    assert.strictEqual(result, "delivered");
+    assert.strictEqual(result, "accepted");
   }).pipe(
     Effect.provide(
       channelLayer(
@@ -1085,7 +1085,7 @@ it.effect(
               turnId: "turn-corrupt",
             })
           ),
-          "delivered"
+          "accepted"
         );
         assert.strictEqual(yield* Ref.get(messageAttempts), 1);
 

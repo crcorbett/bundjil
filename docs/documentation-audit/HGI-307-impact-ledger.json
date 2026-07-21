@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-307",
+  "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
+  "docsInventory": {
+    "pathCount": 160,
+    "sortedPathSha256": "7d35d35d6f88dc7637127dc0efe553a54be42e470ec1912f58bd4297facf78a4"
+  },
+  "readmeInventory": {
+    "pathCount": 19,
+    "sortedPathSha256": "8d85d2c6416cc145137eea5a9b8420a94da09a35af7e1b776d920914ced9f024"
+  },
+  "impactAreas": [
+    {
+      "area": "docs",
+      "decision": "changed",
+      "ownerPaths": [
+        "docs/verification/harness-epochs.md",
+        "docs/verification/effectiveness.md",
+        "docs/verification/hgi-307-epoch.json",
+        "docs/documentation-audit/HGI-307-impact-ledger.json"
+      ],
+      "evidence": [
+        "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports."
+      ],
+      "limitations": [
+        "Local documentation and evaluation evidence do not establish provider or Production state."
+      ],
+      "reviewTrigger": "Worker, model, host, tool, runtime, skill, scenario, metric, or material documentation-owner change."
+    },
+    {
+      "area": "readmes",
+      "decision": "changed",
+      "ownerPaths": ["docs/README.md", "README.md"],
+      "evidence": [
+        "The docs router now routes harness epochs and effectiveness; the root README remains a product/workspace route rather than provider truth."
+      ],
+      "limitations": [
+        "No app or package README required a new public contract claim for this local evaluation capability."
+      ],
+      "reviewTrigger": "A current documentation route, public package contract, or app operational boundary changes."
+    },
+    {
+      "area": "lint",
+      "decision": "preserved",
+      "ownerPaths": [
+        "oxlint.config.ts",
+        "lint/oxlint-plugin.ts",
+        "docs/standards/control-register.json"
+      ],
+      "evidence": [
+        "The accepted lint policy and eighteen exact occurrence exceptions remain owned and are exercised by root verification."
+      ],
+      "limitations": [
+        "HGI-307 adds no new lint rule; it requalifies the existing owner and fixtures."
+      ],
+      "reviewTrigger": "Lint configuration, plugin rule, AST matcher, or exception record changes."
+    },
+    {
+      "area": "skills",
+      "decision": "changed",
+      "ownerPaths": [
+        "AGENTS.md",
+        ".agents/skills/effect-client-wrapper/SKILL.md",
+        ".agents/skills/docs-maintainer/SKILL.md",
+        ".agents/skills/building-components/SKILL.md",
+        ".agents/skills/prd-writer/SKILL.md"
+      ],
+      "evidence": [
+        "AGENTS now directly invokes and routes the strict client-wrapper, docs-maintainer, PRD-writer, and component-composition skills; the correction recheck retrieved them."
+      ],
+      "limitations": [
+        "The epoch binds exact skill bytes but does not claim future workers will never require requalification."
+      ],
+      "reviewTrigger": "Skill content, path, routing, mirror, or agent-context changes."
+    },
+    {
+      "area": "config",
+      "decision": "changed",
+      "ownerPaths": [
+        "package.json",
+        "tooling/tsconfig.json",
+        "tooling/vitest.config.ts"
+      ],
+      "evidence": [
+        "Root scripts, tooling TypeScript scope, and Vitest discovery now include the HGI-307 Effect audit and tests."
+      ],
+      "limitations": [
+        "Configuration admission proves only the repository-local gate at this candidate."
+      ],
+      "reviewTrigger": "Tooling script, TypeScript scope, Vitest configuration, or dependency changes."
+    },
+    {
+      "area": "tests",
+      "decision": "changed",
+      "ownerPaths": [
+        "tooling/evals/harness-evaluation.test.ts",
+        "apps/agent/test/sendblue-channel.test.ts",
+        "docs/documentation-audit/hgi-307/fresh-recheck.report.md"
+      ],
+      "evidence": [
+        "Seven policy fixtures reject incomplete evaluation packets; focused Sendblue fixtures assert accepted rather than delivered; four fresh reports retain scenario evidence."
+      ],
+      "limitations": [
+        "Local fixtures do not establish provider callbacks, handset delivery, runtime deployment, or permanent model quality."
+      ],
+      "reviewTrigger": "Evaluation invariant, Sendblue result contract, scenario, or evidence schema changes."
+    },
+    {
+      "area": "ci",
+      "decision": "changed",
+      "ownerPaths": ["package.json", ".github/workflows/ci.yml"],
+      "evidence": [
+        "The existing CI-owned root verification command now runs eval:hgi-307 before package tests."
+      ],
+      "limitations": [
+        "Repository source proves workflow wiring, not a hosted GitHub run, token, or external consequence."
+      ],
+      "reviewTrigger": "CI workflow, root verification, or harness-evaluation command changes."
+    },
+    {
+      "area": "runbooks",
+      "decision": "preserved",
+      "ownerPaths": [
+        "apps/agent/runbooks/README.md",
+        "apps/codex-proxy/runbooks/README.md",
+        "docs/operations/authority-model.md"
+      ],
+      "evidence": [
+        "Fresh scenarios selected target-owned runbooks for credential, message, Executor, deployment, and incident decisions without duplicating operational steps into skills."
+      ],
+      "limitations": [
+        "No runbook was executed against a provider in this epoch."
+      ],
+      "reviewTrigger": "Operational precondition, authority, command, evidence, rollback, or escalation changes."
+    },
+    {
+      "area": "rollback",
+      "decision": "preserved",
+      "ownerPaths": [
+        "apps/agent/runbooks/incident-revocation.md",
+        "apps/codex-proxy/runbooks/incident-revocation.md",
+        "docs/operations/authority-model.md"
+      ],
+      "evidence": [
+        "BND-J09 and BND-J10 required exact candidate/resource identity, bounded authority, proof, and rollback before consequential work."
+      ],
+      "limitations": [
+        "No deployment, rotation, revocation, containment, or rollback was performed."
+      ],
+      "reviewTrigger": "Deployment topology, credential provider, revocation support, rollback path, or break-glass policy changes."
+    }
+  ],
+  "deferredFindings": [
+    {
+      "id": "BND-J02-deterministic-gateway-recovery",
+      "owner": "apps/agent and docs/verification/journey-command-map.json",
+      "limitation": "No deterministic fixture proves session creation, interrupted-stream classification, recovery, or duplicate absence.",
+      "nonClaim": "Eve startup and info health do not prove the Gateway recovery journey.",
+      "resumeTrigger": "An app-owned deterministic session/interruption/recovery fixture and claim-matched receipt exist."
+    },
+    {
+      "id": "HGI-309-external-provider-qualification",
+      "owner": "HGI-309 and target-owned runbooks",
+      "limitation": "This epoch had no authority to read or mutate authenticated provider state.",
+      "nonClaim": "No Sendblue, Executor, Vercel, hosted credential, deployment, alias, health, delivery, resume, or Production state is established.",
+      "resumeTrigger": "A named owner separately approves one exact provider operation with target, environment, duration, rollback, and readback."
+    },
+    {
+      "id": "HGI-307-timing-telemetry",
+      "owner": "docs/verification/effectiveness.md and the next harness epoch",
+      "limitation": "The worker interface did not expose reliable worker duration, feedback latency, synchronous human attention, or accepted-outcome timing.",
+      "nonClaim": "No null timing value is zero, estimated, or evidence of improved effectiveness.",
+      "resumeTrigger": "A future worker interface supplies separately attributable clock telemetry without fabricating or conflating measures."
+    }
+  ],
+  "unresolvedFindings": []
+}

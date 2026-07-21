@@ -586,7 +586,7 @@ export const SendblueCompletedMessage = Schema.Struct({
 export type SendblueCompletedMessage = typeof SendblueCompletedMessage.Type;
 
 export const SendblueCompletedMessageResult = Schema.Literals([
-  "delivered",
+  "accepted",
   "duplicate",
   "ignored",
 ]);

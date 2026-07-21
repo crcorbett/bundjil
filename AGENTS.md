@@ -25,7 +25,9 @@ the narrowest current owner; do not load completed rollout history by default.
   errors, `Config.schema` with redacted secrets, and explicit live/mock Layers.
   Raw clients, generic SDK callbacks, raw `id: string`,
   primitive semantic config, `instanceof` policy, and unchecked SDK output
-  are forbidden.
+  are forbidden. For every provider or SDK adapter change, invoke the
+  repository-local `.agents/skills/effect-client-wrapper` before deciding the
+  boundary shape.
 - Keep primary Effects flat, linear, sequential, lazy, composable, and readable.
   Keep one-use mapping, decoding, and error translation inline. Helpers require
   demonstrated reuse, independently tested policy, real I/O, or resource
@@ -34,7 +36,9 @@ the narrowest current owner; do not load completed rollout history by default.
   stable shared contract has proven consumers.
 - React routes compose leaf-owned rendering/state components. Keep Effect and
   services above presentation leaves; use explicit conditional composition,
-  not service-aware UI branches or route-sized components.
+  not service-aware UI branches or route-sized components. Invoke the
+  repository-local `.agents/skills/building-components` for visible component
+  work.
 
 ## Current routes
 
@@ -47,6 +51,13 @@ the narrowest current owner; do not load completed rollout history by default.
 - Verification commands: `docs/architecture/testing-and-quality.md`
 - Harness controls, feedback promotion, and automation admission:
   `docs/standards/controls.md`
+- Provider and SDK client boundary design:
+  `.agents/skills/effect-client-wrapper/SKILL.md`
+- New SPEC and task drafting: `.agents/skills/prd-writer/SKILL.md`
+- React and visible component composition:
+  `.agents/skills/building-components/SKILL.md`
+- Documentation impact and owner maintenance:
+  `.agents/skills/docs-maintainer/SKILL.md`
 - Critical journeys, proof packets, bounded receipts, and evidence retention:
   `docs/verification/README.md`
 - Current SPEC/tasks: `docs/product-specs/index.md`

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-307",
+  "status": "candidate",
+  "observedAt": "2026-07-21T17:46:00+01:00",
+  "authority": "repository source, documentation, local fresh-context evaluation, fixtures, tests, Git commit, main push, and remote-ref readback only; no provider, environment-value, secret, message, approval-resume, deployment, rollback, or Production readback or mutation",
+  "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
+  "candidatePathCount": 23,
+  "sortedCandidatePathSha256": "af29a998f5cb904b7520d64f54b43290f541bff221a41ffe45f3b3edad074a8b",
+  "artifacts": [
+    {
+      "path": "docs/verification/harness-epochs.md",
+      "sha256": "f42e80a21b2b0a98c1a1a0d85bd3680630e888c69569c1cc2861e4c0202b8153"
+    },
+    {
+      "path": "docs/verification/effectiveness.md",
+      "sha256": "8c57770ada92a19acae8293e038a78022e45e1fd330e1dac3f4c16cfd49a1b79"
+    },
+    {
+      "path": "docs/verification/hgi-307-epoch.json",
+      "sha256": "f12885fecf1577e684089c7f933bc2efd18430b747c21fa51de1900915444060"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-307-impact-ledger.json",
+      "sha256": "f96d5ab079a695bbfbd98674dbbd441737a657f569d56cde87d49a84800b8cd5"
+    },
+    {
+      "path": "tooling/evals/hgi-307/scenarios.json",
+      "sha256": "2bbede25c01ab9cc1093cf8042166fdcbeae2996456a4c10c38b49dae94ed68f"
+    },
+    {
+      "path": "tooling/evals/harness-evaluation.ts",
+      "sha256": "52e367e78949ae8a73ebada75d5d8fe9d8d66001cd6a9eddb7913b5b053ee62b"
+    },
+    {
+      "path": "tooling/evals/harness-evaluation-audit.ts",
+      "sha256": "dbfd3aacbce7af3c88fb014f8372711019dde034e5a350c5a15a3c31b9ca7949"
+    },
+    {
+      "path": "tooling/evals/harness-evaluation.test.ts",
+      "sha256": "5290dd2b2b0f7f9eb695677e1b88c75edae61a1e4c50191580308a11a8666419"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "5aadbeecc7ae6fcff003e230dd16de9aa4d331b2805dc513f02059a8a4c1a966"
+    },
+    {
+      "path": "apps/agent/agent/lib/sendblue/schemas.ts",
+      "sha256": "4a873a29f23dd60e6d13b552f8e63a5dadb9e4e44b5304b9f2111c2cb0c74cbb"
+    },
+    {
+      "path": "apps/agent/agent/lib/sendblue/channel.ts",
+      "sha256": "184607cc7af40bd6877b08efca88bf5e4b803febe5a83fabf9f66ec1917cdde7"
+    },
+    {
+      "path": "apps/agent/test/sendblue-channel.test.ts",
+      "sha256": "64173ae9adb0eb35fde7a586eaf722f58bd74ba61de3b50d9f1892a270876c18"
+    }
+  ],
+  "freshReports": [
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-a.report.md",
+      "sha256": "4d89614a46a85c651e07a2acdb4b3a01356f0790245b60758d32a04aaa33529e"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-b.report.md",
+      "sha256": "8df365d41c69ddf567e04b327b8319056c8318a4bbcd9699e9bb7d95837852ef"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-c.report.md",
+      "sha256": "d385ade37c45051148d90cc3f14107f43f9334a8ba378c4a2bf2ae320ae81da6"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-recheck.report.md",
+      "sha256": "49fc590e1a5664f62c64730068f9bf83dfae266905a6fb28f8b0bbd2bcb99958"
+    }
+  ],
+  "checks": [
+    {
+      "check": "fresh-context scenario qualification",
+      "status": "passed",
+      "result": "Four fresh Terra workers exercised all ten Bundjil journeys, the strict Effect/client/frontend/documentation contract, and a seeded stale-history contradiction; initial unsafe or incomplete outputs were preserved, corrected at the earliest owner, and rechecked."
+    },
+    {
+      "check": "typed epoch and impact policy",
+      "status": "passed",
+      "result": "The Effect Schema-backed audit accepted exactly twelve passed parent dispositions, nine impact areas, retained report, manifest, and skill digests, addressable owners, one base identity, exact docs/README inventories, explicit deferrals, and no unresolved finding; one positive and ten negative fixtures passed."
+    },
+    {
+      "check": "accepted correction",
+      "status": "passed",
+      "result": "The Sendblue public result now says accepted rather than delivered after a decoded provider response, and AGENTS directly invokes the strict client-wrapper, docs-maintainer, PRD-writer, and component-composition skills."
+    }
+  ],
+  "limitations": [
+    "Worker duration, feedback latency, synchronous human attention, and time to accepted outcome were unavailable and remain null rather than fabricated.",
+    "BND-J02 remains deferred until deterministic session and recovery evidence exists; HGI-309 retains separately approved provider qualification.",
+    "Repository source, local fixtures, model review, and Git readback do not establish external provider, deployment, delivery, resume, rollback, health, or Production actuality."
+  ],
+  "nonClaims": [
+    "No environment value, ignored operational artifact, credential, secret, provider, message, Executor call, deployment, alias, webhook, rollback, recovery, or Production system was read or changed.",
+    "Twelve accepted local decisions do not establish permanent worker quality or effectiveness beyond this named epoch."
+  ],
+  "rollback": "Revert the HGI-307 epoch, impact policy, strict skill routes, Sendblue accepted-result correction, tooling gate, configuration, tests, and retained reports together while preserving accepted HGI-300 through HGI-306, HGI-308, and HGI-310 evidence and the HGI-309 deferral."
+}

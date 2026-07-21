@@ -50,9 +50,10 @@
     "check:authority": "bun tooling/authority-policy-audit.ts",
     "check:controls": "bun tooling/control-policy-audit.ts",
     "check:verification": "bun tooling/verification-policy-audit.ts",
+    "eval:hgi-307": "bun tooling/evals/harness-evaluation-audit.ts",
     "fix": "ultracite fix --type-aware",
     "check": "ultracite check --type-aware",
-    "verification": "bun run check:effect-setup && bun run check:boundaries && bun run check:docs && bun run check:skills && bun run check:authority && bun run check:controls && bun run check:verification && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
+    "verification": "bun run check:effect-setup && bun run check:boundaries && bun run check:docs && bun run check:skills && bun run check:authority && bun run check:controls && bun run check:verification && bun run eval:hgi-307 && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
     "eve": "eve",
     "changeset": "changeset",
     "changeset:add": "changeset add",
@@ -63,6 +64,7 @@
     "test:lint": "vitest run --config lint/vitest.config.ts",
     "test:boundaries": "vitest run --config tooling/vitest.config.ts",
     "test:controls": "vitest run --config tooling/vitest.config.ts tooling/control-policy.test.ts",
+    "test:harness": "vitest run --config tooling/vitest.config.ts tooling/evals/harness-evaluation.test.ts",
     "knip": "knip"
   },
   "devDependencies": {

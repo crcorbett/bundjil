@@ -10,7 +10,8 @@ review_trigger: app, auth, provider, deployment, messaging, approval, recovery, 
 # Bundjil verification
 
 This is the canonical route for the ten consumer-visible critical journeys,
-proof packet contract, bounded command receipts, and retained evidence index.
+proof packet contract, bounded command receipts, retained evidence index, and
+recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
 operation nor asserts present provider state.
 
@@ -28,6 +29,10 @@ operation nor asserts present provider state.
   default route.
 - [`evidence-index.json`](evidence-index.json) owns retention classes,
   provenance fields, lifecycle transitions, and the directory for packets.
+- [`harness-epochs.md`](harness-epochs.md) owns epoch identity,
+  requalification triggers, fresh-context discipline, and intervention
+  lifecycle. [`effectiveness.md`](effectiveness.md) owns accepted outcomes,
+  the four clocks, human attention, and evidence-limited comparisons.
 
 ## Claim boundaries
 
