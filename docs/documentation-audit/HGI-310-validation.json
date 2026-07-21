@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "status": "accepted",
+  "observedAt": "2026-07-21T13:40:54+01:00",
+  "authority": "repository-local skill, documentation, policy, test, Git commit, main push, and remote-ref readback only; no provider, workflow, deployment, credential, release, or production mutation",
+  "baseCommit": "734c719145b3d70414afd8f5a18085f28883f7e4",
+  "implementationCommit": "eb3167bef449246540f30e2a65093299b10802fc",
+  "correctionCommit": "97ca1e61d5af2a012a69bed3fd74a64446fc409c",
+  "evidenceCommit": "0318694e8c04f21bd6687f91331617caefd324e2",
+  "evidenceTree": "6d00726c7bd60a579a0b9ae84ce04350c819b97e",
+  "changedPathCount": 25,
+  "sortedChangedPathSha256": "12bc17e04f11a229083b6a4fd41653753cccb4e03971dbd6a21147c32f7751c8",
+  "candidateReceiptSha256": "7a83e83ac3bf897724e75e5d61360c7172759ebe94ef2b4669f54bcdf5769bd9",
+  "scenarioManifestSha256": "e0beccf5989c81d6326492d82bb37ce6607e2614efc500cfe69918a6302f7bb8",
+  "scenarioResults": [
+    {
+      "id": "HGI310-EFFECT-01",
+      "sha256": "b632bd06ac0c2117fc95c04c4f15f4ed6a493fe3bffb4ff5077d9a428fe3118a"
+    },
+    {
+      "id": "HGI310-PROXY-AUTH-01",
+      "sha256": "43968896fbb224304b3d558c1d2c12fa464e17c0d3b7485626da95ac394ab251"
+    },
+    {
+      "id": "HGI310-PROVIDER-01",
+      "sha256": "f4de3408a0158c5980874c5da28bc0ad1b09fdb432df303e99a32fdaabbb1423"
+    },
+    {
+      "id": "HGI310-WORKFLOW-01",
+      "sha256": "7f97f70e8722b64b63dcc14540221a021d1df7e074ad32cb0e6bd401c3bb2139"
+    },
+    {
+      "id": "HGI310-PROOF-LIFECYCLE-01",
+      "sha256": "05c81ba2fd165bfee08f3a5c8dc9c1c5c402c414308170f1808d278023afd833"
+    },
+    {
+      "id": "HGI310-PORTABLE-01",
+      "sha256": "b057d837369462beeabb90dd7d5a5b148e406ccb4a15535ff30d0c5d26039ab6"
+    }
+  ],
+  "checks": [
+    {
+      "check": "portable local skill graph",
+      "status": "passed",
+      "result": "A dependency-free repository-owned validator accepted docs-maintainer and all three PRD skills; the relative Claude mirror, YAML/Effect Schema metadata, profile references, and clean-clone operation required no global skill path."
+    },
+    {
+      "check": "semantic skill and documentation controls",
+      "status": "passed",
+      "result": "check:skills passed 167 files and 16 mirrors; check:docs passed 206 files; 42 tooling tests reject missing PRD/ordinary routes, runbooks, proof/lifecycle, metadata/mirror, portability, background controls, provider actuality, and tool-authority separation."
+    },
+    {
+      "check": "fresh-context scenarios",
+      "status": "passed",
+      "result": "Six addressable packets at immutable target 97ca1e6 cover Effect/service, proxy/auth, provider/runbook, workflow/background, proof/lifecycle, and clean-clone portability with evaluator identity, owner decisions, evidence limits, and nonclaims."
+    },
+    {
+      "check": "independent rejection, correction, and acceptance",
+      "status": "passed",
+      "result": "The first strict evaluator rejected missing HGI-310 lifecycle mutation and narrative-only scenario evidence. Both were corrected, the exact final clean clone was rechecked, and the same evaluator returned PASS with no remaining blocker."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, docs/skills, 42 tooling tests, Ultracite, lint, Knip, five typechecks, and 250 package/app tests passed with schema-valid synthetic Executor test configuration and no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Implementation eb3167b, correction 97ca1e6, and evidence 0318694 were pushed; after fetch, local HEAD and origin/main both resolved to 0318694e8c04f21bd6687f91331617caefd324e2."
+    }
+  ],
+  "postcondition": "Bundjil has a clean-clone-portable docs-maintainer route for PRD and ordinary work, structured semantic enforcement, report-only background behavior, and addressable forward evidence; HGI-303 may create app-owned runbooks on this baseline.",
+  "rollback": "Revert the HGI-310 closeout, then 0318694e8c04f21bd6687f91331617caefd324e2, 97ca1e61d5af2a012a69bed3fd74a64446fc409c, and eb3167bef449246540f30e2a65093299b10802fc in order while preserving HGI-302 and its controls.",
+  "limitations": [
+    "Skill, fixture, and fresh-context success do not prove provider, workflow, deployment, credential, message, release, or production actuality.",
+    "HGI-303, HGI-304, and HGI-305 still own app runbooks, consequential authority, and canonical critical-journey proof.",
+    "The three HGI-310 commits are unsigned because the configured 1Password signing agent remained unavailable; content, tree, ancestry, push, and remote identity are verified."
+  ],
+  "nonClaims": [
+    "No provider, workflow, GitHub setting, secret, deployment, webhook, message, credential, production, release, or publication system was read or changed.",
+    "The local skill and its checks grant no external-operation authority."
+  ]
+}

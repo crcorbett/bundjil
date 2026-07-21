@@ -41,10 +41,11 @@ and task state.
   Schema, preserve the accepted occurrence-control equivalence bar, and keep
   the required mirrors complete. Acceptance and publication evidence is in
   [`HGI-302-validation.json`](../../documentation-audit/HGI-302-validation.json).
-- **HGI-310 — in progress:** add the portable local docs-maintainer route,
-  repository profile, mirror, PRD and ordinary-change integration, structured
-  negative fixtures, and fresh-context forward evidence on the HGI-302 policy
-  baseline.
+- **HGI-310 — completed:** the portable local docs-maintainer route, repository
+  profile, mirror, PRD and ordinary-change integration, structured negative
+  fixtures, six addressable fresh-context scenarios, clean-clone validation,
+  and strict correction/re-acceptance are recorded in
+  [`HGI-310-validation.json`](../../documentation-audit/HGI-310-validation.json).
 - HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307 remain pending in dependency
   order. HGI-309 remains deferred until separately approved external authority
   exists.

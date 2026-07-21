@@ -47,6 +47,7 @@ HGI-310 skill evidence:
 
 - [`HGI-310-candidate.json`](HGI-310-candidate.json)
 - [`HGI-310-scenarios.json`](HGI-310-scenarios.json)
+- [`HGI-310-validation.json`](HGI-310-validation.json)
 - [`hgi-310/HGI310-EFFECT-01.json`](hgi-310/HGI310-EFFECT-01.json)
 - [`hgi-310/HGI310-PROXY-AUTH-01.json`](hgi-310/HGI310-PROXY-AUTH-01.json)
 - [`hgi-310/HGI310-PROVIDER-01.json`](hgi-310/HGI310-PROVIDER-01.json)
