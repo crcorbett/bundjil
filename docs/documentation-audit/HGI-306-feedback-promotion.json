@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "HGI-306-background-freshness-publication",
+  "repeatedFinding": "Background documentation freshness was repeatedly described as report-only, but prose alone did not prevent self-source, self-review, self-publication, target drift, or publication without recovery/readback.",
+  "priorReminderPaths": [
+    ".agents/skills/docs-maintainer/SKILL.md",
+    ".agents/skills/docs-maintainer/references/repository-profile.md",
+    "docs/README.md"
+  ],
+  "promotedOwner": "tooling/documentation/freshness-candidate.ts",
+  "enforcingControlId": "documentation-owner-policy",
+  "retiredReminderPaths": [".agents/skills/docs-maintainer/SKILL.md"],
+  "evidence": [
+    "tooling/control-policy.test.ts rejects candidate self-source, candidate-root ownership, generator review/publication, incomplete publication, and automation self-feedback.",
+    "docs/documentation-audit/freshness-candidates/HGI-306-report-only-example.json is a typed isolated candidate with no edit or publication authority.",
+    "The docs-maintainer skill now routes to the typed contract instead of duplicating its full field list."
+  ],
+  "rollback": "Restore the prior skill wording only if the typed contract and executable fixtures are reverted together; keep report-only behavior and do not publish existing candidates.",
+  "nonClaim": "The promoted contract does not schedule a scanner, edit repository source, publish policy, or prove external state."
+}

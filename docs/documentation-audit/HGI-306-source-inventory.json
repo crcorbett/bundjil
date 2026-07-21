@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "baseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "sources": [
+    {
+      "path": "tooling/control-policy.ts",
+      "sha256": "2763b735a49ab4b0d0b5a72d28f5531b6949166cab284a255d7752b1d12d6733"
+    },
+    {
+      "path": "tooling/control-policy-audit.ts",
+      "sha256": "379881df54467215827f270eb76a8119e852c51c566c4be7231683dc1ec57477"
+    },
+    {
+      "path": "tooling/control-policy.test.ts",
+      "sha256": "aad54d6e390cac9e08b30ca6ea8d82909534f79596aba0c3369d146e65ab398e"
+    },
+    {
+      "path": "tooling/documentation/freshness-candidate.ts",
+      "sha256": "6d429c29acfebaf5fc94496a07e5ead4b2bb78eaf683a4a761bc0493ea06bb7c"
+    },
+    {
+      "path": "docs/standards/controls.md",
+      "sha256": "7fee55826ee932462e3d03dbf53caf96f82f241d973acdb80b1e4c4349e5903d"
+    },
+    {
+      "path": "docs/standards/control-register.json",
+      "sha256": "a77d4d2f5b4d918ef945dfbc9e42a8d547b65939711bc4c6339158623630eac0"
+    },
+    {
+      "path": "docs/standards/automation-register.json",
+      "sha256": "da1b14fcc7d3077fa9357822390db0f1eb02f78b8b08347ede059a83a0800abf"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-306-boundary-exceptions.decision.json",
+      "sha256": "63e104bde6957ce708c1978b02382589a70e637a0cfe596c8fa8cdcb674760ef"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-306-feedback-promotion.json",
+      "sha256": "79597c83a55571d1862b7b8a12bfc436b5c164417ab10074ffac4e78c9fb695c"
+    },
+    {
+      "path": "docs/documentation-audit/freshness-candidates/HGI-306-report-only-example.json",
+      "sha256": "373775054a81657ac969b4266086af0a4c98bb29f53e6ee2027415fd15eecac5"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-306-scenarios.json",
+      "sha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1"
+    },
+    {
+      "path": "package.json",
+      "sha256": "b399a3dff653f5163683f7660c75f041fd7118b6d0cde91ce4fef23028ec50c1"
+    },
+    {
+      "path": "tooling/vitest.config.ts",
+      "sha256": "27b8c2503f1bceafe90fe1ef82e614cc57f6defd54546e1918e38d3ca44b7c31"
+    },
+    {
+      "path": "tooling/skill-policy.ts",
+      "sha256": "4875507ed4d89dcbba1e3b194bc9d704fdcd16308f61d0fdb10512282128ad66"
+    },
+    {
+      "path": ".agents/skills/docs-maintainer/SKILL.md",
+      "sha256": "86b47d2023fe95da43e8488ca58e9f0e93f0a0b635a6a84d279252149e8b5fda"
+    },
+    {
+      "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
+      "sha256": "3784fc3ff122e25b0b690b60a4bf7389e159d5b1cb837594d660f93b2c9a9419"
+    },
+    {
+      "path": "docs/operations/automation-register.md",
+      "sha256": "f906095380fa0f1ccccf1f366f74bc3f5c64139489b9cb05e37e21d0c059abc4"
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "1bfd9ec92f81ee515059e38f1be88f2c6bd9ee0d8a02ec624889aa8df2c2bc6a"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "78f38f79a67159143b8cb4e95c693b2c17dca88b2d284ed5bd5ab3f3d8991b5b"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "e99958aa52cee48bae9e7ba2e1eb3cce25fd8eb6559ce07ce94e1a5592435535"
+    },
+    {
+      "path": "docs/product-specs/harness-governance-documentation.md",
+      "sha256": "87b311483fb968be632c9bde07c3e885bcccf06810fe567292a47c79c9f1bd4c"
+    },
+    {
+      "path": "docs/exec-plans/active/harness-governance-documentation.md",
+      "sha256": "b515dd7b14b07a13a8e1da37c31752639e49e0d64c3ac96411773dfd120981b3"
+    },
+    {
+      "path": "tooling/boundary-exceptions.ts",
+      "sha256": "9cacc9378a7d16260a6dd9947072534c96dc05e05162b1b48d4f234336e85a0a"
+    },
+    {
+      "path": "tooling/boundary-audit.ts",
+      "sha256": "2780ffb228bf38d14f38ac76ef0adaa8b79aeaad4abb664ec680fe4f0201281b"
+    },
+    {
+      "path": "tooling/boundary-audit.test.ts",
+      "sha256": "9757df490d8a0d9b77dbfccbef996a3e79adbf4270a038571925b616f7653b0b"
+    }
+  ]
+}

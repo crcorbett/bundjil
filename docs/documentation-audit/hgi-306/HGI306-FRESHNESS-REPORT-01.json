@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-FRESHNESS-REPORT-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "tooling/documentation/freshness-candidate.ts plus docs/standards/controls.md",
+  "decision": "Reject the direct edit. The generator may emit only a schema-valid report-only candidate bound to exact source bytes and revision, proposed owner, expiry, recovery, limitations, and non-claims.",
+  "evidenceRequired": [
+    "Typed candidate decode and semantic policy pass.",
+    "Report-only fixture and direct-publication negative test pass."
+  ],
+  "limitations": [
+    "The fixture proves the repository-local policy only; it does not run a scheduled scanner."
+  ],
+  "nonClaims": [
+    "A scan finding or local docs check is not edit or publication authority."
+  ],
+  "rollbackRevocation": "Quarantine or retract the candidate and restore the last-known-good documentation owner; no external revocation applies.",
+  "escalation": ["Documentation owner", "Separately authorised publisher"],
+  "unsafeAmbiguities": []
+}

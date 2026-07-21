@@ -100,6 +100,23 @@ The accepted local proof packet is retained at
 It proves only the exact local contract qualification; every external journey
 retains its declared limit.
 
+HGI-306 accepted candidate evidence:
+
+- [`HGI-306-candidate.json`](HGI-306-candidate.json)
+- [`HGI-306-boundary-exceptions.decision.json`](HGI-306-boundary-exceptions.decision.json)
+- [`HGI-306-feedback-promotion.json`](HGI-306-feedback-promotion.json)
+- [`HGI-306-scenarios.json`](HGI-306-scenarios.json)
+- [`HGI-306-source-inventory.json`](HGI-306-source-inventory.json)
+- [`freshness-candidates/HGI-306-report-only-example.json`](freshness-candidates/HGI-306-report-only-example.json)
+- [`hgi-306/`](hgi-306/)
+
+Fresh-context review recomputed every declared source digest and passed all
+eight adversarial scenarios after the automation register gained enforced,
+addressable fixture ownership. These remain candidate evidence until full
+repository verification, exact Git publication/readback, and the separate
+`HGI-306-validation.json` closeout are complete. The freshness candidate is
+intentionally report-only and outside default current-owner routing.
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

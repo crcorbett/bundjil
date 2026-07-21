@@ -95,15 +95,16 @@ runtime/provider evidence only when the claim and granted authority require it.
 ## Keep background work report-only
 
 Scheduled or background freshness work emits an isolated candidate by default,
-not repository edits or policy publication. Record source, provenance,
-freshness, classification, audience, proposed owner/paths, target revision,
-evidence, unresolved contradictions, responsible reviewer, publisher identity,
-publication status, revocation/quarantine, last-known-good recovery, and
-post-publication readback. Use `unknown` with a named owner and resume trigger
-when evidence is missing.
+not repository edits or policy publication. Conform it to the canonical typed
+contract in `tooling/documentation/freshness-candidate.ts`; do not duplicate the
+contract's field list here. Candidate storage is outside default current-owner
+routing and cannot be its own source or owner. The generator cannot review or
+publish its own candidate.
 
 Attached implementation authority may permit edits to exact repository paths;
 it does not authorize provider operations or self-publication of consequential
-policy. Policy publication requires a separately approved publisher identity
-and atomic target readback. Stop when a current owner, real command, required
-runbook, authority, or claim-matched proof cannot be established.
+policy. Publication requires separate approval, a distinct publisher, an
+immutable target revision, atomic post-publication readback, a
+revocation/quarantine path, and last-known-good recovery. Stop when a current
+owner, real command, required runbook, authority, or claim-matched proof cannot be
+established. Run `bun run check:controls` for the executable contract.

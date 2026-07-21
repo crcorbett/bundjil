@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-FRESHNESS-PUBLISH-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "freshness candidate semantic policy and docs-context-freshness automation record",
+  "decision": "Reject or quarantine self-publication. Publication requires a reviewer distinct from both generator and publisher, an approval receipt, immutable target revision, atomic readback, and last-known-good recovery.",
+  "evidenceRequired": [
+    "Generator self-review and self-publication are rejected.",
+    "Matching reviewer and publisher identities and incomplete publication receipts are rejected."
+  ],
+  "limitations": [
+    "The local policy does not grant a real person or process repository publication authority."
+  ],
+  "nonClaims": [
+    "Candidate completeness does not grant reviewer, publisher, repository, or provider authority."
+  ],
+  "rollbackRevocation": "Retract or quarantine the candidate, restore the last-known-good owner, and preserve the failed publication evidence.",
+  "escalation": ["Documentation owner", "Repository authority owner"],
+  "unsafeAmbiguities": []
+}

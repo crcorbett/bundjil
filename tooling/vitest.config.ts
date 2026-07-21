@@ -9,6 +9,7 @@ export default defineConfig({
       "tooling/skill-policy-audit.test.ts",
       "tooling/authority-policy-audit.test.ts",
       "tooling/verification-policy-audit.test.ts",
+      "tooling/control-policy.test.ts",
     ],
   },
 });

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-BOUNDARY-EQUIVALENCE-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "HGI-306 boundary retention decision plus boundary and control-policy fixtures",
+  "decision": "Reject the wildcard replacement. Retain all 18 occurrence-specific exceptions until a candidate proves exact-match, duplicate-rejection, occurrence-isolation, and stale-detection equivalence against the real audit.",
+  "evidenceRequired": [
+    "Decision count matches the exact 18-row registry.",
+    "Boundary and control-policy tests reject duplicates and weakened equivalence."
+  ],
+  "limitations": [
+    "This decision retains measured complexity; it does not claim the registry can never be replaced."
+  ],
+  "nonClaims": [
+    "Line-count reduction is not equivalence, effectiveness, or lower carrying cost."
+  ],
+  "rollbackRevocation": "Restore the exact occurrence registry and rerun boundary fixtures if a replacement loses any preserved property.",
+  "escalation": ["Boundary policy owner", "Package owner"],
+  "unsafeAmbiguities": []
+}

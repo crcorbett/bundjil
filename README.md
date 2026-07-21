@@ -51,6 +51,7 @@ bun run check:effect-setup
 bun run check:docs
 bun run check:skills
 bun run check:authority
+bun run check:controls
 bun run check:verification
 bun run verification
 ```

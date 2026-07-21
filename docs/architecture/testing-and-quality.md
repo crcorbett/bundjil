@@ -23,6 +23,7 @@ bun run check:effect-setup
 bun run check:docs
 bun run check:skills
 bun run check:authority
+bun run check:controls
 bun run check:verification
 bun run test:boundaries
 bun run check
@@ -61,6 +62,15 @@ does not call Vercel, Executor, Sendblue, Upstash, a model, or Production.
 Packets and their claim boundaries are owned by
 [`../verification/README.md`](../verification/README.md).
 
+`bun run check:controls` decodes the canonical control and automation records,
+the measured boundary decision, the feedback-promotion trace, and all retained
+freshness candidates. It rejects missing owners/fixtures/costs/metrics,
+automation-state drift, duplicate boundary identities, weakened occurrence
+equivalence, candidate self-feedback, and unsafe publication. Full structured
+detail is retained at `tmp/control-policy-report.json`; `bun run test:controls`
+owns positive and adversarial fixtures. The gate is repository-only and grants
+no workflow, deployment, provider, message, or Production authority.
+
 Package-focused commands:
 
 ```bash
@@ -95,6 +105,9 @@ bun run --filter @bundjil/agent preflight:production
   `bun run check:verification`, its focused fixture suite, the affected app
   tests, then root verification. Provider proof remains separately
   authority-gated.
+- Control, automation, feedback-promotion, boundary-decision, or freshness
+  candidate change: run `bun run check:controls`, `bun run test:controls`, the
+  affected earlier-owner fixture, then root verification.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex` tests,
@@ -261,6 +274,7 @@ action-lock, and workflow semantic gate:
 
 ```bash
 bun run check:authority
+bun run check:controls
 bun run test:boundaries
 ```
 

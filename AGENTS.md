@@ -45,6 +45,8 @@ the narrowest current owner; do not load completed rollout history by default.
 - Package/import boundaries: `docs/architecture/repo-structure.md`
 - React composition: `docs/architecture/frontend-composition.md`
 - Verification commands: `docs/architecture/testing-and-quality.md`
+- Harness controls, feedback promotion, and automation admission:
+  `docs/standards/controls.md`
 - Critical journeys, proof packets, bounded receipts, and evidence retention:
   `docs/verification/README.md`
 - Current SPEC/tasks: `docs/product-specs/index.md`
@@ -55,7 +57,8 @@ the narrowest current owner; do not load completed rollout history by default.
   `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
   durable authority rationale, `docs/operations/authority-register.json` owns
   static workflow/provider envelopes, `docs/operations/automation-register.md`
-  owns GitHub automation admission, and `docs/verification/**` owns critical
+  owns GitHub automation rationale, `docs/standards/controls.md` owns the full
+  control/automation admission register, and `docs/verification/**` owns critical
   journeys and bounded proof contracts. Do not treat a runbook, packet,
   README pointer, register, or retained history as current provider truth or
   execution authority.
@@ -65,7 +68,7 @@ the narrowest current owner; do not load completed rollout history by default.
 Use Bun from the repository root. Boundary/provider work runs
 `bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
 `bun run check:skills`, `bun run check:authority`, and
-`bun run check:verification`; every accepted slice runs
+`bun run check:controls`, `bun run check:verification`; every accepted slice runs
 `bun run verification`.
 
 Repository instructions cannot authorize deployments, provider writes,

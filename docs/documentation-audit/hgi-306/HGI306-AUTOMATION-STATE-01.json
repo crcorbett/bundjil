@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-306",
+  "scenarioId": "HGI306-AUTOMATION-STATE-01",
+  "scenarioManifest": "../HGI-306-scenarios.json",
+  "scenarioManifestSha256": "686d7f47d2665b20aefe7d02387e8ef1f2db9ee7b769092eb2c39633a5ac26f1",
+  "targetBaseCommit": "534076e68d663d98fa53f46004397b617282a4a9",
+  "evaluator": "fresh Terra worker /root/hgi306_fresh_acceptance",
+  "observedAt": "2026-07-21T17:10:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/standards/automation-register.json plus authority and workflow owners",
+  "decision": "Reject classification drift. CI stays admitted read-only, release remains disabled pending proof, interactive Claude remains foreground-only, and automatic Claude review remains retired.",
+  "evidenceRequired": [
+    "Typed register enforces the exact 11-loop state map.",
+    "Every automation row has two addressable fixtures, owner, cost, five metrics, review trigger, and retirement."
+  ],
+  "limitations": [
+    "Repository desired state does not establish hosted workflow or integration state."
+  ],
+  "nonClaims": [
+    "Bounded desired source does not prove hosted identity, run, outcome, cost, or external consequence."
+  ],
+  "rollbackRevocation": "Restore the accepted state map and remove any unapproved automatic-review workflow source.",
+  "escalation": ["Security automation maintainer", "Repository owner"],
+  "unsafeAmbiguities": []
+}

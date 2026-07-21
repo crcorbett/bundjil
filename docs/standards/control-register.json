@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "owner": "bundjil-harness-maintainer",
+  "lastReviewed": "2026-07-21",
+  "reviewTrigger": "control finding, false positive, fixture drift, owner change, command change, or accepted-outcome regression",
+  "controls": [
+    {
+      "id": "effect-language-service",
+      "state": "retained",
+      "failureClass": "Effect service, error, environment, and diagnostic contract drift",
+      "invariant": "Effect code remains typed and diagnostics remain enabled at authoring and verification time.",
+      "earliestOwnerPaths": [
+        "tsconfig.base.json",
+        "docs/architecture/effect-patterns.md"
+      ],
+      "commands": ["bun run check:effect-setup"],
+      "fixturePaths": [
+        "tooling/codec-provenance.fixture.ts",
+        "tooling/boundary-audit.test.ts"
+      ],
+      "admissionEvidence": "The language-service gate and boundary fixtures prevent recurring typed-Effect regressions before package tests.",
+      "falsePositiveCost": "A false positive blocks local verification and requires a narrow compiler/diagnostic reproduction.",
+      "repairCost": "Usually one owning Schema, service, or diagnostic correction; never a blanket suppression.",
+      "carryingCost": "Maintain the pinned compiler integration and requalify after TypeScript or Effect upgrades.",
+      "reviewTrigger": "TypeScript, Effect, language-service, service, error, or diagnostic change.",
+      "retirement": "Retire only when an earlier compiler-owned control proves the same failures with equal fixtures.",
+      "rollback": "Restore the last passing TypeScript/Effect setup and retain the failed upgrade evidence.",
+      "metricPlan": {
+        "acceptedOutcome": "Count accepted fixes attributable to the diagnostic.",
+        "falsePositive": "Record disputed diagnostics per changed source set.",
+        "feedbackLatency": "Measure change-to-first-actionable-diagnostic time.",
+        "synchronousHumanAttention": "Record review minutes needed to classify disputed output.",
+        "workerDuration": "Record focused correction duration, not command volume."
+      },
+      "nonClaim": "A patched compiler does not prove runtime, provider, or Production behavior."
+    },
+    {
+      "id": "boundary-provenance",
+      "state": "retained",
+      "failureClass": "unchecked inbound/outbound values, raw semantic primitives, unsafe codecs, assertions, or framework adapter leakage",
+      "invariant": "Encoding and decoding occur once at named boundaries and exceptions match exact file, symbol, rule, and occurrence.",
+      "earliestOwnerPaths": [
+        "tooling/boundary-audit.ts",
+        "tooling/boundary-exceptions.ts"
+      ],
+      "commands": ["bun run check:boundaries", "bun run test:boundaries"],
+      "fixturePaths": [
+        "tooling/boundary-audit.test.ts",
+        "tooling/codec-provenance.fixture.ts"
+      ],
+      "admissionEvidence": "Positive and negative fixtures cover exact admission, occurrence isolation, duplicates, stale entries, codecs, Config, JSON, HTTP, persistence, and assertions.",
+      "falsePositiveCost": "An exact diagnostic blocks one occurrence; resolution requires an owner-named contract or a justified exact exception.",
+      "repairCost": "Usually local to the adapter; repeated exceptions are retained until a proven equivalent representation exists.",
+      "carryingCost": "Maintain compiler-API matching and 18 exact occurrence records.",
+      "reviewTrigger": "Boundary syntax, TypeScript AST, exception, provider SDK, or source-condition change.",
+      "retirement": "Replace only with equal exact-match, duplicate, occurrence-isolation, and stale-detection evidence.",
+      "rollback": "Restore the last exact registry and audit together; never widen to file- or symbol-only admission.",
+      "metricPlan": {
+        "acceptedOutcome": "Count escaped boundary failures prevented or corrected.",
+        "falsePositive": "Record exact diagnostics rejected after owner/call-graph review.",
+        "feedbackLatency": "Measure source change to bounded diagnostic.",
+        "synchronousHumanAttention": "Record exception-admission review minutes.",
+        "workerDuration": "Record correction duration per diagnostic class."
+      },
+      "nonClaim": "Registry line-count reduction is not effectiveness or equivalence."
+    },
+    {
+      "id": "ultracite-lint-format",
+      "state": "retained",
+      "failureClass": "static correctness, consistency, tagged-error identity, and format drift",
+      "invariant": "Type-aware Ultracite, repository lint rules, and formatting reject their named failure classes.",
+      "earliestOwnerPaths": [
+        "oxlint.config.ts",
+        "lint/oxlint-plugin.ts",
+        "oxfmt.config.ts"
+      ],
+      "commands": ["bun run check", "bun run test:lint", "bun run fix"],
+      "fixturePaths": ["lint/oxlint-plugin.test.ts", "lint/oxlint-plugin.ts"],
+      "admissionEvidence": "The repository lint fixture proves exact tagged-error-name failures and the type-aware command covers current source.",
+      "falsePositiveCost": "A false positive blocks the changed file and requires a minimal lint fixture before policy changes.",
+      "repairCost": "Local source or rule-fixture correction; no broad disable without a SPEC-owned replacement.",
+      "carryingCost": "Maintain configuration and focused rule fixtures across tool upgrades.",
+      "reviewTrigger": "Lint, formatting, generated source, TypeScript, or tagged-error change.",
+      "retirement": "Retire a rule when it no longer prevents its named failure or a stronger earlier owner replaces it.",
+      "rollback": "Restore the prior rule/config and retain the rejected fixture.",
+      "metricPlan": {
+        "acceptedOutcome": "Track accepted rule-driven corrections.",
+        "falsePositive": "Track suppressions proposed and rejected/accepted with fixtures.",
+        "feedbackLatency": "Measure edit-to-diagnostic time.",
+        "synchronousHumanAttention": "Record rule-dispute review minutes.",
+        "workerDuration": "Record fix duration for each rule class."
+      },
+      "nonClaim": "A clean lint result does not prove business behavior or external state."
+    },
+    {
+      "id": "documentation-owner-policy",
+      "state": "retained",
+      "failureClass": "stale current owners, broken lifecycle routes, duplicated truth, unsafe freshness publication, and provider-actuality prose",
+      "invariant": "Documentation updates the earliest durable owner; background freshness remains isolated report-only input until distinct review/publication/readback.",
+      "earliestOwnerPaths": [
+        "tooling/documentation-policy.ts",
+        "tooling/documentation/freshness-candidate.ts",
+        "docs/README.md"
+      ],
+      "commands": ["bun run check:docs", "bun run check:controls"],
+      "fixturePaths": [
+        "tooling/documentation-policy.test.ts",
+        "tooling/control-policy.test.ts"
+      ],
+      "admissionEvidence": "Semantic owner fixtures plus typed freshness candidates reject self-source, self-review, self-publication, incomplete publication, and candidate-root ownership.",
+      "falsePositiveCost": "A false positive requires an exact owner/claim segment or candidate fixture; counts alone cannot waive it.",
+      "repairCost": "Update the canonical owner and necessary pointers, or quarantine the candidate with recovery data.",
+      "carryingCost": "Maintain lifecycle metadata, semantic claim fixtures, and the freshness contract.",
+      "reviewTrigger": "Current owner, claim, route, lifecycle, background scan, publication, or recovery change.",
+      "retirement": "Retire only when a smaller generated owner provides the same semantic, lifecycle, and publication safety evidence.",
+      "rollback": "Restore the last-known-good owner and quarantine the candidate or policy revision.",
+      "metricPlan": {
+        "acceptedOutcome": "Count candidates accepted into the correct owner, rejected, or quarantined.",
+        "falsePositive": "Record reviewer-rejected candidate findings by class.",
+        "feedbackLatency": "Measure source observation to reviewer decision.",
+        "synchronousHumanAttention": "Record review/publication attention separately.",
+        "workerDuration": "Record scan and correction duration separately."
+      },
+      "nonClaim": "A candidate, documentation check, or publisher receipt does not prove provider actuality."
+    },
+    {
+      "id": "skill-mirror-policy",
+      "state": "retained",
+      "failureClass": "missing, broken, contradictory, non-portable, or stale repository skill guidance",
+      "invariant": "Required skills and mirrors remain complete, portable, metadata-valid, and semantically aligned with executable owners.",
+      "earliestOwnerPaths": [
+        "tooling/skill-policy.ts",
+        ".agents/skills/docs-maintainer/SKILL.md"
+      ],
+      "commands": [
+        "bun run check:skills",
+        "python3 tooling/quick_validate.py .agents/skills/docs-maintainer"
+      ],
+      "fixturePaths": [
+        "tooling/skill-policy-audit.test.ts",
+        ".agents/skills/docs-maintainer/references/repository-profile.md"
+      ],
+      "admissionEvidence": "Skill-policy fixtures reject missing routes, invalid metadata, contradictory examples, fixed rituals, broken mirrors, and non-portable paths.",
+      "falsePositiveCost": "A false positive blocks a skill surface and requires a semantic-term or mirror fixture.",
+      "repairCost": "Update the skill owner, UI metadata, mirror, and exact policy fixture atomically.",
+      "carryingCost": "Maintain six required mirrors and policy fragments when owners move.",
+      "reviewTrigger": "Skill, mirror, agent instruction, owner path, executable example, or metadata change.",
+      "retirement": "Retire a reminder after its stronger schema/lint/test owner and pointer are accepted.",
+      "rollback": "Restore the last complete mirror set and retained source revision.",
+      "metricPlan": {
+        "acceptedOutcome": "Track skill defects corrected before implementation.",
+        "falsePositive": "Record policy matches rejected after semantic review.",
+        "feedbackLatency": "Measure skill edit to bounded finding.",
+        "synchronousHumanAttention": "Record mirror/provenance review minutes.",
+        "workerDuration": "Record correction duration per skill surface."
+      },
+      "nonClaim": "Valid skill text does not prove a worker followed it or a provider behaved accordingly."
+    },
+    {
+      "id": "workflow-authority-policy",
+      "state": "retained",
+      "failureClass": "unbounded workflow identity, permissions, triggers, convergence, actions, or tool-derived authority",
+      "invariant": "Workflow desired source and interaction/provider envelopes are exact, least-privilege, bounded, convergent, and non-authorizing without readback.",
+      "earliestOwnerPaths": [
+        "tooling/authority-policy.ts",
+        "docs/operations/authority-register.json",
+        "docs/operations/automation-register.md"
+      ],
+      "commands": ["bun run check:authority", "bun run test:boundaries"],
+      "fixturePaths": [
+        "tooling/authority-policy-audit.test.ts",
+        "docs/operations/github-actions-lock.json"
+      ],
+      "admissionEvidence": "Static negative fixtures cover inventory, permissions, target, timeout, convergence, pins, readback, containment, and retired review.",
+      "falsePositiveCost": "A false positive blocks desired workflow source and requires an exact YAML/register fixture.",
+      "repairCost": "Correct source/register/lock together; external application remains separately approved.",
+      "carryingCost": "Maintain three workflow contracts, 15 authority rows, and five action pins.",
+      "reviewTrigger": "Workflow, action, permission, OIDC, token, target, automation, or external-setting change.",
+      "retirement": "Retire a capability when admission or accepted-outcome evidence is absent; restore only through a new accepted SPEC.",
+      "rollback": "Restore the prior source/register/lock and separately reverse external state if authorized.",
+      "metricPlan": {
+        "acceptedOutcome": "Track accepted workflow outcomes, not run count.",
+        "falsePositive": "Track rejected checks/comments or duplicate actions.",
+        "feedbackLatency": "Measure signal to bounded receipt.",
+        "synchronousHumanAttention": "Record approval/review attention separately.",
+        "workerDuration": "Record run duration separately from human latency."
+      },
+      "nonClaim": "Desired source and local fixtures do not prove GitHub settings, runs, credentials, or consequences."
+    },
+    {
+      "id": "critical-journey-proof-policy",
+      "state": "retained",
+      "failureClass": "false success, ambiguous artifact, missing authority/readback, evidence tamper, or unbounded output",
+      "invariant": "Proof identifies candidate, journey, environment, authority, consequence, evidence, limitations, recovery, and immutable lifecycle.",
+      "earliestOwnerPaths": [
+        "tooling/verification-policy.ts",
+        "docs/verification/README.md",
+        "docs/evidence/README.md"
+      ],
+      "commands": ["bun run check:verification"],
+      "fixturePaths": [
+        "tooling/verification-policy-audit.test.ts",
+        "docs/verification/proof-packet.schema.json"
+      ],
+      "admissionEvidence": "Strict schemas and semantic fixtures reject false success, tamper, missing detail, unsafe rerun, unbounded output, and unavailable-as-proved readback.",
+      "falsePositiveCost": "A false positive blocks one packet or journey and requires a claim-matched fixture.",
+      "repairCost": "Correct the owning producer/schema and preserve prior evidence rather than rewriting it.",
+      "carryingCost": "Maintain ten journeys, five packet templates, evidence roots, and lifecycle fixtures.",
+      "reviewTrigger": "Journey, producer, packet, evidence, authority, output, or external consequence change.",
+      "retirement": "Retire only when a smaller packet proves the same consequence and limitation without losing provenance.",
+      "rollback": "Restore the prior producer/schema and retain failed/superseded packets.",
+      "metricPlan": {
+        "acceptedOutcome": "Track accepted journey outcomes by candidate.",
+        "falsePositive": "Track packets rejected despite matching observable evidence.",
+        "feedbackLatency": "Measure run to actionable bounded receipt.",
+        "synchronousHumanAttention": "Record proof review/approval attention.",
+        "workerDuration": "Record journey execution duration separately."
+      },
+      "nonClaim": "Local proof contracts do not establish external actuality."
+    },
+    {
+      "id": "dependency-export-hygiene",
+      "state": "retained",
+      "failureClass": "unused dependency, dead export, package boundary, or source-condition drift",
+      "invariant": "Knip, package exports, TypeScript projects, and build/tests keep live source and consumer boundaries coherent.",
+      "earliestOwnerPaths": ["knip.json", "tsconfig.base.json", "package.json"],
+      "commands": [
+        "bun run knip",
+        "bun run check-types",
+        "bun run test",
+        "bun run build"
+      ],
+      "fixturePaths": [
+        "packages/store/package.json",
+        "packages/eve/package.json"
+      ],
+      "admissionEvidence": "Workspace typechecks/builds/tests plus Knip cover current package and export consumers.",
+      "falsePositiveCost": "A false positive requires tracing the real import/export consumer or generated entry.",
+      "repairCost": "Correct the package/export/config owner rather than add a blanket ignore.",
+      "carryingCost": "Maintain workspace projects, source conditions, manifests, and narrowly justified ignores.",
+      "reviewTrigger": "Dependency, package, export, generated entry, source condition, TypeScript, or build change.",
+      "retirement": "Retire an ignore when its consumer disappears; retire the control only if the package manager/compiler owns equal proof.",
+      "rollback": "Restore the prior manifest/export graph and consumer tests.",
+      "metricPlan": {
+        "acceptedOutcome": "Track accepted dependency/export removals and corrections.",
+        "falsePositive": "Track justified live consumers initially reported dead.",
+        "feedbackLatency": "Measure graph change to diagnostic.",
+        "synchronousHumanAttention": "Record consumer-trace review minutes.",
+        "workerDuration": "Record graph correction duration."
+      },
+      "nonClaim": "A clean dependency graph does not prove runtime or provider behavior."
+    }
+  ]
+}

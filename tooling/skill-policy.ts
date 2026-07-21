@@ -110,6 +110,8 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
       "docsMaintainer",
       "Scheduled or background freshness work emits an isolated candidate",
     ],
+    ["docsMaintainer", "tooling/documentation/freshness-candidate.ts"],
+    ["docsMaintainer", "bun run check:controls"],
     ["docsProfile", "apps/agent/runbooks/**"],
     ["docsProfile", "apps/codex-proxy/runbooks/**"],
     ["docsProfile", "python3 tooling/quick_validate.py"],
@@ -269,13 +271,15 @@ const documentationMaintenanceContracts: readonly DocumentationMaintenanceContra
       requiredTermGroups: [
         ["Scheduled or background", "background freshness"],
         ["isolated candidate", "report-only"],
+        ["tooling/documentation/freshness-candidate.ts"],
+        ["cannot be its own source", "cannot review or publish"],
         ["separate approval", "separately approved"],
         ["revocation/quarantine"],
         ["last-known-good"],
-        ["post-publication readback"],
+        ["atomic post-publication readback", "atomic target readback"],
       ],
       repairHint:
-        "Keep background maintenance report-only with a complete candidate and separately approved publication contract.",
+        "Route report-only background maintenance to the typed freshness-candidate contract with self-feedback exclusion and separately approved publication/readback.",
     },
     {
       id: "clean-clone-portability",

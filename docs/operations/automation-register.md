@@ -18,8 +18,15 @@ GitHub executed the desired state.
 The machine-readable provider and interaction envelopes live in
 [`authority-register.json`](authority-register.json). Approved third-party
 action identities live in [`github-actions-lock.json`](github-actions-lock.json).
+The complete typed inventory for GitHub, deployment, provider, and report-only
+loops lives in
+[`../standards/automation-register.json`](../standards/automation-register.json),
+routed by [`../standards/controls.md`](../standards/controls.md). This document
+keeps the GitHub workflow rationale; the typed register prevents the other
+loops from disappearing from admission review.
 `bun run check:authority` rejects drift across all three owners and the workflow
-source.
+source; `bun run check:controls` rejects automation-state, proof, metric,
+retirement, and freshness-publication drift.
 
 ## Admission rule
 
@@ -118,6 +125,28 @@ evidence. It must not be restored as governed automation without a new SPEC,
 an explicit authority envelope, one-comment-per-head convergence, bounded
 proof, and HGI-306 admission evidence. Retained decision provenance is
 [`HGI-308-claude-review.decision.json`](../documentation-audit/HGI-308-claude-review.decision.json).
+
+### Deployment and provider operations — foreground or disabled
+
+Vercel deployment/promotion, Sendblue outbound work, Executor reads/resumes,
+and AI Gateway/Eve turns remain foreground operations with exact target-owned
+runbooks, authority, proof, stopping, and recovery. The hosted Codex model
+proxy remains disabled pending proof. None is admitted as scheduled continuous
+automation, and unavailable external readback stays inconclusive.
+
+Sendblue inbound processing is the one admitted consequential runtime loop. Its
+signed ingress, durable replay/lease state, one-turn convergence, bounded proof,
+no-blind-retry rule, stopping, recovery, and escalation are recorded in the
+typed register. HGI-306 neither reads nor changes its current provider state.
+
+### Documentation and context freshness — report-only
+
+Background freshness may emit only a typed isolated candidate. Candidate output
+cannot feed itself, edit a current owner, review itself, or publish policy.
+Distinct review, approval, publisher identity, immutable revision, atomic
+readback, and last-known-good recovery are required before publication. The
+canonical contract is
+[`../../tooling/documentation/freshness-candidate.ts`](../../tooling/documentation/freshness-candidate.ts).
 
 ## Action pin ownership
 
