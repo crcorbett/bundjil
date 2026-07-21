@@ -41,6 +41,7 @@ HGI-308 decision evidence:
 HGI-302 control evidence:
 
 - [`HGI-302-candidate.json`](HGI-302-candidate.json)
+- [`HGI-302-validation.json`](HGI-302-validation.json)
 
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state

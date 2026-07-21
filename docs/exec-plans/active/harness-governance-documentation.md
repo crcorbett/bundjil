@@ -35,9 +35,12 @@ and task state.
   fallbacks. Acceptance and exact Git identity are recorded in
   [`HGI-308-validation.json`](../../documentation-audit/HGI-308-validation.json);
   the records do not establish provider state or operation authority.
-- **HGI-302 — in progress:** implement bounded docs and skill-mirror controls,
-  repair current routes and mirrors, preserve the accepted occurrence-control
-  equivalence bar, and add positive/negative fixtures before acceptance.
+- **HGI-302 — completed:** bounded documentation and skill-mirror controls now
+  emit bounded JSON diagnostics, reject semantic current-owner contradictions,
+  inspect every local skill example, validate YAML metadata through Effect
+  Schema, preserve the accepted occurrence-control equivalence bar, and keep
+  the required mirrors complete. Acceptance and publication evidence is in
+  [`HGI-302-validation.json`](../../documentation-audit/HGI-302-validation.json).
 - HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307 remain pending in
   dependency order. HGI-309 remains deferred until separately approved
   external authority exists.

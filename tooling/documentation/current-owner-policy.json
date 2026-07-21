@@ -19,6 +19,7 @@
   "acceptedTaskStates": {
     "HGI-300": "completed",
     "HGI-301": "completed",
+    "HGI-302": "completed",
     "HGI-308": "completed"
   },
   "rules": [
