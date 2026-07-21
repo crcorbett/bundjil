@@ -3,8 +3,8 @@ document_type: audit-index
 lifecycle: evidence
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
-review_trigger: any HGI-300 corpus, route, or receipt change
+last_reviewed: 2026-07-21
+review_trigger: any HGI corpus, route, decision, reconciliation, or acceptance receipt change
 ---
 
 # Documentation audit
@@ -20,6 +20,11 @@ Current HGI-300 receipts:
 - [`HGI-300-S1-git-receipt.json`](HGI-300-S1-git-receipt.json)
 - [`HGI-300-S2-receipt.json`](HGI-300-S2-receipt.json)
 - [`HGI-300-validation.json`](HGI-300-validation.json)
+
+Current HGI-301 candidate evidence:
+
+- [`HGI-301-eve-reconciliation.json`](HGI-301-eve-reconciliation.json)
+- [`HGI-301-candidate.json`](HGI-301-candidate.json)
 
 Counts prove path accounting only. Fresh-context retrieval and the semantic
 owner must support current-document claims.

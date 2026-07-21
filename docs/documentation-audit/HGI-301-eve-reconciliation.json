@@ -1,0 +1,38 @@
+{
+  "documentType": "documentation-reconciliation-receipt",
+  "lifecycle": "inconclusive",
+  "authority": "generated",
+  "owner": "bundjil-architecture-owner",
+  "observedAt": "2026-07-21T11:40:03+01:00",
+  "sourceIdentity": {
+    "gitCommit": "56fd1b972ede348872af6c2cf6e35843e53eba28",
+    "paths": [
+      "apps/agent/agent/config.ts",
+      "apps/agent/agent/model-provider.ts",
+      "apps/agent/agent/channels/sendblue.ts",
+      "apps/agent/agent/connections/executor.ts",
+      "turbo.json"
+    ]
+  },
+  "sourceFindings": [
+    "The agent source selects gateway by default and conditionally constructs a codex-proxy LanguageModel from decoded app configuration.",
+    "The Sendblue route and executor connection are deployable app-owned adapters, but source cannot establish their current external registration or acceptance.",
+    "The build contract declares provider-related environment names, but source cannot establish any environment's current values or deployment revision."
+  ],
+  "providerReadback": {
+    "status": "unavailable",
+    "attempted": [
+      "Checked for a local Vercel CLI; no executable was installed.",
+      "No connected provider-readback capability was available to this implementation environment."
+    ],
+    "fallback": "Retain the source trace and limitation; obtain a fresh target-owned, read-only provider receipt before asserting deployment, provider, webhook, or handset state."
+  },
+  "claims": [
+    "The current architecture is limited to durable source-backed topology and invariants.",
+    "No current production, deployment, webhook, provider-connection, or handset claim is established by this receipt."
+  ],
+  "limitations": [
+    "The observedAt timestamp applies to this local source and capability check only.",
+    "This receipt grants no approval, authority, credential access, or mutation permission."
+  ]
+}

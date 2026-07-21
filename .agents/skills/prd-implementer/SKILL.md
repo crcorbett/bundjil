@@ -11,12 +11,12 @@ This skill is intentionally thin. It routes implementation work into the canonic
 
 Read in this order:
 
-1. the target spec
-2. the sibling task list when the spec has one
-3. the matching active plan in `docs/exec-plans/active/`, if implementation
+1. `AGENTS.md`
+2. `docs/README.md`
+3. the target spec and sibling task list when it has one
+4. the matching active plan in `docs/exec-plans/active/`, if implementation
    has started
-4. `AGENTS.md`
-5. the relevant files in `docs/architecture/`
+5. the relevant routed files in `docs/architecture/`
 
 ## Default Rules
 
@@ -87,10 +87,12 @@ Read in this order:
   active plans as `Change required` or `N/A` with a reason. Edit required
   artifacts in the same slice instead of reporting them as follow-up advice.
 
-## Mandatory Subagent Prompt Block
+## Delegation reference
 
-Include this block in every implementation subagent prompt, then add the
-specific task object, spec path, relevant files, and verification gates:
+When a bounded, independently provable slice needs delegation, include the
+relevant parts of this reference with the task object, routed owner paths, and
+verification gates. Delegation is optional; the primary trajectory remains
+accountable for integration and acceptance:
 
 ```text
 Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,

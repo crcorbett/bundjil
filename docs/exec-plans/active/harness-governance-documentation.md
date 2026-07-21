@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: acceptance or scope change in Bundjil HGI-300 through HGI-310
 ---
 
@@ -21,8 +21,12 @@ and task state.
   independent acceptance, full verification, and pushed Git identity are
   recorded in
   [`HGI-300-validation.json`](../../documentation-audit/HGI-300-validation.json).
-- **HGI-301 — next and dependency-ready:** reconcile current architecture and
-  remove fixed ritual before dependent controls are encoded.
+- **HGI-301 — acceptance pending:** the candidate Eve architecture distinguishes durable
+  source topology from mutable provider state, and the dated reconciliation
+  receipt records the unavailable provider readback rather than a production
+  inference. Current implementation guidance is risk-based; tool data,
+  policy, and approval are explicitly separate; executable semantic fixtures
+  are under fresh-context review.
 - HGI-308, HGI-302, HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307
   remain pending in dependency order. HGI-309 remains deferred until
   separately approved external authority exists.
@@ -38,3 +42,7 @@ or another unresolved semantic-owner class.
 Parent acceptance reproduced corpus/link receipts, passed held-out retrieval,
 `bun run check:skills`, `bun run verification`, and scoped Git/readback proof.
 Those checks do not prove provider/runtime/production state.
+
+HGI-301's source trace and `observedAt` limitation are retained in
+[`HGI-301-eve-reconciliation.json`](../../documentation-audit/HGI-301-eve-reconciliation.json).
+It does not create a runbook, provider authority, or verification owner.

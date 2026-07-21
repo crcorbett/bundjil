@@ -79,25 +79,22 @@ bun run --filter @bundjil/agent build
   stale-claim scans and `git diff --check`; run broader checks only when the
   parent acceptance task requires them.
 
-## Mandatory Effect Audit
+## Risk-based implementation review
 
-SPEC implementation tasks that touch Effect runtime, provider, storage, app
-config, deployment, or durable docs must record the 3-pass Effect TS audit:
+Select the review lenses that match the changed boundary; do not require a
+fixed number of passes, reviewers, or delegated agents. For Effect runtime,
+provider, storage, app-config, deployment, or durable-doc changes, consider:
 
-1. Ownership and call graph: right app/package owner, stable imports/exports,
-   production call graph, test call graph, and unsupported paths.
-2. Implementation quality: flat primary `Effect.gen` programs, Effect Schema
-   contracts, explicit `Type`/`Encoded` provenance, schema-derived types,
-   tagged errors, `Config.schema` with redacted secrets, encoded outward
-   writes, immediately decoded provider outputs, explicit live/mock Layers,
-   and no unsafe casts, DTO mirrors, manual object readers, or helper sprawl.
-3. Verification coverage: targeted commands, root commands, local/proxy/live
-   proof, `check:boundaries`, `check:effect-setup`, `check:skills`,
-   preview-before-production evidence, leak scans, docs/README/skill updates,
-   and deliberately skipped checks with their reasons.
+- ownership and call graph, including supported and intentionally unsupported
+  paths;
+- implementation quality, including Effect Schema provenance, redacted Config,
+  layers, error contracts, and helper admission; and
+- verification coverage, including targeted checks, bounded evidence,
+  deliberately skipped live proof, and required documentation updates.
 
-Do not mark a task accepted just because three entries exist. If an audit pass
-finds a gap, fix it and record another pass.
+Acceptance follows the task's applicable risks and evidence, not the number of
+review entries. Correct an identified gap and rerun only the checks needed to
+establish the repaired claim.
 
 For persistence work, verify native `KeyValueStore` and
 `AtomicKeyValueStore.transact` independently, scan for
@@ -189,50 +186,13 @@ closed without a resume attempt.
 
 The temporary model protocol is instruction-level and weaker than native or
 browser authorization. Keep destructive and authority-management operations
-blocked and the first Production acceptance operation read-only. Do not claim
-browser rollback from a paused result or source review: change the
-target-scoped URL only after clean Preview proof of the hosted page, approve,
-decline, settled replay, and Sendblue delivery, then redeploy from a clean SHA
-before Production promotion. The earlier implementation slice ran no provider,
-browser, Vercel, or Sendblue operation; the separately owned Task 6 promotion
-record below is the exception and retains only sanitized operator evidence.
-
-For Production Executor promotion, retain evidence in three
-separate states: reviewed intended policy, Preview-verified behavior, and
-Production-verified behavior. The reviewed state proves that an independent
-Production toolkit has one selected connection and five ordered policy rules
-matching accepted Preview intent. The accepted promotion record proves
-Production-only Sensitive Vercel bindings, clean-source current and rollback
-deployments, protected health, exact MCP discovery, and read-only execution.
-The replacement bearer matches exactly one current Executor inventory row by
-unique provider name and masked value, is durably stored in the labeled Personal
-item, and matches the replaced Production-only Sensitive binding. The temporary
-handoff file is removed. Since Executor keys are account-level, a dedicated
-environment key is an operational isolation control and toolkit scope comes
-from endpoint/policy. The accepted current and rollback agent deployments are
-`READY` at `e1f33e8`; the refreshed live proxy is also `READY` and healthy at
-that revision. Direct MCP proof and a deployed OIDC-authenticated Eve session
-both completed the exact approved GitHub PR read. The Eve run discovered the
-connection, loaded the execute skill, invoked the read, completed the turn, and
-reached `session.waiting`; no write or approval path ran.
-
-Before accepting Production, verify without retaining values: labeled Personal
-1Password storage before key handoff; exact unique-name/masked-value correlation
-for the dedicated environment key; both Vercel variables targeted only to
-Production and marked Sensitive; clean pushed source plus immutable current and
-rollback deployment references; protected health; exactly `skills`, `execute`,
-and `resume`; one authenticated read-only execution; zero Production writes;
-and log/evidence scans with zero credential, protected-URL, prompt, provider
-result, OAuth, message-content, and execution-id retention. Dry-run or
-read-only inventory must prove policy block, key revocation, deployment restore,
-and post-revocation rejection procedures while leaving the accepted Production
-key active until an incident or planned rotation.
+blocked in tests and do not infer approval from a paused result. External
+approval, deployment, rollback, and provider procedures require their
+target-owned runbook and a fresh readback; this guide owns neither.
 
 Codex proxy mode is not an ordinary Eve test requirement. Gateway remains the
-default. Accepted Production proof verifies a deployed Eve request through the
-live private proxy; Preview proof is historical. The access-token-only `local`
-workaround is deprecated and must never be used as hosted auth. Source ignored
-env values rather than printing them:
+default source selection. The access-token-only `local` workaround must never
+be used as hosted auth. Source ignored env values rather than printing them:
 
 ```bash
 PORT=<local-port> \
@@ -240,10 +200,8 @@ BUNDJIL_CODEX_PROXY_MODE=mock \
 bun run --filter @bundjil/codex-proxy dev
 ```
 
-Use the dedicated proxy runbook in
-[`apps/codex-proxy/README.md`](../../apps/codex-proxy/README.md) for mock,
-access-token-only local filesystem, refresh-capable hosted live,
-reauthentication, monitoring, and rollback operations.
+This is a local mock check only. It establishes neither a hosted proxy nor any
+provider state.
 
 ## Codex Proxy Verification
 
@@ -258,96 +216,10 @@ The smoke test starts a local Bun server on an ephemeral port, checks
 `POST /v1/chat/completions`.
 
 Manual probes must use a minimal request from a private shell; the server
-decodes it through the owning Effect Schema boundary.
-Record no request body or model output. Checks must run against the isolated
-personal Vercel environment before a Production change and must scan logs for
-absence of token values, authorization codes, raw OAuth payloads, prompts, and
-full response bodies. The refresh-capable code path, historical Preview proof,
-and Production proof are accepted. Do not infer a future deployment change
-from a prior proof record.
-
-Hosted Eve verification requires the scoped `@bundjil/agent#build` environment
-contract in `turbo.json`, a source deploy from the repository root, a fresh
-Vercel OIDC bearer for `/eve/v1/*`, and a durable stream replay with
-`startIndex=0`. Record provider/model id, HTTP status, event types/count, and
-leak booleans only; never record the bearer, prompt, or full model response.
-For future Production changes, establish the isolated Preview proof first.
-
-`@bundjil/agent#build` must remain non-cacheable. `eve build` owns
-deployment-local `.vercel/output` materialization and sandbox-template prewarm;
-a replayed Turbo log is not proof that those artifacts were restored. A
-deployment check must include one non-forced redeploy after this task contract
-changes and fail if Vercel falls back to a configured static output directory.
-
-The preview project is `bundjil-codex-proxy` in Cooper's personal Vercel
-account. It must not be linked to Tilt Legal.
-
-Preview deployment command shape:
-
-```bash
-cd apps/codex-proxy
-vercel link --project bundjil-codex-proxy
-vercel env pull .env.preview.local --environment=preview
-bun run --filter @bundjil/codex-proxy build
-vercel deploy
-```
-
-The linked Vercel project settings should remain:
-
-```text
-project: bundjil-codex-proxy
-scope: Cooper Corbett's projects
-root directory: apps/codex-proxy
-framework: Other
-node version: 24.x
-build command: bun run --filter @bundjil/codex-proxy build
-output directory: .
-```
-
-Preview direct HTTP checks start with the public health endpoint. Send the
-private authenticated request only from an ignored local env source and record
-the sanitized result shape below:
-
-```bash
-PROXY_URL=<preview-url>
-
-curl -sS "${PROXY_URL}/health"
-```
-
-Sanitized proof shape:
-
-```text
-healthStatus: 200
-healthMode: mock or live
-unauthenticatedStatus: 401
-invalidTokenStatus: 401
-streamStatus: 200
-streamContentType: text/event-stream
-streamDataLines: 2 or greater
-streamDone: true
-tokenLeak: false
-authorizationCodeLeak: false
-rawPayloadLeak: false
-```
-
-Inspect hosted logs after preview checks:
-
-```bash
-vercel logs "${PROXY_URL}" --since 30m
-```
-
-Only status lines, route names, deployment ids, HTTP status codes, and sanitized
-proof counters belong in docs. Do not record bearer values, OAuth token
-values, refresh token values, authorization codes, raw OAuth payloads, full
-prompts, or full model responses.
-
-For the historical refresh-capable Preview composition, rollback is setting preview
-`BUNDJIL_CODEX_PROXY_MODE` to `mock` and deploying another preview. The
-access-token-only filesystem proof is revoked by deleting its ignored
-directory. Rotate Vercel or Upstash credentials through provider controls if
-exposure is suspected; never print the old value. Current Production rollback
-is recorded in the Production promotion plan and is not performed by this
-historical Preview runbook.
+decodes it through the owning Effect Schema boundary. Record no request body or
+model output. Any hosted or provider observation belongs in a dated,
+target-owned proof receipt with a source identity, `observedAt`, limitations,
+and non-claims. It never grants deployment or mutation authority.
 
 ## Documentation Quality
 

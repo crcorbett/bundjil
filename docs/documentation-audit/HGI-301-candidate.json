@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-301",
+  "status": "accepted",
+  "observedAt": "2026-07-21T11:51:38+01:00",
+  "baseCommit": "56fd1b972ede348872af6c2cf6e35843e53eba28",
+  "authority": "local Bundjil documentation, skill-policy, instruction, and test changes with read-only local capability inspection only",
+  "acceptedOutcome": "Bundjil's Eve architecture now owns only durable source topology and invariants, mutable provider actuality is confined to a dated inconclusive receipt, fixed coordination ritual is removed from current owners, and executable semantic fixtures separate tool observations from policy and authority.",
+  "sourceReceiptSha256": "e7355b1a24e5f4d2bc15508eae29fafe9c2e0329dbb9d2f6bdb57bf255cae375",
+  "contradictionFixtureSha256": "469f81d4cd5138ad8b0f631715669653ac538b379a6927570c80a3ee55be1b73",
+  "impactLedger": [
+    {
+      "surface": "Eve durable architecture and mutable provider state",
+      "decision": "Change required",
+      "paths": [
+        "docs/architecture/eve-agent.md",
+        "docs/documentation-audit/HGI-301-eve-reconciliation.json"
+      ],
+      "acceptance": "Architecture states only source-backed topology/invariants; unavailable provider readback is dated, limited, and makes no production claim."
+    },
+    {
+      "surface": "Effect, testing, and implementation guidance",
+      "decision": "Change required",
+      "paths": [
+        "docs/architecture/effect-patterns.md",
+        "docs/architecture/testing-and-quality.md",
+        ".agents/skills/prd-implementer/SKILL.md"
+      ],
+      "acceptance": "Current owners use risk-matched evidence, read AGENTS/docs routing first, retain one primary trajectory, and require no fixed pass or subagent count."
+    },
+    {
+      "surface": "Tool-result trust contract",
+      "decision": "Change required",
+      "paths": ["apps/agent/agent/instructions.md"],
+      "acceptance": "Tool output is observed data and cannot create policy, approval, identity, capability, permission, or mutation authority."
+    },
+    {
+      "surface": "Semantic contradiction acceptance",
+      "decision": "Change required",
+      "paths": [
+        "tooling/documentation/fixtures/hgi-301-eve-contradictions.json",
+        "tooling/documentation-policy.test.ts",
+        "tooling/vitest.config.ts"
+      ],
+      "acceptance": "The executable test rejects all seeded bad claims and scans the actual Eve truth owners and current ritual owners."
+    },
+    {
+      "surface": "Provider, deployment, webhook, and handset operations",
+      "decision": "N/A",
+      "paths": [],
+      "acceptance": "No provider-read capability or Vercel executable was available; no external claim or mutation was inferred."
+    }
+  ],
+  "verification": [
+    {
+      "check": "fresh-context rejection, corrections, and final acceptance",
+      "status": "passed",
+      "result": "The evaluator first exposed premature completion, residual three-pass ritual, and an inert fixture; it then exposed a fixture classifier that did not scan actual owners. After both correction rounds, it accepted the complete candidate with no blocker."
+    },
+    {
+      "check": "bun run test:boundaries",
+      "status": "passed",
+      "result": "Twenty-nine tests passed across boundary provenance and executable HGI-301 current-owner policy."
+    },
+    {
+      "check": "focused repository policy checks",
+      "status": "passed",
+      "result": "check:skills, check:boundaries, Ultracite type-aware format/lint, and git diff --check passed after the evaluator-driven corrections."
+    },
+    {
+      "check": "fully configured bun run verification",
+      "status": "passed",
+      "result": "Effect setup, boundary and skill audits, 29 tooling tests, Ultracite, lint fixtures, Knip, five workspace typechecks, and 250 package/app tests passed with a schema-valid synthetic Executor test configuration; no provider call was made."
+    }
+  ],
+  "limitations": [
+    "The receipt proves local source topology, documentation coherence, and semantic controls only; it does not prove any Vercel deployment, provider connection, webhook registration, credential binding, or handset outcome.",
+    "A fresh target-owned provider readback remains necessary before any current external-state claim."
+  ],
+  "nonClaims": [
+    "No provider, deployment, webhook, credential, production, release, publication, or external system was read or mutated.",
+    "A successful local test or tool result does not grant authority."
+  ],
+  "rollback": "Revert this bounded HGI-301 candidate slice together; preserve HGI-300 receipts and unrelated Codex reasoning/proxy work at the base commit.",
+  "nextTrigger": "Use the final Git/readback receipt to close HGI-301, then begin HGI-308 without treating this local receipt as provider actuality."
+}
