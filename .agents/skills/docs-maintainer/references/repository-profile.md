@@ -26,12 +26,12 @@ work. Durable output uses repository-relative paths only.
 | Upstash/provider-neutral persistence                                                       | `packages/store/**` and `docs/architecture/repo-structure.md`                                                    | `packages/store/README.md`; target app runbook for consequential provider operation        |
 | React route, leaf ownership, loading/error/fallback state, and URL state                   | `docs/architecture/frontend-composition.md` and owning app code                                                  | Affected app/design README and browser journey when visible behavior changes               |
 | Lint, formatting, TypeScript, boundary exceptions, tests, build, Turbo, and CI             | Executable config, `lint/**`, `tooling/**`, workflow source, and `docs/architecture/testing-and-quality.md`      | Root/app/package README only where a supported command changes                             |
-| GitHub CI, release, Claude review, and background automation                               | `.github/workflows/**`, `docs/operations/automation-register.md`, and `docs/operations/github-actions-lock.json` | `tooling/authority-policy*.ts`; HGI-305 proof and HGI-309 external-setting owners          |
+| GitHub CI, release, Claude review, and background automation                               | `.github/workflows/**`, `docs/operations/automation-register.md`, and `docs/operations/github-actions-lock.json` | `tooling/authority-policy*.ts`; `docs/verification/**`; HGI-309 external-setting owner     |
 | Skill, mirror, or agent instruction                                                        | `.agents/skills/<name>/**`, `.claude/skills/<name>`, and `tooling/skill-policy*.ts`                              | `agents/openai.yaml`, `AGENTS.md`, and affected PRD route                                  |
 | Current SPEC/task/plan                                                                     | `docs/product-specs/index.md`, exact SPEC/tasks, and `docs/exec-plans/active/README.md`                          | Completed route plus execution/validation receipts only after acceptance                   |
 | Dated audit or decision evidence                                                           | `docs/documentation-audit/**`                                                                                    | Pointer from the current owner; evidence never becomes standing policy                     |
 | Current Vercel, Executor, Sendblue, Upstash, secret, webhook, workflow, or messaging state | Target-owned external readback at its observation time                                                           | Sanitized dated evidence; source, a successful command, or an old receipt is not actuality |
-| Critical journey and proof                                                                 | Future `docs/verification/**` owner under HGI-305                                                                | Until created, retain bounded task evidence and name the gap; do not invent the route      |
+| Critical journey, proof packet, bounded receipt, and retained evidence                     | `docs/verification/**`, `tooling/verification-policy*.ts`, and exact `docs/evidence/**` artifacts                | Affected app runbook; HGI-309 for approved provider/send/resume qualification              |
 
 ## Runbook and authority boundaries
 
@@ -90,6 +90,7 @@ python3 tooling/quick_validate.py .agents/skills/prd-implementer
 bun run check:skills
 bun run check:docs
 bun run check:authority
+bun run check:verification
 ```
 
 At accepted closeout run:
@@ -114,6 +115,8 @@ Bundjil lifecycle values are `proposed`, `current`, `implemented`,
 `last_reviewed`, and `review_trigger`. A superseded or tombstone document names
 its successor and reason.
 
-Keep full sanitized logs and raw failed/inconclusive evidence addressable but
-outside the default route. Default output names the violated invariant, exact
-target, repair hint, omitted-detail path, and last proved postcondition.
+Keep full sanitized failed/inconclusive detail addressable but outside the
+default route. Unsanitized raw material remains outside the repository under
+its owning system's retention and access controls. Default output names the
+violated invariant, exact target, repair hint, omitted-detail path, and last
+proved postcondition.

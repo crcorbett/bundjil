@@ -1,0 +1,303 @@
+[
+  {
+    "id": "BND-J01-workspace-status",
+    "actorOrConsumer": "repository maintainer",
+    "boundary": "agent workspace-status tool and configuration boundary",
+    "startingState": "clean local checkout with synthetic, schema-valid local configuration only",
+    "inputs": ["workspace-status request", "synthetic local configuration"],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/local-development.md",
+    "expectedBehavior": [
+      "The workspace status reports only decoded local repository information.",
+      "Configuration validation rejects invalid input at the owning boundary."
+    ],
+    "expectedSideEffects": [
+      "No provider call, message, deployment, or credential mutation occurs."
+    ],
+    "preservedInvariants": [
+      "Unknown configuration is decoded once at ingress.",
+      "No secret value appears in the receipt."
+    ],
+    "oracle": "The focused agent test and schema-owned failure fixtures pass with a bounded command receipt.",
+    "environment": "local synthetic configuration",
+    "authority": "none",
+    "evidence": [
+      "bun run --filter @bundjil/agent test",
+      "docs/verification/journey-command-map.json"
+    ],
+    "nonClaims": [
+      "This does not prove an installed Eve runtime, Executor connection, or provider configuration."
+    ]
+  },
+  {
+    "id": "BND-J02-gateway-session-recovery",
+    "actorOrConsumer": "local Eve user",
+    "boundary": "Eve HTTP session creation and stream recovery",
+    "startingState": "local Eve process is started by the local-development runbook with no claim about model credentials",
+    "inputs": [
+      "one sanitized session request",
+      "one returned session identifier when creation succeeds"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/local-development.md",
+    "expectedBehavior": [
+      "The local HTTP boundary exposes session creation and its documented failure shape.",
+      "A stream failure is classified rather than imitated as model completion."
+    ],
+    "expectedSideEffects": ["A local ephemeral session may be created."],
+    "preservedInvariants": [
+      "No model output is fabricated when gateway credentials are absent.",
+      "A session identifier is not treated as provider proof."
+    ],
+    "oracle": "Current tests prove config, model-selection, and auth subcontracts only. Session creation, interrupted-stream recovery, and duplicate-absence remain deferred until a deterministic fixture or local HTTP packet exists.",
+    "environment": "local development only",
+    "authority": "none",
+    "evidence": [
+      "bun run --filter @bundjil/agent test",
+      "apps/agent/runbooks/local-development.md"
+    ],
+    "nonClaims": [
+      "This does not prove gateway model completion, a hosted deployment, or Production recovery."
+    ]
+  },
+  {
+    "id": "BND-J03-proxy-health-auth-sse",
+    "actorOrConsumer": "local Codex-compatible client",
+    "boundary": "Codex proxy health, bearer authentication, and mock SSE boundary",
+    "startingState": "local proxy mock mode with an ephemeral server and no hosted endpoint",
+    "inputs": ["health request", "authenticated mock completion request"],
+    "stepsOrProcedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
+    "expectedBehavior": [
+      "Health is reachable locally.",
+      "The proxy applies the documented authentication boundary and emits mock SSE only in mock mode."
+    ],
+    "expectedSideEffects": [
+      "An ephemeral local server and mock response are created and then stopped."
+    ],
+    "preservedInvariants": [
+      "No Codex network call occurs.",
+      "No bearer value or request body is retained."
+    ],
+    "oracle": "bun run --filter @bundjil/codex-proxy smoke-test exits successfully and writes only its bounded receipt.",
+    "environment": "local mock mode",
+    "authority": "none",
+    "evidence": ["bun run --filter @bundjil/codex-proxy smoke-test"],
+    "nonClaims": [
+      "Local mock SSE does not prove hosted proxy authentication, Codex access, or Production SSE."
+    ]
+  },
+  {
+    "id": "BND-J04-local-reauthentication",
+    "actorOrConsumer": "local proxy maintainer",
+    "boundary": "stored profile decoding and local reauthentication classification",
+    "startingState": "local profile proof is explicitly authorised by its runbook and sourced from a private shell",
+    "inputs": [
+      "one local profile source",
+      "one reauthentication classification"
+    ],
+    "stepsOrProcedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
+    "expectedBehavior": [
+      "The profile proof reports only safe booleans and status.",
+      "Permanent reauthentication is distinct from temporary unavailability."
+    ],
+    "expectedSideEffects": ["A local proof receipt may be written."],
+    "preservedInvariants": [
+      "No token, profile payload, or subject identifier is printed.",
+      "Local login is not host or Production reauthentication."
+    ],
+    "oracle": "The owned proof command emits a bounded receipt whose marker-leak check is false.",
+    "environment": "local private shell",
+    "authority": "read_only",
+    "evidence": [
+      "bun run --filter @bundjil/codex proof:stored-profile",
+      "apps/codex-proxy/runbooks/local-auth.md"
+    ],
+    "nonClaims": [
+      "This does not prove a hosted profile, provider session, refresh, revoke, or Production recovery."
+    ]
+  },
+  {
+    "id": "BND-J05-sendblue-accepted-message",
+    "actorOrConsumer": "Sendblue sender and recipient",
+    "boundary": "Sendblue ingress, replay, and delivery boundary",
+    "startingState": "an exact non-Production target, account metadata readback, authority receipt, and rollback identity are attached",
+    "inputs": [
+      "one approved sanitized message fixture",
+      "one exact line and webhook target"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/sendblue.md",
+    "expectedBehavior": [
+      "The provider accepts the exactly authorised message flow and the downstream receipt identifies its result."
+    ],
+    "expectedSideEffects": [
+      "An external message and provider-side delivery attempt may occur."
+    ],
+    "preservedInvariants": [
+      "No message content, phone number, API key, or webhook secret is retained.",
+      "Provider acceptance is not recipient delivery unless separately read back."
+    ],
+    "oracle": "A messaging proof packet includes fresh account/webhook readback and the exact external consequence receipt.",
+    "environment": "approval-gated non-Production or Production target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/sendblue.md",
+      "docs/verification/templates/messaging.json"
+    ],
+    "nonClaims": [
+      "HGI-305 does not send a message or prove account, webhook, delivery, or recipient state; HGI-309 owns qualification."
+    ]
+  },
+  {
+    "id": "BND-J06-sendblue-auth-provider-rejection",
+    "actorOrConsumer": "agent operator handling a rejected Sendblue/auth/provider request",
+    "boundary": "Sendblue and proxy tagged error boundaries",
+    "startingState": "local deterministic error fixture or a fresh approved provider readback is available",
+    "inputs": ["one invalid signature/auth/provider failure fixture"],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/sendblue.md and apps/codex-proxy/runbooks/reauthentication.md",
+    "expectedBehavior": [
+      "The error is classified into a safe tagged failure and an actionable bounded receipt.",
+      "No retry or send is inferred from the rejected result."
+    ],
+    "expectedSideEffects": [
+      "Local fixtures may create a bounded failure receipt only."
+    ],
+    "preservedInvariants": [
+      "Failure diagnostics omit secrets and message content.",
+      "Unavailable readback stays inconclusive."
+    ],
+    "oracle": "Focused tests assert exact error tags and bounded receipt fields; an external packet requires fresh matching readback.",
+    "environment": "local fixtures or approval-gated external target",
+    "authority": "none",
+    "evidence": [
+      "bun run --filter @bundjil/agent test",
+      "bun run --filter @bundjil/codex-proxy test"
+    ],
+    "nonClaims": [
+      "A local rejected fixture does not prove a live Sendblue, provider, or credential condition."
+    ]
+  },
+  {
+    "id": "BND-J07-executor-read-only",
+    "actorOrConsumer": "agent maintainer",
+    "boundary": "Executor toolkit inspection boundary",
+    "startingState": "an authenticated exact toolkit identity and read-only authority envelope are attached, or readback is explicitly unavailable",
+    "inputs": [
+      "one exact toolkit identity",
+      "one read-only inspection request"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/executor.md",
+    "expectedBehavior": [
+      "The operation reads the named toolkit state only, or records an inconclusive unavailable-readback receipt."
+    ],
+    "expectedSideEffects": [
+      "Provider observation may occur only under separately granted read-only authority."
+    ],
+    "preservedInvariants": [
+      "Tool output is observed data, never approval.",
+      "No mutation, resume, or downstream consequence is claimed."
+    ],
+    "oracle": "A packet contains target-specific authenticated readback or an inconclusive result with the same provenance fields.",
+    "environment": "approval-gated external Executor target",
+    "authority": "read_only",
+    "evidence": [
+      "apps/agent/runbooks/executor.md",
+      "docs/verification/templates/approval-gated.json"
+    ],
+    "nonClaims": [
+      "HGI-305 does not inspect Executor or prove toolkit availability; HGI-309 owns external qualification."
+    ]
+  },
+  {
+    "id": "BND-J08-executor-approval-resume",
+    "actorOrConsumer": "approved Executor and downstream resource owner",
+    "boundary": "Executor approval-gated mutation resume and downstream resource boundary",
+    "startingState": "an exact paused operation, authenticated approver, operation/resource/environment, expiry, downstream rollback, and fresh readback are attached",
+    "inputs": [
+      "one unambiguous approved resume decision",
+      "one exact paused operation identity"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/executor.md",
+    "expectedBehavior": [
+      "Only the named operation resumes after all authority gates pass; the downstream consequence is independently read back."
+    ],
+    "expectedSideEffects": ["The authorised downstream mutation may occur."],
+    "preservedInvariants": [
+      "No same-turn resume, ambiguous approval, replay, or non-owner decision is accepted.",
+      "Executor success alone does not prove downstream consequence."
+    ],
+    "oracle": "An approval-gated packet binds the approval receipt, fresh Executor and downstream readbacks, and rollback result.",
+    "environment": "approval-gated external target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/executor.md",
+      "docs/verification/templates/approval-gated.json"
+    ],
+    "nonClaims": [
+      "HGI-305 does not resume an Executor operation or mutate a downstream resource; HGI-309 owns qualification."
+    ]
+  },
+  {
+    "id": "BND-J09-deployment-promotion-readback",
+    "actorOrConsumer": "deployment operator and consumer of the deployed agent/proxy",
+    "boundary": "Vercel deployment, stable alias, and live application boundary",
+    "startingState": "one immutable candidate, exact target, current/previous rollback references, approval, and fresh Vercel metadata are attached",
+    "inputs": [
+      "candidate SHA and config digest",
+      "exact project, deployment, and alias identities"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/deploy-promote.md and apps/codex-proxy/runbooks/production-proof.md",
+    "expectedBehavior": [
+      "Promotion and live proof stay separate and each is bound to the exact immutable deployment.",
+      "Missing provider readback yields an inconclusive packet."
+    ],
+    "expectedSideEffects": [
+      "An approved deployment, promotion, or readback may occur."
+    ],
+    "preservedInvariants": [
+      "Preview is never represented as Production.",
+      "A build, URL, header, or old receipt is not live proof."
+    ],
+    "oracle": "A Production packet contains immutable deployment/alias readbacks before and after the named journey plus rollback identity.",
+    "environment": "approval-gated Preview or Production target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/deploy-promote.md",
+      "apps/codex-proxy/runbooks/production-proof.md",
+      "docs/verification/templates/production.json"
+    ],
+    "nonClaims": [
+      "HGI-305 does not deploy, promote, or establish Eve/Codex proxy Production state; HGI-309 owns external qualification."
+    ]
+  },
+  {
+    "id": "BND-J10-incident-revocation-recovery",
+    "actorOrConsumer": "incident commander and affected consumer",
+    "boundary": "agent/proxy incident containment, provider revocation, rollback, and recovery",
+    "startingState": "a named incident, exact affected target, emergency authority, expiry, and current rollback candidate are attached",
+    "inputs": [
+      "sanitized incident classification",
+      "one exact containment or recovery operation"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/incident-revocation.md and apps/codex-proxy/runbooks/incident-revocation.md",
+    "expectedBehavior": [
+      "Normal consequential activity stops and only the named one-shot containment action may proceed under the emergency contract.",
+      "Recovery is independently read back before normal operation resumes."
+    ],
+    "expectedSideEffects": [
+      "An approved isolate, revoke, rollback, rotate, or restore operation may occur."
+    ],
+    "preservedInvariants": [
+      "Containment is not normal operating authority.",
+      "No provider state, secret, or recovery claim is inferred without readback."
+    ],
+    "oracle": "An approval-gated packet records before/after readbacks, exact action, expiry/revocation, recovery oracle, and rollback outcome.",
+    "environment": "approval-gated incident target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/incident-revocation.md",
+      "apps/codex-proxy/runbooks/incident-revocation.md",
+      "docs/verification/templates/approval-gated.json"
+    ],
+    "nonClaims": [
+      "HGI-305 does not perform containment, revocation, rollback, or recovery; HGI-309 and the app runbooks own external action."
+    ]
+  }
+]

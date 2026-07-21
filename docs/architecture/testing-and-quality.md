@@ -22,6 +22,8 @@ bun run check:boundaries
 bun run check:effect-setup
 bun run check:docs
 bun run check:skills
+bun run check:authority
+bun run check:verification
 bun run test:boundaries
 bun run check
 bun run test:lint
@@ -51,6 +53,14 @@ hygiene, workspace typechecks, and tests. `bun run check` enables
 any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
 literal tag do not agree.
 
+`bun run check:verification` validates all ten critical-journey records, their
+real command/runbook mappings, every proof-packet template, bounded command
+receipt constraints, evidence roots, lifecycle/provenance rules, and semantic
+false-success cases. It validates repository contracts and fixtures only. It
+does not call Vercel, Executor, Sendblue, Upstash, a model, or Production.
+Packets and their claim boundaries are owned by
+[`../verification/README.md`](../verification/README.md).
+
 Package-focused commands:
 
 ```bash
@@ -66,6 +76,7 @@ bun run --filter @bundjil/codex-proxy build
 bun run --filter @bundjil/codex-proxy smoke-test
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
+bun run --filter @bundjil/agent preflight:production
 ```
 
 ## Scope Rules
@@ -80,6 +91,10 @@ bun run --filter @bundjil/agent build
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and
   verification.
+- Critical-journey, proof-packet, receipt, or evidence-lifecycle change: run
+  `bun run check:verification`, its focused fixture suite, the affected app
+  tests, then root verification. Provider proof remains separately
+  authority-gated.
 - Channel/provider integration change: add or update a SPEC first, then include
   mock tests, live-boundary proof where safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex` tests,
@@ -183,7 +198,10 @@ curl -N http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
 
 Do not fake model output when Gateway credentials are missing. A session may
 start and then fail during streaming with `MODEL_CALL_FAILED`; document that
-boundary rather than pretending the model path completed.
+boundary rather than pretending the model path completed. The repository does
+not yet have a deterministic session-create, interrupted-stream, and recovery
+fixture, so BND-J02 remains deferred and a local HTTP attempt is not a complete
+recovery proof.
 
 ## Executor MCP Verification
 

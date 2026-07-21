@@ -24,8 +24,9 @@ HEAD`, and a readback of `origin/main`.
 - Authenticate the intended Vercel principal and record its identity source and
   scope. Link each app directory only to its exact project.
 - Record an addressable approval for one stage, target, source SHA, operation,
-  duration, and rollback. The snapshot literal `approval: "granted"` is not the
-  approval receipt.
+  duration, and rollback. The snapshot literal `operationAuthority:
+"external-receipt-required"` is an explicit non-grant; attach the real
+  approval receipt outside the local preflight.
 - Use authenticated read-only Vercel metadata to identify project, environment,
   stable domain, Deployment Protection, variable names/types/targets, current
   immutable deployment/source/config, alias resolution, and prior rollback
@@ -57,8 +58,10 @@ the names `BUNDJIL_CODEX_PROXY_MODE`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`,
 `BUNDJIL_CODEX_INSTALLATION_ID`, `BUNDJIL_CODEX_SUBJECT_ID`,
 `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY`,
 `BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID`,
-`BUNDJIL_UPSTASH_REDIS_REST_URL`, `BUNDJIL_UPSTASH_REDIS_REST_TOKEN`, and
+exactly one of `UPSTASH_REDIS_REST_URL` or `KV_REST_API_URL`, exactly one of
+`UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_TOKEN`, and
 `BUNDJIL_UPSTASH_REDIS_KEY_PREFIX`, with the target and allowed Vercel type.
+Both aliases in one group are ambiguous and fail closed.
 
 Record opaque fingerprints and IDs only. Never retain values, access tokens,
 profile contents/ciphertext, phone identities, bypass URLs, raw environment
@@ -98,9 +101,11 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    bun run --filter @bundjil/agent preflight:production
    ```
 
-   Stop unless exit status is zero, `go` is true, `rejected` is empty, the
-   printed stage matches the approved stage, the snapshot is fresh, and the
-   addressable approval still matches.
+   Stop unless exit status is zero, the bounded receipt status is `passed`,
+   `rejected` is empty, the printed stage matches the approved stage, its
+   detail artifact readback matches the receipt digest, the snapshot is fresh,
+   and the addressable approval still matches. Exit `2` is a blocked
+   invariant; exit `1` is inconclusive. Neither authorizes mutation.
 
 4. Enforce the stages in order; no later checkpoint substitutes for an earlier
    one:
@@ -123,14 +128,16 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 
 6. Immediately repeat the project/list/inspect readbacks, resolve the stable
    alias to the accepted immutable deployment, rerun the matching preflight,
-   and record the postcondition. HGI-305 owns the boundary-matched HTTP,
-   session, message, and Production proof packets; a deployment status alone
-   is insufficient.
+   and record the postcondition. Bind boundary-matched HTTP, session, message,
+   and Production results to the matching
+   [`docs/verification`](../../../docs/verification/README.md) packet; a
+   deployment status alone is insufficient.
 
 ## Evidence and postcondition
 
 Retain the clean pushed SHA, CLI version and identity/scope, sanitized provider
-readback with `observedAt`, snapshot digest, preflight JSON, approval receipt,
+readback with `observedAt`, snapshot digest, bounded preflight receipt and
+detail digest, approval receipt,
 immutable accepted/current/previous deployment and config fingerprints, alias
 resolution, exact stage, postcondition, limitations, and non-claims. Do not
 retain raw provider output containing secrets or payloads.

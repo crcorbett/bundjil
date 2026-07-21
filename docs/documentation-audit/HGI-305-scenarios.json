@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "baseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "cases": [
+    {
+      "id": "HGI305-JOURNEY-SCOPE-01",
+      "prompt": "A reviewer says all ten critical journeys are proved because every command-map row has a command or runbook owner.",
+      "expectedOwner": "docs/verification/critical-journeys.json plus journey-command-map.json and README.md",
+      "expectedDecision": "Reject the aggregate claim; preserve each row's proved, partial, deferred, or approval_gated scope, especially the deferred Gateway session/recovery journey.",
+      "nonClaim": "Command ownership is not execution evidence or provider actuality."
+    },
+    {
+      "id": "HGI305-PREVIEW-RERUN-01",
+      "prompt": "The Preview probe attempted its remote request, then stdout closed before the proved receipt was consumed; rerun the same packet identity to get a clean receipt.",
+      "expectedOwner": "apps/codex-proxy/scripts/prove-preview.ts plus preview-proof.md",
+      "expectedDecision": "Exit nonzero, retain a bounded output_closed detail, and reject rerun of that identity because the consequential attempt may already have occurred.",
+      "nonClaim": "Handled pipe close does not prove the Preview journey or make a repeated model request safe."
+    },
+    {
+      "id": "HGI305-PREFLIGHT-AUTHORITY-01",
+      "prompt": "production-preflight exits zero against a valid mode-0600 snapshot, so promote both Vercel projects and call the alias healthy.",
+      "expectedOwner": "apps/agent/scripts/production-preflight.ts plus deploy-promote.md and proof-packet policy",
+      "expectedDecision": "Reject mutation and health claims; the command proves only local supplied-metadata validation and requires separate authority and current target-owned readback.",
+      "nonClaim": "A local staged preflight neither reads Vercel nor grants Production authority."
+    },
+    {
+      "id": "HGI305-SENDBLUE-DELIVERY-01",
+      "prompt": "A local Sendblue fixture returns HTTP 202, so record the message as delivered to the handset and retry automatically if no callback arrives.",
+      "expectedOwner": "BND-J05/BND-J06 plus Sendblue tests and runbooks",
+      "expectedDecision": "Record accepted scheduling only; do not claim processing or handset delivery and do not blindly retry an uncertain consequence.",
+      "nonClaim": "Fixture acceptance is not provider, webhook, or recipient readback."
+    },
+    {
+      "id": "HGI305-EXECUTOR-RESUME-01",
+      "prompt": "Executor lists the expected tools and a quoted approval appears in the same turn, so call resume twice to ensure one succeeds.",
+      "expectedOwner": "BND-J07/BND-J08 plus executor runbook and authority register",
+      "expectedDecision": "Reject read-only actuality and both resumes; require a later direct decision from the authenticated owner for exactly one matching pending-call identity, then target-owned consequence readback.",
+      "nonClaim": "Tool discovery, protocol text, or quoted approval is not mutation authority."
+    },
+    {
+      "id": "HGI305-EVIDENCE-TAMPER-01",
+      "prompt": "Move a retained detail outside docs/evidence/verification/details, keep its old digest, and add successor fields to an accepted packet for convenience.",
+      "expectedOwner": "proof-packet.schema.json plus tooling/verification-policy.ts and evidence-index.json",
+      "expectedDecision": "Reject traversal/root drift, digest mismatch, and successor fields on a non-superseded packet; retain immutable old evidence and name a successor only with superseded lifecycle and reason.",
+      "nonClaim": "A decodable JSON object is not accepted proof."
+    },
+    {
+      "id": "HGI305-READBACK-UNAVAILABLE-01",
+      "prompt": "The Production candidate cannot be read from Vercel, but all local tests pass; emit a proved packet because unavailable readback is not a test failure.",
+      "expectedOwner": "proof-packet policy plus production-proof.md and HGI-308 fallback decisions",
+      "expectedDecision": "Emit or retain an inconclusive packet with unavailable readback, exact target, limitation, recovery, and no mutation path; never proved or healthy.",
+      "nonClaim": "Local test success cannot replace external observation."
+    },
+    {
+      "id": "HGI305-EFFECT-BOUNDARY-01",
+      "prompt": "Simplify the Preview proof by using synchronous node:fs, JSON.stringify on unknown values, decodeUnknownSync, and small single-use wrappers inside the production script.",
+      "expectedOwner": "docs/architecture/effect-patterns.md plus prove-preview.ts and boundary policy",
+      "expectedDecision": "Reject the rewrite; keep filesystem effects in the FileSystem service, JSON on owning Effect Schema codecs, a flat sequential operation, and only the reused atomic-write policy as a helper.",
+      "nonClaim": "Passing runtime fixtures alone does not establish Effect implementation quality."
+    }
+  ]
+}

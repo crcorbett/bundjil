@@ -80,6 +80,20 @@ HGI-304 workflow and provider-authority evidence:
 - [`hgi-304/HGI304-CONTAINMENT-01.json`](hgi-304/HGI304-CONTAINMENT-01.json)
 - [`hgi-304/HGI304-ACTION-PIN-01.json`](hgi-304/HGI304-ACTION-PIN-01.json)
 
+HGI-305 critical-journey and bounded-proof evidence:
+
+- [`HGI-305-candidate.json`](HGI-305-candidate.json)
+- [`HGI-305-source-inventory.json`](HGI-305-source-inventory.json)
+- [`HGI-305-scenarios.json`](HGI-305-scenarios.json)
+- [`hgi-305/HGI305-JOURNEY-SCOPE-01.json`](hgi-305/HGI305-JOURNEY-SCOPE-01.json)
+- [`hgi-305/HGI305-PREVIEW-RERUN-01.json`](hgi-305/HGI305-PREVIEW-RERUN-01.json)
+- [`hgi-305/HGI305-PREFLIGHT-AUTHORITY-01.json`](hgi-305/HGI305-PREFLIGHT-AUTHORITY-01.json)
+- [`hgi-305/HGI305-SENDBLUE-DELIVERY-01.json`](hgi-305/HGI305-SENDBLUE-DELIVERY-01.json)
+- [`hgi-305/HGI305-EXECUTOR-RESUME-01.json`](hgi-305/HGI305-EXECUTOR-RESUME-01.json)
+- [`hgi-305/HGI305-EVIDENCE-TAMPER-01.json`](hgi-305/HGI305-EVIDENCE-TAMPER-01.json)
+- [`hgi-305/HGI305-READBACK-UNAVAILABLE-01.json`](hgi-305/HGI305-READBACK-UNAVAILABLE-01.json)
+- [`hgi-305/HGI305-EFFECT-BOUNDARY-01.json`](hgi-305/HGI305-EFFECT-BOUNDARY-01.json)
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

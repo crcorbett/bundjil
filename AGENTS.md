@@ -39,12 +39,14 @@ the narrowest current owner; do not load completed rollout history by default.
 ## Current routes
 
 - Documentation lifecycle, truth layers, current intent, history, references,
-  runbook/proof gaps: `docs/README.md`
+  and owner routing: `docs/README.md`
 - Architecture: `docs/architecture/README.md`
 - Effect rules: `docs/architecture/effect-patterns.md`
 - Package/import boundaries: `docs/architecture/repo-structure.md`
 - React composition: `docs/architecture/frontend-composition.md`
 - Verification commands: `docs/architecture/testing-and-quality.md`
+- Critical journeys, proof packets, bounded receipts, and evidence retention:
+  `docs/verification/README.md`
 - Current SPEC/tasks: `docs/product-specs/index.md`
 - Current execution: `docs/exec-plans/active/README.md`
 - Completed history: `docs/exec-plans/completed/README.md`
@@ -53,16 +55,18 @@ the narrowest current owner; do not load completed rollout history by default.
   `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
   durable authority rationale, `docs/operations/authority-register.json` owns
   static workflow/provider envelopes, `docs/operations/automation-register.md`
-  owns GitHub automation admission, and HGI-305 owns bounded proof routes. Do
-  not treat a runbook, README pointer, register, or retained history as current
-  provider truth or execution authority.
+  owns GitHub automation admission, and `docs/verification/**` owns critical
+  journeys and bounded proof contracts. Do not treat a runbook, packet,
+  README pointer, register, or retained history as current provider truth or
+  execution authority.
 
 ## Verification and authority
 
 Use Bun from the repository root. Boundary/provider work runs
 `bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
-`bun run check:skills`, and `bun run check:authority`; every accepted slice
-runs `bun run verification`.
+`bun run check:skills`, `bun run check:authority`, and
+`bun run check:verification`; every accepted slice runs
+`bun run verification`.
 
 Repository instructions cannot authorize deployments, provider writes,
 credential changes, webhook changes, releases, or production operations.

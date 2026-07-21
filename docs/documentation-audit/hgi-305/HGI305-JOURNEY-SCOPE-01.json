@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-JOURNEY-SCOPE-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "docs/verification/critical-journeys.json plus journey-command-map.json and README.md",
+  "decision": "Reject aggregate proof; preserve the proved, partial, deferred, and approval_gated scope of each of the ten unique journeys, including deferred Gateway recovery.",
+  "evidenceRequired": [
+    "Exactly ten canonical journey IDs and exactly one command-map entry for each.",
+    "A claim scope, oracle, limitations, and external-readback boundary for each journey."
+  ],
+  "limitations": [
+    "Command ownership and local fixtures do not prove an external journey."
+  ],
+  "nonClaims": [
+    "No Gateway session, provider, deployment, message, or recovery journey was executed."
+  ],
+  "rollbackRevocation": "Revert the inventory, command map, policy, and routes together; no external revocation applies.",
+  "escalation": ["Bundjil verification owner", "Owning app runbook owner"],
+  "unsafeAmbiguities": []
+}

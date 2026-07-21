@@ -12,10 +12,11 @@ review_trigger: Production deployment, alias, protection, proxy route/auth/mode,
 ## Scope and non-claims
 
 Use this runbook to define and collect independent Production evidence. There
-is currently no app-owned Production proof command. `proof:preview`, local
+is currently no app-owned live Production proof command. `proof:preview`, local
 headers, historical rollout evidence, a Vercel `READY` status, or a passed
-preflight must not be relabeled as Production proof. HGI-305 owns the missing
-bounded Production packet and command improvements.
+preflight must not be relabeled as Production proof. The bounded Production
+packet contract exists under `docs/verification/**`; it does not perform the
+journey or supply provider readback.
 
 ## Preconditions
 
@@ -48,11 +49,10 @@ bounded Production packet and command improvements.
 Production config names are owned by `apps/codex-proxy/src/env.ts`, the Codex
 runtime, and the production-preflight Schema. The runtime reads
 `UPSTASH_REDIS_REST_URL` or `KV_REST_API_URL` and
-`UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_TOKEN`; the current preflight also
-requires `BUNDJIL_UPSTASH_REDIS_REST_URL` and
-`BUNDJIL_UPSTASH_REDIS_REST_TOKEN` metadata. Treat that dual inventory as an
-explicit preflight limitation until HGI-305 resolves the ambiguity. Stop if
-the actual runtime binding cannot be established without reading values.
+`UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_TOKEN`. The preflight matches those
+runtime aliases and requires exactly one URL alias plus exactly one token
+alias; a missing or dual binding fails closed. Stop if the actual runtime
+binding cannot be established from metadata without reading values.
 
 Never retain values, protected URLs, tokens/bypasses, prompts/output, raw SSE,
 profiles/ciphertext, account IDs, authorization artifacts, or unsanitized logs.
@@ -82,10 +82,11 @@ profiles/ciphertext, account IDs, authorization artifacts, or unsanitized logs.
    metadata-only bindings, independent Production identities, stored-profile
    proof, and current/previous rollback references.
 
-3. **Proof gate:** stop unless an approved HGI-305-compatible journey or an
-   explicitly bounded temporary proof plan names the candidate, starting state,
-   health/auth/session oracle, external effects, evidence, limitation,
-   non-claims, and recovery. Do not run `proof:preview` against Production.
+3. **Proof gate:** stop unless the exact critical journey and Production packet
+   from [`docs/verification`](../../../docs/verification/README.md) name the
+   candidate, starting state, authority, health/auth/session oracle, external
+   effects, evidence, limitation, non-claims, rollback, and recovery. Do not
+   run `proof:preview` against Production.
 
 4. Under that separate authority, collect health, absent-bearer `401`,
    invalid-bearer `401`, authenticated SSE completion, no-leak assertions,
@@ -116,8 +117,9 @@ and proof credentials after the window and read back their target state.
 Stop on wrong target/source/config/alias, missing independent identity,
 ambiguous runtime binding, stale or unavailable Vercel readback, no approved
 Production journey, missing rollback, blocked auth/profile proof, secret or
-payload leak, or any attempt to upgrade Preview/local evidence. Escalate proof
-gaps to HGI-305 and authority/workflow gaps to HGI-304.
+payload leak, or any attempt to upgrade Preview/local evidence. Escalate
+proof-contract gaps to the Bundjil verification owner and authority/workflow
+gaps to the authority owner.
 
 ## Readback fallback
 

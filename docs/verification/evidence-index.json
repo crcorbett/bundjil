@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "owner": "bundjil-verification-owner",
+  "lastReviewed": "2026-07-21",
+  "reviewTrigger": "proof, journey, command, provider, retention, or lifecycle change",
+  "packetRoot": "docs/evidence/verification/packets/",
+  "requiredProvenance": [
+    "candidate repository commit",
+    "source/artifact digest",
+    "actor and authority identity",
+    "environment and exact target",
+    "observedAt",
+    "sanitized detail path and digest",
+    "postcondition",
+    "limitations",
+    "nonClaims",
+    "rollback identity"
+  ],
+  "lifecycles": [
+    "accepted",
+    "failed",
+    "blocked",
+    "interrupted",
+    "inconclusive",
+    "deferred",
+    "superseded"
+  ],
+  "transitionRule": "A superseded packet retains its path and digest and names its successor and reason; evidence is never rewritten into standing provider truth.",
+  "defaultRouteRule": "Only this index and the current contract route workers. Packets stay under packetRoot; retained detail stays under docs/evidence/verification/details/ and loads only by exact artifact path.",
+  "redactionRule": "Packets and detail omit raw secrets, tokens, message/request bodies, phone numbers, full provider payloads, user-home paths, and unbounded output."
+}

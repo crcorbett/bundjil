@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "local",
+  "status": "inconclusive",
+  "outcome": "not_attempted",
+  "lifecycle": { "state": "inconclusive" },
+  "externalConsequence": { "outcome": "none", "target": "no external target" },
+  "candidate": {
+    "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sourceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "artifactDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "authority": {
+    "principal": "local maintainer",
+    "identitySource": "local shell",
+    "externalAccess": "none",
+    "approvalReceipt": null,
+    "rollbackOwner": "repository maintainer"
+  },
+  "environment": { "tier": "local", "target": "ephemeral local process" },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "inconclusive",
+      "oracle": "Replace with the focused smoke-test oracle."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "bun run --filter @bundjil/codex-proxy smoke-test",
+    "outcome": "rerun_avoided",
+    "exitCode": null,
+    "invariant": "Replace with the invariant under test.",
+    "target": "ephemeral local proxy",
+    "recoveryHint": "Run the command in the named local environment.",
+    "detailPath": "docs/evidence/verification/details/replace-me.json",
+    "detailSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "postcondition": "No local claim is established until the receipt is replaced."
+  },
+  "externalReadback": {
+    "required": false,
+    "outcome": "not_required",
+    "receipt": "not required for the local claim"
+  },
+  "postconditions": ["Replace before use."],
+  "limitations": ["Template only."],
+  "nonClaims": ["This template does not prove hosted or provider behavior."],
+  "rollback": {
+    "identity": "stop the ephemeral local process",
+    "outcome": "not_needed",
+    "owner": "repository maintainer"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/replace-me.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "provenance": "replace with the retained sanitized command detail"
+    }
+  ],
+  "observedAt": "2026-07-21T00:00:00.000Z"
+}

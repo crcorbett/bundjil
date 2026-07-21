@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-EVIDENCE-TAMPER-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "proof-packet.schema.json plus verification policy and evidence-index.json",
+  "decision": "Reject outside-root or traversing detail, stale digest, and successor fields on a non-superseded packet. Preserve immutable evidence and require successor path plus reason only for superseded lifecycle.",
+  "evidenceRequired": [
+    "Exact details-root path, valid bounded JSON, matching digest, and candidate presence.",
+    "Compatible lifecycle, status, outcome, readback, consequence, and supersession fields."
+  ],
+  "limitations": [
+    "Schema decoding alone does not establish semantic acceptance or artifact integrity."
+  ],
+  "nonClaims": [
+    "A syntactically valid packet is not proof until the executable policy and evidence checks pass."
+  ],
+  "rollbackRevocation": "Restore the immutable original artifact and remove invalid lifecycle edits; no provider revocation applies.",
+  "escalation": ["Bundjil verification owner", "Repository maintainer"],
+  "unsafeAmbiguities": []
+}

@@ -30,6 +30,7 @@ current architecture—not this overview.
 - [Current architecture](./docs/architecture/README.md)
 - [Current SPEC/tasks](./docs/product-specs/index.md)
 - [Current execution plans](./docs/exec-plans/active/README.md)
+- [Critical journeys and proof packets](./docs/verification/README.md)
 - [Completed history](./docs/exec-plans/completed/README.md)
 - [App and package READMEs](./docs/README.md#routes) for local public commands
   and boundaries
@@ -50,6 +51,7 @@ bun run check:effect-setup
 bun run check:docs
 bun run check:skills
 bun run check:authority
+bun run check:verification
 bun run verification
 ```
 

@@ -25,10 +25,12 @@ bun run --filter @bundjil/codex-proxy check-types
 bun run --filter @bundjil/codex-proxy test
 bun run --filter @bundjil/codex-proxy build
 bun run --filter @bundjil/codex-proxy smoke-test
+bun run --filter @bundjil/codex-proxy proof:preview
 ```
 
 `proof:preview` is a deliberately explicit, private probe command; it is not a
-standing deployment assertion or an operating procedure.
+standing deployment assertion or an operating procedure. It emits one bounded
+receipt and stores only integrity-checked sanitized detail.
 
 ## Documentation routes
 
@@ -42,9 +44,11 @@ standing deployment assertion or an operating procedure.
   procedures are owned by [`runbooks/`](runbooks/README.md). They require
   just-in-time target readback and an explicit authority envelope before
   consequential steps.
-- Dated provider/deployment observations have no canonical repository owner
-  yet; HGI-305 must create bounded verification owners. External systems remain
-  authoritative for current state.
+- Critical journeys, proof packets, bounded command receipts, and retained
+  evidence are owned by
+  [`docs/verification/`](../../docs/verification/README.md). External systems
+  remain authoritative for current state; a packet proves only its exact
+  candidate, target, authority, observation, and stated postcondition.
 
 Do not add provider actuality, provisioning sequences, credentials, deployment
 identities, incident steps, rollback procedures, or proof records here; update

@@ -1,0 +1,497 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bundjil.local/schemas/proof-packet.v1.json",
+  "title": "Bundjil proof packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "outcome",
+    "lifecycle",
+    "externalConsequence",
+    "candidate",
+    "authority",
+    "environment",
+    "journeyResults",
+    "commandReceipt",
+    "externalReadback",
+    "postconditions",
+    "limitations",
+    "nonClaims",
+    "rollback",
+    "evidence",
+    "observedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": {
+      "enum": ["local", "preview", "production", "messaging", "approval_gated"]
+    },
+    "status": {
+      "enum": [
+        "proved",
+        "failed",
+        "blocked",
+        "interrupted",
+        "inconclusive",
+        "deferred"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "blocked",
+        "interrupted",
+        "inconclusive",
+        "not_attempted"
+      ]
+    },
+    "lifecycle": { "$ref": "#/$defs/lifecycle" },
+    "externalConsequence": { "$ref": "#/$defs/externalConsequence" },
+    "candidate": { "$ref": "#/$defs/candidate" },
+    "authority": { "$ref": "#/$defs/authority" },
+    "environment": { "$ref": "#/$defs/environment" },
+    "journeyResults": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/journeyResult" }
+    },
+    "commandReceipt": { "$ref": "#/$defs/commandReceipt" },
+    "externalReadback": { "$ref": "#/$defs/readback" },
+    "postconditions": { "$ref": "#/$defs/nonEmptyStrings" },
+    "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "nonClaims": { "$ref": "#/$defs/nonEmptyStrings" },
+    "rollback": { "$ref": "#/$defs/rollback" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 240
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "local" } } },
+      "then": {
+        "properties": {
+          "environment": { "properties": { "tier": { "const": "local" } } },
+          "authority": {
+            "properties": { "externalAccess": { "const": "none" } }
+          },
+          "externalConsequence": {
+            "properties": { "outcome": { "const": "none" } }
+          },
+          "externalReadback": {
+            "properties": {
+              "required": { "const": false },
+              "outcome": { "const": "not_required" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "preview" } } },
+      "then": {
+        "properties": {
+          "environment": { "properties": { "tier": { "const": "preview" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "production" } } },
+      "then": {
+        "properties": {
+          "environment": {
+            "properties": { "tier": { "const": "production" } }
+          },
+          "externalReadback": {
+            "properties": {
+              "required": { "const": true },
+              "outcome": { "enum": ["available", "unavailable"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "proved" },
+          "kind": { "not": { "const": "local" } }
+        }
+      },
+      "then": {
+        "properties": {
+          "externalReadback": {
+            "properties": {
+              "required": { "const": true },
+              "outcome": { "const": "available" }
+            }
+          },
+          "externalConsequence": {
+            "properties": { "outcome": { "const": "observed" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": { "not": { "const": "local" } }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "externalAccess": { "not": { "const": "none" } }
+            }
+          },
+          "externalReadback": {
+            "properties": { "required": { "const": true } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "externalConsequence": {
+            "properties": { "outcome": { "const": "observed" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "externalReadback": {
+            "properties": { "outcome": { "const": "available" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "externalConsequence": {
+            "properties": { "outcome": { "const": "unavailable" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": { "const": "inconclusive" },
+          "externalReadback": {
+            "properties": { "outcome": { "const": "unavailable" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "externalReadback": {
+            "properties": {
+              "required": { "const": true },
+              "outcome": { "const": "unavailable" }
+            }
+          }
+        }
+      },
+      "then": { "properties": { "status": { "const": "inconclusive" } } }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "enum": ["messaging", "approval_gated"] } }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "externalAccess": { "const": "mutation" },
+              "approvalReceipt": { "type": "string", "minLength": 1 }
+            }
+          },
+          "externalReadback": {
+            "properties": { "required": { "const": true } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "commandReceipt": {
+            "properties": {
+              "outcome": { "enum": ["interrupted", "pipe_closed"] }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "commandReceipt": {
+            "properties": { "exitCode": { "not": { "const": 0 } } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "proved" } } },
+      "then": {
+        "properties": {
+          "outcome": { "const": "passed" },
+          "lifecycle": { "properties": { "state": { "const": "accepted" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "failed" } } },
+      "then": {
+        "properties": {
+          "outcome": { "const": "failed" },
+          "lifecycle": { "properties": { "state": { "const": "failed" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "blocked" } } },
+      "then": {
+        "properties": {
+          "outcome": { "const": "blocked" },
+          "lifecycle": { "properties": { "state": { "const": "blocked" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "interrupted" } } },
+      "then": {
+        "properties": {
+          "outcome": { "const": "interrupted" },
+          "lifecycle": {
+            "properties": { "state": { "const": "interrupted" } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "deferred" } } },
+      "then": {
+        "properties": {
+          "outcome": { "const": "not_attempted" },
+          "lifecycle": { "properties": { "state": { "const": "deferred" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "inconclusive" } } },
+      "then": {
+        "properties": {
+          "outcome": { "enum": ["inconclusive", "not_attempted"] },
+          "lifecycle": {
+            "properties": { "state": { "const": "inconclusive" } }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "boundedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "detailPath": {
+      "type": "string",
+      "maxLength": 200,
+      "pattern": "^docs/evidence/verification/details/(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._/-]*\\.json$"
+    },
+    "packetPath": {
+      "type": "string",
+      "maxLength": 200,
+      "pattern": "^docs/evidence/verification/packets/(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._/-]*\\.json$"
+    },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/boundedText" }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "enum": [
+            "accepted",
+            "failed",
+            "blocked",
+            "interrupted",
+            "inconclusive",
+            "deferred",
+            "superseded"
+          ]
+        },
+        "successor": { "$ref": "#/$defs/packetPath" },
+        "reason": { "$ref": "#/$defs/boundedText" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "const": "superseded" } } },
+          "then": { "required": ["successor", "reason"] },
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["successor"] },
+                { "required": ["reason"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "externalConsequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "target"],
+      "properties": {
+        "outcome": {
+          "enum": ["none", "observed", "unavailable", "not_attempted"]
+        },
+        "target": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositoryCommit", "sourceDigest", "artifactDigest"],
+      "properties": {
+        "repositoryCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "sourceDigest": { "$ref": "#/$defs/sha256" },
+        "artifactDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "principal",
+        "identitySource",
+        "externalAccess",
+        "approvalReceipt",
+        "rollbackOwner"
+      ],
+      "properties": {
+        "principal": { "$ref": "#/$defs/boundedText" },
+        "identitySource": { "$ref": "#/$defs/boundedText" },
+        "externalAccess": { "enum": ["none", "read_only", "mutation"] },
+        "approvalReceipt": {
+          "anyOf": [{ "$ref": "#/$defs/boundedText" }, { "type": "null" }]
+        },
+        "rollbackOwner": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "target"],
+      "properties": {
+        "tier": { "enum": ["local", "preview", "production", "external"] },
+        "target": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "journeyResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["journeyId", "status", "oracle"],
+      "properties": {
+        "journeyId": {
+          "allOf": [
+            { "$ref": "#/$defs/boundedText" },
+            { "pattern": "^BND-J[0-9]{2}-" }
+          ]
+        },
+        "status": { "enum": ["passed", "failed", "blocked", "inconclusive"] },
+        "oracle": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "commandReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "invocation",
+        "outcome",
+        "exitCode",
+        "invariant",
+        "target",
+        "recoveryHint",
+        "detailPath",
+        "detailSha256",
+        "postcondition"
+      ],
+      "properties": {
+        "invocation": { "$ref": "#/$defs/boundedText" },
+        "outcome": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "interrupted",
+            "pipe_closed",
+            "rerun_avoided"
+          ]
+        },
+        "exitCode": { "type": ["integer", "null"] },
+        "invariant": { "$ref": "#/$defs/boundedText" },
+        "target": { "$ref": "#/$defs/boundedText" },
+        "recoveryHint": { "$ref": "#/$defs/boundedText" },
+        "detailPath": { "$ref": "#/$defs/detailPath" },
+        "detailSha256": { "$ref": "#/$defs/sha256" },
+        "postcondition": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "outcome", "receipt"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "outcome": { "enum": ["not_required", "available", "unavailable"] },
+        "receipt": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "outcome", "owner"],
+      "properties": {
+        "identity": { "$ref": "#/$defs/boundedText" },
+        "outcome": {
+          "enum": ["not_needed", "ready", "performed", "unavailable"]
+        },
+        "owner": { "$ref": "#/$defs/boundedText" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "provenance"],
+      "properties": {
+        "path": { "$ref": "#/$defs/detailPath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "provenance": { "$ref": "#/$defs/boundedText" }
+      }
+    }
+  }
+}

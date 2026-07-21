@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "kind": "approval_gated",
+  "status": "inconclusive",
+  "outcome": "not_attempted",
+  "lifecycle": { "state": "inconclusive" },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "replace with exact paused operation and downstream resource"
+  },
+  "candidate": {
+    "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sourceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "artifactDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "authority": {
+    "principal": "approved exact resource owner",
+    "identitySource": "target-owned approval",
+    "externalAccess": "mutation",
+    "approvalReceipt": "replace with exact approval receipt",
+    "rollbackOwner": "downstream resource owner"
+  },
+  "environment": {
+    "tier": "external",
+    "target": "replace with exact paused operation and downstream resource"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J08-executor-approval-resume",
+      "status": "inconclusive",
+      "oracle": "Replace with Executor and downstream readback oracle."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "run one exact approved procedure",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Ambiguous, replayed, or non-owner approval must fail closed.",
+    "target": "replace with exact paused operation",
+    "recoveryHint": "Attach unambiguous approval, expiry, rollback, and both readbacks.",
+    "detailPath": "docs/evidence/verification/details/replace-me.json",
+    "detailSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "postcondition": "No mutation occurs by this template."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "unavailable",
+    "receipt": "replace with Executor and downstream readbacks"
+  },
+  "postconditions": ["No operation resumes while readback is unavailable."],
+  "limitations": [
+    "Executor output alone cannot prove a downstream consequence."
+  ],
+  "nonClaims": [
+    "This template does not resume work, mutate a resource, or establish approval."
+  ],
+  "rollback": {
+    "identity": "replace with downstream rollback identity",
+    "outcome": "unavailable",
+    "owner": "downstream resource owner"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/replace-me.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "provenance": "replace with retained sanitised detail"
+    }
+  ],
+  "observedAt": "2026-07-21T00:00:00.000Z"
+}

@@ -88,8 +88,13 @@ payloads.
 5. Require health `200`, `live`, ready, high reasoning; missing and invalid
    bearer `401`; authenticated `200` SSE with multiple data lines and `[DONE]`;
    requested Terra model; and no token, raw prompt, authorization-code, or
-   verifier leak. A `{ "status": "blocked" }` result is inconclusive/failure,
-   not a healthy Preview.
+   verifier leak. Require one bounded receipt and an integrity-checked detail
+   artifact. `blocked`, `interrupted`, `output_closed`, `rerun_avoided`, or
+   missing/corrupt detail is not a healthy Preview.
+
+   A `rerun_avoided` receipt must reference and preserve the prior attempt detail.
+   If stdout closes after that detail was retained, preserve it and write a
+   separate `output_closed` sidecar that records the prior path and digest.
 
 6. Re-read the immutable deployment metadata and record the exact candidate,
    proof JSON, exit status, `observedAt`, and limitations. Do not infer stable
@@ -99,10 +104,11 @@ payloads.
 ## Evidence and postcondition
 
 Retain source/deployment/config identity, sanitized Vercel readback, stored
-profile booleans, authority receipt, probe JSON, `observedAt`, exit status,
-limitations, and non-claims. HGI-305 owns a future richer packet; the current
-blocked output intentionally lacks diagnostic detail and must not be upgraded
-to a success claim.
+profile booleans, authority receipt, bounded receipt and detail digest,
+`observedAt`, true exit status, limitations, and non-claims in the matching
+[`docs/verification`](../../../docs/verification/README.md) Preview packet.
+The packet must not be upgraded beyond the external readback it actually
+contains.
 
 ## Rollback and revocation
 
@@ -118,7 +124,7 @@ Stop on wrong project/environment/source, mutable alias instead of immutable
 candidate, local/mock mode, missing stored profile, failed protection or auth
 oracle, blocked proof, secret/payload leak, or any unapproved model call.
 Escalate deployment/protection to Vercel, profile/auth to the Codex owner, and
-proof output gaps to HGI-305.
+proof-contract gaps to the Bundjil verification owner.
 
 ## Readback fallback
 

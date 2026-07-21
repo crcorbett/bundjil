@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "scenarioId": "HGI305-PREVIEW-RERUN-01",
+  "scenarioManifest": "../HGI-305-scenarios.json",
+  "scenarioManifestSha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6",
+  "targetBaseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "evaluator": "fresh Terra worker /root/bundjil_hgi305_recheck",
+  "observedAt": "2026-07-21T16:20:00+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/codex-proxy/scripts/prove-preview.ts plus preview-proof.md and bounded-command-receipt.md",
+  "decision": "Exit nonzero and avoid a repeated request. rerun_avoided references the byte-preserved prior detail; output_closed preserves proved detail and creates a separate sidecar linked by path and digest.",
+  "evidenceRequired": [
+    "Focused loopback fixture proving zero requests on identity reuse and byte-identical retained detail.",
+    "Closed-stdout fixture proving a distinct content-addressed sidecar with priorDetail linkage."
+  ],
+  "limitations": [
+    "Loopback HTTP fixtures do not prove any Vercel Preview or model-provider response."
+  ],
+  "nonClaims": [
+    "A handled rerun or pipe close is not a healthy or proved Preview."
+  ],
+  "rollbackRevocation": "Revert the receipt producer, tests, and runbook wording together; provider revocation is outside this local fixture.",
+  "escalation": ["Bundjil Codex proxy operator", "Bundjil verification owner"],
+  "unsafeAmbiguities": []
+}

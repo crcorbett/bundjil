@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-305",
+  "status": "candidate",
+  "observedAt": "2026-07-21T16:21:00+01:00",
+  "authority": "repository source, documentation, policy, local fixture, test, evidence, Git commit, main push, and remote-ref readback only; no provider, deployment, environment-value, secret, message, approval-resume, delivery, rollback, or Production readback or mutation",
+  "baseCommit": "32f7b0c55f4a25cb5d9fd15a400f5fd24195ef01",
+  "candidatePathCount": 51,
+  "sortedCandidatePathSha256": "d151f051c26f00dae93336161d8ce735db740a85af1272e41004d0b1cd6b49ec",
+  "artifacts": [
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "6fa49b2f623311e9288413f8e65b2487d190708a39b44b8ea9bb45e779ab2085"
+    },
+    {
+      "path": "docs/verification/journey-command-map.json",
+      "sha256": "09126825dbba54f6387115fe25dc5bd3e054b9715cac650648d1c00a7fcc9921"
+    },
+    {
+      "path": "docs/verification/evidence-index.json",
+      "sha256": "4d27be08cf166b30191456389284d80192db6143047bcddd5bd140e07ccdd007"
+    },
+    {
+      "path": "docs/verification/proof-packet.schema.json",
+      "sha256": "0263d6b6d8fab1cdc13286a36fc02df6f63385f060e4c4350833060d8a2483c8"
+    },
+    {
+      "path": "tooling/verification-policy.ts",
+      "sha256": "488c1b157bf7dbf9fe8924fb7b46586f4833a2b009200dfc10b8df5d6ab8f42a"
+    },
+    {
+      "path": "tooling/verification-policy-audit.ts",
+      "sha256": "07e7e9360e6a31c01359421eea6af9ea20b6eb2afa6b4755b95fafabcbbca7e5"
+    },
+    {
+      "path": "apps/codex-proxy/scripts/prove-preview.ts",
+      "sha256": "975f4dc7cb914f5436aea7da2322d9c4451bf5b63c69b110df752dee0c4d233d"
+    },
+    {
+      "path": "apps/agent/agent/production-preflight.ts",
+      "sha256": "8dcab4c218a57a677376b5c0d028f6e60bf7f3c19d7ec86ea9ae116a61585323"
+    },
+    {
+      "path": "apps/agent/scripts/production-preflight.ts",
+      "sha256": "731e5a800afbe16a969a74e957bb144bc7e79623f3bf81ff2e1f9e9a3721cebc"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-305-source-inventory.json",
+      "sha256": "a005739954509c25b1ce29393963bc59350c70b1706611aa7f2de3411c3346ab"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-305-scenarios.json",
+      "sha256": "4a0d311afa0f48283b38fe19252f78f4f34b429234fb2c1fca0be250092e29f6"
+    }
+  ],
+  "scenarioPackets": [
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-JOURNEY-SCOPE-01.json",
+      "sha256": "a118170b74fd828d471d59dc073ab09befde4b548a0b34b264fa17c83fa118b0"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-PREVIEW-RERUN-01.json",
+      "sha256": "f89448804ea7453424a5708ad933cf399ed553789ecbc5a2b591a15edaa19bf1"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-PREFLIGHT-AUTHORITY-01.json",
+      "sha256": "a71fe2810c2d739a4069a78540ae99ad8e247e201470c063a33e7f642d26ebe3"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-SENDBLUE-DELIVERY-01.json",
+      "sha256": "57bae44b2038e534904f77d114ab01a5b7f5f47c270bb036c2b5bd1defb5aff6"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-EXECUTOR-RESUME-01.json",
+      "sha256": "ffeef7dc58e551293050985da3f64e595e00f91ca0d0efc4edf2bc6f39a790bb"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-EVIDENCE-TAMPER-01.json",
+      "sha256": "7bb81904f7f9f4f98480f37e94bb64669fe35759225de8c1046f496e0f208ce1"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-READBACK-UNAVAILABLE-01.json",
+      "sha256": "d96ec90c515fd2ed163b60580dfc9cdbefcd65ddd78bd8a2ccd84503e5efd62f"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-305/HGI305-EFFECT-BOUNDARY-01.json",
+      "sha256": "ce2cc017d9f1f89ceedd0aa7b7ed7b7224e4526c720269bd3f81e8a5bcebec38"
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "Critical-journey inventory and command ownership",
+      "decision": "change-required",
+      "owners": [
+        "docs/verification/critical-journeys.json",
+        "docs/verification/journey-command-map.json",
+        "docs/verification/README.md"
+      ],
+      "result": "Exactly ten consumer-visible journeys have stable identity, starting state, oracle, side effects, invariants, evidence, non-claims, command or runbook owner, environment, readback boundary, and honest proved/partial/deferred/approval_gated scope."
+    },
+    {
+      "surface": "Proof packets, retained evidence, and lifecycle",
+      "decision": "change-required",
+      "owners": [
+        "docs/verification/proof-packet.schema.json",
+        "docs/verification/evidence-index.json",
+        "docs/evidence/README.md",
+        "tooling/verification-policy.ts"
+      ],
+      "result": "Effect and interoperable schemas enforce candidate identity, authority, environment, journey results, bounded detail roots and digests, readback/consequence truth, rollback, status/outcome/lifecycle compatibility, supersession, limitations, and non-claims."
+    },
+    {
+      "surface": "Bounded verification output",
+      "decision": "change-required",
+      "owners": [
+        "docs/verification/bounded-command-receipt.md",
+        "tooling/verification-policy-audit.ts",
+        "package.json"
+      ],
+      "result": "The verification gate prints bounded invariant, target, repair, postcondition, and omitted-detail routing while retaining a structured report; invalid or unavailable evidence fails without raw cause, secret, body, home path, or unbounded log output."
+    },
+    {
+      "surface": "Preview receipt producer",
+      "decision": "change-required",
+      "owners": [
+        "apps/codex-proxy/scripts/prove-preview.ts",
+        "apps/codex-proxy/test/prove-preview.test.ts",
+        "apps/codex-proxy/runbooks/preview-proof.md"
+      ],
+      "result": "Effect FileSystem, Config, Schema, HTTP, and bounded-stream operations produce a typed receipt; request-attempt identity is durable, rerun_avoided preserves prior detail, output_closed writes a linked sidecar, interruption exits nonzero, and no body or secret is retained."
+    },
+    {
+      "surface": "Production preflight receipt producer",
+      "decision": "change-required",
+      "owners": [
+        "apps/agent/agent/production-preflight.ts",
+        "apps/agent/scripts/production-preflight.ts",
+        "apps/agent/test/production-preflight*.test.ts",
+        "apps/agent/runbooks/deploy-promote.md"
+      ],
+      "result": "Runtime-aligned Upstash aliases, bounded mode-0600 metadata input, strict Effect Schema decoding, integrity-checked detail, staged rejection, and true 0/1/2 exit receipts prove local supplied-metadata validation only and explicitly grant no Production authority."
+    },
+    {
+      "surface": "Docs, READMEs, repository skill, SPEC, and active plan",
+      "decision": "change-required",
+      "owners": [
+        "AGENTS.md",
+        "README.md",
+        "docs/**",
+        "apps/*/README.md",
+        ".agents/skills/docs-maintainer/references/repository-profile.md"
+      ],
+      "result": "Current routes name the verification/evidence owners, maintenance triggers, proof limits, HGI-309 provider boundary, executable gates, and local/Preview/Production distinctions."
+    },
+    {
+      "surface": "External providers and consequences",
+      "decision": "not-applicable-to-execution",
+      "owners": [
+        "Vercel",
+        "Executor",
+        "Sendblue",
+        "Upstash",
+        "AI Gateway",
+        "Codex account",
+        "deployed Eve"
+      ],
+      "result": "No provider readback or mutation occurred. HGI-309 retains external qualification; unavailable readback remains inconclusive and no local packet claims deployment, delivery, resume, recovery, or health."
+    }
+  ],
+  "checks": [
+    {
+      "check": "verification policy and semantic fixtures",
+      "status": "passed",
+      "result": "check:verification passed exactly ten journeys; 59 tooling tests passed, including strict schema, lifecycle, authority, readback, digest, bounded-output, interruption, and tamper cases."
+    },
+    {
+      "check": "Preview and production receipt fixtures",
+      "status": "passed",
+      "result": "Ten Preview cases and 16 production-preflight cases passed, including immutable rerun detail, linked pipe-close sidecar, interruption, input bounds, permissions, aliases, classification, exit code, and integrity readback."
+    },
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "Three fresh Terra audits found and caused correction of destructive retained-detail handling, terminology, evidence routing, and stale hashes; final recheck recomputed all 15 source hashes and passed all eight adversarial scenarios."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, docs, skills, authority, verification, 59 tooling tests, type-aware Ultracite, lint fixture, Knip, five typechecks, and 262 app/package tests passed with the documented public synthetic Executor endpoint and no provider call."
+    }
+  ],
+  "limitations": [
+    "Repository source, local loopback HTTP, synthetic metadata, local tests, and fresh-context acceptance do not prove Vercel, Executor, Sendblue, Upstash, AI Gateway, Codex, deployed Eve, delivery, approval, rollback, or Production actuality.",
+    "Gateway session creation and interrupted-stream recovery remain deferred; other external journeys retain their partial or approval_gated scope until HGI-309 qualification.",
+    "The public synthetic Executor URL satisfies build-time discovery only; no API key or provider request was used."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored operational artifact, credential, secret, deployment, alias, webhook, message, delivery, approval resume, rollback, recovery, or Production system was read or changed.",
+    "A local test, receipt schema, passed preflight, command owner, model output, or unavailable readback is not external proof or operation authority."
+  ],
+  "rollback": "Revert the ten-journey owner, proof/evidence contracts, verification policy/tests, Preview and production receipt producers/tests/runbooks, current routes/SPEC/plan/skill profile, and HGI-305 evidence together while preserving accepted HGI-300 through HGI-304, HGI-308, and HGI-310 evidence."
+}

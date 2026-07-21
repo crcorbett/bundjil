@@ -61,7 +61,11 @@ and task state.
   containment, executable negative controls, six fresh scenarios, full
   verification, and pushed Git identity are recorded in
   [`HGI-304-validation.json`](../../documentation-audit/HGI-304-validation.json).
-- HGI-305, HGI-306, and HGI-307 remain pending in dependency order.
+- **HGI-305 — in progress:** add the ten critical journeys, five proof-packet
+  kinds, evidence lifecycle, bounded Preview and Production-preflight
+  receipts, false-success fixtures, honest deferred/inconclusive routes, and
+  fresh-context acceptance without external provider operations.
+- HGI-306 and HGI-307 remain pending in dependency order.
   HGI-309 remains deferred until separately approved external authority exists.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,
