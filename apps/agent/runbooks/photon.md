@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
 last_reviewed: 2026-07-21
-review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, line, webhook, deployment, typing, resource lifecycle, or output contract change
+review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, shared-user, webhook, deployment, typing, resource lifecycle, or output contract change
 ---
 
 # Operate Photon Channel rollout
@@ -24,10 +24,10 @@ resource, deployment, message, typing, and readback procedure below.
   `PHOTON_PROJECT_SECRET` in the ignored file named by
   `BUNDJIL_PHOTON_ENV_FILE`.
 - Permitted writes: the fixed non-routable proof webhook, exact environment
-  webhooks, required iMessage platform toggle, one adopted or rollout-created
-  dedicated line, approved Preview/Production bindings/deployments, and the
+  webhooks, required iMessage platform toggle, one exact adopted or
+  rollout-created Free managed-shared user, approved Preview/Production bindings/deployments, and the
   bounded message plus typing journeys named by the active task.
-- Forbidden writes: unrelated lines, users, contacts, message history,
+- Forbidden writes: dedicated lines, unrelated users, contacts, message history,
   platforms, webhooks, projects, billing policy, DNS, Sendblue resources,
   Upstash data, or any target outside the accepted rollout envelope.
 
@@ -44,7 +44,16 @@ deletion, and a five-request-per-second project limit. Registration validates
 URL syntax before delivery; the proof therefore uses a reserved
 `example.invalid` HTTPS URL that cannot become Bundjil ingress.
 
-Sources: [API introduction](https://photon.codes/docs/api-reference/introduction),
+The Free plan supplies managed-shared iMessage routing. The management API
+reports the project's `shared | dedicated` service type, checks shared-user
+availability, and idempotently creates a shared user from the exact E.164 user
+identity. Photon assigns the routing number. Dedicated-line endpoints are a
+separate Business capability and are not part of this rollout.
+
+Sources: [Photon pricing](https://photon.codes/pricing),
+[management OpenAPI](https://spectrum.photon.codes/openapi/json),
+[shared-routing architecture](https://photon.codes/blog/how-we-rebuilt-our-shared-imessage-routing-to-handle-10m-messages-a-day),
+[API introduction](https://photon.codes/docs/api-reference/introduction),
 [webhook lifecycle](https://photon.codes/docs/webhooks/managing-webhooks), and
 [rate limit](https://photon.codes/docs/api-reference/rate-limit).
 
@@ -60,17 +69,14 @@ Sources: [API introduction](https://photon.codes/docs/api-reference/introduction
    isolated, SDK acquisition/release fails, deletion is ambiguous, final
    readback differs from the baseline, or any request would touch a forbidden
    target.
-5. The provider-only proof does not add a line. The hosted rollout may adopt or
-   add exactly one dedicated iMessage line only after authenticated inventory.
-   Photon documents create/delete as a Business-plan subscription quantity and
-   prorated billing consequence; record that classification and stop on an
-   ambiguous write or billing mismatch.
-6. Read `/billing/subscription` before any line create. A new line is eligible
-   only when the decoded tier is `business` and subscription status is
-   `active`. A Free, canceled, past-due, missing, or unknown subscription is a
-   terminal stop. The management API documents subscription readback but no
-   subscription-upgrade operation, so do not infer authority or attempt to
-   change billing through another surface.
+5. The provider-only proof does not add a user. The hosted rollout requires
+   service type `shared`, zero dedicated lines, and one exact approved shared
+   user. Stop on a dedicated service, ambiguous user identity, unavailable
+   identity, or a create whose exact postcondition cannot be read back.
+6. Shared-user creation is provider-documented as idempotent by phone identity,
+   but the operator still lists first and reads back after create. Do not retry
+   an uncertain create before exact identity reconciliation. Never retain the
+   user phone or assigned routing number in durable evidence.
 
 ## Procedure
 
@@ -132,26 +138,28 @@ observation at that time. It never substitutes for the hosted procedure below.
 1. Attach the `photon-management` authority receipt, verify the ignored
    credential file is mode `0600`, load it without printing values, and run the
    focused/full local gates.
-2. Use authenticated management reads to decode the project, platform,
-   subscription, dedicated-line, and complete webhook inventories. Retain only
-   sanitized counts/state, tier/status, eligibility, and protected stable-ID
+2. Use authenticated management reads to decode the project, iMessage service
+   type, platform, complete shared-user inventory, and complete webhook
+   inventory. Retain only sanitized counts/state and protected stable-ID
    fingerprints. Never infer an owned resource from list order, creation time,
-   phone identity, or partial ID.
-3. Require iMessage enabled. If exactly one approved healthy dedicated line is
-   present, adopt it. If none is present, create once, immediately list and
-   identify the new stable ID, and record the prorated billing consequence—but
-   only after subscription readback proves active Business eligibility. If the
-   response is lost, list and reconcile before any retry. More than one
-   adoptable line, an unhealthy line, or an ineligible subscription is a stop.
+   phone identity, assigned routing number, or partial ID.
+3. Require service type `shared`, zero dedicated lines, and iMessage enabled.
+   Match the exact approved redacted user identity. Adopt one exact existing
+   match; if none exists, check shared availability and call the idempotent
+   shared-user create once, then read back one exact stable user ID and an
+   assigned routing number without retaining either phone value. More than one
+   exact match, an unavailable identity, a dedicated service, or an uncertain
+   postcondition is a stop.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
    signing secret is already present in the approved secret store; otherwise
    register once, bind the returned secret and ID directly to the target, and
    never persist or print them. Reconcile an ambiguous create by URL inventory.
-5. Read back platform, line, and webhook topology. The only accepted desired
-   state is one healthy approved line and one exact environment webhook. Do not
-   delete unrelated resources to make counts fit.
+5. Read back service, platform, shared-user, and webhook topology. The accepted
+   desired state is service type `shared`, zero dedicated lines, one exact
+   approved shared user, and one exact environment webhook. Do not delete
+   unrelated resources to make counts fit.
 
 ## Hosted Channel proof
 
@@ -161,7 +169,7 @@ observation at that time. It never substitutes for the hosted procedure below.
 2. Send one bounded inbound direct-text event through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, one outbound
    provider result, and scoped SDK release without retaining body, content,
-   phone, project, line, webhook, Space, or message values.
+   phone, assigned routing number, project, user, webhook, Space, or message values.
 3. Redeliver the same provider event identity and require a duplicate outcome
    with zero second external response. Do not synthesize a new identifier.
 4. Against the exact decoded conversation, execute `setPresence(start)` and
@@ -183,8 +191,7 @@ Stop Photon ingress first, wait at least the current documented worst-case
 webhook retry horizon (about 3.5 minutes unless fresh provider truth states a
 longer configured value), and quarantine the new replay namespace. Delete only
 the exact rollout-created webhook and, if rollback explicitly requires it, the
-rollout-created line by stable ID; a line deletion is a prorated subscription
-credit consequence. Restore only platform state changed by this rollout,
+rollout-created shared user by stable ID. Preserve an adopted user. Restore only platform state changed by this rollout,
 re-read the complete inventory, and preserve all adopted pre-existing
 resources. Never retry an uncertain message and never restore legacy runtime,
 config, state, or replay behavior.

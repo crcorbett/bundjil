@@ -304,7 +304,7 @@
     "id": "BND-J11-photon-accepted-message-typing",
     "actorOrConsumer": "approved Photon test conversation and Bundjil agent operator",
     "boundary": "Photon signed ingress, fresh replay, Eve dispatch, outbound acceptance, typing start/stop, and SDK release",
-    "startingState": "one exact Photon project, healthy dedicated line, environment webhook, accepted immutable deployment, fresh namespace, and task-scoped approval are attached",
+    "startingState": "one exact Photon project, Free managed-shared service, exact approved shared user assignment, zero dedicated lines, environment webhook, accepted immutable deployment, fresh namespace, and task-scoped approval are attached",
     "inputs": [
       "one approved direct-text inbound event",
       "one duplicate delivery of the same event identity",
@@ -320,7 +320,7 @@
     ],
     "preservedInvariants": [
       "Provider acceptance is not handset delivery or typing display.",
-      "No content, phone, Space, message, line, webhook, project, or secret value enters durable evidence."
+      "No content, phone, assigned routing number, Space, message, user, webhook, project, or secret value enters durable evidence."
     ],
     "oracle": "A Photon messaging packet binds source/deployment, signed ingress, replay, Eve, outbound, typing start/stop, release, provider readback, limitations, and rollback identity.",
     "environment": "approval-gated Photon Preview or Production target",

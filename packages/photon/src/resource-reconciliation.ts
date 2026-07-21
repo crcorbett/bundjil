@@ -1,46 +1,40 @@
-import { Config, Effect, Exit, Schema } from "effect";
+import { Config, Effect, Exit, Redacted, Schema } from "effect";
 
 import { PhotonManagement } from "./management.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
-import { PhotonSubscriptionTier } from "./schemas.js";
+import { PhotonSharedUserPhoneNumber } from "./schemas.js";
 
 export const PhotonResourceReconciliationMode = Schema.Literals([
   "inspect",
-  "reconcile-line",
+  "reconcile-shared-user",
 ]);
 export type PhotonResourceReconciliationMode =
   typeof PhotonResourceReconciliationMode.Type;
 
 export const PhotonResourceReconciliationReceipt = Schema.Struct({
-  billingSyncStatus: Schema.Literals(["not_applicable", "in_sync", "syncing"]),
-  finalAvailableDedicatedLineCount: Schema.Int.pipe(
+  approvedSharedUserCount: Schema.Int.pipe(
+    Schema.check(Schema.isBetween({ minimum: 0, maximum: 1 }))
+  ),
+  assignmentPresent: Schema.Boolean,
+  dedicatedLineCount: Schema.Literal(0),
+  finalSharedUserCount: Schema.Int.pipe(
     Schema.check(Schema.isGreaterThanOrEqualTo(0))
   ),
-  finalDedicatedLineCount: Schema.Int.pipe(
+  initialSharedUserCount: Schema.Int.pipe(
     Schema.check(Schema.isGreaterThanOrEqualTo(0))
   ),
-  initialAvailableDedicatedLineCount: Schema.Int.pipe(
-    Schema.check(Schema.isGreaterThanOrEqualTo(0))
-  ),
-  initialDedicatedLineCount: Schema.Int.pipe(
-    Schema.check(Schema.isGreaterThanOrEqualTo(0))
-  ),
-  lineCreationEligible: Schema.Boolean,
-  lineAction: Schema.Literals([
-    "inspected",
-    "adopted",
-    "created",
-    "recovered-after-ambiguous-create",
-  ]),
   managementAuthenticated: Schema.Literal(true),
   mode: PhotonResourceReconciliationMode,
   platformAction: Schema.Literals(["inspected", "retained", "enabled"]),
   platformEnabled: Schema.Boolean,
+  serviceType: Schema.Literal("shared"),
+  sharedUserAction: Schema.Literals([
+    "inspected",
+    "adopted",
+    "created",
+    "recovered-after-create",
+  ]),
   status: Schema.Literals(["inspected", "reconciled"]),
-  subscriptionStatus: Schema.NullOr(
-    Schema.Literals(["active", "canceled", "past_due"])
-  ),
-  subscriptionTier: PhotonSubscriptionTier,
   webhookCount: Schema.Int.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(0))),
 });
 export type PhotonResourceReconciliationReceipt =
@@ -51,64 +45,62 @@ export const loadPhotonResourceReconciliationMode = Config.schema(
   "BUNDJIL_PHOTON_RESOURCE_MODE"
 ).pipe(Config.withDefault("inspect"));
 
+export const loadPhotonSharedUserPhoneNumber = Config.schema(
+  PhotonSharedUserPhoneNumber,
+  "BUNDJIL_PHOTON_SHARED_USER_PHONE_NUMBER"
+);
+
 const inspectPhotonResources = Effect.fn(
   "PhotonResourceReconciliation.inspect"
 )(function* () {
   const management = yield* PhotonManagement;
-  const initialPlatform = yield* management.getIMessagePlatform();
-  const subscription = yield* management.getSubscription();
-  const initialLines = yield* management.listDedicatedLines();
-  const webhooks = yield* management.listWebhooks();
-  const initialAvailableDedicatedLineCount = initialLines.filter(
-    (line) => line.status === "available"
-  ).length;
-  const lineCreationEligible =
-    subscription.tier.toLowerCase() === "business" &&
-    subscription.status === "active";
-
-  return PhotonResourceReconciliationReceipt.make({
-    billingSyncStatus: "not_applicable",
-    finalAvailableDedicatedLineCount: initialAvailableDedicatedLineCount,
-    finalDedicatedLineCount: initialLines.length,
-    initialAvailableDedicatedLineCount,
-    initialDedicatedLineCount: initialLines.length,
-    lineAction: "inspected",
-    lineCreationEligible,
-    managementAuthenticated: true,
-    mode: "inspect",
-    platformAction: "inspected",
-    platformEnabled: initialPlatform.enabled,
-    status: "inspected",
-    subscriptionStatus: subscription.status,
-    subscriptionTier: subscription.tier,
-    webhookCount: webhooks.length,
-  });
-});
-
-const reconcilePhotonLine = Effect.fn(
-  "PhotonResourceReconciliation.reconcileLine"
-)(function* () {
-  const management = yield* PhotonManagement;
-  const initialPlatform = yield* management.getIMessagePlatform();
-  const subscription = yield* management.getSubscription();
-  const initialLines = yield* management.listDedicatedLines();
-  const webhooks = yield* management.listWebhooks();
-  const initialAvailableDedicatedLineCount = initialLines.filter(
-    (line) => line.status === "available"
-  ).length;
-  const lineCreationEligible =
-    subscription.tier.toLowerCase() === "business" &&
-    subscription.status === "active";
-  if (
-    initialLines.length > 1 ||
-    (initialLines.length === 1 && initialAvailableDedicatedLineCount !== 1)
-  ) {
+  const service = yield* management.getIMessageService();
+  if (service.type !== "shared") {
     return yield* new PhotonProviderProofError({
       operation: "assert",
       reason: "resourceConflict",
     });
   }
-  if (initialLines.length === 0 && !lineCreationEligible) {
+  const platform = yield* management.getIMessagePlatform();
+  const users = yield* management.listSharedUsers();
+  const webhooks = yield* management.listWebhooks();
+
+  return PhotonResourceReconciliationReceipt.make({
+    approvedSharedUserCount: 0,
+    assignmentPresent: false,
+    dedicatedLineCount: 0,
+    finalSharedUserCount: users.length,
+    initialSharedUserCount: users.length,
+    managementAuthenticated: true,
+    mode: "inspect",
+    platformAction: "inspected",
+    platformEnabled: platform.enabled,
+    serviceType: "shared",
+    sharedUserAction: "inspected",
+    status: "inspected",
+    webhookCount: webhooks.length,
+  });
+});
+
+const reconcilePhotonSharedUser = Effect.fn(
+  "PhotonResourceReconciliation.reconcileSharedUser"
+)(function* (redactedPhoneNumber: PhotonSharedUserPhoneNumber) {
+  const management = yield* PhotonManagement;
+  const phoneNumber = Redacted.value(redactedPhoneNumber);
+  const service = yield* management.getIMessageService();
+  if (service.type !== "shared") {
+    return yield* new PhotonProviderProofError({
+      operation: "assert",
+      reason: "resourceConflict",
+    });
+  }
+  const initialPlatform = yield* management.getIMessagePlatform();
+  const initialUsers = yield* management.listSharedUsers();
+  const webhooks = yield* management.listWebhooks();
+  const matching = initialUsers.filter(
+    (user) => user.phoneNumber === phoneNumber
+  );
+  if (matching.length > 1) {
     return yield* new PhotonProviderProofError({
       operation: "assert",
       reason: "resourceConflict",
@@ -125,74 +117,83 @@ const reconcilePhotonLine = Effect.fn(
     });
   }
 
-  if (initialLines.length === 1) {
+  if (matching.length === 1) {
     return PhotonResourceReconciliationReceipt.make({
-      billingSyncStatus: "not_applicable",
-      finalAvailableDedicatedLineCount: 1,
-      finalDedicatedLineCount: 1,
-      initialAvailableDedicatedLineCount,
-      initialDedicatedLineCount: initialLines.length,
-      lineAction: "adopted",
-      lineCreationEligible,
+      approvedSharedUserCount: 1,
+      assignmentPresent: true,
+      dedicatedLineCount: 0,
+      finalSharedUserCount: initialUsers.length,
+      initialSharedUserCount: initialUsers.length,
       managementAuthenticated: true,
-      mode: "reconcile-line",
+      mode: "reconcile-shared-user",
       platformAction: initialPlatform.enabled ? "retained" : "enabled",
       platformEnabled: true,
+      serviceType: "shared",
+      sharedUserAction: "adopted",
       status: "reconciled",
-      subscriptionStatus: subscription.status,
-      subscriptionTier: subscription.tier,
       webhookCount: webhooks.length,
     });
   }
 
-  const createExit = yield* Effect.exit(management.createDedicatedLine());
-  const finalLines = yield* management.listDedicatedLines();
+  if (!(yield* management.checkSharedAvailability(phoneNumber))) {
+    return yield* new PhotonProviderProofError({
+      operation: "assert",
+      reason: "resourceConflict",
+    });
+  }
+
+  const createExit = yield* Effect.exit(
+    management.createSharedUser(phoneNumber)
+  );
+  const finalUsers = yield* management.listSharedUsers();
+  const finalMatching = finalUsers.filter(
+    (user) => user.phoneNumber === phoneNumber
+  );
   if (
-    finalLines.length !== 1 ||
-    finalLines[0]?.status !== "available" ||
-    (Exit.isSuccess(createExit) &&
-      finalLines[0].id !== createExit.value.line.id)
+    finalMatching.length !== 1 ||
+    (Exit.isSuccess(createExit) && finalMatching[0]?.id !== createExit.value.id)
   ) {
     return yield* new PhotonProviderProofError({
       operation: "assert",
       reason: "resourceConflict",
     });
   }
-  let billingSyncStatus: typeof PhotonResourceReconciliationReceipt.fields.billingSyncStatus.Type =
-    "not_applicable";
-  if (Exit.isSuccess(createExit)) {
-    if (createExit.value.billingSyncStatus === "failed") {
-      return yield* new PhotonProviderProofError({
-        operation: "assert",
-        reason: "resourceConflict",
-      });
-    }
-    ({ billingSyncStatus } = createExit.value);
-  }
 
   return PhotonResourceReconciliationReceipt.make({
-    billingSyncStatus,
-    finalAvailableDedicatedLineCount: 1,
-    finalDedicatedLineCount: 1,
-    initialAvailableDedicatedLineCount,
-    initialDedicatedLineCount: initialLines.length,
-    lineAction: Exit.isSuccess(createExit)
-      ? "created"
-      : "recovered-after-ambiguous-create",
-    lineCreationEligible,
+    approvedSharedUserCount: 1,
+    assignmentPresent: true,
+    dedicatedLineCount: 0,
+    finalSharedUserCount: finalUsers.length,
+    initialSharedUserCount: initialUsers.length,
     managementAuthenticated: true,
-    mode: "reconcile-line",
+    mode: "reconcile-shared-user",
     platformAction: initialPlatform.enabled ? "retained" : "enabled",
     platformEnabled: true,
+    serviceType: "shared",
+    sharedUserAction: Exit.isSuccess(createExit)
+      ? "created"
+      : "recovered-after-create",
     status: "reconciled",
-    subscriptionStatus: subscription.status,
-    subscriptionTier: subscription.tier,
     webhookCount: webhooks.length,
   });
 });
 
 export const reconcilePhotonResources = Effect.fn(
   "PhotonResourceReconciliation.reconcile"
-)((mode: PhotonResourceReconciliationMode) =>
-  mode === "inspect" ? inspectPhotonResources() : reconcilePhotonLine()
-);
+)((
+  mode: PhotonResourceReconciliationMode,
+  sharedUserPhoneNumber?: PhotonSharedUserPhoneNumber
+) => {
+  if (mode === "inspect") {
+    return inspectPhotonResources();
+  }
+  if (sharedUserPhoneNumber === undefined) {
+    return Effect.fail(
+      new PhotonProviderProofError({
+        operation: "assert",
+        reason: "resourceConflict",
+      })
+    );
+  }
+  return reconcilePhotonSharedUser(sharedUserPhoneNumber);
+});

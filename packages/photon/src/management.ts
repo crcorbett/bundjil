@@ -8,12 +8,13 @@ import {
 import type { PhotonProviderProofOperation } from "./provider-proof.error.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
 import {
-  PhotonLineId,
-  PhotonSubscriptionTier,
+  PhotonE164PhoneNumber,
+  PhotonProjectId,
+  PhotonUserId,
   PhotonWebhookId,
   PhotonWebhookSecret,
 } from "./schemas.js";
-import type { PhotonProjectId, PhotonProjectSecret } from "./schemas.js";
+import type { PhotonProjectSecret } from "./schemas.js";
 
 const PhotonManagedWebhook = Schema.Struct({
   id: PhotonWebhookId,
@@ -30,43 +31,9 @@ const PhotonWebhookRegistration = Schema.Struct({
   webhookUrl: Schema.URLFromString,
 });
 
-const PhotonDedicatedLineStatus = Schema.Literals([
-  "available",
-  "unavailable",
-  "unknown",
-]);
-
-const PhotonManagedDedicatedLine = Schema.Struct({
-  id: PhotonLineId,
-  status: PhotonDedicatedLineStatus,
-});
-
-const PhotonProviderDedicatedLine = Schema.Struct({
-  platform: Schema.Literal("imessage"),
-  id: PhotonLineId,
-  phoneNumber: Schema.String,
-  profile: Schema.Struct({
-    firstName: Schema.NullOr(Schema.String),
-    lastName: Schema.NullOr(Schema.String),
-    avatarUrl: Schema.NullOr(Schema.String),
-  }),
-  status: PhotonDedicatedLineStatus,
-  createdAt: Schema.String,
-});
-
-const PhotonBilling = Schema.Struct({
-  quantity: Schema.NullOr(Schema.Number),
-  prorationAmount: Schema.NullOr(Schema.Number),
-  syncStatus: Schema.Literals(["in_sync", "syncing", "failed"]),
-});
-
 const PhotonPlatformToggle = Schema.Struct({
   platform: Schema.Literal("imessage"),
   enabled: Schema.Boolean,
-});
-
-const PhotonDedicatedLineRegistration = Schema.Struct({
-  platform: Schema.Literal("imessage"),
 });
 
 const PhotonPlatformsResponse = Schema.Struct({
@@ -94,48 +61,72 @@ const PhotonPlatformsResponse = Schema.Struct({
   }),
 });
 
-const PhotonSubscriptionStatus = Schema.NullOr(
-  Schema.Literals(["active", "canceled", "past_due"])
-);
+const PhotonIMessageServiceType = Schema.Literals(["shared", "dedicated"]);
 
-const PhotonSubscriptionResponse = Schema.Struct({
+const PhotonIMessageServiceResponse = Schema.Struct({
+  status: Schema.Literal(200),
+  body: Schema.Struct({
+    succeed: Schema.Literal(true),
+    data: Schema.Struct({ type: PhotonIMessageServiceType }),
+  }),
+});
+
+const PhotonSharedAvailabilityResponse = Schema.Struct({
+  status: Schema.Literal(200),
+  body: Schema.Struct({
+    succeed: Schema.Literal(true),
+    data: Schema.Struct({ available: Schema.Boolean }),
+  }),
+});
+
+const PhotonProviderUser = Schema.Struct({
+  id: PhotonUserId,
+  projectId: PhotonProjectId,
+  type: PhotonIMessageServiceType,
+  firstName: Schema.NullOr(Schema.String),
+  lastName: Schema.NullOr(Schema.String),
+  email: Schema.NullOr(Schema.String),
+  phoneNumber: PhotonE164PhoneNumber,
+  assignedPhoneNumber: PhotonE164PhoneNumber,
+  meta: Schema.NullOr(Schema.Record(Schema.String, Schema.Unknown)),
+  createdAt: Schema.String,
+});
+
+const PhotonManagedSharedUser = Schema.Struct({
+  id: PhotonUserId,
+  phoneNumber: PhotonE164PhoneNumber,
+  assignedPhoneNumber: PhotonE164PhoneNumber,
+});
+
+const PhotonSharedUserRegistration = Schema.Struct({
+  type: Schema.Literal("shared"),
+  phoneNumber: PhotonE164PhoneNumber,
+});
+
+const PhotonListSharedUsersResponse = Schema.Struct({
   status: Schema.Literal(200),
   body: Schema.Struct({
     succeed: Schema.Literal(true),
     data: Schema.Struct({
-      tier: PhotonSubscriptionTier,
-      status: PhotonSubscriptionStatus,
-      cancel_at_period_end: Schema.Boolean,
-      subscription_id: Schema.NullOr(Schema.String),
-      customer_id: Schema.NullOr(Schema.String),
+      users: Schema.Array(PhotonProviderUser),
+      total: Schema.Int,
     }),
   }),
 });
 
-const PhotonListDedicatedLinesResponse = Schema.Struct({
+const PhotonCreateSharedUserResponse = Schema.Struct({
   status: Schema.Literal(200),
   body: Schema.Struct({
     succeed: Schema.Literal(true),
-    data: Schema.Struct({ lines: Schema.Array(PhotonProviderDedicatedLine) }),
+    data: PhotonProviderUser,
   }),
 });
 
-const PhotonCreateDedicatedLineResponse = Schema.Struct({
+const PhotonDeleteSharedUserResponse = Schema.Struct({
   status: Schema.Literal(200),
   body: Schema.Struct({
     succeed: Schema.Literal(true),
-    data: Schema.Struct({
-      line: PhotonProviderDedicatedLine,
-      billing: PhotonBilling,
-    }),
-  }),
-});
-
-const PhotonDeleteDedicatedLineResponse = Schema.Struct({
-  status: Schema.Literal(200),
-  body: Schema.Struct({
-    succeed: Schema.Literal(true),
-    data: Schema.Struct({ billing: Schema.NullOr(PhotonBilling) }),
+    data: Schema.Struct({ userId: PhotonUserId }),
   }),
 });
 
@@ -164,44 +155,35 @@ const PhotonDeleteWebhookResponse = Schema.Struct({
 });
 
 interface PhotonManagementShape {
-  readonly createDedicatedLine: () => Effect.Effect<
-    {
-      readonly line: typeof PhotonManagedDedicatedLine.Type;
-      readonly billingSyncStatus: typeof PhotonBilling.fields.syncStatus.Type;
-    },
-    PhotonProviderProofError
-  >;
-  readonly deleteDedicatedLine: (
-    lineId: typeof PhotonLineId.Type
+  readonly checkSharedAvailability: (
+    phoneNumber: typeof PhotonE164PhoneNumber.Type
+  ) => Effect.Effect<boolean, PhotonProviderProofError>;
+  readonly createSharedUser: (
+    phoneNumber: typeof PhotonE164PhoneNumber.Type
   ) => Effect.Effect<
-    {
-      readonly billingChanged: boolean;
-      readonly billingSyncStatus:
-        | typeof PhotonBilling.fields.syncStatus.Type
-        | null;
-    },
+    typeof PhotonManagedSharedUser.Type,
     PhotonProviderProofError
   >;
+  readonly deleteSharedUser: (
+    userId: typeof PhotonUserId.Type
+  ) => Effect.Effect<void, PhotonProviderProofError>;
   readonly deleteWebhook: (
     webhookId: typeof PhotonWebhookId.Type
   ) => Effect.Effect<void, PhotonProviderProofError>;
-  readonly listWebhooks: () => Effect.Effect<
-    readonly (typeof PhotonManagedWebhook.Type)[],
-    PhotonProviderProofError
-  >;
   readonly getIMessagePlatform: () => Effect.Effect<
     { readonly enabled: boolean },
     PhotonProviderProofError
   >;
-  readonly getSubscription: () => Effect.Effect<
-    {
-      readonly tier: typeof PhotonSubscriptionTier.Type;
-      readonly status: typeof PhotonSubscriptionStatus.Type;
-    },
+  readonly getIMessageService: () => Effect.Effect<
+    { readonly type: typeof PhotonIMessageServiceType.Type },
     PhotonProviderProofError
   >;
-  readonly listDedicatedLines: () => Effect.Effect<
-    readonly (typeof PhotonManagedDedicatedLine.Type)[],
+  readonly listSharedUsers: () => Effect.Effect<
+    readonly (typeof PhotonManagedSharedUser.Type)[],
+    PhotonProviderProofError
+  >;
+  readonly listWebhooks: () => Effect.Effect<
+    readonly (typeof PhotonManagedWebhook.Type)[],
     PhotonProviderProofError
   >;
   readonly registerWebhook: (
@@ -259,50 +241,72 @@ export const layerPhotonManagementLive = (
         );
 
       return PhotonManagement.of({
-        createDedicatedLine: Effect.fn("PhotonManagement.createDedicatedLine")(
-          function* () {
+        checkSharedAvailability: Effect.fn(
+          "PhotonManagement.checkSharedAvailability"
+        )(function* (phoneNumber) {
+          const response = yield* execute(
+            "checkSharedAvailability",
+            HttpClientRequest.get(
+              managementUrl(projectId, "imessage/shared/availability")
+            ).pipe(
+              HttpClientRequest.setUrlParam("phoneNumber", phoneNumber),
+              HttpClientRequest.basicAuth(projectId, projectSecret)
+            ),
+            PhotonSharedAvailabilityResponse
+          );
+          return response.body.data.available;
+        }),
+        createSharedUser: Effect.fn("PhotonManagement.createSharedUser")(
+          function* (phoneNumber) {
             const request = yield* HttpClientRequest.post(
-              managementUrl(projectId, "lines/")
+              managementUrl(projectId, "users/")
             ).pipe(
               HttpClientRequest.basicAuth(projectId, projectSecret),
-              HttpClientRequest.schemaBodyJson(PhotonDedicatedLineRegistration)(
-                { platform: "imessage" }
-              ),
+              HttpClientRequest.schemaBodyJson(PhotonSharedUserRegistration)({
+                type: "shared",
+                phoneNumber,
+              }),
               Effect.mapError(
                 () =>
                   new PhotonProviderProofError({
-                    operation: "createDedicatedLine",
+                    operation: "createSharedUser",
                     reason: "requestFailed",
                   })
               )
             );
             const response = yield* execute(
-              "createDedicatedLine",
+              "createSharedUser",
               request,
-              PhotonCreateDedicatedLineResponse
+              PhotonCreateSharedUserResponse
             );
-            return {
-              line: PhotonManagedDedicatedLine.make({
-                id: response.body.data.line.id,
-                status: response.body.data.line.status,
-              }),
-              billingSyncStatus: response.body.data.billing.syncStatus,
-            };
+            if (
+              response.body.data.type !== "shared" ||
+              response.body.data.phoneNumber !== phoneNumber
+            ) {
+              return yield* new PhotonProviderProofError({
+                operation: "createSharedUser",
+                reason: "invalidResponse",
+              });
+            }
+            return PhotonManagedSharedUser.make(response.body.data);
           }
         ),
-        deleteDedicatedLine: Effect.fn("PhotonManagement.deleteDedicatedLine")(
-          function* (lineId) {
+        deleteSharedUser: Effect.fn("PhotonManagement.deleteSharedUser")(
+          function* (userId) {
             const response = yield* execute(
-              "deleteDedicatedLine",
+              "deleteSharedUser",
               HttpClientRequest.make("DELETE")(
-                managementUrl(projectId, `lines/${lineId}`)
+                managementUrl(projectId, `users/${userId}/`)
               ).pipe(HttpClientRequest.basicAuth(projectId, projectSecret)),
-              PhotonDeleteDedicatedLineResponse
+              PhotonDeleteSharedUserResponse
             );
-            return {
-              billingChanged: response.body.data.billing !== null,
-              billingSyncStatus: response.body.data.billing?.syncStatus ?? null,
-            };
+            if (response.body.data.userId !== userId) {
+              return yield* new PhotonProviderProofError({
+                operation: "deleteSharedUser",
+                reason: "invalidResponse",
+              });
+            }
+            return yield* Effect.void;
           }
         ),
         deleteWebhook: Effect.fn("PhotonManagement.deleteWebhook")(
@@ -341,36 +345,40 @@ export const layerPhotonManagementLive = (
             return { enabled: response.body.data.imessage.enabled };
           }
         ),
-        getSubscription: Effect.fn("PhotonManagement.getSubscription")(
+        getIMessageService: Effect.fn("PhotonManagement.getIMessageService")(
           function* () {
             const response = yield* execute(
-              "getSubscription",
-              HttpClientRequest.get(
-                managementUrl(projectId, "billing/subscription")
-              ).pipe(HttpClientRequest.basicAuth(projectId, projectSecret)),
-              PhotonSubscriptionResponse
-            );
-            return {
-              status: response.body.data.status,
-              tier: response.body.data.tier,
-            };
-          }
-        ),
-        listDedicatedLines: Effect.fn("PhotonManagement.listDedicatedLines")(
-          function* () {
-            const response = yield* execute(
-              "listDedicatedLines",
-              HttpClientRequest.get(managementUrl(projectId, "lines/")).pipe(
-                HttpClientRequest.setUrlParam("platform", "imessage"),
+              "getIMessageService",
+              HttpClientRequest.get(managementUrl(projectId, "imessage/")).pipe(
                 HttpClientRequest.basicAuth(projectId, projectSecret)
               ),
-              PhotonListDedicatedLinesResponse
+              PhotonIMessageServiceResponse
             );
-            return response.body.data.lines.map((line) =>
-              PhotonManagedDedicatedLine.make({
-                id: line.id,
-                status: line.status,
-              })
+            return response.body.data;
+          }
+        ),
+        listSharedUsers: Effect.fn("PhotonManagement.listSharedUsers")(
+          function* () {
+            const response = yield* execute(
+              "listSharedUsers",
+              HttpClientRequest.get(managementUrl(projectId, "users/")).pipe(
+                HttpClientRequest.setUrlParam("type", "shared"),
+                HttpClientRequest.setUrlParam("limit", "500"),
+                HttpClientRequest.basicAuth(projectId, projectSecret)
+              ),
+              PhotonListSharedUsersResponse
+            );
+            if (
+              response.body.data.total !== response.body.data.users.length ||
+              response.body.data.users.some((user) => user.type !== "shared")
+            ) {
+              return yield* new PhotonProviderProofError({
+                operation: "listSharedUsers",
+                reason: "invalidResponse",
+              });
+            }
+            return response.body.data.users.map((user) =>
+              PhotonManagedSharedUser.make(user)
             );
           }
         ),

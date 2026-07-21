@@ -6,7 +6,7 @@
   "lifecycle": { "state": "inconclusive" },
   "externalConsequence": {
     "outcome": "not_attempted",
-    "target": "replace with exact Channel provider, account/project, line, and webhook"
+    "target": "replace with exact Channel provider, account/project, provider routing identity, and webhook"
   },
   "candidate": {
     "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -22,7 +22,7 @@
   },
   "environment": {
     "tier": "external",
-    "target": "replace with exact Channel provider, account/project, line, and webhook"
+    "target": "replace with exact Channel provider, account/project, provider routing identity, and webhook"
   },
   "journeyResults": [
     {
@@ -50,7 +50,7 @@
   "externalReadback": {
     "required": true,
     "outcome": "unavailable",
-    "receipt": "replace with sanitized provider account/project, line, webhook, and operation readback"
+    "receipt": "replace with sanitized provider account/project, routing identity, webhook, and operation readback"
   },
   "postconditions": ["No external messaging consequence is established."],
   "limitations": [

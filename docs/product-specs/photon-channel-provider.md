@@ -67,8 +67,9 @@ contract must not live in `@bundjil/eve`, and it must not become a generic
 
 The Production amendment begins only after this plan is restored under
 [`../exec-plans/active/`](../exec-plans/active/) and linked from its index. It
-owns only the exact Photon line/platform/webhook resources, Vercel bindings,
-deployments, Channel routes, and bounded journeys needed for this rollout.
+owns only the exact Photon shared-user/platform/webhook resources, Vercel
+bindings, deployments, Channel routes, and bounded journeys needed for this
+rollout. A dedicated Photon line is not required.
 
 ## PRD re-review: rejected legacy patterns
 
@@ -140,8 +141,9 @@ protocol capability. Only dated readback can establish Preview or Production
 provider state.
 
 The user directly approved this full Production rollout and Photon project
-CRUD, including dedicated number-line operations, in the current Codex thread
-on 2026-07-21. That approval is task-scoped: each mutation still requires the
+CRUD in the current Codex thread on 2026-07-21. The approved Free-plan topology
+uses a managed shared number assignment and does not create or delete a
+dedicated line. That approval is task-scoped: each mutation still requires the
 matching app-owned runbook envelope, exact authenticated target readback,
 clean pushed source identity, rollback reference, sanitized receipt, and
 immediate postcondition. It does not authorize unrelated Sendblue, Photon,
@@ -167,10 +169,12 @@ types, and callback APIs are not Bundjil contracts.
 The Production amendment was revalidated against these primary contracts on
 2026-07-21:
 
-- Photon [management API introduction](https://photon.codes/docs/api-reference/introduction)
-  and [Spectrum OpenAPI](https://spectrum.photon.codes/openapi/json) expose
-  project platform, dedicated line, and webhook management. Dedicated
-  iMessage line create/delete changes prorated subscription quantity.
+- Photon [pricing](https://photon.codes/pricing) defines Free as managed-shared
+  iMessage with direct messaging and up to ten users. The
+  [Spectrum OpenAPI](https://spectrum.photon.codes/openapi/json) exposes the
+  project's `shared | dedicated` iMessage service type, idempotent shared-user
+  creation keyed by user phone number, shared-number availability, and webhook
+  management. Dedicated line CRUD is Business-only and outside this topology.
 - Photon [webhook management](https://photon.codes/docs/webhooks/managing-webhooks)
   returns a signing secret only on create, uses logical deletion, and permits
   in-flight delivery after delete; [delivery and retries](https://photon.codes/docs/webhooks/delivery)
@@ -554,7 +558,7 @@ local fixture command
 
 authorized staged deployment proof
   -> environment-scoped encrypted new config
-  -> exact Photon project/line/webhook
+  -> exact Photon project/shared-user/webhook
   -> signed inbound -> replay -> Eve -> outbound accepted
   -> sanitized Vercel/Photon/runtime readback
 
@@ -589,7 +593,7 @@ Inspect the exact npm tarball and record package/version/integrity/exports,
 dependency weight, Promise behavior, and resource release. Compare the SDK
 webhook callback helper with direct documented HMAC verification. Retain one
 deterministic implementation. Fault-test malformed output, rejection,
-timeout/uncertain send, Space lookup, line ambiguity, presence no-op, and Layer
+timeout/uncertain send, Space lookup, presence no-op, and Layer
 release without credentials.
 
 ### Spike 4: dual conformance
@@ -604,28 +608,27 @@ Only with separate provider/deployment authority, use new Preview-only config,
 a separate replay namespace, and an isolated Photon project. Prove one signed
 inbound, one fresh claim, one Eve turn, one outbound accepted result, retry
 suppression, cold Space resolution, presence outcome, `waitUntil` completion,
-and resource release. Do not create/delete a dedicated line without additional
-authority and confirmed lifecycle semantics.
+and resource release. Use the Free managed-shared service; do not create or
+delete a dedicated line.
 
 ### Spike 6: Production preflight and resource adoption
 
 Decode authenticated Vercel, Photon, Sendblue, and Upstash metadata into one
 sanitized preflight receipt. Prove the exact projects, environment-scoped
-bindings, current and previous immutable deployments, Photon platform/line
-inventory, Sendblue line/webhook inventory, and fresh replay/routing namespace
-without reading legacy replay data or exposing values. A missing or ambiguous
-resource is inconclusive, never healthy.
+bindings, current and previous immutable deployments, Photon service type,
+approved shared-user/webhook inventory, Sendblue line/webhook inventory, and
+fresh replay/routing namespace without reading legacy replay data or exposing
+values. A missing or ambiguous resource is inconclusive, never healthy.
 
-### Spike 7: Photon line and webhook rollout
+### Spike 7: Photon shared-user and webhook rollout
 
-Adopt exactly one healthy existing dedicated iMessage line when readback proves
-it belongs to the approved project; otherwise create exactly one line and
-record that the operation changes prorated subscription quantity. Enable only
-the required iMessage platform state, register the final HTTPS webhook once,
-capture its write-only signing secret directly into the approved secret
-binding, and read back stable line/webhook IDs. Never retry an ambiguous create;
-reconcile by listing first. Delete only a rollout-created resource during
-rollback.
+Require the project iMessage service type to be `shared`, check shared-number
+availability for the exact approved test user, and adopt or idempotently create
+that one project user. Enable only the required iMessage platform state,
+register the final HTTPS webhook once, capture its write-only signing secret
+directly into the approved secret binding, and read back stable user/webhook
+IDs. Reconcile by exact user identity and stable provider ID, never list order.
+Delete only a rollout-created shared user or webhook during rollback.
 
 ### Spike 8: dual-provider staged promotion
 
@@ -669,9 +672,10 @@ domain and retain previous deployment/config references for rollback.
 - Production exposes both `/eve/v1/sendblue/webhook` and
   `/eve/v1/photon/webhook` from one accepted immutable deployment and the
   stable alias resolves to that deployment after promotion.
-- Photon line/platform/webhook and Vercel binding operations use stable IDs,
-  list-before-create adoption, create-without-blind-retry, immediate readback,
-  write-only secret handling, and rollout-owned deletion only.
+- Photon shared-user/platform/webhook and Vercel binding operations use stable
+  IDs, exact-identity adoption, idempotent shared-user creation, immediate
+  readback, write-only secret handling, and rollout-owned deletion only. The
+  accepted Free topology has zero dedicated lines.
 - Both providers prove decoded typing `start` and `stop` outcomes at the
   provider boundary; handset display is either separately observed or recorded
   as unproved.
@@ -716,12 +720,12 @@ domain and retain previous deployment/config references for rollback.
 | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | SPEC, task ledger, active plan, and indexes                                | Reopen current owners                                                  | Promotion tasks and terminal proof remain aligned                                                             |
 | Agent Production preflight and tests                                       | Add dual-Channel stages and binding metadata                           | Invalid, shared, stale, or legacy configuration fails closed                                                  |
-| Photon management service and tests                                        | Add project/platform/line inventory and bounded reconciliation         | Stable IDs, billing consequence, adoption, ambiguous-write recovery, and deletion ownership are explicit      |
+| Photon management service and tests                                        | Add project/service/shared-user/webhook inventory and reconciliation   | Free managed-shared selection, exact identity, idempotency, stable IDs, and deletion ownership are explicit   |
 | Agent, Sendblue, and Photon runbooks                                       | Replace provider-only/legacy config procedures                         | Exact dual-provider Preview/Production procedures, typing proof, rollback, and secret handling are executable |
 | Authority and automation registers                                         | Add Photon ingress/outbound/management boundaries and current fixtures | Direct approval is represented as a task-bounded receipt, not standing authority                              |
 | Critical journeys, command map, proof schema/templates, and evidence index | Add Photon and dual-provider typing/promotion journeys                 | Repository, deployment, provider acceptance, and handset observations remain distinct                         |
 | Vercel environment and deployment                                          | Bind new config, stage, prove, promote, read back                      | Stable alias resolves to accepted immutable deployment with previous rollback reference                       |
-| Photon project                                                             | Adopt/create one line and register one Production webhook              | Exact resources are healthy and read back; write-only secret is bound without disclosure                      |
+| Photon project                                                             | Adopt/create one shared user and register one Production webhook       | Shared service/user assignment and webhook are read back; write-only secret is bound without disclosure       |
 | Sendblue account                                                           | Preserve the current approved line and reconcile the receive webhook   | Clean route and typing work without legacy runtime/config/state behavior                                      |
 | Upstash                                                                    | Reuse the approved database only through a new physical prefix         | No legacy key is read, copied, cleared, or treated as proof                                                   |
 | Architecture, READMEs, runbook index, and verification router              | Reconcile after live readback                                          | Current routes describe only accepted source and bounded provider truth                                       |
@@ -739,21 +743,20 @@ domain and retain previous deployment/config references for rollback.
   Preview account/line prove them without touching the shared Production line?
 - Can Photon deterministically finish webhook work under Eve `waitUntil`, and
   does its SDK release resources in the Vercel runtime?
-- What stable Space/line identity is required after cold start, and how is an
+- What stable Space identity is required after cold start, and how is an
   ambiguous send prevented from being retried?
 - Can the existing Sendblue receive webhook be replaced atomically enough to
   avoid a gap, or must the cutover use an overlap followed by an exact inventory
   replacement?
-- Does the approved Photon project already own one healthy dedicated iMessage
-  line, or must the rollout create one and accept the documented prorated
-  subscription change?
+- Does the approved Photon project already own the exact shared test user, or
+  must the rollout idempotently create it after an availability check?
 - Can provider-level typing acceptance be paired with a safe handset
-  observation for both lines during the rollout window?
+  observation for both providers during the rollout window?
 - Which exact current and previous Vercel deployments and configuration
   fingerprints does authenticated readback establish immediately before the
   staged deployment?
 
-Any unresolved SDK lifecycle, cold-Space, line, uncertain-send, isolated
+Any unresolved SDK lifecycle, cold-Space, shared-user assignment, uncertain-send, isolated
 resource, or framework state-write question is a stop condition. Public docs
 do not prove tenant state. The direct approval permits only the exact rollout
 operations represented in the active task and matching runbook; ambiguity,

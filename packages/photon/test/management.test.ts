@@ -8,33 +8,47 @@ import {
 } from "../src/management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import {
-  PhotonLineId,
+  PhotonE164PhoneNumber,
   PhotonProjectId,
   PhotonProjectSecret,
-  PhotonSubscriptionTier,
+  PhotonUserId,
 } from "../src/schemas.js";
 
 const fixtures = Effect.gen(function* decodeManagementFixtures() {
   return {
-    lineId: yield* Schema.decodeEffect(PhotonLineId)(
-      "60d6d04f-f9fa-4a7b-9c97-37c9c90ce91c"
+    assignedPhoneNumber: yield* Schema.decodeEffect(PhotonE164PhoneNumber)(
+      "+14155550177"
     ),
-    projectId: yield* Schema.decodeEffect(PhotonProjectId)("test-project"),
+    phoneNumber: yield* Schema.decodeEffect(PhotonE164PhoneNumber)(
+      "+14155550199"
+    ),
+    projectId: yield* Schema.decodeEffect(PhotonProjectId)(
+      "ab96fc27-475d-4a52-a52e-bef2d4c66dde"
+    ),
     projectSecret: yield* Schema.decodeEffect(PhotonProjectSecret)(
       Redacted.make("test-project-secret")
     ),
-    subscriptionTier: yield* Schema.decodeEffect(PhotonSubscriptionTier)(
-      "business"
+    userId: yield* Schema.decodeEffect(PhotonUserId)(
+      "60d6d04f-f9fa-4a7b-9c97-37c9c90ce91c"
     ),
   };
 });
 
-const providerLine = (lineId: string) => ({
-  platform: "imessage",
-  id: lineId,
-  phoneNumber: "+14155550177",
-  profile: { firstName: null, lastName: null, avatarUrl: null },
-  status: "available",
+const providerUser = (fixture: {
+  readonly assignedPhoneNumber: string;
+  readonly phoneNumber: string;
+  readonly projectId: string;
+  readonly userId: string;
+}) => ({
+  id: fixture.userId,
+  projectId: fixture.projectId,
+  type: "shared",
+  firstName: null,
+  lastName: null,
+  email: null,
+  phoneNumber: fixture.phoneNumber,
+  assignedPhoneNumber: fixture.assignedPhoneNumber,
+  meta: null,
   createdAt: "2026-07-21T00:00:00.000Z",
 });
 
@@ -48,7 +62,7 @@ const layer = (
   );
 
 it.effect(
-  "decodes platform and dedicated-line lifecycle without exposing phone or billing amounts",
+  "decodes the managed-shared lifecycle through exact provider endpoints",
   () =>
     Effect.gen(function* proveManagementContracts() {
       const fixture = yield* fixtures;
@@ -64,23 +78,11 @@ it.effect(
           urlParams: [...request.urlParams],
         });
         const response = (() => {
+          if (request.url.endsWith("imessage/") && request.method === "GET") {
+            return { succeed: true, data: { type: "shared" } };
+          }
           if (request.url.endsWith("platforms/") && request.method === "GET") {
             return { succeed: true, data: { imessage: { enabled: false } } };
-          }
-          if (
-            request.url.endsWith("billing/subscription") &&
-            request.method === "GET"
-          ) {
-            return {
-              succeed: true,
-              data: {
-                tier: "business",
-                status: "active",
-                cancel_at_period_end: false,
-                subscription_id: "subscription-secret",
-                customer_id: "customer-secret",
-              },
-            };
           }
           if (
             request.url.endsWith("platforms/") &&
@@ -88,35 +90,22 @@ it.effect(
           ) {
             return { succeed: true, data: { imessage: { enabled: true } } };
           }
-          if (request.method === "GET" && request.url.includes("/lines/")) {
+          if (
+            request.url.endsWith("availability") &&
+            request.method === "GET"
+          ) {
+            return { succeed: true, data: { available: true } };
+          }
+          if (request.url.endsWith("users/") && request.method === "GET") {
             return {
               succeed: true,
-              data: { lines: [providerLine(fixture.lineId)] },
+              data: { users: [providerUser(fixture)], total: 1 },
             };
           }
-          if (request.url.endsWith("lines/") && request.method === "POST") {
-            return {
-              succeed: true,
-              data: {
-                line: providerLine(fixture.lineId),
-                billing: {
-                  quantity: 1,
-                  prorationAmount: 1.23,
-                  syncStatus: "in_sync",
-                },
-              },
-            };
+          if (request.url.endsWith("users/") && request.method === "POST") {
+            return { succeed: true, data: providerUser(fixture) };
           }
-          return {
-            succeed: true,
-            data: {
-              billing: {
-                quantity: 0,
-                prorationAmount: -1.23,
-                syncStatus: "in_sync",
-              },
-            },
-          };
+          return { succeed: true, data: { userId: fixture.userId } };
         })();
         return Effect.succeed(
           HttpClientResponse.fromWeb(
@@ -131,63 +120,55 @@ it.effect(
 
       const result = yield* Effect.gen(function* runManagementOperations() {
         const management = yield* PhotonManagement;
+        const service = yield* management.getIMessageService();
         const before = yield* management.getIMessagePlatform();
-        const subscription = yield* management.getSubscription();
         const enabled = yield* management.setIMessagePlatformEnabled(true);
-        const listed = yield* management.listDedicatedLines();
-        const created = yield* management.createDedicatedLine();
-        const deleted = yield* management.deleteDedicatedLine(fixture.lineId);
-        return { before, created, deleted, enabled, listed, subscription };
+        const available = yield* management.checkSharedAvailability(
+          fixture.phoneNumber
+        );
+        const listed = yield* management.listSharedUsers();
+        const created = yield* management.createSharedUser(fixture.phoneNumber);
+        yield* management.deleteSharedUser(fixture.userId);
+        return { available, before, created, enabled, listed, service };
       }).pipe(
         Effect.provide(layer(client, fixture.projectId, fixture.projectSecret))
       );
 
-      assert.deepStrictEqual(result.before, { enabled: false });
-      assert.deepStrictEqual(result.subscription, {
-        status: "active",
-        tier: fixture.subscriptionTier,
+      const managedUser = {
+        id: fixture.userId,
+        phoneNumber: fixture.phoneNumber,
+        assignedPhoneNumber: fixture.assignedPhoneNumber,
+      };
+      assert.deepStrictEqual(result, {
+        available: true,
+        before: { enabled: false },
+        created: managedUser,
+        enabled: { enabled: true },
+        listed: [managedUser],
+        service: { type: "shared" },
       });
-      assert.deepStrictEqual(result.enabled, { enabled: true });
-      assert.deepStrictEqual(result.listed, [
-        { id: fixture.lineId, status: "available" },
-      ]);
-      assert.deepStrictEqual(result.created, {
-        line: { id: fixture.lineId, status: "available" },
-        billingSyncStatus: "in_sync",
-      });
-      assert.deepStrictEqual(result.deleted, {
-        billingChanged: true,
-        billingSyncStatus: "in_sync",
-      });
+      const base = `https://spectrum.photon.codes/projects/${fixture.projectId}`;
       assert.deepStrictEqual(requests, [
+        { method: "GET", url: `${base}/imessage/`, urlParams: [] },
+        { method: "GET", url: `${base}/platforms/`, urlParams: [] },
+        { method: "PATCH", url: `${base}/platforms/`, urlParams: [] },
         {
           method: "GET",
-          url: "https://spectrum.photon.codes/projects/test-project/platforms/",
-          urlParams: [],
-        },
-        {
-          method: "GET",
-          url: "https://spectrum.photon.codes/projects/test-project/billing/subscription",
-          urlParams: [],
-        },
-        {
-          method: "PATCH",
-          url: "https://spectrum.photon.codes/projects/test-project/platforms/",
-          urlParams: [],
+          url: `${base}/imessage/shared/availability`,
+          urlParams: [["phoneNumber", fixture.phoneNumber]],
         },
         {
           method: "GET",
-          url: "https://spectrum.photon.codes/projects/test-project/lines/",
-          urlParams: [["platform", "imessage"]],
+          url: `${base}/users/`,
+          urlParams: [
+            ["type", "shared"],
+            ["limit", "500"],
+          ],
         },
-        {
-          method: "POST",
-          url: "https://spectrum.photon.codes/projects/test-project/lines/",
-          urlParams: [],
-        },
+        { method: "POST", url: `${base}/users/`, urlParams: [] },
         {
           method: "DELETE",
-          url: `https://spectrum.photon.codes/projects/test-project/lines/${fixture.lineId}`,
+          url: `${base}/users/${fixture.userId}/`,
           urlParams: [],
         },
       ]);

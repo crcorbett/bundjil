@@ -255,9 +255,10 @@ const channelInventory = {
     productionRoutingFingerprint: fingerprint("d"),
   },
   photon: {
-    dedicatedLineCount: 1,
-    healthyDedicatedLineCount: 1,
+    approvedSharedUserCount: 1,
+    dedicatedLineCount: 0,
     platformEnabled: true,
+    serviceType: "shared",
     webhookCount: 1,
   },
   sendblue: { lineReady: true, receiveWebhookCount: 1 },
@@ -432,6 +433,34 @@ describe("Production promotion preflight", () => {
         },
       }).pipe(Effect.runSync)
     ).toThrow("Channel Preview and Production namespaces must be distinct");
+  });
+
+  vitestIt("rejects a dedicated or missing Photon shared-user topology", () => {
+    expect(() =>
+      decode({
+        ...channelInventoryReady,
+        channel: {
+          ...channelInventory,
+          photon: {
+            ...channelInventory.photon,
+            dedicatedLineCount: 1,
+            serviceType: "dedicated",
+          },
+        },
+      }).pipe(Effect.runSync)
+    ).toThrow("Expected 0");
+    expect(() =>
+      decode({
+        ...channelInventoryReady,
+        channel: {
+          ...channelInventory,
+          photon: {
+            ...channelInventory.photon,
+            approvedSharedUserCount: 0,
+          },
+        },
+      }).pipe(Effect.runSync)
+    ).toThrow("Expected 1");
   });
 
   it.effect("rejects plain secret bindings and shared identities", () =>

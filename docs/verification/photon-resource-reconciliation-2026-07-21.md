@@ -1,19 +1,19 @@
 ---
 document_type: proof-receipt
-lifecycle: evidence
+lifecycle: inconclusive
 authority: supporting
 owner: bundjil-photon-provider-owner
 observed_at: 2026-07-21T17:02:52Z
 artifact_git_identity: 130cb896fda27d493da8d3789552c9cf3b72541b
 environment: photon-internal-project-resource-reconciliation
-review_trigger: do not refresh; create a new dated receipt after subscription eligibility changes
+review_trigger: do not refresh; current successor is docs/product-specs/photon-channel-provider.md
 ---
 
-# Photon resource reconciliation stop — 2026-07-21
+# Photon dedicated-line reconciliation attempt — 2026-07-21
 
 ## Observation
 
-The user authorised the active Photon line and Production rollout. The operator
+The user authorised Photon CRUD and the Production rollout. The operator
 restricted the ignored Photon credential source from owner/world-readable mode
 `0644` to owner-only mode `0600`, loaded it without emitting values, and ran
 the Schema-encoded resource command from pushed commit
@@ -50,15 +50,20 @@ gate, inspect-only default, exact one-line adoption/create policy, no blind
 create retry, safe receipt, and error boundary. Photon owns the live tier,
 subscription, line, platform, and webhook facts at the readback time.
 
-## Terminal stop and recovery
+## Superseded conclusion and recovery
 
-An active Business subscription must be established through an authorised
-Photon billing surface before the line task can be reopened. Billing-policy
-activation was outside the accepted runbook and could not be performed through
-the documented management API. The create rejection and two zero-line
-readbacks require no provider cleanup.
+The original run concluded that an active Business subscription was required.
+That conclusion was incorrect for Bundjil's use case. Current Photon pricing
+identifies Free as managed-shared iMessage, and the management OpenAPI exposes
+service-type readback, shared-user availability, idempotent shared-user create,
+list, and delete operations. The current SPEC therefore requires service type
+`shared`, one exact approved shared user, and zero dedicated lines. This receipt
+remains useful only as proof that the attempted dedicated-line write was not
+retried and left no provider or billing mutation.
 
 Because the line prerequisite failed, the operator did not create a Preview
 webhook, bind Photon secrets, deploy Vercel Preview, execute inbound/outbound or
 typing operations, touch Sendblue or Upstash, stage Production, or promote a
 domain. Those boundaries remain unproved and unchanged.
+
+Successor: [Schema-driven Channels and Production promotion](../product-specs/photon-channel-provider.md).

@@ -10,18 +10,25 @@ export const PhotonProjectSecret = Schema.Redacted(Schema.NonEmptyString);
 export type PhotonProjectSecret = typeof PhotonProjectSecret.Type;
 export type PhotonProjectSecretEncoded = typeof PhotonProjectSecret.Encoded;
 
-export const PhotonSubscriptionTier = Schema.NonEmptyString.pipe(
-  Schema.brand("@bundjil/photon/PhotonSubscriptionTier")
+export const PhotonUserId = Schema.NonEmptyString.pipe(
+  Schema.brand("@bundjil/photon/PhotonUserId")
 );
-export type PhotonSubscriptionTier = typeof PhotonSubscriptionTier.Type;
-export type PhotonSubscriptionTierEncoded =
-  typeof PhotonSubscriptionTier.Encoded;
+export type PhotonUserId = typeof PhotonUserId.Type;
+export type PhotonUserIdEncoded = typeof PhotonUserId.Encoded;
 
-export const PhotonLineId = Schema.String.check(Schema.isUUID()).pipe(
-  Schema.brand("@bundjil/photon/PhotonLineId")
+export const PhotonE164PhoneNumber = Schema.String.check(
+  Schema.isPattern(/^\+[1-9]\d{6,14}$/)
+).pipe(Schema.brand("@bundjil/photon/PhotonE164PhoneNumber"));
+export type PhotonE164PhoneNumber = typeof PhotonE164PhoneNumber.Type;
+export type PhotonE164PhoneNumberEncoded = typeof PhotonE164PhoneNumber.Encoded;
+
+export const PhotonSharedUserPhoneNumber = Schema.Redacted(
+  PhotonE164PhoneNumber
 );
-export type PhotonLineId = typeof PhotonLineId.Type;
-export type PhotonLineIdEncoded = typeof PhotonLineId.Encoded;
+export type PhotonSharedUserPhoneNumber =
+  typeof PhotonSharedUserPhoneNumber.Type;
+export type PhotonSharedUserPhoneNumberEncoded =
+  typeof PhotonSharedUserPhoneNumber.Encoded;
 
 export const PhotonWebhookId = Schema.String.check(Schema.isUUID()).pipe(
   Schema.brand("@bundjil/photon/PhotonWebhookId")

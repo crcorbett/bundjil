@@ -238,9 +238,10 @@ const ChannelInventory = Schema.Struct({
   legacyReplayRead: Schema.Literal(false),
   namespaces: DistinctChannelNamespaces,
   photon: Schema.Struct({
-    dedicatedLineCount: Schema.Literal(1),
-    healthyDedicatedLineCount: Schema.Literal(1),
+    approvedSharedUserCount: Schema.Literal(1),
+    dedicatedLineCount: Schema.Literal(0),
     platformEnabled: Schema.Literal(true),
+    serviceType: Schema.Literal("shared"),
     webhookCount: Schema.Literal(1),
   }),
   sendblue: Schema.Struct({

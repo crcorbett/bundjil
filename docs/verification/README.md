@@ -32,8 +32,9 @@ operation nor asserts present provider state.
   retains the bounded pre-promotion Photon management/SDK lifecycle receipt;
   it is not Preview, messaging, handset, or Production proof.
 - [`photon-resource-reconciliation-2026-07-21.md`](photon-resource-reconciliation-2026-07-21.md)
-  retains the bounded line/subscription stop. It proves no Preview, message,
-  typing, Sendblue, or Production result.
+  retains the bounded dedicated-line attempt and zero-mutation readback. Its
+  Business-upgrade conclusion is superseded by the current Free managed-shared
+  topology; it proves no Preview, message, typing, Sendblue, or Production result.
 
 ## Claim boundaries
 

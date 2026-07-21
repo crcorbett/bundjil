@@ -15,10 +15,11 @@ send, and typing presence.
 
 Spectrum clients, Spaces, callbacks, SDK/Zod values, raw provider failures,
 and Photon management operations are private implementation details. The
-bounded operator workflow can reconcile one dedicated iMessage line, the
-iMessage platform state, and one webhook by stable provider IDs. Its decoded
-results expose lifecycle status and billing-sync classification only; phone
-numbers and billing amounts do not cross the package boundary.
+bounded operator workflow can reconcile the Free managed-shared iMessage
+service, one exact approved shared user, the iMessage platform state, and one
+webhook by stable provider IDs. Its decoded results expose only service type,
+counts, lifecycle actions, and assignment presence; user and assigned phone
+numbers do not cross the management boundary.
 
 The exact `12.2.0` SDK declarations contain one upstream
 `exactOptionalPropertyTypes` mismatch: the iMessage definition omits optional
@@ -76,12 +77,13 @@ proof.
 
 `bun run --filter @bundjil/photon reconcile:resources` is the bounded hosted
 inventory edge. It defaults to read-only `inspect`; setting
-`BUNDJIL_PHOTON_RESOURCE_MODE=reconcile-line` may enable iMessage and adopt or
-create exactly one healthy dedicated line after active Business-subscription
-readback. Its Schema receipt contains counts, actions, tier/status eligibility,
-and billing-sync classification only.
+`BUNDJIL_PHOTON_RESOURCE_MODE=reconcile-shared-user` with the redacted
+`BUNDJIL_PHOTON_SHARED_USER_PHONE_NUMBER` may enable iMessage and adopt or
+idempotently create the exact approved Free managed-shared user. The accepted
+topology has service type `shared` and zero dedicated lines. Its Schema receipt
+contains only counts, actions, service type, and assignment presence.
 
-Production line, platform, webhook, and deployment reconciliation follows the
-same runbook but remains a distinct promotion workflow. Repository tests and
+Production shared-user, platform, webhook, and deployment reconciliation
+follows the same runbook but remains a distinct promotion workflow. Repository tests and
 the provider-only proof cannot stand in for immutable deployment, signed
 ingress, Eve completion, send acceptance, delivery, or typing-display proof.

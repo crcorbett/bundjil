@@ -2,12 +2,13 @@ import { Schema } from "effect";
 
 export const PhotonProviderProofOperation = Schema.Literals([
   "assert",
-  "createDedicatedLine",
-  "deleteDedicatedLine",
+  "checkSharedAvailability",
+  "createSharedUser",
+  "deleteSharedUser",
   "deleteWebhook",
-  "getSubscription",
+  "getIMessageService",
   "getPlatforms",
-  "listDedicatedLines",
+  "listSharedUsers",
   "listWebhooks",
   "registerWebhook",
   "sdkLifecycle",

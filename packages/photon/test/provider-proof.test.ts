@@ -24,11 +24,12 @@ const fixtures = Effect.gen(function* decodeProviderProofFixtures() {
 });
 
 const unusedProvisioningOperations = {
-  createDedicatedLine: () => Effect.die("unused createDedicatedLine"),
-  deleteDedicatedLine: () => Effect.die("unused deleteDedicatedLine"),
+  checkSharedAvailability: () => Effect.die("unused checkSharedAvailability"),
+  createSharedUser: () => Effect.die("unused createSharedUser"),
+  deleteSharedUser: () => Effect.die("unused deleteSharedUser"),
   getIMessagePlatform: () => Effect.die("unused getIMessagePlatform"),
-  getSubscription: () => Effect.die("unused getSubscription"),
-  listDedicatedLines: () => Effect.die("unused listDedicatedLines"),
+  getIMessageService: () => Effect.die("unused getIMessageService"),
+  listSharedUsers: () => Effect.die("unused listSharedUsers"),
   setIMessagePlatformEnabled: () =>
     Effect.die("unused setIMessagePlatformEnabled"),
 } as const;

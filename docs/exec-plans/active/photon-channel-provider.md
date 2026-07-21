@@ -60,11 +60,12 @@ the owning task, is corrected, and is reverified before closeout.
   `/Users/cooper/Projects/bundjil/.env.photon`; they may be sourced in place and
   must never be copied, printed, logged, committed, or retained in evidence.
 - Photon authority covers project-scoped management-plane and runtime actions,
-  including reversible webhook, platform, line, and test-resource operations.
+  including reversible webhook, platform, shared-user, and test-resource
+  operations.
 - The user directly approved this full Production rollout and all Photon CRUD,
-  including number-line operations, in the current Codex thread on 2026-07-21.
+  in the current Codex thread on 2026-07-21.
   The approval covers only exact runbook-governed Vercel agent deployment and
-  environment operations, Photon project/platform/line/webhook operations,
+  environment operations, Photon project/platform/shared-user/webhook operations,
   reconciliation of the existing Sendblue line/webhook, fresh Upstash
   namespace binding, bounded dual-provider journeys, and their rollback.
 - Every mutation remains stage-bounded by authenticated readback, clean pushed
@@ -85,7 +86,7 @@ The promotion sequence is fixed:
 1. amend the canonical SPEC/tasks/plan and current routers;
 2. extend the Schema-driven preflight, authority, runbook, journey, and proof
    contracts;
-3. reconcile Photon platform/line/webhook state and prove a hosted Preview;
+3. reconcile Photon platform/shared-user/webhook state and prove a hosted Preview;
 4. reconcile Sendblue/Upstash metadata, bind only fresh
    `BUNDJIL_CHANNEL_*` Production configuration, and deploy with domains
    skipped;
@@ -98,12 +99,12 @@ fallback for the other. Sendblue and Photon retain independent provider
 credentials, webhook verification, transport Layers, and provider proof;
 identity, routing, replay, dispatch, and Eve orchestration remain app-owned.
 
-Photon resource reconciliation lists first and adopts one healthy dedicated
-iMessage line if exactly one approved candidate exists. Otherwise it creates
-one line once, records the documented prorated subscription consequence, and
-never retries an ambiguous create before stable-ID inventory reconciliation.
-Webhook registration follows the same list-before-create rule; its signing
-secret is write-only and must flow directly into the target secret binding.
+Photon resource reconciliation requires the Free managed-shared service type,
+checks assignment availability for the exact approved test user, and adopts or
+idempotently creates that shared user. It does not create or delete a dedicated
+line. Webhook registration follows list-before-create reconciliation; its
+signing secret is write-only and must flow directly into the target secret
+binding.
 
 Typing proof is mandatory for both providers. Photon uses the pinned Spectrum
 Space `startTyping` and `stopTyping` operations. Sendblue uses the documented
@@ -225,14 +226,14 @@ internal state/status/test structure:
 
 ### Promotion task progress
 
-| Task                               | Status    | Acceptance receipt                                                                                                                                 |
-| ---------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                         |
-| Build promotion contracts          | Completed | Dual-provider preflight, authority, proof/runbook, line/platform management, 12 journeys, 236 tests, and full gate passed                          |
-| Reconcile Photon and prove Preview | Stopped   | Authenticated readback proved Free tier, active iMessage, zero lines/webhooks; one rejected create left zero lines; no Preview deployment followed |
-| Stage dual-provider Production     | Pending   | —                                                                                                                                                  |
-| Promote and prove Production       | Pending   | —                                                                                                                                                  |
-| Reconcile docs and final audit     | Pending   | —                                                                                                                                                  |
+| Task                               | Status      | Acceptance receipt                                                                                                                               |
+| ---------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                       |
+| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed |
+| Reconcile Photon and prove Preview | In progress | Authenticated service/shared-user/platform/webhook inventory and hosted Preview proof are active                                                 |
+| Stage dual-provider Production     | Pending     | —                                                                                                                                                |
+| Promote and prove Production       | Pending     | —                                                                                                                                                |
+| Reconcile docs and final audit     | Pending     | —                                                                                                                                                |
 
 ## Downstream-impact ledger
 
@@ -256,22 +257,37 @@ internal state/status/test structure:
 | Frontend/browser/generated audits | N/A                                                    | No visible UI or generated documentation surface changes                                                  |
 | Codex/store/eve public contracts  | Preserve                                               | Store is consumed through its existing public atomic service; no other public package contract changes    |
 
-## Current external stop
+## Corrected Free-plan topology
 
-Task 3 reached a target-specific terminal stop on 2026-07-21. The ignored
-credential source was restricted from mode `0644` to `0600`. Authenticated
-Photon readback then proved iMessage enabled, zero dedicated lines, zero
-webhooks, Free tier, no active subscription, and line-creation ineligibility.
-One line-create request was rejected; immediate and later readback both proved
-zero lines, so no ambiguous provider resource or billing mutation remains.
+Task 3 was stopped on 2026-07-21 because the first Production amendment
+incorrectly required a dedicated Business line. Current Photon pricing and API
+contracts show that Free projects use managed-shared iMessage numbers, support
+direct messaging for up to ten users, expose `type: shared`, and allocate a
+number through idempotent project-user creation. The runtime already routes by
+project credentials and opaque Space ID; it consumes no dedicated line ID.
 
-Photon's current OpenAPI describes dedicated line creation as Business-plan
-only and exposes subscription readback but no subscription-upgrade operation.
-The user must activate an eligible Business subscription in Photon before this
-task can be reopened. No Preview webhook, Vercel binding/deployment, message,
-typing operation, Sendblue change, Upstash change, or Production operation
-followed the stop. See the dated
+The rejected line-create observation remains retained as inconclusive evidence
+that no line or billing mutation occurred, but its Business-upgrade conclusion
+is superseded. Task 2 is reopened to replace the preflight, management,
+authority, runbook, journey, and proof contracts. Task 3 resumes only after
+those corrected contracts pass. See the retained
 [`Photon resource reconciliation receipt`](../../verification/photon-resource-reconciliation-2026-07-21.md).
+
+### Corrected-contract docs-maintainer accounting
+
+- **Change required:** this SPEC/task ledger/active plan; Photon package
+  management, reconciler, public exports, tests, command contract, and README;
+  agent Production preflight and tests; Photon runbook; authority and automation
+  registers; Photon critical journey and verification router; the retained
+  failed receipt. Each now owns the Free managed-shared user topology and zero
+  dedicated-line invariant.
+- **Preserve:** provider-neutral Channel contracts, Sendblue implementation and
+  runbook, Effect rules, CI/skills/AGENTS routing, unrelated app/package owners,
+  and immutable completed history.
+- **N/A:** frontend/browser surfaces, public package release, DNS, database
+  migration, generated API docs, and deployment evidence. This correction has
+  not yet changed any provider, secret, webhook, deployment, traffic, or
+  Production state.
 
 ### Task 6 docs-maintainer accounting
 
@@ -324,9 +340,10 @@ identity, and recovery route.
 - For reversible Photon resources: record the pre-operation resource class and
   count, use stable provider IDs only in process memory, read back the intended
   postcondition, delete only resources created by this rollout, and verify the
-  prior count/topology is restored. A lost write response is an uncertain
-  outcome and requires readback before retry.
-- Stop on ambiguous line/Space selection, unverifiable signing semantics,
+  prior count/topology is restored. Shared-user creation is idempotent by exact
+  project/user phone identity; webhook creation still requires URL readback
+  before retry.
+- Stop on ambiguous shared-user/Space selection, unverifiable signing semantics,
   leaked protected data, malformed SDK output, non-idempotent uncertain send,
   resource cleanup failure, provider drift outside the authorised project,
   missing rollback identity, or any request for Vercel/Production/Sendblue

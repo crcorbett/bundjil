@@ -5,6 +5,7 @@ import { layerPhotonManagementLive } from "../src/management.js";
 import { loadPhotonProviderProofConfig } from "../src/provider-proof.js";
 import {
   loadPhotonResourceReconciliationMode,
+  loadPhotonSharedUserPhoneNumber,
   PhotonResourceReconciliationReceipt,
   reconcilePhotonResources,
 } from "../src/resource-reconciliation.js";
@@ -24,7 +25,11 @@ const PhotonResourceReconciliationBlocked = Schema.Struct({
 const command = Effect.gen(function* reconcilePhotonResourcesCommand() {
   const config = yield* loadPhotonProviderProofConfig;
   const mode = yield* loadPhotonResourceReconciliationMode;
-  return yield* reconcilePhotonResources(mode).pipe(
+  const sharedUserPhoneNumber =
+    mode === "reconcile-shared-user"
+      ? yield* loadPhotonSharedUserPhoneNumber
+      : undefined;
+  return yield* reconcilePhotonResources(mode, sharedUserPhoneNumber).pipe(
     Effect.provide(
       layerPhotonManagementLive(config.projectId, config.projectSecret).pipe(
         Layer.provide(BunHttpClient.layer)

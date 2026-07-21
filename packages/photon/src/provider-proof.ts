@@ -15,7 +15,6 @@ import type {
 } from "./schemas.js";
 
 export const PhotonProviderProofReceipt = Schema.Struct({
-  dedicatedLineMutation: Schema.Literal(false),
   finalWebhookCount: Schema.Int.pipe(
     Schema.check(Schema.isGreaterThanOrEqualTo(0))
   ),
@@ -25,6 +24,7 @@ export const PhotonProviderProofReceipt = Schema.Struct({
     Schema.check(Schema.isGreaterThanOrEqualTo(0))
   ),
   sdkLifecycleReleased: Schema.Literal(true),
+  sharedUserMutation: Schema.Literal(false),
   signingSecretObservedOnce: Schema.Literal(true),
   staleProofWebhookRecovered: Schema.Boolean,
   status: Schema.Literal("proved"),
@@ -148,12 +148,12 @@ export const provePhotonProvider = (
       });
     }
     return PhotonProviderProofReceipt.make({
-      dedicatedLineMutation: false,
       finalWebhookCount: final.length,
       managementAuthenticated: true,
       messageMutation: false,
       preexistingWebhookCount: baseline.length,
       sdkLifecycleReleased: true,
+      sharedUserMutation: false,
       signingSecretObservedOnce: attempt.value.signingSecretObservedOnce,
       staleProofWebhookRecovered: staleProofWebhooks.length > 0,
       status: "proved",
