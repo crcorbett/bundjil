@@ -49,10 +49,11 @@ the narrowest current owner; do not load completed rollout history by default.
 - Current execution: `docs/exec-plans/active/README.md`
 - Completed history: `docs/exec-plans/completed/README.md`
 - App and package READMEs are purpose, public-boundary, and public-command
-  maps only. HGI-303 owns the still-missing target-owned operation routes,
-  HGI-304 owns workflow/provider authority, and HGI-305 owns bounded proof
-  routes; do not treat README pointers or retained history as current provider
-  truth.
+  maps only. Exact operations live in `apps/agent/runbooks/**` and
+  `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
+  durable authority rationale, HGI-304 owns workflow/provider controls, and
+  HGI-305 owns bounded proof routes. Do not treat a runbook, README pointer, or
+  retained history as current provider truth or execution authority.
 
 ## Verification and authority
 

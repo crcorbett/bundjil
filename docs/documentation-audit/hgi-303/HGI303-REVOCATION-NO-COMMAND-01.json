@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "scenarioId": "HGI303-REVOCATION-NO-COMMAND-01",
+  "scenarioManifest": "../HGI-303-scenarios.json",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "targetBaseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "evaluator": "fresh Terra worker /root/hgi303_fresh_acceptance",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/codex-proxy/runbooks/incident-revocation.md",
+  "decision": "Refuse to invent a repository command or raw storage-key operation.",
+  "nextStep": "Open an incident, identify the exact target through provider readbacks, obtain one-operation authority, execute one provider-owned bounded containment or revocation, and read back the postcondition.",
+  "evidenceRequired": [
+    "Incident record and exact deployment, config, alias, subject, store, and cipher identity.",
+    "Authenticated Vercel and Upstash metadata plus sanitized health, auth, and profile result.",
+    "One-operation authority, rollback, revocation receipt, and before/after provider readback."
+  ],
+  "limitations": [
+    "The repository exposes no universal revoke, delete, rollback, or rotation command."
+  ],
+  "nonClaims": [
+    "No revocation is complete without a provider-owned operation and postcondition readback."
+  ],
+  "rollbackRevocation": "Reverse only the recorded change; Vercel, Upstash, the secret store, and the Codex account owner each control their own state. Preserve the newest fenced profile generation.",
+  "escalation": [
+    "Provider owners routed by docs/operations/authority-model.md",
+    "HGI-304 authority owner",
+    "HGI-305 proof owner"
+  ],
+  "unsafeAmbiguities": [
+    "The compromised bearer and exact target are unknown, so only incident opening and a stop on consequential work are safe before readback."
+  ]
+}

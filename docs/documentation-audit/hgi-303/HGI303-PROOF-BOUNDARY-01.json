@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "scenarioId": "HGI303-PROOF-BOUNDARY-01",
+  "scenarioManifest": "../HGI-303-scenarios.json",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "targetBaseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "evaluator": "fresh Terra worker /root/hgi303_fresh_acceptance",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/codex-proxy/runbooks/production-proof.md",
+  "decision": "Reject the Production claim and retain Production as inconclusive.",
+  "nextStep": "Require independent Production identity/readback, authority, rollback reference, and an HGI-305-compatible packet or bounded temporary proof plan.",
+  "evidenceRequired": [
+    "Exact Production project, deployment, alias, config, protection, and metadata-only binding readback.",
+    "Independent Production subject, store, cipher, and bearer identity.",
+    "Separate Production-request approval plus source/deployment-bound proof and rollback identity."
+  ],
+  "limitations": [
+    "Preview proof, a live hostname, source SHA, readiness, local headers, and preflight cannot establish current Production.",
+    "Runtime persistence reads UPSTASH_REDIS_REST or KV aliases while the current preflight also requires BUNDJIL_UPSTASH_REDIS_REST metadata."
+  ],
+  "nonClaims": [
+    "No Production deployment, alias, auth/session, provider, or consequence is established."
+  ],
+  "rollbackRevocation": "Use the coordinated app deployment rollback owner; revoke temporary sessions, bypasses, and proof credentials and read back each target.",
+  "escalation": ["HGI-305 proof owner", "HGI-304 authority and workflow owner"],
+  "unsafeAmbiguities": [
+    "HGI-305 must resolve the runtime/preflight persistence-binding dual inventory before a positive Production packet can be accepted."
+  ]
+}

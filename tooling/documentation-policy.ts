@@ -149,11 +149,13 @@ const isCurrentMetadataOwner = (path: string) =>
   path === "ARCHITECTURE.md" ||
   path === "docs/README.md" ||
   path === "docs/documentation-audit/README.md" ||
+  path === "docs/operations/authority-model.md" ||
   path === "docs/product-specs/index.md" ||
   path === "docs/product-specs/harness-governance-documentation.md" ||
   /^docs\/architecture\/(?!legacy-atlas\.md$).+\.md$/.test(path) ||
   /^docs\/exec-plans\/active\/.+\.md$/.test(path) ||
-  path === "docs/exec-plans/completed/README.md";
+  path === "docs/exec-plans/completed/README.md" ||
+  /^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(path);
 
 const validDate = (value: string) => {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -462,6 +464,7 @@ const commandFindings = (
     if (
       !snapshot.ownerPolicy.owners.includes(file.path) &&
       !/^(apps|packages)\/[^/]+\/README\.md$/.test(file.path) &&
+      !/^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(file.path) &&
       !/^\.agents\/skills\/(effect-client-wrapper|package-structure|prd-implementer|prd-review|prd-writer)\/SKILL\.md$/.test(
         file.path
       )
@@ -520,7 +523,8 @@ const portabilityFindings = (
     .filter(
       (file) =>
         snapshot.ownerPolicy.owners.includes(file.path) ||
-        /^\.agents\/skills\/.+\.md$/.test(file.path)
+        /^\.agents\/skills\/.+\.md$/.test(file.path) ||
+        /^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(file.path)
     )
     .flatMap((file) =>
       (file.content.match(/\/Users\/[^/\s]+\//g) ?? []).map((value) =>
@@ -720,6 +724,273 @@ const occurrenceControlFindings = (
   return [];
 };
 
+const requiredRunbookPaths = [
+  "apps/agent/runbooks/local-development.md",
+  "apps/agent/runbooks/deploy-promote.md",
+  "apps/agent/runbooks/executor.md",
+  "apps/agent/runbooks/sendblue.md",
+  "apps/agent/runbooks/incident-revocation.md",
+  "apps/codex-proxy/runbooks/local-auth.md",
+  "apps/codex-proxy/runbooks/preview-proof.md",
+  "apps/codex-proxy/runbooks/production-proof.md",
+  "apps/codex-proxy/runbooks/reauthentication.md",
+  "apps/codex-proxy/runbooks/incident-revocation.md",
+] as const;
+
+const requiredRunbookRoutePaths = [
+  "apps/agent/runbooks/README.md",
+  "apps/codex-proxy/runbooks/README.md",
+  "docs/operations/authority-model.md",
+  ...requiredRunbookPaths,
+] as const;
+
+const requiredRunbookHeadings = [
+  "## Scope and non-claims",
+  "## Preconditions",
+  "## Authority envelope",
+  "## Inputs and secret handling",
+  "## Procedure",
+  "## Evidence and postcondition",
+  "## Rollback and revocation",
+  "## Stop and escalation",
+  "## Readback fallback",
+  "## Maintenance",
+] as const;
+
+const requiredAuthorityTerms = [
+  "Identity",
+  "Operation",
+  "Resource",
+  "Environment",
+  "Duration/revocation",
+  "Approval",
+  "Receipt",
+] as const;
+
+const hasRunbookRoute = (repositoryPaths: readonly string[]) =>
+  repositoryPaths.some(
+    (path) =>
+      path.startsWith("apps/agent/runbooks/") ||
+      path.startsWith("apps/codex-proxy/runbooks/") ||
+      path === "docs/operations/authority-model.md"
+  );
+
+const missingRunbookRouteFindings = (
+  repositoryPaths: readonly string[]
+): readonly DocumentationFinding[] => {
+  const paths = new Set(repositoryPaths);
+  return requiredRunbookRoutePaths.flatMap((path) =>
+    paths.has(path)
+      ? []
+      : [
+          finding(
+            "DOC-RUNBOOK-INVENTORY",
+            "HGI-303 retains two target-owned indexes, ten runbooks, and one durable authority model",
+            "bundjil-app-operators",
+            path,
+            `Restore the required target-owned route ${path}`,
+            "Required HGI-303 route is missing"
+          ),
+        ]
+  );
+};
+
+const runbookIndexFindings = (
+  files: readonly DocumentationFile[]
+): readonly DocumentationFinding[] => [
+  ...indexCoverage(
+    files,
+    "apps/agent/runbooks/README.md",
+    /^apps\/agent\/runbooks\/(?!README\.md$).+\.md$/,
+    "Agent runbook inventory"
+  ),
+  ...indexCoverage(
+    files,
+    "apps/codex-proxy/runbooks/README.md",
+    /^apps\/codex-proxy\/runbooks\/(?!README\.md$).+\.md$/,
+    "Codex proxy runbook inventory"
+  ),
+];
+
+const runbookStructureFindings = (
+  file: DocumentationFile,
+  owner: string
+): readonly DocumentationFinding[] => {
+  const missing = requiredRunbookHeadings.filter(
+    (heading) => !file.content.includes(heading)
+  );
+  return missing.length === 0
+    ? []
+    : [
+        finding(
+          "DOC-RUNBOOK-STRUCTURE",
+          "Every app runbook carries the complete sequential operating contract",
+          owner,
+          file.path,
+          `Restore the missing sections: ${missing.join(", ")}`,
+          `Missing sections: ${missing.join(", ")}`
+        ),
+      ];
+};
+
+const runbookAuthorityFindings = (
+  file: DocumentationFile,
+  owner: string
+): readonly DocumentationFinding[] => {
+  const lowered = file.content.toLocaleLowerCase("en");
+  const missing: string[] = requiredAuthorityTerms.filter(
+    (term) => !lowered.includes(term.toLocaleLowerCase("en"))
+  );
+  for (const required of [
+    "observedAt",
+    "inconclusive",
+    "never healthy",
+  ] as const) {
+    if (!file.content.includes(required)) {
+      missing.push(required);
+    }
+  }
+  return missing.length === 0
+    ? []
+    : [
+        finding(
+          "DOC-RUNBOOK-AUTHORITY",
+          "Every app runbook records authority, just-in-time evidence, and unavailable-readback behavior",
+          owner,
+          file.path,
+          `Add the missing authority/readback terms: ${missing.join(", ")}`,
+          `Missing terms: ${missing.join(", ")}`
+        ),
+      ];
+};
+
+const runbookMetadataFindings = (
+  file: DocumentationFile,
+  metadata: Frontmatter | undefined,
+  owner: string
+): readonly DocumentationFinding[] =>
+  metadata?.["document_type"] === "runbook" &&
+  metadata["lifecycle"] === "current" &&
+  metadata["authority"] === "canonical"
+    ? []
+    : [
+        finding(
+          "DOC-RUNBOOK-METADATA",
+          "Every operational member is a current canonical runbook with an explicit owner",
+          owner,
+          file.path,
+          "Restore document_type runbook, lifecycle current, authority canonical, owner, and review trigger",
+          `document_type=${metadata?.["document_type"] ?? "missing"}; lifecycle=${metadata?.["lifecycle"] ?? "missing"}; authority=${metadata?.["authority"] ?? "missing"}`
+        ),
+      ];
+
+const runbookSecretFindings = (
+  file: DocumentationFile,
+  owner: string
+): readonly DocumentationFinding[] => {
+  const secretAssignment =
+    /\b(?:BUNDJIL|UPSTASH|KV|VERCEL|SENDBLUE)_[A-Z0-9_]+\s*=\s*(?!["']?\$|["']?<)[^\s`]+/u.exec(
+      file.content
+    );
+  const bearerLiteral = /\bBearer\s+(?!\$|<|\{)[A-Za-z0-9._~+/-]{12,}/u.exec(
+    file.content
+  );
+  const exposed = secretAssignment?.[0] ?? bearerLiteral?.[0];
+  return exposed === undefined
+    ? []
+    : [
+        finding(
+          "DOC-RUNBOOK-SECRET",
+          "Runbooks name secret inputs without embedding values or bearer material",
+          owner,
+          file.path,
+          "Remove the value and keep only the variable/binding name plus the approved secret-loading route",
+          exposed
+        ),
+      ];
+};
+
+const runbookClaimFindings = (
+  file: DocumentationFile,
+  owner: string
+): readonly DocumentationFinding[] => {
+  const segments = semanticSegments(file.content);
+  const actuality = segments.find((segment) =>
+    /\b(?:is|are) (?:currently )?(?:deployed|active|running|ready|operational) (?:in|on|to) (?:production|preview)\b/u.test(
+      segment
+    )
+  );
+  const toolAuthority = segments.find((segment) =>
+    /\b(?:successful|passing|passed) (?:command|preflight|tool|readback|probe)[^.;]*(?:authorizes|approves|grants|permits)\b/u.test(
+      segment
+    )
+  );
+  const unsafeClaim = actuality ?? toolAuthority;
+  return unsafeClaim === undefined
+    ? []
+    : [
+        finding(
+          "DOC-RUNBOOK-CLAIM",
+          "Runbooks do not convert undated provider actuality or tool output into authority",
+          owner,
+          file.path,
+          "Replace the standing claim with a dated target-owned readback, explicit non-claim, and separate approval receipt",
+          unsafeClaim
+        ),
+      ];
+};
+
+const runbookMemberFindings = (
+  file: DocumentationFile
+): readonly DocumentationFinding[] => {
+  const metadata = parseFrontmatter(file);
+  const owner = metadata?.["owner"] ?? "bundjil-app-operators";
+  return [
+    ...runbookStructureFindings(file, owner),
+    ...runbookAuthorityFindings(file, owner),
+    ...runbookMetadataFindings(file, metadata, owner),
+    ...runbookSecretFindings(file, owner),
+    ...runbookClaimFindings(file, owner),
+  ];
+};
+
+const competingRunbookOwnerFindings = (
+  repositoryPaths: readonly string[]
+): readonly DocumentationFinding[] =>
+  repositoryPaths.some((path) => path.startsWith("docs/runbooks/"))
+    ? [
+        finding(
+          "DOC-RUNBOOK-OWNER",
+          "Agent and proxy operations remain with their target apps",
+          "bundjil-documentation-owner",
+          "docs/runbooks/",
+          "Move the operation to the owning app runbook and retain only durable authority rationale centrally",
+          "A competing central runbook path exists"
+        ),
+      ]
+    : [];
+
+const runbookFindings = (
+  files: readonly DocumentationFile[],
+  repositoryPaths: readonly string[]
+): readonly DocumentationFinding[] => {
+  if (!hasRunbookRoute(repositoryPaths)) {
+    return [];
+  }
+
+  const byPath = new Map(files.map((file) => [file.path, file]));
+  const memberIssues = requiredRunbookPaths.flatMap((path) => {
+    const file = byPath.get(path);
+    return file === undefined ? [] : runbookMemberFindings(file);
+  });
+  return [
+    ...missingRunbookRouteFindings(repositoryPaths),
+    ...runbookIndexFindings(files),
+    ...memberIssues,
+    ...competingRunbookOwnerFindings(repositoryPaths),
+  ];
+};
+
 const compareFindings = (
   left: DocumentationFinding,
   right: DocumentationFinding
@@ -760,6 +1031,7 @@ export const auditDocumentation = (
     ...portabilityFindings(snapshot),
     ...contradictionFindings(snapshot),
     ...occurrenceControlFindings(snapshot.files),
+    ...runbookFindings(snapshot.files, snapshot.repositoryPaths),
   ].toSorted(compareFindings);
   const shownFindings = Math.min(options.maxFindings, findings.length);
   return {

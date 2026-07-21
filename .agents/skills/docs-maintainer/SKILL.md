@@ -40,8 +40,9 @@ inspected owner or call graph is incomplete.
 - Put repeatable consequential operations only in the target app's runbook,
   with preconditions, identity, operation, resource, environment,
   duration/revocation, approval, sequential steps, evidence, rollback, and
-  escalation. Record an ownership gap while the HGI-303 routes are absent;
-  never copy procedures into this skill, architecture, or a README.
+  escalation. Route agent operations to `apps/agent/runbooks/**` and proxy/auth
+  operations to `apps/codex-proxy/runbooks/**`; never copy procedures into this
+  skill, architecture, or a README.
 - Put one-run observations in dated, addressable evidence with artifact,
   environment, actor/authority, `observedAt`, digest, postcondition,
   limitations, non-claims, and rollback identity.

@@ -37,13 +37,15 @@ standing deployment assertion or an operating procedure.
 - Historical Codex provider, storage, and proxy rollout provenance:
   [`docs/product-specs/`](../../docs/product-specs/index.md) and
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
-- Repeatable deployment, credential, incident, rollback, and recovery
-  procedures have no canonical repository owner yet; HGI-303 must create the
-  target-owned runbooks before such operations are performed from repository
-  documentation.
+- Repeatable local-authentication, Preview/Production proof,
+  reauthentication, deployment, credential, incident, rollback, and recovery
+  procedures are owned by [`runbooks/`](runbooks/README.md). They require
+  just-in-time target readback and an explicit authority envelope before
+  consequential steps.
 - Dated provider/deployment observations have no canonical repository owner
   yet; HGI-305 must create bounded verification owners. External systems remain
   authoritative for current state.
 
 Do not add provider actuality, provisioning sequences, credentials, deployment
-identities, incident steps, rollback procedures, or proof records here.
+identities, incident steps, rollback procedures, or proof records here; update
+the target-owned runbook and only this pointer when routing changes.

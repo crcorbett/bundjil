@@ -55,6 +55,17 @@ HGI-310 skill evidence:
 - [`hgi-310/HGI310-PROOF-LIFECYCLE-01.json`](hgi-310/HGI310-PROOF-LIFECYCLE-01.json)
 - [`hgi-310/HGI310-PORTABLE-01.json`](hgi-310/HGI310-PORTABLE-01.json)
 
+HGI-303 runbook and authority evidence:
+
+- [`HGI-303-candidate.json`](HGI-303-candidate.json)
+- [`HGI-303-scenarios.json`](HGI-303-scenarios.json)
+- [`hgi-303/HGI303-DEPLOY-STOP-01.json`](hgi-303/HGI303-DEPLOY-STOP-01.json)
+- [`hgi-303/HGI303-EXECUTOR-RESUME-01.json`](hgi-303/HGI303-EXECUTOR-RESUME-01.json)
+- [`hgi-303/HGI303-SENDBLUE-INCONCLUSIVE-01.json`](hgi-303/HGI303-SENDBLUE-INCONCLUSIVE-01.json)
+- [`hgi-303/HGI303-PROOF-BOUNDARY-01.json`](hgi-303/HGI303-PROOF-BOUNDARY-01.json)
+- [`hgi-303/HGI303-REAUTH-SUBJECT-01.json`](hgi-303/HGI303-REAUTH-SUBJECT-01.json)
+- [`hgi-303/HGI303-REVOCATION-NO-COMMAND-01.json`](hgi-303/HGI303-REVOCATION-NO-COMMAND-01.json)
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

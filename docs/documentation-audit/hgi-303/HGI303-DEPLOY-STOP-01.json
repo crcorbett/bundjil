@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "scenarioId": "HGI303-DEPLOY-STOP-01",
+  "scenarioManifest": "../HGI-303-scenarios.json",
+  "scenarioManifestSha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa",
+  "targetBaseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "evaluator": "fresh Terra worker /root/hgi303_fresh_acceptance",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "status": "passed",
+  "selectedOwner": "apps/agent/runbooks/deploy-promote.md",
+  "decision": "Stop before preflight and every mutation.",
+  "nextStep": "Obtain authenticated target-specific Vercel metadata, a 0600 sanitized snapshot, stage-matched approval, and distinct current/previous rollback identity.",
+  "evidenceRequired": [
+    "Authenticated Vercel identity and scope plus project, environment, deployment, alias, protection, and metadata-only variable inventory.",
+    "Approval receipt matching source SHA, stage, target, operation, duration, and rollback.",
+    "Snapshot digest, fresh preflight result, and current/previous rollback references."
+  ],
+  "limitations": [
+    "Repository source and tests cannot establish current Vercel state or a Production consequence."
+  ],
+  "nonClaims": [
+    "Clean pushed code and passing tests neither prove Production nor authorize deploy or promotion."
+  ],
+  "rollbackRevocation": "A separately authorized Vercel rollback may use only the recorded distinct previous deployment; then re-read the target and revoke the Vercel session/token separately.",
+  "escalation": [
+    "Vercel project owner",
+    "Codex proxy operator",
+    "Sendblue owner",
+    "HGI-304 authority owner"
+  ],
+  "unsafeAmbiguities": []
+}

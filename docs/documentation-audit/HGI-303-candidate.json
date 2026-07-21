@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-303",
+  "status": "candidate",
+  "observedAt": "2026-07-21T14:09:31+01:00",
+  "authority": "repository-local runbook, documentation, policy, test, scenario, and evidence writes only; source audits and fresh evaluators were read-only; no provider, workflow, deployment, credential, message, approval-resume, release, or production operation",
+  "baseCommit": "45fc7f2149ca9a0e10d21bb1e0d4cbbfe71a84db",
+  "candidatePathCount": 37,
+  "sortedCandidatePathSha256": "3f16305b9e9d23e44c744c4fe92a86aee37e24b5210aff0c7dd50b1c01b9e31e",
+  "artifacts": [
+    {
+      "path": "apps/agent/runbooks/README.md",
+      "sha256": "12d637c9c83b06d50c87f680ada17a6b8ae9e13a2597a18ea767c817ed7e2af7"
+    },
+    {
+      "path": "apps/codex-proxy/runbooks/README.md",
+      "sha256": "921a1d5ed7135d3ab0e6cecfbbabfaa762e155c43c682e3872ff474dbd2fa2dd"
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "sha256": "4cb7cbe9eeec2a7f662cd8219b01504fabd956c1e1f4565cbedf3b01b6d01322"
+    },
+    {
+      "path": "tooling/documentation-policy.ts",
+      "sha256": "e6504e305d1546e9761ede7cfeed16b290a2ad431f0b36b59491b3ea9f1c18d3"
+    },
+    {
+      "path": "tooling/documentation-policy-audit.test.ts",
+      "sha256": "5ce12a977eed2152150bdf7a263253b7e61f3deba7418f686447964cba41b0f6"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-303-scenarios.json",
+      "sha256": "876eed5d3caa605afccff715d0428a1cb8b8b537d422fd5d1effcc2a605d71aa"
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "Target-owned runbooks and authority records",
+      "decision": "change-required",
+      "owners": [
+        "apps/agent/runbooks/**",
+        "apps/codex-proxy/runbooks/**",
+        "docs/operations/authority-model.md"
+      ],
+      "result": "Two app indexes route exactly five runbooks each; every member separates preflight, mutation authority, evidence, rollback/revocation, stop, fallback, and escalation. Central docs retain rationale and pointers only."
+    },
+    {
+      "surface": "Root, app, and package READMEs",
+      "decision": "change-required",
+      "owners": [
+        "AGENTS.md",
+        "docs/README.md",
+        "apps/agent/README.md",
+        "apps/codex-proxy/README.md",
+        "packages/codex/README.md"
+      ],
+      "result": "Missing-owner text was replaced by concise routes; no provider actuality, procedure, credential, or proof record was copied into a README."
+    },
+    {
+      "surface": "Executable documentation policy, lint, config, and commands",
+      "decision": "change-required",
+      "owners": [
+        "tooling/documentation-policy.ts",
+        "tooling/documentation-policy-audit.test.ts",
+        "tooling/documentation/current-owner-policy.json"
+      ],
+      "result": "The docs gate enforces the exact inventory, app indexes, metadata, sequential authority shape, just-in-time/unavailable behavior, command ownership, portability, secret safety, claim separation, and absence of a competing central runbook tree."
+    },
+    {
+      "surface": "Repository-local skills",
+      "decision": "change-required",
+      "owners": [
+        ".agents/skills/docs-maintainer/SKILL.md",
+        ".agents/skills/docs-maintainer/references/repository-profile.md"
+      ],
+      "result": "The maintenance route now points to the implemented app owners and stops at their authority gates; it no longer describes the routes as absent or future."
+    },
+    {
+      "surface": "Active SPEC, task, plan, lifecycle, and receipts",
+      "decision": "change-required",
+      "owners": [
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/exec-plans/active/harness-governance-documentation.md",
+        "docs/documentation-audit/HGI-303-scenarios.json",
+        "docs/documentation-audit/hgi-303/**"
+      ],
+      "result": "HGI-303 is in progress; six addressable fresh-context packets preserve owner selection, stops, evidence, limitations, non-claims, rollback/revocation, escalation, and the deferred HGI-305 binding ambiguity."
+    },
+    {
+      "surface": "API/generated references, package exports, React, and implementation source",
+      "decision": "preserve",
+      "owners": [
+        "apps/agent/**",
+        "apps/codex-proxy/**",
+        "packages/codex/**",
+        "packages/store/**"
+      ],
+      "result": "Source was read to derive commands and contracts but no API, Schema, service, Layer, package export, React route, provider adapter, workflow, or runtime behavior changed."
+    },
+    {
+      "surface": "External provider state and operations",
+      "decision": "not-applicable-to-execution",
+      "owners": [
+        "Vercel",
+        "Executor",
+        "Sendblue",
+        "Upstash",
+        "Codex account",
+        "GitHub",
+        "secret store"
+      ],
+      "result": "No provider or environment-value access occurred. Runbooks define readback shapes and stop when unavailable; they do not claim current state or grant mutation authority."
+    }
+  ],
+  "checks": [
+    {
+      "check": "target-owned inventory and semantic policy",
+      "status": "passed",
+      "result": "check:docs passed 219 selected files; six documentation-policy tests and all 43 tooling tests passed, including missing inventory/section, secret assignment, provider actuality, and tool-authority mutations."
+    },
+    {
+      "check": "skill routes",
+      "status": "passed",
+      "result": "check:skills passed 167 files and 16 mirrors after the docs-maintainer route changed from future/missing owners to the implemented app trees."
+    },
+    {
+      "check": "fresh-context authority scenarios",
+      "status": "passed",
+      "result": "One fresh Terra evaluator selected the correct owner and stopped safely in all six deployment, Executor, Sendblue, proof-boundary, reauthentication, and unsupported-revocation scenarios."
+    },
+    {
+      "check": "formatting and static analysis",
+      "status": "passed",
+      "result": "Ultracite formatting and type-aware static analysis passed after the runbook policy was decomposed under the repository complexity limit."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundary/docs/skill controls, 43 tooling tests, Ultracite, lint fixture, Knip, five typechecks, and 250 package/app tests passed with a schema-valid synthetic Executor configuration and no provider call."
+    }
+  ],
+  "limitations": [
+    "Runbook, source, local-check, and fresh-context success do not prove Vercel, Executor, Sendblue, Upstash, Codex-account, secret, deployment, webhook, message, credential, approval, release, or production state.",
+    "The current Production preflight requires BUNDJIL_UPSTASH_REDIS_REST metadata while the runtime reads UPSTASH_REDIS_REST or KV aliases; the Production runbook stops on the ambiguity and HGI-305 must resolve it before a positive Production packet.",
+    "HGI-304 still owns workflow/provider authority and HGI-305 still owns bounded critical-journey proof and improved blocked/preflight receipts."
+  ],
+  "nonClaims": [
+    "No provider, environment value, ignored local file, workflow, deployment, credential, secret, webhook, message, approval resume, profile, database, release, or production system was read or changed.",
+    "A runbook, tool result, passing preflight, local check, fresh evaluator, or old receipt grants no external-operation authority."
+  ],
+  "rollback": "Revert the two app runbook trees, durable authority model, policy/tests, README/skill routing, active task/plan state, and HGI-303 evidence together; preserve source code and all previously accepted HGI-300 through HGI-310 evidence."
+}

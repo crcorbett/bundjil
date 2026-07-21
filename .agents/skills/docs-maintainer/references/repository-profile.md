@@ -21,8 +21,8 @@ work. Durable output uses repository-relative paths only.
 | Documentation classes, lifecycle, truth layers, and archives                               | `docs/README.md`                                                                                            | `docs/product-specs/index.md`, active/completed plan index, or audit index as applicable   |
 | Repository, package, export, and source-condition ownership                                | `docs/architecture/repo-structure.md` and owning code/config                                                | Affected app/package README when its consumer contract changes                             |
 | Effect Schema, services, errors, Config, Layers, codecs, and helper admission              | `docs/architecture/effect-patterns.md` and owning app/package code                                          | Owning README and focused boundary/service tests when public behavior changes              |
-| Agent/Eve, channel, Executor, Sendblue, model-provider, and tool boundary                  | `docs/architecture/eve-agent.md` and `apps/agent/**`                                                        | `apps/agent/README.md`; future `apps/agent/runbooks/**` for repeatable operations          |
-| Codex proxy, HTTP, auth, mode, provider, profile, and storage boundary                     | `apps/codex-proxy/**`, `packages/codex/**`, and `docs/architecture/repo-structure.md`                       | App/package README; future `apps/codex-proxy/runbooks/**` for repeatable operations        |
+| Agent/Eve, channel, Executor, Sendblue, model-provider, and tool boundary                  | `docs/architecture/eve-agent.md` and `apps/agent/**`                                                        | `apps/agent/README.md`; `apps/agent/runbooks/**` for repeatable operations                 |
+| Codex proxy, HTTP, auth, mode, provider, profile, and storage boundary                     | `apps/codex-proxy/**`, `packages/codex/**`, and `docs/architecture/repo-structure.md`                       | App/package README; `apps/codex-proxy/runbooks/**` for repeatable operations               |
 | Upstash/provider-neutral persistence                                                       | `packages/store/**` and `docs/architecture/repo-structure.md`                                               | `packages/store/README.md`; target app runbook for consequential provider operation        |
 | React route, leaf ownership, loading/error/fallback state, and URL state                   | `docs/architecture/frontend-composition.md` and owning app code                                             | Affected app/design README and browser journey when visible behavior changes               |
 | Lint, formatting, TypeScript, boundary exceptions, tests, build, Turbo, and CI             | Executable config, `lint/**`, `tooling/**`, workflow source, and `docs/architecture/testing-and-quality.md` | Root/app/package README only where a supported command changes                             |
@@ -35,15 +35,16 @@ work. Durable output uses repository-relative paths only.
 
 ## Runbook and authority boundaries
 
-HGI-303 owns the future app-local runbook trees:
+HGI-303 establishes the app-local runbook trees:
 
 - `apps/agent/runbooks/**` for Eve, Sendblue, Executor, Vercel app deployment,
   configuration, incident, rollback, and recovery operations;
 - `apps/codex-proxy/runbooks/**` for proxy deployment, auth/credentials,
   provider proof, incident, rollback, and recovery operations.
 
-Until those routes exist, record the missing owner and stop before directing a
-consequential operation. Do not create `docs/runbooks/**` as a competing owner.
+Use those routes for exact operations and stop at their authority gate when a
+target readback, identity, approval, rollback, or revocation owner is missing.
+Do not create `docs/runbooks/**` as a competing owner.
 
 HGI-304 owns workflow/provider authority. Any consequential procedure must
 record principal, identity source, operation, resource, environment,

@@ -37,13 +37,15 @@ does not grant deployment authority or establish current provider state.
 - Historical Eve, Executor, Sendblue, and model-provider rollout provenance:
   [`docs/product-specs/`](../../docs/product-specs/index.md) and retained
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
-- Repeatable deployment, provider configuration, incident, rollback, and
-  recovery procedures have no canonical repository owner yet; HGI-303 must
-  create target-owned runbooks.
+- Repeatable local, deployment/promotion, Executor, Sendblue, incident,
+  rollback, and recovery procedures are owned by
+  [`runbooks/`](runbooks/README.md). They require just-in-time target readback
+  and an explicit authority envelope before consequential steps.
 - Dated deployment, webhook, provider, and critical-journey observations have
   no canonical repository owner yet; HGI-305 must create bounded verification
   owners. External systems remain authoritative for current state.
 
 Do not add provider actuality, deployment identifiers, credentials,
 provisioning sequences, incident steps, rollback procedures, or proof records
-here.
+here; update the target-owned runbook and only this pointer when routing
+changes.

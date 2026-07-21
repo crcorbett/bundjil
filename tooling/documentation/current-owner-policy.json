@@ -10,11 +10,14 @@
     "docs/architecture/frontend-composition.md",
     "docs/architecture/repo-structure.md",
     "docs/architecture/testing-and-quality.md",
+    "docs/operations/authority-model.md",
     "docs/product-specs/index.md",
     "docs/product-specs/harness-governance-documentation.md",
     "docs/exec-plans/active/README.md",
     "docs/exec-plans/active/harness-governance-documentation.md",
-    "apps/agent/agent/instructions.md"
+    "apps/agent/agent/instructions.md",
+    "apps/agent/runbooks/README.md",
+    "apps/codex-proxy/runbooks/README.md"
   ],
   "acceptedTaskStates": {
     "HGI-300": "completed",

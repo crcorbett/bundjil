@@ -118,6 +118,95 @@ const run = (input: DocumentationSnapshot, maxFindings = 20) =>
     maxFindings,
   });
 
+const runbookPaths = {
+  agent: [
+    "local-development.md",
+    "deploy-promote.md",
+    "executor.md",
+    "sendblue.md",
+    "incident-revocation.md",
+  ],
+  proxy: [
+    "local-auth.md",
+    "preview-proof.md",
+    "production-proof.md",
+    "reauthentication.md",
+    "incident-revocation.md",
+  ],
+} as const;
+
+const runbookMetadata = (documentType: string, owner: string) =>
+  [
+    "---",
+    `document_type: ${documentType}`,
+    "lifecycle: current",
+    "authority: canonical",
+    `owner: ${owner}`,
+    "last_reviewed: 2026-07-21",
+    "review_trigger: fixture changes",
+    "---",
+  ].join("\n");
+
+const runbookFixture = (path: string, owner: string): DocumentationFile => ({
+  content: [
+    runbookMetadata("runbook", owner),
+    "# Fixture runbook",
+    "## Scope and non-claims",
+    "No provider claim.",
+    "## Preconditions",
+    "Inspect the target.",
+    "## Authority envelope",
+    "Identity Operation Resource Environment Duration/revocation Approval Receipt",
+    "## Inputs and secret handling",
+    "Name inputs only.",
+    "## Procedure",
+    "Stop before consequence.",
+    "## Evidence and postcondition",
+    "Record observedAt.",
+    "## Rollback and revocation",
+    "Use the target owner.",
+    "## Stop and escalation",
+    "Escalate unknown state.",
+    "## Readback fallback",
+    "Mark inconclusive; unavailable is never healthy.",
+    "## Maintenance",
+    "Review on change.",
+  ].join("\n\n"),
+  path,
+});
+
+const runbookFixtureFiles: readonly DocumentationFile[] = [
+  {
+    content: [
+      runbookMetadata("runbook-index", "bundjil-agent-operator"),
+      "# Agent runbooks",
+      ...runbookPaths.agent.map((path) => `- [${path}](${path})`),
+    ].join("\n"),
+    path: "apps/agent/runbooks/README.md",
+  },
+  ...runbookPaths.agent.map((path) =>
+    runbookFixture(`apps/agent/runbooks/${path}`, "bundjil-agent-operator")
+  ),
+  {
+    content: [
+      runbookMetadata("runbook-index", "bundjil-codex-proxy-operator"),
+      "# Proxy runbooks",
+      ...runbookPaths.proxy.map((path) => `- [${path}](${path})`),
+    ].join("\n"),
+    path: "apps/codex-proxy/runbooks/README.md",
+  },
+  ...runbookPaths.proxy.map((path) =>
+    runbookFixture(
+      `apps/codex-proxy/runbooks/${path}`,
+      "bundjil-codex-proxy-operator"
+    )
+  ),
+  {
+    content: `${runbookMetadata("authority-model", "bundjil-security-automation-maintainer")}\n\n# Authority model`,
+    path: "docs/operations/authority-model.md",
+  },
+];
+
 describe("HGI-302 documentation policy", () => {
   it("accepts a coherent current-owner snapshot", () => {
     const report = run(snapshot());
@@ -295,5 +384,77 @@ describe("HGI-302 documentation policy", () => {
     expect(
       decoded.findings.some((issue) => issue.detail.length > 240)
     ).toBeTruthy();
+  });
+
+  it("enforces the HGI-303 runbook inventory, authority shape, secret safety, and claim boundary", () => {
+    const coherentFiles = [...baseFiles, ...runbookFixtureFiles];
+    expect(
+      run(snapshot(coherentFiles)).findings.filter((issue) =>
+        issue.code.startsWith("DOC-RUNBOOK")
+      )
+    ).toStrictEqual([]);
+
+    const mutations: readonly [string, readonly DocumentationFile[]][] = [
+      [
+        "DOC-RUNBOOK-INVENTORY",
+        coherentFiles.filter(
+          (file) => file.path !== "apps/agent/runbooks/executor.md"
+        ),
+      ],
+      [
+        "DOC-RUNBOOK-STRUCTURE",
+        coherentFiles.map((file) =>
+          file.path === "apps/agent/runbooks/local-development.md"
+            ? {
+                ...file,
+                content: file.content.replace("## Preconditions", "## Setup"),
+              }
+            : file
+        ),
+      ],
+      [
+        "DOC-RUNBOOK-SECRET",
+        coherentFiles.map((file) =>
+          file.path === "apps/agent/runbooks/sendblue.md"
+            ? {
+                ...file,
+                content: `${file.content}\nBUNDJIL_SECRET=literal-value`,
+              }
+            : file
+        ),
+      ],
+      [
+        "DOC-RUNBOOK-CLAIM",
+        coherentFiles.map((file) =>
+          file.path === "apps/codex-proxy/runbooks/production-proof.md"
+            ? {
+                ...file,
+                content: `${file.content}\nThe proxy is currently deployed to Production.`,
+              }
+            : file
+        ),
+      ],
+      [
+        "DOC-RUNBOOK-CLAIM",
+        coherentFiles.map((file) =>
+          file.path === "apps/agent/runbooks/deploy-promote.md"
+            ? {
+                ...file,
+                content: `${file.content}\nA passing preflight grants authority.`,
+              }
+            : file
+        ),
+      ],
+    ];
+
+    for (const [expectedCode, files] of mutations) {
+      const report = run({
+        ...snapshot(files),
+        repositoryPaths: files.map((file) => file.path),
+      });
+      expect(
+        report.findings.some((issue) => issue.code === expectedCode)
+      ).toBeTruthy();
+    }
   });
 });
