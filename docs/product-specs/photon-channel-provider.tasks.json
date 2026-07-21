@@ -73,7 +73,7 @@
     {
       "id": "build-clean-channel-vertical-slice",
       "title": "Build the canonical channel package and clean app vertical slice",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["plan-clean-channel-replacement"],
       "description": "Implement @bundjil/channel plus app-owned Channel, replay, identity, routing, and Eve dispatch services using only deterministic Layers, proving an HTTP-to-Eve-to-outbound journey before either provider exists.",
       "implementationNotes": [
@@ -92,12 +92,17 @@
         "A full clean journey passes entirely through memory Layers and canonical contracts.",
         "The slice contains no provider or legacy dependency."
       ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/channel owns the nominal direct-text transport Schemas, safe common tagged errors, service, and memory Layer; apps/agent owns Channel identity, deterministic fresh routing, atomic replay, orchestration, immutable state/events, and Eve dispatch. Imports point inward to @bundjil/channel, @bundjil/eve, and @bundjil/store only; no provider or legacy module enters the slice.",
+        "Implementation quality: public package values use branded Schema-derived Types and explicit Encoded aliases; app persistence decodes canonical store values and uses AtomicKeyValueStore.transact; named Context.Service operations and explicit Layers form one dependency graph; primary Effects are flat; no unsafe assertion, DTO mirror, manual reader, raw callback, process env, Effect.orDie, swallowed cause, Object.assign, nested runtime, method-local provision, or helper sprawl remains in the changed slice.",
+        "Verification coverage: @bundjil/channel typecheck, 2 contract tests and build passed; the agent build and 87 tests passed including 8 clean vertical tests for accepted/ignored ingress, identity rejection, stable routing, concurrent duplicate claims, dispatch success/failure, outbound acceptance/duplicate, presence, and immutable encoded state. Boundary/effect/skill checks, Knip, six-workspace typechecks, 255 workspace tests, negative scans, full verification, and git diff --check passed."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "build-clean-sendblue-provider-and-rewrite-edge",
       "title": "Build @bundjil/sendblue and replace the legacy Eve edge",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["build-clean-channel-vertical-slice"],
       "description": "Implement a new Sendblue ChannelTransport from protocol documentation, rewrite the Eve adapter around the clean services, replace old tests, and remove the old app-owned Sendblue implementation.",
       "implementationNotes": [
