@@ -16,8 +16,8 @@ const configLayer = (env: Readonly<Record<string, string>>) =>
   ConfigProvider.layer(ConfigProvider.fromEnv({ env }));
 
 const currentEnvironment = {
-  BUNDJIL_CHANNEL_REPLAY_REST_TOKEN: "synthetic-replay-token",
-  BUNDJIL_CHANNEL_REPLAY_REST_URL: "https://example.invalid/replay",
+  BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN: "synthetic-replay-token",
+  BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL: "https://example.invalid/replay",
   BUNDJIL_CHANNEL_ROUTING_IDENTITIES:
     '[{"participantId":"+61400000001","principalId":"principal-1"}]',
   BUNDJIL_CHANNEL_ROUTING_SECRET: "synthetic-routing-secret",
@@ -89,6 +89,26 @@ it.effect("does not fall back to the legacy Sendblue environment", () =>
           BUNDJIL_SENDBLUE_API_SECRET: "legacy-api-secret",
           BUNDJIL_SENDBLUE_FROM_NUMBER: "+61400000002",
           BUNDJIL_SENDBLUE_WEBHOOK_SECRET: "legacy-webhook-secret",
+        })
+      ),
+      Effect.exit
+    );
+
+    assert.strictEqual(exit._tag, "Failure");
+  })
+);
+
+it.effect("does not accept copied replay credential aliases", () =>
+  Effect.gen(function* testLegacyReplayConfigRejection() {
+    const exit = yield* loadChannelConfig.pipe(
+      Effect.provide(
+        configLayer({
+          BUNDJIL_CHANNEL_REPLAY_REST_TOKEN: "copied-replay-token",
+          BUNDJIL_CHANNEL_REPLAY_REST_URL:
+            "https://example.invalid/copied-replay",
+          BUNDJIL_CHANNEL_ROUTING_IDENTITIES:
+            '[{"participantId":"+61400000001","principalId":"principal-1"}]',
+          BUNDJIL_CHANNEL_ROUTING_SECRET: "synthetic-routing-secret",
         })
       ),
       Effect.exit

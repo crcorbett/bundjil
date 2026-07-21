@@ -325,6 +325,34 @@ readback remains pending on the corrected immutable deployment.
   and Production evidence. The failed Preview requests sent no provider
   message and establish no outbound, typing, handset, or Production claim.
 
+### Task 3 Marketplace replay-binding correction
+
+The next configured Preview reached the corrected webhook boundary but failed
+while constructing the Upstash client. The manually created replay URL/token
+contained Vercel's non-readable sensitive-value placeholder because the first
+operator flow had attempted to copy an existing sensitive binding through
+`vercel env pull`. The approved Upstash resource remains healthy and no key or
+data was read, copied, cleared, or changed.
+
+Preview now reconnects that exact Vercel Marketplace resource with the
+`BUNDJIL_CHANNEL_REPLAY_` prefix. Vercel owns encrypted
+`BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL` and
+`BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN` values; the app reads only those
+names and keeps the new `bundjil:channel:preview:v1:` physical prefix. The
+Production preflight requires those exact encrypted bindings and rejects the
+copied replay names plus unprefixed `KV_*`/Redis aliases.
+
+- **Change required:** agent Effect config and negative fallback test;
+  Production preflight and tests; Turbo env declaration; agent README;
+  deployment runbook; SPEC acceptance/inventory; this execution record.
+- **Preserve:** the approved Upstash database and data, new physical replay
+  namespace, Channel/store contracts, Photon/Sendblue transports, Vercel
+  deployment identity, authority/controls, and historical evidence.
+- **N/A:** database migration, data copy/inspection, frontend, DNS, public
+  release, generated API docs, and Production proof. The failed request sent no
+  provider message and proves no outbound, typing, handset, or Production
+  behavior.
+
 ### Task 6 docs-maintainer accounting
 
 - **Changed:** root README; agent README; docs/architecture/research routers;

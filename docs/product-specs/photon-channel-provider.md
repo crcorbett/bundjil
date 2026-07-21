@@ -688,8 +688,12 @@ domain and retain previous deployment/config references for rollback.
   provider boundary; handset display is either separately observed or recorded
   as unproved.
 - Production starts only with fresh `BUNDJIL_CHANNEL_*` configuration and
-  replay/routing namespaces; no `BUNDJIL_SENDBLUE_*` binding or old replay data
-  is read, copied, imported, or used as fallback.
+  replay/routing namespaces. The approved Upstash resource supplies
+  `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_*` through a Vercel Marketplace
+  connection with the exact `BUNDJIL_CHANNEL_REPLAY_` prefix; no sensitive
+  value is copied or recovered. No `BUNDJIL_SENDBLUE_*`, unprefixed `KV_*`,
+  copied replay credential, or old replay data is read, imported, or used as
+  fallback.
 - `bun run check:boundaries`, `bun run check:effect-setup`,
   `bun run check:skills`, focused package/app checks, negative legacy-pattern
   scans, `bun run verification`, and `git diff --check` pass.
@@ -724,21 +728,21 @@ domain and retain previous deployment/config references for rollback.
 
 ### Production amendment impact ledger
 
-| Surface                                                                    | Required change                                                        | Promotion postcondition                                                                                       |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| SPEC, task ledger, active plan, and indexes                                | Reopen current owners                                                  | Promotion tasks and terminal proof remain aligned                                                             |
-| Agent Production preflight and tests                                       | Add dual-Channel stages and binding metadata                           | Invalid, shared, stale, or legacy configuration fails closed                                                  |
-| Photon management service and tests                                        | Add project/service/shared-user/webhook inventory and reconciliation   | Free managed-shared selection, exact identity, idempotency, stable IDs, and deletion ownership are explicit   |
-| Agent, Sendblue, and Photon runbooks                                       | Replace provider-only/legacy config procedures                         | Exact dual-provider Preview/Production procedures, typing proof, rollback, and secret handling are executable |
-| Authority and automation registers                                         | Add Photon ingress/outbound/management boundaries and current fixtures | Direct approval is represented as a task-bounded receipt, not standing authority                              |
-| Critical journeys, command map, proof schema/templates, and evidence index | Add Photon and dual-provider typing/promotion journeys                 | Repository, deployment, provider acceptance, and handset observations remain distinct                         |
-| Vercel environment and deployment                                          | Bind new config, stage, prove, promote, read back                      | Stable alias resolves to accepted immutable deployment with previous rollback reference                       |
-| Photon project                                                             | Adopt/create one shared user and register one Production webhook       | Shared service/user assignment and webhook are read back; write-only secret is bound without disclosure       |
-| Sendblue account                                                           | Preserve the current approved line and reconcile the receive webhook   | Clean route and typing work without legacy runtime/config/state behavior                                      |
-| Upstash                                                                    | Reuse the approved database only through a new physical prefix         | No legacy key is read, copied, cleared, or treated as proof                                                   |
-| Architecture, READMEs, runbook index, and verification router              | Reconcile after live readback                                          | Current routes describe only accepted source and bounded provider truth                                       |
-| Historical plans, receipts, research, and legacy atlas                     | Preserve                                                               | Historical provenance is not rewritten as current provider truth                                              |
-| Frontend, public API publication, package release, DNS, and unrelated apps | N/A                                                                    | No changed contract or target in this rollout                                                                 |
+| Surface                                                                    | Required change                                                                                             | Promotion postcondition                                                                                                 |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger, active plan, and indexes                                | Reopen current owners                                                                                       | Promotion tasks and terminal proof remain aligned                                                                       |
+| Agent Production preflight and tests                                       | Add dual-Channel stages and binding metadata                                                                | Invalid, shared, stale, or legacy configuration fails closed                                                            |
+| Photon management service and tests                                        | Add project/service/shared-user/webhook inventory and reconciliation                                        | Free managed-shared selection, exact identity, idempotency, stable IDs, and deletion ownership are explicit             |
+| Agent, Sendblue, and Photon runbooks                                       | Replace provider-only/legacy config procedures                                                              | Exact dual-provider Preview/Production procedures, typing proof, rollback, and secret handling are executable           |
+| Authority and automation registers                                         | Add Photon ingress/outbound/management boundaries and current fixtures                                      | Direct approval is represented as a task-bounded receipt, not standing authority                                        |
+| Critical journeys, command map, proof schema/templates, and evidence index | Add Photon and dual-provider typing/promotion journeys                                                      | Repository, deployment, provider acceptance, and handset observations remain distinct                                   |
+| Vercel environment and deployment                                          | Bind new config, stage, prove, promote, read back                                                           | Stable alias resolves to accepted immutable deployment with previous rollback reference                                 |
+| Photon project                                                             | Adopt/create one shared user and register one Production webhook                                            | Shared service/user assignment and webhook are read back; write-only secret is bound without disclosure                 |
+| Sendblue account                                                           | Preserve the current approved line and reconcile the receive webhook                                        | Clean route and typing work without legacy runtime/config/state behavior                                                |
+| Upstash                                                                    | Reconnect the approved Marketplace resource with the clean binding prefix and use a new physical key prefix | Vercel owns fresh encrypted credentials; no sensitive value or legacy key is read, copied, cleared, or treated as proof |
+| Architecture, READMEs, runbook index, and verification router              | Reconcile after live readback                                                                               | Current routes describe only accepted source and bounded provider truth                                                 |
+| Historical plans, receipts, research, and legacy atlas                     | Preserve                                                                                                    | Historical provenance is not rewritten as current provider truth                                                        |
+| Frontend, public API publication, package release, DNS, and unrelated apps | N/A                                                                                                         | No changed contract or target in this rollout                                                                           |
 
 ## Risks and unresolved questions
 

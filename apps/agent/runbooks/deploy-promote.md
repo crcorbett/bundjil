@@ -69,9 +69,11 @@ exactly one of `UPSTASH_REDIS_REST_URL` or `KV_REST_API_URL`, exactly one of
 `UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_TOKEN`, and
 `BUNDJIL_UPSTASH_REDIS_KEY_PREFIX`, with the target and allowed Vercel type.
 Both aliases in one proxy group are ambiguous and fail closed. Channel replay
-uses only `BUNDJIL_CHANNEL_REPLAY_REST_URL` and
-`BUNDJIL_CHANNEL_REPLAY_REST_TOKEN`; no KV alias is a Channel compatibility
-input.
+uses only the Vercel Marketplace connection-owned
+`BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL` and
+`BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN`. Connect the approved Upstash
+resource with the exact `BUNDJIL_CHANNEL_REPLAY_` prefix; do not copy an
+unprefixed alias or a sensitive-value placeholder from `vercel env pull`.
 
 Record opaque fingerprints and IDs only. Never retain values, access tokens,
 profile contents/ciphertext, phone identities, bypass URLs, raw environment

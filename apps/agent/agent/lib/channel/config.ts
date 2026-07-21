@@ -45,11 +45,11 @@ export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
     ).pipe(Config.withDefault(ChannelReplayOptions.fields.prefix.make("v1:"))),
     replayRestToken: Config.schema(
       UpstashPersistenceOptions.fields.restToken,
-      "BUNDJIL_CHANNEL_REPLAY_REST_TOKEN"
+      "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"
     ),
     replayRestUrl: Config.schema(
       UpstashPersistenceOptions.fields.restUrl,
-      "BUNDJIL_CHANNEL_REPLAY_REST_URL"
+      "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL"
     ),
     replayStorePrefix: Config.schema(
       UpstashPersistenceOptions.fields.keyPrefix,

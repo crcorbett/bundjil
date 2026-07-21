@@ -40,7 +40,7 @@ The replacement path uses only these app-owned environment namespaces:
 | Concern  | Environment names                                                                                                                                                                                                                                     |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Routing  | `BUNDJIL_CHANNEL_ROUTING_IDENTITIES`, `BUNDJIL_CHANNEL_ROUTING_SECRET`                                                                                                                                                                                |
-| Replay   | `BUNDJIL_CHANNEL_REPLAY_PREFIX`, `BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_REST_URL`, `BUNDJIL_CHANNEL_REPLAY_REST_TOKEN`, `BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX`                |
+| Replay   | `BUNDJIL_CHANNEL_REPLAY_PREFIX`, `BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN`, `BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX`  |
 | Sendblue | `BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES`, `BUNDJIL_CHANNEL_SENDBLUE_API_KEY`, `BUNDJIL_CHANNEL_SENDBLUE_API_SECRET`, `BUNDJIL_CHANNEL_SENDBLUE_LINE`, `BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS`, `BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET` |
 | Photon   | `BUNDJIL_CHANNEL_PHOTON_PROJECT_ID`, `BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_TOLERANCE_SECONDS`                                        |
 
@@ -48,6 +48,12 @@ Secrets are decoded as `Redacted` values through owner Schemas. The state,
 replay prefix, store prefix, routing tokens, and config namespace intentionally
 do not read the removed legacy Sendblue path. Git history and retained rollout
 evidence are the only legacy rollback sources.
+
+The replay URL/token names are created by the existing Vercel Marketplace
+Upstash resource connected with the exact `BUNDJIL_CHANNEL_REPLAY_` prefix.
+They are provider-owned bindings, not values copied from `vercel env pull`;
+sensitive Vercel variables are non-readable after creation and must never be
+rebound from their placeholder export.
 
 Neither clean provider route is current Production behavior merely because it
 exists in source or builds. A provider-selection and Production-promotion SPEC

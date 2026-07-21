@@ -419,8 +419,8 @@ const expectedAgentVariables = [
   [["BUNDJIL_CHANNEL_ROUTING_IDENTITIES"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_ROUTING_SECRET"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_REPLAY_PREFIX"], ["encrypted", "sensitive"]],
-  [["BUNDJIL_CHANNEL_REPLAY_REST_TOKEN"], ["sensitive"]],
-  [["BUNDJIL_CHANNEL_REPLAY_REST_URL"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"], ["encrypted"]],
+  [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL"], ["encrypted"]],
   [["BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS"], ["encrypted", "sensitive"]],
@@ -443,7 +443,13 @@ const expectedAgentVariables = [
   ],
 ] as const;
 
-const legacyChannelBindingPrefixes = ["BUNDJIL_SENDBLUE_"] as const;
+const legacyChannelBindingPrefixes = [
+  "BUNDJIL_SENDBLUE_",
+  "BUNDJIL_CHANNEL_REPLAY_REST_",
+  "KV_REST_API_",
+  "KV_URL",
+  "REDIS_URL",
+] as const;
 
 const expectedProxyVariables = [
   [["BUNDJIL_CODEX_PROXY_MODE"], ["encrypted", "sensitive"]],

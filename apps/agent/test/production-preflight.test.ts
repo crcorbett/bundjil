@@ -19,8 +19,8 @@ const channelAgentVariables = [
   productionVariable("BUNDJIL_CHANNEL_ROUTING_IDENTITIES", "sensitive"),
   productionVariable("BUNDJIL_CHANNEL_ROUTING_SECRET", "sensitive"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_PREFIX", "encrypted"),
-  productionVariable("BUNDJIL_CHANNEL_REPLAY_REST_TOKEN", "sensitive"),
-  productionVariable("BUNDJIL_CHANNEL_REPLAY_REST_URL", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL", "encrypted"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX", "encrypted"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS", "encrypted"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS", "encrypted"),
@@ -401,6 +401,7 @@ describe("Production promotion preflight", () => {
                   variable.name !== "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
               ),
               productionVariable("BUNDJIL_SENDBLUE_API_KEY", "sensitive"),
+              productionVariable("KV_REST_API_URL", "sensitive"),
             ],
           },
           candidateAgent: {
@@ -413,6 +414,7 @@ describe("Production promotion preflight", () => {
         assert.deepStrictEqual(evidence.rejected, [
           "missing-production-variable:BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
           "legacy-production-variable:BUNDJIL_SENDBLUE_API_KEY",
+          "legacy-production-variable:KV_REST_API_URL",
           "channel-candidate-source-mismatch",
           "channel-stable-alias-rollback-mismatch",
         ]);
