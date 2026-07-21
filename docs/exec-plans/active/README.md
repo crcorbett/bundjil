@@ -13,8 +13,7 @@ Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
-  HGI-300 through HGI-303, HGI-308, and HGI-310 are complete; HGI-304 is in
-  progress.
+  HGI-300 through HGI-304, HGI-308, and HGI-310 are complete; HGI-305 is next.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation is in progress; Preview subscription proof is pending
   deployment authority.

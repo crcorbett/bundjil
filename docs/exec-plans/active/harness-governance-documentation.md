@@ -55,10 +55,12 @@ and task state.
   policy checks, six dry-run receipts, full repository verification, fresh-context
   acceptance, and pushed semantic identity are recorded in
   [`HGI-303-validation.json`](../../documentation-audit/HGI-303-validation.json).
-- **HGI-304 — in progress:** harden CI, release-PR, and interactive-Claude
-  desired state; retire ungoverned automatic review; add complete provider and
-  interaction authority envelopes, immutable action ownership, emergency
-  containment, and executable negative controls without accessing providers.
+- **HGI-304 — completed:** CI, release-PR, and interactive-Claude desired
+  source is bounded; ungoverned automatic review is retired; complete provider
+  and interaction authority envelopes, immutable action ownership, emergency
+  containment, executable negative controls, six fresh scenarios, full
+  verification, and pushed Git identity are recorded in
+  [`HGI-304-validation.json`](../../documentation-audit/HGI-304-validation.json).
 - HGI-305, HGI-306, and HGI-307 remain pending in dependency order.
   HGI-309 remains deferred until separately approved external authority exists.
 

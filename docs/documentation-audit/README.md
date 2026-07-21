@@ -69,8 +69,10 @@ HGI-303 runbook and authority evidence:
 
 HGI-304 workflow and provider-authority evidence:
 
+- [`HGI-304-candidate.json`](HGI-304-candidate.json)
 - [`HGI-304-source-inventory.json`](HGI-304-source-inventory.json)
 - [`HGI-304-scenarios.json`](HGI-304-scenarios.json)
+- [`HGI-304-validation.json`](HGI-304-validation.json)
 - [`hgi-304/HGI304-CLAUDE-ACTOR-01.json`](hgi-304/HGI304-CLAUDE-ACTOR-01.json)
 - [`hgi-304/HGI304-RELEASE-EPOCH-01.json`](hgi-304/HGI304-RELEASE-EPOCH-01.json)
 - [`hgi-304/HGI304-AUTO-REVIEW-01.json`](hgi-304/HGI304-AUTO-REVIEW-01.json)
