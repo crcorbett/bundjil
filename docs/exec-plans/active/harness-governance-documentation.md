@@ -28,13 +28,13 @@ and task state.
   policy, and approval are explicitly separate; executable semantic fixtures
   and exact Git identity are recorded in
   [`HGI-301-validation.json`](../../documentation-audit/HGI-301-validation.json).
-- **HGI-308 — candidate, acceptance pending:** local decision records defer
+- **HGI-308 — completed:** local decision records defer
   the Eve Production claim, accept app-owned runbook ownership, retain
   occurrence-based boundary exceptions pending equivalent fixtures, bound
   automatic Claude review as experimental, and accept provider readback
-  fallbacks. They are indexed in
-  [`HGI-308-source-receipt.json`](../../documentation-audit/HGI-308-source-receipt.json)
-  and do not establish policy, provider state, or operation authority.
+  fallbacks. Acceptance and exact Git identity are recorded in
+  [`HGI-308-validation.json`](../../documentation-audit/HGI-308-validation.json);
+  the records do not establish provider state or operation authority.
 - HGI-302, HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307 remain
   pending in dependency order. HGI-309 remains deferred until separately
   approved external authority exists.
