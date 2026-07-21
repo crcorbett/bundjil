@@ -7,7 +7,15 @@
   "preChange": {
     "docsFiles": 44,
     "readmePaths": 11,
-    "taskLedgersWithAllTaskEntriesCompleted": 12,
+    "historicalLedgers": {
+      "total": 12,
+      "individualTaskEntriesCompleted": 12,
+      "ledgerTerminalStatusCounts": {
+        "completed": 10,
+        "implemented": 2
+      },
+      "historicalGrantedApprovals": 1
+    },
     "completedPlanInActiveRoute": 1
   },
   "postSlice": {
@@ -40,8 +48,8 @@
     "completedPlans": "docs/exec-plans/completed/README.md; 11 retained completed plan files",
     "historicalLedgers": {
       "total": 12,
-      "taskArraysWithAllEntriesCompleted": 12,
-      "ledgerStatusCounts": {
+      "individualTaskArraysWithAllEntriesCompleted": 12,
+      "ledgerTerminalStatusCounts": {
         "completed": 10,
         "implemented": 2
       },
@@ -57,7 +65,7 @@
           "recordedAt": "2026-07-14"
         }
       ],
-      "classification": "Task-array completion does not erase retained ledger-level lifecycle or recorded approval provenance; see docs/product-specs/index.md."
+      "classification": "The historical ledgers have heterogeneous terminal provenance: 10 completed ledger statuses, 2 implemented ledger statuses, and 1 scoped historical granted approval. Completed individual task entries do not erase those ledger-level lifecycle or approval fields; see docs/product-specs/index.md."
     },
     "researchRoute": "docs/research/README.md",
     "rootReadmePolicy": "Product purpose, stable repo shape, routes, and local commands only; mutable provider/deployment proof removed.",

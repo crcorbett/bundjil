@@ -25,13 +25,13 @@ context.
 
 ## Implemented or superseded history
 
-Each of the twelve sibling ledger documents records a `tasks` array whose
-entries are `completed`. That array-level result does not mean the ledgers
-contain only task-completion fields: ten use ledger-level `status: completed`,
-the Effect persistence and Effect Schema string-contract ledgers use
-`status: implemented`, and the Vercel promotion ledger retains a historical,
-scoped `approval.status: granted`. These historical lifecycle and approval
-fields are provenance, not standing authority.
+The twelve sibling historical ledgers retain heterogeneous terminal
+provenance: ten use ledger-level `status: completed`, while the Effect
+persistence and Effect Schema string-contract ledgers use `status:
+implemented`. The Vercel promotion ledger also retains a historical, scoped
+`approval.status: granted`. Every individual entry in those ledgers' `tasks`
+arrays is `completed`, but that does not flatten the distinct ledger-level
+lifecycle or recorded approval fields. None is standing authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
