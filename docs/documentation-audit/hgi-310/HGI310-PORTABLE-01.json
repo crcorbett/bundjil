@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "scenarioId": "HGI310-PORTABLE-01",
+  "scenarioManifest": "../HGI-310-scenarios.json",
+  "scenarioManifestSha256": "e0beccf5989c81d6326492d82bb37ce6607e2614efc500cfe69918a6302f7bb8",
+  "targetCommit": "97ca1e61d5af2a012a69bed3fd74a64446fc409c",
+  "evaluator": "fresh Terra worker /root/hgi310_packet_proof_portable",
+  "observedAt": "2026-07-21T13:36:49+01:00",
+  "status": "passed",
+  "output": [
+    "Repository-owned quick_validate.py passed docs-maintainer and all three PRD skills from a clean clone without a global skill installation.",
+    "check:skills passed 167 files and 16 mirrors; check:docs passed 206 files; four tooling files and 42 tests passed.",
+    "The relative Claude mirror, UI metadata, PRD phases, ordinary route, semantic fixtures, and bounded report paths were all present."
+  ],
+  "limitations": [
+    "Structural portability and held-out scenarios do not prove every future worker decision."
+  ],
+  "nonClaims": [
+    "No external provider, workflow, deployment, credential, release, publication, or production state was accessed or established."
+  ]
+}

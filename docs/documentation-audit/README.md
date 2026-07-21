@@ -47,6 +47,12 @@ HGI-310 skill evidence:
 
 - [`HGI-310-candidate.json`](HGI-310-candidate.json)
 - [`HGI-310-scenarios.json`](HGI-310-scenarios.json)
+- [`hgi-310/HGI310-EFFECT-01.json`](hgi-310/HGI310-EFFECT-01.json)
+- [`hgi-310/HGI310-PROXY-AUTH-01.json`](hgi-310/HGI310-PROXY-AUTH-01.json)
+- [`hgi-310/HGI310-PROVIDER-01.json`](hgi-310/HGI310-PROVIDER-01.json)
+- [`hgi-310/HGI310-WORKFLOW-01.json`](hgi-310/HGI310-WORKFLOW-01.json)
+- [`hgi-310/HGI310-PROOF-LIFECYCLE-01.json`](hgi-310/HGI310-PROOF-LIFECYCLE-01.json)
+- [`hgi-310/HGI310-PORTABLE-01.json`](hgi-310/HGI310-PORTABLE-01.json)
 
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state

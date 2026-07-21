@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "scenarioId": "HGI310-PROOF-LIFECYCLE-01",
+  "scenarioManifest": "../HGI-310-scenarios.json",
+  "scenarioManifestSha256": "e0beccf5989c81d6326492d82bb37ce6607e2614efc500cfe69918a6302f7bb8",
+  "targetCommit": "97ca1e61d5af2a012a69bed3fd74a64446fc409c",
+  "evaluator": "fresh Terra worker /root/hgi310_packet_proof_portable",
+  "observedAt": "2026-07-21T13:36:49+01:00",
+  "status": "passed",
+  "output": [
+    "Required task/SPEC status updates, active-plan removal, completed-plan routing, and successor/reason/provenance evidence for lifecycle transitions.",
+    "Required artifact and Git identity, environment, actor/authority, observedAt, digest, commands/postconditions, limitations, nonclaims, rollback, and retained failed/inconclusive state.",
+    "Preserved the earlier provider result as inconclusive and refused to create the future HGI-305 verification owner prematurely."
+  ],
+  "limitations": [
+    "Local closeout proof cannot upgrade an inconclusive provider check or establish external state."
+  ],
+  "nonClaims": [
+    "Lifecycle acceptance grants no provider, workflow, deployment, credential, release, or production authority."
+  ]
+}

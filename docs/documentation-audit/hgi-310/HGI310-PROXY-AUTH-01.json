@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "scenarioId": "HGI310-PROXY-AUTH-01",
+  "scenarioManifest": "../HGI-310-scenarios.json",
+  "scenarioManifestSha256": "e0beccf5989c81d6326492d82bb37ce6607e2614efc500cfe69918a6302f7bb8",
+  "targetCommit": "97ca1e61d5af2a012a69bed3fd74a64446fc409c",
+  "evaluator": "fresh Terra worker /root/hgi310_packet_effect_proxy",
+  "observedAt": "2026-07-21T13:36:49+01:00",
+  "status": "passed",
+  "output": [
+    "Selected apps/codex-proxy/src/server.ts and schemas.ts for HTTP/auth mapping, env.ts for redacted config, and packages/codex provider contracts only when the shared API changes.",
+    "Routed deployment, auth rotation, incident, and rollback procedures to future apps/codex-proxy/runbooks under HGI-303, authority to HGI-304, and hosted proof to HGI-305.",
+    "Separated local mock/smoke verification from explicitly authorized Preview proof and separately authorized Production proof."
+  ],
+  "limitations": [
+    "A clean-clone focused proxy test requires its package dependency to be built first; this is a setup limitation, not auth proof."
+  ],
+  "nonClaims": [
+    "Source and local tests do not establish token validity, deployment identity, provider reachability, or credential-rotation authority."
+  ]
+}

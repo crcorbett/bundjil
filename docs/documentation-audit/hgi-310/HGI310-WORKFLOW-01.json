@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-310",
+  "scenarioId": "HGI310-WORKFLOW-01",
+  "scenarioManifest": "../HGI-310-scenarios.json",
+  "scenarioManifestSha256": "e0beccf5989c81d6326492d82bb37ce6607e2614efc500cfe69918a6302f7bb8",
+  "targetCommit": "97ca1e61d5af2a012a69bed3fd74a64446fc409c",
+  "evaluator": "fresh Terra worker /root/hgi310_packet_provider_workflow",
+  "observedAt": "2026-07-21T13:36:49+01:00",
+  "status": "passed",
+  "output": [
+    "Selected .github/workflows/claude-code-review.yml as the executable owner for an attached concurrency edit without treating it as governed automation.",
+    "Kept the unverified README finding in an isolated report-only candidate with reviewer, publisher, quarantine/recovery, target revision, and post-publication readback fields.",
+    "Required HGI-304 authority and HGI-306 cost/false-positive evidence before retention as governed continuous automation."
+  ],
+  "limitations": [
+    "Repository workflow text does not prove GitHub execution, credentials, comments, convergence, cost, or effectiveness."
+  ],
+  "nonClaims": [
+    "The background scan neither established a stale pointer nor authorized a correction or publication."
+  ]
+}
