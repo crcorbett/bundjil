@@ -46,7 +46,7 @@ bounded evidence, limitations, rollback, and exact Git identity.
 | HGI-304 — workflow and provider authority                                                                                               | Completed | `HGI-304-validation.json`, hardened workflows, complete authority/action registers, semantic fixtures, and fresh-context acceptance        |
 | HGI-305 — critical journeys, proof packets, and bounded output                                                                          | Completed | `HGI-305-validation.json`, ten journeys, five packet templates, bounded receipts, immutable evidence, and fresh-context acceptance         |
 | HGI-306 — feedback, controls, and continuous automation                                                                                 | Completed | `HGI-306-validation.json`, eight typed controls, eleven fixture-backed automation states, feedback promotion, and fresh-context acceptance |
-| HGI-307 — harness requalification and repository closeout                                                                               | Pending   | Fresh-worker evaluation, accepted receipts, and pushed commit identity                                                                     |
+| HGI-307 — harness requalification and repository closeout                                                                               | Completed | `HGI-307-validation.json`, twelve fresh scenarios, typed epoch/impact gates, accepted corrections, full verification, and pushed identity  |
 | HGI-309 — external-authority application                                                                                                | Deferred  | Separately approved provider operations and external readback                                                                              |
 
 ## Non-goals and authority
@@ -106,3 +106,22 @@ outbound, Executor, and AI Gateway/Eve work remains foreground; automatic
 Claude review remains retired; documentation freshness remains report-only.
 External GitHub/provider state and accepted external consequences are
 inconclusive unless HGI-309 later performs separately approved readback.
+
+## HGI-307 implementation contract
+
+HGI-307 records one worker/tool/runtime/skill epoch, ten Bundjil journey
+scenarios, one strict Effect/client/frontend/docs scenario, one seeded
+current-owner contradiction, and all nine material impact surfaces. Fresh
+reports preserve their original pass, fail, and inconclusive journey outcomes;
+parent acceptance grades whether the worker made the safe bounded decision.
+The first pass exposed and corrected an outbound result label that overstated
+the proved boundary, plus missing direct skill routes; fresh rechecks accepted
+both changes.
+
+`bun run eval:hgi-307` rejects missing, extra, duplicate, ownerless, stale, or
+base-divergent evidence, binds the exact manifest/report/skill bytes, and checks
+complete docs and README path inventories. The four effectiveness clocks remain
+separate and `null` when unavailable. BND-J02 remains deferred pending a
+deterministic Gateway recovery fixture, and HGI-309 remains deferred pending
+separately approved target-owned provider authority. Neither deferral weakens
+the accepted local repository closeout or creates an external claim.

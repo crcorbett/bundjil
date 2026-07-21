@@ -72,9 +72,17 @@ and task state.
   promotion, outcome/attention metrics, full verification, fresh-context
   acceptance, and semantic Git readback are recorded in
   [`HGI-306-validation.json`](../../documentation-audit/HGI-306-validation.json).
-- **HGI-307 — next:** requalify the harness and close the repository campaign.
-  HGI-309 remains deferred until separately approved
-  external authority exists.
+- **HGI-307 — completed:** one typed evaluation epoch binds the exact worker
+  context, tools, runtimes, skills, base, twelve fresh scenarios, retained
+  reports, four separate clocks, intervention decisions, nine impact surfaces,
+  and exact docs/README inventories. Fresh review corrected the Sendblue
+  acceptance boundary and direct local-skill routing; the stricter gate, full
+  verification, semantic commit, push, and remote readback are recorded in
+  [`HGI-307-validation.json`](../../documentation-audit/HGI-307-validation.json).
+- **HGI-309 — deferred:** no provider qualification is admitted until a named
+  owner separately approves one exact target operation with authority,
+  rollback, and current readback. The plan remains current solely to retain
+  this explicit deferred boundary; no external work is active or implied.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,
 ledger-lifecycle, and recorded-approval fields), completed plans, research,

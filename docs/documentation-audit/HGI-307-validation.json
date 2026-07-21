@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-307",
+  "status": "accepted",
+  "observedAt": "2026-07-21T17:55:00+01:00",
+  "authority": "repository source, documentation, local fresh-context evaluation, fixtures, tests, Git commit, main push, and remote-ref readback only; no provider, environment-value, secret, message, approval-resume, deployment, rollback, or Production readback or mutation",
+  "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
+  "implementationCommit": "05746b54614da21880b09ed5295ef47ff2f610d9",
+  "implementationTree": "bd579457ec42a9efbcf2cb109cc70dceb4f418a1",
+  "changedPathCount": 23,
+  "sortedChangedPathSha256": "af29a998f5cb904b7520d64f54b43290f541bff221a41ffe45f3b3edad074a8b",
+  "candidateReceiptSha256": "0cc7a87bcda28bcecdfca2e91ab60a1efb6b9ffd3c7334fb6fad70adcd2d9a03",
+  "impactLedgerSha256": "0a27c6d84cddb8cb5f750d189a6c0c7c7177ef39130a524456514bae01a47483",
+  "epochSha256": "f12885fecf1577e684089c7f933bc2efd18430b747c21fa51de1900915444060",
+  "scenarioManifestSha256": "2bbede25c01ab9cc1093cf8042166fdcbeae2996456a4c10c38b49dae94ed68f",
+  "freshReports": [
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-a.report.md",
+      "sha256": "4d89614a46a85c651e07a2acdb4b3a01356f0790245b60758d32a04aaa33529e"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-b.report.md",
+      "sha256": "8df365d41c69ddf567e04b327b8319056c8318a4bbcd9699e9bb7d95837852ef"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-c.report.md",
+      "sha256": "d385ade37c45051148d90cc3f14107f43f9334a8ba378c4a2bf2ae320ae81da6"
+    },
+    {
+      "path": "docs/documentation-audit/hgi-307/fresh-recheck.report.md",
+      "sha256": "49fc590e1a5664f62c64730068f9bf83dfae266905a6fb28f8b0bbd2bcb99958"
+    }
+  ],
+  "checks": [
+    {
+      "check": "fresh-context and parent acceptance",
+      "status": "passed",
+      "result": "Four fresh Terra workers exercised ten Bundjil journeys, one strict Effect/client/frontend/docs proposal, and one seeded contradiction. Original fail and inconclusive journey dispositions remain retained; parent grading accepted the safe decisions. A final independent parent reviewer recomputed every declared artifact, report, skill, candidate-path, docs-path, and README-path digest and found no blocker."
+    },
+    {
+      "check": "accepted corrections",
+      "status": "passed",
+      "result": "Fresh review found that a terminal Sendblue operation returned delivered despite proving only decoded provider acceptance, and that local client/docs skills were not directly discoverable. The Schema, implementation, fixtures, and AGENTS routes were corrected; a fresh recheck accepted both boundaries."
+    },
+    {
+      "check": "typed evaluation policy",
+      "status": "passed",
+      "result": "eval:hgi-307 accepted exactly twelve scenario results, nine unique impact areas, one shared base, canonical manifest ownership, current report/manifest/skill digests, addressable owners, exact 161-file docs and 19-file README inventories, explicit deferrals, and no unresolved finding. Eleven focused fixtures passed, including ten negative cases."
+    },
+    {
+      "check": "full repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundaries, the 230-file docs policy, 167-file/16-mirror skill policy, three-workflow authority policy, eight controls, eleven automations, one freshness candidate, ten journeys, HGI-307 evaluation, 87 tooling tests, type-aware Ultracite, the lint fixture, Knip, five typechecks, and 262 app/package tests passed. The first verification attempt correctly rejected an invalid synthetic Executor host; the accepted rerun used an approved-host-shaped public URL only as configuration and made no provider call."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "Unsigned semantic commit 05746b54614da21880b09ed5295ef47ff2f610d9 was pushed. After fetch, local HEAD and origin/main both resolved to that commit with tree bd579457ec42a9efbcf2cb109cc70dceb4f418a1 and the declared 23-path digest."
+    }
+  ],
+  "postcondition": "Bundjil now has a machine-checked harness epoch that binds the evaluated worker context, exact scenarios and evidence, all material documentation/code/tooling impact surfaces, accepted-outcome interpretation, and intervention lifecycle while preserving honest deferred and external-authority boundaries.",
+  "rollback": "Revert this closeout and implementation commit 05746b54614da21880b09ed5295ef47ff2f610d9 together while preserving accepted HGI-300 through HGI-306, HGI-308, and HGI-310 evidence, the HGI-309 deferral, and all unchanged provider state.",
+  "limitations": [
+    "Worker duration, feedback latency, synchronous human attention, and time to accepted outcome were unavailable and remain null rather than zero or estimated.",
+    "BND-J02 remains deferred pending deterministic Gateway session/interruption/recovery evidence; HGI-309 remains deferred pending separately approved exact external authority.",
+    "The semantic and closeout commits are unsigned because the configured 1Password signing agent remains unavailable; content, tree, ancestry, push, and remote identity are independently verified.",
+    "Repository source, local fixtures, model review, commands, and Git readback do not prove hosted workflows, provider state, deployment, delivery, resume, rollback, recovery, health, or Production actuality."
+  ],
+  "nonClaims": [
+    "No environment value, ignored operational artifact, credential, secret, authenticated provider state, message, Executor call, deployment, alias, webhook, rollback, recovery, or Production system was read or changed.",
+    "This accepted epoch qualifies only the named candidate and scenarios; it does not establish permanent model quality or effectiveness."
+  ]
+}

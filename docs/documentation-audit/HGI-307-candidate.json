@@ -22,7 +22,7 @@
     },
     {
       "path": "docs/documentation-audit/HGI-307-impact-ledger.json",
-      "sha256": "f96d5ab079a695bbfbd98674dbbd441737a657f569d56cde87d49a84800b8cd5"
+      "sha256": "0a27c6d84cddb8cb5f750d189a6c0c7c7177ef39130a524456514bae01a47483"
     },
     {
       "path": "tooling/evals/hgi-307/scenarios.json",

@@ -17,8 +17,8 @@ context.
 ## Current
 
 - [Harness-governance documentation](harness-governance-documentation.md) —
-  HGI-300 through HGI-306, HGI-308, and HGI-310 are complete; HGI-307 harness
-  requalification and repository closeout is next.
+  all repository-local tasks are complete; HGI-309 external qualification is
+  explicitly deferred pending separate authority.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.

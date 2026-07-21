@@ -118,6 +118,22 @@ Git publication/readback are retained in `HGI-306-validation.json`. The
 freshness candidate remains intentionally report-only and outside default
 current-owner routing.
 
+HGI-307 harness requalification and repository closeout evidence:
+
+- [`HGI-307-candidate.json`](HGI-307-candidate.json)
+- [`HGI-307-impact-ledger.json`](HGI-307-impact-ledger.json)
+- [`HGI-307-validation.json`](HGI-307-validation.json)
+- [`../verification/hgi-307-epoch.json`](../verification/hgi-307-epoch.json)
+- [`../../tooling/evals/hgi-307/scenarios.json`](../../tooling/evals/hgi-307/scenarios.json)
+- [`hgi-307/`](hgi-307/)
+
+The accepted epoch binds twelve fresh scenarios, all nine material impact
+surfaces, exact report/skill/manifest digests, and four distinct nullable
+clocks. Initial failed or inconclusive journey dispositions remain retained as
+evidence; parent acceptance records whether each result chose the safe bounded
+decision. BND-J02 and HGI-309 remain explicitly deferred and no external state
+is inferred.
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 160,
-    "sortedPathSha256": "7d35d35d6f88dc7637127dc0efe553a54be42e470ec1912f58bd4297facf78a4"
+    "pathCount": 161,
+    "sortedPathSha256": "99d9f85f98b737e5287ed893392d9e6153245db9f7d37a022f780753c3797565"
   },
   "readmeInventory": {
     "pathCount": 19,
@@ -18,7 +18,8 @@
         "docs/verification/harness-epochs.md",
         "docs/verification/effectiveness.md",
         "docs/verification/hgi-307-epoch.json",
-        "docs/documentation-audit/HGI-307-impact-ledger.json"
+        "docs/documentation-audit/HGI-307-impact-ledger.json",
+        "docs/documentation-audit/HGI-307-validation.json"
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports."
