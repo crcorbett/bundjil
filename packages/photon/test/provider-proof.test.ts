@@ -23,6 +23,15 @@ const fixtures = Effect.gen(function* decodeProviderProofFixtures() {
   };
 });
 
+const unusedProvisioningOperations = {
+  createDedicatedLine: () => Effect.die("unused createDedicatedLine"),
+  deleteDedicatedLine: () => Effect.die("unused deleteDedicatedLine"),
+  getIMessagePlatform: () => Effect.die("unused getIMessagePlatform"),
+  listDedicatedLines: () => Effect.die("unused listDedicatedLines"),
+  setIMessagePlatformEnabled: () =>
+    Effect.die("unused setIMessagePlatformEnabled"),
+} as const;
+
 it.effect(
   "proves create, read, SDK lifecycle, delete, and restored topology",
   () =>
@@ -34,6 +43,7 @@ it.effect(
       }[] = [];
       let lifecycleRuns = 0;
       const management = PhotonManagement.of({
+        ...unusedProvisioningOperations,
         deleteWebhook: (webhookId) =>
           Effect.sync(() => {
             webhooks = webhooks.filter((webhook) => webhook.id !== webhookId);
@@ -85,6 +95,7 @@ it.effect("removes the exact proof webhook when SDK acquisition fails", () =>
       readonly webhookUrl: URL;
     }[] = [];
     const management = PhotonManagement.of({
+      ...unusedProvisioningOperations,
       deleteWebhook: (webhookId) =>
         Effect.sync(() => {
           webhooks = webhooks.filter((webhook) => webhook.id !== webhookId);
@@ -142,6 +153,7 @@ it.effect(
       };
       let webhooks = [unrelated];
       const management = PhotonManagement.of({
+        ...unusedProvisioningOperations,
         deleteWebhook: (webhookId) =>
           Effect.sync(() => {
             webhooks = webhooks.filter((webhook) => webhook.id !== webhookId);
@@ -194,6 +206,7 @@ it.effect("rejects unrelated same-count topology drift", () =>
     };
     let webhooks = [original];
     const management = PhotonManagement.of({
+      ...unusedProvisioningOperations,
       deleteWebhook: (webhookId) =>
         Effect.sync(() => {
           webhooks =

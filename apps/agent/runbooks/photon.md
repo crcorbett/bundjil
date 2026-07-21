@@ -4,15 +4,16 @@ lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
 last_reviewed: 2026-07-21
-review_trigger: Photon API, SDK pin, credential path, proof command, authority, resource lifecycle, or output contract change
+review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, line, webhook, deployment, typing, resource lifecycle, or output contract change
 ---
 
-# Operate Photon provider lifecycle proof
+# Operate Photon Channel rollout
 
-This runbook proves authenticated Photon management access, one isolated
-webhook create/read/delete lifecycle, write-only signing-secret receipt, and
-Spectrum SDK acquire/release. It does not prove a hosted Preview, ingress,
-replay, Eve dispatch, outbound messaging, handset delivery, or Production.
+Use this runbook for the bounded provider lifecycle proof and the active hosted
+Channel rollout. The provider-only command proves authenticated management,
+one isolated webhook lifecycle, write-only signing-secret handling, and SDK
+acquire/release. Hosted Preview and Production claims require the additional
+resource, deployment, message, typing, and readback procedure below.
 
 ## Authority and target
 
@@ -22,14 +23,18 @@ replay, Eve dispatch, outbound messaging, handset delivery, or Production.
 - Target resolution: the project scoped by `PHOTON_PROJECT_ID` and
   `PHOTON_PROJECT_SECRET` in the ignored file named by
   `BUNDJIL_PHOTON_ENV_FILE`.
-- Permitted writes: only the fixed, non-routable proof webhook owned by this
-  command. An exact stale record at that proof URL may be recovered first.
-- Forbidden writes: dedicated lines, phone numbers, platform/billing state,
-  messages, users, Vercel, DNS, environment variables, deployments, Sendblue,
-  Upstash, Preview runtime, and Production.
+- Permitted writes: the fixed non-routable proof webhook, exact environment
+  webhooks, required iMessage platform toggle, one adopted or rollout-created
+  dedicated line, approved Preview/Production bindings/deployments, and the
+  bounded message plus typing journeys named by the active task.
+- Forbidden writes: unrelated lines, users, contacts, message history,
+  platforms, webhooks, projects, billing policy, DNS, Sendblue resources,
+  Upstash data, or any target outside the accepted rollout envelope.
 
-Repository instructions do not grant future provider authority. Reconfirm the
-actor, target, operation, duration, and approval before any later run.
+Repository instructions do not grant future provider authority. The user's
+2026-07-21 approval is bounded to the active promotion tasks; reconfirm the
+actor, target, operation, duration, stable resource identity, rollback, and
+approval before every stage.
 
 ## Upstream contract used
 
@@ -55,9 +60,11 @@ Sources: [API introduction](https://photon.codes/docs/api-reference/introduction
    isolated, SDK acquisition/release fails, deletion is ambiguous, final
    readback differs from the baseline, or any request would touch a forbidden
    target.
-5. Do not add a dedicated line. Photon documents that operation as a Business
-   plan allocation that changes Stripe subscription quantity and prorated
-   billing; it is outside this proof.
+5. The provider-only proof does not add a line. The hosted rollout may adopt or
+   add exactly one dedicated iMessage line only after authenticated inventory.
+   Photon documents create/delete as a Business-plan subscription quantity and
+   prorated billing consequence; record that classification and stop on an
+   ambiguous write or billing mismatch.
 
 ## Procedure
 
@@ -110,7 +117,65 @@ authority statement, timestamp, limitations, and recovery result. Do not
 retain project, webhook, Space, message, phone, identity, secret, URL, content,
 SDK object, raw response, prompt, tool, or model values.
 
-A passing receipt proves only the named Photon project observation at that
-time. Vercel deployment authority and a known live inbound Space are absent, so
-the hosted signed-ingress-to-Eve journey remains a terminal candidate stop
-under this SPEC.
+A passing provider-only receipt proves only the named Photon project
+observation at that time. It never substitutes for the hosted procedure below.
+
+## Hosted resource reconciliation
+
+1. Attach the `photon-management` authority receipt, verify the ignored
+   credential file is mode `0600`, load it without printing values, and run the
+   focused/full local gates.
+2. Use authenticated management reads to decode the project, platform,
+   dedicated-line, and complete webhook inventories. Retain only sanitized
+   counts/state and protected stable-ID fingerprints. Never infer an owned
+   resource from list order, creation time, phone identity, or partial ID.
+3. Require iMessage enabled. If exactly one approved healthy dedicated line is
+   present, adopt it. If none is present, create once, immediately list and
+   identify the new stable ID, and record the prorated billing consequence. If
+   the response is lost, list and reconcile before any retry. More than one
+   adoptable line or an unhealthy line is a stop.
+4. Confirm the immutable Vercel target serves
+   `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
+   before create. Adopt an exact environment URL only when its write-only
+   signing secret is already present in the approved secret store; otherwise
+   register once, bind the returned secret and ID directly to the target, and
+   never persist or print them. Reconcile an ambiguous create by URL inventory.
+5. Read back platform, line, and webhook topology. The only accepted desired
+   state is one healthy approved line and one exact environment webhook. Do not
+   delete unrelated resources to make counts fit.
+
+## Hosted Channel proof
+
+1. Attach `photon-inbound` and `photon-outbound` authority, exact pushed source
+   and immutable deployment/config identities, fresh replay/routing namespace
+   fingerprints, the approved test conversation, and rollback references.
+2. Send one bounded inbound direct-text event through Photon. Record signed
+   authentication, fresh claim, one Eve dispatch/completion, one outbound
+   provider result, and scoped SDK release without retaining body, content,
+   phone, project, line, webhook, Space, or message values.
+3. Redeliver the same provider event identity and require a duplicate outcome
+   with zero second external response. Do not synthesize a new identifier.
+4. Against the exact decoded conversation, execute `setPresence(start)` and
+   `setPresence(stop)`. The pinned Layer maps these to Spectrum Space
+   `startTyping()` and `stopTyping()`. Require a decoded accepted/no-op result
+   for each; an unsupported no-op, timeout, provider rejection, ambiguous
+   Space, or release failure blocks a visible-typing claim.
+5. Record provider acceptance, Eve completion, handset message delivery, and
+   handset typing display as four separate boundaries. If a safe device
+   observer is unavailable, mark the handset boundaries unproved rather than
+   upgrading SDK acceptance.
+6. For Preview use `BND-J11-photon-accepted-message-typing`. For Production,
+   bind that packet into `BND-J12-dual-channel-production` with the matching
+   Vercel and Sendblue packets.
+
+## Hosted rollback
+
+Stop Photon ingress first, wait at least the current documented worst-case
+webhook retry horizon (about 3.5 minutes unless fresh provider truth states a
+longer configured value), and quarantine the new replay namespace. Delete only
+the exact rollout-created webhook and, if rollback explicitly requires it, the
+rollout-created line by stable ID; a line deletion is a prorated subscription
+credit consequence. Restore only platform state changed by this rollout,
+re-read the complete inventory, and preserve all adopted pre-existing
+resources. Never retry an uncertain message and never restore legacy runtime,
+config, state, or replay behavior.

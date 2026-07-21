@@ -42,19 +42,18 @@ processing or that a handset received a message.
 
 ## Inputs and secret handling
 
-Configuration names are `BUNDJIL_SENDBLUE_API_KEY`,
-`BUNDJIL_SENDBLUE_API_SECRET`, `BUNDJIL_SENDBLUE_WEBHOOK_SECRET`,
-`BUNDJIL_SENDBLUE_ROUTING_KEY`, `BUNDJIL_SENDBLUE_FROM_NUMBER`,
-`BUNDJIL_SENDBLUE_SENDER_IDENTITIES`,
-`BUNDJIL_SENDBLUE_REPLAY_STORE_URL`,
-`BUNDJIL_SENDBLUE_REPLAY_STORE_TOKEN`,
-`BUNDJIL_SENDBLUE_REPLAY_STORE_PREFIX`,
-`BUNDJIL_SENDBLUE_REPLAY_STORE_TTL_SECONDS`,
-`BUNDJIL_SENDBLUE_REPLAY_STORE_LEASE_SECONDS`,
-`BUNDJIL_SENDBLUE_ALLOWED_SERVICES`, and
-`BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS`. `KV_REST_API_URL` and
-`KV_REST_API_TOKEN` are compatibility inputs. The test-only URL is permitted
-only with `BUNDJIL_SENDBLUE_TEST_MODE`.
+The only accepted runtime configuration is
+`BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES`,
+`BUNDJIL_CHANNEL_SENDBLUE_API_KEY`,
+`BUNDJIL_CHANNEL_SENDBLUE_API_SECRET`, `BUNDJIL_CHANNEL_SENDBLUE_LINE`,
+`BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS`,
+`BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET`, the app-owned
+`BUNDJIL_CHANNEL_ROUTING_*` names, and the app-owned
+`BUNDJIL_CHANNEL_REPLAY_*` names listed in the agent README. Any
+`BUNDJIL_SENDBLUE_*` binding is legacy and blocks promotion; do not copy,
+import, or fall back to it. Existing provider credential values may be entered
+under the new names only through the approved secret operation and must never
+be emitted by a migration script.
 
 Never print secret values, full phone identities, message contents, protected
 webhook URLs, routing material, replay keys, or raw provider responses.
@@ -64,6 +63,8 @@ webhook URLs, routing material, replay keys, or raw provider responses.
 1. Prove source contracts locally:
 
    ```bash
+   bun run --filter @bundjil/sendblue check-types
+   bun run --filter @bundjil/sendblue test
    bun run --filter @bundjil/agent check-types
    bun run --filter @bundjil/agent test
    ```
@@ -82,37 +83,52 @@ webhook URLs, routing material, replay keys, or raw provider responses.
 4. Compare the complete `receive` webhook host inventory, app target,
    environment isolation, expected secret presence, sender allowlist shape,
    allowed services, replay prefix, lease, and terminal TTL to the intended
-   configuration. A missing preferred readback is inconclusive.
+   configuration. Confirm the target has no redirect and the accepted Vercel
+   immutable deployment owns the route before changing provider state. A
+   missing preferred readback is inconclusive.
 
 5. **Mutation gate:** stop before POST/PUT/DELETE webhook calls, credential or
    routing changes, replay-data changes, typing, or message sends until the
    complete authority envelope and rollback snapshot are approved.
 
-6. Perform at most the one approved change. Immediately re-read the complete
-   webhook and database metadata before any bounded ingress/delivery journey.
+6. Disable or isolate ingress, preserve the exact prior webhook inventory, and
+   wait the current documented/provider-confirmed retry horizon before the
+   intentional replay-continuity break. Perform at most the one approved
+   change, then immediately re-read the complete webhook and database metadata
+   before any bounded ingress/delivery journey.
 
-7. Record webhook outcomes by status class: ignored/duplicate `200`, accepted
+7. Record webhook outcomes by status class: ignored/duplicate `204`, accepted
    dispatch `202`, invalid signature `401`, schema failure `400`, and
    replay/routing failure `503`. Keep provider acceptance, Eve processing, and
    handset delivery as separate claims. Treat `DeliveryUncertain` as unknown;
    never retry blindly.
 
+8. For the exact approved direct conversation, call typing `start` with the
+   configured bounded duration and then typing `stop`. Decode the complete
+   response for each action. A stop when no indicator is active is an accepted
+   no-op; a firmware `503`, route-mapping failure, timeout, or malformed body is
+   a failed/inconclusive typing proof and blocks a success claim. Provider
+   acceptance is best-effort and must not be recorded as handset display.
+
 ## Evidence and postcondition
 
 Retain source/deployment identity, sanitized account/line and webhook-host
 inventory, replay-database metadata, `observedAt`, one approved operation,
-HTTP/result shapes, non-sensitive counts, separate consequence claims,
-limitations, and non-claims. HGI-305 owns the future bounded critical-journey
-packet; this runbook does not turn a local or provider response into Production
-proof.
+HTTP/result shapes, non-sensitive counts, separate ingress, Eve, outbound,
+typing-start, typing-stop, delivery, and handset-display claims, limitations,
+and non-claims. Use `BND-J05-sendblue-accepted-message` and, for the combined
+Production result, `BND-J12-dual-channel-production`. This runbook does not
+turn a local or provider response into Production proof.
 
 ## Rollback and revocation
 
-Under separate authority, restore the complete prior webhook inventory rather
-than appending a guessed route. Rotate/revoke affected webhook, API, routing,
-or replay-store material through its provider owner, then read back metadata
-and confirm invalid/missing webhook secrets return `401` without recording a
-secret. Provider and handset outcomes require their own postcondition.
+Under separate authority, stop ingress, wait the retry horizon, quarantine the
+new namespace, and restore the complete prior webhook inventory rather than
+appending a guessed route. Rotate/revoke affected webhook, API, routing, or
+replay-store material through its provider owner, then read back metadata and
+confirm invalid/missing webhook secrets return `401` without recording a
+secret. Never restore a legacy runtime/config/state path into the new source.
+Provider and handset outcomes require their own postcondition.
 
 ## Stop and escalation
 

@@ -2,10 +2,15 @@ import { Schema } from "effect";
 
 export const PhotonProviderProofOperation = Schema.Literals([
   "assert",
+  "createDedicatedLine",
+  "deleteDedicatedLine",
   "deleteWebhook",
+  "getPlatforms",
+  "listDedicatedLines",
   "listWebhooks",
   "registerWebhook",
   "sdkLifecycle",
+  "setIMessagePlatformEnabled",
 ]);
 
 const PhotonProviderProofReason = Schema.Literals([

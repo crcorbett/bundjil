@@ -4,6 +4,7 @@ export { layerLive } from "./live.layer.js";
 export { layerMemory } from "./memory.layer.js";
 export {
   PhotonConfig,
+  PhotonLineId,
   PhotonProjectId,
   PhotonProjectSecret,
   PhotonWebhookId,
@@ -13,6 +14,8 @@ export {
 export type {
   PhotonConfig as PhotonConfigType,
   PhotonConfigEncoded,
+  PhotonLineId as PhotonLineIdType,
+  PhotonLineIdEncoded,
   PhotonProjectId as PhotonProjectIdType,
   PhotonProjectIdEncoded,
   PhotonProjectSecret as PhotonProjectSecretType,

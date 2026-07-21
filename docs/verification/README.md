@@ -9,7 +9,7 @@ review_trigger: app, auth, provider, deployment, messaging, approval, recovery, 
 
 # Bundjil verification
 
-This is the canonical route for the ten consumer-visible critical journeys,
+This is the canonical route for the twelve consumer-visible critical journeys,
 proof packet contract, bounded command receipts, and retained evidence index.
 It describes repository-owned proof structure; it neither grants an external
 operation nor asserts present provider state.
@@ -39,7 +39,9 @@ local postconditions. A Preview packet is not a Production packet. A packet
 whose required external readback is unavailable is `inconclusive`; it may not
 become `proved`, `passed`, or a provider-health claim. HGI-309 owns any approved
 provider readback, mutation, send, deployment, promotion, or approval-resume
-qualification.
+qualification unless an accepted current SPEC and target-owned runbook record
+the exact task-scoped authority. The active Channel promotion uses that latter
+boundary; it grants no standing authority after the task closes.
 
 Current qualification is explicit in `journey-command-map.json`. Workspace
 status and local proxy mock health/auth/SSE are locally proved. Gateway
@@ -47,7 +49,9 @@ session creation/recovery is deferred because no deterministic session and
 interrupted-stream recovery fixture exists. Local reauthentication,
 Sendblue/provider rejection, and deployment preflight have only partial local
 contract proof. Sendblue sends, Executor reads/resumes, deployment/promotion,
-and incident containment/recovery remain approval-gated external journeys.
+Photon messaging/typing, the combined dual-Channel Production journey,
+Sendblue sends, Executor reads/resumes, deployment/promotion, and incident
+containment/recovery remain approval-gated external journeys.
 
 For an external or approval-gated journey, first use the app-owned runbook:
 [`../../apps/agent/runbooks/README.md`](../../apps/agent/runbooks/README.md) or

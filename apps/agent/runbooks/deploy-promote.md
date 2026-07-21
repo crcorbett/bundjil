@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
 last_reviewed: 2026-07-21
-review_trigger: Vercel project, deployment, environment, domain, protection, variable, source, preflight, rollout-stage, rollback, proxy, agent, or Sendblue activation change
+review_trigger: Vercel project, deployment, environment, domain, protection, variable, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
 # Deploy and promote the agent system
@@ -12,7 +12,7 @@ review_trigger: Vercel project, deployment, environment, domain, protection, var
 ## Scope and non-claims
 
 Use this runbook for the sequential Vercel rollout of the Codex proxy, agent,
-and final Sendblue activation. The repository command validates a sanitized
+and clean Sendblue plus Photon Channel routes. The repository command validates a sanitized
 snapshot; it does not fetch Vercel state, deploy, promote, roll back, grant
 authority, or establish Production. The deferred Eve live-state decision
 remains in force until a fresh target-owned readback is retained.
@@ -40,7 +40,7 @@ HEAD`, and a readback of `origin/main`.
 | Field               | Required value                                                                                                     |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Identity            | Authenticated Vercel principal, team/scope, and human approver                                                     |
-| Operation           | One read, staged deploy, promote, rollback, environment/alias change, or Sendblue activation                       |
+| Operation           | One read, staged deploy, promote, rollback, environment/alias change, or exact Channel provider activation         |
 | Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                    |
 | Environment         | Explicit Vercel Preview or Production target                                                                       |
 | Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                   |
@@ -50,9 +50,16 @@ HEAD`, and a readback of `origin/main`.
 ## Inputs and secret handling
 
 The preflight command reads only `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT`.
-Production agent metadata must include the names
-`BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_CODEX_PROXY_BASE_URL`, and
-`BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`. Production proxy metadata must include
+Production agent metadata must include `BUNDJIL_AGENT_MODEL_PROVIDER`,
+`BUNDJIL_CODEX_PROXY_BASE_URL`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`, every
+app-owned `BUNDJIL_CHANNEL_ROUTING_*` and `BUNDJIL_CHANNEL_REPLAY_*` name, and
+every provider name under `BUNDJIL_CHANNEL_SENDBLUE_*` and
+`BUNDJIL_CHANNEL_PHOTON_*` listed by `apps/agent/README.md`. All identity,
+line, credential, webhook, and protected routing values use sensitive
+metadata; bounded semantic configuration uses encrypted or sensitive metadata.
+Any `BUNDJIL_SENDBLUE_*` name is a legacy binding and blocks promotion.
+
+Production proxy metadata must include
 the names `BUNDJIL_CODEX_PROXY_MODE`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`,
 `BUNDJIL_CODEX_PROFILE_ID`, `BUNDJIL_CODEX_CONNECTOR_ID`,
 `BUNDJIL_CODEX_INSTALLATION_ID`, `BUNDJIL_CODEX_SUBJECT_ID`,
@@ -61,7 +68,10 @@ the names `BUNDJIL_CODEX_PROXY_MODE`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`,
 exactly one of `UPSTASH_REDIS_REST_URL` or `KV_REST_API_URL`, exactly one of
 `UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_TOKEN`, and
 `BUNDJIL_UPSTASH_REDIS_KEY_PREFIX`, with the target and allowed Vercel type.
-Both aliases in one group are ambiguous and fail closed.
+Both aliases in one proxy group are ambiguous and fail closed. Channel replay
+uses only `BUNDJIL_CHANNEL_REPLAY_REST_URL` and
+`BUNDJIL_CHANNEL_REPLAY_REST_TOKEN`; no KV alias is a Channel compatibility
+input.
 
 Record opaque fingerprints and IDs only. Never retain values, access tokens,
 profile contents/ciphertext, phone identities, bypass URLs, raw environment
@@ -116,7 +126,9 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    | `proxy-provisioned`               | Proxy configured `live`; required metadata bindings; separate Preview/Production subject, namespace, cipher, profile, lock, and fence identity; encrypted stored-profile proof |
    | `proxy-accepted-agent-configured` | Accepted immutable proxy matches pushed SHA/config/stable alias; agent uses `codex-proxy`, Vercel OIDC, no anonymous/deployed-local fallback, and a separate bearer            |
    | `agent-accepted-rollback-ready`   | Accepted immutable agent plus distinct current/previous deployment and config references for both apps                                                                         |
-   | `sendblue-final-promotion`        | Soak and rollback drill completed; Sendblue Production activation still false immediately before its separately approved final change                                          |
+   | `channel-inventory-ready`         | New-only Channel bindings present; legacy bindings/data absent; Preview/Production namespace fingerprints distinct; exact healthy Sendblue and Photon inventories              |
+   | `channel-candidate-staged`        | One pushed immutable candidate serves both routes with domains skipped; stable alias remains on the recorded current deployment                                                |
+   | `channel-production-promotion`    | Candidate source/config/routes accepted; soak and rollback drill complete; Production activation remains false immediately before the approved promote                         |
 
 5. **Mutation gate:** stop before deploy, promote, alias/environment change, or
    rollback until the complete stage-specific authority envelope is attached.
@@ -126,12 +138,20 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 "$DEPLOYMENT_URL" --scope "$BUNDJIL_VERCEL_SCOPE"`. Do not use `--yes`,
    inline secret flags, or an unreviewed prebuilt artifact.
 
-6. Immediately repeat the project/list/inspect readbacks, resolve the stable
+6. Before promotion, execute the Sendblue and Photon runbooks against the
+   immutable candidate URL. Require signed ingress, replay suppression, Eve
+   completion, outbound acceptance, typing start, typing stop, and scoped
+   resource release for each provider. A provider-accepted result does not
+   establish handset delivery or typing display.
+
+7. Immediately repeat the project/list/inspect readbacks, resolve the stable
    alias to the accepted immutable deployment, rerun the matching preflight,
    and record the postcondition. Bind boundary-matched HTTP, session, message,
    and Production results to the matching
-   [`docs/verification`](../../../docs/verification/README.md) packet; a
-   deployment status alone is insufficient.
+   [`docs/verification`](../../../docs/verification/README.md) packet. Repeat
+   both provider journeys through the stable domain and bind them to
+   `BND-J12-dual-channel-production`; a deployment status alone is
+   insufficient.
 
 ## Evidence and postcondition
 
@@ -149,8 +169,12 @@ matches the accepted `current` reference and the previous reference is
 distinct. Under separate authority, use `vercel rollback
 "$PREVIOUS_DEPLOYMENT" --scope "$BUNDJIL_VERCEL_SCOPE"`, then re-read project,
 deployment, alias, variable metadata, and app proof. Coordinate proxy and agent
-configuration; preserve the newest fenced OAuth profile generation. Revoke the
-Vercel session/token separately when required.
+configuration; preserve the newest fenced OAuth profile generation. Before
+restoring agent traffic, disable both provider ingresses, drain their retry
+horizons, and quarantine the new replay namespace so delayed deliveries cannot
+cross the intentional continuity break. Never reintroduce legacy source,
+environment names, state, or replay readers. Revoke the Vercel session/token
+separately when required.
 
 ## Stop and escalation
 
@@ -159,8 +183,8 @@ scope/project/environment, stale/unavailable provider readback, shared
 Preview/Production identity or bearer, missing metadata binding, alias drift,
 missing rollback candidate, unavailable approval, secret leak, or unexpected
 Production activation. Escalate Vercel state to the project owner, Codex
-profile/proxy issues to the proxy operator, Sendblue issues to its owner, and
-authority/workflow gaps to HGI-304.
+profile/proxy issues to the proxy operator, Sendblue or Photon issues to their
+provider owner, and authority/workflow gaps to the authority register owner.
 
 ## Readback fallback
 

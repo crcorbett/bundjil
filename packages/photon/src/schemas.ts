@@ -10,6 +10,12 @@ export const PhotonProjectSecret = Schema.Redacted(Schema.NonEmptyString);
 export type PhotonProjectSecret = typeof PhotonProjectSecret.Type;
 export type PhotonProjectSecretEncoded = typeof PhotonProjectSecret.Encoded;
 
+export const PhotonLineId = Schema.String.check(Schema.isUUID()).pipe(
+  Schema.brand("@bundjil/photon/PhotonLineId")
+);
+export type PhotonLineId = typeof PhotonLineId.Type;
+export type PhotonLineIdEncoded = typeof PhotonLineId.Encoded;
+
 export const PhotonWebhookId = Schema.String.check(Schema.isUUID()).pipe(
   Schema.brand("@bundjil/photon/PhotonWebhookId")
 );

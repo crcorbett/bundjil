@@ -9,6 +9,40 @@ import {
 
 const fingerprint = (character: string) => character.repeat(64);
 
+const productionVariable = (name: string, type: "encrypted" | "sensitive") => ({
+  name,
+  target: "production" as const,
+  type,
+});
+
+const channelAgentVariables = [
+  productionVariable("BUNDJIL_CHANNEL_ROUTING_IDENTITIES", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_ROUTING_SECRET", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_PREFIX", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_REST_TOKEN", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_REST_URL", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES", "encrypted"),
+  productionVariable("BUNDJIL_CHANNEL_SENDBLUE_API_KEY", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_SENDBLUE_API_SECRET", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_SENDBLUE_LINE", "sensitive"),
+  productionVariable(
+    "BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS",
+    "encrypted"
+  ),
+  productionVariable("BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID", "sensitive"),
+  productionVariable("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET", "sensitive"),
+  productionVariable(
+    "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_TOLERANCE_SECONDS",
+    "encrypted"
+  ),
+] as const;
+
 const beforeFirstMutation = {
   adapter: "vercel-readonly-metadata-v1",
   agent: {
@@ -162,6 +196,7 @@ const proxyAcceptedAgentConfigured = {
         target: "production",
         type: "sensitive",
       },
+      ...channelAgentVariables,
     ],
   },
   inventory: {
@@ -210,12 +245,49 @@ const agentAcceptedRollbackReady = {
   stage: "agent-accepted-rollback-ready",
 } as const;
 
-const sendblueFinalPromotion = {
+const channelInventory = {
+  legacyBindingsPresent: false,
+  legacyReplayRead: false,
+  namespaces: {
+    previewReplayFingerprint: fingerprint("a"),
+    previewRoutingFingerprint: fingerprint("b"),
+    productionReplayFingerprint: fingerprint("c"),
+    productionRoutingFingerprint: fingerprint("d"),
+  },
+  photon: {
+    dedicatedLineCount: 1,
+    healthyDedicatedLineCount: 1,
+    platformEnabled: true,
+    webhookCount: 1,
+  },
+  sendblue: { lineReady: true, receiveWebhookCount: 1 },
+} as const;
+
+const channelInventoryReady = {
   ...agentAcceptedRollbackReady,
+  channel: channelInventory,
+  stage: "channel-inventory-ready",
+} as const;
+
+const channelCandidateStaged = {
+  ...channelInventoryReady,
+  candidateAgent: {
+    configFingerprint: fingerprint("e"),
+    deploymentId: "dpl_channelcandidate",
+    routes: ["/eve/v1/sendblue/webhook", "/eve/v1/photon/webhook"] as const,
+    sourceSha: beforeFirstMutation.source.pushedSha,
+  },
+  stableAliasDeploymentId:
+    agentAcceptedRollbackReady.rollback.agent.current.deploymentId,
+  stage: "channel-candidate-staged",
+} as const;
+
+const channelProductionPromotion = {
+  ...channelCandidateStaged,
+  productionActivated: false,
   rollbackDrill: { completed: true },
-  sendblue: { productionActivated: false },
   soak: { completed: true },
-  stage: "sendblue-final-promotion",
+  stage: "channel-production-promotion",
 } as const;
 
 const decode = (input: unknown) =>
@@ -229,7 +301,9 @@ describe("Production promotion preflight", () => {
     proxyProvisioned,
     proxyAcceptedAgentConfigured,
     agentAcceptedRollbackReady,
-    sendblueFinalPromotion,
+    channelInventoryReady,
+    channelCandidateStaged,
+    channelProductionPromotion,
   ]) {
     it.effect(`accepts the ${fixture.stage} checkpoint`, () =>
       Effect.gen(function* () {
@@ -277,7 +351,7 @@ describe("Production promotion preflight", () => {
       )
     ).toThrow("Expected");
     expect(() =>
-      decode({ ...sendblueFinalPromotion, soak: undefined }).pipe(
+      decode({ ...channelProductionPromotion, soak: undefined }).pipe(
         Effect.runSync
       )
     ).toThrow("Expected");
@@ -306,10 +380,58 @@ describe("Production promotion preflight", () => {
     ).toThrow("Unexpected key");
     expect(() =>
       decode({
-        ...sendblueFinalPromotion,
-        sendblue: { productionActivated: false, variables: [] },
+        ...channelProductionPromotion,
+        channel: { ...channelInventory, legacyBindingsPresent: true },
       }).pipe(Effect.runSync)
     ).toThrow("Unexpected key");
+  });
+
+  it.effect(
+    "rejects missing clean Channel bindings, legacy bindings, and candidate drift",
+    () =>
+      Effect.gen(function* () {
+        const evidence = yield* decode({
+          ...channelCandidateStaged,
+          agent: {
+            ...channelCandidateStaged.agent,
+            variables: [
+              ...channelCandidateStaged.agent.variables.filter(
+                (variable) =>
+                  variable.name !== "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
+              ),
+              productionVariable("BUNDJIL_SENDBLUE_API_KEY", "sensitive"),
+            ],
+          },
+          candidateAgent: {
+            ...channelCandidateStaged.candidateAgent,
+            sourceSha: "a".repeat(40),
+          },
+          stableAliasDeploymentId: "dpl_wrongstable",
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.deepStrictEqual(evidence.rejected, [
+          "missing-production-variable:BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+          "legacy-production-variable:BUNDJIL_SENDBLUE_API_KEY",
+          "channel-candidate-source-mismatch",
+          "channel-stable-alias-rollback-mismatch",
+        ]);
+      })
+  );
+
+  vitestIt("rejects shared Preview and Production Channel namespaces", () => {
+    expect(() =>
+      decode({
+        ...channelInventoryReady,
+        channel: {
+          ...channelInventory,
+          namespaces: {
+            ...channelInventory.namespaces,
+            productionReplayFingerprint:
+              channelInventory.namespaces.previewReplayFingerprint,
+          },
+        },
+      }).pipe(Effect.runSync)
+    ).toThrow("Channel Preview and Production namespaces must be distinct");
   });
 
   it.effect("rejects plain secret bindings and shared identities", () =>

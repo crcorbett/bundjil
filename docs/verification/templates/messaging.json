@@ -6,7 +6,7 @@
   "lifecycle": { "state": "inconclusive" },
   "externalConsequence": {
     "outcome": "not_attempted",
-    "target": "replace with exact Sendblue account, line, and webhook"
+    "target": "replace with exact Channel provider, account/project, line, and webhook"
   },
   "candidate": {
     "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -14,25 +14,30 @@
     "artifactDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   },
   "authority": {
-    "principal": "approved Sendblue operator",
+    "principal": "approved Sendblue or Photon operator",
     "identitySource": "target-owned approval",
     "externalAccess": "mutation",
     "approvalReceipt": "replace with message authority receipt",
-    "rollbackOwner": "Sendblue account owner"
+    "rollbackOwner": "exact Channel provider owner"
   },
   "environment": {
     "tier": "external",
-    "target": "replace with exact Sendblue account, line, and webhook"
+    "target": "replace with exact Channel provider, account/project, line, and webhook"
   },
   "journeyResults": [
     {
       "journeyId": "BND-J05-sendblue-accepted-message",
       "status": "inconclusive",
       "oracle": "Replace with a sanitized provider acceptance and consequence oracle."
+    },
+    {
+      "journeyId": "BND-J11-photon-accepted-message-typing",
+      "status": "inconclusive",
+      "oracle": "Replace or remove this placeholder so the packet names only the exact provider journey and its typing start/stop outcomes."
     }
   ],
   "commandReceipt": {
-    "invocation": "run the named Sendblue operation after its authority gate",
+    "invocation": "run the named Channel provider operation after its authority gate",
     "outcome": "blocked",
     "exitCode": null,
     "invariant": "A send requires exact recipient-safe target, approval, and rollback.",
@@ -45,19 +50,19 @@
   "externalReadback": {
     "required": true,
     "outcome": "unavailable",
-    "receipt": "replace with sanitised account/webhook readback"
+    "receipt": "replace with sanitized provider account/project, line, webhook, and operation readback"
   },
   "postconditions": ["No external messaging consequence is established."],
   "limitations": [
-    "Provider acceptance and recipient delivery are different claims."
+    "Provider acceptance, Eve completion, recipient delivery, and typing display are different claims."
   ],
   "nonClaims": [
-    "This template contains no message content and proves no delivery."
+    "This template contains no message content and proves no delivery or visible typing."
   ],
   "rollback": {
     "identity": "replace with provider-owned rollback identity",
     "outcome": "unavailable",
-    "owner": "Sendblue account owner"
+    "owner": "exact Channel provider owner"
   },
   "evidence": [
     {

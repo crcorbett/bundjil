@@ -160,6 +160,24 @@ const authorityRows = [
     target: "sendblue",
   },
   {
+    id: "photon-management",
+    status: "bounded",
+    surface: "provider",
+    target: "photon",
+  },
+  {
+    id: "photon-inbound",
+    status: "bounded",
+    surface: "provider",
+    target: "photon",
+  },
+  {
+    id: "photon-outbound",
+    status: "foreground_only",
+    surface: "provider",
+    target: "photon",
+  },
+  {
     id: "upstash-sendblue-replay",
     status: "bounded",
     surface: "provider",

@@ -14,7 +14,11 @@ send, and typing presence.
 - `@bundjil/photon/memory` exports the provider-neutral memory Layer.
 
 Spectrum clients, Spaces, callbacks, SDK/Zod values, raw provider failures,
-and Photon management operations are private implementation details.
+and Photon management operations are private implementation details. The
+bounded operator workflow can reconcile one dedicated iMessage line, the
+iMessage platform state, and one webhook by stable provider IDs. Its decoded
+results expose lifecycle status and billing-sync classification only; phone
+numbers and billing amounts do not cross the package boundary.
 
 The exact `12.2.0` SDK declarations contain one upstream
 `exactOptionalPropertyTypes` mismatch: the iMessage definition omits optional
@@ -69,3 +73,8 @@ The separately authorised, provider-only lifecycle command is
 performs one reversible proof-webhook lifecycle plus SDK acquire/release, and
 emits only a sanitised Schema receipt. It is not a deployment or messaging
 proof.
+
+Production line, platform, webhook, and deployment reconciliation follows the
+same runbook but remains a distinct promotion workflow. Repository tests and
+the provider-only proof cannot stand in for immutable deployment, signed
+ingress, Eve completion, send acceptance, delivery, or typing-display proof.

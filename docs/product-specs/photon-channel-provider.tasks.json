@@ -249,7 +249,7 @@
     {
       "id": "build-production-promotion-contracts",
       "title": "Build dual-Channel preflight, authority, and proof contracts",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["plan-production-promotion"],
       "description": "Extend the existing Schema-driven Production preflight and governed proof surfaces so the rollout fails closed on missing, legacy, shared, stale, ambiguous, or unprovable Sendblue/Photon configuration.",
       "implementationNotes": [
@@ -268,7 +268,12 @@
         "A sanitized preflight can represent every rollout checkpoint and cannot claim Production from repository or Preview evidence.",
         "Runbooks and proof owners are executable before the first provider mutation."
       ],
-      "evidence": [],
+      "evidence": [
+        "Production contract: the Schema-driven preflight now owns channel-inventory-ready, channel-candidate-staged, and channel-production-promotion checkpoints. It requires distinct clean Preview/Production replay and routing fingerprints, one healthy Photon line/platform/webhook inventory, one ready Sendblue line/webhook inventory, immutable candidate/source/config identities, both exact webhook routes, a distinct rollback deployment, every new BUNDJIL_CHANNEL_* metadata binding, and zero legacy BUNDJIL_SENDBLUE_* names.",
+        "Governance and operations: authority and automation registers now bind Photon management, inbound, and foreground outbound operations to task-scoped approval and exact runbooks; 12 critical journeys include Photon accepted-message/typing and dual-channel Production. Sendblue, Photon, deploy/promote runbooks and messaging/Production templates separate provider acceptance, Eve completion, delivery, typing display, retry drain, quarantine, billing consequences, stable-ID adoption, and no-legacy rollback.",
+        "Effect and provider boundary: private named PhotonManagement operations now decode complete platform, dedicated-line, billing-sync, and webhook management responses through Effect Schemas; public output retains only branded stable IDs, lifecycle status, and billing-sync classification. Platform enablement and line create/delete are explicit non-retried operations with exact fake-HTTP lifecycle tests; no phone number or billing amount leaves the management boundary.",
+        "Verification: formatting, docs/skills/authority/controls/verification policies, Effect setup, boundary audit and 76 boundary/control tests, focused agent typecheck and 20 preflight tests, Photon build/typecheck and 16 tests, lint, Knip, eight workspace typechecks, 236 workspace tests, full verification, and diff checks passed with documented synthetic Executor configuration. No provider, secret, Vercel, Sendblue, Upstash, DNS, webhook, line, deployment, or Production mutation ran."
+      ],
       "commitAfterPassing": true
     },
     {
