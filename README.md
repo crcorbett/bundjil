@@ -47,6 +47,7 @@ bun run build
 bun run test
 bun run check:boundaries
 bun run check:effect-setup
+bun run check:docs
 bun run check:skills
 bun run verification
 ```

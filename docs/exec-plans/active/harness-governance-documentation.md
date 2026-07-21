@@ -35,9 +35,12 @@ and task state.
   fallbacks. Acceptance and exact Git identity are recorded in
   [`HGI-308-validation.json`](../../documentation-audit/HGI-308-validation.json);
   the records do not establish provider state or operation authority.
-- HGI-302, HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307 remain
-  pending in dependency order. HGI-309 remains deferred until separately
-  approved external authority exists.
+- **HGI-302 — in progress:** implement bounded docs and skill-mirror controls,
+  repair current routes and mirrors, preserve the accepted occurrence-control
+  equivalence bar, and add positive/negative fixtures before acceptance.
+- HGI-310, HGI-303, HGI-304, HGI-305, HGI-306, and HGI-307 remain pending in
+  dependency order. HGI-309 remains deferred until separately approved
+  external authority exists.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,
 ledger-lifecycle, and recorded-approval fields), completed plans, research,

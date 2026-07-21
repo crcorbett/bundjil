@@ -18,6 +18,7 @@
         "typescript": "catalog:typescript",
         "ultracite": "7.6.1",
         "vitest": "catalog:testing",
+        "yaml": "^2.9.0",
       },
     },
     "apps/agent": {
@@ -25,7 +26,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@ai-sdk/openai-compatible": "^3.0.5",
-        "@bundjil/codex": "workspace:*",
         "@bundjil/eve": "workspace:*",
         "@bundjil/store": "workspace:*",
         "@effect/platform-bun": "catalog:effect",

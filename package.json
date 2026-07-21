@@ -45,10 +45,11 @@
     "check-types": "bun run check:effect-setup && turbo run check-types",
     "check:boundaries": "bun run check:effect-setup && tsc --project tooling/tsconfig.json && bun tooling/boundary-audit.ts",
     "check:effect-setup": "effect-language-service check",
+    "check:docs": "bun tooling/documentation-policy-audit.ts",
     "check:skills": "bun tooling/skill-policy-audit.ts",
     "fix": "ultracite fix --type-aware",
     "check": "ultracite check --type-aware",
-    "verification": "bun run check:effect-setup && bun run check:boundaries && bun run check:skills && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
+    "verification": "bun run check:effect-setup && bun run check:boundaries && bun run check:docs && bun run check:skills && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
     "eve": "eve",
     "changeset": "changeset",
     "changeset:add": "changeset add",
@@ -73,7 +74,8 @@
     "turbo": "^2.9.6",
     "typescript": "catalog:typescript",
     "ultracite": "7.6.1",
-    "vitest": "catalog:testing"
+    "vitest": "catalog:testing",
+    "yaml": "^2.9.0"
   },
   "engines": {
     "bun": ">=1.3.14",

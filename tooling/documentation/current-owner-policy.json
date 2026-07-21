@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 2,
+  "owners": [
+    "AGENTS.md",
+    "README.md",
+    "docs/README.md",
+    "docs/architecture/README.md",
+    "docs/architecture/effect-patterns.md",
+    "docs/architecture/eve-agent.md",
+    "docs/architecture/frontend-composition.md",
+    "docs/architecture/repo-structure.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/product-specs/index.md",
+    "docs/product-specs/harness-governance-documentation.md",
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/active/harness-governance-documentation.md",
+    "apps/agent/agent/instructions.md"
+  ],
+  "acceptedTaskStates": {
+    "HGI-300": "completed",
+    "HGI-301": "completed",
+    "HGI-308": "completed"
+  },
+  "rules": [
+    {
+      "id": "mutable-provider-state",
+      "claimType": "external-actuality",
+      "ownerPaths": [
+        "docs/architecture/eve-agent.md",
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/exec-plans/active/harness-governance-documentation.md"
+      ],
+      "requiredTermGroups": [
+        ["eve", "sendblue", "webhook", "deployment", "provider endpoint"],
+        ["production", "preview", "live", "now", "currently"],
+        [
+          "active",
+          "deployed",
+          "live",
+          "ready",
+          "running",
+          "serves",
+          "serving",
+          "operational"
+        ]
+      ],
+      "nonClaimTerms": [
+        "not",
+        "no ",
+        "never",
+        "deferred",
+        "historical",
+        "inconclusive",
+        "unavailable",
+        "unproved",
+        "does not",
+        "cannot",
+        "requires readback",
+        "without a production inference"
+      ],
+      "repairHint": "Move mutable actuality to a dated target-owned readback with limitations and a non-claim."
+    },
+    {
+      "id": "tool-data-authority",
+      "claimType": "authority-grant",
+      "ownerPaths": ["AGENTS.md", "apps/agent/agent/instructions.md"],
+      "requiredTermGroups": [
+        ["tool output", "tool result", "provider response", "successful tool"],
+        [
+          "approves",
+          "approval",
+          "authorizes",
+          "authority",
+          "grants",
+          "permission",
+          "permits"
+        ]
+      ],
+      "nonClaimTerms": ["not", "no ", "never", "cannot", "does not", "do not"],
+      "repairHint": "Separate observed tool data from policy, identity, approval, capability, and authority."
+    },
+    {
+      "id": "runbook-owner",
+      "claimType": "semantic-owner-assignment",
+      "ownerPaths": [
+        "AGENTS.md",
+        "docs/README.md",
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/exec-plans/active/harness-governance-documentation.md"
+      ],
+      "requiredTermGroups": [
+        ["operation", "procedure", "runbook"],
+        ["docs/runbooks", "central runbook", "central docs"],
+        [
+          "canonical",
+          "lives",
+          "owned",
+          "route",
+          "routes",
+          "store",
+          "stored",
+          "write",
+          "written"
+        ]
+      ],
+      "nonClaimTerms": [
+        "not",
+        "no ",
+        "never",
+        "missing",
+        "pending",
+        "do not",
+        "without creating"
+      ],
+      "repairHint": "Route operations to apps/agent/runbooks or apps/codex-proxy/runbooks; do not create a competing central runbook tree."
+    },
+    {
+      "id": "fixed-coordination-ritual",
+      "claimType": "mandatory-ritual",
+      "ownerPaths": [
+        "AGENTS.md",
+        ".agents/skills/prd-writer/SKILL.md",
+        ".agents/skills/prd-review/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md"
+      ],
+      "requiredTermGroups": [
+        ["audit pass", "pass audit", "subagent", "review pass"],
+        ["always", "every implementation", "fixed", "mandatory", "required"]
+      ],
+      "nonClaimTerms": [
+        "not",
+        "no ",
+        "never",
+        "do not",
+        "without",
+        "optional",
+        "risk-based"
+      ],
+      "repairHint": "Use risk-based evidence and optional bounded delegation on one accountable primary trajectory."
+    }
+  ],
+  "taskStateOwnerPaths": [
+    "docs/product-specs/index.md",
+    "docs/exec-plans/active/README.md",
+    "docs/product-specs/harness-governance-documentation.md",
+    "docs/exec-plans/active/harness-governance-documentation.md"
+  ],
+  "nonterminalTaskTerms": [
+    "active",
+    "in progress",
+    "not complete",
+    "ongoing",
+    "pending",
+    "underway"
+  ]
+}

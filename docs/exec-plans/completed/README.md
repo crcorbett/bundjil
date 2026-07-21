@@ -15,7 +15,20 @@ authority for a new operation. Current work lives only under
 [`../active/`](../active/); durable policy lives under
 [`../../architecture/`](../../architecture/).
 
-The retained plans cover Codex provider/storage work, Effect boundaries and
-persistence, Executor MCP, repository naming, Sendblue channel/typing, Vercel
-promotion, and Effect Schema string contracts. Read one only when its
-provenance is necessary.
+## Retained plans
+
+| Plan                                                                                | Provenance class                                           |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)               | Implemented storage rollout                                |
+| [Codex local profile import workaround](codex-local-profile-import-workaround.md)   | Superseded local fallback                                  |
+| [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                 | Implemented provider composition                           |
+| [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md) | Implemented boundary control                               |
+| [Effect persistence](effect-persistence.md)                                         | Implemented persistence history                            |
+| [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented Schema migration                               |
+| [Executor MCP connection](executor-mcp-connection.md)                               | Implemented connection history; not current provider truth |
+| [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration                                      |
+| [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented channel rollout history                        |
+| [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented feature rollout history                        |
+| [Vercel production promotion](vercel-production-promotion.md)                       | Completed rollout evidence; not current Vercel truth       |
+
+Read one only when its provenance is necessary.

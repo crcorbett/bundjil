@@ -3,6 +3,8 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
+last_reviewed: 2026-07-21
+review_trigger: task status, provider effort, Preview proof, authority, or rollback change
 spec: ../../product-specs/codex-terra-high-reasoning.md
 task_ledger: ../../product-specs/codex-terra-high-reasoning.tasks.json
 started: 2026-07-21

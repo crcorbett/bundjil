@@ -54,8 +54,8 @@ the narrowest current owner; do not load completed rollout history by default.
 ## Verification and authority
 
 Use Bun from the repository root. Boundary/provider work runs
-`bun run check:boundaries`, `bun run check:effect-setup`, and
-`bun run check:skills`; every accepted slice runs `bun run verification`.
+`bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
+and `bun run check:skills`; every accepted slice runs `bun run verification`.
 
 Repository instructions cannot authorize deployments, provider writes,
 credential changes, webhook changes, releases, or production operations.

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-302",
+  "status": "accepted-candidate",
+  "observedAt": "2026-07-21T13:01:57+01:00",
+  "baseCommit": "feaf14d9821280fb617d7c526221b708f17e2228",
+  "authority": "repository-local documentation, skill-mirror, tooling, metadata, dependency, test, and route changes only; no provider or external-system access or mutation",
+  "acceptedOutcome": "Bundjil has executable bounded docs and skill controls, complete required Claude mirrors, YAML/Schema-validated skill metadata, semantic current-owner claim checks, preserved occurrence-control equivalence, and positive/negative fixtures wired into verification.",
+  "candidateInputPathCount": 28,
+  "sortedCandidateInputPathSha256": "7f469c973e37e63abf4adf569de58dbfa9da43acaeb5c36632a6af247f783044",
+  "candidateInputPathScope": "All HGI-302 worktree changes before adding this candidate receipt; the set includes the audit-index route and excludes only this receipt.",
+  "checks": [
+    {
+      "check": "check:docs positive repository pass and negative fixtures",
+      "status": "passed",
+      "result": "The live check passed 204 selected files and emitted a bounded JSON report; fixtures reject metadata, links, indexes, lifecycle, commands, missing package READMEs, successor/tombstone gaps, personal paths, semantic paraphrases, accepted-task drift, and weakened occurrence controls."
+    },
+    {
+      "check": "check:skills positive repository pass and negative fixtures",
+      "status": "passed",
+      "result": "The live check passed 164 instruction/reference files and all 15 Claude mirrors; fixtures reject broken, missing, and legacy mirrors, YAML/Schema metadata errors, broken references, personal paths, and contradictory executable examples across local skills."
+    },
+    {
+      "check": "fresh-context rejection, correction, and acceptance",
+      "status": "passed",
+      "result": "The evaluator first rejected phrase-only contradiction logic and weak metadata/example coverage. Structured claim modelling, accepted-task comparison, YAML plus Effect Schema decoding, all-local-skill example scanning, and paraphrase fixtures then received PASS."
+    },
+    {
+      "check": "occurrence-control equivalence",
+      "status": "passed",
+      "result": "The accepted HGI-308 decision is mechanically required, and the real boundary suite preserves exact matching, duplicate rejection, occurrence isolation, and stale-entry detection."
+    },
+    {
+      "check": "fully staged repository verification",
+      "status": "passed",
+      "result": "Effect setup, boundary and skill/docs audits, 38 tooling tests, Ultracite, lint fixtures, Knip, five workspace typechecks, and 250 package/app tests passed with schema-valid synthetic Executor test configuration and no provider call."
+    }
+  ],
+  "ephemeralReports": [
+    {
+      "path": "tmp/docs-policy-report.json",
+      "sha256": "48b3327f2306046a18c2bbeaad0348827bf2f7336609c7db538bb70d4b643ff8",
+      "result": "ok=true; checkedFiles=204; shownFindings=0; omittedFindings=0"
+    },
+    {
+      "path": "tmp/skill-policy-report.json",
+      "sha256": "fee0a468d87cc6619a86ca3f20af3df2be266119a346a8f6d8a474237a9e4dcb",
+      "result": "ok=true; checkedFiles=164; checkedLinks=15; shownFindings=0; omittedFindings=0"
+    }
+  ],
+  "limitations": [
+    "Structural and semantic repository controls do not prove provider, deployment, workflow, credential, release, or application-runtime actuality.",
+    "Semantic claim classification is an explicit checked-in policy model; new claim domains or vocabulary require owner-reviewed rule and fixture updates.",
+    "The JSON policy reports are per-run ignored receipts; this candidate binds their observed digests and the durable closeout receipt will bind committed source identity."
+  ],
+  "nonClaims": [
+    "No provider, deployment, workflow, GitHub setting, secret, webhook, message, credential, release, production, or publication system was read or changed.",
+    "The docs and skill checks do not grant operation authority or replace provider/runtime proof."
+  ],
+  "rollback": "Revert the bounded HGI-302 semantic commit; preserve the accepted HGI-308 occurrence-control decision and prior HGI-300/HGI-301/HGI-308 receipts.",
+  "nextTrigger": "Commit the accepted semantic candidate, create a content-addressed Git validation receipt, publish/read back main, and close HGI-302 before HGI-310."
+}

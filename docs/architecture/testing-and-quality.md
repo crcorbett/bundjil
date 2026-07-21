@@ -1,3 +1,12 @@
+---
+document_type: architecture-standard
+lifecycle: current
+authority: canonical
+owner: bundjil-quality-owner
+last_reviewed: 2026-07-21
+review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
+---
+
 # Testing And Quality
 
 Use the smallest check that proves the changed behavior, then broaden before
@@ -11,6 +20,7 @@ Run from the repo root:
 ```bash
 bun run check:boundaries
 bun run check:effect-setup
+bun run check:docs
 bun run check:skills
 bun run test:boundaries
 bun run check
@@ -26,7 +36,12 @@ bun run verification
 `bun run test:boundaries` proves its positive/negative fixtures and stale
 exception behavior. `bun run check:effect-setup` proves the installed
 TypeScript compiler is patched with the configured Effect language service.
-`bun run check:skills` rejects contradictory executable examples and stale
+`bun run check:docs` validates current metadata, links, indexes, lifecycle,
+documented commands, package README coverage, successor routes, portability,
+and owner-aware contradictions. It writes bounded console diagnostics and full
+JSON detail to `tmp/docs-policy-report.json`. `bun run check:skills` rejects
+broken/missing skill mirrors, invalid metadata/reference routes,
+contradictory executable examples, and stale
 Site-specific overlays in the relevant repo-owned skills, and confirms the
 required provenance and frontend-composition policy is present in instruction
 surfaces. `bun run verification` is the standard closeout gate. It runs those
@@ -244,6 +259,7 @@ Use `rg` for docs checks:
 rg -n "old-path|old-package|old-command" README.md AGENTS.md docs apps packages
 rg -n "docs/architecture/(effect-patterns|repo-structure|testing-and-quality)" README.md AGENTS.md docs ARCHITECTURE.md
 bun run check:skills
+bun run check:docs
 ```
 
 Stale-name scans must be scoped by provenance. Current source, manifests,

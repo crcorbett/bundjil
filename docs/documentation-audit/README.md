@@ -38,6 +38,10 @@ HGI-308 decision evidence:
 - [`HGI-308-boundary-exceptions.decision.json`](HGI-308-boundary-exceptions.decision.json)
 - [`HGI-308-readback-fallbacks.decision.json`](HGI-308-readback-fallbacks.decision.json)
 
+HGI-302 control evidence:
+
+- [`HGI-302-candidate.json`](HGI-302-candidate.json)
+
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.

@@ -1,3 +1,12 @@
+---
+document_type: architecture-standard
+lifecycle: current
+authority: canonical
+owner: bundjil-repository-owner
+last_reviewed: 2026-07-21
+review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
+---
+
 # Repo Structure
 
 Bundjil is a Bun workspace and Turbo monorepo. Keep the repo small, explicit,
