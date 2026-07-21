@@ -136,6 +136,12 @@ Removal order:
   verification requires exact bytes and headers.
 - The Spectrum SDK instance, Space, callbacks, Zod types, Promises, and raw
   errors remain private to `@bundjil/photon`'s live Layer.
+- Spectrum `12.2.0` has one exact declaration defect under
+  `exactOptionalPropertyTypes`: its iMessage definition omits optional
+  `events`, while core's `AnyPlatformDef` constraint rejects that omission.
+  The adjacent `@ts-expect-error` on the `providers` property is the sole
+  owned type-boundary exception; package and consuming-app typechecks remain
+  strict.
 - Eve's framework state may receive one complete encoded snapshot assignment
   in the thin adapter. Domain services return immutable decoded values.
 - Any primitive forced by a third-party signature is confined to its exact
@@ -162,14 +168,14 @@ internal state/status/test structure:
 
 ## Task progress
 
-| Task                                   | Status    | Acceptance receipt                                                                                            |
-| -------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------- |
-| Active plan and clean boundary         | Completed | Plan, baseline, authority, owners, removal order, continuity break, full verification, and no provider action |
-| Neutral Channel and app vertical slice | Completed | Canonical package plus clean memory journey; focused and full gates passed with no provider action            |
-| Fresh Sendblue and rewritten Eve edge  | Completed | New package/config/runtime/edge accepted; old tree removed; 39 app and 8 provider tests plus full gate passed |
-| Photon and dual local conformance      | Pending   | —                                                                                                             |
-| Isolated Photon Preview proof          | Pending   | Hosted Preview blocked without Vercel authority; provider-only proof may proceed                              |
-| Docs reconciliation and promotion gate | Pending   | —                                                                                                             |
+| Task                                   | Status    | Acceptance receipt                                                                                                                                                     |
+| -------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Active plan and clean boundary         | Completed | Plan, baseline, authority, owners, removal order, continuity break, full verification, and no provider action                                                          |
+| Neutral Channel and app vertical slice | Completed | Canonical package plus clean memory journey; focused and full gates passed with no provider action                                                                     |
+| Fresh Sendblue and rewritten Eve edge  | Completed | New package/config/runtime/edge accepted; old tree removed; 39 app and 8 provider tests plus full gate passed                                                          |
+| Photon and dual local conformance      | Completed | Exact Spectrum 12.2.0 pins, signed direct webhook adapter, scoped SDK boundary, dual contract/app journeys, both built routes, 229 tests, and full gate passed locally |
+| Isolated Photon Preview proof          | Pending   | Hosted Preview blocked without Vercel authority; provider-only proof may proceed                                                                                       |
+| Docs reconciliation and promotion gate | Pending   | —                                                                                                                                                                      |
 
 ## Downstream-impact ledger
 

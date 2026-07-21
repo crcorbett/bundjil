@@ -131,7 +131,7 @@
     {
       "id": "build-and-conform-photon-provider",
       "title": "Build @bundjil/photon and prove dual conformance locally",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["build-clean-sendblue-provider-and-rewrite-edge"],
       "description": "Pin the exact published Spectrum boundary, implement Photon ChannelTransport, resolve signature/resource/Space uncertainties locally, and run both providers through the same contract and app journey.",
       "implementationNotes": [
@@ -149,6 +149,11 @@
       "completionCriteria": [
         "Both providers satisfy one nominal contract without leaking provider-specific types or behavior into the app.",
         "Any unresolved SDK lifecycle, Space, line, or uncertain-send issue stops live proof."
+      ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/photon owns exact @spectrum-ts/core and @spectrum-ts/imessage 12.2.0 pins, signed Photon wire Schemas, the private Spectrum/Space boundary, safe lifecycle handling, and live/memory ChannelTransport Layers. apps/agent owns Config.schema environment names, provider-specific composition roots, the shared Eve adapter, and two thin absolute routes; @bundjil/channel/testing supplies one provider-neutral conformance operation consumed by both provider suites.",
+        "Implementation quality: direct raw-byte HMAC-SHA256 verifies webhook id, clock tolerance, event header, and signature before one complete payload decode; the SDK fire-and-forget webhook callback is unused. Effect.acquireRelease brackets one explicit Spectrum instance and app.stop, cold Space resolution is distinct from ambiguous send, every SDK result is decoded before a common result, secrets stay Redacted, and only safe tagged errors escape. The sole documented third-party type exception is the adjacent Spectrum 12.2.0 exact-optional events defect; Eve externalises @bundjil/photon so Nitro traces the pinned SDK graph without broad compiler relaxation.",
+        "Verification coverage: 10 Photon tests prove missing/invalid/stale/valid signatures, body bounds, malformed/unsupported events and content, stable retry identity, inconsistent spaces, complete SDK result decoding, cold-Space versus uncertain-send errors, send/presence timeouts, scoped release and acquisition/cleanup failures. The shared conformance journey passes in 9 Sendblue tests and 10 Photon tests; 41 agent tests include the same app journey from both provider Layers and built Sendblue/Photon routes. Boundary/effect/skill checks, 24 boundary fixtures, formatting, lint, Knip, eight workspace typechecks, 229 workspace tests, dependency/legacy/leak scans, full verification and git diff --check passed. No credential was loaded and no Photon, Vercel, Sendblue, Upstash, DNS, deployment, webhook, line, secret or Production operation ran; live Space and line behavior remains Task 5 proof."
       ],
       "commitAfterPassing": true
     },

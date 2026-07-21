@@ -17,6 +17,9 @@ SDK clients, callbacks, secrets, and delivery claims never cross this package.
 The `/memory` export supplies a deterministic Layer from already decoded
 canonical outcomes. It performs no provider or network work.
 
+The `/testing` export runs the provider-neutral transport conformance journey
+used by each provider package. It is test support, not a runtime registry.
+
 ## Commands
 
 From the repository root:

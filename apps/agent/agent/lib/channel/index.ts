@@ -8,6 +8,8 @@ export {
   ChannelConfig,
   layerLive as ChannelConfigLive,
   loadChannelConfig,
+  loadPhotonConfig,
+  loadSendblueConfig,
 } from "./config.js";
 export type { ChannelConfigShape } from "./config.js";
 export {
@@ -17,6 +19,7 @@ export {
   layerMemory as EveChannelDispatchMemory,
 } from "./dispatch.js";
 export type { EveChannelDispatchShape } from "./dispatch.js";
+export { makeChannelEveChannel, makeChannelEveEvents } from "./eve.js";
 export {
   EveChannelDispatchError,
   ChannelConfigError,

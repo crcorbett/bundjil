@@ -7,6 +7,7 @@ import {
   ChannelWebhookAuthenticationError,
   ChannelWebhookSchemaError,
 } from "@bundjil/channel";
+import { runChannelTransportConformance } from "@bundjil/channel/testing";
 import { assert, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Redacted, Ref, Schema } from "effect";
 import * as TestClock from "effect/testing/TestClock";
@@ -72,6 +73,49 @@ const unusedClient = HttpClient.make((request) =>
       reason: new HttpClientError.TransportError({ request }),
     })
   )
+);
+
+it.effect("runs the shared ChannelTransport conformance journey", () =>
+  Effect.gen(function* testSendblueConformance() {
+    const fixture = yield* fixtures;
+    const sendResponse = yield* Schema.decodeEffect(
+      SendblueSendMessageResponse
+    )({ status: "QUEUED", message_handle: "provider-message-1" });
+    const presenceResponse = yield* Schema.decodeEffect(
+      SendbluePresenceResponse
+    )({ status: "SENT" });
+    const sendBody = yield* Schema.encodeEffect(
+      Schema.fromJsonString(SendblueSendMessageResponse)
+    )(sendResponse);
+    const presenceBody = yield* Schema.encodeEffect(
+      Schema.fromJsonString(SendbluePresenceResponse)
+    )(presenceResponse);
+    const client = HttpClient.make((request) =>
+      Effect.succeed(
+        HttpClientResponse.fromWeb(
+          request,
+          new Response(
+            request.url.endsWith("send-message") ? sendBody : presenceBody,
+            { status: 202, headers: { "content-type": "application/json" } }
+          )
+        )
+      )
+    );
+    const result = yield* runChannelTransportConformance({
+      webhookRequest: new Request("https://example.invalid/sendblue", {
+        method: "POST",
+        headers: { "sb-signing-secret": "test-webhook-secret" },
+        body: fixture.encodedWebhook,
+      }),
+      send: { conversation: fixture.conversation, text: fixture.text },
+      presence: { conversation: fixture.conversation, action: "start" },
+    }).pipe(Effect.provide(layer(client, fixture.config)));
+
+    assert.strictEqual(result.webhook._tag, "Accepted");
+    assert.strictEqual(result.send.provider, "sendblue");
+    assert.strictEqual(result.send.messageId, "provider-message-1");
+    assert.strictEqual(result.presence, "accepted");
+  })
 );
 
 it.effect(

@@ -1,3 +1,4 @@
+import { PhotonConfig } from "@bundjil/photon/config";
 import { SendblueConfig } from "@bundjil/sendblue";
 import { UpstashPersistenceOptions } from "@bundjil/store/upstash";
 import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
@@ -18,7 +19,6 @@ export interface ChannelConfigShape {
   readonly identities: ChannelIdentityRecordsType;
   readonly replay: ChannelReplayOptionsType;
   readonly routingSecret: ChannelRoutingSecretType;
-  readonly sendblue: typeof SendblueConfig.Type;
   readonly store: typeof UpstashPersistenceOptions.Type;
 }
 
@@ -63,34 +63,6 @@ export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
       ChannelRoutingSecret,
       "BUNDJIL_CHANNEL_ROUTING_SECRET"
     ),
-    sendblueAllowedServices: Config.schema(
-      SendblueConfig.fields.allowedServices,
-      "BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES"
-    ).pipe(Config.withDefault(["iMessage"])),
-    sendblueApiKey: Config.schema(
-      SendblueConfig.fields.apiKey,
-      "BUNDJIL_CHANNEL_SENDBLUE_API_KEY"
-    ),
-    sendblueApiSecret: Config.schema(
-      SendblueConfig.fields.apiSecret,
-      "BUNDJIL_CHANNEL_SENDBLUE_API_SECRET"
-    ),
-    sendblueLine: Config.schema(
-      SendblueConfig.fields.line,
-      "BUNDJIL_CHANNEL_SENDBLUE_LINE"
-    ),
-    sendblueTypingDurationMillis: Config.schema(
-      SendblueConfig.fields.typingDurationMillis,
-      "BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS"
-    ).pipe(
-      Config.withDefault(
-        SendblueConfig.fields.typingDurationMillis.make(120_000)
-      )
-    ),
-    sendblueWebhookSecret: Config.schema(
-      SendblueConfig.fields.webhookSecret,
-      "BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET"
-    ),
   });
 
   return ChannelConfig.of({
@@ -101,14 +73,6 @@ export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
       ttlMilliseconds: values.replayTtlMilliseconds,
     },
     routingSecret: values.routingSecret,
-    sendblue: {
-      allowedServices: values.sendblueAllowedServices,
-      apiKey: values.sendblueApiKey,
-      apiSecret: values.sendblueApiSecret,
-      line: values.sendblueLine,
-      typingDurationMillis: values.sendblueTypingDurationMillis,
-      webhookSecret: values.sendblueWebhookSecret,
-    },
     store: {
       keyPrefix: values.replayStorePrefix,
       restToken: values.replayRestToken,
@@ -118,3 +82,65 @@ export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
 }).pipe(Effect.mapError(() => new ChannelConfigError({ reason: "invalid" })));
 
 export const layerLive = Layer.effect(ChannelConfig, loadChannelConfig);
+
+export const loadSendblueConfig = Effect.gen(function* loadSendblueConfig() {
+  const values = yield* Effect.all({
+    allowedServices: Config.schema(
+      SendblueConfig.fields.allowedServices,
+      "BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES"
+    ).pipe(Config.withDefault(["iMessage"])),
+    apiKey: Config.schema(
+      SendblueConfig.fields.apiKey,
+      "BUNDJIL_CHANNEL_SENDBLUE_API_KEY"
+    ),
+    apiSecret: Config.schema(
+      SendblueConfig.fields.apiSecret,
+      "BUNDJIL_CHANNEL_SENDBLUE_API_SECRET"
+    ),
+    line: Config.schema(
+      SendblueConfig.fields.line,
+      "BUNDJIL_CHANNEL_SENDBLUE_LINE"
+    ),
+    typingDurationMillis: Config.schema(
+      SendblueConfig.fields.typingDurationMillis,
+      "BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS"
+    ).pipe(
+      Config.withDefault(
+        SendblueConfig.fields.typingDurationMillis.make(120_000)
+      )
+    ),
+    webhookSecret: Config.schema(
+      SendblueConfig.fields.webhookSecret,
+      "BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET"
+    ),
+  });
+  return SendblueConfig.make(values);
+}).pipe(Effect.mapError(() => new ChannelConfigError({ reason: "invalid" })));
+
+export const loadPhotonConfig = Effect.gen(function* loadPhotonConfig() {
+  const values = yield* Effect.all({
+    projectId: Config.schema(
+      PhotonConfig.fields.projectId,
+      "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"
+    ),
+    projectSecret: Config.schema(
+      PhotonConfig.fields.projectSecret,
+      "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+    ),
+    webhookId: Config.schema(
+      PhotonConfig.fields.webhookId,
+      "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID"
+    ),
+    webhookSecret: Config.schema(
+      PhotonConfig.fields.webhookSecret,
+      "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
+    ),
+    webhookToleranceSeconds: Config.schema(
+      PhotonConfig.fields.webhookToleranceSeconds,
+      "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_TOLERANCE_SECONDS"
+    ).pipe(
+      Config.withDefault(PhotonConfig.fields.webhookToleranceSeconds.make(300))
+    ),
+  });
+  return PhotonConfig.make(values);
+}).pipe(Effect.mapError(() => new ChannelConfigError({ reason: "invalid" })));

@@ -1,12 +1,12 @@
 {
-  "name": "@bundjil/channel",
+  "name": "@bundjil/photon",
   "version": "0.1.0",
   "private": true,
-  "description": "Provider-neutral Effect contracts for Bundjil direct-text channels.",
+  "description": "Photon Spectrum ChannelTransport Layers for Bundjil.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crcorbett/bundjil.git",
-    "directory": "packages/channel"
+    "directory": "packages/photon"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -17,31 +17,20 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./live": {
+      "@bundjil/source": "./src/live.layer.ts",
+      "types": "./dist/live.layer.d.ts",
+      "default": "./dist/live.layer.js"
+    },
+    "./config": {
+      "@bundjil/source": "./src/schemas.ts",
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
+    },
     "./memory": {
       "@bundjil/source": "./src/memory.layer.ts",
       "types": "./dist/memory.layer.d.ts",
       "default": "./dist/memory.layer.js"
-    },
-    "./testing": {
-      "@bundjil/source": "./src/testing.ts",
-      "types": "./dist/testing.d.ts",
-      "default": "./dist/testing.js"
-    }
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./memory": {
-        "types": "./dist/memory.layer.d.ts",
-        "default": "./dist/memory.layer.js"
-      },
-      "./testing": {
-        "types": "./dist/testing.d.ts",
-        "default": "./dist/testing.js"
-      }
     }
   },
   "scripts": {
@@ -50,6 +39,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@bundjil/channel": "workspace:*",
+    "@spectrum-ts/core": "12.2.0",
+    "@spectrum-ts/imessage": "12.2.0",
     "effect": "catalog:effect"
   },
   "devDependencies": {

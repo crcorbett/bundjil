@@ -10,6 +10,12 @@ import { EveSessionId, EveTurnId } from "@bundjil/eve";
 import { AtomicKeyValueStoreValue } from "@bundjil/store";
 import { Schema } from "effect";
 
+export const ChannelWebhookPath = Schema.Literals([
+  "/eve/v1/sendblue/webhook",
+  "/eve/v1/photon/webhook",
+]);
+export type ChannelWebhookPath = typeof ChannelWebhookPath.Type;
+
 export const ChannelPrincipalId = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/agent/ChannelPrincipalId")
 );

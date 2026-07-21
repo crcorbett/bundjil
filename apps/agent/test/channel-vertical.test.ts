@@ -5,6 +5,8 @@ import {
   ChannelWebhookResult,
 } from "@bundjil/channel";
 import { layerMemory as ChannelTransportMemory } from "@bundjil/channel/memory";
+import { layerMemory as PhotonTransportMemory } from "@bundjil/photon/memory";
+import { layerMemory as SendblueTransportMemory } from "@bundjil/sendblue/memory";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
 import { Array, Effect, Layer, Schema, pipe } from "effect";
@@ -78,6 +80,94 @@ const channelLayer = fixtures.pipe(
       ChannelReplayMemory(fixture.replay).pipe(Layer.provide(PersistenceMemory))
     );
     return ChannelLive.pipe(Layer.provide(dependencies));
+  })
+);
+
+it.effect("runs the same clean app journey from both provider Layers", () =>
+  Effect.gen(function* testProviderSubstitution() {
+    const fixture = yield* fixtures;
+    const text = yield* Schema.decodeEffect(ChannelOutboundText)("reply");
+    const sendblueWebhook = yield* Schema.decodeEffect(ChannelWebhookResult)({
+      _tag: "Accepted",
+      message: {
+        ...fixture.message,
+        conversation: {
+          ...fixture.message.conversation,
+          provider: "sendblue",
+        },
+      },
+    });
+    const sendblueSend = yield* Schema.decodeEffect(ChannelSendAccepted)({
+      provider: "sendblue",
+      messageId: "provider-message-1",
+    });
+    const providers = [
+      {
+        expected: "sendblue",
+        layer: SendblueTransportMemory({
+          webhook: sendblueWebhook,
+          send: sendblueSend,
+          presence: "accepted",
+        }),
+      },
+      {
+        expected: "photon",
+        layer: PhotonTransportMemory({
+          webhook: fixture.webhook,
+          send: fixture.send,
+          presence: "accepted",
+        }),
+      },
+    ];
+
+    const results = yield* Effect.all(
+      providers.map(({ expected, layer }) => {
+        const dependencies = Layer.mergeAll(
+          layer,
+          ChannelIdentityMemory(fixture.identities),
+          ChannelRouterMemory,
+          ChannelReplayMemory(fixture.replay).pipe(
+            Layer.provide(PersistenceMemory)
+          )
+        );
+        return Effect.gen(function* runProviderJourney() {
+          const channel = yield* Channel;
+          const inbound = yield* channel.decodeWebhook(
+            new Request("https://example.invalid/webhook")
+          );
+          if (inbound._tag !== "Accepted") {
+            return yield* Effect.die("accepted provider fixture required");
+          }
+          const prepared = yield* channel.prepareInbound(inbound.message);
+          if (prepared._tag !== "Dispatch") {
+            return yield* Effect.die("fresh provider dispatch required");
+          }
+          const presence = yield* channel.handleEvent({
+            _tag: "PresenceRequested",
+            action: "start",
+            conversation: inbound.message.conversation,
+          });
+          const outbound = yield* channel.handleEvent({
+            _tag: "OutboundTextReady",
+            coordinates: fixture.coordinates,
+            conversation: inbound.message.conversation,
+            text,
+          });
+          return {
+            expected,
+            provider: inbound.message.conversation.provider,
+            presence: presence.outcome,
+            outbound: outbound.outcome,
+          };
+        }).pipe(Effect.provide(ChannelLive.pipe(Layer.provide(dependencies))));
+      })
+    );
+
+    for (const result of results) {
+      assert.strictEqual(result.provider, result.expected);
+      assert.strictEqual(result.presence._tag, "Presence");
+      assert.strictEqual(result.outbound._tag, "SendAccepted");
+    }
   })
 );
 
