@@ -9,8 +9,11 @@ the narrowest current owner; do not load completed rollout history by default.
 2. Read `docs/README.md`, then only the routed current architecture, SPEC,
    plan, runbook, and proof owner needed for the task.
 3. Update the earliest durable owner in the same slice as code/config changes.
-4. Run the smallest focused check, then `bun run verification` before handoff.
-5. Keep runtime/provider claims separate from repository proof and record
+4. For every material PRD or ordinary change, invoke the repository-local
+   `.agents/skills/docs-maintainer`, record `Change required`, `Preserve`, or
+   evidenced `N/A` across its impact ledger, and run `bun run check:docs`.
+5. Run the smallest focused check, then `bun run verification` before handoff.
+6. Keep runtime/provider claims separate from repository proof and record
    limitations, rollback, and exact Git identity.
 
 ## Non-negotiable code patterns

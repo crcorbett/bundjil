@@ -67,9 +67,12 @@ research, or raw evidence without an approved retention manifest.
 
 ## Maintenance
 
-Every material slice decides `Change required`, `Preserve`, or `N/A` for
+Every material PRD or ordinary slice invokes the repository-local
+`.agents/skills/docs-maintainer`, then decides `Change required`, `Preserve`, or `N/A` for
 docs, READMEs, architecture, public/generated references, runbooks,
 proof/evidence, skills, lint/config/CI, and active SPEC/tasks. Update the
 earliest durable owner and necessary pointers in the same slice. Counts prove
 accounting only; semantic, consumer, runtime, and provider claims require
-boundary-matched evidence.
+boundary-matched evidence. Scheduled/background maintenance remains
+report-only unless attached implementation authority names the exact paths;
+policy publication requires separate approval and readback.

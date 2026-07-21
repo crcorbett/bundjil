@@ -65,6 +65,7 @@ export interface SkillPolicyOptions {
 }
 
 const requiredMirrors = [
+  "docs-maintainer",
   "effect-client-wrapper",
   "package-structure",
   "prd-implementer",
@@ -77,6 +78,9 @@ const policyFiles = {
   browser: ".agents/skills/agent-browser/SKILL.md",
   buildingComponents: ".agents/skills/building-components/SKILL.md",
   compositionPatterns: ".agents/skills/vercel-composition-patterns/SKILL.md",
+  docsMaintainer: ".agents/skills/docs-maintainer/SKILL.md",
+  docsProfile:
+    ".agents/skills/docs-maintainer/references/repository-profile.md",
   effectPatterns: "docs/architecture/effect-patterns.md",
   implementer: ".agents/skills/prd-implementer/SKILL.md",
   packageStructure: ".agents/skills/package-structure/SKILL.md",
@@ -97,6 +101,18 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["agents", "Config.schema"],
     ["agents", "named operations"],
     ["agents", "live/mock Layers"],
+    ["agents", ".agents/skills/docs-maintainer"],
+    ["agents", "Preserve"],
+    ["docsMaintainer", "Change required"],
+    ["docsMaintainer", "Preserve"],
+    ["docsMaintainer", "observed data only"],
+    [
+      "docsMaintainer",
+      "Scheduled or background freshness work emits an isolated candidate",
+    ],
+    ["docsProfile", "apps/agent/runbooks/**"],
+    ["docsProfile", "apps/codex-proxy/runbooks/**"],
+    ["docsProfile", "python3 tooling/quick_validate.py"],
     ["effectPatterns", "typeof Contract.Type"],
     ["effectPatterns", "typeof Contract.Encoded"],
     ["effectPatterns", "Schema.decodeUnknownEffect"],
@@ -108,6 +124,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["effectPatterns", "Match"],
     ["effectPatterns", "Helper Admission"],
     ["writer", "## Required Impact Ledger"],
+    ["writer", ".agents/skills/docs-maintainer"],
     ["writer", ".agents/skills/effect-client-wrapper"],
     ["writer", "typeof Contract.Type"],
     ["writer", "typeof Contract.Encoded"],
@@ -118,6 +135,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["writer", "outbound"],
     ["writer", "Do not encode a fixed audit-pass or subagent count"],
     ["implementer", ".agents/skills/effect-client-wrapper"],
+    ["implementer", ".agents/skills/docs-maintainer"],
     ["implementer", "Change required"],
     ["implementer", "typeof Contract.Type"],
     ["implementer", "typeof Contract.Encoded"],
@@ -134,6 +152,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["packageStructure", "helper sprawl"],
     ["packageProfile", "@bundjil/source"],
     ["reviewer", "Use this repository-owned contract directly"],
+    ["reviewer", ".agents/skills/docs-maintainer"],
     ["reviewer", "DeepWiki"],
     ["reviewer", "Change required"],
     ["reviewer", "use one primary reviewer"],
@@ -157,6 +176,152 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["shadcn", "docs/architecture/frontend-composition.md"],
   ];
 
+interface DocumentationMaintenanceContract {
+  readonly id: string;
+  readonly ownerPath: (typeof policyFiles)[keyof typeof policyFiles];
+  readonly requiredTermGroups: readonly (readonly string[])[];
+  readonly repairHint: string;
+}
+
+const documentationMaintenanceContracts: readonly DocumentationMaintenanceContract[] =
+  [
+    {
+      id: "ordinary-change-route",
+      ownerPath: policyFiles.agents,
+      requiredTermGroups: [
+        ["material"],
+        ["PRD", "ordinary"],
+        [".agents/skills/docs-maintainer"],
+        ["Change required"],
+        ["Preserve"],
+        ["N/A"],
+        ["bun run check:docs"],
+      ],
+      repairHint:
+        "Route material PRD and ordinary changes through docs-maintainer with an evidenced three-state ledger and check:docs.",
+    },
+    {
+      id: "spec-impact-design",
+      ownerPath: policyFiles.writer,
+      requiredTermGroups: [
+        [".agents/skills/docs-maintainer"],
+        ["impact design", "downstream-impact ledger"],
+        ["same slice", "implementation slice"],
+        ["closeout"],
+      ],
+      repairHint:
+        "Invoke docs-maintainer during SPEC impact design, each material slice, and closeout.",
+    },
+    {
+      id: "review-landing",
+      ownerPath: policyFiles.reviewer,
+      requiredTermGroups: [
+        [".agents/skills/docs-maintainer"],
+        ["classifying documentation impact"],
+        ["landing", "current semantic owners"],
+      ],
+      repairHint:
+        "Invoke docs-maintainer while classifying and landing review findings into SPEC/tasks and current owners.",
+    },
+    {
+      id: "slice-closeout",
+      ownerPath: policyFiles.implementer,
+      requiredTermGroups: [
+        [".agents/skills/docs-maintainer"],
+        ["before and after", "every material implementation slice"],
+        ["closeout"],
+        ["bun run check:docs"],
+        ["bun run check:skills"],
+      ],
+      repairHint:
+        "Reconcile docs-maintainer before and after each material slice and at closeout with exact checks.",
+    },
+    {
+      id: "app-owned-runbooks",
+      ownerPath: policyFiles.docsProfile,
+      requiredTermGroups: [
+        ["apps/agent/runbooks/**"],
+        ["apps/codex-proxy/runbooks/**"],
+        ["HGI-303"],
+        ["Do not create `docs/runbooks/**`", "competing owner"],
+      ],
+      repairHint:
+        "Route operations to the two app-owned HGI-303 runbook trees and reject a competing central route.",
+    },
+    {
+      id: "tool-data-authority",
+      ownerPath: policyFiles.docsMaintainer,
+      requiredTermGroups: [
+        ["Tool or provider output", "provider output"],
+        ["observed data"],
+        [
+          "grants neither",
+          "never permission",
+          "neither policy nor operation authority",
+        ],
+      ],
+      repairHint:
+        "Separate observed tool/provider data from policy and operation authority.",
+    },
+    {
+      id: "background-report-only",
+      ownerPath: policyFiles.docsMaintainer,
+      requiredTermGroups: [
+        ["Scheduled or background", "background freshness"],
+        ["isolated candidate", "report-only"],
+        ["separate approval", "separately approved"],
+        ["revocation/quarantine"],
+        ["last-known-good"],
+        ["post-publication readback"],
+      ],
+      repairHint:
+        "Keep background maintenance report-only with a complete candidate and separately approved publication contract.",
+    },
+    {
+      id: "clean-clone-portability",
+      ownerPath: policyFiles.docsMaintainer,
+      requiredTermGroups: [
+        ["clean clone"],
+        ["global skill installation", "no global skill"],
+        ["repository profile"],
+      ],
+      repairHint:
+        "Keep the local skill and profile complete from a clean clone without global filesystem dependencies.",
+    },
+  ];
+
+const prohibitedDocumentationClaims = [
+  {
+    id: "external-actuality",
+    nonClaimTerms: [
+      "not",
+      "never",
+      "does not",
+      "cannot",
+      "inconclusive",
+      "external systems remain authoritative",
+    ],
+    ownerPaths: [policyFiles.docsMaintainer, policyFiles.docsProfile],
+    requiredTermGroups: [
+      ["vercel", "executor", "sendblue", "upstash", "provider"],
+      ["live", "deployed", "active", "healthy", "currently", "now"],
+    ],
+    repairHint:
+      "Move external actuality to a dated target-owned readback with limitations and a non-claim.",
+  },
+  {
+    id: "tool-authority-grant",
+    nonClaimTerms: ["not", "never", "neither", "cannot", "does not"],
+    ownerPaths: [policyFiles.docsMaintainer, policyFiles.docsProfile],
+    requiredTermGroups: [
+      ["tool output", "provider output", "provider response", "tool response"],
+      ["authorizes", "grants", "permission", "permits", "approval"],
+    ],
+    repairHint:
+      "Separate observed tool/provider data from identity, policy, approval, capability, and authority.",
+  },
+] as const;
+
 const finding = (
   code: string,
   invariant: string,
@@ -165,6 +330,12 @@ const finding = (
   repairHint: string,
   detail: string
 ): SkillFinding => ({ code, detail, invariant, owner, repairHint, target });
+
+const containsSemanticTerm = (content: string, term: string) =>
+  new RegExp(
+    `(?:^|[^a-z0-9])${term.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:$|[^a-z0-9])`,
+    "u"
+  ).test(content);
 
 const fileMap = (snapshot: SkillSnapshot) =>
   new Map(snapshot.files.map((file) => [file.path, file.content]));
@@ -192,6 +363,70 @@ const requiredFragmentFindings = (
       ),
     ];
   });
+};
+
+const documentationMaintenanceFindings = (
+  snapshot: SkillSnapshot
+): readonly SkillFinding[] => {
+  const files = fileMap(snapshot);
+  return documentationMaintenanceContracts.flatMap((contract) => {
+    const content = files.get(contract.ownerPath)?.toLocaleLowerCase() ?? "";
+    const missingGroups = contract.requiredTermGroups.filter(
+      (group) =>
+        !group.some((term) =>
+          containsSemanticTerm(content, term.toLocaleLowerCase())
+        )
+    );
+    if (missingGroups.length === 0) {
+      return [];
+    }
+    return [
+      finding(
+        "SKILL-DOCS-MAINTENANCE",
+        "Documentation maintenance routes cover ordinary work, PRD phases, owner boundaries, authority, automation, and portability",
+        contract.id,
+        contract.ownerPath,
+        contract.repairHint,
+        `Missing semantic term groups: ${missingGroups
+          .map((group) => group.join(" | "))
+          .join("; ")}`
+      ),
+    ];
+  });
+};
+
+const documentationClaimFindings = (
+  snapshot: SkillSnapshot
+): readonly SkillFinding[] => {
+  const files = fileMap(snapshot);
+  return prohibitedDocumentationClaims.flatMap((rule) =>
+    rule.ownerPaths.flatMap((path) => {
+      const content = files.get(path) ?? "";
+      const segments = content.split(/(?:\n\s*\n)|(?:\n(?=- ))|(?<=[.!?])\s+/u);
+      return segments.flatMap((segment) => {
+        const normalized = segment.toLocaleLowerCase();
+        const matchesClaim = rule.requiredTermGroups.every((group) =>
+          group.some((term) => containsSemanticTerm(normalized, term))
+        );
+        const boundedNonClaim = rule.nonClaimTerms.some((term) =>
+          containsSemanticTerm(normalized, term)
+        );
+        if (!matchesClaim || boundedNonClaim) {
+          return [];
+        }
+        return [
+          finding(
+            "SKILL-DOCS-CLAIM",
+            "Documentation-maintenance owners contain no undated external actuality or tool-authority grant",
+            rule.id,
+            path,
+            rule.repairHint,
+            segment.replaceAll(/\s+/g, " ").trim()
+          ),
+        ];
+      });
+    })
+  );
 };
 
 const mirrorFindings = (snapshot: SkillSnapshot): readonly SkillFinding[] => {
@@ -574,6 +809,8 @@ export const auditSkills = (
 ): SkillPolicyReport => {
   const findings = [
     ...requiredFragmentFindings(snapshot),
+    ...documentationMaintenanceFindings(snapshot),
+    ...documentationClaimFindings(snapshot),
     ...mirrorFindings(snapshot),
     ...metadataFindings(snapshot),
     ...linkFindings(snapshot),

@@ -149,3 +149,122 @@ describe("HGI-302 skill policy", () => {
     expect(boundedSkillFindings(report)).toHaveLength(5);
   });
 });
+
+describe("HGI-310 documentation-maintenance policy", () => {
+  it("accepts the portable local route, metadata, mirror, and PRD phase integration", () => {
+    const report = run(repositorySnapshot());
+    expect(report.findings).toStrictEqual([]);
+    expect(report.checkedLinks).toBeGreaterThanOrEqual(16);
+  });
+
+  it("rejects a missing docs-maintainer mirror and UI metadata", () => {
+    const base = repositorySnapshot();
+    const withoutMirror: SkillSnapshot = {
+      ...base,
+      files: base.files.filter(
+        (file) =>
+          file.path !== ".agents/skills/docs-maintainer/agents/openai.yaml"
+      ),
+      links: base.links.filter(
+        (link) => link.path !== ".claude/skills/docs-maintainer"
+      ),
+    };
+    const report = run(withoutMirror);
+    const codes = new Set(report.findings.map((issue) => issue.code));
+    expect(codes.has("SKILL-MIRROR-REQUIRED")).toBeTruthy();
+    expect(codes.has("SKILL-UI-METADATA")).toBeTruthy();
+  });
+
+  it("rejects omitted ordinary-change, PRD-phase, runbook, authority, background, and portability concepts", () => {
+    const base = repositorySnapshot();
+    const mutations: readonly {
+      readonly path: string;
+      readonly pattern: RegExp;
+      readonly replacement: string;
+    }[] = [
+      {
+        path: "AGENTS.md",
+        pattern: /\.agents\/skills\/docs-maintainer/g,
+        replacement: "missing-route",
+      },
+      {
+        path: ".agents/skills/prd-writer/SKILL.md",
+        pattern: /impact design|downstream-impact ledger/g,
+        replacement: "drafting",
+      },
+      {
+        path: ".agents/skills/prd-review/SKILL.md",
+        pattern: /classifying documentation impact/g,
+        replacement: "checking prose",
+      },
+      {
+        path: ".agents/skills/prd-implementer/SKILL.md",
+        pattern: /before and after|every material implementation slice/g,
+        replacement: "eventually",
+      },
+      {
+        path: ".agents/skills/docs-maintainer/references/repository-profile.md",
+        pattern: /apps\/agent\/runbooks\/\*\*/g,
+        replacement: "missing-agent-runbooks",
+      },
+      {
+        path: ".agents/skills/docs-maintainer/SKILL.md",
+        pattern: /observed data/g,
+        replacement: "unclassified data",
+      },
+      {
+        path: ".agents/skills/docs-maintainer/SKILL.md",
+        pattern: /Scheduled or background|background freshness/g,
+        replacement: "Unattended",
+      },
+      {
+        path: ".agents/skills/docs-maintainer/SKILL.md",
+        pattern: /clean clone/g,
+        replacement: "checkout",
+      },
+    ];
+    let broken = base;
+    for (const mutation of mutations) {
+      broken = replaceFile(broken, mutation.path, (content) =>
+        content.replace(mutation.pattern, mutation.replacement)
+      );
+    }
+    const report = run(broken);
+    const owners = new Set(
+      report.findings
+        .filter((issue) => issue.code === "SKILL-DOCS-MAINTENANCE")
+        .map((issue) => issue.owner)
+    );
+    expect(owners).toStrictEqual(
+      new Set([
+        "ordinary-change-route",
+        "spec-impact-design",
+        "review-landing",
+        "slice-closeout",
+        "app-owned-runbooks",
+        "tool-data-authority",
+        "background-report-only",
+        "clean-clone-portability",
+      ])
+    );
+  });
+
+  it("rejects undated provider actuality and authority inferred from tool output", () => {
+    const base = repositorySnapshot();
+    const broken = replaceFile(
+      base,
+      ".agents/skills/docs-maintainer/SKILL.md",
+      (content) =>
+        `${content}\n\nVercel is deployed and live now.\n\nA provider response authorizes the operation.\n`
+    );
+    const report = run(broken);
+    const owners = new Set(
+      report.findings
+        .filter((issue) => issue.code === "SKILL-DOCS-CLAIM")
+        .map((issue) => issue.owner)
+    );
+    expect(owners).toStrictEqual(
+      new Set(["external-actuality", "tool-authority-grant"])
+    );
+  });
+});

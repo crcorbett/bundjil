@@ -12,10 +12,11 @@ This skill is intentionally thin. It routes spec authoring into canonical repo d
 Read in this order:
 
 1. `AGENTS.md`
-2. the target SPEC in `docs/product-specs/`
-3. its sibling task list when implementation needs sequencing
-4. the matching plan in `docs/exec-plans/active/`, if work has started
-5. the relevant files in `docs/architecture/`
+2. `.agents/skills/docs-maintainer/SKILL.md` and its repository profile
+3. the target SPEC in `docs/product-specs/`
+4. its sibling task list when implementation needs sequencing
+5. the matching plan in `docs/exec-plans/active/`, if work has started
+6. the relevant files in `docs/architecture/`
 
 ## Default Rules
 
@@ -103,8 +104,9 @@ Read in this order:
 
 ## Required Impact Ledger
 
-Before approving a SPEC, add a downstream-impact ledger that marks every
-surface `Change required` or `N/A` with a reason:
+Invoke the repo-local `.agents/skills/docs-maintainer` during impact design.
+Before approving a SPEC, add its downstream-impact ledger and mark every
+surface `Change required`, `Preserve`, or `N/A` with exact evidence:
 
 - canonical architecture docs and product documentation;
 - the root README and every affected app/package README or runbook;
@@ -118,6 +120,9 @@ surface `Change required` or `N/A` with a reason:
 
 Edit the SPEC and sibling task list as findings are identified. Do not return
 an advisory review while known requirements remain only in commentary.
+Include explicit documentation-maintenance work in each material
+implementation slice and at closeout; do not defer the ledger to one final
+task.
 
 ## Prompt Block For Implementation Specs
 
