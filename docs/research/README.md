@@ -3,7 +3,7 @@ document_type: research-index
 lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: new research, upstream-version change, or promotion into policy
 ---
 
@@ -23,7 +23,9 @@ runbook, or SPEC owner rather than copying the report.
   separates repository, upstream, and live-provider truth; compares the
   Sendblue and Photon lifecycle surfaces; and defines eight bounded spikes plus
   the two-stage `prd-writer` boundary required before infrastructure ownership
-  or a messaging-provider migration.
+  or Production provider selection. Its post-research note routes the later
+  clean Channel implementation and bounded Photon proof without turning the
+  report into current architecture or provider truth.
 
 Failed or inconclusive research retains provenance, last successful step,
 observed state, limitations, non-claims, escalation, and resume trigger outside

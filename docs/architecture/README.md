@@ -3,7 +3,7 @@ document_type: architecture-router
 lifecycle: current
 authority: canonical
 owner: bundjil-architecture-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: app, package, Effect, frontend, provider-adapter, or architecture-route change
 ---
 
@@ -44,6 +44,6 @@ architecture/rollout record as history, not current provider truth.
 - React routes compose leaf-owned presentation/state components. Effects and
   service orchestration remain above leaves.
 
-External systems own deployment/provider actuality. Current operations and
-proof are explicit gaps routed by [`../README.md`](../README.md); dated details
-inside retained app/package prose are not standing truth.
+External systems own deployment/provider actuality. Target-owned operations
+and bounded evidence are routed by [`../README.md`](../README.md); missing
+targets remain explicit gaps, and dated details are never standing truth.

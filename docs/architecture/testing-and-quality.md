@@ -1,3 +1,12 @@
+---
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: bundjil-quality-owner
+last_reviewed: 2026-07-21
+review_trigger: verification command, package, channel, provider, proof, lint, boundary, or evidence-policy change
+---
+
 # Testing And Quality
 
 Use the smallest check that proves the changed behavior, then broaden before
@@ -40,6 +49,12 @@ Package-focused commands:
 
 ```bash
 bun run --filter @bundjil/eve test
+bun run --filter @bundjil/channel test
+bun run --filter @bundjil/channel build
+bun run --filter @bundjil/sendblue test
+bun run --filter @bundjil/sendblue build
+bun run --filter @bundjil/photon test
+bun run --filter @bundjil/photon build
 bun run --filter @bundjil/codex test
 bun run --filter @bundjil/codex build
 bun run --filter @bundjil/store test
@@ -66,7 +81,9 @@ bun run --filter @bundjil/agent build
 - Runtime config change: run app typecheck, app tests, app build, and
   verification.
 - Channel/provider integration change: add or update a SPEC first, then include
-  mock tests, live-boundary proof where safe, and docs.
+  the shared transport conformance suite, app vertical/build-route tests,
+  provider failure/lifecycle fixtures, live-boundary proof only where separately
+  authorised and safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex` tests,
   typecheck/build, and the opt-in `proof:codex-responses` command only with a
   private `CODEX_ACCESS_TOKEN` source. Proof output must contain only status,
@@ -137,6 +154,48 @@ Rules:
 - For Eve tools, test both `execute(...)` behavior and the Standard Schema /
   Standard JSON Schema metadata produced by `toEveSchema(...)`.
 
+## Channel Verification
+
+Routine Channel verification is credential-free:
+
+```bash
+bun run --filter @bundjil/channel check-types
+bun run --filter @bundjil/channel test
+bun run --filter @bundjil/channel build
+bun run --filter @bundjil/sendblue check-types
+bun run --filter @bundjil/sendblue test
+bun run --filter @bundjil/sendblue build
+bun run --filter @bundjil/photon check-types
+bun run --filter @bundjil/photon test
+bun run --filter @bundjil/photon build
+bun run --filter @bundjil/agent check-types
+bun run --filter @bundjil/agent test
+bun run --filter @bundjil/agent build
+```
+
+The same `@bundjil/channel/testing` conformance journey must pass against each
+provider Layer. App tests must prove provider substitution only at composition
+roots, atomic concurrent replay, immutable state encoding, the shared Eve
+adapter, and both built routes. Provider fixtures own authentication,
+complete-response decoding, rejection, timeout/uncertain delivery, presence,
+and cleanup behavior.
+
+The opt-in Photon management command is not routine verification:
+
+```bash
+bun run --filter @bundjil/photon proof:provider
+```
+
+Run it only through the
+[Photon provider proof runbook](../runbooks/photon-provider-proof.md) with
+current explicit authority and owner-only credential-file permissions. Its
+sanitised receipt proves authenticated management, one isolated webhook
+lifecycle, write-only secret receipt, SDK acquire/release, and restored
+topology at readback time. It does not prove Vercel Preview, signed hosted
+ingress, Eve dispatch, replay, outbound acceptance, presence against a live
+Space, or handset delivery. Those require a later target-owned SPEC/runbook and
+fresh evidence. Routine `verification` and `build` perform no provider action.
+
 ## Eve Runtime Verification
 
 The app test suite proves tool execution without starting Eve or calling a
@@ -192,10 +251,11 @@ browser authorization. Keep destructive and authority-management operations
 blocked and the first Production acceptance operation read-only. Do not claim
 browser rollback from a paused result or source review: change the
 target-scoped URL only after clean Preview proof of the hosted page, approve,
-decline, settled replay, and Sendblue delivery, then redeploy from a clean SHA
-before Production promotion. The earlier implementation slice ran no provider,
-browser, Vercel, or Sendblue operation; the separately owned Task 6 promotion
-record below is the exception and retains only sanitized operator evidence.
+decline, settled replay, and delivery through the separately selected/promoted
+Channel, then redeploy from a clean SHA before Production promotion. The
+earlier implementation slice ran no provider, browser, Vercel, or Sendblue
+operation; the separately owned Task 6 promotion record below is the exception
+and retains only sanitized operator evidence.
 
 For Production Executor promotion, retain evidence in three
 separate states: reviewed intended policy, Preview-verified behavior, and

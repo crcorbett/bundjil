@@ -3,13 +3,13 @@ document_type: research-report
 lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: Alchemy provider support, Vercel, Sendblue, or Photon API changes, Bundjil deployment topology, messaging-provider selection, or infrastructure SPEC changes
 ---
 
 # Alchemy ownership for Vercel and messaging providers
 
-## Decision
+## Research snapshot decision
 
 Adopt a **hybrid Alchemy model** after an infrastructure proof SPEC and a
 messaging-provider decision are accepted:
@@ -20,8 +20,8 @@ messaging-provider decision are accepted:
 - Vercel Git integration continues to create immutable Preview and Production
   deployments. Promotion and rollback remain explicit CI/runbook operations;
   they are not ordinary convergent resources.
-- The current Sendblue runtime and production-only ingress remain unchanged
-  while the proof compares two provider paths. If Sendblue is retained,
+- The Sendblue runtime and production-only ingress observed at research time
+  remain unchanged while the proof compares two provider paths. If Sendblue is retained,
   Alchemy may own one adopted account webhook set, with retain and deletion
   protection, while line/account lifecycle remains provider-owned. If Photon
   is selected, separate production and preview Spectrum projects may support
@@ -44,6 +44,25 @@ Infrastructure proof must begin with `prd-writer`; a Photon migration would
 require a second provider-selection/channel-migration SPEC. Accepted SPECs are
 then implemented through `prd-implementer`.
 
+### Post-research implementation status — 2026-07-21
+
+The later [Schema-driven Channels and Photon Preview proof SPEC](../product-specs/photon-channel-provider.md)
+implemented a clean provider-neutral Channel boundary plus fresh Sendblue and
+Photon packages. It deliberately migrated no legacy Sendblue behavior. Local
+dual-provider conformance and a bounded Photon management/SDK lifecycle proof
+passed; the hosted Preview/message journey stopped because Vercel authority and
+a live Space were absent. The [dated receipt](../verification/photon-provider-proof-2026-07-21.md)
+is the only live Photon observation and the
+[target runbook](../runbooks/photon-provider-proof.md) owns repeatable proof
+operations.
+
+That implementation does not accept this report's Alchemy recommendation,
+select a Production provider, or establish current Vercel, Sendblue, or Photon
+topology. Current architecture is routed through
+[`../architecture/README.md`](../architecture/README.md); any Production
+provider selection or Alchemy ownership still requires a new `$prd-writer`
+SPEC.
+
 ## Truth and evidence boundaries
 
 | Truth layer                   | Evidence used                                                                                                                        | What it proves                                                                                               | What it does not prove                                                                                     |
@@ -57,7 +76,7 @@ No Vercel, Sendblue, Photon, DNS, Upstash, secret, webhook, deployment, or
 other provider mutation was performed. Photon findings are public-documentation
 truth only; no Photon tenant was queried.
 
-## 1. Current Bundjil call graph and ownership
+## 1. Research-time Bundjil call graph and ownership
 
 ### Runtime call graph
 
@@ -1299,7 +1318,11 @@ Additional risks:
 - A full desired-state environment inventory can reveal operational topology
   even without values. Proof artifacts require access control and retention.
 
-### Documentation impact ledger
+### Research-time documentation impact ledger — 2026-07-20
+
+This ledger records the original research slice. The post-research status above
+routes later implementation, runbook, and proof owners; it does not rewrite the
+report's original no-operation evidence.
 
 This research slice follows the repository lifecycle and routing model in
 `docs/README.md`. It does not activate implementation or expand the active

@@ -1,13 +1,31 @@
 ---
 document_type: product-specification
-lifecycle: proposed
+lifecycle: implemented
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-21
+last_reviewed: 2026-07-21
 review_trigger: channel contract, provider implementation, Photon SDK/API, deployment, or proof change
 ---
 
 # Schema-Driven Channels And Photon Preview Proof
+
+## Implementation outcome
+
+Implemented on `codex/photon-channel-provider-spec` as a clean replacement:
+`@bundjil/channel` owns the nominal contract, `@bundjil/sendblue` and
+`@bundjil/photon` provide independent Effect Layers, and `apps/agent` owns Eve
+adaptation, identity, routing, replay, dispatch, and composition. The legacy
+Sendblue source tree, configuration namespace, state, replay, typing lifecycle,
+and callback graph were not migrated.
+
+Deterministic local conformance and application journeys pass for both
+providers. An authorised, bounded Photon provider lifecycle proof created,
+read back, and deleted exactly one reserved webhook and exercised the scoped
+SDK lifecycle, restoring the observed zero-webhook topology. This is provider
+proof only: no Vercel Preview, handset delivery, Sendblue, or Production action
+was authorised or performed. Production provider selection and promotion
+remain gated by a new SPEC with fresh provider and deployment readback.
 
 ## Decision
 

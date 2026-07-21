@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-channel-rollout-owner
 created: 2026-07-21
@@ -10,7 +10,7 @@ review_trigger: channel contract, provider boundary, task status, authority, pro
 
 # Channel Providers And Photon Proof Implementation Plan
 
-Status: Active
+Status: Completed
 
 Spec: [`../../product-specs/photon-channel-provider.md`](../../product-specs/photon-channel-provider.md)
 
@@ -175,7 +175,7 @@ internal state/status/test structure:
 | Fresh Sendblue and rewritten Eve edge  | Completed | New package/config/runtime/edge accepted; old tree removed; 39 app and 8 provider tests plus full gate passed                                                                                      |
 | Photon and dual local conformance      | Completed | Exact Spectrum 12.2.0 pins, signed direct webhook adapter, scoped SDK boundary, dual contract/app journeys, both built routes, 229 tests, and full gate passed locally                             |
 | Isolated Photon Preview proof          | Completed | Provider-only CRUD and SDK lifecycle passed with restored zero-webhook topology; hosted Preview stopped on absent Vercel authority/live Space, and the `0644` credential file is a future-run stop |
-| Docs reconciliation and promotion gate | Pending   | —                                                                                                                                                                                                  |
+| Docs reconciliation and promotion gate | Completed | Canonical architecture and public maps reconciled; provider-only proof routed; Production selection remains a separate SPEC boundary                                                               |
 
 ## Downstream-impact ledger
 
@@ -198,6 +198,31 @@ internal state/status/test structure:
 | AGENTS/skills                     | Preserve unless routing becomes incomplete             | Current task map and skills already route provider/package work                                           |
 | Frontend/browser/generated audits | N/A                                                    | No visible UI or generated documentation surface changes                                                  |
 | Codex/store/eve public contracts  | Preserve                                               | Store is consumed through its existing public atomic service; no other public package contract changes    |
+
+### Task 6 docs-maintainer accounting
+
+- **Changed:** root README; agent README; docs/architecture/research routers;
+  repo-structure, Eve-agent, testing, and Effect architecture metadata;
+  research status pointer; AGENTS routes; SPEC/task/index and plan/index
+  lifecycle records. These owners now route the clean packages, app services,
+  config/state/replay boundaries, local/provider proof levels, and later
+  Production SPEC boundary.
+- **Preserved after review:** `@bundjil/channel`, `@bundjil/sendblue`, and
+  `@bundjil/photon` READMEs already match their accepted exports, commands, and
+  limitations; Photon runbook and dated receipt already match Task 5; Codex,
+  Eve, store, codex-proxy, frontend, and unrelated package/app READMEs have no
+  changed public contract.
+- **Historical/reference:** completed Sendblue SPECs/plans, legacy atlas, and
+  generated HGI-300 receipts remain immutable provenance. The Alchemy report
+  remains `reference`/`supporting`; only a post-research pointer was added so
+  its research-time call graph cannot be mistaken for current architecture.
+- **N/A:** frontend/browser proof, public/generated API references, changelog,
+  Changeset, release note, data migration, package publication, and deployment
+  evidence. No UI, released API, provider selection, deployment, or Production
+  state changed.
+- **Operations and proof:** only the Photon provider lifecycle has a canonical
+  target runbook and dated receipt. HGI-303/HGI-305 still own every missing
+  target/journey, and HGI-304 still owns standing workflow/provider authority.
 
 ## Verification and evidence policy
 

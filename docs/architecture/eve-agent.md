@@ -1,3 +1,12 @@
+---
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: bundjil-agent-owner
+last_reviewed: 2026-07-21
+review_trigger: Eve app, channel, model-provider, config, route, runtime, or proof-boundary change
+---
+
 # Eve Agent Architecture
 
 ## Codex Provider Proof Boundary
@@ -11,10 +20,12 @@ records, not standing provider probes. Earlier adapter proofs remain distinct
 historical evidence for their own environments.
 
 This guide documents the committed Bundjil Eve app and the Effect package
-boundary it uses. Sendblue is a Production-verified app-owned channel with one
-active stable Production receive webhook. Preview proof is historical and has
-no active shared-line Sendblue ingress. Cloudflare email, Vercel Connect, and
-Notion remain future boundaries.
+boundaries it uses. The repository contains one clean provider-neutral Channel
+path with Sendblue and Photon transport implementations. Both build and conform
+locally; neither clean route is standing Production truth or authorised for
+deployment. The bounded Photon provider-only proof is dated evidence, not a
+hosted Preview or messaging proof. Cloudflare email, Vercel Connect, and Notion
+remain future boundaries.
 
 ## Filesystem Layout
 
@@ -31,34 +42,43 @@ apps/agent/
     instructions.md
     model-provider.ts
     channels/
+      eve.ts
       sendblue.ts
-    lib/sendblue/
-      config.ts
-      schemas.ts
+      photon.ts
+    lib/channel/
       channel.ts
-      client.ts
-      identity-directory.ts
-      replay-store.ts
+      config.ts
+      dispatch.ts
+      eve.ts
+      identity.ts
+      photon.runtime.ts
+      replay.ts
+      router.ts
       runtime.ts
-      testing.ts
+      schemas.ts
+      sendblue.runtime.ts
     tools/
       workspace_status.ts
   test/
     model-provider.test.ts
     workspace-status-tool.test.ts
 
-packages/eve/
-  src/
-    schemas.ts
-    errors.ts
-    schema.ts
-    workspace-status.ts
-    services/
-      workspace-operations.ts
-  test/
-    error-contracts.test.ts
-    workspace-operations.test.ts
-    schema.test.ts
+packages/
+  channel/
+  sendblue/
+  photon/
+  eve/
+    src/
+      schemas.ts
+      errors.ts
+      schema.ts
+      workspace-status.ts
+      services/
+        workspace-operations.ts
+    test/
+      error-contracts.test.ts
+      workspace-operations.test.ts
+      schema.test.ts
 ```
 
 Ignored local/runtime files:
@@ -94,16 +114,23 @@ Vercel-managed runtime configuration, never in committed source.
 - `agent/instructions.md` tells the agent to use `workspace_status` for
   current repo/package questions and not to claim live channels or integrations.
 - `agent/tools/workspace_status.ts` is the model-facing Eve tool slug.
-- `agent/channels/sendblue.ts` is a thin Eve adapter only. It owns the
-  absolute route, `waitUntil` scheduling, HTTP status mapping, the typed
-  `ChannelEvents` projection, and encoded lifecycle-state mutation at the
-  framework boundary.
-- `agent/lib/sendblue/` is Eve's import-only implementation slot for the
-  channel. It owns canonical Schema contracts, tagged errors, redacted Config,
-  Context services, runtime/testing Layers, provider
-  authentication, sender policy, opaque routing, replay persistence, typing
-  policy and observations, and the Sendblue HTTP client. It does not move into
-  a shared package until a stable second-channel contract exists.
+- `agent/channels/sendblue.ts` and `agent/channels/photon.ts` are thin
+  composition edges. Each owns one module-edge `ManagedRuntime`, one absolute
+  route identity, and one provider Layer selection; neither contains provider
+  or domain policy.
+- `agent/lib/channel/eve.ts` owns the shared Eve adapter, status mapping,
+  `waitUntil` completion, typed `ChannelEvents` projection, one runtime
+  execution per callback, and the exact encoded snapshot assignment.
+- `agent/lib/channel/` owns canonical app Schemas, tagged errors,
+  `Config.schema` environment binding names, identity, HMAC continuation
+  routing, atomic replay, immutable `ChannelStateV1`, outbound/presence policy,
+  request-scoped dispatch, and provider composition roots.
+- `@bundjil/channel` owns the nominal provider-neutral transport service and
+  direct-text contracts; `@bundjil/sendblue` and `@bundjil/photon` own only
+  their private wire/client boundaries and live/memory transport Layers.
+- `@bundjil/store` supplies `AtomicKeyValueStore`; the app owns Channel keys,
+  records, lease/TTL, and transitions. No clean owner reads the removed legacy
+  Sendblue state, replay key, continuation, typing lifecycle, or config names.
 
 `@bundjil/eve` owns the reusable operation boundary:
 
@@ -198,10 +225,11 @@ operation remains read-only.
 
 Browser mode remains the rollback target. Change the target-scoped URL only
 after clean Preview proof renders the hosted page, covers approve, decline,
-settled replay, and Sendblue delivery, then redeploys from a clean SHA before
-Production promotion. No Bundjil approval service, persistence store, state
-machine, MCP client, proxy, or SDK is introduced: Eve owns session continuity
-and Executor owns the paused execution state.
+settled replay, and delivery through the separately selected/promoted Channel,
+then redeploys from a clean SHA before Production promotion. No Bundjil
+approval service, persistence store, state machine, MCP client, proxy, or SDK
+is introduced: Eve owns session continuity and Executor owns the paused
+execution state.
 
 Production authority is therefore an app-owned configuration binding, not a
 shared package or a second policy engine. The independent Production toolkit
@@ -223,17 +251,12 @@ sanitized status evidence, but no raw provider result, execution identifier, or
 credential belongs in Bundjil. A mode-`0600` ignored local credential copy is a
 trusted-workstation recovery aid only, never a package or runtime owner.
 
-For the shared Sendblue account, exactly one active receive webhook targets the
-stable Production route. The Preview receive entry and its dedicated Sendblue
-automation bypass were revoked on 2026-07-16 after provider readback. Earlier
-dual-webhook behavior is historical evidence of account-level fan-out, not a
-current environment-routing design. The accepted typing rollout on READY
-deployment `dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb` recorded one early
-`StartInbound`, no duplicate `StartTurn` provider request, one bounded stop,
-one delivered iMessage without error or downgrade, and direct user confirmation
-of the visible bubble. Provider `SENT` remains API acceptance rather than
-handset proof. Repeat proof is required only for a future deployment or routing
-change.
+The removed Sendblue implementation and its dated Production/Preview provider
+observations remain in completed SPECs and plans as historical rollback
+provenance. They are not the call graph of the clean source, do not establish
+current webhook topology, and must not be copied into new state/config/replay
+owners. A later provider-selection and Production-promotion SPEC must obtain
+fresh external readback before it changes any deployment or webhook.
 
 ## Production Call Graph
 
@@ -299,73 +322,71 @@ Effect.runPromise(
 );
 ```
 
-## Sendblue Channel Call Graphs
+## Channel Call Graphs
 
-Current Production ingress is:
+The provider-specific production-code paths differ only at composition and
+transport boundaries:
 
 ```text
-Sendblue receive webhook
-  -> independent Vercel Deployment Protection bypass
-  -> POST /eve/v1/sendblue/webhook
-  -> makeSendblueEveChannel ManagedRuntime
-  -> SendblueChannel.authorizeAndClaimInbound
-  -> constant-time shared sb-signing-secret verification
-  -> Schema JSON decode and ignored-event classification
-  -> allowlisted identity + opaque keyed continuation token + atomic Upstash claim
-  -> SendblueChannel.transitionTyping(StartInbound)
-  -> SendblueClient.setTypingIndicator(start, bounded duration)
-  -> encoded channel.state.typing = Pending
-  -> Eve send under waitUntil
+POST /eve/v1/sendblue/webhook              POST /eve/v1/photon/webhook
+  -> SendblueChannelRuntimeLive              -> PhotonChannelRuntimeLive
+  -> @bundjil/sendblue layerLive              -> @bundjil/photon layerLive
+                  \                          /
+                   -> shared makeChannelEveChannel
+                   -> Channel.decodeWebhook(Request)
+                   -> Channel.prepareInbound(decoded common message)
+                   -> ChannelIdentity.resolve
+                   -> ChannelRouter.route
+                   -> ChannelReplay.claimInbound -> AtomicKeyValueStore.transact
+                   -> EveChannelDispatchEve(send).dispatch under waitUntil
+                   -> Channel.completeInbound
 ```
 
-An accepted event returns `202`; ignored or duplicate events return `200`.
+The provider Layer authenticates exact ingress before one complete payload
+decode: Sendblue compares the documented shared header secret; Photon verifies
+webhook ID, timestamp tolerance, event header, and raw-body HMAC. Provider wire
+values become one decoded `ChannelInboundTextMessage` and do not cross into app
+policy.
+
+Accepted ingress returns `202`; ignored or duplicate ingress returns `204`.
 Authentication failures return `401`, authenticated malformed input returns
-`400`, and replay/routing failures return `503`. `sb-signing-secret` is a
-shared header secret, not a body HMAC. The Vercel bypass is only platform
-authentication and never substitutes for route authentication.
+`400`, and replay/routing failures return `503`. Deployment protection is a
+separate platform boundary and never substitutes for provider authentication.
 
-Typing adoption and outbound delivery are:
+Eve events use the same Channel service:
 
 ```text
-Eve turn.started
-  -> makeSendblueEveEvents typed event seam
-  -> SendblueChannel.transitionTyping(StartTurn)
-  -> provider-silent adoption as Active(turnId)
-  -> Eve model/tool loop
-Eve message.completed
-  -> SendblueChannel.transitionTyping(StopTurn)
-  -> SendblueClient.setTypingIndicator(stop), bounded to two seconds
-  -> SendblueChannel.deliverCompletedMessage
-  -> stable event-coordinate replay claim
-  -> SendblueClient.sendMessage
-  -> POST /api/send-message
-  -> owner-fenced completion record
+turn.started / authorization.completed
+  -> makeChannelEveEvents
+  -> Schema.decodeEffect(ChannelAdapterState)
+  -> Channel.handleEvent(PresenceRequested start)
+  -> ChannelTransport.setPresence
+  -> Schema.encodeEffect(ChannelAdapterState)
+  -> exact snapshot assignment
+
+message.completed with non-empty final text
+  -> Schema.decodeUnknownEffect(ChannelEvent.OutboundTextReady)
+  -> ChannelReplay.claimOutbound(event coordinates)
+  -> ChannelTransport.sendMessage
+  -> accepted -> owner-fenced complete record
+  -> uncertain send -> owner-fenced uncertain record, never auto-resend
+  -> known rejection/unavailability/encoding/unsupported -> remove owned claim
+  -> immutable ChannelStateV1
+  -> exact encoded snapshot assignment
 ```
 
-Known provider rejections release the claim so a later operator-directed or
-provider retry can make a new claim; no automatic or background provider retry
-is implemented. Timeout, transport, malformed provider response, and
-completion-persistence failures become uncertain and are not automatically
-resent. This limits duplicate personal messages but cannot establish exactly-once
-delivery after an indeterminate provider outcome.
+`authorization.required`, `input.requested`, terminal turn/session events, and
+waiting request presence stop. Presence is stateless app policy: the provider
+returns accepted/no-op/failure, while persisted state remains only
+`ChannelAdapterState { snapshot: ChannelStateV1 }`. No legacy
+`Idle | Pending | Active`, typing-repair state, provider attempt observation,
+or compatibility decoder exists.
 
-The encoded lifecycle is `Idle | Pending | Active(turnId)`. A missing typing
-field from a pre-feature conversation decodes to `Idle`; corrupt auxiliary
-typing state is repaired without coupling it to final-message decoding.
-Duplicate accepted-inbound starts, same-turn starts, idle stops, and stale
-terminal events make no provider request. Authorization wait stops typing;
-`authorization.completed(outcome=authorized)` reissues a bounded start before
-continuation. Turn/session completion, failure, waiting, and input events are
-cleanup fallbacks. `session.failed` can attempt cleanup but cannot claim durable
-state persistence.
-
-Every provider attempt emits one app-owned `SendblueTypingObservation` through
-Effect's logger and Clock. The observation carries only the command, outcome,
-provider-attempted flag, safe reason/status, and elapsed time. A start or stop
-failure is fail-open for Eve and final delivery, and Sendblue's configured
-maximum duration bounds cleanup. `BUNDJIL_SENDBLUE_TYPING_MAX_DURATION_MILLIS`
-defaults to `120000` and is Schema-constrained to `1..300000`; the auxiliary
-HTTP timeout is two seconds with no automatic retry.
+Outbound provider success means Channel `accepted`; it never means handset
+delivered. The app issues no automatic provider retry after an ambiguous send.
+The later promotion/monitoring owner must observe safe outcome/error-class and
+latency counts without retaining content, identities, raw bodies, or provider
+IDs.
 
 ## Test Call Graph
 
@@ -387,11 +408,12 @@ bun run --filter @bundjil/agent test
   -> injected fetch proof for private bearer auth and no token body leak
 
 bun run --filter @bundjil/agent test
-  -> apps/agent/test/sendblue-*.test.ts
-  -> injected Config, memory replay/client Layers, and typed Eve event factory
-  -> provider request codecs and TestClock timeout
-  -> auth/status/replay plus Idle | Pending | Active lifecycle transitions
-  -> stop-before-send ordering and sanitized observation privacy
+  -> channel-config / channel-vertical / sendblue-channel suites
+  -> Config.schema namespace and Redacted secret checks
+  -> Channel memory Layers and typed Eve event factory
+  -> identity, HMAC routing, atomic concurrent replay, immutable state encoding
+  -> Sendblue and Photon provider substitution through composition roots
+  -> both authored routes in the built Nitro output
   -> behavior without provider access
 ```
 
@@ -404,6 +426,18 @@ bun run --filter @bundjil/eve test
   -> WorkspaceOperationsMemory
   -> packages/eve/test/schema.test.ts
   -> toEveSchema(WorkspaceStatusInput / WorkspaceStatusSuccess)
+
+bun run --filter @bundjil/channel test
+  -> canonical memory transport and common contract behavior
+
+bun run --filter @bundjil/sendblue test
+  -> shared ChannelTransport conformance
+  -> authenticated webhook and complete HTTP codec failures
+
+bun run --filter @bundjil/photon test
+  -> shared ChannelTransport conformance
+  -> signature/body/SDK/Space/presence/uncertain-send lifecycle fixtures
+  -> provider-proof success, cleanup failure, and ambiguous-create recovery
 
 bun run --filter @bundjil/codex test
   -> profile store, token service, request/stream mappers
@@ -426,6 +460,9 @@ Run commands from the repo root:
 ```bash
 bun install --frozen-lockfile
 bun run --filter @bundjil/eve test
+bun run --filter @bundjil/channel test
+bun run --filter @bundjil/sendblue test
+bun run --filter @bundjil/photon test
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 bun run check
@@ -473,14 +510,20 @@ bun run --filter @bundjil/agent dev:no-ui
 
 ## HTTP Endpoints
 
-Default Eve HTTP routes are available without an authored
-`agent/channels/eve.ts`:
+`agent/channels/eve.ts` exposes Eve routes with the app-owned Vercel OIDC and
+local-development auth policy:
 
 - `GET /eve/v1/health`
 - `GET /eve/v1/info`
 - `POST /eve/v1/session`
 - `POST /eve/v1/session/:sessionId`
 - `GET /eve/v1/session/:sessionId/stream`
+
+The provider routes are separately authored and require provider
+authentication in addition to any deployment boundary:
+
+- `POST /eve/v1/sendblue/webhook`
+- `POST /eve/v1/photon/webhook`
 
 Local probes:
 
@@ -696,8 +739,9 @@ code moves.
 
 ## Future Boundaries
 
-Sendblue is Production verified with retained historical Preview evidence.
-These integrations are intentionally not implemented in the current slice:
+The clean Sendblue and Photon routes are implementation candidates, not
+Production selections. These integrations are also intentionally not
+implemented in the current slice:
 
 - Cloudflare Email Routing Workers and email handlers.
 - Vercel Connect connection setup and token exchange.
@@ -705,5 +749,13 @@ These integrations are intentionally not implemented in the current slice:
 - Long-term memory persistence.
 
 Add them in `apps/agent` first unless the contract has become stable enough to
-move into a capability-owned package. Keep the existing Sendblue
-boundary app-owned until a stable second-channel contract exists.
+move into a capability-owned package.
+
+Any Production Channel promotion begins with `$prd-writer`, not a deployment
+command. The new SPEC must select clean Sendblue or Photon and own fresh
+provider/Vercel readback, isolated Preview configuration, new secret custody,
+new routing/replay namespaces, ingress disable-and-drain, the provider retry
+horizon, webhook cutover, monitoring/alerts, accepted-versus-delivered proof,
+rollback traffic quarantine, retained deployment recovery, and old deployment
+retirement. It must preserve the intentional continuity break and must not
+reintroduce legacy Sendblue code, config, state, replay, typing, or tests.

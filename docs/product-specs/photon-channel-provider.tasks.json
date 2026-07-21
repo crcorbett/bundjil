@@ -1,7 +1,7 @@
 {
   "title": "Schema-Driven Channels And Photon Preview Proof Tasks",
   "spec": "docs/product-specs/photon-channel-provider.md",
-  "status": "active",
+  "status": "completed",
   "principles": [
     "Build the channel path cleanly from canonical Effect Schemas, Context.Service contracts, and explicit live/memory Layers; do not extract, wrap, migrate, or preserve the current Sendblue implementation.",
     "@bundjil/channel owns one narrow provider-neutral ChannelTransport; @bundjil/sendblue and @bundjil/photon provide it through separate Layers; apps/agent owns Eve, identity, fresh replay, dispatch, and composition.",
@@ -189,7 +189,7 @@
     {
       "id": "reconcile-clean-channel-docs-and-promotion-gate",
       "title": "Reconcile durable docs and define the later promotion gate",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["prove-photon-isolated-preview"],
       "description": "Update durable architecture and README owners to the verified clean implementation, close the plan, and state whether a later Production SPEC should select clean Sendblue or Photon.",
       "implementationNotes": [
@@ -207,6 +207,11 @@
       "completionCriteria": [
         "Current docs route directly to the clean contracts, providers, operations, proof, continuity break, and promotion gate.",
         "Photon and clean Sendblue remain non-Production until a separately accepted promotion SPEC exists."
+      ],
+      "evidence": [
+        "Ownership and call graph: canonical repo, app, architecture, testing, runbook, verification, research, and task routes now point to @bundjil/channel, @bundjil/sendblue, @bundjil/photon, and app-owned Eve/identity/routing/replay/dispatch composition. Current source and docs retain no legacy Sendblue implementation owner or compatibility path.",
+        "Implementation quality: docs distinguish decoded contract ownership from encoded boundaries, provider Layers from app composition, accepted from delivered, local from provider proof, and repository evidence from current provider truth. Historical Sendblue records and the Alchemy research report remain explicitly non-current provenance.",
+        "Verification coverage: docs formatting, changed-link/frontmatter checks, current-source legacy and unsafe-boundary scans, package build, boundary/effect/skill checks, Knip, typechecks, 232 tests, full verification, and git diff checks passed. The only whole-corpus link findings were four pre-existing links in the explicitly historical legacy-atlas document."
       ],
       "commitAfterPassing": true
     }

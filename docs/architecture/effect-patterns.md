@@ -1,3 +1,12 @@
+---
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: bundjil-effect-owner
+last_reviewed: 2026-07-21
+review_trigger: Effect, Schema, Config, service, Layer, error, resource, or boundary pattern change
+---
+
 # Effect Patterns
 
 ## Codex Provider Boundaries

@@ -45,11 +45,13 @@ the narrowest current owner; do not load completed rollout history by default.
 - Current SPEC/tasks: `docs/product-specs/index.md`
 - Current execution: `docs/exec-plans/active/README.md`
 - Completed history: `docs/exec-plans/completed/README.md`
+- Target-owned operations: `docs/runbooks/README.md`
+- Bounded proof receipts: `docs/verification/README.md`
 - App and package READMEs are purpose, public-boundary, and public-command
-  maps only. HGI-303 owns the still-missing target-owned operation routes,
-  HGI-304 owns workflow/provider authority, and HGI-305 owns bounded proof
-  routes; do not treat README pointers or retained history as current provider
-  truth.
+  maps only. The Photon provider-only runbook/receipt is the sole new narrow
+  route; HGI-303 owns missing target operations, HGI-304 owns workflow/provider
+  authority, and HGI-305 owns missing bounded journeys. Do not treat README
+  pointers or retained history as current provider truth.
 
 ## Verification and authority
 
