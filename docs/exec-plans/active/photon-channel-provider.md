@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: historical
+lifecycle: current
 authority: canonical
 owner: bundjil-channel-rollout-owner
 created: 2026-07-21
@@ -8,9 +8,9 @@ last_reviewed: 2026-07-21
 review_trigger: channel contract, provider boundary, task status, authority, proof, or rollback change
 ---
 
-# Channel Providers And Photon Proof Implementation Plan
+# Channel Providers And Production Promotion Plan
 
-Status: Completed
+Status: Active — Production promotion phase
 
 Spec: [`../../product-specs/photon-channel-provider.md`](../../product-specs/photon-channel-provider.md)
 
@@ -18,10 +18,12 @@ Task ledger: [`../../product-specs/photon-channel-provider.tasks.json`](../../pr
 
 ## Execution rule
 
-Implement the task ledger serially. Each task receives focused verification,
-the applicable three Effect risk lenses, full `bun run verification`, a diff
-review, and one coherent commit before the next task begins. After all six
-tasks reach a terminal accepted state, run a separate five-pass closeout audit:
+The first six implementation tasks and their original closeout audit are
+complete. Implement the six appended Production tasks serially. Each task
+receives focused verification, the applicable three Effect risk lenses, full
+`bun run verification`, a diff review, and one coherent commit before the next
+task begins. After every promotion task reaches a terminal accepted state, run
+the separate five-pass closeout audit:
 
 1. ownership, imports, exports, and production/test/proof call graphs;
 2. Effect, Schema, Config, Layer, error, resource, and helper quality;
@@ -59,26 +61,66 @@ the owning task, is corrected, and is reverified before closeout.
   must never be copied, printed, logged, committed, or retained in evidence.
 - Photon authority covers project-scoped management-plane and runtime actions,
   including reversible webhook, platform, line, and test-resource operations.
-- No authority has been granted for Vercel deployments, Vercel environment
-  variables, Deployment Protection, DNS, Production, Sendblue, Upstash, or
-  other provider mutation. The hosted Preview portion therefore stops before
-  a Vercel action unless authority changes.
+- The user directly approved this full Production rollout and all Photon CRUD,
+  including number-line operations, in the current Codex thread on 2026-07-21.
+  The approval covers only exact runbook-governed Vercel agent deployment and
+  environment operations, Photon project/platform/line/webhook operations,
+  reconciliation of the existing Sendblue line/webhook, fresh Upstash
+  namespace binding, bounded dual-provider journeys, and their rollback.
+- Every mutation remains stage-bounded by authenticated readback, clean pushed
+  source, a matching authority envelope, previous-state identity, sanitized
+  receipt, and immediate postcondition. The approval is not standing authority
+  for unrelated resources, accounts, billing policy, DNS, contacts, messages,
+  or future operations.
 - Local tests use memory/fake Layers. Live Photon checks are opt-in, bounded,
   sanitised, and occur only after deterministic local conformance passes.
 - No proof may retain secret values, request bodies, message text, full
   identities, webhook URLs, project/space/message/resource IDs, SDK objects,
   prompts, tool results, or model output.
 
+## Production promotion phase
+
+The promotion sequence is fixed:
+
+1. amend the canonical SPEC/tasks/plan and current routers;
+2. extend the Schema-driven preflight, authority, runbook, journey, and proof
+   contracts;
+3. reconcile Photon platform/line/webhook state and prove a hosted Preview;
+4. reconcile Sendblue/Upstash metadata, bind only fresh
+   `BUNDJIL_CHANNEL_*` Production configuration, and deploy with domains
+   skipped;
+5. prove both providers on the immutable candidate, promote the stable domain,
+   then repeat Sendblue and Photon ingress/send/replay/typing journeys; and
+6. reconcile durable truth and run the final five-pass audit.
+
+Production must serve both clean routes. No task selects one provider as a
+fallback for the other. Sendblue and Photon retain independent provider
+credentials, webhook verification, transport Layers, and provider proof;
+identity, routing, replay, dispatch, and Eve orchestration remain app-owned.
+
+Photon resource reconciliation lists first and adopts one healthy dedicated
+iMessage line if exactly one approved candidate exists. Otherwise it creates
+one line once, records the documented prorated subscription consequence, and
+never retries an ambiguous create before stable-ID inventory reconciliation.
+Webhook registration follows the same list-before-create rule; its signing
+secret is write-only and must flow directly into the target secret binding.
+
+Typing proof is mandatory for both providers. Photon uses the pinned Spectrum
+Space `startTyping` and `stopTyping` operations. Sendblue uses the documented
+typing endpoint with explicit `start`/`stop`; a `stop` against no active
+indicator is an accepted no-op. Provider acceptance never proves the handset
+displayed the indicator, so any device observation is a separate receipt.
+
 ## Intentional continuity break
 
 The new path starts a new `ChannelStateV1`, replay namespace, routing
 namespace, and environment namespace. It does not read or write the legacy
 Sendblue snapshot, replay keys, continuation algorithm, typing lifecycle, or
-`BUNDJIL_SENDBLUE_*` configuration. A later Production promotion requires a
-separate SPEC and runbook that disable and drain ingress, wait through the
-provider retry horizon, bind new secrets, cut over from a clean Git identity,
-observe the new path, and quarantine rollback traffic so old deliveries cannot
-enter the new replay namespace.
+`BUNDJIL_SENDBLUE_*` configuration. This Production phase disables and drains
+ingress, waits through each provider's bounded retry horizon, binds new
+secrets, cuts over from a clean Git identity, observes the new path, and
+quarantines rollback traffic so old deliveries cannot enter the new replay
+namespace.
 
 ## Source owners and removal order
 
@@ -164,7 +206,11 @@ internal state/status/test structure:
 - concurrent duplicate claims are atomic;
 - Sendblue and Photon pass the same nominal transport conformance suite;
 - authorised Photon management/runtime checks retain only sanitised outcomes;
-- Production and the sole Sendblue webhook remain unchanged.
+- staged and stable-domain journeys prove both providers without treating
+  provider acceptance as handset delivery;
+- Photon and Sendblue typing start/stop outcomes are proved independently; and
+- current/previous deployment plus provider resource identities remain
+  rollback-ready without a legacy runtime bridge.
 
 ## Task progress
 
@@ -176,6 +222,17 @@ internal state/status/test structure:
 | Photon and dual local conformance      | Completed | Exact Spectrum 12.2.0 pins, signed direct webhook adapter, scoped SDK boundary, dual contract/app journeys, both built routes, 229 tests, and full gate passed locally                             |
 | Isolated Photon Preview proof          | Completed | Provider-only CRUD and SDK lifecycle passed with restored zero-webhook topology; hosted Preview stopped on absent Vercel authority/live Space, and the `0644` credential file is a future-run stop |
 | Docs reconciliation and promotion gate | Completed | Canonical architecture and public maps reconciled; provider-only proof routed; Production selection remains a separate SPEC boundary                                                               |
+
+### Promotion task progress
+
+| Task                               | Status    | Acceptance receipt                                                                                                         |
+| ---------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation |
+| Build promotion contracts          | Pending   | —                                                                                                                          |
+| Reconcile Photon and prove Preview | Pending   | —                                                                                                                          |
+| Stage dual-provider Production     | Pending   | —                                                                                                                          |
+| Promote and prove Production       | Pending   | —                                                                                                                          |
+| Reconcile docs and final audit     | Pending   | —                                                                                                                          |
 
 ## Downstream-impact ledger
 

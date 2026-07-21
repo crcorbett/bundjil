@@ -23,6 +23,9 @@ context.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.
+- [Schema-driven Channels and Production promotion](photon-channel-provider.md) —
+  clean provider implementation is complete; task-scoped Photon, Preview, and
+  dual-provider Production promotion is in progress.
 
 ## Implemented or superseded history
 
@@ -34,21 +37,20 @@ ledgers use `status: implemented`, and the Vercel promotion ledger retains a
 historical, scoped `approval.status: granted`. These historical lifecycle and
 approval fields are provenance, not standing authority.
 
-| SPEC                                                                                | Lifecycle note                                                                                          |
-| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)               | Implemented history                                                                                     |
-| [Codex local profile import workaround](codex-local-profile-import-workaround.md)   | Superseded fallback history                                                                             |
-| [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                 | Implemented history                                                                                     |
-| [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md) | Implemented history                                                                                     |
-| [Effect persistence](effect-persistence.md)                                         | Implemented history; current package names/exports own present state                                    |
-| [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                                                     |
-| [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                                                               |
-| [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth                                                 |
-| [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration history                                                                           |
-| [Schema-driven Channels and Photon Preview proof](photon-channel-provider.md)       | Implemented clean architecture and provider-only Photon proof; Production selection requires a new SPEC |
-| [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented rollout history                                                                             |
-| [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented rollout history                                                                             |
-| [Vercel production promotion](vercel-production-promotion.md)                       | Completed rollout evidence; not current Vercel truth                                                    |
+| SPEC                                                                                | Lifecycle note                                                       |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)               | Implemented history                                                  |
+| [Codex local profile import workaround](codex-local-profile-import-workaround.md)   | Superseded fallback history                                          |
+| [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                 | Implemented history                                                  |
+| [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md) | Implemented history                                                  |
+| [Effect persistence](effect-persistence.md)                                         | Implemented history; current package names/exports own present state |
+| [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                  |
+| [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
+| [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
+| [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration history                                        |
+| [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented rollout history                                          |
+| [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented rollout history                                          |
+| [Vercel production promotion](vercel-production-promotion.md)                       | Completed rollout evidence; not current Vercel truth                 |
 
 The [Codex OAuth parallel research report](codex-oauth-subscription-model-access.parallel-research.md)
 is supporting historical research routed through [`../research/README.md`](../research/README.md),

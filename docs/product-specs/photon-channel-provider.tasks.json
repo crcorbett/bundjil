@@ -1,14 +1,16 @@
 {
-  "title": "Schema-Driven Channels And Photon Preview Proof Tasks",
+  "title": "Schema-Driven Channels And Production Promotion Tasks",
   "spec": "docs/product-specs/photon-channel-provider.md",
-  "status": "completed",
+  "status": "in_progress",
   "principles": [
     "Build the channel path cleanly from canonical Effect Schemas, Context.Service contracts, and explicit live/memory Layers; do not extract, wrap, migrate, or preserve the current Sendblue implementation.",
     "@bundjil/channel owns one narrow provider-neutral ChannelTransport; @bundjil/sendblue and @bundjil/photon provide it through separate Layers; apps/agent owns Eve, identity, fresh replay, dispatch, and composition.",
     "Decode unknown only at host/provider ingress, decode statically encoded values with Schema.decodeEffect, encode immediately before outward writes, and pass decoded Schema-derived Types between services.",
     "Use a fresh versioned state, replay namespace, and environment namespace; import no legacy state, keys, continuation, typing lifecycle, config namespace, modules, or tests.",
     "One module-edge ManagedRuntime and one runPromise per Eve callback are allowed; nested runtime execution, Effect.orDie, swallowed causes, Object.assign state updates, callback escape hatches, and method-local dependency re-provisioning are acceptance failures.",
-    "Photon remains Preview-only and conditional on exact published pins, deterministic serverless lifecycle, signed-webhook/replay proof, isolated resources, and separate authority.",
+    "Photon is promoted only after exact published pins, deterministic serverless lifecycle, signed-webhook/replay proof, stable line/webhook adoption, staged deployment acceptance, and target-bound authority.",
+    "Production exposes both clean Sendblue and Photon routes; provider selection remains a composition-root Layer concern and no legacy behavior, state, config, or fallback is migrated.",
+    "Typing start and stop must be proved independently for Sendblue and Photon at the provider-accepted boundary; handset display is a separate claim.",
     "Repository, local, Preview, provider, handset, and Production proof are distinct; protected values and message/identity content never enter evidence."
   ],
   "riskLenses": [
@@ -214,9 +216,163 @@
         "Verification coverage: docs formatting, changed-link/frontmatter checks, current-source legacy and unsafe-boundary scans, package build, boundary/effect/skill checks, Knip, typechecks, 232 tests, full verification, and git diff checks passed. The only whole-corpus link findings were four pre-existing links in the explicitly historical legacy-atlas document."
       ],
       "commitAfterPassing": true
+    },
+    {
+      "id": "plan-production-promotion",
+      "title": "Reopen the SPEC and lock the full Production rollout",
+      "status": "completed",
+      "dependsOn": ["reconcile-clean-channel-docs-and-promotion-gate"],
+      "description": "Review and amend the clean-Channel SPEC, restore its active plan, validate current upstream contracts, and bind the user's task-scoped Photon and Production approval to exact resource, deployment, proof, and rollback boundaries.",
+      "implementationNotes": [
+        "Preserve all completed clean-replacement evidence and append a serial promotion phase; do not rewrite history or create a compatibility migration.",
+        "Record that Production must serve both clean Sendblue and Photon routes with distinct provider secrets and one fresh app-owned replay/routing namespace.",
+        "Route operations through apps/agent/runbooks/deploy-promote.md, sendblue.md, and photon.md; update authority/verification owners before mutation.",
+        "Treat Photon line creation/deletion as a prorated billing consequence and use stable-ID list-before-create reconciliation without blind retries."
+      ],
+      "mandatoryVerification": [
+        "The SPEC, task ledger, active plan, product index, and plan indexes agree on current status, dual-provider scope, exact authority, rollback, and non-goals.",
+        "Primary Photon, Sendblue, and Vercel documentation is cited for current management, webhook, retry, deployment, and typing contracts.",
+        "The downstream-impact ledger accounts for code, config, provider resources, runbooks, authority, critical journeys, proof packets, architecture, READMEs, and preserved history.",
+        "Run docs, skills, authority, controls, verification, boundary, Effect, full repository, formatting, and diff checks before committing the plan."
+      ],
+      "completionCriteria": [
+        "The promotion phase is executable without relying on legacy behavior or unsupported provider claims.",
+        "No live provider or deployment mutation occurs in this planning task."
+      ],
+      "evidence": [
+        "PRD review and writer outcome: the same clean-Channel SPEC was reopened without altering the six completed implementation tasks or importing legacy behavior. The current SPEC, appended six-task ledger, restored active plan, product index, and plan indexes now agree on a dual-provider Production topology, fresh namespaces, task-scoped approval, exact mutation/readback/rollback limits, and the final-only five-pass audit.",
+        "Primary contract evidence: current Photon management/OpenAPI, webhook/retry, Spectrum typing, Sendblue typing, and Vercel staged-deployment/promote documentation was inspected and cited. The plan records stable-ID list-before-create adoption, write-only webhook secrets, prorated line billing, at-least-once retry drain, best-effort typing, provider acceptance versus handset display, and create-without-blind-retry semantics.",
+        "Verification: JSON parsing, docs/skills/authority/controls/verification policies, Effect setup, boundary audit and 76 boundary/control tests, formatting, lint, Knip, eight workspace typechecks, 233 workspace tests, full verification, and diff checks passed against merge baseline af66b06. No live provider, secret, Vercel, Sendblue, Upstash, DNS, webhook, line, deployment, or Production operation ran in this task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-production-promotion-contracts",
+      "title": "Build dual-Channel preflight, authority, and proof contracts",
+      "status": "pending",
+      "dependsOn": ["plan-production-promotion"],
+      "description": "Extend the existing Schema-driven Production preflight and governed proof surfaces so the rollout fails closed on missing, legacy, shared, stale, ambiguous, or unprovable Sendblue/Photon configuration.",
+      "implementationNotes": [
+        "Add explicit stages for channel inventory, staged dual-provider deployment, stable-domain promotion, and accepted rollback-ready state; remove the legacy sendblue-final-promotion stage name.",
+        "Require metadata-only new BUNDJIL_CHANNEL_* bindings, fresh replay/routing fingerprints, distinct webhook IDs/secrets, exact current/previous deployments, and no legacy config names.",
+        "Add Photon management, ingress, outbound, and typing authority records plus dual-provider critical journeys and command-map owners.",
+        "Extend target-owned runbooks and proof templates with provider-accepted versus handset-observed typing, uncertain send, retry drain, and rollback quarantine."
+      ],
+      "mandatoryVerification": [
+        "Schema and CLI tests reject legacy variable names, shared identities, missing Photon/Sendblue bindings, wrong Vercel target/type, same current/previous deployment, stale snapshots, and unsupported proof escalation.",
+        "Authority/control/verification audits accept exact new records and current fixture paths without granting standing provider authority.",
+        "Effect review confirms branded identities, Config.schema/Redacted secrets, named operations, explicit Layers, safe tagged errors, flat effects, and no generic helper or manual reader.",
+        "Run focused agent/Photon tests and builds plus every global gate before committing."
+      ],
+      "completionCriteria": [
+        "A sanitized preflight can represent every rollout checkpoint and cannot claim Production from repository or Preview evidence.",
+        "Runbooks and proof owners are executable before the first provider mutation."
+      ],
+      "evidence": [],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-photon-resources-and-preview",
+      "title": "Reconcile Photon resources and prove the hosted Preview",
+      "status": "pending",
+      "dependsOn": ["build-production-promotion-contracts"],
+      "description": "Authenticate the approved Photon project, adopt or create one dedicated iMessage line, register an isolated Preview webhook, bind new Preview configuration, deploy the pushed candidate, and prove the clean Photon journey without Production traffic.",
+      "implementationNotes": [
+        "Require the ignored Photon credential file to be mode 0600 before loading it; never print, copy, or retain protected values.",
+        "List project/platform/line/webhook state first; adopt exactly one healthy dedicated iMessage line or create exactly one and record its billing consequence and stable ID in the protected operation receipt.",
+        "Register one Preview webhook, immediately bind its write-only signing secret and stable ID, and reconcile uncertain creates by URL inventory before any retry.",
+        "Use fresh Preview replay/routing namespaces and prove signed ingress, one dispatch, one accepted outbound, duplicate suppression, cold Space resolution, typing start/stop, and scoped SDK release."
+      ],
+      "mandatoryVerification": [
+        "Authenticated before/after Photon and Vercel readback identifies only sanitized counts, health/state, fingerprints, immutable deployment identity, and exact postconditions.",
+        "The Preview proof distinguishes provider acceptance, Eve completion, and optional handset display; message content, phone identities, URLs, resource IDs, and secrets are excluded from durable evidence.",
+        "Any ambiguous line/webhook create, unhealthy line, absent Space, uncertain send, typing failure, release failure, or cleanup/readback mismatch stops Production staging.",
+        "Run focused and full repository verification against the exact pushed candidate before committing the bounded receipt."
+      ],
+      "completionCriteria": [
+        "The Photon Preview journey and both typing transitions are proved, or the task records a terminal target-specific stop without claiming success.",
+        "Production and Sendblue provider state remain unchanged in this task."
+      ],
+      "evidence": [],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "stage-dual-provider-production",
+      "title": "Bind clean Production configuration and stage the dual-provider deployment",
+      "status": "pending",
+      "dependsOn": ["reconcile-photon-resources-and-preview"],
+      "description": "Reconcile current Sendblue, Upstash, Photon, and Vercel metadata; bind only new Production Channel configuration; register the final Photon webhook; and deploy one Production candidate with domains skipped.",
+      "implementationNotes": [
+        "Preserve the approved Sendblue line and reconcile its receive webhook to the clean route without migrating old config/state behavior.",
+        "Use the approved Upstash database only through a fresh physical prefix and never inspect, copy, clear, or import legacy replay keys.",
+        "Bind BUNDJIL_CHANNEL_SENDBLUE_*, BUNDJIL_CHANNEL_PHOTON_*, BUNDJIL_CHANNEL_REPLAY_*, and BUNDJIL_CHANNEL_ROUTING_* to Production with sensitive/encrypted types and sanitized metadata readback.",
+        "Deploy from the clean pushed SHA using vercel deploy --prod --skip-domain and preserve current/previous deployment and config fingerprints before any alias change."
+      ],
+      "mandatoryVerification": [
+        "The staged immutable URL serves both routes, exact source/config identity, deployment protection, proxy authentication, and fresh namespace metadata while the stable Production domain remains on the previous deployment.",
+        "Signed Sendblue and Photon ingress fixtures plus negative authentication and replay cases pass against the immutable deployment without exposing provider payloads.",
+        "No legacy environment name is present in the accepted Production metadata and no provider webhook points to an unaccepted target.",
+        "Run matching preflight, target readback, focused journeys, full verification, and diff checks before committing the stage receipt."
+      ],
+      "completionCriteria": [
+        "One rollback-ready immutable Production candidate is accepted without stable-domain traffic.",
+        "Both provider webhook inventories and previous deployment references are exact and recoverable."
+      ],
+      "evidence": [],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "promote-and-prove-dual-channel-production",
+      "title": "Promote and prove Sendblue and Photon in Production",
+      "status": "pending",
+      "dependsOn": ["stage-dual-provider-production"],
+      "description": "Promote the accepted immutable agent deployment to the stable domain, read back the alias, and execute bounded end-to-end journeys for both clean Channel providers, including typing start and stop.",
+      "implementationNotes": [
+        "Promote only the accepted staged deployment and immediately verify stable alias, source/config fingerprint, health, route presence, provider webhook targets, and rollback references.",
+        "For Sendblue and Photon separately, prove one signed inbound, one fresh replay claim, one Eve turn, one accepted outbound, one duplicate suppression, typing start, and typing stop.",
+        "Do not retry uncertain outbound effects; reconcile provider status where available and retain inconclusive rather than upgrading acceptance to delivery.",
+        "Observe handset delivery and typing display only when the exact safe test conversation is approved; otherwise record those boundaries as unproved."
+      ],
+      "mandatoryVerification": [
+        "The stable domain resolves to the accepted immutable deployment and both provider webhook inventories resolve to its exact final route without redirects.",
+        "Each provider has a separate proof packet tying source, deployment, provider, replay, dispatch, send, and typing outcomes together while excluding content and identities.",
+        "A rollback drill or non-mutating rollback qualification proves the previous deployment/config is distinct and the retry quarantine procedure is executable.",
+        "Run post-promotion preflight/readback, both bounded journeys, monitoring checks, and full repository verification before committing the Production receipt."
+      ],
+      "completionCriteria": [
+        "Both clean Channel providers and both typing transitions work at the claimed Production boundary with zero duplicate response.",
+        "Any unproved handset boundary is explicit and does not weaken provider/deployment acceptance."
+      ],
+      "evidence": [],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-production-docs-and-closeout",
+      "title": "Reconcile Production truth and run the final five-pass audit",
+      "status": "pending",
+      "dependsOn": ["promote-and-prove-dual-channel-production"],
+      "description": "Update durable docs only to accepted source and dated provider truth, close the plan, and perform the required five-pass audit after every implementation and rollout task is terminal.",
+      "implementationNotes": [
+        "Update app/package READMEs, architecture, runbooks, verification router/evidence index, SPEC/task/plan indexes, and monitoring/rollback ownership to exact accepted results.",
+        "Preserve historical plans, old receipts, research, and legacy atlas without presenting them as current provider truth.",
+        "Run the five passes in order: ownership/call graphs; Effect/Schema/Layer quality; tests/build/provider proof; docs/authority/operations/rollback; adversarial legacy/secret/drift/unsupported-claim review.",
+        "Any finding reopens and repairs its owning task before closeout."
+      ],
+      "mandatoryVerification": [
+        "Docs-maintainer accounting classifies every affected README/docs/runbook/proof/history surface as changed, preserved, historical, or N/A.",
+        "All repository, Preview, Production, provider-accepted, Eve-completed, and handset-observed claims cite the exact bounded owner and date.",
+        "Legacy/secret/unsafe-boundary/drift scans and all policy, Effect, boundary, type, build, test, lint, Knip, docs, and full verification gates pass.",
+        "The final task ledger and active/completed plan indexes move atomically only after every task and audit pass is accepted."
+      ],
+      "completionCriteria": [
+        "Current documentation routes directly to the accepted dual-provider Production topology, operations, proof, rollback, and limitations.",
+        "The final five-pass audit is recorded once at the end and the plan is archived."
+      ],
+      "evidence": [],
+      "commitAfterPassing": true
     }
   ],
-  "closeoutAudit": {
+  "implementationCloseoutAudit": {
     "status": "completed",
     "completedAt": "2026-07-21",
     "passes": [
@@ -232,5 +388,10 @@
       "Hosted Vercel Preview, live messaging, handset delivery, and Production remain unproved and unauthorised.",
       "The whole historical documentation corpus retains four broken relative links in docs/architecture/legacy-atlas.md and two missing review_trigger fields in historical documents; current and changed documentation surfaces pass link and frontmatter checks."
     ]
+  },
+  "promotionCloseoutAudit": {
+    "status": "pending",
+    "passes": [],
+    "limitations": []
   }
 }

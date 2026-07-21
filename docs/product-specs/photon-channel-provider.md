@@ -1,6 +1,6 @@
 ---
 document_type: product-specification
-lifecycle: implemented
+lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-21
@@ -8,9 +8,9 @@ last_reviewed: 2026-07-21
 review_trigger: channel contract, provider implementation, Photon SDK/API, deployment, or proof change
 ---
 
-# Schema-Driven Channels And Photon Preview Proof
+# Schema-Driven Channels And Production Promotion
 
-## Implementation outcome
+## Current implementation baseline
 
 Implemented on `codex/photon-channel-provider-spec` as a clean replacement:
 `@bundjil/channel` owns the nominal contract, `@bundjil/sendblue` and
@@ -24,8 +24,10 @@ providers. An authorised, bounded Photon provider lifecycle proof created,
 read back, and deleted exactly one reserved webhook and exercised the scoped
 SDK lifecycle, restoring the observed zero-webhook topology. This is provider
 proof only: no Vercel Preview, handset delivery, Sendblue, or Production action
-was authorised or performed. Production provider selection and promotion
-remain gated by a new SPEC with fresh provider and deployment readback.
+was performed by the completed phase. The 2026-07-21 Production amendment
+below reopens this SPEC and task ledger for a full dual-provider rollout.
+Historical evidence remains evidence of its named boundary only; fresh
+authenticated readback owns every current provider and deployment claim.
 
 ## Decision
 
@@ -54,18 +56,19 @@ machine, service graph, or error handling.
 
 The previous immutable Production deployment and Git history are the rollback
 artifact. No `legacy/`, `compat`, adapter bridge, dual decoder, old-state
-importer, or old replay namespace belongs in the new source tree. Existing
-Production remains unchanged until a separately authorized promotion.
+importer, or old replay namespace belongs in the new source tree. Production
+remained unchanged during the completed implementation phase; the amendment
+below supplies the separately reviewed promotion boundary.
 
 The package boundary requires three packages. Two provider packages that each
 declare a similar interface are not nominally substitutable. The neutral
 contract must not live in `@bundjil/eve`, and it must not become a generic
 `core`, `common`, `shared`, `helpers`, or `utils` package.
 
-Implementation begins only after an active plan is created under
-[`../exec-plans/active/`](../exec-plans/active/) and linked from its index.
-Provider infrastructure remains outside this runtime SPEC and requires a
-separate `prd-writer` then `prd-implementer` flow.
+The Production amendment begins only after this plan is restored under
+[`../exec-plans/active/`](../exec-plans/active/) and linked from its index. It
+owns only the exact Photon line/platform/webhook resources, Vercel bindings,
+deployments, Channel routes, and bounded journeys needed for this rollout.
 
 ## PRD re-review: rejected legacy patterns
 
@@ -102,8 +105,12 @@ replacement channel slice.
   state or claims.
 - Prove the entire new application path locally through memory Layers before
   any provider access.
-- Prove Photon only in an isolated Vercel Preview and Photon project under
+- Prove Photon first in an isolated Vercel Preview and Photon project under
   separate authority.
+- Promote both clean Sendblue and Photon Channel routes through staged Vercel
+  Production deployment with fresh replay/routing namespaces.
+- Prove start and stop typing at the provider-accepted boundary for both
+  providers, and record handset display separately when it can be observed.
 - Keep content, identities, provider bodies, credentials, and protected
   resource values out of errors, logs, spans, tests, and proof.
 
@@ -113,9 +120,11 @@ replacement channel slice.
   physical keys, typing transitions, HTTP status choices, internal error tags,
   module names, or test structure.
 - Reading old session/replay data or keeping a compatibility decoder.
-- Production Photon promotion, Sendblue retirement, or Production deployment.
-- Photon or Sendblue account, project, line, phone, webhook, billing, platform,
-  secret, or alert infrastructure ownership.
+- Migrating any legacy Sendblue state, replay keys, continuation, environment
+  namespace, typing lifecycle, modules, or tests.
+- Managing provider accounts, billing policy, unrelated lines, contacts,
+  messages, platforms, webhooks, DNS, or alerts beyond the exact task-scoped
+  resources required by the accepted rollout.
 - A provider registry, dynamic plugins, rich-message framework, generic SDK
   client/callback, or universal messaging abstraction.
 - Group messages, media, reactions, replies, read receipts, voice, WhatsApp,
@@ -123,17 +132,25 @@ replacement channel slice.
 
 ## Truth and authority
 
-Repository code defines the current legacy implementation. This SPEC defines
-replacement intent. The supporting
+Repository code defines the clean implementation. This SPEC defines the
+Production promotion intent. The supporting
 [Alchemy, Vercel, Sendblue, and Photon report](../research/alchemy-vercel-sendblue-decision-report.md)
 is research-time evidence. Photon and Sendblue documentation defines published
 protocol capability. Only dated readback can establish Preview or Production
 provider state.
 
-No live provider, Vercel, DNS, secret, webhook, line, storage, or deployment
-mutation is authorized by this SPEC. The current Production Sendblue route
-continues to be served by its retained deployment until a later promotion
-SPEC and runbook authorize a maintenance-window cutover.
+The user directly approved this full Production rollout and Photon project
+CRUD, including dedicated number-line operations, in the current Codex thread
+on 2026-07-21. That approval is task-scoped: each mutation still requires the
+matching app-owned runbook envelope, exact authenticated target readback,
+clean pushed source identity, rollback reference, sanitized receipt, and
+immediate postcondition. It does not authorize unrelated Sendblue, Photon,
+Vercel, Upstash, DNS, account, billing-policy, contact, or message operations.
+
+Production must expose both clean routes. Sendblue remains the existing line's
+clean Channel transport; Photon is added as an independent clean Channel
+transport. There is no provider registry, legacy compatibility path, shared
+webhook secret, shared replay prefix, or runtime fallback between them.
 
 Photon documents HMAC-signed, at-least-once webhooks with opaque stable space
 and message IDs. The Spectrum TypeScript SDK exposes webhook handling and
@@ -146,6 +163,30 @@ official [Spectrum repository](https://github.com/photon-hq/spectrum-ts) and
 [Vercel Chat SDK adapter](https://github.com/photon-hq/vercel-chat-adapter-imessage)
 are upstream reference only. GitHub `main`, the Chat SDK adapter, SDK-owned Zod
 types, and callback APIs are not Bundjil contracts.
+
+The Production amendment was revalidated against these primary contracts on
+2026-07-21:
+
+- Photon [management API introduction](https://photon.codes/docs/api-reference/introduction)
+  and [Spectrum OpenAPI](https://spectrum.photon.codes/openapi/json) expose
+  project platform, dedicated line, and webhook management. Dedicated
+  iMessage line create/delete changes prorated subscription quantity.
+- Photon [webhook management](https://photon.codes/docs/webhooks/managing-webhooks)
+  returns a signing secret only on create, uses logical deletion, and permits
+  in-flight delivery after delete; [delivery and retries](https://photon.codes/docs/webhooks/delivery)
+  documents at-least-once delivery, up to six attempts, and a worst-case
+  default retry horizon of about 3.5 minutes.
+- Photon [Spaces and Users](https://photon.codes/docs/spectrum-ts/spaces-and-users)
+  exposes `startTyping` and `stopTyping`; [typing indicators](https://photon.codes/docs/spectrum-ts/content/typing-indicators)
+  states unsupported platforms may no-op.
+- Sendblue [typing indicators](https://docs.sendblue.com/api-v2/typing-indicators)
+  accepts explicit `start`/`stop`, treats stop-without-active as a safe no-op,
+  and can return a firmware-related `503`; the provider's
+  [typing guide](https://docs.sendblue.com/guides/typing-indicator/) states
+  acceptance is best-effort and does not establish handset display.
+- Vercel's [staged Production deployment](https://vercel.com/docs/cli/deploying-from-cli)
+  and [promote](https://vercel.com/docs/cli/promote) contracts support a
+  Production deployment with domains skipped followed by explicit promotion.
 
 ## Package boundaries
 
@@ -472,7 +513,7 @@ Eve framework event callback
   -> exact Eve snapshot assignment
 ```
 
-### Photon Preview runtime
+### Photon runtime
 
 ```text
 POST /eve/v1/photon/webhook
@@ -511,14 +552,17 @@ provider contract suite
 local fixture command
   -> no credentials -> memory Layers -> sanitized contract receipt
 
-authorized isolated Preview proof
-  -> Preview-only encrypted new config
-  -> isolated Photon project/webhook
+authorized staged deployment proof
+  -> environment-scoped encrypted new config
+  -> exact Photon project/line/webhook
   -> signed inbound -> replay -> Eve -> outbound accepted
   -> sanitized Vercel/Photon/runtime readback
 
 Production
-  -> no change under this SPEC
+  -> staged production deployment without domains
+  -> dual-provider proof against immutable deployment URL
+  -> promote stable domain only after acceptance
+  -> repeat Sendblue and Photon ingress/send/typing/readback
 ```
 
 ## Progressive proof spikes
@@ -563,6 +607,37 @@ suppression, cold Space resolution, presence outcome, `waitUntil` completion,
 and resource release. Do not create/delete a dedicated line without additional
 authority and confirmed lifecycle semantics.
 
+### Spike 6: Production preflight and resource adoption
+
+Decode authenticated Vercel, Photon, Sendblue, and Upstash metadata into one
+sanitized preflight receipt. Prove the exact projects, environment-scoped
+bindings, current and previous immutable deployments, Photon platform/line
+inventory, Sendblue line/webhook inventory, and fresh replay/routing namespace
+without reading legacy replay data or exposing values. A missing or ambiguous
+resource is inconclusive, never healthy.
+
+### Spike 7: Photon line and webhook rollout
+
+Adopt exactly one healthy existing dedicated iMessage line when readback proves
+it belongs to the approved project; otherwise create exactly one line and
+record that the operation changes prorated subscription quantity. Enable only
+the required iMessage platform state, register the final HTTPS webhook once,
+capture its write-only signing secret directly into the approved secret
+binding, and read back stable line/webhook IDs. Never retry an ambiguous create;
+reconcile by listing first. Delete only a rollout-created resource during
+rollback.
+
+### Spike 8: dual-provider staged promotion
+
+Deploy Production with `--skip-domain`, prove both signed routes against the
+immutable deployment URL, then promote the stable domain. For each provider,
+prove one accepted inbound, one Eve turn, one accepted outbound, replay
+suppression, typing start, and typing stop. Photon `Space.startTyping()` and
+`stopTyping()` and Sendblue's typing endpoint must each return a decoded
+provider outcome. Provider acceptance and visible handset display remain
+separate observations. After promotion, repeat the journeys through the stable
+domain and retain previous deployment/config references for rollback.
+
 ## Acceptance criteria
 
 - The three packages use explicit exports, canonical Schemas, named Types and
@@ -591,6 +666,18 @@ authority and confirmed lifecycle semantics.
   signature, failure, and conformance tests.
 - Any live Preview proof is isolated, separately authorized, sanitized, and
   does not mutate Production or Sendblue provider state.
+- Production exposes both `/eve/v1/sendblue/webhook` and
+  `/eve/v1/photon/webhook` from one accepted immutable deployment and the
+  stable alias resolves to that deployment after promotion.
+- Photon line/platform/webhook and Vercel binding operations use stable IDs,
+  list-before-create adoption, create-without-blind-retry, immediate readback,
+  write-only secret handling, and rollout-owned deletion only.
+- Both providers prove decoded typing `start` and `stop` outcomes at the
+  provider boundary; handset display is either separately observed or recorded
+  as unproved.
+- Production starts only with fresh `BUNDJIL_CHANNEL_*` configuration and
+  replay/routing namespaces; no `BUNDJIL_SENDBLUE_*` binding or old replay data
+  is read, copied, imported, or used as fallback.
 - `bun run check:boundaries`, `bun run check:effect-setup`,
   `bun run check:skills`, focused package/app checks, negative legacy-pattern
   scans, `bun run verification`, and `git diff --check` pass.
@@ -623,6 +710,24 @@ authority and confirmed lifecycle semantics.
 | Codex/store/eve package READMEs and codex-proxy docs | N/A                                              | No public contract or command change in those owners                                                 |
 | Frontend/browser proof                               | N/A                                              | No React or visible browser surface                                                                  |
 
+### Production amendment impact ledger
+
+| Surface                                                                    | Required change                                                        | Promotion postcondition                                                                                       |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger, active plan, and indexes                                | Reopen current owners                                                  | Promotion tasks and terminal proof remain aligned                                                             |
+| Agent Production preflight and tests                                       | Add dual-Channel stages and binding metadata                           | Invalid, shared, stale, or legacy configuration fails closed                                                  |
+| Photon management service and tests                                        | Add project/platform/line inventory and bounded reconciliation         | Stable IDs, billing consequence, adoption, ambiguous-write recovery, and deletion ownership are explicit      |
+| Agent, Sendblue, and Photon runbooks                                       | Replace provider-only/legacy config procedures                         | Exact dual-provider Preview/Production procedures, typing proof, rollback, and secret handling are executable |
+| Authority and automation registers                                         | Add Photon ingress/outbound/management boundaries and current fixtures | Direct approval is represented as a task-bounded receipt, not standing authority                              |
+| Critical journeys, command map, proof schema/templates, and evidence index | Add Photon and dual-provider typing/promotion journeys                 | Repository, deployment, provider acceptance, and handset observations remain distinct                         |
+| Vercel environment and deployment                                          | Bind new config, stage, prove, promote, read back                      | Stable alias resolves to accepted immutable deployment with previous rollback reference                       |
+| Photon project                                                             | Adopt/create one line and register one Production webhook              | Exact resources are healthy and read back; write-only secret is bound without disclosure                      |
+| Sendblue account                                                           | Preserve the current approved line and reconcile the receive webhook   | Clean route and typing work without legacy runtime/config/state behavior                                      |
+| Upstash                                                                    | Reuse the approved database only through a new physical prefix         | No legacy key is read, copied, cleared, or treated as proof                                                   |
+| Architecture, READMEs, runbook index, and verification router              | Reconcile after live readback                                          | Current routes describe only accepted source and bounded provider truth                                       |
+| Historical plans, receipts, research, and legacy atlas                     | Preserve                                                               | Historical provenance is not rewritten as current provider truth                                              |
+| Frontend, public API publication, package release, DNS, and unrelated apps | N/A                                                                    | No changed contract or target in this rollout                                                                 |
+
 ## Risks and unresolved questions
 
 - Does a new provider-neutral transport need `providerAgentId`, or can the
@@ -636,12 +741,21 @@ authority and confirmed lifecycle semantics.
   does its SDK release resources in the Vercel runtime?
 - What stable Space/line identity is required after cold start, and how is an
   ambiguous send prevented from being retried?
-- What provider retry horizon must the later Production runbook drain before
-  cutover or rollback when old replay data is deliberately ignored?
-- Should Production adopt Photon or clean Sendblue after both conform locally?
-  That provider-selection decision belongs to a later promotion SPEC.
+- Can the existing Sendblue receive webhook be replaced atomically enough to
+  avoid a gap, or must the cutover use an overlap followed by an exact inventory
+  replacement?
+- Does the approved Photon project already own one healthy dedicated iMessage
+  line, or must the rollout create one and accept the documented prorated
+  subscription change?
+- Can provider-level typing acceptance be paired with a safe handset
+  observation for both lines during the rollout window?
+- Which exact current and previous Vercel deployments and configuration
+  fingerprints does authenticated readback establish immediately before the
+  staged deployment?
 
 Any unresolved SDK lifecycle, cold-Space, line, uncertain-send, isolated
 resource, or framework state-write question is a stop condition. Public docs
-do not prove tenant state. No write, deployment, secret, webhook, DNS, line,
-storage, or provider operation is authorized here.
+do not prove tenant state. The direct approval permits only the exact rollout
+operations represented in the active task and matching runbook; ambiguity,
+missing readback, secret leakage, or an unavailable rollback reference stops
+the mutation sequence.
