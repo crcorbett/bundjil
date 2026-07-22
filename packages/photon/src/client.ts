@@ -19,6 +19,11 @@ import type {
   PhotonSdkSendResult as PhotonSdkSendResultType,
   PhotonSdkSendResultEncoded,
 } from "./schemas.js";
+import { PhotonSdkObservedFailure } from "./sdk-observed-failure.js";
+import type {
+  PhotonSdkOperation,
+  PhotonSdkPhase,
+} from "./sdk-observed-failure.js";
 
 export interface PhotonClientShape {
   readonly sendMessage: (
@@ -58,6 +63,52 @@ export interface PhotonSdkResource {
 export interface PhotonSdkFactory {
   readonly acquire: (config: PhotonConfig) => Promise<PhotonSdkResource>;
 }
+
+const safeSdkToken = (value: unknown) =>
+  typeof value === "string" && /^[A-Za-z][A-Za-z0-9_.-]{0,63}$/u.test(value)
+    ? value
+    : "unknown";
+
+const sdkProperty = (value: unknown, key: PropertyKey): unknown => {
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
+  const property: unknown = Reflect.get(value, key);
+  return property;
+};
+
+const makeSdkObservedFailure = (
+  operation: PhotonSdkOperation,
+  phase: PhotonSdkPhase,
+  failure: unknown
+) => {
+  const nestedCause = sdkProperty(failure, "cause");
+  const transportStatus = sdkProperty(nestedCause, "code");
+  const retryable = sdkProperty(failure, "retryable");
+  return new PhotonSdkObservedFailure({
+    operation,
+    phase,
+    errorName: safeSdkToken(sdkProperty(failure, "name")),
+    providerCode: safeSdkToken(sdkProperty(failure, "code")),
+    transportStatus:
+      typeof transportStatus === "number" &&
+      Number.isSafeInteger(transportStatus)
+        ? transportStatus
+        : "unknown",
+    retryable: typeof retryable === "boolean" ? retryable : "unknown",
+  });
+};
+
+const observeSdkFailure = (failure: PhotonSdkObservedFailure) =>
+  Effect.logError("PhotonSdkOperationFailure", {
+    provider: "photon",
+    operation: failure.operation,
+    phase: failure.phase,
+    errorName: failure.errorName,
+    providerCode: failure.providerCode,
+    transportStatus: failure.transportStatus,
+    retryable: failure.retryable,
+  });
 
 const liveFactory: PhotonSdkFactory = {
   acquire: async (config) => {
@@ -108,15 +159,22 @@ export const provePhotonSdkLifecycle = (config: PhotonConfig) =>
       })
   );
 
-const releasePhotonResource = (resource: PhotonSdkResource) =>
+const releasePhotonResource = (
+  resource: PhotonSdkResource,
+  operation: PhotonSdkOperation
+) =>
   Effect.tryPromise({
     try: () => resource.stop(),
-    catch: () =>
-      new PhotonLifecycleError({
-        operation: "release",
-        reason: "unavailable",
-      }),
+    catch: (failure) => makeSdkObservedFailure(operation, "release", failure),
   }).pipe(
+    Effect.tapError(observeSdkFailure),
+    Effect.mapError(
+      () =>
+        new PhotonLifecycleError({
+          operation: "release",
+          reason: "unavailable",
+        })
+    ),
     Effect.tapError(() =>
       Effect.logError("PhotonLifecycleError", {
         operation: "release",
@@ -129,22 +187,27 @@ const releasePhotonResource = (resource: PhotonSdkResource) =>
 const withPhotonResource = <A, E>(
   config: PhotonConfig,
   factory: PhotonSdkFactory,
-  operation: "sendMessage" | "setPresence",
+  operation: PhotonSdkOperation,
   use: (resource: PhotonSdkResource) => Effect.Effect<A, E>
 ) =>
   Effect.acquireUseRelease(
     Effect.tryPromise({
       try: () => factory.acquire(config),
-      catch: () =>
-        new ChannelUnavailableError({
-          provider: "photon",
-          operation,
-          reason: "transport",
-          retry: "backoff",
-        }),
-    }),
+      catch: (failure) => makeSdkObservedFailure(operation, "acquire", failure),
+    }).pipe(
+      Effect.tapError(observeSdkFailure),
+      Effect.mapError(
+        () =>
+          new ChannelUnavailableError({
+            provider: "photon",
+            operation,
+            reason: "transport",
+            retry: "backoff",
+          })
+      )
+    ),
     use,
-    releasePhotonResource
+    (resource) => releasePhotonResource(resource, operation)
   );
 
 export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
@@ -157,24 +220,40 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
             Effect.gen(function* sendPhotonMessage() {
               const space = yield* Effect.tryPromise({
                 try: () => resource.resolveDirectSpace(participantId),
-                catch: () =>
-                  new ChannelUnavailableError({
-                    provider: "photon",
-                    operation: "sendMessage",
-                    reason: "transport",
-                    retry: "backoff",
-                  }),
-              });
+                catch: (failure) =>
+                  makeSdkObservedFailure(
+                    "sendMessage",
+                    "resolveDirectSpace",
+                    failure
+                  ),
+              }).pipe(
+                Effect.tapError(observeSdkFailure),
+                Effect.mapError(
+                  () =>
+                    new ChannelUnavailableError({
+                      provider: "photon",
+                      operation: "sendMessage",
+                      reason: "transport",
+                      retry: "backoff",
+                    })
+                )
+              );
               const result = yield* Effect.tryPromise({
                 try: () => space.sendMessage(text),
-                catch: () =>
-                  new ChannelDeliveryUncertainError({
-                    provider: "photon",
-                    operation: "sendMessage",
-                    reason: "uncertain",
-                    retry: "readbackRequired",
-                  }),
-              });
+                catch: (failure) =>
+                  makeSdkObservedFailure("sendMessage", "send", failure),
+              }).pipe(
+                Effect.tapError(observeSdkFailure),
+                Effect.mapError(
+                  () =>
+                    new ChannelDeliveryUncertainError({
+                      provider: "photon",
+                      operation: "sendMessage",
+                      reason: "uncertain",
+                      retry: "readbackRequired",
+                    })
+                )
+              );
               return yield* Schema.decodeUnknownEffect(PhotonSdkSendResult)(
                 result
               ).pipe(
@@ -197,24 +276,44 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
             Effect.gen(function* setPhotonPresence() {
               const space = yield* Effect.tryPromise({
                 try: () => resource.resolveDirectSpace(participantId),
-                catch: () =>
-                  new ChannelUnavailableError({
-                    provider: "photon",
-                    operation: "setPresence",
-                    reason: "transport",
-                    retry: "backoff",
-                  }),
-              });
+                catch: (failure) =>
+                  makeSdkObservedFailure(
+                    "setPresence",
+                    "resolveDirectSpace",
+                    failure
+                  ),
+              }).pipe(
+                Effect.tapError(observeSdkFailure),
+                Effect.mapError(
+                  () =>
+                    new ChannelUnavailableError({
+                      provider: "photon",
+                      operation: "setPresence",
+                      reason: "transport",
+                      retry: "backoff",
+                    })
+                )
+              );
               yield* Effect.tryPromise({
                 try: () => space.setPresence(action),
-                catch: () =>
-                  new ChannelUnavailableError({
-                    provider: "photon",
-                    operation: "setPresence",
-                    reason: "transport",
-                    retry: "backoff",
-                  }),
-              });
+                catch: (failure) =>
+                  makeSdkObservedFailure(
+                    "setPresence",
+                    action === "start" ? "startTyping" : "stopTyping",
+                    failure
+                  ),
+              }).pipe(
+                Effect.tapError(observeSdkFailure),
+                Effect.mapError(
+                  () =>
+                    new ChannelUnavailableError({
+                      provider: "photon",
+                      operation: "setPresence",
+                      reason: "transport",
+                      retry: "backoff",
+                    })
+                )
+              );
             })
           )
       ),

@@ -381,6 +381,16 @@ complete provider result, then return a decoded common result. Raw failures
 map once to safe `Schema.TaggedErrorClass` values. Live and deterministic
 memory Layers are explicit exports.
 
+The Photon SDK boundary additionally emits one allowlisted operational
+observation before mapping a failed Promise. It may contain only provider,
+public operation, lifecycle phase, a bounded error-name token, a bounded
+provider-code token, a numeric nested transport status, and a boolean retry
+hint. It must never retain or log the raw error, message, stack, cause,
+participant, conversation, content, URL, credential, or provider metadata.
+This observation exists to distinguish acquisition, Space reconstruction,
+typing, send, and release failures at the hosted boundary without weakening
+the common safe error contract.
+
 ### Agent orchestration
 
 `apps/agent/agent/lib/channel/` is a new owner, not a renamed copy of

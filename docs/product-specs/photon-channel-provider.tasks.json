@@ -290,7 +290,8 @@
         "List project/service/platform/shared-user/webhook state first; require service type shared and zero dedicated lines, then adopt the exact approved shared user or check availability and idempotently create it by phone identity.",
         "Register one Preview webhook, immediately bind its write-only signing secret and stable ID, and reconcile uncertain creates by URL inventory before any retry.",
         "Use fresh Preview replay/routing namespaces and prove signed ingress, one dispatch, one accepted outbound, duplicate suppression, cold Space resolution, typing start/stop, and scoped SDK release.",
-        "Immediately before cutting the hosted candidate, compare both direct @spectrum-ts package pins with the npm latest dist-tag, keep them on one exact stable release, regenerate the lockfile, and rerun Photon plus agent package/build proof."
+        "Immediately before cutting the hosted candidate, compare both direct @spectrum-ts package pins with the npm latest dist-tag, keep them on one exact stable release, regenerate the lockfile, and rerun Photon plus agent package/build proof.",
+        "When hosted and local SDK outcomes differ, record only an allowlisted Photon SDK failure observation containing operation, phase, bounded name/code tokens, numeric nested status, and boolean retry hint; never record the raw error, message, stack, cause, identity, content, URL, credential, or provider metadata."
       ],
       "mandatoryVerification": [
         "Authenticated before/after Photon and Vercel readback identifies only sanitized counts, health/state, fingerprints, immutable deployment identity, and exact postconditions.",
