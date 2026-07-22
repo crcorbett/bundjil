@@ -44,9 +44,12 @@
   },
   "dependencies": {
     "@bundjil/channel": "workspace:*",
+    "@grpc/grpc-js": "1.14.4",
     "@spectrum-ts/core": "12.3.0",
     "@spectrum-ts/imessage": "12.3.0",
-    "effect": "catalog:effect"
+    "effect": "catalog:effect",
+    "nice-grpc": "2.1.16",
+    "nice-grpc-common": "2.0.3"
   },
   "devDependencies": {
     "@effect/platform-bun": "catalog:effect",

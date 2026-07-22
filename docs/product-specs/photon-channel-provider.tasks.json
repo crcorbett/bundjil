@@ -291,13 +291,14 @@
         "Register one Preview webhook, immediately bind its write-only signing secret and stable ID, and reconcile uncertain creates by URL inventory before any retry.",
         "Use fresh Preview replay/routing namespaces and prove signed ingress, one dispatch, one accepted outbound, duplicate suppression, cold Space resolution, typing start/stop, and scoped SDK release.",
         "Immediately before cutting the hosted candidate, compare both direct @spectrum-ts package pins with the npm latest dist-tag, keep them on one exact stable release, regenerate the lockfile, and rerun Photon plus agent package/build proof.",
-        "When hosted and local SDK outcomes differ, record only an allowlisted Photon SDK failure observation containing operation, phase, bounded name/code tokens, numeric nested status, and boolean retry hint; never record the raw error, message, stack, cause, identity, content, URL, credential, or provider metadata."
+        "When hosted and local SDK outcomes differ, record only an allowlisted Photon SDK failure observation containing operation, phase, bounded name/code tokens, numeric nested status, and boolean retry hint; never record the raw error, message, stack, cause, identity, content, URL, credential, or provider metadata.",
+        "Treat Spectrum's dynamically imported iMessage gRPC peers as an explicit hosted-runtime boundary: @bundjil/photon directly owns @grpc/grpc-js, nice-grpc, and nice-grpc-common at the versions required by the pinned Spectrum release, Eve externalises the complete runtime set for Nitro tracing, and packaged-build proof must show those peer imports remain resolvable."
       ],
       "mandatoryVerification": [
         "Authenticated before/after Photon and Vercel readback identifies only sanitized counts, health/state, fingerprints, immutable deployment identity, and exact postconditions.",
         "The Preview proof distinguishes provider acceptance, Eve completion, and optional handset display; message content, phone identities, URLs, resource IDs, and secrets are excluded from durable evidence.",
         "Any ambiguous shared-user/webhook create, non-shared service, absent Space, uncertain send, typing failure, release failure, or cleanup/readback mismatch stops Production staging.",
-        "Run focused and full repository verification against the exact pushed candidate before committing the bounded receipt.",
+        "Run focused and full repository verification against the exact pushed candidate before committing the bounded receipt, including an agent build assertion over the compiled external-dependency manifest and hosted output for Spectrum's dynamically resolved gRPC peers.",
         "A dependency refresh preserves earlier receipts under their recorded version but requires a new hosted Preview journey for the refreshed immutable artifact; local typecheck/test/build cannot inherit provider, handset, or typing proof."
       ],
       "completionCriteria": [

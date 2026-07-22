@@ -34,12 +34,19 @@ supported call without weakening repository compiler settings.
 | ----------------------- | -------- | ------------------------------------------------------------------------------------------------- | ----------- |
 | `@spectrum-ts/core`     | `12.3.0` | `sha512-j4NM5lRBE/GIAYKGVDIkfM5Gvn6CxHQiCRbaQPpEmidhkkR0i4DSDZKjZpNE1VLxU3knuPlOxAP6v+/7m84X1w==` | `.`         |
 | `@spectrum-ts/imessage` | `12.3.0` | `sha512-RiGFBnmgTMjzE+ZsSCFTQtl8DCNfLk8EiY1KXcFFwjMoHf6GmJk84MYgtd9wAA7VddrwEAF6Sp+jXSp0ZmILwQ==` | `.`         |
+| `@grpc/grpc-js`         | `1.14.4` | Registry integrity retained in `bun.lock`                                                         | runtime     |
+| `nice-grpc`             | `2.1.16` | Registry integrity retained in `bun.lock`                                                         | runtime     |
+| `nice-grpc-common`      | `2.0.3`  | Registry integrity retained in `bun.lock`                                                         | runtime     |
 
 The direct packages are the documented lean installation, not the
 `spectrum-ts` batteries-included metapackage. Core brings Photon proto/OTel,
 Repeater, content parsing, MIME, vCard, and Zod dependencies; iMessage brings
-the Photon gRPC client. Eve keeps `@bundjil/photon` external while compiling
-authored modules so Nitro traces this dependency graph into the server output.
+the Photon gRPC client. That client dynamically imports and resolves the three
+gRPC packages above, so `@bundjil/photon` declares them directly rather than
+relying on a transitive install shape. Eve keeps `@bundjil/photon` and those
+runtime peers external while compiling authored modules so Nitro traces
+resolvable packages into the server output; the agent packaged-build test owns
+this deployment boundary.
 The `12.3.0` refresh resolves `@photon-ai/otel` to `3.3.0` and changes the
 iMessage provider's failed contact-card sharing behavior; it does not widen
 Bundjil's direct-text Channel contract.

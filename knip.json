@@ -23,6 +23,9 @@
         "scripts/**/*.ts",
         "test/**/*.ts"
       ]
+    },
+    "packages/photon": {
+      "ignoreDependencies": ["@grpc/grpc-js", "nice-grpc", "nice-grpc-common"]
     }
   }
 }
