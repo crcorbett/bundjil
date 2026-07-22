@@ -1,40 +1,90 @@
 {
   "schemaVersion": 1,
   "taskId": "HGI-309-lifecycle-correction",
-  "status": "locally-validated",
-  "observedAt": "2026-07-22T16:45:56+01:00",
+  "status": "passed",
+  "observedAt": "2026-07-22T16:56:17+01:00",
   "baseCommit": "655ffecbe56d0259f0f376f82cd89c658c38b1c4",
+  "semanticCommit": "a04d92d9dea3bd27f8da15e8415b0f01a9966d0f",
+  "semanticTree": "b84971763f8489a36fcf277f4b5760efaa0f1130",
   "authority": "Repository documentation and local verification only; no provider, deployment, workflow setting, credential, message, approval, readback, or mutation authority.",
-  "candidatePath": "docs/documentation-audit/HGI-309-lifecycle-correction-candidate.json",
-  "checks": [
+  "changedPaths": {
+    "count": 14,
+    "sortedPathSha256": "7487e2555447de363f24b8522a0b3ead732988e6ead8ef3c2da85318961b17df"
+  },
+  "artifacts": [
     {
-      "check": "explicit Git-index lifecycle move and diff hygiene",
-      "status": "passed",
-      "result": "The harness plan is staged as a rename from active to completed; staged diff whitespace checks pass."
+      "path": "docs/documentation-audit/HGI-309-lifecycle-correction-candidate.json",
+      "sha256": "348264dbf62d0ed1a3ae8ab716e9062387127f9ebbd7925fcff632304db7706a"
     },
     {
-      "check": "docs policy after current-owner correction",
-      "status": "passed",
-      "result": "check:docs passed 230 files after the current-owner policy and test stopped naming accepted harness provenance as active intent."
+      "path": "docs/documentation-audit/HGI-307-validation.json",
+      "sha256": "dbd239b9c6d06a98a9f9c6235724efc6f79c3897226effc51c55312b202a36eb"
     },
     {
-      "check": "skills, authority, controls, and verification focused gates",
-      "status": "passed",
-      "result": "check:skills passed 167 files and 16 mirrors; check:authority passed 3 workflows; check:controls passed 8 controls, 11 automations, and 1 freshness candidate; check:verification passed 10 journeys. The repository-local docs-maintainer structure validator also passed."
-    },
-    {
-      "check": "retained initial failure",
-      "status": "retained-corrected",
-      "result": "The first check:docs run correctly failed DOC-OWNER because the checked-in current-owner policy still named the removed active plan. The policy and test were corrected, then the same gate passed."
+      "path": "docs/documentation-audit/HGI-307-impact-ledger.json",
+      "sha256": "bd18a99864e8023e010a204aaca5b735553e64cda5f51124f5d865d72302c5e8"
     }
   ],
-  "postcondition": "Accepted local harness provenance is completed history; the active index contains only current Codex Terra work; HGI-309 remains explicitly deferred and external state remains unclaimed.",
+  "claims": [
+    "Bundjil current navigation no longer presents accepted HGI-300 through HGI-310 local work as active: the harness plan is retained under completed and its SPEC is implemented/supporting.",
+    "The unrelated Codex Terra implementation remains the only active plan, while HGI-309 remains a separately deferred external-authority owner requiring exact approval, target, rollback, and current readback.",
+    "The current HGI-307 impact ledger re-inventories the 163-path documentation corpus without rewriting its original 161-path accepted-candidate receipt or any worker result."
+  ],
+  "checks": [
+    {
+      "command": "bun run check:docs; bun run check:skills; bun run check:authority; bun run check:controls; bun run check:verification; python3 tooling/quick_validate.py .agents/skills/docs-maintainer; git diff --cached --check",
+      "exitCode": 0,
+      "observedPostcondition": "Documentation policy passed over 230 files; skill policy passed 167 files and 16 mirrors; three workflow authority contracts, eight controls, eleven automations, one report-only freshness candidate, ten journeys, the local skill structure, and staged diff hygiene passed."
+    },
+    {
+      "command": "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model' bun run verification",
+      "exitCode": 0,
+      "observedPostcondition": "Effect setup, boundary, docs, skill, authority, control, journey and HGI-307 gates passed; HGI-307 accepted 12 scenarios and nine impact areas; 87 tooling tests, type-aware format/lint, lint fixtures, Knip, five typechecks, and all Turbo package tests passed using the documented public synthetic Executor endpoint as local configuration only."
+    },
+    {
+      "command": "git -c commit.gpgsign=false commit -m 'docs: close Bundjil harness lifecycle'; git rev-parse HEAD HEAD^{tree}; git status --short --branch",
+      "exitCode": 0,
+      "observedPostcondition": "The semantic tree is committed at a04d92d9dea3bd27f8da15e8415b0f01a9966d0f with tree b84971763f8489a36fcf277f4b5760efaa0f1130; local main is one commit ahead of origin/main before this validation closeout."
+    }
+  ],
+  "retainedFailures": [
+    {
+      "command": "bun run check:docs",
+      "lastSuccessfulStep": "The explicit plan move was staged.",
+      "observedState": "DOC-OWNER rejected the stale current-owner policy because it still required the removed active harness-plan path.",
+      "recovery": "Remove the stale active SPEC/plan references from the current-owner policy and fixture, then rerun the documentation gate.",
+      "nonClaim": "The policy failure is not a provider or product result."
+    },
+    {
+      "command": "bun run verification",
+      "lastSuccessfulStep": "All gates before eval:hgi-307 passed.",
+      "observedState": "HARNESS-DOCS-INVENTORY rejected the old 161-path current inventory after the correction produced 163 paths.",
+      "recovery": "Refresh only the current inventory and digest in the HGI-307 impact ledger, preserving the original 161-path acceptance receipt as historical evidence; eval:hgi-307 then passed 12 scenarios and nine impact areas.",
+      "nonClaim": "The inventory change does not rewrite the accepted worker reports or qualify a new epoch."
+    },
+    {
+      "command": "bun run verification",
+      "lastSuccessfulStep": "Earlier repository gates passed.",
+      "observedState": "Ultracite found formatting issues limited to docs/README.md, the HGI-309 correction candidate, and the current-owner policy.",
+      "recovery": "Run the repository formatter on those exact paths and rerun full verification.",
+      "nonClaim": "Formatting failure establishes no external consequence."
+    },
+    {
+      "command": "bun run verification",
+      "lastSuccessfulStep": "Every earlier aggregate gate passed before the agent-app test build.",
+      "observedState": "@bundjil/agent#test stopped with ExecutorConfigError: loadEndpoint because the local synthetic build endpoint was absent.",
+      "recovery": "Rerun with the documented public synthetic BUNDJIL_EXECUTOR_MCP_URL configuration; full verification passed without an API key or authenticated provider request.",
+      "nonClaim": "The synthetic URL is local build configuration and proves no Executor availability or provider state."
+    }
+  ],
+  "rollback": "Revert this validation closeout, then semantic commit a04d92d9dea3bd27f8da15e8415b0f01a9966d0f; preserve accepted HGI-300 through HGI-310 evidence, original HGI-307 receipts, and the HGI-309 deferral.",
   "limitations": [
-    "No command in this receipt establishes any external state or authority.",
-    "The implementation commit and remote identity are intentionally absent until a later authorized publication step."
+    "The correction proves repository-local lifecycle and verification only; it does not widen or rerun the accepted HGI-307 epoch.",
+    "The HGI-400 cross-repository contract must use a new Bundjil target identity and recomputed seed/order before any worker dispatch."
   ],
   "nonClaims": [
-    "No provider, credential, deployment, message, approval, readback, rollback, or Production system was read or changed."
+    "No HGI-400 worker, grader, comparison, causal effect, stable effect size, or permanent worker qualification is established.",
+    "No provider, credential, deployment, message, workflow approval, readback, rollback, recovery, Production, or external-consumer system was read, changed, or established."
   ],
-  "rollback": "Revert this lifecycle correction and its candidate together while preserving the accepted HGI-300 through HGI-310 evidence and HGI-309 deferral."
+  "postcondition": "Accepted local harness provenance is completed history, the active index contains only current Codex Terra work, HGI-307 remains epoch-bound and verifiable, and HGI-309 remains explicitly deferred with external state unclaimed."
 }
