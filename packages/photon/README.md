@@ -77,8 +77,10 @@ Promise becomes one private typed error and emits only operation, phase,
 bounded name/code tokens, numeric nested status, and a boolean retry hint
 before mapping to the common safe Channel error; raw errors, messages, stacks,
 causes, identities, content, URLs, credentials, and provider metadata are never
-observed. The SDK's webhook helper is deliberately not used because its
-handler is fire-and-forget.
+observed. Successful acquire, direct-Space resolution, send, typing, and
+release phases emit only provider, operation, and phase so hosted proof can
+establish the lifecycle without exposing data-plane values. The SDK's webhook
+helper is deliberately not used because its handler is fire-and-forget.
 Bundjil instead follows Photon's documented raw-body HMAC contract and keeps
 deterministic completion in the Eve `waitUntil` program.
 

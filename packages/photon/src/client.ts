@@ -110,6 +110,16 @@ const observeSdkFailure = (failure: PhotonSdkObservedFailure) =>
     retryable: failure.retryable,
   });
 
+const observeSdkSuccess = (
+  operation: PhotonSdkOperation,
+  phase: PhotonSdkPhase
+) =>
+  Effect.logInfo("PhotonSdkOperationSuccess", {
+    provider: "photon",
+    operation,
+    phase,
+  });
+
 const liveFactory: PhotonSdkFactory = {
   acquire: async (config) => {
     const app = await Spectrum({
@@ -167,6 +177,7 @@ const releasePhotonResource = (
     try: () => resource.stop(),
     catch: (failure) => makeSdkObservedFailure(operation, "release", failure),
   }).pipe(
+    Effect.tap(() => observeSdkSuccess(operation, "release")),
     Effect.tapError(observeSdkFailure),
     Effect.mapError(
       () =>
@@ -195,6 +206,7 @@ const withPhotonResource = <A, E>(
       try: () => factory.acquire(config),
       catch: (failure) => makeSdkObservedFailure(operation, "acquire", failure),
     }).pipe(
+      Effect.tap(() => observeSdkSuccess(operation, "acquire")),
       Effect.tapError(observeSdkFailure),
       Effect.mapError(
         () =>
@@ -227,6 +239,9 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     failure
                   ),
               }).pipe(
+                Effect.tap(() =>
+                  observeSdkSuccess("sendMessage", "resolveDirectSpace")
+                ),
                 Effect.tapError(observeSdkFailure),
                 Effect.mapError(
                   () =>
@@ -243,6 +258,7 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                 catch: (failure) =>
                   makeSdkObservedFailure("sendMessage", "send", failure),
               }).pipe(
+                Effect.tap(() => observeSdkSuccess("sendMessage", "send")),
                 Effect.tapError(observeSdkFailure),
                 Effect.mapError(
                   () =>
@@ -283,6 +299,9 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     failure
                   ),
               }).pipe(
+                Effect.tap(() =>
+                  observeSdkSuccess("setPresence", "resolveDirectSpace")
+                ),
                 Effect.tapError(observeSdkFailure),
                 Effect.mapError(
                   () =>
@@ -303,6 +322,12 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     failure
                   ),
               }).pipe(
+                Effect.tap(() =>
+                  observeSdkSuccess(
+                    "setPresence",
+                    action === "start" ? "startTyping" : "stopTyping"
+                  )
+                ),
                 Effect.tapError(observeSdkFailure),
                 Effect.mapError(
                   () =>
