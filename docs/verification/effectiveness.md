@@ -3,8 +3,8 @@ document_type: verification-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-evaluation-owner
-last_reviewed: 2026-07-21
-review_trigger: evaluation metric, telemetry source, accepted-outcome, intervention, or human-review change
+last_reviewed: 2026-07-22
+review_trigger: evaluation metric, telemetry source, accepted-outcome, intervention, human-review, or harness lifecycle change
 ---
 
 # Harness effectiveness
@@ -45,3 +45,12 @@ recorded cases and do not establish permanent worker quality.
 Provider charges, hosted duration, latency, and external consequences require
 their own current readback. Repository-local evaluation must leave those values
 unknown and make no Production or provider-effectiveness claim.
+
+## Lifecycle correction
+
+The HGI-307 intervention lifecycle is retained as **revise** for the
+active-route correction recorded on 2026-07-22: local harness work had been
+accepted, while HGI-309 remained separately deferred. Its plan and SPEC now
+route to implemented/completed history. This route correction has no outcome or
+timing measurement and does not requalify the worker, change external
+authority, or establish provider effectiveness.

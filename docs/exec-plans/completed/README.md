@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-22
 review_trigger: any execution-plan completion or archival change
 ---
 
@@ -26,6 +26,7 @@ authority for a new operation. Current work lives only under
 | [Effect persistence](effect-persistence.md)                                         | Implemented persistence history                            |
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented Schema migration                               |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented connection history; not current provider truth |
+| [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains deferred        |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration                                      |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented channel rollout history                        |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented feature rollout history                        |

@@ -25,7 +25,6 @@ const currentGuidanceOwners = [
   "docs/README.md",
   "docs/architecture/effect-patterns.md",
   "docs/architecture/testing-and-quality.md",
-  "docs/exec-plans/active/harness-governance-documentation.md",
   ".agents/skills/prd-writer/SKILL.md",
   ".agents/skills/prd-review/SKILL.md",
   ".agents/skills/prd-implementer/SKILL.md",
@@ -34,7 +33,6 @@ const currentGuidanceOwners = [
 const currentEveTruthOwners = [
   "docs/architecture/eve-agent.md",
   "docs/product-specs/harness-governance-documentation.md",
-  "docs/exec-plans/active/harness-governance-documentation.md",
   "apps/agent/agent/instructions.md",
 ] as const;
 

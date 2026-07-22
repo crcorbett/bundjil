@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -16,9 +16,6 @@ context.
 
 ## Current
 
-- [Harness-governance documentation](harness-governance-documentation.md) —
-  all repository-local tasks are complete; HGI-309 external qualification is
-  explicitly deferred pending separate authority.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.
@@ -43,6 +40,7 @@ lifecycle or recorded approval fields. None is standing authority.
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                  |
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
+| [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains separately deferred       |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration history                                        |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented rollout history                                          |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented rollout history                                          |

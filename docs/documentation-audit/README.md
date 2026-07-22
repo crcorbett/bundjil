@@ -3,8 +3,8 @@ document_type: audit-index
 lifecycle: evidence
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-21
-review_trigger: any HGI corpus, route, decision, reconciliation, or acceptance receipt change
+last_reviewed: 2026-07-22
+review_trigger: any HGI corpus, route, decision, reconciliation, acceptance receipt, or lifecycle correction
 ---
 
 # Documentation audit
@@ -137,6 +137,16 @@ is inferred.
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
 deferral remains inconclusive rather than healthy.
+
+HGI-309 lifecycle-correction evidence:
+
+- [`HGI-309-lifecycle-correction-candidate.json`](HGI-309-lifecycle-correction-candidate.json)
+- [`HGI-309-lifecycle-correction-validation.json`](HGI-309-lifecycle-correction-validation.json)
+
+The correction moves accepted local harness provenance out of current/active
+routing. It retains HGI-309's explicit external-authority deferral and proves
+only repository lifecycle consistency and local checks, not provider state,
+approval, readback, or mutation.
 
 Counts prove path accounting only. Fresh-context retrieval and the semantic
 owner must support current-document claims.

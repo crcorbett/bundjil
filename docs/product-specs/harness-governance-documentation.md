@@ -1,13 +1,19 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-21
-review_trigger: acceptance or scope change in Bundjil HGI-300 through HGI-310
+last_reviewed: 2026-07-22
+review_trigger: retained HGI evidence, deferred external-authority ownership, or lifecycle correction
 ---
 
 # Harness-governance documentation
+
+> Implemented historical specification. HGI-300 through HGI-310
+> repository-local work is accepted. HGI-309 remains a separately owned,
+> deferred provider-qualification boundary and is not active implementation
+> intent. Use the target-owned runbook and explicit authority for any future
+> external operation.
 
 ## Outcome
 
@@ -125,3 +131,15 @@ separate and `null` when unavailable. BND-J02 remains deferred pending a
 deterministic Gateway recovery fixture, and HGI-309 remains deferred pending
 separately approved target-owned provider authority. Neither deferral weakens
 the accepted local repository closeout or creates an external claim.
+
+## Lifecycle correction
+
+On 2026-07-22, this accepted SPEC and its plan moved from the current/active
+routes to implemented/completed provenance. The move corrects an active-route
+contradiction: a deferred external-authority boundary is not active repository
+work. The retained correction candidate and local validation are
+[`HGI-309-lifecycle-correction-candidate.json`](../documentation-audit/HGI-309-lifecycle-correction-candidate.json)
+and
+[`HGI-309-lifecycle-correction-validation.json`](../documentation-audit/HGI-309-lifecycle-correction-validation.json).
+They preserve HGI-309's owner, approval, rollback, and current-readback
+requirements without treating any local verification as provider proof.

@@ -1,17 +1,20 @@
 ---
 document_type: execution-plan
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-21
-review_trigger: acceptance or scope change in Bundjil HGI-300 through HGI-310
+last_reviewed: 2026-07-22
+review_trigger: retained HGI evidence, deferred external-authority ownership, or lifecycle correction
 ---
 
 # Bundjil harness-governance documentation rollout
 
-This plan owns Bundjil's current bounded sequence. The cross-repository ledger
-owns aggregate dependencies; the repository-local SPEC owns Bundjil outcomes
-and task state.
+This completed plan preserves Bundjil's bounded rollout sequence. The
+cross-repository ledger owns aggregate dependencies; the retained
+repository-local SPEC preserves the accepted outcome and task provenance.
+Current provider work requires a separately approved owner and target-owned
+runbook; HGI-309's deferred boundary is retained below but does not make this
+completed plan current intent.
 
 ## Progress
 
@@ -81,8 +84,18 @@ and task state.
   [`HGI-307-validation.json`](../../documentation-audit/HGI-307-validation.json).
 - **HGI-309 — deferred:** no provider qualification is admitted until a named
   owner separately approves one exact target operation with authority,
-  rollback, and current readback. The plan remains current solely to retain
-  this explicit deferred boundary; no external work is active or implied.
+  rollback, and current readback. This retained deferred boundary does not
+  activate external work or imply any external state.
+
+## Lifecycle correction
+
+All repository-local HGI-300 through HGI-310 work is accepted. HGI-309 is a
+separately owned deferred provider-qualification boundary, not current
+implementation intent. This plan therefore moved from the active route to
+completed history on 2026-07-22. The correction evidence is retained at
+[`HGI-309-lifecycle-correction-validation.json`](../../documentation-audit/HGI-309-lifecycle-correction-validation.json).
+It proves only the repository route and local checks; it does not approve,
+read, or change a provider.
 
 HGI-300-S1 preserves historical ledgers (including their distinct task-array,
 ledger-lifecycle, and recorded-approval fields), completed plans, research,

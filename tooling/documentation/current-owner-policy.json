@@ -15,10 +15,8 @@
     "docs/operations/automation-register.md",
     "docs/standards/controls.md",
     "docs/product-specs/index.md",
-    "docs/product-specs/harness-governance-documentation.md",
     "docs/verification/README.md",
     "docs/exec-plans/active/README.md",
-    "docs/exec-plans/active/harness-governance-documentation.md",
     "apps/agent/agent/instructions.md",
     "apps/agent/runbooks/README.md",
     "apps/codex-proxy/runbooks/README.md"
@@ -38,11 +36,7 @@
     {
       "id": "mutable-provider-state",
       "claimType": "external-actuality",
-      "ownerPaths": [
-        "docs/architecture/eve-agent.md",
-        "docs/product-specs/harness-governance-documentation.md",
-        "docs/exec-plans/active/harness-governance-documentation.md"
-      ],
+      "ownerPaths": ["docs/architecture/eve-agent.md"],
       "requiredTermGroups": [
         ["eve", "sendblue", "webhook", "deployment", "provider endpoint"],
         ["production", "preview", "live", "now", "currently"],
@@ -95,12 +89,7 @@
     {
       "id": "runbook-owner",
       "claimType": "semantic-owner-assignment",
-      "ownerPaths": [
-        "AGENTS.md",
-        "docs/README.md",
-        "docs/product-specs/harness-governance-documentation.md",
-        "docs/exec-plans/active/harness-governance-documentation.md"
-      ],
+      "ownerPaths": ["AGENTS.md", "docs/README.md"],
       "requiredTermGroups": [
         ["operation", "procedure", "runbook"],
         ["docs/runbooks", "central runbook", "central docs"],
@@ -154,9 +143,7 @@
   ],
   "taskStateOwnerPaths": [
     "docs/product-specs/index.md",
-    "docs/exec-plans/active/README.md",
-    "docs/product-specs/harness-governance-documentation.md",
-    "docs/exec-plans/active/harness-governance-documentation.md"
+    "docs/exec-plans/active/README.md"
   ],
   "nonterminalTaskTerms": [
     "active",

@@ -3,8 +3,8 @@ document_type: verification-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-evaluation-owner
-last_reviewed: 2026-07-21
-review_trigger: material worker, model, host, tool, runtime, skill, repository-contract, authority, or scenario change
+last_reviewed: 2026-07-22
+review_trigger: material worker, model, host, tool, runtime, skill, repository-contract, authority, scenario, or harness lifecycle change
 ---
 
 # Harness evaluation epochs
@@ -59,3 +59,8 @@ The current machine-checked packet is routed by the single scenario source at
 the accepted epoch record, and the impact ledger. Structured evaluation
 evidence remains outside default task context under
 `docs/documentation-audit/hgi-307/`.
+
+The HGI-307 accepted epoch remains the current local qualification. The
+2026-07-22 route correction moves accepted harness provenance out of active
+intent while preserving HGI-309 as an unqualified external boundary; it does
+not change the evaluated worker, source contract, scenario manifest, or epoch.

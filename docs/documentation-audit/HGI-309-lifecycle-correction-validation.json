@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-309-lifecycle-correction",
+  "status": "locally-validated",
+  "observedAt": "2026-07-22T16:45:56+01:00",
+  "baseCommit": "655ffecbe56d0259f0f376f82cd89c658c38b1c4",
+  "authority": "Repository documentation and local verification only; no provider, deployment, workflow setting, credential, message, approval, readback, or mutation authority.",
+  "candidatePath": "docs/documentation-audit/HGI-309-lifecycle-correction-candidate.json",
+  "checks": [
+    {
+      "check": "explicit Git-index lifecycle move and diff hygiene",
+      "status": "passed",
+      "result": "The harness plan is staged as a rename from active to completed; staged diff whitespace checks pass."
+    },
+    {
+      "check": "docs policy after current-owner correction",
+      "status": "passed",
+      "result": "check:docs passed 230 files after the current-owner policy and test stopped naming accepted harness provenance as active intent."
+    },
+    {
+      "check": "skills, authority, controls, and verification focused gates",
+      "status": "passed",
+      "result": "check:skills passed 167 files and 16 mirrors; check:authority passed 3 workflows; check:controls passed 8 controls, 11 automations, and 1 freshness candidate; check:verification passed 10 journeys. The repository-local docs-maintainer structure validator also passed."
+    },
+    {
+      "check": "retained initial failure",
+      "status": "retained-corrected",
+      "result": "The first check:docs run correctly failed DOC-OWNER because the checked-in current-owner policy still named the removed active plan. The policy and test were corrected, then the same gate passed."
+    }
+  ],
+  "postcondition": "Accepted local harness provenance is completed history; the active index contains only current Codex Terra work; HGI-309 remains explicitly deferred and external state remains unclaimed.",
+  "limitations": [
+    "No command in this receipt establishes any external state or authority.",
+    "The implementation commit and remote identity are intentionally absent until a later authorized publication step."
+  ],
+  "nonClaims": [
+    "No provider, credential, deployment, message, approval, readback, rollback, or Production system was read or changed."
+  ],
+  "rollback": "Revert this lifecycle correction and its candidate together while preserving the accepted HGI-300 through HGI-310 evidence and HGI-309 deferral."
+}

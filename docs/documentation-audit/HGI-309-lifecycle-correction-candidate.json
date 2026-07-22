@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-309-lifecycle-correction",
+  "status": "candidate",
+  "observedAt": "2026-07-22T16:45:56+01:00",
+  "baseCommit": "655ffecbe56d0259f0f376f82cd89c658c38b1c4",
+  "authority": "Repository documentation, local policy, local skill validation, local verification, and Git-index inspection only. No provider, deployment, workflow setting, credential, message, approval, readback, or mutation authority.",
+  "finding": {
+    "invariant": "The active route contains only genuinely current implementation intent.",
+    "target": "docs/exec-plans/active/harness-governance-documentation.md and the matching current SPEC/index routes",
+    "cause": "All repository-local harness work was accepted, but the plan and SPEC stayed current solely to retain HGI-309's separately deferred external-authority boundary.",
+    "repair": "Move the accepted plan to completed history, classify the retained SPEC as implemented/supporting, update indexes and current routers, and preserve HGI-309's deferred provider boundary in retained evidence.",
+    "omittedDetailPath": "docs/documentation-audit/HGI-307-validation.json",
+    "lastProvedPostcondition": "HGI-307 accepted the local repository harness closeout while explicitly retaining HGI-309 as deferred and making no external claim."
+  },
+  "impactLedger": [
+    {
+      "surface": "Lifecycle, SPEC, plan, and indexes",
+      "decision": "change-required",
+      "owners": [
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/product-specs/index.md",
+        "docs/exec-plans/active/README.md",
+        "docs/exec-plans/completed/README.md",
+        "docs/exec-plans/completed/harness-governance-documentation.md"
+      ],
+      "postcondition": "Only the unrelated Codex Terra work remains active; accepted harness provenance is completed history."
+    },
+    {
+      "surface": "Documentation router, audit, effectiveness, and epoch provenance",
+      "decision": "change-required",
+      "owners": [
+        "docs/README.md",
+        "docs/documentation-audit/README.md",
+        "docs/verification/effectiveness.md",
+        "docs/verification/harness-epochs.md"
+      ],
+      "postcondition": "Current routes distinguish accepted local provenance from active intent and retain a bounded correction receipt."
+    },
+    {
+      "surface": "Documentation policy test",
+      "decision": "change-required",
+      "owners": [
+        "tooling/documentation/current-owner-policy.json",
+        "tooling/documentation-policy.test.ts"
+      ],
+      "postcondition": "The current-owner policy and test no longer require accepted harness provenance at an active path."
+    },
+    {
+      "surface": "READMEs, architecture, runbooks, authority, provider state, skills, lint, config, CI, and automation",
+      "decision": "preserve",
+      "owners": [
+        "README.md",
+        "docs/architecture/**",
+        "apps/agent/runbooks/**",
+        "apps/codex-proxy/runbooks/**",
+        "docs/operations/**",
+        ".agents/skills/**",
+        "oxlint.config.ts",
+        "oxfmt.json",
+        "tsconfig.json",
+        "package.json",
+        ".github/workflows/**"
+      ],
+      "postcondition": "No public contract, provider procedure, authority envelope, skill, lint/config/CI rule, or automation behavior changes."
+    },
+    {
+      "surface": "External provider qualification",
+      "decision": "preserve-deferred",
+      "owners": [
+        "HGI-309",
+        "target-owned runbooks",
+        "docs/operations/authority-register.json"
+      ],
+      "postcondition": "A named owner must still approve one exact operation with target, environment, duration, rollback, and current readback before any external qualification."
+    }
+  ],
+  "limitations": [
+    "This candidate cannot accept HGI-309 or establish provider, workflow, deployment, credential, delivery, rollback, recovery, or Production actuality.",
+    "Local checks prove repository consistency only; accepted prior evidence and deferred ownership remain addressable rather than rewritten."
+  ],
+  "nonClaims": [
+    "No external system was read or changed.",
+    "The lifecycle correction does not requalify the worker or create an effectiveness claim."
+  ],
+  "rollback": "Revert the lifecycle-route, documentation-policy test, and bounded correction evidence together; preserve the accepted HGI-300 through HGI-310 evidence and HGI-309 deferral."
+}
