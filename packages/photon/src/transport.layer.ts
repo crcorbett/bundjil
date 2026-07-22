@@ -222,7 +222,7 @@ export const layerTransport = (config: PhotonConfig) =>
             yield* client
               .setPresence(input.conversation.participantId, input.action)
               .pipe(
-                Effect.timeoutOption("2 seconds"),
+                Effect.timeoutOption("15 seconds"),
                 Effect.flatMap(
                   Option.match({
                     onNone: () =>

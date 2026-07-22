@@ -404,7 +404,7 @@ it.effect(
         Effect.forkChild
       );
       yield* Deferred.await(presenceStarted);
-      yield* TestClock.adjust("3 seconds");
+      yield* TestClock.adjust("16 seconds");
       const presenceError = yield* Fiber.join(presenceFiber);
       assert.strictEqual(
         Schema.is(ChannelUnavailableError)(presenceError),

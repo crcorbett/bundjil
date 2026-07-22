@@ -70,12 +70,15 @@ Space send and typing operations return Promises, and `app.stop()` releases the
 SDK. The live Layer is construction-safe for a serverless webhook: signature
 verification and payload decoding do not acquire Spectrum. Each outbound send
 or presence operation brackets one SDK resource with
-`Effect.acquireUseRelease`. A failed SDK Promise becomes one private typed
-error and emits only operation, phase, bounded name/code tokens, numeric nested
-status, and a boolean retry hint before mapping to the common safe Channel
-error; raw errors, messages, stacks, causes, identities, content, URLs,
-credentials, and provider metadata are never observed. The SDK's webhook
-helper is deliberately not used because its handler is fire-and-forget.
+`Effect.acquireUseRelease`. Send has a 30-second delivery-uncertain bound;
+presence has a distinct 15-second unavailable bound so hosted Spectrum
+acquisition can complete before `startTyping()` or `stopTyping()`. A failed SDK
+Promise becomes one private typed error and emits only operation, phase,
+bounded name/code tokens, numeric nested status, and a boolean retry hint
+before mapping to the common safe Channel error; raw errors, messages, stacks,
+causes, identities, content, URLs, credentials, and provider metadata are never
+observed. The SDK's webhook helper is deliberately not used because its
+handler is fire-and-forget.
 Bundjil instead follows Photon's documented raw-body HMAC contract and keeps
 deterministic completion in the Eve `waitUntil` program.
 
