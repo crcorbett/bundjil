@@ -9,7 +9,8 @@ import { layerMemory as PhotonTransportMemory } from "@bundjil/photon/memory";
 import { layerMemory as SendblueTransportMemory } from "@bundjil/sendblue/memory";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
-import { Array, Effect, Layer, Schema, pipe } from "effect";
+import { Array, Effect, Layer, ManagedRuntime, Schema, pipe } from "effect";
+import type { RouteHandlerArgs, Session } from "eve/channels";
 
 import {
   Channel,
@@ -22,6 +23,7 @@ import {
   EveChannelDispatch,
   EveChannelDispatchFailureMemory,
   EveChannelDispatchMemory,
+  makeChannelEveChannel,
 } from "../agent/lib/channel/index.js";
 import {
   ChannelIdentityRecords,
@@ -82,6 +84,24 @@ const channelLayer = fixtures.pipe(
     return ChannelLive.pipe(Layer.provide(dependencies));
   })
 );
+
+const makeSession = (): Session => ({
+  continuationToken: "channel:v1:photon:conversation-1",
+  getEventStream: () => Promise.resolve(new ReadableStream()),
+  id: "session-1",
+});
+
+const makeRouteArgs = (
+  send: RouteHandlerArgs<ChannelAdapterStateEncoded>["send"],
+  waitUntil: RouteHandlerArgs<ChannelAdapterStateEncoded>["waitUntil"]
+): RouteHandlerArgs<ChannelAdapterStateEncoded> => ({
+  getSession: makeSession,
+  params: {},
+  receive: () => Promise.resolve(makeSession()),
+  requestIp: null,
+  send,
+  waitUntil,
+});
 
 it.effect("runs the same clean app journey from both provider Layers", () =>
   Effect.gen(function* testProviderSubstitution() {
@@ -288,6 +308,96 @@ it.effect("atomically accepts only one concurrent inbound claim", () =>
       1
     );
   })
+);
+
+it.effect(
+  "completes one Photon claim before requesting an exact provider retry",
+  () =>
+    Effect.scoped(
+      Effect.gen(function* testPhotonProviderRetryProof() {
+        const layer = yield* channelLayer;
+        const runtime = ManagedRuntime.make(layer);
+        yield* Effect.addFinalizer(() =>
+          Effect.promise(() => runtime.dispose())
+        );
+        const definition = makeChannelEveChannel(
+          runtime,
+          "/eve/v1/photon/webhook",
+          "provider-retry"
+        );
+        const [route] = definition.routes;
+        if (route === undefined || route.transport === "websocket") {
+          return yield* Effect.die("Photon HTTP route required");
+        }
+        let sendCount = 0;
+        const session = makeSession();
+        const args = makeRouteArgs(
+          () => {
+            sendCount += 1;
+            return Promise.resolve(session);
+          },
+          () => {
+            throw new Error("retry proof must complete before responding");
+          }
+        );
+        const request = new Request(
+          "https://example.invalid/eve/v1/photon/webhook?bundjil-proof=retry-once"
+        );
+
+        const first = yield* Effect.promise(() =>
+          route.handler(request.clone(), args)
+        );
+        const retry = yield* Effect.promise(() =>
+          route.handler(request.clone(), args)
+        );
+
+        assert.strictEqual(first.status, 503);
+        assert.strictEqual(retry.status, 204);
+        assert.strictEqual(sendCount, 1);
+        return yield* Effect.void;
+      })
+    )
+);
+
+it.effect("keeps the Sendblue acknowledgement path proof-disabled", () =>
+  Effect.scoped(
+    Effect.gen(function* testSendblueRetryProofDisabled() {
+      const layer = yield* channelLayer;
+      const runtime = ManagedRuntime.make(layer);
+      yield* Effect.addFinalizer(() => Effect.promise(() => runtime.dispose()));
+      const definition = makeChannelEveChannel(
+        runtime,
+        "/eve/v1/sendblue/webhook",
+        "disabled"
+      );
+      const [route] = definition.routes;
+      if (route === undefined || route.transport === "websocket") {
+        return yield* Effect.die("Sendblue HTTP route required");
+      }
+      const session = makeSession();
+      let completion: Promise<unknown> | undefined;
+      const response = yield* Effect.promise(() =>
+        route.handler(
+          new Request(
+            "https://example.invalid/eve/v1/sendblue/webhook?bundjil-proof=retry-once"
+          ),
+          makeRouteArgs(
+            () => Promise.resolve(session),
+            (task) => {
+              completion = task;
+            }
+          )
+        )
+      );
+      const retainedCompletion = completion;
+      if (retainedCompletion !== undefined) {
+        yield* Effect.promise(() => retainedCompletion);
+      }
+
+      assert.strictEqual(response.status, 202);
+      return yield* Effect.void;
+    })
+  )
 );
 
 it.effect("reports request-scoped Eve dispatch failure", () =>

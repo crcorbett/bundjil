@@ -16,6 +16,17 @@ export const ChannelWebhookPath = Schema.Literals([
 ]);
 export type ChannelWebhookPath = typeof ChannelWebhookPath.Type;
 
+export const ChannelWebhookProofPolicy = Schema.Literals([
+  "disabled",
+  "provider-retry",
+]);
+export type ChannelWebhookProofPolicy = typeof ChannelWebhookProofPolicy.Type;
+
+export const ChannelWebhookQuery = Schema.Struct({
+  "bundjil-proof": Schema.optional(Schema.Literal("retry-once")),
+});
+export type ChannelWebhookQuery = typeof ChannelWebhookQuery.Type;
+
 export const ChannelPrincipalId = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/agent/ChannelPrincipalId")
 );

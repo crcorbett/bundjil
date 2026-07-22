@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-23
 review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, shared-user, webhook, deployment, typing, resource lifecycle, or output contract change
 ---
 
@@ -228,6 +228,14 @@ duplicate suppression, Preview, Production, or durable process supervision.
    a DM to its sender.
 3. Redeliver the same provider event identity and require a duplicate outcome
    with zero second external response. Do not synthesize a new identifier.
+   Photon currently documents no replay endpoint or dashboard delivery replay.
+   In Preview only, set the sole callback's decoded query to
+   `bundjil-proof=retry-once`. The Photon app adapter completes the fresh claim
+   before returning one intentional `503`; require the provider retry with the
+   same event identity to return `204`, one total Eve dispatch, and one total
+   external response. The signed callback remains the only caller able to
+   activate the control. Sendblue and the Production Photon callback must not
+   use this query. Do not use it to retry an outbound send.
 4. Against the exact decoded conversation, execute `setPresence(start)` and
    `setPresence(stop)`. The pinned Layer maps these to Spectrum Space
    `startTyping()` and `stopTyping()`. Require a decoded accepted/no-op result

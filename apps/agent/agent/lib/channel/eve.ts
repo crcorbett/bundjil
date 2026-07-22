@@ -8,10 +8,15 @@ import {
   EveChannelDispatch,
   layerEve as EveChannelDispatchEve,
 } from "./dispatch.js";
-import { ChannelAdapterState, ChannelEvent } from "./schemas.js";
+import {
+  ChannelAdapterState,
+  ChannelEvent,
+  ChannelWebhookQuery,
+} from "./schemas.js";
 import type {
   ChannelMutableAdapterStateEncoded,
   ChannelWebhookPath,
+  ChannelWebhookProofPolicy,
 } from "./schemas.js";
 
 interface ChannelEveContext {
@@ -110,7 +115,8 @@ export const makeChannelEveEvents = <E>(
 
 export const makeChannelEveChannel = <E>(
   channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>,
-  webhookPath: ChannelWebhookPath
+  webhookPath: ChannelWebhookPath,
+  proofPolicy: ChannelWebhookProofPolicy
 ) =>
   defineChannel<ChannelMutableAdapterStateEncoded, ChannelEveContext>({
     context(state) {
@@ -121,6 +127,9 @@ export const makeChannelEveChannel = <E>(
       POST(webhookPath, async (request, { send, waitUntil }) => {
         const result = await channelRuntime.runPromise(
           Effect.gen(function* handleChannelWebhook() {
+            const query = yield* Schema.decodeUnknownEffect(
+              ChannelWebhookQuery
+            )(Object.fromEntries(new URL(request.url).searchParams));
             const channel = yield* Channel;
             const decoded = yield* channel.decodeWebhook(request);
             if (decoded._tag === "Ignored") {
@@ -140,6 +149,13 @@ export const makeChannelEveChannel = <E>(
               ),
               Effect.provide(EveChannelDispatchEve(send))
             );
+            if (
+              proofPolicy === "provider-retry" &&
+              query["bundjil-proof"] === "retry-once"
+            ) {
+              yield* background;
+              return { response: new Response(null, { status: 503 }) };
+            }
             const fiber = yield* Effect.forkDetach(background, {
               startImmediately: true,
             });

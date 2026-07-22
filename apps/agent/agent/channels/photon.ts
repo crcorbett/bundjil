@@ -7,6 +7,11 @@ const runtime = ManagedRuntime.make(PhotonChannelRuntimeLive);
 
 export const makePhotonEveChannel = <E>(
   channelRuntime: Parameters<typeof makeChannelEveChannel<E>>[0]
-) => makeChannelEveChannel(channelRuntime, "/eve/v1/photon/webhook");
+) =>
+  makeChannelEveChannel(
+    channelRuntime,
+    "/eve/v1/photon/webhook",
+    "provider-retry"
+  );
 
 export default makePhotonEveChannel(runtime);

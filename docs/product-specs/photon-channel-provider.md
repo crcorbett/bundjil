@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-21
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-23
 review_trigger: channel contract, provider implementation, Photon SDK/API, deployment, or proof change
 ---
 
@@ -658,6 +658,17 @@ suppression, participant-based direct-Space reconstruction, presence
 outcome, `waitUntil` completion,
 and resource release. Use the Free managed-shared service; do not create or
 delete a dedicated line.
+
+Photon exposes no management or dashboard operation that replays a webhook.
+For the exact hosted duplicate receipt, the Photon adapter alone may admit the
+Schema-decoded `bundjil-proof=retry-once` query on its Preview callback. A fresh
+signed delivery must finish dispatch and mark its replay claim complete before
+returning one intentional `503`; Photon's documented retry of the same
+`message.id` must then return `204` with zero second dispatch and zero second
+external response. Sendblue never enables this policy, an unsigned request
+cannot reach it, and the Production Photon callback must omit the proof query.
+This is an at-least-once delivery proof control, not normal acknowledgement
+behavior or a message-send retry.
 
 ### Spike 6: Production preflight and resource adoption
 

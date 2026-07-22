@@ -65,6 +65,8 @@ export {
   ChannelReplayRecord,
   ChannelRoutingSecret,
   ChannelStateV1,
+  ChannelWebhookProofPolicy,
+  ChannelWebhookQuery,
 } from "./schemas.js";
 export type {
   ChannelAdapterStateEncoded,

@@ -7,6 +7,7 @@ const runtime = ManagedRuntime.make(SendblueChannelRuntimeLive);
 
 export const makeSendblueEveChannel = <E>(
   channelRuntime: Parameters<typeof makeChannelEveChannel<E>>[0]
-) => makeChannelEveChannel(channelRuntime, "/eve/v1/sendblue/webhook");
+) =>
+  makeChannelEveChannel(channelRuntime, "/eve/v1/sendblue/webhook", "disabled");
 
 export default makeSendblueEveChannel(runtime);
