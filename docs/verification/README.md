@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -39,6 +39,19 @@ operation nor asserts present provider state.
   current hosted Preview deployment, Marketplace binding, protection, and
   signed-ingress proof plus the inconclusive first messaging attempt. It is not
   outbound, handset, duplicate, Eve-completion, or Production proof.
+- [`photon-corrected-recipient-2026-07-22.md`](photon-corrected-recipient-2026-07-22.md)
+  retains the corrected Australian managed-shared user reconciliation and one
+  unretried uncertain local SDK send. It proves neither provider acceptance nor
+  handset delivery and leaves the Production gate closed.
+- [`photon-local-stream-2026-07-22.md`](photon-local-stream-2026-07-22.md)
+  proves one exact Free per-user assigned route through local Spectrum inbound,
+  provider-accepted reply, clean SDK release, and handset reply observation. It
+  is not webhook, Eve, replay, duplicate, visible-typing, Preview, or Production
+  proof.
+- [`photon-sdk-version-refresh-2026-07-22.md`](photon-sdk-version-refresh-2026-07-22.md)
+  records the exact latest-stable Spectrum 12.3.0 manifest/lock refresh and
+  repository compatibility gates. It performs no provider operation and does
+  not upgrade the 12.2.0 handset receipt into 12.3.0 live proof.
 
 ## Claim boundaries
 

@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-channel-rollout-owner
 created: 2026-07-21
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: channel contract, provider boundary, task status, authority, proof, or rollback change
 ---
 
@@ -179,7 +179,7 @@ Removal order:
   verification requires exact bytes and headers.
 - The Spectrum SDK instance, Space, callbacks, Zod types, Promises, and raw
   errors remain private to `@bundjil/photon`'s live Layer.
-- Spectrum `12.2.0` has one exact declaration defect under
+- Spectrum `12.3.0` has one exact declaration defect under
   `exactOptionalPropertyTypes`: its iMessage definition omits optional
   `events`, while core's `AnyPlatformDef` constraint rejects that omission.
   The adjacent `@ts-expect-error` on the `providers` property is the sole
@@ -215,25 +215,25 @@ internal state/status/test structure:
 
 ## Task progress
 
-| Task                                   | Status    | Acceptance receipt                                                                                                                                                                                 |
-| -------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Active plan and clean boundary         | Completed | Plan, baseline, authority, owners, removal order, continuity break, full verification, and no provider action                                                                                      |
-| Neutral Channel and app vertical slice | Completed | Canonical package plus clean memory journey; focused and full gates passed with no provider action                                                                                                 |
-| Fresh Sendblue and rewritten Eve edge  | Completed | New package/config/runtime/edge accepted; old tree removed; 39 app and 8 provider tests plus full gate passed                                                                                      |
-| Photon and dual local conformance      | Completed | Exact Spectrum 12.2.0 pins, signed direct webhook adapter, scoped SDK boundary, dual contract/app journeys, both built routes, 229 tests, and full gate passed locally                             |
-| Isolated Photon Preview proof          | Completed | Provider-only CRUD and SDK lifecycle passed with restored zero-webhook topology; hosted Preview stopped on absent Vercel authority/live Space, and the `0644` credential file is a future-run stop |
-| Docs reconciliation and promotion gate | Completed | Canonical architecture and public maps reconciled; provider-only proof routed; Production selection remains a separate SPEC boundary                                                               |
+| Task                                   | Status    | Acceptance receipt                                                                                                                                                             |
+| -------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Active plan and clean boundary         | Completed | Plan, baseline, authority, owners, removal order, continuity break, full verification, and no provider action                                                                  |
+| Neutral Channel and app vertical slice | Completed | Canonical package plus clean memory journey; focused and full gates passed with no provider action                                                                             |
+| Fresh Sendblue and rewritten Eve edge  | Completed | New package/config/runtime/edge accepted; old tree removed; 39 app and 8 provider tests plus full gate passed                                                                  |
+| Photon and dual local conformance      | Completed | Initial exact Spectrum 12.2.0 pins, signed direct webhook adapter, scoped SDK boundary, dual contract/app journeys, both built routes, 229 tests, and full gate passed locally |
+| Isolated Photon Preview proof          | Completed | At completion, provider-only CRUD and SDK lifecycle passed with restored zero-webhook topology; hosted Preview and credential correction remained later promotion work         |
+| Docs reconciliation and promotion gate | Completed | Canonical architecture and public maps reconciled; provider-only proof routed; Production selection remains a separate SPEC boundary                                           |
 
 ### Promotion task progress
 
-| Task                               | Status      | Acceptance receipt                                                                                                                                   |
-| ---------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                           |
-| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed     |
-| Reconcile Photon and prove Preview | In progress | READY deployment, clean Marketplace binding, protection, and signed HTTP ingress proved; outbound/typing stopped on one unretried uncertain SDK send |
-| Stage dual-provider Production     | Pending     | —                                                                                                                                                    |
-| Promote and prove Production       | Pending     | —                                                                                                                                                    |
-| Reconcile docs and final audit     | Pending     | —                                                                                                                                                    |
+| Task                               | Status      | Acceptance receipt                                                                                                                                                                                          |
+| ---------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                                                                                  |
+| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed                                                            |
+| Reconcile Photon and prove Preview | In progress | Local SDK-stream inbound/reply and handset delivery passed on 12.2.0; source is refreshed to latest 12.3.0 with package/app proof, while hosted Preview Eve/replay/duplicate and visible typing remain open |
+| Stage dual-provider Production     | Pending     | —                                                                                                                                                                                                           |
+| Promote and prove Production       | Pending     | —                                                                                                                                                                                                           |
+| Reconcile docs and final audit     | Pending     | —                                                                                                                                                                                                           |
 
 ## Downstream-impact ledger
 
@@ -256,6 +256,26 @@ internal state/status/test structure:
 | AGENTS/skills                     | Preserve unless routing becomes incomplete             | Current task map and skills already route provider/package work                                           |
 | Frontend/browser/generated audits | N/A                                                    | No visible UI or generated documentation surface changes                                                  |
 | Codex/store/eve public contracts  | Preserve                                               | Store is consumed through its existing public atomic service; no other public package contract changes    |
+
+### 2026-07-22 SDK freshness and documentation re-review
+
+The npm registry readback found `12.3.0` as the current stable release for
+both direct Spectrum packages. The manifest and lockfile now pin that exact
+pair and resolve current Photon transitive releases. The successful handset
+journey remains evidence for `12.2.0`; repository typecheck, tests, build, and
+agent packaging establish only local compatibility for `12.3.0`. Hosted or
+Production proof must use an immutable candidate containing the refreshed
+pins.
+
+| Surface                                                                                           | Decision        | Owner and postcondition                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Photon manifest, lock, client boundary, and package README                                        | Change required | `packages/photon/package.json`, `bun.lock`, `packages/photon/src/client.ts`, and `packages/photon/README.md` own exact 12.3.0 desired state, integrity, and the retained narrow type exception. |
+| SPEC, current task, plan, and proof route                                                         | Change required | Current intent requires latest-stable readback before candidate cut and separates 12.2.0 live proof from 12.3.0 repository proof.                                                               |
+| Repository and testing architecture                                                               | Change required | `docs/architecture/repo-structure.md` owns the current pins; `docs/architecture/testing-and-quality.md` and the control register use the current twelve-journey inventory.                      |
+| Photon runbook                                                                                    | Change required | A local or hosted message qualification must compare both direct pins with npm `latest`, rerun package/app proof, and requalify the refreshed artifact.                                         |
+| Dated Photon receipts                                                                             | Preserve        | Earlier 12.2.0 observations remain immutable evidence and are not rewritten as 12.3.0 proof.                                                                                                    |
+| Root/app/Channel/Sendblue READMEs and Eve/Effect architecture                                     | Preserve        | No public route, config, service, Layer, Schema, or app composition contract changed.                                                                                                           |
+| API/generated docs, skills/mirrors, lint/CI, frontend, migration, release, and provider resources | N/A             | No API generation, skill, rule, workflow, UI, data, release, deployment, secret, webhook, user, line, or provider mutation is part of this refresh.                                             |
 
 ## Corrected Free-plan topology
 
@@ -439,7 +459,7 @@ identity, and recovery route.
   missing rollback identity, or any request for Vercel/Production/Sendblue
   mutation without fresh authority.
 
-## Final five-pass closeout audit
+## Historical clean-implementation five-pass closeout audit
 
 The audit ran only after all six tasks were terminal. Its five passes covered:
 
@@ -467,7 +487,9 @@ four pre-existing relative-link errors in `legacy-atlas.md` and two historical
 documents without `review_trigger`; those retained history defects are not
 current architecture or provider truth.
 
-No credential value is tracked. The ignored Photon credential file remains
-mode `0644`, so the runbook blocks another provider action until mode `0600`.
-Hosted Vercel Preview, live messaging, handset delivery, and Production remain
-unproved and unauthorised.
+At that 2026-07-21 closeout, no credential value was tracked, the ignored
+Photon credential file was mode `0644`, and hosted Preview, live messaging,
+handset delivery, and Production were unproved. Later promotion evidence owns
+the credential correction, hosted signed-ingress proof, and 2026-07-22 local
+SDK-stream handset result. Production and the complete hosted Photon journey
+remain open in the promotion table above.

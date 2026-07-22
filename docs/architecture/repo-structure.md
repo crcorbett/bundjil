@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -211,7 +211,7 @@ plane.
   operations private; only the target-owned proof executable uses its internal
   management and lifecycle services;
 - exposes root, `/config`, `/live`, and `/memory` boundaries, with exact
-  `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.2.0` pins;
+  `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.3.0` pins;
 - owns no Eve, identity, routing, replay, persistence, environment binding,
   provider-selection, deployment, or Production policy.
 

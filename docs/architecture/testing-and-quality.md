@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -54,7 +54,7 @@ hygiene, workspace typechecks, and tests. `bun run check` enables
 any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
 literal tag do not agree.
 
-`bun run check:verification` validates all ten critical-journey records, their
+`bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command
 receipt constraints, evidence roots, lifecycle/provenance rules, and semantic
 false-success cases. It validates repository contracts and fixtures only. It

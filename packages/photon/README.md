@@ -21,7 +21,7 @@ webhook by stable provider IDs. Its decoded results expose only service type,
 counts, lifecycle actions, and assignment presence; user and assigned phone
 numbers do not cross the management boundary.
 
-The exact `12.2.0` SDK declarations contain one upstream
+The exact `12.3.0` SDK declarations contain one upstream
 `exactOptionalPropertyTypes` mismatch: the iMessage definition omits optional
 `events`, while core's `AnyPlatformDef` constraint treats that omission as
 incompatible. The single adjacent `@ts-expect-error` at `Spectrum(...)` is the
@@ -32,14 +32,25 @@ supported call without weakening repository compiler settings.
 
 | Package                 | Pin      | npm integrity                                                                                     | Export used |
 | ----------------------- | -------- | ------------------------------------------------------------------------------------------------- | ----------- |
-| `@spectrum-ts/core`     | `12.2.0` | `sha512-AducO3pBUwDdwgjUkQq1NVVOhZYfWOtNG41uBcxDv4GcPHZSH2+s3+E3+77uRV0PebtnCQGEAjQxbJpIrKYpIg==` | `.`         |
-| `@spectrum-ts/imessage` | `12.2.0` | `sha512-WZouKWRtDfgysZVC07wzyQYc3Oleo2ZHLw0b0a3F5IpbJ8gejIT70NcU2gX+w1eJ0stTYnstyMhmAuAly20U5g==` | `.`         |
+| `@spectrum-ts/core`     | `12.3.0` | `sha512-j4NM5lRBE/GIAYKGVDIkfM5Gvn6CxHQiCRbaQPpEmidhkkR0i4DSDZKjZpNE1VLxU3knuPlOxAP6v+/7m84X1w==` | `.`         |
+| `@spectrum-ts/imessage` | `12.3.0` | `sha512-RiGFBnmgTMjzE+ZsSCFTQtl8DCNfLk8EiY1KXcFFwjMoHf6GmJk84MYgtd9wAA7VddrwEAF6Sp+jXSp0ZmILwQ==` | `.`         |
 
 The direct packages are the documented lean installation, not the
 `spectrum-ts` batteries-included metapackage. Core brings Photon proto/OTel,
 Repeater, content parsing, MIME, vCard, and Zod dependencies; iMessage brings
 the Photon gRPC client. Eve keeps `@bundjil/photon` external while compiling
 authored modules so Nitro traces this dependency graph into the server output.
+The `12.3.0` refresh resolves `@photon-ai/otel` to `3.3.0` and changes the
+iMessage provider's failed contact-card sharing behavior; it does not widen
+Bundjil's direct-text Channel contract.
+
+Free managed-shared routing is per user, not one interchangeable project
+number. Each authorised user has its own `phoneNumber -> assignedPhoneNumber`
+pairing. An inbound local-stream proof must send from that exact user identity
+to that user's assigned number; another authorised user's assigned number
+rejects the sender before the application receives an event. The dated
+[local-stream receipt](../../docs/verification/photon-local-stream-2026-07-22.md)
+records this distinction without making it standing provider-state truth.
 
 `Spectrum(...)` acquires the app asynchronously; `imessage(app).space.get(id)`
 resolves a cold Space; Space send and typing operations return Promises; and
@@ -51,6 +62,13 @@ cleanup fails. The SDK's webhook helper is deliberately not used because its
 handler is fire-and-forget. Bundjil instead follows Photon's documented raw-
 body HMAC contract and keeps deterministic completion in the Eve `waitUntil`
 program.
+
+The Photon dashboard's generated `bun start` command is the SDK-stream
+development mode: one process for the application/project consumes
+`app.messages` and must remain running while it handles inbound events. It is
+not one process per user or assigned line. Bundjil's hosted topology instead
+uses Photon-signed webhooks into Vercel and acquires Spectrum only for outbound
+Space operations; it does not require a continuously running Bun process.
 
 Upstream references: [lean Spectrum installation](https://photon.codes/docs/spectrum-ts/getting-started),
 [serverless webhook guidance](https://photon.codes/docs/webhooks/overview),

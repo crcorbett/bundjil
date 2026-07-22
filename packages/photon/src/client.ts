@@ -64,7 +64,7 @@ const liveFactory: PhotonSdkFactory = {
     const app = await Spectrum({
       projectId: config.projectId,
       projectSecret: Redacted.value(config.projectSecret),
-      // @ts-expect-error Spectrum 12.2.0 models an absent events property as
+      // @ts-expect-error Spectrum 12.3.0 models an absent events property as
       // incompatible with its own AnyPlatformDef under exact optional types.
       providers: [imessage.config()],
       telemetry: false,

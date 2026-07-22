@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-21
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: channel contract, provider implementation, Photon SDK/API, deployment, or proof change
 ---
 
@@ -166,6 +166,13 @@ official [Spectrum repository](https://github.com/photon-hq/spectrum-ts) and
 are upstream reference only. GitHub `main`, the Chat SDK adapter, SDK-owned Zod
 types, and callback APIs are not Bundjil contracts.
 
+Before cutting any hosted candidate, query the npm `latest` dist-tag for both
+direct `@spectrum-ts/*` dependencies, require the same exact stable release,
+record its registry integrity, regenerate the lockfile, and rerun Photon plus
+agent package/build proof. A dependency refresh creates a new repository
+artifact boundary: earlier live/provider observations remain valid only for
+their recorded SDK version and cannot prove the refreshed candidate.
+
 The Production amendment was revalidated against these primary contracts on
 2026-07-21:
 
@@ -191,6 +198,15 @@ The Production amendment was revalidated against these primary contracts on
 - Vercel's [staged Production deployment](https://vercel.com/docs/cli/deploying-from-cli)
   and [promote](https://vercel.com/docs/cli/promote) contracts support a
   Production deployment with domains skipped followed by explicit promotion.
+
+The 2026-07-22 local SDK-stream qualification established an additional Free
+topology invariant: an authorised user must text that user's own
+`assignedPhoneNumber`. Assigned numbers are per-user routes rather than
+interchangeable project endpoints. The dashboard scaffold's `bun start` is one
+long-lived development consumer for the project; Bundjil's accepted hosted
+topology remains Photon-signed webhooks into Vercel with scoped outbound SDK
+acquisition. Local stream success does not satisfy the hosted Preview, replay,
+Eve, duplicate, visible-typing, or Production gates.
 
 ## Package boundaries
 
@@ -673,8 +689,9 @@ domain and retain previous deployment/config references for rollback.
   primitive semantic identities do not cross service boundaries.
 - Fresh state/replay behavior and the intentional continuity break are tested
   and documented; no old data is read or modified.
-- Photon uses exact published dependency pins and passes local lifecycle,
-  signature, failure, and conformance tests.
+- Photon uses the latest stable exact published dependency pins at candidate
+  cut and passes local lifecycle, signature, failure, conformance, and agent
+  packaging tests.
 - Any live Preview proof is isolated, separately authorized, sanitized, and
   does not mutate Production or Sendblue provider state.
 - Production exposes both `/eve/v1/sendblue/webhook` and
@@ -743,6 +760,25 @@ domain and retain previous deployment/config references for rollback.
 | Architecture, READMEs, runbook index, and verification router              | Reconcile after live readback                                                                               | Current routes describe only accepted source and bounded provider truth                                                 |
 | Historical plans, receipts, research, and legacy atlas                     | Preserve                                                                                                    | Historical provenance is not rewritten as current provider truth                                                        |
 | Frontend, public API publication, package release, DNS, and unrelated apps | N/A                                                                                                         | No changed contract or target in this rollout                                                                           |
+
+### 2026-07-22 dependency and proof re-review
+
+The current npm registry readback moved the direct Spectrum boundary from
+`12.2.0` to `12.3.0`. `@bundjil/photon` and the lockfile now own the refreshed
+exact pair. The package's Effect services, Layers, Schemas, tagged errors,
+resource scope, app composition, and public exports remain unchanged. The
+existing local handset receipt is deliberately retained as `12.2.0` evidence;
+`12.3.0` requires the same hosted journey before Preview acceptance or
+Production staging.
+
+| Surface                                                                                                             | Decision        | Evidence                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------- |
+| Manifest, lock, Photon README, and private SDK adapter comment                                                      | Change required | Exact `12.3.0` pins and registry integrities replace current desired-state `12.2.0` references.                |
+| Current Preview task, active plan, runbook, and dated version receipt                                               | Change required | Candidate freshness, focused package/app proof, and requalification limits are executable and addressable.     |
+| Repo/testing architecture and proof-count control                                                                   | Change required | Current dependency and twelve-journey claims match executable source.                                          |
+| Dated 12.2.0 message/provider evidence and completed task evidence                                                  | Preserve        | Historical observations retain their actual SDK identity and are not upgraded by prose.                        |
+| Root/app/Channel/Sendblue READMEs, Eve/Effect architecture, public Schemas/services/Layers/exports                  | Preserve        | The dependency refresh changes no consumer-visible contract or call graph.                                     |
+| Generated/API docs, skills/mirrors, lint/CI/workflows, frontend, migration, release, deployment, and provider state | N/A             | No affected generated owner, workflow, UI, data, release, or external resource operation exists in this slice. |
 
 ## Risks and unresolved questions
 
