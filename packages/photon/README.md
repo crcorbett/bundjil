@@ -52,12 +52,18 @@ rejects the sender before the application receives an event. The dated
 [local-stream receipt](../../docs/verification/photon-local-stream-2026-07-22.md)
 records this distinction without making it standing provider-state truth.
 
-`Spectrum(...)` acquires the app asynchronously; `imessage(app).space.get(id)`
-resolves a cold Space; Space send and typing operations return Promises; and
-`app.stop()` releases the SDK. The live Layer is construction-safe for a
-serverless webhook: signature verification and payload decoding do not acquire
-Spectrum. Each outbound send or presence operation brackets one SDK resource
-with `Effect.acquireUseRelease`, then emits only a safe lifecycle tag if final
+`Spectrum(...)` acquires the app asynchronously. A Photon webhook Space ID is
+an opaque stable conversation identity, not a public serverless send lookup.
+For an accepted direct-message webhook, the live Layer resolves the branded
+participant through `imessage(app).user(participantId)` and reconstructs the
+DM with `space.create(participant)` before send or typing. Group webhook spaces
+are ignored as unsupported because the current serialized event does not
+contain enough membership state to reconstruct their outbound Space safely.
+Space send and typing operations return Promises, and `app.stop()` releases the
+SDK. The live Layer is construction-safe for a serverless webhook: signature
+verification and payload decoding do not acquire Spectrum. Each outbound send
+or presence operation brackets one SDK resource with
+`Effect.acquireUseRelease`, then emits only a safe lifecycle tag if final
 cleanup fails. The SDK's webhook helper is deliberately not used because its
 handler is fire-and-forget. Bundjil instead follows Photon's documented raw-
 body HMAC contract and keeps deterministic completion in the Eve `waitUntil`
@@ -73,6 +79,7 @@ Space operations; it does not require a continuously running Bun process.
 Upstream references: [lean Spectrum installation](https://photon.codes/docs/spectrum-ts/getting-started),
 [serverless webhook guidance](https://photon.codes/docs/webhooks/overview),
 [webhook wire format](https://photon.codes/docs/webhooks/events),
+[Spaces and Users](https://photon.codes/docs/spectrum-ts/spaces-and-users),
 [signature verification](https://photon.codes/docs/webhooks/verifying-signatures),
 and [iMessage routing](https://photon.codes/docs/spectrum-ts/providers/imessage/connection-and-routing).
 

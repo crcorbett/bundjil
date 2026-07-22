@@ -156,9 +156,13 @@ webhook secret, shared replay prefix, or runtime fallback between them.
 
 Photon documents HMAC-signed, at-least-once webhooks with opaque stable space
 and message IDs. The Spectrum TypeScript SDK exposes webhook handling and
-Space send/typing operations. See [webhook events](https://photon.codes/docs/webhooks/events),
+Space send/typing operations. Its current webhook contract does not expose a
+public serverless send or Space-by-ID lookup: a direct-message Space must be
+reconstructed from the decoded sender identity, while serialized group events
+lack enough membership state for safe reconstruction and remain unsupported.
+See [webhook events](https://photon.codes/docs/webhooks/events),
 [webhook overview](https://photon.codes/docs/webhooks/overview), and
-[Spectrum TypeScript getting started](https://photon.codes/docs/spectrum-ts/getting-started).
+[Spectrum Spaces and Users](https://photon.codes/docs/spectrum-ts/spaces-and-users).
 
 Implementation must inspect and pin the exact published npm tarballs. The
 official [Spectrum repository](https://github.com/photon-hq/spectrum-ts) and
@@ -545,12 +549,21 @@ POST /eve/v1/photon/webhook
        -> same app identity/replay/orchestration services
   -> decoded common message -> claim -> Eve dispatch -> provider send
        -> PhotonClient.sendMessage
-            -> acquire Spectrum -> resolve opaque Space -> send -> stop
+            -> acquire Spectrum
+            -> resolve branded participant -> reconstruct direct Space
+            -> send -> stop
 
 Eve presence event
   -> PhotonClient.setPresence
-       -> acquire Spectrum -> resolve opaque Space -> start/stop typing -> stop
+       -> acquire Spectrum
+       -> resolve branded participant -> reconstruct direct Space
+       -> start/stop typing -> stop
 ```
+
+The opaque webhook Space ID remains the stable `ChannelConversationId` for
+state, routing, and replay. It is not passed to Spectrum's outbound boundary.
+Authenticated group events return `unsupportedConversation` before dispatch so
+the provider cannot silently redirect a group response to the sender's DM.
 
 Provider choice exists only in the composition-root Layer. Domain operations
 contain no provider switch, registry, string-indexed service map, or raw SDK
@@ -631,7 +644,8 @@ selection occurs only in Layer composition.
 Only with separate provider/deployment authority, use new Preview-only config,
 a separate replay namespace, and an isolated Photon project. Prove one signed
 inbound, one fresh claim, one Eve turn, one outbound accepted result, retry
-suppression, cold Space resolution, presence outcome, `waitUntil` completion,
+suppression, participant-based direct-Space reconstruction, presence
+outcome, `waitUntil` completion,
 and resource release. Use the Free managed-shared service; do not create or
 delete a dedicated line.
 

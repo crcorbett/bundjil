@@ -4,8 +4,8 @@ import {
   ChannelUnavailableError,
 } from "@bundjil/channel";
 import type {
-  ChannelConversationIdType,
   ChannelOutboundTextType,
+  ChannelParticipantIdType,
   ChannelPresenceActionType,
 } from "@bundjil/channel";
 import { Spectrum } from "@spectrum-ts/core";
@@ -22,7 +22,7 @@ import type {
 
 export interface PhotonClientShape {
   readonly sendMessage: (
-    conversationId: ChannelConversationIdType,
+    participantId: ChannelParticipantIdType,
     text: ChannelOutboundTextType
   ) => Effect.Effect<
     PhotonSdkSendResultType,
@@ -31,7 +31,7 @@ export interface PhotonClientShape {
     | ChannelProviderRejectedError
   >;
   readonly setPresence: (
-    conversationId: ChannelConversationIdType,
+    participantId: ChannelParticipantIdType,
     action: ChannelPresenceActionType
   ) => Effect.Effect<void, ChannelUnavailableError>;
 }
@@ -49,8 +49,8 @@ export interface PhotonSdkSpace {
 }
 
 export interface PhotonSdkResource {
-  readonly resolveSpace: (
-    conversationId: ChannelConversationIdType
+  readonly resolveDirectSpace: (
+    participantId: ChannelParticipantIdType
   ) => Promise<PhotonSdkSpace>;
   readonly stop: () => Promise<void>;
 }
@@ -72,8 +72,9 @@ const liveFactory: PhotonSdkFactory = {
     });
     const provider = imessage(app);
     return {
-      resolveSpace: async (conversationId) => {
-        const space = await provider.space.get(conversationId);
+      resolveDirectSpace: async (participantId) => {
+        const participant = await provider.user(participantId);
+        const space = await provider.space.create(participant);
         return {
           sendMessage: (text) => space.send(text),
           setPresence: (action) =>
@@ -151,11 +152,11 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
     PhotonClient,
     PhotonClient.of({
       sendMessage: Effect.fn("PhotonClient.sendMessage")(
-        (conversationId, text) =>
+        (participantId, text) =>
           withPhotonResource(config, factory, "sendMessage", (resource) =>
             Effect.gen(function* sendPhotonMessage() {
               const space = yield* Effect.tryPromise({
-                try: () => resource.resolveSpace(conversationId),
+                try: () => resource.resolveDirectSpace(participantId),
                 catch: () =>
                   new ChannelUnavailableError({
                     provider: "photon",
@@ -191,11 +192,11 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
           )
       ),
       setPresence: Effect.fn("PhotonClient.setPresence")(
-        (conversationId, action) =>
+        (participantId, action) =>
           withPhotonResource(config, factory, "setPresence", (resource) =>
             Effect.gen(function* setPhotonPresence() {
               const space = yield* Effect.tryPromise({
-                try: () => resource.resolveSpace(conversationId),
+                try: () => resource.resolveDirectSpace(participantId),
                 catch: () =>
                   new ChannelUnavailableError({
                     provider: "photon",

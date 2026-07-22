@@ -138,6 +138,9 @@ export const layerTransport = (config: PhotonConfig) =>
             if (payload.message.direction !== "inbound") {
               return { _tag: "Ignored", reason: "nonInbound" };
             }
+            if (payload.space.type !== "dm") {
+              return { _tag: "Ignored", reason: "unsupportedConversation" };
+            }
             if (!Schema.is(PhotonTextContent)(payload.message.content)) {
               return { _tag: "Ignored", reason: "unsupportedEvent" };
             }
@@ -170,7 +173,7 @@ export const layerTransport = (config: PhotonConfig) =>
               });
             }
             const result = yield* client
-              .sendMessage(input.conversation.conversationId, input.text)
+              .sendMessage(input.conversation.participantId, input.text)
               .pipe(
                 Effect.timeoutOption("30 seconds"),
                 Effect.flatMap(
@@ -217,7 +220,7 @@ export const layerTransport = (config: PhotonConfig) =>
               });
             }
             yield* client
-              .setPresence(input.conversation.conversationId, input.action)
+              .setPresence(input.conversation.participantId, input.action)
               .pipe(
                 Effect.timeoutOption("2 seconds"),
                 Effect.flatMap(

@@ -219,17 +219,20 @@ duplicate suppression, Preview, Production, or durable process supervision.
 1. Attach `photon-inbound` and `photon-outbound` authority, exact pushed source
    and immutable deployment/config identities, fresh replay/routing namespace
    fingerprints, the approved test conversation, and rollback references.
-2. Send one bounded inbound direct-text event through Photon. Record signed
-   authentication, fresh claim, one Eve dispatch/completion, one outbound
-   provider result, and scoped SDK release without retaining body, content,
-   phone, assigned routing number, project, user, webhook, Space, or message values.
+2. Send one bounded inbound direct-text DM through Photon. Record signed
+   authentication, fresh claim, one Eve dispatch/completion, participant-based
+   direct-Space reconstruction, one outbound provider result, and scoped SDK
+   release without retaining body, content, phone, assigned routing number,
+   project, user, webhook, Space, or message values. A group event must return
+   the documented unsupported-conversation no-op and must never be answered as
+   a DM to its sender.
 3. Redeliver the same provider event identity and require a duplicate outcome
    with zero second external response. Do not synthesize a new identifier.
 4. Against the exact decoded conversation, execute `setPresence(start)` and
    `setPresence(stop)`. The pinned Layer maps these to Spectrum Space
    `startTyping()` and `stopTyping()`. Require a decoded accepted/no-op result
    for each; an unsupported no-op, timeout, provider rejection, ambiguous
-   Space, or release failure blocks a visible-typing claim.
+   participant/Space, or release failure blocks a visible-typing claim.
 5. Record provider acceptance, Eve completion, handset message delivery, and
    handset typing display as four separate boundaries. If a safe device
    observer is unavailable, mark the handset boundaries unproved rather than

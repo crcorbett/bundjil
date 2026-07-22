@@ -226,14 +226,14 @@ internal state/status/test structure:
 
 ### Promotion task progress
 
-| Task                               | Status      | Acceptance receipt                                                                                                                                                                                          |
-| ---------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                                                                                  |
-| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed                                                            |
-| Reconcile Photon and prove Preview | In progress | Local SDK-stream inbound/reply and handset delivery passed on 12.2.0; source is refreshed to latest 12.3.0 with package/app proof, while hosted Preview Eve/replay/duplicate and visible typing remain open |
-| Stage dual-provider Production     | Pending     | —                                                                                                                                                                                                           |
-| Promote and prove Production       | Pending     | —                                                                                                                                                                                                           |
-| Reconcile docs and final audit     | Pending     | —                                                                                                                                                                                                           |
+| Task                               | Status      | Acceptance receipt                                                                                                                                                                                                             |
+| ---------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Reopen SPEC and plan               | Completed   | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                                                                                                     |
+| Build promotion contracts          | Completed   | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed                                                                               |
+| Reconcile Photon and prove Preview | In progress | The 12.3.0 hosted path now proves signed inbound and Eve completion; its failed outbound exposed opaque-Space misuse, so participant-based DM reconstruction is corrected locally and requires a fresh immutable Preview proof |
+| Stage dual-provider Production     | Pending     | —                                                                                                                                                                                                                              |
+| Promote and prove Production       | Pending     | —                                                                                                                                                                                                                              |
+| Reconcile docs and final audit     | Pending     | —                                                                                                                                                                                                                              |
 
 ## Downstream-impact ledger
 
@@ -344,6 +344,34 @@ readback remains pending on the corrected immutable deployment.
 - **N/A:** frontend, DNS, public release, data migration, generated API docs,
   and Production evidence. The failed Preview requests sent no provider
   message and establish no outbound, typing, handset, or Production claim.
+
+### Task 3 participant-resolution correction
+
+The refreshed hosted Preview accepted one signed direct-message webhook and
+completed the Eve workflow, then mapped outbound SDK resolution to the safe
+`ChannelUnavailableError` transport class. Photon documents serialized webhook
+Space IDs as opaque and provides no public serverless send-by-Space-ID call.
+For a stateless direct-message reply, the SDK instance resolves the sender and
+reconstructs the Space from that participant. The previous private client used
+`space.get(conversationId)`, so the hosted failure was an implementation defect
+rather than a provider-acceptance result.
+
+`@bundjil/photon` now keeps the webhook Space ID as the stable common
+conversation identity but passes only the decoded branded participant ID into
+its private outbound client. Both send and presence resolve the participant
+and create the direct Space inside their operation-scoped SDK lifetime. Group
+webhooks are ignored as `unsupportedConversation`; reconstructing a group from
+one sender would misroute the response into a DM.
+
+- **Change required:** Photon client/transport/tests and package README; SPEC
+  source contract and call graph; Photon hosted-proof runbook; current task and
+  this execution record; dated partial Preview evidence.
+- **Preserve:** neutral Channel Schema/service, app identity/routing/replay,
+  Sendblue, existing provider resources and environment binding, earlier
+  receipts, Production deployment/configuration, and unrelated READMEs.
+- **N/A:** public API generation, frontend, DNS, database migration, public
+  package release, and Production proof. A fresh pushed candidate and bounded
+  DM journey are still required before this task can close.
 
 ### Task 3 Marketplace replay-binding correction
 

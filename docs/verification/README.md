@@ -52,6 +52,10 @@ operation nor asserts present provider state.
   records the exact latest-stable Spectrum 12.3.0 manifest/lock refresh and
   repository compatibility gates. It performs no provider operation and does
   not upgrade the 12.2.0 handset receipt into 12.3.0 live proof.
+- [`photon-preview-participant-resolution-2026-07-22.md`](photon-preview-participant-resolution-2026-07-22.md)
+  retains the 12.3.0 hosted signed-ingress/Eve observation, failed opaque-Space
+  outbound diagnosis, and local participant-based DM correction. It is not a
+  successful outbound, typing, handset, duplicate, or Production proof.
 
 ## Claim boundaries
 

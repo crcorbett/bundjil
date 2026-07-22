@@ -273,6 +273,36 @@ it.effect("rejects inconsistent messages and ignores unsupported content", () =>
 );
 
 it.effect(
+  "ignores group spaces that cannot be reconstructed from a webhook",
+  () =>
+    Effect.gen(function* testPhotonGroupPolicy() {
+      const fixture = yield* fixtures;
+      const messagesWebhook = Schema.is(PhotonMessagesWebhook)(fixture.webhook)
+        ? fixture.webhook
+        : yield* Effect.die("messages fixture required");
+      const body = yield* Schema.encodeEffect(
+        Schema.fromJsonString(PhotonWebhookPayload)
+      )({
+        ...messagesWebhook,
+        space: { ...messagesWebhook.space, type: "group" },
+        message: {
+          ...messagesWebhook.message,
+          space: { ...messagesWebhook.message.space, type: "group" },
+        },
+      });
+      const result = yield* Effect.gen(function* decodeWebhook() {
+        const transport = yield* ChannelTransport;
+        return yield* transport.decodeWebhook(request(body));
+      }).pipe(Effect.provide(layer(fixture.config)));
+
+      assert.deepStrictEqual(result, {
+        _tag: "Ignored",
+        reason: "unsupportedConversation",
+      });
+    })
+);
+
+it.effect(
   "decodes complete SDK results and keeps send failures uncertain",
   () =>
     Effect.gen(function* testPhotonSendFailures() {
@@ -383,14 +413,14 @@ it.effect(
     })
 );
 
-it.effect("separates cold-space failure from ambiguous send failure", () =>
+it.effect("separates direct-space resolution failure from ambiguous send", () =>
   Effect.gen(function* testPhotonSdkFailureBoundaries() {
     const fixture = yield* fixtures;
     const run = (factory: PhotonSdkFactory) =>
       Effect.gen(function* runSdkClient() {
         const client = yield* PhotonClient;
         return yield* client.sendMessage(
-          fixture.conversation.conversationId,
+          fixture.conversation.participantId,
           fixture.text
         );
       }).pipe(
@@ -399,15 +429,15 @@ it.effect("separates cold-space failure from ambiguous send failure", () =>
       );
     const unavailableResult = yield* run({
       acquire: async () => ({
-        resolveSpace: async () => {
-          throw new Error("private cold-space detail");
+        resolveDirectSpace: async () => {
+          throw new Error("private direct-space detail");
         },
         stop: async () => {},
       }),
     });
     const uncertainResult = yield* run({
       acquire: async () => ({
-        resolveSpace: async () => ({
+        resolveDirectSpace: async () => ({
           sendMessage: async () => {
             throw new Error("private send detail");
           },
@@ -418,7 +448,7 @@ it.effect("separates cold-space failure from ambiguous send failure", () =>
     });
     const malformedResult = yield* run({
       acquire: async () => ({
-        resolveSpace: async () => ({
+        resolveDirectSpace: async () => ({
           sendMessage: async () => {},
           setPresence: async () => {},
         }),
@@ -441,7 +471,7 @@ it.effect("separates cold-space failure from ambiguous send failure", () =>
       Schema.is(ChannelProviderRejectedError)(malformed),
       true
     );
-    assert.notInclude(String(unavailable), "private cold-space detail");
+    assert.notInclude(String(unavailable), "private direct-space detail");
     assert.notInclude(String(uncertain), "private send detail");
   })
 );
@@ -452,12 +482,16 @@ it.effect(
     Effect.gen(function* testPhotonLifecycle() {
       const fixture = yield* fixtures;
       const stops = { count: 0 };
+      const participants: string[] = [];
       const factory: PhotonSdkFactory = {
         acquire: async () => ({
-          resolveSpace: async () => ({
-            sendMessage: async () => ({ id: "provider-message-1" }),
-            setPresence: async () => {},
-          }),
+          resolveDirectSpace: async (participantId) => {
+            participants.push(participantId);
+            return {
+              sendMessage: async () => ({ id: "provider-message-1" }),
+              setPresence: async () => {},
+            };
+          },
           stop: async () => {
             stops.count += 1;
             throw new Error("private cleanup detail");
@@ -466,14 +500,20 @@ it.effect(
       };
       const result = yield* Effect.gen(function* useScopedPhotonClient() {
         const client = yield* PhotonClient;
-        return yield* client.sendMessage(
-          fixture.conversation.conversationId,
+        const send = yield* client.sendMessage(
+          fixture.conversation.participantId,
           fixture.text
         );
+        yield* client.setPresence(fixture.conversation.participantId, "start");
+        return send;
       }).pipe(Effect.provide(layerClient(fixture.config, factory)));
 
       assert.deepStrictEqual(result, { id: "provider-message-1" });
-      assert.strictEqual(stops.count, 1);
+      assert.deepStrictEqual(participants, [
+        fixture.conversation.participantId,
+        fixture.conversation.participantId,
+      ]);
+      assert.strictEqual(stops.count, 2);
     })
 );
 
@@ -494,7 +534,7 @@ it.effect(
       assert.strictEqual(acquisitions, 0);
 
       const result = yield* client
-        .sendMessage(fixture.conversation.conversationId, fixture.text)
+        .sendMessage(fixture.conversation.participantId, fixture.text)
         .pipe(Effect.result);
 
       assert.strictEqual(Result.isFailure(result), true);
