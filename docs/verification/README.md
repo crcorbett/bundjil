@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-23
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -56,6 +56,11 @@ operation nor asserts present provider state.
   retains the 12.3.0 hosted signed-ingress/Eve observation, failed opaque-Space
   outbound diagnosis, and local participant-based DM correction. It is not a
   successful outbound, typing, handset, duplicate, or Production proof.
+- [`photon-preview-accepted-2026-07-23.md`](photon-preview-accepted-2026-07-23.md)
+  proves the exact 12.3.0 hosted Preview source/deployment, signed ingress,
+  same-ID provider retry suppression, Eve completion, provider-accepted reply,
+  both typing transitions, scoped release, and one handset reply. Visible
+  handset typing and every Production boundary remain unproved.
 
 ## Claim boundaries
 
