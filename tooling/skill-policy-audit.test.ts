@@ -30,6 +30,7 @@ const repositorySnapshot = (): SkillSnapshot => {
     (path) =>
       path === "AGENTS.md" ||
       path === "docs/architecture/effect-patterns.md" ||
+      path === "docs/architecture/frontend-composition.md" ||
       (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/.test(path))
   );
   const files = selected.map(
@@ -131,6 +132,24 @@ describe("HGI-302 skill policy", () => {
     expect(codes.has("SKILL-PORTABILITY")).toBeTruthy();
     expect(codes.has("SKILL-REFERENCE")).toBeTruthy();
     expect(codes.has("SKILL-UI-METADATA")).toBeTruthy();
+  });
+
+  it("rejects leaf-owned data, mutation, and command policy", () => {
+    const base = repositorySnapshot();
+    const broken = replaceFile(
+      base,
+      ".agents/skills/building-components/SKILL.md",
+      (content) =>
+        `${content}\nA leaf owns its specific query, mutation, and command.\n`
+    );
+    const report = run(broken);
+    expect(
+      report.findings.some(
+        (issue) =>
+          issue.code === "SKILL-FRONTEND-BOUNDARY" &&
+          issue.target === ".agents/skills/building-components/SKILL.md"
+      )
+    ).toBeTruthy();
   });
 
   it("bounds console diagnostics while retaining the complete finding list", () => {

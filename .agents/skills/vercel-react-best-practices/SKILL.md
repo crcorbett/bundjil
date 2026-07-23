@@ -24,9 +24,11 @@ Reference these guidelines when:
 ## Bundjil Frontend Rule
 
 Before writing or reviewing React UI in this repo, read
-`docs/architecture/frontend-composition.md`. Compose visible structure high,
-let data-bearing leaves own narrow state and fallbacks, and avoid prop drilling
-or wrapper-only components. If a SPEC introduces a visible app or design
+`docs/architecture/frontend-composition.md`. Compose visible structure high.
+Presentation leaves own rendering, accessibility, local UI interaction, and
+state display; route/feature boundaries own data loading, Effect execution,
+service/RPC calls, auth, mutations, shared workflows, and command execution.
+Avoid prop drilling or wrapper-only components. If a SPEC introduces a visible app or design
 system, use the authority and typography contract named there. Capture Browser
 evidence for affected visible states, including mobile when text can wrap or
 density can shift.

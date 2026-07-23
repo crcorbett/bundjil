@@ -36,10 +36,12 @@ Before frontend composition work in Bundjil, read
 `docs/architecture/frontend-composition.md`.
 
 Compose stable visible structure as high as practical through primitive ->
-composite -> layout -> route. Data-bearing leaves own the narrow read, command,
-loading, empty, error, retry, skeleton, and fallback states for the fragment
-they render. Avoid nested feature wrappers that only shorten route JSX and do
-not prop-drill leaf state. Keep the app router as the URL writer, use
+composite -> layout -> route. Presentation leaves own rendering, accessibility,
+local UI interaction, and loading/empty/error/retry/skeleton/fallback display.
+Route and feature boundaries own data loading, Effect execution, service/RPC
+calls, auth, mutations, shared workflows, and command execution; leaves receive
+narrow readonly values and action callbacks. Avoid nested feature wrappers that
+only shorten route JSX and do not prop-drill unrelated state. Keep the app router as the URL writer, use
 schema-owned URL and route-identity contracts, and keep app route APIs out of
 reusable packages. When visible UI exists and changes,
 follow the SPEC's design-system authority and capture Browser evidence for the

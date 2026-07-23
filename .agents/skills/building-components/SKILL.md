@@ -46,13 +46,17 @@ For this repo, component work follows
   page-level parent.
 - Use the primitive -> composite -> layout -> route chain for visible
   structure.
-- Let leaves own the data, commands, loading, empty, error, retry, skeleton,
-  and fallback states for the exact fragment or action they render.
+- Let presentation leaves own rendering, accessibility, local UI interaction,
+  and loading/empty/error/retry/skeleton/fallback display for the exact
+  fragment they render. Route and feature boundaries own data loading, Effect
+  execution, service/RPC calls, auth, mutations, shared workflows, and command
+  execution; leaves receive narrow readonly values and action callbacks.
 - Keep the app router as the URL writer, use schema-owned URL/route identities,
   and keep app route APIs out of reusable packages.
 - Do not add nested feature wrappers merely to shorten route JSX.
-- Do not prop-drill query results, selected ids, loading flags, command
-  callbacks, or derived option lists when a leaf can own the narrow value.
+- Do not prop-drill unrelated query results, selected ids, loading flags,
+  command callbacks, or derived option lists through ancestors. Do not move
+  boundary-owned data or commands into a leaf merely to shorten its props.
 - If a SPEC introduces a design system or visible text contract, name its
   authority and typography roles before implementation. Capture Browser
   evidence for affected desktop/mobile states and verify no overlap or

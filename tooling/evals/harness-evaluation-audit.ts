@@ -69,6 +69,32 @@ const read = (path: string) =>
       }),
   });
 
+const readAtGitCommit = (commit: string, path: string) =>
+  Effect.tryPromise({
+    try: async () => {
+      const child = Bun.spawn(["git", "show", `${commit}:${path}`], {
+        cwd: repositoryRoot,
+        stderr: "pipe",
+        stdout: "pipe",
+      });
+      const [stdout, stderr, exitCode] = await Promise.all([
+        new Response(child.stdout).text(),
+        new Response(child.stderr).text(),
+        child.exited,
+      ]);
+      if (exitCode !== 0) {
+        throw new Error(stderr || `git show exited ${exitCode}`);
+      }
+      return stdout;
+    },
+    catch: (cause) =>
+      new HarnessEvaluationError({
+        detail: String(cause),
+        operation: "read",
+        target: `${commit}:${path}`,
+      }),
+  });
+
 const decode = <A, I>(path: string, schema: Schema.Codec<A, I>) =>
   read(path).pipe(
     Effect.flatMap((content) =>
@@ -119,9 +145,8 @@ const program = Effect.gen(function* () {
   const digestPaths = [
     epoch.scenarioManifest.path,
     ...epoch.scenarios.map(({ report }) => report.path),
-    ...epoch.skills.map(({ path }) => path),
   ];
-  const contentDigests = Object.fromEntries(
+  const currentContentDigests = Object.fromEntries(
     yield* Effect.forEach(
       [...new Set(digestPaths)],
       (path) =>
@@ -132,6 +157,23 @@ const program = Effect.gen(function* () {
       { concurrency: 4 }
     )
   );
+  const historicalSkillDigests = Object.fromEntries(
+    yield* Effect.forEach(
+      epoch.skills,
+      (skill) =>
+        (skill.path.startsWith("/")
+          ? Effect.succeed(skill.sha256)
+          : readAtGitCommit(epoch.baseCommit, skill.path).pipe(
+              Effect.flatMap(sha256)
+            )
+        ).pipe(Effect.map((digest) => [skill.path, digest] as const)),
+      { concurrency: 4 }
+    )
+  );
+  const contentDigests = {
+    ...currentContentDigests,
+    ...historicalSkillDigests,
+  };
   const docsPaths = repositoryPaths
     .filter((path) => path.startsWith("docs/"))
     .toSorted();

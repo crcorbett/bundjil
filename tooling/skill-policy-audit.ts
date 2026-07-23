@@ -78,6 +78,7 @@ const discoverRepositoryPaths = Effect.fn("SkillAudit.discoverRepositoryPaths")(
 const selectedPolicyFile = (path: string) =>
   path === "AGENTS.md" ||
   path === "docs/architecture/effect-patterns.md" ||
+  path === "docs/architecture/frontend-composition.md" ||
   (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/.test(path));
 
 const readPolicyFile = Effect.fn("SkillAudit.readPolicyFile")((path: string) =>

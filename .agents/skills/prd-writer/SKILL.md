@@ -79,10 +79,12 @@ Read in this order:
   mobile viewports when wrapping, density, or hierarchy can change.
 - Frontend specs that touch route/component composition must reference
   `docs/architecture/frontend-composition.md`, require the primitive ->
-  composite -> layout -> route chain for visible structure, and require
-  leaf-owned data, commands, loading/error states, skeletons, and fallbacks.
-  Do not approve nested feature wrappers that merely shorten route JSX or
-  prop-drill leaf state.
+  composite -> layout -> route chain for visible structure, and assign data
+  loading, Effect execution, service/RPC calls, auth, mutations, commands, and
+  shared workflows to route/feature boundaries. Presentation leaves own
+  rendering, accessibility, local UI interaction, and state display from narrow
+  readonly values and action callbacks. Do not approve nested feature wrappers
+  that merely shorten route JSX or prop-drill unrelated state.
 - Frontend specs that touch reusable URL state, search params, page params, or
   route-agnostic component state must reference
   `docs/architecture/frontend-composition.md`, require schema-owned URL and
@@ -117,6 +119,12 @@ surface `Change required`, `Preserve`, or `N/A` with exact evidence:
 - tests, fixtures, compatibility assertions, Browser/HTTP/provider evidence,
   observability, rollout, migration, and rollback artifacts; and
 - SPEC indexes, task ledgers, and active execution plans.
+
+For each applicable fixture, name whether it is created, updated, retained, or
+retired, its owner, and its compatibility or negative-case coverage. For each
+release or rollback, name the grounded product or decision owner, the operating
+owner, and the exact trigger to release, halt, or roll back; do not leave those
+decisions as generic follow-up work.
 
 Edit the SPEC and sibling task list as findings are identified. Do not return
 an advisory review while known requirements remain only in commentary.

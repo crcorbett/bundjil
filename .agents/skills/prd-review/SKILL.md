@@ -30,13 +30,19 @@ Always:
    and operational artifacts `Change required`, `Preserve`, or `N/A` with
    exact paths and evidence;
 7. require `Context.Service`, explicit Layers, boundary-only codecs, flat
-   sequential Effects, deterministic test Layers, narrow leaf ownership, and no
-   helper sprawl where applicable;
+   sequential Effects, deterministic test Layers, route/feature-owned data and workflows,
+   presentation-leaf rendering/accessibility/local UI state, and no helper
+   sprawl where applicable;
 8. make rewriting any stale `effect-client-wrapper` an acceptance task,
    including generic SDK callbacks, raw identifiers/client access, primitive
    config, runtime class policy, and unchecked provider output;
 9. apply every supported finding to the SPEC/tasks and current semantic owners,
    including runbook/proof/lifecycle gaps; run the repository's real
    documentation, lint, typecheck, test, build, and skill checks that apply.
+
+For every applicable fixture, require a create/update/retain/retire lifecycle,
+an owning path or team, and compatibility or negative-case coverage. Require
+each release and rollback path to name the grounded product or decision owner,
+the operating owner, and the exact trigger to release, halt, or roll back.
 
 Report only edits made, evidence, commands, and genuine unresolved blockers.

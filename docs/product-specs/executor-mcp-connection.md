@@ -636,14 +636,20 @@ This SPEC intentionally changes no Bundjil React component, route, visible
 text, URL state, or browser bundle. Any such change stops this task and
 requires a separate accepted frontend SPEC before implementation.
 
+The completed implementation originally used a leaf-owned data/workflow rule.
+That wording is retained only in dated task evidence; it is not current
+architecture policy.
+
 That frontend SPEC must follow
 `docs/architecture/frontend-composition.md` and require:
 
 - visible structure composed as high as practical through `primitive ->
 composite -> layout -> route`;
-- leaf components owning the exact fragment's reads, mutations, search/page
-  params, local interaction state, commands, atoms/stores, loading, empty,
-  error, retry, skeleton, and fallback states;
+- route or feature boundaries owning data loading, Effect execution, service/RPC
+  calls, auth, mutations, commands, shared workflows, and schema-owned
+  search/page/URL state; presentation leaves owning rendering, accessibility,
+  local interaction state, and loading, empty, error, retry, skeleton, and
+  fallback display from narrow readonly values and action callbacks;
 - no prop drilling of query results, selected ids, loading flags, command
   callbacks, or derived option lists through unrelated ancestors;
 - no nested feature wrapper, generic hook, boolean-prop matrix, or view-model
@@ -1149,10 +1155,12 @@ active execution plan before accepting the task.
   formatter, and test settings are not weakened and no unaccepted suppression
   or broadened ignore list exists.
 - No Bundjil React/route/visible-text/URL-state change exists. Any later UI is
-  governed by a separate SPEC with highest-parent composition, leaf-owned
-  data/commands/states, children/slot composition, render-time derivation,
-  schema-backed URL state, app-router-only URL writes, accessibility,
-  canonical typography, and desktop/mobile Browser proof.
+  governed by a separate SPEC with highest-parent composition; route/feature-
+  owned data loading, Effect execution, service/RPC calls, auth, mutations,
+  commands, and shared workflows; presentation-leaf rendering, accessibility,
+  local UI, and state display; children/slot composition, render-time
+  derivation, schema-backed URL state, app-router-only URL writes,
+  accessibility, canonical typography, and desktop/mobile Browser proof.
 - `bun install --frozen-lockfile`, focused agent checks, root checks, knip,
   `bun run verification`, JSON validation, diff checks, language-service
   review, secret scans, and all mandatory live proofs pass.

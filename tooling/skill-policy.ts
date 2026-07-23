@@ -82,6 +82,7 @@ const policyFiles = {
   docsProfile:
     ".agents/skills/docs-maintainer/references/repository-profile.md",
   effectPatterns: "docs/architecture/effect-patterns.md",
+  frontendComposition: "docs/architecture/frontend-composition.md",
   implementer: ".agents/skills/prd-implementer/SKILL.md",
   packageStructure: ".agents/skills/package-structure/SKILL.md",
   packageProfile:
@@ -170,11 +171,18 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["browser", "docs/architecture/frontend-composition.md"],
     ["buildingComponents", "docs/architecture/frontend-composition.md"],
     ["buildingComponents", "primitive -> composite -> layout -> route"],
+    ["buildingComponents", "Route and feature boundaries own data loading"],
     ["buildingComponents", "schema-owned URL"],
     ["compositionPatterns", "docs/architecture/frontend-composition.md"],
+    ["compositionPatterns", "Route and feature boundaries own data loading"],
     ["compositionPatterns", "schema-owned URL"],
     ["reactPractices", "docs/architecture/frontend-composition.md"],
-    ["reactPractices", "data-bearing leaves"],
+    ["reactPractices", "Presentation leaves own rendering"],
+    ["frontendComposition", "Presentation leaves own the narrow rendering"],
+    ["frontendComposition", "Route and feature boundaries own data loading"],
+    ["writer", "grounded product or decision owner"],
+    ["implementer", "create/update/retain/retire lifecycle"],
+    ["reviewer", "route/feature-owned data and workflows"],
     ["shadcn", "docs/architecture/frontend-composition.md"],
   ];
 
@@ -793,6 +801,30 @@ const executableAndPortabilityFindings = (
           path,
           "Remove or rewrite the contradictory policy",
           `Contains ${label}`
+        )
+      );
+    }
+  }
+  const leafOwnedBoundaryWork =
+    /\b(?:data-bearing\s+|presentation\s+)?(?:leaf|leaves)\s+(?:should\s+)?own(?:s|ed|ing)?(?:\s+(?:their|its)(?:\s+own)?)?\s+(?:the\s+)?(?:narrow\s+|specific\s+)?(?:quer(?:y|ies)|reads?|data(?:\s+loading)?|fetch(?:ing)?|effects?(?:\s+execution)?|services?|rpc|mutations?|commands?|shared\s+(?:state|workflows?)|url\s+state)(?:\b|,)/iu;
+  for (const path of [
+    policyFiles.frontendComposition,
+    policyFiles.buildingComponents,
+    policyFiles.compositionPatterns,
+    policyFiles.reactPractices,
+    policyFiles.writer,
+    policyFiles.implementer,
+    policyFiles.reviewer,
+  ]) {
+    if (leafOwnedBoundaryWork.test(files.get(path) ?? "")) {
+      issues.push(
+        finding(
+          "SKILL-FRONTEND-BOUNDARY",
+          "Frontend guidance keeps data and workflow execution at route/feature boundaries",
+          "bundjil-frontend-owner",
+          path,
+          "Assign data loading, Effect execution, auth, mutations, and commands to a route or feature boundary",
+          "Presentation leaves must not own reads, data, mutations, or commands"
         )
       );
     }

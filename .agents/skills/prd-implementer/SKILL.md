@@ -65,9 +65,11 @@ Read in this order:
   when hierarchy, wrapping, or density can change.
 - For frontend implementation tasks, follow
   `docs/architecture/frontend-composition.md`: compose visible structure as
-  high as practical through primitive -> composite -> layout -> route, and let
-  leaves own their data, commands, loading/error states, skeletons, and
-  fallbacks.
+  high as practical through primitive -> composite -> layout -> route.
+  Route or feature boundaries own data loading, Effect execution, service/RPC
+  calls, auth, mutations, shared workflows, and command execution. Presentation
+  leaves own rendering, accessibility, local UI interaction, and state display
+  from narrow readonly values and action callbacks.
 - For reusable URL/search/page-param work, follow
   `docs/architecture/frontend-composition.md`: use schema-owned URL and route
   identity contracts, keep the app router as the URL writer, and keep app route
@@ -87,6 +89,10 @@ Read in this order:
   fixtures, evidence, observability, rollout/rollback, SPECs, task ledgers, and
   active plans as `Change required` or `N/A` with a reason. Edit required
   artifacts in the same slice instead of reporting them as follow-up advice.
+- For each applicable fixture, record its create/update/retain/retire lifecycle,
+  owner, and compatibility or negative-case coverage. For release and rollback,
+  record the grounded product/decision owner, operating owner, and exact
+  release, halt, and rollback triggers.
 - Invoke `.agents/skills/docs-maintainer` before and after every material
   implementation slice. Reconcile `Change required`, `Preserve`, and evidenced
   `N/A` decisions against the actual diff, then invoke it again at task
@@ -129,12 +135,13 @@ mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
 or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
 primitive or owning service contract should carry the behavior.
 
-For UI work, use the primitive -> composite -> layout -> route chain. Let
-leaves own the data, commands, loading, empty, error, retry, skeleton, and
-fallback behavior for the exact fragment they render. Do not add nested
-feature wrappers merely to shorten route JSX, and do not prop-drill query
-results, selected ids, loading flags, command callbacks, or derived option
-lists when a leaf can own the narrow value.
+For UI work, use the primitive -> composite -> layout -> route chain.
+Route/feature boundaries own data loading, Effect execution, service/RPC calls,
+auth, mutations, shared workflows, and command execution. Presentation leaves
+own rendering, accessibility, local UI interaction, and loading, empty, error,
+retry, skeleton, and fallback display from narrow readonly values and action
+callbacks. Do not add nested feature wrappers merely to shorten route JSX, and
+do not prop-drill unrelated values through ancestors.
 
 For reusable URL state, use schema-owned search and route-identity contracts.
 Keep the app router as the URL writer, and do not import app route modules into
@@ -208,12 +215,14 @@ Before accepting a task, audit for:
   nested feature wrappers only to hide route JSX
 - frontend visible text uses the app/design-system typography contract, with
   applicable lint rules and Browser evidence proving no overlap or overflow
-- data-bearing leaves own their own reads, commands, loading, empty, error,
-  retry, skeleton, and fallback states
+- presentation leaves own rendering, accessibility, local UI interaction, and
+  loading/empty/error/retry/skeleton/fallback display; route/feature boundaries
+  own reads, mutations, commands, and shared workflows
 - reusable URL state uses schema-owned search and route identity contracts,
   with the app router as writer and no app route imports in reusable packages
-- no prop drilling of query results, selected ids, loading flags, command
-  callbacks, or derived option lists when a leaf can own the narrow value
+- no prop drilling of service clients, loader-result bags, loading policy, or
+  unrelated query state through wrappers; put the route/feature boundary near
+  the leaf and pass narrow values/callbacks
 - implementation call graphs still match the spec's production/test/CLI graphs,
   or the spec and task list are updated with the intentional architecture
   change before acceptance

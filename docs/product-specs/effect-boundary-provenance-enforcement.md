@@ -580,7 +580,8 @@ More passes are required while any weakness remains.
    adapter, Layer, and exception has one owner; imports point inward through
    stable exports; raw data exists only at the named boundary; frontend work,
    if unexpectedly introduced, follows primitive -> composite -> layout ->
-   route composition with leaf-owned state.
+   route composition with route/feature-owned data and workflows and
+   presentation-leaf rendering, accessibility, local UI, and state display.
 2. **Effect and implementation quality:** inspect complete diffs for flat
    linear `Effect.gen`, typed errors in outer `.pipe(...)`, correct
    `decodeUnknownEffect`/`decodeEffect`/`encodeEffect` selection, exhaustive

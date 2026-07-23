@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -72,11 +72,15 @@ detail is retained at `tmp/control-policy-report.json`; `bun run test:controls`
 owns positive and adversarial fixtures. The gate is repository-only and grants
 no workflow, deployment, provider, message, or Production authority.
 
-`bun run eval:hgi-307` validates the current recorded harness epoch: all twelve
+`bun run eval:hgi-307` validates the accepted historical epoch: all twelve
 fresh-context scenario receipts, the exact scenario-manifest digest, distinct
 four-clock fields, intervention decisions, every docs/README path inventory,
 and the full docs/README/lint/skills/config/tests/CI/runbooks/rollback impact
-ledger. It reads repository evidence only, writes bounded detail to
+ledger. Repository-local evaluated skills are read from the epoch's exact Git
+base commit rather than the mutable working tree; external skill identities
+remain the epoch's stored digest receipts. Current skill behavior is owned by
+the repository skill-policy checks and a separately qualified successor epoch.
+The command reads repository evidence only, writes bounded detail to
 `tmp/harness-evaluation-report.json`, and grants no provider or mutation
 authority. Epoch identity and metric interpretation are owned by
 [`../verification/harness-epochs.md`](../verification/harness-epochs.md) and

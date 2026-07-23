@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-frontend-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-23
 review_trigger: React, route, component, state, URL, accessibility, or frontend-skill change
 ---
 
@@ -32,21 +32,29 @@ Do not add nested feature wrappers merely to shorten route JSX. A component
 must own rendering, behavior, accessibility, state, or a genuinely reusable
 composition. Pass-through wrappers and single-use aliases are helper sprawl.
 
-## Leaf Ownership
+## Presentation Leaf Ownership
 
-The component that renders a narrow fragment should own the narrow state and
-behavior needed by that fragment whenever the framework boundary permits it:
+Presentation leaves own the narrow rendering and local interaction needed by
+the fragment they render:
 
-- reads and mutations for the exact fragment;
-- loading, empty, error, and retry states;
-- local form or interaction state;
-- the command triggered by its button or control;
-- its skeleton and fallback with the same stable dimensions.
+- rendering, accessibility, focus, and local UI interaction state;
+- loading, empty, error, retry, skeleton, and fallback display with stable
+  dimensions;
+- narrow readonly view values and action callbacks received from their owning
+  route or feature; and
+- event wiring for controls, without owning the underlying command execution or
+  mutation policy.
 
-Do not prop-drill query results, selected ids, loading flags, command callbacks,
-or derived option lists through unrelated ancestors. Hoist state only when
-multiple siblings must coordinate or a route/layout genuinely owns the
-workflow.
+Route and feature boundaries own data loading, Effect execution, service/RPC
+calls, authentication and authorisation, mutations, command execution, and
+shared workflow state. They pass schema-owned serializable view values and
+narrow action callbacks to presentation leaves. Do not prop-drill unrelated
+values through ancestors merely to avoid a boundary; hoist local UI state only
+when siblings must coordinate or a route/layout genuinely owns it.
+
+Bundjil has no React UI. That is not an exception to this ownership model:
+future component work still requires a SPEC-owned route or feature boundary
+before it introduces reads, service/RPC calls, auth, mutations, or workflows.
 
 ## Effect And React
 
@@ -75,8 +83,9 @@ workflow.
 - Do not hide business workflows in generic hooks merely to shorten a
   component. A hook must own reusable React lifecycle behavior or a real
   framework boundary.
-- Keep command handlers at the component that owns the control unless a shared
-  workflow boundary requires coordination.
+- Keep event wiring at the presentation component that owns the control; the
+  owning route or feature supplies the callback and retains data, authority,
+  and command execution.
 - Use stable keys from owning schemas. Never use array indexes for reorderable
   or stateful lists.
 - Preserve accessibility semantics, focus behavior, keyboard operation, and

@@ -24,7 +24,9 @@ const currentGuidanceOwners = [
   "ARCHITECTURE.md",
   "docs/README.md",
   "docs/architecture/effect-patterns.md",
+  "docs/architecture/frontend-composition.md",
   "docs/architecture/testing-and-quality.md",
+  ".agents/skills/building-components/SKILL.md",
   ".agents/skills/prd-writer/SKILL.md",
   ".agents/skills/prd-review/SKILL.md",
   ".agents/skills/prd-implementer/SKILL.md",
@@ -91,5 +93,20 @@ describe("HGI-301 current-owner policy", () => {
     );
     expect(implementer).toContain("Delegation is optional");
     expect(implementer).toMatch(/primary trajectory remains\s+accountable/u);
+  });
+
+  it("keeps route and feature work out of presentation leaves", () => {
+    const composition = readRepositoryFile(
+      "docs/architecture/frontend-composition.md"
+    );
+    expect(composition).toContain(
+      "Presentation leaves own the narrow rendering"
+    );
+    expect(composition).toContain(
+      "Route and feature boundaries own data loading, Effect execution"
+    );
+    expect(composition).not.toContain(
+      "reads and mutations for the exact fragment"
+    );
   });
 });

@@ -332,12 +332,19 @@ If implementation discovers a real need for visible persistence management,
 stop and amend through a separate frontend SPEC governed by
 `docs/architecture/frontend-composition.md`. That SPEC must require:
 
+The accepted implementation originally described a leaf-owned query/mutation
+and command rule. That wording remains only as historical evidence and is not
+current architecture policy.
+
 ```text
 primitive -> composite -> layout -> route
 ```
 
-- leaf components owning their exact query/mutation, command, loading, empty,
-  error, retry, skeleton, and fallback states;
+- route or feature boundaries owning data loading, Effect execution, service/RPC
+  calls, auth, mutations, commands, shared workflows, and schema-owned URL
+  state; presentation leaves owning rendering, accessibility, local UI, and
+  loading, empty, error, retry, skeleton, and fallback display from narrow
+  readonly values and action callbacks;
 - no prop-drilling of query results, ids, loading flags, commands, or derived
   options through unrelated ancestors;
 - no nested feature wrappers that merely shorten route JSX, generic hooks that
