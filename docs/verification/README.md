@@ -61,6 +61,11 @@ operation nor asserts present provider state.
   same-ID provider retry suppression, Eve completion, provider-accepted reply,
   both typing transitions, scoped release, and one handset reply. Visible
   handset typing and every Production boundary remain unproved.
+- [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
+  proves the exact clean dual-Channel Production candidate, source/config and
+  rollback identities, provider inventories, signed route fixtures, and passed
+  staged preflight while the explicit stable domain remains unchanged. It is
+  not a promotion, live provider journey, handset, or visible-typing receipt.
 
 ## Claim boundaries
 

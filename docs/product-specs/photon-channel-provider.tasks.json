@@ -331,7 +331,7 @@
     {
       "id": "stage-dual-provider-production",
       "title": "Bind clean Production configuration and stage the dual-provider deployment",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["reconcile-photon-resources-and-preview"],
       "description": "Reconcile current Sendblue, Upstash, Photon, and Vercel metadata; bind only new Production Channel configuration; register the final Photon webhook; and deploy one Production candidate with domains skipped.",
       "implementationNotes": [
@@ -351,7 +351,9 @@
         "One rollback-ready immutable Production candidate is accepted without stable-domain traffic.",
         "Both provider webhook inventories and previous deployment references are exact and recoverable."
       ],
-      "evidence": [],
+      "evidence": [
+        "Accepted Production stage at 2026-07-23T00:13:22Z: pushed source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b produced READY candidate dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG while the explicit stable domain remained on dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb. Production metadata contained 22 clean Channel bindings and zero legacy bindings; the Free Upstash connection covered Preview and Production without a data read. Sendblue retained one assigned line and one clean receive webhook with provider truth adopted into sensitive bindings. Photon retained shared Free service, iMessage enabled, one approved of two total users, zero dedicated lines, and one new Production plus one preserved Preview webhook. Both routes returned unsigned 401 and signed ignored 204, candidate error/fatal logs were empty, and the channel-candidate-staged preflight passed with no rejection and detail digest 58f85db19c836ef6e5bdc74fe072389d448176004ea32b6c8e1c386e3f8a846d. See docs/verification/channel-production-staged-2026-07-23.md."
+      ],
       "commitAfterPassing": true
     },
     {
