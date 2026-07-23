@@ -452,6 +452,22 @@ owns the proof/non-claim boundary.
   target runbook and dated receipt. HGI-303/HGI-305 still own every missing
   target/journey, and HGI-304 still owns standing workflow/provider authority.
 
+### Production staged-source preflight correction
+
+- **Change required:** the agent Production preflight, its focused regression
+  suite, the deployment runbook, this active plan, and the Channel provider
+  SPEC/task ledger. The late Channel stages now compare the pushed SHA with the
+  new candidate only; they preserve independently observed source identities
+  for the accepted proxy and rollback agent.
+- **Preserve:** app/package READMEs, architecture owners, provider packages,
+  runtime Channel behavior, environment names, Preview receipts, historical
+  plans, and existing rollback deployments. No public boundary or command
+  changed.
+- **N/A:** frontend, DNS, generated/public API references, package release,
+  data migration, provider payloads, and unrelated app/package docs. The dated
+  Production stage receipt remains pending until the replacement immutable
+  candidate passes readback and route proof.
+
 ## Verification and evidence policy
 
 Each task records focused commands plus:

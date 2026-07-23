@@ -338,6 +338,7 @@
         "Preserve the approved Sendblue line and reconcile its receive webhook to the clean route without migrating old config/state behavior.",
         "Use the approved Upstash database only through a fresh physical prefix and never inspect, copy, clear, or import legacy replay keys.",
         "Bind BUNDJIL_CHANNEL_SENDBLUE_*, BUNDJIL_CHANNEL_PHOTON_*, BUNDJIL_CHANNEL_REPLAY_*, and BUNDJIL_CHANNEL_ROUTING_* to Production with sensitive/encrypted types and sanitized metadata readback.",
+        "Preserve the independently observed source identities of the accepted proxy and current rollback agent; only the new Channel candidate must match the current pushed SHA.",
         "Deploy from the clean pushed SHA using vercel deploy --prod --skip-domain and preserve current/previous deployment and config fingerprints before any alias change."
       ],
       "mandatoryVerification": [

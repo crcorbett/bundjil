@@ -677,6 +677,27 @@ describe("Production promotion preflight", () => {
       })
   );
 
+  it.effect(
+    "keeps rollback sources independent from a later Channel candidate",
+    () =>
+      Effect.gen(function* () {
+        const evidence = yield* decode({
+          ...channelCandidateStaged,
+          acceptedProxy: {
+            ...channelCandidateStaged.acceptedProxy,
+            sourceSha: "a".repeat(40),
+          },
+          acceptedAgent: {
+            ...channelCandidateStaged.acceptedAgent,
+            sourceSha: "b".repeat(40),
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.strictEqual(evidence.go, true);
+        assert.deepStrictEqual(evidence.rejected, []);
+      })
+  );
+
   vitestIt(
     "fails closed for wrong targets, scope, mode, hosts, OIDC, immutable references, and read-only state",
     () => {

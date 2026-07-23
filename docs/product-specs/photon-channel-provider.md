@@ -678,6 +678,10 @@ bindings, current and previous immutable deployments, Photon service type,
 approved shared-user/webhook inventory, Sendblue line/webhook inventory, and
 fresh replay/routing namespace without reading legacy replay data or exposing
 values. A missing or ambiguous resource is inconclusive, never healthy.
+The already-accepted proxy and rollback agent keep their independently
+observed source identities; only the new Channel candidate must match the
+current pushed SHA. A staged candidate cannot require its rollback deployment
+to have been built from the later candidate source.
 
 ### Spike 7: Photon shared-user and webhook rollout
 

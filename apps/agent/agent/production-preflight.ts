@@ -508,6 +508,11 @@ const legacyChannelBindings = (
 export const preflightProductionPromotion = Effect.fn(
   "ProductionPromotion.preflight"
 )(function* (snapshot: ProductionPreflightSnapshot) {
+  const verifiesAcceptedProxySource =
+    snapshot.stage === "proxy-accepted-agent-configured" ||
+    snapshot.stage === "agent-accepted-rollback-ready";
+  const verifiesAcceptedAgentSource =
+    snapshot.stage === "agent-accepted-rollback-ready";
   const rejected =
     snapshot.stage === "before-first-mutation"
       ? []
@@ -534,15 +539,16 @@ export const preflightProductionPromotion = Effect.fn(
                 snapshot.agent.bearerFingerprint
                   ? ["shared-preview-production-bearer"]
                   : []),
-                ...(snapshot.acceptedProxy.sourceSha ===
-                snapshot.source.pushedSha
+                ...(!verifiesAcceptedProxySource ||
+                snapshot.acceptedProxy.sourceSha === snapshot.source.pushedSha
                   ? []
                   : ["accepted-proxy-source-mismatch"]),
                 ...(snapshot.stage === "proxy-accepted-agent-configured"
                   ? []
                   : [
-                      ...(snapshot.acceptedAgent.sourceSha ===
-                      snapshot.source.pushedSha
+                      ...(!verifiesAcceptedAgentSource ||
+                      snapshot.acceptedAgent.sourceSha ===
+                        snapshot.source.pushedSha
                         ? []
                         : ["accepted-agent-source-mismatch"]),
                       ...(snapshot.rollback.proxy.current.deploymentId ===

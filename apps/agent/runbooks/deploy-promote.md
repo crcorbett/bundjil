@@ -132,6 +132,13 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    | `channel-candidate-staged`        | One pushed immutable candidate serves both routes with domains skipped; stable alias remains on the recorded current deployment                                                |
    | `channel-production-promotion`    | Candidate source/config/routes accepted; soak and rollback drill complete; Production activation remains false immediately before the approved promote                         |
 
+   The accepted proxy and current rollback agent retain their own observed
+   source identities during the Channel stages. They are not required to match
+   a later Channel candidate. `channel-candidate-staged` and
+   `channel-production-promotion` instead require the candidate source to match
+   the newly pushed SHA while preserving the distinct stable-alias rollback
+   deployment.
+
 5. **Mutation gate:** stop before deploy, promote, alias/environment change, or
    rollback until the complete stage-specific authority envelope is attached.
    When granted, operate one app and one stage only. Vercel's staged pattern is
