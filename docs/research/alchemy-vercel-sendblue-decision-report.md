@@ -3,7 +3,7 @@ document_type: research-report
 lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-24
 review_trigger: Alchemy provider support, Vercel, Sendblue, or Photon API changes, Bundjil deployment topology, messaging-provider selection, or infrastructure SPEC changes
 ---
 
@@ -44,24 +44,53 @@ Infrastructure proof must begin with `prd-writer`; a Photon migration would
 require a second provider-selection/channel-migration SPEC. Accepted SPECs are
 then implemented through `prd-implementer`.
 
-### Post-research implementation status — 2026-07-21
+### Post-research implementation and revalidation — 2026-07-24
 
-The later [Schema-driven Channels and Photon Preview proof SPEC](../product-specs/photon-channel-provider.md)
-implemented a clean provider-neutral Channel boundary plus fresh Sendblue and
-Photon packages. It deliberately migrated no legacy Sendblue behavior. Local
-dual-provider conformance and a bounded Photon management/SDK lifecycle proof
-passed; the hosted Preview/message journey stopped because Vercel authority and
-a live Space were absent. The [dated receipt](../verification/photon-provider-proof-2026-07-21.md)
-is the only live Photon observation and the
-[target runbook](../../apps/agent/runbooks/photon.md) owns repeatable proof
-operations.
+The later
+[Schema-driven Channels and Production promotion SPEC](../product-specs/photon-channel-provider.md)
+implemented a clean Channel boundary plus fresh Sendblue and Photon packages.
+It deliberately migrated no legacy Sendblue implementation. Dated Preview and
+Production receipts accepted both providers against one immutable deployment,
+including Photon signed ingress, replay, send, and typing proof. The Photon
+branch was merged into `origin/main` at
+`23ae79bfb3f383f7ff66f0698ac1ec49c51247fe` on 2026-07-24. Those receipts
+remain evidence only; they do not establish current provider state or grant a
+new operation.
 
-That implementation does not accept this report's Alchemy recommendation,
-select a Production provider, or establish current Vercel, Sendblue, or Photon
-topology. Current architecture is routed through
-[`../architecture/README.md`](../architecture/README.md); any Production
-provider selection or Alchemy ownership still requires a new `$prd-writer`
-SPEC.
+Photon is therefore no longer a conditional provider candidate for
+infrastructure planning. The new
+[Alchemy infrastructure SPEC](../product-specs/alchemy-vercel-photon-infrastructure.md)
+selects the current Vercel + Photon architecture and retains Sendblue
+management outside new Alchemy ownership.
+
+Mutable evidence was revalidated before that SPEC:
+
+- `/Users/cooper/Projects/site` is at
+  `bbadf2b00c5b861433319cf399a4f6f46d849d4d` with unrelated dirty
+  documentation/tooling. Its current Alchemy dependency and retained
+  Production receipts use `2.0.0-beta.64`.
+- npm's Alchemy `next` tag resolves to `2.0.0-beta.64`. The installed package
+  and current provider documentation still expose no native Vercel or Photon
+  provider. Core custom-provider, adoption, state, retention, refresh, and
+  test-provider capabilities remain applicable
+  ([custom providers](https://v2.alchemy.run/infrastructure-as-code/custom-provider/),
+  [resource lifecycle](https://v2.alchemy.run/infrastructure-as-code/resource-lifecycle/),
+  [testing](https://v2.alchemy.run/concepts/testing)).
+- Current Vercel REST documentation still exposes projects, environment
+  variables, domains, deployments, integrations/Marketplace, webhooks, and
+  drains but no Alchemy-native integration
+  ([Vercel REST API](https://vercel.com/docs/rest-api)).
+- Current Photon documentation still exposes project-scoped users, platforms,
+  webhooks, lines, billing readback, and the documented delivery retry
+  contract. Project deletion/secret rotation remain incomplete public API
+  lifecycles, dedicated line create remains billable without a documented
+  idempotency key, and no alert-policy or persistent delivery-log API was
+  established
+  ([Photon API](https://photon.codes/docs/api-reference/introduction)).
+
+No Vercel, Photon, Sendblue, Upstash, DNS, secret, deployment, webhook,
+message, or handset provider was queried or changed during the 2026-07-24
+revalidation.
 
 ## Truth and evidence boundaries
 

@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 179,
-    "sortedPathSha256": "175eb5330ea650d2eb2564e1fe9940bebe837bf26c6a96f6d40d3b201c00392f"
+    "pathCount": 182,
+    "sortedPathSha256": "491cd5a544c462b612ff1202dcb6f172f5860c75ea219e032a2080e6ecd8ba88"
   },
   "readmeInventory": {
     "pathCount": 22,
@@ -24,7 +24,7 @@
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried the 177-path corpus. The accepted Eve runtime-ownership SPEC and task list then expanded the current corpus to 179 paths without changing the scenario manifest, expected owners, skill bytes, or worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, and the Alchemy SPEC/task/active-plan slice re-inventories the current 182-path corpus. These path-accounting corrections change neither the scenario manifest, expected owners, skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."
