@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-07-23",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -191,9 +191,9 @@
       "escalation": "Sendblue account owner, Upstash owner, and Bundjil agent operator",
       "nonClaim": "HTTP 202 proves scheduled dispatch only, not Eve completion, reply, handset delivery, or current Production topology",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Sendblue or Upstash metadata readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one authenticated provider-RECEIVED inbound, stable signed route, fresh claim, Eve completion, exact-identity duplicate 204, and zero second external response to the accepted deployment"
       }
     },
     {
@@ -215,9 +215,9 @@
       "escalation": "Sendblue account owner and Bundjil agent operator",
       "nonClaim": "Transport success or provider acceptance does not prove handset delivery; uncertainty never authorizes blind retry",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Sendblue line, credential, message, or delivery readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one authenticated outbound readback, provider-accepted typing start/stop, and one handset reply to the accepted deployment; visible typing display remains unproved"
       }
     },
     {
@@ -239,9 +239,9 @@
       "escalation": "Upstash owner, secret-store owner, and Bundjil agent operator",
       "nonClaim": "Source atomicity and tests do not prove the current database, binding, namespace, credential, or hosted replay result",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Upstash replay database readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 staged and accepted Production receipts bind credential-hidden Free database metadata, isolated Preview/Production prefixes, fresh atomic claims, and duplicate suppression without retaining raw keys or values"
       }
     },
     {
@@ -350,7 +350,7 @@
       "resource": "Approved Photon project, shared iMessage service, one adopted or rollout-created shared user, zero dedicated lines, and exact Preview/Production webhook records",
       "environment": "Task-scoped Preview then Production rollout on 2026-07-21; each resource is named by stable provider identity in the protected operation receipt",
       "status": "bounded",
-      "durationRevocation": "Tasks reconcile-photon-resources-and-preview through promote-and-prove-dual-channel-production only; revoke project credentials and stop on task completion, expiry, target drift, or user revocation",
+      "durationRevocation": "Management mutation authority ended when promote-and-prove-dual-channel-production completed. Runtime credentials remain only under the separate inbound/outbound envelopes; rotate or revoke them on target drift, incident, or user revocation.",
       "approvalBoundary": "The user's direct 2026-07-21 approval permits Photon CRUD for this rollout; dedicated lines, billing-policy, unrelated project/resource, contact, message-history, and future operations are excluded from the accepted Free topology",
       "approvalReceipt": "Current Codex task in source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 plus docs/product-specs/photon-channel-provider.tasks.json",
       "auditEvidence": "Sanitized authenticated project/service/platform/shared-user/webhook counts and states, observedAt, stable-ID fingerprints, exact operation, postcondition, and rollback ownership",
@@ -359,9 +359,9 @@
       "escalation": "Photon project owner and Bundjil agent operator",
       "nonClaim": "Direct approval and repository source do not prove current Photon state, shared-user assignment, webhook delivery, message delivery, typing display, or Production",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "The earlier Free-tier dedicated-line receipt did not read the shared service or user inventory; corrected authenticated readback remains pending"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 staged and accepted receipts read back shared Free service, iMessage enabled, the exact approved user among two preserved users, zero dedicated lines, and one Production plus one Preview webhook"
       }
     },
     {
@@ -383,9 +383,9 @@
       "escalation": "Photon project owner, Upstash owner, and Bundjil agent operator",
       "nonClaim": "A 2xx acknowledgement proves only the named ingress disposition; it does not prove Eve completion, outbound acceptance, handset delivery, or typing display",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No hosted Photon Preview or Production signed-ingress journey has yet been observed for this promotion phase"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one signed inbound 202, fresh claim, Eve completion, exact real-identity duplicate 204, and zero second external response to the accepted stable deployment"
       }
     },
     {
@@ -407,9 +407,9 @@
       "escalation": "Photon project owner and Bundjil agent operator",
       "nonClaim": "Spectrum send or typing acceptance does not prove handset delivery or display; an unsupported-platform no-op is not a visible typing result",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No hosted Photon outbound, typing, or handset journey has yet been observed for this promotion phase"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds direct-Space resolution, one provider send, typing start/stop, scoped release, visible typing, and one handset reply to the accepted deployment"
       }
     },
     {

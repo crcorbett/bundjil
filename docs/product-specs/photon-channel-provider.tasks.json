@@ -1,7 +1,7 @@
 {
   "title": "Schema-Driven Channels And Production Promotion Tasks",
   "spec": "docs/product-specs/photon-channel-provider.md",
-  "status": "in_progress",
+  "status": "completed",
   "principles": [
     "Build the channel path cleanly from canonical Effect Schemas, Context.Service contracts, and explicit live/memory Layers; do not extract, wrap, migrate, or preserve the current Sendblue implementation.",
     "@bundjil/channel owns one narrow provider-neutral ChannelTransport; @bundjil/sendblue and @bundjil/photon provide it through separate Layers; apps/agent owns Eve, identity, fresh replay, dispatch, and composition.",
@@ -372,7 +372,7 @@
         "The stable domain resolves to the accepted immutable deployment and both provider webhook inventories resolve to its exact final route without redirects.",
         "Each provider has a separate proof packet tying source, deployment, provider, replay, dispatch, send, and typing outcomes together while excluding content and identities.",
         "A rollback drill or non-mutating rollback qualification proves the previous deployment/config is distinct and the retry quarantine procedure is executable.",
-        "Run post-promotion preflight/readback, both bounded journeys, monitoring checks, and full repository verification before committing the Production receipt."
+        "Retain the passed promotion preflight and run post-promotion target/provider readback, both bounded journeys, monitoring checks, and full repository verification before committing the Production receipt."
       ],
       "completionCriteria": [
         "Both clean Channel providers and both typing transitions work at the claimed Production boundary with zero duplicate response.",
@@ -386,7 +386,7 @@
     {
       "id": "reconcile-production-docs-and-closeout",
       "title": "Reconcile Production truth and run the final five-pass audit",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["promote-and-prove-dual-channel-production"],
       "description": "Update durable docs only to accepted source and dated provider truth, close the plan, and perform the required five-pass audit after every implementation and rollout task is terminal.",
       "implementationNotes": [
@@ -405,7 +405,9 @@
         "Current documentation routes directly to the accepted dual-provider Production topology, operations, proof, rollback, and limitations.",
         "The final five-pass audit is recorded once at the end and the plan is archived."
       ],
-      "evidence": [],
+      "evidence": [
+        "Final closeout accepted on 2026-07-23 after the promotion task was terminal. The five passes confirmed package/app ownership and public import graphs; Effect Service/Layer/Schema/Config and tagged-error quality with zero unsafe assertion or generic helper owners; focused provider/runtime proof plus complete repository verification; current docs, authority, operations, monitoring, and rollback routing; and zero tracked secret values, legacy config consumers/source tree, unsafe boundary escapes, retained proof payload markers, or Production binding artifacts. The audit corrected the deploy runbook and task contract so the passed pre-mutation promotion gate is retained and fresh post-promotion readback is required instead of an impossible post-promotion rerun. The active plan was then archived."
+      ],
       "commitAfterPassing": true
     }
   ],
@@ -427,8 +429,20 @@
     ]
   },
   "promotionCloseoutAudit": {
-    "status": "pending",
-    "passes": [],
-    "limitations": []
+    "status": "completed",
+    "completedAt": "2026-07-23",
+    "passes": [
+      "Ownership, imports, exports, and production/test/proof call graphs retain @bundjil/channel as the neutral contract, independent @bundjil/sendblue and @bundjil/photon Layers, and app-owned Eve, routing, replay, dispatch, and composition; the boundary audit passes.",
+      "Effect, Schema, Config, Layer, tagged-error, resource, and helper review found zero unsafe assertions, process/Bun environment reads, instanceof policy, or generic common/utils/helpers owner in the Channel replacement slice; named operations and explicit live/memory Layers remain intact.",
+      "Provider proof bound the accepted Vercel deployment to separate Photon and Sendblue ingress, Eve, outbound, typing, duplicate, and handset results; full repository verification passed with 76 tooling tests, 57 agent tests, 37 proxy tests, and all 14 workspace tasks.",
+      "Documentation, authority, operations, monitoring, and rollback review passed all docs, authority, controls, and verification policy gates and routes exact Preview, staged, Production, provider, handset, limitation, and rollback claims to dated owners.",
+      "Adversarial legacy, secret, unsafe-boundary, drift, and unsupported-claim scans found zero tracked credential values, legacy runtime config consumers or source tree, unsafe boundary escapes, tracked proof payload markers, or retained Production binding artifacts."
+    ],
+    "findingAndResolution": "Pass 4 found that the deploy runbook and promotion task required rerunning a pre-mutation preflight after promotion even though its stable-alias invariant intentionally changes at promotion. It also found stale inconclusive provider readbacks in the authority register. The runbook and task contract now retain the passed promotion gate and require fresh post-promotion target/provider readback; the register now cites the dated accepted receipts, and task-scoped Photon management authority expires at closeout while runtime authority remains separately bounded.",
+    "limitations": [
+      "Photon visible typing was observed in Production; Sendblue typing start and stop were provider-accepted but its handset display was not observed.",
+      "The Photon Production duplicate was an operator redelivery of the exact real provider message identity; the dated Preview receipt separately owns the real Photon provider retry claim.",
+      "The accepted Production runtime remains source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b; later documentation-only closeout commits do not change that deployed artifact and grant no standing provider or deployment authority."
+    ]
   }
 }

@@ -154,9 +154,11 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    establish handset delivery or typing display.
 
 7. Immediately repeat the project/list/inspect readbacks, resolve the stable
-   alias to the accepted immutable deployment, rerun the matching preflight,
-   and record the postcondition. Bind boundary-matched HTTP, session, message,
-   and Production results to the matching
+   alias to the accepted immutable deployment, retain the passed pre-promotion
+   preflight and record the post-promotion readback. Do not rerun that
+   pre-mutation stage as a passing postcondition: promotion intentionally
+   changes its stable-alias invariant. Bind boundary-matched HTTP, session,
+   message, and Production results to the matching
    [`docs/verification`](../../../docs/verification/README.md) packet. Repeat
    both provider journeys through the stable domain and bind them to
    `BND-J12-dual-channel-production`; a deployment status alone is

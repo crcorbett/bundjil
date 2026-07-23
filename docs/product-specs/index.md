@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-23
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -23,15 +23,12 @@ context.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.
-- [Schema-driven Channels and Production promotion](photon-channel-provider.md) —
-  clean provider implementation is complete; task-scoped Photon, Preview, and
-  dual-provider Production promotion is in progress.
 
 ## Implemented or superseded history
 
-Each of the twelve historical sibling ledger documents listed below records a
+Each of the thirteen historical sibling ledger documents listed below records a
 `tasks` array whose entries are `completed`. That array-level result does not
-mean the ledgers contain only task-completion fields: ten use ledger-level
+mean the ledgers contain only task-completion fields: eleven use ledger-level
 `status: completed`, the Effect persistence and Effect Schema string-contract
 ledgers use `status: implemented`, and the Vercel promotion ledger retains a
 historical, scoped `approval.status: granted`. These historical lifecycle and
@@ -47,6 +44,7 @@ approval fields are provenance, not standing authority.
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                  |
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
+| [Schema-driven Channels and Production promotion](photon-channel-provider.md)       | Implemented dual-provider rollout; dated receipt owns provider truth |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration history                                        |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented rollout history                                          |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented rollout history                                          |

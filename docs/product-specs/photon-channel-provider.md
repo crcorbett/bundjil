@@ -1,6 +1,6 @@
 ---
 document_type: product-specification
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-21
@@ -20,14 +20,17 @@ Sendblue source tree, configuration namespace, state, replay, typing lifecycle,
 and callback graph were not migrated.
 
 Deterministic local conformance and application journeys pass for both
-providers. An authorised, bounded Photon provider lifecycle proof created,
-read back, and deleted exactly one reserved webhook and exercised the scoped
-SDK lifecycle, restoring the observed zero-webhook topology. This is provider
-proof only: no Vercel Preview, handset delivery, Sendblue, or Production action
-was performed by the completed phase. The 2026-07-21 Production amendment
-below reopens this SPEC and task ledger for a full dual-provider rollout.
-Historical evidence remains evidence of its named boundary only; fresh
-authenticated readback owns every current provider and deployment claim.
+providers. The rollout then accepted Photon Preview, staged a clean
+dual-provider Production candidate, and promoted source
+`2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b` as Vercel deployment
+`dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG`. Separate Photon and Sendblue Production
+journeys proved signed ingress, one Eve result, one external response,
+exact-identity duplicate suppression, and both provider typing transitions.
+Both replies reached the handset; Photon visible typing was observed while
+Sendblue visible typing remains unproved. The dated
+[`channel-production-accepted-2026-07-23.md`](../verification/channel-production-accepted-2026-07-23.md)
+receipt owns that external truth. This completed SPEC and its task ledger are
+historical intent/provenance, not standing authority or current provider truth.
 
 ## Decision
 
