@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-07-23",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -191,9 +191,9 @@
       "escalation": "Sendblue account owner, Upstash owner, and Bundjil agent operator",
       "nonClaim": "HTTP 202 proves scheduled dispatch only, not Eve completion, reply, handset delivery, or current Production topology",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Sendblue or Upstash metadata readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one authenticated provider-RECEIVED inbound, stable signed route, fresh claim, Eve completion, exact-identity duplicate 204, and zero second external response to the accepted deployment"
       }
     },
     {
@@ -215,9 +215,9 @@
       "escalation": "Sendblue account owner and Bundjil agent operator",
       "nonClaim": "Transport success or provider acceptance does not prove handset delivery; uncertainty never authorizes blind retry",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Sendblue line, credential, message, or delivery readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one authenticated outbound readback, provider-accepted typing start/stop, and one handset reply to the accepted deployment; visible typing display remains unproved"
       }
     },
     {
@@ -239,9 +239,9 @@
       "escalation": "Upstash owner, secret-store owner, and Bundjil agent operator",
       "nonClaim": "Source atomicity and tests do not prove the current database, binding, namespace, credential, or hosted replay result",
       "readback": {
-        "availability": "unavailable",
-        "outcome": "inconclusive",
-        "evidence": "No authenticated current Upstash replay database readback was performed in HGI-304"
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 staged and accepted Production receipts bind credential-hidden Free database metadata, isolated Preview/Production prefixes, fresh atomic claims, and duplicate suppression without retaining raw keys or values"
       }
     },
     {
@@ -338,6 +338,78 @@
         "availability": "unavailable",
         "outcome": "inconclusive",
         "evidence": "No authenticated current Production proxy, Codex account, or remote model readback was performed in HGI-304"
+      }
+    },
+    {
+      "id": "photon-management",
+      "surface": "provider",
+      "target": "photon",
+      "principal": "Authenticated Bundjil Photon rollout operator using the exact project-scoped management credential",
+      "identitySource": "Photon Basic-auth project readback plus the accepted source, active rollout task, and current Codex approval receipt",
+      "operation": "List and reconcile the exact project Free managed-shared service, one approved shared user, platform, and environment-scoped webhooks required by the Channel rollout",
+      "resource": "Approved Photon project, shared iMessage service, one adopted or rollout-created shared user, zero dedicated lines, and exact Preview/Production webhook records",
+      "environment": "Task-scoped Preview then Production rollout on 2026-07-21; each resource is named by stable provider identity in the protected operation receipt",
+      "status": "bounded",
+      "durationRevocation": "Management mutation authority ended when promote-and-prove-dual-channel-production completed. Runtime credentials remain only under the separate inbound/outbound envelopes; rotate or revoke them on target drift, incident, or user revocation.",
+      "approvalBoundary": "The user's direct 2026-07-21 approval permits Photon CRUD for this rollout; dedicated lines, billing-policy, unrelated project/resource, contact, message-history, and future operations are excluded from the accepted Free topology",
+      "approvalReceipt": "Current Codex task in source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 plus docs/product-specs/photon-channel-provider.tasks.json",
+      "auditEvidence": "Sanitized authenticated project/service/platform/shared-user/webhook counts and states, observedAt, stable-ID fingerprints, exact operation, postcondition, and rollback ownership",
+      "rollback": "Delete only a rollout-created webhook or shared user by its stable ID, preserve adopted users, restore prior platform state only when changed by this rollout, and read back the complete approved inventory",
+      "stopCondition": "Stop on credential mode, project mismatch, non-shared service, ambiguous shared-user identity, unavailable identity, write-only secret loss, provider error, unavailable readback, or uncertain deletion",
+      "escalation": "Photon project owner and Bundjil agent operator",
+      "nonClaim": "Direct approval and repository source do not prove current Photon state, shared-user assignment, webhook delivery, message delivery, typing display, or Production",
+      "readback": {
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 staged and accepted receipts read back shared Free service, iMessage enabled, the exact approved user among two preserved users, zero dedicated lines, and one Production plus one Preview webhook"
+      }
+    },
+    {
+      "id": "photon-inbound",
+      "surface": "provider",
+      "target": "photon",
+      "principal": "Photon webhook service presenting the exact registered webhook ID, timestamp, and valid HMAC signature",
+      "identitySource": "Constant-time signature verification over exact body bytes plus environment-scoped webhook and routing identities",
+      "operation": "Accept, deduplicate, lease, and schedule one Photon direct-text inbound message for Eve processing",
+      "resource": "Exact Photon project, webhook, Space, message replay identity, agent deployment, and fresh Channel namespace",
+      "environment": "Explicit Preview or Production route and namespace; neither environment can substitute for the other",
+      "status": "bounded",
+      "durationRevocation": "One webhook request and bounded replay lease; revoke the exact webhook or signing material through Photon management authority",
+      "approvalBoundary": "Valid signed ingress permits processing only; it does not approve a provider mutation, outbound message, typing consequence, or unrelated Eve tool operation",
+      "approvalReceipt": "Sanitized webhook classification, replay result, exact source/deployment identity, and separate bounded Eve journey receipt",
+      "auditEvidence": "Webhook status class, stable-ID fingerprints, replay disposition, dispatch result, observedAt, limitations, and non-claims without body, content, phone, Space, or message values",
+      "rollback": "Disable/delete the exact rollout webhook under photon-management authority, preserve replay evidence, drain in-flight retries, and read back the webhook inventory",
+      "stopCondition": "Stop on signature, timestamp, webhook, route, namespace, duplicate, lease, deployment, environment, or provider mismatch",
+      "escalation": "Photon project owner, Upstash owner, and Bundjil agent operator",
+      "nonClaim": "A 2xx acknowledgement proves only the named ingress disposition; it does not prove Eve completion, outbound acceptance, handset delivery, or typing display",
+      "readback": {
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds one signed inbound 202, fresh claim, Eve completion, exact real-identity duplicate 204, and zero second external response to the accepted stable deployment"
+      }
+    },
+    {
+      "id": "photon-outbound",
+      "surface": "provider",
+      "target": "photon",
+      "principal": "Bundjil agent using the environment-scoped Photon project credential and pinned Spectrum SDK",
+      "identitySource": "Exact agent deployment/config, Photon project/shared-user/Space metadata, approved test conversation, and one-run operation authority",
+      "operation": "Send one bounded text response or one typing start/stop operation to the exact Photon Space",
+      "resource": "Exact Photon project, managed-shared user assignment, Space, message turn, and typing operation",
+      "environment": "Explicit Preview proof or Production messaging environment with a separate replay/routing namespace",
+      "status": "foreground_only",
+      "durationRevocation": "One message or typing transition; revoke the webhook/project credential or stop the deployment under its separate owner",
+      "approvalBoundary": "The user's rollout approval permits only the bounded proof conversation and ordinary accepted inbound replies; generated output cannot widen recipient, content, provider, or operation",
+      "approvalReceipt": "Exact actor, task, deployment, provider operation, target fingerprint, observedAt, provider acceptance, and separate handset observation if available",
+      "auditEvidence": "Sanitized SDK/provider result class, replay identity fingerprint, typing action, latency, limitation, and non-claim without content, phone, Space, message, or credential values",
+      "rollback": "Messages cannot be assumed retractable; stop further sends, reconcile uncertain provider state without retry, revoke exact runtime authority, and preserve the previous deployment",
+      "stopCondition": "Stop on shared-user/Space ambiguity, wrong environment, uncertain send, duplicate operation, typing failure, SDK release failure, target drift, or absent readback",
+      "escalation": "Photon project owner and Bundjil agent operator",
+      "nonClaim": "Spectrum send or typing acceptance does not prove handset delivery or display; an unsupported-platform no-op is not a visible typing result",
+      "readback": {
+        "availability": "available",
+        "outcome": "verified",
+        "evidence": "The 2026-07-23 Production receipt binds direct-Space resolution, one provider send, typing start/stop, scoped release, visible typing, and one handset reply to the accepted deployment"
       }
     },
     {

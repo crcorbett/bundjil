@@ -3,13 +3,13 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-24
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
 # Bundjil verification
 
-This is the canonical route for the ten consumer-visible critical journeys,
+This is the canonical route for the twelve consumer-visible critical journeys,
 proof packet contract, bounded command receipts, retained evidence index, and
 recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
@@ -33,6 +33,50 @@ operation nor asserts present provider state.
   requalification triggers, fresh-context discipline, and intervention
   lifecycle. [`effectiveness.md`](effectiveness.md) owns accepted outcomes,
   the four clocks, human attention, and evidence-limited comparisons.
+- [`photon-provider-proof-2026-07-21.md`](photon-provider-proof-2026-07-21.md)
+  retains the bounded pre-promotion Photon management/SDK lifecycle receipt;
+  it is not Preview, messaging, handset, or Production proof.
+- [`photon-resource-reconciliation-2026-07-21.md`](photon-resource-reconciliation-2026-07-21.md)
+  retains the bounded dedicated-line attempt and zero-mutation readback. Its
+  Business-upgrade conclusion is superseded by the current Free managed-shared
+  topology; it proves no Preview, message, typing, Sendblue, or Production result.
+- [`photon-preview-2026-07-21.md`](photon-preview-2026-07-21.md) retains the
+  hosted Preview deployment, Marketplace binding, protection, and
+  signed-ingress proof plus the inconclusive first messaging attempt. It is not
+  outbound, handset, duplicate, Eve-completion, or Production proof.
+- [`photon-corrected-recipient-2026-07-22.md`](photon-corrected-recipient-2026-07-22.md)
+  retains the corrected Australian managed-shared user reconciliation and one
+  unretried uncertain local SDK send. It proves neither provider acceptance nor
+  handset delivery and leaves the Production gate closed.
+- [`photon-local-stream-2026-07-22.md`](photon-local-stream-2026-07-22.md)
+  proves one exact Free per-user assigned route through local Spectrum inbound,
+  provider-accepted reply, clean SDK release, and handset reply observation. It
+  is not webhook, Eve, replay, duplicate, visible-typing, Preview, or Production
+  proof.
+- [`photon-sdk-version-refresh-2026-07-22.md`](photon-sdk-version-refresh-2026-07-22.md)
+  records the exact latest-stable Spectrum 12.3.0 manifest/lock refresh and
+  repository compatibility gates. It performs no provider operation and does
+  not upgrade the 12.2.0 handset receipt into 12.3.0 live proof.
+- [`photon-preview-participant-resolution-2026-07-22.md`](photon-preview-participant-resolution-2026-07-22.md)
+  retains the 12.3.0 hosted signed-ingress/Eve observation, failed opaque-Space
+  outbound diagnosis, and local participant-based DM correction. It is not a
+  successful outbound, typing, handset, duplicate, or Production proof.
+- [`photon-preview-accepted-2026-07-23.md`](photon-preview-accepted-2026-07-23.md)
+  proves the exact 12.3.0 hosted Preview source/deployment, signed ingress,
+  same-ID provider retry suppression, Eve completion, provider-accepted reply,
+  both typing transitions, scoped release, and one handset reply. Visible
+  handset typing and every Production boundary remain unproved.
+- [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
+  proves the exact clean dual-Channel Production candidate, source/config and
+  rollback identities, provider inventories, signed route fixtures, and passed
+  staged preflight while the explicit stable domain remains unchanged. It is
+  not a promotion, live provider journey, handset, or visible-typing receipt.
+- [`channel-production-accepted-2026-07-23.md`](channel-production-accepted-2026-07-23.md)
+  proves the accepted stable-domain Production deployment, separate real
+  Photon and Sendblue handset journeys, exact-identity duplicate suppression,
+  provider typing start/stop, rollback readiness, and zero second external
+  response. Photon visible typing is observed; Sendblue visible typing remains
+  unproved.
 
 ## Claim boundaries
 
@@ -41,15 +85,20 @@ local postconditions. A Preview packet is not a Production packet. A packet
 whose required external readback is unavailable is `inconclusive`; it may not
 become `proved`, `passed`, or a provider-health claim. HGI-309 owns any approved
 provider readback, mutation, send, deployment, promotion, or approval-resume
-qualification.
+qualification unless an accepted current SPEC and target-owned runbook record
+the exact task-scoped authority. Historical Channel rollout authority grants no
+standing authority after its task closed.
 
 Current qualification is explicit in `journey-command-map.json`. Workspace
 status and local proxy mock health/auth/SSE are locally proved. Gateway
 session creation/recovery is deferred because no deterministic session and
 interrupted-stream recovery fixture exists. Local reauthentication,
 Sendblue/provider rejection, and deployment preflight have only partial local
-contract proof. Sendblue sends, Executor reads/resumes, deployment/promotion,
-and incident containment/recovery remain approval-gated external journeys.
+contract proof. Future Sendblue or Photon sends, Executor reads/resumes,
+deployment/promotion, and incident containment/recovery remain approval-gated
+external journeys. The accepted dual-Channel Production journey is retained
+only in its dated receipt and grants no standing authority for another
+operation.
 
 For an external or approval-gated journey, first use the app-owned runbook:
 [`../../apps/agent/runbooks/README.md`](../../apps/agent/runbooks/README.md) or

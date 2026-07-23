@@ -80,6 +80,7 @@ const AuthorityRecord = Schema.Struct({
     "vercel",
     "executor",
     "sendblue",
+    "photon",
     "upstash",
     "secret-store",
     "ai-gateway",
@@ -199,6 +200,24 @@ const requiredAuthorityRecords = [
     status: "foreground_only",
     surface: "provider",
     target: "sendblue",
+  },
+  {
+    id: "photon-management",
+    status: "bounded",
+    surface: "provider",
+    target: "photon",
+  },
+  {
+    id: "photon-inbound",
+    status: "bounded",
+    surface: "provider",
+    target: "photon",
+  },
+  {
+    id: "photon-outbound",
+    status: "foreground_only",
+    surface: "provider",
+    target: "photon",
   },
   {
     id: "upstash-sendblue-replay",

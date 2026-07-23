@@ -14,6 +14,9 @@ does not speak for those traditions.
 - `apps/agent` owns the Eve app, model selection, channels, instructions,
   tools, and deployment boundary.
 - `apps/codex-proxy` owns the private Effect HTTP proxy boundary.
+- `packages/channel` owns provider-neutral direct-text Channel contracts.
+- `packages/sendblue` owns the Sendblue `ChannelTransport` implementation.
+- `packages/photon` owns the Photon Spectrum `ChannelTransport` implementation.
 - `packages/eve` owns Eve-facing Schemas and named operations.
 - `packages/codex` owns Codex subscription profile, storage, refresh, and
   private provider contracts.
@@ -32,6 +35,8 @@ current architecture—not this overview.
 - [Current execution plans](./docs/exec-plans/active/README.md)
 - [Critical journeys and proof packets](./docs/verification/README.md)
 - [Completed history](./docs/exec-plans/completed/README.md)
+- [Target-owned agent runbooks](./apps/agent/runbooks/README.md)
+- [Bounded verification evidence](./docs/verification/README.md)
 - [App and package READMEs](./docs/README.md#routes) for local public commands
   and boundaries
 

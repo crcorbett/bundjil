@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -20,6 +20,9 @@ apps/
   codex-proxy/        Private Effect HTTP proxy app for Codex provider proof.
 
 packages/
+  channel/            Provider-neutral direct-text Channel contracts.
+  sendblue/           Sendblue ChannelTransport adapter.
+  photon/             Photon Spectrum ChannelTransport adapter.
   store/              Provider-neutral native/atomic persistence and adapters.
   codex/              Complete Codex integration and intent-based exports.
   eve/                Eve contracts, workspace status, and schema bridge.
@@ -29,6 +32,8 @@ docs/
   product-specs/      Specs and task ledgers; completed records keep provenance.
   exec-plans/active/  Plans for work that is actually in progress.
   exec-plans/completed/  Accepted and superseded execution evidence.
+  runbooks/           Target-owned consequential operations.
+  verification/       Dated bounded proof receipts.
 
 lint/
   oxlint-plugin.ts        Repository-owned structural lint rules.
@@ -56,8 +61,8 @@ needs it.
   a Layer, a repository pattern, or another implementation mechanism.
 - Keep provider qualifiers only when the capability genuinely wraps that
   provider boundary. Provider-specific adapters such as Codex, Eve, Sendblue,
-  Executor, and Upstash retain their owner names; provider-neutral contracts do
-  not inherit a provider qualifier from one implementation.
+  Photon, Executor, and Upstash retain their owner names; provider-neutral
+  contracts do not inherit a provider qualifier from one implementation.
 - `@bundjil/eve` owns reusable Eve operation contracts and the Effect
   Schema bridge to Eve, including the workspace-status feature.
 - `@bundjil/store` owns native `KeyValueStore` composition,
@@ -86,20 +91,24 @@ apps/agent/
     connections/
       executor.ts     thin Eve Executor MCP definition
     channels/
-      sendblue.ts     thin Eve route/event adapter
+      eve.ts          Eve auth policy
+      sendblue.ts     thin Sendblue route/composition edge
+      photon.ts       thin Photon route/composition edge
     lib/executor/
       config.ts       app-owned Executor endpoint policy and Redacted bearer
-    lib/sendblue/     app-owned Sendblue contracts, services, and Layers
+    lib/channel/      provider-neutral app identity/routing/replay/orchestration
     tools/            Eve tool modules
   test/               app-level tool and runtime-edge tests
   README.md           app usage and verification guide
 ```
 
 Eve's `agent/lib` directory is the framework's import-only authored slot, not a
-general-purpose shared-code bucket. Its immediate children name owned
-integrations such as `sendblue` and `executor`. Discovery identities remain the
-direct `channels/sendblue.ts` and `connections/executor.ts` files; do not
-replace them with nested `index.ts` entrypoints.
+general-purpose shared-code bucket. `lib/channel` owns app-only identity,
+routing, replay, orchestration, dispatch, state Schemas, and provider
+composition roots; `lib/executor` owns the Executor integration. Discovery
+identities remain the direct `channels/sendblue.ts`, `channels/photon.ts`, and
+`connections/executor.ts` files; do not replace them with nested `index.ts`
+entrypoints.
 
 `apps/codex-proxy` owns the private Codex provider HTTP runtime:
 
@@ -129,18 +138,24 @@ import server-safe layers from
 `@bundjil/codex/runtime`; trusted-local browser, loopback, and login
 composition is isolated behind `@bundjil/codex/local`.
 
-The Production-verified Sendblue channel remains app-owned in
-`apps/agent/agent/channels/sendblue.ts` and `agent/lib/sendblue/`; retained
-Preview evidence does not make it a shared package contract. Future Cloudflare
-email, Vercel Connect, and Notion code should likewise start in app-owned
-boundaries. Move shared contracts into packages only after the shape has
-survived at least one real tool/channel implementation.
+The accepted clean Channel boundary now has proven consumers. Provider-neutral
+transport contracts live in `@bundjil/channel`; Sendblue and Photon wire/client
+logic lives in `@bundjil/sendblue` and `@bundjil/photon`; the app owns all Eve,
+identity, routing, replay, dispatch, and provider-composition policy. Packages
+must not import the app or each other through deep source paths.
 
-`apps/agent` keeps Sendblue replay keys, record schemas, TTL policy, and
-delivery decisions app-owned. It composes the shared persistence `/upstash`
-Layer from app-owned redacted config. Replay/idempotency storage is not Eve
-conversation history, session-stream persistence, or a generic Workflow store;
-the adapter must preserve the pre-existing physical key, encoded value, and TTL.
+`apps/agent` owns the new versioned Channel replay key, record Schema, lease,
+TTL, retry/uncertain policy, and outbound event-coordinate claims. It composes
+the shared persistence `/upstash` Layer from app-owned redacted config.
+Replay/idempotency storage is not Eve conversation history, session-stream
+persistence, or a generic Workflow store. The clean path deliberately does not
+preserve or inspect the removed legacy Sendblue physical key, value, typing
+state, or continuation algorithm.
+
+Future Cloudflare email, Vercel Connect, and Notion code starts in an app-owned
+adapter until its stable reusable contract is proven. A new provider that can
+implement the existing `ChannelTransport` may begin in a provider package only
+after an accepted SPEC defines its wire/client boundary and app composition.
 
 The Executor MCP connection is also app-owned: `agent/lib/executor/config.ts`
 owns its Effect Config endpoint policy and redacted bearer, while
@@ -161,6 +176,44 @@ the provider catalog, key, policy records, paused state, or deployment control
 plane.
 
 ## Package Boundaries
+
+`@bundjil/channel`:
+
+- owns branded provider, conversation, participant, inbound-message, and
+  provider-message identities plus decoded direct-text transport values;
+- owns the nominal `ChannelTransport` service with `decodeWebhook`,
+  `sendMessage`, and `setPresence` operations and a common safe tagged-error
+  vocabulary;
+- exposes explicit root, `/memory`, and `/testing` boundaries;
+- accepts raw `Request` only at `decodeWebhook` so a provider adapter can
+  authenticate exact bytes and headers;
+- owns no provider SDK/client, Eve adapter, environment name, replay policy,
+  persistence, management operation, or deployment concern.
+
+`@bundjil/sendblue`:
+
+- owns Sendblue E.164 and private wire Schemas, webhook authentication, HTTP
+  request/response codecs, safe error translation, and live/memory
+  `ChannelTransport` Layers;
+- accepts an already decoded `SendblueConfig`; app config owns environment
+  binding names and provides the Effect HTTP client Layer;
+- exposes no raw HTTP client, DTO, callback, Promise, account-management
+  operation, replay behavior, or delivery claim;
+- maps provider queue/send/delivery statuses to Channel `accepted`, never
+  handset-delivered proof.
+
+`@bundjil/photon`:
+
+- owns Photon config and webhook Schemas, raw-body HMAC verification, the
+  private pinned Spectrum SDK/Space boundary, safe error translation, and
+  scoped live/memory `ChannelTransport` Layers;
+- keeps SDK clients, Spaces, callbacks, Zod/Promise values, and management
+  operations private; only the target-owned proof executable uses its internal
+  management and lifecycle services;
+- exposes root, `/config`, `/live`, and `/memory` boundaries, with exact
+  `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.3.0` pins;
+- owns no Eve, identity, routing, replay, persistence, environment binding,
+  provider-selection, deployment, or Production policy.
 
 `@bundjil/eve`:
 

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-307-photon-merge-inventory-correction",
+  "status": "passed",
+  "observedAt": "2026-07-24T00:30:44+01:00",
+  "baseIdentities": {
+    "main": "7019a4167cb4ebd09be23ce61d0c6701a3a29f2b",
+    "photonBranch": "7ddcdc514af5d3edee1b151575a3ce18226268bb"
+  },
+  "authority": "Repository merge, documentation, and local verification only; no Photon, Sendblue, Vercel, deployment, credential, webhook, message, provider readback, or mutation authority.",
+  "docsMaintainerImpact": [
+    {
+      "area": "docs",
+      "decision": "changed",
+      "owners": [
+        "docs/README.md",
+        "docs/product-specs/index.md",
+        "docs/exec-plans/completed/README.md"
+      ],
+      "evidence": "Merged the implemented Photon SPEC, completed plan, research update, and current routes while preserving the newer main harness lifecycle."
+    },
+    {
+      "area": "readmes",
+      "decision": "changed",
+      "owners": [
+        "README.md",
+        "apps/agent/README.md",
+        "packages/channel/README.md",
+        "packages/photon/README.md",
+        "packages/sendblue/README.md"
+      ],
+      "evidence": "Added the accepted Channel, Photon, and Sendblue public package routes and retained app command ownership."
+    },
+    {
+      "area": "architecture",
+      "decision": "changed",
+      "owners": [
+        "docs/architecture/effect-patterns.md",
+        "docs/architecture/eve-agent.md",
+        "docs/architecture/repo-structure.md"
+      ],
+      "evidence": "Merged the Schema-driven Channel transport boundary and retained the current main architecture/control guidance."
+    },
+    {
+      "area": "public_or_generated_references",
+      "decision": "not_applicable",
+      "owners": ["docs/README.md"],
+      "evidence": "No generated API reference or public website surface is owned by this repository merge."
+    },
+    {
+      "area": "runbooks",
+      "decision": "changed",
+      "owners": [
+        "apps/agent/runbooks/photon.md",
+        "apps/agent/runbooks/sendblue.md",
+        "apps/agent/runbooks/deploy-promote.md"
+      ],
+      "evidence": "Merged target-owned Photon and dual-Channel operational procedures without executing them."
+    },
+    {
+      "area": "proof_and_evidence",
+      "decision": "changed",
+      "owners": [
+        "docs/verification/README.md",
+        "docs/verification/critical-journeys.json",
+        "docs/verification/journey-command-map.json"
+      ],
+      "evidence": "Merged bounded dated Preview and Production receipts and preserved their explicit non-current provider-truth limits."
+    },
+    {
+      "area": "skills",
+      "decision": "preserved",
+      "owners": [
+        ".agents/skills/docs-maintainer/SKILL.md",
+        ".agents/skills/effect-client-wrapper/SKILL.md"
+      ],
+      "evidence": "No skill bytes or mirrors changed in the merge; current main skill policy remains authoritative."
+    },
+    {
+      "area": "lint_config_and_ci",
+      "decision": "changed",
+      "owners": [
+        "turbo.json",
+        "knip.json",
+        "docs/architecture/testing-and-quality.md"
+      ],
+      "evidence": "Merged package/build boundaries while preserving the current main harness evaluation gate and CI command."
+    },
+    {
+      "area": "tests",
+      "decision": "changed",
+      "owners": [
+        "packages/channel/test/channel-transport.test.ts",
+        "packages/photon/test/photon-transport.test.ts",
+        "packages/sendblue/test/sendblue-transport.test.ts",
+        "apps/agent/test/sendblue-channel.test.ts"
+      ],
+      "evidence": "Merged the provider and vertical test suites; the accepted result vocabulary remains provider acceptance rather than handset delivery."
+    },
+    {
+      "area": "active_spec_tasks_and_plan",
+      "decision": "preserved",
+      "owners": [
+        "docs/product-specs/index.md",
+        "docs/exec-plans/active/README.md"
+      ],
+      "evidence": "Photon rollout material is completed history; the unrelated Codex Terra work remains the only active implementation."
+    }
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The merge adds package, runbook, proof, and completed-history paths but does not change the HGI-307 scenario manifest, expected owner set, worker identity, skill bytes, or accepted worker reports.",
+    "limitation": "This correction does not requalify HGI-307 against Photon behavior and does not upgrade any dated Photon receipt into current provider truth."
+  },
+  "retainedFailure": {
+    "command": "bun run verification",
+    "lastSuccessfulStep": "Effect, boundary, documentation, skill, authority, control, and twelve-journey verification gates passed.",
+    "observedState": "HARNESS-DOCS-INVENTORY and HARNESS-README-INVENTORY rejected the pre-merge current path inventory.",
+    "recovery": "Refresh only the current path counts and digests while preserving the original epoch, reports, scenario manifest, and historical acceptance receipt.",
+    "nonClaim": "An inventory mismatch is not a Photon, Sendblue, Vercel, deployment, message, or Production result."
+  },
+  "checks": [
+    {
+      "command": "bun run --filter @bundjil/channel test; bun run --filter @bundjil/photon test; bun run --filter @bundjil/sendblue test",
+      "status": "passed",
+      "result": "Channel passed 2 tests, Photon passed 25 tests, and Sendblue passed 9 tests."
+    },
+    {
+      "command": "BUNDJIL_EXECUTOR_MCP_URL='<approved-host-shaped synthetic URL>' BUNDJIL_EXECUTOR_API_KEY='<test-only value>' bun run --cwd apps/agent test",
+      "status": "passed",
+      "result": "The agent built and passed 57 tests without an authenticated Executor request."
+    },
+    {
+      "command": "BUNDJIL_EXECUTOR_MCP_URL='<approved-host-shaped synthetic URL>' BUNDJIL_EXECUTOR_API_KEY='<test-only value>' bun run verification",
+      "status": "passed",
+      "result": "Effect, boundary, docs, skills, authority, controls, twelve journeys, HGI-307 inventory, 87 tooling tests, format/lint, Knip, eight package typechecks, and fourteen package build/test tasks passed."
+    }
+  ],
+  "limitations": [
+    "The original HGI-307 epoch remains bound to its recorded base commit and worker reports.",
+    "The merge preserves dated Photon proof as evidence only and performs no external readback.",
+    "The checked-out main worktree contains unrelated local edits and is intentionally untouched."
+  ],
+  "nonClaims": [
+    "No provider state, credential, deployment, webhook, line, user, message, handset, billing, or Production system was read or changed.",
+    "No recurring automation or future provider operation is authorised by this receipt."
+  ]
+}

@@ -19,7 +19,10 @@
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
+    "@bundjil/channel": "workspace:*",
     "@bundjil/eve": "workspace:*",
+    "@bundjil/photon": "workspace:*",
+    "@bundjil/sendblue": "workspace:*",
     "@bundjil/store": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
     "ai": "^7.0.16",

@@ -299,5 +299,72 @@
     "nonClaims": [
       "HGI-305 does not perform containment, revocation, rollback, or recovery; HGI-309 and the app runbooks own external action."
     ]
+  },
+  {
+    "id": "BND-J11-photon-accepted-message-typing",
+    "actorOrConsumer": "approved Photon test conversation and Bundjil agent operator",
+    "boundary": "Photon signed ingress, fresh replay, Eve dispatch, outbound acceptance, typing start/stop, and SDK release",
+    "startingState": "one exact Photon project, Free managed-shared service, exact approved shared user assignment, zero dedicated lines, environment webhook, accepted immutable deployment, fresh namespace, and task-scoped approval are attached",
+    "inputs": [
+      "one approved direct-text inbound event",
+      "one duplicate delivery of the same event identity",
+      "one outbound response and typing start/stop lifecycle"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/photon.md",
+    "expectedBehavior": [
+      "The signed message is dispatched once, the duplicate is suppressed, and one outbound result is classified without blind retry.",
+      "Typing start and stop each return a decoded accepted, no-op, or safe failure result and the scoped SDK releases."
+    ],
+    "expectedSideEffects": [
+      "One approved Photon message and two bounded typing operations may reach the exact test conversation."
+    ],
+    "preservedInvariants": [
+      "Provider acceptance is not handset delivery or typing display.",
+      "No content, phone, assigned routing number, Space, message, user, webhook, project, or secret value enters durable evidence."
+    ],
+    "oracle": "A Photon messaging packet binds source/deployment, signed ingress, replay, Eve, outbound, typing start/stop, release, provider readback, limitations, and rollback identity.",
+    "environment": "approval-gated Photon Preview or Production target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/photon.md",
+      "docs/verification/templates/messaging.json"
+    ],
+    "nonClaims": [
+      "Local fixtures, SDK acceptance, or an HTTP 2xx do not prove hosted processing, handset delivery, typing display, or Production."
+    ]
+  },
+  {
+    "id": "BND-J12-dual-channel-production",
+    "actorOrConsumer": "Production deployment operator and approved Sendblue/Photon test conversations",
+    "boundary": "stable Vercel alias plus both clean Channel provider routes and their provider-accepted typing lifecycles",
+    "startingState": "one accepted staged Production deployment, exact stable alias, current/previous rollback references, reconciled provider webhooks, fresh namespace, and approval are attached",
+    "inputs": [
+      "one bounded Sendblue ingress/outbound/typing journey",
+      "one bounded Photon ingress/outbound/typing journey",
+      "stable alias and provider metadata readbacks"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
+    "expectedBehavior": [
+      "The stable alias resolves to the accepted immutable deployment and both final webhook routes avoid redirects.",
+      "Each provider processes one turn once and reports outbound plus typing start/stop outcomes at the exact claimed boundary."
+    ],
+    "expectedSideEffects": [
+      "The accepted deployment is promoted and one approved message plus two typing operations per provider may occur."
+    ],
+    "preservedInvariants": [
+      "No legacy config, replay data, typing lifecycle, or provider fallback is read or migrated.",
+      "Provider acceptance, Eve completion, handset delivery, and typing display remain separate claims."
+    ],
+    "oracle": "A Production packet binds the stable and immutable Vercel readbacks to separate Sendblue and Photon packets, zero duplicate responses, monitoring, and rollback readiness.",
+    "environment": "approval-gated Production target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/deploy-promote.md",
+      "docs/verification/templates/production.json",
+      "docs/verification/templates/messaging.json"
+    ],
+    "nonClaims": [
+      "A promoted deployment or provider acceptance alone does not prove both journeys, handset delivery, or visible typing."
+    ]
   }
 ]

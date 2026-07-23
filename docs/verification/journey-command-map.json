@@ -83,6 +83,22 @@
       "claimScope": "approval_gated",
       "procedureOwner": "apps/agent/runbooks/incident-revocation.md and apps/codex-proxy/runbooks/incident-revocation.md",
       "externalReadback": "required before and after an external containment/recovery claim"
+    },
+    {
+      "journeyId": "BND-J11-photon-accepted-message-typing",
+      "environment": "approval-gated Photon Preview or Production target",
+      "command": "run the named Photon procedure only after its management, ingress, and outbound authority gates",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/photon.md",
+      "externalReadback": "required for provider acceptance; handset delivery and typing display require separate observation"
+    },
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "environment": "approval-gated Production target",
+      "command": "run the staged promotion procedure, then the named Sendblue and Photon procedures",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
+      "externalReadback": "required for Vercel and both providers; each handset observation remains separate"
     }
   ]
 }

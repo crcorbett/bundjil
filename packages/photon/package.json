@@ -1,0 +1,60 @@
+{
+  "name": "@bundjil/photon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Photon Spectrum ChannelTransport Layers for Bundjil.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcorbett/bundjil.git",
+    "directory": "packages/photon"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "@bundjil/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./live": {
+      "@bundjil/source": "./src/live.layer.ts",
+      "types": "./dist/live.layer.d.ts",
+      "default": "./dist/live.layer.js"
+    },
+    "./config": {
+      "@bundjil/source": "./src/schemas.ts",
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
+    },
+    "./memory": {
+      "@bundjil/source": "./src/memory.layer.ts",
+      "types": "./dist/memory.layer.d.ts",
+      "default": "./dist/memory.layer.js"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check-types": "tsc --noEmit",
+    "delete:environment-webhook": "bun run scripts/delete-environment-webhook.ts",
+    "proof:provider": "bun run scripts/prove-provider.ts",
+    "register:environment-webhook": "bun run scripts/register-environment-webhook.ts",
+    "reconcile:resources": "bun run scripts/reconcile-resources.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bundjil/channel": "workspace:*",
+    "@grpc/grpc-js": "1.14.4",
+    "@spectrum-ts/core": "12.3.0",
+    "@spectrum-ts/imessage": "12.3.0",
+    "effect": "catalog:effect",
+    "nice-grpc": "2.1.16",
+    "nice-grpc-common": "2.0.3"
+  },
+  "devDependencies": {
+    "@effect/platform-bun": "catalog:effect",
+    "@effect/vitest": "catalog:effect",
+    "typescript": "catalog:typescript",
+    "vitest": "catalog:testing"
+  }
+}

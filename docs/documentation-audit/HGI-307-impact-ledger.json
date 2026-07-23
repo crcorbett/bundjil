@@ -3,12 +3,12 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 163,
-    "sortedPathSha256": "04f108553bc5bdb076440224fc29992c1eb14cb684e530c9432a10a8ac1c848f"
+    "pathCount": 177,
+    "sortedPathSha256": "4a67525e1440157f1fe481f849b7b5a4a0a5684c682eea7c32015a5decafd079"
   },
   "readmeInventory": {
-    "pathCount": 19,
-    "sortedPathSha256": "8d85d2c6416cc145137eea5a9b8420a94da09a35af7e1b776d920914ced9f024"
+    "pathCount": 22,
+    "sortedPathSha256": "90bd5f38a4403f9c78ad6114674b1d31438a087ef3bfbf7f780d274cd01544df"
   },
   "impactAreas": [
     {
@@ -24,7 +24,7 @@
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the current 163-path docs corpus after accepted harness provenance moved out of active intent; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventories the current 177-path corpus without changing the scenario manifest, expected owners, skill bytes, or worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."
@@ -39,7 +39,7 @@
         "The docs router now routes harness epochs and effectiveness; the root README remains a product/workspace route rather than provider truth."
       ],
       "limitations": [
-        "No app or package README required a new public contract claim for this local evaluation capability."
+        "The 2026-07-24 merge adds the accepted Channel, Photon, and Sendblue package README contracts. Their dated rollout evidence does not establish current provider state."
       ],
       "reviewTrigger": "A current documentation route, public package contract, or app operational boundary changes."
     },

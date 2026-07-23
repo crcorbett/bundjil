@@ -3,13 +3,13 @@ document_type: research-report
 lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: Alchemy provider support, Vercel, Sendblue, or Photon API changes, Bundjil deployment topology, messaging-provider selection, or infrastructure SPEC changes
 ---
 
 # Alchemy ownership for Vercel and messaging providers
 
-## Decision
+## Research snapshot decision
 
 Adopt a **hybrid Alchemy model** after an infrastructure proof SPEC and a
 messaging-provider decision are accepted:
@@ -20,8 +20,8 @@ messaging-provider decision are accepted:
 - Vercel Git integration continues to create immutable Preview and Production
   deployments. Promotion and rollback remain explicit CI/runbook operations;
   they are not ordinary convergent resources.
-- The current Sendblue runtime and production-only ingress remain unchanged
-  while the proof compares two provider paths. If Sendblue is retained,
+- The Sendblue runtime and production-only ingress observed at research time
+  remain unchanged while the proof compares two provider paths. If Sendblue is retained,
   Alchemy may own one adopted account webhook set, with retain and deletion
   protection, while line/account lifecycle remains provider-owned. If Photon
   is selected, separate production and preview Spectrum projects may support
@@ -44,6 +44,25 @@ Infrastructure proof must begin with `prd-writer`; a Photon migration would
 require a second provider-selection/channel-migration SPEC. Accepted SPECs are
 then implemented through `prd-implementer`.
 
+### Post-research implementation status — 2026-07-21
+
+The later [Schema-driven Channels and Photon Preview proof SPEC](../product-specs/photon-channel-provider.md)
+implemented a clean provider-neutral Channel boundary plus fresh Sendblue and
+Photon packages. It deliberately migrated no legacy Sendblue behavior. Local
+dual-provider conformance and a bounded Photon management/SDK lifecycle proof
+passed; the hosted Preview/message journey stopped because Vercel authority and
+a live Space were absent. The [dated receipt](../verification/photon-provider-proof-2026-07-21.md)
+is the only live Photon observation and the
+[target runbook](../../apps/agent/runbooks/photon.md) owns repeatable proof
+operations.
+
+That implementation does not accept this report's Alchemy recommendation,
+select a Production provider, or establish current Vercel, Sendblue, or Photon
+topology. Current architecture is routed through
+[`../architecture/README.md`](../architecture/README.md); any Production
+provider selection or Alchemy ownership still requires a new `$prd-writer`
+SPEC.
+
 ## Truth and evidence boundaries
 
 | Truth layer                   | Evidence used                                                                                                                        | What it proves                                                                                               | What it does not prove                                                                                     |
@@ -57,7 +76,7 @@ No Vercel, Sendblue, Photon, DNS, Upstash, secret, webhook, deployment, or
 other provider mutation was performed. Photon findings are public-documentation
 truth only; no Photon tenant was queried.
 
-## 1. Current Bundjil call graph and ownership
+## 1. Research-time Bundjil call graph and ownership
 
 ### Runtime call graph
 
@@ -361,7 +380,7 @@ apps/codex-proxy/infrastructure/
 tooling/infrastructure/
   preview/                   # plan/readback orchestration and tests
   production/                # apply/readback orchestration and tests
-docs/runbooks/               # added only with the implementation SPEC
+apps/agent/runbooks/         # app-owned consequential provider operations
 docs/verification/           # sanitized current proof owner added with implementation
 ```
 
@@ -1299,29 +1318,33 @@ Additional risks:
 - A full desired-state environment inventory can reveal operational topology
   even without values. Proof artifacts require access control and retention.
 
-### Documentation impact ledger
+### Research-time documentation impact ledger — 2026-07-20
+
+This ledger records the original research slice. The post-research status above
+routes later implementation, runbook, and proof owners; it does not rewrite the
+report's original no-operation evidence.
 
 This research slice follows the repository lifecycle and routing model in
 `docs/README.md`. It does not activate implementation or expand the active
 harness-governance campaign.
 
-| Surface                                    | Decision         | Owner and reason                                                                                                                                             | Verification or non-claim                                                                                         |
-| ------------------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| This decision report                       | Change required  | `docs/research/alchemy-vercel-sendblue-decision-report.md` owns supporting Vercel/Sendblue/Photon research, spike charters, and the two-stage SPEC boundary  | Research is not executable policy, provider selection, current provider truth, or authority                       |
-| Research index                             | Change required  | `docs/research/README.md` is the necessary pointer from the sole docs router's existing research route                                                       | Pointer resolves to this report                                                                                   |
-| Root `README.md`                           | Preserve         | Public repository entry point already routes to `docs/README.md`; spike detail and mutable provider questions do not belong there                            | No public setup, package shape, or supported command changed                                                      |
-| `docs/README.md`                           | Preserve         | It already owns lifecycle/truth layers and routes supporting research to `docs/research/README.md`                                                           | No document class, lifecycle vocabulary, or route changed                                                         |
-| Architecture and standards                 | Preserve         | Hybrid ownership and Photon are recommendations, not accepted durable design; promotion waits for provider-selection SPEC and implementation evidence        | No current architecture or provider-selection claim is made                                                       |
-| App and package READMEs                    | Preserve         | No runtime, public command, export, app boundary, or package contract changed                                                                                | Historical provider observations there remain non-current and are not copied                                      |
-| Public API and generated references        | N/A              | No public API, generated document, source Schema, export, or generator changed; Bundjil has no generated owner for this research                             | No generated output is edited and no regeneration command is claimed                                              |
-| Active SPEC/tasks and execution plans      | Preserve         | Current intent remains HGI-300 only; infrastructure work must begin with `prd-writer`, a new indexed SPEC/task ledger, and a matching active plan            | This report neither opens nor advances an implementation task                                                     |
-| Runbooks                                   | N/A for research | No provider operation is authorized; HGI-304 still owns creation of canonical `docs/runbooks/**` routes, and the future infrastructure SPEC must add targets | Proposed commands are explicitly unexecuted; no operational authority, receipt, rollback execution, or readback   |
-| Critical journeys and proof                | N/A for research | No spike has run; HGI-305 owns canonical `docs/verification/**`, and a future SPEC must define artifact/environment/authority receipts                       | Local documentation checks cannot prove Vercel, Sendblue, Photon, Upstash, DNS, deployment, or Production state   |
-| Skills and agent instructions              | N/A              | This slice follows existing `docs-maintainer`, `prd-writer`, and `prd-implementer` contracts without changing their behavior                                 | `bun run check:skills` verifies existing instruction surfaces only                                                |
-| Code, config, Schemas, CI, lint, and tests | N/A              | No implementation or executable policy changed                                                                                                               | Repository verification proves the documentation slice does not regress the checked repository, not spike success |
-| Migration and release notes                | N/A              | No data migration, compatibility transition, package version, release, publication, or deployment occurred                                                   | No changelog, Changeset, release note, migration guide, or release proof is created                               |
-| Observability and operations               | Preserve         | The report proposes future monitoring evidence, but no monitor, alert, webhook, drain, dashboard, operational owner, or provider configuration changed       | Operational actuality still requires provider readback and a target-owned runbook                                 |
-| Documentation-audit evidence               | N/A              | This feature research is not an HGI-300 acceptance receipt and must not be represented as one                                                                | Worktree diff and verification receipt are reported at handoff; no corpus-count claim is added                    |
+| Surface                                    | Decision         | Owner and reason                                                                                                                                            | Verification or non-claim                                                                                         |
+| ------------------------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| This decision report                       | Change required  | `docs/research/alchemy-vercel-sendblue-decision-report.md` owns supporting Vercel/Sendblue/Photon research, spike charters, and the two-stage SPEC boundary | Research is not executable policy, provider selection, current provider truth, or authority                       |
+| Research index                             | Change required  | `docs/research/README.md` is the necessary pointer from the sole docs router's existing research route                                                      | Pointer resolves to this report                                                                                   |
+| Root `README.md`                           | Preserve         | Public repository entry point already routes to `docs/README.md`; spike detail and mutable provider questions do not belong there                           | No public setup, package shape, or supported command changed                                                      |
+| `docs/README.md`                           | Preserve         | It already owns lifecycle/truth layers and routes supporting research to `docs/research/README.md`                                                          | No document class, lifecycle vocabulary, or route changed                                                         |
+| Architecture and standards                 | Preserve         | Hybrid ownership and Photon are recommendations, not accepted durable design; promotion waits for provider-selection SPEC and implementation evidence       | No current architecture or provider-selection claim is made                                                       |
+| App and package READMEs                    | Preserve         | No runtime, public command, export, app boundary, or package contract changed                                                                               | Historical provider observations there remain non-current and are not copied                                      |
+| Public API and generated references        | N/A              | No public API, generated document, source Schema, export, or generator changed; Bundjil has no generated owner for this research                            | No generated output is edited and no regeneration command is claimed                                              |
+| Active SPEC/tasks and execution plans      | Preserve         | Current intent remains HGI-300 only; infrastructure work must begin with `prd-writer`, a new indexed SPEC/task ledger, and a matching active plan           | This report neither opens nor advances an implementation task                                                     |
+| Runbooks                                   | N/A for research | No provider operation is authorized; app-owned runbooks and the authority register own any later target operation                                           | Proposed commands are explicitly unexecuted; no operational authority, receipt, rollback execution, or readback   |
+| Critical journeys and proof                | N/A for research | No spike has run; HGI-305 owns canonical `docs/verification/**`, and a future SPEC must define artifact/environment/authority receipts                      | Local documentation checks cannot prove Vercel, Sendblue, Photon, Upstash, DNS, deployment, or Production state   |
+| Skills and agent instructions              | N/A              | This slice follows existing `docs-maintainer`, `prd-writer`, and `prd-implementer` contracts without changing their behavior                                | `bun run check:skills` verifies existing instruction surfaces only                                                |
+| Code, config, Schemas, CI, lint, and tests | N/A              | No implementation or executable policy changed                                                                                                              | Repository verification proves the documentation slice does not regress the checked repository, not spike success |
+| Migration and release notes                | N/A              | No data migration, compatibility transition, package version, release, publication, or deployment occurred                                                  | No changelog, Changeset, release note, migration guide, or release proof is created                               |
+| Observability and operations               | Preserve         | The report proposes future monitoring evidence, but no monitor, alert, webhook, drain, dashboard, operational owner, or provider configuration changed      | Operational actuality still requires provider readback and a target-owned runbook                                 |
+| Documentation-audit evidence               | N/A              | This feature research is not an HGI-300 acceptance receipt and must not be represented as one                                                               | Worktree diff and verification receipt are reported at handoff; no corpus-count claim is added                    |
 
 Ledger-wide lifecycle/generated action: this report and its index remain
 `reference`/`supporting`; no lifecycle transition or generated document occurs.

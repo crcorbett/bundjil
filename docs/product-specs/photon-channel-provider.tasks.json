@@ -1,0 +1,448 @@
+{
+  "title": "Schema-Driven Channels And Production Promotion Tasks",
+  "spec": "docs/product-specs/photon-channel-provider.md",
+  "status": "completed",
+  "principles": [
+    "Build the channel path cleanly from canonical Effect Schemas, Context.Service contracts, and explicit live/memory Layers; do not extract, wrap, migrate, or preserve the current Sendblue implementation.",
+    "@bundjil/channel owns one narrow provider-neutral ChannelTransport; @bundjil/sendblue and @bundjil/photon provide it through separate Layers; apps/agent owns Eve, identity, fresh replay, dispatch, and composition.",
+    "Decode unknown only at host/provider ingress, decode statically encoded values with Schema.decodeEffect, encode immediately before outward writes, and pass decoded Schema-derived Types between services.",
+    "Use a fresh versioned state, replay namespace, and environment namespace; import no legacy state, keys, continuation, typing lifecycle, config namespace, modules, or tests.",
+    "One module-edge ManagedRuntime and one runPromise per Eve callback are allowed; nested runtime execution, Effect.orDie, swallowed causes, Object.assign state updates, callback escape hatches, and method-local dependency re-provisioning are acceptance failures.",
+    "Photon is promoted only after exact published pins, deterministic serverless lifecycle, signed-webhook/replay proof, stable Free managed-shared user/webhook adoption, staged deployment acceptance, and target-bound authority.",
+    "Production exposes both clean Sendblue and Photon routes; provider selection remains a composition-root Layer concern and no legacy behavior, state, config, or fallback is migrated.",
+    "Typing start and stop must be proved independently for Sendblue and Photon at the provider-accepted boundary; handset display is a separate claim.",
+    "Repository, local, Preview, provider, handset, and Production proof are distinct; protected values and message/identity content never enter evidence."
+  ],
+  "riskLenses": [
+    "ownership and production/test call graph",
+    "clean replacement and legacy-pattern exclusion",
+    "Effect control flow and helper admission",
+    "Schema Type/Encoded boundary provenance",
+    "service requirements and Layer composition",
+    "safe tagged errors and uncertain delivery",
+    "fresh state/replay and continuity break",
+    "secret/config redaction",
+    "provider/runtime isolation",
+    "verification and proof authority",
+    "observability, cutover, and rollback"
+  ],
+  "globalVerification": [
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:skills",
+    "bun run --filter @bundjil/channel check-types",
+    "bun run --filter @bundjil/channel test",
+    "bun run --filter @bundjil/sendblue check-types",
+    "bun run --filter @bundjil/sendblue test",
+    "bun run --filter @bundjil/photon check-types",
+    "bun run --filter @bundjil/photon test",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "Effect language-service diagnostics for changed TypeScript files",
+    "narrow scans for forbidden legacy imports, Effect.orDie, swallowed catchCause, Object.assign state writes, nested runPromise, raw callbacks, DTO mirrors, and helper sprawl",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "tasks": [
+    {
+      "id": "plan-clean-channel-replacement",
+      "title": "Create the active plan and lock the clean replacement boundary",
+      "status": "completed",
+      "description": "Create the active plan, inventory exact files to replace/remove and external journeys to re-prove, and record the old implementation solely as rejected-pattern and rollback evidence.",
+      "implementationNotes": [
+        "Link the plan from docs/exec-plans/active/README.md and record base commit, branch, environment authority, immutable Production rollback deployment, no-migration decision, ingress drain requirement, and proof boundaries.",
+        "List apps/agent/agent/channels/sendblue.ts and every apps/agent/agent/lib/sendblue file as replace/remove targets; do not create a legacy or compatibility directory.",
+        "Define new package/app file owners, new environment namespace, fresh state/replay schemas and prefix, exact third-party boundary exceptions, and the removal order.",
+        "Identify consumer journeys from current docs without treating old internal tests, status values, state, or replay keys as compatibility requirements."
+      ],
+      "mandatoryVerification": [
+        "The plan distinguishes current repository/deployment truth from replacement intent and names the intentional session/replay continuity break.",
+        "No live provider/deployment state is read or mutated and no secret/identity content is captured.",
+        "Review every planned operation for flat Effect flow, canonical Schema Type/Encoded ownership, named Context.Service operations, explicit Layers, typed pipe error handling, and zero unsafe casts/manual readers/DTO mirrors/helpers.",
+        "Run boundary/effect/skill checks, docs formatting/link/frontmatter checks, verification with required ignored synthetic env, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Implementation has an active plan whose source target is a clean replacement, not a compatibility refactor.",
+        "Removal, cutover, rollback, and non-authority boundaries are explicit."
+      ],
+      "evidence": [
+        "Ownership and call graph: the active plan records the exact three package owners, app-owned service and Eve boundaries, complete legacy removal inventory/order, fresh namespaces, dated Git/deployment rollback identities, intentional continuity break, Photon-only authority, and Vercel/Production stop condition.",
+        "Implementation quality: plan review confirms decoded Schema Types between named services, encoded values only at persistence/framework/provider egress, raw Request and SDK primitives confined to exact adapters, explicit live/memory Layers, flat Effect operations, and no compatibility/helper/DTO/manual-reader design.",
+        "Verification coverage: jq, routed-link and naming scans, Ultracite formatting, check:boundaries, check:effect-setup, check:skills, Knip, five-workspace typechecks, 246 workspace tests including the 79-test legacy agent baseline, full verification, and git diff --check passed. No provider or deployment operation ran."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-clean-channel-vertical-slice",
+      "title": "Build the canonical channel package and clean app vertical slice",
+      "status": "completed",
+      "dependsOn": ["plan-clean-channel-replacement"],
+      "description": "Implement @bundjil/channel plus app-owned Channel, replay, identity, routing, and Eve dispatch services using only deterministic Layers, proving an HTTP-to-Eve-to-outbound journey before either provider exists.",
+      "implementationNotes": [
+        "Export canonical provider/conversation/message/send/presence Schemas with named Type/Encoded aliases, safe tagged errors, ChannelTransport Context.Service, and layerMemory.",
+        "Add app-owned ChannelStateV1 with only a conversation snapshot, new replay contracts/prefix through AtomicKeyValueStore, fresh branded continuation routing, ChannelIdentity, ChannelRouter, ChannelReplay, Channel, and request-scoped EveChannelDispatch services.",
+        "Project Eve events into one canonical tagged Schema; domain operations return immutable decoded state and explicit outcomes.",
+        "Use one test composition root and no import from apps/agent/agent/lib/sendblue."
+      ],
+      "mandatoryVerification": [
+        "@effect/vitest proves accepted/ignored ingress, identity rejection, fresh deterministic routing, concurrent duplicate claims, Eve dispatch completion/failure, outbound claim/send outcomes, stateless presence, immutable next state, and encoded snapshot round trips.",
+        "All primary operations are named flat Effect.fn/Effect.gen programs with expected catchTag/catchTags/mapError in outer pipes; dependencies come from Context.Service/Layer requirements, never method-local provideService chains.",
+        "Assert decodeUnknown occurs only at synthetic host/provider ingress, decodeEffect handles encoded fixtures, encodeEffect owns persistence/framework egress, and there are no unsafe casts/manual readers/DTO mirrors/raw callbacks/trivial helpers.",
+        "Run common/agent focused checks, boundary/effect/skill checks, Effect diagnostics, negative legacy-pattern scans, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "A full clean journey passes entirely through memory Layers and canonical contracts.",
+        "The slice contains no provider or legacy dependency."
+      ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/channel owns the nominal direct-text transport Schemas, safe common tagged errors, service, and memory Layer; apps/agent owns Channel identity, deterministic fresh routing, atomic replay, orchestration, immutable state/events, and Eve dispatch. Imports point inward to @bundjil/channel, @bundjil/eve, and @bundjil/store only; no provider or legacy module enters the slice.",
+        "Implementation quality: public package values use branded Schema-derived Types and explicit Encoded aliases; app persistence decodes canonical store values and uses AtomicKeyValueStore.transact; named Context.Service operations and explicit Layers form one dependency graph; primary Effects are flat; no unsafe assertion, DTO mirror, manual reader, raw callback, process env, Effect.orDie, swallowed cause, Object.assign, nested runtime, method-local provision, or helper sprawl remains in the changed slice.",
+        "Verification coverage: @bundjil/channel typecheck, 2 contract tests and build passed; the agent build and 87 tests passed including 8 clean vertical tests for accepted/ignored ingress, identity rejection, stable routing, concurrent duplicate claims, dispatch success/failure, outbound acceptance/duplicate, presence, and immutable encoded state. Boundary/effect/skill checks, Knip, six-workspace typechecks, 255 workspace tests, negative scans, full verification, and git diff --check passed."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-clean-sendblue-provider-and-rewrite-edge",
+      "title": "Build @bundjil/sendblue and replace the legacy Eve edge",
+      "status": "completed",
+      "dependsOn": ["build-clean-channel-vertical-slice"],
+      "description": "Implement a new Sendblue ChannelTransport from protocol documentation, rewrite the Eve adapter around the clean services, replace old tests, and remove the old app-owned Sendblue implementation.",
+      "implementationNotes": [
+        "Create private provider Schemas, Config input Schema, constant-time webhook verification, Effect HTTP request/response adapters, safe tagged errors, and explicit live/memory Layers without copying old app code.",
+        "Rewrite channels/sendblue.ts with one module-edge runtime, one runPromise per callback, request-scoped EveChannelDispatch Layer, waitUntil at the edge, Schema decode/encode, and one exact complete snapshot assignment.",
+        "Use new BUNDJIL_CHANNEL_SENDBLUE_*, BUNDJIL_CHANNEL_REPLAY_*, and BUNDJIL_CHANNEL_ROUTING_* config; do not read old BUNDJIL_SENDBLUE_* values or old stored state/claims.",
+        "After the new provider and app journey pass, remove apps/agent/agent/lib/sendblue/** and replace old implementation-structured tests with new contract/journey tests."
+      ],
+      "mandatoryVerification": [
+        "Provider tests prove auth before body trust, body limits, valid/ignored/malformed cases, outbound encoding, complete response decoding, known rejection, timeout/uncertain delivery, presence accepted/no-op/failure, and secret-safe errors.",
+        "Direct Request/Response tests prove the new 202 accepted, 204 ignored/duplicate, 400 invalid payload, 401 authentication failure, and 503 pre-claim dependency failure semantics plus one waitUntil dispatch without importing old modules or comparing old internal state/status fixtures.",
+        "Scans in the replacement slice find no agent/lib/sendblue import, Effect.orDie, catchCause swallow, Object.assign state mutation, nested runPromise, public callback, hand-written provider attempt union, method-local dependency re-provisioning, unsafe cast, DTO mirror, manual reader, raw JSON, or helper sprawl.",
+        "Run common/Sendblue/agent checks and builds, boundary/effect/skill checks, Effect diagnostics, Knip, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "The current source tree contains only the clean Sendblue package and thin Eve adapter; the old app-owned Sendblue tree is absent.",
+        "No provider/deployment mutation occurred and the retained immutable Production deployment remains rollback truth."
+      ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/sendblue owns private webhook and HTTP wire Schemas plus one nominal ChannelTransport live Layer; apps/agent owns Config.schema loading, redacted identities/secrets, HMAC continuation routing, atomic replay, the request-scoped Eve dispatch Layer, one module-edge ManagedRuntime, and the thin authored route/events. The old apps/agent/agent/lib/sendblue tree and its four implementation-shaped suites are absent; no compatibility import or old state/replay/config reader remains.",
+        "Implementation quality: provider ingress authenticates the documented sb-signing-secret before one bounded body read and complete Schema decode; outbound and presence use Effect HttpClient request/response Schemas and safe common tagged errors. The route performs one runPromise per Eve callback, forks dispatch in that same runtime for one waitUntil Promise, observes/logs only a safe error tag, assigns one encoded snapshot field, and contains no Effect.orDie, swallowed cause, Object.assign, nested runtime execution, unsafe cast, DTO mirror, direct JSON, raw client export, callback-bearing domain service, method-local dependency re-provisioning outside the required request Layer, or helper sprawl.",
+        "Verification coverage: @bundjil/sendblue typecheck, build and 8 tests passed for authentication ordering, bounded/malformed/ignored ingress, request and response codecs, known rejection, uncertain transport/timeout, presence and safe errors. The agent build and 39 tests passed, including fresh Config rejection of legacy variables and direct 202/204/400/401/503 plus single-waitUntil dispatch semantics. Boundary/effect/skill checks, 24 boundary fixtures, formatting, lint, Knip, seven workspace typechecks, 216 workspace tests, negative scans, full verification and git diff --check passed with only documented synthetic Executor inputs. No Sendblue, Photon, Vercel, DNS, secret, webhook, deployment or Production operation ran."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-and-conform-photon-provider",
+      "title": "Build @bundjil/photon and prove dual conformance locally",
+      "status": "completed",
+      "dependsOn": ["build-clean-sendblue-provider-and-rewrite-edge"],
+      "description": "Pin the exact published Spectrum boundary, implement Photon ChannelTransport, resolve signature/resource/Space uncertainties locally, and run both providers through the same contract and app journey.",
+      "implementationNotes": [
+        "Record exact npm package names, versions, integrity, exports, dependency boundary, Promise behavior, and release semantics; never target unpublished main.",
+        "Keep SDK/Zod types, client, Space, callbacks, and raw failures private; decode every unknown complete SDK result before returning a common Type.",
+        "Compare the SDK webhook helper with direct documented HMAC verification using fixed Clock/raw-body fixtures; retain only one deterministic adapter.",
+        "Use scoped Layer resource acquire/release and fault-test malformed output, rejection, timeout/uncertain send, cold Space/line ambiguity, presence no-op, and cleanup failure."
+      ],
+      "mandatoryVerification": [
+        "Signed fixtures cover missing/invalid/stale/valid signatures, malformed/unsupported events, stable retry IDs, and deterministic handler completion without a callback escape hatch.",
+        "The same ChannelTransport conformance and clean app vertical suites pass with Sendblue and Photon Layers; provider selection exists only at composition roots.",
+        "Review every operation for Schema Type/Encoded boundaries, Config Schema/Redacted inputs, named Context.Service operations, scoped live/memory Layers, flat Effects, safe tagged pipe errors, and no unsafe casts/DTO mirrors/manual readers/generic callbacks/helper sprawl.",
+        "Run all package/agent checks and builds, boundary/effect/skill checks, Effect diagnostics, dependency/leak/legacy scans, verification, diff checks, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Both providers satisfy one nominal contract without leaking provider-specific types or behavior into the app.",
+        "Any unresolved SDK lifecycle, Space, line, or uncertain-send issue stops live proof."
+      ],
+      "evidence": [
+        "Ownership and call graph: @bundjil/photon owns exact @spectrum-ts/core and @spectrum-ts/imessage 12.2.0 pins, signed Photon wire Schemas, the private Spectrum/Space boundary, safe lifecycle handling, and live/memory ChannelTransport Layers. apps/agent owns Config.schema environment names, provider-specific composition roots, the shared Eve adapter, and two thin absolute routes; @bundjil/channel/testing supplies one provider-neutral conformance operation consumed by both provider suites.",
+        "Implementation quality: direct raw-byte HMAC-SHA256 verifies webhook id, clock tolerance, event header, and signature before one complete payload decode; the SDK fire-and-forget webhook callback is unused. Effect.acquireRelease brackets one explicit Spectrum instance and app.stop, cold Space resolution is distinct from ambiguous send, every SDK result is decoded before a common result, secrets stay Redacted, and only safe tagged errors escape. The sole documented third-party type exception is the adjacent Spectrum 12.2.0 exact-optional events defect; Eve externalises @bundjil/photon so Nitro traces the pinned SDK graph without broad compiler relaxation.",
+        "Verification coverage: 10 Photon tests prove missing/invalid/stale/valid signatures, body bounds, malformed/unsupported events and content, stable retry identity, inconsistent spaces, complete SDK result decoding, cold-Space versus uncertain-send errors, send/presence timeouts, scoped release and acquisition/cleanup failures. The shared conformance journey passes in 9 Sendblue tests and 10 Photon tests; 41 agent tests include the same app journey from both provider Layers and built Sendblue/Photon routes. Boundary/effect/skill checks, 24 boundary fixtures, formatting, lint, Knip, eight workspace typechecks, 229 workspace tests, dependency/legacy/leak scans, full verification and git diff --check passed. No credential was loaded and no Photon, Vercel, Sendblue, Upstash, DNS, deployment, webhook, user, secret or Production operation ran; live Space and managed-shared routing behavior remains Task 5 proof."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "prove-photon-isolated-preview",
+      "title": "Prove the clean Photon path in an isolated Preview",
+      "status": "completed",
+      "dependsOn": ["build-and-conform-photon-provider"],
+      "description": "Only with separate provider/deployment authority, configure the new Photon path in an isolated Preview and prove signed ingress, fresh replay, Eve dispatch, outbound acceptance, presence, and resource cleanup.",
+      "implementationNotes": [
+        "Create/follow a target-owned runbook with exact actor, project/deployment identities, permitted operations, new config/replay namespace, rollback, rotation, evidence redaction, and stop conditions.",
+        "Use only BUNDJIL_CHANNEL_PHOTON_* and BUNDJIL_CHANNEL_REPLAY_* Preview values in an isolated Photon project; Production and Sendblue state remain unchanged.",
+        "Prove one synthetic inbound/outbound journey, stable-ID retry suppression, cold Space resolution, presence outcome, waitUntil completion, and Layer release.",
+        "Do not create/delete a dedicated line without separate authority and confirmed ambiguous-write/deletion semantics."
+      ],
+      "mandatoryVerification": [
+        "Exact commit, Preview deployment, Photon project/webhook, new replay namespace, actor/authority, and rollback receipt are recorded with protected values omitted.",
+        "One signed inbound yields one fresh claim, one Eve turn, one outbound accepted result, and zero duplicate; no old state, replay key, continuation, or config value is used.",
+        "No secret, content, full identity, raw body, URL, project/message/Space ID, SDK object, prompt, tool value, or model output appears in code, logs, errors, spans, fixtures, or evidence.",
+        "Run full package/agent/build checks, boundary/effect/skill checks, Effect diagnostics, verification, diff checks, sanitized provider/runtime readback, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "An isolated Preview proves the clean Photon journey or records a terminal candidate stop with exact evidence.",
+        "No Production or Sendblue provider state changed."
+      ],
+      "evidence": [
+        "Provider-only proof: the user-authorized Photon command decoded project credentials through Config.schema and Redacted, authenticated the management plane, recovered no stale proof record, created and listed one fixed non-routable proof webhook, observed its create-only signing secret only in Redacted memory, acquired and released the pinned Spectrum SDK, deleted the exact proof webhook, and read back the original zero-webhook topology. The sanitized receipt contained only booleans and counts; no line, billing, message, user, platform, Vercel, DNS, environment, deployment, Sendblue, Upstash, Preview-runtime, or Production mutation ran.",
+        "Lifecycle safety and verification: @bundjil/photon now owns internal named PhotonManagement and PhotonLifecycleProbe services, Effect HTTP and Bun live Layers, strict management response Schemas, a Config/Redacted executable edge, bounded request/lifecycle timeouts, create-without-retry semantics, exact reserved-URL adoption, acquireUseRelease cleanup, post-failure readback, and a sanitized receipt. Three new tests prove success, cleanup after SDK failure, and ambiguous-create recovery without deleting an unrelated webhook. The first final gate found one consistent-return lint issue in deleteWebhook; it was corrected, then Effect setup, boundaries, skills, 24 boundary fixtures, formatting, lint, Knip, eight workspace typechecks, 232 workspace tests, both Photon and agent builds, full verification, stale-pattern scans, and diff checks passed.",
+        "Terminal candidate stop: Vercel deployment authority, a hosted Preview identity/config binding, and a known live inbound Photon Space or approved synthetic recipient were absent. Hosted ingress, replay, Eve dispatch, cold live Space resolution, outbound acceptance, presence, waitUntil, retry suppression, and handset behavior therefore remain explicitly unproved. The dated receipt is docs/verification/photon-provider-proof-2026-07-21.md against accepted runtime commit c7bed88338e50e5177489fecca8d89968605728e. The ignored credential file was mode 0644; no value was emitted or copied, but the runbook now blocks future execution until it is 0600. No Production or Sendblue provider state changed."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-clean-channel-docs-and-promotion-gate",
+      "title": "Reconcile durable docs and define the later promotion gate",
+      "status": "completed",
+      "dependsOn": ["prove-photon-isolated-preview"],
+      "description": "Update durable architecture and README owners to the verified clean implementation, close the plan, and state whether a later Production SPEC should select clean Sendblue or Photon.",
+      "implementationNotes": [
+        "Update repo-structure, Eve architecture, testing, root/app/package READMEs, package tree, new config, routes, state/replay, boundary exceptions, proof, monitoring, and cutover/rollback pointers only to verified truth.",
+        "Keep completed Sendblue SPECs/plans as historical evidence and mark them non-authoritative for the replacement; do not rewrite their old proof as current behavior.",
+        "Record local and Preview proof separately and keep provider accepted distinct from handset delivered.",
+        "If promotion advances, create a new provider-selection/Production SPEC with prd-writer. It must own ingress drain, intentional continuity break, new secret binding, cutover, observation, rollback quarantine, and old-deployment retirement."
+      ],
+      "mandatoryVerification": [
+        "Docs-maintainer audit accounts for every repository docs/README class: affected owners change, historical/unrelated owners are explicitly preserved or N/A, and generated audit receipts are not hand-edited.",
+        "All production/test/CLI call graphs, Type/Encoded boundaries, service/Layer exports, commands, state/replay/config claims, and proof levels match source and dated evidence.",
+        "Final source scan proves no legacy Sendblue tree/import/config/state/replay/typing/callback pattern, unsafe cast, DTO mirror, manual reader, raw JSON, deep import, raw provider client, or helper sprawl remains in the replacement.",
+        "Run all global verification, docs formatting/link/frontmatter checks, task-ledger consistency, leak/stale scans, and record every risk lens."
+      ],
+      "completionCriteria": [
+        "Current docs route directly to the clean contracts, providers, operations, proof, continuity break, and promotion gate.",
+        "Photon and clean Sendblue remain non-Production until a separately accepted promotion SPEC exists."
+      ],
+      "evidence": [
+        "Ownership and call graph: canonical repo, app, architecture, testing, runbook, verification, research, and task routes now point to @bundjil/channel, @bundjil/sendblue, @bundjil/photon, and app-owned Eve/identity/routing/replay/dispatch composition. Current source and docs retain no legacy Sendblue implementation owner or compatibility path.",
+        "Implementation quality: docs distinguish decoded contract ownership from encoded boundaries, provider Layers from app composition, accepted from delivered, local from provider proof, and repository evidence from current provider truth. Historical Sendblue records and the Alchemy research report remain explicitly non-current provenance.",
+        "Verification coverage: docs formatting, changed-link/frontmatter checks, current-source legacy and unsafe-boundary scans, package build, boundary/effect/skill checks, Knip, typechecks, 232 tests, full verification, and git diff checks passed. The only whole-corpus link findings were four pre-existing links in the explicitly historical legacy-atlas document."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "plan-production-promotion",
+      "title": "Reopen the SPEC and lock the full Production rollout",
+      "status": "completed",
+      "dependsOn": ["reconcile-clean-channel-docs-and-promotion-gate"],
+      "description": "Review and amend the clean-Channel SPEC, restore its active plan, validate current upstream contracts, and bind the user's task-scoped Photon and Production approval to exact resource, deployment, proof, and rollback boundaries.",
+      "implementationNotes": [
+        "Preserve all completed clean-replacement evidence and append a serial promotion phase; do not rewrite history or create a compatibility migration.",
+        "Record that Production must serve both clean Sendblue and Photon routes with distinct provider secrets and one fresh app-owned replay/routing namespace.",
+        "Route operations through apps/agent/runbooks/deploy-promote.md, sendblue.md, and photon.md; update authority/verification owners before mutation.",
+        "Validate the Free managed-shared topology before implementation; use exact-identity shared-user adoption, provider-documented idempotent creation, stable IDs, and readback before any rollout mutation."
+      ],
+      "mandatoryVerification": [
+        "The SPEC, task ledger, active plan, product index, and plan indexes agree on current status, dual-provider scope, exact authority, rollback, and non-goals.",
+        "Primary Photon, Sendblue, and Vercel documentation is cited for current management, webhook, retry, deployment, and typing contracts.",
+        "The downstream-impact ledger accounts for code, config, provider resources, runbooks, authority, critical journeys, proof packets, architecture, READMEs, and preserved history.",
+        "Run docs, skills, authority, controls, verification, boundary, Effect, full repository, formatting, and diff checks before committing the plan."
+      ],
+      "completionCriteria": [
+        "The promotion phase is executable without relying on legacy behavior or unsupported provider claims.",
+        "No live provider or deployment mutation occurs in this planning task."
+      ],
+      "evidence": [
+        "PRD review and writer outcome: the same clean-Channel SPEC was reopened without altering the six completed implementation tasks or importing legacy behavior. The current SPEC, appended six-task ledger, restored active plan, product index, and plan indexes now agree on a dual-provider Production topology, fresh namespaces, task-scoped approval, exact mutation/readback/rollback limits, and the final-only five-pass audit.",
+        "Primary contract evidence at planning time covered Photon management/OpenAPI, webhook/retry, Spectrum typing, Sendblue typing, and Vercel staged-deployment/promote documentation. Its dedicated-line billing assumption was subsequently superseded by the verified Free managed-shared service and shared-user endpoints; current intent and implementation no longer require a dedicated line.",
+        "Verification: JSON parsing, docs/skills/authority/controls/verification policies, Effect setup, boundary audit and 76 boundary/control tests, formatting, lint, Knip, eight workspace typechecks, 233 workspace tests, full verification, and diff checks passed against merge baseline af66b06. No live provider, secret, Vercel, Sendblue, Upstash, DNS, webhook, line, deployment, or Production operation ran in this task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "build-production-promotion-contracts",
+      "title": "Build dual-Channel preflight, authority, and proof contracts",
+      "status": "completed",
+      "dependsOn": ["plan-production-promotion"],
+      "description": "Extend the existing Schema-driven Production preflight and governed proof surfaces so the rollout fails closed on missing, legacy, shared, stale, ambiguous, or unprovable Sendblue/Photon configuration.",
+      "implementationNotes": [
+        "Add explicit stages for channel inventory, staged dual-provider deployment, stable-domain promotion, and accepted rollback-ready state; remove the legacy sendblue-final-promotion stage name.",
+        "Require metadata-only new BUNDJIL_CHANNEL_* bindings, fresh replay/routing fingerprints, distinct webhook IDs/secrets, exact current/previous deployments, and no legacy config names.",
+        "Add Photon management, ingress, outbound, and typing authority records plus dual-provider critical journeys and command-map owners.",
+        "Extend target-owned runbooks and proof templates with provider-accepted versus handset-observed typing, uncertain send, retry drain, and rollback quarantine."
+      ],
+      "mandatoryVerification": [
+        "Schema and CLI tests reject legacy variable names, shared identities, missing Photon/Sendblue bindings, wrong Vercel target/type, same current/previous deployment, stale snapshots, and unsupported proof escalation.",
+        "Authority/control/verification audits accept exact new records and current fixture paths without granting standing provider authority.",
+        "Effect review confirms branded identities, Config.schema/Redacted secrets, named operations, explicit Layers, safe tagged errors, flat effects, and no generic helper or manual reader.",
+        "Run focused agent/Photon tests and builds plus every global gate before committing."
+      ],
+      "completionCriteria": [
+        "A sanitized preflight can represent every rollout checkpoint and cannot claim Production from repository or Preview evidence.",
+        "Runbooks and proof owners are executable before the first provider mutation."
+      ],
+      "evidence": [
+        "Superseded initial contract: the first implementation incorrectly required one healthy Photon dedicated line and Business billing eligibility. The task is reopened to replace that gate with the verified Free managed-shared service, exactly one approved shared user, zero dedicated lines, enabled platform, and one environment webhook.",
+        "Governance and operations: authority and automation registers now bind Photon management, inbound, and foreground outbound operations to task-scoped approval and exact runbooks; 12 critical journeys include Photon accepted-message/typing and dual-channel Production. Sendblue, Photon, deploy/promote runbooks and messaging/Production templates separate provider acceptance, Eve completion, delivery, typing display, retry drain, quarantine, billing consequences, stable-ID adoption, and no-legacy rollback.",
+        "Superseded initial boundary: dedicated-line and billing operations are being removed. The corrected private PhotonManagement boundary decodes complete service-type, shared-user, availability, platform, and webhook responses and exposes only branded identities plus sanitized lifecycle facts; phone identities remain redacted or private.",
+        "Verification: formatting, docs/skills/authority/controls/verification policies, Effect setup, boundary audit and 76 boundary/control tests, focused agent typecheck and 20 preflight tests, Photon build/typecheck and 16 tests, lint, Knip, eight workspace typechecks, 236 workspace tests, full verification, and diff checks passed with documented synthetic Executor configuration. No provider, secret, Vercel, Sendblue, Upstash, DNS, webhook, line, deployment, or Production mutation ran.",
+        "Corrected Free contract: PhotonManagement now decodes the complete service-type, shared-user availability/list/create/delete, platform, and webhook responses through owning Schemas. Shared-user identity is branded and operator input is Config.schema plus Redacted; create is idempotent by exact E.164 identity with list/readback recovery; the sanitized receipt exposes no phone, assigned routing number, secret, raw client, or raw response. Dedicated-line and subscription operations and public types were removed.",
+        "Corrected promotion gate and docs-maintainer result: Production preflight requires service type shared, exactly one approved shared user, zero dedicated lines, enabled platform, and one webhook. The package README, Photon runbook, authority/automation registers, critical journey, messaging template, verification router, active SPEC/plan, and retained failed receipt all distinguish the Free topology from the superseded Business-line conclusion; Channel, Sendblue, Effect rules, historical owners, frontend, DNS, releases, and migrations were preserved or evidenced N/A.",
+        "Corrected verification: focused Photon typecheck/build and 20 tests, agent typecheck and 16 preflight tests, formatting, docs/skills/authority/controls/verification policies, Effect setup, boundary audit and 76 boundary/control tests, lint, Knip, eight workspace typechecks, 260 workspace tests, full verification, and diff checks passed with documented synthetic Executor configuration. No provider, credential, Vercel, Sendblue, Upstash, DNS, webhook, user, deployment, message, or Production mutation ran."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-photon-resources-and-preview",
+      "title": "Reconcile Photon resources and prove the hosted Preview",
+      "status": "completed",
+      "dependsOn": ["build-production-promotion-contracts"],
+      "description": "Authenticate the approved Photon project, require its Free managed-shared iMessage service, adopt or idempotently create one exact approved shared user, register an isolated Preview webhook, bind new Preview configuration, deploy the pushed candidate, and prove the clean Photon journey without Production traffic.",
+      "implementationNotes": [
+        "Require the ignored Photon credential file to be mode 0600 before loading it; never print, copy, or retain protected values.",
+        "List project/service/platform/shared-user/webhook state first; require service type shared and zero dedicated lines, then adopt the exact approved shared user or check availability and idempotently create it by phone identity.",
+        "Register one Preview webhook, immediately bind its write-only signing secret and stable ID, and reconcile uncertain creates by URL inventory before any retry.",
+        "Use fresh Preview replay/routing namespaces and prove signed ingress, one dispatch, one accepted outbound, duplicate suppression, cold Space resolution, typing start/stop, and scoped SDK release.",
+        "Immediately before cutting the hosted candidate, compare both direct @spectrum-ts package pins with the npm latest dist-tag, keep them on one exact stable release, regenerate the lockfile, and rerun Photon plus agent package/build proof.",
+        "When hosted and local SDK outcomes differ, record only an allowlisted Photon SDK failure observation containing operation, phase, bounded name/code tokens, numeric nested status, and boolean retry hint; never record the raw error, message, stack, cause, identity, content, URL, credential, or provider metadata.",
+        "Treat Spectrum's dynamically imported iMessage gRPC peers as an explicit hosted-runtime boundary: @bundjil/photon directly owns @grpc/grpc-js, nice-grpc, and nice-grpc-common at the versions required by the pinned Spectrum release, Eve externalises the complete runtime set for Nitro tracing, and packaged-build proof must show those peer imports remain resolvable.",
+        "Budget Photon presence for hosted Spectrum acquisition before startTyping or stopTyping: use a bounded 15-second unavailable timeout, keep send's distinct 30-second delivery-uncertain timeout, and prove both presence transitions on the immutable Preview rather than inheriting local latency.",
+        "Emit only allowlisted Photon SDK lifecycle observations for successful acquire, direct-Space resolution, startTyping, stopTyping, send, and release phases; each observation contains provider, operation, and phase only, while identities, content, URLs, resource IDs, durations, credentials, and provider payloads remain excluded.",
+        "Because Photon exposes no API or dashboard webhook replay operation, use the Photon-only Schema-decoded Preview callback query bundjil-proof=retry-once for the exact duplicate receipt: finish the fresh dispatch and replay claim before returning one intentional 503, then require Photon's documented same-message-ID retry to return 204 with zero second dispatch or external response. Sendblue remains proof-disabled and the Production Photon callback omits the query."
+      ],
+      "mandatoryVerification": [
+        "Authenticated before/after Photon and Vercel readback identifies only sanitized counts, health/state, fingerprints, immutable deployment identity, and exact postconditions.",
+        "The Preview proof distinguishes provider acceptance, Eve completion, and optional handset display; message content, phone identities, URLs, resource IDs, and secrets are excluded from durable evidence.",
+        "The duplicate receipt ties one fresh 503 and one duplicate 204 to the same provider delivery identity through Photon's documented retry contract; it does not synthesize a new identifier or retry an outbound send.",
+        "Any ambiguous shared-user/webhook create, non-shared service, absent Space, uncertain send, typing failure, release failure, or cleanup/readback mismatch stops Production staging.",
+        "Run focused and full repository verification against the exact pushed candidate before committing the bounded receipt, including an agent build assertion over the compiled external-dependency manifest and hosted output for Spectrum's dynamically resolved gRPC peers.",
+        "A dependency refresh preserves earlier receipts under their recorded version but requires a new hosted Preview journey for the refreshed immutable artifact; local typecheck/test/build cannot inherit provider, handset, or typing proof."
+      ],
+      "completionCriteria": [
+        "The Photon Preview journey and both typing transitions are proved, or the task records a terminal target-specific stop without claiming success.",
+        "Production and Sendblue provider state remain unchanged in this task."
+      ],
+      "evidence": [
+        "Retained safety evidence: the ignored credential source was restricted from mode 0644 to 0600 without changing its contents, and the initial provider inventory was sanitized. The dedicated-line reconciler and Business eligibility gate described by the original receipt are superseded and are not accepted implementation evidence for this task.",
+        "Authenticated provider truth at 2026-07-21T17:02:52Z: iMessage was enabled, subscription tier was Free with no active subscription, dedicated-line count was zero, and webhook count was zero. Before the subscription eligibility guard was added, one create request returned the safe blocked result; it was not retried. Immediate and later authenticated readbacks both proved zero lines, zero webhooks, and no ambiguous resource or billing mutation.",
+        "Superseded conclusion: the dated receipt correctly proves that the single dedicated-line request was not retried and produced no line, webhook, or billing mutation, but it incorrectly treated Business eligibility as a prerequisite. Current Photon pricing and OpenAPI expose Free managed-shared routing and idempotent shared-user creation, so this task resumes only after the corrected contracts pass.",
+        "Authenticated provider truth at 2026-07-21T22:34:27Z: the approved project reported service type shared, iMessage enabled, one existing shared user, zero dedicated lines, and zero webhooks. The sole existing user was adopted by exact in-process identity with no user/platform/provider mutation and no phone, assigned routing number, resource ID, or secret retained.",
+        "Preview bootstrap: pushed source 8b63f3560e4f32533a2f9d4164917775e350638e produced isolated Vercel Preview deployment dpl_F4dmhBppbjPhWmmjvuYc9bAjTvHf in READY state with target preview and no aliases. Production domains, environments, Sendblue, Upstash data, Photon webhooks/messages, and provider traffic were unchanged.",
+        "Webhook binding boundary: a new private Effect operator operation rejects an existing target with an unrecoverable write-only secret, registers and reads back one exact URL, returns the secret only as Redacted, and persists ID/secret to an absolute mode-0600 artifact for direct environment binding. Two fake-provider tests cover exact create/readback and fail-closed existing-target behavior; all policy gates, 76 boundary/control tests, eight workspace typechecks, 262 workspace tests, and full verification passed before provider execution.",
+        "Hosted Preview repository/provider evidence at 2026-07-21T23:12:14Z: pushed source 855f71acd678873fdc7b65bafbc2709a4233bbea produced READY Preview deployment dpl_E5P3pYaEMXxWxfRzgDecrNspkpZo; the dedicated Preview alias resolved to it. Vercel protection returned 302 without the task bypass and application 404 with it; the Photon route returned 401 unsigned and 204 for a valid signed ignored event with no SDK acquisition or dispatch.",
+        "Replay binding correction: the first manually copied sensitive placeholders were rejected by the Upstash client, deleted, and not retained as compatibility input. The approved Marketplace resource was reconnected to bundjil-agent Preview with the exact BUNDJIL_CHANNEL_REPLAY_ prefix; provider readback showed encrypted clean KV REST bindings and no copied/unprefixed replay aliases. No Upstash data was inspected or changed.",
+        "Live message/typing evidence remains inconclusive: a bounded local SDK bootstrap stopped at typing-start before send, then one message-first attempt threw during send with no provider acceptance identity. The uncertain send was not retried. The Preview webhook/bypass remain active pending handset or provider-supported readback; Production and Sendblue provider state remain unchanged. See docs/verification/photon-preview-2026-07-21.md.",
+        "Corrected-recipient and direct-transport evidence through 2026-07-22T16:21:34Z: Photon reported the approved Australian identity available, the reconciler created it once and read back one exact assigned match alongside the preserved adopted UK user, and one Spectrum 12.2.0 send under Bun 1.3.14 threw during send without a provider message identity. No retry or UK-alternative send ran. Direct REST token issuance then succeeded, TLS/HTTP2 connectivity succeeded under Node 24.16.0, and a read-only low-level shared iMessage RPC failed non-retryably with PERMISSION_DENIED and no provider request identity. The result localises a transport entitlement/authentication failure but cannot prove the earlier send carried the same status. The rollout-created Australian user remains for exact readback; Production staging remains blocked pending delivery resolution, Photon-side diagnosis, and a durable one-user versus multi-user topology decision. See docs/verification/photon-corrected-recipient-2026-07-22.md.",
+        "Local SDK-stream qualification at 2026-07-22T21:05:49Z resolved the provider-readiness ambiguity without retrying the uncertain cold outbound send. Photon CLI 2.0.0 authenticated to the one Free project and read back iMessage enabled, two assigned shared users, and zero dedicated lines. A Messages send from the registered Australian identity to the other user's assigned number produced Photon's explicit unrecognised-sender response and no application event; the same identity then sent once to its own assigned number, after which the running Spectrum 12.2.0 loop received one inbound text, completed one space.responding reply with a provider message identity, stopped cleanly, and the handset displayed the reply. This proves local managed-line inbound, SDK stream, provider-accepted reply, and handset delivery for the exact pairing; visible typing, Photon webhook delivery, hosted Preview Eve/replay/duplicate behavior, and Production remain unproved. See docs/verification/photon-local-stream-2026-07-22.md.",
+        "SDK freshness review at 2026-07-22T21:23:27Z: npm latest resolved @spectrum-ts/core and @spectrum-ts/imessage to 12.3.0 with new registry integrities. The exact manifest and lockfile pair was refreshed from 12.2.0; @photon-ai/otel resolved to current 3.3.0 while @photon-ai/advanced-imessage 2.0.2 and @photon-ai/proto 0.2.4 remained current. Frozen install, Photon typecheck/all 24 tests/build, agent packaged build/all 53 tests, 76 boundary tests, 17 control tests, docs/skills/authority/controls/verification policies, formatting, lint, Knip, eight workspace typechecks, 265 workspace tests, full verification, and diff checks passed. The 12.3.0 delta retains the narrow exact-optional declaration exception and changes iMessage contact-card precondition handling without widening the Channel contract. No credential or provider was loaded and no Photon, Vercel, Sendblue, Upstash, DNS, secret, webhook, user, line, deployment, message, or Production operation ran. The successful handset journey remains 12.2.0 evidence; hosted Preview, typing display, and Production remain open for the refreshed artifact. See docs/verification/photon-sdk-version-refresh-2026-07-22.md.",
+        "Hosted Preview diagnosis at 2026-07-22T22:54:00Z: pushed source 38a89f90a3f190ed702e3dd8826943bb6371db5d produced READY Preview deployment dpl_5sZhTL7wzi5AmRsb5cxz1YCXeieZ behind the dedicated protected alias and one exact Photon callback. Unsigned ingress returned 401, a signed ignored fixture returned 204, and one fresh handset DM returned 202 and completed Eve before outbound Space resolution mapped to ChannelUnavailableError transport without provider acceptance. The send was not retried; no handset reply, visible typing, or duplicate proof was claimed. Photon documents webhook Space IDs as opaque with no public serverless send-by-ID call, so the package now preserves that ID for common state while resolving send and presence from the branded participant and fails group webhooks closed as unsupportedConversation. Photon typecheck, all 25 tests, and build pass locally; a new pushed immutable Preview candidate and complete journey remain required. Production and Sendblue state were unchanged. See docs/verification/photon-preview-participant-resolution-2026-07-22.md.",
+        "Hosted packaging and timeout diagnosis at 2026-07-22T22:56:50Z: pushed source bcb8fa603ce7b8af34ab4cdf6d7011743c069f70 produced READY Preview deployment dpl_HdtDHbkJVTZtUYunUB5KPCRseh36 with a fresh routing namespace. Its Linux/Node 24 build traced all three Spectrum gRPC peers; one exact callback passed unsigned 401 and signed ignored 204 checks. One fresh handset DM returned 202, completed Eve, produced one provider-accepted outbound reply, and displayed that reply on the handset. The presence event alone failed with ChannelUnavailableError after the explicit two-second bound and no Photon SDK failure observation, localising the remaining stop to Bundjil's pre-provider timeout rather than the corrected package graph. The outbound was not retried; duplicate and both accepted presence transitions remain unproved, so Production remains untouched.",
+        "Accepted hosted Preview at 2026-07-22T23:43:17Z: pushed source daab3e04ef4a7ae043904893a6ae9ee05d79a83e produced READY Preview deployment dpl_HL8XcE9GRRYtQBUSaujhebzdrKK4 with one alias, fresh sensitive webhook/replay/routing bindings, and all three Spectrum gRPC peers traced on Linux/Node 24. One exact callback returned unsigned 401 and signed ignored 204. One fresh signed handset event completed one claim and Eve dispatch, intentionally returned 503, then Photon's documented same-message-ID retry returned 204 after 1.435 seconds; the hosted workflow matched direct-Space resolution, typing start, send, typing stop, and release with no SDK or inbound failure match, and exactly one handset reply appeared. Visible handset typing remains unproved. Production and Sendblue state remained unchanged. See docs/verification/photon-preview-accepted-2026-07-23.md."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "stage-dual-provider-production",
+      "title": "Bind clean Production configuration and stage the dual-provider deployment",
+      "status": "completed",
+      "dependsOn": ["reconcile-photon-resources-and-preview"],
+      "description": "Reconcile current Sendblue, Upstash, Photon, and Vercel metadata; bind only new Production Channel configuration; register the final Photon webhook; and deploy one Production candidate with domains skipped.",
+      "implementationNotes": [
+        "Preserve the approved Sendblue line and reconcile its receive webhook to the clean route without migrating old config/state behavior.",
+        "Use the approved Upstash database only through a fresh physical prefix and never inspect, copy, clear, or import legacy replay keys.",
+        "Bind BUNDJIL_CHANNEL_SENDBLUE_*, BUNDJIL_CHANNEL_PHOTON_*, BUNDJIL_CHANNEL_REPLAY_*, and BUNDJIL_CHANNEL_ROUTING_* to Production with sensitive/encrypted types and sanitized metadata readback.",
+        "Preserve the independently observed source identities of the accepted proxy and current rollback agent; only the new Channel candidate must match the current pushed SHA.",
+        "Deploy from the clean pushed SHA using vercel deploy --prod --skip-domain and preserve current/previous deployment and config fingerprints before any alias change."
+      ],
+      "mandatoryVerification": [
+        "The staged immutable URL serves both routes, exact source/config identity, deployment protection, proxy authentication, and fresh namespace metadata while the stable Production domain remains on the previous deployment.",
+        "Signed Sendblue and Photon ingress fixtures plus negative authentication and replay cases pass against the immutable deployment without exposing provider payloads.",
+        "No legacy environment name is present in the accepted Production metadata and no provider webhook points to an unaccepted target.",
+        "Run matching preflight, target readback, focused journeys, full verification, and diff checks before committing the stage receipt."
+      ],
+      "completionCriteria": [
+        "One rollback-ready immutable Production candidate is accepted without stable-domain traffic.",
+        "Both provider webhook inventories and previous deployment references are exact and recoverable."
+      ],
+      "evidence": [
+        "Accepted Production stage at 2026-07-23T00:13:22Z: pushed source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b produced READY candidate dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG while the explicit stable domain remained on dpl_F4YP4B1keHZU6raPgBmtwbqSyqKb. Production metadata contained 22 clean Channel bindings and zero legacy bindings; the Free Upstash connection covered Preview and Production without a data read. Sendblue retained one assigned line and one clean receive webhook with provider truth adopted into sensitive bindings. Photon retained shared Free service, iMessage enabled, one approved of two total users, zero dedicated lines, and one new Production plus one preserved Preview webhook. Both routes returned unsigned 401 and signed ignored 204, candidate error/fatal logs were empty, and the channel-candidate-staged preflight passed with no rejection and detail digest 58f85db19c836ef6e5bdc74fe072389d448176004ea32b6c8e1c386e3f8a846d. See docs/verification/channel-production-staged-2026-07-23.md."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "promote-and-prove-dual-channel-production",
+      "title": "Promote and prove Sendblue and Photon in Production",
+      "status": "completed",
+      "dependsOn": ["stage-dual-provider-production"],
+      "description": "Promote the accepted immutable agent deployment to the stable domain, read back the alias, and execute bounded end-to-end journeys for both clean Channel providers, including typing start and stop.",
+      "implementationNotes": [
+        "Promote only the accepted staged deployment and immediately verify stable alias, source/config fingerprint, health, route presence, provider webhook targets, and rollback references.",
+        "For Sendblue and Photon separately, prove one signed inbound, one fresh replay claim, one Eve turn, one accepted outbound, one duplicate suppression, typing start, and typing stop.",
+        "Do not retry uncertain outbound effects; reconcile provider status where available and retain inconclusive rather than upgrading acceptance to delivery.",
+        "Observe handset delivery and typing display only when the exact safe test conversation is approved; otherwise record those boundaries as unproved."
+      ],
+      "mandatoryVerification": [
+        "The stable domain resolves to the accepted immutable deployment and both provider webhook inventories resolve to its exact final route without redirects.",
+        "Each provider has a separate proof packet tying source, deployment, provider, replay, dispatch, send, and typing outcomes together while excluding content and identities.",
+        "A rollback drill or non-mutating rollback qualification proves the previous deployment/config is distinct and the retry quarantine procedure is executable.",
+        "Retain the passed promotion preflight and run post-promotion target/provider readback, both bounded journeys, monitoring checks, and full repository verification before committing the Production receipt."
+      ],
+      "completionCriteria": [
+        "Both clean Channel providers and both typing transitions work at the claimed Production boundary with zero duplicate response.",
+        "Any unproved handset boundary is explicit and does not weaken provider/deployment acceptance."
+      ],
+      "evidence": [
+        "Accepted Production promotion at 2026-07-23T00:35:19Z: stable domain bundjil-agent.vercel.app resolved to READY deployment dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG from source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b. Photon produced one signed inbound, one Eve turn, provider send, typing start/stop, scoped release, visible typing, and one handset reply; exact real message-identity redelivery returned 204 and the SDK send count remained one. Sendblue produced one provider-RECEIVED inbound, one Eve reply, one handset reply, and provider-accepted typing start/stop; exact provider-record redelivery returned 204 while outbound readback remained one. Error/fatal logs were zero. Sendblue visible typing remains unproved. See docs/verification/channel-production-accepted-2026-07-23.md."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-production-docs-and-closeout",
+      "title": "Reconcile Production truth and run the final five-pass audit",
+      "status": "completed",
+      "dependsOn": ["promote-and-prove-dual-channel-production"],
+      "description": "Update durable docs only to accepted source and dated provider truth, close the plan, and perform the required five-pass audit after every implementation and rollout task is terminal.",
+      "implementationNotes": [
+        "Update app/package READMEs, architecture, runbooks, verification router/evidence index, SPEC/task/plan indexes, and monitoring/rollback ownership to exact accepted results.",
+        "Preserve historical plans, old receipts, research, and legacy atlas without presenting them as current provider truth.",
+        "Run the five passes in order: ownership/call graphs; Effect/Schema/Layer quality; tests/build/provider proof; docs/authority/operations/rollback; adversarial legacy/secret/drift/unsupported-claim review.",
+        "Any finding reopens and repairs its owning task before closeout."
+      ],
+      "mandatoryVerification": [
+        "Docs-maintainer accounting classifies every affected README/docs/runbook/proof/history surface as changed, preserved, historical, or N/A.",
+        "All repository, Preview, Production, provider-accepted, Eve-completed, and handset-observed claims cite the exact bounded owner and date.",
+        "Legacy/secret/unsafe-boundary/drift scans and all policy, Effect, boundary, type, build, test, lint, Knip, docs, and full verification gates pass.",
+        "The final task ledger and active/completed plan indexes move atomically only after every task and audit pass is accepted."
+      ],
+      "completionCriteria": [
+        "Current documentation routes directly to the accepted dual-provider Production topology, operations, proof, rollback, and limitations.",
+        "The final five-pass audit is recorded once at the end and the plan is archived."
+      ],
+      "evidence": [
+        "Final closeout accepted on 2026-07-23 after the promotion task was terminal. The five passes confirmed package/app ownership and public import graphs; Effect Service/Layer/Schema/Config and tagged-error quality with zero unsafe assertion or generic helper owners; focused provider/runtime proof plus complete repository verification; current docs, authority, operations, monitoring, and rollback routing; and zero tracked secret values, legacy config consumers/source tree, unsafe boundary escapes, retained proof payload markers, or Production binding artifacts. The audit corrected the deploy runbook and task contract so the passed pre-mutation promotion gate is retained and fresh post-promotion readback is required instead of an impossible post-promotion rerun. The active plan was then archived."
+      ],
+      "commitAfterPassing": true
+    }
+  ],
+  "implementationCloseoutAudit": {
+    "status": "completed",
+    "completedAt": "2026-07-21",
+    "passes": [
+      "Ownership/import/export and production/test/proof call graphs match the neutral Channel package, independent provider Layers, app-owned orchestration, and private Photon proof boundary; the repository boundary audit passes.",
+      "Effect, Schema, Config, Layer, tagged-error, resource, and helper review found no unsafe assertion, raw environment/provider client escape, fatal decode, swallowed cause, state mutation helper, or generic common/utils/helpers owner in the replacement slice.",
+      "Contract, failure, timeout, concurrency, build-route, package, boundary, and regression coverage passes for both providers and the agent; the final repository suite contains 233 tests.",
+      "Current documentation separates repository, local, provider, Preview, handset, and Production truth; accepted is not delivered; the continuity break, authority stops, cleanup, rollback, and separate Production SPEC boundary are routed canonically.",
+      "Adversarial legacy, secret, unsafe-boundary, drift, and unsupported-claim scans found no tracked Photon credential value, legacy source tree/config consumer, unsafe cast, raw fetch/process environment access, or unsupported live claim."
+    ],
+    "findingAndResolution": "The audit reopened Task 5 because final Photon cleanup compared only webhook count and proof-URL absence. The provider proof now compares the complete baseline and final webhook topology by stable ID and URL in both directions; a new adversarial test rejects unrelated same-count drift.",
+    "limitations": [
+      "The ignored Photon credential file remains mode 0644, so the canonical runbook blocks any future provider execution until it is 0600.",
+      "Hosted Vercel Preview, live messaging, handset delivery, and Production remain unproved and unauthorised.",
+      "The whole historical documentation corpus retains four broken relative links in docs/architecture/legacy-atlas.md and two missing review_trigger fields in historical documents; current and changed documentation surfaces pass link and frontmatter checks."
+    ]
+  },
+  "promotionCloseoutAudit": {
+    "status": "completed",
+    "completedAt": "2026-07-23",
+    "passes": [
+      "Ownership, imports, exports, and production/test/proof call graphs retain @bundjil/channel as the neutral contract, independent @bundjil/sendblue and @bundjil/photon Layers, and app-owned Eve, routing, replay, dispatch, and composition; the boundary audit passes.",
+      "Effect, Schema, Config, Layer, tagged-error, resource, and helper review found zero unsafe assertions, process/Bun environment reads, instanceof policy, or generic common/utils/helpers owner in the Channel replacement slice; named operations and explicit live/memory Layers remain intact.",
+      "Provider proof bound the accepted Vercel deployment to separate Photon and Sendblue ingress, Eve, outbound, typing, duplicate, and handset results; full repository verification passed with 76 tooling tests, 57 agent tests, 37 proxy tests, and all 14 workspace tasks.",
+      "Documentation, authority, operations, monitoring, and rollback review passed all docs, authority, controls, and verification policy gates and routes exact Preview, staged, Production, provider, handset, limitation, and rollback claims to dated owners.",
+      "Adversarial legacy, secret, unsafe-boundary, drift, and unsupported-claim scans found zero tracked credential values, legacy runtime config consumers or source tree, unsafe boundary escapes, tracked proof payload markers, or retained Production binding artifacts."
+    ],
+    "findingAndResolution": "Pass 4 found that the deploy runbook and promotion task required rerunning a pre-mutation preflight after promotion even though its stable-alias invariant intentionally changes at promotion. It also found stale inconclusive provider readbacks in the authority register. The runbook and task contract now retain the passed promotion gate and require fresh post-promotion target/provider readback; the register now cites the dated accepted receipts, and task-scoped Photon management authority expires at closeout while runtime authority remains separately bounded.",
+    "limitations": [
+      "Photon visible typing was observed in Production; Sendblue typing start and stop were provider-accepted but its handset display was not observed.",
+      "The Photon Production duplicate was an operator redelivery of the exact real provider message identity; the dated Preview receipt separately owns the real Photon provider retry claim.",
+      "The accepted Production runtime remains source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b; later documentation-only closeout commits do not change that deployed artifact and grant no standing provider or deployment authority."
+    ]
+  }
+}

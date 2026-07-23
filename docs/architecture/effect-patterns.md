@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
 last_reviewed: 2026-07-21
-review_trigger: Effect, Schema, service, Layer, provider, helper, lint, or boundary-control change
+review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
 # Effect Patterns

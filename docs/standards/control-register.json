@@ -205,7 +205,7 @@
       "admissionEvidence": "Strict schemas and semantic fixtures reject false success, tamper, missing detail, unsafe rerun, unbounded output, and unavailable-as-proved readback.",
       "falsePositiveCost": "A false positive blocks one packet or journey and requires a claim-matched fixture.",
       "repairCost": "Correct the owning producer/schema and preserve prior evidence rather than rewriting it.",
-      "carryingCost": "Maintain ten journeys, five packet templates, evidence roots, and lifecycle fixtures.",
+      "carryingCost": "Maintain twelve journeys, five packet templates, evidence roots, and lifecycle fixtures.",
       "reviewTrigger": "Journey, producer, packet, evidence, authority, output, or external consequence change.",
       "retirement": "Retire only when a smaller packet proves the same consequence and limitation without losing provenance.",
       "rollback": "Restore the prior producer/schema and retain failed/superseded packets.",

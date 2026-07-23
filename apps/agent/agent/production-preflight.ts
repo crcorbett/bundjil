@@ -215,20 +215,102 @@ export const AgentAcceptedRollbackReadyPreflightSnapshot = Schema.Struct({
   stage: Schema.Literal("agent-accepted-rollback-ready"),
 });
 
-export const SendblueFinalPromotionPreflightSnapshot = Schema.Struct({
-  ...agentAcceptedRollbackReadyFields,
-  rollbackDrill: Schema.Struct({ completed: Schema.Literal(true) }),
-  sendblue: Schema.Struct({ productionActivated: Schema.Literal(false) }),
-  soak: Schema.Struct({ completed: Schema.Literal(true) }),
-  stage: Schema.Literal("sendblue-final-promotion"),
+const DistinctChannelNamespaces = Schema.Struct({
+  previewReplayFingerprint: OpaqueIdentityFingerprint,
+  previewRoutingFingerprint: OpaqueIdentityFingerprint,
+  productionReplayFingerprint: OpaqueIdentityFingerprint,
+  productionRoutingFingerprint: OpaqueIdentityFingerprint,
+}).pipe(
+  Schema.check(
+    Schema.makeFilter((namespaces) =>
+      namespaces.previewReplayFingerprint !==
+        namespaces.productionReplayFingerprint &&
+      namespaces.previewRoutingFingerprint !==
+        namespaces.productionRoutingFingerprint
+        ? undefined
+        : "Channel Preview and Production namespaces must be distinct."
+    )
+  )
+);
+
+const ChannelInventory = Schema.Struct({
+  legacyBindingsPresent: Schema.Literal(false),
+  legacyReplayRead: Schema.Literal(false),
+  namespaces: DistinctChannelNamespaces,
+  photon: Schema.Struct({
+    approvedSharedUserCount: Schema.Literal(1),
+    dedicatedLineCount: Schema.Literal(0),
+    platformEnabled: Schema.Literal(true),
+    serviceType: Schema.Literal("shared"),
+    webhookCount: Schema.Literal(1),
+  }),
+  sendblue: Schema.Struct({
+    lineReady: Schema.Literal(true),
+    receiveWebhookCount: Schema.Literal(1),
+  }),
 });
+
+const channelInventoryReadyFields = {
+  ...agentAcceptedRollbackReadyFields,
+  channel: ChannelInventory,
+} as const;
+
+export const ChannelInventoryReadyPreflightSnapshot = Schema.Struct({
+  ...channelInventoryReadyFields,
+  stage: Schema.Literal("channel-inventory-ready"),
+});
+
+const stagedChannelCandidateFields = {
+  ...channelInventoryReadyFields,
+  candidateAgent: Schema.Struct({
+    configFingerprint: OpaqueIdentityFingerprint,
+    deploymentId: ImmutableDeploymentReference,
+    routes: Schema.Tuple([
+      Schema.Literal("/eve/v1/sendblue/webhook"),
+      Schema.Literal("/eve/v1/photon/webhook"),
+    ]),
+    sourceSha: ImmutableSourceReference,
+  }),
+  stableAliasDeploymentId: ImmutableDeploymentReference,
+} as const;
+
+export const ChannelCandidateStagedPreflightSnapshot = Schema.Struct({
+  ...stagedChannelCandidateFields,
+  stage: Schema.Literal("channel-candidate-staged"),
+}).pipe(
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      snapshot.candidateAgent.deploymentId !== snapshot.stableAliasDeploymentId
+        ? undefined
+        : "Staged candidate must not already own the stable alias."
+    )
+  )
+);
+
+export const ChannelProductionPromotionPreflightSnapshot = Schema.Struct({
+  ...stagedChannelCandidateFields,
+  productionActivated: Schema.Literal(false),
+  rollbackDrill: Schema.Struct({ completed: Schema.Literal(true) }),
+  soak: Schema.Struct({ completed: Schema.Literal(true) }),
+  stage: Schema.Literal("channel-production-promotion"),
+}).pipe(
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      snapshot.candidateAgent.deploymentId !== snapshot.stableAliasDeploymentId
+        ? undefined
+        : "Promotion candidate must not already own the stable alias."
+    )
+  )
+);
 
 export const ProductionPreflightSnapshot = Schema.Union([
   BeforeFirstMutationPreflightSnapshot,
   ProxyProvisionedPreflightSnapshot,
   ProxyAcceptedAgentConfiguredPreflightSnapshot,
   AgentAcceptedRollbackReadyPreflightSnapshot,
-  SendblueFinalPromotionPreflightSnapshot,
+  ChannelInventoryReadyPreflightSnapshot,
+  ChannelCandidateStagedPreflightSnapshot,
+  ChannelProductionPromotionPreflightSnapshot,
 ]);
 
 export type ProductionPreflightSnapshot =
@@ -243,7 +325,9 @@ export const ProductionPreflightEvidence = Schema.Struct({
     "proxy-provisioned",
     "proxy-accepted-agent-configured",
     "agent-accepted-rollback-ready",
-    "sendblue-final-promotion",
+    "channel-inventory-ready",
+    "channel-candidate-staged",
+    "channel-production-promotion",
   ]),
 });
 
@@ -332,6 +416,39 @@ const expectedAgentVariables = [
   [["BUNDJIL_AGENT_MODEL_PROVIDER"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CODEX_PROXY_BASE_URL"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_ROUTING_IDENTITIES"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_ROUTING_SECRET"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_REPLAY_PREFIX"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"], ["encrypted"]],
+  [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL"], ["encrypted"]],
+  [["BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES"], ["encrypted", "sensitive"]],
+  [["BUNDJIL_CHANNEL_SENDBLUE_API_KEY"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_SENDBLUE_API_SECRET"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_SENDBLUE_LINE"], ["sensitive"]],
+  [
+    ["BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS"],
+    ["encrypted", "sensitive"],
+  ],
+  [["BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID"], ["sensitive"]],
+  [["BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"], ["sensitive"]],
+  [
+    ["BUNDJIL_CHANNEL_PHOTON_WEBHOOK_TOLERANCE_SECONDS"],
+    ["encrypted", "sensitive"],
+  ],
+] as const;
+
+const legacyChannelBindingPrefixes = [
+  "BUNDJIL_SENDBLUE_",
+  "BUNDJIL_CHANNEL_REPLAY_REST_",
+  "KV_REST_API_",
+  "KV_URL",
+  "REDIS_URL",
 ] as const;
 
 const expectedProxyVariables = [
@@ -377,9 +494,25 @@ const missingVariableBindings = (
       : [`ambiguous-production-variable:${names.join("|")}`];
   });
 
+const legacyChannelBindings = (
+  variables: readonly (typeof VercelProductionVariable.Type)[]
+) =>
+  variables
+    .filter((variable) =>
+      legacyChannelBindingPrefixes.some((prefix) =>
+        variable.name.startsWith(prefix)
+      )
+    )
+    .map((variable) => `legacy-production-variable:${variable.name}`);
+
 export const preflightProductionPromotion = Effect.fn(
   "ProductionPromotion.preflight"
 )(function* (snapshot: ProductionPreflightSnapshot) {
+  const verifiesAcceptedProxySource =
+    snapshot.stage === "proxy-accepted-agent-configured" ||
+    snapshot.stage === "agent-accepted-rollback-ready";
+  const verifiesAcceptedAgentSource =
+    snapshot.stage === "agent-accepted-rollback-ready";
   const rejected =
     snapshot.stage === "before-first-mutation"
       ? []
@@ -401,19 +534,21 @@ export const preflightProductionPromotion = Effect.fn(
                   snapshot.agent.variables,
                   expectedAgentVariables
                 ),
+                ...legacyChannelBindings(snapshot.agent.variables),
                 ...(snapshot.previewBearerFingerprint ===
                 snapshot.agent.bearerFingerprint
                   ? ["shared-preview-production-bearer"]
                   : []),
-                ...(snapshot.acceptedProxy.sourceSha ===
-                snapshot.source.pushedSha
+                ...(!verifiesAcceptedProxySource ||
+                snapshot.acceptedProxy.sourceSha === snapshot.source.pushedSha
                   ? []
                   : ["accepted-proxy-source-mismatch"]),
                 ...(snapshot.stage === "proxy-accepted-agent-configured"
                   ? []
                   : [
-                      ...(snapshot.acceptedAgent.sourceSha ===
-                      snapshot.source.pushedSha
+                      ...(!verifiesAcceptedAgentSource ||
+                      snapshot.acceptedAgent.sourceSha ===
+                        snapshot.source.pushedSha
                         ? []
                         : ["accepted-agent-source-mismatch"]),
                       ...(snapshot.rollback.proxy.current.deploymentId ===
@@ -428,6 +563,19 @@ export const preflightProductionPromotion = Effect.fn(
                         snapshot.acceptedAgent.configFingerprint
                         ? []
                         : ["agent-current-rollback-mismatch"]),
+                      ...(snapshot.stage === "channel-candidate-staged" ||
+                      snapshot.stage === "channel-production-promotion"
+                        ? [
+                            ...(snapshot.candidateAgent.sourceSha ===
+                            snapshot.source.pushedSha
+                              ? []
+                              : ["channel-candidate-source-mismatch"]),
+                            ...(snapshot.stableAliasDeploymentId ===
+                            snapshot.rollback.agent.current.deploymentId
+                              ? []
+                              : ["channel-stable-alias-rollback-mismatch"]),
+                          ]
+                        : []),
                     ]),
               ]),
         ];

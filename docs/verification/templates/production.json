@@ -29,6 +29,11 @@
       "journeyId": "BND-J09-deployment-promotion-readback",
       "status": "inconclusive",
       "oracle": "Replace with the live, readback-backed oracle."
+    },
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "inconclusive",
+      "oracle": "Replace with stable-alias plus separate Sendblue and Photon route, replay, outbound, and typing readbacks."
     }
   ],
   "commandReceipt": {
@@ -54,7 +59,7 @@
     "A stable hostname, source build, or Preview result is not Production proof."
   ],
   "nonClaims": [
-    "This template does not prove deployment, promotion, message delivery, or provider health."
+    "This template does not prove deployment, promotion, either provider journey, message delivery, visible typing, or provider health."
   ],
   "rollback": {
     "identity": "replace with current and previous immutable deployment references",

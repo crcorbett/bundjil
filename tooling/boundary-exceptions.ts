@@ -39,28 +39,16 @@ export type BoundaryRule =
  */
 export const boundaryExceptions = [
   {
-    file: "apps/agent/agent/lib/sendblue/channel.ts",
+    file: "packages/sendblue/src/live.layer.ts",
     symbol: "body",
     occurrence: "request.text#1",
-    owner: "apps/agent",
+    owner: "@bundjil/sendblue",
     boundaryKind: "http-in",
-    canonicalContract: "SendblueInboundMessage",
+    canonicalContract: "SendblueWebhookMessage",
     admittedSyntax: "Fetch Request text reader",
     reason:
-      "The Fetch webhook adapter must read the signed body as text before immediately decoding SendblueInboundMessage.",
+      "The Sendblue webhook adapter authenticates the exact request header before reading and immediately decoding its bounded JSON body.",
     rule: "raw-response-text",
-  },
-  {
-    file: "apps/agent/agent/lib/sendblue/session-router.ts",
-    symbol: "keyedSendblueDigest",
-    occurrence: "StringKeyword:string#1",
-    owner: "apps/agent",
-    boundaryKind: "framework",
-    canonicalContract: "SendblueConversationKey",
-    admittedSyntax: "Web Crypto encoder input",
-    reason:
-      "Web Crypto accepts primitive UTF-8 fragments only inside the private HMAC adapter before its digest is decoded as SendblueConversationKey.",
-    rule: "boundary-raw-primitive",
   },
   {
     file: "packages/store/src/upstash-client.internal.ts",

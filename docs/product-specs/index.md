@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -22,8 +22,8 @@ context.
 
 ## Implemented or superseded history
 
-The twelve sibling historical ledgers retain heterogeneous terminal
-provenance: ten use ledger-level `status: completed`, while the Effect
+The thirteen sibling historical ledgers retain heterogeneous terminal
+provenance: eleven use ledger-level `status: completed`, while the Effect
 persistence and Effect Schema string-contract ledgers use `status:
 implemented`. The Vercel promotion ledger also retains a historical, scoped
 `approval.status: granted`. Every individual entry in those ledgers' `tasks`
@@ -41,6 +41,7 @@ lifecycle or recorded approval fields. None is standing authority.
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
 | [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains separately deferred       |
+| [Schema-driven Channels and Production promotion](photon-channel-provider.md)       | Implemented dual-provider rollout; dated receipt owns provider truth |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                 | Implemented migration history                                        |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                     | Implemented rollout history                                          |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                         | Implemented rollout history                                          |

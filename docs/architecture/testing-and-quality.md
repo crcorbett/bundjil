@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -55,7 +55,7 @@ hygiene, workspace typechecks, and tests. `bun run check` enables
 any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
 literal tag do not agree.
 
-`bun run check:verification` validates all ten critical-journey records, their
+`bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command
 receipt constraints, evidence roots, lifecycle/provenance rules, and semantic
 false-success cases. It validates repository contracts and fixtures only. It
@@ -86,6 +86,12 @@ Package-focused commands:
 
 ```bash
 bun run --filter @bundjil/eve test
+bun run --filter @bundjil/channel test
+bun run --filter @bundjil/channel build
+bun run --filter @bundjil/sendblue test
+bun run --filter @bundjil/sendblue build
+bun run --filter @bundjil/photon test
+bun run --filter @bundjil/photon build
 bun run --filter @bundjil/codex test
 bun run --filter @bundjil/codex build
 bun run --filter @bundjil/store test
@@ -125,7 +131,9 @@ bun run --filter @bundjil/agent preflight:production
   timing values between the four clocks or preserve a stale qualification
   silently.
 - Channel/provider integration change: add or update a SPEC first, then include
-  mock tests, live-boundary proof where safe, and docs.
+  the shared transport conformance suite, app vertical/build-route tests,
+  provider failure/lifecycle fixtures, live-boundary proof only where separately
+  authorised and safe, and docs.
 - Codex subscription proof change: run `@bundjil/codex` tests,
   typecheck/build, and the opt-in `proof:codex-responses` command only with a
   private `CODEX_ACCESS_TOKEN` source. Proof output must contain only status,
@@ -192,6 +200,48 @@ Rules:
   and that unrelated contracts stayed exact.
 - For Eve tools, test both `execute(...)` behavior and the Standard Schema /
   Standard JSON Schema metadata produced by `toEveSchema(...)`.
+
+## Channel Verification
+
+Routine Channel verification is credential-free:
+
+```bash
+bun run --filter @bundjil/channel check-types
+bun run --filter @bundjil/channel test
+bun run --filter @bundjil/channel build
+bun run --filter @bundjil/sendblue check-types
+bun run --filter @bundjil/sendblue test
+bun run --filter @bundjil/sendblue build
+bun run --filter @bundjil/photon check-types
+bun run --filter @bundjil/photon test
+bun run --filter @bundjil/photon build
+bun run --filter @bundjil/agent check-types
+bun run --filter @bundjil/agent test
+bun run --filter @bundjil/agent build
+```
+
+The same `@bundjil/channel/testing` conformance journey must pass against each
+provider Layer. App tests must prove provider substitution only at composition
+roots, atomic concurrent replay, immutable state encoding, the shared Eve
+adapter, and both built routes. Provider fixtures own authentication,
+complete-response decoding, rejection, timeout/uncertain delivery, presence,
+and cleanup behavior.
+
+The opt-in Photon management command is not routine verification:
+
+```bash
+bun run --filter @bundjil/photon proof:provider
+```
+
+Run it only through the
+[Photon provider proof runbook](../../apps/agent/runbooks/photon.md) with
+current explicit authority and owner-only credential-file permissions. Its
+sanitised receipt proves authenticated management, one isolated webhook
+lifecycle, write-only secret receipt, SDK acquire/release, and restored
+topology at readback time. It does not prove Vercel Preview, signed hosted
+ingress, Eve dispatch, replay, outbound acceptance, presence against a live
+Space, or handset delivery. Those require a later target-owned SPEC/runbook and
+fresh evidence. Routine `verification` and `build` perform no provider action.
 
 ## Eve Runtime Verification
 

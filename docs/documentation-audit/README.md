@@ -142,6 +142,7 @@ HGI-309 lifecycle-correction evidence:
 
 - [`HGI-309-lifecycle-correction-candidate.json`](HGI-309-lifecycle-correction-candidate.json)
 - [`HGI-309-lifecycle-correction-validation.json`](HGI-309-lifecycle-correction-validation.json)
+- [`HGI-307-photon-merge-inventory-correction.json`](HGI-307-photon-merge-inventory-correction.json)
 
 The correction moves accepted local harness provenance out of current/active
 routing. It retains HGI-309's explicit external-authority deferral and proves
