@@ -359,7 +359,7 @@
     {
       "id": "promote-and-prove-dual-channel-production",
       "title": "Promote and prove Sendblue and Photon in Production",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["stage-dual-provider-production"],
       "description": "Promote the accepted immutable agent deployment to the stable domain, read back the alias, and execute bounded end-to-end journeys for both clean Channel providers, including typing start and stop.",
       "implementationNotes": [
@@ -378,7 +378,9 @@
         "Both clean Channel providers and both typing transitions work at the claimed Production boundary with zero duplicate response.",
         "Any unproved handset boundary is explicit and does not weaken provider/deployment acceptance."
       ],
-      "evidence": [],
+      "evidence": [
+        "Accepted Production promotion at 2026-07-23T00:35:19Z: stable domain bundjil-agent.vercel.app resolved to READY deployment dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG from source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b. Photon produced one signed inbound, one Eve turn, provider send, typing start/stop, scoped release, visible typing, and one handset reply; exact real message-identity redelivery returned 204 and the SDK send count remained one. Sendblue produced one provider-RECEIVED inbound, one Eve reply, one handset reply, and provider-accepted typing start/stop; exact provider-record redelivery returned 204 while outbound readback remained one. Error/fatal logs were zero. Sendblue visible typing remains unproved. See docs/verification/channel-production-accepted-2026-07-23.md."
+      ],
       "commitAfterPassing": true
     },
     {

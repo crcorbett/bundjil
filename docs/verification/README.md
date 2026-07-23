@@ -66,6 +66,12 @@ operation nor asserts present provider state.
   rollback identities, provider inventories, signed route fixtures, and passed
   staged preflight while the explicit stable domain remains unchanged. It is
   not a promotion, live provider journey, handset, or visible-typing receipt.
+- [`channel-production-accepted-2026-07-23.md`](channel-production-accepted-2026-07-23.md)
+  proves the accepted stable-domain Production deployment, separate real
+  Photon and Sendblue handset journeys, exact-identity duplicate suppression,
+  provider typing start/stop, rollback readiness, and zero second external
+  response. Photon visible typing is observed; Sendblue visible typing remains
+  unproved.
 
 ## Claim boundaries
 
@@ -83,10 +89,11 @@ status and local proxy mock health/auth/SSE are locally proved. Gateway
 session creation/recovery is deferred because no deterministic session and
 interrupted-stream recovery fixture exists. Local reauthentication,
 Sendblue/provider rejection, and deployment preflight have only partial local
-contract proof. Sendblue sends, Executor reads/resumes, deployment/promotion,
-Photon messaging/typing, the combined dual-Channel Production journey,
-Sendblue sends, Executor reads/resumes, deployment/promotion, and incident
-containment/recovery remain approval-gated external journeys.
+contract proof. Future Sendblue or Photon sends, Executor reads/resumes,
+deployments, promotions, and incident containment/recovery remain
+approval-gated external journeys. The accepted dual-Channel Production journey
+is retained only in its dated receipt and grants no standing authority for
+another operation.
 
 For an external or approval-gated journey, first use the app-owned runbook:
 [`../../apps/agent/runbooks/README.md`](../../apps/agent/runbooks/README.md) or
