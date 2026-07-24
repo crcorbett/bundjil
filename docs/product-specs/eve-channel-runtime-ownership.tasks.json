@@ -1,0 +1,181 @@
+{
+  "title": "Eve Channel Runtime Ownership and Supervision Tasks",
+  "status": "proposed",
+  "spec": "docs/product-specs/eve-channel-runtime-ownership.md",
+  "principles": [
+    "Own one concrete ManagedRuntime per loaded provider composition root per JavaScript module instance; current local output loads both roots, but future function splitting must be read back rather than assumed.",
+    "Use native Effect Layer, ManagedRuntime, Fiber, Scope, Schema, Config, Service, Exit, and tagged-error primitives directly. Reject a ChannelEffectRunner, generic callback, pass-through interface, trivial wrapper, or helper/common/utils module.",
+    "Keep provider Layer graphs separate while reusing canonical contracts and Layer constructors through ordinary composition; do not share MemoMaps explicitly across provider runtimes.",
+    "Accepted background work belongs to the provider runtime Scope and Eve waitUntil; Photon Spectrum remains per-operation acquireUseRelease unless a separate accepted decision changes it.",
+    "Repository, local, Preview, Production, bundle, warm-instance, scale-out, shutdown, provider, and handset claims remain separate and evidence-bounded."
+  ],
+  "globalVerification": [
+    "Effect language-server diagnostics for every changed TypeScript file",
+    "bun run --filter @bundjil/channel check-types",
+    "bun run --filter @bundjil/channel test",
+    "bun run --filter @bundjil/sendblue check-types",
+    "bun run --filter @bundjil/sendblue test",
+    "bun run --filter @bundjil/photon check-types",
+    "bun run --filter @bundjil/photon test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "riskLenses": [
+    "Ownership and call graph: Eve Promise/callback edges, concrete provider runtimes, Channel and ChannelTransport Services, provider Layers, request-local EveChannelDispatch, runtime Scope, accepted Fiber, waitUntil, and deployment instances remain correctly separated.",
+    "Implementation quality: flat meaningful Effect control flow, typed .pipe error handling, canonical Schema Type/Encoded provenance, named operations and safe errors, explicit live/memory Layers, native primitives, and no unsafe casts/manual readers/DTO mirrors/runner wrappers/helper sprawl.",
+    "Verification coverage: independent Layer builds, concurrency, failure poisoning and recovery, supervised waitUntil completion, disposal/finalizers, global-scope regression, route/status compatibility, Photon lifecycle retention, build topology, documentation, and evidence non-claims."
+  ],
+  "fixtureLifecycle": [
+    "Create apps/agent/test/channel-runtime.test.ts for independent provider-shaped Layer build-once, concurrency, failure isolation, cached failure, fresh-runtime recovery, and scoped runtime disposal.",
+    "Update apps/agent/test/sendblue-channel.test.ts for waitUntil ordering, success/typed-failure/defect/interruption completion, disposal finalizers, client-abort independence, and the forkDetach/global-Scope regression while retaining exact route/status/duplicate fixtures.",
+    "Retain apps/agent/test/channel-config.test.ts as provider credential-isolation proof.",
+    "Retain apps/agent/test/channel-vertical.test.ts for concurrent replay, provider substitution, Photon retry proof, Sendblue proof-disabled, and duplicate behavior; update only if the shared adapter fixture requires it.",
+    "Retain apps/agent/test/sendblue-build-route.test.ts as local-output proof for both absolute routes and both provider operations; update only if emitted output shape changes and never treat it as Vercel readback.",
+    "Retain packages/channel/test/channel-transport.test.ts, packages/sendblue/test/sendblue-transport.test.ts, packages/photon/test/photon-transport.test.ts, other Photon lifecycle tests, production preflight tests, and Vercel packaging tests. Retire no fixture in this slice."
+  ],
+  "tasks": [
+    {
+      "id": "prove-provider-runtime-behavior",
+      "title": "Prove provider runtime caching, concurrency, failure isolation, and recovery",
+      "status": "pending",
+      "description": "Add deterministic app-level runtime tests before changing accepted background execution. Prove one lazy build per concrete runtime, concurrent execution without accidental serialization, independent provider Layer failure, retained same-runtime build failure, and fresh-runtime recovery. Source/module and build evidence, not this unit fixture, own runtime cardinality.",
+      "implementationNotes": [
+        "Create apps/agent/test/channel-runtime.test.ts; keep runtime-lifecycle proof out of production helpers and services.",
+        "Build two explicit test Layers that provide the same Channel Service tag through independent provider-shaped composition roots; count acquisition with Effect-native Ref/Deferred/TestClock primitives where applicable.",
+        "Run concurrent operations through one ManagedRuntime and prove overlap without scheduling sleeps or plain mutable timing helpers.",
+        "Make one provider Layer acquisition fail with its existing typed acquisition/config failure, prove the other runtime still builds and runs, and prove repeated calls to the failed runtime observe the cached failure.",
+        "Preserve the current framework boundary: ManagedRuntime.runPromise rejects on initial Layer-build failure; installed Eve dispatch catches an authored handler rejection and returns its sanitized 500. Do not remap build failure to the app's 503 routing/replay contract or encode the tagged error outward.",
+        "Create a fresh runtime from the repaired test Layer to prove recovery. Do not add automatic production singleton replacement, a runtime registry, a ChannelEffectRunner, or a shared MemoMap.",
+        "Register every test runtime's disposeEffect in Effect.scoped; no test may leak a runtime."
+      ],
+      "mandatoryVerification": [
+        "Focused runtime tests prove independent and once-only Layer builds, concurrent calls do not serialize, one provider failure does not poison the other, same-runtime build failure remains cached, and recovery requires a fresh runtime. The implementation receipt separately cites exact module placement and local build evidence for cardinality.",
+        "Audit the task's primary Effects for flat meaningful Effect.gen control flow and expected typed failures handled in .pipe(...) using catchTag, catchTags, or mapError.",
+        "Verify every value uses canonical Schema-derived contracts and exact Type/Encoded sides; decode unknown only at host/provider ingress and encode only at outward boundaries.",
+        "Verify no unsafe cast, manual reader/mapper, DTO mirror, synchronous production codec, runner abstraction, trivial wrapper, generic callback, shared MemoMap, or helper/common/utils sprawl was introduced.",
+        "Verify correct Service, Layer, ManagedRuntime, Scope, Fiber, and test-finalizer ownership; run Effect language-server diagnostics for every changed TypeScript file.",
+        "Require zero unexplained boundary findings and zero stale exact exceptions; run focused @bundjil/agent tests plus bun run check:boundaries, bun run check:effect-setup, bun run check:docs, bun run check:skills, bun run check:authority, bun run check:controls, and bun run check:verification.",
+        "Invoke docs-maintainer for this slice and record Change required, Preserve, or N/A against the SPEC impact ledger before acceptance."
+      ],
+      "completionCriteria": [
+        "The test suite makes per-runtime caching, concurrency, failure isolation, disposal, and recovery executable without pretending to prove module/function cardinality.",
+        "All focused checks pass and the task records ownership/call-graph, implementation-quality, and verification-coverage evidence."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "supervise-accepted-eve-background-work",
+      "title": "Replace global detached work with the provider runtime's supervised Fiber",
+      "status": "pending",
+      "description": "Change only the shared Eve adapter so the request-decision Effect returns accepted background work to the concrete ManagedRuntime edge, which starts it with runFork and passes native Fiber.await completion to Eve waitUntil. Preserve all route, callback, replay, state, and provider behavior.",
+      "implementationNotes": [
+        "Keep makeChannelEveChannel and makeChannelEveEvents parameterized by ManagedRuntime.ManagedRuntime<Channel, E>. Do not introduce ChannelEffectRunner, a runtime Service, a generic interface, or callback-based test seam.",
+        "Remove Effect.forkDetach from accepted webhook execution. Keep the request decision in channelRuntime.runPromise and return the one-use background Effect inline with the 202 response.",
+        "At the Eve Promise edge call channelRuntime.runFork(background), then pass Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)) exactly once to waitUntil.",
+        "Start the accepted Fiber and register its completion with waitUntil before the handler Promise resolves. Keep the bounded post-claim/pre-fork interval explicit and rely on the existing replay lease/provider retry boundary if the process terminates there; do not hide it behind nested runtime interpretation or a helper.",
+        "Use Fiber.await rather than join so every Exit is observed without changing the already-accepted HTTP response. Existing tapError observes typed failures only; do not claim it logs defects/interruption or add a telemetry wrapper. Do not bind accepted work to request.signal.",
+        "Add no Channel-wide adapter timeout or retry. Preserve Sendblue's 30-second message and 2-second presence timeouts, Photon's 30-second message and 15-second presence timeouts, and the existing delivery-uncertainty policy.",
+        "Keep the provider-retry proof branch inline and synchronous before its intentional 503; Sendblue remains proof-disabled.",
+        "Do not change Channel, ChannelTransport, EveChannelDispatch, replay policy, Config, Schemas, errors, status mapping, or Photon resource lifetime."
+      ],
+      "mandatoryVerification": [
+        "Focused route tests prove accepted work is supervised, exactly one completion Promise reaches waitUntil before the 202 handler Promise resolves, and waitUntil resolves after success, typed failure, defect, or interruption without a second dispatch.",
+        "Dispose the test runtime while accepted work is pending; assert the Fiber is interrupted and its finalizer completes. Add regression evidence that the accepted path contains no forkDetach/global-Scope ownership and no detached work survives runtime disposal.",
+        "Abort the ingress Request signal after acceptance and prove the accepted provider-runtime Fiber is not cancelled by the client disconnect.",
+        "Retain exact 202 accepted, 204 ignored/duplicate, 400 schema, 401 authentication, 503 routing/replay/provider-retry behavior and exact one-dispatch duplicate suppression.",
+        "Retain provider timeout fixtures and prove the shared Eve adapter adds no timer, retry, or conversion of waitUntil into durable execution.",
+        "Audit the task's primary Effects for flat meaningful Effect.gen control flow and expected typed failures handled in .pipe(...) using catchTag, catchTags, or mapError.",
+        "Verify every value uses canonical Schema-derived contracts and exact Type/Encoded sides; decode unknown only at host/provider ingress and encode only at outward boundaries.",
+        "Verify no unsafe cast, manual reader/mapper, DTO mirror, synchronous production codec, runner abstraction, trivial wrapper, generic callback, cross-provider tag collision, or helper/common/utils sprawl was introduced.",
+        "Verify correct request-local EveChannelDispatch Layer, provider ManagedRuntime, runtime Scope, Fiber.await, interruption, acquireUseRelease finalizer, and waitUntil ownership; run Effect language-server diagnostics for every changed TypeScript file.",
+        "Require zero unexplained boundary findings and zero stale exact exceptions; run focused @bundjil/agent tests plus bun run check:boundaries, bun run check:effect-setup, bun run check:docs, bun run check:skills, bun run check:authority, bun run check:controls, and bun run check:verification.",
+        "Invoke docs-maintainer for this slice and update the earliest durable owners required by the impact ledger before acceptance."
+      ],
+      "completionCriteria": [
+        "No accepted Channel work is attached to Effect's global Scope; the owning provider runtime supervises it and Eve waitUntil observes native Fiber completion.",
+        "No per-request ManagedRuntime construction/disposal, combined runtime, shared MemoMap, provider eager loading, or Photon lifetime change exists."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "reconcile-runtime-docs-and-repository-closeout",
+      "title": "Reconcile durable runtime owners and complete repository verification",
+      "status": "pending",
+      "description": "Update implemented architecture and app documentation, retain provider/runbook/proof boundaries, verify both built routes and Photon lifecycle compatibility, and run the complete repository closeout without deployment or provider operations.",
+      "implementationNotes": [
+        "Update docs/architecture/eve-agent.md and apps/agent/README.md only after code implements the accepted runtime behavior.",
+        "Reverify the pinned Eve source before implementation. Installed eve@0.20.0 clears compiled runtime caches and can reload Nitro, while development-server close owns watcher/listener/Nitro/sandbox cleanup; neither path exposes authored Channel ManagedRuntime disposal. Preserve apps/agent/runbooks/local-development.md unless a separately reviewed Eve pin adds a real public lifecycle API.",
+        "Keep packages/channel, sendblue, photon, and store READMEs unchanged unless implementation actually changes their public contract. Photon README must continue to state per-operation acquireUseRelease.",
+        "Do not rewrite the completed Photon SPEC, dated deployment evidence, or historical plans as current intent.",
+        "Create an active execution plan only when implementation begins, keep it current during implementation, and move it through repository lifecycle only after acceptance."
+      ],
+      "mandatoryVerification": [
+        "The app build contains both absolute provider routes and both provider composition roots, with no provider eager-loading or Service-tag collision assertion inferred beyond source/build evidence.",
+        "Focused Photon tests retain per-operation Spectrum acquire/use/release, timeout, failure, interruption, and cleanup behavior; no runtime-scoped SDK app exists.",
+        "Audit every changed code path for flat meaningful Effect.gen, typed .pipe catchTag/catchTags/mapError, canonical Schema Type/Encoded, decode-once/encode-once, named operations/safe errors/live-memory Layers, and correct Fiber/Scope/Layer ownership.",
+        "Verify no unsafe cast, manual reader/mapper, DTO mirror, synchronous production codec, runner abstraction, trivial wrapper, generic callback, shared MemoMap, or helper/common/utils sprawl; require zero unexplained boundary findings and zero stale exact exceptions.",
+        "Run Effect language-server diagnostics and focused Channel, Sendblue, Photon, and agent check-types/tests/builds.",
+        "Run bun run check:boundaries, bun run check:effect-setup, bun run check:docs, bun run check:skills, bun run check:authority, bun run check:controls, bun run check:verification, final bun run verification, and git diff --check.",
+        "Run an exact source scan proving production ManagedRuntime.make remains only in apps/agent/agent/channels/sendblue.ts and photon.ts, no request handler constructs or disposes a runtime, the accepted app path contains no forkDetach, and shared-edge runFork has no second production owner.",
+        "Invoke docs-maintainer at closeout and reconcile every impact-ledger row, fixture lifecycle, rollback owner, deliberate N/A, and external-state non-claim."
+      ],
+      "completionCriteria": [
+        "Current architecture and app routes describe implemented provider-root cardinality, supervision, disposal limits, failure recovery, and Vercel evidence boundaries without claiming current provider state.",
+        "All focused and repository gates pass. An unavailable or environment-inconclusive check does not count as acceptance and must be rerun in a valid repository environment.",
+        "No provider, Vercel, credential, deployment, message, or Production mutation occurred."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "optional-authorized-preview-runtime-readback",
+      "title": "Optionally prove one immutable Preview runtime topology under separate authority",
+      "status": "pending",
+      "description": "Only after implementation, clean Git publication, and explicit target-owned deployment/provider authority, deploy an isolated Preview and collect bounded evidence for its exact function topology and one approved waitUntil journey. This task grants no authority itself and is not required for repository acceptance.",
+      "implementationNotes": [
+        "Resolve the exact personal bundjil-agent project, Preview environment, pushed source SHA, immutable rollback deployment, protection, and authority receipt before any operation.",
+        "Read back whether Sendblue and Photon routes share one function identity for that exact deployment; do not generalize the result to all deployments or instances.",
+        "If an approved synthetic Channel journey is in scope, require exactly one accepted dispatch, one waitUntil completion, zero duplicate dispatch, safe logs, and no secret/content/identity retention.",
+        "Do not test scale-down by waiting, infer disposal from quiet logs, mutate Photon lifetime, or perform Production promotion."
+      ],
+      "mandatoryVerification": [
+        "Record immutable deployment/source identity, environment=Preview, function-route mapping, observedAt, safe statuses/counts, rollback identity, limitations, and non-claims.",
+        "Classify repository, deployment, runtime-log, provider, and handset evidence separately; unavailable readback is inconclusive, never healthy.",
+        "Re-run the accepted repository verification and confirm the deployed source contains no runner abstraction, forkDetach accepted path, combined runtime, shared MemoMap, or Photon resource-lifetime change.",
+        "Use the existing target-owned runbook and verification packet owner; halt on missing authority, target ambiguity, secret exposure, duplicate dispatch, non-completion, provider uncertainty, or unavailable rollback."
+      ],
+      "completionCriteria": [
+        "Any retained packet proves only the exact Preview deployment and observation, not Vercel shutdown, future bundling, scale-out cardinality, Production, provider health, or handset behavior.",
+        "No Production operation follows without a separate accepted product decision and authority."
+      ],
+      "commitAfterPassing": false
+    }
+  ],
+  "review": {
+    "status": "accepted",
+    "reviewedAt": "2026-07-24",
+    "findings": [
+      "Rejected ChannelEffectRunner, generic callback runners, runtime Services, and pass-through helpers; the concrete provider ManagedRuntime remains the framework-edge dependency and test seam.",
+      "Rejected one combined Eve runtime and explicit cross-runtime MemoMap sharing because they create false provider/config/failure/Scope coupling without a demonstrated consumer.",
+      "Selected direct provider runFork plus Effect.runPromise(Fiber.await(...).pipe(Effect.asVoid)) at the Eve edge; forkChild, forkScoped, forkDetach, and join do not match the accepted-response lifetime and failure contract.",
+      "Required the accepted Fiber and waitUntil registration before the handler resolves and documented the bounded post-claim/pre-fork process-termination interval and replay-lease recovery boundary.",
+      "Confirmed installed eve@0.20.0 owns watcher/listener/Nitro/sandbox cleanup but exposes no authored Channel teardown callback and does not dispose module ManagedRuntimes on cache clear or reload.",
+      "Kept Layer-build failure cached per runtime with recovery only through a fresh owner lifecycle; no automatic singleton replacement.",
+      "Preserved Photon Spectrum per-operation acquireUseRelease as a separate resource-lifetime decision.",
+      "Bounded Vercel claims to immutable deployment evidence and repeated Effect, boundary, diagnostics, documentation, and verification gates in every code task.",
+      "Corrected cardinality to one runtime per loaded provider composition root per module instance: the installed Eve/current local output loads both roots, but future function splitting is a readback question.",
+      "Corrected stale source and reference anchors, made fixture create/update/retain ownership explicit, preserved the current effect-client-wrapper policy, and require all implementation gates to pass rather than accepting an inconclusive environment.",
+      "Separated per-runtime semantic tests from source/build cardinality proof, documented installed Eve's sanitized 500 for authored handler rejection, and rejected an unowned Channel-wide timeout or retry.",
+      "Completed the 22-README inventory, corrected product-spec counts, and grounded repository implementation acceptance to bundjil-agent-architecture-owner."
+    ]
+  }
+}

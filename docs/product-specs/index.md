@@ -14,6 +14,12 @@ entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
 
+## Proposed
+
+- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
+  — implementation-ready specification accepted after adversarial formal review;
+  implementation has not begun and no active execution plan exists.
+
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
