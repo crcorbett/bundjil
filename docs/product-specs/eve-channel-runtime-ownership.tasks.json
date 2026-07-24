@@ -999,7 +999,7 @@
     {
       "id": "supervise-accepted-eve-background-work",
       "title": "Replace global detached work with the provider runtime's supervised Fiber",
-      "status": "pending",
+      "status": "completed",
       "findingIds": ["FINDING-001", "FINDING-002", "FINDING-003"],
       "requirementIds": [
         "EVE-RUNTIME-REQ-001",
@@ -1037,6 +1037,15 @@
       "completionCriteria": [
         "No accepted Channel work is attached to Effect's global Scope; the owning provider runtime supervises it and Eve waitUntil observes native Fiber completion.",
         "No per-request ManagedRuntime construction/disposal, combined runtime, shared MemoMap, provider eager loading, or Photon lifetime change exists."
+      ],
+      "completedAt": "2026-07-24",
+      "completionEvidence": [
+        "apps/agent/agent/lib/channel/eve.ts now returns the accepted background Effect from request preparation, starts it directly with the existing concrete provider ManagedRuntime.runFork, and passes exactly one Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)) Promise to Eve waitUntil before returning the response. The old Effect.forkDetach, Fiber observer, and Promise.withResolvers path is removed.",
+        "apps/agent/test/sendblue-channel.test.ts retains the actual route/status/replay fixture and adds a canonical test Channel Layer used through the concrete ManagedRuntime seam. Five route tests prove 202 acceptance, one waitUntil registration before handler resolution, success, typed Eve dispatch failure, defect, runtime-disposal interruption and finalizer completion, request-abort independence, exactly one dispatch, 204 ignored/duplicate, 401 authentication, 400 schema, and 503 routing behavior without sleeps.",
+        "Ownership and call-graph review confirms only the shared Eve framework edge interprets the accepted background Effect; production ManagedRuntime.make remains only in the Sendblue and Photon module roots; no request handler constructs or disposes a runtime; EveChannelDispatch remains request-local; provider-retry proof stays inline and synchronous; and no request.signal, adapter timeout, or retry was added.",
+        "Implementation-quality review found direct native ManagedRuntime, Fiber, Scope, Deferred, Effect, Layer, and Schema use with no ChannelEffectRunner, runtime Service, generic callback seam, shared MemoMap, combined provider runtime, unsafe cast, DTO mirror, manual codec/reader, helper module, stringly policy, synchronous production codec, or boundary exception.",
+        "Effect-enabled agent check-types completed with no language-service diagnostic. The 18 affected runtime/vertical/route tests, 62 full agent tests, and 25 Photon tests passed. Photon per-operation acquireUseRelease, timeouts, failure, interruption, and cleanup remained unchanged.",
+        "Direct boundary, Effect setup, docs, skills, authority, controls, and verification gates passed, followed by a fresh full bun run verification. Repository/local tests and build prove only source behavior; no Preview, Production, provider, credential, message, handset, or deployment operation occurred."
       ],
       "commitAfterPassing": true
     },

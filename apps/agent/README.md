@@ -19,8 +19,10 @@ It composes:
 
 The app does not own provider wire DTOs/clients, Codex OAuth/profile storage, a
 public proxy gateway, or provider management state. Provider selection does not
-exist inside domain operations: the two authored routes each build one
-provider-specific runtime over the same app-owned services.
+exist inside domain operations: each loaded authored provider module owns one
+module-level runtime for its provider composition root and reuses that runtime
+across invocations. The roots reuse contracts and Layer constructors but do not
+share live Contexts, Scopes, build fibers, or `Layer.MemoMap` values.
 
 ## Channel boundary
 
@@ -34,6 +36,17 @@ identity, HMAC routing, atomic replay, immutable `ChannelStateV1`, Eve dispatch,
 presence, and outbound-acceptance path. Accepted ingress returns `202`;
 ignored/duplicate ingress returns `204`; authentication, payload, and
 routing/replay failures map to `401`, `400`, and `503` respectively.
+
+The shared Eve adapter prepares a request with the concrete provider runtime,
+then starts accepted work with that runtime's `runFork` before returning
+`202`. Eve `waitUntil` receives one Promise that awaits the supervised Fiber's
+completion across success, typed failure, defect, or interruption. Client
+disconnect does not cancel accepted work; runtime disposal interrupts it in
+tests. The adapter never constructs or disposes a runtime per request, adds no
+Channel-wide timeout or retry, and does not treat `waitUntil` as durable
+execution. Local build output and a named deployment readback are separate
+proof classes; source does not establish current Vercel bundling, instance
+reuse, scale-out, shutdown, or provider state.
 
 The replacement path uses only these app-owned environment namespaces:
 
