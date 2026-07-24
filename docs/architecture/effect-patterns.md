@@ -102,6 +102,16 @@ Tests use a scoped `ConfigProvider` when proving configuration and a
 deterministic mock/memory Layer for service behavior. Every provider service
 exports explicit live and mock/memory Layers.
 
+Alchemy custom providers follow the same boundary. `Resource` props and
+attributes are canonical decoded Schema types; `Provider.succeed` delegates
+named `read`/`diff`/`reconcile`/`delete`/`list` operations to injected services
+and exposes no provider client. Reconciliation is observe-first and idempotent,
+adoption requires an exact reviewed metadata digest, uncertain writes recover
+by stable physical identity with bounded readback, and native Alchemy `sync`
+remains the drift engine. Provider credentials remain lazy `Context.Service`
+Effects backed by `Config.schema` and `Redacted` so Layer construction performs
+no credential read.
+
 Keep each named operation flat and sequential. Keep its one-use encoding,
 decoding, and error mapping visible at the call site. A retry Schedule or other
 helper is justified only when reused or when it owns a non-trivial tested

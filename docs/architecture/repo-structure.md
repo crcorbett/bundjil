@@ -20,6 +20,7 @@ apps/
   codex-proxy/        Private Effect HTTP proxy app for Codex provider proof.
 
 packages/
+  infrastructure/     Private Alchemy resources, providers, state-safe contracts.
   channel/            Provider-neutral direct-text Channel contracts.
   sendblue/           Sendblue ChannelTransport adapter.
   photon/             Photon Spectrum ChannelTransport adapter.
@@ -45,6 +46,9 @@ tooling/
 .agents/skills/       Repo-owned agent skills aligned to Bundjil architecture.
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
+
+alchemy.run.ts         Root Alchemy stack router; no provider transport details.
+stacks/                Stage-aware infrastructure topology and stack outputs.
 ```
 
 ## Ownership Rule
@@ -176,6 +180,23 @@ the provider catalog, key, policy records, paused state, or deployment control
 plane.
 
 ## Package Boundaries
+
+`@bundjil/infrastructure`:
+
+- is private repository tooling owned by the accepted Alchemy infrastructure
+  SPEC and is not an application runtime dependency;
+- owns state-safe infrastructure Schemas, Alchemy custom resources and
+  providers, adoption manifests, bounded receipts, lazy credential contracts,
+  and deterministic memory Layers;
+- keeps root stack topology in `alchemy.run.ts` and `stacks/**`, provider
+  clients private to their eventual owning adapters, and Vercel Git deployment
+  ownership outside Alchemy configuration reconciliation;
+- exposes only its root contract and explicit testing fixture surface; it
+  exposes no raw client, provider DTO, generic callback, app environment
+  binding, or provider-operation authority;
+- begins with ignored local Alchemy state and a synthetic provider only. Local
+  plan and sync evidence is repository proof, not Vercel, Photon, Preview,
+  Production, deployment, or provider-state proof.
 
 `@bundjil/channel`:
 

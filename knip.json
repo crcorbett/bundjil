@@ -3,8 +3,12 @@
   "ignoreExportsUsedInFile": true,
   "workspaces": {
     ".": {
-      "entry": ["tooling/codec-provenance.fixture.ts"],
-      "project": ["tooling/**/*.ts"]
+      "entry": [
+        "alchemy.run.ts",
+        "stacks/**/*.ts",
+        "tooling/codec-provenance.fixture.ts"
+      ],
+      "project": ["stacks/**/*.ts", "tooling/**/*.ts"]
     },
     "apps/agent": {
       "entry": [
@@ -26,6 +30,14 @@
     },
     "packages/photon": {
       "ignoreDependencies": ["@grpc/grpc-js", "nice-grpc", "nice-grpc-common"]
+    },
+    "packages/infrastructure": {
+      "entry": [
+        "test/**/*.compile.ts",
+        "test/**/*.test.ts",
+        "test-alchemy/**/*.test.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "test-alchemy/**/*.ts"]
     }
   }
 }

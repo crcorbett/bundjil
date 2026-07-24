@@ -7,8 +7,8 @@
     "sortedPathSha256": "491cd5a544c462b612ff1202dcb6f172f5860c75ea219e032a2080e6ecd8ba88"
   },
   "readmeInventory": {
-    "pathCount": 22,
-    "sortedPathSha256": "90bd5f38a4403f9c78ad6114674b1d31438a087ef3bfbf7f780d274cd01544df"
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
   },
   "impactAreas": [
     {
@@ -36,10 +36,12 @@
       "decision": "changed",
       "ownerPaths": ["docs/README.md", "README.md"],
       "evidence": [
-        "The docs router now routes harness epochs and effectiveness; the root README remains a product/workspace route rather than provider truth."
+        "The docs router now routes harness epochs and effectiveness; the root README remains a product/workspace route rather than provider truth.",
+        "The 2026-07-24 Alchemy offline-foundation slice adds the private packages/infrastructure/README.md contract and refreshes only the current 23-path README count and digest."
       ],
       "limitations": [
-        "The 2026-07-24 merge adds the accepted Channel, Photon, and Sendblue package README contracts. Their dated rollout evidence does not establish current provider state."
+        "The 2026-07-24 merge adds the accepted Channel, Photon, and Sendblue package README contracts. Their dated rollout evidence does not establish current provider state.",
+        "The infrastructure README and local synthetic Alchemy commands establish no Vercel, Photon, deployment, credential, remote-state, Preview, or Production truth and do not requalify the retained HGI-307 worker reports."
       ],
       "reviewTrigger": "A current documentation route, public package contract, or app operational boundary changes."
     },

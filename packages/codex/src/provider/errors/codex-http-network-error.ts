@@ -10,6 +10,6 @@ export class CodexHttpNetworkError extends Schema.TaggedErrorClass<CodexHttpNetw
   {
     operation: CodexHttpClientOperation,
     message: CodexProviderErrorMessage,
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   }
 ) {}

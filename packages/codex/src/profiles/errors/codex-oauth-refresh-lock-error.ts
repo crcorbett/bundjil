@@ -17,6 +17,6 @@ export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAu
     expiresAtEpochMillis: Schema.optional(CodexProfileEpochMillis),
     nowEpochMillis: Schema.optional(CodexProfileEpochMillis),
     message: CodexProfileErrorMessage,
-    cause: Schema.optional(Schema.Defect),
+    cause: Schema.optional(Schema.Defect()),
   }
 ) {}

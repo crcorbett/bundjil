@@ -10,6 +10,6 @@ export class UpstashKeyValueStoreConfigError extends Schema.TaggedErrorClass<Ups
   {
     boundary: UpstashKeyValueStoreConfigBoundary,
     message: UpstashKeyValueStoreErrorMessage,
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   }
 ) {}

@@ -14,6 +14,6 @@ export class CodexOAuthProfileCommitError extends Schema.TaggedErrorClass<CodexO
     profileId: CodexOAuthProfileId,
     subjectHash: CodexOAuthSubjectHash,
     message: CodexProfileErrorMessage,
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   }
 ) {}

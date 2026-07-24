@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": [
+    "../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json",
+    "../../alchemy.run.ts",
+    "../../stacks/**/*.ts",
+    "./src/**/*.ts",
+    "./test/**/*.ts",
+    "./test-alchemy/**/*.ts"
+  ],
+  "compilerOptions": {
+    "rootDir": "../..",
+    "strictNullChecks": true,
+    "types": ["bun-types"]
+  }
+}

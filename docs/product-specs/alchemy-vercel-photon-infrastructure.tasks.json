@@ -1,6 +1,6 @@
 {
   "title": "Alchemy Infrastructure For Vercel And Photon Tasks",
-  "status": "pending",
+  "status": "in_progress",
   "spec": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
   "harnessContract": {
     "sourceClassification": "research-backed product decision; not audit-derived",
@@ -67,7 +67,7 @@
     {
       "id": "alchemy-offline-foundation",
       "title": "Prove the Alchemy and Effect foundation without provider access",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [],
       "invariantIds": [
         "HC-OUTCOME-001",
@@ -84,7 +84,10 @@
         "Implement the SPEC boundary-codec matrix for CLI, adoption file, Resource props/attributes, local state-safe projections, fixtures, and receipts. Use Schema.fromJsonString for JSON files, decode once at ingress, and encode immediately before every file/stdout/state-fixture write; do not use JSON.parse/stringify or synchronous Schema codecs.",
         "Follow the site pattern at /Users/cooper/Projects/site/alchemy.run.ts for Alchemy.Stack, Stage-dependent Provider Layers, state, flat Effect.gen composition, and schema-shaped outputs without copying site-specific resources or state identity.",
         "Implement a memory service and synthetic Resource plus Provider.succeed Layer with required list/reconcile/delete and optional read/diff. One observe -> ensure -> sync reconcile must handle greenfield, adoption, and update without separate provider create/update programs.",
-        "Exercise native alchemy sync --dry-run and sync with the memory provider; do not build a parallel drift engine."
+        "Exercise native alchemy sync --dry-run and sync with the memory provider; do not build a parallel drift engine.",
+        "Implemented on codex/alchemy-vercel-photon-infrastructure from origin/main 38a8a3f4cde7b6c519803f233b80b48f079a206d. The exact Alchemy beta.64 package requires Effect/platform peers at beta.100 or later and its CLI imports the declared-optional @effect/platform-node peer, so the coherent dependency slice includes that exact root runtime peer.",
+        "The accepted synthetic provider uses exact-manifest adoption, stable physical identity, retain-by-default, explicit deletion approval, bounded uncertain-write readback, ignored local state, and native Alchemy sync. No provider credential, network call, remote state, deployment, Vercel resource, or Photon resource was used.",
+        "The compatible Effect resolution changed Schema.Defect from a Schema value to a constructor. Existing Codex, codex-proxy, and Eve safe error contracts were migrated mechanically to Schema.Defect() and retained their encoded public contract under full workspace tests."
       ],
       "mandatoryVerification": [
         "Alchemy provider-harness tests cover read/diff/reconcile/delete/list, create/update/replace/no-op plan classifications, native sync detection/repair, adoption denied/allowed, retain, delete protection, timeout-after-write, and state-write partial failure.",
@@ -98,6 +101,15 @@
         "A deterministic local plan, sync dry-run, and provider test prove the intended lifecycle contract without touching Vercel, Photon, DNS, secrets, webhooks, deployments, or remote state.",
         "The infrastructure package has a narrow README, exports only owned contracts, and remains outside app runtime dependency graphs."
       ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: root alchemy.run.ts and stacks/** own topology; @bundjil/infrastructure owns state-safe contracts and custom provider lifecycle; no application imports the package; Vercel Git and app runbooks retain deployment and operation ownership.",
+          "Pass 2 - implementation quality: contracts use Effect Schema Type/Encoded pairs and owner brands; config and credentials use Config.schema and Redacted; services use named operations and explicit Layers; errors are operation-specific and safe; uncertain writes use bounded observation; scans and focused Ultracite found no raw client, generic callback, unchecked DTO, unsafe cast, instanceof policy, manual JSON reader, double decode, or helper sprawl.",
+          "Pass 3 - verification coverage: 5 Vitest codec/config tests and 7 Alchemy Test/Bun lifecycle tests passed; compile fixtures reject foundational cross-brand use; fixed receipt compatibility passed; plan/create/update/replace/no-op, exact adoption, native sync drift repair, timeout-before-write, timeout-after-write, eventual-consistency exhaustion, lost-state recovery, retain/delete protection, idempotent delete, and sentinel absence are covered. Root plan and both sync commands used only ignored local state. Full verification then passed Effect setup, boundaries, docs, skills, authority, controls, HGI-307, tooling tests, lint, Knip, all nine package typechecks, and all fifteen Turbo build/test tasks with the documented process-only synthetic Executor test configuration."
+        ]
+      },
       "commitAfterPassing": true
     },
     {

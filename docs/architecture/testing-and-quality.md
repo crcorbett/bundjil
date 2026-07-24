@@ -118,6 +118,12 @@ bun run --filter @bundjil/agent preflight:production
   the required ignored local environment loaded.
 - Package schema or export change: run that package's `check-types`, tests, and
   build, then root `bun run verification`.
+- Infrastructure package or root Alchemy-stack change: build
+  `@bundjil/infrastructure`, run its codec and provider-harness tests, then run
+  `bun alchemy plan --stage preview`, `bun alchemy sync --stage preview
+--dry-run`, and `bun alchemy sync --stage preview --yes` only while the root
+  stack is the deterministic synthetic provider with ignored local state.
+  These commands prove no live provider, deployment, or authority claim.
 - Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and

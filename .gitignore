@@ -9,6 +9,7 @@ node_modules/
 !.yarn/versions
 
 # TurboRepo
+.alchemy/
 .turbo/
 
 # Build outputs
