@@ -1,6 +1,6 @@
 {
   "title": "Eve Channel Runtime Ownership and Supervision Tasks",
-  "status": "in_progress",
+  "status": "implemented",
   "spec": "docs/product-specs/eve-channel-runtime-ownership.md",
   "principles": [
     "Own one concrete ManagedRuntime per loaded provider composition root per JavaScript module instance; current local output loads both roots, but future function splitting must be read back rather than assumed.",
@@ -1052,7 +1052,7 @@
     {
       "id": "reconcile-runtime-docs-and-repository-closeout",
       "title": "Reconcile durable runtime owners and complete repository verification",
-      "status": "pending",
+      "status": "completed",
       "findingIds": [
         "FINDING-001",
         "FINDING-002",
@@ -1093,6 +1093,15 @@
         "Current architecture and app routes describe implemented provider-root cardinality, supervision, disposal limits, failure recovery, and Vercel evidence boundaries without claiming current provider state.",
         "All focused and repository gates pass. An unavailable or environment-inconclusive check does not count as acceptance and must be rerun in a valid repository environment.",
         "No provider, Vercel, credential, deployment, message, or Production mutation occurred."
+      ],
+      "completedAt": "2026-07-24",
+      "completionEvidence": [
+        "docs/architecture/eve-agent.md and apps/agent/README.md are the implemented durable owners for provider-root cardinality, direct concrete ManagedRuntime interpretation, supervised Fiber/waitUntil completion, disposal limits, and repository-versus-hosted evidence boundaries. Package READMEs, exports, Schemas, Services, Layers, runbooks, authority registers, verification journeys, skills, CI, and Photon lifecycle remain preserved.",
+        "The explicit package matrix passed Channel check-types and 2 tests, Sendblue check-types and 9 tests, Photon check-types and 25 tests, and agent check-types, 62 tests, and the Nitro build. The built-route and channel-config fixtures retain both absolute provider routes and separate provider roots without proving a future hosted function topology.",
+        "A fresh ownership and call-graph scan found production ManagedRuntime.make only in apps/agent/agent/channels/sendblue.ts and photon.ts, runFork only in the shared Eve adapter, no accepted-path forkDetach or request-owned runtime disposal, and no production change under packages/channel, packages/sendblue, packages/photon, or packages/store.",
+        "The implementation-quality scan found no ChannelEffectRunner, shared MemoMap, combined provider runtime, generic runtime callback, unsafe cast, manual codec/reader, DTO mirror, helper/common/utils module, new boundary exception, adapter timeout/retry, or synchronous production codec. Photon retains its two per-operation Effect.acquireUseRelease owners.",
+        "Effect language-service diagnostics and the direct boundary, Effect setup, docs, skills, authority, controls, and verification gates passed. HGI-307 evaluation, 89 tooling tests, Ultracite, lint policy tests, Knip, eight workspace typechecks, all workspace tests, and git diff --check passed in the full repository verification.",
+        "The SPEC, task ledger, completed plan, product and plan indexes, and executable documentation inventory are reconciled. Evidence remains repository/local-build only: no Preview, Production, Vercel, provider, credential, webhook, message, handset, deployment, push, merge, or release operation occurred."
       ],
       "commitAfterPassing": true
     }

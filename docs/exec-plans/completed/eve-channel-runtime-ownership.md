@@ -1,7 +1,7 @@
 ---
 document_type: execution-plan
-lifecycle: active
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-agent-architecture-owner
 created: 2026-07-24
 last_reviewed: 2026-07-24
@@ -9,13 +9,14 @@ review_trigger: runtime task status, Eve adapter, ManagedRuntime, Fiber, Scope, 
 spec: ../../product-specs/eve-channel-runtime-ownership.md
 task_ledger: ../../product-specs/eve-channel-runtime-ownership.tasks.json
 started: 2026-07-24
+completed: 2026-07-24
 ---
 
 # Eve Channel runtime ownership and supervision
 
-## Current trajectory
+## Accepted outcome
 
-Implement the three accepted tasks serially:
+The three accepted tasks were implemented serially:
 
 1. prove independent provider-runtime build, concurrency, failure, disposal,
    and fresh-runtime recovery behavior without changing production code;
@@ -43,15 +44,15 @@ Production authority.
 - The worktree `bun.lock` matches the canonical checkout used to inspect
   installed `effect@4.0.0-beta.74` and `eve@0.20.0` source.
 
-## Current task
+## Implementation outcome
 
 `prove-provider-runtime-behavior` is accepted in commit
 `0c9082c8685a0fdd2512ea92222fad8022b86941`.
-`supervise-accepted-eve-background-work` is accepted and awaiting its coherent
-commit. It changes only the shared Eve framework adapter, focused route tests,
-and the now-implemented durable architecture/app owners; provider Services,
-Layers, Schemas, Config, exports, runtime roots, replay policy, timeouts, and
-Photon SDK lifetime remain preserved.
+`supervise-accepted-eve-background-work` is accepted in commit
+`a97d80d5943fa596cc09535a71a7d7e2b5414f54`.
+`reconcile-runtime-docs-and-repository-closeout` completed after the final
+adversarial review, explicit package matrix, full repository verification,
+durable-owner reconciliation, inventory update, and plan archival.
 
 ## Accepted-finding boundary
 
@@ -62,11 +63,11 @@ findings and `EVE-RUNTIME-REQ-001` through `EVE-RUNTIME-REQ-004`.
 
 ## Task progress
 
-| Task                                             | Status    | Acceptance receipt                                                                                                                                                                                                          |
-| ------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `prove-provider-runtime-behavior`                | Completed | Commit `0c9082c8685a0fdd2512ea92222fad8022b86941`; two focused runtime tests, 59 agent tests, direct policy gates, docs-inventory reconciliation, and a fresh full repository verification passed                           |
-| `supervise-accepted-eve-background-work`         | Completed | Direct provider `runFork`, native `Fiber.await` waitUntil completion, five focused route tests, 62 agent tests, 25 Photon tests, direct policy gates, and full repository verification passed; coherent task commit pending |
-| `reconcile-runtime-docs-and-repository-closeout` | Pending   | Must not begin until both code tasks are accepted and committed                                                                                                                                                             |
+| Task                                             | Status    | Acceptance receipt                                                                                                                                                                                                                               |
+| ------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `prove-provider-runtime-behavior`                | Completed | Commit `0c9082c8685a0fdd2512ea92222fad8022b86941`; two focused runtime tests, 59 agent tests, direct policy gates, docs-inventory reconciliation, and a fresh full repository verification passed                                                |
+| `supervise-accepted-eve-background-work`         | Completed | Commit `a97d80d5943fa596cc09535a71a7d7e2b5414f54`; direct provider `runFork`, native `Fiber.await` waitUntil completion, five focused route tests, 62 agent tests, 25 Photon tests, direct policy gates, and full repository verification passed |
+| `reconcile-runtime-docs-and-repository-closeout` | Completed | Explicit package matrix, source/build ownership scans, adversarial diff review, all direct gates, full repository verification, durable-owner reconciliation, archive pointers, limitations, and rollback identity accepted                      |
 
 ## Risk-lens evidence
 
@@ -88,8 +89,8 @@ findings and `EVE-RUNTIME-REQ-001` through `EVE-RUNTIME-REQ-004`.
 | Skills and `AGENTS.md`                                            | Preserve                                                                                | The requested PRD implementer, docs maintainer, and effect-client-wrapper instructions already govern the slice. No skill, mirror, agent instruction, or harness profile source change is needed.                                                                                                                                                                                        |
 | Lint, config, commands, CI, and workflows                         | Preserve executable rules; Change required for HGI-307 docs inventory                   | Existing Effect setup, boundary, docs, skills, authority, controls, verification, lint, Knip, typecheck, test, and build commands remain sufficient. Adding the required active-plan path changed the executable docs inventory from 179 to 180 paths; `docs/documentation-audit/HGI-307-impact-ledger.json` now owns the corrected count/digest. No exception or suppression was added. |
 | Schemas, services, Layers, provider boundaries, and runtime roots | Preserve production owners                                                              | Task 1 creates test-local Layers only. Sendblue and Photon production composition roots remain separate; no shared `MemoMap`, combined runtime, provider eager loading, Config change, Service-tag redesign, or Photon lifetime change is allowed.                                                                                                                                       |
-| Tests and fixtures                                                | Change required                                                                         | Create `apps/agent/test/channel-runtime.test.ts`; later update `sendblue-channel.test.ts`. Retain config, vertical, build-route, Channel, Sendblue, Photon, preflight, and packaging fixtures. Owner is the affected app/package test suite; no fixture is retired.                                                                                                                      |
-| SPEC, tasks, active plan, and lifecycle pointers                  | Change required                                                                         | The SPEC/task ledger, this plan, product index, and active-plan index record current intent and per-task evidence. They move to implemented/completed routing only after every accepted task passes.                                                                                                                                                                                     |
+| Tests and fixtures                                                | Change required                                                                         | `apps/agent/test/channel-runtime.test.ts` owns runtime caching, concurrency, isolation, failure, recovery, and disposal proof. `sendblue-channel.test.ts` owns supervision and waitUntil proof. Config, vertical, build-route, Channel, Sendblue, Photon, preflight, and packaging fixtures remain retained; no fixture was retired.                                                     |
+| SPEC, tasks, plan, and lifecycle pointers                         | Change required                                                                         | The SPEC and task ledger are implemented, this plan is retained under completed history, the product index routes the SPEC as implemented history, and the active/completed plan indexes now match the terminal lifecycle.                                                                                                                                                               |
 | Receipts and evidence artifacts                                   | Change required in plan; no new hosted packet                                           | Task receipts record exact revision, commands, postconditions, risk lenses, limitations, non-claims, and rollback identity here and in the task ledger. No provider/deployment receipt is created.                                                                                                                                                                                       |
 | Migration, release, and rollback                                  | Preserve; no data migration or release                                                  | Repository rollback is exact Git reversion of each coherent task commit to starting revision `61992a2fa220313530dc7a8b3d54ec970a7483ec`. No replay clearing, provider retry, credential rebinding, deployment rollback, or release action occurs.                                                                                                                                        |
 | Frontend/browser                                                  | N/A after inspecting the app call graph                                                 | No React route, visible text, client state, URL state, browser response, or accessibility surface changes. Browser screenshots are not applicable.                                                                                                                                                                                                                                       |
@@ -103,3 +104,40 @@ runtime, shared `MemoMap`, eager provider config, Photon lifetime change, or
 unbounded external-state claim. Correct repository findings in the owning
 slice; do not substitute optional hosted evidence for deterministic local
 proof.
+
+## Closeout receipt
+
+- Starting revision:
+  `61992a2fa220313530dc7a8b3d54ec970a7483ec`.
+- Accepted task commits:
+  `0c9082c8685a0fdd2512ea92222fad8022b86941` and
+  `a97d80d5943fa596cc09535a71a7d7e2b5414f54`.
+- Focused matrix: Channel typecheck and 2 tests; Sendblue typecheck and 9 tests;
+  Photon typecheck and 25 tests; agent typecheck, 62 tests, and Nitro build.
+- Repository matrix: Effect diagnostics; boundary, docs, skills, authority,
+  controls, verification, and HGI-307 gates; 89 tooling tests; Ultracite; lint
+  policy; Knip; eight workspace typechecks; all workspace tests; and
+  `git diff --check`.
+- Adversarial ownership scan: production `ManagedRuntime.make` remains only in
+  the two provider module roots; `runFork` remains only in the shared Eve
+  adapter; the accepted app path has no `forkDetach`, request-owned runtime
+  disposal, combined runtime, shared `MemoMap`, runner abstraction, unsafe
+  cast, or helper sprawl.
+- Photon compatibility: no Photon package source changed, and its two
+  per-operation `Effect.acquireUseRelease` call sites and 25 focused tests
+  remain intact.
+
+## Limitations, non-claims, and rollback
+
+This receipt proves repository source, deterministic local tests, and a local
+Nitro build only. It does not prove Vercel function topology, warm-instance or
+scale-out cardinality, shutdown disposal, Preview or Production behavior,
+provider state, credential validity, webhook delivery, handset receipt, or
+host durability. Optional hosted readback remains unperformed and separately
+authority-gated.
+
+Rollback is Git-owned and ordered: revert the closeout commit containing this
+plan, then `a97d80d5943fa596cc09535a71a7d7e2b5414f54`, then
+`0c9082c8685a0fdd2512ea92222fad8022b86941` to return to
+`61992a2fa220313530dc7a8b3d54ec970a7483ec`. No deployment or provider rollback
+identity exists because no external operation occurred.

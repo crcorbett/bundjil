@@ -25,6 +25,7 @@ authority for a new operation. Current work lives only under
 | [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md) | Implemented boundary control                               |
 | [Effect persistence](effect-persistence.md)                                         | Implemented persistence history                            |
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented Schema migration                               |
+| [Eve Channel runtime ownership](eve-channel-runtime-ownership.md)                   | Implemented runtime ownership and supervision              |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented connection history; not current provider truth |
 | [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains deferred        |
 | [Channel providers and Production promotion](photon-channel-provider.md)            | Accepted dual-provider rollout; dated receipt owns truth   |

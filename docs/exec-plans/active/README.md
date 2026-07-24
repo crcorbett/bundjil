@@ -15,6 +15,3 @@ Accepted and superseded plans live in [`../completed`](../completed/).
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation is in progress; Preview subscription proof is pending
   deployment authority.
-- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
-  — repository implementation is in progress; hosted readback remains optional
-  and separately authority-gated.

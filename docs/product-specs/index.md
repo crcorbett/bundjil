@@ -16,23 +16,20 @@ context.
 
 ## Current
 
-- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
-  — repository implementation is in progress under its canonical active plan;
-  optional hosted readback remains outside required acceptance and requires
-  separate authority.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.
 
 ## Implemented or superseded history
 
-The thirteen sibling historical ledgers retain heterogeneous terminal
+The fourteen sibling historical ledgers retain heterogeneous terminal
 provenance: eleven use ledger-level `status: completed`, while the Effect
-persistence and Effect Schema string-contract ledgers use `status:
-implemented`. The Vercel promotion ledger also retains a historical, scoped
-`approval.status: granted`. Every individual entry in those ledgers' `tasks`
-arrays is `completed`, but that does not flatten the distinct ledger-level
-lifecycle or recorded approval fields. None is standing authority.
+persistence, Effect Schema string-contract, and Eve runtime-ownership ledgers
+use `status: implemented`. The Vercel promotion ledger also retains a
+historical, scoped `approval.status: granted`. Every individual entry in those
+ledgers' required `tasks` arrays is `completed`, but that does not flatten the
+distinct ledger-level lifecycle or recorded approval fields. None is standing
+authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -43,6 +40,7 @@ lifecycle or recorded approval fields. None is standing authority.
 | [Effect persistence](effect-persistence.md)                                         | Implemented history; current package names/exports own present state |
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                  |
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
+| [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)   | Implemented runtime ownership and supervision history                |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
 | [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains separately deferred       |
 | [Schema-driven Channels and Production promotion](photon-channel-provider.md)       | Implemented dual-provider rollout; dated receipt owns provider truth |
