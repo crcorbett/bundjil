@@ -115,7 +115,7 @@
     {
       "id": "vercel-read-import-vertical",
       "title": "Build the Vercel read and import vertical slice",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["alchemy-offline-foundation"],
       "invariantIds": ["HC-REPO-001", "HC-BOUNDARY-001", "HC-DEPENDENCY-001"],
       "description": "Implement the private Vercel Effect client and custom read/import resources for projects, project settings, domains, environment metadata, Marketplace bindings, and deployment observations. Live writes remain disabled.",
@@ -138,6 +138,20 @@
         "A complete synthetic two-project inventory can be planned and adopted from memory fixtures by stable IDs with zero provider writes.",
         "Vercel Git deployment and promotion operations are absent from convergent resource create/update/delete paths."
       ],
+      "implementationEvidence": [
+        "Added the private @bundjil/infrastructure/vercel export with owner-qualified team/project/env/key/branch/domain/integration/configuration/resource/database/deployment/Git/pagination identities; Schema Type/Encoded request, result, props and attributes contracts; five named read services plus exact-name discovery; operation-specific safe errors; lazy Redacted Config credentials; deterministic memory and private HttpClient live Layers; and five retained custom Resources.",
+        "Every live operation encodes its scoped request immediately before URL/query/header assignment and decodes the complete status/header/body envelope immediately after HttpClient. Collection reads exhaust pagination, environment observations omit values, exact-name discovery rejects ambiguity, stage and team scope remain explicit, and no Git deployment or promotion operation exists.",
+        "Read/import providers return Unowned for exact existing resources, re-observe during reconcile without a provider write, retain by default, and fail closed on delete. The live Layer remains unwired and no tenant credential, read, write, deployment, remote state or external resource was used."
+      ],
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: @bundjil/infrastructure/vercel privately owns metadata-only HTTP and state-safe provider contracts; the root stack remains synthetic; applications do not import the subpath; Vercel Git and app runbooks retain deployment, promotion and operation ownership.",
+          "Pass 2 - implementation quality: request/result/props/attributes contracts use Schema-derived Type/Encoded values and owner brands; credentials are lazy Config.schema Redacted values; five named services have live/memory Layers and safe operation errors; full envelopes decode at ingress; scans and focused Ultracite found no raw client escape, generic callback, unchecked DTO, unsafe cast, instanceof policy, manual JSON reader, double decode, primitive semantic public signature, or helper sprawl.",
+          "Pass 3 - verification coverage: 10 Vitest package tests and 9 Alchemy Test/Bun provider tests passed. They cover codec round trips, malformed full envelopes, exhaustive pagination, 404, ambiguous names, team mismatch, 429/reset headers, transient 5xx, sensitive env metadata, Marketplace/deployment identity, cross-brand rejection, two-project memory observation/adoption, zero provider writes, retention/deletion denial, and sentinel absence. Full verification passed Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 89 tooling tests, format/lint, Knip, all nine package typechecks, and all fifteen Turbo build/test tasks with the documented process-only synthetic Executor configuration."
+        ]
+      },
       "commitAfterPassing": true
     },
     {

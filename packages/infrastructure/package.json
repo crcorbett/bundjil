@@ -21,6 +21,11 @@
       "@bundjil/source": "./src/__testing__/fixtures.ts",
       "types": "./dist/__testing__/fixtures.d.ts",
       "default": "./dist/__testing__/fixtures.js"
+    },
+    "./vercel": {
+      "@bundjil/source": "./src/vercel/index.ts",
+      "types": "./dist/vercel/index.d.ts",
+      "default": "./dist/vercel/index.js"
     }
   },
   "scripts": {

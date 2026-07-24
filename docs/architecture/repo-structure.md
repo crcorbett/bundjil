@@ -194,8 +194,14 @@ plane.
 - exposes only its root contract and explicit testing fixture surface; it
   exposes no raw client, provider DTO, generic callback, app environment
   binding, or provider-operation authority;
-- begins with ignored local Alchemy state and a synthetic provider only. Local
-  plan and sync evidence is repository proof, not Vercel, Photon, Preview,
+- exposes the private `@bundjil/infrastructure/vercel` read/import subpath with
+  state-safe Vercel contracts, five named services, live/memory Layers, and
+  retained custom Resources. HTTP clients, response DTOs, bearer credentials,
+  environment values, and Git deployment/promotion operations remain private
+  or absent;
+- keeps the root stack on ignored local Alchemy state and the synthetic
+  provider only. Local plan, sync, Vercel contract, and memory-adoption
+  evidence is repository proof, not Vercel tenant, Photon, Preview,
   Production, deployment, or provider-state proof.
 
 `@bundjil/channel`:

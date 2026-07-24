@@ -112,6 +112,15 @@ remains the drift engine. Provider credentials remain lazy `Context.Service`
 Effects backed by `Config.schema` and `Redacted` so Layer construction performs
 no credential read.
 
+The Vercel read/import boundary applies this per operation: encode one
+owner-qualified request immediately before team/project/query assignment,
+decode the complete status/header/body envelope immediately after
+`HttpClient`, and map the private provider DTO once to a state-safe observation
+or list result. Every collection exhausts pagination. Sensitive environment
+observations contain metadata and an explicit sensitivity flag, never the
+value. Read/import reconcile re-observes without a provider write and all
+delete handlers fail closed.
+
 Keep each named operation flat and sequential. Keep its one-use encoding,
 decoding, and error mapping visible at the call site. A retry Schedule or other
 helper is justified only when reused or when it owns a non-trivial tested

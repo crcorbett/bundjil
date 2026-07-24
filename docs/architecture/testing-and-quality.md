@@ -124,6 +124,10 @@ bun run --filter @bundjil/agent preflight:production
 --dry-run`, and `bun alchemy sync --stage preview --yes` only while the root
   stack is the deterministic synthetic provider with ignored local state.
   These commands prove no live provider, deployment, or authority claim.
+- Vercel read/import changes additionally run the package full-envelope HTTP,
+  pagination, cross-brand, memory-inventory, zero-write adoption, retention,
+  deletion-denial, and leak fixtures. The live Layer stays unwired and these
+  tests do not establish current tenant state.
 - Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and

@@ -33,13 +33,13 @@ The target is hybrid ownership:
 
 ## Current task
 
-`alchemy-offline-foundation` is implemented and locally accepted on
-`codex/alchemy-vercel-photon-infrastructure`. The next repository slice is
-`vercel-read-import-vertical`; its live Layer remains unused and no tenant read
-is authorised. The accepted foundation pins Alchemy `2.0.0-beta.64`, adds the
-private infrastructure package and root stack, and proves the canonical codec,
-brand, service, Layer, custom-provider, adoption, retention, recovery, native
-sync, and fixed-receipt paths with deterministic memory state only.
+`alchemy-offline-foundation` is implemented, locally accepted, and committed
+as `0a08767` on `codex/alchemy-vercel-photon-infrastructure`.
+`vercel-read-import-vertical` is implemented and locally accepted: its private
+contracts, live and memory Layers, five retained custom Resources, complete
+synthetic two-project inventory, and zero-write adoption path passed the full
+repository gate. Its live Layer remains unused and no tenant read is
+authorised. The next repository slice is `photon-read-import-vertical`.
 
 ## Accepted planning evidence
 
@@ -118,6 +118,24 @@ was queried.
 - Rollback identity: remove ignored `.alchemy/` local state if desired and
   revert the exact coherent task commit. No external rollback exists because
   no external operation occurred.
+
+## Vercel read/import impact ledger
+
+| Surface                           | Status          | Slice decision                                                                                                                                                                                                                                                                                |
+| --------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan | Change required | Keep the SPEC proposed, mark the Vercel slice in progress until the complete gate passes, record the exact implementation/proof boundary, and route Photon next only after local acceptance.                                                                                                  |
+| Architecture and docs router      | Change required | Record the implemented private Vercel subpath, full-envelope ingress, pagination, state-safe env metadata, read-only reconcile, and fail-closed deletion. The existing docs route remains canonical.                                                                                          |
+| Root, app and package READMEs     | Change required | Update the infrastructure package boundary and explicit non-claims. Root/app commands and runtime ownership are preserved because no application or root stack imports the Vercel subpath.                                                                                                    |
+| Exports and generated references  | Change required | Add only `@bundjil/infrastructure/vercel`; no raw client, DTO, token, value, generic callback, generated API reference, or second package is exported. Generated-reference work is evidenced N/A.                                                                                             |
+| Runbooks and authority            | Preserve        | No live Layer wiring, tenant read, provider write, credential access, deployment, promotion, webhook, DNS, remote state, or Production operation occurred. Existing Vercel runbooks retain authority.                                                                                         |
+| Verification journeys and proof   | Preserve        | Contract and memory fixtures are repository evidence only. No retained provider packet or critical-journey truth changes until separately authorised fresh readback.                                                                                                                          |
+| Skills and AGENTS                 | Preserve        | The invoked implementer, docs, Effect-client, and package-structure guidance already owns this shape. No skill bytes, mirrors, AGENTS rule, worker identity, or harness epoch changed.                                                                                                        |
+| Lint, config, commands and CI     | Change required | Add the explicit Vercel package export and focused fixtures. Hosted workflow, root command, automation admission, and CI authority remain unchanged.                                                                                                                                          |
+| Schemas, services and Layers      | Change required | Add owner-qualified Vercel identities, Type/Encoded request/result/props/attributes contracts, five named services, operation-specific safe errors, lazy redacted credentials, private live Layer, deterministic memory Layer, and retained providers.                                        |
+| Tests and fixtures                | Change required | Cover full-envelope decoding, malformed and rate-limited responses, exhaustive project pagination, outbound team/project scoping, sensitive env metadata, Marketplace/deployment identity, cross-brand rejection, two-project memory observation, adoption, zero writes, and deletion denial. |
+| Receipts and evidence             | Preserve        | No dated receipt is valid for synthetic contract proof alone. Test output and ignored state are not provider truth and contain no secret/value sentinels.                                                                                                                                     |
+| Rollout, rollback and lifecycle   | Preserve        | No rollout occurred. Rollback is reversion of the coherent local slice commit; there is no external rollback. The plan remains active and no archive/completed-history pointer changes.                                                                                                       |
+| Documentation audit inventory     | Preserve        | No README file was added or removed; the existing inventory/digest remains current.                                                                                                                                                                                                           |
 
 ## Authority and stop conditions
 
