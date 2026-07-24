@@ -2,7 +2,7 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
 import { PhotonLifecycleProbe } from "../src/lifecycle-probe.js";
-import { PhotonManagement } from "../src/management.js";
+import { PhotonManagement } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { provePhotonProvider } from "../src/provider-proof.js";
 import { PhotonProjectId, PhotonWebhookId } from "../src/schemas.js";

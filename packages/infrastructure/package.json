@@ -26,14 +26,20 @@
       "@bundjil/source": "./src/vercel/index.ts",
       "types": "./dist/vercel/index.d.ts",
       "default": "./dist/vercel/index.js"
+    },
+    "./photon": {
+      "@bundjil/source": "./src/photon/index.ts",
+      "types": "./dist/photon/index.d.ts",
+      "default": "./dist/photon/index.js"
     }
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
-    "test": "vitest run && bun test test-alchemy"
+    "test": "vitest run && bun --conditions=@bundjil/source test test-alchemy"
   },
   "dependencies": {
+    "@bundjil/photon": "workspace:*",
     "alchemy": "2.0.0-beta.64",
     "effect": "catalog:effect"
   },

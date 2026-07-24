@@ -234,13 +234,22 @@ plane.
 - owns Photon config and webhook Schemas, raw-body HMAC verification, the
   private pinned Spectrum SDK/Space boundary, safe error translation, and
   scoped live/memory `ChannelTransport` Layers;
-- keeps SDK clients, Spaces, callbacks, Zod/Promise values, and management
-  operations private; only the target-owned proof executable uses its internal
-  management and lifecycle services;
-- exposes root, `/config`, `/live`, and `/memory` boundaries, with exact
-  `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.3.0` pins;
+- keeps SDK clients, Spaces, callbacks, Zod/Promise values, Basic auth,
+  management URLs/DTOs, and operator mutations private; target-owned proof
+  executables alone use the internal operator-management service;
+- exposes root, `/config`, `/live`, `/memory`, and a narrow read-only
+  `/management` boundary. The latter owns canonical request/result Schemas,
+  operation-specific safe errors, lazy redacted credentials, exhaustive user
+  pagination, full-envelope decoding, and live/memory Layers for Alchemy;
+- retains exact `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.3.0` pins;
 - owns no Eve, identity, routing, replay, persistence, environment binding,
   provider-selection, deployment, or Production policy.
+
+`@bundjil/infrastructure/photon` composes retained Alchemy observation
+Resources over `@bundjil/photon/management`. It owns stage-scoped state
+attributes and read/import lifecycle only; it neither duplicates Photon HTTP
+logic nor gains project, platform, user, webhook, line, billing, credential,
+message, deployment, or Production write authority.
 
 `@bundjil/eve`:
 

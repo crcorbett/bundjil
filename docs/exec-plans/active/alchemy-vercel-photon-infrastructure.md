@@ -39,7 +39,16 @@ as `0a08767` on `codex/alchemy-vercel-photon-infrastructure`.
 contracts, live and memory Layers, five retained custom Resources, complete
 synthetic two-project inventory, and zero-write adoption path passed the full
 repository gate. Its live Layer remains unused and no tenant read is
-authorised. The next repository slice is `photon-read-import-vertical`.
+authorised. `photon-read-import-vertical` is implemented and locally accepted:
+Photon owns the new read-only `/management`
+boundary, infrastructure owns six retained observation Resources, and the
+accepted memory topology is Free/shared with zero dedicated lines. Neither
+live Layer is wired and no project credential or provider state was read. The
+full repository gate passed, and the adversarial closeout extended the shared
+bounded retry policy across every Photon HTTP read before focused Photon and
+infrastructure checks passed again. The next task is
+`authorized-read-only-inventory`; it remains pending until a separate current
+authority permits credential access and Vercel/Photon tenant reads.
 
 ## Accepted planning evidence
 
@@ -136,6 +145,33 @@ was queried.
 | Receipts and evidence             | Preserve        | No dated receipt is valid for synthetic contract proof alone. Test output and ignored state are not provider truth and contain no secret/value sentinels.                                                                                                                                     |
 | Rollout, rollback and lifecycle   | Preserve        | No rollout occurred. Rollback is reversion of the coherent local slice commit; there is no external rollback. The plan remains active and no archive/completed-history pointer changes.                                                                                                       |
 | Documentation audit inventory     | Preserve        | No README file was added or removed; the existing inventory/digest remains current.                                                                                                                                                                                                           |
+
+## Photon read/import impact ledger
+
+| Surface                           | Status          | Slice decision                                                                                                                                                                                                                                                                                                        |
+| --------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan | Change required | Keep the SPEC proposed, mark the Photon task accepted after the full gate, record the exact local proof boundary, and route the authority-gated read-only inventory task next.                                                                                                                                        |
+| Architecture and docs router      | Change required | Record Photon HTTP ownership, the public read-only management boundary, exhaustive user pagination, complete-envelope decoding, safe projections, retained Alchemy resources, and fail-closed mutation. The existing docs router remains canonical.                                                                   |
+| Root, app and package READMEs     | Change required | Update the root, Photon and infrastructure package boundaries. App READMEs and runtime composition are preserved because neither application imports infrastructure and the existing Channel transport contract is unchanged.                                                                                         |
+| Exports and generated references  | Change required | Add only `@bundjil/photon/management` and `@bundjil/infrastructure/photon` with source/types/default conditions. No raw client, Basic-auth function, URL builder, DTO, provider body, generic callback, SDK type, phone value, secret value, or generated API reference is exported; generated-reference work is N/A. |
+| Runbooks and authority            | Preserve        | Internal operator commands and the target-owned Photon runbook remain the only mutation route. No live Layer wiring, credential access, provider read/write, webhook, billing, line, deployment, message, handset, Preview, Production, or remote-state operation occurred.                                           |
+| Verification journeys and proof   | Preserve        | Contract and Alchemy memory fixtures are repository proof only. No retained provider packet, current Photon truth, deployment journey, Channel proof, or handset claim changed.                                                                                                                                       |
+| Skills and AGENTS                 | Preserve        | The invoked implementer, docs, Effect-client, and package-structure guidance already owns the slice. No skill bytes, mirrors, AGENTS rule, worker identity, or harness epoch changed.                                                                                                                                 |
+| Lint, config, commands and CI     | Change required | Add two explicit package subpaths, the infrastructure workspace dependency, and the Bun source condition for provider-harness tests. Root stack, hosted workflow, automation admission, credentials, and CI authority remain unchanged.                                                                               |
+| Schemas, services and Layers      | Change required | Add owner-qualified Photon project/user/webhook/line/pagination/callback identities; request/result and resource Type/Encoded contracts; six named services/errors; lazy redacted credentials; live/memory Layers; and six retained read/import providers.                                                            |
+| Tests and fixtures                | Change required | Cover project/platform/user/webhook/line/billing success, complete-envelope failure, exhaustive pagination, semantic ambiguity, `404`/`409`/`429`/`5xx`, unavailable billing, exact adoption, zero lines/writes, mutation denial, codec round trips, cross-brand rejection, and leak sentinels.                       |
+| Receipts and evidence             | Preserve        | No dated receipt is valid for local contract proof alone. Test output and build artifacts are not provider truth; state-safe observations exclude project/signing secrets, phone/assigned values, callback query, raw bodies, Space/message identity, SDK failures, and billing/customer IDs.                         |
+| Rollout and rollback              | Preserve        | No rollout occurred. Rollback is reversion of the coherent local task commit; no external rollback exists. Existing operator rollback procedures remain unchanged.                                                                                                                                                    |
+| Lifecycle and archive pointers    | Preserve        | The plan remains active, the SPEC remains proposed, and no completed-history/archive pointer changes until the full sibling ledger reaches terminal disposition.                                                                                                                                                      |
+| Documentation audit inventory     | Preserve        | No README file was added or removed; only existing README contents changed, so the tracked inventory/digest remains current.                                                                                                                                                                                          |
+
+## Photon read/import risk review
+
+| Lens                     | Evidence                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph | Runtime Spectrum and operator mutations remain inside `@bundjil/photon`; the exported `/management` surface owns only read transport/contracts; `@bundjil/infrastructure/photon` owns Alchemy props, state attributes and provider lifecycle; root stack and apps remain disconnected.                                                                                              |
+| Implementation quality   | Every public operation takes one Schema-decoded owner request and returns one Schema-decoded result; credentials are lazy and redacted; provider output is decoded as one complete envelope; shared user pagination is exhaustive; stable UUIDs remain physical identities; sensitive semantic values are projected out; mutation handlers fail closed.                             |
+| Verification coverage    | Focused Photon tests cover all six read classes, malformed responses, pagination, ambiguity, rate/transient/status policy, unavailable billing, public codec round trips, memory parity, compile-time brands and leak sentinels. The Alchemy harness covers exact adoption, Free/shared service, zero dedicated lines, zero writes and explicit project/line/billing/secret denial. |
 
 ## Authority and stop conditions
 

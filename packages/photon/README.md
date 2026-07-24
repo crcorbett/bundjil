@@ -12,14 +12,26 @@ send, and typing presence.
 - `@bundjil/photon/config` exports config Schemas without loading the SDK.
 - `@bundjil/photon/live` exports the scoped live Layer.
 - `@bundjil/photon/memory` exports the provider-neutral memory Layer.
+- `@bundjil/photon/management` exports the read-only Photon management
+  Schemas, six named observation services, operation-specific safe errors,
+  lazy redacted credential service, and explicit live/memory Layers required
+  by Alchemy. It exports no mutation operation.
 
 Spectrum clients, Spaces, callbacks, SDK/Zod values, raw provider failures,
-and Photon management operations are private implementation details. The
-bounded operator workflow can reconcile the Free managed-shared iMessage
-service, one exact approved shared user, the iMessage platform state, and one
-webhook by stable provider IDs. Its decoded results expose only service type,
-counts, lifecycle actions, and assignment presence; user and assigned phone
-numbers do not cross the management boundary.
+Basic-auth construction, management URLs, provider DTOs, and operator
+mutations are private implementation details. The public read/import boundary
+observes project profile metadata, iMessage platform/service type, exhaustively
+paged shared users, webhooks, dedicated-line inventory, and billing status.
+Its state-safe observations expose only stable branded IDs and safe metadata:
+project and webhook secrets, shared and assigned phone numbers, callback query
+values, billing/customer identifiers, provider bodies, SDK values, and raw
+failures do not cross it. Webhook signing state is `ObservedUnknown` because
+list readback cannot recover the create-only secret.
+
+The existing bounded operator workflows remain internal and separately
+authority-gated. They may reconcile the Free managed-shared iMessage service,
+one exact approved shared user, platform state, and one webhook by stable
+provider IDs, but are not imported by Alchemy.
 
 The exact `12.3.0` SDK declarations contain one upstream
 `exactOptionalPropertyTypes` mismatch: the iMessage definition omits optional

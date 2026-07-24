@@ -13,7 +13,7 @@ import {
   deletePhotonEnvironmentWebhook,
   PhotonEnvironmentWebhookDeletionReceipt,
 } from "../src/environment-webhook.js";
-import { layerPhotonManagementLive } from "../src/management.js";
+import { layerPhotonManagementLive } from "../src/operator-management.js";
 import { loadPhotonProviderProofConfig } from "../src/provider-proof.js";
 
 declare const process: { exitCode: number | undefined };

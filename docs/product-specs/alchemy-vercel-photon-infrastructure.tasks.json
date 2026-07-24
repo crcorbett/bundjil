@@ -157,7 +157,7 @@
     {
       "id": "photon-read-import-vertical",
       "title": "Build the Photon read and import vertical slice",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["alchemy-offline-foundation"],
       "invariantIds": ["HC-REPO-001", "HC-BOUNDARY-001", "HC-DEPENDENCY-001"],
       "description": "Rewrite the existing proof-only @bundjil/photon management boundary for Alchemy consumers and implement read/import resources for project observation, iMessage platform, shared users, webhook observation, line inventory, and billing observation. No Photon write is performed.",

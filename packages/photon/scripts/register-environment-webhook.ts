@@ -21,7 +21,7 @@ import {
 import {
   layerPhotonManagementLive,
   PhotonManagement,
-} from "../src/management.js";
+} from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { loadPhotonProviderProofConfig } from "../src/provider-proof.js";
 import { PhotonWebhookId } from "../src/schemas.js";

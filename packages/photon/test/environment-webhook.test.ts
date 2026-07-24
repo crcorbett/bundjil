@@ -5,7 +5,7 @@ import {
   deletePhotonEnvironmentWebhook,
   registerPhotonEnvironmentWebhook,
 } from "../src/environment-webhook.js";
-import { PhotonManagement } from "../src/management.js";
+import { PhotonManagement } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { PhotonWebhookId, PhotonWebhookSecret } from "../src/schemas.js";
 

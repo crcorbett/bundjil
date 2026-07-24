@@ -16,7 +16,8 @@ does not speak for those traditions.
 - `apps/codex-proxy` owns the private Effect HTTP proxy boundary.
 - `packages/channel` owns provider-neutral direct-text Channel contracts.
 - `packages/sendblue` owns the Sendblue `ChannelTransport` implementation.
-- `packages/photon` owns the Photon Spectrum `ChannelTransport` implementation.
+- `packages/photon` owns the Photon Spectrum `ChannelTransport` implementation
+  and its narrow read-only management boundary.
 - `packages/infrastructure` owns private Alchemy stack contracts, custom
   resources, and deterministic provider lifecycle tests. Apps do not import it.
 - `packages/eve` owns Eve-facing Schemas and named operations.

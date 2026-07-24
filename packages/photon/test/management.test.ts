@@ -5,7 +5,7 @@ import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 import {
   layerPhotonManagementLive,
   PhotonManagement,
-} from "../src/management.js";
+} from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import {
   PhotonE164PhoneNumber,

@@ -1,7 +1,7 @@
 import { Config, Effect, Exit, Redacted, Schema } from "effect";
 
 import { PhotonLifecycleProbe } from "./lifecycle-probe.js";
-import { PhotonManagement } from "./management.js";
+import { PhotonManagement } from "./operator-management.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
 import {
   PhotonConfig,

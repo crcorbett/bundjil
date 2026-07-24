@@ -128,6 +128,13 @@ bun run --filter @bundjil/agent preflight:production
   pagination, cross-brand, memory-inventory, zero-write adoption, retention,
   deletion-denial, and leak fixtures. The live Layer stays unwired and these
   tests do not establish current tenant state.
+- Photon read/import changes additionally run `@bundjil/photon` full-envelope,
+  outbound-scope, exhaustive pagination, semantic-ambiguity, rate/transient,
+  unavailable-billing, cross-brand, memory and leak fixtures, plus
+  `@bundjil/infrastructure` exact-adoption, zero-dedicated-line, zero-write,
+  retention and deletion-denial provider tests. The live Layers remain
+  unwired; these tests establish no project, line, billing, webhook, handset,
+  deployment, Preview, or Production state.
 - Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and

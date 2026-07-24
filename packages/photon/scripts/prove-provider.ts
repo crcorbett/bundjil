@@ -2,7 +2,7 @@ import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { ConfigProvider, Console, Effect, Exit, Layer, Schema } from "effect";
 
 import { layerPhotonLifecycleProbeLive } from "../src/lifecycle-probe.js";
-import { layerPhotonManagementLive } from "../src/management.js";
+import { layerPhotonManagementLive } from "../src/operator-management.js";
 import {
   loadPhotonProviderProofConfig,
   PhotonProviderProofReceipt,

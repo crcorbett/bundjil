@@ -121,6 +121,17 @@ observations contain metadata and an explicit sensitivity flag, never the
 value. Read/import reconcile re-observes without a provider write and all
 delete handlers fail closed.
 
+The Photon read/import boundary applies the same rule while preserving its
+provider owner. `@bundjil/photon/management` resolves a redacted, project-scoped
+credential Effect only inside an operation; encodes one owner-named request;
+decodes one complete status/header/body envelope; exhausts shared-user
+pagination; and projects phone, assigned-number, callback-query,
+subscription/customer, signing-secret, provider-body, and SDK data out of
+state-safe results. A reused bounded exponential retry policy handles only
+rate-limited and transient reads. `@bundjil/infrastructure/photon` consumes the
+decoded services and exposes retained read/import Resources whose reconcile
+re-observes and whose deletes fail closed.
+
 Keep each named operation flat and sequential. Keep its one-use encoding,
 decoding, and error mapping visible at the call site. A retry Schedule or other
 helper is justified only when reused or when it owns a non-trivial tested

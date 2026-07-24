@@ -1,6 +1,6 @@
 import { Effect, Exit, Schema } from "effect";
 
-import { PhotonManagement } from "./management.js";
+import { PhotonManagement } from "./operator-management.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
 import { PhotonWebhookId, PhotonWebhookSecret } from "./schemas.js";
 

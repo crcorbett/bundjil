@@ -30,6 +30,19 @@ export type PhotonSharedUserPhoneNumber =
 export type PhotonSharedUserPhoneNumberEncoded =
   typeof PhotonSharedUserPhoneNumber.Encoded;
 
+export const PhotonLineId = Schema.String.check(Schema.isUUID()).pipe(
+  Schema.brand("@bundjil/photon/PhotonLineId")
+);
+export type PhotonLineId = typeof PhotonLineId.Type;
+export type PhotonLineIdEncoded = typeof PhotonLineId.Encoded;
+
+export const PhotonSubscriptionTier = Schema.NonEmptyString.pipe(
+  Schema.brand("@bundjil/photon/PhotonSubscriptionTier")
+);
+export type PhotonSubscriptionTier = typeof PhotonSubscriptionTier.Type;
+export type PhotonSubscriptionTierEncoded =
+  typeof PhotonSubscriptionTier.Encoded;
+
 export const PhotonWebhookId = Schema.String.check(Schema.isUUID()).pipe(
   Schema.brand("@bundjil/photon/PhotonWebhookId")
 );

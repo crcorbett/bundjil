@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
-import { PhotonManagement } from "../src/management.js";
+import { PhotonManagement } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { reconcilePhotonResources } from "../src/resource-reconciliation.js";
 import {
