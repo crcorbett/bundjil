@@ -1,4 +1,4 @@
 interface:
-  display_name: "Documentation Maintainer"
+  display_name: "Bundjil Documentation Maintainer"
   short_description: "Keep Bundjil documentation synchronized"
   default_prompt: "Use $docs-maintainer to route a Bundjil change to its earliest documentation owner, exact checks, and claim-matched proof."
