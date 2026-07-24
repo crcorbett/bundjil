@@ -1,6 +1,6 @@
 {
   "title": "Eve Channel Runtime Ownership and Supervision Tasks",
-  "status": "implemented",
+  "status": "in_progress",
   "spec": "docs/product-specs/eve-channel-runtime-ownership.md",
   "principles": [
     "Own one concrete ManagedRuntime per loaded provider composition root per JavaScript module instance; current local output loads both roots, but future function splitting must be read back rather than assumed.",
@@ -986,13 +986,18 @@
         "All focused checks pass and the task records ownership/call-graph, implementation-quality, and verification-coverage evidence."
       ],
       "completedAt": "2026-07-24",
+      "auditReopenedAt": "2026-07-24",
+      "auditReopenReason": "Five-pass audit pass 4 found that the test proved distinct runtime construction and Photon service identity but did not directly assert the Sendblue-backed value of the shared Channel Service tag. Strengthen the existing runtime fixture, rerun focused verification, and record the correction before accepting pass 4.",
+      "auditCorrectionCompletedAt": "2026-07-24",
       "completionEvidence": [
         "apps/agent/test/channel-runtime.test.ts uses canonical decoded Channel fixtures, explicit Sendblue and Photon memory transport Layers, separate ManagedRuntimes, Ref acquisition/finalizer counts, and Deferred gates. Its two focused tests prove one build per runtime, concurrent overlap without sleeps, independent provider roots, typed ChannelConfigError build failure, retained same-runtime failure, fresh-runtime recovery, and scoped disposal.",
         "Ownership and call graph review found no production change: ManagedRuntime.make remains module-owned only by apps/agent/agent/channels/sendblue.ts and photon.ts; the new ManagedRuntime and disposeEffect sites are test-owned; no combined runtime, shared MemoMap, runtime Service, runner, provider eager loading, or Photon SDK lifetime change exists.",
         "Implementation-quality review found only native Schema, Layer, ManagedRuntime, Deferred, Ref, Effect.acquireRelease, Exit, Cause, and Option primitives; no unsafe cast, DTO mirror, manual codec, raw provider value, wrapper/helper module, generic callback, exception, suppression, or production boundary change was introduced.",
         "Focused @bundjil/agent check-types completed with no Effect language-service diagnostic; the runtime fixture passed 2 tests and the full agent suite passed 59 tests after the fresh worktree package outputs were built and the documented synthetic Executor build configuration was supplied.",
         "Direct check:boundaries, check:effect-setup, check:docs, check:skills, check:authority, check:controls, and check:verification gates passed. The first root verification run correctly rejected the new active-plan path as a stale HGI-307 docs inventory; docs-maintainer reconciled the executable inventory owner to 180 paths, eval:hgi-307 passed, and a fresh full bun run verification then passed all repository gates and eight workspace test tasks.",
-        "No deployment, provider, credential, message, Preview, Production, or other external operation occurred. Source/build tests remain repository proof and make no Vercel topology, warm-instance, scale-out, shutdown, provider, or handset claim."
+        "No deployment, provider, credential, message, Preview, Production, or other external operation occurred. Source/build tests remain repository proof and make no Vercel topology, warm-instance, scale-out, shutdown, provider, or handset claim.",
+        "Five-pass audit pass 4 reopened this task because the concurrent-root fixture asserted only the Photon-backed value of the shared Channel Service tag. apps/agent/test/channel-runtime.test.ts now resolves and executes Channel from both concrete runtimes and asserts provider=sendblue and provider=photon. The corrected fixture passed 6 focused runtime/config tests, agent typechecking, Effect setup, and boundary checks.",
+        "Pass 4 also found audit-plan formatting drift. The active plan was formatted with the repository formatter; the previously failing bun run check then passed with 0 warnings and 0 errors."
       ],
       "commitAfterPassing": true
     },
@@ -1052,7 +1057,7 @@
     {
       "id": "reconcile-runtime-docs-and-repository-closeout",
       "title": "Reconcile durable runtime owners and complete repository verification",
-      "status": "completed",
+      "status": "in_progress",
       "findingIds": [
         "FINDING-001",
         "FINDING-002",
@@ -1095,6 +1100,230 @@
         "No provider, Vercel, credential, deployment, message, or Production mutation occurred."
       ],
       "completedAt": "2026-07-24",
+      "reopenedAt": "2026-07-24",
+      "reopenReason": "The closeout recorded one generic adversarial review rather than the mandatory five explicit post-implementation audit passes. Reopen only this lifecycle owner, run and evidence all five passes, correct any pass finding in its owning task, then repeat terminal verification and commit.",
+      "fivePassAudit": {
+        "status": "in_progress",
+        "baselineCommit": "cb10720e1eb43396f4b3351143c11002a2e96cf8",
+        "passes": [
+          {
+            "id": "ownership-and-call-graph",
+            "status": "passed",
+            "executedAt": "2026-07-24",
+            "filesInspected": [
+              "apps/agent/agent/agent.ts",
+              "apps/agent/agent/channels/sendblue.ts",
+              "apps/agent/agent/channels/photon.ts",
+              "apps/agent/agent/lib/channel/eve.ts",
+              "apps/agent/agent/lib/channel/channel.ts",
+              "apps/agent/agent/lib/channel/config.ts",
+              "apps/agent/agent/lib/channel/runtime.ts",
+              "apps/agent/agent/lib/channel/sendblue.runtime.ts",
+              "apps/agent/agent/lib/channel/photon.runtime.ts",
+              "packages/channel/src/service.ts",
+              "packages/channel/src/memory.layer.ts",
+              "packages/sendblue/src/live.layer.ts",
+              "packages/photon/src/client.ts",
+              "packages/photon/src/transport.layer.ts",
+              "packages/photon/src/live.layer.ts",
+              "apps/agent/test/channel-config.test.ts",
+              "apps/agent/test/channel-runtime.test.ts",
+              "apps/agent/test/sendblue-channel.test.ts",
+              "apps/agent/test/sendblue-build-route.test.ts",
+              "node_modules/eve/dist/src/runtime/sessions/compiled-agent-cache.js",
+              "node_modules/eve/dist/src/internal/nitro/host/dev-authored-source-watcher.js",
+              "node_modules/eve/dist/src/internal/nitro/host/start-development-server.js",
+              "node_modules/eve/dist/src/services/dev-client.js"
+            ],
+            "commands": [
+              "rg -n \"ManagedRuntime\\.make|runPromise|runFork|disposeEffect|MemoMap|forkDetach\" apps/agent/agent apps/agent/test packages/channel packages/sendblue packages/photon",
+              "rg -n \"SendblueChannelRuntimeLive|PhotonChannelRuntimeLive|makeSendblueEveChannel|makePhotonEveChannel\" apps/agent/agent apps/agent/test",
+              "rg -n \"from ['\\\"]@bundjil/(sendblue|photon)|from ['\\\"].*apps/agent|ChannelTransport\" packages/channel/src packages/sendblue/src packages/photon/src apps/agent/agent/lib/channel apps/agent/agent/channels",
+              "rg -n \"ManagedRuntime\\.make|new ManagedRuntime|MemoMap|disposeEffect|\\.dispose\\(\" apps/agent/agent packages/channel/src packages/sendblue/src packages/photon/src",
+              "rg -n \"ManagedRuntime\\.make|runFork|disposeEffect|forkDetach\" apps/agent/test/channel-runtime.test.ts apps/agent/test/sendblue-channel.test.ts apps/agent/test/sendblue-build-route.test.ts apps/agent/test/channel-config.test.ts"
+            ],
+            "findings": [
+              "Production ManagedRuntime.make occurs exactly once in each provider discovery module: Sendblue and Photon. No request, Service, provider package, runtime Layer, or shared adapter constructs or disposes a runtime.",
+              "The shared Eve adapter receives the concrete provider runtime, owns all runPromise/runFork interpretation, and preserves request-local EveChannelDispatch. Channel and ChannelTransport expose canonical Effect Services; provider and app composition remain in their owning Layers.",
+              "No explicit MemoMap exists and the two ManagedRuntimes receive distinct Layer graphs. Provider config loaders are called only by their corresponding runtime roots; tests separately own test runtimes and disposal.",
+              "Installed eve@0.20.0 clears its compiled-agent bundle cache and can request Nitro rollup reload during authored-source changes. Its development close path owns watcher, listener, Nitro, and sandbox cleanup, but exposes no authored Channel ManagedRuntime teardown hook. HMR therefore does not justify a cross-runtime MemoMap or a new disposal wrapper.",
+              "The local build fixture owns only current bundle evidence for both absolute routes and both provider operations; it does not generalize module-instance cardinality to future hosted splitting or scale-out."
+            ],
+            "corrections": [],
+            "evidence": [
+              "Exact source scans returned two production ManagedRuntime.make sites, one shared runFork site, no production disposal site, no MemoMap, and no forkDetach.",
+              "Package import scans keep @bundjil/channel provider-neutral, Sendblue/Photon package-owned, and app composition rooted under apps/agent.",
+              "Installed Eve source inspection confirmed cache reload and development resource cleanup are framework-owned while authored Channel runtime disposal is not exposed."
+            ]
+          },
+          {
+            "id": "effect-implementation-quality",
+            "status": "passed",
+            "executedAt": "2026-07-24",
+            "filesInspected": [
+              "apps/agent/agent/lib/channel/eve.ts",
+              "apps/agent/agent/lib/channel/channel.ts",
+              "apps/agent/agent/lib/channel/dispatch.ts",
+              "apps/agent/agent/lib/channel/errors.ts",
+              "apps/agent/agent/lib/channel/schemas.ts",
+              "apps/agent/agent/lib/channel/config.ts",
+              "apps/agent/agent/lib/channel/replay.ts",
+              "apps/agent/agent/lib/channel/identity.ts",
+              "apps/agent/agent/lib/channel/router.ts",
+              "apps/agent/agent/lib/channel/sendblue.runtime.ts",
+              "apps/agent/agent/lib/channel/photon.runtime.ts",
+              "packages/channel/src/service.ts",
+              "packages/channel/src/memory.layer.ts",
+              "packages/sendblue/src/live.layer.ts",
+              "packages/photon/src/client.ts",
+              "packages/photon/src/transport.layer.ts",
+              "packages/photon/src/live.layer.ts",
+              "apps/agent/test/channel-runtime.test.ts",
+              "apps/agent/test/sendblue-channel.test.ts"
+            ],
+            "commands": [
+              "git diff 61992a2fa220313530dc7a8b3d54ec970a7483ec..cb10720e1eb43396f4b3351143c11002a2e96cf8 -- '*.ts'",
+              "rg -n \"ChannelEffectRunner|EffectRunner|ManagedRuntime.*Service|as unknown as|as any|unsafeCast|instanceof|switch\\s*\\(|Object\\.(entries|values)|from ['\\\"].*(utils|helpers|common)|Promise\\.withResolvers|addObserver|forkDetach|MemoMap\" apps/agent/agent apps/agent/test/channel-runtime.test.ts apps/agent/test/sendblue-channel.test.ts packages/channel/src packages/sendblue/src packages/photon/src",
+              "rg -n \"Effect\\.gen|Effect\\.fn|Effect\\.(catchTag|catchTags|mapError)|Layer\\.(effect|succeed|unwrap)|Context\\.Service|Effect\\.acquireUseRelease|Fiber\\.await|runFork\" apps/agent/agent/lib/channel apps/agent/agent/channels packages/channel/src packages/sendblue/src packages/photon/src apps/agent/test/channel-runtime.test.ts apps/agent/test/sendblue-channel.test.ts",
+              "git diff 61992a2fa220313530dc7a8b3d54ec970a7483ec..cb10720e1eb43396f4b3351143c11002a2e96cf8 -- apps/agent/agent/lib/channel/eve.ts apps/agent/test/channel-runtime.test.ts apps/agent/test/sendblue-channel.test.ts | rg -n \"^\\+.*(ChannelEffectRunner|EffectRunner|as unknown as|as any|unsafeCast|instanceof|switch\\s*\\(|Object\\.(entries|values)|Promise\\.withResolvers|addObserver|forkDetach|MemoMap)\"",
+              "bun run check:effect-setup",
+              "bun run check:boundaries",
+              "bun run --filter @bundjil/agent check-types"
+            ],
+            "findings": [
+              "The production change uses direct ManagedRuntime.runFork, Fiber.await, Effect.runPromise, and the runtime Scope already owned by ManagedRuntime. It introduces no Service or wrapper around runtime interpretation.",
+              "The accepted background Effect is a meaningful independently executed program; the request decision stays flat and its expected ingress errors remain handled in the outer catchTags pipeline. Request-local dispatch provisioning remains at the Eve edge.",
+              "New tests use native Layer, ManagedRuntime, Deferred, Ref, Exit, Cause, Option, Schema, acquireRelease, scoped finalizers, and Effect programs. makeSupervisionRuntime is a test-only reusable concrete runtime fixture with four call sites rather than a production pass-through abstraction.",
+              "No added ChannelEffectRunner, runtime Service, callback escape hatch, helper/common/utils module, unsafe cast, manual DTO/reader/mapper, switch, instanceof policy, Object.entries/Object.values transformation, stringly runtime branch, suppression, Promise.withResolvers, observer, forkDetach, or MemoMap exists.",
+              "No package source changed. Photon still owns two per-operation Effect.acquireUseRelease paths and no runtime-scoped Spectrum app or lifetime helper was introduced."
+            ],
+            "corrections": [],
+            "evidence": [
+              "The added-line prohibited-pattern scan returned no matches.",
+              "Effect language-service setup, boundary audit, and agent typecheck passed.",
+              "The package diff from the implementation baseline is empty for channel, sendblue, photon, and store."
+            ]
+          },
+          {
+            "id": "boundary-and-lifecycle-correctness",
+            "status": "passed",
+            "executedAt": "2026-07-24",
+            "filesInspected": [
+              "apps/agent/agent/lib/channel/eve.ts",
+              "apps/agent/agent/lib/channel/dispatch.ts",
+              "apps/agent/agent/lib/channel/channel.ts",
+              "apps/agent/agent/lib/channel/config.ts",
+              "apps/agent/agent/lib/channel/schemas.ts",
+              "apps/agent/agent/lib/channel/errors/config-error.ts",
+              "apps/agent/agent/lib/channel/errors/dispatch-error.ts",
+              "apps/agent/agent/lib/channel/errors/identity-error.ts",
+              "apps/agent/agent/lib/channel/errors/replay-error.ts",
+              "apps/agent/agent/lib/channel/errors/routing-error.ts",
+              "packages/channel/src/schemas.ts",
+              "packages/channel/src/service.ts",
+              "packages/channel/src/errors/delivery-uncertain-error.ts",
+              "packages/channel/src/errors/provider-rejected-error.ts",
+              "packages/channel/src/errors/request-encoding-error.ts",
+              "packages/channel/src/errors/unavailable-error.ts",
+              "packages/channel/src/errors/unsupported-operation-error.ts",
+              "packages/channel/src/errors/webhook-authentication-error.ts",
+              "packages/channel/src/errors/webhook-schema-error.ts",
+              "packages/sendblue/src/schemas.ts",
+              "packages/sendblue/src/live.layer.ts",
+              "packages/photon/src/schemas.ts",
+              "packages/photon/src/client.ts",
+              "packages/photon/src/transport.layer.ts",
+              "apps/agent/test/channel-config.test.ts",
+              "apps/agent/test/channel-runtime.test.ts",
+              "apps/agent/test/sendblue-channel.test.ts",
+              "apps/agent/test/channel-vertical.test.ts",
+              "node_modules/effect/src/ManagedRuntime.ts",
+              "node_modules/effect/src/Fiber.ts"
+            ],
+            "commands": [
+              "rg -n \"Schema\\.(decodeUnknownEffect|decodeEffect|encodeEffect|TaggedErrorClass)|typeof [A-Za-z0-9_]+\\.(Type|Encoded)|Config\\.schema|Schema\\.Redacted\" apps/agent/agent/lib/channel apps/agent/agent/channels packages/channel/src packages/sendblue/src packages/photon/src",
+              "rg -n \"Request|Response|RouteHandlerArgs|ChannelMutableAdapterStateEncoded|EveChannelDispatch|waitUntil|runFork|Fiber\\.await|request\\.signal\" apps/agent/agent/lib/channel/eve.ts apps/agent/test/sendblue-channel.test.ts",
+              "rg -n \"buildFiber|MemoMap|scope|runFork|disposeEffect|fiberAwait|runIn\" node_modules/effect/src/ManagedRuntime.ts node_modules/effect/src/Fiber.ts",
+              "bun run --cwd apps/agent vitest run test/channel-config.test.ts test/channel-runtime.test.ts test/sendblue-channel.test.ts test/channel-vertical.test.ts"
+            ],
+            "findings": [
+              "Framework state is explicitly the Encoded side of ChannelAdapterState. Eve callbacks decode it before domain decisions and encode it before mutation or send; EveChannelDispatch accepts decoded ChannelPreparedInbound and encodes state only at the outbound send boundary.",
+              "Unknown webhook/query/header/body/SDK values decode once in their owning adapter. Channel, ChannelTransport, config, replay, identity, routing, and provider services exchange Schema-derived Type values; the raw Request remains intentionally confined to ChannelTransport.decodeWebhook for exact authentication bytes.",
+              "Channel and provider Config use Config.schema with owner Schemas and redacted secrets. Expected public failures are safe owner-named Schema.TaggedErrorClass values and raw Promise/SDK/config failures do not cross the adapter.",
+              "ManagedRuntime source creates a fresh MemoMap and Scope per runtime, retains its buildFiber including failure, attaches runFork fibers to that Scope, and closes the Scope on disposeEffect. Fiber.await always succeeds with Exit, matching the accepted waitUntil contract.",
+              "Focused tests prove concurrent calls, one build per runtime, independent provider failure, cached same-runtime failure, fresh-runtime recovery, typed failure and defect completion, runtime-disposal interruption, finalizer completion, request-abort independence, and exact dispatch count without sleeps."
+            ],
+            "corrections": [],
+            "evidence": [
+              "The focused boundary/lifecycle suite passed 22 tests across channel config, runtime, route supervision, and vertical behavior.",
+              "ManagedRuntime and Fiber source lines directly establish fresh MemoMap, cached buildFiber, runIn(scope), Scope.close, and await-to-Exit semantics.",
+              "Schema/Config/error scans found the expected owning codecs and no added raw boundary value flowing into domain Services."
+            ]
+          },
+          {
+            "id": "verification-and-adversarial-coverage",
+            "status": "passed",
+            "executedAt": "2026-07-24",
+            "filesInspected": [
+              "apps/agent/test/channel-runtime.test.ts",
+              "apps/agent/test/channel-config.test.ts",
+              "apps/agent/test/sendblue-channel.test.ts",
+              "apps/agent/test/channel-vertical.test.ts",
+              "apps/agent/test/sendblue-build-route.test.ts",
+              "packages/channel/test/channel-transport.test.ts",
+              "packages/sendblue/test/sendblue-transport.test.ts",
+              "packages/photon/test/photon-transport.test.ts",
+              "packages/photon/test/photon-client.test.ts",
+              "apps/agent/agent/channels/sendblue.ts",
+              "apps/agent/agent/channels/photon.ts",
+              "apps/agent/agent/lib/channel/eve.ts",
+              "docs/exec-plans/active/eve-channel-runtime-ownership.md"
+            ],
+            "commands": [
+              "bun run --cwd apps/agent vitest run test/channel-runtime.test.ts test/channel-config.test.ts",
+              "bun run --cwd apps/agent vitest run test/channel-config.test.ts test/channel-runtime.test.ts test/sendblue-channel.test.ts test/channel-vertical.test.ts",
+              "bun run --filter @bundjil/channel check-types && bun run --filter @bundjil/channel test && bun run --filter @bundjil/channel build",
+              "bun run --filter @bundjil/sendblue check-types && bun run --filter @bundjil/sendblue test && bun run --filter @bundjil/sendblue build",
+              "bun run --filter @bundjil/photon check-types && bun run --filter @bundjil/photon test && bun run --filter @bundjil/photon build",
+              "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model' BUNDJIL_EXECUTOR_API_KEY='synthetic-agent-test-key' bun run --filter @bundjil/agent check-types",
+              "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model' BUNDJIL_EXECUTOR_API_KEY='synthetic-agent-test-key' bun run --filter @bundjil/agent test",
+              "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model' BUNDJIL_EXECUTOR_API_KEY='synthetic-agent-test-key' bun run --filter @bundjil/agent build",
+              "bun run test:boundaries",
+              "bun run check",
+              "bun run test:lint",
+              "bun run knip",
+              "bun run check:effect-setup",
+              "bun run check:boundaries",
+              "bun run check:docs",
+              "bun run check:skills",
+              "bun run check:authority",
+              "bun run check:controls",
+              "bun run check:verification",
+              "bun run eval:hgi-307",
+              "git diff --check"
+            ],
+            "findings": [
+              "The runtime fixture proved distinct runtime construction and Photon service identity, but its concurrent Sendblue calls resolved the shared Channel tag without directly asserting the Sendblue-backed value. That left the negative service-tag-collision proof weaker than the accepted requirement.",
+              "The first full bun run check found formatting drift in the reopened active execution plan.",
+              "All other required negative paths were already executable: once-only independent builds, concurrent overlap, provider build-failure isolation, cached same-runtime failure, fresh-runtime recovery, separate Config loading, supervised waitUntil success/typed failure/defect, disposal interruption/finalizers, request-abort independence, exact dispatch count, retained route/status behavior, old forkDetach absence, and unchanged Photon lifecycle."
+            ],
+            "corrections": [
+              "Reopened prove-provider-runtime-behavior and changed apps/agent/test/channel-runtime.test.ts so each concrete runtime resolves Channel, decodes the same canonical inbound fixture, and asserts its own provider value: sendblue for the Sendblue runtime and photon for the Photon runtime.",
+              "Formatted docs/exec-plans/active/eve-channel-runtime-ownership.md with the repository formatter and reran the previously failing bun run check."
+            ],
+            "evidence": [
+              "The corrected runtime/config focus passed 6 tests; the four-file boundary/lifecycle focus passed 22 tests.",
+              "The provider matrix passed Channel typecheck, 2 tests, and build; Sendblue typecheck, 9 tests, and build; Photon typecheck, 25 tests, and build. The agent matrix passed typecheck, 62 tests, and Nitro build under the documented synthetic Executor build configuration.",
+              "The boundary harness passed 89 tests. Ultracite passed with 0 warnings and 0 errors after correction; lint policy, Knip, Effect setup, boundary, docs, skills, authority, controls, verification, HGI-307, and git diff checks passed.",
+              "Source and diff scans retain zero production forkDetach, per-request runtime construction/disposal, cross-runtime MemoMap, combined provider runtime, runner wrapper, unsafe cast, or Photon lifetime change."
+            ]
+          },
+          {
+            "id": "documentation-authority-and-closeout",
+            "status": "pending"
+          }
+        ]
+      },
       "completionEvidence": [
         "docs/architecture/eve-agent.md and apps/agent/README.md are the implemented durable owners for provider-root cardinality, direct concrete ManagedRuntime interpretation, supervised Fiber/waitUntil completion, disposal limits, and repository-versus-hosted evidence boundaries. Package READMEs, exports, Schemas, Services, Layers, runbooks, authority registers, verification journeys, skills, CI, and Photon lifecycle remain preserved.",
         "The explicit package matrix passed Channel check-types and 2 tests, Sendblue check-types and 9 tests, Photon check-types and 25 tests, and agent check-types, 62 tests, and the Nitro build. The built-route and channel-config fixtures retain both absolute provider routes and separate provider roots without proving a future hosted function topology.",

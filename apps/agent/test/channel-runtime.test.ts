@@ -187,6 +187,19 @@ it.effect(
         ["first", "second"]
       );
 
+      const sendblueProvider = yield* Effect.promise(() =>
+        sendblueRuntime.runPromise(
+          Effect.gen(function* runSendblueInvocation() {
+            const channel = yield* Channel;
+            const decoded = yield* channel.decodeWebhook(
+              new Request("https://example.invalid/sendblue")
+            );
+            return decoded._tag === "Accepted"
+              ? decoded.message.conversation.provider
+              : "ignored";
+          })
+        )
+      );
       const photonProvider = yield* Effect.promise(() =>
         photonRuntime.runPromise(
           Effect.gen(function* runPhotonInvocation() {
@@ -200,6 +213,7 @@ it.effect(
           })
         )
       );
+      assert.strictEqual(sendblueProvider, "sendblue");
       assert.strictEqual(photonProvider, "photon");
       assert.strictEqual(yield* Ref.get(photonBuilds), 1);
 

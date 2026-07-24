@@ -1,7 +1,7 @@
 ---
 document_type: execution-plan
-lifecycle: implemented
-authority: supporting
+lifecycle: active
+authority: canonical
 owner: bundjil-agent-architecture-owner
 created: 2026-07-24
 last_reviewed: 2026-07-24
@@ -9,12 +9,11 @@ review_trigger: runtime task status, Eve adapter, ManagedRuntime, Fiber, Scope, 
 spec: ../../product-specs/eve-channel-runtime-ownership.md
 task_ledger: ../../product-specs/eve-channel-runtime-ownership.tasks.json
 started: 2026-07-24
-completed: 2026-07-24
 ---
 
 # Eve Channel runtime ownership and supervision
 
-## Accepted outcome
+## Reopened closeout
 
 The three accepted tasks were implemented serially:
 
@@ -25,9 +24,12 @@ The three accepted tasks were implemented serially:
 3. reconcile durable architecture, app, SPEC/task, plan, fixture, proof, and
    lifecycle owners before repository closeout.
 
-The implementation remains repository-only. It does not include the optional
-Preview readback and grants no deployment, provider, credential, message, or
-Production authority.
+The implementation remains repository-only. Closeout was reopened after
+`cb10720e1eb43396f4b3351143c11002a2e96cf8` because the prior receipt recorded
+one generic adversarial review instead of the mandatory five explicit
+post-implementation passes. It does not include the optional Preview readback
+and grants no deployment, provider, credential, message, or Production
+authority.
 
 ## Baseline and Git identity
 
@@ -50,9 +52,9 @@ Production authority.
 `0c9082c8685a0fdd2512ea92222fad8022b86941`.
 `supervise-accepted-eve-background-work` is accepted in commit
 `a97d80d5943fa596cc09535a71a7d7e2b5414f54`.
-`reconcile-runtime-docs-and-repository-closeout` completed after the final
-adversarial review, explicit package matrix, full repository verification,
-durable-owner reconciliation, inventory update, and plan archival.
+`reconcile-runtime-docs-and-repository-closeout` is reopened. The two
+implementation tasks remain accepted unless one of the five passes produces a
+specific finding against its owned code or proof.
 
 ## Accepted-finding boundary
 
@@ -63,11 +65,130 @@ findings and `EVE-RUNTIME-REQ-001` through `EVE-RUNTIME-REQ-004`.
 
 ## Task progress
 
-| Task                                             | Status    | Acceptance receipt                                                                                                                                                                                                                               |
-| ------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `prove-provider-runtime-behavior`                | Completed | Commit `0c9082c8685a0fdd2512ea92222fad8022b86941`; two focused runtime tests, 59 agent tests, direct policy gates, docs-inventory reconciliation, and a fresh full repository verification passed                                                |
-| `supervise-accepted-eve-background-work`         | Completed | Commit `a97d80d5943fa596cc09535a71a7d7e2b5414f54`; direct provider `runFork`, native `Fiber.await` waitUntil completion, five focused route tests, 62 agent tests, 25 Photon tests, direct policy gates, and full repository verification passed |
-| `reconcile-runtime-docs-and-repository-closeout` | Completed | Explicit package matrix, source/build ownership scans, adversarial diff review, all direct gates, full repository verification, durable-owner reconciliation, archive pointers, limitations, and rollback identity accepted                      |
+| Task                                             | Status      | Acceptance receipt                                                                                                                                                                                                                               |
+| ------------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `prove-provider-runtime-behavior`                | Completed   | Commit `0c9082c8685a0fdd2512ea92222fad8022b86941`; Pass 4 reopened its proof, added explicit Sendblue and Photon shared-tag identity assertions, then passed 6 focused tests, agent typechecking, Effect setup, and boundary checks              |
+| `supervise-accepted-eve-background-work`         | Completed   | Commit `a97d80d5943fa596cc09535a71a7d7e2b5414f54`; direct provider `runFork`, native `Fiber.await` waitUntil completion, five focused route tests, 62 agent tests, 25 Photon tests, direct policy gates, and full repository verification passed |
+| `reconcile-runtime-docs-and-repository-closeout` | In progress | Mandatory five-pass audit, any resulting corrections, final full verification, lifecycle reconciliation, and coherent audit commit remain                                                                                                        |
+
+## Mandatory five-pass audit
+
+Baseline: `cb10720e1eb43396f4b3351143c11002a2e96cf8`.
+
+| Pass                                      | Status  | Evidence                                                                                                                                                                                                      |
+| ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Ownership and call graph               | Passed  | Two provider-owned production runtimes, one shared interpretation edge, separate Layer/config graphs, test-owned disposal, and installed Eve/HMR limits confirmed.                                            |
+| 2. Effect implementation quality          | Passed  | Direct native runtime/Fiber interpretation, flat request/background programs, outer typed handling, admitted test fixtures, and unchanged Photon lifetime confirmed.                                          |
+| 3. Boundary and lifecycle correctness     | Passed  | Type/Encoded and Config/error ownership, runtime-Scope supervision, Exit observation, cached failure/recovery, concurrency, cancellation, and finalizers confirmed.                                           |
+| 4. Verification and adversarial coverage  | Passed  | A missing direct Sendblue shared-tag assertion and active-plan formatting drift were corrected; focused, provider/app, boundary, Effect, lint, type, build, docs, harness, and negative-source checks passed. |
+| 5. Documentation, authority, and closeout | Pending | Durable owners, lifecycle, proof limits, rollback, archives, and Git identity remain to be reconciled.                                                                                                        |
+
+### Pass 1 — ownership and call graph
+
+- Files inspected: `apps/agent/agent/agent.ts`,
+  `apps/agent/agent/channels/{sendblue,photon}.ts`,
+  `apps/agent/agent/lib/channel/{eve,channel,config,runtime,sendblue.runtime,photon.runtime}.ts`,
+  `packages/channel/src/{service,memory.layer}.ts`,
+  `packages/sendblue/src/live.layer.ts`,
+  `packages/photon/src/{client,transport.layer,live.layer}.ts`,
+  `apps/agent/test/{channel-config,channel-runtime,sendblue-channel,sendblue-build-route}.test.ts`,
+  and installed Eve's `compiled-agent-cache.js`,
+  `dev-authored-source-watcher.js`, `start-development-server.js`, and
+  `dev-client.js`.
+- Commands: exact `rg` scans for `ManagedRuntime.make`, `runPromise`,
+  `runFork`, `disposeEffect`, `MemoMap`, `forkDetach`, provider-root symbols,
+  package imports, and test-only runtime ownership, followed by direct reads
+  of every listed source.
+- Findings: production owns exactly two module-level runtimes and one shared
+  `runFork` edge; provider Layers/config remain separate; tests alone own test
+  disposal; no request creates/disposes a runtime; no cross-runtime `MemoMap`
+  exists. Eve reloads its compiled bundle cache and owns watcher/Nitro/sandbox
+  close, but exposes no authored Channel runtime teardown hook. Build evidence
+  proves the current local bundle only.
+- Corrections: none. Task 1 and task 2 remain accepted.
+- Evidence: source searches returned two production `ManagedRuntime.make`
+  sites, one production `runFork`, and zero production `disposeEffect`,
+  `MemoMap`, or `forkDetach` sites.
+
+### Pass 2 — Effect implementation quality
+
+- Files inspected: the complete TypeScript implementation diff plus
+  `eve.ts`, Channel service/dispatch/errors/schemas/config/replay/identity/router
+  owners, both runtime Layers, Channel transport Service/memory Layer,
+  Sendblue live Layer, Photon client/transport/live Layers, and both changed
+  test files.
+- Commands: full baseline-to-closeout TypeScript diff; exact scans for Effect,
+  Layer, Service, Fiber, Scope/lifecycle primitives and forbidden runners,
+  casts, manual transforms, native-class or switch policy, generic helpers,
+  observers, `forkDetach`, and `MemoMap`; `bun run check:effect-setup`;
+  `bun run check:boundaries`; and the agent typecheck.
+- Findings: the production slice directly uses `ManagedRuntime.runFork`,
+  `Fiber.await`, and `Effect.runPromise`; expected ingress errors remain in the
+  outer `catchTags` pipeline; request-local dispatch stays at the framework
+  edge. Test programs use native Effect primitives. The reused
+  `makeSupervisionRuntime` is a four-call-site test fixture, not a production
+  runner seam. No forbidden abstraction or construct was added, and no Photon
+  package source or Spectrum lifetime changed.
+- Corrections: none. Task 1 and task 2 remain accepted.
+- Evidence: the added-line forbidden-pattern scan returned no matches; Effect
+  setup, the boundary audit, and agent typecheck passed; the provider/package
+  diff is empty.
+
+### Pass 3 — boundary and lifecycle correctness
+
+- Files inspected: Channel app Schemas, config, errors, Service, dispatch and
+  Eve edge; Channel package Schemas/Service/errors; Sendblue Schemas/live
+  Layer; Photon Schemas/client/transport; four focused agent fixtures; and
+  installed Effect `ManagedRuntime.ts` and `Fiber.ts`.
+- Commands: exact Schema Type/Encoded, decode/encode, Config/redaction,
+  tagged-error, host-value, `waitUntil`, request-signal, MemoMap/build-fiber,
+  Scope/disposal, `runFork`, and `Fiber.await` scans; direct source reads; and
+  `bun run --cwd apps/agent vitest run test/channel-config.test.ts
+test/channel-runtime.test.ts test/sendblue-channel.test.ts
+test/channel-vertical.test.ts`.
+- Findings: Eve state decodes from and encodes to the canonical adapter Schema;
+  request/provider unknowns decode at their exact adapters; Services exchange
+  decoded owner types; config is Schema-owned and redacted; public failures are
+  safe tagged errors. ManagedRuntime owns a fresh MemoMap/Scope, caches its
+  build fiber including failure, supervises `runFork`, and closes the Scope on
+  disposal; `Fiber.await` observes every Exit without propagating it.
+- Corrections: none. Task 1 and task 2 remain accepted.
+- Evidence: 22 focused tests passed, covering config isolation, concurrency,
+  failure poisoning/isolation/recovery, waitUntil success/failure/defect,
+  disposal interruption/finalizer completion, request-abort independence, and
+  vertical compatibility.
+
+### Pass 4 — verification and adversarial coverage
+
+- Files inspected: all focused agent fixtures under
+  `apps/agent/test/{channel-runtime,channel-config,sendblue-channel,channel-vertical,sendblue-build-route}.test.ts`;
+  Channel, Sendblue, and Photon transport/client fixtures; both provider
+  discovery roots; the shared Eve edge; and this active plan.
+- Commands: the corrected 6-test runtime/config focus; the 22-test
+  boundary/lifecycle focus; Channel, Sendblue, Photon, and agent typecheck,
+  test, and build matrices; `bun run test:boundaries`; `bun run check`;
+  `bun run test:lint`; `bun run knip`; all direct Effect, boundary, docs,
+  skills, authority, controls, verification, and HGI-307 gates; and
+  `git diff --check`. Agent build commands used only the documented synthetic
+  Executor URL and key.
+- Findings: the runtime fixture proved distinct construction and Photon
+  identity, but concurrent Sendblue calls did not directly assert that the
+  shared `Channel` tag resolved to the Sendblue-backed value. The first full
+  `bun run check` also found formatting drift in this reopened plan. All other
+  accepted negative paths were already executable.
+- Corrections: reopened `prove-provider-runtime-behavior`, resolved `Channel`
+  from both concrete runtimes, decoded the same canonical inbound fixture, and
+  asserted `sendblue` and `photon` provider values. Formatted this plan with
+  the repository formatter. Reran the focused proof and each failed check.
+- Evidence: 6 corrected focused tests and 22 lifecycle tests passed. Channel
+  passed typecheck, 2 tests, and build; Sendblue passed typecheck, 9 tests, and
+  build; Photon passed typecheck, 25 tests, and build; agent passed typecheck,
+  62 tests, and Nitro build. The boundary harness passed 89 tests. Ultracite
+  passed with zero warnings/errors after correction; lint policy, Knip, Effect
+  setup, boundary, docs, skills, authority, controls, verification, HGI-307,
+  and diff checks passed. Source/diff scans retain zero old detached path,
+  per-request lifecycle, combined runtime, shared MemoMap, runner wrapper,
+  unsafe cast, or Photon lifetime change.
 
 ## Risk-lens evidence
 

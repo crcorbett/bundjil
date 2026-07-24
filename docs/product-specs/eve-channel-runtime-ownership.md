@@ -1,7 +1,7 @@
 ---
 document_type: product-specification
-lifecycle: implemented
-authority: supporting
+lifecycle: current
+authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-24
 last_reviewed: 2026-07-24
@@ -13,14 +13,15 @@ review_trigger: Eve, Effect, ManagedRuntime, Channel provider, Fiber, Scope, wai
 ## Implementation status
 
 Repository implementation completed from
-`61992a2fa220313530dc7a8b3d54ec970a7483ec` on 2026-07-24. The
-[completed execution plan](../exec-plans/completed/eve-channel-runtime-ownership.md)
-retains task progress, impact decisions, risk-lens evidence, checks,
-limitations, and rollback identity. Current runtime behavior is owned by
+`61992a2fa220313530dc7a8b3d54ec970a7483ec` on 2026-07-24, but closeout task
+three was reopened after commit
+`cb10720e1eb43396f4b3351143c11002a2e96cf8` because its receipt collapsed the
+required five post-implementation audit passes into one generic adversarial
+review. The [active execution plan](../exec-plans/active/eve-channel-runtime-ownership.md)
+owns the correction. Current runtime behavior remains owned by
 [`../architecture/eve-agent.md`](../architecture/eve-agent.md) and
 [`../../apps/agent/README.md`](../../apps/agent/README.md). Optional Preview
-readback remains outside required acceptance and was not authorised or
-performed by this implementation.
+readback remains outside required acceptance and is not authorised.
 
 ## Decision
 

@@ -4,7 +4,7 @@
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
     "pathCount": 180,
-    "sortedPathSha256": "6053a04eaca1be61b4211184d70daf1db59f5157eba3a38b407183f543524942"
+    "sortedPathSha256": "4ebd342dc9fb9131c02df705cfa5e46c0476627da8189ee2cd78a16d5d34f6a0"
   },
   "readmeInventory": {
     "pathCount": 22,
@@ -24,7 +24,7 @@
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried the 177-path corpus. The accepted Eve runtime-ownership SPEC and task list expanded the current corpus to 179 paths, its implementation plan expanded it to 180 paths, and closeout moved that path from active to completed history without changing the count, scenario manifest, expected owners, skill bytes, or worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried the 177-path corpus. The accepted Eve runtime-ownership SPEC and task list expanded the current corpus to 179 paths, and its implementation plan expanded it to 180 paths. The mandatory five-pass closeout correction has reopened that plan under active intent without changing the count, scenario manifest, expected owners, skill bytes, or worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."
