@@ -1,6 +1,6 @@
 {
   "title": "Eve Channel Runtime Ownership and Supervision Tasks",
-  "status": "in_progress",
+  "status": "implemented",
   "spec": "docs/product-specs/eve-channel-runtime-ownership.md",
   "principles": [
     "Own one concrete ManagedRuntime per loaded provider composition root per JavaScript module instance; current local output loads both roots, but future function splitting must be read back rather than assumed.",
@@ -1057,7 +1057,7 @@
     {
       "id": "reconcile-runtime-docs-and-repository-closeout",
       "title": "Reconcile durable runtime owners and complete repository verification",
-      "status": "in_progress",
+      "status": "completed",
       "findingIds": [
         "FINDING-001",
         "FINDING-002",
@@ -1102,9 +1102,11 @@
       "completedAt": "2026-07-24",
       "reopenedAt": "2026-07-24",
       "reopenReason": "The closeout recorded one generic adversarial review rather than the mandatory five explicit post-implementation audit passes. Reopen only this lifecycle owner, run and evidence all five passes, correct any pass finding in its owning task, then repeat terminal verification and commit.",
+      "auditCompletedAt": "2026-07-24",
       "fivePassAudit": {
-        "status": "in_progress",
+        "status": "passed",
         "baselineCommit": "cb10720e1eb43396f4b3351143c11002a2e96cf8",
+        "correctionCommit": "b849b3025e14ae31fcc09bcfd819c72ee9ce6097",
         "passes": [
           {
             "id": "ownership-and-call-graph",
@@ -1320,7 +1322,62 @@
           },
           {
             "id": "documentation-authority-and-closeout",
-            "status": "pending"
+            "status": "passed",
+            "executedAt": "2026-07-24",
+            "filesInspected": [
+              "docs/README.md",
+              "docs/architecture/eve-agent.md",
+              "docs/architecture/effect-patterns.md",
+              "docs/architecture/repo-structure.md",
+              "docs/architecture/testing-and-quality.md",
+              "apps/agent/README.md",
+              "apps/agent/runbooks/README.md",
+              "apps/agent/runbooks/sendblue.md",
+              "apps/agent/runbooks/photon.md",
+              "docs/operations/authority-model.md",
+              "docs/operations/authority-register.json",
+              "docs/verification/README.md",
+              "docs/product-specs/eve-channel-runtime-ownership.md",
+              "docs/product-specs/eve-channel-runtime-ownership.tasks.json",
+              "docs/product-specs/index.md",
+              "docs/exec-plans/active/README.md",
+              "docs/exec-plans/completed/README.md",
+              "docs/exec-plans/completed/eve-channel-runtime-ownership.md",
+              "docs/documentation-audit/HGI-307-impact-ledger.json"
+            ],
+            "commands": [
+              "git status --short",
+              "git rev-parse HEAD",
+              "git log -5 --oneline --decorate",
+              "sed and rg owner/lifecycle/authority/proof/rollback inspections across every listed file",
+              "git ls-files --cached --others --exclude-standard",
+              "bun run check:docs",
+              "bun run check:skills",
+              "bun run check:authority",
+              "bun run check:controls",
+              "bun run check:verification",
+              "bun run eval:hgi-307",
+              "bun run check",
+              "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model' BUNDJIL_EXECUTOR_API_KEY='synthetic-agent-test-key' bun run verification",
+              "git diff --check"
+            ],
+            "findings": [
+              "The reopened SPEC, task ledger, active/completed indexes, product index, plan path, and HGI-307 docs digest required a single terminal lifecycle reconciliation after all other passes.",
+              "The SPEC said the linked worktree had no local node_modules without qualifying that statement as rereview-time evidence. That could become a false current workspace claim after dependency setup.",
+              "The closeout receipt and rollback chain did not yet identify the pass-4 correction commit b849b3025e14ae31fcc09bcfd819c72ee9ce6097."
+            ],
+            "corrections": [
+              "Qualified the node_modules statement as point-in-time SPEC rereview evidence and retained the exact installed-source provenance without asserting current workspace state.",
+              "Set the SPEC/task lifecycle to implemented, closed the five-pass audit, moved this plan from active to completed history, reconciled the product and plan indexes, and regenerated the HGI-307 docs path digest for the terminal path set.",
+              "Added the exact pass-4 correction commit to the closeout receipt and ordered Git rollback identity. No deployment/provider rollback identity was invented."
+            ],
+            "evidence": [
+              "Architecture and app README remain the earliest durable behavior owners; package READMEs, exports, Schemas, Services, Layers, runbooks, authority registers, verification journeys, skills, AGENTS, CI, and Photon lifetime remain preserved as classified in the downstream-impact ledger.",
+              "Authority and verification owners continue to state that repository source, local tests/builds, historical receipts, and available credentials neither prove current provider/deployment state nor authorize another operation.",
+              "The terminal product/plan indexes route runtime ownership only through implemented history; the optional Preview readback remains unperformed, outside required acceptance, and separately authority-gated.",
+              "Docs, skills, authority, controls, verification, HGI-307, Ultracite, and diff checks passed on the reconciled terminal documentation state.",
+              "The complete repository verification passed on the terminal candidate: Effect setup, boundary/docs/skills/authority/controls/verification/HGI-307 gates, 89 tooling tests, Ultracite, lint policy, Knip, eight workspace typechecks, and all eight workspace test tasks including the fresh 62-test agent run and Nitro build."
+            ]
           }
         ]
       },
@@ -1330,7 +1387,8 @@
         "A fresh ownership and call-graph scan found production ManagedRuntime.make only in apps/agent/agent/channels/sendblue.ts and photon.ts, runFork only in the shared Eve adapter, no accepted-path forkDetach or request-owned runtime disposal, and no production change under packages/channel, packages/sendblue, packages/photon, or packages/store.",
         "The implementation-quality scan found no ChannelEffectRunner, shared MemoMap, combined provider runtime, generic runtime callback, unsafe cast, manual codec/reader, DTO mirror, helper/common/utils module, new boundary exception, adapter timeout/retry, or synchronous production codec. Photon retains its two per-operation Effect.acquireUseRelease owners.",
         "Effect language-service diagnostics and the direct boundary, Effect setup, docs, skills, authority, controls, and verification gates passed. HGI-307 evaluation, 89 tooling tests, Ultracite, lint policy tests, Knip, eight workspace typechecks, all workspace tests, and git diff --check passed in the full repository verification.",
-        "The SPEC, task ledger, completed plan, product and plan indexes, and executable documentation inventory are reconciled. Evidence remains repository/local-build only: no Preview, Production, Vercel, provider, credential, webhook, message, handset, deployment, push, merge, or release operation occurred."
+        "The SPEC, task ledger, completed plan, product and plan indexes, and executable documentation inventory are reconciled. Evidence remains repository/local-build only: no Preview, Production, Vercel, provider, credential, webhook, message, handset, deployment, push, merge, or release operation occurred.",
+        "The mandatory five-pass audit passed separately for ownership/call graph, Effect implementation quality, boundary/lifecycle correctness, verification/adversarial coverage, and documentation/authority/closeout. Pass 4 corrections are committed as b849b3025e14ae31fcc09bcfd819c72ee9ce6097; pass 5 corrected one time-unbounded workspace claim and reconciled terminal lifecycle owners before the final full verification."
       ],
       "commitAfterPassing": true
     }
