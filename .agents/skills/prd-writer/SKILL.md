@@ -7,6 +7,24 @@ description: "Thin router for Bundjil spec authoring. Use when writing a SPEC, P
 
 This skill is intentionally thin. It routes spec authoring into canonical repo docs instead of carrying a parallel planning framework inside the skill.
 
+## Structured harness and audit handoff
+
+For substantial repository, operational, automation, migration, or harness
+work, read the embedded repository harness contract, contract map, and invariant
+register under `../docs-maintainer/references/`.
+
+When work begins with an audit, require the accepted-finding register and its
+structured crosswalk. Validate it with the repository audit validator when one
+exists. Preserve stable finding and invariant IDs; map every accepted finding
+to an owning requirement and task, including its complete impact-surface
+decisions, verification, journeys, and proof. Keep rejected, deferred, and
+optional findings out of implementation scope unless explicitly accepted.
+
+For ordinary repository improvements, require normal repository checks,
+applicable real journeys, and one fresh independent review. Do not create a
+comparative harness campaign unless the SPEC explicitly claims a general
+harness effect.
+
 ## Start Here
 
 Read in this order:

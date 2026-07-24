@@ -7,6 +7,22 @@ description: "Thin router for implementing Bundjil specs and plans with the cano
 
 This skill is intentionally thin. It routes implementation work into the canonical execution docs instead of embedding another rollout framework inside the skill.
 
+## Enforce the structured handoff
+
+For substantial repository, operational, automation, migration, or harness
+work, load the embedded harness contract, contract map, and invariant register
+under `../docs-maintainer/references/` once during grounding.
+
+When work derives from an audit, confirm each task's accepted finding IDs and
+validate the structured crosswalk when a local validator exists. Implement only
+accepted findings and carry their full impact-surface decisions, verification,
+journeys, and proof through task closure. Do not silently implement rejected,
+deferred, or optional findings.
+
+For ordinary repository work, stop after accepted corrections, normal checks,
+applicable journeys, and one fresh independent review. Do not extend delivery
+into a comparative harness campaign without an explicit approved claim.
+
 ## Start Here
 
 Read in this order:
