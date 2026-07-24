@@ -14,15 +14,12 @@ entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
 
-## Proposed
-
-- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
-  — implementation-ready specification accepted after adversarial formal
-  review, with a structured audit-finding crosswalk in its sibling task ledger;
-  implementation has not begun and no active execution plan exists.
-
 ## Current
 
+- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
+  — repository implementation is in progress under its canonical active plan;
+  optional hosted readback remains outside required acceptance and requires
+  separate authority.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.

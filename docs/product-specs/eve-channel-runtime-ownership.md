@@ -1,6 +1,6 @@
 ---
 document_type: product-specification
-lifecycle: proposed
+lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-24
@@ -9,6 +9,15 @@ review_trigger: Eve, Effect, ManagedRuntime, Channel provider, Fiber, Scope, wai
 ---
 
 # Eve Channel runtime ownership and supervision
+
+## Implementation status
+
+Repository implementation began from
+`61992a2fa220313530dc7a8b3d54ec970a7483ec` on 2026-07-24. The canonical
+[active execution plan](../exec-plans/active/eve-channel-runtime-ownership.md)
+owns task progress, impact decisions, risk-lens evidence, checks, limitations,
+and rollback identity. Optional Preview readback remains outside required
+acceptance and is not authorised by this implementation.
 
 ## Decision
 

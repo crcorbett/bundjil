@@ -1,6 +1,6 @@
 {
   "title": "Eve Channel Runtime Ownership and Supervision Tasks",
-  "status": "proposed",
+  "status": "in_progress",
   "spec": "docs/product-specs/eve-channel-runtime-ownership.md",
   "principles": [
     "Own one concrete ManagedRuntime per loaded provider composition root per JavaScript module instance; current local output loads both roots, but future function splitting must be read back rather than assumed.",
@@ -954,7 +954,7 @@
     {
       "id": "prove-provider-runtime-behavior",
       "title": "Prove provider runtime caching, concurrency, failure isolation, and recovery",
-      "status": "pending",
+      "status": "completed",
       "findingIds": ["FINDING-001", "FINDING-003"],
       "requirementIds": ["EVE-RUNTIME-REQ-001", "EVE-RUNTIME-REQ-003"],
       "owningPaths": [
@@ -984,6 +984,15 @@
       "completionCriteria": [
         "The test suite makes per-runtime caching, concurrency, failure isolation, disposal, and recovery executable without pretending to prove module/function cardinality.",
         "All focused checks pass and the task records ownership/call-graph, implementation-quality, and verification-coverage evidence."
+      ],
+      "completedAt": "2026-07-24",
+      "completionEvidence": [
+        "apps/agent/test/channel-runtime.test.ts uses canonical decoded Channel fixtures, explicit Sendblue and Photon memory transport Layers, separate ManagedRuntimes, Ref acquisition/finalizer counts, and Deferred gates. Its two focused tests prove one build per runtime, concurrent overlap without sleeps, independent provider roots, typed ChannelConfigError build failure, retained same-runtime failure, fresh-runtime recovery, and scoped disposal.",
+        "Ownership and call graph review found no production change: ManagedRuntime.make remains module-owned only by apps/agent/agent/channels/sendblue.ts and photon.ts; the new ManagedRuntime and disposeEffect sites are test-owned; no combined runtime, shared MemoMap, runtime Service, runner, provider eager loading, or Photon SDK lifetime change exists.",
+        "Implementation-quality review found only native Schema, Layer, ManagedRuntime, Deferred, Ref, Effect.acquireRelease, Exit, Cause, and Option primitives; no unsafe cast, DTO mirror, manual codec, raw provider value, wrapper/helper module, generic callback, exception, suppression, or production boundary change was introduced.",
+        "Focused @bundjil/agent check-types completed with no Effect language-service diagnostic; the runtime fixture passed 2 tests and the full agent suite passed 59 tests after the fresh worktree package outputs were built and the documented synthetic Executor build configuration was supplied.",
+        "Direct check:boundaries, check:effect-setup, check:docs, check:skills, check:authority, check:controls, and check:verification gates passed. The first root verification run correctly rejected the new active-plan path as a stale HGI-307 docs inventory; docs-maintainer reconciled the executable inventory owner to 180 paths, eval:hgi-307 passed, and a fresh full bun run verification then passed all repository gates and eight workspace test tasks.",
+        "No deployment, provider, credential, message, Preview, Production, or other external operation occurred. Source/build tests remain repository proof and make no Vercel topology, warm-instance, scale-out, shutdown, provider, or handset claim."
       ],
       "commitAfterPassing": true
     },
