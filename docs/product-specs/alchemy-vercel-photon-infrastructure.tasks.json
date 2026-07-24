@@ -63,6 +63,55 @@
     "bun run verification",
     "git diff --check"
   ],
+  "repositoryAuthorizedFivePassAudit": {
+    "status": "passed_with_correction",
+    "scope": "Repository-authorized implementation only; this is not the final SPEC audit.",
+    "baseRevision": "38a8a3f4cde7b6c519803f233b80b48f079a206d",
+    "auditedCommits": ["0a08767", "43af287", "65f4d7b"],
+    "remainingGate": "Seven tasks remain pending. authorized-read-only-inventory requires a new target-specific authority envelope for credential-backed Vercel and Photon tenant reads.",
+    "findings": [
+      {
+        "id": "FPA-003-001",
+        "pass": 3,
+        "ownerTask": "photon-read-import-vertical",
+        "consequence": "Photon rate-limited and transient reads used bounded exponential retry without the SPEC-required jitter.",
+        "correction": "Reopened the Photon owner, added Schedule.jittered to the shared retry schedule, and added request-count assertions proving 409 receives one request while 429 and 503 receive exactly three.",
+        "status": "corrected_and_reclosed"
+      }
+    ],
+    "passes": [
+      {
+        "pass": 1,
+        "name": "Ownership and call graph",
+        "status": "passed",
+        "evidence": "Executable import/export scans show only alchemy.run.ts and stacks/bundjil.ts consume the infrastructure root; applications do not import infrastructure. @bundjil/infrastructure/vercel owns Vercel metadata-only services/resources, @bundjil/photon/management owns Photon read transport/services, and @bundjil/infrastructure/photon owns Alchemy observation resources. App runbooks retain Vercel Git deployment/promotion/rollback. All implemented resources retain and fail closed. Stage brands exist, while separate live Preview/Production state and credentials remain explicitly unimplemented."
+      },
+      {
+        "pass": 2,
+        "name": "Effect and provider implementation quality",
+        "status": "passed",
+        "evidence": "Source inspection and rejection scans confirmed Schema Type/Encoded contracts, owner brands, named Context.Service operations, Config.schema with Redacted secrets, constant live/memory Layers, Schema tagged errors, Match-based policy and named flat Effects. No raw client/generic callback export, unsafe cast, manual JSON, DTO mirror export, primitive semantic public service contract, switch, instanceof or unowned helper sprawl was found. Private primitive URL helpers remain confined to encoded HTTP adapters."
+      },
+      {
+        "pass": 3,
+        "name": "Lifecycle, state and security correctness",
+        "status": "passed_after_correction",
+        "evidence": "Stable branded identities, exact adoption/no-write paths, retain/delete protection, exhaustive Vercel/Photon pagination, bounded jittered 429/5xx retry, synthetic timeout-after-write/eventual-consistency/partial-failure recovery, Managed/ObservedUnknown/Absent secret state, state-safe projections and fail-closed provider/billable mutation are source- and test-backed. FPA-003-001 reopened and then reclosed photon-read-import-vertical after focused typecheck and 30 Photon tests passed."
+      },
+      {
+        "pass": 4,
+        "name": "Verification and adversarial coverage",
+        "status": "passed",
+        "evidence": "Effect language-service, boundary/docs/skills/authority/controls/verification audits, 89 tooling tests, type-aware lint, lint tests, Knip and all nine workspace typechecks passed. Infrastructure passed 10 Vitest and 11 Alchemy lifecycle tests; Photon passed 30 tests; both package builds passed. The exercised matrix includes malformed envelopes, cross-brand compile failures, ambiguity, pagination, leaks, uncertain writes, eventual consistency, no-write adoption and fail-closed deletion."
+      },
+      {
+        "pass": 5,
+        "name": "Documentation, authority and closeout",
+        "status": "passed_for_repository_scope",
+        "evidence": "The canonical SPEC, task ledger and active plan now own the five-pass contract, executed evidence, corrected finding, repeated final-closeout requirement, rollback and non-claims. Architecture/README/runbook/authority/verification owners were inspected and preserved because their executable boundaries did not change. No provider credential, read, write, deployment, webhook, billable action, push or merge occurred. Full verification remains the acceptance gate for the exact audit-correction candidate."
+      }
+    ]
+  },
   "tasks": [
     {
       "id": "alchemy-offline-foundation",
@@ -419,7 +468,7 @@
         "HC-EVIDENCE-001",
         "HC-LIFETIME-001"
       ],
-      "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and complete one fresh independent review after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
+      "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and repeat the mandatory five-pass audit after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
       "implementationNotes": [
         "PR CI runs repository checks, provider-memory tests, a read-only Preview plan, and native sync --dry-run. Protected Preview/Production apply jobs remain separate and approval-gated.",
         "Scheduled drift wraps native sync --dry-run with read-only credentials, produces sanitized classified findings, and never auto-applies. Route any future repair automation through controls admission.",
@@ -427,13 +476,17 @@
         "Update docs/architecture/repo-structure.md, effect-patterns.md, testing-and-quality.md, README.md, packages/infrastructure/README.md, packages/photon/README.md, affected app READMEs, target app runbooks, authority/control/automation registers, verification contracts/templates, current plan, and supporting research at their earliest owners. Recompute the tracked docs/README inventories; if paths or a declared harness trigger changed, create a dated successor/correction receipt and update docs/documentation-audit/README.md without rewriting historical HGI evidence.",
         "For every provider fixture, record create/update/retain/retire lifecycle, owning package path, upstream review trigger, malformed/compatibility case, and the negative test that prevents stale reuse.",
         "Validate added critical journeys, bounded receipts, task-scoped authority envelopes, and scheduled controls against the four fixed embedded harness Schemas and their current repository owners; do not substitute free-form Markdown or duplicate field shapes.",
-        "Perform one fresh independent review after task code is complete, shaped by the proved risks: ownership/call graph; exact boundary codec and branded-identity coverage; Effect/Schema/service/Layer quality; test, fixture and failure-path coverage; docs/README/lifecycle/authority/proof consistency; rollout/rollback triggers; and final clean verification/Git state. This is not a comparative harness campaign; open a new epoch only if a later claim concerns worker/harness effectiveness."
+        "After every remaining task has reached an honest terminal disposition, repeat the SPEC's mandatory five-pass audit in order: (1) ownership and call graph, (2) Effect and provider implementation quality, (3) lifecycle/state/security correctness, (4) verification and adversarial coverage, and (5) documentation/authority/closeout. Record exact evidence and corrections for each pass; every finding reopens its earliest owning task and blocks that pass until corrected and reverified. This is not a comparative harness campaign; open a new epoch only if a later claim concerns worker/harness effectiveness."
       ],
       "mandatoryVerification": [
         "Native sync fixtures cover unchanged normalization, unowned resource, missing resource, in-place drift, destructive drift, unavailable/ambiguous readback, unknown secret revision, skipped provider read, and deployment drift.",
         "Workflow policy proves PR jobs cannot apply, Preview cannot target Production, scheduled drift is report-only, and protected apply requires exact authority.",
         "Any scheduled drift control validates against the fixed control-record contract and the repository control/automation owner, including signal, durable state, authority, convergence, proof per run, bounded failure, repair, cost, review trigger, stop/rollback, retirement, and disconfirming evidence.",
-        "The fresh independent review reports evidence and direct corrections for every risk lens, including a complete Type/Encoded/decode-owner/encode-owner/exception matrix, cross-brand compile protection, flat named Effects, safe outer-pipe errors, no generic helper/client sprawl, and no secret/personal-data leaks.",
+        "Five-pass audit pass 1 records exact executable ownership/call-graph evidence for packages, services/Layers, Alchemy versus Vercel Git, imported/retained/read-only/runbook-owned resources and Preview/Production isolation.",
+        "Five-pass audit pass 2 records exact Effect/provider quality evidence, including the complete Type/Encoded/decode-owner/encode-owner/exception matrix, flat named Effects, typed outer-pipe errors and rejection scans for raw clients/callbacks, helper sprawl, casts, manual JSON/readers/mappers, DTO mirrors, primitive public contracts, switch, instanceof and stringly policy.",
+        "Five-pass audit pass 3 records exact lifecycle/state/security evidence for identity, adoption/no-op/drift, retain/delete, pagination, retry/rate/eventual consistency, timeout-after-write/partial failure, write-only secret state and fail-closed destructive or billable operations.",
+        "Five-pass audit pass 4 reruns and inspects every mock/provider lifecycle and negative matrix plus Effect LS, type/lint/Knip/build and boundary/docs/skills/authority/controls/verification gates; missing negative tests are added and their owner is reopened before the pass succeeds.",
+        "Five-pass audit pass 5 reconciles the docs-maintainer ledger, architecture/READMEs, SPEC/tasks/plan, runbooks/authority, proof/non-claims, fixture lifecycle, rollback and exact Git identity. Findings reopen their owner. Full repository verification then passes on the exact final state.",
         "All task dependencies are accepted or have an explicit terminal blocked/deferred disposition; every applicable stable invariant ID has claim-matched evidence and every fixed structured artifact validates against its checked-in Schema.",
         "Documentation acceptance proves all 182-baseline docs and 22-baseline READMEs were accounted for through their routed owners, exact current inventories were recomputed after implementation, and any path or harness-epoch change has a dated correction/successor with limitations and non-claims.",
         "Run every global verification command, all package/provider tests, Alchemy provider tests, scoped runbook dry runs, git diff --check, and exact Git identity/readback."

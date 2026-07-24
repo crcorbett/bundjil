@@ -1132,6 +1132,50 @@ worker/skill epoch or prove infrastructure effectiveness. Run
 `bun run test:harness` separately only when a harness evaluator/control
 implementation or fixture changes.
 
+## Mandatory five-pass implementation audit
+
+Implementation has two explicit audit checkpoints: after the repository-only
+foundation and read/import slices, and again in
+`drift-ci-monitoring-and-closeout` after every remaining task has reached an
+honest terminal disposition. Both checkpoints run these five passes in order:
+
+1. **Ownership and call graph:** inspect executable imports, exports, package
+   ownership, Alchemy versus Vercel Git deployment ownership, Vercel and Photon
+   service/Layer graphs, imported/retained/read-only/runbook-owned boundaries,
+   and Preview/Production isolation.
+2. **Effect and provider implementation quality:** inspect native
+   Effect/Schema/Config/Layer/Service/Data/Match/Scope use, flat named Effects
+   and typed outer-pipe failures, and reject raw client/callback escapes,
+   wrapper/helper sprawl, unsafe casts, manual JSON/readers/mappers, DTO
+   mirrors, primitive semantic public contracts, `switch`, `instanceof`, and
+   stringly policy.
+3. **Lifecycle, state and security correctness:** inspect stable identities,
+   adoption/no-op/drift, retain/delete protection, pagination, bounded
+   rate-limit/retry/eventual-consistency behavior, timeout-after-write and
+   partial-failure recovery, secret redaction/write-only state, and
+   fail-closed mutation or billable operations.
+4. **Verification and adversarial coverage:** rerun and inspect the complete
+   mock/provider lifecycle matrices, malformed/cross-brand/ambiguity/leak/
+   uncertain-outcome tests, Effect language-service diagnostics, type/lint/
+   Knip/build checks, and every boundary/docs/skills/authority/controls/
+   verification gate. Add missing negative tests.
+5. **Documentation, authority and closeout:** reconcile the docs-maintainer
+   ledger, architecture and READMEs, SPEC/tasks/plan status, runbooks and
+   authority envelopes, verification/proof/non-claims, fixture lifecycle,
+   rollback, and exact Git identity.
+
+A finding reopens its earliest owning task. Correct it and rerun the affected
+focused checks before that pass may succeed. Pass counts remain coordination
+data; each pass requires claim-matched evidence and corrections. After pass 5,
+run the full repository verification suite on the exact final candidate state.
+
+The 2026-07-24 checkpoint recorded in the sibling task ledger and active plan
+covers only repository-authorized commits `0a08767`, `43af287`, and `65f4d7b`
+plus its local audit correction. It is not the final SPEC audit: seven tasks
+remain behind new target-specific provider authority, beginning with
+`authorized-read-only-inventory`. The final closeout task must repeat all five
+passes against the integrated provider-authorized result.
+
 ## Acceptance criteria
 
 - `@bundjil/infrastructure` and root stacks follow the stated ownership and
@@ -1234,10 +1278,9 @@ support every decision below.
 Future implementation must start with this SPEC and
 `alchemy-vercel-photon-infrastructure.tasks.json`, then use the repository-local
 `prd-implementer` skill. Each task must close its applicable invariant IDs and
-three risk lenses with evidence. The final task performs one fresh independent
-review of the integrated result across ownership/call graphs, boundary codecs
-and branded identities, Effect/service quality, failure/fixture coverage,
-documentation/authority/proof consistency, and clean verification/Git state.
+three risk lenses with evidence. The final task repeats the mandatory
+five-pass audit of the integrated result, reopens and corrects every finding at
+its earliest task owner, and runs full verification on the exact final state.
 It is not a comparative harness campaign. A pass, worker, command or finding
 count is not acceptance proof. Any expansion into DNS mutation, Photon project
 or dedicated-line lifecycle, automatic drift apply, Sendblue management, or a

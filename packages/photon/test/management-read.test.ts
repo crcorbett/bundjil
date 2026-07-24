@@ -304,10 +304,15 @@ it.effect(
   "fails safely for malformed, conflict, rate-limited, transient and unavailable responses",
   () =>
     Effect.gen(function* () {
-      const responseFor = (status: number, body: unknown) =>
+      const responseFor = (
+        status: number,
+        body: unknown,
+        onRequest: () => void = () => {}
+      ) =>
         HttpClient.make((request) =>
-          Effect.succeed(
-            HttpClientResponse.fromWeb(
+          Effect.sync(() => {
+            onRequest();
+            return HttpClientResponse.fromWeb(
               request,
               Response.json(body, {
                 status,
@@ -316,8 +321,8 @@ it.effect(
                   "retry-after": "1",
                 },
               })
-            )
-          )
+            );
+          })
         );
 
       const malformed = yield* Effect.gen(function* () {
@@ -338,6 +343,7 @@ it.effect(
         [429, "rateLimited"],
         [503, "transient"],
       ] as const) {
+        let requestCount = 0;
         const program = Effect.gen(function* () {
           const webhooks = yield* PhotonWebhooks;
           return yield* webhooks.listWebhooks(
@@ -346,12 +352,18 @@ it.effect(
         }).pipe(
           Effect.provide(
             liveLayer(
-              responseFor(status, {
-                succeed: false,
-                data: null,
-                code: "safe-code",
-                message: "raw-provider-sentinel",
-              })
+              responseFor(
+                status,
+                {
+                  succeed: false,
+                  data: null,
+                  code: "safe-code",
+                  message: "raw-provider-sentinel",
+                },
+                () => {
+                  requestCount += 1;
+                }
+              )
             )
           ),
           Effect.flip
@@ -365,6 +377,7 @@ it.effect(
           failure = yield* Fiber.join(fiber);
         }
         assert.strictEqual(failure.reason, expected);
+        assert.strictEqual(requestCount, status === 409 ? 1 : 3);
         assert.strictEqual(
           Schema.encodeSync(Schema.UnknownFromJsonString)(failure).includes(
             "sentinel"

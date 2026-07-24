@@ -305,7 +305,7 @@ const PhotonBillingEnvelope = Schema.Union([
   PhotonFailureEnvelope,
 ]);
 
-const retrySchedule = Schedule.exponential("10 millis");
+const retrySchedule = Schedule.exponential("10 millis").pipe(Schedule.jittered);
 
 const retryTransientPhotonRead = <A, E extends { readonly retry: string }, R>(
   effect: EffectType.Effect<A, E, R>
