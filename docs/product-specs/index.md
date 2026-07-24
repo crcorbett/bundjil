@@ -16,6 +16,9 @@ context.
 
 ## Current
 
+- [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md) —
+  implementation intent is active; the offline Alchemy/custom-provider
+  lifecycle proof is next and grants no provider authority.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.

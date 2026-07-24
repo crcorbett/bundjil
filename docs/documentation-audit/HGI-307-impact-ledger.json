@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 180,
-    "sortedPathSha256": "6053a04eaca1be61b4211184d70daf1db59f5157eba3a38b407183f543524942"
+    "pathCount": 183,
+    "sortedPathSha256": "224076c379ba4548593e0a3bb68cfba923a57c281974f5698d738698abd15416"
   },
   "readmeInventory": {
     "pathCount": 22,
@@ -24,7 +24,7 @@
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried the 177-path corpus. The accepted Eve runtime-ownership SPEC and task list expanded the current corpus to 179 paths, and its implementation plan expanded it to 180 paths. The mandatory five-pass closeout correction temporarily reopened that plan, then returned it to completed history without changing the count, scenario manifest, expected owners, skill bytes, or worker reports; this digest owns the terminal completed-plan path set. The original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, the Eve implementation plan expanded it to 180 paths, and the Alchemy SPEC/task/active-plan slice produces the merged 183-path corpus. The mandatory Eve five-pass correction returned its plan to completed history while preserving the Alchemy plan as current intent. These path-accounting corrections change neither the scenario manifest, expected owners, skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."

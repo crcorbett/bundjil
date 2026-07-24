@@ -12,6 +12,9 @@ review_trigger: any active-plan admission, completion, or scope change
 Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
+- [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md) —
+  the offline lifecycle proof is next; no provider read, write, deployment, or
+  remote state operation is authorized.
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation is in progress; Preview subscription proof is pending
   deployment authority.

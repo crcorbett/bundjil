@@ -3,7 +3,7 @@ document_type: research-report
 lifecycle: reference
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-24
 review_trigger: Alchemy provider support, Vercel, Sendblue, or Photon API changes, Bundjil deployment topology, messaging-provider selection, or infrastructure SPEC changes
 ---
 
@@ -44,24 +44,67 @@ Infrastructure proof must begin with `prd-writer`; a Photon migration would
 require a second provider-selection/channel-migration SPEC. Accepted SPECs are
 then implemented through `prd-implementer`.
 
-### Post-research implementation status — 2026-07-21
+### Post-research implementation and revalidation — 2026-07-24
 
-The later [Schema-driven Channels and Photon Preview proof SPEC](../product-specs/photon-channel-provider.md)
-implemented a clean provider-neutral Channel boundary plus fresh Sendblue and
-Photon packages. It deliberately migrated no legacy Sendblue behavior. Local
-dual-provider conformance and a bounded Photon management/SDK lifecycle proof
-passed; the hosted Preview/message journey stopped because Vercel authority and
-a live Space were absent. The [dated receipt](../verification/photon-provider-proof-2026-07-21.md)
-is the only live Photon observation and the
-[target runbook](../../apps/agent/runbooks/photon.md) owns repeatable proof
-operations.
+The later
+[Schema-driven Channels and Production promotion SPEC](../product-specs/photon-channel-provider.md)
+implemented a clean Channel boundary plus fresh Sendblue and Photon packages.
+It deliberately migrated no legacy Sendblue implementation. Dated Preview and
+Production receipts accepted both providers against one immutable deployment,
+including Photon signed ingress, replay, send, and typing proof. The Photon
+branch was merged into `origin/main` at
+`23ae79bfb3f383f7ff66f0698ac1ec49c51247fe` on 2026-07-24. Those receipts
+remain evidence only; they do not establish current provider state or grant a
+new operation.
 
-That implementation does not accept this report's Alchemy recommendation,
-select a Production provider, or establish current Vercel, Sendblue, or Photon
-topology. Current architecture is routed through
-[`../architecture/README.md`](../architecture/README.md); any Production
-provider selection or Alchemy ownership still requires a new `$prd-writer`
-SPEC.
+Photon is therefore no longer a conditional provider candidate for
+infrastructure planning. The new
+[Alchemy infrastructure SPEC](../product-specs/alchemy-vercel-photon-infrastructure.md)
+selects the current Vercel + Photon architecture and retains Sendblue
+management outside new Alchemy ownership.
+
+This report remains research source material rather than an audit finding
+register. The accepted product decision, stable harness invariant mapping,
+structured journey/receipt/authority/control contracts, task dependencies and
+implementation acceptance live only in that SPEC and its sibling ledger.
+
+Mutable evidence was revalidated before that SPEC:
+
+- `/Users/cooper/Projects/site` is at
+  `878d18de8af9a7a082df9f8395128e3aecc94b5b`, clean and nine commits behind
+  its `origin/main`. Its manifest and lock pin `2.0.0-beta.64`, while the
+  existing installed `node_modules` resolution reports beta.63. The installed
+  tree was therefore not used to establish beta.64 APIs.
+- npm's Alchemy `next` tag and the downloaded exact package tarball resolve to
+  `2.0.0-beta.64`. Its exports/source expose no native Vercel or Photon
+  provider. The pinned v2 provider contract is `read`, `diff`, one convergent
+  `reconcile`, `delete`, and exhaustive `list`, not separate create/update
+  hooks. Beta.64 also includes native `alchemy sync --dry-run` drift detection
+  and approved `alchemy sync` repair. Core custom-provider, adoption, state,
+  removal-policy, sync, and test-provider capabilities remain applicable
+  ([custom providers](https://v2.alchemy.run/infrastructure-as-code/custom-provider/),
+  [resource lifecycle](https://v2.alchemy.run/infrastructure-as-code/resource-lifecycle/),
+  [testing](https://v2.alchemy.run/concepts/testing),
+  [release index](https://alchemy.run/blog/)).
+- Current Vercel REST documentation still exposes projects, environment
+  variables, domains, deployments, integrations/Marketplace, webhooks, and
+  drains but no Alchemy-native integration. It now documents endpoints that
+  may retrieve decrypted environment values under sufficient authority;
+  Bundjil's infrastructure design forbids those endpoints and treats sensitive
+  values as write-only by policy
+  ([Vercel REST API](https://vercel.com/docs/rest-api)).
+- Current Photon documentation still exposes project-scoped users, platforms,
+  webhooks, lines, billing readback, and the documented delivery retry
+  contract. The public management OpenAPI exposes project read/profile, but no
+  complete project create/delete/secret-rotation lifecycle. Dedicated line
+  create remains Business-only and billable without a documented idempotency
+  key, webhook signing secrets remain create-only, and no alert-policy or
+  persistent delivery-log API was established
+  ([Photon API](https://photon.codes/docs/api-reference/introduction)).
+
+No Vercel, Photon, Sendblue, Upstash, DNS, secret, deployment, webhook,
+message, or handset provider was queried or changed during the 2026-07-24
+revalidation.
 
 ## Truth and evidence boundaries
 
@@ -532,21 +575,21 @@ live read-only inventory.
 
 ### Production
 
-| Resource                   | Desired repository-derived state                                                                                                                         | Physical identity to adopt                   | Mutation posture                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-| Vercel agent project       | Root `apps/agent`; root build command; Production/Preview envs                                                                                           | Existing project ID/name                     | Read/adopt, retain                                  |
-| Vercel codex-proxy project | Root `apps/codex-proxy`; no framework; 30s API function; catch-all rewrite                                                                               | Existing project ID/name                     | Read/adopt, retain                                  |
-| Production domains         | Stable agent and proxy aliases; exact names unknown                                                                                                      | Existing domain plus project ID              | Read/adopt; no DNS ownership initially              |
-| Agent model/Executor env   | `BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_AGENT_MODEL`, `AI_GATEWAY_API_KEY`, `VERCEL_OIDC_TOKEN`, `BUNDJIL_EXECUTOR_MCP_URL`, `BUNDJIL_EXECUTOR_API_KEY` | project + key + `production`                 | Declare target/type; external secret values         |
-| Agent-to-proxy env         | proxy base URL, internal token, optional protection bypass, proxy model, context window                                                                  | project + key + `production`                 | One coordinated rotation group                      |
-| Sendblue app env           | API key/secret, webhook secret, line, sender identities, routing key, allowed services, typing duration                                                  | agent project + key + `production`           | External values; sensitive where supported          |
-| Sendblue replay env        | app-specific Upstash URL/token/prefix/TTL/lease; legacy `KV_REST_API_*` only during migration                                                            | agent project + key + `production`           | Preserve database and prefix                        |
-| Codex proxy env            | mode, internal token, profile/connector/installation/subject/account, cipher key/id/algorithm, refresh timing                                            | proxy project + key + `production`           | External values; coordinated token/cipher revisions |
-| Codex profile store        | Upstash URL/token/key prefix                                                                                                                             | existing Marketplace/database/connection IDs | Import/read; never recreate from a guessed name     |
-| Sendblue replay store      | Upstash URL/token/key prefix                                                                                                                             | existing database/connection IDs             | Import/read; prove whether shared physical DB       |
-| Sendblue webhook set       | one `receive` URL at stable Production route, signing secret                                                                                             | account + canonical URL/type set             | Import first; retain/protect                        |
-| Sendblue line inventory    | configured `from_number` and account lines                                                                                                               | provider line ID/phone number                | Read-only                                           |
-| Monitoring                 | Vercel deployment/project events, proxy `/health`, safe Sendblue attempt/outcome metrics, duplicate Preview ingress alert                                | existing drain/webhook/observability IDs     | Read/adopt before mutation                          |
+| Resource                   | Desired repository-derived state                                                                                                                         | Physical identity to adopt                   | Mutation posture                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Vercel agent project       | Root `apps/agent`; root build command; Production/Preview envs                                                                                           | Existing project ID/name                     | Read/adopt, retain                                                                    |
+| Vercel codex-proxy project | Root `apps/codex-proxy`; no framework; 30s API function; catch-all rewrite                                                                               | Existing project ID/name                     | Read/adopt, retain                                                                    |
+| Production domains         | Stable agent and proxy aliases; exact names unknown                                                                                                      | Existing domain plus project ID              | Read/adopt; no DNS ownership initially                                                |
+| Agent model/Executor env   | `BUNDJIL_AGENT_MODEL_PROVIDER`, `BUNDJIL_AGENT_MODEL`, `AI_GATEWAY_API_KEY`, `VERCEL_OIDC_TOKEN`, `BUNDJIL_EXECUTOR_MCP_URL`, `BUNDJIL_EXECUTOR_API_KEY` | project + key + `production`                 | Declare target/type; external secret values                                           |
+| Agent-to-proxy env         | proxy base URL, internal token, optional protection bypass, proxy model, context window                                                                  | project + key + `production`                 | URL/metadata ownership; shared-token rotation blocked until overlap/downtime contract |
+| Sendblue app env           | API key/secret, webhook secret, line, sender identities, routing key, allowed services, typing duration                                                  | agent project + key + `production`           | External values; sensitive where supported                                            |
+| Sendblue replay env        | app-specific Upstash URL/token/prefix/TTL/lease; legacy `KV_REST_API_*` only during migration                                                            | agent project + key + `production`           | Preserve database and prefix                                                          |
+| Codex proxy env            | mode, internal token, profile/connector/installation/subject/account, cipher key/id/algorithm, refresh timing                                            | proxy project + key + `production`           | External values; coordinated token/cipher revisions                                   |
+| Codex profile store        | Upstash URL/token/key prefix                                                                                                                             | existing Marketplace/database/connection IDs | Import/read; never recreate from a guessed name                                       |
+| Sendblue replay store      | Upstash URL/token/key prefix                                                                                                                             | existing database/connection IDs             | Import/read; prove whether shared physical DB                                         |
+| Sendblue webhook set       | one `receive` URL at stable Production route, signing secret                                                                                             | account + canonical URL/type set             | Import first; retain/protect                                                          |
+| Sendblue line inventory    | configured `from_number` and account lines                                                                                                               | provider line ID/phone number                | Read-only                                                                             |
+| Monitoring                 | Vercel deployment/project events, proxy `/health`, safe Sendblue attempt/outcome metrics, duplicate Preview ingress alert                                | existing drain/webhook/observability IDs     | Read/adopt before mutation                                                            |
 
 ### Preview
 
@@ -703,7 +746,7 @@ For every resource:
 - the API fake records named calls, paginates, simulates `404`, `409`, `429`,
   transient `5xx`, timeout-after-write, and eventual consistency;
 - provider tests cover create, no-op, in-place update, replace, adoption denied,
-  adoption allowed, drift refresh, retain, idempotent delete, and recovery after
+  adoption allowed, native sync drift detection/repair, retain, idempotent delete, and recovery after
   state persistence failure;
 - write-only secret tests assert no value appears in attributes, plan, state
   serialization, error text, spans, or fixtures;
@@ -921,7 +964,7 @@ The fake must record calls and simulate:
 - timeout before a write and timeout after provider acceptance;
 - state persistence failure after provider success; and
 - create, no-op, in-place update, replacement, adoption denied/allowed,
-  drift refresh, retain, and idempotent missing-on-delete.
+  native sync drift detection/repair, retain, and idempotent missing-on-delete.
 
 **Acceptance:** timeout-after-write triggers observe-before-retry and never a
 duplicate; second reconcile is no-op; secrets appear nowhere in attributes,
@@ -1326,7 +1369,7 @@ report's original no-operation evidence.
 
 This research slice follows the repository lifecycle and routing model in
 `docs/README.md`. It does not activate implementation or expand the active
-harness-governance campaign.
+plan, and it does not initiate a comparative harness-effect campaign.
 
 | Surface                                    | Decision         | Owner and reason                                                                                                                                            | Verification or non-claim                                                                                         |
 | ------------------------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
