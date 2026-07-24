@@ -2,17 +2,48 @@
   "title": "Alchemy Infrastructure For Vercel And Photon Tasks",
   "status": "pending",
   "spec": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+  "harnessContract": {
+    "sourceClassification": "research-backed product decision; not audit-derived",
+    "acceptedFindingIds": [],
+    "invariantIds": [
+      "HC-OUTCOME-001",
+      "HC-CTX-001",
+      "HC-CTX-002",
+      "HC-REPO-001",
+      "HC-BOUNDARY-001",
+      "HC-TOOL-001",
+      "HC-DOC-001",
+      "HC-PROOF-001",
+      "HC-AUTH-001",
+      "HC-FEEDBACK-001",
+      "HC-AUTO-001",
+      "HC-DEPENDENCY-001",
+      "HC-METRIC-001",
+      "HC-EVIDENCE-001",
+      "HC-LIFETIME-001"
+    ],
+    "notApplicable": {
+      "HC-EPOCH-001": "This work claims effectiveness only for bounded infrastructure-operation approaches, not a worker or harness. A later general harness-effect claim requires a new current epoch."
+    },
+    "artifactSchemas": [
+      ".agents/skills/docs-maintainer/assets/harness/critical-journey.schema.json",
+      ".agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json",
+      ".agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json",
+      ".agents/skills/docs-maintainer/assets/harness/control-record.schema.json"
+    ]
+  },
   "principles": [
     "Adopt before mutate: an existing resource is Unowned until an exact reviewed manifest authorizes adoption.",
     "Alchemy owns stable configuration and drift; Vercel Git and app-owned runbooks own deployment, promotion, rollback, and runtime proof.",
-    "Preview and Production have separate state, credentials, manifests, storage namespaces, and Photon projects; no shared Photon project is accepted as an isolation fallback.",
-    "Provider input is decoded once, output is decoded immediately, secrets and personal/channel data never enter state or ordinary proof, and every custom boundary has live and memory Layers.",
+    "Preview and Production have separate state, profiles/credentials, manifests, storage namespaces, and Photon projects; a shared Photon project remains observation-only migration state, not an isolation fallback.",
+    "Every config, CLI, file, Alchemy state, provider HTTP, secret-binding, fixture, and receipt boundary names one canonical codec, its Type and Encoded sides, its single decode and encode owners, and any exact third-party exception. Unknown input is decoded once at ingress, outward values are encoded immediately before the write, and every custom boundary has live and memory Layers.",
+    "Open semantic identities use owner-qualified branded Schemas; closed modes, operations, targets, resource kinds, ownership states, diff/outcome/retry classes, and removal policies use named literal Schemas. Public services expose no raw semantic strings, naked URL/boolean/array/object/void contracts, provider DTOs, or cross-stage/provider identity aliases.",
     "Production projects, domains, data stores, Photon project/users/webhooks, and bindings begin retained and delete-protected."
   ],
   "riskLenses": [
     "Ownership and call graph: root stack topology, private infrastructure tooling, existing Photon management ownership, app runtime boundaries, Vercel Git deployment ownership, and runbook authority remain distinct.",
-    "Implementation quality: canonical Schema Type/Encoded contracts, branded identities, Config.schema with Redacted secrets, named services, safe tagged errors, flat sequential Effects, immediate decode/encode, explicit live/memory Layers, and no raw clients, primitive semantic strings, generic callbacks, unsafe casts, or helper sprawl.",
-    "Verification coverage: provider fakes and Alchemy lifecycle tests cover import, adoption, no-op, drift, create/update/replace/delete, timeout-after-write, partial failure, retain/delete protection, secret leakage, provider readback, deployment proof, and separately bounded Channel/handset proof."
+    "Implementation quality: the SPEC boundary-codec matrix is complete; canonical Schema Type/Encoded contracts, owner-qualified branded identities, named literal discriminants, Config.schema with Redacted secrets, named request/result service operations, safe tagged errors, flat sequential Effects, explicit live/memory Layers, and no raw clients, primitive semantic strings, generic callbacks, unsafe casts, manual JSON/DTO readers, double decoding, unencoded writes, or helper sprawl.",
+    "Verification coverage: codec round trips and malformed ingress, cross-brand compile failures, provider fakes, and Alchemy lifecycle tests cover read/diff/reconcile/delete/list, import, adoption, no-op, native sync drift, create/update/replace plan classifications, timeout-after-write, partial failure, retain/delete protection, secret leakage, provider readback, deployment proof, and separately bounded Channel/handset proof."
   ],
   "globalVerification": [
     "bun run check:effect-setup",
@@ -22,10 +53,13 @@
     "bun run check:authority",
     "bun run check:controls",
     "bun run check:verification",
+    "bun run test:boundaries",
     "bun run --filter @bundjil/infrastructure check-types",
     "bun run --filter @bundjil/infrastructure test",
+    "bun run --filter @bundjil/infrastructure build",
     "bun run --filter @bundjil/photon check-types",
     "bun run --filter @bundjil/photon test",
+    "bun run --filter @bundjil/photon build",
     "bun run verification",
     "git diff --check"
   ],
@@ -34,22 +68,34 @@
       "id": "alchemy-offline-foundation",
       "title": "Prove the Alchemy and Effect foundation without provider access",
       "status": "pending",
+      "dependsOn": [],
+      "invariantIds": [
+        "HC-OUTCOME-001",
+        "HC-REPO-001",
+        "HC-BOUNDARY-001",
+        "HC-TOOL-001",
+        "HC-DEPENDENCY-001"
+      ],
       "description": "Pin the revalidated Alchemy v2 package, add the private @bundjil/infrastructure package and root stack router, and prove one synthetic resource through the complete Schema, service, Layer, Resource, Provider, state, plan, adoption, retention, and test-provider path. Use ignored local state only.",
       "implementationNotes": [
         "Add alchemy.run.ts, stacks/bundjil.ts, and the package structure defined by the SPEC. Applications must not import @bundjil/infrastructure.",
-        "Define InfrastructureStage, logical/physical identity, SecretReference, deletion policy, adoption manifest digest, safe result, and tagged error Schemas with explicit Type and Encoded exports.",
-        "Load stack/stage/mode and synthetic provider config with Config.schema; use Redacted for every credential-shaped value.",
+        "Define InfrastructureStage, owner-qualified logical/physical identities, the tagged SecretOwnership union, removal/destructive policy, adoption manifest digest, InfrastructureCommandInput, fixed-compatible InfrastructureBoundedReceipt, safe result, and tagged error Schemas with explicit Type and Encoded exports. Add compile fixtures that reject cross-provider, cross-resource, cross-stage, logical/physical, secret-reference, and deployment identity assignment.",
+        "Load stack/stage/mode through Config.schema. Model provider credentials as lazy Context.Service Effects backed by Config.schema and Redacted; constructing provider Layers must not resolve them.",
+        "Implement the SPEC boundary-codec matrix for CLI, adoption file, Resource props/attributes, local state-safe projections, fixtures, and receipts. Use Schema.fromJsonString for JSON files, decode once at ingress, and encode immediately before every file/stdout/state-fixture write; do not use JSON.parse/stringify or synchronous Schema codecs.",
         "Follow the site pattern at /Users/cooper/Projects/site/alchemy.run.ts for Alchemy.Stack, Stage-dependent Provider Layers, state, flat Effect.gen composition, and schema-shaped outputs without copying site-specific resources or state identity.",
-        "Implement a memory service and synthetic custom resource that can return missing, Unowned, no-op, drift, replacement, OutcomeUncertain, retain, and delete-protected results."
+        "Implement a memory service and synthetic Resource plus Provider.succeed Layer with required list/reconcile/delete and optional read/diff. One observe -> ensure -> sync reconcile must handle greenfield, adoption, and update without separate provider create/update programs.",
+        "Exercise native alchemy sync --dry-run and sync with the memory provider; do not build a parallel drift engine."
       ],
       "mandatoryVerification": [
-        "Alchemy provider-harness tests cover create, read, no-op, in-place update, replacement, list, refresh, adoption denied/allowed, retain, delete protection, timeout-after-write, and state-write partial failure.",
+        "Alchemy provider-harness tests cover read/diff/reconcile/delete/list, create/update/replace/no-op plan classifications, native sync detection/repair, adoption denied/allowed, retain, delete protection, timeout-after-write, and state-write partial failure.",
+        "Codec tests prove Type -> Encoded -> Type round trips, malformed encoded rejection at the owning ingress, zero double decoding, encoded outward writes, and compile-time cross-brand failures for every foundational identity.",
+        "InfrastructureBoundedReceipt.Encoded compatibility tests validate the fixed embedded bounded-receipt field contract; no task-local receipt or free-form-only substitute exists.",
         "Leak tests prove secret and personal-data sentinels are absent from state serialization, plan, outputs, errors, spans, and receipts.",
         "Run all global repository-only checks that are available after the package is added; no provider credential, network request, or remote state is used.",
-        "Record all three risk lenses and confirm no raw client, generic callback, primitive semantic ID, instanceof policy, unchecked output, manual DTO reader, or common/utils/helper sprawl."
+        "Record all three risk lenses and confirm flat named Effects, typed error handling in the outer pipe, zero raw client/generic callback/primitive semantic contract/instanceof/unchecked output/manual DTO or JSON reader/double decode/unencoded write/unsafe cast, and no common/utils/helper sprawl."
       ],
       "completionCriteria": [
-        "A deterministic local plan and provider test prove the intended lifecycle contract without touching Vercel, Photon, DNS, secrets, webhooks, deployments, or remote state.",
+        "A deterministic local plan, sync dry-run, and provider test prove the intended lifecycle contract without touching Vercel, Photon, DNS, secrets, webhooks, deployments, or remote state.",
         "The infrastructure package has a narrow README, exports only owned contracts, and remains outside app runtime dependency graphs."
       ],
       "commitAfterPassing": true
@@ -58,19 +104,23 @@
       "id": "vercel-read-import-vertical",
       "title": "Build the Vercel read and import vertical slice",
       "status": "pending",
+      "dependsOn": ["alchemy-offline-foundation"],
+      "invariantIds": ["HC-REPO-001", "HC-BOUNDARY-001", "HC-DEPENDENCY-001"],
       "description": "Implement the private Vercel Effect client and custom read/import resources for projects, project settings, domains, environment metadata, Marketplace bindings, and deployment observations. Live writes remain disabled.",
       "implementationNotes": [
         "Keep Vercel HTTP details private under @bundjil/infrastructure/vercel; do not create @bundjil/vercel without a second proved consumer.",
-        "Expose named VercelProjects, VercelDomains, VercelEnvironmentVariables, VercelMarketplaceBindings, and VercelDeployments operations with operation-specific tagged errors and live/memory Layers.",
-        "Decode every unknown status/body/header response immediately. Brand team, project, env, domain, integration, resource, database, and deployment identities.",
+        "Expose named VercelProjects, VercelDomains, VercelEnvironmentVariables, VercelMarketplaceBindings, and VercelDeployments operations with operation-specific tagged errors and live/memory Layers. Every operation accepts one decoded request Schema Type and returns one decoded result Schema Type; no naked ID, URL, boolean, array, object literal, tuple, void, or provider DTO crosses the service.",
+        "Define owner-qualified brands for team, project, env, env key, branch, canonical domain, integration/configuration/resource/database, deployment, Git SHA and pagination identities; define named literals for target, env type, operation, resource kind, result, retry, certainty and ownership states.",
+        "Encode every private Vercel request immediately before URL/query/header/body assignment and decode the complete unknown status/header/body envelope immediately after the call. Keep provider DTOs, raw headers/bodies and raw errors inside the named live operation.",
         "Implement full pagination, team scoping, rate-header handling, exact missing/ambiguous classification, sensitive env metadata, and read-only deployment provenance.",
-        "Resources return Unowned for exact existing matches and reject create/update/delete while read-only mode is active."
+        "Resources return Unowned for exact existing matches. In read/import mode, reconcile observes and returns fresh attributes without provider writes, while delete fails closed; this permits state adoption even though Alchemy invokes reconcile after adoption."
       ],
       "mandatoryVerification": [
         "Contract tests cover valid and malformed fixtures, pagination, 404, ambiguous names, team mismatch, 429/reset headers, transient 5xx, sensitive env write-only metadata, Marketplace identity, and immutable deployment observations.",
+        "Codec and typecheck fixtures cover request/result/props/attributes/receipt round trips, malformed full-envelope decoding, outbound encoding, no double decode, and cross-use rejection among team/project/env/deployment/integration/database/domain identities.",
         "Provider tests prove import/adoption planning without writes and reject project/domain/database/deployment deletion.",
         "State/plan/error leak tests cover Vercel token, sensitive env value, integration credential, URL query, and raw body sentinels.",
-        "Run global checks, package typecheck/tests, and Effect language-service diagnostics for all changed TypeScript."
+        "Run global checks, package typecheck/tests, and Effect language-service diagnostics; audit flat Effects, outer-pipe tagged error handling, exact boundary exceptions, unsafe casts, manual readers/mappers, duplicate DTOs, and helper sprawl."
       ],
       "completionCriteria": [
         "A complete synthetic two-project inventory can be planned and adopted from memory fixtures by stable IDs with zero provider writes.",
@@ -82,22 +132,28 @@
       "id": "photon-read-import-vertical",
       "title": "Build the Photon read and import vertical slice",
       "status": "pending",
-      "description": "Harden the existing @bundjil/photon management boundary for Alchemy consumers and implement read/import resources for project observation, iMessage platform, shared users, webhooks, line inventory, and billing observation. No Photon write is performed.",
+      "dependsOn": ["alchemy-offline-foundation"],
+      "invariantIds": ["HC-REPO-001", "HC-BOUNDARY-001", "HC-DEPENDENCY-001"],
+      "description": "Rewrite the existing proof-only @bundjil/photon management boundary for Alchemy consumers and implement read/import resources for project observation, iMessage platform, shared users, webhook observation, line inventory, and billing observation. No Photon write is performed.",
       "implementationNotes": [
-        "Expose a narrow @bundjil/photon/management subpath only after replacing proof-specific generic errors with operation-specific safe contracts where required. Keep HttpClient, auth, URLs, DTOs, and raw provider errors private.",
-        "Reuse existing PhotonProjectId, PhotonUserId, PhotonWebhookId, project-secret, shared-user, and platform Schemas; add line/billing identities and response Schemas only where primary API contracts require them.",
+        "Expose a narrow @bundjil/photon/management subpath only after replacing PhotonProviderProofError with operation-specific safe contracts. Keep HttpClient, Basic auth, management URLs, DTOs, and raw provider errors private.",
+        "Replace layerPhotonManagementLive(projectId, projectSecret) with a constant live Layer requiring HttpClient and a lazy PhotonManagementCredentials service backed by Config.schema. Export a separate Config Layer and deterministic memory Layer.",
+        "Replace primitive URL/boolean/ID service inputs and naked boolean/array/object/void outputs with canonical owner-named request/result Schemas and Type/Encoded exports. Keep shared and assigned phone values Redacted inside management observations and out of Alchemy Attributes.",
+        "Reuse existing PhotonProjectId, PhotonUserId, PhotonWebhookId, project-secret, shared-user, and platform Schemas; add owner-qualified line, billing, callback URL, pagination, operation, resource-kind, retry, certainty and result contracts only where the primary API requires them. Typecheck fixtures must reject Photon/Vercel and Photon project/user/webhook/line identity mixing.",
+        "For each management operation, encode the private request immediately before the HttpClient call and decode one complete response envelope immediately after it. Eliminate the generic execute callback/helper when it hides operation-specific codecs or error policy; retain a shared function only if multiple real call sites and direct tests prove a genuine boundary or retry policy.",
         "Keep phone and assigned-number semantics Redacted and out of Alchemy attributes/receipts. The physical shared-user identity is the stable user UUID.",
         "Return Unowned for exact reviewed project/platform/user/webhook matches. Assert Free shared service and zero dedicated lines without mutating them.",
-        "Represent webhook signing state only by external reference/revision and secretConfigured; list cannot recover the signing secret."
+        "Represent webhook signing state as observed-unknown or a proved external reference/revision; list cannot recover the signing secret. Do not export a webhook mutation Resource in this task."
       ],
       "mandatoryVerification": [
         "Contract tests cover platform/user/webhook/line/billing success, malformed output, pagination, semantic user ambiguity, same-URL webhook ambiguity, 404, 409, 429, transient 5xx, and unavailable billing readback.",
+        "Codec/type tests cover every request/result/response/props/attributes round trip, malformed complete-envelope output, outbound request encoding, no double decoding, cross-brand compile rejection, and zero primitive public signature or stale exception finding.",
         "Provider tests prove project/line/billing read-only behavior, exact stable-ID adoption, and rejection of project, dedicated-line, billing, or secret-rotation writes.",
         "Leak tests cover project secret, signing secret, phone, assigned number, webhook URL query, raw response, Space/message identity, and SDK error sentinels.",
-        "Run @bundjil/photon and @bundjil/infrastructure typechecks/tests plus every global repository gate."
+        "Run @bundjil/photon and @bundjil/infrastructure typechecks/tests plus every global repository gate; audit flat named Effects, outer-pipe safe error translation, unsafe casts, manual readers/mappers, duplicate DTOs and helper sprawl."
       ],
       "completionCriteria": [
-        "The complete accepted Photon topology can be represented from memory fixtures without duplicating management HTTP logic or importing runtime Spectrum operations into Alchemy.",
+        "The complete accepted Photon topology can be represented from memory fixtures without duplicating management HTTP logic or importing runtime Spectrum operations into Alchemy, and the public management boundary passes the effect-client-wrapper rejection checklist.",
         "Project, line, billing, and create-only secret gaps are explicit and fail closed."
       ],
       "commitAfterPassing": true
@@ -106,19 +162,30 @@
       "id": "authorized-read-only-inventory",
       "title": "Capture an authorized read-only Vercel and Photon inventory",
       "status": "pending",
+      "dependsOn": [
+        "vercel-read-import-vertical",
+        "photon-read-import-vertical"
+      ],
+      "invariantIds": [
+        "HC-TOOL-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-EVIDENCE-001"
+      ],
       "description": "Under new target-specific read authority, run metadata-only Vercel and Photon inventory for Preview and Production, resolve exact physical identities and isolation, and produce sanitized manifests. Do not create, update, delete, rotate, deploy, promote, or send.",
       "implementationNotes": [
         "Resolve the current authenticated principal, Vercel team/projects, environment targets/types, domains, integration/configuration/resource/database IDs, deployment/protection metadata, Photon project/platform/service/users/webhooks/lines/billing, and current Preview/Production credential ownership.",
         "Use the target-owned Vercel and Photon runbooks and stop on identity, scope, permission, ambiguity, unavailable readback, or secret-output risk.",
         "Do not print or retain sensitive values, phone numbers, assigned numbers, webhook URLs with proof queries, message identities, account data, or credentials.",
         "Record whether the current shared Photon project can be replaced by a separate Free Preview project; observation does not authorize project creation.",
-        "Generate canonical observed-manifest hashes and explicit adopted-versus-rollout-created classifications where evidence exists."
+        "Generate canonical observed-manifest hashes and explicit adopted-versus-rollout-created classifications where evidence exists. The CLI decodes one InfrastructureCommandInput, services receive decoded branded identities only, and the artifact writer encodes one sanitized inventory/manifest receipt before persistence."
       ],
       "mandatoryVerification": [
-        "Readback receipts bind principal, target, stage, operation, observedAt, exact safe physical IDs/fingerprints, source SHA, limitations, non-claims, and zero writes.",
+        "The read-only authority envelope validates against the fixed embedded contract before execution. Readback receipts validate as InfrastructureBoundedReceipt.Encoded and bind principal, target, stage, operation, observedAt, exact safe physical IDs/fingerprints, source SHA, limitations, non-claims, and zero writes.",
         "A second inventory read produces the same canonical manifest or a classified drift result.",
+        "Boundary evidence names every codec Type/Encoded pair and exact decode/encode adapter used by the live command; leak and boundary audits reject raw CLI strings, manual JSON, cross-stage/provider brand mixing, double decoding and unencoded artifact writes.",
         "Provider logs and local artifacts pass leak scans; every unavailable field remains unknown rather than inferred.",
-        "Repository verification passes before the inventory evidence is accepted."
+        "Repository verification passes before the inventory evidence is accepted, and the task audit confirms flat named Effects, safe tagged errors, no unsafe casts/manual DTO readers/mappers, and no helper sprawl."
       ],
       "completionCriteria": [
         "Preview and Production resource inventories are complete enough to build exact adoption manifests or explicitly list the unresolved readbacks that block adoption.",
@@ -127,22 +194,34 @@
       "commitAfterPassing": false
     },
     {
-      "id": "remote-state-secret-custody-and-adoption",
-      "title": "Bootstrap state, secret custody, and no-op adoption",
+      "id": "remote-state-and-noop-adoption",
+      "title": "Bootstrap state and prove no-mutation adoption",
       "status": "pending",
-      "description": "Choose and separately authorize a dedicated remote Alchemy state backend, implement the named secret-custody boundary, and adopt existing Preview then Production resources one class at a time with provider writes disabled.",
+      "dependsOn": ["authorized-read-only-inventory"],
+      "invariantIds": [
+        "HC-BOUNDARY-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-DEPENDENCY-001",
+        "HC-EVIDENCE-001"
+      ],
+      "description": "Choose and separately authorize a dedicated remote Alchemy state backend, model managed versus observed-unknown secret references, and adopt existing Preview then Production resources one class at a time with provider writes disabled.",
       "implementationNotes": [
         "If Cloudflare.state() is chosen, use a Bundjil-specific stack/backend identity and scoped credentials; never reuse the site state or token.",
-        "Implement SecretReference resolution and PhotonWebhookSecretCustody as named services with live/memory Layers. State stores references/revisions/booleans only.",
-        "Create reviewed adoption manifests from the accepted inventory, including logical ID, physical ID, stage, deletion policy, observed-manifest digest, and owner.",
+        "Implement owner-specific lazy SecretReference resolution for secrets that already have a proved custody owner. Mark unrecoverable write-only values observed-unknown; do not fabricate pre-Alchemy revisions or call Vercel value-decryption endpoints.",
+        "Create reviewed adoption manifests from the accepted inventory, including separately branded logical ID, physical ID, stage, deletion policy, observed-manifest digest, and owner. Decode the encoded manifest once at the file boundary; Alchemy lifecycle handlers receive only decoded Props/Attributes/identity Types.",
         "Adopt Vercel projects, domains, env metadata, Marketplace/Upstash observations, Photon project/platform/user/webhooks, line/billing observations, and deployment observations in that order.",
-        "Stop on any create, replacement, delete, provider write, secret value in state, or changed manifest hash."
+        "For each class, first run alchemy plan --adopt, then an approved alchemy deploy --adopt. The deploy may persist Alchemy state and invoke reconcile, but read/import reconcile must perform zero provider writes.",
+        "Stop on any unintended create, replacement, delete, provider write, secret value in state, changed manifest hash, or adoption of an observed-unknown value as if it were managed."
       ],
       "mandatoryVerification": [
-        "Two consecutive refreshed plans are no-op at the same provider snapshot for Preview and Production.",
+        "A desired-state plan is no-op and two consecutive alchemy sync --dry-run results are unchanged at the same provider snapshot for Preview and Production.",
+        "The remote-state/adoption authority envelope and every bounded receipt validate against the fixed embedded contracts before execution or persistence; valid structure does not substitute for approval.",
         "Adoption tests reject wrong stage, wrong physical ID, changed observed digest, renamed logical ID, missing retain policy, and any secret-bearing state.",
+        "Codec and compile fixtures prove manifest/state Type-Encoded round trips, malformed and cross-brand rejection, Managed/ObservedUnknown/Absent secret-state exhaustiveness, and encoding before every generated manifest/state-fixture/receipt write.",
         "Remote-state rollback and access-revocation procedures are dry-run validated without destroying state.",
-        "Run full repository verification and record repository versus provider versus state proof separately."
+        "Provider call recording proves adoption invoked only list/read/observe operations and zero transport writes while Alchemy persisted state.",
+        "Run full repository verification and record repository versus provider versus state proof separately; audit flat lifecycle Effects, safe tagged errors, exact exceptions, unsafe casts, manual JSON/DTO readers, double decodes, unencoded writes and helper sprawl."
       ],
       "completionCriteria": [
         "Existing resources are represented in remote state without provider mutation, accidental replacement, deletion, secret disclosure, or traffic change.",
@@ -154,19 +233,30 @@
       "id": "preview-vercel-configuration-spike",
       "title": "Prove convergent Vercel configuration in Preview",
       "status": "pending",
+      "dependsOn": ["remote-state-and-noop-adoption"],
+      "invariantIds": [
+        "HC-TOOL-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-METRIC-001",
+        "HC-EVIDENCE-001"
+      ],
       "description": "Under separately approved Preview write authority, enable the smallest reversible Vercel project-setting and environment-metadata resource, observe convergence, induce safe drift, reconcile it, and prove that deployment remains owned by Vercel Git.",
       "implementationNotes": [
         "Select non-secret Preview-only configuration with a recorded before value and safe rollback. Do not begin with Production, domains, Marketplace, auth tokens, or provider secrets.",
-        "Plan, approve, apply, refresh, induce one safe manual drift, detect it, reconcile once, and restore the accepted state.",
+        "Plan, approve, apply, and prove sync dry-run unchanged. Under a separately enumerated direct-provider drift operation in the same authority receipt, induce one safe drift, detect it with sync --dry-run, repair it with approved sync, and restore the accepted state.",
         "Use Vercel Git to create the resulting immutable Preview deployment; Alchemy may observe but must not create/promote it.",
         "Prove project/team/target identity before every operation and revoke write credentials after the bounded spike.",
         "Capture latency, API attempts, plan readability, drift precision, recovery effort, and operator attention for the effectiveness scorecard."
       ],
       "mandatoryVerification": [
-        "Provider tests for the exercised resource already cover no-op, update, timeout-after-write, eventual consistency, retain, and rollback.",
+        "Provider tests for the exercised resource already cover no-op, reconcile update, sync drift detection/repair, timeout-after-write, eventual consistency, retain, and rollback.",
+        "The exact Preview read/write/drift authority envelope validates before execution, the infrastructure journey has one stable critical-journey ID, and the receipt validates against the fixed bounded-receipt contract plus the repository proof packet.",
+        "The live adapter proves encoded request and complete-envelope decode at the exact Vercel boundary; provider readback, Alchemy Attributes and the bounded receipt use their canonical branded Type/Encoded contracts with no cross-stage or cross-resource identity conversion.",
         "Authenticated readback proves the exact Preview setting converged and Production was untouched.",
         "Deployment observation binds the resulting Vercel deployment to the immutable Git SHA and records no promotion.",
-        "The spike passes the SPEC effectiveness bar: deterministic second no-op, no secret/state leak, bounded recovery, and clearer diff than the current imperative procedure."
+        "The spike passes the SPEC effectiveness bar: deterministic second no-op, no secret/state leak, bounded recovery, and clearer diff than the current imperative procedure.",
+        "The task audit confirms flat named Effects, outer-pipe tagged error handling, no primitive public contracts, unsafe casts, manual readers/mappers, duplicate DTOs, double decoding, unencoded writes or helper sprawl."
       ],
       "completionCriteria": [
         "Alchemy safely detects and reconciles one real Preview Vercel drift while Vercel Git remains the only deployment creator.",
@@ -178,19 +268,36 @@
       "id": "isolated-photon-preview-spike",
       "title": "Prove isolated Photon Preview reconciliation",
       "status": "pending",
-      "description": "Only after a separate Photon Preview project and secret-custody path are approved, adopt or create one synthetic Free shared user and one Preview webhook, prove timeout/partial-failure recovery and signed ingress, then exercise retain-safe cleanup. If project isolation is unavailable, record the spike as blocked and perform no shared-project write.",
+      "dependsOn": [
+        "remote-state-and-noop-adoption",
+        "preview-vercel-configuration-spike"
+      ],
+      "invariantIds": [
+        "HC-BOUNDARY-001",
+        "HC-TOOL-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-METRIC-001",
+        "HC-EVIDENCE-001"
+      ],
+      "description": "Only after a separate Photon Preview project and an owner-specific PhotonWebhookBindingSink/cutover path are approved, adopt or create one synthetic Free shared user and one Preview webhook, prove timeout/partial-failure recovery and signed ingress, then exercise retain-safe cleanup. If either isolation or binding custody is unavailable, record the spike as blocked and perform no shared-project write.",
       "implementationNotes": [
         "Require a separate Preview project, Free shared service, zero dedicated lines, isolated credentials, synthetic approved user, Preview callback, and rollback identities.",
-        "Enable only iMessage if needed, reconcile the shared user using documented semantic idempotency, and register one webhook while persisting the create-only secret through PhotonWebhookSecretCustody.",
+        "Implement PhotonWebhookBindingSink as a named owner-specific service with one decoded PhotonWebhookBindingWrite request Type, one safe SecretReference result Type, safe tagged errors, and live/memory Layers. Its adapter encodes the sink request and decodes any acknowledgement; it must not expose a generic secret callback, naked URL/ID/value parameter, raw provider result, or signing value.",
+        "Enable only iMessage if needed, reconcile the shared user using documented semantic idempotency, and register one webhook while persisting the create-only secret through PhotonWebhookBindingSink before the Resource returns.",
         "Test observe-after-timeout without blind create replay and preserve any uncertain endpoint by stable ID/URL.",
-        "Bind the secret reference to the Preview Vercel environment, let Vercel Git deploy, then follow the Photon runbook for signed ingress and bounded Channel proof.",
+        "Bind the secret reference to the Preview Vercel environment, let Vercel Git deploy, then follow the Photon runbook for signed ingress and bounded Channel proof. Prove how the old callback/deployment remains recoverable through cutover and retry drain.",
         "Never create/delete a dedicated line, mutate billing, reuse Production user/credential/namespace, or send outside the approved proof conversation."
       ],
       "mandatoryVerification": [
         "Authenticated management readback proves project, service, platform, stable user/webhook IDs, zero dedicated lines, and separate Preview credentials without exposing phone or secret values.",
+        "The exact Photon Preview authority envelope validates before execution, the isolated reconciliation/signed-ingress journey has one stable critical-journey ID, and each receipt validates against the fixed bounded-receipt contract plus the repository proof packet.",
         "A forced memory-provider timeout-after-write and state-partial-failure test recovers by observation and never creates a duplicate.",
+        "Binding-sink tests cover successful persistence, sink failure after webhook creation, Vercel/env partial failure, old/new deployment signature compatibility, and rollback without printing or serializing the secret.",
+        "Codec/typecheck tests cover management and binding request/result Type-Encoded round trips, malformed provider/sink envelopes, cross-project/user/webhook/line/stage brand rejection, exact outbound encoding, and no double decode or unencoded artifact write.",
         "Deployment and Channel receipts separately prove source/deployment identity, signed ingress, replay disposition, provider acceptance, limitations, and no Production inference.",
-        "Cleanup deletes only rollout-created resources when explicitly authorized, waits through the retry horizon, and preserves adopted resources."
+        "Cleanup deletes only rollout-created resources when explicitly authorized, waits through the retry horizon, and preserves adopted resources.",
+        "The task audit confirms flat named Effects, outer-pipe safe error translation, exact exceptions, no primitive public contracts, unsafe casts, manual readers/mappers, duplicate DTOs or helper sprawl."
       ],
       "completionCriteria": [
         "The isolated Preview Photon lifecycle converges and recovers without duplicate users/webhooks or secret leakage, or the task records a truthful blocked result with zero shared-project mutation.",
@@ -202,23 +309,36 @@
       "id": "stable-bindings-and-deployment-observation",
       "title": "Adopt stable env, Marketplace, storage, and inter-service bindings",
       "status": "pending",
-      "description": "After the Preview spikes pass, enable approved env metadata/value-revision ownership, exact Marketplace/Upstash binding observation, coordinated agent-to-proxy auth revision, and deployment observations without creating data stores or promoting deployments.",
+      "dependsOn": [
+        "preview-vercel-configuration-spike",
+        "isolated-photon-preview-spike"
+      ],
+      "invariantIds": [
+        "HC-BOUNDARY-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-DEPENDENCY-001"
+      ],
+      "description": "After the Preview spikes pass, enable approved env metadata and already-custodied value-revision ownership, exact Marketplace/Upstash binding observation, inter-service URL ownership, and deployment observations without creating data stores, rotating the single shared bearer, or promoting deployments.",
       "implementationNotes": [
         "Derive the exact env inventory from every Config owner and Vercel readback; remove no key based only on a stale README or alias.",
-        "Resolve secret values at apply time and compare only SecretReference revisions. Coordinate agent/proxy internal token changes as one rotation group.",
+        "Resolve only the Managed SecretOwnership variant at reconcile time and compare branded revisions without values. Keep ObservedUnknown metadata-only and branch exhaustively over Managed, ObservedUnknown, and Absent rather than optional strings/booleans.",
+        "The current agent and proxy each accept one BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN. Reject bearer rotation until a separate dual-token overlap contract or accepted bounded-downtime procedure exists; Alchemy cannot make two Vercel project env updates transactional.",
         "Import Marketplace configuration/resource/database IDs and project/target attachments. Never create or detach a database from an env alias.",
         "Preserve Channel replay and Codex profile prefixes/data. Reject Preview/Production credential, prefix, project, or database crossover.",
         "Require a new immutable Vercel deployment after env changes and observe it; promotion remains runbook-owned."
       ],
       "mandatoryVerification": [
-        "Memory tests cover secret revision no-op/update, two-project coordinated rotation, partial one-project failure, deployment-required result, Marketplace ambiguity, and data-store retain.",
+        "Memory tests cover managed secret revision no-op/update, observed-unknown rejection, single-bearer rotation rejection, partial one-project failure, deployment-required result, Marketplace ambiguity, and data-store retain.",
+        "Every binding read/write uses a validated task-scoped authority envelope and produces a fixed-contract bounded receipt; the immutable deployment remains a distinct repository proof-packet observation.",
+        "Codec/typecheck tests cover env/binding/secret-state request-result round trips, malformed encoded secret ownership, cross-target/project/database/prefix/revision brand rejection, exact provider request encoding and complete readback decoding.",
         "Preview readback proves exact key/type/target metadata and safe revision fingerprints; secret values remain absent.",
         "Profile/replay continuity checks prove namespaces and existing data identities were preserved without reading application data unnecessarily.",
-        "Full repository verification and all three risk-lens audits pass."
+        "Full repository verification and all three risk-lens audits pass, including flat named Effects, safe outer-pipe error handling, zero primitive public contracts, unsafe casts, manual readers/mappers, duplicate DTOs, double decoding, unencoded writes or helper sprawl."
       ],
       "completionCriteria": [
         "Stable bindings and auth revisions converge in Preview with exact provider readback, immutable deployment observation, and no data-store recreation or promotion.",
-        "Rollback retains both credential revisions until the old deployment remains usable."
+        "Rollback uses an externally retained prior secret revision, reapplies it to the same env key, and creates a new deployment; it does not claim Vercel retains two values for one key/target."
       ],
       "commitAfterPassing": true
     },
@@ -226,42 +346,70 @@
       "id": "production-adoption-and-rollout",
       "title": "Apply the accepted stable configuration to Production",
       "status": "pending",
-      "description": "Under new Production authority, run a zero-replacement plan, apply only previously accepted stable configuration classes, refresh provider state, let Vercel build a Production candidate, and use app-owned runbooks for proof and promotion.",
+      "dependsOn": ["stable-bindings-and-deployment-observation"],
+      "invariantIds": [
+        "HC-OUTCOME-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-EVIDENCE-001"
+      ],
+      "description": "Under new Production authority, run a zero-replacement plan, apply only previously accepted stable configuration classes, require provider readback plus sync --dry-run unchanged, let Vercel build a Production candidate, and use app-owned runbooks for proof and promotion.",
       "implementationNotes": [
         "Bind immutable main SHA, state revision, adoption manifest, Vercel/Photon principals, current rollback deployments, and approved operation list.",
         "Reject project/domain/store/webhook/user replacement, any delete, Photon project/line/billing mutation, DNS write, secret rotation outside an approved group, or ambiguous readback.",
-        "Apply in dependency order: proxy stable config, agent-to-proxy bindings, agent Channel/storage config, Photon platform/user/webhook only if already proved and explicitly approved.",
-        "Refresh and require no drift before Vercel deployment proof. Promote proxy before agent for URL/auth changes.",
+        "Apply in dependency order: proxy stable non-rotating config, agent-to-proxy URL/metadata bindings, agent Channel/storage config, Photon platform/shared-user state, and webhook mutation only if the isolated binding-sink/cutover spike already passed and this authority names it.",
+        "Run sync --dry-run and require unchanged before Vercel deployment proof. Promote proxy before agent for URL changes; bearer rotation remains blocked by the single-token runtime contract.",
         "Retain previous deployments, env revisions, Photon webhook, users, projects, stores, and state until rollback expiry."
       ],
       "mandatoryVerification": [
         "The approved Production plan contains no unapproved create, replacement, delete, database operation, domain move, Photon project/line/billing change, or secret disclosure.",
+        "The exact Production authority envelope validates before execution, each Production journey uses a stable critical-journey ID, and every infrastructure/provider/deployment/Channel receipt validates against its owning fixed/repository contract without merging proof classes.",
         "Provider readback proves the exact stable resources; Vercel deployment proof binds source/config; app runbooks separately prove health/auth/Channel behavior and promotion.",
         "A failed/uncertain apply stops promotion and records safe recovery without blind retry.",
         "Production and Preview state, credentials, projects, namespaces, manifests, and receipts remain distinct."
       ],
       "completionCriteria": [
         "Production stable configuration is Alchemy-owned by exact adopted IDs and refreshed no-op state, while deployment/promotion remains Vercel Git/runbook-owned.",
-        "Rollback readiness is proved and no evidence class is overstated."
+        "Rollback readiness is proved and no evidence class is overstated.",
+        "The task receipt names canonical codec Type/Encoded pairs and single decode/encode owners for every exercised boundary; compile/runtime evidence rejects cross-stage/provider/resource identities, and the task audit confirms flat named Effects with safe outer-pipe error handling plus no primitive public contract, unsafe cast, manual reader/mapper, duplicate DTO, double decode, unencoded write or helper sprawl."
       ],
       "commitAfterPassing": false
     },
     {
-      "id": "drift-ci-monitoring-and-five-pass-closeout",
-      "title": "Complete drift CI, monitoring, documentation, and the five-pass audit",
+      "id": "drift-ci-monitoring-and-closeout",
+      "title": "Complete drift CI, monitoring, documentation, and fresh review",
       "status": "pending",
-      "description": "Add report-only refreshed plan workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and perform the required five-pass audit after all implementation tasks are complete.",
+      "dependsOn": ["production-adoption-and-rollout"],
+      "invariantIds": [
+        "HC-OUTCOME-001",
+        "HC-CTX-001",
+        "HC-CTX-002",
+        "HC-DOC-001",
+        "HC-PROOF-001",
+        "HC-AUTH-001",
+        "HC-FEEDBACK-001",
+        "HC-AUTO-001",
+        "HC-METRIC-001",
+        "HC-EVIDENCE-001",
+        "HC-LIFETIME-001"
+      ],
+      "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and complete one fresh independent review after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
       "implementationNotes": [
-        "PR CI runs repository checks, provider-memory tests, and read-only Preview plan. Protected Preview/Production apply jobs remain separate and approval-gated.",
-        "Scheduled drift uses read-only credentials, produces sanitized classified findings, and never auto-applies. Route any future automation through controls admission.",
+        "PR CI runs repository checks, provider-memory tests, a read-only Preview plan, and native sync --dry-run. Protected Preview/Production apply jobs remain separate and approval-gated.",
+        "Scheduled drift wraps native sync --dry-run with read-only credentials, produces sanitized classified findings, and never auto-applies. Route any future repair automation through controls admission.",
         "Emit safe Effect spans/receipts for stage, resource kind, operation, physical-ID fingerprint, attempts, duration, diff, retry, and known/uncertain outcome.",
-        "Update architecture, package/root READMEs, runbooks, authority/control registers, verification contracts, proof templates, current plan, and supporting research at their earliest owners.",
-        "Perform prd-implementer's five passes only after task code is complete: implementation correctness, Effect/Schema/service/Layer quality, test and failure-path coverage, docs/authority/proof consistency, and final clean verification/Git state."
+        "Update docs/architecture/repo-structure.md, effect-patterns.md, testing-and-quality.md, README.md, packages/infrastructure/README.md, packages/photon/README.md, affected app READMEs, target app runbooks, authority/control/automation registers, verification contracts/templates, current plan, and supporting research at their earliest owners. Recompute the tracked docs/README inventories; if paths or a declared harness trigger changed, create a dated successor/correction receipt and update docs/documentation-audit/README.md without rewriting historical HGI evidence.",
+        "For every provider fixture, record create/update/retain/retire lifecycle, owning package path, upstream review trigger, malformed/compatibility case, and the negative test that prevents stale reuse.",
+        "Validate added critical journeys, bounded receipts, task-scoped authority envelopes, and scheduled controls against the four fixed embedded harness Schemas and their current repository owners; do not substitute free-form Markdown or duplicate field shapes.",
+        "Perform one fresh independent review after task code is complete, shaped by the proved risks: ownership/call graph; exact boundary codec and branded-identity coverage; Effect/Schema/service/Layer quality; test, fixture and failure-path coverage; docs/README/lifecycle/authority/proof consistency; rollout/rollback triggers; and final clean verification/Git state. This is not a comparative harness campaign; open a new epoch only if a later claim concerns worker/harness effectiveness."
       ],
       "mandatoryVerification": [
-        "Drift fixtures cover expected normalization, unowned resource, in-place drift, destructive drift, unavailable/ambiguous readback, unknown secret revision, and deployment drift.",
+        "Native sync fixtures cover unchanged normalization, unowned resource, missing resource, in-place drift, destructive drift, unavailable/ambiguous readback, unknown secret revision, skipped provider read, and deployment drift.",
         "Workflow policy proves PR jobs cannot apply, Preview cannot target Production, scheduled drift is report-only, and protected apply requires exact authority.",
-        "The five-pass audit reports findings and corrections for every risk lens, including no generic helper/client sprawl and no secret/personal-data leaks.",
+        "Any scheduled drift control validates against the fixed control-record contract and the repository control/automation owner, including signal, durable state, authority, convergence, proof per run, bounded failure, repair, cost, review trigger, stop/rollback, retirement, and disconfirming evidence.",
+        "The fresh independent review reports evidence and direct corrections for every risk lens, including a complete Type/Encoded/decode-owner/encode-owner/exception matrix, cross-brand compile protection, flat named Effects, safe outer-pipe errors, no generic helper/client sprawl, and no secret/personal-data leaks.",
+        "All task dependencies are accepted or have an explicit terminal blocked/deferred disposition; every applicable stable invariant ID has claim-matched evidence and every fixed structured artifact validates against its checked-in Schema.",
+        "Documentation acceptance proves all 182-baseline docs and 22-baseline READMEs were accounted for through their routed owners, exact current inventories were recomputed after implementation, and any path or harness-epoch change has a dated correction/successor with limitations and non-claims.",
         "Run every global verification command, all package/provider tests, Alchemy provider tests, scoped runbook dry runs, git diff --check, and exact Git identity/readback."
       ],
       "completionCriteria": [
