@@ -35,6 +35,913 @@
     "Implementation quality: flat meaningful Effect control flow, typed .pipe error handling, canonical Schema Type/Encoded provenance, named operations and safe errors, explicit live/memory Layers, native primitives, and no unsafe casts/manual readers/DTO mirrors/runner wrappers/helper sprawl.",
     "Verification coverage: independent Layer builds, concurrency, failure poisoning and recovery, supervised waitUntil completion, disposal/finalizers, global-scope regression, route/status compatibility, Photon lifecycle retention, build topology, documentation, and evidence non-claims."
   ],
+  "requirements": [
+    {
+      "id": "EVE-RUNTIME-REQ-001",
+      "findingIds": ["FINDING-001"],
+      "statement": "Own one concrete ManagedRuntime per loaded provider composition root per module instance, keep provider Layer graphs and lifetimes separate, and reject false sharing or pass-through runtime abstractions.",
+      "owner": "bundjil-agent-architecture-owner"
+    },
+    {
+      "id": "EVE-RUNTIME-REQ-002",
+      "findingIds": ["FINDING-002"],
+      "statement": "Run accepted Channel work as a Fiber supervised by the owning provider runtime and register its native completion with Eve waitUntil before the handler resolves.",
+      "owner": "bundjil-agent-architecture-owner"
+    },
+    {
+      "id": "EVE-RUNTIME-REQ-003",
+      "findingIds": ["FINDING-003"],
+      "statement": "Prove runtime build, concurrency, failure, recovery, supervision, disposal, request-abort, route-compatibility, and Photon-lifetime behavior deterministically.",
+      "owner": "bundjil-agent-architecture-owner"
+    },
+    {
+      "id": "EVE-RUNTIME-REQ-004",
+      "findingIds": ["FINDING-004"],
+      "statement": "Keep repository, local-build, deployment, warm-instance, scale-out, shutdown, provider, Preview, and Production claims evidence-bounded and authority-scoped.",
+      "owner": "bundjil-product-owner"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "EVE-RUNTIME-JOURNEY-001",
+      "title": "Provider runtime composition and isolation",
+      "proof": "Source/build inspection plus apps/agent/test/channel-runtime.test.ts"
+    },
+    {
+      "id": "EVE-RUNTIME-JOURNEY-002",
+      "title": "Accepted Channel dispatch supervision",
+      "proof": "apps/agent/test/sendblue-channel.test.ts"
+    },
+    {
+      "id": "EVE-RUNTIME-JOURNEY-003",
+      "title": "Runtime failure, disposal, and recovery",
+      "proof": "apps/agent/test/channel-runtime.test.ts and apps/agent/test/sendblue-channel.test.ts"
+    },
+    {
+      "id": "EVE-RUNTIME-JOURNEY-004",
+      "title": "Repository closeout and bounded lifecycle claims",
+      "proof": "Implementation receipt, focused builds/tests, documentation impact ledger, and repository verification"
+    }
+  ],
+  "auditFindings": {
+    "schemaVersion": "1",
+    "auditId": "EVE-RUNTIME-OWNERSHIP-AUDIT-001",
+    "targetRevision": "d08c767ba41e3eab1724b0a73a14c9d435b4e564",
+    "findings": [
+      {
+        "id": "FINDING-001",
+        "invariantIds": ["HC-CTX-001", "HC-REPO-001", "HC-DEPENDENCY-001"],
+        "priority": "important_correction",
+        "risk": "Provider composition roots need explicit runtime ownership: Current provider modules create separate ManagedRuntimes, but the durable owner must state that cardinality follows loaded provider composition roots and module instances rather than routes or one logical Eve backend.",
+        "evidence": [
+          {
+            "path": "apps/agent/agent/channels/sendblue.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "The Sendblue module owns a module-level ManagedRuntime built from SendblueChannelRuntimeLive."
+          },
+          {
+            "path": "apps/agent/agent/channels/photon.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "The Photon module owns a distinct module-level ManagedRuntime built from PhotonChannelRuntimeLive."
+          },
+          {
+            "path": "apps/agent/agent/lib/channel/eve.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "The Eve adapter receives the concrete runtime at the framework boundary and does not need another runner abstraction."
+          }
+        ],
+        "lifecycleOrDecision": "accepted: Separate roots isolate provider config, same-tag Service values, Layer-build failure, Scope, fibers, disposal, and Photon lifetime while preserving the native Effect boundary.",
+        "semanticOwner": "docs/product-specs/eve-channel-runtime-ownership.md",
+        "proofGap": "Repository tests do not yet prove build-once behavior, concurrency, cached build failure, fresh-runtime recovery, or cross-provider failure isolation.",
+        "rootCorrection": "Keep one concrete runtime per loaded provider composition root per module instance; compose canonical services through ordinary Layers; reject a combined runtime, explicit MemoMap sharing, runtime/runner Services, generic callbacks, and runtime-scoped Photon Spectrum.",
+        "retire": [
+          "Any proposal for ChannelEffectRunner or an equivalent pass-through test seam",
+          "Any proposal for one combined Eve backend ManagedRuntime",
+          "Any proposal for explicit cross-runtime Layer.MemoMap sharing"
+        ],
+        "surfaces": {
+          "docs": {
+            "decision": "change_required",
+            "evidence": [
+              "The SPEC and task ledger own the provider-root runtime decision and structured crosswalk."
+            ]
+          },
+          "readmes": {
+            "decision": "change_required",
+            "evidence": [
+              "apps/agent/README.md must describe implemented provider-root cardinality."
+            ]
+          },
+          "architecture_standards": {
+            "decision": "change_required",
+            "evidence": [
+              "docs/architecture/eve-agent.md must own implemented runtime and Layer boundaries."
+            ]
+          },
+          "runbooks": {
+            "decision": "preserve",
+            "evidence": ["Provider and deployment procedures do not change."]
+          },
+          "proof_evidence": {
+            "decision": "change_required",
+            "evidence": [
+              "Runtime composition and isolation require deterministic test and implementation receipts."
+            ]
+          },
+          "skills": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing Effect client, PRD, and docs skills govern the change without source edits."
+            ]
+          },
+          "lint_config_ci": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing diagnostics, boundaries, and repository gates are sufficient."
+            ]
+          },
+          "spec_tasks": {
+            "decision": "change_required",
+            "evidence": [
+              "Stable requirement and task mappings must remain current through implementation."
+            ]
+          },
+          "tests_fixtures": {
+            "decision": "change_required",
+            "evidence": [
+              "Create apps/agent/test/channel-runtime.test.ts and retain build/config fixtures."
+            ]
+          },
+          "config_exports": {
+            "decision": "preserve",
+            "evidence": [
+              "Provider Config, Service tags, package exports, and Schemas remain separate and unchanged."
+            ]
+          },
+          "lifecycle": {
+            "decision": "change_required",
+            "evidence": [
+              "Runtime cardinality and disposal follow each loaded provider composition root and module instance."
+            ]
+          },
+          "release_rollback": {
+            "decision": "preserve",
+            "evidence": [
+              "Repository implementation grants no release or provider authority."
+            ]
+          },
+          "critical_journeys": {
+            "decision": "change_required",
+            "evidence": [
+              "EVE-RUNTIME-JOURNEY-001 and EVE-RUNTIME-JOURNEY-003 own isolation and recovery proof."
+            ]
+          }
+        },
+        "verification": [
+          "Command: bun run --filter @bundjil/agent test",
+          "Command: bun run --filter @bundjil/agent build",
+          "Command: bun run check:boundaries",
+          "Command: bun run check:effect-setup",
+          "Test: apps/agent/test/channel-runtime.test.ts",
+          "Test: apps/agent/test/sendblue-build-route.test.ts",
+          "Inspection: Scan production ManagedRuntime.make owners",
+          "Inspection: Inspect built route/provider module placement",
+          "Expected: One lazy build per provider runtime",
+          "Expected: Concurrent calls overlap",
+          "Expected: Provider failure and config acquisition remain isolated",
+          "Expected: No combined runtime, shared MemoMap, runner abstraction, or Photon lifetime change"
+        ],
+        "journeyIds": ["EVE-RUNTIME-JOURNEY-001", "EVE-RUNTIME-JOURNEY-003"],
+        "authorityOrDecision": "bundjil-agent-architecture-owner for repository implementation; no deployment or provider authority",
+        "limitations": [
+          "Module/source and local-build proof cannot establish every Vercel deployment topology."
+        ],
+        "nonClaims": [
+          "This finding does not claim one process, bundle, or warm instance across all deployments.",
+          "This finding does not change Photon Spectrum resource lifetime."
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "FINDING-002",
+        "invariantIds": ["HC-OUTCOME-001", "HC-REPO-001", "HC-LIFETIME-001"],
+        "priority": "important_correction",
+        "risk": "Accepted work escapes provider-runtime supervision: The accepted Channel path currently uses Effect.forkDetach, which attaches work to Effect's global Scope rather than the provider ManagedRuntime Scope observed by Eve waitUntil.",
+        "evidence": [
+          {
+            "path": "apps/agent/agent/lib/channel/eve.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "The accepted path detaches background dispatch while Eve exposes waitUntil for accepted completion."
+          },
+          {
+            "path": "node_modules/effect/src/internal/effect.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Installed effect@4.0.0-beta.74 attaches forkDetach to the global Scope."
+          },
+          {
+            "path": "node_modules/effect/src/ManagedRuntime.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "ManagedRuntime.runFork runs the root Fiber in the runtime Scope and runtime disposal closes that Scope."
+          }
+        ],
+        "lifecycleOrDecision": "accepted: The provider runtime already owns accepted work lifetime, and Eve waitUntil is the framework callback for observing its completion after the 202 response.",
+        "semanticOwner": "docs/product-specs/eve-channel-runtime-ownership.md",
+        "proofGap": "Current tests do not prove waitUntil registration ordering, Exit observation, runtime-disposal interruption/finalizers, client-abort independence, or rejection of global-scope work.",
+        "rootCorrection": "Return accepted work to the Eve edge, start it with channelRuntime.runFork, and pass Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)) to waitUntil before resolving the handler.",
+        "retire": [
+          "Effect.forkDetach on the accepted Channel path",
+          "Any second runtime interpretation or generic runner around runFork",
+          "Any request-signal coupling for accepted provider work"
+        ],
+        "surfaces": {
+          "docs": {
+            "decision": "change_required",
+            "evidence": [
+              "The SPEC and implemented architecture must describe provider-runtime supervision and waitUntil."
+            ]
+          },
+          "readmes": {
+            "decision": "change_required",
+            "evidence": [
+              "apps/agent/README.md must describe the implemented accepted-work boundary."
+            ]
+          },
+          "architecture_standards": {
+            "decision": "change_required",
+            "evidence": [
+              "docs/architecture/eve-agent.md must own Fiber, Scope, waitUntil, and disposal semantics."
+            ]
+          },
+          "runbooks": {
+            "decision": "preserve",
+            "evidence": [
+              "Installed Eve exposes no authored-module teardown procedure to add."
+            ]
+          },
+          "proof_evidence": {
+            "decision": "change_required",
+            "evidence": [
+              "Accepted-work Exit, finalizer, abort, and waitUntil behavior require bounded proof."
+            ]
+          },
+          "skills": {
+            "decision": "preserve",
+            "evidence": [
+              "Native Effect primitives and wrapper rejection are already governed."
+            ]
+          },
+          "lint_config_ci": {
+            "decision": "preserve",
+            "evidence": [
+              "No lint, boundary exception, or CI workflow change is required."
+            ]
+          },
+          "spec_tasks": {
+            "decision": "change_required",
+            "evidence": [
+              "The required supervision task and acceptance signals must remain explicit."
+            ]
+          },
+          "tests_fixtures": {
+            "decision": "change_required",
+            "evidence": [
+              "Update apps/agent/test/sendblue-channel.test.ts with supervision regressions."
+            ]
+          },
+          "config_exports": {
+            "decision": "preserve",
+            "evidence": [
+              "No Schema, Config, Service, or export contract changes."
+            ]
+          },
+          "lifecycle": {
+            "decision": "change_required",
+            "evidence": [
+              "Accepted work moves from global Scope to the provider ManagedRuntime Scope."
+            ]
+          },
+          "release_rollback": {
+            "decision": "preserve",
+            "evidence": [
+              "Code rollback restores the preceding implementation without provider mutation."
+            ]
+          },
+          "critical_journeys": {
+            "decision": "change_required",
+            "evidence": [
+              "EVE-RUNTIME-JOURNEY-002 and EVE-RUNTIME-JOURNEY-003 own completion and finalization proof."
+            ]
+          }
+        },
+        "verification": [
+          "Command: bun run --filter @bundjil/agent test",
+          "Command: bun run check:boundaries",
+          "Command: bun run check:effect-setup",
+          "Test: apps/agent/test/sendblue-channel.test.ts",
+          "Inspection: Scan the accepted production path for forkDetach",
+          "Inspection: Inspect runFork and waitUntil for single ownership and ordering",
+          "Expected: Exactly one completion Promise reaches waitUntil before the handler resolves",
+          "Expected: Success, typed failure, defect, and interruption all settle waitUntil",
+          "Expected: Runtime disposal interrupts the Fiber and completes finalizers",
+          "Expected: Client abort does not cancel accepted work",
+          "Expected: No detached global-scope work survives disposal"
+        ],
+        "journeyIds": ["EVE-RUNTIME-JOURNEY-002", "EVE-RUNTIME-JOURNEY-003"],
+        "authorityOrDecision": "bundjil-agent-architecture-owner for repository implementation; Eve waitUntil remains framework-owned",
+        "limitations": [
+          "waitUntil observes completion but is not a durable queue.",
+          "A process may terminate in the bounded interval after replay claim and before Fiber start."
+        ],
+        "nonClaims": [
+          "This finding does not guarantee completion after process termination.",
+          "This finding does not add a Channel-wide retry, timeout, or telemetry policy."
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "FINDING-003",
+        "invariantIds": ["HC-PROOF-001", "HC-EVIDENCE-001"],
+        "priority": "important_correction",
+        "risk": "Runtime ownership lacks deterministic acceptance proof: Existing focused tests preserve Channel behavior but do not make the ManagedRuntime caching, failure, recovery, concurrency, Scope, and accepted-background lifecycle executable as one bounded proof set.",
+        "evidence": [
+          {
+            "path": "apps/agent/test",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "No channel-runtime.test.ts currently owns provider-shaped ManagedRuntime lifecycle proof."
+          },
+          {
+            "path": "apps/agent/test/sendblue-channel.test.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Current route tests do not prove runtime disposal of accepted work or waitUntil completion across all Exit cases."
+          }
+        ],
+        "lifecycleOrDecision": "accepted: The architecture decision is incomplete without deterministic proof of its caching, failure, concurrency, supervision, and finalization properties.",
+        "semanticOwner": "docs/product-specs/eve-channel-runtime-ownership.tasks.json",
+        "proofGap": "There is no focused runtime fixture or complete supervision regression suite.",
+        "rootCorrection": "Create the focused runtime fixture, extend the shared Eve adapter route fixture, retain provider and build fixtures, and require the full Effect/boundary/docs/authority/controls/verification gates in every code task.",
+        "retire": [
+          "Scheduling sleeps as concurrency or finalizer proof",
+          "A single final quality reminder in place of per-task gates",
+          "Claims that unit tests prove Vercel function cardinality"
+        ],
+        "surfaces": {
+          "docs": {
+            "decision": "change_required",
+            "evidence": [
+              "The SPEC/task ledger owns deterministic acceptance and fixture lifecycle."
+            ]
+          },
+          "readmes": {
+            "decision": "preserve",
+            "evidence": [
+              "README changes depend on implemented behavior, not the test-only proof task."
+            ]
+          },
+          "architecture_standards": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing testing-and-quality and Effect standards already define gate semantics."
+            ]
+          },
+          "runbooks": {
+            "decision": "preserve",
+            "evidence": ["Repository tests do not change operating procedures."]
+          },
+          "proof_evidence": {
+            "decision": "change_required",
+            "evidence": [
+              "Focused tests, diagnostics, source scans, and repository receipts must close each proof gap."
+            ]
+          },
+          "skills": {
+            "decision": "preserve",
+            "evidence": [
+              "Updated PRD and docs skills are consumed without source changes."
+            ]
+          },
+          "lint_config_ci": {
+            "decision": "preserve",
+            "evidence": ["Existing checks are sufficient and must all pass."]
+          },
+          "spec_tasks": {
+            "decision": "change_required",
+            "evidence": [
+              "Every code task carries its own boundary, Effect, docs, authority, and proof gates."
+            ]
+          },
+          "tests_fixtures": {
+            "decision": "change_required",
+            "evidence": [
+              "Create channel-runtime.test.ts, update sendblue-channel.test.ts, and retain provider/build fixtures."
+            ]
+          },
+          "config_exports": {
+            "decision": "preserve",
+            "evidence": [
+              "Tests must use canonical contracts without new DTOs, casts, readers, or exports."
+            ]
+          },
+          "lifecycle": {
+            "decision": "change_required",
+            "evidence": [
+              "Tests must prove runtime disposal, Fiber interruption, finalizers, cached failure, and fresh-owner recovery."
+            ]
+          },
+          "release_rollback": {
+            "decision": "preserve",
+            "evidence": [
+              "Acceptance remains repository-only and no release action is implied."
+            ]
+          },
+          "critical_journeys": {
+            "decision": "change_required",
+            "evidence": [
+              "All four EVE-RUNTIME-JOURNEY IDs map requirements to executable proof."
+            ]
+          }
+        },
+        "verification": [
+          "Command: bun run --filter @bundjil/channel test",
+          "Command: bun run --filter @bundjil/sendblue test",
+          "Command: bun run --filter @bundjil/photon test",
+          "Command: bun run --filter @bundjil/agent test",
+          "Command: bun run --filter @bundjil/agent build",
+          "Command: bun run verification",
+          "Test: apps/agent/test/channel-runtime.test.ts",
+          "Test: apps/agent/test/sendblue-channel.test.ts",
+          "Test: apps/agent/test/channel-config.test.ts",
+          "Test: apps/agent/test/channel-vertical.test.ts",
+          "Test: apps/agent/test/sendblue-build-route.test.ts",
+          "Test: packages/photon/test/photon-transport.test.ts",
+          "Inspection: Effect language-server diagnostics for every changed TypeScript file",
+          "Inspection: Source scan for ManagedRuntime.make, runFork, dispose, and forkDetach",
+          "Inspection: Boundary exception audit with zero unexplained findings",
+          "Expected: All required runtime and route behavior is deterministic",
+          "Expected: All focused and repository gates pass",
+          "Expected: Zero leaked runtimes, fibers, scopes, or stale exceptions"
+        ],
+        "journeyIds": [
+          "EVE-RUNTIME-JOURNEY-001",
+          "EVE-RUNTIME-JOURNEY-002",
+          "EVE-RUNTIME-JOURNEY-003",
+          "EVE-RUNTIME-JOURNEY-004"
+        ],
+        "authorityOrDecision": "bundjil-agent-architecture-owner for test and repository acceptance",
+        "limitations": [
+          "An unavailable or environment-inconclusive gate is not acceptance.",
+          "Local tests and builds do not prove hosted lifecycle behavior."
+        ],
+        "nonClaims": [
+          "This finding does not require hosted traffic or provider mutation.",
+          "This finding does not permit unsafe casts, manual codecs, wrappers, or helper sprawl as test seams."
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "FINDING-004",
+        "invariantIds": ["HC-DOC-001", "HC-AUTH-001", "HC-PROOF-001"],
+        "priority": "important_correction",
+        "risk": "Deployment and lifecycle claims need bounded owners: Repository and installed-source evidence establish module and runtime semantics, but they do not establish current Vercel bundling, warm-instance reuse, scale-out, shutdown, Preview, Production, provider, or handset state.",
+        "evidence": [
+          {
+            "path": "docs/product-specs/eve-channel-runtime-ownership.md",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "The SPEC separates repository, installed dependency, upstream, historical deployment, and inferred platform truth."
+          },
+          {
+            "path": "docs/operations/authority-model.md",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Repository instructions and product documents do not grant provider or deployment authority."
+          }
+        ],
+        "lifecycleOrDecision": "accepted: Implementation can be accepted from repository proof while hosted claims remain separately authorised and bounded to immutable readback evidence.",
+        "semanticOwner": "docs/product-specs/eve-channel-runtime-ownership.md",
+        "proofGap": "No current immutable deployment readback exists for a future implementation, and installed Eve exposes no authored Channel runtime teardown hook.",
+        "rootCorrection": "Update architecture and app docs only after implementation, preserve runbook and authority owners, state disposal limits precisely, and keep any Preview readback optional and outside repository acceptance.",
+        "retire": [
+          "Standing claims that both provider routes always share one Vercel function",
+          "Claims that a module singleton is global across scale-out, Preview, or Production",
+          "Guessed HMR, process-signal, Nitro, or Vercel shutdown hooks"
+        ],
+        "surfaces": {
+          "docs": {
+            "decision": "change_required",
+            "evidence": [
+              "Durable owners must separate repository, dependency, upstream, deployment, and inferred truth."
+            ]
+          },
+          "readmes": {
+            "decision": "change_required",
+            "evidence": [
+              "apps/agent/README.md changes only after implementation and must avoid provider actuality claims."
+            ]
+          },
+          "architecture_standards": {
+            "decision": "change_required",
+            "evidence": [
+              "docs/architecture/eve-agent.md must record lifecycle limits and non-claims."
+            ]
+          },
+          "runbooks": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing local-development and deploy/promote runbooks remain the operational owners."
+            ]
+          },
+          "proof_evidence": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing docs/verification journey and packet owners govern any later authorised hosted evidence."
+            ]
+          },
+          "skills": {
+            "decision": "preserve",
+            "evidence": [
+              "The refreshed harness contract is applied in the SPEC/task owners without modifying the skills."
+            ]
+          },
+          "lint_config_ci": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing docs, authority, controls, verification, and root gates remain authoritative."
+            ]
+          },
+          "spec_tasks": {
+            "decision": "change_required",
+            "evidence": [
+              "Optional Preview readback must remain outside accepted findings and required tasks."
+            ]
+          },
+          "tests_fixtures": {
+            "decision": "preserve",
+            "evidence": [
+              "Local build fixtures retain their bounded source/output claim and do not become Vercel readback."
+            ]
+          },
+          "config_exports": {
+            "decision": "preserve",
+            "evidence": [
+              "Pinned Eve/Effect dependencies and deployment configuration do not change in this slice."
+            ]
+          },
+          "lifecycle": {
+            "decision": "change_required",
+            "evidence": [
+              "Warm-instance, scale-out, shutdown, Preview, and Production claims stay evidence-bounded."
+            ]
+          },
+          "release_rollback": {
+            "decision": "preserve",
+            "evidence": [
+              "Target-owned authority and immutable rollback remain mandatory for any later hosted operation."
+            ]
+          },
+          "critical_journeys": {
+            "decision": "change_required",
+            "evidence": [
+              "EVE-RUNTIME-JOURNEY-004 owns repository closeout and bounded lifecycle claims."
+            ]
+          }
+        },
+        "verification": [
+          "Command: bun run check:docs",
+          "Command: bun run check:authority",
+          "Command: bun run check:controls",
+          "Command: bun run check:verification",
+          "Command: bun run verification",
+          "Test: apps/agent/test/sendblue-build-route.test.ts",
+          "Inspection: Review every Vercel/Eve lifecycle statement for evidence scope",
+          "Inspection: Record exact Git identity and distinguish local build from deployment readback",
+          "Inspection: Confirm no active implementation plan exists before implementation",
+          "Expected: Architecture and app docs change only with implemented behavior",
+          "Expected: No unbounded deployment, shutdown, provider, or Production claim",
+          "Expected: No provider or deployment mutation during repository acceptance"
+        ],
+        "journeyIds": ["EVE-RUNTIME-JOURNEY-004"],
+        "authorityOrDecision": "bundjil-product-owner decides product acceptance; bundjil-agent-architecture-owner accepts repository implementation; bundjil-agent-operator requires separate target authority for hosted operations",
+        "limitations": [
+          "Installed Eve has no authored Channel teardown hook.",
+          "Vercel may reuse, scale, freeze, or terminate instances without a repository-observable shutdown callback."
+        ],
+        "nonClaims": [
+          "This finding does not claim current Preview, Production, provider, or handset state.",
+          "This finding does not authorise deployment, credentials, provider writes, or message delivery."
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "FINDING-005",
+        "invariantIds": ["HC-EVIDENCE-001", "HC-AUTH-001"],
+        "priority": "optional_improvement",
+        "risk": "A future Preview readback could narrow deployment uncertainty: An immutable authorised Preview could prove function-route mapping and one bounded waitUntil journey for that exact deployment, but it is not required to accept repository implementation.",
+        "evidence": [
+          {
+            "path": "docs/verification",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Existing verification owners can retain a bounded hosted packet when separate authority exists."
+          }
+        ],
+        "lifecycleOrDecision": "optional: Hosted readback improves deployment evidence but cannot prove universal lifecycle behavior and must not block repository acceptance.",
+        "semanticOwner": "docs/product-specs/eve-channel-runtime-ownership.tasks.json",
+        "proofGap": "No future implementation deployment exists to inspect.",
+        "rootCorrection": "Keep the readback outside required tasks and execute it only under explicit target-owned authority after a clean immutable publication.",
+        "retire": [],
+        "surfaces": {
+          "docs": {
+            "decision": "preserve",
+            "evidence": [
+              "The SPEC already records Preview readback as optional and separately authorised."
+            ]
+          },
+          "readmes": {
+            "decision": "not_applicable",
+            "evidence": ["Optional hosted readback creates no README change."]
+          },
+          "architecture_standards": {
+            "decision": "not_applicable",
+            "evidence": [
+              "A bounded observation does not change architecture intent."
+            ]
+          },
+          "runbooks": {
+            "decision": "preserve",
+            "evidence": [
+              "Any optional operation must use the existing target-owned deploy/promote runbook."
+            ]
+          },
+          "proof_evidence": {
+            "decision": "not_applicable",
+            "evidence": [
+              "No proof packet is created unless the optional task is separately authorised and executed."
+            ]
+          },
+          "skills": {
+            "decision": "preserve",
+            "evidence": [
+              "Existing verification and authority skills remain sufficient."
+            ]
+          },
+          "lint_config_ci": {
+            "decision": "preserve",
+            "evidence": [
+              "Optional readback does not change CI or repository rules."
+            ]
+          },
+          "spec_tasks": {
+            "decision": "preserve",
+            "evidence": [
+              "FINDING-005 remains excluded from the accepted crosswalk and required tasks array."
+            ]
+          },
+          "tests_fixtures": {
+            "decision": "preserve",
+            "evidence": ["Hosted readback cannot replace repository fixtures."]
+          },
+          "config_exports": {
+            "decision": "not_applicable",
+            "evidence": ["No config or export change."]
+          },
+          "lifecycle": {
+            "decision": "not_applicable",
+            "evidence": [
+              "No lifecycle claim exists until an immutable authorised observation is made."
+            ]
+          },
+          "release_rollback": {
+            "decision": "preserve",
+            "evidence": [
+              "Explicit target authority and immutable rollback are prerequisites, not grants from this ledger."
+            ]
+          },
+          "critical_journeys": {
+            "decision": "not_applicable",
+            "evidence": [
+              "Optional readback is not a repository acceptance journey."
+            ]
+          }
+        },
+        "verification": [
+          "Command: bun run verification",
+          "Inspection: Read back immutable Preview function-route mapping",
+          "Inspection: Classify repository, deployment, runtime-log, provider, and handset evidence separately",
+          "Expected: Any claim is bounded to one immutable Preview and observation time",
+          "Expected: Missing authority, rollback, or readback halts the optional task"
+        ],
+        "journeyIds": ["EVE-RUNTIME-JOURNEY-004"],
+        "authorityOrDecision": "No standing authority; requires explicit bundjil-product-owner decision and target-owned bundjil-agent-operator authority",
+        "limitations": [
+          "Optional readback cannot prove scale-down disposal, future bundling, scale-out cardinality, or Production."
+        ],
+        "nonClaims": [
+          "This optional finding is outside required implementation scope.",
+          "It does not authorise Production promotion or provider mutation."
+        ],
+        "decision": "optional"
+      }
+    ],
+    "foundationsToPreserve": [
+      {
+        "id": "PRESERVE-001",
+        "summary": "Provider-owned Layer composition roots: They compose canonical Services and provider-specific Layers without cross-provider runtime sharing.",
+        "evidence": [
+          {
+            "path": "apps/agent/agent/lib/channel/sendblue.runtime.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "They compose canonical Services and provider-specific Layers without cross-provider runtime sharing."
+          },
+          {
+            "path": "apps/agent/agent/lib/channel/photon.runtime.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "They compose canonical Services and provider-specific Layers without cross-provider runtime sharing."
+          }
+        ],
+        "owner": "docs/product-specs/eve-channel-runtime-ownership.md"
+      },
+      {
+        "id": "PRESERVE-002",
+        "summary": "Photon per-operation Spectrum lifetime: Effect.acquireUseRelease owns current SDK resource cleanup and remains outside this runtime-supervision change.",
+        "evidence": [
+          {
+            "path": "packages/photon/src/client.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Effect.acquireUseRelease owns current SDK resource cleanup and remains outside this runtime-supervision change."
+          },
+          {
+            "path": "packages/photon/src/transport.layer.ts",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Effect.acquireUseRelease owns current SDK resource cleanup and remains outside this runtime-supervision change."
+          }
+        ],
+        "owner": "docs/product-specs/eve-channel-runtime-ownership.md"
+      },
+      {
+        "id": "PRESERVE-003",
+        "summary": "Canonical Schema, Config, Service, Layer, and tagged-error boundaries: Runtime ownership changes must not create DTO mirrors, semantic primitive strings, unsafe casts, manual codecs, or raw-client escapes.",
+        "evidence": [
+          {
+            "path": "apps/agent/agent/lib/channel",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Runtime ownership changes must not create DTO mirrors, semantic primitive strings, unsafe casts, manual codecs, or raw-client escapes."
+          },
+          {
+            "path": "packages/channel/src",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Runtime ownership changes must not create DTO mirrors, semantic primitive strings, unsafe casts, manual codecs, or raw-client escapes."
+          },
+          {
+            "path": "packages/sendblue/src",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Runtime ownership changes must not create DTO mirrors, semantic primitive strings, unsafe casts, manual codecs, or raw-client escapes."
+          },
+          {
+            "path": "packages/photon/src",
+            "lineStart": null,
+            "lineEnd": null,
+            "observation": "Runtime ownership changes must not create DTO mirrors, semantic primitive strings, unsafe casts, manual codecs, or raw-client escapes."
+          }
+        ],
+        "owner": "docs/product-specs/eve-channel-runtime-ownership.md"
+      }
+    ],
+    "limitations": [
+      "The linked worktree has no local node_modules; installed-source evidence comes from the canonical checkout whose relevant bun.lock entries match.",
+      "Repository and local-build evidence cannot establish current or universal Vercel lifecycle behavior.",
+      "No deployment, provider, credential, handset, or Production readback occurred in this review."
+    ],
+    "nonClaims": [
+      "The register does not claim live deployment or provider health.",
+      "The register does not authorise implementation, deployment, provider writes, credential changes, or message delivery.",
+      "The register does not make optional Preview readback a repository acceptance requirement."
+    ]
+  },
+  "acceptedFindingCrosswalk": {
+    "schemaVersion": "1",
+    "auditId": "EVE-RUNTIME-OWNERSHIP-AUDIT-001",
+    "targetRevision": "d08c767ba41e3eab1724b0a73a14c9d435b4e564",
+    "entries": [
+      {
+        "findingId": "FINDING-001",
+        "requirementIds": ["EVE-RUNTIME-REQ-001"],
+        "taskIds": [
+          "prove-provider-runtime-behavior",
+          "supervise-accepted-eve-background-work",
+          "reconcile-runtime-docs-and-repository-closeout"
+        ],
+        "owningPaths": [
+          "apps/agent/agent/channels/sendblue.ts",
+          "apps/agent/agent/channels/photon.ts",
+          "apps/agent/agent/lib/channel/eve.ts",
+          "apps/agent/test/channel-runtime.test.ts",
+          "docs/architecture/eve-agent.md",
+          "apps/agent/README.md"
+        ],
+        "verification": [
+          "Focused runtime tests prove build-once, concurrency, provider-failure isolation, cached failure, fresh-runtime recovery, and scoped disposal.",
+          "Source/build inspection proves runtime creation remains provider-root-owned with no combined runtime, shared MemoMap, runner abstraction, or Photon lifetime change."
+        ],
+        "proof": [
+          "Journey: EVE-RUNTIME-JOURNEY-001",
+          "Journey: EVE-RUNTIME-JOURNEY-003",
+          "Artifact: apps/agent/test/channel-runtime.test.ts",
+          "Artifact: apps/agent/test/sendblue-build-route.test.ts",
+          "Artifact: future implementation receipt"
+        ]
+      },
+      {
+        "findingId": "FINDING-002",
+        "requirementIds": ["EVE-RUNTIME-REQ-002"],
+        "taskIds": [
+          "supervise-accepted-eve-background-work",
+          "reconcile-runtime-docs-and-repository-closeout"
+        ],
+        "owningPaths": [
+          "apps/agent/agent/lib/channel/eve.ts",
+          "apps/agent/test/sendblue-channel.test.ts",
+          "docs/architecture/eve-agent.md",
+          "apps/agent/README.md"
+        ],
+        "verification": [
+          "Accepted work uses provider runFork and exactly one Fiber.await completion reaches waitUntil before handler resolution.",
+          "Tests prove all Exit completion, runtime-disposal interruption/finalizers, client-abort independence, and rejection of the old global-scope behavior."
+        ],
+        "proof": [
+          "Journey: EVE-RUNTIME-JOURNEY-002",
+          "Journey: EVE-RUNTIME-JOURNEY-003",
+          "Artifact: apps/agent/test/sendblue-channel.test.ts",
+          "Artifact: future implementation receipt"
+        ]
+      },
+      {
+        "findingId": "FINDING-003",
+        "requirementIds": ["EVE-RUNTIME-REQ-003"],
+        "taskIds": [
+          "prove-provider-runtime-behavior",
+          "supervise-accepted-eve-background-work",
+          "reconcile-runtime-docs-and-repository-closeout"
+        ],
+        "owningPaths": [
+          "apps/agent/test/channel-runtime.test.ts",
+          "apps/agent/test/sendblue-channel.test.ts",
+          "apps/agent/test/channel-config.test.ts",
+          "apps/agent/test/channel-vertical.test.ts",
+          "apps/agent/test/sendblue-build-route.test.ts",
+          "packages/photon/test/photon-transport.test.ts"
+        ],
+        "verification": [
+          "Every code task satisfies its focused Effect, boundary, codec, ownership, diagnostics, docs, authority, controls, verification, and zero-stale-exception gates.",
+          "Final bun run verification and git diff --check pass at one recorded Git identity."
+        ],
+        "proof": [
+          "Journey: EVE-RUNTIME-JOURNEY-001",
+          "Journey: EVE-RUNTIME-JOURNEY-002",
+          "Journey: EVE-RUNTIME-JOURNEY-003",
+          "Journey: EVE-RUNTIME-JOURNEY-004",
+          "Artifact: focused test output",
+          "Artifact: Effect language-server diagnostics",
+          "Artifact: future implementation receipt"
+        ]
+      },
+      {
+        "findingId": "FINDING-004",
+        "requirementIds": ["EVE-RUNTIME-REQ-004"],
+        "taskIds": ["reconcile-runtime-docs-and-repository-closeout"],
+        "owningPaths": [
+          "docs/product-specs/eve-channel-runtime-ownership.md",
+          "docs/architecture/eve-agent.md",
+          "apps/agent/README.md",
+          "docs/operations/authority-model.md",
+          "docs/verification"
+        ],
+        "verification": [
+          "Every lifecycle and deployment statement identifies its truth layer, evidence identity, limitation, and non-claim.",
+          "Repository acceptance completes without deployment, provider, credential, message, or Production mutation."
+        ],
+        "proof": [
+          "Journey: EVE-RUNTIME-JOURNEY-004",
+          "Artifact: docs/product-specs/eve-channel-runtime-ownership.md",
+          "Artifact: future implementation receipt"
+        ]
+      }
+    ]
+  },
   "fixtureLifecycle": [
     "Create apps/agent/test/channel-runtime.test.ts for independent provider-shaped Layer build-once, concurrency, failure isolation, cached failure, fresh-runtime recovery, and scoped runtime disposal.",
     "Update apps/agent/test/sendblue-channel.test.ts for waitUntil ordering, success/typed-failure/defect/interruption completion, disposal finalizers, client-abort independence, and the forkDetach/global-Scope regression while retaining exact route/status/duplicate fixtures.",
@@ -48,6 +955,13 @@
       "id": "prove-provider-runtime-behavior",
       "title": "Prove provider runtime caching, concurrency, failure isolation, and recovery",
       "status": "pending",
+      "findingIds": ["FINDING-001", "FINDING-003"],
+      "requirementIds": ["EVE-RUNTIME-REQ-001", "EVE-RUNTIME-REQ-003"],
+      "owningPaths": [
+        "apps/agent/test/channel-runtime.test.ts",
+        "apps/agent/agent/channels/sendblue.ts",
+        "apps/agent/agent/channels/photon.ts"
+      ],
       "description": "Add deterministic app-level runtime tests before changing accepted background execution. Prove one lazy build per concrete runtime, concurrent execution without accidental serialization, independent provider Layer failure, retained same-runtime build failure, and fresh-runtime recovery. Source/module and build evidence, not this unit fixture, own runtime cardinality.",
       "implementationNotes": [
         "Create apps/agent/test/channel-runtime.test.ts; keep runtime-lifecycle proof out of production helpers and services.",
@@ -77,6 +991,16 @@
       "id": "supervise-accepted-eve-background-work",
       "title": "Replace global detached work with the provider runtime's supervised Fiber",
       "status": "pending",
+      "findingIds": ["FINDING-001", "FINDING-002", "FINDING-003"],
+      "requirementIds": [
+        "EVE-RUNTIME-REQ-001",
+        "EVE-RUNTIME-REQ-002",
+        "EVE-RUNTIME-REQ-003"
+      ],
+      "owningPaths": [
+        "apps/agent/agent/lib/channel/eve.ts",
+        "apps/agent/test/sendblue-channel.test.ts"
+      ],
       "description": "Change only the shared Eve adapter so the request-decision Effect returns accepted background work to the concrete ManagedRuntime edge, which starts it with runFork and passes native Fiber.await completion to Eve waitUntil. Preserve all route, callback, replay, state, and provider behavior.",
       "implementationNotes": [
         "Keep makeChannelEveChannel and makeChannelEveEvents parameterized by ManagedRuntime.ManagedRuntime<Channel, E>. Do not introduce ChannelEffectRunner, a runtime Service, a generic interface, or callback-based test seam.",
@@ -111,6 +1035,24 @@
       "id": "reconcile-runtime-docs-and-repository-closeout",
       "title": "Reconcile durable runtime owners and complete repository verification",
       "status": "pending",
+      "findingIds": [
+        "FINDING-001",
+        "FINDING-002",
+        "FINDING-003",
+        "FINDING-004"
+      ],
+      "requirementIds": [
+        "EVE-RUNTIME-REQ-001",
+        "EVE-RUNTIME-REQ-002",
+        "EVE-RUNTIME-REQ-003",
+        "EVE-RUNTIME-REQ-004"
+      ],
+      "owningPaths": [
+        "docs/architecture/eve-agent.md",
+        "apps/agent/README.md",
+        "docs/product-specs/eve-channel-runtime-ownership.md",
+        "docs/product-specs/eve-channel-runtime-ownership.tasks.json"
+      ],
       "description": "Update implemented architecture and app documentation, retain provider/runbook/proof boundaries, verify both built routes and Photon lifecycle compatibility, and run the complete repository closeout without deployment or provider operations.",
       "implementationNotes": [
         "Update docs/architecture/eve-agent.md and apps/agent/README.md only after code implements the accepted runtime behavior.",
@@ -135,11 +1077,19 @@
         "No provider, Vercel, credential, deployment, message, or Production mutation occurred."
       ],
       "commitAfterPassing": true
-    },
+    }
+  ],
+  "optionalTasks": [
     {
       "id": "optional-authorized-preview-runtime-readback",
       "title": "Optionally prove one immutable Preview runtime topology under separate authority",
-      "status": "pending",
+      "status": "optional",
+      "findingIds": ["FINDING-005"],
+      "requirementIds": [],
+      "owningPaths": [
+        "apps/agent/runbooks/deploy-promote.md",
+        "docs/verification"
+      ],
       "description": "Only after implementation, clean Git publication, and explicit target-owned deployment/provider authority, deploy an isolated Preview and collect bounded evidence for its exact function topology and one approved waitUntil journey. This task grants no authority itself and is not required for repository acceptance.",
       "implementationNotes": [
         "Resolve the exact personal bundjil-agent project, Preview environment, pushed source SHA, immutable rollback deployment, protection, and authority receipt before any operation.",
@@ -175,7 +1125,8 @@
       "Corrected cardinality to one runtime per loaded provider composition root per module instance: the installed Eve/current local output loads both roots, but future function splitting is a readback question.",
       "Corrected stale source and reference anchors, made fixture create/update/retain ownership explicit, preserved the current effect-client-wrapper policy, and require all implementation gates to pass rather than accepting an inconclusive environment.",
       "Separated per-runtime semantic tests from source/build cardinality proof, documented installed Eve's sanitized 500 for authored handler rejection, and rejected an unowned Channel-wide timeout or retry.",
-      "Completed the 22-README inventory, corrected product-spec counts, and grounded repository implementation acceptance to bundjil-agent-architecture-owner."
+      "Completed the 22-README inventory, corrected product-spec counts, and grounded repository implementation acceptance to bundjil-agent-architecture-owner.",
+      "Re-reviewed against d08c767ba41e3eab1724b0a73a14c9d435b4e564 after the embedded harness contract update; retained the runtime decision, added stable finding/invariant/requirement ownership and a structured accepted-finding crosswalk, and moved optional Preview readback outside the required tasks array."
     ]
   }
 }

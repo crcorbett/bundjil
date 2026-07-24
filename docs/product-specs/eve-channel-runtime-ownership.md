@@ -54,12 +54,13 @@ decision and is forbidden by this SPEC.
 
 ## Evidence base and current repository truth
 
-This SPEC was drafted from fetched `origin/main` commit
-`c8c5d53f71b9a8b9ac81bbc44a20c6fd1ecea90f` on 2026-07-24. The Channel runtime,
+This SPEC was re-reviewed from fetched `origin/main` commit
+`d08c767ba41e3eab1724b0a73a14c9d435b4e564` on 2026-07-24. The Channel runtime,
 adapter, provider, test, and dependency-lock paths are unchanged from the
-earlier immutable audit commit
-`7ddcdc514af5d3edee1b151575a3ce18226268bb`; current `main` adds an HGI-307
-repository verification gate but does not change the runtime graph.
+previously reviewed `c8c5d53f71b9a8b9ac81bbc44a20c6fd1ecea90f` and the earlier
+immutable audit commit `7ddcdc514af5d3edee1b151575a3ce18226268bb`.
+Current `main` embeds the structured repository-harness contract and updates
+the HGI-307 documentation inventory; it does not change the runtime graph.
 
 Committed dependency truth is:
 
@@ -167,6 +168,25 @@ main differs.
 - Adding guessed Eve, Nitro, HMR, process-signal, or Vercel shutdown hooks.
 - Deployment, provider mutation, credential change, message send, Production
   promotion, or current-provider claim as part of implementation.
+
+## Accepted audit findings and requirement crosswalk
+
+The sibling task ledger is the canonical structured finding register and
+accepted-finding crosswalk. This table is its readable view. Finding IDs use
+the repository audit schema; requirement IDs remain stable through
+implementation and proof:
+
+| Finding       | Harness invariants                                 | Requirement           | Accepted root correction                                                                                                                                                                                                                                                                 | Required tasks                                                                                                                |
+| ------------- | -------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `FINDING-001` | `HC-CTX-001`, `HC-REPO-001`, `HC-DEPENDENCY-001`   | `EVE-RUNTIME-REQ-001` | Own one concrete runtime per loaded provider composition root and module instance; keep provider Layer graphs, config, failures, Scope, and disposal separate; reject a combined Eve runtime, explicit MemoMap sharing, runner/runtime Services, and a Photon lifetime change.           | `prove-provider-runtime-behavior`, `supervise-accepted-eve-background-work`, `reconcile-runtime-docs-and-repository-closeout` |
+| `FINDING-002` | `HC-OUTCOME-001`, `HC-REPO-001`, `HC-LIFETIME-001` | `EVE-RUNTIME-REQ-002` | Remove accepted work from Effect's global Scope. Start it with the owning provider runtime, register `Fiber.await` completion with Eve `waitUntil` before resolving the handler, and let runtime disposal supervise interruption/finalizers without coupling it to the request signal.   | `supervise-accepted-eve-background-work`, `reconcile-runtime-docs-and-repository-closeout`                                    |
+| `FINDING-003` | `HC-PROOF-001`, `HC-EVIDENCE-001`                  | `EVE-RUNTIME-REQ-003` | Add deterministic proof for lazy build-once behavior, concurrency, provider-failure isolation, retained same-runtime build failure, fresh-runtime recovery, waitUntil ordering, disposal, interruption, defects, abort independence, route compatibility, and Photon lifetime retention. | `prove-provider-runtime-behavior`, `supervise-accepted-eve-background-work`, `reconcile-runtime-docs-and-repository-closeout` |
+| `FINDING-004` | `HC-DOC-001`, `HC-AUTH-001`, `HC-PROOF-001`        | `EVE-RUNTIME-REQ-004` | Keep repository/build proof distinct from Vercel, Preview, Production, provider, handset, warm-instance, scale-out, and shutdown claims; update durable architecture/app owners only with implementation; keep hosted readback optional and separately authorised.                       | `reconcile-runtime-docs-and-repository-closeout`                                                                              |
+
+Optional `FINDING-005` Preview readback is deliberately outside the
+accepted-finding crosswalk and required implementation task array. It may
+improve bounded deployment evidence later, but its absence cannot block
+repository acceptance and this SPEC grants no authority to perform it.
 
 ## Ownership and Layer composition
 
@@ -611,7 +631,7 @@ claim limits.
 
 | Surface                                                                                                                                | SPEC/review result                                                         | Implementation owner and observable postcondition                                                                                                                                                                                                                                                                                       |
 | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/product-specs/eve-channel-runtime-ownership.md` and sibling tasks                                                                | Change required                                                            | Own proposed decision, progressive tasks, review findings, and acceptance.                                                                                                                                                                                                                                                              |
+| `docs/product-specs/eve-channel-runtime-ownership.md` and sibling tasks                                                                | Change required                                                            | Own the proposed decision, stable audit finding/requirement IDs, structured accepted-finding crosswalk, progressive required tasks, separately optional readback, review findings, and acceptance.                                                                                                                                      |
 | `docs/product-specs/index.md`                                                                                                          | Change required                                                            | Route this proposed SPEC without claiming implementation has begun; no active plan yet.                                                                                                                                                                                                                                                 |
 | `docs/README.md` and `docs/architecture/README.md`                                                                                     | Preserve                                                                   | Documentation lifecycle and architecture routing do not change; this SPEC and the product-spec index remain the narrow current-intent owners.                                                                                                                                                                                           |
 | `docs/architecture/eve-agent.md`                                                                                                       | Preserve during SPEC; change required with code                            | Record provider-root cardinality, direct concrete runtime use, supervised accepted Fiber, waitUntil, disposal limits, and evidence/non-claims after implementation.                                                                                                                                                                     |
@@ -629,6 +649,7 @@ claim limits.
 | `apps/agent/runbooks/local-development.md`                                                                                             | Preserve                                                                   | Installed `eve@0.20.0` has no public authored-Channel teardown hook, so there is no executable runtime-disposal procedure to add. Reconsider only with a separately reviewed Eve lifecycle API change.                                                                                                                                  |
 | Agent deployment/provider/incident runbooks                                                                                            | Preserve                                                                   | No operation, authority, provider, credential, rollout, or rollback procedure changes in the repository-only slice.                                                                                                                                                                                                                     |
 | `.agents/skills/effect-client-wrapper/SKILL.md`                                                                                        | Preserve                                                                   | Its public-boundary rules already forbid generic SDK callbacks/raw clients and require canonical Schema, Config, safe tagged errors, named operations, and live/mock Layers. Photon's internal `withPhotonResource` has two real consumers and owns `acquireUseRelease`; it is not a public escape hatch or a runtime-runner precedent. |
+| `.agents/skills/prd-review/SKILL.md` and `.agents/skills/docs-maintainer/**`                                                           | Preserve source; change required in this SPEC/task ledger                  | The refreshed embedded harness contract now requires stable finding/invariant IDs and a structured accepted-finding crosswalk for this audit-derived SPEC. The source skills remain unchanged; their requirement is satisfied in the canonical current-intent artifacts.                                                                |
 | `AGENTS.md`, other repo-local skills, mirrors, and instruction surfaces                                                                | Preserve                                                                   | Current Effect boundary, helper admission, docs, PRD, authority, and verification rules already govern this work.                                                                                                                                                                                                                       |
 | `.changeset/README.md`, `.agents/skills/vercel-composition-patterns/README.md`, `.agents/skills/vercel-react-best-practices/README.md` | Preserve                                                                   | No release/versioning or React composition work occurs. These remaining repository `README.md` paths do not become runtime owners.                                                                                                                                                                                                      |
 | Schemas, Type/Encoded aliases, branded identities, Config, errors, Services, Layers, package exports                                   | Preserve                                                                   | Runtime/fiber ownership changes only; canonical boundaries above must remain byte/shape compatible.                                                                                                                                                                                                                                     |
@@ -679,9 +700,13 @@ they do not become current intent for this repository-only runtime edge.
 
 ## Formal review outcome
 
-`prd-review` completed an initial pass and two adversarial in-place re-reviews
-on 2026-07-24. The corrected SPEC is accepted for implementation planning. No
-active execution plan was created because implementation has not begun.
+`prd-review` completed an initial pass, two adversarial in-place re-reviews, and
+a structured-harness re-review against `d08c767ba41e3eab1724b0a73a14c9d435b4e564`
+on 2026-07-24. The runtime architecture decision remains accepted for
+implementation planning. The latest review added stable audit
+finding/requirement IDs, a structured accepted-finding crosswalk, and removed
+the optional Preview readback from required implementation tasks. No active
+execution plan was created because implementation has not begun.
 
 The review made these decisions:
 
@@ -718,3 +743,7 @@ The review made these decisions:
     rejection, reject an unowned Channel-wide timeout/retry, account for every
     repository `README.md`, and ground repository acceptance to the named agent
     architecture owner.
+13. Retain the four accepted audit findings and their invariant, requirement,
+    task, owner, verification, journey, and proof mappings in the sibling
+    structured crosswalk; keep optional hosted readback outside required
+    implementation scope.

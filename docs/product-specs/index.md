@@ -17,7 +17,8 @@ context.
 ## Proposed
 
 - [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
-  — implementation-ready specification accepted after adversarial formal review;
+  — implementation-ready specification accepted after adversarial formal
+  review, with a structured audit-finding crosswalk in its sibling task ledger;
   implementation has not begun and no active execution plan exists.
 
 ## Current
