@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -13,6 +13,15 @@ Current implementation intent requires both an active SPEC/task here and an
 entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
+
+## Proposed
+
+- [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md) —
+  reviewed proof intent for `202` after Eve-owned intended-session Workflow
+  acceptance, Eve/Nitro-owned generated-function timeout readback, and a
+  deliberately slow bounded interruption/resumption journey;
+  implementation and every hosted operation remain pending an active plan and
+  explicit authority.
 
 ## Current
 

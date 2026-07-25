@@ -1,0 +1,987 @@
+{
+  "title": "Hosted Eve Runtime Qualification And Durable Handoff Tasks",
+  "status": "pending",
+  "spec": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
+  "harnessContract": {
+    "primaryOwner": "bundjil-product-owner",
+    "acceptedOutcome": "The exact custom-channel route returns 202 only after Eve-owned Workflow start or intended-session hook-resume acceptance, then Preview directly proves the matching durable session and turn resume without a second app Workflow.",
+    "invariantIds": [
+      "HC-OUTCOME-001",
+      "HC-CTX-001",
+      "HC-REPO-001",
+      "HC-BOUNDARY-001",
+      "HC-DOC-001",
+      "HC-PROOF-001",
+      "HC-AUTH-001",
+      "HC-EVIDENCE-001",
+      "HC-LIFETIME-001",
+      "HC-DEPENDENCY-001",
+      "HC-EPOCH-001"
+    ],
+    "stopConditions": [
+      "Stop on source, lock, Eve reference, config, deployment, function, duration, provider, authority, rollback, or observation-epoch mismatch.",
+      "Stop if implementation adds a second app-level Workflow or raw Workflow client without a new pinned-source finding that proves a missing Eve boundary.",
+      "Stop if 202 can precede the awaited Eve send acceptance identity.",
+      "Stop if an existing-session resume failure falls through to a different new run and that continuity fork is treated as successful acceptance.",
+      "Stop on blind retry after an outcome-uncertain provider write.",
+      "Stop when a guessed vercel.json glob, patched generated output, Sandbox timeout, local Build Output, or broad suite is offered as hosted function-duration or durability proof.",
+      "Stop every hosted/provider operation until the target-owned runbook and one-run authority are attached."
+    ]
+  },
+  "principles": [
+    "Eve 0.20 owns Workflow start, resume, durable sessions, and per-turn child workflows.",
+    "Bundjil owns the provider webhook, replay claim, send acceptance ordering, provider side-effect safety, and evidence.",
+    "A 202 response follows awaited Eve send acceptance and intended-session convergence; starting an Effect Fiber, registering waitUntil, or accepting a fallback continuity fork is insufficient.",
+    "waitUntil extends only the ordinary webhook invocation up to that function's timeout.",
+    "Workflow lifetime, each function or step invocation, Sandbox idle timeout, and session lifetime are separate clocks.",
+    "Decode unknown input once at ingress, use canonical Schema Type values internally, and encode at outward boundaries.",
+    "Effects stay flat, lazy, linear and typed; raw clients, DTO mirrors, casts, stringly policy, wrappers and helper sprawl are forbidden.",
+    "Every hosted consequence is runbook- and authority-gated; repository proof never grants external authority."
+  ],
+  "riskLenses": [
+    "Ownership and call graph: provider ingress, replay, EveChannelDispatch, Eve send, Workflow runtime, provider effects and evidence remain distinct.",
+    "Effect quality: Schema, branded identities, Config/Redacted, tagged errors, Services/Layers, Scope/Fiber/Exit/Match and direct operations remain canonical.",
+    "Boundary and lifecycle correctness: send start/resume acceptance, 202 ordering, waitUntil limit, duplicate convergence, interrupted step replay, uncertainty and rollback.",
+    "Verification and adversarial coverage: each acceptance, timeout, retry, duplicate and interruption claim has a direct observable and false-green rejection.",
+    "Documentation, authority and closeout: architecture, README, runbooks, authority, verification journeys, immutable packets and lifecycle pointers agree."
+  ],
+  "auditFindings": [
+    {
+      "id": "HEQ-F001",
+      "status": "accepted",
+      "priority": "critical",
+      "summary": "Pinned Eve 0.20 already owns durable session and turn workflows through startWorkflowPreferLatest and resumeHook.",
+      "evidence": [
+        "node_modules/eve/dist/src/channel/send.js",
+        "node_modules/eve/dist/src/execution/workflow-runtime.js",
+        "node_modules/eve/dist/src/execution/workflow-entry.js",
+        "node_modules/eve/dist/src/execution/workflow-steps.js",
+        ".local/references/eve/packages/eve/src/execution/workflow-runtime.ts"
+      ],
+      "rootCorrection": "Reuse Eve send and reject a second app-owned Workflow unless future pinned source proves a missing boundary."
+    },
+    {
+      "id": "HEQ-F002",
+      "status": "accepted",
+      "priority": "critical",
+      "summary": "Bundjil currently returns 202 while send runs in a background Fiber under waitUntil.",
+      "evidence": [
+        "apps/agent/agent/lib/channel/eve.ts",
+        "apps/agent/agent/lib/channel/dispatch.ts"
+      ],
+      "rootCorrection": "Move 202 after awaited send acceptance identity and return provider-retryable non-2xx on pre-acceptance rejection or timeout."
+    },
+    {
+      "id": "HEQ-F003",
+      "status": "accepted",
+      "priority": "important",
+      "summary": "waitUntil shares the ordinary webhook function timeout and does not prove cross-process durability.",
+      "evidence": [
+        "https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package#waituntil",
+        "apps/agent/agent/lib/channel/eve.ts"
+      ],
+      "rootCorrection": "Retain Exit observability while using the matching Workflow run as the durable oracle."
+    },
+    {
+      "id": "HEQ-F004",
+      "status": "accepted",
+      "priority": "important",
+      "summary": "Eve deliberately generates the workflow flow function with Node 24, a namespaced queue trigger and maxDuration max.",
+      "evidence": [
+        "apps/agent/.vercel/output/functions/.well-known/workflow/v1/flow.func/.vc-config.json",
+        ".local/references/eve/packages/eve/src/internal/workflow-bundle/builder.ts"
+      ],
+      "rootCorrection": "Preserve Eve-owned workflow output and read it back from the immutable Preview deployment."
+    },
+    {
+      "id": "HEQ-F005",
+      "status": "accepted",
+      "priority": "important",
+      "summary": "The generated ordinary __server function has no maxDuration; Eve directly owns Nitro creation and exposes no application duration seam in 0.20.",
+      "evidence": [
+        "apps/agent/.vercel/output/functions/__server.func/.vc-config.json",
+        "apps/agent/.vercel/output/config.json",
+        "apps/agent/vercel.json",
+        ".local/references/eve/packages/eve/src/internal/nitro/host/create-application-nitro.ts",
+        ".local/references/eve/packages/eve/src/internal/nitro/host/vercel-build-output-config.ts",
+        "node_modules/.bun/nitro@3.0.260610-beta+699ae0070c32e085/node_modules/nitro/dist/types/index.d.mts"
+      ],
+      "rootCorrection": "Measure handoff latency and effective project duration; if an override is justified, use a supported Eve application seam or pinned upstream Eve change and Preview readback."
+    },
+    {
+      "id": "HEQ-F006",
+      "status": "accepted",
+      "priority": "important",
+      "summary": "Workflow replay does not make provider writes exactly once and historical receipts do not prove a newer candidate.",
+      "evidence": [
+        "docs/verification/channel-production-accepted-2026-07-23.md",
+        "docs/verification/photon-preview-accepted-2026-07-23.md",
+        "docs/architecture/eve-agent.md"
+      ],
+      "rootCorrection": "Directly prove exact-result observation, idempotency or quarantine, same-ID duplicates, new immutable packets and explicit non-claims."
+    },
+    {
+      "id": "HEQ-F007",
+      "status": "accepted",
+      "priority": "critical",
+      "summary": "Pinned Eve 0.20 send falls through to starting a new session after any deliver error, not only a no-active-session result.",
+      "evidence": [
+        ".local/references/eve/packages/eve/src/channel/send.ts",
+        ".local/references/eve/packages/eve/src/channel/send.test.ts",
+        "node_modules/eve/dist/src/channel/send.js",
+        ".local/references/eve/packages/eve/src/execution/workflow-runtime.ts"
+      ],
+      "rootCorrection": "For existing continuations, observe intended versus accepted run identity and reject or quarantine a fallback continuity fork before 202."
+    }
+  ],
+  "acceptedFindingCrosswalk": [
+    {
+      "findingId": "HEQ-F001",
+      "requirementIds": ["HEQ-REQ-003", "HEQ-REQ-008", "HEQ-REQ-009"],
+      "taskIds": ["prove-eve-owned-handoff", "qualify-final-preview"]
+    },
+    {
+      "findingId": "HEQ-F002",
+      "requirementIds": ["HEQ-REQ-004", "HEQ-REQ-005"],
+      "taskIds": ["add-handoff-observability", "correct-202-ordering"]
+    },
+    {
+      "findingId": "HEQ-F003",
+      "requirementIds": ["HEQ-REQ-005", "HEQ-REQ-010"],
+      "taskIds": ["add-handoff-observability", "set-and-readback-timeouts"]
+    },
+    {
+      "findingId": "HEQ-F004",
+      "requirementIds": ["HEQ-REQ-002", "HEQ-REQ-010"],
+      "taskIds": ["prove-eve-owned-handoff", "set-and-readback-timeouts"]
+    },
+    {
+      "findingId": "HEQ-F005",
+      "requirementIds": ["HEQ-REQ-002", "HEQ-REQ-010"],
+      "taskIds": ["set-and-readback-timeouts"]
+    },
+    {
+      "findingId": "HEQ-F006",
+      "requirementIds": [
+        "HEQ-REQ-006",
+        "HEQ-REQ-011",
+        "HEQ-REQ-012",
+        "HEQ-REQ-013"
+      ],
+      "taskIds": [
+        "correct-202-ordering",
+        "qualify-final-preview",
+        "qualify-production-candidate"
+      ]
+    },
+    {
+      "findingId": "HEQ-F007",
+      "requirementIds": ["HEQ-REQ-004", "HEQ-REQ-006", "HEQ-REQ-008"],
+      "taskIds": [
+        "prove-eve-owned-handoff",
+        "correct-202-ordering",
+        "qualify-final-preview"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "HEQ-REQ-001",
+      "requirement": "Every hosted packet binds exact source, lock, Eve reference, config, immutable deployment, environment, function/runtime, authority, epoch and rollback identity.",
+      "taskIds": ["qualify-final-preview", "qualify-production-candidate"],
+      "directObservable": "Packet identity tuple equals fresh immutable target readback.",
+      "expectedPostcondition": "No behaviour claim floats across candidates or epochs.",
+      "falseGreenRejected": "Branch, alias, local build or historical receipt.",
+      "focusedCommandOrProcedureOwner": "deploy-promote runbook",
+      "evidenceOwner": "Dated Preview or Production packet",
+      "limitationsAndNonClaims": "Identity proves no runtime behaviour."
+    },
+    {
+      "id": "HEQ-REQ-002",
+      "requirement": "Hosted proof reads actual Channel route/function mapping and effective duration from the immutable deployment and treats topology as evidence only.",
+      "taskIds": [
+        "set-and-readback-timeouts",
+        "qualify-final-preview",
+        "qualify-production-candidate"
+      ],
+      "directObservable": "Deployment readback maps each route to the exact function and duration.",
+      "expectedPostcondition": "Timeout and topology claims are deployment-specific.",
+      "falseGreenRejected": "Local Build Output, source route or old deployment.",
+      "focusedCommandOrProcedureOwner": "deploy-promote Vercel readback procedure",
+      "evidenceOwner": "Packet detail artifact",
+      "limitationsAndNonClaims": "No future topology guarantee."
+    },
+    {
+      "id": "HEQ-REQ-003",
+      "requirement": "The implementation retains the pinned webhook to EveChannelDispatch to send to resumeHook/startWorkflowPreferLatest to session and child-turn workflow call graph and never adds a second app Workflow without new source evidence.",
+      "taskIds": ["prove-eve-owned-handoff", "correct-202-ordering"],
+      "directObservable": "Source and focused tests reach the Eve-owned Runtime methods with no raw Workflow client.",
+      "expectedPostcondition": "Eve remains the single durable execution owner.",
+      "falseGreenRejected": "A wrapper around Eve send or app Workflow orchestration.",
+      "focusedCommandOrProcedureOwner": "Agent check-types, test, build and boundary audit",
+      "evidenceOwner": "Source/call-graph receipt",
+      "limitationsAndNonClaims": "Local call graph is not hosted acceptance."
+    },
+    {
+      "id": "HEQ-REQ-004",
+      "requirement": "The route returns 202 only after the exact Eve send resolves with an observable safe session/run identity and an existing continuation converges on its intended owner run; rejection, continuity uncertainty or deadline expiry returns provider-retryable non-2xx or quarantine and does not complete inbound work.",
+      "taskIds": [
+        "add-handoff-observability",
+        "correct-202-ordering",
+        "qualify-final-preview"
+      ],
+      "directObservable": "sendAcceptedAt is not later than response202At and acceptance mode plus intended/accepted safe run fingerprints converge.",
+      "expectedPostcondition": "Every accepted 202 has reached the intended Eve hook-resume or a deliberate new-session start.",
+      "falseGreenRejected": "Fiber start, waitUntil registration, queue trigger, 202 alone or a different fallback run after resume failure.",
+      "focusedCommandOrProcedureOwner": "Focused agent test and Preview journey",
+      "evidenceOwner": "Deterministic fixture and Preview Workflow packet",
+      "limitationsAndNonClaims": "Acceptance is not terminal reply completion."
+    },
+    {
+      "id": "HEQ-REQ-005",
+      "requirement": "waitUntil is used and described only as ordinary-function lifetime extension; Fiber Exit and any remaining post-ack action are named, idempotent and observable.",
+      "taskIds": ["add-handoff-observability", "correct-202-ordering"],
+      "directObservable": "Exit-derived settlement and post-ack action inventory are directly asserted.",
+      "expectedPostcondition": "No critical accepted work relies on waitUntil.",
+      "falseGreenRejected": "Treating waitUntil settlement as durable recovery.",
+      "focusedCommandOrProcedureOwner": "Agent sendblue-channel test",
+      "evidenceOwner": "Focused Exit fixture",
+      "limitationsAndNonClaims": "Only the observed invocation is proved."
+    },
+    {
+      "id": "HEQ-REQ-006",
+      "requirement": "Exact authenticated provider-event redelivery produces one Eve delivery/turn/result/provider effect and zero second response.",
+      "taskIds": [
+        "correct-202-ordering",
+        "qualify-final-preview",
+        "qualify-production-candidate"
+      ],
+      "directObservable": "Same event identity yields counts 1/1/1/1/0 for accepted work, Eve delivery, turn result, provider effect and second response.",
+      "expectedPostcondition": "Retries and duplicates converge without a second user-visible consequence.",
+      "falseGreenRejected": "204, replay key, new event ID or Workflow count alone.",
+      "focusedCommandOrProcedureOwner": "Channel vertical test and provider runbook",
+      "evidenceOwner": "Fixture and messaging packet",
+      "limitationsAndNonClaims": "One controlled identity and window only."
+    },
+    {
+      "id": "HEQ-REQ-007",
+      "requirement": "Observability and receipts contain only Schema-encoded safe phases, counts, latency and HMAC fingerprints and never raw data-plane, identity, hook, run, secret, URL, error, Cause or stack values.",
+      "taskIds": [
+        "add-handoff-observability",
+        "qualify-final-preview",
+        "qualify-production-candidate"
+      ],
+      "directObservable": "Schema round trip and leak fixtures pass; bounded queries report zero forbidden markers.",
+      "expectedPostcondition": "Handoff and Workflow proof is correlatable without sensitive values.",
+      "falseGreenRejected": "Generic clean logs or redaction by convention.",
+      "focusedCommandOrProcedureOwner": "Agent tests and bounded log procedure",
+      "evidenceOwner": "Leak fixture and packet detail",
+      "limitationsAndNonClaims": "Unqueried logs are not proved clean."
+    },
+    {
+      "id": "HEQ-REQ-008",
+      "requirement": "Preview directly correlates acceptance mode, intended and accepted session identity, send acceptance and 202 with the matching Vercel Workflow session run, turn child workflow and terminal or waiting outcome.",
+      "taskIds": ["qualify-final-preview"],
+      "directObservable": "One safe work fingerprint joins acceptance mode and intended/accepted run fingerprints to bounded Workflow dashboard/run readback.",
+      "expectedPostcondition": "Hosted durable acceptance and session continuity are directly visible for the exact deployment.",
+      "falseGreenRejected": "Local generated output, DeepWiki, READY, function existence or any newly started fallback run.",
+      "focusedCommandOrProcedureOwner": "Updated deploy/Workflow readback runbook",
+      "evidenceOwner": "Preview Workflow packet",
+      "limitationsAndNonClaims": "One deployment and run only."
+    },
+    {
+      "id": "HEQ-REQ-009",
+      "requirement": "An authorised Preview-only deliberately slow bounded model/tool step is visible below the invocation limit; interruption after acceptance resumes the same Eve run from the named checkpoint and yields one terminal result without duplicate outbound effect.",
+      "taskIds": ["qualify-final-preview"],
+      "directObservable": "The bounded slow step and its limit are visible; the same safe run fingerprint spans interruption, replayed invocation and terminal result with no duplicate effect.",
+      "expectedPostcondition": "Eve-owned cross-process recovery is proved at the injected boundary.",
+      "falseGreenRejected": "Fast fixture, Effect retry, warm reuse, a new run or a second outbound effect.",
+      "focusedCommandOrProcedureOwner": "Approved Preview interruption procedure",
+      "evidenceOwner": "Workflow interruption packet",
+      "limitationsAndNonClaims": "Does not prove all crashes or Vercel availability."
+    },
+    {
+      "id": "HEQ-REQ-010",
+      "requirement": "Webhook handoff, workflow/turn invocation, Sandbox idle timeout and session lifetime retain distinct owners; Eve owns Nitro Build Output and values are set only through a supported Eve configuration seam plus Preview readback.",
+      "taskIds": ["set-and-readback-timeouts", "qualify-final-preview"],
+      "directObservable": "Four-clock matrix contains measured latency, effective value, owner, plan/provider bound and readback.",
+      "expectedPostcondition": "Only the intended generated function changes through its framework owner and Eve workflow max remains preserved.",
+      "falseGreenRejected": "Sandbox 30 minutes, guessed glob, generated-output patch, project default or local vc-config.",
+      "focusedCommandOrProcedureOwner": "Agent build plus Preview Vercel function readback",
+      "evidenceOwner": "Timeout decision/readback packet",
+      "limitationsAndNonClaims": "Limits can change with plan, provider or Eve."
+    },
+    {
+      "id": "HEQ-REQ-011",
+      "requirement": "Effect retry eligibility, ceiling, backoff, jitter, timeout and uncertain-side-effect observation are independently proved; non-idempotent uncertain writes are never blindly retried.",
+      "taskIds": ["correct-202-ordering", "qualify-final-preview"],
+      "directObservable": "Property fixtures expose attempt schedule, exact operation identity, observation and terminal classification.",
+      "expectedPostcondition": "Only eligible transient failures retry and uncertain writes converge or fail visibly.",
+      "falseGreenRejected": "One retry test or in-process retry as crash proof.",
+      "focusedCommandOrProcedureOwner": "Agent and affected provider tests",
+      "evidenceOwner": "Retry/uncertainty property fixtures",
+      "limitationsAndNonClaims": "Mocks require hosted provider confirmation."
+    },
+    {
+      "id": "HEQ-REQ-012",
+      "requirement": "Accepted terminal failure retains safe state, alert owner, threshold, retention and user repair/resend route covering provider retry horizons.",
+      "taskIds": [
+        "correct-202-ordering",
+        "qualify-final-preview",
+        "qualify-production-candidate"
+      ],
+      "directObservable": "One failed safe identity appears in retained state, alert and repair procedure.",
+      "expectedPostcondition": "Failure remains visible and repairable after logs expire.",
+      "falseGreenRejected": "Terminal error log without state or alert.",
+      "focusedCommandOrProcedureOwner": "Monitoring and incident runbooks",
+      "evidenceOwner": "Failure packet",
+      "limitationsAndNonClaims": "Does not guarantee user action."
+    },
+    {
+      "id": "HEQ-REQ-013",
+      "requirement": "Production qualification follows accepted identical Preview proof, repeats fresh function/duration/Workflow/provider readback and runs one controlled journey per active provider.",
+      "taskIds": ["qualify-production-candidate"],
+      "directObservable": "Fresh Production tuple equals final Preview and every active provider has a separate journey.",
+      "expectedPostcondition": "No unqualified candidate or provider is accepted.",
+      "falseGreenRejected": "Historical Production receipt or one provider standing for another.",
+      "focusedCommandOrProcedureOwner": "Deploy, Sendblue and Photon runbooks",
+      "evidenceOwner": "New Production and messaging packets",
+      "limitationsAndNonClaims": "Controlled observation window only."
+    },
+    {
+      "id": "HEQ-REQ-014",
+      "requirement": "Hosted tasks define rollback deployment/config, drain, quarantine, in-flight Eve-run handling, alerts, stop conditions and recovery readback without clearing replay state or uncertain writes.",
+      "taskIds": ["qualify-final-preview", "qualify-production-candidate"],
+      "directObservable": "Rollback checklist resolves every named identity, trigger and postcondition.",
+      "expectedPostcondition": "Rollback is safe for replay state and compatible in-flight runs.",
+      "falseGreenRejected": "Previous alias exists.",
+      "focusedCommandOrProcedureOwner": "Deploy and incident-revocation runbooks",
+      "evidenceOwner": "Rollback packet",
+      "limitationsAndNonClaims": "This ledger grants no rollback authority."
+    },
+    {
+      "id": "HEQ-REQ-015",
+      "requirement": "All changed boundaries use canonical Effect Schema, branded identities, tagged errors, Config/Redacted, services, Layers, Scope/Fiber/Exit/Match and flat lazy Effects with no forbidden escapes.",
+      "taskIds": [
+        "add-handoff-observability",
+        "correct-202-ordering",
+        "set-and-readback-timeouts"
+      ],
+      "directObservable": "Focused source/fixture audit and policy gates have no unexplained finding.",
+      "expectedPostcondition": "The handoff remains narrow, typed and composable.",
+      "falseGreenRejected": "Typecheck alone or raw Workflow wrapper.",
+      "focusedCommandOrProcedureOwner": "Effect and boundary checks plus affected tests",
+      "evidenceOwner": "Source and audit receipt",
+      "limitationsAndNonClaims": "Repository proof only."
+    },
+    {
+      "id": "HEQ-REQ-016",
+      "requirement": "Every material requirement and finding retains task, observable, postcondition, false green, procedure, evidence, limitation and non-claim fields.",
+      "taskIds": [
+        "prove-eve-owned-handoff",
+        "add-handoff-observability",
+        "correct-202-ordering",
+        "set-and-readback-timeouts",
+        "qualify-final-preview",
+        "qualify-production-candidate",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Ledger schema review finds every required field and owner.",
+      "expectedPostcondition": "No proof obligation is delegated to a broad suite.",
+      "falseGreenRejected": "A passing aggregate command.",
+      "focusedCommandOrProcedureOwner": "PRD review and jq ledger checks",
+      "evidenceOwner": "Sibling ledger",
+      "limitationsAndNonClaims": "Traceability is not execution proof."
+    },
+    {
+      "id": "HEQ-REQ-017",
+      "requirement": "One terminal five-pass audit runs after all implementation and hosted tasks; findings reopen owners and invalidate stale receipts.",
+      "taskIds": ["terminal-five-pass-audit"],
+      "directObservable": "One ordered five-pass receipt follows all dependencies.",
+      "expectedPostcondition": "Closeout reflects the final receipt-bearing state.",
+      "falseGreenRejected": "Review after each slice or stale audit.",
+      "focusedCommandOrProcedureOwner": "Terminal audit task",
+      "evidenceOwner": "Five-pass closeout receipt",
+      "limitationsAndNonClaims": "Audit grants no external authority."
+    },
+    {
+      "id": "HEQ-REQ-018",
+      "requirement": "Every external consequence has one-run authority and packets retain warm reuse, topology, shutdown, Sandbox, exactly-once, handset and platform-availability non-claims.",
+      "taskIds": [
+        "qualify-final-preview",
+        "qualify-production-candidate",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Authority envelope precedes each procedure and non-claim checklist is complete.",
+      "expectedPostcondition": "Repository access is never confused with external authority or proof.",
+      "falseGreenRejected": "Tool access, credential metadata or old approval.",
+      "focusedCommandOrProcedureOwner": "Authority register and target runbooks",
+      "evidenceOwner": "Authority receipts and packets",
+      "limitationsAndNonClaims": "External readback owns actuality."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "prove-eve-owned-handoff",
+      "title": "Pin and prove Eve-owned workflow acceptance",
+      "status": "pending",
+      "dependsOn": [],
+      "findingIds": ["HEQ-F001", "HEQ-F004", "HEQ-F007"],
+      "requirementIds": ["HEQ-REQ-003", "HEQ-REQ-010", "HEQ-REQ-016"],
+      "owningPaths": [
+        "apps/agent/package.json",
+        "bun.lock",
+        "apps/agent/agent/lib/channel/dispatch.ts",
+        "apps/agent/test/",
+        "docs/architecture/eve-agent.md"
+      ],
+      "description": "Reconcile installed Eve 0.20, pinned reference source and generated Build Output; codify the exact send/start/resume/session/turn call graph without changing runtime behaviour.",
+      "implementationNotes": [
+        "Use pinned Eve source and installed package, not generic Workflow examples.",
+        "Prove existing-session resumeHook and new-session startWorkflowPreferLatest separately.",
+        "Prove that every deliver rejection currently reaches Eve's new-session fallback and record that as a continuity risk, not accepted recovery.",
+        "Reject a second app Workflow and raw Workflow SDK service.",
+        "Treat local Build Output as preflight only."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-003",
+          "directObservable": "Focused tests and source receipt show send awaiting resumeHook or startWorkflowPreferLatest, the all-error fallback, and Eve dispatching turnWorkflow.",
+          "expectedPostcondition": "Eve is the sole durable execution owner.",
+          "falseGreenRejected": "Generic Vercel Workflow documentation or wrapper design.",
+          "focusedCommandOrProcedureOwner": "Agent check-types, test and build",
+          "evidenceOwner": "Pinned call-graph receipt",
+          "limitationsAndNonClaims": "No hosted acceptance claim."
+        },
+        {
+          "requirementId": "HEQ-REQ-010",
+          "directObservable": "Generated flow and __server configs plus route config are Schema-decoded and asserted.",
+          "expectedPostcondition": "Real entrypoints and current duration fields are known.",
+          "falseGreenRejected": "Assumed route function or Sandbox timeout.",
+          "focusedCommandOrProcedureOwner": "Agent build and packaging tests",
+          "evidenceOwner": "Generated-output fixture",
+          "limitationsAndNonClaims": "Local output may differ from a deployment."
+        }
+      ],
+      "mandatoryVerification": [
+        "Assert Eve 0.20 and the lock-resolved package source.",
+        "Assert new, successful existing, no-active fallback and non-no-active delivery-error fallback paths plus turn child workflow source.",
+        "Assert Eve createApplicationNitro, createEveVercelOptions and installed Nitro vercel.functions output ownership.",
+        "Assert generated Node 24 flow queue trigger/max and __server missing maxDuration.",
+        "Run focused agent check-types/test/build, boundaries, Effect setup and docs checks."
+      ],
+      "completionCriteria": [
+        "The exact call graph and generated entrypoints are directly proved.",
+        "No app Workflow or runtime code change is introduced.",
+        "Every claim is bounded to pinned source/local output."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "add-handoff-observability",
+      "title": "Add safe Eve handoff and Exit observability",
+      "status": "pending",
+      "dependsOn": ["prove-eve-owned-handoff"],
+      "findingIds": ["HEQ-F002", "HEQ-F003"],
+      "requirementIds": [
+        "HEQ-REQ-004",
+        "HEQ-REQ-005",
+        "HEQ-REQ-007",
+        "HEQ-REQ-015",
+        "HEQ-REQ-016"
+      ],
+      "owningPaths": ["apps/agent/agent/lib/channel/", "apps/agent/test/"],
+      "description": "Add a Schema-safe HMAC work/run fingerprint and direct prepared, send-started, send-accepted/rejected, response and Exit phases without moving acknowledgement yet.",
+      "implementationNotes": [
+        "Expose no raw session/run/provider/replay identity or message content.",
+        "Derive settlement from Fiber Exit and keep it separate from Workflow acceptance.",
+        "Keep the observer app-owned and narrow; do not expose logger/runtime clients."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-004",
+          "directObservable": "Delayed send fixture records response and acceptance ordering for one safe fingerprint.",
+          "expectedPostcondition": "Current false ordering and later corrected ordering are distinguishable.",
+          "falseGreenRejected": "Outbound result or 202 without phase timestamps.",
+          "focusedCommandOrProcedureOwner": "Agent sendblue-channel test",
+          "evidenceOwner": "Handoff observation fixture",
+          "limitationsAndNonClaims": "No Vercel persistence proof."
+        },
+        {
+          "requirementId": "HEQ-REQ-007",
+          "directObservable": "Encode/decode and forbidden-marker fixtures pass.",
+          "expectedPostcondition": "Safe correlation cannot leak data-plane values.",
+          "falseGreenRejected": "Manual redaction inspection.",
+          "focusedCommandOrProcedureOwner": "Agent tests",
+          "evidenceOwner": "Schema/leak fixtures",
+          "limitationsAndNonClaims": "Unqueried hosted logs remain unknown."
+        }
+      ],
+      "mandatoryVerification": [
+        "Prove delayed, resolved, rejected, defect and interrupted send outcomes separately.",
+        "Prove HMAC determinism within an environment and separation across keys.",
+        "Prove all forbidden fields fail Schema encoding or leak assertions.",
+        "Audit flat lazy linear Effects, boundary-only Schema decode/encode, tagged failures, live/mock Layers, and zero unsafe casts, DTO mirrors, manual readers or pass-through helpers.",
+        "Run focused agent tests and Effect/boundary checks."
+      ],
+      "completionCriteria": [
+        "Direct safe handoff and Exit observables exist.",
+        "Current 202 ordering is measurable without changing semantics.",
+        "No raw identity or runtime client escapes."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "correct-202-ordering",
+      "title": "Return 202 only after Eve durable acceptance",
+      "status": "pending",
+      "dependsOn": ["add-handoff-observability"],
+      "findingIds": ["HEQ-F002", "HEQ-F003", "HEQ-F006", "HEQ-F007"],
+      "requirementIds": [
+        "HEQ-REQ-003",
+        "HEQ-REQ-004",
+        "HEQ-REQ-005",
+        "HEQ-REQ-006",
+        "HEQ-REQ-011",
+        "HEQ-REQ-012",
+        "HEQ-REQ-015",
+        "HEQ-REQ-016"
+      ],
+      "owningPaths": [
+        "apps/agent/agent/lib/channel/eve.ts",
+        "apps/agent/agent/lib/channel/dispatch.ts",
+        "apps/agent/agent/lib/channel/replay.ts",
+        "apps/agent/test/"
+      ],
+      "description": "Await Eve send acceptance and intended-session convergence before 202, make pre-acceptance failure retryable or quarantined, and preserve replay/uncertainty semantics without adding a Workflow wrapper.",
+      "implementationNotes": [
+        "Await the existing EveChannelDispatch operation; do not expose Session or Workflow SDK into domain services.",
+        "Return a narrow Schema-owned acceptance result that distinguishes deliberate new start, intended-session resume and uncertain fallback fork without exposing raw Eve objects.",
+        "Complete inbound only after send acceptance and fence delayed/duplicate completion.",
+        "Retain waitUntil only for named non-critical post-acceptance work.",
+        "Observe uncertain provider writes before retry and retain visible terminal failure."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-004",
+          "directObservable": "Delayed send cannot produce 202 until acceptance; intended/accepted run fingerprints converge; rejection, fork or timeout produces non-2xx/quarantine and incomplete claim.",
+          "expectedPostcondition": "Every 202 has a matching accepted Eve identity and no silent continuity fork.",
+          "falseGreenRejected": "Started Fiber, registered waitUntil or different new run after resume failure.",
+          "focusedCommandOrProcedureOwner": "Agent route tests",
+          "evidenceOwner": "202 ordering fixture",
+          "limitationsAndNonClaims": "Local Eve double is not Vercel."
+        },
+        {
+          "requirementId": "HEQ-REQ-006",
+          "directObservable": "Concurrent and delayed same-ID fixtures retain 1/1/1/1/0 counts.",
+          "expectedPostcondition": "No duplicate turn/result/provider response.",
+          "falseGreenRejected": "204 or replay record alone.",
+          "focusedCommandOrProcedureOwner": "Channel vertical and route tests",
+          "evidenceOwner": "Duplicate property fixtures",
+          "limitationsAndNonClaims": "Hosted duplicate proof remains pending."
+        },
+        {
+          "requirementId": "HEQ-REQ-011",
+          "directObservable": "Eligible, ineligible, pre-effect timeout and post-effect uncertainty fixtures have exact attempt/effect counts.",
+          "expectedPostcondition": "No blind retry after uncertain effect.",
+          "falseGreenRejected": "One aggregate retry test.",
+          "focusedCommandOrProcedureOwner": "Agent and provider tests",
+          "evidenceOwner": "Retry/uncertainty fixtures",
+          "limitationsAndNonClaims": "Provider mocks are not provider truth."
+        }
+      ],
+      "mandatoryVerification": [
+        "Prove new-session and existing-session acceptance ordering separately.",
+        "Prove rejection, handoff timeout, deliberate hook-not-found fallback, non-not-found continuity fork, delayed duplicate and completion fencing.",
+        "Prove terminal failed state, alert contract and user repair route.",
+        "Audit flat lazy linear Effects, tagged Match/catch handling, canonical Schema Type/Encoded boundaries, Config/Duration policy, live/mock Layers, no unsafe casts/readers/DTO mirrors/helpers, and no second Workflow/raw client.",
+        "Run Channel/provider/agent focused matrices and repository policy gates."
+      ],
+      "completionCriteria": [
+        "202 follows Eve send acceptance and intended-session convergence in every direct fixture.",
+        "Duplicate and uncertain-side-effect properties pass independently.",
+        "Implementation is ready for timeout readback and Preview but makes no hosted claim."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "set-and-readback-timeouts",
+      "title": "Set and Preview-read back supported timeout owners",
+      "status": "pending",
+      "dependsOn": ["correct-202-ordering"],
+      "findingIds": ["HEQ-F004", "HEQ-F005"],
+      "requirementIds": [
+        "HEQ-REQ-002",
+        "HEQ-REQ-010",
+        "HEQ-REQ-015",
+        "HEQ-REQ-016",
+        "HEQ-REQ-018"
+      ],
+      "owningPaths": [
+        "apps/agent/vercel.json",
+        "apps/agent/package.json",
+        "apps/agent/test/vercel-packaging.test.ts",
+        "apps/agent/runbooks/deploy-promote.md",
+        "docs/architecture/eve-agent.md"
+      ],
+      "description": "Measure handoff and model/tool latency, read effective plan/project values, preserve the established Eve/Nitro configuration owner, set only supported durations and verify generated plus Preview values.",
+      "implementationNotes": [
+        "Preserve Eve-generated flow max and queue trigger.",
+        "Do not infer Function duration from the 30-minute Sandbox idle default.",
+        "Pinned Eve 0.20 directly creates Nitro and exposes no app-owned vercel.functions seam; do not add a guessed vercel.json functions glob or patch generated output.",
+        "If measured handoff latency requires an override, use a supported Eve application seam or a separately pinned upstream Eve change.",
+        "Keep provider/deployment values in Config.schema and cohesive stable product values in narrow constants only."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-010",
+          "directObservable": "Four-clock matrix joins measured distributions, owner, configured/effective value, plan/provider bound and Preview readback.",
+          "expectedPostcondition": "Webhook and step values are justified and only intended functions change.",
+          "falseGreenRejected": "Sandbox default, guessed glob, generated-output patch, local output or dashboard project default.",
+          "focusedCommandOrProcedureOwner": "Agent packaging test and deploy runbook readback",
+          "evidenceOwner": "Timeout decision/readback packet",
+          "limitationsAndNonClaims": "Values can change with plan/provider/Eve."
+        },
+        {
+          "requirementId": "HEQ-REQ-002",
+          "directObservable": "Immutable Preview route/function mapping reports flow and __server effective durations.",
+          "expectedPostcondition": "Deployment-specific values match the intended configuration.",
+          "falseGreenRejected": "Generated local vc-config only.",
+          "focusedCommandOrProcedureOwner": "Vercel deployment Resources/function readback",
+          "evidenceOwner": "Preview function detail",
+          "limitationsAndNonClaims": "No future deployment guarantee."
+        }
+      ],
+      "mandatoryVerification": [
+        "Measure cold/warm new-session start and existing-session resume acceptance.",
+        "Measure model/tool/provider steps independently.",
+        "Read effective project default, plan maximum and provider deadline.",
+        "Prove Eve createApplicationNitro/createEveVercelOptions and Nitro vercel.functions own exact generated output.",
+        "If an override is justified, prove a supported Eve seam changes only __server; otherwise retain the project default as an explicit blocker/decision.",
+        "Preserve flow max/trigger and read back immutable Preview functions.",
+        "Update architecture, README, runbooks, verification and rollback in the same slice."
+      ],
+      "completionCriteria": [
+        "Every timeout class has a distinct accepted owner and value or a retained blocker.",
+        "No guessed configuration or Sandbox/function conflation remains.",
+        "Preview readback matches generated intent or retains the unsupported-override blocker."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "qualify-final-preview",
+      "title": "Qualify durable Eve acceptance and interruption in Preview",
+      "status": "pending",
+      "dependsOn": ["set-and-readback-timeouts"],
+      "findingIds": [
+        "HEQ-F001",
+        "HEQ-F002",
+        "HEQ-F003",
+        "HEQ-F004",
+        "HEQ-F005",
+        "HEQ-F006",
+        "HEQ-F007"
+      ],
+      "requirementIds": [
+        "HEQ-REQ-001",
+        "HEQ-REQ-002",
+        "HEQ-REQ-004",
+        "HEQ-REQ-006",
+        "HEQ-REQ-007",
+        "HEQ-REQ-008",
+        "HEQ-REQ-009",
+        "HEQ-REQ-010",
+        "HEQ-REQ-011",
+        "HEQ-REQ-012",
+        "HEQ-REQ-014",
+        "HEQ-REQ-016",
+        "HEQ-REQ-018"
+      ],
+      "owningPaths": [
+        "apps/agent/runbooks/",
+        "docs/operations/authority-register.json",
+        "docs/verification/critical-journeys.json",
+        "docs/verification/journey-command-map.json",
+        "docs/evidence/verification/"
+      ],
+      "description": "Under one-run authority, deploy the exact isolated Preview candidate and directly correlate 202-after-send acceptance, Workflow session/turn runs, interruption/resumption, duplicate zero-effects, timeouts, logs, monitoring and rollback.",
+      "implementationNotes": [
+        "Use provider-safe run fingerprints; never retain raw Workflow inputs, outputs, run IDs or hook tokens.",
+        "Inject only an approved bounded interruption.",
+        "Use one qualification-only deliberately slow, bounded model/tool step below the accepted invocation limit; the hook is Preview-only and removed or disabled before Production.",
+        "For existing-session proof, compare intended and accepted run fingerprints and reject a newly started fallback run.",
+        "Separate workflow acceptance, turn completion, outbound provider result and handset display.",
+        "Retain failed, blocked and inconclusive packets."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-008",
+          "directObservable": "One safe fingerprint correlates acceptance mode, intended/accepted run, send acceptance, 202, session run, turn child and terminal/waiting result.",
+          "expectedPostcondition": "The exact hosted handoff is durably accepted into the intended session.",
+          "falseGreenRejected": "READY, local output, Workflow function existence or a different fallback run.",
+          "focusedCommandOrProcedureOwner": "Deploy and Workflow readback runbooks",
+          "evidenceOwner": "Preview Workflow packet",
+          "limitationsAndNonClaims": "One run/deployment only."
+        },
+        {
+          "requirementId": "HEQ-REQ-009",
+          "directObservable": "A deliberately slow bounded step is visible in the run; approved interruption resumes the same safe run from the named checkpoint to one result/effect.",
+          "expectedPostcondition": "Cross-process recovery is proved at that boundary.",
+          "falseGreenRejected": "Warm instance, Effect retry or new run.",
+          "focusedCommandOrProcedureOwner": "Preview interruption procedure",
+          "evidenceOwner": "Interruption packet",
+          "limitationsAndNonClaims": "Not all termination or platform outage modes."
+        },
+        {
+          "requirementId": "HEQ-REQ-006",
+          "directObservable": "Exact provider redelivery yields one accepted delivery, turn, result/effect and zero second response.",
+          "expectedPostcondition": "Duplicate convergence holds in Preview.",
+          "falseGreenRejected": "204 or different event.",
+          "focusedCommandOrProcedureOwner": "Provider Preview runbook",
+          "evidenceOwner": "Messaging packet",
+          "limitationsAndNonClaims": "Controlled identity/window only."
+        }
+      ],
+      "mandatoryVerification": [
+        "Attach one-run deploy, provider, Workflow-read, interruption and rollback authority.",
+        "Read exact source/config/Eve/function/duration/queue trigger/provider identities.",
+        "Prove 202-after-intended-session acceptance, Workflow run and turn child correlation.",
+        "Observe one deliberately slow bounded model/tool step in the Workflow dashboard/run.",
+        "Interrupt that approved step and prove same-run resumption plus exact duplicate zero effects.",
+        "Prove bounded clean logs, terminal monitoring/alerting and rollback readiness.",
+        "Retain repository verification for the exact pushed candidate and every packet."
+      ],
+      "completionCriteria": [
+        "One accepted Preview packet proves all named hosted boundaries or retains a non-accepted outcome.",
+        "No Production operation occurred.",
+        "All topology, warm reuse, shutdown, Sandbox, exactly-once and availability non-claims remain explicit."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "qualify-production-candidate",
+      "title": "Qualify the identical Production candidate per active provider",
+      "status": "pending",
+      "dependsOn": ["qualify-final-preview"],
+      "findingIds": ["HEQ-F006"],
+      "requirementIds": [
+        "HEQ-REQ-001",
+        "HEQ-REQ-002",
+        "HEQ-REQ-006",
+        "HEQ-REQ-007",
+        "HEQ-REQ-012",
+        "HEQ-REQ-013",
+        "HEQ-REQ-014",
+        "HEQ-REQ-016",
+        "HEQ-REQ-018"
+      ],
+      "owningPaths": [
+        "apps/agent/runbooks/deploy-promote.md",
+        "apps/agent/runbooks/sendblue.md",
+        "apps/agent/runbooks/photon.md",
+        "apps/agent/runbooks/incident-revocation.md",
+        "docs/evidence/verification/"
+      ],
+      "description": "Under separate authority, repeat fresh Production readback and one minimal controlled journey per active provider against the exact accepted Preview candidate.",
+      "implementationNotes": [
+        "Any source, lock, Eve, config, function, timeout, provider or observability drift returns to Preview.",
+        "Do not reuse the 2026-07-23 receipt.",
+        "Handset proof is required only for a named display claim.",
+        "Promotion and stable-alias readback are separate authorised stages."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-013",
+          "directObservable": "Final Preview tuple equals fresh Production tuple and every active provider has its own complete packet.",
+          "expectedPostcondition": "Production accepts no stale candidate or untested provider.",
+          "falseGreenRejected": "Historical receipt, same branch or one provider.",
+          "focusedCommandOrProcedureOwner": "Deploy, Sendblue and Photon runbooks",
+          "evidenceOwner": "New Production packet",
+          "limitationsAndNonClaims": "Bounded controlled observation only."
+        },
+        {
+          "requirementId": "HEQ-REQ-014",
+          "directObservable": "Rollback/drain/quarantine identities and monitoring are read before and after the stage.",
+          "expectedPostcondition": "Failed qualification can stop without replay-state or in-flight-run corruption.",
+          "falseGreenRejected": "Previous alias alone.",
+          "focusedCommandOrProcedureOwner": "Deploy and incident-revocation runbooks",
+          "evidenceOwner": "Production rollback detail",
+          "limitationsAndNonClaims": "No standing authority."
+        }
+      ],
+      "mandatoryVerification": [
+        "Require fresh one-run authority for every consequence.",
+        "Repeat source/config/Eve/function/duration/Workflow/provider/storage readback.",
+        "Run one journey and exact duplicate oracle per active provider.",
+        "Prove bounded clean logs, terminal monitoring and rollback readiness.",
+        "Repeat stable-alias readback only after separately authorised promotion.",
+        "Retain all historical and failed/inconclusive evidence."
+      ],
+      "completionCriteria": [
+        "A new Production packet accepts or retains a non-accepted result.",
+        "Every active provider has a direct journey and duplicate oracle.",
+        "No Preview or historical actuality is represented as current Production truth."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "terminal-five-pass-audit",
+      "title": "Run one terminal five-pass implementation audit and closeout",
+      "status": "pending",
+      "dependsOn": ["qualify-production-candidate"],
+      "findingIds": [
+        "HEQ-F001",
+        "HEQ-F002",
+        "HEQ-F003",
+        "HEQ-F004",
+        "HEQ-F005",
+        "HEQ-F006",
+        "HEQ-F007"
+      ],
+      "requirementIds": ["HEQ-REQ-016", "HEQ-REQ-017", "HEQ-REQ-018"],
+      "owningPaths": ["docs/", "apps/agent/", "packages/", "tooling/"],
+      "description": "After every implementation and hosted task is terminal, audit the final receipt-bearing state once and reopen every finding at its owner.",
+      "implementationNotes": [
+        "Pass 1: ownership and call graph.",
+        "Pass 2: Effect quality.",
+        "Pass 3: boundary and lifecycle correctness.",
+        "Pass 4: verification and adversarial coverage.",
+        "Pass 5: documentation, authority and closeout.",
+        "Do not run this terminal audit after each slice."
+      ],
+      "requirementProof": [
+        {
+          "requirementId": "HEQ-REQ-017",
+          "directObservable": "One ordered five-pass receipt is newer than all dependency evidence and records reopened owners.",
+          "expectedPostcondition": "Accepted closeout matches the final source and hosted packets.",
+          "falseGreenRejected": "Per-slice review or stale receipt.",
+          "focusedCommandOrProcedureOwner": "Terminal audit procedure and full verification",
+          "evidenceOwner": "Five-pass closeout receipt",
+          "limitationsAndNonClaims": "Audit is not external authority."
+        },
+        {
+          "requirementId": "HEQ-REQ-018",
+          "directObservable": "Authority and non-claim audit finds no standing approval or overstated topology/lifecycle claim.",
+          "expectedPostcondition": "Repository and external truth remain separated.",
+          "falseGreenRejected": "Passing checks or available credentials.",
+          "focusedCommandOrProcedureOwner": "Authority/controls/verification checks",
+          "evidenceOwner": "Closeout authority section",
+          "limitationsAndNonClaims": "External state can change after readback."
+        }
+      ],
+      "mandatoryVerification": [
+        "Run all five passes only after dependencies are terminal.",
+        "Reopen owning tasks and invalidate stale downstream receipts for every finding.",
+        "Rerun focused proof, docs, skills, authority, controls, verification and full repository verification.",
+        "Confirm exact Git/deployment/rollback identity and immutable packet digests.",
+        "Move lifecycle owners only after all reopened work is accepted."
+      ],
+      "completionCriteria": [
+        "All five passes are accepted on the final receipt-bearing state.",
+        "All stale evidence is invalidated or refreshed.",
+        "Closeout preserves all explicit non-claims and authority limits."
+      ],
+      "commitAfterPassing": true
+    }
+  ],
+  "fixtureLifecycle": [
+    {
+      "fixture": "apps/agent/test/sendblue-channel.test.ts",
+      "decision": "Change required",
+      "owner": "Direct delayed/resolved/rejected send, 202 ordering and Fiber Exit proof."
+    },
+    {
+      "fixture": "apps/agent/test/channel-vertical.test.ts",
+      "decision": "Change required",
+      "owner": "Exact same-ID one-delivery/turn/result/effect and zero-second-response proof."
+    },
+    {
+      "fixture": "apps/agent/test/channel-runtime.test.ts",
+      "decision": "Preserve",
+      "owner": "In-process runtime caching/concurrency/disposal only; never durability."
+    },
+    {
+      "fixture": "apps/agent/test/vercel-packaging.test.ts",
+      "decision": "Change required",
+      "owner": "Schema-decoded flow/__server/config entrypoints, Node runtime, trigger and duration fields."
+    },
+    {
+      "fixture": "New handoff and Workflow fixtures under apps/agent/test",
+      "decision": "Change required",
+      "owner": "Safe run fingerprint, start/resume acceptance, timeout, interruption, retry and leak properties."
+    },
+    {
+      "fixture": "2026-07-23 Preview and Production receipts",
+      "decision": "Preserve",
+      "owner": "Historical immutable evidence only."
+    },
+    {
+      "fixture": "New Preview and Production packets",
+      "decision": "Change required",
+      "owner": "Exact candidate handoff, Workflow, timeout, duplicate, provider, rollback and non-claim evidence."
+    }
+  ],
+  "journeys": [
+    {
+      "id": "BND-J13-proposed",
+      "name": "Eve durable handoff and interruption",
+      "directOracle": "202 follows matching send acceptance; same Workflow run resumes after approved interruption; exact duplicate creates no second result/effect.",
+      "falseGreenRejected": "waitUntil, Effect retry, READY, local Build Output, warm reuse or a second Workflow.",
+      "status": "proposed"
+    }
+  ],
+  "globalVerification": [
+    "bun run --filter @bundjil/channel check-types",
+    "bun run --filter @bundjil/channel test",
+    "bun run --filter @bundjil/channel build",
+    "bun run --filter @bundjil/sendblue check-types",
+    "bun run --filter @bundjil/sendblue test",
+    "bun run --filter @bundjil/sendblue build",
+    "bun run --filter @bundjil/photon check-types",
+    "bun run --filter @bundjil/photon test",
+    "bun run --filter @bundjil/photon build",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run --filter @bundjil/agent build",
+    "bun run --filter @bundjil/agent preflight:production",
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "review": {
+    "status": "accepted",
+    "reviewedAt": "2026-07-25",
+    "requiredSkill": ".agents/skills/prd-review",
+    "docsMaintainerRequired": true,
+    "supportedCorrectionsApplied": [
+      "Replaced the proposed second durable executor with the pinned Eve 0.20 Workflow lifecycle.",
+      "Traced new-session start and existing-session resume acceptance through exact Eve source.",
+      "Recorded Eve 0.20's all-delivery-error fallback and rejected a different new run as proof of existing-session continuity.",
+      "Moved the required durability boundary to 202-after-send acceptance rather than turn completion.",
+      "Separated webhook, workflow-step, Sandbox and session lifetime clocks.",
+      "Established Eve createApplicationNitro/createEveVercelOptions as the Nitro Build Output owner, preserved generated flow max/queue ownership and rejected a guessed __server source glob.",
+      "Added direct Preview Workflow run, deliberately slow bounded step, interruption/resumption, duplicate, timeout and failure-visibility proof.",
+      "Retained one terminal five-pass audit after all implementation and hosted tasks."
+    ],
+    "remainingBlockers": [
+      "Product owner must set the webhook handoff target/deadline and safety margin from active provider deadlines and measured start/resume latency.",
+      "Architecture and product owners must decide whether measured handoff latency and effective project duration justify a supported Eve configuration seam; pinned Eve 0.20 exposes none.",
+      "Architecture owner must define how an existing-session continuity fork is observed and quarantined without exposing raw Eve runtime objects.",
+      "Product and architecture owners must set model/tool step timeouts from measured latency and effective plan limits.",
+      "Provider owners must establish exact readback/idempotency handling for outcome-uncertain writes.",
+      "Hosted proof remains blocked on immutable candidates, target-owned procedures and one-run authority."
+    ],
+    "acceptance": [
+      "Every supported correction is applied to SPEC and task ledger in place.",
+      "Every requirement and task names direct proof, false green, owner and limitation.",
+      "Repository commands and current owners are verified before use.",
+      "Documentation, skills, authority, controls, verification, full repository verification and diff checks pass without external operations."
+    ]
+  }
+}
