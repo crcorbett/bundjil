@@ -456,12 +456,19 @@ it.effect(
         const deployments = yield* deploymentsService.listDeployments(
           ListVercelDeployments.make(project)
         );
+        const productionDeployments = yield* deploymentsService.listDeployments(
+          ListVercelDeployments.make({
+            ...project,
+            stage: "prod",
+          })
+        );
         return {
           projects,
           domains,
           environmentVariables,
           marketplaceBindings,
           deployments,
+          productionDeployments,
         };
       }).pipe(Effect.provide(liveLayer(client)));
       assert.strictEqual(result.projects.projects.length, 2);
@@ -484,9 +491,18 @@ it.effect(
         false
       );
       assert.strictEqual(result.deployments.deployments.length, 1);
-      assert.deepStrictEqual(deploymentCursors, [null, "123"]);
+      assert.deepStrictEqual(deploymentCursors, [null, "123", null]);
       assert.strictEqual(result.deployments.deployments[0]?.target, "preview");
       assert.deepStrictEqual(result.deployments.deployments[0]?.aliases, []);
+      assert.strictEqual(result.productionDeployments.deployments.length, 1);
+      assert.strictEqual(
+        result.productionDeployments.deployments[0]?.stage,
+        "prod"
+      );
+      assert.strictEqual(
+        result.productionDeployments.deployments[0]?.target,
+        "production"
+      );
       assert.strictEqual(
         result.environmentVariables.environmentVariables[0] !== undefined &&
           "value" in result.environmentVariables.environmentVariables[0],

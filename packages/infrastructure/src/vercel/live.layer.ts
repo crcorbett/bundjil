@@ -1000,7 +1000,11 @@ export const VercelLive = Layer.effectContext(
           deployments.push(
             ...response.body.deployments.flatMap((deployment) => {
               const target = deployment.target ?? "preview";
-              return target === input.stage &&
+              const belongsToStage =
+                input.stage === "prod"
+                  ? target === "production"
+                  : target === "preview";
+              return belongsToStage &&
                 deployment.meta.githubCommitSha !== undefined
                 ? [
                     VercelDeploymentObservationAttributes.make({
