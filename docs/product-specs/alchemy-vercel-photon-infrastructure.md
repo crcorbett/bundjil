@@ -1132,12 +1132,52 @@ worker/skill epoch or prove infrastructure effectiveness. Run
 `bun run test:harness` separately only when a harness evaluator/control
 implementation or fixture changes.
 
+## Per-task requirement proof replay
+
+Before any remaining task is accepted, replay every material SPEC requirement
+applicable to that task as an independently falsifiable proof row. Each row
+records:
+
+- the exact requirement or independently testable property;
+- the direct observable at the owning code, command, state, provider,
+  deployment, Channel, or handset boundary;
+- the expected postcondition;
+- one plausible false green that the oracle rejects;
+- the smallest focused command or authorized readback that exercises that
+  observable;
+- the earliest evidence owner and addressable artifact or receipt;
+- the observed result, limitation, non-claim, and correction when the result
+  is not accepted.
+
+The sibling task object and matching active-plan section are the canonical
+acceptance record. A broad test suite, typecheck, neighbouring assertion,
+successful command exit, Alchemy state, or another proof class may support a
+row but cannot substitute for its direct observable. Missing, indirect,
+ambiguous, stale, or inconclusive evidence keeps the owning task open or gives
+it an honest non-accepted terminal disposition.
+
+Expand compound policies into separate rows rather than accepting their
+summary label. Retry proof, where applicable, separately covers:
+
+1. eligibility by operation, status, provider contract, and outcome certainty;
+2. the exact bounded attempt ceiling;
+3. the backoff progression and provider `Retry-After`/rate-reset handling;
+4. jitter without weakening the bound;
+5. idempotent/read effects versus non-idempotent, billable, or
+   outcome-uncertain effects; and
+6. exact-identity observation after timeout before any permitted replay.
+
+Apply the same property-by-property rule to authority, adoption, isolation,
+retain/delete protection, secret custody, pagination, drift/no-op,
+partial-failure recovery, rollout, and rollback policies. One assertion for a
+compound label is proof by proxy and is rejected.
+
 ## Mandatory five-pass implementation audit
 
-Implementation has two explicit audit checkpoints: after the repository-only
-foundation and read/import slices, and again in
-`drift-ci-monitoring-and-closeout` after every remaining task has reached an
-honest terminal disposition. Both checkpoints run these five passes in order:
+The earlier repository-only checkpoint is retained historical/interim evidence
+and does not satisfy this requirement. Run one fresh formal five-pass audit in
+`drift-ci-monitoring-and-closeout`, only after every remaining task has reached
+an honest terminal disposition. Run these five passes in order:
 
 1. **Ownership and call graph:** inspect executable imports, exports, package
    ownership, Alchemy versus Vercel Git deployment ownership, Vercel and Photon
@@ -1169,12 +1209,14 @@ focused checks before that pass may succeed. Pass counts remain coordination
 data; each pass requires claim-matched evidence and corrections. After pass 5,
 run the full repository verification suite on the exact final candidate state.
 
-The 2026-07-24 checkpoint recorded in the sibling task ledger and active plan
-covers only repository-authorized commits `0a08767`, `43af287`, and `65f4d7b`
-plus its local audit correction. It is not the final SPEC audit: seven tasks
-remain behind new target-specific provider authority, beginning with
-`authorized-read-only-inventory`. The final closeout task must repeat all five
-passes against the integrated provider-authorized result.
+The earlier 2026-07-24 checkpoint recorded in the sibling task ledger and
+active plan covers only repository-authorized commits `0a08767`, `43af287`,
+and `65f4d7b` plus its local audit correction. It is not the final SPEC audit.
+Implementation later resumed with an authority-validated inventory command,
+but the first live attempt remained inconclusive after the Vercel
+current-principal read returned `403`; no accepted inventory receipt exists
+and the task remains pending. Run the formal five passes once, from scratch,
+only as the terminal closeout stage after every SPEC task is complete.
 
 ## Acceptance criteria
 
@@ -1278,7 +1320,8 @@ support every decision below.
 Future implementation must start with this SPEC and
 `alchemy-vercel-photon-infrastructure.tasks.json`, then use the repository-local
 `prd-implementer` skill. Each task must close its applicable invariant IDs and
-three risk lenses with evidence. The final task repeats the mandatory
+three risk lenses with evidence and complete the per-task requirement proof
+replay without proof by proxy. The final task runs the one fresh formal
 five-pass audit of the integrated result, reopens and corrects every finding at
 its earliest task owner, and runs full verification on the exact final state.
 It is not a comparative harness campaign. A pass, worker, command or finding

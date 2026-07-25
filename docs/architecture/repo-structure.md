@@ -187,7 +187,8 @@ plane.
   SPEC and is not an application runtime dependency;
 - owns state-safe infrastructure Schemas, Alchemy custom resources and
   providers, adoption manifests, bounded receipts, lazy credential contracts,
-  and deterministic memory Layers;
+  deterministic memory Layers, and the cross-provider sanitized inventory
+  service/artifact contract;
 - keeps root stack topology in `alchemy.run.ts` and `stacks/**`, provider
   clients private to their eventual owning adapters, and Vercel Git deployment
   ownership outside Alchemy configuration reconciliation;
@@ -199,6 +200,10 @@ plane.
   retained custom Resources. HTTP clients, response DTOs, bearer credentials,
   environment values, and Git deployment/promotion operations remain private
   or absent;
+- composes the Vercel and Photon read Layers only in the authority-validated
+  inventory executable. That command accepts exact branded target identities,
+  performs two sequential reads, persists only a Schema-encoded mode-`0600`
+  artifact, and has no provider mutation capability;
 - keeps the root stack on ignored local Alchemy state and the synthetic
   provider only. Local plan, sync, Vercel contract, and memory-adoption
   evidence is repository proof, not Vercel tenant, Photon, Preview,

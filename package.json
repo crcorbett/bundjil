@@ -66,7 +66,8 @@
     "test:boundaries": "vitest run --config tooling/vitest.config.ts",
     "test:controls": "vitest run --config tooling/vitest.config.ts tooling/control-policy.test.ts",
     "test:harness": "vitest run --config tooling/vitest.config.ts tooling/evals/harness-evaluation.test.ts",
-    "knip": "knip"
+    "knip": "knip",
+    "infrastructure:inventory": "bun run --filter @bundjil/infrastructure inventory:live"
   },
   "devDependencies": {
     "@bundjil/infrastructure": "workspace:*",

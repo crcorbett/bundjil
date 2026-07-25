@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/bundjil-read-only-inventory-authority.v1.json",
+  "title": "Bundjil read-only inventory authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "read_only" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": { "type": "array", "minItems": 2 },
+    "resources": { "type": "array", "minItems": 2 },
+    "environments": {
+      "type": "array",
+      "allOf": [
+        { "contains": { "const": "preview" }, "minContains": 1 },
+        { "contains": { "const": "production" }, "minContains": 1 }
+      ]
+    }
+  }
+}

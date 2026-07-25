@@ -9,7 +9,8 @@ receipts, and deterministic memory Layers.
 
 - `@bundjil/infrastructure` exports the owned Schema, service, receipt,
   adoption, Config, credential, synthetic Resource, provider, and deterministic
-  memory contracts without a provider client or credential escape hatch.
+  memory plus sanitized inventory contracts without a provider client or
+  credential escape hatch.
 - `@bundjil/infrastructure/testing` exports decoded fixture Effects.
 - `@bundjil/infrastructure/vercel` exports only Vercel read/import Schemas,
   named services, safe operation errors, lazy credential and live/memory
@@ -41,6 +42,14 @@ inventory with zero dedicated lines. The Alchemy harness proves exact
 read/import adoption and destructive denial with zero provider writes; it is
 not Photon state or billing proof.
 
+The live inventory executable is the only place that composes both provider
+read Layers. It validates the fixed authority envelope and the narrower
+read-only Preview/Production policy before resolving credentials, decodes one
+`InfrastructureCommandInput`, performs two sequential reads, writes one
+mode-`0600` Schema-encoded artifact, and emits one bounded receipt. It contains
+no provider write operation. A blocked or absent artifact establishes no
+current provider state.
+
 ## Commands
 
 Run from the repository root:
@@ -49,6 +58,7 @@ Run from the repository root:
 bun run --filter @bundjil/infrastructure check-types
 bun run --filter @bundjil/infrastructure test
 bun run --filter @bundjil/infrastructure build
+bun run infrastructure:inventory
 bun alchemy plan --stage preview
 bun alchemy deploy --stage preview --yes
 bun alchemy sync --stage preview --dry-run
@@ -57,3 +67,9 @@ bun alchemy sync --stage preview --dry-run
 The Alchemy commands currently exercise only the deterministic synthetic
 offline resource. They are repository/local-state proof, not provider,
 deployment, Preview, Production, or authority proof.
+
+`infrastructure:inventory` additionally requires the accepted task-scoped
+authority file, source/principal identities, exact Vercel team/project scope,
+and the redacted Vercel and Photon credential configuration named by
+`scripts/inventory-live.ts`. Follow the Vercel and Photon runbooks; never put
+credential values on stdout or commit ignored `tmp/proof/**` artifacts.

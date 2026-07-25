@@ -45,6 +45,42 @@
     "Implementation quality: the SPEC boundary-codec matrix is complete; canonical Schema Type/Encoded contracts, owner-qualified branded identities, named literal discriminants, Config.schema with Redacted secrets, named request/result service operations, safe tagged errors, flat sequential Effects, explicit live/memory Layers, and no raw clients, primitive semantic strings, generic callbacks, unsafe casts, manual JSON/DTO readers, double decoding, unencoded writes, or helper sprawl.",
     "Verification coverage: codec round trips and malformed ingress, cross-brand compile failures, provider fakes, and Alchemy lifecycle tests cover read/diff/reconcile/delete/list, import, adoption, no-op, native sync drift, create/update/replace plan classifications, timeout-after-write, partial failure, retain/delete protection, secret leakage, provider readback, deployment proof, and separately bounded Channel/handset proof."
   ],
+  "taskAcceptanceProofContract": {
+    "appliesTo": "Every remaining task before accepted/completed status or an honest non-accepted terminal disposition.",
+    "recordOwner": "The task object's requirementProofReplay evidence plus the matching section in docs/exec-plans/active/alchemy-vercel-photon-infrastructure.md.",
+    "requirementUnit": "Every material SPEC requirement applicable to the task and every independently falsifiable property inside a compound policy.",
+    "requiredFields": [
+      "exact requirement or property",
+      "direct observable at the owning boundary",
+      "expected postcondition",
+      "plausible false green rejected",
+      "smallest focused command or authorized readback",
+      "earliest evidence owner and addressable artifact or receipt",
+      "observed result",
+      "limitations, non-claims and correction"
+    ],
+    "compoundPolicies": {
+      "retry": [
+        "eligibility by operation, status, provider contract and outcome certainty",
+        "exact bounded attempt ceiling",
+        "backoff progression and Retry-After or rate-reset handling",
+        "jitter without weakening the bound",
+        "idempotent or read effects versus non-idempotent, billable or outcome-uncertain effects",
+        "exact-identity observation after timeout before any permitted replay"
+      ],
+      "other": [
+        "authority identity, scope, operation, environment, expiry, revocation and readback",
+        "adoption identity, manifest digest, no-provider-write behavior and state persistence",
+        "Preview and Production credentials, state, manifests, projects and namespaces",
+        "retain, delete protection, permitted cleanup identity and missing-is-success",
+        "secret ownership variant, custody, revision, resolution edge and leak absence",
+        "pagination continuation, termination, duplication and ambiguity",
+        "desired-state no-op, provider drift observation, repair and repeated convergence",
+        "partial-failure classification, recovery identity, duplicate prevention and rollback"
+      ]
+    },
+    "acceptanceRule": "Broad-suite success, typechecking, a neighbouring assertion, command exit zero, Alchemy state or a different proof class cannot prove a row by proxy. Missing, indirect, ambiguous, stale or inconclusive evidence keeps the task open or gives it an honest non-accepted terminal disposition."
+  },
   "globalVerification": [
     "bun run check:effect-setup",
     "bun run check:boundaries",
@@ -248,6 +284,12 @@
         "HC-EVIDENCE-001"
       ],
       "description": "Under new target-specific read authority, run metadata-only Vercel and Photon inventory for Preview and Production, resolve exact physical identities and isolation, and produce sanitized manifests. Do not create, update, delete, rotate, deploy, promote, or send.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's authorized inventory section.",
+        "currentResult": "inconclusive: repository observables passed, but no accepted direct provider receipt exists; the task remains pending."
+      },
       "implementationNotes": [
         "Resolve the current authenticated principal, Vercel team/projects, environment targets/types, domains, integration/configuration/resource/database IDs, deployment/protection metadata, Photon project/platform/service/users/webhooks/lines/billing, and current Preview/Production credential ownership.",
         "Use the target-owned Vercel and Photon runbooks and stop on identity, scope, permission, ambiguity, unavailable readback, or secret-output risk.",
@@ -256,6 +298,7 @@
         "Generate canonical observed-manifest hashes and explicit adopted-versus-rollout-created classifications where evidence exists. The CLI decodes one InfrastructureCommandInput, services receive decoded branded identities only, and the artifact writer encodes one sanitized inventory/manifest receipt before persistence."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; broad-suite or neighbouring proof cannot accept the task.",
         "The read-only authority envelope validates against the fixed embedded contract before execution. Readback receipts validate as InfrastructureBoundedReceipt.Encoded and bind principal, target, stage, operation, observedAt, exact safe physical IDs/fingerprints, source SHA, limitations, non-claims, and zero writes.",
         "A second inventory read produces the same canonical manifest or a classified drift result.",
         "Boundary evidence names every codec Type/Encoded pair and exact decode/encode adapter used by the live command; leak and boundary audits reject raw CLI strings, manual JSON, cross-stage/provider brand mixing, double decoding and unencoded artifact writes.",
@@ -266,6 +309,38 @@
         "Preview and Production resource inventories are complete enough to build exact adoption manifests or explicitly list the unresolved readbacks that block adoption.",
         "No provider or deployment mutation occurred, and historical receipts were not promoted to current truth."
       ],
+      "repositoryImplementationEvidence": [
+        "Added the root infrastructure:inventory command and private package executable. The CLI decodes one InfrastructureCommandInput, validates the exact embedded authority-envelope JSON Schema plus the stricter read-only two-stage task policy, resolves redacted provider Config only after validation, and composes the existing Vercel and Photon live Layers through one named InfrastructureInventory service.",
+        "InfrastructureInventoryTarget owns branded Vercel team/project and Photon project identities. InfrastructureObservedManifest and InfrastructureInventoryArtifact own Type/Encoded contracts, canonical ordering, a SHA-256 manifest digest, source/principal identity, a literal zero-write field, a mode-0600 artifact writer and InfrastructureBoundedReceipt encoding. The Photon artifact projection excludes project name/slug, phones, assigned numbers, webhook queries, secrets, raw responses and account data.",
+        "Focused repository proof passes infrastructure typecheck, 14 Vitest contract/memory/authority/leak tests, 11 Alchemy lifecycle tests and the package build. Full bun run verification passed on the exact candidate with the documented process-only synthetic Executor configuration and no Executor request. The fixed authority fixture rejects mutation access and missing Production scope; memory composition rejects missing or duplicate exact Vercel project identities and the encoded artifact omits phone, Photon project-name and secret sentinels."
+      ],
+      "executionAttempt": {
+        "status": "inconclusive",
+        "observedAt": "2026-07-24T21:48:14.000Z",
+        "authorityReceipt": "Ignored tmp/proof/alchemy-inventory-authority.json validated against the fixed embedded authority contract before provider discovery. Closeout inspection then found its filesystem mode was 0644 rather than the Photon runbook's required 0600, so the discovery is not accepted proof. The mode was corrected to 0600 for a future rerun and the executable now checks mode and bounded size before credential resolution.",
+        "evidence": [
+          "Authenticated read-only discovery located the candidate Bundjil Vercel team and the existing bundjil-agent and bundjil-codex-proxy project identities. The generic connector was rejected as the retained inventory path after its deployment response included account metadata outside the accepted projection; none of that raw response was persisted in the repository.",
+          "Photon CLI authentication was fingerprinted without printing the principal. Metadata-only structural reads observed one project, two shared-user records and zero dedicated lines; platform and billing response shapes were available. These CLI observations were not promoted into the manifest because they did not traverse the new owning inventory codec and webhook readback was not completed.",
+          "The mode-0600 local Vercel auth cache was present, but its bearer returned HTTP 403 on the mandatory current-principal read. The command stopped on permission/identity readback before any accepted Preview or Production manifest or bounded receipt was created. No refresh, credential change, provider write, deployment, promotion, webhook mutation, message, billable action, push or merge occurred."
+        ],
+        "unresolvedReadbacks": [
+          "Current Vercel authenticated principal and usable inventory credential",
+          "Schema-owned Vercel environment, domain, Marketplace, deployment and protection inventory for both targets",
+          "Schema-owned Photon project, platform/service, user, webhook, line and billing inventory plus exact Preview/Production credential custody",
+          "Whether a separate Free Photon Preview project is available without creating one",
+          "Two matching canonical live manifest digests and a Schema-valid receipt"
+        ],
+        "downstream": "The task remains pending and remote-state-and-noop-adoption remains blocked. The terminal five-pass audit has not occurred and belongs only to drift-ci-monitoring-and-closeout after every SPEC task reaches an honest terminal disposition."
+      },
+      "implementationImprovementAudit": {
+        "requiredPasses": 3,
+        "completedPasses": 3,
+        "evidence": [
+          "Pass 1 - ownership and call graph: applications still do not import infrastructure; the root/package executable alone composes private Vercel and Photon read Layers; Vercel Git retains deployment/promotion ownership; the command has no mutation operation and treats the shared Photon project as observation-only.",
+          "Pass 2 - implementation quality: source uses owner Schemas and brands, named Context.Service and Effect operations, Config.schema/Redacted credentials, fixed JSON-Schema authority validation, complete provider projections, Schema-encoded artifact/receipt writes and explicit Layers. Focused scans found no exported raw client/callback, unsafe cast, manual provider JSON reader/mapper, switch/instanceof policy, primitive semantic service signature or helper/common/utils sprawl.",
+          "Pass 3 - verification coverage: focused typecheck, 14 Vitest tests, 11 Alchemy provider tests, build, Effect language-service diagnostics and full repository verification passed with the documented process-only synthetic Executor configuration. The repository matrix covers fixed/task authority rejection, exact and duplicate target matching, deterministic canonicalization, artifact round trip, cross-provider memory composition, zero writes and leak sentinels. Closeout found and corrected the ignored authority file's 0644 mode; the live command now rejects non-0600 or oversized authority files before credentials. Live proof remains inconclusive because that precondition defect invalidated the discovery evidence and the Vercel principal read returned 403 before the receipt-bearing command could run."
+        ]
+      },
       "commitAfterPassing": false
     },
     {
@@ -281,6 +356,12 @@
         "HC-EVIDENCE-001"
       ],
       "description": "Choose and separately authorize a dedicated remote Alchemy state backend, model managed versus observed-unknown secret references, and adopt existing Preview then Production resources one class at a time with provider writes disabled.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's remote-state/adoption section.",
+        "currentResult": "not_run: blocked by authorized-read-only-inventory."
+      },
       "implementationNotes": [
         "If Cloudflare.state() is chosen, use a Bundjil-specific stack/backend identity and scoped credentials; never reuse the site state or token.",
         "Implement owner-specific lazy SecretReference resolution for secrets that already have a proved custody owner. Mark unrecoverable write-only values observed-unknown; do not fabricate pre-Alchemy revisions or call Vercel value-decryption endpoints.",
@@ -290,6 +371,7 @@
         "Stop on any unintended create, replacement, delete, provider write, secret value in state, changed manifest hash, or adoption of an observed-unknown value as if it were managed."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; broad-suite or neighbouring proof cannot accept the task.",
         "A desired-state plan is no-op and two consecutive alchemy sync --dry-run results are unchanged at the same provider snapshot for Preview and Production.",
         "The remote-state/adoption authority envelope and every bounded receipt validate against the fixed embedded contracts before execution or persistence; valid structure does not substitute for approval.",
         "Adoption tests reject wrong stage, wrong physical ID, changed observed digest, renamed logical ID, missing retain policy, and any secret-bearing state.",
@@ -317,6 +399,12 @@
         "HC-EVIDENCE-001"
       ],
       "description": "Under separately approved Preview write authority, enable the smallest reversible Vercel project-setting and environment-metadata resource, observe convergence, induce safe drift, reconcile it, and prove that deployment remains owned by Vercel Git.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Preview Vercel spike section.",
+        "currentResult": "not_run: blocked by remote-state-and-noop-adoption."
+      },
       "implementationNotes": [
         "Select non-secret Preview-only configuration with a recorded before value and safe rollback. Do not begin with Production, domains, Marketplace, auth tokens, or provider secrets.",
         "Plan, approve, apply, and prove sync dry-run unchanged. Under a separately enumerated direct-provider drift operation in the same authority receipt, induce one safe drift, detect it with sync --dry-run, repair it with approved sync, and restore the accepted state.",
@@ -325,6 +413,7 @@
         "Capture latency, API attempts, plan readability, drift precision, recovery effort, and operator attention for the effectiveness scorecard."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; expand retry eligibility, bound, backoff, jitter, effect certainty and observation-after-timeout separately.",
         "Provider tests for the exercised resource already cover no-op, reconcile update, sync drift detection/repair, timeout-after-write, eventual consistency, retain, and rollback.",
         "The exact Preview read/write/drift authority envelope validates before execution, the infrastructure journey has one stable critical-journey ID, and the receipt validates against the fixed bounded-receipt contract plus the repository proof packet.",
         "The live adapter proves encoded request and complete-envelope decode at the exact Vercel boundary; provider readback, Alchemy Attributes and the bounded receipt use their canonical branded Type/Encoded contracts with no cross-stage or cross-resource identity conversion.",
@@ -356,6 +445,12 @@
         "HC-EVIDENCE-001"
       ],
       "description": "Only after a separate Photon Preview project and an owner-specific PhotonWebhookBindingSink/cutover path are approved, adopt or create one synthetic Free shared user and one Preview webhook, prove timeout/partial-failure recovery and signed ingress, then exercise retain-safe cleanup. If either isolation or binding custody is unavailable, record the spike as blocked and perform no shared-project write.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's isolated Photon Preview section.",
+        "currentResult": "not_run: blocked by remote-state adoption, Preview Vercel proof, Photon isolation and binding custody."
+      },
       "implementationNotes": [
         "Require a separate Preview project, Free shared service, zero dedicated lines, isolated credentials, synthetic approved user, Preview callback, and rollback identities.",
         "Implement PhotonWebhookBindingSink as a named owner-specific service with one decoded PhotonWebhookBindingWrite request Type, one safe SecretReference result Type, safe tagged errors, and live/memory Layers. Its adapter encodes the sink request and decodes any acknowledgement; it must not expose a generic secret callback, naked URL/ID/value parameter, raw provider result, or signing value.",
@@ -365,6 +460,7 @@
         "Never create/delete a dedicated line, mutate billing, reuse Production user/credential/namespace, or send outside the approved proof conversation."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; expand retry eligibility, bound, backoff, jitter, effect certainty and observation-after-timeout separately.",
         "Authenticated management readback proves project, service, platform, stable user/webhook IDs, zero dedicated lines, and separate Preview credentials without exposing phone or secret values.",
         "The exact Photon Preview authority envelope validates before execution, the isolated reconciliation/signed-ingress journey has one stable critical-journey ID, and each receipt validates against the fixed bounded-receipt contract plus the repository proof packet.",
         "A forced memory-provider timeout-after-write and state-partial-failure test recovers by observation and never creates a duplicate.",
@@ -395,6 +491,12 @@
         "HC-DEPENDENCY-001"
       ],
       "description": "After the Preview spikes pass, enable approved env metadata and already-custodied value-revision ownership, exact Marketplace/Upstash binding observation, inter-service URL ownership, and deployment observations without creating data stores, rotating the single shared bearer, or promoting deployments.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's stable bindings section.",
+        "currentResult": "not_run: blocked by the Preview spikes."
+      },
       "implementationNotes": [
         "Derive the exact env inventory from every Config owner and Vercel readback; remove no key based only on a stale README or alias.",
         "Resolve only the Managed SecretOwnership variant at reconcile time and compare branded revisions without values. Keep ObservedUnknown metadata-only and branch exhaustively over Managed, ObservedUnknown, and Absent rather than optional strings/booleans.",
@@ -404,6 +506,7 @@
         "Require a new immutable Vercel deployment after env changes and observe it; promotion remains runbook-owned."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; broad-suite or neighbouring proof cannot accept the task.",
         "Memory tests cover managed secret revision no-op/update, observed-unknown rejection, single-bearer rotation rejection, partial one-project failure, deployment-required result, Marketplace ambiguity, and data-store retain.",
         "Every binding read/write uses a validated task-scoped authority envelope and produces a fixed-contract bounded receipt; the immutable deployment remains a distinct repository proof-packet observation.",
         "Codec/typecheck tests cover env/binding/secret-state request-result round trips, malformed encoded secret ownership, cross-target/project/database/prefix/revision brand rejection, exact provider request encoding and complete readback decoding.",
@@ -429,6 +532,12 @@
         "HC-EVIDENCE-001"
       ],
       "description": "Under new Production authority, run a zero-replacement plan, apply only previously accepted stable configuration classes, require provider readback plus sync --dry-run unchanged, let Vercel build a Production candidate, and use app-owned runbooks for proof and promotion.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Production rollout section.",
+        "currentResult": "not_run: blocked by stable Preview bindings and deployment observation."
+      },
       "implementationNotes": [
         "Bind immutable main SHA, state revision, adoption manifest, Vercel/Photon principals, current rollback deployments, and approved operation list.",
         "Reject project/domain/store/webhook/user replacement, any delete, Photon project/line/billing mutation, DNS write, secret rotation outside an approved group, or ambiguous readback.",
@@ -437,6 +546,7 @@
         "Retain previous deployments, env revisions, Photon webhook, users, projects, stores, and state until rollback expiry."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; expand retry eligibility, bound, backoff, jitter, effect certainty and observation-after-timeout separately.",
         "The approved Production plan contains no unapproved create, replacement, delete, database operation, domain move, Photon project/line/billing change, or secret disclosure.",
         "The exact Production authority envelope validates before execution, each Production journey uses a stable critical-journey ID, and every infrastructure/provider/deployment/Channel receipt validates against its owning fixed/repository contract without merging proof classes.",
         "Provider readback proves the exact stable resources; Vercel deployment proof binds source/config; app runbooks separately prove health/auth/Channel behavior and promotion.",
@@ -468,7 +578,13 @@
         "HC-EVIDENCE-001",
         "HC-LIFETIME-001"
       ],
-      "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and repeat the mandatory five-pass audit after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
+      "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and run one fresh formal five-pass audit after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
+      "requirementProofReplay": {
+        "status": "required_before_acceptance",
+        "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract before the one fresh terminal five-pass audit.",
+        "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's terminal closeout section.",
+        "currentResult": "not_run: terminal closeout is blocked by every earlier pending task."
+      },
       "implementationNotes": [
         "PR CI runs repository checks, provider-memory tests, a read-only Preview plan, and native sync --dry-run. Protected Preview/Production apply jobs remain separate and approval-gated.",
         "Scheduled drift wraps native sync --dry-run with read-only credentials, produces sanitized classified findings, and never auto-applies. Route any future repair automation through controls admission.",
@@ -476,9 +592,10 @@
         "Update docs/architecture/repo-structure.md, effect-patterns.md, testing-and-quality.md, README.md, packages/infrastructure/README.md, packages/photon/README.md, affected app READMEs, target app runbooks, authority/control/automation registers, verification contracts/templates, current plan, and supporting research at their earliest owners. Recompute the tracked docs/README inventories; if paths or a declared harness trigger changed, create a dated successor/correction receipt and update docs/documentation-audit/README.md without rewriting historical HGI evidence.",
         "For every provider fixture, record create/update/retain/retire lifecycle, owning package path, upstream review trigger, malformed/compatibility case, and the negative test that prevents stale reuse.",
         "Validate added critical journeys, bounded receipts, task-scoped authority envelopes, and scheduled controls against the four fixed embedded harness Schemas and their current repository owners; do not substitute free-form Markdown or duplicate field shapes.",
-        "After every remaining task has reached an honest terminal disposition, repeat the SPEC's mandatory five-pass audit in order: (1) ownership and call graph, (2) Effect and provider implementation quality, (3) lifecycle/state/security correctness, (4) verification and adversarial coverage, and (5) documentation/authority/closeout. Record exact evidence and corrections for each pass; every finding reopens its earliest owning task and blocks that pass until corrected and reverified. This is not a comparative harness campaign; open a new epoch only if a later claim concerns worker/harness effectiveness."
+        "After every remaining task has reached an honest terminal disposition, run the SPEC's one fresh formal five-pass audit in order: (1) ownership and call graph, (2) Effect and provider implementation quality, (3) lifecycle/state/security correctness, (4) verification and adversarial coverage, and (5) documentation/authority/closeout. Record exact evidence and corrections for each pass; every finding reopens its earliest owning task and blocks that pass until corrected and reverified. This is not a comparative harness campaign; open a new epoch only if a later claim concerns worker/harness effectiveness."
       ],
       "mandatoryVerification": [
+        "Populate the requirementProofReplay evidence property-by-property for every applicable material SPEC requirement using a direct observable, expected postcondition, plausible false green, focused command/readback and exact evidence owner; broad-suite or neighbouring proof cannot accept the task.",
         "Native sync fixtures cover unchanged normalization, unowned resource, missing resource, in-place drift, destructive drift, unavailable/ambiguous readback, unknown secret revision, skipped provider read, and deployment drift.",
         "Workflow policy proves PR jobs cannot apply, Preview cannot target Production, scheduled drift is report-only, and protected apply requires exact authority.",
         "Any scheduled drift control validates against the fixed control-record contract and the repository control/automation owner, including signal, durable state, authority, convergence, proof per run, bounded failure, repair, cost, review trigger, stop/rollback, retirement, and disconfirming evidence.",

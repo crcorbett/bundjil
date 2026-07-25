@@ -46,9 +46,17 @@ accepted memory topology is Free/shared with zero dedicated lines. Neither
 live Layer is wired and no project credential or provider state was read. The
 full repository gate passed, and the adversarial closeout extended the shared
 bounded retry policy across every Photon HTTP read before focused Photon and
-infrastructure checks passed again. The next task is
-`authorized-read-only-inventory`; it remains pending until a separate current
-authority permits credential access and Vercel/Photon tenant reads.
+infrastructure checks passed again. `authorized-read-only-inventory` is now
+the current task. A fixed-schema read-only authority envelope permitted one
+bounded Preview/Production inventory attempt. The repository command and
+memory proof are implemented, but the live attempt is inconclusive. Closeout
+found that the ignored authority file used for discovery had mode `0644`, so
+that discovery is not accepted proof; it was corrected to `0600`, and the
+command now enforces mode and size before resolving credentials. The
+mode-`0600` cached Vercel bearer separately returned `403` on the mandatory
+current-principal read. No accepted manifest or receipt exists and downstream
+adoption remains blocked. No credential refresh or provider/deployment
+mutation was attempted.
 
 ## Accepted planning evidence
 
@@ -57,6 +65,50 @@ authority permits credential access and Vercel/Photon tenant reads.
 | Ownership and call graph | Reviewed `origin/main` at `61992a2`, which contains Photon merge `23ae79b`, the harness-aligned proposed Eve runtime ownership SPEC, and the embedded structured harness contract. `@bundjil/infrastructure` is private tooling; `@bundjil/photon` remains the management transport owner; Vercel Git and app runbooks retain deployment authority.                                                                                |
 | Implementation quality   | The SPEC requires actual Alchemy v2 reconcile semantics, lazy credential services, a complete boundary matrix naming each codec `Type`/`Encoded` and single decode/encode owner, owner-qualified branded identities, named literal discriminants, `Config.schema`/`Redacted`, named request/result services, safe errors, constant live/memory Layers, flat Effects, and no generic client/helper sprawl.                          |
 | Verification coverage    | The sibling ledger requires codec round trips and malformed ingress, cross-brand compile failures, adoption, desired-state no-op, native sync drift, timeout-after-write, partial-failure, retain/delete-protection/leak tests, provider readback, deployment proof, Channel/handset proof separation, fixed structured artifact validation, stable invariant evidence, fixture lifecycle, and one fresh independent final review. |
+
+## Per-task requirement proof replay
+
+Every pending task must populate its `requirementProofReplay` record before
+acceptance. Each material SPEC requirement and each independently falsifiable
+property inside a compound policy receives one row with the direct observable,
+expected postcondition, plausible false green, smallest focused
+command/authorized readback, earliest evidence owner, observed result,
+limitations/non-claims and any correction. Broad-suite success, typechecking,
+a neighbouring assertion, command exit zero, Alchemy state, or another proof
+class cannot satisfy a row by proxy.
+
+For retry-capable operations, separate rows prove eligibility, bounded
+attempts, backoff, provider rate-delay handling, jitter, idempotent/read versus
+non-idempotent/billable/uncertain effects, and exact-identity observation after
+timeout before replay. Apply the same property expansion to authority,
+adoption, isolation, retain/delete protection, secret custody, pagination,
+drift/no-op, partial failure, rollout and rollback.
+
+The current `authorized-read-only-inventory` replay is incomplete. Repository
+observables prove the command's fixed authority decoder, mode/size preflight,
+canonical codecs, zero-write call graph, memory composition, leak exclusions
+and verification gates. They do not prove the direct provider requirements:
+the initial authority-file mode invalidated discovery, the Vercel principal
+read returned `403`, and no receipt-bearing Preview/Production inventory or
+matching second digest exists. The task therefore remains pending.
+
+### Requirement-proof hardening impact ledger
+
+| Surface                           | Status          | Decision, owner, observable and non-claim                                                                                                                                                                                                                                              |
+| --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan | Change required | The SPEC owns the proof-by-proxy prohibition and property expansion; every pending task owns a required replay record; this plan owns current execution status. `check:docs`, JSON decoding and exact task-record inspection must pass. This does not complete any provider task.      |
+| Architecture and docs router      | Preserve        | `docs/README.md` and routed architecture already distinguish repository, provider, deployment and runtime proof. No durable executable boundary changes in this documentation-only hardening slice.                                                                                    |
+| Root, app and package READMEs     | Preserve        | No command, export, package purpose, app route or public contract changes. Existing README pointers remain accurate.                                                                                                                                                                   |
+| Exports and generated references  | Preserve        | No source, export, generated contract or boundary exception changes.                                                                                                                                                                                                                   |
+| Runbooks and authority            | Preserve        | Target-owned procedures and authority envelopes remain the operation owners. The replay records evidence requirements and grants no read, write, credential, deployment, promotion or Production authority.                                                                            |
+| Verification journeys and proof   | Preserve        | Existing journey/receipt Schemas remain canonical. Future task rows must point to their direct observable and owning receipt; this slice creates no provider, deployment, Channel or handset evidence.                                                                                 |
+| Skills and `AGENTS.md`            | Preserve        | Current repository-local PRD implementer and docs-maintainer rules already route task acceptance and proof ownership. The prepared current-main hardening was applied to this SPEC's earliest intent owners without copying a second generic policy into skills or agent instructions. |
+| Lint, config, commands and CI     | Preserve        | No executable check or workflow changes. Focused docs/JSON checks and the full repository gate verify source consistency only.                                                                                                                                                         |
+| Schemas, services and Layers      | Preserve        | No runtime Schema, Service, Layer or provider implementation changes. Future proof rows must observe these owners directly when their requirement is exercised.                                                                                                                        |
+| Tests and fixtures                | Preserve        | No fixture changes in this documentation-only slice. Future task acceptance must add or strengthen the smallest direct negative test when an existing assertion only proves a neighbour or compound summary.                                                                           |
+| Receipts and evidence             | Change required | Task objects and matching plan sections become the acceptance-accounting owners. Actual external observations still require the fixed bounded receipt and repository proof owner; prose rows alone are not evidence.                                                                   |
+| Rollout, rollback and lifecycle   | Preserve        | No rollout occurred. Local rollback is reversion of this documentation slice. Pending tasks and the active lifecycle remain unchanged.                                                                                                                                                 |
+| Archive pointers and formal audit | Preserve        | No archive transition. The earlier repository checkpoint remains interim history. One fresh formal five-pass audit runs only in terminal closeout after all tasks reach honest dispositions; per-task replay and ordinary risk review do not multiply that audit.                      |
 
 The supporting research and first implementation slice were revalidated
 against the exact Alchemy
@@ -173,9 +225,67 @@ was queried.
 | Implementation quality   | Every public operation takes one Schema-decoded owner request and returns one Schema-decoded result; credentials are lazy and redacted; provider output is decoded as one complete envelope; shared user pagination is exhaustive; stable UUIDs remain physical identities; sensitive semantic values are projected out; mutation handlers fail closed.                             |
 | Verification coverage    | Focused Photon tests cover all six read classes, malformed responses, pagination, ambiguity, rate/transient/status policy, unavailable billing, public codec round trips, memory parity, compile-time brands and leak sentinels. The Alchemy harness covers exact adoption, Free/shared service, zero dedicated lines, zero writes and explicit project/line/billing/secret denial. |
 
+## Authorized inventory implementation and inconclusive read
+
+The repository slice adds `bun run infrastructure:inventory`. The executable
+validates the fixed authority envelope and stricter read-only two-stage policy
+before credential resolution, decodes one `InfrastructureCommandInput`, passes
+only branded target Types to one named inventory service, performs two
+sequential reads, canonicalizes the result, Schema-encodes a mode-`0600`
+artifact and emits an `InfrastructureBoundedReceipt`. No provider write
+operation is present.
+
+The 2026-07-24 authority file was ignored under `tmp/proof/**` and validated
+before discovery. Closeout inspection found its filesystem mode was `0644`
+rather than the Photon runbook's required `0600`, so none of the discovery is
+accepted proof. The file was corrected to `0600` for a future rerun, and the
+command now rejects non-`0600` or oversized authority files before resolving
+credentials. Authenticated Vercel discovery located the candidate Bundjil team
+plus the existing agent and proxy projects, but the generic connector was
+rejected as an evidence path when its deployment response included account
+metadata outside the accepted projection. Photon CLI discovery was restricted
+to fingerprints and structural counts: one project, two shared-user records
+and zero dedicated lines were observed, while platform/billing shapes were
+available. Those observations were not promoted to current truth because the
+authority-file precondition failed, they did not traverse the receipt-bearing
+command and webhook readback was absent.
+
+The final command preflight then stopped: the local mode-`0600` Vercel bearer
+returned `403` on the required current-principal endpoint. Current principal,
+complete Vercel metadata, complete Photon metadata/credential custody,
+separate-Free-Preview-project availability, two manifest digests and a bounded
+receipt therefore remain unresolved. `authorized-read-only-inventory` stays
+pending; `remote-state-and-noop-adoption` stays blocked.
+
+### Authorized inventory impact ledger
+
+| Surface                             | Status          | Decision and evidence boundary                                                                                                                                                                                            |
+| ----------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan   | Change required | Record the repository command, authority, inconclusive live attempt, exact unresolved readbacks and downstream block. Keep the SPEC proposed, task pending and plan active.                                               |
+| Architecture and docs router        | Change required | Route the cross-provider inventory composition, fixed authority boundary, double read and mode-`0600` artifact through the existing package/quality owners.                                                               |
+| Root, app and package READMEs       | Change required | Add the root/package command and its non-claims. App READMEs are preserved because no app imports or invokes infrastructure.                                                                                              |
+| Exports and generated references    | Change required | Export only the owned inventory Schema/service/policy contracts from the private root package. No provider client, credential, DTO or generated reference is exposed; generated-reference work is evidenced N/A.          |
+| Runbooks and authority              | Preserve        | Existing Vercel/Photon runbooks remain operation owners. The ignored one-run authority validates the fixed contract; it grants reads only and expires with this task. No recurring authority is added.                    |
+| Verification journeys and proof     | Change required | The bounded receipt path is implemented, but no accepted live receipt exists because principal readback failed. No deployment, Channel, handset or provider-health claim is made and no historical packet is promoted.    |
+| Skills and AGENTS                   | Preserve        | PRD implementer, docs maintainer, Effect client-wrapper and package-structure rules were applied. No recurring gap requires a skill or `AGENTS.md` change.                                                                |
+| Lint, config, commands and CI       | Change required | Add root/package inventory commands, `@effect/platform-bun` development runtime and script typecheck ownership. No CI/automation admission or hosted credential is added.                                                 |
+| Schemas, services and Layers        | Change required | Add branded target/source/principal/digest contracts, sanitized manifest/artifact codecs, authority task policy, named inventory service and explicit live composition. Existing provider Layers remain transport owners. |
+| Tests and fixtures                  | Change required | Add cross-provider memory composition, fixed/task authority rejection, missing identity, canonicalization, artifact round trip, zero-write and phone/project-name/secret leak checks.                                     |
+| Receipts and evidence               | Change required | The command can write only an ignored Schema-encoded artifact and bounded receipt. The failed preflight created neither; the task ledger/plan retain the inconclusive attempt without raw account or credential data.     |
+| Rollout, rollback and lifecycle     | Preserve        | No rollout or external mutation occurred, so external rollback is N/A. Local rollback is reversion of this repository slice; adoption and later tasks remain closed.                                                      |
+| Archive pointers and terminal audit | Preserve        | The plan remains active and no completed/archive pointer changes. The prior five-pass audit remains interim; one fresh formal five-pass audit runs only at terminal SPEC closeout after all tasks complete.               |
+
+### Authorized inventory risk review
+
+| Lens                     | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph | Applications do not import infrastructure. The package executable alone composes Vercel metadata reads with Photon management reads; Vercel Git retains deployment/promotion and runbooks retain external operations. Shared Photon state remains observation-only and no mutation operation is reachable.                                                                                                                                                                                                                                      |
+| Implementation quality   | Contracts use Schema-derived Type/Encoded values, owner-qualified brands, a named Context service, Config.schema/Redacted credentials, fixed JSON-Schema authority validation, explicit Layers and Schema-encoded file/stdout writes. Photon project names/slugs, phones, assigned numbers, webhook queries, secrets, raw bodies and account metadata are absent from the artifact contract.                                                                                                                                                    |
+| Verification coverage    | Infrastructure typecheck, 14 Vitest tests, 11 Alchemy lifecycle tests, package build, Effect language-service diagnostics and full repository verification passed with the documented process-only synthetic Executor configuration. Closeout found and corrected the ignored authority file's `0644` mode; the command now rejects non-`0600` or oversized authority files before credentials. Live proof remains inconclusive because the precondition defect invalidated discovery and the Vercel `403` stopped the receipt-bearing command. |
+
 ## Repository-authorized five-pass audit
 
-This 2026-07-24 checkpoint audited the three implemented repository slices on
+This 2026-07-24 interim checkpoint audited the first three repository slices on
 `codex/alchemy-vercel-photon-infrastructure`: `0a08767`, `43af287`, and
 `65f4d7b`, based on `origin/main`
 `38a8a3f4cde7b6c519803f233b80b48f079a206d`. It is an interim audit, not the
@@ -224,8 +334,10 @@ provider authority, beginning with `authorized-read-only-inventory`.
 The plan completes only after every sibling dependency reaches an honest
 terminal disposition, the SPEC acceptance criteria are reconciled, every task
 has evidence for its applicable stable invariant IDs and three risk lenses,
-the fixed structured artifacts validate at their owning boundaries, the
-mandatory five-pass audit is repeated against the integrated result and closes
-every finding at its earliest owner, and exact Git identity and verification
-evidence are recorded. This is not a comparative harness campaign. A
-pass/worker/command count or successful local plan is not completion.
+every material requirement has a direct property-level replay with its
+false-green oracle and evidence owner, the fixed structured artifacts validate
+at their owning boundaries, the one fresh formal five-pass audit runs against
+the integrated terminal result and closes every finding at its earliest owner,
+and exact Git identity and verification evidence are recorded. This is not a
+comparative harness campaign. A pass/worker/command count or successful local
+plan is not completion.

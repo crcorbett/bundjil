@@ -20,6 +20,31 @@ export {
 } from "./adoption-manifest.js";
 export { loadInfrastructureCommandConfig } from "./config.js";
 export {
+  canonicalizeInfrastructureObservedManifest,
+  InfrastructureInventory,
+  InfrastructureInventoryArtifact,
+  type InfrastructureInventoryArtifactEncoded,
+  InfrastructureInventoryArtifactJson,
+  InfrastructureInventoryDigest,
+  type InfrastructureInventoryDigestEncoded,
+  InfrastructureInventoryLive,
+  InfrastructureInventoryPrincipalFingerprint,
+  type InfrastructureInventoryPrincipalFingerprintEncoded,
+  InfrastructureInventoryReadError,
+  InfrastructureInventoryReadMessage,
+  type InfrastructureInventoryReadMessageEncoded,
+  InfrastructureInventorySourceSha,
+  type InfrastructureInventorySourceShaEncoded,
+  InfrastructureInventoryTarget,
+  type InfrastructureInventoryTargetEncoded,
+  InfrastructureObservedManifest,
+  type InfrastructureObservedManifestEncoded,
+  PhotonInventoryProjectObservation,
+  type PhotonInventoryProjectObservationEncoded,
+  PhotonReadOnlyInventory,
+  type PhotonReadOnlyInventoryEncoded,
+} from "./inventory.js";
+export {
   SyntheticResourceDeleteError,
   SyntheticResourceReadError,
   SyntheticResourceWriteError,

@@ -19,7 +19,8 @@ does not speak for those traditions.
 - `packages/photon` owns the Photon Spectrum `ChannelTransport` implementation
   and its narrow read-only management boundary.
 - `packages/infrastructure` owns private Alchemy stack contracts, custom
-  resources, and deterministic provider lifecycle tests. Apps do not import it.
+  resources, deterministic provider lifecycle tests, and the
+  authority-validated read-only inventory command. Apps do not import it.
 - `packages/eve` owns Eve-facing Schemas and named operations.
 - `packages/codex` owns Codex subscription profile, storage, refresh, and
   private provider contracts.

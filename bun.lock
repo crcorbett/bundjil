@@ -106,13 +106,15 @@
       "name": "@bundjil/infrastructure",
       "version": "0.1.0",
       "dependencies": {
+        "@bundjil/photon": "workspace:*",
+        "@effect/platform-bun": "catalog:effect",
+        "ajv": "^8.17.1",
         "alchemy": "2.0.0-beta.64",
         "effect": "catalog:effect",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:effect",
         "@types/bun": "^1.3.14",
-        "ajv": "^8.17.1",
         "bun-types": "1.3.14",
         "typescript": "catalog:typescript",
         "vitest": "catalog:testing",

@@ -135,6 +135,12 @@ bun run --filter @bundjil/agent preflight:production
   retention and deletion-denial provider tests. The live Layers remain
   unwired; these tests establish no project, line, billing, webhook, handset,
   deployment, Preview, or Production state.
+- Authorized inventory changes additionally test cross-provider memory
+  composition, canonical ordering, repeated-read digest policy, fixed
+  authority validation, bounded receipt encoding, missing-identity stops, and
+  secret/phone leakage. Live acceptance still requires fresh
+  credential-backed readback through the target-owned runbooks; a blocked
+  credential preflight remains inconclusive.
 - Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and
