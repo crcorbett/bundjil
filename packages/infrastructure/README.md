@@ -57,9 +57,9 @@ current provider state.
 Run from the repository root:
 
 ```sh
-bun run --filter @bundjil/infrastructure check-types
-bun run --filter @bundjil/infrastructure test
-bun run --filter @bundjil/infrastructure build
+bun run --filter=@bundjil/infrastructure check-types
+bun run --filter=@bundjil/infrastructure test
+bun run --filter=@bundjil/infrastructure build
 bun run infrastructure:inventory
 bun alchemy plan --stage preview
 bun alchemy deploy --stage preview --yes
