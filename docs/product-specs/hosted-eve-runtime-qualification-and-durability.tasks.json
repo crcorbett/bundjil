@@ -637,7 +637,7 @@
     {
       "id": "set-and-readback-timeouts",
       "title": "Set and Preview-read back supported timeout owners",
-      "status": "pending",
+      "status": "blocked",
       "dependsOn": ["correct-202-ordering"],
       "findingIds": ["HEQ-F004", "HEQ-F005"],
       "requirementIds": [
@@ -704,12 +704,24 @@
         "Current Sendblue documentation retains a 45-second response window and up to three timeout or 5xx retries. No numeric Photon webhook response deadline is established; it remains a provider readback blocker.",
         "BND-J13-hosted-eve-durability now owns the authority-gated Preview acceptance, same-run interruption/resumption, duplicate-zero-effects, timeout, monitoring and rollback proof contract."
       ],
+      "blockedAt": "2026-07-25",
+      "blockingEvidence": [
+        "No deployment for candidate eb9fd67d7282e1d7675232ee4f440e8ddf76a696 exists in the returned twenty-deployment Vercel inventory; the latest observed Production deployment is older source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b.",
+        "Available read-only project and deployment metadata expose neither the effective candidate function duration nor the account plan; the connector's returned live field is not interpreted as Fluid Compute state.",
+        "Cold/warm new-session and resume acceptance, model/tool/provider distributions, Workflow run detail and interruption require an immutable Preview candidate plus target-owned deploy, provider, Workflow-read, interruption and rollback authority.",
+        "Pinned Eve 0.20 exposes no supported Bundjil-facing Nitro vercel.functions seam, so no ordinary __server override is justified before measured need and supported ownership exist.",
+        "Sendblue's current documentation supplies a 45-second response window; no numeric Photon webhook response deadline is established."
+      ],
+      "retainedEvidence": [
+        "docs/evidence/verification/details/HEQ-timeout-readback-2026-07-25.json",
+        "docs/evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json"
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "qualify-final-preview",
       "title": "Qualify durable Eve acceptance and interruption in Preview",
-      "status": "pending",
+      "status": "blocked",
       "dependsOn": ["set-and-readback-timeouts"],
       "findingIds": [
         "HEQ-F001",
@@ -794,12 +806,21 @@
         "No Production operation occurred.",
         "All topology, warm reuse, shutdown, Sandbox, exactly-once and availability non-claims remain explicit."
       ],
+      "blockedAt": "2026-07-25",
+      "blockingEvidence": [
+        "No pushed immutable Preview candidate for eb9fd67d7282e1d7675232ee4f440e8ddf76a696 exists.",
+        "No current receipt grants the exact isolated Preview deployment, provider message/readback, Workflow run-read, deliberately slow bounded step, interruption or rollback operations.",
+        "Without the candidate and authority, exact 202-to-send acceptance, intended-session continuity, session/turn run correlation, interruption/resumption, duplicate zero effects, bounded logs, monitoring and rollback cannot be observed."
+      ],
+      "retainedEvidence": [
+        "docs/evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json"
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "qualify-production-candidate",
       "title": "Qualify the identical Production candidate per active provider",
-      "status": "pending",
+      "status": "blocked",
       "dependsOn": ["qualify-final-preview"],
       "findingIds": ["HEQ-F006"],
       "requirementIds": [
@@ -859,6 +880,15 @@
         "A new Production packet accepts or retains a non-accepted result.",
         "Every active provider has a direct journey and duplicate oracle.",
         "No Preview or historical actuality is represented as current Production truth."
+      ],
+      "blockedAt": "2026-07-25",
+      "blockingEvidence": [
+        "The identical candidate has no accepted Preview packet, so Production qualification is not admissible.",
+        "No current receipt grants Production deployment, per-provider message/duplicate, monitoring, promotion or rollback operations.",
+        "The latest observed Production deployment is older source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b and the 2026-07-23 receipt remains historical only."
+      ],
+      "retainedEvidence": [
+        "docs/evidence/verification/packets/HEQ-production-qualification-blocked-2026-07-25.json"
       ],
       "commitAfterPassing": true
     },

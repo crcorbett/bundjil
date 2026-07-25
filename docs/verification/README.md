@@ -77,6 +77,15 @@ operation nor asserts present provider state.
   provider typing start/stop, rollback readiness, and zero second external
   response. Photon visible typing is observed; Sendblue visible typing remains
   unproved.
+- [`HEQ-timeout-readback-2026-07-25.json`](../evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json)
+  retains the inconclusive exact-candidate Preview timeout/readback gate:
+  local Eve/Nitro ownership and Build Output are proved, while the candidate
+  deployment, effective duration, plan, latency, Workflow, provider,
+  interruption, monitoring, and rollback results are unavailable.
+- [`HEQ-production-qualification-blocked-2026-07-25.json`](../evidence/verification/packets/HEQ-production-qualification-blocked-2026-07-25.json)
+  retains the unattempted Production gate. No accepted identical Preview or
+  Production authority exists; the observed older Production deployment and
+  2026-07-23 receipt are not candidate proof.
 
 ## Claim boundaries
 

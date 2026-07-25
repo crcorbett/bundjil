@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "production",
+  "status": "inconclusive",
+  "outcome": "not_attempted",
+  "lifecycle": {
+    "state": "inconclusive"
+  },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "identical Production candidate after accepted Preview for eb9fd67d7282e1d7675232ee4f440e8ddf76a696"
+  },
+  "candidate": {
+    "repositoryCommit": "eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+    "sourceDigest": "384dcf6ae67c901803725b7b4e388deb48aa6c6c912893c28e0c667e2c91a442",
+    "artifactDigest": "144d4b0ba708cc8da7bf2fff3731de34a50cdcda2afdff86be8c0d6d2b83df66"
+  },
+  "authority": {
+    "principal": "local repository maintainer with authenticated Vercel read-only connector",
+    "identitySource": "local Git plus connector-resolved personal Vercel team",
+    "externalAccess": "read_only",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil agent operator under a future Production receipt"
+  },
+  "environment": {
+    "tier": "production",
+    "target": "absent Production candidate for eb9fd67d7282e1d7675232ee4f440e8ddf76a696"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "blocked",
+      "oracle": "No accepted identical Preview, candidate Production deployment, per-provider journey, duplicate oracle, monitoring or rollback readback exists."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "inspect current Vercel project and latest Production deployment metadata without mutation",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Production qualification follows accepted identical Preview and fresh target-owned authority for every provider and consequence.",
+    "target": "Bundjil agent Production candidate eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+    "recoveryHint": "First accept BND-J13 in isolated Preview, then attach separate Production deploy, provider, monitoring and rollback authority.",
+    "detailPath": "docs/evidence/verification/details/HEQ-timeout-readback-2026-07-25.json",
+    "detailSha256": "262db878feac3b5cc524bb85bf925c4e3ab8995df4b15ea211573038f6a448ff",
+    "postcondition": "Production remains unchanged and unqualified; historical receipts retain only their dated scope."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "unavailable",
+    "receipt": "Latest observed Production source is 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b, not the candidate."
+  },
+  "postconditions": [
+    "No Production deployment, provider, webhook, credential, message, promotion or rollback operation occurred.",
+    "The 2026-07-23 historical Production receipt was not reused as current candidate proof.",
+    "Production remains gated on accepted identical Preview and separate current authority."
+  ],
+  "limitations": [
+    "No immutable Production candidate exists for the local commit.",
+    "No active provider has a candidate-specific Production journey or duplicate oracle.",
+    "No candidate-specific monitoring, alert, rollback or stable-alias readback exists."
+  ],
+  "nonClaims": [
+    "The current older READY deployment does not qualify this candidate.",
+    "Preview source or local Build Output cannot establish Production.",
+    "This packet grants no standing deployment, provider, promotion or rollback authority."
+  ],
+  "rollback": {
+    "identity": "current observed Production deployment dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG remains historical read-only context",
+    "outcome": "unavailable",
+    "owner": "Vercel project owner under a future target-owned receipt"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-timeout-readback-2026-07-25.json",
+      "sha256": "262db878feac3b5cc524bb85bf925c4e3ab8995df4b15ea211573038f6a448ff",
+      "provenance": "authenticated Vercel read-only metadata and exact local candidate identity"
+    }
+  ],
+  "observedAt": "2026-07-25T17:24:18Z"
+}
