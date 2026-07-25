@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 review_trigger: task status, Alchemy/provider capability, state/secret decision, authority, rollout, rollback, or proof change
 spec: ../../product-specs/alchemy-vercel-photon-infrastructure.md
 task_ledger: ../../product-specs/alchemy-vercel-photon-infrastructure.tasks.json
@@ -57,6 +57,46 @@ mode-`0600` cached Vercel bearer separately returned `403` on the mandatory
 current-principal read. No accepted manifest or receipt exists and downstream
 adoption remains blocked. No credential refresh or provider/deployment
 mutation was attempted.
+
+On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
+`65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
+merged current `origin/main` `ff73113` at `f81fba7`. The merged tree includes
+the runtime-ownership and requirement-to-proof hardening, passes the complete
+repository gate, and retains the task lifecycle above. The ignored
+mode-`0600` authority file is structurally valid but expired with its one-run
+2026-07-24 duration. Required Vercel and Photon project credential Config is
+not available in the process environment; cached Vercel identity previously
+returned `403`, while Photon CLI login is not the project ID/secret pair owned
+by the management Layer. No provider call was made during resumption.
+
+### Current-main integration and resumed authority boundary
+
+| Requirement                                              | Direct observable and expected postcondition                                                                                                                                                                                     | Plausible false green rejected                                                                                              | Focused command or readback                                                                                                                | Evidence owner and result                                                                                                                     |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preserve branch history while integrating current main   | `ff73113`, `0a08767`, `43af287` and `65f4d7b` are all ancestors of merge commit `f81fba7`; the current task remains pending                                                                                                      | Seeing the commit subjects in `git log` without proving ancestry, or selecting stale docs counts during conflict resolution | `git fetch origin`; `git merge-base --is-ancestor <sha> HEAD`; `git status --short`; normal merge of `origin/main`                         | Git graph and this plan; passed with no merge conflict                                                                                        |
+| Recompute merged documentation lifecycle                 | The merged router resolves 262 documentation files with no lifecycle or inventory finding                                                                                                                                        | Reusing the pre-merge file count or accepting a conflict side verbatim                                                      | `bun run check:docs`                                                                                                                       | `tmp/docs-policy-report.json`; passed on `f81fba7`                                                                                            |
+| Require current target-specific read authority           | The fixed harness and task Schemas accept an envelope whose principal, scope, operations, Preview/Production environments, duration, custody, readback and stops apply to this execution                                         | File mode `0600`, JSON validity or the 2026-07-24 approval being treated as perpetual authority                             | Inspect both fixed authority Schemas, ignored-file metadata/duration and `docs/operations/authority-register.json` without provider access | Task `resumptionBoundary`; blocked because the available envelope expired                                                                     |
+| Require usable credential custody without disclosure     | `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`, `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID` and `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET` are supplied only to their redacted Config boundaries; both principals succeed before resource reads | Treating a cached bearer or Photon CLI session as proof of the exact credentials required by the inventory command          | Presence-only environment check; credential-file mode/key inspection; later authorized current-principal readback                          | Owning live Layers and future bounded receipt; blocked because command Config is absent and cached Vercel principal previously returned `403` |
+| Preserve zero external mutation and honest proof classes | Resumption produces no provider request or write and makes no current-state claim; repository verification proves only the merged source state                                                                                   | A green full suite, old discovery or mock lifecycle matrix being promoted to current provider truth                         | Provider action log remains empty; `bun run verification` on the exact merged state                                                        | Task ledger and this plan; passed for repository scope only                                                                                   |
+
+### Resumption impact ledger
+
+| Surface                           | Status          | Decision and evidence boundary                                                                                                                                                                          |
+| --------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan | Change required | Record exact merge identity, expired authority, credential custody, direct observables, rejected false greens and the unchanged downstream block. Keep the SPEC proposed, task pending and plan active. |
+| Architecture and docs router      | Preserve        | Current-main architecture and runtime-ownership owners were merged intact. `check:docs` recomputed 262 routed files; no architecture contract changed in this recording slice.                          |
+| Root, app and package READMEs     | Preserve        | The inventory command and non-claims were already documented by `c54c499`; no command, package purpose or app route changed after the merge.                                                            |
+| Exports and generated references  | Preserve        | No public export, generated contract or boundary exception changed.                                                                                                                                     |
+| Runbooks and authority            | Preserve        | Target-owned runbooks and fixed authority Schemas remain canonical. The expired ignored envelope and static records grant no current provider access.                                                   |
+| Verification journeys and proof   | Preserve        | No provider receipt was produced or promoted. The future command must still perform two Schema-owned reads and emit the fixed bounded receipt.                                                          |
+| Skills and `AGENTS.md`            | Preserve        | The merged PRD implementer, docs-maintainer and Effect client-wrapper contracts were reread and applied; no recurring instruction gap was found.                                                        |
+| Lint, config, commands and CI     | Preserve        | No command, credential, workflow or CI admission changed. The process-only synthetic Executor values were used only to exercise the repository verification contract.                                   |
+| Schemas, services and Layers      | Preserve        | No runtime boundary changed. The exact redacted Config owners remain `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`, `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID` and `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.       |
+| Tests and fixtures                | Preserve        | Current-main tests and the existing inventory matrix passed; no direct provider requirement is accepted by proxy.                                                                                       |
+| SPEC tasks, plan and lifecycle    | Change required | This task stays pending, its dependent task stays blocked and the plan stays active. No accepted-task count was changed.                                                                                |
+| Receipts and evidence             | Change required | The ledger and plan own the repository/authority boundary. No external receipt, manifest or current provider-state evidence exists.                                                                     |
+| Rollout, rollback and lifecycle   | Preserve        | No rollout occurred. Local rollback is reversion of the resumed-boundary documentation commit; external rollback is N/A because no provider operation occurred.                                         |
+| Archive pointers and formal audit | Preserve        | No archive transition. The earlier audit remains interim; one fresh formal five-pass audit runs only at terminal full-SPEC closeout.                                                                    |
 
 ## Accepted planning evidence
 

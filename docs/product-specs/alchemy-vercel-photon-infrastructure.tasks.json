@@ -332,6 +332,30 @@
         ],
         "downstream": "The task remains pending and remote-state-and-noop-adoption remains blocked. The terminal five-pass audit has not occurred and belongs only to drift-ci-monitoring-and-closeout after every SPEC task reaches an honest terminal disposition."
       },
+      "resumptionBoundary": {
+        "status": "blocked_pending_fresh_authority_and_usable_credentials",
+        "observedAt": "2026-07-25",
+        "repositoryIdentity": "Branch codex/alchemy-vercel-photon-infrastructure merged origin/main ff73113 at f81fba7 after preserving 0a08767, 43af287 and 65f4d7b; the prepared inventory slice is c54c499.",
+        "authority": "The ignored mode-0600 authority file is structurally valid but authorizes one bounded execution in the 2026-07-24 Codex task. It is expired on 2026-07-25 and was not reused. Static Vercel authority records remain disabled_pending_proof, and the historical Photon rollout envelope does not authorize this inventory.",
+        "credentialCustody": [
+          "VERCEL_INFRASTRUCTURE_ACCESS_TOKEN is absent from the process environment. A mode-0600 Vercel auth cache exists, but its prior current-principal read returned HTTP 403; it was neither read as a secret nor refreshed.",
+          "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID and BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET are absent from the process environment. The mode-0600 Photon CLI credential record contains CLI access identity rather than the project ID and project secret required by the owning management Layer; no secret value was printed or copied."
+        ],
+        "directObservables": [
+          "git merge-base --is-ancestor proves ff73113 and the three required Alchemy commits are ancestors of f81fba7.",
+          "The fixed authority Schema, target task policy, ignored authority metadata and static authority register prove the available envelope is expired and no current target-specific grant exists.",
+          "Environment-name presence checks, executable discovery and credential-file key/mode inspection prove the required command Config is unavailable without revealing credential values.",
+          "bun run check:docs recomputed 262 routed documentation files, and bun run verification passed the exact merged repository state with the documented process-only synthetic Executor test configuration."
+        ],
+        "rejectedFalseGreens": [
+          "A structurally valid or mode-0600 authority file is not current authority after its bounded date/task duration expires.",
+          "A cached Vercel token is not a usable inventory credential when mandatory principal readback returned HTTP 403.",
+          "Photon CLI login is not proof that the project-scoped ID and secret required by PhotonManagementCredentialsLive are available.",
+          "A green repository suite, old provider observations or neighbouring mock assertions do not prove current Preview or Production provider state."
+        ],
+        "providerActions": "No Vercel or Photon API call, credential refresh/change, provider write, deployment, promotion, webhook mutation, send, billable action or Production mutation occurred during the 2026-07-25 resumption.",
+        "downstream": "authorized-read-only-inventory remains pending at the fresh authority plus usable credential boundary; remote-state-and-noop-adoption remains blocked. The formal five-pass audit remains reserved for terminal full-SPEC closeout."
+      },
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 3,
