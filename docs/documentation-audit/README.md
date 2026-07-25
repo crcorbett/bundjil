@@ -3,7 +3,7 @@ document_type: audit-index
 lifecycle: evidence
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 review_trigger: any HGI corpus, route, decision, reconciliation, acceptance receipt, or lifecycle correction
 ---
 
@@ -11,6 +11,10 @@ review_trigger: any HGI corpus, route, decision, reconciliation, acceptance rece
 
 This directory owns dated corpus, link, acceptance, and Git receipts. It does
 not own current policy or provider truth; use [`../README.md`](../README.md).
+
+Implementation-audit feedback promotion:
+
+- [`implementation-audit-feedback-2026-07-24.json`](implementation-audit-feedback-2026-07-24.json)
 
 Current HGI-300 receipts:
 

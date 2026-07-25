@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 183,
-    "sortedPathSha256": "224076c379ba4548593e0a3bb68cfba923a57c281974f5698d738698abd15416"
+    "pathCount": 184,
+    "sortedPathSha256": "a7a512fae575461674638cff05f5e2cdb6c5cdf54f18f8c02eadd4c7fc839500"
   },
   "readmeInventory": {
     "pathCount": 22,
@@ -20,11 +20,12 @@
         "docs/verification/hgi-307-epoch.json",
         "docs/documentation-audit/HGI-307-impact-ledger.json",
         "docs/documentation-audit/HGI-307-validation.json",
-        "docs/documentation-audit/HGI-309-lifecycle-correction-validation.json"
+        "docs/documentation-audit/HGI-309-lifecycle-correction-validation.json",
+        "docs/documentation-audit/implementation-audit-feedback-2026-07-24.json"
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, the Eve implementation plan expanded it to 180 paths, and the Alchemy SPEC/task/active-plan slice produces the merged 183-path corpus. The mandatory Eve five-pass correction returned its plan to completed history while preserving the Alchemy plan as current intent. These path-accounting corrections change neither the scenario manifest, expected owners, skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, the Eve implementation plan expanded it to 180 paths, and the Alchemy SPEC/task/active-plan slice expanded it to 182 paths. Runtime closeout added the completed plan and returned the Eve work to completed history while preserving the Alchemy plan as current intent; the implementation-audit feedback receipt then expands the current combined corpus to 184 paths. These path-accounting corrections change neither the scenario manifest, expected owners, historical skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."

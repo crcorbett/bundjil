@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-harness-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-07-24",
   "reviewTrigger": "control finding, false positive, fixture drift, owner change, command change, or accepted-outcome regression",
   "controls": [
     {
@@ -126,8 +126,8 @@
     {
       "id": "skill-mirror-policy",
       "state": "retained",
-      "failureClass": "missing, broken, contradictory, non-portable, or stale repository skill guidance",
-      "invariant": "Required skills and mirrors remain complete, portable, metadata-valid, and semantically aligned with executable owners.",
+      "failureClass": "missing, broken, contradictory, non-portable, stale, or proof-by-proxy repository skill guidance",
+      "invariant": "Required skills and mirrors remain complete, portable, metadata-valid, semantically aligned with executable owners, and explicit about direct requirement oracles and audit feedback promotion.",
       "earliestOwnerPaths": [
         "tooling/skill-policy.ts",
         ".agents/skills/docs-maintainer/SKILL.md"
@@ -140,11 +140,11 @@
         "tooling/skill-policy-audit.test.ts",
         ".agents/skills/docs-maintainer/references/repository-profile.md"
       ],
-      "admissionEvidence": "Skill-policy fixtures reject missing routes, invalid metadata, contradictory examples, fixed rituals, broken mirrors, and non-portable paths.",
+      "admissionEvidence": "Skill-policy fixtures reject missing routes, invalid metadata, contradictory examples, fixed rituals, broken mirrors, non-portable paths, omitted requirement-to-proof oracles, and audit findings that are not promoted to an earlier preventing owner.",
       "falsePositiveCost": "A false positive blocks a skill surface and requires a semantic-term or mirror fixture.",
       "repairCost": "Update the skill owner, UI metadata, mirror, and exact policy fixture atomically.",
-      "carryingCost": "Maintain six required mirrors and policy fragments when owners move.",
-      "reviewTrigger": "Skill, mirror, agent instruction, owner path, executable example, or metadata change.",
+      "carryingCost": "Maintain six required mirrors, requirement-oracle policy fragments, and audit-feedback fixtures when owners move.",
+      "reviewTrigger": "Skill, mirror, agent instruction, owner path, executable example, metadata, task-proof, or audit-feedback change.",
       "retirement": "Retire a reminder after its stronger schema/lint/test owner and pointer are accepted.",
       "rollback": "Restore the last complete mirror set and retained source revision.",
       "metricPlan": {

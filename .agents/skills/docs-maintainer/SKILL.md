@@ -106,6 +106,16 @@ into a current external-state claim.
   reconcile it again at task closeout.
 - For ordinary non-PRD changes, use the same ledger. A mechanical change may
   retain evidenced `N/A` decisions; it may not skip impact assessment.
+- When review or a terminal audit finds an issue, record why the prior SPEC,
+  task, implementation check, or receipt allowed the false green. Promote the
+  prevention to the earliest durable owner: domain contract, direct test
+  oracle, task verification, lint/tooling control, or lifecycle rule. Retain
+  the dated finding as evidence, but do not treat another audit reminder as the
+  root correction.
+- Any correction after task acceptance reopens the owning task and refreshes
+  affected proof, candidate identity, rollback identity, and lifecycle
+  receipts. A terminal audit runs only after the complete SPEC is terminal;
+  later implementation invalidates its terminal status.
 
 Fixed worker, pass, or reread counts are coordination state rather than proof.
 Use fresh-context review for changed semantic claims and boundary-matched

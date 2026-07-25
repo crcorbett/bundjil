@@ -292,4 +292,53 @@ describe("HGI-310 documentation-maintenance policy", () => {
       new Set(["external-actuality", "tool-authority-grant"])
     );
   });
+
+  it("rejects missing requirement oracles and audit feedback promotion", () => {
+    const base = repositorySnapshot();
+    const mutations: readonly {
+      readonly path: string;
+      readonly pattern: RegExp;
+      readonly replacement: string;
+    }[] = [
+      {
+        path: ".agents/skills/docs-maintainer/SKILL.md",
+        pattern: /false green/g,
+        replacement: "review issue",
+      },
+      {
+        path: ".agents/skills/prd-writer/SKILL.md",
+        pattern: /plausible false green/g,
+        replacement: "possible issue",
+      },
+      {
+        path: ".agents/skills/prd-review/SKILL.md",
+        pattern: /requirement-to-proof/g,
+        replacement: "requirements",
+      },
+      {
+        path: ".agents/skills/prd-implementer/SKILL.md",
+        pattern: /proof by proxy/g,
+        replacement: "indirect proof",
+      },
+    ];
+    let broken = base;
+    for (const mutation of mutations) {
+      broken = replaceFile(broken, mutation.path, (content) =>
+        content.replace(mutation.pattern, mutation.replacement)
+      );
+    }
+    const owners = new Set(
+      run(broken)
+        .findings.filter((issue) => issue.code === "SKILL-DOCS-MAINTENANCE")
+        .map((issue) => issue.owner)
+    );
+    expect(owners).toStrictEqual(
+      new Set([
+        "audit-feedback-promotion",
+        "spec-proof-crosswalk",
+        "review-proof-crosswalk",
+        "implementation-proof-replay",
+      ])
+    );
+  });
 });

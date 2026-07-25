@@ -3,7 +3,7 @@ document_type: control-register
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-maintainer
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-24
 review_trigger: control finding, false positive, automation loop, boundary exception, accepted-outcome, carrying-cost, or retirement change
 ---
 
@@ -33,6 +33,12 @@ lint/format, documentation ownership and freshness, skill/mirror integrity,
 workflow authority, critical-journey proof, and dependency/export hygiene.
 Passing controls proves their named repository invariants only; it does not
 aggregate into provider, deployment, delivery, health, or Production proof.
+
+The skill control also retains requirement-to-proof traceability across PRD
+writing, review, implementation, and documentation maintenance. It rejects
+removal of direct-observable and plausible-false-green guidance, but it cannot
+prove a worker followed the guidance. The implementation's task assertions and
+claim-matched evidence remain the behavioral oracle.
 
 ## Boundary exception decision
 
