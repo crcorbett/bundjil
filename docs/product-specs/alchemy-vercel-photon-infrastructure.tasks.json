@@ -651,7 +651,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Preview Vercel spike section.",
-        "currentResult": "in_progress_git_link_correction: exact Preview authority validated; full repository verification passed before writes. Live plan/apply/no-op, direct drift, sync detection/repair, two unchanged syncs and rollback completed against bundjil-agent. The final safe resource ID was 8jrS3AIVoAvFh0Y3; rollback restored Preview and Production feedback to null and deleted the exact disposable key while bundjil-codex-proxy stayed unchanged. PVC-001 and PVC-002 were corrected and reverified. Implementation commit eb11b738b353c59715feb15044ff2a337b7d9084 was pushed, but two decoded deployment reads returned no matching SHA and an authenticated project read proved the exact project has no Git link. PVC-003 is reopened while a separate project-global fixed authority is validated, the exact Git link is established and read back, and a subsequent immutable Preview deployment plus bounded receipt remain before acceptance.",
+        "currentResult": "in_progress_deployment_observation: exact Preview authority validated; full repository verification passed before writes. Live plan/apply/no-op, direct drift, sync detection/repair, two unchanged syncs and rollback completed against bundjil-agent. The final safe resource ID was 8jrS3AIVoAvFh0Y3; rollback restored Preview and Production feedback to null and deleted the exact disposable key while bundjil-codex-proxy stayed unchanged. PVC-001 and PVC-002 were corrected and reverified. PVC-003 found the exact project unlinked after implementation commit eb11b738b353c59715feb15044ff2a337b7d9084 produced no deployment. A distinct project-global mode-0600 authority, focused negative tests and full verification passed before the supported Vercel Git surface connected only bundjil-agent. Immediate Schema-decoded readback proved GitHub repo ID 1291167731, owner/repo crcorbett/bundjil and Production branch main. Exact-link disconnect restores the captured absent-link state. A subsequent immutable commit push, Git-created Preview deployment observation and bounded receipt remain before acceptance.",
         "findings": [
           {
             "id": "PVC-001",
@@ -672,7 +672,7 @@
             "owner": "preview-vercel-configuration-spike",
             "finding": "The exact implementation commit was pushed, but two decoded deployment reads returned no matching SHA and authenticated project readback found bundjil-agent has no Vercel Git link.",
             "correction": "Keep project-global Git bootstrap outside the Preview Alchemy Layer; validate a distinct fixed authority naming Preview and Production, connect only the exact project to github:crcorbett/bundjil after absent-link readback, read it back, retain exact-link disconnect as rollback, then push and observe the resulting deployment by immutable SHA without a deployment-create or promotion call.",
-            "status": "reopened"
+            "status": "corrected_and_read_back"
           }
         ]
       },
