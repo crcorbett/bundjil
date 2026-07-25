@@ -356,6 +356,26 @@
         "providerActions": "No Vercel or Photon API call, credential refresh/change, provider write, deployment, promotion, webhook mutation, send, billable action or Production mutation occurred during the 2026-07-25 resumption.",
         "downstream": "authorized-read-only-inventory remains pending at the fresh authority plus usable credential boundary; remote-state-and-noop-adoption remains blocked. The formal five-pass audit remains reserved for terminal full-SPEC closeout."
       },
+      "authorizedIdentityPreflight": {
+        "status": "inconclusive_vercel_credential_unavailable",
+        "observedAt": "2026-07-25T10:41:42Z",
+        "authority": "The user directly approved the exact fixed-schema read-only envelope in Codex source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1. The ignored mode-0600 file validates against both fixed Schemas. Its 30-minute inventory window starts only after both principals resolve and the first inventory read is ready; that condition was not reached.",
+        "directObservables": [
+          "photon whoami exited zero and produced one non-empty authenticated-principal fingerprint: 4b150aa4b96f5234f56f61c22726d49def4751bce2669d54808f560e0590ac67. No raw account data or credential was emitted.",
+          "The sole mode-0600 Vercel CLI auth cache is expired. A fresh GET /v2/user identity read returned HTTP 403 with no resolved principal; no refresh was attempted.",
+          "Both linked Vercel projects have the exact approved names and one shared organization identity, but link metadata is not authentication proof.",
+          "Two bounded read-only 1Password CLI candidate-list attempts produced no result because desktop authorization did not complete. No item, field, session token or secret was printed, copied, persisted, created, edited or exported."
+        ],
+        "rejectedFalseGreens": [
+          "A successful Photon principal does not satisfy the required two-provider identity gate.",
+          "An expired Vercel cache, project link or refresh-token presence is not a usable authenticated Vercel principal.",
+          "A hung or unopened 1Password approval is not credential resolution.",
+          "The approved envelope alone does not start its duration or prove provider inventory."
+        ],
+        "providerActions": "Only Photon and Vercel authenticated-principal reads were attempted. No resource inventory read, provider write, credential refresh/change, deployment, promotion, webhook mutation, send, billable action or Production mutation occurred.",
+        "artifacts": "No inventory artifact or bounded provider receipt was created. The authority file remains ignored and mode 0600.",
+        "downstream": "Unlock 1Password desktop with CLI integration or otherwise place one existing valid personal Vercel credential into secure local custody as VERCEL_INFRASTRUCTURE_ACCESS_TOKEN, then rerun both principal readbacks. The task remains pending, the 30-minute window has not started, and remote-state-and-noop-adoption remains blocked."
+      },
       "implementationImprovementAudit": {
         "requiredPasses": 3,
         "completedPasses": 3,

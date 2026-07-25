@@ -69,6 +69,46 @@ not available in the process environment; cached Vercel identity previously
 returned `403`, while Photon CLI login is not the project ID/secret pair owned
 by the management Layer. No provider call was made during resumption.
 
+The owner approved the exact replacement read-only envelope on 2026-07-25,
+including existing local and read-only 1Password credential custody. The
+ignored mode-`0600` envelope validates against both fixed Schemas. Photon
+principal readback succeeded and retained only an opaque fingerprint. The sole
+Vercel CLI cache is expired and a fresh `/v2/user` read returned `403`.
+Two bounded 1Password candidate-list attempts did not complete desktop
+authorization and returned no item or field. The required two-principal gate
+therefore did not pass, the 30-minute inventory window did not start, and no
+resource inventory read, manifest, provider receipt, credential refresh or
+mutation occurred.
+
+### Approved identity-preflight requirement replay
+
+| Requirement                               | Direct observable and expected postcondition                                                                                                                                                     | Plausible false green rejected                                                                                            | Focused command/readback                                                             | Evidence owner and result                                                                  |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Fixed current authority                   | The mode-`0600` ignored envelope validates against the harness and task policy, names the approved resources/operations/stages, and starts its 30-minute duration only at the two-principal gate | Reusing the expired 2026-07-24 envelope or treating user approval as provider proof                                       | AJV validation of both fixed Schemas plus file mode/size readback                    | Ignored authority file and task `authorizedIdentityPreflight`; passed                      |
+| Photon principal                          | `photon whoami` exits zero with one non-empty principal, retaining only SHA-256 fingerprint `4b150aa4b96f5234f56f61c22726d49def4751bce2669d54808f560e0590ac67`                                   | Treating CLI credential-file presence or project credentials as user authentication                                       | Bounded `photon whoami` with in-memory output hashing                                | Task ledger; passed                                                                        |
+| Vercel principal                          | One non-expired personal Vercel credential returns a successful current user identity before any project read                                                                                    | Treating link metadata, token presence, an expired bearer, refresh-token presence or another provider's identity as proof | Expiry classification and `GET /v2/user`, emitting only status and fingerprint state | Task ledger; blocked: the sole cache is expired and readback returned `403`                |
+| 1Password fallback                        | Exactly one matching existing Vercel record is read through unlocked CLI custody without emitting any item field                                                                                 | A hanging desktop authorization, multiple candidates or list-command construction being treated as a credential           | Two bounded sanitized `op item list` attempts                                        | Task ledger; blocked: desktop authorization did not complete and no candidate was returned |
+| Inventory-window and zero-mutation policy | The timer begins only after both principals resolve and the first canonical inventory read is ready; before then there are zero resource reads and zero writes                                   | Starting the timer at approval-message time or promoting one successful principal into inventory acceptance               | Provider-action review and absence of artifact/receipt                               | This plan and task ledger; passed, window not started                                      |
+
+### Approved identity-preflight impact ledger
+
+| Surface                           | Status          | Decision and evidence boundary                                                                                                                                   |
+| --------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger and active plan | Change required | Record the approved envelope, direct principal observables, rejected false greens, exact Vercel/1Password block and unchanged task lifecycle.                    |
+| Architecture and docs router      | Preserve        | The read-only provider boundary and proof classes did not change.                                                                                                |
+| Root, app and package READMEs     | Preserve        | No command, config name, package purpose or app operation changed.                                                                                               |
+| Exports and generated references  | Preserve        | No export, codec or generated reference changed.                                                                                                                 |
+| Runbooks and authority            | Preserve        | The approved ignored envelope instantiates the fixed authority contract; target runbooks remain operational owners. It grants no credential refresh or mutation. |
+| Verification journeys and proof   | Change required | Preserve the inconclusive identity preflight in the canonical task/plan. No provider receipt or manifest exists.                                                 |
+| Skills and `AGENTS.md`            | Preserve        | PRD implementer, docs-maintainer and Effect client-wrapper contracts were applied; no instruction gap was found.                                                 |
+| Lint, config, commands and CI     | Preserve        | No repository config, workflow or command changed; existing secret Config names remain canonical.                                                                |
+| Schemas, services and Layers      | Preserve        | No provider boundary changed. Photon and Vercel identity readbacks were preflight only; resource reads remain owned by the canonical inventory Layers.           |
+| Tests and fixtures                | Preserve        | No executable behavior changed and no mock proof substitutes for the failed Vercel identity gate.                                                                |
+| SPEC tasks, plan and lifecycle    | Change required | `authorized-read-only-inventory` remains pending and its dependent task remains blocked.                                                                         |
+| Receipts and evidence             | Change required | Record only opaque Photon fingerprint, Vercel status, authority identity and non-claims. Retain no account data, secret, raw response or inventory artifact.     |
+| Rollout, rollback and lifecycle   | Preserve        | No rollout occurred. External rollback is N/A; local ignored authority can be discarded if invalidated.                                                          |
+| Archive pointers and formal audit | Preserve        | No archive transition and no terminal five-pass audit.                                                                                                           |
+
 ### Current-main integration and resumed authority boundary
 
 | Requirement                                              | Direct observable and expected postcondition                                                                                                                                                                                     | Plausible false green rejected                                                                                              | Focused command or readback                                                                                                                | Evidence owner and result                                                                                                                     |
