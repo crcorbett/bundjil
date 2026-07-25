@@ -326,23 +326,27 @@ it.effect(
                     type: "sensitive",
                     target: ["preview"],
                     sensitive: true,
+                    contentHint: {
+                      integrationConfigurationId: "configuration-upstash",
+                      integrationId: "integration-upstash",
+                      storeId: "resource-upstash",
+                    },
                   },
                 ],
                 pagination: { next: null },
               };
             }
-            if (url.pathname === "/v1/integrations/resources") {
+            if (
+              url.pathname ===
+              "/v1/installations/configuration-upstash/resources"
+            ) {
               return {
                 resources: [
                   {
-                    id: "resource-upstash",
-                    integrationId: "integration-upstash",
-                    configurationId: "configuration-upstash",
-                    databaseId: "database-upstash",
-                    projectId: "prj-agent",
+                    internalId: "resource-upstash",
+                    partnerId: "database-upstash",
                   },
                 ],
-                pagination: { next: null },
               };
             }
             return {
@@ -421,6 +425,68 @@ it.effect(
       assert.strictEqual(
         result.environmentVariables.environmentVariables[0] !== undefined &&
           "value" in result.environmentVariables.environmentVariables[0],
+        false
+      );
+      return yield* Effect.void;
+    })
+);
+
+it.effect(
+  "fails closed when Marketplace content hints do not match one installation resource",
+  () =>
+    Effect.gen(function* testMarketplaceContentHintMismatch() {
+      const decoded = yield* inventory;
+      const [project] = decoded.projects;
+      if (project === undefined) {
+        return yield* Effect.die(
+          "The Vercel Marketplace mismatch fixture is incomplete."
+        );
+      }
+      const client = HttpClient.make((request) => {
+        const url = new URL(request.url);
+        return Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            Response.json(
+              url.pathname.endsWith("/env")
+                ? {
+                    envs: [
+                      {
+                        id: "env-marketplace",
+                        key: "MARKETPLACE_SECRET",
+                        type: "sensitive",
+                        target: ["preview"],
+                        contentHint: {
+                          integrationConfigurationId: "configuration-upstash",
+                          integrationId: "integration-upstash",
+                          storeId: "expected-resource",
+                        },
+                      },
+                    ],
+                    pagination: { next: null },
+                  }
+                : {
+                    resources: [
+                      {
+                        internalId: "different-resource",
+                        partnerId: "sentinel-database-id",
+                      },
+                    ],
+                  },
+              { status: 200 }
+            )
+          )
+        );
+      });
+      const mismatch = yield* Effect.gen(function* listMarketplaceBindings() {
+        const marketplaceBindings = yield* VercelMarketplaceBindings;
+        return yield* marketplaceBindings.listMarketplaceBindings(
+          ListVercelMarketplaceBindings.make(project)
+        );
+      }).pipe(Effect.provide(liveLayer(client)), Effect.exit);
+      assert.strictEqual(Exit.isFailure(mismatch), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(mismatch).includes("sentinel-database-id"),
         false
       );
       return yield* Effect.void;
