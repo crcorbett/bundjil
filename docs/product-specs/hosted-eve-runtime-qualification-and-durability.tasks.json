@@ -702,7 +702,8 @@
         "Pinned and installed Eve 0.20 directly create Nitro and expose no Bundjil-facing vercel.functions input. Official Vercel guidance names Nitro vercel.functions.maxDuration as the supported owner, so no guessed vercel.json source glob or generated-output patch is admitted.",
         "Read-only Vercel inventory at 2026-07-25T17:13:58Z resolved project prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and latest Production deployment dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG at source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b. It is older than the local candidate and exposes neither effective function duration nor plan.",
         "Current Sendblue documentation retains a 45-second response window and up to three timeout or 5xx retries. No numeric Photon webhook response deadline is established; it remains a provider readback blocker.",
-        "BND-J13-hosted-eve-durability now owns the authority-gated Preview acceptance, same-run interruption/resumption, duplicate-zero-effects, timeout, monitoring and rollback proof contract."
+        "BND-J13-hosted-eve-durability now owns the authority-gated Preview acceptance, same-run interruption/resumption, duplicate-zero-effects, timeout, monitoring and rollback proof contract.",
+        "The terminal audit reopened this task's documentation-impact owner after detecting a stale 187-path HGI inventory. The focused repair reclosed that owner at 190 paths before the audit receipt, and the receipt plus packet expand final accounting to 192 paths without changing the blocked hosted result."
       ],
       "blockedAt": "2026-07-25",
       "blockingEvidence": [
@@ -895,7 +896,7 @@
     {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["qualify-production-candidate"],
       "findingIds": [
         "HEQ-F001",
@@ -948,6 +949,18 @@
         "All five passes are accepted on the final receipt-bearing state.",
         "All stale evidence is invalidated or refreshed.",
         "Closeout preserves all explicit non-claims and authority limits."
+      ],
+      "completedAt": "2026-07-25",
+      "completionEvidence": [
+        "The five passes ran exactly once after every dependency reached completed or blocked terminal state. Ownership/call graph, Effect quality, boundary/lifecycle correctness and adversarial repository proof were accepted without upgrading local evidence into a hosted claim.",
+        "The documentation/authority pass found one stale HGI docs-path inventory. It reopened the set-and-readback-timeouts documentation-impact owner, invalidated only the stale inventory claim, corrected the inventory from 187 to 190 paths, and passed focused HGI, docs, verification and controls checks.",
+        "The terminal detail and local proof packet retain the ordered audit, final dependency states, exact candidate/source/artifact identities, rollback chain, limitations, non-claims and the corrected finding. Those two retained paths expand final docs accounting to 192 paths.",
+        "Timeout, Preview and Production remain blocked with retained inconclusive packets because no immutable hosted candidate, exact effective-duration/plan readback, latency/Workflow/provider observations, or target-owned deploy/interruption/Production/rollback authority exists.",
+        "The final complete repository verification passed after the focused correction. No deployment, provider, webhook, credential, message, Workflow interruption, promotion, rollback, push or merge operation occurred."
+      ],
+      "retainedEvidence": [
+        "docs/evidence/verification/details/HEQ-terminal-five-pass-audit-2026-07-25.json",
+        "docs/evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json"
       ],
       "commitAfterPassing": true
     }

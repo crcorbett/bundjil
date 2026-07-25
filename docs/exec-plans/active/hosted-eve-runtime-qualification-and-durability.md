@@ -54,15 +54,15 @@ Only accepted findings `HEQ-F001` through `HEQ-F007` and requirements
 `HEQ-REQ-001` through `HEQ-REQ-018` enter implementation. Tasks remain in the
 accepted dependency order:
 
-| Task                           | Status    | Current owner and next direct proof                                                                                       |
-| ------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `prove-eve-owned-handoff`      | Completed | Commit `bcf59bb`; installed source/generated output proof and all local gates passed                                      |
-| `add-handoff-observability`    | Completed | Commit `5c67398`; safe observations and 19 focused leak/ordering/lifecycle tests passed                                   |
-| `correct-202-ordering`         | Completed | Coherent task commit; exact send ordering, continuity fencing, timeout quarantine, terminal repair and local gates passed |
-| `set-and-readback-timeouts`    | Blocked   | Local owner decision retained; no exact candidate Preview, effective duration, plan, latency, Workflow, or Photon bound   |
-| `qualify-final-preview`        | Blocked   | No immutable candidate or target-owned deploy/provider/Workflow/interruption/rollback authority                           |
-| `qualify-production-candidate` | Blocked   | No accepted identical Preview or separate target-owned Production/provider/monitoring/rollback authority                  |
-| `terminal-five-pass-audit`     | Pending   | One audit only after every dependency is terminal; blocked hosted outcomes retain exact gates and non-claims              |
+| Task                           | Status    | Current owner and next direct proof                                                                                         |
+| ------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `prove-eve-owned-handoff`      | Completed | Commit `bcf59bb`; installed source/generated output proof and all local gates passed                                        |
+| `add-handoff-observability`    | Completed | Commit `5c67398`; safe observations and 19 focused leak/ordering/lifecycle tests passed                                     |
+| `correct-202-ordering`         | Completed | Coherent task commit; exact send ordering, continuity fencing, timeout quarantine, terminal repair and local gates passed   |
+| `set-and-readback-timeouts`    | Blocked   | Local owner decision retained; no exact candidate Preview, effective duration, plan, latency, Workflow, or Photon bound     |
+| `qualify-final-preview`        | Blocked   | No immutable candidate or target-owned deploy/provider/Workflow/interruption/rollback authority                             |
+| `qualify-production-candidate` | Blocked   | No accepted identical Preview or separate target-owned Production/provider/monitoring/rollback authority                    |
+| `terminal-five-pass-audit`     | Completed | Single five-pass audit accepted local closeout after correcting one stale docs-inventory claim; hosted gates remain blocked |
 
 ## Implementation decisions
 
@@ -243,6 +243,21 @@ accepted dependency order:
   packet records `inconclusive/not_attempted`. The 2026-07-23 Production
   receipt remains immutable historical evidence only.
 
+### `terminal-five-pass-audit` — completed local closeout
+
+- The audit ran once at `2026-07-25T17:31:47Z`, after all implementation and
+  hosted tasks were terminal, against dependency commit
+  `865365d5529a388a312ce11c8183c06625f31241`.
+- Ownership/call graph, Effect quality, boundary/lifecycle correctness,
+  adversarial repository proof, and documentation/authority closeout were
+  accepted. The only finding was stale HGI docs-path accounting: the
+  documentation owner was reopened, the stale 187-path claim was invalidated,
+  and focused repair reclosed it at 190 paths before the audit receipt.
+- The retained audit detail and packet expand final docs accounting to 192
+  paths. They do not change the inconclusive Preview or Production packets:
+  [`HEQ-terminal-five-pass-audit-2026-07-25.json`](../../evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json)
+  proves only the local closeout.
+
 ## Requirement-to-proof and risk-lens loop
 
 At each task closeout:
@@ -263,26 +278,26 @@ after all implementation and hosted tasks have a terminal state.
 
 ## Downstream-impact ledger
 
-| Surface                                             | Decision           | Earliest owner, action, proof, limitation, and non-claim                                                                                           |
-| --------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SPEC, task ledger, indexes, and active plan         | Change required    | Exact SPEC/tasks and active-plan indexes own current intent and task status; `check:docs` proves routing only                                      |
-| Documentation audit inventory                       | Change required    | The retained timeout detail plus Preview/Production packets expand current accounting to 190 docs paths; focused HGI recheck owns the exact digest |
-| Agent/Eve architecture                              | Change required    | `docs/architecture/eve-agent.md` will own corrected acceptance, Workflow, timeout, and non-claim boundaries                                        |
-| Agent README                                        | Change required    | Route the corrected handoff and supported configuration owners without embedding procedures                                                        |
-| Channel and Eve package READMEs/exports             | Preserve           | App-owned handoff changes no package public boundary; package checks and diff review verify preservation                                           |
-| Schemas, services, Layers, config, and errors       | Change required    | Narrow `apps/agent/agent/lib/channel/**` owners; decode/encode once, branded identities, safe errors, explicit live/memory Layers                  |
-| Provider adapters and SDK clients                   | Preserve initially | Inspect both call graphs; no provider transport change is admitted without its own direct retry/uncertainty proof                                  |
-| Runbooks                                            | Change required    | Deploy, Sendblue, Photon, and incident owners add Workflow acceptance, timeout, interruption, monitoring, rollback, and authority gates            |
-| Authority model/register                            | Preserve rationale | Change a static envelope only if a real supported read/control operation changes; no app Workflow resource is added                                |
-| Critical journeys, command map, and proof templates | Change required    | Add the durable-handoff/interruption journey and bounded packet contract; repository validation makes no hosted claim                              |
-| Dated evidence                                      | Conditional        | Add only exact attempted local/Preview/Production receipts; retain blocked/inconclusive outcomes and never fabricate hosted evidence               |
-| Tests and fixtures                                  | Change required    | Installed Eve/build output, acceptance/Exit/leak, ordering, duplicate, timeout, continuity, retry, uncertainty, and failure-state fixtures         |
-| Monitoring and terminal failure                     | Change required    | Safe phases/fingerprints, bounded latency/outcome, terminal state, alert threshold, repair route, and forbidden-marker assertions                  |
-| Lint, boundary rules, CI, and commands              | Preserve initially | Existing gates remain sufficient unless a direct fixture exposes an unenforced recurring pattern                                                   |
-| Skills and `AGENTS.md`                              | Preserve           | Current `prd-implementer`, `docs-maintainer`, `effect-client-wrapper`, authority, and component routing already cover the work                     |
-| Rollout and rollback                                | Change required    | Exact candidate/config/deployment identities, retry drain, quarantine, compatible in-flight Eve runs, stop conditions, and readback                |
-| Frontend/browser/accessibility                      | N/A                | Inspected app call graph contains no React, visible UI, URL state, accessibility, or browser rendering change                                      |
-| Release/publication/push/merge                      | N/A                | The request authorises local coherent commits only; no tag, package publication, push, merge, or release                                           |
+| Surface                                             | Decision           | Earliest owner, action, proof, limitation, and non-claim                                                                                                        |
+| --------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC, task ledger, indexes, and active plan         | Change required    | Exact SPEC/tasks and active-plan indexes own current intent and task status; `check:docs` proves routing only                                                   |
+| Documentation audit inventory                       | Change required    | Timeout/Preview/Production evidence first expanded accounting to 190 paths; the retained terminal detail and packet expand it to 192 with a focused HGI recheck |
+| Agent/Eve architecture                              | Change required    | `docs/architecture/eve-agent.md` will own corrected acceptance, Workflow, timeout, and non-claim boundaries                                                     |
+| Agent README                                        | Change required    | Route the corrected handoff and supported configuration owners without embedding procedures                                                                     |
+| Channel and Eve package READMEs/exports             | Preserve           | App-owned handoff changes no package public boundary; package checks and diff review verify preservation                                                        |
+| Schemas, services, Layers, config, and errors       | Change required    | Narrow `apps/agent/agent/lib/channel/**` owners; decode/encode once, branded identities, safe errors, explicit live/memory Layers                               |
+| Provider adapters and SDK clients                   | Preserve initially | Inspect both call graphs; no provider transport change is admitted without its own direct retry/uncertainty proof                                               |
+| Runbooks                                            | Change required    | Deploy, Sendblue, Photon, and incident owners add Workflow acceptance, timeout, interruption, monitoring, rollback, and authority gates                         |
+| Authority model/register                            | Preserve rationale | Change a static envelope only if a real supported read/control operation changes; no app Workflow resource is added                                             |
+| Critical journeys, command map, and proof templates | Change required    | Add the durable-handoff/interruption journey and bounded packet contract; repository validation makes no hosted claim                                           |
+| Dated evidence                                      | Conditional        | Add only exact attempted local/Preview/Production receipts; retain blocked/inconclusive outcomes and never fabricate hosted evidence                            |
+| Tests and fixtures                                  | Change required    | Installed Eve/build output, acceptance/Exit/leak, ordering, duplicate, timeout, continuity, retry, uncertainty, and failure-state fixtures                      |
+| Monitoring and terminal failure                     | Change required    | Safe phases/fingerprints, bounded latency/outcome, terminal state, alert threshold, repair route, and forbidden-marker assertions                               |
+| Lint, boundary rules, CI, and commands              | Preserve initially | Existing gates remain sufficient unless a direct fixture exposes an unenforced recurring pattern                                                                |
+| Skills and `AGENTS.md`                              | Preserve           | Current `prd-implementer`, `docs-maintainer`, `effect-client-wrapper`, authority, and component routing already cover the work                                  |
+| Rollout and rollback                                | Change required    | Exact candidate/config/deployment identities, retry drain, quarantine, compatible in-flight Eve runs, stop conditions, and readback                             |
+| Frontend/browser/accessibility                      | N/A                | Inspected app call graph contains no React, visible UI, URL state, accessibility, or browser rendering change                                                   |
+| Release/publication/push/merge                      | N/A                | The request authorises local coherent commits only; no tag, package publication, push, merge, or release                                                        |
 
 ## Current limitations and stop conditions
 

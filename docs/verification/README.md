@@ -86,6 +86,10 @@ operation nor asserts present provider state.
   retains the unattempted Production gate. No accepted identical Preview or
   Production authority exists; the observed older Production deployment and
   2026-07-23 receipt are not candidate proof.
+- [`HEQ-terminal-five-pass-audit-2026-07-25.json`](../evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json)
+  retains the single accepted local five-pass closeout and its corrected
+  documentation finding. It does not qualify Preview or Production and grants
+  no external operation authority.
 
 ## Claim boundaries
 
