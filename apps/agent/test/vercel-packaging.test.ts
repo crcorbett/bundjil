@@ -28,6 +28,14 @@ const VercelConfig = Schema.Struct({
   ),
 });
 
+const TurboConfig = Schema.Struct({
+  tasks: Schema.Struct({
+    "@bundjil/agent#build": Schema.Struct({
+      env: Schema.Array(Schema.String),
+    }),
+  }),
+});
+
 const BuildRoute = Schema.Struct({
   dest: Schema.optional(Schema.String),
   handle: Schema.optional(Schema.String),
@@ -137,6 +145,11 @@ describe("Vercel packaging", () => {
         await readFile(new URL("vercel.json", appDirectory), "utf-8")
       )
     );
+    const turbo = await Effect.runPromise(
+      Schema.decodeUnknownEffect(Schema.fromJsonString(TurboConfig))(
+        await readFile(new URL("turbo.json", repositoryDirectory), "utf-8")
+      )
+    );
     const applicationBuilder = await readFile(
       new URL(
         "dist/src/internal/nitro/host/create-application-nitro.js",
@@ -154,6 +167,9 @@ describe("Vercel packaging", () => {
 
     expect(config.buildCommand).toBe(
       "cd ../.. && bun run build --filter=@bundjil/agent"
+    );
+    expect(turbo.tasks["@bundjil/agent#build"].env).toContain(
+      "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"
     );
     expect(applicationBuilder).toContain("vercel:createEveVercelOptions");
     expect(vercelOptions).toContain(

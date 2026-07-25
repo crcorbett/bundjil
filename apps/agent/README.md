@@ -58,7 +58,13 @@ Pinned Eve `0.20.0` owns durable session start/resume and turn child workflows
 behind its route-owned `send()` operation. Bundjil adds no second Workflow or
 raw Workflow client. The test command generates ordinary and Vercel Build
 Output and verifies Eve's generated Workflow `max` separately from the
-ordinary function's unset duration; it makes no hosted claim.
+ordinary function's unset duration; it makes no hosted claim. Eve creates
+Nitro internally and exposes no supported app input for
+`vercel.functions.maxDuration`, so a duration override requires an upstream
+Eve seam rather than a guessed source glob or generated-output patch. The
+handoff environment name is admitted through the Turbo build allowlist, but
+the effective hosted function duration, plan and latency distributions remain
+deployment readbacks.
 
 The replacement path uses only these app-owned environment namespaces:
 

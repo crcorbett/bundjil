@@ -77,8 +77,8 @@ export const CriticalJourney = Schema.Struct({
 });
 export type CriticalJourney = typeof CriticalJourney.Type;
 export const CriticalJourneys = Schema.Array(CriticalJourney)
-  .check(Schema.isMinLength(12))
-  .check(Schema.isMaxLength(12));
+  .check(Schema.isMinLength(13))
+  .check(Schema.isMaxLength(13));
 export const CriticalJourneysJson = Schema.fromJsonString(CriticalJourneys);
 
 const CommandMapEntry = Schema.Struct({
@@ -287,6 +287,7 @@ const expectedJourneyIds = [
   "BND-J10-incident-revocation-recovery",
   "BND-J11-photon-accepted-message-typing",
   "BND-J12-dual-channel-production",
+  "BND-J13-hosted-eve-durability",
 ] as const;
 
 const prohibitedOutput =
@@ -326,10 +327,10 @@ const auditJourneyInventory = (
   if (ids.length !== expectedJourneyIds.length) {
     add(
       "JOURNEY_COUNT",
-      "The inventory contains exactly ten critical journeys.",
+      "The inventory contains exactly thirteen critical journeys.",
       "docs/verification/critical-journeys.json",
-      "Restore the ten canonical Bundjil journey IDs.",
-      "Exactly ten journeys are present."
+      "Restore the thirteen canonical Bundjil journey IDs.",
+      "Exactly thirteen journeys are present."
     );
   }
   for (const id of expectedJourneyIds) {
@@ -675,7 +676,7 @@ const auditPacketLifecycle = (packet: ProofPacket, add: AddFinding) => {
         "PACKET_JOURNEY_UNKNOWN",
         "Packet journey results reference only canonical journey IDs.",
         journeyId,
-        "Use one of the ten declared critical journeys.",
+        "Use one of the thirteen declared critical journeys.",
         "Every packet result resolves to its durable journey contract."
       );
     }

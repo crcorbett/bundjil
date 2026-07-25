@@ -54,15 +54,15 @@ Only accepted findings `HEQ-F001` through `HEQ-F007` and requirements
 `HEQ-REQ-001` through `HEQ-REQ-018` enter implementation. Tasks remain in the
 accepted dependency order:
 
-| Task                           | Status    | Current owner and next direct proof                                                                                       |
-| ------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `prove-eve-owned-handoff`      | Completed | Commit `bcf59bb`; installed source/generated output proof and all local gates passed                                      |
-| `add-handoff-observability`    | Completed | Commit `5c67398`; safe observations and 19 focused leak/ordering/lifecycle tests passed                                   |
-| `correct-202-ordering`         | Completed | Coherent task commit; exact send ordering, continuity fencing, timeout quarantine, terminal repair and local gates passed |
-| `set-and-readback-timeouts`    | Pending   | Generated-output owner proof, measured local handoff policy, then authority-gated immutable Preview readback              |
-| `qualify-final-preview`        | Pending   | Target-owned Vercel/provider/Workflow/interruption authority and immutable Preview packet                                 |
-| `qualify-production-candidate` | Pending   | Accepted identical Preview plus separate target-owned Production/provider authority                                       |
-| `terminal-five-pass-audit`     | Pending   | One audit only after every dependency is terminal; blocked hosted outcomes retain exact gates and non-claims              |
+| Task                           | Status      | Current owner and next direct proof                                                                                       |
+| ------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `prove-eve-owned-handoff`      | Completed   | Commit `bcf59bb`; installed source/generated output proof and all local gates passed                                      |
+| `add-handoff-observability`    | Completed   | Commit `5c67398`; safe observations and 19 focused leak/ordering/lifecycle tests passed                                   |
+| `correct-202-ordering`         | Completed   | Coherent task commit; exact send ordering, continuity fencing, timeout quarantine, terminal repair and local gates passed |
+| `set-and-readback-timeouts`    | In progress | Supported owner and local output proved; exact candidate Preview duration/latency/plan/provider readback remains gated    |
+| `qualify-final-preview`        | Pending     | Target-owned Vercel/provider/Workflow/interruption authority and immutable Preview packet                                 |
+| `qualify-production-candidate` | Pending     | Accepted identical Preview plus separate target-owned Production/provider authority                                       |
+| `terminal-five-pass-audit`     | Pending     | One audit only after every dependency is terminal; blocked hosted outcomes retain exact gates and non-claims              |
 
 ## Implementation decisions
 
@@ -181,6 +181,36 @@ accepted dependency order:
 - Rollback identity is the coherent commit containing this receipt, reverting
   after `5c67398`, then `bcf59bb`, toward
   `e92f8d2508dd927c09cb63eddb50c6ca09904b95`.
+
+### `set-and-readback-timeouts` — local owner decision
+
+- The four-clock owner matrix now separates the Bundjil handoff deadline, Eve
+  Workflow/model/tool invocation, Vercel ordinary `__server`, and Sandbox
+  lifecycle. Durable session lifetime remains a separate product policy.
+- Turbo admits `BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS` to the agent
+  build environment, and the Schema-owned packaging fixture verifies that
+  admission while preserving generated Workflow `maxDuration: "max"` and its
+  queue trigger.
+- Vercel documentation identifies Nitro
+  `vercel.functions.maxDuration` as the supported ordinary-function owner.
+  Installed and pinned Eve `0.20.0` create Nitro internally and expose no
+  Bundjil-facing input for that object. No guessed `vercel.json` source glob or
+  generated-output patch is admitted.
+- Read-only Vercel inventory observed at `2026-07-25T17:13:58Z` resolved
+  project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`. Its latest deployment
+  `dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG` is Production source
+  `2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b`, older than this local
+  candidate. The available project/deployment response exposes neither
+  effective function duration nor account plan and is not candidate proof.
+- Current Sendblue documentation retains a 45-second response window and up
+  to three timeout or `5xx` retries. No numeric Photon webhook response
+  deadline is established. The exact candidate still lacks cold/warm new and
+  resume acceptance, model/tool/provider distributions, function/resource
+  readback, plan/Fluid bounds, and Workflow run evidence.
+- `BND-J13-hosted-eve-durability` now owns the isolated Preview proof. Its
+  deployment, provider message, Workflow read, interruption, rollback, and
+  exact-candidate evidence require target-owned authority and a pushed
+  immutable candidate.
 
 ## Requirement-to-proof and risk-lens loop
 

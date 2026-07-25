@@ -9,7 +9,7 @@ review_trigger: app, auth, provider, deployment, messaging, approval, recovery, 
 
 # Bundjil verification
 
-This is the canonical route for the twelve consumer-visible critical journeys,
+This is the canonical route for the thirteen consumer-visible critical journeys,
 proof packet contract, bounded command receipts, retained evidence index, and
 recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
@@ -98,7 +98,10 @@ contract proof. Future Sendblue or Photon sends, Executor reads/resumes,
 deployment/promotion, and incident containment/recovery remain approval-gated
 external journeys. The accepted dual-Channel Production journey is retained
 only in its dated receipt and grants no standing authority for another
-operation.
+operation. `BND-J13-hosted-eve-durability` owns future immutable Preview
+acceptance, Workflow interruption/resumption, duplicate, and timeout
+qualification; local Build Output and the retained inconclusive timeout
+readback packet do not satisfy it.
 
 For an external or approval-gated journey, first use the app-owned runbook:
 [`../../apps/agent/runbooks/README.md`](../../apps/agent/runbooks/README.md) or

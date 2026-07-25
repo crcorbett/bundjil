@@ -153,6 +153,21 @@ interrupts only the local wait, records a safe timeout phase, retains the
 inbound claim as outcome-uncertain, returns `503`, and never blind-retries the
 possibly accepted Eve write.
 
+The four clocks are intentionally separate:
+
+| Clock                               | Owner                                                                         | Current repository value                                                     | Hosted/provider bound                                                                                       | Required readback                                                  |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Webhook-to-Eve acceptance           | Bundjil Channel config and `ChannelHandoff`                                   | Positive `Effect.Duration`; 15-second product default                        | Sendblue currently documents a 45-second response window; no numeric Photon requirement is established      | Cold/warm new and resume distributions for the immutable candidate |
+| Eve Workflow/turn invocation        | Eve Workflow-generated function and the operation-specific model/tool adapter | Eve flow remains `maxDuration: "max"`; no app model/tool ceiling is accepted | Effective plan maximum and measured model/tool/provider distributions are unknown                           | Workflow run/function detail for the exact candidate               |
+| Vercel ordinary `__server` function | Eve-created Nitro Build Output, then Vercel project/deployment precedence     | Local generated `.vc-config.json` omits `maxDuration`                        | Project default, Fluid setting, plan, and effective deployment value are unavailable from repository source | Exact immutable deployment resource/function readback              |
+| Vercel Sandbox lifecycle            | Eve Sandbox invocation                                                        | Eve upstream default is 30 minutes of inactivity                             | Plan/runtime limits can change independently                                                                | Read only when a Sandbox-backed journey requires it                |
+
+Session retention and closure form a fifth product lifecycle policy, not a
+function timeout. No clock borrows the value of another. The 15-second handoff
+default is passed through Turbo's agent build environment allowlist, but it is
+not accepted as a hosted latency or function-duration value until the named
+readbacks exist.
+
 The atomic continuity record owns the last accepted session fingerprint per
 continuation token. No prior owner is a deliberate new start. A matching
 accepted fingerprint is a resume. A different fingerprint while an owner is
@@ -208,6 +223,15 @@ generated output. The agent test command creates both ordinary local output
 and Vercel Build Output, then Schema-decodes the generated route/function
 contracts. These are local artifact assertions only; an immutable hosted
 deployment must read back its own mapping and effective durations.
+
+Vercel's supported Nitro configuration owner is
+`defineNitroConfig({ vercel: { functions: { maxDuration }}})`. Because Eve
+creates Nitro internally and exposes no application input for that object in
+`0.20.0`, Bundjil cannot use the supported seam without an upstream Eve
+change. A source `vercel.json` glob must name a real source entrypoint and
+therefore cannot safely target the generated `__server`. Until measurements
+show a need and a supported Eve seam exists, retain the effective project
+default as an explicit hosted blocker rather than patching Build Output.
 
 Eve events use the same Channel service:
 

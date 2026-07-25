@@ -99,6 +99,14 @@
       "claimScope": "approval_gated",
       "procedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
       "externalReadback": "required for Vercel and both providers; each handset observation remains separate"
+    },
+    {
+      "journeyId": "BND-J13-hosted-eve-durability",
+      "environment": "approval-gated isolated Preview target",
+      "command": "run the Eve durability Preview procedure only after deploy, provider, Workflow-read, interruption, and rollback authority are attached",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
+      "externalReadback": "required for immutable functions, exact Workflow run and turn, same-run resumption, duplicate zero effects, provider result, monitoring, and rollback"
     }
   ]
 }

@@ -3,8 +3,8 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-21
-review_trigger: Vercel project, deployment, environment, domain, protection, variable, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
+last_reviewed: 2026-07-25
+review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
 # Deploy and promote the agent system
@@ -54,7 +54,9 @@ Production agent metadata must include `BUNDJIL_AGENT_MODEL_PROVIDER`,
 `BUNDJIL_CODEX_PROXY_BASE_URL`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`, every
 app-owned `BUNDJIL_CHANNEL_ROUTING_*` and `BUNDJIL_CHANNEL_REPLAY_*` name, and
 every provider name under `BUNDJIL_CHANNEL_SENDBLUE_*` and
-`BUNDJIL_CHANNEL_PHOTON_*` listed by `apps/agent/README.md`. All identity,
+`BUNDJIL_CHANNEL_PHOTON_*` listed by `apps/agent/README.md`. It must also
+include the positive semantic configuration
+`BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS`. All identity,
 line, credential, webhook, and protected routing values use sensitive
 metadata; bounded semantic configuration uses encrypted or sensitive metadata.
 Any `BUNDJIL_SENDBLUE_*` name is a legacy binding and blocks promotion.
@@ -106,7 +108,25 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 "$BUNDJIL_VERCEL_SCOPE"`. Sanitize provider output into the snapshot; do not
    copy raw output into evergreen documentation.
 
-3. For the current stage, set `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT` through
+3. For an Eve durability candidate, retain the locally generated Build Output
+   as preflight, then inspect the immutable deployment's Resources/function
+   detail. Record the source SHA, Eve version, route-to-function mapping,
+   ordinary `__server` effective maximum duration, Workflow flow
+   `maxDuration`, queue trigger, project default, Fluid setting, plan maximum,
+   and `observedAt`. Also retain separately measured cold/warm new-session and
+   resume acceptance plus model, tool, and provider latency distributions.
+   Missing function detail, project setting, plan, candidate deployment, or
+   measurement makes the packet inconclusive.
+
+   Eve `0.20.0` directly creates Nitro and exposes no Bundjil-facing
+   `vercel.functions` input. Preserve the generated Workflow flow's
+   `maxDuration: "max"` and queue trigger. Do not use the Sandbox idle timeout
+   as a function value, guess a `vercel.json` glob for generated `__server`,
+   patch `.vercel/output`, or treat local Build Output as hosted readback. If
+   an ordinary-function override becomes necessary, stop until a supported
+   Eve/Nitro seam or separately pinned upstream change exists.
+
+4. For the current stage, set `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT` through
    the approved secret/environment mechanism and run:
 
    ```bash
@@ -119,7 +139,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    and the addressable approval still matches. Exit `2` is a blocked
    invariant; exit `1` is inconclusive. Neither authorizes mutation.
 
-4. Enforce the stages in order; no later checkpoint substitutes for an earlier
+5. Enforce the stages in order; no later checkpoint substitutes for an earlier
    one:
 
    | Stage                             | Required postcondition before the next stage                                                                                                                                   |
@@ -139,7 +159,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    the newly pushed SHA while preserving the distinct stable-alias rollback
    deployment.
 
-5. **Mutation gate:** stop before deploy, promote, alias/environment change, or
+6. **Mutation gate:** stop before deploy, promote, alias/environment change, or
    rollback until the complete stage-specific authority envelope is attached.
    When granted, operate one app and one stage only. Vercel's staged pattern is
    `vercel deploy --prod --skip-domain --cwd <app> --scope
@@ -147,13 +167,13 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 "$DEPLOYMENT_URL" --scope "$BUNDJIL_VERCEL_SCOPE"`. Do not use `--yes`,
    inline secret flags, or an unreviewed prebuilt artifact.
 
-6. Before promotion, execute the Sendblue and Photon runbooks against the
+7. Before promotion, execute the Sendblue and Photon runbooks against the
    immutable candidate URL. Require signed ingress, replay suppression, Eve
    completion, outbound acceptance, typing start, typing stop, and scoped
    resource release for each provider. A provider-accepted result does not
    establish handset delivery or typing display.
 
-7. Immediately repeat the project/list/inspect readbacks, resolve the stable
+8. Immediately repeat the project/list/inspect readbacks, resolve the stable
    alias to the accepted immutable deployment, retain the passed pre-promotion
    preflight and record the post-promotion readback. Do not rerun that
    pre-mutation stage as a passing postcondition: promotion intentionally
@@ -170,7 +190,9 @@ Retain the clean pushed SHA, CLI version and identity/scope, sanitized provider
 readback with `observedAt`, snapshot digest, bounded preflight receipt and
 detail digest, approval receipt,
 immutable accepted/current/previous deployment and config fingerprints, alias
-resolution, exact stage, postcondition, limitations, and non-claims. Do not
+resolution, exact route/function duration and Workflow trigger readback,
+measured acceptance/model/tool/provider distributions, exact stage,
+postcondition, limitations, and non-claims. Do not
 retain raw provider output containing secrets or payloads.
 
 ## Rollback and revocation
