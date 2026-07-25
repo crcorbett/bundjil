@@ -12,6 +12,7 @@ export {
   loadSendblueConfig,
 } from "./config.js";
 export type { ChannelConfigShape } from "./config.js";
+export { channelHandoffTimeoutDefault } from "./constants.js";
 export {
   EveChannelDispatch,
   layerEve as EveChannelDispatchEve,
@@ -62,6 +63,7 @@ export {
   ChannelHandoffAttempt,
   ChannelHandoffLatency,
   ChannelHandoffObservation,
+  ChannelHandoffTimeout,
   ChannelHandoffTimestamp,
   ChannelIdentityRecord,
   ChannelIdentityRecords,
@@ -75,12 +77,17 @@ export {
   ChannelReplayOptions,
   ChannelReplayPrefix,
   ChannelReplayRecord,
+  ChannelContinuityRecord,
+  ChannelInboundAcceptance,
   ChannelRoutingSecret,
   ChannelSessionFingerprint,
+  ChannelSessionSettlement,
+  ChannelSessionTerminalOutcome,
   ChannelStateV1,
   ChannelWebhookProofPolicy,
   ChannelWebhookQuery,
   ChannelWorkFingerprint,
+  ChannelTerminalFailureRecord,
 } from "./schemas.js";
 export type {
   ChannelAdapterStateEncoded,

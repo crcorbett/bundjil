@@ -1,5 +1,5 @@
 import { EveSessionId } from "@bundjil/eve";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Option, Schema } from "effect";
 import type { SendFn } from "eve/channels";
 
 import { EveChannelDispatchError } from "./errors.js";
@@ -30,7 +30,7 @@ export const layerMemory = Layer.effect(
     sessionFingerprint: "0".repeat(64),
     workFingerprint: "1".repeat(64),
   }).pipe(
-    Effect.mapError(() => new EveChannelDispatchError({ reason: "failed" })),
+    Effect.mapError(() => new EveChannelDispatchError({ reason: "rejected" })),
     Effect.map((acceptance) =>
       EveChannelDispatch.of({
         dispatch: Effect.fn("EveChannelDispatch.dispatch")(() =>
@@ -45,7 +45,7 @@ export const layerFailureMemory = Layer.succeed(
   EveChannelDispatch,
   EveChannelDispatch.of({
     dispatch: Effect.fn("EveChannelDispatch.dispatch")(function* () {
-      return yield* new EveChannelDispatchError({ reason: "failed" });
+      return yield* new EveChannelDispatchError({ reason: "rejected" });
     }),
   })
 );
@@ -62,39 +62,78 @@ export const layerEve = (send: SendFn<typeof ChannelAdapterState.Encoded>) =>
               .sendStarted(attempt)
               .pipe(
                 Effect.mapError(
-                  () => new EveChannelDispatchError({ reason: "failed" })
+                  () => new EveChannelDispatchError({ reason: "rejected" })
                 )
               );
-            return yield* Effect.gen(function* sendChannelInboundToEve() {
-              const state = yield* Schema.encodeEffect(ChannelAdapterState)(
-                input.state
-              );
-              const session = yield* Effect.tryPromise({
-                try: () =>
-                  send(input.message.text, {
-                    auth: {
-                      attributes: {
-                        channel: input.message.conversation.provider,
-                      },
-                      authenticator: input.message.conversation.provider,
-                      principalId: input.principalId,
-                      principalType: "user",
-                    },
-                    continuationToken: input.continuationToken,
-                    state,
-                  }),
-                catch: () => new EveChannelDispatchError({ reason: "failed" }),
-              });
-              const sessionId = yield* Schema.decodeUnknownEffect(EveSessionId)(
-                session.id
-              );
-              return yield* handoff.sendAccepted(attempt, sessionId);
-            }).pipe(
-              Effect.tapError(() => handoff.sendRejected(attempt)),
+            const state = yield* Schema.encodeEffect(ChannelAdapterState)(
+              input.state
+            ).pipe(
               Effect.mapError(
-                () => new EveChannelDispatchError({ reason: "failed" })
+                () => new EveChannelDispatchError({ reason: "rejected" })
+              ),
+              Effect.tapError(() =>
+                handoff
+                  .sendRejected(attempt, "rejected")
+                  .pipe(
+                    Effect.mapError(
+                      () => new EveChannelDispatchError({ reason: "rejected" })
+                    )
+                  )
+              ),
+              Effect.mapError(
+                () => new EveChannelDispatchError({ reason: "rejected" })
               )
             );
+            const accepted = yield* Effect.gen(
+              function* sendChannelInboundToEve() {
+                const session = yield* Effect.tryPromise({
+                  try: () =>
+                    send(input.message.text, {
+                      auth: {
+                        attributes: {
+                          channel: input.message.conversation.provider,
+                        },
+                        authenticator: input.message.conversation.provider,
+                        principalId: input.principalId,
+                        principalType: "user",
+                      },
+                      continuationToken: input.continuationToken,
+                      state,
+                    }),
+                  catch: () =>
+                    new EveChannelDispatchError({
+                      reason: "acceptance-uncertain",
+                    }),
+                });
+                const sessionId = yield* Schema.decodeUnknownEffect(
+                  EveSessionId
+                )(session.id);
+                return yield* handoff.sendAccepted(attempt, sessionId);
+              }
+            ).pipe(
+              Effect.tapError(() => handoff.sendRejected(attempt, "uncertain")),
+              Effect.mapError(
+                () =>
+                  new EveChannelDispatchError({
+                    reason: "acceptance-uncertain",
+                  })
+              ),
+              Effect.timeoutOption(handoff.acceptanceTimeout)
+            );
+            if (Option.isNone(accepted)) {
+              yield* handoff.sendRejected(attempt, "timeout").pipe(
+                Effect.mapError(
+                  () =>
+                    new EveChannelDispatchError({
+                      reason: "acceptance-timeout",
+                    })
+                )
+              );
+              return yield* new EveChannelDispatchError({
+                reason: "acceptance-timeout",
+              });
+            }
+            return accepted.value;
           }
         ),
       });

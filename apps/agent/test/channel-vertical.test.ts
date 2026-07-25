@@ -245,8 +245,12 @@ it.effect(
           return yield* Effect.die("dispatch required");
         }
         const attempt = yield* handoff.prepared(prepared.prepared.claim);
-        yield* dispatch.dispatch(prepared.prepared, attempt);
-        yield* channel.completeInbound(prepared.prepared.claim);
+        const acceptance = yield* dispatch.dispatch(prepared.prepared, attempt);
+        yield* channel.acceptInbound(
+          prepared.prepared.claim,
+          prepared.prepared.continuationToken,
+          acceptance
+        );
         return prepared.prepared;
       }).pipe(Effect.provide(Layer.mergeAll(layer, EveChannelDispatchMemory)));
 

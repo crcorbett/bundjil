@@ -2,5 +2,11 @@ import { Schema } from "effect";
 
 export class EveChannelDispatchError extends Schema.TaggedErrorClass<EveChannelDispatchError>()(
   "EveChannelDispatchError",
-  { reason: Schema.Literal("failed") }
+  {
+    reason: Schema.Literals([
+      "acceptance-timeout",
+      "acceptance-uncertain",
+      "rejected",
+    ]),
+  }
 ) {}

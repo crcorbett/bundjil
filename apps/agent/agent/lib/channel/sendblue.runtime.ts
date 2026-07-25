@@ -22,7 +22,7 @@ export const SendblueChannelRuntimeLive = Layer.unwrap(
       ChannelLive.pipe(
         Layer.provide(Layer.merge(transport, channelServices(config)))
       ),
-      ChannelHandoffLive(config.routingSecret)
+      ChannelHandoffLive(config.routingSecret, config.handoffTimeout)
     );
   })
 ).pipe(Layer.provide(ChannelConfigLive));

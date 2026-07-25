@@ -1,6 +1,7 @@
 import type { EveSessionId } from "@bundjil/eve";
 import { Context, Effect, Layer, Redacted, Ref, Schema } from "effect";
 
+import { channelHandoffTimeoutDefault } from "./constants.js";
 import { ChannelHandoffObservationError } from "./errors.js";
 import {
   ChannelHandoffAcceptance,
@@ -14,11 +15,17 @@ import type {
   ChannelHandoffAttempt as ChannelHandoffAttemptType,
   ChannelHandoffExitOutcome,
   ChannelHandoffObservation as ChannelHandoffObservationType,
+  ChannelHandoffTimeout,
+  ChannelInboundAcceptance,
   ChannelReplayClaim,
   ChannelRoutingSecret,
+  ChannelSessionFingerprint as ChannelSessionFingerprintType,
+  ChannelSessionSettlement,
+  ChannelSessionTerminalOutcome,
 } from "./schemas.js";
 
 export interface ChannelHandoffShape {
+  readonly acceptanceTimeout: ChannelHandoffTimeout;
   readonly prepared: (
     claim: ChannelReplayClaim
   ) => Effect.Effect<ChannelHandoffAttemptType, ChannelHandoffObservationError>;
@@ -33,7 +40,23 @@ export interface ChannelHandoffShape {
     ChannelHandoffObservationError
   >;
   readonly sendRejected: (
-    attempt: ChannelHandoffAttemptType
+    attempt: ChannelHandoffAttemptType,
+    outcome: "rejected" | "timeout" | "uncertain"
+  ) => Effect.Effect<void, ChannelHandoffObservationError>;
+  readonly converged: (
+    attempt: ChannelHandoffAttemptType,
+    result: ChannelInboundAcceptance
+  ) => Effect.Effect<void, ChannelHandoffObservationError>;
+  readonly fingerprintSession: (
+    sessionId: EveSessionId
+  ) => Effect.Effect<
+    ChannelSessionFingerprintType,
+    ChannelHandoffObservationError
+  >;
+  readonly sessionTerminal: (
+    sessionFingerprint: ChannelSessionFingerprintType,
+    outcome: ChannelSessionTerminalOutcome,
+    settlement: ChannelSessionSettlement
   ) => Effect.Effect<void, ChannelHandoffObservationError>;
   readonly response: (
     attempt: ChannelHandoffAttemptType,
@@ -52,6 +75,7 @@ export class ChannelHandoff extends Context.Service<
 
 const makeLayer = (
   secret: ChannelRoutingSecret,
+  acceptanceTimeout: ChannelHandoffTimeout,
   observations?: Ref.Ref<readonly ChannelHandoffObservationType[]>
 ) =>
   Layer.effect(
@@ -130,8 +154,23 @@ const makeLayer = (
           };
         }
       );
+      const fingerprintSession = Effect.fn("ChannelHandoff.fingerprintSession")(
+        function* (sessionId: EveSessionId) {
+          return yield* fingerprint("session", sessionId).pipe(
+            Effect.flatMap(Schema.decodeEffect(ChannelSessionFingerprint)),
+            Effect.mapError(
+              () =>
+                new ChannelHandoffObservationError({
+                  operation: "fingerprint",
+                  reason: "unavailable",
+                })
+            )
+          );
+        }
+      );
 
       return ChannelHandoff.of({
+        acceptanceTimeout,
         prepared: Effect.fn("ChannelHandoff.prepared")(function* (claim) {
           const workFingerprint = yield* fingerprint("work", claim.key).pipe(
             Effect.flatMap(Schema.decodeEffect(ChannelWorkFingerprint)),
@@ -176,19 +215,7 @@ const makeLayer = (
         ),
         sendAccepted: Effect.fn("ChannelHandoff.sendAccepted")(
           function* (attempt, sessionId) {
-            const sessionFingerprint = yield* fingerprint(
-              "session",
-              sessionId
-            ).pipe(
-              Effect.flatMap(Schema.decodeEffect(ChannelSessionFingerprint)),
-              Effect.mapError(
-                () =>
-                  new ChannelHandoffObservationError({
-                    operation: "fingerprint",
-                    reason: "unavailable",
-                  })
-              )
-            );
+            const sessionFingerprint = yield* fingerprintSession(sessionId);
             const base = yield* observationBase(attempt);
             yield* emit({
               _tag: "SendAccepted",
@@ -211,12 +238,34 @@ const makeLayer = (
             );
           }
         ),
+        converged: Effect.fn("ChannelHandoff.converged")(
+          function* (attempt, result) {
+            yield* emit({
+              _tag: "Continuity",
+              ...(yield* observationBase(attempt)),
+              outcome: result._tag,
+              sessionFingerprint: result.acceptance.sessionFingerprint,
+            });
+          }
+        ),
+        fingerprintSession,
+        sessionTerminal: Effect.fn("ChannelHandoff.sessionTerminal")(
+          function* (sessionFingerprint, outcome, settlement) {
+            yield* emit({
+              _tag: "SessionTerminal",
+              observedAtEpochMilliseconds: yield* timestamp,
+              outcome,
+              sessionFingerprint,
+              settlement,
+            });
+          }
+        ),
         sendRejected: Effect.fn("ChannelHandoff.sendRejected")(
-          function* (attempt) {
+          function* (attempt, outcome) {
             yield* emit({
               _tag: "SendRejected",
               ...(yield* observationBase(attempt)),
-              outcome: "rejected",
+              outcome,
             });
           }
         ),
@@ -243,9 +292,13 @@ const makeLayer = (
     })
   );
 
-export const layerLive = (secret: ChannelRoutingSecret) => makeLayer(secret);
+export const layerLive = (
+  secret: ChannelRoutingSecret,
+  acceptanceTimeout: ChannelHandoffTimeout
+) => makeLayer(secret, acceptanceTimeout);
 
 export const layerMemory = (
   secret: ChannelRoutingSecret,
-  observations: Ref.Ref<readonly ChannelHandoffObservationType[]>
-) => makeLayer(secret, observations);
+  observations: Ref.Ref<readonly ChannelHandoffObservationType[]>,
+  acceptanceTimeout: ChannelHandoffTimeout = channelHandoffTimeoutDefault
+) => makeLayer(secret, acceptanceTimeout, observations);

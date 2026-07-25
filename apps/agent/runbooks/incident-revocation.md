@@ -95,6 +95,33 @@ recorded expiry.
    owner/trigger is assigned. Otherwise preserve the incident as failed or
    inconclusive.
 
+## Channel terminal-failure alert and repair
+
+The agent operator owns the Channel terminal-failure alert. Alert immediately
+on any safe `SessionTerminal` observation with `outcome=failed` and
+`settlement=retired`; do not wait for a count threshold. Bind the alert to its
+HMAC session fingerprint, environment, source/config/deployment identity, and
+bounded observation window. The matching replay store retains a safe
+`status=failed` marker for the configured replay lifetime. Neither record
+contains content, participant/provider identity, raw Eve/session/run ID,
+continuation token, error, Cause, or stack.
+
+For a retired failed owner, the supported user repair route is the next fresh,
+authenticated provider message with a new provider event identity. It may
+establish a new Eve session owner after the failed owner was atomically
+retired. Do not replay the failed payload, remove replay/uncertain records,
+blind-retry an outcome-uncertain write, or manually synthesize an Eve run. A
+`settlement=stale` failure did not retire the current owner: preserve it,
+correlate the safe fingerprint with the target-owned Workflow readback under
+authority, and stop rather than clearing continuity.
+
+Also alert immediately on a bounded handoff timeout or
+`ContinuityUncertain`. Those outcomes return `503` and quarantine the exact
+inbound identity; a provider redelivery is suppressed until an operator can
+read back the accepted owner or the retained replay horizon expires under an
+accepted repair plan. Repository logs and storage markers prove only local
+classification, not the hosted Workflow or provider outcome.
+
 ## Evidence and postcondition
 
 Retain incident ID/times, actor/authority, exact target/environment, source and

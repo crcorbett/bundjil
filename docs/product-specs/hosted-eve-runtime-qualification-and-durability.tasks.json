@@ -424,7 +424,7 @@
     {
       "id": "prove-eve-owned-handoff",
       "title": "Pin and prove Eve-owned workflow acceptance",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": [],
       "findingIds": ["HEQ-F001", "HEQ-F004", "HEQ-F007"],
       "requirementIds": ["HEQ-REQ-003", "HEQ-REQ-010", "HEQ-REQ-016"],
@@ -488,7 +488,7 @@
     {
       "id": "add-handoff-observability",
       "title": "Add safe Eve handoff and Exit observability",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["prove-eve-owned-handoff"],
       "findingIds": ["HEQ-F002", "HEQ-F003"],
       "requirementIds": [
@@ -552,7 +552,7 @@
     {
       "id": "correct-202-ordering",
       "title": "Return 202 only after Eve durable acceptance",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["add-handoff-observability"],
       "findingIds": ["HEQ-F002", "HEQ-F003", "HEQ-F006", "HEQ-F007"],
       "requirementIds": [
@@ -619,6 +619,18 @@
         "202 follows Eve send acceptance and intended-session convergence in every direct fixture.",
         "Duplicate and uncertain-side-effect properties pass independently.",
         "Implementation is ready for timeout readback and Preview but makes no hosted claim."
+      ],
+      "completedAt": "2026-07-25",
+      "completionEvidence": [
+        "The route now awaits the exact Eve send Promise inside EveChannelDispatch and returns 202 only after a Schema-owned safe acceptance and atomic app-owned continuity convergence. It registers no critical waitUntil work; rejection, timeout, replay/observation failure, interruption, defect or continuity uncertainty produces no 202.",
+        "ChannelReplay atomically classifies an ownerless continuation as New, a matching accepted fingerprint as Resumed, and a different accepted fingerprint as ContinuityUncertain. The uncertain claim is retained, exact redelivery is suppressed, matching terminal completion/failure alone retires an owner, and stale terminal settlement cannot clear a newer owner.",
+        "The app-owned handoff deadline is decoded through Config.schema as a positive Effect Duration. Its 15-second constants.ts value is a conservative product default below Sendblue's last documented 45-second response deadline, not a provider requirement or hosted latency/function-duration readback. Timeout interrupts the local wait, records a safe timeout, quarantines the claim, returns 503 and never blind-retries the possibly accepted Eve write.",
+        "Direct route fixtures separately prove New and Resumed 202 ordering, delayed send withholding 202, one send under a concurrent same-ID duplicate, rejection, handoff timeout, continuity-fork 503, defect, interruption/finalizer and request-abort behavior. The atomic continuity fixture proves deliberate ownerless fallback, matching resume, different-owner quarantine, failed terminal retention, user repair, stale settlement and deliberate post-terminal restart.",
+        "Failed terminal state is retained under the same safe session fingerprint used by the SessionTerminal observation. The incident runbook assigns an immediate alert threshold and the next fresh authenticated provider message as the repair route; it forbids payload replay, replay-state clearing, synthesized Eve runs and blind uncertain-write retry.",
+        "No provider operation is admitted to Effect.retry in this slice: Sendblue and Photon uncertain transport/write timeouts remain one-attempt readback-required failures, known retryable ingress responses rely on provider redelivery, and a retained uncertain identity suppresses a second effect. The proposed three-attempt/backoff/jitter policy remains unadmitted pending measured operation-specific evidence.",
+        "Twenty-eight focused Config/handoff/continuity/route/vertical tests passed; the final full agent suite passed 73 tests after ordinary and Vercel Eve builds; Sendblue passed 9 tests and Photon passed 25 tests. Agent typechecking, Effect language-service setup/diagnostics, boundary, docs, skills, authority, controls, verification-policy, HGI-307, local skill validation, formatting, Knip and diff checks passed in the fresh complete repository verification.",
+        "The first full agent-test attempt stopped before tests at the fail-closed missing Executor endpoint. The accepted rerun used only the documented public synthetic build-time endpoint and made no authenticated provider request.",
+        "The receipt is repository/local-build proof only. No deployment, provider mutation/readback, webhook, credential, message, Preview, Production, Workflow run, plan limit, Vercel effective duration, hosted alert or durable-resumption claim is established."
       ],
       "commitAfterPassing": true
     },

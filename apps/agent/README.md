@@ -37,35 +37,34 @@ presence, and outbound-acceptance path. Accepted ingress returns `202`;
 ignored/duplicate ingress returns `204`; authentication, payload, and
 routing/replay failures map to `401`, `400`, and `503` respectively.
 
-The shared Eve adapter prepares a request with the concrete provider runtime,
-then starts accepted work with that runtime's `runFork` before returning
-`202`. Eve `waitUntil` receives one Promise that awaits the supervised Fiber's
-completion. `ChannelHandoff` records Schema-owned prepared, send,
-response, and native Exit phases using domain-separated HMAC work/session
-fingerprints and bounded timestamps/latencies; it retains no content, raw
-identity, secret, error, Cause, or stack. The current delayed-send fixture
-still observes `Response` before `SendAccepted`; the active execution plan owns
-the pending acknowledgement correction. Client disconnect does not cancel
-accepted work; runtime disposal interrupts it in tests. The adapter never
-constructs or disposes a runtime per request, adds no Channel-wide timeout or
-retry, and does not treat `waitUntil` or a safe fingerprint as durable
-execution. Local build output and a named deployment readback are separate
-proof classes; source does not establish current Vercel bundling, instance
-reuse, scale-out, shutdown, or provider state.
+The shared Eve adapter prepares a request with the concrete provider runtime
+and awaits the exact Eve `send()` Promise before acknowledging. It returns
+`202` only after a Schema-owned safe session acceptance and an atomic
+continuity fence classify the result as a new owner or intended-session
+resume. A different fallback session, rejected send, or bounded handoff
+timeout returns `503` and retains the inbound identity as uncertain; an exact
+redelivery is suppressed. No critical work remains under `waitUntil`.
+`ChannelHandoff` records only Schema-owned prepared, send, continuity,
+response, terminal-session, and native Exit phases using domain-separated HMAC
+work/session fingerprints and bounded timestamps/latencies. It retains no
+content, raw identity, secret, error, Cause, or stack. Client disconnect does
+not cancel an already-started acceptance operation; runtime disposal
+interrupts it in tests without returning `202`. The adapter never constructs
+or disposes a runtime per request, adds no Channel-wide retry, and does not
+treat a safe fingerprint as hosted durability proof. Local Build Output and a
+named deployment readback remain separate proof classes.
 
 Pinned Eve `0.20.0` owns durable session start/resume and turn child workflows
 behind its route-owned `send()` operation. Bundjil adds no second Workflow or
-raw Workflow client. The current acknowledgement ordering remains tracked by
-the active hosted-Eve execution plan: source-level `send()` resolution is the
-minimum acceptance boundary, while an established continuation must also
-reject a different fallback run. The test command generates ordinary and
-Vercel Build Output and verifies Eve's generated Workflow `max` separately
-from the ordinary function's unset duration; it makes no hosted claim.
+raw Workflow client. The test command generates ordinary and Vercel Build
+Output and verifies Eve's generated Workflow `max` separately from the
+ordinary function's unset duration; it makes no hosted claim.
 
 The replacement path uses only these app-owned environment namespaces:
 
 | Concern  | Environment names                                                                                                                                                                                                                                     |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Handoff  | `BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS` (positive Duration; 15-second product default, not a provider or Vercel requirement)                                                                                                                   |
 | Routing  | `BUNDJIL_CHANNEL_ROUTING_IDENTITIES`, `BUNDJIL_CHANNEL_ROUTING_SECRET`                                                                                                                                                                                |
 | Replay   | `BUNDJIL_CHANNEL_REPLAY_PREFIX`, `BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN`, `BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX`  |
 | Sendblue | `BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES`, `BUNDJIL_CHANNEL_SENDBLUE_API_KEY`, `BUNDJIL_CHANNEL_SENDBLUE_API_SECRET`, `BUNDJIL_CHANNEL_SENDBLUE_LINE`, `BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS`, `BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET` |

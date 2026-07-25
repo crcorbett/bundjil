@@ -113,14 +113,23 @@ it.effect("encodes only bounded safe handoff observations", () =>
       const handoff = yield* ChannelHandoff;
       const attempt = yield* handoff.prepared(fixture.claim);
       yield* handoff.sendStarted(attempt);
-      yield* handoff.sendAccepted(attempt, fixture.sessionId);
-      yield* handoff.sendRejected(attempt);
+      const acceptance = yield* handoff.sendAccepted(
+        attempt,
+        fixture.sessionId
+      );
+      yield* handoff.converged(attempt, { _tag: "New", acceptance });
+      yield* handoff.sendRejected(attempt, "rejected");
       yield* handoff.response(attempt, 202);
       yield* handoff.response(attempt, 503);
       yield* Effect.forEach(
         ["succeeded", "failed", "defect", "interrupted"] as const,
         (outcome) => handoff.settled(attempt, outcome),
         { discard: true }
+      );
+      yield* handoff.sessionTerminal(
+        acceptance.sessionFingerprint,
+        "failed",
+        "retired"
       );
     }).pipe(
       Effect.provide(ChannelHandoffMemory(fixture.firstSecret, observations))
@@ -154,6 +163,7 @@ it.effect("encodes only bounded safe handoff observations", () =>
         "Prepared",
         "SendStarted",
         "SendAccepted",
+        "Continuity",
         "SendRejected",
         "Response",
         "Response",
@@ -161,6 +171,7 @@ it.effect("encodes only bounded safe handoff observations", () =>
         "Exit",
         "Exit",
         "Exit",
+        "SessionTerminal",
       ]
     );
 

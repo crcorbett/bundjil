@@ -8,8 +8,12 @@ import {
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
 import {
+  Context,
   Deferred,
+  Duration,
   Effect,
+  Exit,
+  Fiber,
   Layer,
   ManagedRuntime,
   Redacted,
@@ -22,6 +26,7 @@ import { makeSendblueEveChannel } from "../agent/channels/sendblue.js";
 import type { ChannelHandoff } from "../agent/lib/channel/index.js";
 import {
   Channel,
+  channelHandoffTimeoutDefault,
   ChannelHandoffMemory,
   ChannelIdentityMemory,
   ChannelLive,
@@ -30,15 +35,17 @@ import {
   ChannelRouterMemory,
   ChannelRoutingError,
 } from "../agent/lib/channel/index.js";
+import type {
+  ChannelHandoffObservation,
+  ChannelHandoffTimeout,
+  ChannelInboundAcceptance,
+  ChannelMutableAdapterStateEncoded,
+} from "../agent/lib/channel/schemas.js";
 import {
   ChannelIdentityRecords,
   ChannelPrepareInboundResult,
   ChannelReplayOptions,
   ChannelRoutingSecret,
-} from "../agent/lib/channel/schemas.js";
-import type {
-  ChannelMutableAdapterStateEncoded,
-  ChannelHandoffObservation,
 } from "../agent/lib/channel/schemas.js";
 
 const fixtures = Effect.gen(function* decodeSendblueChannelFixtures() {
@@ -115,7 +122,8 @@ const makeObservedRuntime = Effect.fn(
   webhook: Effect.Effect<
     typeof ChannelWebhookResult.Type,
     ChannelWebhookAuthenticationError | ChannelWebhookSchemaError
-  >
+  >,
+  handoffTimeout: ChannelHandoffTimeout = channelHandoffTimeoutDefault
 ) {
   const fixture = yield* fixtures;
   const observations = yield* Ref.make<
@@ -138,7 +146,7 @@ const makeObservedRuntime = Effect.fn(
   const runtime = ManagedRuntime.make(
     Layer.merge(
       ChannelLive.pipe(Layer.provide(dependencies)),
-      ChannelHandoffMemory(fixture.routingSecret, observations)
+      ChannelHandoffMemory(fixture.routingSecret, observations, handoffTimeout)
     )
   );
   return { observations, runtime };
@@ -155,7 +163,10 @@ const makeRuntime = Effect.fn("SendblueChannelTest.makeRuntime")(function* (
 
 const makeObservedSupervisionRuntime = Effect.fn(
   "SendblueChannelTest.makeObservedSupervisionRuntime"
-)(function* (completeInbound: Effect.Effect<void>) {
+)(function* (
+  acceptInbound: Effect.Effect<void>,
+  acceptanceMode: (typeof ChannelInboundAcceptance.Type)["_tag"] = "New"
+) {
   const fixture = yield* fixtures;
   const observations = yield* Ref.make<
     readonly (typeof ChannelHandoffObservation.Type)[]
@@ -165,11 +176,15 @@ const makeObservedSupervisionRuntime = Effect.fn(
       Layer.succeed(
         Channel,
         Channel.of({
-          completeInbound: () => completeInbound,
+          acceptInbound: (_claim, _continuationToken, acceptance) =>
+            acceptInbound.pipe(Effect.as({ _tag: acceptanceMode, acceptance })),
           decodeWebhook: () => Effect.succeed(fixture.accepted),
           handleEvent: () =>
             Effect.die("channel event is not used in this test"),
           prepareInbound: () => Effect.succeed(fixture.prepared),
+          retryInbound: () => Effect.void,
+          settleSession: () => Effect.succeed("retired"),
+          uncertainInbound: () => Effect.void,
         })
       ),
       ChannelHandoffMemory(fixture.routingSecret, observations)
@@ -246,7 +261,6 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
     );
 
     let sends = 0;
-    const pending: Promise<unknown>[] = [];
     let waitUntilRegistrations = 0;
     const args = {
       getSession: () => session,
@@ -259,20 +273,18 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
       },
       waitUntil: (task) => {
         waitUntilRegistrations += 1;
-        pending.push(task);
+        void task;
       },
     } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
 
     const acceptedRoute = routeFor(acceptedRuntime);
     const acceptedResponse = yield* Effect.promise(() =>
       acceptedRoute.handler(request(), args).then((response) => {
-        assert.strictEqual(waitUntilRegistrations, 1);
+        assert.strictEqual(waitUntilRegistrations, 0);
         return response;
       })
     );
     assert.strictEqual(acceptedResponse.status, 202);
-    assert.strictEqual(pending.length, 1);
-    yield* Effect.promise(() => Promise.all(pending));
     assert.strictEqual(sends, 1);
     assert.strictEqual(
       (yield* Effect.promise(() => acceptedRoute.handler(request(), args)))
@@ -301,42 +313,61 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
 );
 
 it.effect(
-  "records the current 202 before a deliberately delayed Eve acceptance",
+  "withholds 202 and suppresses a duplicate until delayed Eve acceptance converges",
   () =>
     Effect.gen(function* testDelayedChannelHandoffOrdering() {
+      const fixture = yield* fixtures;
       const started = yield* Deferred.make<null>();
       const release = yield* Deferred.make<null>();
-      const runPromise = Effect.runPromiseWith(yield* Effect.context());
-      const observed = yield* makeObservedSupervisionRuntime(Effect.void);
+      const runPromise = Effect.runPromiseWith(Context.empty());
+      const observed = yield* makeObservedRuntime(
+        Effect.succeed(fixture.accepted)
+      );
       yield* Effect.addFinalizer(() => observed.runtime.disposeEffect);
 
-      const pending: Promise<unknown>[] = [];
-      const response = yield* Effect.promise(() =>
-        routeFor(observed.runtime).handler(request(), {
-          getSession: () => session,
-          params: {},
-          receive: () => Promise.resolve(session),
-          requestIp: null,
-          send: () =>
-            runPromise(
-              Deferred.succeed(started, null).pipe(
-                Effect.andThen(Deferred.await(release)),
-                Effect.as(session)
-              )
-            ),
-          waitUntil: (task) => {
-            pending.push(task);
-          },
-        })
+      let sends = 0;
+      let waitUntilRegistrations = 0;
+      let responseResolved = false;
+      const args = {
+        getSession: () => session,
+        params: {},
+        receive: () => Promise.resolve(session),
+        requestIp: null,
+        send: () => {
+          sends += 1;
+          return runPromise(
+            Deferred.succeed(started, null).pipe(
+              Effect.andThen(Deferred.await(release)),
+              Effect.as(session)
+            )
+          );
+        },
+        waitUntil: () => {
+          waitUntilRegistrations += 1;
+        },
+      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      const route = routeFor(observed.runtime);
+      const responseFiber = yield* Effect.forkChild(
+        Effect.promise(() =>
+          route.handler(request(), args).then((response) => {
+            responseResolved = true;
+            return response;
+          })
+        )
       );
       yield* Deferred.await(started);
+      const duplicate = yield* Effect.promise(() =>
+        route.handler(request(), args)
+      );
       const beforeAcceptance = yield* Ref.get(observed.observations);
 
-      assert.strictEqual(response.status, 202);
-      assert.strictEqual(pending.length, 1);
+      assert.strictEqual(duplicate.status, 204);
+      assert.strictEqual(sends, 1);
+      assert.strictEqual(responseResolved, false);
+      assert.strictEqual(waitUntilRegistrations, 0);
       assert.deepStrictEqual(
         beforeAcceptance.map((observation) => observation._tag),
-        ["Prepared", "SendStarted", "Response"]
+        ["Prepared", "SendStarted"]
       );
       assert.strictEqual(
         beforeAcceptance.some(
@@ -346,11 +377,20 @@ it.effect(
       );
 
       yield* Deferred.succeed(release, null);
-      yield* Effect.promise(() => Promise.all(pending));
+      const response = yield* Fiber.join(responseFiber);
       const afterAcceptance = yield* Ref.get(observed.observations);
+      assert.strictEqual(response.status, 202);
+      assert.strictEqual(sends, 1);
       assert.deepStrictEqual(
         afterAcceptance.map((observation) => observation._tag),
-        ["Prepared", "SendStarted", "Response", "SendAccepted", "Exit"]
+        [
+          "Prepared",
+          "SendStarted",
+          "SendAccepted",
+          "Continuity",
+          "Exit",
+          "Response",
+        ]
       );
       const responseObservation = afterAcceptance.find(
         (observation) => observation._tag === "Response"
@@ -368,112 +408,228 @@ it.effect(
 );
 
 it.effect(
-  "settles waitUntil after typed failure and defect without another dispatch",
+  "returns 202 for intended-session resume but rejects a continuity fork",
   () =>
-    Effect.gen(function* testChannelBackgroundFailureCompletion() {
-      const typedFailure = yield* makeObservedSupervisionRuntime(Effect.void);
-      const defect = yield* makeObservedSupervisionRuntime(
-        Effect.die("synthetic channel completion defect")
+    Effect.gen(function* testExistingSessionConvergence() {
+      const resumed = yield* makeObservedSupervisionRuntime(
+        Effect.void,
+        "Resumed"
+      );
+      const forked = yield* makeObservedSupervisionRuntime(
+        Effect.void,
+        "ContinuityUncertain"
       );
       yield* Effect.addFinalizer(() =>
         Effect.all(
-          [typedFailure.runtime.disposeEffect, defect.runtime.disposeEffect],
+          [resumed.runtime.disposeEffect, forked.runtime.disposeEffect],
           { discard: true }
         )
       );
 
-      let typedFailureSends = 0;
-      let typedFailureRegistered = false;
-      const typedFailurePending: Promise<unknown>[] = [];
-      const typedFailureResponse = yield* Effect.promise(() =>
-        routeFor(typedFailure.runtime)
-          .handler(request(), {
-            getSession: () => session,
-            params: {},
-            receive: () => Promise.resolve(session),
-            requestIp: null,
-            send: () => {
-              typedFailureSends += 1;
-              return Promise.reject(new Error("synthetic send rejection"));
-            },
-            waitUntil: (task) => {
-              typedFailureRegistered = true;
-              typedFailurePending.push(task);
-            },
-          })
-          .then((response) => {
-            assert.strictEqual(typedFailureRegistered, true);
-            return response;
-          })
+      const args = {
+        getSession: () => session,
+        params: {},
+        receive: () => Promise.resolve(session),
+        requestIp: null,
+        send: () => Promise.resolve(session),
+        waitUntil: () => {},
+      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      const resumedResponse = yield* Effect.promise(() =>
+        routeFor(resumed.runtime).handler(request(), args)
       );
-      assert.strictEqual(typedFailureResponse.status, 202);
-      assert.strictEqual(typedFailurePending.length, 1);
-      yield* Effect.promise(() => Promise.all(typedFailurePending));
-      assert.strictEqual(typedFailureSends, 1);
-      const typedFailureObservations = yield* Ref.get(
-        typedFailure.observations
+      const forkedResponse = yield* Effect.promise(() =>
+        routeFor(forked.runtime).handler(request(), args)
       );
-      assert.strictEqual(
-        typedFailureObservations.some(
-          (observation) => observation._tag === "SendRejected"
-        ),
-        true
-      );
-      assert.strictEqual(
-        typedFailureObservations.some(
-          (observation) =>
-            observation._tag === "Exit" && observation.outcome === "failed"
-        ),
-        true
-      );
+      const resumedObservations = yield* Ref.get(resumed.observations);
+      const forkedObservations = yield* Ref.get(forked.observations);
 
-      let defectSends = 0;
-      let defectRegistered = false;
-      const defectPending: Promise<unknown>[] = [];
-      const defectResponse = yield* Effect.promise(() =>
-        routeFor(defect.runtime)
-          .handler(request(), {
-            getSession: () => session,
-            params: {},
-            receive: () => Promise.resolve(session),
-            requestIp: null,
-            send: () => {
-              defectSends += 1;
-              return Promise.resolve(session);
-            },
-            waitUntil: (task) => {
-              defectRegistered = true;
-              defectPending.push(task);
-            },
-          })
-          .then((response) => {
-            assert.strictEqual(defectRegistered, true);
-            return response;
-          })
-      );
-      assert.strictEqual(defectResponse.status, 202);
-      assert.strictEqual(defectPending.length, 1);
-      yield* Effect.promise(() => Promise.all(defectPending));
-      assert.strictEqual(defectSends, 1);
-      const defectObservations = yield* Ref.get(defect.observations);
-      assert.strictEqual(
-        defectObservations.some(
-          (observation) => observation._tag === "SendAccepted"
-        ),
-        true
+      assert.strictEqual(resumedResponse.status, 202);
+      assert.deepStrictEqual(
+        resumedObservations.map((observation) => observation._tag),
+        [
+          "Prepared",
+          "SendStarted",
+          "SendAccepted",
+          "Continuity",
+          "Exit",
+          "Response",
+        ]
       );
       assert.strictEqual(
-        defectObservations.some(
+        resumedObservations.some(
           (observation) =>
-            observation._tag === "Exit" && observation.outcome === "defect"
+            observation._tag === "Continuity" &&
+            observation.outcome === "Resumed"
         ),
         true
+      );
+      assert.strictEqual(forkedResponse.status, 503);
+      assert.strictEqual(
+        forkedObservations.some(
+          (observation) =>
+            observation._tag === "Continuity" &&
+            observation.outcome === "ContinuityUncertain"
+        ),
+        true
+      );
+      assert.strictEqual(
+        forkedObservations.some(
+          (observation) =>
+            observation._tag === "Response" && observation.status === 202
+        ),
+        false
+      );
+    }).pipe(Effect.scoped)
+);
+
+it.effect("returns no 202 for rejected or defective pre-response handoff", () =>
+  Effect.gen(function* testChannelBackgroundFailureCompletion() {
+    const typedFailure = yield* makeObservedSupervisionRuntime(Effect.void);
+    const defect = yield* makeObservedSupervisionRuntime(
+      Effect.die("synthetic channel completion defect")
+    );
+    yield* Effect.addFinalizer(() =>
+      Effect.all(
+        [typedFailure.runtime.disposeEffect, defect.runtime.disposeEffect],
+        { discard: true }
+      )
+    );
+
+    let typedFailureSends = 0;
+    let typedFailureWaitUntilRegistrations = 0;
+    const typedFailureResponse = yield* Effect.promise(() =>
+      routeFor(typedFailure.runtime).handler(request(), {
+        getSession: () => session,
+        params: {},
+        receive: () => Promise.resolve(session),
+        requestIp: null,
+        send: () => {
+          typedFailureSends += 1;
+          return Promise.reject(new Error("synthetic send rejection"));
+        },
+        waitUntil: () => {
+          typedFailureWaitUntilRegistrations += 1;
+        },
+      })
+    );
+    assert.strictEqual(typedFailureResponse.status, 503);
+    assert.strictEqual(typedFailureWaitUntilRegistrations, 0);
+    assert.strictEqual(typedFailureSends, 1);
+    const typedFailureObservations = yield* Ref.get(typedFailure.observations);
+    assert.strictEqual(
+      typedFailureObservations.some(
+        (observation) =>
+          observation._tag === "SendRejected" &&
+          observation.outcome === "uncertain"
+      ),
+      true
+    );
+    assert.strictEqual(
+      typedFailureObservations.some(
+        (observation) =>
+          observation._tag === "Exit" && observation.outcome === "failed"
+      ),
+      true
+    );
+
+    let defectSends = 0;
+    let defectWaitUntilRegistrations = 0;
+    const defectExit = yield* Effect.promise(() =>
+      routeFor(defect.runtime).handler(request(), {
+        getSession: () => session,
+        params: {},
+        receive: () => Promise.resolve(session),
+        requestIp: null,
+        send: () => {
+          defectSends += 1;
+          return Promise.resolve(session);
+        },
+        waitUntil: () => {
+          defectWaitUntilRegistrations += 1;
+        },
+      })
+    ).pipe(Effect.exit);
+    assert.strictEqual(Exit.hasDies(defectExit), true);
+    assert.strictEqual(defectWaitUntilRegistrations, 0);
+    assert.strictEqual(defectSends, 1);
+    const defectObservations = yield* Ref.get(defect.observations);
+    assert.strictEqual(
+      defectObservations.some(
+        (observation) => observation._tag === "SendAccepted"
+      ),
+      true
+    );
+    assert.strictEqual(
+      defectObservations.some(
+        (observation) =>
+          observation._tag === "Exit" && observation.outcome === "defect"
+      ),
+      true
+    );
+  }).pipe(Effect.scoped)
+);
+
+it.effect(
+  "times out before 202 and quarantines the outcome-uncertain inbound event",
+  () =>
+    Effect.gen(function* testChannelHandoffTimeout() {
+      const fixture = yield* fixtures;
+      const pending = yield* Deferred.make<Session>();
+      const runPromise = Effect.runPromiseWith(Context.empty());
+      const observed = yield* makeObservedRuntime(
+        Effect.succeed(fixture.accepted),
+        Duration.millis(10)
+      );
+      yield* Effect.addFinalizer(() => observed.runtime.disposeEffect);
+
+      let sends = 0;
+      let waitUntilRegistrations = 0;
+      const route = routeFor(observed.runtime);
+      const args = {
+        getSession: () => session,
+        params: {},
+        receive: () => Promise.resolve(session),
+        requestIp: null,
+        send: () => {
+          sends += 1;
+          return runPromise(Deferred.await(pending));
+        },
+        waitUntil: () => {
+          waitUntilRegistrations += 1;
+        },
+      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      const timedOut = yield* Effect.promise(() =>
+        route.handler(request(), args)
+      );
+      const duplicate = yield* Effect.promise(() =>
+        route.handler(request(), args)
+      );
+      const observations = yield* Ref.get(observed.observations);
+
+      assert.strictEqual(timedOut.status, 503);
+      assert.strictEqual(duplicate.status, 204);
+      assert.strictEqual(sends, 1);
+      assert.strictEqual(waitUntilRegistrations, 0);
+      assert.strictEqual(
+        observations.some(
+          (observation) =>
+            observation._tag === "SendRejected" &&
+            observation.outcome === "timeout"
+        ),
+        true
+      );
+      assert.strictEqual(
+        observations.some(
+          (observation) =>
+            observation._tag === "Response" && observation.status === 202
+        ),
+        false
       );
     }).pipe(Effect.scoped)
 );
 
 it.effect(
-  "interrupts accepted work and runs its finalizer when the runtime is disposed",
+  "withholds 202 and runs the acceptance finalizer when runtime disposal interrupts",
   () =>
     Effect.gen(function* testChannelBackgroundRuntimeDisposal() {
       const started = yield* Deferred.make<null>();
@@ -487,28 +643,30 @@ it.effect(
       yield* Effect.addFinalizer(() => observed.runtime.disposeEffect);
 
       let sends = 0;
-      const pending: Promise<unknown>[] = [];
-      const response = yield* Effect.promise(() =>
-        routeFor(observed.runtime).handler(request(), {
-          getSession: () => session,
-          params: {},
-          receive: () => Promise.resolve(session),
-          requestIp: null,
-          send: () => {
-            sends += 1;
-            return Promise.resolve(session);
-          },
-          waitUntil: (task) => {
-            pending.push(task);
-          },
-        })
+      let waitUntilRegistrations = 0;
+      const handlerFiber = yield* Effect.forkChild(
+        Effect.promise(() =>
+          routeFor(observed.runtime).handler(request(), {
+            getSession: () => session,
+            params: {},
+            receive: () => Promise.resolve(session),
+            requestIp: null,
+            send: () => {
+              sends += 1;
+              return Promise.resolve(session);
+            },
+            waitUntil: () => {
+              waitUntilRegistrations += 1;
+            },
+          })
+        ).pipe(Effect.exit)
       );
-      assert.strictEqual(response.status, 202);
-      assert.strictEqual(pending.length, 1);
       yield* Deferred.await(started);
       yield* observed.runtime.disposeEffect;
       yield* Deferred.await(finalized);
-      yield* Effect.promise(() => Promise.all(pending));
+      const handlerExit = yield* Fiber.join(handlerFiber);
+      assert.strictEqual(handlerExit._tag, "Failure");
+      assert.strictEqual(waitUntilRegistrations, 0);
       assert.strictEqual(sends, 1);
       const observations = yield* Ref.get(observed.observations);
       assert.strictEqual(
@@ -539,36 +697,45 @@ it.effect(
 
       let sends = 0;
       const controller = new AbortController();
-      const pending: Promise<unknown>[] = [];
-      const response = yield* Effect.promise(() =>
-        routeFor(runtime).handler(
-          new Request("https://agent.test/eve/v1/sendblue/webhook", {
-            method: "POST",
-            signal: controller.signal,
-          }),
-          {
-            getSession: () => session,
-            params: {},
-            receive: () => Promise.resolve(session),
-            requestIp: null,
-            send: () => {
-              sends += 1;
-              return Promise.resolve(session);
-            },
-            waitUntil: (task) => {
-              pending.push(task);
-            },
-          }
+      let waitUntilRegistrations = 0;
+      let responseResolved = false;
+      const responseFiber = yield* Effect.forkChild(
+        Effect.promise(() =>
+          routeFor(runtime)
+            .handler(
+              new Request("https://agent.test/eve/v1/sendblue/webhook", {
+                method: "POST",
+                signal: controller.signal,
+              }),
+              {
+                getSession: () => session,
+                params: {},
+                receive: () => Promise.resolve(session),
+                requestIp: null,
+                send: () => {
+                  sends += 1;
+                  return Promise.resolve(session);
+                },
+                waitUntil: () => {
+                  waitUntilRegistrations += 1;
+                },
+              }
+            )
+            .then((response) => {
+              responseResolved = true;
+              return response;
+            })
         )
       );
-      assert.strictEqual(response.status, 202);
-      assert.strictEqual(pending.length, 1);
       yield* Deferred.await(started);
+      assert.strictEqual(responseResolved, false);
       controller.abort();
       assert.strictEqual(controller.signal.aborted, true);
       yield* Deferred.succeed(release, null);
       yield* Deferred.await(completed);
-      yield* Effect.promise(() => Promise.all(pending));
+      const response = yield* Fiber.join(responseFiber);
+      assert.strictEqual(response.status, 202);
+      assert.strictEqual(waitUntilRegistrations, 0);
       assert.strictEqual(sends, 1);
     }).pipe(Effect.scoped)
 );

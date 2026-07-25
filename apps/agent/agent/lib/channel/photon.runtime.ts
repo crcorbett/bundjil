@@ -20,7 +20,7 @@ export const PhotonChannelRuntimeLive = Layer.unwrap(
           Layer.merge(PhotonTransportLive(photon), channelServices(config))
         )
       ),
-      ChannelHandoffLive(config.routingSecret)
+      ChannelHandoffLive(config.routingSecret, config.handoffTimeout)
     );
   })
 ).pipe(Layer.provide(ChannelConfigLive));
