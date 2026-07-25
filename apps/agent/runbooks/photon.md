@@ -187,12 +187,19 @@ duplicate suppression, Preview, Production, or durable process supervision.
    fingerprints. Never infer an owned resource from list order, creation time,
    phone identity, assigned routing number, or partial ID.
 3. Require service type `shared`, zero dedicated lines, and iMessage enabled.
-   Match the exact approved redacted user identity. Adopt one exact existing
-   match; if none exists, check shared availability and call the idempotent
-   shared-user create once, then read back one exact stable user ID and an
-   assigned routing number without retaining either phone value. More than one
-   exact match, an unavailable identity, a dedicated service, or an uncertain
-   postcondition is a stop.
+   Inventory approved controlled identities by safe fingerprint and prove each
+   candidate's current Photon project/user binding without retaining a full
+   number. Prefer an unbound test/non-Production candidate. For a bound
+   candidate, prove Photon permits concurrent reference from the isolated
+   Preview project without detach, reassignment, disablement, or delivery
+   change before calling create. Never move an existing binding merely to pass
+   the spike. Match the selected exact redacted identity, check shared
+   availability, call the idempotent shared-user create once, then read back
+   one exact stable user ID and an assigned routing number without retaining
+   either phone value. Re-read the source project's binding after creation.
+   More than one exact match, an unavailable or exclusive identity, any source
+   binding change, a dedicated service, or an uncertain postcondition is a
+   stop.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only

@@ -386,24 +386,35 @@ reuse the site's state identity or credentials.
 
 ### Preview
 
-| Resource                 | Desired ownership                                                                          | Isolation rule                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Alchemy stage            | `BundjilInfrastructure / preview`                                                          | Separate state and provider credentials from `prod`                                                                         |
-| Vercel projects/settings | same existing two projects, `preview` target                                               | Never mutate Production targets from Preview or PR jobs                                                                     |
-| Preview domains          | Vercel-generated deployment URLs; optional imported Preview alias                          | No Production custom-domain or DNS write                                                                                    |
-| Agent/proxy env          | Preview-only URL, internal token, bypass, model, Channel routing and storage values        | Must not equal Production secret references or replay/profile prefixes; token rotation is not implied                       |
-| Upstash bindings         | imported Preview connection and prefixes                                                   | Physical DB may be shared only after exact database and namespace review; destructive ownership remains disabled            |
-| Photon project           | separate Preview project and project secret                                                | Until proved, Photon Preview apply stops before provider writes; current shared project is observation-only migration state |
-| Photon platform/user     | approved synthetic Preview user in Preview project                                         | No Production user identity, assignment, or credential reuse                                                                |
-| Photon webhook           | one exact Preview callback observation; mutation is a gated spike                          | Separate signing secret and webhook ID; create/delete requires proved binding sink, deployment cutover, and retry drain     |
-| Photon lines/billing     | read-only; zero dedicated lines expected                                                   | No billable line creation                                                                                                   |
-| Deployment observation   | immutable PR/Preview deployment IDs                                                        | Observation only; PR closure removes no project/provider resource                                                           |
-| Proof                    | plan, provider readback, deployment health/auth, isolated signed ingress and Channel proof | Sanitized artifact; no Production or handset inference                                                                      |
+| Resource                 | Desired ownership                                                                          | Isolation rule                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Alchemy stage            | `BundjilInfrastructure / preview`                                                          | Separate state and provider credentials from `prod`                                                                                                                |
+| Vercel projects/settings | same existing two projects, `preview` target                                               | Never mutate Production targets from Preview or PR jobs                                                                                                            |
+| Preview domains          | Vercel-generated deployment URLs; optional imported Preview alias                          | No Production custom-domain or DNS write                                                                                                                           |
+| Agent/proxy env          | Preview-only URL, internal token, bypass, model, Channel routing and storage values        | Must not equal Production secret references or replay/profile prefixes; token rotation is not implied                                                              |
+| Upstash bindings         | imported Preview connection and prefixes                                                   | Physical DB may be shared only after exact database and namespace review; destructive ownership remains disabled                                                   |
+| Photon project           | separate Preview project and project secret                                                | Until proved, Photon Preview apply stops before provider writes; current shared project is observation-only migration state                                        |
+| Photon platform/user     | approved existing controlled identity in Preview project                                   | Prefer a test/non-Production identity; reuse across projects only when provider readback proves it causes no detach, reassignment, disablement, or delivery change |
+| Photon webhook           | one exact Preview callback observation; mutation is a gated spike                          | Separate signing secret and webhook ID; create/delete requires proved binding sink, deployment cutover, and retry drain                                            |
+| Photon lines/billing     | read-only; zero dedicated lines expected                                                   | No billable line creation                                                                                                                                          |
+| Deployment observation   | immutable PR/Preview deployment IDs                                                        | Observation only; PR closure removes no project/provider resource                                                                                                  |
+| Proof                    | plan, provider readback, deployment health/auth, isolated signed ingress and Channel proof | Sanitized artifact; no Production or handset inference                                                                                                             |
 
 If a separate Free Photon Preview project cannot be created or cannot host an
 isolated approved user, the accepted fallback is **no live Photon Preview
 management or webhook**. Sharing the Production project is not an isolation
 fallback.
+
+The approved Preview user need not require purchasing or provisioning a new
+number. Inventory existing controlled iMessage-capable identities through
+approved surfaces with full values omitted. Select the least disruptive
+candidate by safe fingerprint. A candidate already bound to another project
+may be reused only when current Photon capability/readback proves the same
+identity can be referenced by the isolated Preview project without moving,
+detaching, reassigning, disabling, or changing delivery for the existing
+project. Never detach an existing binding to make the spike pass. If every
+controlled identity is provider-exclusive, retain the isolated Preview stop
+and record that provider constraint instead of weakening project isolation.
 
 ## Canonical Schema and Effect contracts
 
