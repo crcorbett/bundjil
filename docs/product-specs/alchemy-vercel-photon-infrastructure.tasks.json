@@ -272,7 +272,7 @@
     {
       "id": "authorized-read-only-inventory",
       "title": "Capture an authorized read-only Vercel and Photon inventory",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "vercel-read-import-vertical",
         "photon-read-import-vertical"
@@ -285,10 +285,10 @@
       ],
       "description": "Under new target-specific read authority, run metadata-only Vercel and Photon inventory for Preview and Production, resolve exact physical identities and isolation, and produce sanitized manifests. Do not create, update, delete, rotate, deploy, promote, or send.",
       "requirementProofReplay": {
-        "status": "required_before_acceptance",
+        "status": "passed",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's authorized inventory section.",
-        "currentResult": "inconclusive: both principals and all non-Marketplace metadata reads resolved under the approved envelope, but both authenticated Vercel paths returned 403 for the one Marketplace installation resource read. The canonical command failed closed before its second read, artifact and bounded receipt; the task remains pending."
+        "currentResult": "passed: the customer-authorized Vercel storage catalog and Photon management APIs produced two matching canonical reads for Preview and Production at source 86a1b9a. Both mode-0600 artifacts and receipts decode through their owning Effect Schemas and the fixed bounded-receipt contract, stage-target checks pass, value-based leak scans are empty, and providerWrites is zero. Shared project-scoped Vercel domains/Marketplace identity and the one shared Free Photon project are classified as shared observations rather than stage isolation; Vercel protection settings, deployment aliases omitted by the list API, and availability of a separately created Free Preview Photon project remain explicit unknowns for later authorized tasks."
       },
       "implementationNotes": [
         "Resolve the current authenticated principal, Vercel team/projects, environment targets/types, domains, integration/configuration/resource/database IDs, deployment/protection metadata, Photon project/platform/service/users/webhooks/lines/billing, and current Preview/Production credential ownership.",
@@ -429,6 +429,81 @@
           "Pass 3 - verification coverage: focused typecheck, 14 Vitest tests, 11 Alchemy provider tests, build, Effect language-service diagnostics and full repository verification passed with the documented process-only synthetic Executor configuration. The repository matrix covers fixed/task authority rejection, exact and duplicate target matching, deterministic canonicalization, artifact round trip, cross-provider memory composition, zero writes and leak sentinels. Closeout found and corrected the ignored authority file's 0644 mode; the live command now rejects non-0600 or oversized authority files before credentials. Live proof remains inconclusive because that precondition defect invalidated the discovery evidence and the Vercel principal read returned 403 before the receipt-bearing command could run."
         ]
       },
+      "acceptedInventoryExecution": {
+        "status": "passed",
+        "observedAt": "2026-07-25T16:11:45.732Z",
+        "repositoryIdentity": "86a1b9a341054ccfa5c00250adc473d1ed6bafa3",
+        "authority": "The user approved the fixed read-only two-stage envelope and credential custody. Both principal fingerprints resolved before the first provider inventory read at 2026-07-25T15:44:23Z. All retained reads completed before the 60-minute window expired; the envelope authorized no mutation.",
+        "credentialCustody": "The exact three Config values remained only in ignored mode-0600 .env.local and were resolved at the authenticated adapters. No credential was printed, logged, copied into a tracked owner or retained in a receipt.",
+        "requirementProofReplay": [
+          {
+            "requirement": "Exact authority, principals, resources and read-only operations",
+            "directObservable": "The fixed authority and task-policy Schemas accepted the mode-0600 envelope; Vercel /v2/user and Photon identity reads each produced one opaque fingerprint; the canonical command used the approved personal team, exact bundjil-agent and bundjil-codex-proxy project IDs, and the sole configured Photon project ID.",
+            "expectedPostcondition": "Only the approved identities receive metadata reads and no mutation capability is reachable.",
+            "rejectedFalseGreen": "Credential presence, linked project metadata, a single-provider login or structurally valid authority without current principal readback is insufficient.",
+            "focusedCommand": "Fixed authority validation, fresh principal readback, exact target configuration and canonical infrastructure:inventory.",
+            "evidenceOwner": "Ignored authority/artifact/receipt files plus this acceptedInventoryExecution record."
+          },
+          {
+            "requirement": "Exact Marketplace resource and safe provider projection",
+            "directObservable": "Vercel's customer /v1/storage/stores catalog decoded immediately, then each project's contentHint matched exactly one integration store by store, configuration, integration and project identity. Both stage manifests contain two Unowned binding observations; provider secret fields are absent.",
+            "expectedPostcondition": "One stable Marketplace resource/database identity is observed per project without exposing the raw store client or secret-bearing envelope.",
+            "rejectedFalseGreen": "The provider-only installation endpoint 403, a contentHint alone, a CLI display name or neighbouring environment success is not a binding identity.",
+            "focusedCommand": "VercelMarketplaceBindings live contract tests plus both canonical inventory reads and artifact leak scan.",
+            "evidenceOwner": "packages/infrastructure/src/vercel/live.layer.ts, its focused contract fixture and both ignored artifacts."
+          },
+          {
+            "requirement": "Preview and Production isolation",
+            "directObservable": "The Preview artifact contains 48 environment observations whose target arrays all include preview and 45 Git deployment observations whose target is preview. The Production artifact contains 45 environment observations whose target arrays all include production and 11 Git deployment observations whose target is production.",
+            "expectedPostcondition": "No Preview-only environment/deployment observation appears in Production and no Production-only observation appears in Preview.",
+            "rejectedFalseGreen": "Relabelling the same unfiltered provider response with a different stage or accepting zero Production deployments as isolation is rejected.",
+            "focusedCommand": "Stage-specific live adapter tests, jq all-target predicates and deployment-target uniqueness checks on both artifacts.",
+            "evidenceOwner": "VercelEnvironmentVariablesLive, VercelDeploymentsLive, vercel-contracts.test.ts and both artifacts."
+          },
+          {
+            "requirement": "Canonical repeated inventory and bounded evidence",
+            "directObservable": "Preview digest e011bf3fa798142d3a23a5395b82765c5cb12d5673060af531498a10cdb56169 and Production digest e8b25f3aab1b683775e722b8dc6f963402faea42d0cbec97b8dc3fb56138f3ce each came from two unchanged reads. Four retained files are mode 0600, source-bound to 86a1b9a, decode through InfrastructureInventoryArtifactJson or InfrastructureBoundedReceiptJson, and both receipts validate against the fixed embedded bounded-receipt Schema.",
+            "expectedPostcondition": "Each stage has one Schema-valid artifact and passed receipt whose detail digest matches the exact file.",
+            "rejectedFalseGreen": "HTTP 200 component reads, one read, a blocked JSON line, an empty redirected file or a green mock suite is not a canonical receipt.",
+            "focusedCommand": "Two canonical infrastructure:inventory executions followed by Effect Schema decode, AJV fixed-contract validation, SHA-256, source identity and mode checks.",
+            "evidenceOwner": "tmp/proof/alchemy-inventory-{preview,production}{,.receipt}.json and this task record."
+          },
+          {
+            "requirement": "Write-only secret and sensitive-data safety",
+            "directObservable": "Artifacts retain environment keys, types, targets and sensitivity flags but no values. Exact Vercel token and Photon project-secret searches returned zero; forbidden value, phone, assigned-number, project-name/slug, URL and secret keys returned zero. Temporary raw CLI/diagnostic captures were removed.",
+            "expectedPostcondition": "Only Schema-owned sanitized metadata persists and no credential, phone, webhook URL/query or raw account/provider object is retained.",
+            "rejectedFalseGreen": "Mode 0600 alone, a redacted log label or a safe receipt cannot establish that its referenced artifact is safe.",
+            "focusedCommand": "Owning Schema decode, exact credential-value scans and recursive forbidden-key scans over all four retained files.",
+            "evidenceOwner": "Both ignored artifacts/receipts and the package-owned artifact contracts."
+          },
+          {
+            "requirement": "Zero mutation and honest unresolved boundaries",
+            "directObservable": "Both manifests and receipts record providerWrites:0. The command exposes inventory only; no create, update, delete, rotate, deploy, promote, webhook mutation, message or billable operation occurred. The sole Photon project is Free/shared with two shared users, two webhooks and zero dedicated lines in both observations.",
+            "expectedPostcondition": "The task closes as current metadata inventory only and does not claim adoption, state, deployment health, protection, Channel behavior or a separate Preview Photon project.",
+            "rejectedFalseGreen": "A shared project observed twice is not Preview/Production isolation, and deployment IDs/status are not deployment health or promotion proof.",
+            "focusedCommand": "Manifest/receipt providerWrites assertions, command call-graph review and safe topology aggregation.",
+            "evidenceOwner": "Both receipts, the inventory service call graph and this explicit non-claim."
+          }
+        ],
+        "corrections": [
+          "395d08f replaced the provider-only Marketplace installation endpoint with the supported customer storage catalog.",
+          "d779b43 decoded current deployment envelopes, numeric pagination and absent Git/alias fields while rejecting provenance-free observations.",
+          "67fda39 made the root inventory command execute from repository root instead of a workspace cwd.",
+          "c5dad50 mapped repository prod to Vercel production and rejected the earlier zero-deployment false green.",
+          "86a1b9a filtered environment metadata and Marketplace hints by the exact stage target."
+        ],
+        "unresolvedReadbacks": [
+          "Vercel project protection settings are not part of the accepted inventory contract and remain unknown until a later target-owned read.",
+          "The deployment list API omitted aliases; empty alias observations are not proof that deployments have no aliases.",
+          "Project domains and Marketplace storage identities are project-scoped shared observations, not separate Preview resources.",
+          "The authenticated Photon principal exposes the configured shared Free project; no separate Free Preview project exists in the accepted manifest, and creation/availability is not inferred."
+        ],
+        "providerActions": "Read-only identity, project, domain, environment metadata, customer storage, deployment, Photon project/platform/shared-user/webhook/line/billing calls only. No external mutation occurred.",
+        "verification": "The exact task-closeout candidate passed Effect language-service diagnostics; boundary, docs, skills, authority, controls, verification-policy and HGI-307 gates; 90 tooling tests; type-aware format/lint; the lint fixture; Knip; all nine workspace typechecks; and all fifteen Turbo build/test tasks. The final gate used only the documented process-local synthetic Executor URL/key fixture and made no Executor request.",
+        "artifacts": "Only the fixed authority plus two Schema-valid mode-0600 artifacts and two Schema-valid mode-0600 receipts remain under ignored tmp/proof. Temporary raw CLI and diagnostic captures were removed and are not recoverable from the worktree.",
+        "rollback": "No provider rollback is required. Repository rollback is reversion of 395d08f, d779b43, 67fda39, c5dad50 and 86a1b9a; local evidence rollback is deletion of the ignored artifacts after downstream adoption manifests no longer require them.",
+        "downstream": "remote-state-and-noop-adoption is now the current task. It must choose and authorize a dedicated backend, preserve the accepted artifact digests, and perform read/import adoption with zero provider writes. The formal five-pass audit remains reserved for terminal full-SPEC closeout."
+      },
       "commitAfterPassing": false
     },
     {
@@ -448,7 +523,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's remote-state/adoption section.",
-        "currentResult": "not_run: blocked by authorized-read-only-inventory."
+        "currentResult": "ready_not_run: authorized-read-only-inventory is accepted at source 86a1b9a. Dedicated remote state backend selection, target authority, adoption manifests and zero-write state persistence remain unimplemented."
       },
       "implementationNotes": [
         "If Cloudflare.state() is chosen, use a Bundjil-specific stack/backend identity and scoped credentials; never reuse the site state or token.",

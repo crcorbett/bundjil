@@ -17,8 +17,8 @@ started: 2026-07-24
 Start with an offline Alchemy/custom-provider lifecycle proof using beta.64's
 actual `read`/`diff`/`reconcile`/`delete`/`list` and native `sync` contracts.
 Then implement read/import Vercel and Photon vertical slices with memory Layers.
-No live provider read occurs until the separately authorized inventory task,
-and no write occurs until exact adoption, state, secret binding, Preview
+Live provider reads occur only through a separately authorized task-scoped
+command; no write occurs until exact adoption, state, secret binding, Preview
 isolation, rollback, and proof gates pass.
 
 The target is hybrid ownership:
@@ -38,25 +38,25 @@ as `0a08767` on `codex/alchemy-vercel-photon-infrastructure`.
 `vercel-read-import-vertical` is implemented and locally accepted: its private
 contracts, live and memory Layers, five retained custom Resources, complete
 synthetic two-project inventory, and zero-write adoption path passed the full
-repository gate. Its live Layer remains unused and no tenant read is
-authorised. `photon-read-import-vertical` is implemented and locally accepted:
-Photon owns the new read-only `/management`
+repository gate. That vertical was accepted before its live Layer was used.
+`photon-read-import-vertical` is implemented and locally accepted: Photon owns
+the new read-only `/management`
 boundary, infrastructure owns six retained observation Resources, and the
-accepted memory topology is Free/shared with zero dedicated lines. Neither
-live Layer is wired and no project credential or provider state was read. The
-full repository gate passed, and the adversarial closeout extended the shared
-bounded retry policy across every Photon HTTP read before focused Photon and
-infrastructure checks passed again. `authorized-read-only-inventory` is now
-the current task. A fixed-schema read-only authority envelope permitted one
-bounded Preview/Production inventory attempt. The repository command and
-memory proof are implemented, but the live attempt is inconclusive. Closeout
-found that the ignored authority file used for discovery had mode `0644`, so
-that discovery is not accepted proof; it was corrected to `0600`, and the
-command now enforces mode and size before resolving credentials. The
-mode-`0600` cached Vercel bearer separately returned `403` on the mandatory
-current-principal read. No accepted manifest or receipt exists and downstream
-adoption remains blocked. No credential refresh or provider/deployment
-mutation was attempted.
+accepted memory topology is Free/shared with zero dedicated lines. At vertical
+acceptance neither live Layer was wired or used. The full repository gate
+passed, and the adversarial closeout extended the shared bounded retry policy
+across every Photon HTTP read before focused Photon and infrastructure checks
+passed again. `authorized-read-only-inventory` is now accepted at repository
+identity
+`86a1b9a341054ccfa5c00250adc473d1ed6bafa3`. A bounded read-only execution
+produced matching double-read Preview and Production manifests, passed
+receipts, exact stage-target isolation, customer Marketplace storage identity,
+and a shared Free Photon observation with zero provider writes. The retained
+ignored artifacts are mode `0600`, Schema-valid, fixed-contract compatible and
+leak-scanned. Project-scoped domains/Marketplace identity and the sole shared
+Photon project are not treated as separate stage resources; Vercel protection,
+list-omitted deployment aliases and a separately created Preview Photon project
+remain unknown. `remote-state-and-noop-adoption` is now the current task.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -164,13 +164,16 @@ timeout before replay. Apply the same property expansion to authority,
 adoption, isolation, retain/delete protection, secret custody, pagination,
 drift/no-op, partial failure, rollout and rollback.
 
-The current `authorized-read-only-inventory` replay is incomplete. Repository
-observables prove the command's fixed authority decoder, mode/size preflight,
-canonical codecs, zero-write call graph, memory composition, leak exclusions
-and verification gates. They do not prove the direct provider requirements:
-the initial authority-file mode invalidated discovery, the Vercel principal
-read returned `403`, and no receipt-bearing Preview/Production inventory or
-matching second digest exists. The task therefore remains pending.
+The `authorized-read-only-inventory` replay is complete at `86a1b9a`.
+Repository checks, authenticated readback and the ignored receipt owners remain
+distinct: Preview digest
+`e011bf3fa798142d3a23a5395b82765c5cb12d5673060af531498a10cdb56169`
+and Production digest
+`e8b25f3aab1b683775e722b8dc6f963402faea42d0cbec97b8dc3fb56138f3ce`
+each came from two unchanged reads. The task ledger owns the full
+property-level replay and explicit non-claims. The next task must not promote
+these read receipts into remote-state, adoption, deployment, protection,
+Channel or separately isolated Photon proof.
 
 ### Requirement-proof hardening impact ledger
 
@@ -418,6 +421,74 @@ billable operation or Production mutation occurred.
 | Receipts and evidence            | Change required | Retain no invalid receipt. Record only redacted status/shape/count evidence and the missing canonical artifact/receipt non-claim.                                        |
 | Rollout, rollback and lifecycle  | Preserve        | No external mutation occurred. Local rollback identity is revert of `711a133` and the later ledger commit; adoption remains closed.                                      |
 | Archive and terminal audit       | Preserve        | The plan remains active. The formal five-pass audit still runs once only at terminal full-SPEC closeout after every task reaches an honest terminal disposition.         |
+
+## Accepted authorized read-only inventory
+
+The prior installation-resource `403` was a provider/customer API ownership
+error, not a missing customer entitlement. Vercel's customer storage catalog
+is the supported read surface for the authenticated team. Commit `395d08f`
+corrected that adapter. Live deployment evidence then reopened the Vercel
+owner twice: `d779b43` admitted current nullable fields and numeric pagination,
+and `c5dad50` mapped repository `prod` to provider `production` after the first
+Production receipt exposed a zero-deployment false green. Commit `86a1b9a`
+then rejected cross-stage environment metadata and Marketplace hints. Root
+command correction `67fda39` preserves repository-relative authority and
+artifact paths.
+
+The accepted execution is bound to
+`86a1b9a341054ccfa5c00250adc473d1ed6bafa3`. Preview digest
+`e011bf3fa798142d3a23a5395b82765c5cb12d5673060af531498a10cdb56169`
+contains two projects, 48 stage-applicable environment observations, two
+project-scoped Marketplace observations and 45 Preview Git deployment
+observations. Production digest
+`e8b25f3aab1b683775e722b8dc6f963402faea42d0cbec97b8dc3fb56138f3ce`
+contains two projects, 45 stage-applicable environment observations, the same
+two shared Marketplace observations and 11 Production Git deployment
+observations. Both observe the one configured Free/shared Photon project, two
+shared users, two webhooks and zero dedicated lines. Each digest came from two
+unchanged reads; both manifests and receipts are ignored, mode `0600`,
+Schema-valid, fixed-receipt compatible, source/digest-bound and value/leak
+scanned.
+
+### Accepted inventory requirement replay
+
+| Requirement                           | Direct observable and expected postcondition                                                                                                                               | Plausible false green rejected                                                                             | Focused command/readback                                                           | Evidence owner and result                                          |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Authority, principal and exact target | Fixed authority/task Schemas, two fresh principal fingerprints and exact two-project plus configured Photon identities gate the reads; no mutation operation is reachable  | Credential/link presence, one successful principal or a valid envelope alone                               | Authority validation, principal readback and canonical command Config              | Ignored authority/receipts and task ledger; passed                 |
+| Customer Marketplace identity         | Each stage resolves exactly one customer storage resource per project through content hint + store/configuration/integration/project identity and strips provider secrets  | Provider-only endpoint `403`, CLI display, hint presence or neighbouring env success                       | Focused Marketplace fixture and canonical `/v1/storage/stores` adapter reads       | Vercel live Layer and both artifacts; passed                       |
+| Stage isolation                       | Every Preview env target includes `preview`, every Production env target includes `production`; deployment target sets are exactly `preview` and `production` respectively | Relabelled unfiltered inventory or zero Production deployments                                             | Negative two-stage fixture and all-element artifact predicates                     | Vercel env/deployment owners; passed after `c5dad50` and `86a1b9a` |
+| Repeated canonical manifests          | Each stage's two reads produce one unchanged digest and one fixed-contract receipt whose detail SHA matches the artifact                                                   | Component HTTP 200, one read, empty/block output or mock suite                                             | `bun run infrastructure:inventory`, Effect Schema decode, AJV, SHA and mode checks | Four ignored evidence files; passed                                |
+| Sensitive/write-only safety           | Environment values, credentials, phones, assigned numbers, webhook URLs/query data and raw provider/account objects are absent                                             | Mode `0600` or receipt safety alone proving the referenced artifact safe                                   | Exact credential-value and recursive forbidden-key scans                           | Artifact Schemas and ignored evidence; passed                      |
+| Zero mutation and honest gaps         | Both manifests/receipts record `providerWrites:0`; no provider/deployment/billable operation occurred                                                                      | Two observations of one shared identity proving isolation, or deployment metadata proving health/promotion | Command call graph, provider action review and safe topology aggregation           | Task ledger and receipts; passed with explicit non-claims          |
+
+Vercel protection settings remain unread, deployment aliases omitted by the
+list API remain unknown, project domains/Marketplace storage remain
+project-scoped shared observations, and the authenticated Photon principal
+does not expose a separately isolated Preview project in the accepted
+manifest. Those are later-task inputs or stop conditions, not inferred facts.
+The full repository gate passed Effect diagnostics, every boundary/docs/skills/
+authority/controls/verification/HGI-307 policy, 90 tooling tests, formatting,
+lint, Knip, all nine typechecks and all fifteen Turbo build/test tasks with only
+the documented process-local synthetic Executor fixture and no Executor
+request.
+
+### Accepted inventory docs-maintainer impact ledger
+
+| Surface                          | Status          | Decision and evidence boundary                                                                                                                                                                               |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture and docs router     | Preserve        | Existing provider, Effect and verification owners already route the corrected private adapters and proof classes; no durable architecture contract changed.                                                  |
+| Root, app and package READMEs    | Change required | Correct the root command invocation and remove stale claims that live Layers had never been read. App READMEs remain unchanged because apps do not import or operate this package.                           |
+| Exports and generated references | Preserve        | No public export or generated owner changed; provider clients and raw envelopes remain private.                                                                                                              |
+| Runbooks and authority           | Preserve        | The target-owned runbooks and fixed ignored envelope authorized this bounded read only. No standing authority, workflow register or mutation procedure changed.                                              |
+| Verification journeys and proof  | Change required | Retain provider readback as two ignored fixed receipts and task-ledger summaries. Do not merge it with deployment, Channel, handset, protection or remote-state proof.                                       |
+| Skills and `AGENTS.md`           | Preserve        | PRD implementer, docs maintainer, Effect client wrapper and package structure rules caught no recurring instruction gap.                                                                                     |
+| Lint, config, commands and CI    | Change required | Root `infrastructure:inventory` now invokes the package script from repository root. No CI admission or hosted credential was added.                                                                         |
+| Schemas, services and Layers     | Change required | Customer storage decoding, current deployment envelope/pagination, repository-to-provider stage mapping and env/hint target filtering remain private to the Vercel live Layer.                               |
+| Tests and fixtures               | Change required | The focused contract fixture directly covers secret stripping, customer storage matching, nullable/provenance-free deployment omission, numeric pagination and both stage directions.                        |
+| SPEC, tasks and active plan      | Change required | Mark `authorized-read-only-inventory` completed, preserve prior failed/inconclusive attempts as history, and route `remote-state-and-noop-adoption` next.                                                    |
+| Receipts and evidence            | Change required | Retain only the fixed authority plus two Schema-valid artifacts and two fixed-compatible receipts under ignored `tmp/proof`; temporary raw CLI/diagnostic captures were removed.                             |
+| Rollout and rollback             | Preserve        | No external rollout or mutation occurred, so provider rollback is N/A. Repository rollback is reversion of the five correction commits; ignored evidence remains needed by the next adoption-manifest slice. |
+| Lifecycle and archive pointers   | Preserve        | The SPEC and plan remain active with six pending tasks. No completed-plan or archive pointer changes; the single formal five-pass audit remains terminal-only.                                               |
 
 ## Repository-authorized five-pass audit
 

@@ -32,17 +32,13 @@ provider boundary. The initial synthetic provider uses ignored local
 `.alchemy/` state only and performs no Vercel, Photon, DNS, secret, webhook,
 deployment, remote-state, or other network operation.
 
-The Vercel live Layer is implemented but is not wired into the root stack and
-has not been executed against a tenant. Its tests use an in-process HTTP client
-and deterministic two-project memory inventory; they are contract proof, not
-provider readback.
-
-The Photon live management Layer and Alchemy providers are likewise not wired
-into the root stack and have not been executed against a Photon project.
-Contract tests use in-process HTTP and a deterministic Free shared-service
-inventory with zero dedicated lines. The Alchemy harness proves exact
-read/import adoption and destructive denial with zero provider writes; it is
-not Photon state or billing proof.
+The Vercel and Photon live read Layers are not wired into the root stack.
+`infrastructure:inventory` may compose them only under a validated bounded
+authority envelope. Current provider evidence belongs in the canonical task
+ledger and its Schema-valid ignored receipts, never in this README. Contract
+tests use in-process HTTP and deterministic memory inventories; the Alchemy
+harness proves exact read/import adoption and destructive denial with zero
+provider writes, not current provider state or billing.
 
 The live inventory executable is the only place that composes both provider
 read Layers. It validates the fixed authority envelope and the narrower
