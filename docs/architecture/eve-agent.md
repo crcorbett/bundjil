@@ -3,8 +3,8 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-07-21
-review_trigger: agent wiring, provider selection, channel adapter, deployment boundary, or external readback change
+last_reviewed: 2026-07-24
+review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, deployment boundary, or external readback change
 ---
 
 # Eve agent architecture
@@ -59,12 +59,16 @@ environment currently configures or serves.
 - `agent/connections/executor.ts` exposes only `skills`, `execute`, and
   `resume`; provider procedure and approval remain externally owned.
 - `agent/channels/sendblue.ts` and `agent/channels/photon.ts` are thin Eve
-  composition adapters. Each owns one module-edge `ManagedRuntime`, an
-  absolute route identity, and one provider Layer selection.
+  composition adapters. Each owns one `ManagedRuntime` for its loaded provider
+  composition root in that JavaScript module instance, an absolute route
+  identity, and one provider Layer selection. They do not share a Context,
+  Scope, build fiber, or `Layer.MemoMap`.
 - `agent/lib/channel/**` owns the shared Eve adapter, status mapping,
-  `waitUntil` completion, identity, HMAC routing, atomic replay, immutable
-  `ChannelStateV1`, outbound/presence policy, and exact encoded snapshot
-  assignment.
+  supervised accepted Fiber, `waitUntil` completion, identity, HMAC routing,
+  atomic replay, immutable `ChannelStateV1`, outbound/presence policy, and
+  exact encoded snapshot assignment. The adapter receives the concrete
+  provider runtime and performs the minimum Effect interpretation at Eve's
+  JavaScript boundary; no domain service receives a runtime.
 - Provider input is authenticated and decoded once in its owning package.
   Only decoded `@bundjil/channel` values cross into app policy; provider DTOs,
   raw SDK values, callbacks, Promises, and secrets remain private.
@@ -99,8 +103,11 @@ POST /eve/v1/sendblue/webhook              POST /eve/v1/photon/webhook
                    -> ChannelRouter.route
                    -> ChannelReplay.claimInbound
                    -> AtomicKeyValueStore.transact
-                   -> EveChannelDispatchEve.dispatch under waitUntil
+                   -> accepted background Effect
+                   -> provider ManagedRuntime.runFork
+                   -> EveChannelDispatchEve.dispatch
                    -> Channel.completeInbound
+                   -> Fiber.await completion under Eve waitUntil
 ```
 
 The provider Layer authenticates exact ingress before one complete payload
@@ -108,6 +115,25 @@ decode. Accepted ingress returns `202`; ignored or duplicate ingress returns
 `204`; authentication, authenticated-payload, and replay/routing failures map
 to `401`, `400`, and `503`. Deployment Protection is a separate boundary and
 never substitutes for provider authentication.
+
+Request preparation runs with the concrete provider runtime's `runPromise`.
+Accepted work starts before the handler resolves with that runtime's
+`runFork`, so the runtime Scope owns the root Fiber. Eve receives exactly one
+`Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid))` completion Promise.
+`Fiber.await` observes success, typed failure, defect, or interruption without
+turning an already returned `202` into another response failure. Client abort
+does not cancel accepted work; runtime disposal interrupts it and runs
+cooperative finalizers. The adapter constructs or disposes no runtime per
+request and adds no Channel-wide timeout or retry.
+
+Installed Eve exposes no authored Channel-module teardown hook during local
+cache replacement or development-server close, and Vercel exposes no
+repository-observable per-instance shutdown callback. A replaced local module
+or terminated hosted instance may therefore be abandoned without app-owned
+runtime disposal. `waitUntil` extends work only within the host lifetime and
+is not durable execution. Current local build proof loads both provider roots;
+future bundle splitting, warm-instance reuse, scale-out, freeze, and shutdown
+remain deployment readback questions.
 
 Eve events use the same Channel service:
 
@@ -148,6 +174,9 @@ handset-delivered.
   -> Config.schema and Redacted boundaries
   -> identity, routing, concurrent atomic replay, immutable state
   -> provider substitution through live/memory composition roots
+  -> independent runtime build caching, concurrency, failure, and recovery
+  -> waitUntil ordering plus success/failure/defect/interruption completion
+  -> runtime-disposal interruption/finalizers and client-abort independence
   -> both absolute routes in the Nitro build
 ```
 

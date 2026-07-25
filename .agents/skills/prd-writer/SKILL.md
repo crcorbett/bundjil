@@ -113,6 +113,19 @@ Read in this order:
 - Do not allow a single top-level quality reminder to cover implementation
   style. Each code task must explicitly verify Effect TS control flow, schema
   ownership, unsafe casts, manual mappers/readers, and wrapper/helper sprawl.
+- Translate every material normative requirement into task-level proof. For
+  each `must`, `required`, `never`, or accepted finding, name the owning task,
+  direct observable, expected postcondition, plausible false green rejected,
+  focused command, and evidence owner. Broad test-file coverage, successful
+  construction, or a neighbouring assertion is not a direct oracle.
+- Expand compound policy language into deterministic verification. If the
+  SPEC requires retry eligibility, bounded attempts, backoff, jitter,
+  idempotency, or observation-after-timeout, the task's
+  `mandatoryVerification` must name each property and its positive or negative
+  fixture rather than collapsing them into “retry tests”.
+- Isolation, substitution, and composition-root requirements must assert the
+  semantic result at every relevant root. Do not infer provider separation
+  from build counts, unrelated calls, or source layout alone.
 - Substantial implementation task lists must name the applicable ownership,
   Effect flow, frontend composition, browser, and verification risk lenses.
   Do not encode a fixed audit-pass or subagent count as acceptance proof.
@@ -218,6 +231,12 @@ as the default final task gate unless the task explicitly records a narrower
 reasoned exception. For substantial implementation or verification work, name
 the applicable ownership/call-graph, implementation-quality, and
 verification-coverage risk lenses without fixed counters.
+
+When a SPEC explicitly requires a terminal review, place it once in the final
+closeout task after every implementation dependency. Any later implementation
+invalidates that terminal status. The final task must reopen the owner of each
+finding, refresh affected receipts and rollback identity, and run full
+verification on the exact receipt-bearing state.
 
 For visible route/runtime task lists, add Browser evidence to
 `browserVerification` for each changed state. Direct HTTP checks should prove

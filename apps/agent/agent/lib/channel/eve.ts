@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Fiber, Schema } from "effect";
 import type { ManagedRuntime } from "effect";
 import { defineChannel, POST } from "eve/channels";
 import type { ChannelEvents } from "eve/channels";
@@ -156,11 +156,8 @@ export const makeChannelEveChannel = <E>(
               yield* background;
               return { response: new Response(null, { status: 503 }) };
             }
-            const fiber = yield* Effect.forkDetach(background, {
-              startImmediately: true,
-            });
             return {
-              fiber,
+              background,
               response: new Response(null, { status: 202 }),
             };
           }).pipe(
@@ -188,12 +185,9 @@ export const makeChannelEveChannel = <E>(
             })
           )
         );
-        if ("fiber" in result) {
-          const completion = Promise.withResolvers<undefined>();
-          result.fiber.addObserver(() => {
-            completion.resolve();
-          });
-          waitUntil(completion.promise);
+        if ("background" in result) {
+          const fiber = channelRuntime.runFork(result.background);
+          waitUntil(Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)));
         }
         return result.response;
       }),

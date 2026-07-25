@@ -14,13 +14,6 @@ entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
 
-## Proposed
-
-- [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)
-  — implementation-ready specification accepted after adversarial formal
-  review, with a structured audit-finding crosswalk in its sibling task ledger;
-  implementation has not begun and no active execution plan exists.
-
 ## Current
 
 - [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md) —
@@ -33,13 +26,12 @@ context.
 
 ## Implemented or superseded history
 
-The thirteen sibling historical ledgers retain heterogeneous terminal
-provenance: eleven use ledger-level `status: completed`, while the Effect
-persistence and Effect Schema string-contract ledgers use `status:
-implemented`. The Vercel promotion ledger also retains a historical, scoped
-`approval.status: granted`. Every individual entry in those ledgers' `tasks`
-arrays is `completed`, but that does not flatten the distinct ledger-level
-lifecycle or recorded approval fields. None is standing authority.
+The historical ledgers retain heterogeneous terminal provenance, including
+ledger-level `completed` and `implemented` states. The Vercel promotion ledger
+also retains a historical, scoped `approval.status: granted`. Every individual
+entry in those ledgers' required `tasks` arrays is completed, but that does not
+flatten the distinct ledger-level lifecycle or recorded approval fields. None
+is standing authority.
 
 | SPEC                                                                                | Lifecycle note                                                       |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -49,6 +41,7 @@ lifecycle or recorded approval fields. None is standing authority.
 | [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md) | Implemented history                                                  |
 | [Effect persistence](effect-persistence.md)                                         | Implemented history; current package names/exports own present state |
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                 | Implemented history                                                  |
+| [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)   | Implemented runtime/supervision history; five-pass audit accepted    |
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                 | Implemented spike history                                            |
 | [Executor MCP connection](executor-mcp-connection.md)                               | Implemented rollout history; not current provider truth              |
 | [Harness-governance documentation](harness-governance-documentation.md)             | Implemented local harness; HGI-309 remains separately deferred       |

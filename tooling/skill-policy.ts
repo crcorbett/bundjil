@@ -136,6 +136,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["writer", "Schema.encodeEffect"],
     ["writer", "inbound"],
     ["writer", "outbound"],
+    ["writer", "plausible false green"],
     ["writer", "Do not encode a fixed audit-pass or subagent count"],
     ["implementer", ".agents/skills/effect-client-wrapper"],
     ["implementer", ".agents/skills/docs-maintainer"],
@@ -149,6 +150,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["implementer", "unencoded outward writes"],
     ["implementer", "stale exceptions"],
     ["implementer", "helper sprawl"],
+    ["implementer", "proof by proxy"],
     ["implementer", "Use a goal only when the user explicitly requests one"],
     ["packageStructure", "Use this skill directly"],
     ["packageStructure", "Required separation"],
@@ -159,6 +161,7 @@ const requiredPolicy: readonly (readonly [keyof typeof policyFiles, string])[] =
     ["reviewer", "DeepWiki"],
     ["reviewer", "Change required"],
     ["reviewer", "use one primary reviewer"],
+    ["reviewer", "requirement-to-proof"],
     ["wrapper", "Config.schema"],
     ["wrapper", "ConfigProvider"],
     ["wrapper", "Schema.encodeEffect"],
@@ -319,6 +322,59 @@ const documentationMaintenanceContracts: readonly DocumentationMaintenanceContra
       ],
       repairHint:
         "Require complete proof identity and successor/reason/provenance evidence for lifecycle transitions.",
+    },
+    {
+      id: "audit-feedback-promotion",
+      ownerPath: policyFiles.docsMaintainer,
+      requiredTermGroups: [
+        ["false green"],
+        ["earliest durable owner"],
+        ["direct test oracle", "lint/tooling control"],
+        ["reopens the owning task"],
+        ["terminal audit"],
+      ],
+      repairHint:
+        "Promote audit findings to an earlier preventing owner and invalidate stale task acceptance and terminal receipts.",
+    },
+    {
+      id: "spec-proof-crosswalk",
+      ownerPath: policyFiles.writer,
+      requiredTermGroups: [
+        ["normative requirement"],
+        ["direct observable"],
+        ["plausible false green"],
+        ["mandatoryVerification"],
+        ["proof by proxy", "not a direct oracle"],
+      ],
+      repairHint:
+        "Map every material SPEC requirement to task-level direct proof and a rejected plausible false green.",
+    },
+    {
+      id: "review-proof-crosswalk",
+      ownerPath: policyFiles.reviewer,
+      requiredTermGroups: [
+        ["requirement-to-proof"],
+        ["direct observable"],
+        ["plausible false green"],
+        ["proof by proxy"],
+        ["terminal audit"],
+      ],
+      repairHint:
+        "Reject SPEC readiness when normative requirements lack direct task-level oracles or terminal-audit ordering.",
+    },
+    {
+      id: "implementation-proof-replay",
+      ownerPath: policyFiles.implementer,
+      requiredTermGroups: [
+        ["requirement-to-proof"],
+        ["direct observable"],
+        ["plausible false green"],
+        ["proof by proxy"],
+        ["reopen the owning task"],
+        ["receipt-bearing state"],
+      ],
+      repairHint:
+        "Replay direct requirement proof before task acceptance and reopen stale receipts after corrections.",
     },
   ];
 

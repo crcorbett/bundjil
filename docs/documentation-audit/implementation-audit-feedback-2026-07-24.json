@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "id": "IAF-2026-07-24",
+  "lifecycle": "evidence",
+  "observedAt": "2026-07-24T21:47:17Z",
+  "baseRevision": "38a8a3f4cde7b6c519803f233b80b48f079a206d",
+  "authority": "Repository source, local implementation worktrees, tests, documentation, skills, and local Git history only; no provider, deployment, credential, message, billing, or Production operation.",
+  "findings": [
+    {
+      "id": "IAF-001",
+      "consequence": "The runtime task could pass while proving two runtime builds and only one provider-backed semantic result. That was weaker than the intended no-Service-tag-collision claim.",
+      "evidence": [
+        "Runtime correction commit b849b3025e14ae31fcc09bcfd819c72ee9ce6097 added a direct assertion that the Sendblue runtime resolves the shared Channel tag to sendblue while the Photon runtime resolves it to photon.",
+        "The pre-correction task required independent provider-shaped roots and broad failure isolation but did not name both provider semantic assertions as the direct oracle."
+      ],
+      "priorEscape": "The SPEC described independent composition roots, while task verification accepted build counts, successful calls, and one Photon semantic assertion as sufficient proxy evidence.",
+      "rootCorrection": "Require every isolation or substitution claim to assert the semantic result from every relevant composition root and name the plausible false green rejected.",
+      "earliestOwners": [
+        "docs/architecture/testing-and-quality.md",
+        ".agents/skills/prd-writer/SKILL.md",
+        ".agents/skills/prd-review/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md",
+        "apps/agent/test/channel-runtime.test.ts"
+      ],
+      "status": "promoted"
+    },
+    {
+      "id": "IAF-002",
+      "consequence": "Photon transient reads implemented bounded exponential retry without the SPEC-required jitter.",
+      "evidence": [
+        "The Alchemy SPEC required exponential backoff and jitter.",
+        "The Photon task required 429 and transient-5xx coverage but did not translate jitter into mandatoryVerification.",
+        "Audit correction commit 1f813d469d1561c16f3f302691e33b31d495fe68 added Schedule.jittered and assertions proving one request for 409 and exactly three for 429 and 503."
+      ],
+      "priorEscape": "A compound design requirement was shortened during SPEC-to-task translation. Error classification tests passed without observing every retry-policy property.",
+      "rootCorrection": "Expand compound policy requirements into deterministic task-level fixtures for eligibility, attempt bounds, backoff, jitter, idempotency, and observation-after-timeout.",
+      "earliestOwners": [
+        "docs/architecture/testing-and-quality.md",
+        ".agents/skills/prd-writer/SKILL.md",
+        ".agents/skills/prd-review/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md",
+        "packages/photon/test/management-read.test.ts"
+      ],
+      "status": "promoted"
+    },
+    {
+      "id": "IAF-003",
+      "consequence": "Runtime closeout documentation retained a time-unbounded dependency claim and a rollback receipt that omitted the latest correction commit.",
+      "evidence": [
+        "Terminal closeout commit d1d94dc30926a260dbfbbed005ac6f357fd4dc48 bounded the node_modules observation, refreshed rollback identity, reconciled lifecycle routes, and reran full verification on the receipt-bearing state."
+      ],
+      "priorEscape": "Closeout receipts were treated as append-only completion evidence even though a later audit correction changed the candidate and rollback chain.",
+      "rootCorrection": "Any post-acceptance correction reopens the owning task, invalidates affected receipts and terminal-audit status, refreshes candidate and rollback identity, and reruns final verification.",
+      "earliestOwners": [
+        "docs/architecture/testing-and-quality.md",
+        ".agents/skills/docs-maintainer/SKILL.md",
+        ".agents/skills/prd-review/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md"
+      ],
+      "status": "promoted"
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "Architecture and quality standards",
+      "decision": "Change required",
+      "owners": ["docs/architecture/testing-and-quality.md"],
+      "postcondition": "Direct oracles, plausible false-green rejection, deterministic compound-policy proof, and terminal receipt invalidation are canonical quality rules."
+    },
+    {
+      "surface": "Repository-local PRD and documentation skills",
+      "decision": "Change required",
+      "owners": [
+        ".agents/skills/prd-writer/SKILL.md",
+        ".agents/skills/prd-review/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md",
+        ".agents/skills/docs-maintainer/SKILL.md"
+      ],
+      "postcondition": "Drafting, review, implementation, and audit feedback use one requirement-to-proof lifecycle and one terminal audit after the full SPEC."
+    },
+    {
+      "surface": "Skill lint, configuration, and CI controls",
+      "decision": "Change required",
+      "owners": [
+        "tooling/skill-policy.ts",
+        "tooling/skill-policy-audit.test.ts",
+        "docs/standards/control-register.json",
+        "docs/standards/controls.md"
+      ],
+      "postcondition": "check:skills rejects removal of requirement-oracle and feedback-promotion guidance; existing commands and CI ownership remain unchanged."
+    },
+    {
+      "surface": "Dated audit evidence and routing",
+      "decision": "Change required",
+      "owners": [
+        "docs/documentation-audit/implementation-audit-feedback-2026-07-24.json",
+        "docs/documentation-audit/README.md",
+        "docs/documentation-audit/HGI-307-impact-ledger.json"
+      ],
+      "postcondition": "The concrete findings, prior escape, root correction, limits, and Git identities remain addressable without becoming standing policy; the current 184-path docs inventory is exact without rewriting the historical HGI-307 epoch."
+    },
+    {
+      "surface": "Root, app, and package READMEs",
+      "decision": "Preserve",
+      "owners": [
+        "README.md",
+        "apps/agent/README.md",
+        "packages/photon/README.md"
+      ],
+      "postcondition": "No public purpose, export, command, environment, route, or provider contract changed."
+    },
+    {
+      "surface": "API references, exports, Schemas, services, Layers, and runtime code",
+      "decision": "N/A",
+      "owners": [
+        "apps/agent/test/channel-runtime.test.ts",
+        "packages/photon/src/management/live.layer.ts",
+        "packages/photon/test/management-read.test.ts"
+      ],
+      "postcondition": "The feature worktrees already own the concrete runtime and retry corrections; this feedback slice changes only reusable process owners."
+    },
+    {
+      "surface": "Runbooks, authority, providers, credentials, deployments, and rollback operations",
+      "decision": "N/A",
+      "owners": ["docs/operations/authority-model.md", "apps/agent/runbooks"],
+      "postcondition": "No consequential operation occurred and no operation procedure or authority envelope changed."
+    },
+    {
+      "surface": "Critical journeys, proof packets, monitoring, and external evidence",
+      "decision": "Preserve",
+      "owners": ["docs/verification/README.md", "docs/evidence/README.md"],
+      "postcondition": "The correction concerns task-level repository proof quality; no journey, provider claim, monitoring contract, or external proof class changed."
+    },
+    {
+      "surface": "Active SPECs, task ledgers, plans, lifecycle, and archive pointers",
+      "decision": "Preserve",
+      "owners": [
+        "docs/product-specs/eve-channel-runtime-ownership.md",
+        "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+        "docs/exec-plans/active"
+      ],
+      "postcondition": "Active implementation worktrees retain ownership of their task receipts and lifecycle. Generic prevention is promoted without competing edits to those current execution owners."
+    }
+  ],
+  "limitations": [
+    "The runtime correction and terminal audit commits are local implementation-worktree evidence and were not merged by this documentation slice.",
+    "The Alchemy audit was repository-scope evidence before later authorized implementation resumed; it is not the terminal full-SPEC audit.",
+    "Skill-policy enforcement proves required guidance is present, not that a worker followed it or that every future oracle is semantically sufficient."
+  ],
+  "retainedFailure": {
+    "command": "bun run verification",
+    "lastSuccessfulStep": "Effect setup, boundary, documentation, skill, authority, control, and verification-policy gates passed.",
+    "observedState": "HARNESS-DOCS-INVENTORY rejected the prior 182-path current inventory after this slice added one dated evidence document. Runtime closeout then advanced origin/main with one completed-plan path while this slice was in progress.",
+    "recovery": "The initial local correction refreshed the inventory to 183 paths. After rebasing onto runtime-integrated main, refresh only the current count and digest to the combined 184 paths while preserving the original epoch, scenario manifest, historical skill digests, worker reports, and acceptance receipt.",
+    "nonClaim": "The path inventory mismatch is not a runtime, Photon, Vercel, provider, deployment, message, billing, or Production result."
+  },
+  "checks": [
+    {
+      "command": "python3 tooling/quick_validate.py for docs-maintainer, prd-writer, prd-review, and prd-implementer",
+      "status": "passed",
+      "result": "All four repository-local skill directories passed metadata and structure validation."
+    },
+    {
+      "command": "bunx vitest run --config tooling/vitest.config.ts tooling/skill-policy-audit.test.ts; bun run test:controls",
+      "status": "passed",
+      "result": "Ten skill-policy tests and seventeen control-policy tests passed, including the new adversarial requirement-oracle and audit-feedback fixture."
+    },
+    {
+      "command": "bun run check:docs; bun run check:skills; bun run check:controls; bun run check:verification; bun run eval:hgi-307",
+      "status": "passed",
+      "result": "Documentation checked 259 files, skill policy checked 175 files and 16 mirrors, controls checked eight controls and fourteen automations, verification checked twelve journeys, and the HGI-307 evaluator passed twelve scenarios and nine impact areas against the pre-rebase 183-path candidate. Final verification is rerun after the runtime-integrated 184-path inventory correction."
+    },
+    {
+      "command": "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser' bun run --filter @bundjil/agent test",
+      "status": "passed",
+      "result": "The affected agent build and all 57 tests passed with a public synthetic endpoint used only for Config decoding; no Executor provider call occurred."
+    },
+    {
+      "command": "BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=browser' bun run verification",
+      "status": "passed",
+      "result": "After rebasing onto runtime-integrated main, Effect setup, boundaries, 260-file documentation policy, 175-file and 16-mirror skill policy, authority, controls, twelve journeys, the exact 184-path HGI-307 inventory, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, eight workspace typechecks, and all fourteen workspace test/build tasks passed, including 62 agent tests. The earlier unqualified attempt stopped only at the agent Config boundary because the shell had no Executor endpoint."
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed",
+      "result": "The candidate contains no whitespace errors."
+    }
+  ],
+  "nonClaims": [
+    "This evidence does not prove current Vercel, Photon, Sendblue, deployment, provider, credential, message, billing, handset, or Production state.",
+    "The number of audit passes or findings is not acceptance proof.",
+    "No provider read, write, deployment, credential change, message, billable action, push, merge, or release occurred."
+  ],
+  "rollback": "Revert this evidence, the quality-standard section, four skill additions, skill-policy fixtures, and control-register wording together. Preserve the feature-worktree correction commits and their historical audit receipts."
+}

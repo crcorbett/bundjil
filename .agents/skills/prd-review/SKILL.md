@@ -56,6 +56,26 @@ Always:
    including runbook/proof/lifecycle gaps; run the repository's real
    documentation, lint, typecheck, test, build, and skill checks that apply.
 
+Before accepting implementation readiness, build a requirement-to-proof
+crosswalk for every material `must`, `required`, `never`, and accepted finding.
+Each row needs an owning task, direct observable, expected postcondition,
+plausible false green rejected, focused command, evidence owner, and any
+limitation or non-claim. Reject proof by proxy: broad suite coverage,
+successful construction, source layout, or a neighbouring assertion does not
+establish the named behavior.
+
+Review compound policies property by property. Retry requirements must
+separately cover eligibility, bounded attempts, backoff, jitter, idempotent
+versus uncertain effects, and observation-after-timeout when applicable.
+Isolation and substitution must directly assert the semantic result from every
+relevant composition root. If the SPEC states a property that the sibling
+task's `mandatoryVerification` does not name, edit the task before approval.
+
+For a SPEC-required terminal audit, confirm it appears once after all
+implementation dependencies. Any implementation after that audit invalidates
+terminal status and requires one fresh final audit; do not require the formal
+audit after every slice.
+
 For every applicable fixture, require a create/update/retain/retire lifecycle,
 an owning path or team, and compatibility or negative-case coverage. Require
 each release and rollback path to name the grounded product or decision owner,

@@ -178,14 +178,19 @@ For each task:
 4. Apply the task's `implementationImprovementAudit` risk lenses when present:
    ownership/call graph, implementation quality, and verification coverage.
    Record pass evidence in the active execution plan and task list.
-5. Correct incomplete work directly or return a delegated slice to the same
+5. Replay the task's requirement-to-proof crosswalk against the actual
+   assertions. For every material requirement, confirm the direct observable,
+   expected postcondition, plausible false green rejected, focused command,
+   and evidence owner. Do not accept broad suite coverage, successful
+   construction, source layout, or a neighbouring assertion as proof by proxy.
+6. Correct incomplete work directly or return a delegated slice to the same
    owner with exact failed evidence.
-6. Mark the task complete only after the parent agent is satisfied and every
+7. Mark the task complete only after the parent agent is satisfied and every
    required risk lens and proof passes.
-7. Reconcile the repo-local docs-maintainer ledger and run `bun run check:docs`
+8. Reconcile the repo-local docs-maintainer ledger and run `bun run check:docs`
    plus `bun run check:skills` before accepting the slice.
-8. Commit the coherent slice when `commitAfterPassing` requires it.
-9. Begin the next task only after the current task is accepted.
+9. Commit the coherent slice when `commitAfterPassing` requires it.
+10. Begin the next task only after the current task is accepted.
 
 Default to serial task execution. Parallelize only when the task list proves
 independent dependencies and disjoint write scopes.
@@ -248,6 +253,19 @@ Before accepting a task, audit for:
 - leaf-component frontend composition when UI is touched
 - completed evidence for each applicable ownership, implementation-quality,
   and verification-coverage risk lens
+
+For compound runtime/provider policy, inspect the policy itself as well as the
+terminal result. Retry tests must distinguish eligible and ineligible failures,
+bounded attempts, backoff, jitter, idempotent reads, uncertain writes, and
+observation-after-timeout when applicable. Isolation and substitution tests
+must directly assert the semantic result from every relevant composition root.
+
+If review or a terminal audit finds a gap, reopen the owning task. The
+correction invalidates affected downstream acceptance, receipts, rollback
+identity, and any earlier terminal-audit status. Rerun focused proof and the
+affected review lens after correction. A SPEC-required terminal review runs
+once after every implementation task is terminal, followed by full verification
+on the exact receipt-bearing state; it does not run after each slice.
 
 ## Implementation Improvement Audits
 

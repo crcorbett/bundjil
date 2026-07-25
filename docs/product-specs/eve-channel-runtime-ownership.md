@@ -1,7 +1,7 @@
 ---
 document_type: product-specification
-lifecycle: proposed
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-product-owner
 created: 2026-07-24
 last_reviewed: 2026-07-24
@@ -9,6 +9,20 @@ review_trigger: Eve, Effect, ManagedRuntime, Channel provider, Fiber, Scope, wai
 ---
 
 # Eve Channel runtime ownership and supervision
+
+## Implementation status
+
+Repository implementation completed from
+`61992a2fa220313530dc7a8b3d54ec970a7483ec` on 2026-07-24. Closeout task three
+was reopened after commit
+`cb10720e1eb43396f4b3351143c11002a2e96cf8` because its receipt collapsed the
+required five post-implementation audit passes into one generic adversarial
+review. All five passes and their corrections are now accepted in the
+[completed execution plan](../exec-plans/completed/eve-channel-runtime-ownership.md).
+Current runtime behavior remains owned by
+[`../architecture/eve-agent.md`](../architecture/eve-agent.md) and
+[`../../apps/agent/README.md`](../../apps/agent/README.md). Optional Preview
+readback remains outside required acceptance and is not authorised.
 
 ## Decision
 
@@ -114,9 +128,11 @@ Eve's internal sandbox shutdown plugin uses Nitro's `close` hook only for
 sandbox handles and explicitly excludes Eve development and Vercel. This is
 evidence of Eve-owned host cleanup, not a public authored-module teardown hook.
 
-The linked worktree has no local `node_modules`. Installed dependency evidence
-was read from the canonical Bundjil checkout after confirming its `bun.lock`
-matches this worktree for the relevant packages. Exact installed anchors are:
+At SPEC rereview time the new linked worktree had no local `node_modules`.
+Installed dependency evidence was therefore read from the canonical Bundjil
+checkout after confirming its `bun.lock` matched this worktree for the relevant
+packages. That is point-in-time evidence, not a claim about the worktree's
+current dependency setup. Exact installed anchors are:
 
 - `node_modules/effect/src/ManagedRuntime.ts` and
   `node_modules/effect/src/internal/effect.ts`;

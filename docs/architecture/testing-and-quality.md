@@ -190,6 +190,47 @@ Acceptance follows the task's applicable risks and evidence, not the number of
 review entries. Correct an identified gap and rerun only the checks needed to
 establish the repaired claim.
 
+## Requirement-to-proof traceability
+
+Every material normative requirement must map to an owning task and a direct
+observable oracle. The task record must name:
+
+- the exact behavior or invariant;
+- the fixture, journey, or boundary that exercises it;
+- the expected observable postcondition;
+- a plausible false green that the oracle rejects;
+- the focused command and evidence owner; and
+- any environment, authority, limitation, or non-claim.
+
+Passing a broad test file, successful construction, a neighbouring assertion,
+or an aggregate verification command is not proof by proxy. Isolation and
+substitution requirements must assert the semantic result from every relevant
+composition root. A shared Service tag, for example, is proved independent
+only when each provider runtime resolves and exercises the expected
+provider-backed service, not merely when both runtimes build.
+
+Policy requirements need deterministic policy evidence, not only terminal
+error classification. Retry and reconciliation fixtures must distinguish
+eligible from ineligible failures, assert the bounded attempt count, prove the
+required backoff and jitter policy without wall-clock sleeps, separate
+idempotent reads from uncertain writes, and exercise observation-after-timeout
+where applicable. Equivalent matrices apply to pagination, rate limits,
+eventual consistency, circuit breaking, leases, and cleanup.
+
+During SPEC review, trace every `must`, `required`, `never`, and accepted
+finding into task-level verification. During task acceptance, replay that
+crosswalk against the actual diff and test assertions. If a requirement has no
+direct oracle, keep the task open or explicitly classify the claim as
+unproved.
+
+A terminal audit required by a SPEC runs once after all implementation tasks
+are terminal. Any audit correction reopens its owning task and invalidates
+affected downstream acceptance and receipts. Re-run focused proof, refresh
+rollback and candidate identity, complete the terminal review, then run
+`bun run verification` on the exact receipt-bearing state. An earlier
+intermediate audit cannot be relabelled as terminal after implementation
+resumes.
+
 For persistence work, verify native `KeyValueStore` and
 `AtomicKeyValueStore.transact` independently, scan for
 `KeyValueStore.modify`/get-then-set coordination and consumer SDK imports, and
