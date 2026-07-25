@@ -566,8 +566,8 @@ Knip, nine package typechecks and fifteen Turbo build/test tasks.
 
 ## Preview Vercel configuration spike
 
-The provider lifecycle and rollback are complete; immutable Git deployment
-observation remains. Authenticated readback selected only `bundjil-agent`
+The provider lifecycle, rollback and immutable Git deployment observation are
+accepted. Authenticated readback selected only `bundjil-agent`
 (`prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`) under the accepted Bundjil team. The
 mode-`0600` authority passed the shared and task-specific fixed contracts before
 credentials resolved.
@@ -604,15 +604,18 @@ or promotion call is admitted. After the fixed mode-`0600` authority, focused
 negative tests and full repository verification passed, the supported Vercel
 Git surface connected only `bundjil-agent`. Immediate Schema-decoded readback
 proved GitHub repo ID `1291167731`, owner/repo `crcorbett/bundjil` and
-Production branch `main`. The immutable post-link commit push and deployment
-observation remain.
+Production branch `main`. Post-link commit
+`ee1bcb81a40f61bbe565546851840be2d24dd648` then produced exact Preview
+deployment `dpl_E5FCMM66ofzCayNo5niJrhSjtYKR`, observed `BUILDING` and finally
+`READY`. No deployment-create, promotion or alias call ran. The mode-`0600`
+receipt passed the native and fixed harness Schemas.
 
-| Requirement                      | Direct observable and expected postcondition                                                                                                      | Plausible false green rejected                                                                               | Focused command/readback                                    | Evidence owner and current result                      |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------ |
-| Exact target and before identity | Team/project readback resolves one `bundjil-agent`; both feedback fields are `null`; disposable key match count is zero on both projects          | Project link, name match, credential presence, or absence on only one project                                | Authenticated project GET and target-filtered env list      | Fixed authority plus before/rollback readbacks; passed |
-| Preview-only reversible scope    | Preview becomes `true` while Production stays `null`; one fixed non-secret Preview env key may change; proxy remains a control                    | Trusting the property name, request body, or response without reading Production; `PVC-001` rejected exactly | Complete request/response decode and both-project readbacks | Corrected live adapter and provider contract; passed   |
-| Drift and rollback               | Desired becomes true, direct drift false, sync detects/repairs true, rollback restores null; disposable key is deleted by exact created ID        | Successful PATCH, ordinary plan, a mock drift test, or key absence without stable-ID cleanup                 | Alchemy plan/deploy/sync plus provider before/after reads   | Native live lifecycle and rollback; passed             |
-| Vercel Git deployment ownership  | Exact project link readback passed; the pushed immutable task commit, not Alchemy, must create the observed Preview deployment; no promotion runs | Existing deployment, unlinked branch push, manual API deploy, state entry, or READY status without Git SHA   | Link readback, Git push, deployment readback by exact SHA   | `PVC-003` link correction passed; deployment pending   |
+| Requirement                      | Direct observable and expected postcondition                                                                                               | Plausible false green rejected                                                                               | Focused command/readback                                    | Evidence owner and current result                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------ |
+| Exact target and before identity | Team/project readback resolves one `bundjil-agent`; both feedback fields are `null`; disposable key match count is zero on both projects   | Project link, name match, credential presence, or absence on only one project                                | Authenticated project GET and target-filtered env list      | Fixed authority plus before/rollback readbacks; passed |
+| Preview-only reversible scope    | Preview becomes `true` while Production stays `null`; one fixed non-secret Preview env key may change; proxy remains a control             | Trusting the property name, request body, or response without reading Production; `PVC-001` rejected exactly | Complete request/response decode and both-project readbacks | Corrected live adapter and provider contract; passed   |
+| Drift and rollback               | Desired becomes true, direct drift false, sync detects/repairs true, rollback restores null; disposable key is deleted by exact created ID | Successful PATCH, ordinary plan, a mock drift test, or key absence without stable-ID cleanup                 | Alchemy plan/deploy/sync plus provider before/after reads   | Native live lifecycle and rollback; passed             |
+| Vercel Git deployment ownership  | Exact project link and immutable SHA bind READY Preview deployment `dpl_E5FCMM66ofzCayNo5niJrhSjtYKR`; no promotion ran                    | Existing deployment, unlinked branch push, manual API deploy, state entry, or READY status without Git SHA   | Link readback, Git push, deployment readback by exact SHA   | `PVC-003` corrected; bounded receipt passed            |
 
 ### Preview configuration impact ledger
 
@@ -627,11 +630,14 @@ observation remain.
 | Lint, config, commands, and CI   | Change required | Add root/package Preview commands and extend the executable verification-policy inventory from twelve to thirteen journeys; no CI workflow or standing external authority changes.     |
 | Schemas, services, and Layers    | Change required | Add Preview-literal stage contracts, branded value/key/IDs, safe tagged errors, exact production guard, named operations and isolated live/mock provider graphs.                       |
 | Tests and fixtures               | Change required | Add complete-envelope HTTP tests plus native Alchemy no-op/update/drift/uncertain/eventual/retain/rollback tests with Production and secret-leak negatives.                            |
-| SPEC, tasks, and plan            | Change required | Keep this task open through immutable Git deployment observation; record `PVC-001`, `PVC-002`, `PVC-003`, their corrections and exact provider lifecycle evidence now.                 |
-| Receipts and evidence            | Change required | Retain only Schema-valid mode-`0600` redacted authority/receipt artifacts; no credential or provider value is retained.                                                                |
-| Rollout, rollback, and archive   | Change required | Live rollback restored the exact prior state; the plan remains active and the formal five-pass audit stays terminal-only after every SPEC task completes.                              |
+| SPEC, tasks, and plan            | Change required | Accept this task with `PVC-001`, `PVC-002`, `PVC-003`, corrections and property-level proof; route current work to the isolated Photon Preview spike.                                  |
+| Receipts and evidence            | Change required | Retain only Schema-valid mode-`0600` redacted authority/receipt artifacts; the accepted receipt binds the exact stable IDs, SHA, deployment, limitations and non-claims.               |
+| Rollout, rollback, and archive   | Change required | Live configuration rollback restored the exact prior state; exact-link disconnect restores the earlier Git baseline; the active plan and terminal audit remain open.                   |
 
-The formal five-pass audit remains deferred until all SPEC tasks finish.
+The task is accepted. `isolated-photon-preview-spike` is current and may not
+reuse this receipt as Photon isolation, secret-custody, signed-ingress, Channel
+or handset proof. The formal five-pass audit remains deferred until all SPEC
+tasks finish.
 
 ## Repository-authorized five-pass audit
 

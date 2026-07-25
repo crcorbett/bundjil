@@ -388,7 +388,7 @@
       "Preview feedback and one non-secret Preview-only variable change temporarily, dedicated Preview state is updated, and one implementation-branch push may trigger a Vercel Git Preview deployment."
     ],
     "preservedInvariants": [
-      "Production configuration, deployment promotion, domains, Marketplace bindings, Photon resources and unrelated Vercel projects remain untouched.",
+      "Production app env/settings, promotion, domains, Marketplace, Photon and unrelated projects stay unchanged; project-global Git bootstrap is separately authorized, read back and rollback-identifiable.",
       "Provider values and credentials never enter state, receipts, tracked files or logs.",
       "Retained configuration is not deleted without the exact rollback permission."
     ],

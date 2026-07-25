@@ -637,7 +637,7 @@
     {
       "id": "preview-vercel-configuration-spike",
       "title": "Prove convergent Vercel configuration in Preview",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["remote-state-and-noop-adoption"],
       "invariantIds": [
         "HC-TOOL-001",
@@ -648,10 +648,10 @@
       ],
       "description": "Under separately approved Preview write authority, enable the smallest reversible Vercel project-setting and environment-metadata resource, observe convergence, induce safe drift, reconcile it, and prove that deployment remains owned by Vercel Git.",
       "requirementProofReplay": {
-        "status": "required_before_acceptance",
+        "status": "passed",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Preview Vercel spike section.",
-        "currentResult": "in_progress_deployment_observation: exact Preview authority validated; full repository verification passed before writes. Live plan/apply/no-op, direct drift, sync detection/repair, two unchanged syncs and rollback completed against bundjil-agent. The final safe resource ID was 8jrS3AIVoAvFh0Y3; rollback restored Preview and Production feedback to null and deleted the exact disposable key while bundjil-codex-proxy stayed unchanged. PVC-001 and PVC-002 were corrected and reverified. PVC-003 found the exact project unlinked after implementation commit eb11b738b353c59715feb15044ff2a337b7d9084 produced no deployment. A distinct project-global mode-0600 authority, focused negative tests and full verification passed before the supported Vercel Git surface connected only bundjil-agent. Immediate Schema-decoded readback proved GitHub repo ID 1291167731, owner/repo crcorbett/bundjil and Production branch main. Exact-link disconnect restores the captured absent-link state. A subsequent immutable commit push, Git-created Preview deployment observation and bounded receipt remain before acceptance.",
+        "currentResult": "passed: the corrected live Preview lifecycle converged, detected and repaired one exact drift, produced two unchanged syncs, and rolled back to Preview and Production feedback null with only disposable stable ID 8jrS3AIVoAvFh0Y3 deleted. PVC-001, PVC-002 and PVC-003 were corrected and directly reverified. A distinct mode-0600 project-global authority gated the exact Git link; readback proved GitHub repo ID 1291167731, owner/repo crcorbett/bundjil and Production branch main. Vercel Git, not Alchemy, created READY Preview deployment dpl_E5FCMM66ofzCayNo5niJrhSjtYKR for immutable SHA ee1bcb81a40f61bbe565546851840be2d24dd648. The mode-0600 bounded receipt passed the native and shared harness Schemas and records zero deployment-create, promotion or alias calls.",
         "findings": [
           {
             "id": "PVC-001",
@@ -672,7 +672,7 @@
             "owner": "preview-vercel-configuration-spike",
             "finding": "The exact implementation commit was pushed, but two decoded deployment reads returned no matching SHA and authenticated project readback found bundjil-agent has no Vercel Git link.",
             "correction": "Keep project-global Git bootstrap outside the Preview Alchemy Layer; validate a distinct fixed authority naming Preview and Production, connect only the exact project to github:crcorbett/bundjil after absent-link readback, read it back, retain exact-link disconnect as rollback, then push and observe the resulting deployment by immutable SHA without a deployment-create or promotion call.",
-            "status": "corrected_and_read_back"
+            "status": "corrected_and_reverified"
           }
         ]
       },
@@ -697,6 +697,101 @@
         "Alchemy safely detects and reconciles one real Preview Vercel drift while Vercel Git remains the only deployment creator.",
         "Rollback restores the prior setting and readback, with no Production or data-resource change."
       ],
+      "acceptedPreviewVercelExecution": {
+        "status": "passed",
+        "observedAt": "2026-07-25T18:23:56.000Z",
+        "repositoryCandidate": "ee1bcb81a40f61bbe565546851840be2d24dd648",
+        "authority": "The mode-0600 Preview configuration authority passed the shared and task-specific fixed Schemas before configuration writes. When absent Git linkage blocked the required Vercel Git proof, a separate mode-0600 project-global envelope named the exact team/project, github:crcorbett/bundjil, both environments, stop conditions and exact-link disconnect rollback; it passed the shared and fixed Git-link Schemas before connect.",
+        "externalMutations": [
+          "First attempt: set bundjil-agent Preview feedback true, observed unintended Production feedback true from an omitted field, stopped, restored both fields null, and deleted only the first disposable environment-variable stable ID.",
+          "Corrected lifecycle: set Preview feedback true while explicitly preserving Production feedback null, created one plain Preview-only BUNDJIL_ALCHEMY_PREVIEW_SPIKE variable with stable ID 8jrS3AIVoAvFh0Y3, induced Preview-only feedback drift false, repaired true, then restored both feedback fields null and deleted only that stable ID.",
+          "Connected only bundjil-agent to GitHub repository crcorbett/bundjil after absent-link readback; immediate readback proved repository ID 1291167731 and Production branch main. No deployment-create, promotion or alias operation was called.",
+          "Pushed the accepted implementation branch; Vercel Git created Preview deployment dpl_E5FCMM66ofzCayNo5niJrhSjtYKR for exact SHA ee1bcb81a40f61bbe565546851840be2d24dd648 and terminal readback reported READY."
+        ],
+        "requirementProofReplay": [
+          {
+            "requirement": "Exact target, authority separation and before identity",
+            "directObservable": "Authenticated reads resolved one Bundjil team, exact bundjil-agent project ID, Preview and Production feedback null, zero disposable-key matches on both projects, and bundjil-codex-proxy as an unchanged control. The Preview and project-global Git-link envelopes validate independently.",
+            "expectedPostcondition": "Only the exact project receives the bounded property, metadata and Git-link operations; Git bootstrap does not broaden the Alchemy configuration Layer.",
+            "rejectedFalseGreen": "Credential presence, project name, local Vercel link metadata, a Preview-only envelope for a global Git mutation, or readback of only one feedback field cannot accept the target.",
+            "focusedCommand": "Fixed authority validators, authenticated project and target-filtered environment reads, and exact project-link readback.",
+            "evidenceOwner": "Two ignored mode-0600 authority artifacts, fixed policy Schemas, task findings and active plan.",
+            "result": "passed"
+          },
+          {
+            "requirement": "Effect and provider boundary quality",
+            "directObservable": "Named Services and live/memory Layers accept branded decoded Types; redacted Config resolves only at the adapter; outbound project/env requests encode exact Encoded contracts; complete response envelopes decode immediately; safe tagged failures remain in outer pipes.",
+            "expectedPostcondition": "No raw SDK/client, generic callback, primitive semantic public contract, unsafe cast, manual DTO reader/mapper, switch, instanceof policy, or helper sprawl reaches the provider boundary.",
+            "rejectedFalseGreen": "Typecheck success, a decoded happy-path field, an SDK type, or neighbouring adoption adapters do not prove the exercised write boundary.",
+            "focusedCommand": "Effect language-service diagnostics, boundary scans, contract tests with malformed/cross-stage responses, and complete diff review.",
+            "evidenceOwner": "packages/infrastructure/src/vercel/configuration*.ts, preview-configuration*.ts and focused contract tests.",
+            "result": "passed"
+          },
+          {
+            "requirement": "Preview-only mutation, Production guard and secret safety",
+            "directObservable": "The corrected PATCH sends enablePreviewFeedback and explicit enableProductionFeedback:null; apply/readback kept Production null, the variable was plain/non-sensitive/Preview-only, provider values were projected out immediately, and bundjil-codex-proxy remained unchanged.",
+            "expectedPostcondition": "Only Preview feedback and one non-secret disposable metadata identity change; Production controls and unrelated projects do not.",
+            "rejectedFalseGreen": "The property name, request intent, Preview-only target array or successful HTTP status cannot prove Production remained untouched. PVC-001 rejected this exact false green.",
+            "focusedCommand": "Complete request/response contract test, both-field live readback, both-project environment readback and exact secret/value leak scan.",
+            "evidenceOwner": "Corrected live adapter, focused tests, active plan and bounded receipt.",
+            "result": "passed"
+          },
+          {
+            "requirement": "Stable identity, convergence, real drift repair and rollback",
+            "directObservable": "Corrected apply retained stable ID 8jrS3AIVoAvFh0Y3; plan and sync reached no-op; direct drift changed only Preview feedback false; sync reported one setting drift and environment unchanged; one repair restored true; two syncs were unchanged; rollback restored both fields null and deleted only that stable ID.",
+            "expectedPostcondition": "One stable disposable identity converges, one exact drift is repaired without replacement, and rollback restores the captured provider baseline.",
+            "rejectedFalseGreen": "A mock lifecycle, successful PATCH, plan after apply, absent key without exact-ID deletion, or rollback command overridden by stored Config cannot accept the lifecycle. PVC-002 rejected the phase-override false green.",
+            "focusedCommand": "Alchemy plan/deploy/sync, separately composed direct-provider drift command, two unchanged syncs, rollback plan/apply/no-op and provider readbacks.",
+            "evidenceOwner": "Native Alchemy state, provider lifecycle test, active plan and mode-0600 receipt.",
+            "result": "passed"
+          },
+          {
+            "requirement": "Retry eligibility, bound, backoff, jitter, effect certainty, eventual consistency and timeout-after-write",
+            "directObservable": "Focused provider tests give a known pre-write failure one attempt, bound eligible transient observation attempts, apply exponential jittered backoff, observe an uncertain write before deciding whether to replay, recover timeout-after-write by stable identity, and converge after bounded eventual-consistency reads.",
+            "expectedPostcondition": "Known non-write failures are not retried; only eligible reads/observations are bounded and delayed; uncertain mutations are observed rather than blindly replayed.",
+            "rejectedFalseGreen": "A generic retry helper, one eventual success, aggregate suite green or synthetic neighbouring provider does not prove every exercised policy property.",
+            "focusedCommand": "vercel-preview-configuration-provider.test.ts uncertain-write and eventual-consistency cases plus exact-attempt contract assertions.",
+            "evidenceOwner": "Preview configuration live/memory Layers and Alchemy provider matrix.",
+            "result": "passed"
+          },
+          {
+            "requirement": "Vercel Git deployment ownership and immutable observation",
+            "directObservable": "Implementation SHA eb11b738b353c59715feb15044ff2a337b7d9084 produced no deployment while the project link was absent. After exact-link connect/readback, pushing SHA ee1bcb81a40f61bbe565546851840be2d24dd648 caused Preview deployment dpl_E5FCMM66ofzCayNo5niJrhSjtYKR, observed BUILDING then READY with that exact githubCommitSha.",
+            "expectedPostcondition": "Vercel Git is the sole deployment creator; Alchemy only observes the exact immutable Preview candidate and performs no promotion.",
+            "rejectedFalseGreen": "An existing deployment, unlinked push, READY status without SHA, manual deployment API, state entry or neighbouring commit cannot prove Git causality. PVC-003 rejected the unlinked-push false green.",
+            "focusedCommand": "Git push followed by Schema-decoded Vercel deployment listing filtered by exact project, Preview target and immutable SHA.",
+            "evidenceOwner": "Vercel project/deployment readbacks, Git commits and bounded receipt.",
+            "result": "passed; deployment-create, promotion and alias mutation calls were zero."
+          },
+          {
+            "requirement": "Effectiveness, operator attention and bounded evidence",
+            "directObservable": "The corrected plan exposed exactly one setting update and one metadata create; drift precision was one setting with environment unchanged; second convergence used two unchanged syncs; three concrete false greens caused explicit stops and owner corrections; the Git deployment reached READY after an initial observation and two bounded follow-up reads.",
+            "expectedPostcondition": "The spike provides readable property-level diffs, deterministic no-op, precise drift, bounded recovery, no secret leak and an operator-visible stop on unsafe outcomes.",
+            "rejectedFalseGreen": "A broad green suite, successful final state with hidden failed attempts, or approximate neighbouring latency cannot establish the scorecard.",
+            "focusedCommand": "Live plan/sync/readback sequence, finding ledger, exact deployment polling and receipt validation.",
+            "evidenceOwner": "Task findings, active plan and tmp/proof/preview-vercel-configuration.receipt.json.",
+            "result": "passed with one limitation: configuration command wall-clock latency and a numeric aggregate of live provider HTTP attempts were not retained, so no exact value is claimed."
+          },
+          {
+            "requirement": "Fixed proof, rollback and non-claims",
+            "directObservable": "The mode-0600 receipt decodes through InfrastructureBoundedReceiptJson and validates against the shared bounded-receipt Schema; it binds exact authority paths, candidate/deployment/stable IDs, lifecycle observations, current retained Git link, limitations, non-claims and disconnect rollback.",
+            "expectedPostcondition": "Repository, provider, state and deployment evidence remain distinct and no credential/provider value enters tracked or ignored proof.",
+            "rejectedFalseGreen": "Mode 0600, valid JSON, a READY deployment, local test matrix or receipt structure alone cannot substitute for referenced provider readbacks.",
+            "focusedCommand": "Native Schema decode/encode, fixed AJV validation, mode check, secret scan and full repository verification.",
+            "evidenceOwner": "tmp/proof/preview-vercel-configuration.receipt.json and canonical task/plan owners.",
+            "result": "passed"
+          }
+        ],
+        "verification": "The receipt-bearing candidate passed the Git-link authority validator; focused authority negatives; Effect language-service diagnostics; boundary, docs, skills, authority, controls, verification-policy and HGI-307 gates; 90 tooling tests; type-aware formatting/lint; lint fixture; Knip; all nine workspace typechecks; 22 infrastructure Vitest tests; 14 Alchemy lifecycle tests; and all fifteen Turbo build/test tasks. Full repository verification passed immediately before the immutable candidate push; closeout reruns it after the receipt-bearing ledger update.",
+        "artifacts": "The two fixed authorities and bounded receipt remain ignored and mode 0600. Root and app-local credentials remain ignored and mode 0600; no credential or provider value is retained in source, state, task evidence or the receipt.",
+        "limitations": [
+          "The retained project-global Git link may let a separately authorized future main push create a Production deployment; this task authorizes no such push, deployment, promotion or alias change.",
+          "Configuration command wall-clock latency and a numeric aggregate of live provider HTTP attempts were not retained, so no exact value is claimed.",
+          "READY deployment metadata does not prove application runtime health, alias traffic, Photon isolation, signed ingress, message delivery or handset behavior."
+        ],
+        "rollback": "Preview configuration is already restored. To restore the captured project-link baseline, disconnect only github:crcorbett/bundjil from prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and read back link absence; do not delete deployments or change aliases.",
+        "downstream": "isolated-photon-preview-spike is current. It may reuse neither this Preview Vercel receipt nor the shared Photon adoption state as proof of a separate Photon Preview project, isolated credentials, webhook secret custody, signed ingress or handset behavior. The formal five-pass audit remains terminal-only."
+      },
       "commitAfterPassing": false
     },
     {
