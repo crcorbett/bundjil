@@ -334,6 +334,13 @@ it.effect(
                       storeId: "resource-upstash",
                     },
                   },
+                  {
+                    id: "env-production-only",
+                    key: "PRODUCTION_ONLY_SECRET",
+                    type: "sensitive",
+                    target: ["production"],
+                    sensitive: true,
+                  },
                 ],
                 pagination: { next: null },
               };
@@ -449,6 +456,13 @@ it.effect(
           yield* environmentVariablesService.listEnvironmentVariables(
             ListVercelEnvironmentVariables.make(project)
           );
+        const productionEnvironmentVariables =
+          yield* environmentVariablesService.listEnvironmentVariables(
+            ListVercelEnvironmentVariables.make({
+              ...project,
+              stage: "prod",
+            })
+          );
         const marketplaceBindings =
           yield* marketplaceBindingsService.listMarketplaceBindings(
             ListVercelMarketplaceBindings.make(project)
@@ -466,6 +480,7 @@ it.effect(
           projects,
           domains,
           environmentVariables,
+          productionEnvironmentVariables,
           marketplaceBindings,
           deployments,
           productionDeployments,
@@ -476,6 +491,14 @@ it.effect(
       assert.strictEqual(
         result.environmentVariables.environmentVariables.length,
         1
+      );
+      assert.strictEqual(
+        result.productionEnvironmentVariables.environmentVariables.length,
+        1
+      );
+      assert.strictEqual(
+        result.productionEnvironmentVariables.environmentVariables[0]?.key,
+        "PRODUCTION_ONLY_SECRET"
       );
       assert.strictEqual(result.marketplaceBindings.bindings.length, 1);
       assert.strictEqual(

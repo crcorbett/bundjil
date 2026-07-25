@@ -688,24 +688,30 @@ export const VercelLive = Layer.effectContext(
           });
         }
         environmentVariables.push(
-          ...response.body.envs.map((environmentVariable) =>
-            VercelEnvironmentVariableAttributes.make({
-              stage: input.stage,
-              teamId: input.teamId,
-              projectId: input.projectId,
-              environmentVariableId: environmentVariable.id,
-              key: environmentVariable.key,
-              type: environmentVariable.type,
-              targets: environmentVariable.target,
-              gitBranch: environmentVariable.gitBranch,
-              sensitive:
-                environmentVariable.sensitive === true ||
-                environmentVariable.type === "sensitive" ||
-                environmentVariable.type === "encrypted" ||
-                environmentVariable.type === "secret",
-              ownership: "Unowned",
-            })
-          )
+          ...response.body.envs
+            .filter((environmentVariable) =>
+              environmentVariable.target.includes(
+                input.stage === "prod" ? "production" : "preview"
+              )
+            )
+            .map((environmentVariable) =>
+              VercelEnvironmentVariableAttributes.make({
+                stage: input.stage,
+                teamId: input.teamId,
+                projectId: input.projectId,
+                environmentVariableId: environmentVariable.id,
+                key: environmentVariable.key,
+                type: environmentVariable.type,
+                targets: environmentVariable.target,
+                gitBranch: environmentVariable.gitBranch,
+                sensitive:
+                  environmentVariable.sensitive === true ||
+                  environmentVariable.type === "sensitive" ||
+                  environmentVariable.type === "encrypted" ||
+                  environmentVariable.type === "secret",
+                ownership: "Unowned",
+              })
+            )
         );
         cursor = response.body.pagination?.next ?? undefined;
       } while (cursor !== undefined);
@@ -810,9 +816,11 @@ export const VercelLive = Layer.effectContext(
         }
         contentHints.push(
           ...response.body.envs.flatMap((environmentVariable) =>
-            environmentVariable.contentHint === undefined
-              ? []
-              : [environmentVariable.contentHint]
+            environmentVariable.target.includes(
+              input.stage === "prod" ? "production" : "preview"
+            ) && environmentVariable.contentHint !== undefined
+              ? [environmentVariable.contentHint]
+              : []
           )
         );
         cursor = response.body.pagination?.next ?? undefined;
