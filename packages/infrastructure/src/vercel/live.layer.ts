@@ -5,7 +5,6 @@ import {
   Context,
   Effect,
   Layer,
-  Match,
   Option,
   Redacted,
   Schedule,
@@ -215,20 +214,37 @@ const VercelEnvironmentVariablesEnvelope = Schema.Union([
   VercelFailureEnvelope,
 ]);
 
-const VercelMarketplaceInstallationResourcesSuccessEnvelope = Schema.Struct({
+const VercelMarketplaceStorageStoresSuccessEnvelope = Schema.Struct({
   status: Schema.Literal(200),
   headers: VercelResponseHeaders,
   body: Schema.Struct({
-    resources: Schema.Array(
-      Schema.Struct({
-        internalId: VercelMarketplaceResourceId,
-        partnerId: VercelMarketplaceDatabaseId,
-      })
+    stores: Schema.Array(
+      Schema.Union([
+        Schema.Struct({
+          id: VercelMarketplaceResourceId,
+          externalResourceId: VercelMarketplaceDatabaseId,
+          type: Schema.Literal("integration"),
+          product: Schema.Struct({
+            integrationConfigurationId: VercelIntegrationConfigurationId,
+            integration: Schema.Struct({
+              id: VercelIntegrationId,
+            }),
+          }),
+          projectsMetadata: Schema.Array(
+            Schema.Struct({
+              projectId: VercelProjectId,
+            })
+          ),
+        }),
+        Schema.Struct({
+          type: Schema.optional(Schema.Literal("blob")),
+        }),
+      ])
     ),
   }),
 });
-const VercelMarketplaceInstallationResourcesEnvelope = Schema.Union([
-  VercelMarketplaceInstallationResourcesSuccessEnvelope,
+const VercelMarketplaceStorageStoresEnvelope = Schema.Union([
+  VercelMarketplaceStorageStoresSuccessEnvelope,
   VercelFailureEnvelope,
 ]);
 
@@ -795,6 +811,41 @@ export const VercelLive = Layer.effectContext(
         cursor = response.body.pagination?.next ?? undefined;
       } while (cursor !== undefined);
 
+      const storesResponse = yield* client
+        .execute(
+          withVercelAuthorization(
+            HttpClientRequest.get(vercelUrl("/v1/storage/stores")).pipe(
+              HttpClientRequest.setUrlParam("teamId", encoded.teamId)
+            ),
+            token
+          )
+        )
+        .pipe(
+          Effect.flatMap(
+            HttpClientResponse.schemaJson(
+              VercelMarketplaceStorageStoresEnvelope
+            )
+          ),
+          Effect.mapError(
+            () =>
+              new VercelMarketplaceBindingsReadError({
+                operation: "listMarketplaceBindings",
+                reason: "invalidResponse",
+                retry: "never",
+                message:
+                  "Vercel returned an invalid Marketplace storage envelope.",
+              })
+          )
+        );
+      if (storesResponse.status !== 200) {
+        return yield* new VercelMarketplaceBindingsReadError({
+          operation: "listMarketplaceBindings",
+          reason: storesResponse.status === 429 ? "rateLimited" : "transient",
+          retry: "backoff",
+          message: "Vercel could not list Marketplace storage bindings.",
+        });
+      }
+
       const bindings = yield* Effect.forEach(
         Array.dedupeWith(
           contentHints,
@@ -807,58 +858,29 @@ export const VercelLive = Layer.effectContext(
         Effect.fn(
           "VercelMarketplaceBindingsLive.resolveMarketplaceContentHint"
         )(function* (contentHint: VercelMarketplaceContentHint) {
-          const response = yield* client
-            .execute(
-              withVercelAuthorization(
-                HttpClientRequest.get(
-                  vercelUrl(
-                    `/v1/installations/${contentHint.integrationConfigurationId}/resources`
-                  )
-                ),
-                token
+          const matches = storesResponse.body.stores.filter(
+            (store) =>
+              store.type === "integration" &&
+              store.id === contentHint.storeId &&
+              store.product.integrationConfigurationId ===
+                contentHint.integrationConfigurationId &&
+              store.product.integration.id === contentHint.integrationId &&
+              store.projectsMetadata.some(
+                (project) => project.projectId === input.projectId
               )
-            )
-            .pipe(
-              Effect.flatMap(
-                HttpClientResponse.schemaJson(
-                  VercelMarketplaceInstallationResourcesEnvelope
-                )
-              ),
-              Effect.mapError(
-                () =>
-                  new VercelMarketplaceBindingsReadError({
-                    operation: "listMarketplaceBindings",
-                    reason: "invalidResponse",
-                    retry: "never",
-                    message:
-                      "Vercel returned an invalid installation resource envelope.",
-                  })
-              )
-            );
-          if (response.status !== 200) {
-            return yield* new VercelMarketplaceBindingsReadError({
-              operation: "listMarketplaceBindings",
-              reason: Match.value(response.status).pipe(
-                Match.when(404, () => "notFound" as const),
-                Match.when(429, () => "rateLimited" as const),
-                Match.orElse(() => "transient" as const)
-              ),
-              retry: response.status === 404 ? "never" : "backoff",
-              message:
-                "Vercel could not resolve a Marketplace installation resource.",
-            });
-          }
-          const matches = response.body.resources.filter(
-            (resource) => resource.internalId === contentHint.storeId
           );
-          const [resource] = matches;
-          if (resource === undefined || matches.length !== 1) {
+          const [store] = matches;
+          if (
+            store === undefined ||
+            store.type !== "integration" ||
+            matches.length !== 1
+          ) {
             return yield* new VercelMarketplaceBindingsReadError({
               operation: "listMarketplaceBindings",
-              reason: resource === undefined ? "notFound" : "ambiguous",
+              reason: store === undefined ? "notFound" : "ambiguous",
               retry: "never",
               message:
-                "Vercel Marketplace metadata did not identify one exact installation resource.",
+                "Vercel Marketplace metadata did not identify one exact customer storage binding.",
             });
           }
           return VercelMarketplaceBindingAttributes.make({
@@ -867,8 +889,8 @@ export const VercelLive = Layer.effectContext(
             projectId: input.projectId,
             integrationId: contentHint.integrationId,
             configurationId: contentHint.integrationConfigurationId,
-            resourceId: resource.internalId,
-            databaseId: resource.partnerId,
+            resourceId: store.id,
+            databaseId: store.externalResourceId,
             ownership: "Unowned",
           });
         })

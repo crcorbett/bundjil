@@ -336,15 +336,31 @@ it.effect(
                 pagination: { next: null },
               };
             }
-            if (
-              url.pathname ===
-              "/v1/installations/configuration-upstash/resources"
-            ) {
+            if (url.pathname === "/v1/storage/stores") {
               return {
-                resources: [
+                stores: [
                   {
-                    internalId: "resource-upstash",
-                    partnerId: "database-upstash",
+                    id: "resource-upstash",
+                    externalResourceId: "database-upstash",
+                    type: "integration",
+                    product: {
+                      integrationConfigurationId: "configuration-upstash",
+                      integration: {
+                        id: "integration-upstash",
+                      },
+                    },
+                    projectsMetadata: [{ projectId: "prj-agent" }],
+                    secrets: [
+                      {
+                        name: "UPSTASH_REDIS_REST_TOKEN",
+                        value: "sentinel-marketplace-secret",
+                      },
+                    ],
+                  },
+                  {
+                    id: "blob-store",
+                    type: "blob",
+                    secrets: [{ value: "sentinel-unrelated-store-secret" }],
                   },
                 ],
               };
@@ -421,6 +437,18 @@ it.effect(
         1
       );
       assert.strictEqual(result.marketplaceBindings.bindings.length, 1);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(result.marketplaceBindings).includes(
+          "sentinel-marketplace-secret"
+        ),
+        false
+      );
+      assert.strictEqual(
+        Inspectable.toStringUnknown(result.marketplaceBindings).includes(
+          "sentinel-unrelated-store-secret"
+        ),
+        false
+      );
       assert.strictEqual(result.deployments.deployments.length, 1);
       assert.strictEqual(
         result.environmentVariables.environmentVariables[0] !== undefined &&
@@ -466,10 +494,18 @@ it.effect(
                     pagination: { next: null },
                   }
                 : {
-                    resources: [
+                    stores: [
                       {
-                        internalId: "different-resource",
-                        partnerId: "sentinel-database-id",
+                        id: "different-resource",
+                        externalResourceId: "sentinel-database-id",
+                        type: "integration",
+                        product: {
+                          integrationConfigurationId: "configuration-upstash",
+                          integration: {
+                            id: "integration-upstash",
+                          },
+                        },
+                        projectsMetadata: [{ projectId: "prj-agent" }],
                       },
                     ],
                   },

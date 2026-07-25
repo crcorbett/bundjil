@@ -16,8 +16,10 @@ receipts, and deterministic memory Layers.
   named services, safe operation errors, lazy credential and live/memory
   Layers, and retained custom Resources. The private HTTP adapter encodes
   scoped requests, decodes complete response envelopes, exhausts pagination,
-  omits environment values, and contains no Git deployment or promotion
-  operation.
+  omits environment values, resolves Marketplace identity through Vercel's
+  customer storage catalog, projects its secret-bearing provider envelope
+  immediately into safe binding identities, and contains no Git deployment or
+  promotion operation.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and
   stage-scoped state-safe props/attributes for Photon project, iMessage
   platform, shared user, webhook, dedicated-line, and billing observation. It
