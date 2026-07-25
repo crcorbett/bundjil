@@ -509,7 +509,7 @@
     {
       "id": "remote-state-and-noop-adoption",
       "title": "Bootstrap state and prove no-mutation adoption",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["authorized-read-only-inventory"],
       "invariantIds": [
         "HC-BOUNDARY-001",
@@ -520,10 +520,10 @@
       ],
       "description": "Choose and separately authorize a dedicated remote Alchemy state backend, model managed versus observed-unknown secret references, and adopt existing Preview then Production resources one class at a time with provider writes disabled.",
       "requirementProofReplay": {
-        "status": "required_before_acceptance",
+        "status": "passed",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's remote-state/adoption section.",
-        "currentResult": "ready_not_run: authorized-read-only-inventory is accepted at source 86a1b9a. Dedicated remote state backend selection, target authority, adoption manifests and zero-write state persistence remain unimplemented."
+        "currentResult": "passed: one dedicated bucket-scoped R2 native state store contains the exact 106 Preview and 69 Production logical identities derived from the accepted inventory digests. Side-effect-free adoption plans contained zero create/replace/delete, authorized adoption performed Vercel/Photon reads plus R2 state writes only, post-adoption plans were entirely no-op, two sync dry-runs per stage were unchanged, fixed-contract receipts passed, and exact credential-value leak scans returned zero. The one shared Free Photon physical project remains an explicit cross-stage observation and not isolation proof."
       },
       "implementationNotes": [
         "If Cloudflare.state() is chosen, use a Bundjil-specific stack/backend identity and scoped credentials; never reuse the site state or token.",
@@ -547,6 +547,91 @@
         "Existing resources are represented in remote state without provider mutation, accidental replacement, deletion, secret disclosure, or traffic change.",
         "Every Production project/domain/store/Photon resource is retained and delete-protected."
       ],
+      "acceptedAdoptionExecution": {
+        "status": "passed",
+        "observedAt": "2026-07-25T17:25:53.195Z",
+        "repositoryCandidate": "git parent fb124fb36ac65e3bf1a36b9f05172000b9d2783c plus the remote-state/adoption task diff; the acceptance commit is recorded after the complete verification gate.",
+        "authority": "The user approved the exact Cloudflare/R2 bootstrap, bucket-scoped credential creation, Vercel/Photon read-only adoption and remote-state persistence envelope. The ignored mode-0600 authority artifact validated against the fixed harness Schema before execution and named account, bucket, prefix, two Vercel projects, Photon project, both stages, rollback and stop conditions.",
+        "externalMutations": [
+          "Created R2 bucket bundjil-alchemy-state in Cloudflare account f9f94270a4a5af8af7010d891020922d after readback proved it absent.",
+          "Created one R2 Object Read & Write API token named Bundjil Alchemy State restricted to the exact bucket; values remain only in ignored mode-0600 .env.local.",
+          "Persisted Alchemy state objects under bundjil/v1 for the BundjilInfrastructure preview and prod stages. No Vercel or Photon transport write occurred."
+        ],
+        "requirementProofReplay": [
+          {
+            "requirement": "Dedicated remote backend, stable identity and least-privilege secret custody",
+            "directObservable": "Authenticated Cloudflare readback identified the exact account and previously absent bucket; the created credential policy named only bundjil-alchemy-state with Object Read & Write; the native State service reports id s3 and version 5.",
+            "expectedPostcondition": "Bundjil Alchemy state uses one dedicated bucket/prefix and does not reuse the site state worker, bucket or credential.",
+            "rejectedFalseGreen": "A general Cloudflare credential, similarly named bucket, local .alchemy state or Cloudflare.state() default worker is not the accepted backend.",
+            "focusedCommand": "Cloudflare account/bucket/token metadata readback plus infrastructure:adoption-proof native state read.",
+            "evidenceOwner": "apps/agent/runbooks/alchemy-infrastructure.md, src/state/r2-state.ts, fixed authority and both ignored receipts.",
+            "result": "passed; credential values are redacted Config and remain only in ignored mode-0600 custody."
+          },
+          {
+            "requirement": "Exact manifest Type/Encoded identity, stage, digest, owner and retain policy",
+            "directObservable": "Preview and Production manifests contain 106 and 69 unique branded logical/physical identities respectively, preserve the two accepted inventory digests, and require literal retain on every resource.",
+            "expectedPostcondition": "Only the reviewed physical resources from the accepted inventory can enter adoption state.",
+            "rejectedFalseGreen": "Matching counts, provider labels, a renamed logical ID, changed digest, wrong physical ID, missing retain field or secret-bearing excess property is rejected.",
+            "focusedCommand": "Infrastructure adoption-manifest tests and Schema encode/decode of both mode-0600 manifests.",
+            "evidenceOwner": "src/adoption-manifest.ts, adoption-manifest.test.ts and tmp/proof/alchemy-adoption-{preview,production}.json.",
+            "result": "passed with direct negatives for wrong stage, ID, digest, logical name, retain and secret field."
+          },
+          {
+            "requirement": "Read/import adoption with zero provider writes and no unintended lifecycle operation",
+            "directObservable": "deploy --dry-run --adopt showed exactly 106 Preview and 69 Production import/update actions with zero create, replacement or delete; the private live Vercel and Photon adapters contain GET transports only.",
+            "expectedPostcondition": "Alchemy may read imported resources and persist R2 state but cannot mutate either provider.",
+            "rejectedFalseGreen": "Alchemy's update label alone is not a provider mutation or no-mutation proof; state persistence alone does not prove provider call classes.",
+            "focusedCommand": "Supported adoption dry runs, live provider transport scan, authorized deploy --adopt --yes and receipt call-class review.",
+            "evidenceOwner": "alchemy.run.ts, adoption-live.layer.ts, provider live Layers, task receipts and this execution record.",
+            "result": "passed; Vercel/Photon transport writes 0, state writes limited to the approved R2 prefix."
+          },
+          {
+            "requirement": "Exact state persistence, Preview/Production isolation and no-op convergence",
+            "directObservable": "Native state lists one BundjilInfrastructure stack with separate preview and prod stages, exact manifest logical-ID sets, exact stage props and completed updated status. Post-adoption plans were 106 and 69 no-ops and two sync dry-runs per stage were unchanged.",
+            "expectedPostcondition": "Both accepted manifests converge independently without an unowned, missing, drifted or cross-stage state identity.",
+            "rejectedFalseGreen": "A successful deploy, resource count only, one dry run, relabelled state or neighbouring mock convergence cannot accept live state.",
+            "focusedCommand": "Alchemy plan, two sync --dry-run calls per stage, then infrastructure:adoption-proof list/get comparison.",
+            "evidenceOwner": "R2 state plus tmp/proof/alchemy-adoption-{preview,production}.receipt.json.",
+            "result": "passed; the shared Photon project is explicitly not separate-project isolation."
+          },
+          {
+            "requirement": "Retain/delete protection, safe recovery and access revocation",
+            "directObservable": "Every manifest resource is retain-only; Vercel and Photon Alchemy lifecycle tests fail closed on delete and forbidden Photon project/line/billing operations; the runbook rollback retains R2/provider resources and specifies create-readback-cutover-revoke credential replacement.",
+            "expectedPostcondition": "Repository rollback or credential rotation cannot destroy state or retained provider resources.",
+            "rejectedFalseGreen": "A retain string without executable delete denial, deleting state to recover, or revoking the old token before proving the replacement is rejected.",
+            "focusedCommand": "11 Alchemy lifecycle tests, manifest negatives and target-owned runbook dry review.",
+            "evidenceOwner": "test-alchemy provider tests and apps/agent/runbooks/alchemy-infrastructure.md.",
+            "result": "passed; no destructive rollback was exercised."
+          },
+          {
+            "requirement": "Retry, pagination, timeout and partial-failure properties applicable to read-only adoption",
+            "directObservable": "Adoption adds no provider write effect. It reuses the accepted Vercel exhaustive pagination and Photon read policies, including eligibility, bounded attempts, backoff, rate delay, jitter and no retry of non-eligible failures; synthetic lifecycle tests separately prove observation after timeout and partial-failure healing.",
+            "expectedPostcondition": "Only idempotent metadata reads may use their bounded retry policy and no billable or outcome-uncertain provider effect is replayed.",
+            "rejectedFalseGreen": "A broad retry suite or synthetic provider write cannot prove an uninspected live adoption call graph.",
+            "focusedCommand": "Provider transport scan, Vercel pagination tests, Photon exact-attempt retry tests and synthetic timeout/partial-failure lifecycle tests.",
+            "evidenceOwner": "Existing provider vertical owners plus the remote-state task call graph.",
+            "result": "passed for the read-only adoption scope; no provider write retry exists or is claimed."
+          },
+          {
+            "requirement": "Write-only secret safety and fixed evidence contracts",
+            "directObservable": "The proof command Schema-encodes the complete state for an in-memory exact-value scan and returns zero matches for R2 access/secret, Vercel token and Photon project secret. Both receipts encode through InfrastructureBoundedReceipt and validate against the fixed contract before mode-0600 persistence; detail SHA values bind each manifest.",
+            "expectedPostcondition": "No credential or write-only provider value appears in manifest, state, tracked source, stdout or receipt.",
+            "rejectedFalseGreen": "Redacted Config, mode 0600, a safe summary or receipt validation alone cannot prove the referenced state has no secret.",
+            "focusedCommand": "infrastructure:adoption-proof for both stages, fixed AJV validation, Schema encode and exact credential-value scan.",
+            "evidenceOwner": "prove-adoption-state.ts and both ignored receipts.",
+            "result": "passed with credential-value-leaks 0."
+          }
+        ],
+        "verification": "The receipt-bearing candidate passed Effect language-service diagnostics; boundary, docs, skills, authority, controls, verification-policy and HGI-307 gates; 90 tooling tests; type-aware formatting/lint; the lint fixture; Knip; all nine workspace typechecks; 18 infrastructure Vitest tests; 11 Alchemy lifecycle tests; and all fifteen Turbo build/test tasks. The final rerun used only the documented process-local synthetic Executor URL/key fixture and made no Executor request.",
+        "artifacts": "The fixed authority, accepted inventory artifacts, two adoption manifests and two adoption receipts remain ignored and mode 0600. Credentials remain only in ignored mode-0600 .env.local; no value is present in tracked artifacts or task evidence.",
+        "limitations": [
+          "Alchemy beta.64 has no plan --adopt option; deploy --dry-run --adopt was the supported side-effect-free adoption plan.",
+          "One shared Free Photon project is represented in both state stages as observed migration state. A separately isolated Preview Photon project is unproved.",
+          "Adoption proves no provider configuration mutation, Vercel deployment/promotion, runtime health, Channel behavior or handset result."
+        ],
+        "rollback": "Retain the R2 bucket/state and all provider resources. Revert the accepted repository commit, run read-only plan/sync, and apply only a separately approved property restoration. Replace the state credential only through create-readback-cutover-revoke.",
+        "downstream": "preview-vercel-configuration-spike is current. It requires a new property-specific Preview authority/readback and may not reuse this adoption receipt as mutation, deployment or drift-repair proof. The formal five-pass audit remains terminal-only."
+      },
       "commitAfterPassing": true
     },
     {
@@ -566,7 +651,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Preview Vercel spike section.",
-        "currentResult": "not_run: blocked by remote-state-and-noop-adoption."
+        "currentResult": "ready_not_run: remote-state-and-noop-adoption is accepted. The next slice must select one reversible non-secret Preview-only property, validate a fresh exact authority envelope, record before/rollback identity, and prove apply, drift detection/repair, Production non-change and Vercel Git deployment ownership."
       },
       "implementationNotes": [
         "Select non-secret Preview-only configuration with a recorded before value and safe rollback. Do not begin with Production, domains, Marketplace, auth tokens, or provider secrets.",

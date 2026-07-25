@@ -6,6 +6,7 @@ import {
   SyntheticProviderCredentials,
   SyntheticProviderCredentialsLive,
 } from "../src/live.layer.js";
+import { loadAlchemyR2StateConfig } from "../src/state/r2-state.js";
 
 it.effect("decodes semantic command config at its executable ingress", () =>
   Effect.gen(function* testInfrastructureCommandConfig() {
@@ -67,4 +68,29 @@ it.effect("does not render a resolved credential value", () =>
       })
     )
   )
+);
+
+it.effect(
+  "decodes the dedicated R2 state identity with redacted credentials",
+  () =>
+    Effect.gen(function* testAlchemyR2StateConfig() {
+      const config = yield* loadAlchemyR2StateConfig;
+      assert.strictEqual(config.accountId, "f9f94270a4a5af8af7010d891020922d");
+      assert.strictEqual(config.bucketName, "bundjil-alchemy-state");
+      assert.strictEqual(config.prefix, "bundjil/v1");
+      assert.strictEqual(Redacted.isRedacted(config.accessKeyId), true);
+      assert.strictEqual(Redacted.isRedacted(config.secretAccessKey), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(config).includes("r2-secret-sentinel"),
+        false
+      );
+    }).pipe(
+      Effect.provideService(
+        ConfigProvider.ConfigProvider,
+        ConfigProvider.fromUnknown({
+          BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID: "r2-access-sentinel",
+          BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "r2-secret-sentinel",
+        })
+      )
+    )
 );

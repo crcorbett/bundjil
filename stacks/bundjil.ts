@@ -1,52 +1,135 @@
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- Effect language-service file directive.
 /** @effect-diagnostics anyUnknownInErrorContext:off */
 
-import {
-  AdoptionManifestDigest,
-  AlchemyLogicalResourceId,
-  InfrastructureStage,
-  SyntheticDesiredValue,
-  SyntheticPhysicalResourceId,
-  SyntheticResource,
-  SyntheticResourceProps,
+import type {
+  AdoptionManifest,
+  AdoptionManifestResource,
 } from "@bundjil/infrastructure";
+import { InfrastructureStage } from "@bundjil/infrastructure";
+import {
+  PhotonBillingObservationResource,
+  PhotonLineObservationResource,
+  PhotonPlatformConfigurationResource,
+  PhotonProjectObservationResource,
+  PhotonSharedUserResource,
+  PhotonWebhookObservationResource,
+} from "@bundjil/infrastructure/photon";
+import {
+  VercelDeploymentObservationResource,
+  VercelEnvironmentVariable,
+  VercelMarketplaceBinding,
+  VercelProject,
+  VercelProjectDomain,
+} from "@bundjil/infrastructure/vercel";
 import { Stage } from "alchemy/Stage";
-import { Config, Effect, Schema } from "effect";
+import { Config, Effect, Match, Schema } from "effect";
 
-export const BundjilInfrastructureStack = Effect.gen(
-  function* bundjilInfrastructureStack() {
+const failConfiguration = (message: string) =>
+  Schema.decodeUnknownEffect(Schema.Never)(message).pipe(
+    Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
+  );
+
+type AdoptionProviderRequirements =
+  | typeof PhotonBillingObservationResource.Provider
+  | typeof PhotonLineObservationResource.Provider
+  | typeof PhotonPlatformConfigurationResource.Provider
+  | typeof PhotonProjectObservationResource.Provider
+  | typeof PhotonSharedUserResource.Provider
+  | typeof PhotonWebhookObservationResource.Provider
+  | typeof VercelDeploymentObservationResource.Provider
+  | typeof VercelEnvironmentVariable.Provider
+  | typeof VercelMarketplaceBinding.Provider
+  | typeof VercelProject.Provider
+  | typeof VercelProjectDomain.Provider;
+
+const deployAdoptionResource = (
+  resource: AdoptionManifestResource
+): Effect.Effect<unknown, Config.ConfigError, AdoptionProviderRequirements> =>
+  Match.value(resource).pipe(
+    Match.discriminatorsExhaustive("resourceKind")({
+      syntheticResource: () =>
+        failConfiguration(
+          "Synthetic resources are not valid in the provider-bound adoption stack."
+        ),
+      vercelProject: (candidate) =>
+        VercelProject(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      vercelDomain: (candidate) =>
+        VercelProjectDomain(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      vercelEnvironmentVariable: (candidate) =>
+        VercelEnvironmentVariable(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      vercelMarketplaceBinding: (candidate) =>
+        VercelMarketplaceBinding(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonProjectObservation: (candidate) =>
+        PhotonProjectObservationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonPlatformConfiguration: (candidate) =>
+        PhotonPlatformConfigurationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonSharedUser: (candidate) =>
+        PhotonSharedUserResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonWebhookObservation: (candidate) =>
+        PhotonWebhookObservationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonLineObservation: (candidate) =>
+        PhotonLineObservationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      photonBillingObservation: (candidate) =>
+        PhotonBillingObservationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+      vercelDeploymentObservation: (candidate) =>
+        VercelDeploymentObservationResource(candidate.logicalId, {
+          stage: candidate.stage,
+          ...candidate.physicalId,
+        }),
+    })
+  );
+
+export const BundjilInfrastructureStack = (manifest: AdoptionManifest) =>
+  Effect.gen(function* bundjilInfrastructureStack() {
     const rawStage = yield* Stage;
-    const stage =
-      yield* Schema.decodeUnknownEffect(InfrastructureStage)(rawStage);
-    const logicalId = yield* Schema.decodeUnknownEffect(
-      AlchemyLogicalResourceId
-    )("offline-foundation");
-    const physicalId = yield* Schema.decodeUnknownEffect(
-      SyntheticPhysicalResourceId
-    )(`synthetic-${stage}-foundation`);
-    const desiredValue = yield* Schema.decodeUnknownEffect(
-      SyntheticDesiredValue
-    )("foundation-v1");
-    const adoptionManifestDigest = yield* Schema.decodeUnknownEffect(
-      AdoptionManifestDigest
-    )("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    const props = SyntheticResourceProps.make({
-      stage,
-      logicalId,
-      physicalId,
-      desiredValue,
-      adoptionManifestDigest,
-      removalPolicy: "retain",
-      destructivePolicy: { _tag: "Protected" },
+    const stage = yield* Schema.decodeUnknownEffect(InfrastructureStage)(
+      rawStage
+    ).pipe(
+      Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
+    );
+    if (stage !== manifest.stage) {
+      return yield* failConfiguration(
+        "The Alchemy CLI stage does not match the decoded adoption manifest."
+      );
+    }
+    yield* Effect.forEach(manifest.resources, deployAdoptionResource, {
+      concurrency: 1,
+      discard: true,
     });
-    const resource = yield* SyntheticResource("OfflineFoundation", props);
 
     return {
       stage,
-      syntheticPhysicalId: resource.physicalId,
-      syntheticStateRevision: resource.stateRevision,
+      retainedResourceCount: manifest.resources.length,
+      observedManifestDigest: manifest.digest,
     };
-  }
-).pipe(
-  Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
-);
+  });

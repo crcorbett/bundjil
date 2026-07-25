@@ -56,7 +56,11 @@ ignored artifacts are mode `0600`, Schema-valid, fixed-contract compatible and
 leak-scanned. Project-scoped domains/Marketplace identity and the sole shared
 Photon project are not treated as separate stage resources; Vercel protection,
 list-omitted deployment aliases and a separately created Preview Photon project
-remain unknown. `remote-state-and-noop-adoption` is now the current task.
+remain unknown. `remote-state-and-noop-adoption` is now accepted: the dedicated
+R2 state store contains the exact 106 Preview and 69 Production logical
+identities, both stages converge to no-op, and the read-only provider adapters
+record zero transport writes. `preview-vercel-configuration-spike` is now the
+current task.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -490,14 +494,85 @@ request.
 | Rollout and rollback             | Preserve        | No external rollout or mutation occurred, so provider rollback is N/A. Repository rollback is reversion of the five correction commits; ignored evidence remains needed by the next adoption-manifest slice. |
 | Lifecycle and archive pointers   | Preserve        | The SPEC and plan remain active with six pending tasks. No completed-plan or archive pointer changes; the single formal five-pass audit remains terminal-only.                                               |
 
+## Accepted remote state and no-mutation adoption
+
+The owner approved one exact Cloudflare/R2 bootstrap plus read-only
+Vercel/Photon adoption envelope. The operation created the previously absent
+`bundjil-alchemy-state` bucket in Cloudflare account
+`f9f94270a4a5af8af7010d891020922d` and one Object Read & Write credential
+restricted to that bucket. Its values remain only in ignored mode-`0600`
+`.env.local`. The stack uses Alchemy's native S3 state interface with prefix
+`bundjil/v1`; it does not reuse the site's Cloudflare state worker or token.
+
+Stage-specific manifests preserve the accepted inventory digests:
+
+- Preview:
+  `e011bf3fa798142d3a23a5395b82765c5cb12d5673060af531498a10cdb56169`,
+  106 retained resources;
+- Production:
+  `e8b25f3aab1b683775e722b8dc6f963402faea42d0cbec97b8dc3fb56138f3ce`,
+  69 retained resources.
+
+The installed Alchemy beta does not implement `plan --adopt`.
+`deploy --dry-run --adopt` supplied the side-effect-free adoption plans. Each
+plan contained only the manifest-sized import/update set and no create,
+replace, or delete. Authorized `deploy --adopt --yes` then persisted state
+while the Vercel and Photon adapters performed metadata reads only. The
+post-adoption plans were 106 and 69 no-ops respectively, and two consecutive
+`sync --dry-run` executions per stage were unchanged. The native state
+readback returned store `s3`, version `5`, one `BundjilInfrastructure` stack,
+distinct `preview` and `prod` stages, exact logical-ID sets, completed adoption
+status, and zero matches for the four credential values.
+
+### Remote-state/adoption requirement replay
+
+| Requirement or property                 | Direct observable and expected postcondition                                                                                                                                   | Plausible false green rejected                                                                                      | Focused command/readback                                                              | Evidence owner and result                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Dedicated backend and credential scope  | Exact account/bucket readback plus one bucket-only Object Read & Write token; native state reports `s3` v5                                                                     | Reusing the site state worker/token or treating a general Cloudflare credential as bucket scope                     | Cloudflare metadata readback and `infrastructure:adoption-proof`                      | Fixed authority, R2 config owner and ignored receipts; passed                    |
+| Manifest identity and retain policy     | Every generated resource retains stage, logical ID, branded physical ID, owner, accepted digest and literal `retain`                                                           | Matching resource count, provider name, or a locally invented DTO                                                   | Manifest Schema round trip plus wrong-stage/ID/digest/name/retain negatives           | `adoption-manifest.ts`, focused tests and ignored manifests; passed              |
+| Provider-write-free adoption            | Both dry runs contain zero create/replace/delete; live Vercel/Photon adapters expose GET reads only; receipts record zero provider writes                                      | Calling an import an update without checking the adapter transport, or treating state writes as provider writes     | `deploy --dry-run --adopt`, provider call-graph scan, deploy readback                 | Task ledger and stage receipts; passed                                           |
+| Exact remote persistence and isolation  | One state store contains 106 Preview and 69 Production identities under distinct stages with exact stage props                                                                 | Counting state objects without comparing logical IDs/stage, or treating shared Photon identity as isolated projects | Native State list/get plus manifest logical-ID comparison                             | `prove-adoption-state.ts` and both receipts; passed with shared-Photon non-claim |
+| No-op and repeated sync convergence     | Post-adoption plans are entirely no-op and two sync dry-runs per stage are unchanged                                                                                           | Successful deploy, a single plan, or neighbouring mock no-op assertion                                              | Alchemy plan and two native sync dry-runs per stage                                   | Ignored stage receipts and this plan; passed                                     |
+| Secret/write-only safety                | Manifest/state Schemas contain no secret values and encoded state has zero exact credential matches                                                                            | Mode `0600`, redacted stdout, or a safe receipt proving the referenced state safe                                   | Schema encode plus exact in-memory credential-value scan                              | Adoption proof command and receipts; passed                                      |
+| Retain/delete protection and recovery   | All manifest resources are retain-only; provider lifecycle tests reject Vercel/Photon deletion and forbidden Photon mutations; state rollback preserves the bucket/resources   | A manifest label without executable delete denial, or destructive state reset presented as rollback                 | Adoption negatives, 11 Alchemy lifecycle tests and runbook dry review                 | Package tests and Alchemy runbook; passed                                        |
+| Retry, pagination and uncertain effects | Adoption performs idempotent metadata reads using the already proved bounded provider read policies; it introduces no provider write retry                                     | Broad retry suite proving a new write path, or state persistence proving provider outcome                           | Existing focused Vercel pagination/Photon retry matrices plus new provider call graph | Provider vertical owners; passed for read-only adoption, no provider-write claim |
+| Fixed evidence contracts                | Authority validates before execution; both receipts encode through `InfrastructureBoundedReceipt` and validate against the fixed harness Schema before mode-`0600` persistence | Markdown summary, command exit zero, or receipt shape without referenced artifact digest                            | AJV fixed-contract validation, Effect Schema encode, SHA and mode readback            | Ignored authority/manifests/receipts and task ledger; passed                     |
+
+### Remote-state/adoption docs-maintainer impact ledger
+
+| Surface                          | Status          | Decision and evidence boundary                                                                                                                                    |
+| -------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs router     | Preserve        | Existing Effect, provider and hybrid-ownership architecture already covers the implementation; no cross-package ownership moved.                                  |
+| Root, app and package READMEs    | Change required | Replace stale offline/live-layer claims, add manifest/proof commands, and route operators to the new app-owned runbook.                                           |
+| Exports and generated references | Change required | Export the native R2 state Config/Layer, strict adoption manifest contracts and live adoption Layer; no raw client or credential export.                          |
+| Runbooks and authority           | Change required | Add the target-owned Alchemy procedure, authority-model route and static register envelope for state/adoption/reconciliation.                                     |
+| Verification journeys and proof  | Change required | Route the two ignored fixed receipts without adding a consumer journey or merging provider/state/deployment claims.                                               |
+| Skills and `AGENTS.md`           | Preserve        | The repository skills and task map were sufficient; no recurring gap or instruction change was found.                                                             |
+| Lint, config, commands and CI    | Change required | Add root/package adoption-manifest and adoption-proof commands; no CI/provider credential or apply admission is added.                                            |
+| Schemas, services and Layers     | Change required | Add branded R2 Config with redacted secrets, strict manifest variants, exact provider scopes, native state Layer and explicit read-only live provider graph.      |
+| Tests and fixtures               | Change required | Add manifest round-trip and six direct false-green negatives, cross-brand compile fixtures, state redaction, and retain/no-write lifecycle coverage.              |
+| SPEC, tasks and active plan      | Change required | Complete `remote-state-and-noop-adoption`, record property-level proof, and route `preview-vercel-configuration-spike` next.                                      |
+| Receipts and evidence            | Change required | Retain the authority, two manifests and two fixed-compatible receipts only under ignored mode-`0600` `tmp/proof/**`; terminal output is not the evidence owner.   |
+| Rollout and rollback             | Change required | Record the bucket/token bootstrap, state adoption, Git reversion path and create-readback-cutover-revoke credential procedure without destroying state/resources. |
+| Lifecycle and archive pointers   | Preserve        | The SPEC and plan remain active with five tasks pending. The prior five-pass checkpoint stays interim; the one fresh formal audit remains terminal-only.          |
+
+No Vercel deployment, promotion, configuration mutation, Photon mutation,
+message, Channel, handset, runtime-health, or separately isolated Photon
+project claim is made. The next task begins with a fresh bounded Preview
+configuration authority/readback, not this adoption receipt. The receipt-bearing
+candidate passed the complete repository verification gate, including Effect
+language-service diagnostics, all policy/boundary checks, 90 tooling tests,
+Knip, nine package typechecks and fifteen Turbo build/test tasks.
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on
 `codex/alchemy-vercel-photon-infrastructure`: `0a08767`, `43af287`, and
 `65f4d7b`, based on `origin/main`
 `38a8a3f4cde7b6c519803f233b80b48f079a206d`. It is an interim audit, not the
-final SPEC audit. Seven tasks remain pending behind new target-specific
-provider authority, beginning with `authorized-read-only-inventory`.
+final SPEC audit. Seven tasks remained pending at that checkpoint, beginning
+with `authorized-read-only-inventory`; later provider work does not upgrade
+the checkpoint into the terminal audit.
 
 | Pass                                          | Result                      | Exact evidence and corrections                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | --------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -527,7 +602,8 @@ provider authority, beginning with `authorized-read-only-inventory`.
 
 ## Authority and stop conditions
 
-- This plan grants repository documentation authority only.
+- This plan records repository intent and prior task-scoped external authority;
+  it grants no future provider operation.
 - Provider inventory, remote state bootstrap, secret access, Vercel apply,
   Photon mutation, deployment, promotion, rollback, message, or handset proof
   requires the exact later task, target-owned runbook, and current authority.

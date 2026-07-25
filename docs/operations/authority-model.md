@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-25
 review_trigger: identity, provider, workflow, permission, deployment, messaging, credential, approval, rollback, or runbook change
 ---
 
@@ -55,6 +55,7 @@ confirmed, or rollback/revocation cannot be named.
 
 | Target                            | Repeatable-operation owner                                                                                                           | Current-state readback                                                                                         | Consequential boundary                                                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Alchemy infrastructure and state  | [Alchemy infrastructure](../../apps/agent/runbooks/alchemy-infrastructure.md)                                                        | Authenticated R2 state, exact adoption manifest, and metadata-only Vercel/Photon provider readback             | State bootstrap/credential, adoption, drift repair, provider configuration, or retained cleanup |
 | Agent/Eve and Vercel deployment   | [`apps/agent/runbooks/`](../../apps/agent/runbooks/README.md)                                                                        | Authenticated Vercel project, environment, deployment, alias, protection, and metadata-only variable inventory | Deploy, promote, alias, environment, rollback, or traffic change                                |
 | Executor                          | [Executor runbook](../../apps/agent/runbooks/executor.md)                                                                            | Authenticated toolkit, connection, capability, policy, and approval-state metadata                             | Tool execution, approval acceptance/decline, resume, connection, key, or policy change          |
 | Sendblue and agent replay store   | [Sendblue runbook](../../apps/agent/runbooks/sendblue.md)                                                                            | Authenticated account/webhook metadata and Upstash database metadata with credentials hidden                   | Webhook, line, message, replay data, credential, or routing change                              |

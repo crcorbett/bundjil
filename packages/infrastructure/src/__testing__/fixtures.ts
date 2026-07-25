@@ -49,7 +49,11 @@ export const decodeSyntheticFixture = Effect.gen(
       provider: "synthetic",
       resourceKind: "syntheticResource",
       logicalId,
-      physicalId,
+      physicalId: { resourceId: physicalId },
+      owner: {
+        _tag: "Repository",
+        owner: "@bundjil/infrastructure",
+      },
       removalPolicy: "retain",
       observedMetadataDigest: digest,
     });

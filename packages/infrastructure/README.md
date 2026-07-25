@@ -28,17 +28,19 @@ receipts, and deterministic memory Layers.
 
 Applications do not import this package. Root `alchemy.run.ts` and
 `stacks/**` own stack topology; provider HTTP adapters remain in their owning
-provider boundary. The initial synthetic provider uses ignored local
-`.alchemy/` state only and performs no Vercel, Photon, DNS, secret, webhook,
-deployment, remote-state, or other network operation.
+provider boundary. Provider-bound stack commands require one exact
+stage/digest adoption manifest, compose read-only Vercel and Photon Layers,
+and use Alchemy's native S3 state interface against the dedicated
+`bundjil-alchemy-state` R2 bucket under `bundjil/v1`. The remote-state
+credential is bucket-scoped and distinct from any site state credential.
 
-The Vercel and Photon live read Layers are not wired into the root stack.
-`infrastructure:inventory` may compose them only under a validated bounded
-authority envelope. Current provider evidence belongs in the canonical task
-ledger and its Schema-valid ignored receipts, never in this README. Contract
-tests use in-process HTTP and deterministic memory inventories; the Alchemy
-harness proves exact read/import adoption and destructive denial with zero
-provider writes, not current provider state or billing.
+Current provider evidence belongs in the canonical task ledger and its
+Schema-valid ignored receipts, never in this README. Contract tests use
+in-process HTTP and deterministic memory inventories; the Alchemy harness
+proves exact read/import adoption, no-op convergence, recovery and destructive
+denial. The live adoption path permits R2 state writes but its Vercel and
+Photon adapters expose reads only. It does not create, update, delete, deploy,
+promote, send, or change billing at either provider.
 
 The live inventory executable is the only place that composes both provider
 read Layers. It validates the fixed authority envelope and the narrower
@@ -57,17 +59,22 @@ bun run --filter=@bundjil/infrastructure check-types
 bun run --filter=@bundjil/infrastructure test
 bun run --filter=@bundjil/infrastructure build
 bun run infrastructure:inventory
+bun run infrastructure:adoption-manifest
+bun run infrastructure:adoption-proof
+bun alchemy deploy --stage preview --dry-run --adopt
+bun alchemy deploy --stage preview --adopt --yes
 bun alchemy plan --stage preview
-bun alchemy deploy --stage preview --yes
 bun alchemy sync --stage preview --dry-run
 ```
-
-The Alchemy commands currently exercise only the deterministic synthetic
-offline resource. They are repository/local-state proof, not provider,
-deployment, Preview, Production, or authority proof.
 
 `infrastructure:inventory` additionally requires the accepted task-scoped
 authority file, source/principal identities, exact Vercel team/project scope,
 and the redacted Vercel and Photon credential configuration named by
-`scripts/inventory-live.ts`. Follow the Vercel and Photon runbooks; never put
-credential values on stdout or commit ignored `tmp/proof/**` artifacts.
+`scripts/inventory-live.ts`. Adoption additionally requires the exact accepted
+inventory digest, stage-specific mode-`0600` manifest, validated authority,
+and dedicated R2 Config named by `src/state/r2-state.ts`. The installed
+Alchemy beta has no `plan --adopt`; use `deploy --dry-run --adopt` for the
+side-effect-free adoption plan. Follow the
+[Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
+never put credential values on stdout or commit ignored `tmp/proof/**`
+artifacts.

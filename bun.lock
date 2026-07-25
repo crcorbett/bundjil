@@ -107,6 +107,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@bundjil/photon": "workspace:*",
+        "@distilled.cloud/aws": "0.30.1",
         "@effect/platform-bun": "catalog:effect",
         "ajv": "^8.17.1",
         "alchemy": "2.0.0-beta.64",

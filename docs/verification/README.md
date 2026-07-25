@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -27,6 +27,10 @@ operation nor asserts present provider state.
 - [`bounded-command-receipt.md`](bounded-command-receipt.md) owns legible
   command/procedure output. Full sanitised detail is addressable outside this
   default route.
+- Alchemy adoption keeps its fixed-contract state receipts under ignored
+  mode-`0600` `tmp/proof/**` while the active SPEC remains open. The task
+  ledger and active plan retain the sanitized summary; state, provider,
+  deployment, runtime, Channel, and handset claims remain separate.
 - [`evidence-index.json`](evidence-index.json) owns retention classes,
   provenance fields, lifecycle transitions, and the directory for packets.
 - [`harness-epochs.md`](harness-epochs.md) owns epoch identity,

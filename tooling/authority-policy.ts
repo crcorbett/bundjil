@@ -86,6 +86,7 @@ const AuthorityRecord = Schema.Struct({
     "ai-gateway",
     "codex-model-proxy",
     "eve-interaction",
+    "alchemy-infrastructure",
   ]),
 });
 
@@ -170,6 +171,12 @@ const requiredAuthorityRecords = [
     status: "retired",
     surface: "workflow",
     target: "github-actions",
+  },
+  {
+    id: "alchemy-infrastructure-state",
+    status: "foreground_only",
+    surface: "provider",
+    target: "alchemy-infrastructure",
   },
   {
     id: "vercel-agent",

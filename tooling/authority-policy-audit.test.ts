@@ -130,6 +130,12 @@ const authorityRows = [
     target: "github-actions",
   },
   {
+    id: "alchemy-infrastructure-state",
+    status: "foreground_only",
+    surface: "provider",
+    target: "alchemy-infrastructure",
+  },
+  {
     id: "vercel-agent",
     status: "disabled_pending_proof",
     surface: "provider",

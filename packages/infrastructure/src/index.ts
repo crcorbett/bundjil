@@ -12,12 +12,23 @@ export {
 } from "./secret-reference.js";
 export {
   AdoptionManifest,
+  AdoptionManifestBuildError,
+  AdoptionManifestBuildMessage,
+  type AdoptionManifestBuildMessageEncoded,
   type AdoptionManifestEncoded,
   AdoptionManifestJson,
   type AdoptionManifestJsonEncoded,
   AdoptionManifestResource,
   type AdoptionManifestResourceEncoded,
+  AdoptionProviderScopes,
+  type AdoptionProviderScopesEncoded,
+  AdoptionResourceOwner,
+  type AdoptionResourceOwnerEncoded,
+  adoptionManifestProviderScopes,
+  buildAdoptionManifest,
+  verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
+export { layerLiveReadOnlyAdoptionProviders } from "./adoption-live.layer.js";
 export { loadInfrastructureCommandConfig } from "./config.js";
 export {
   canonicalizeInfrastructureObservedManifest,
@@ -55,6 +66,23 @@ export {
   SyntheticProviderCredentials,
   SyntheticProviderCredentialsLive,
 } from "./live.layer.js";
+export {
+  AlchemyR2AccessKeyId,
+  type AlchemyR2AccessKeyIdEncoded,
+  AlchemyR2AccountId,
+  type AlchemyR2AccountIdEncoded,
+  AlchemyR2BucketName,
+  type AlchemyR2BucketNameEncoded,
+  AlchemyR2SecretAccessKey,
+  type AlchemyR2SecretAccessKeyEncoded,
+  AlchemyR2StateConfig,
+  type AlchemyR2StateConfigEncoded,
+  AlchemyR2StatePrefix,
+  type AlchemyR2StatePrefixEncoded,
+  layerAlchemyR2State,
+  layerAlchemyR2StateMemory,
+  loadAlchemyR2StateConfig,
+} from "./state/r2-state.js";
 export {
   emptyMemoryConfig,
   layerMemory,

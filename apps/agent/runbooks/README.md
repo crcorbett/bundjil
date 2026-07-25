@@ -3,7 +3,7 @@ document_type: runbook-index
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-25
 review_trigger: agent, Eve, Vercel, Executor, Sendblue, Photon, Upstash, secret, deployment, approval, or incident boundary change
 ---
 
@@ -26,6 +26,9 @@ command, and routing map.
   bound any separately approved ingress or delivery operation.
 - [Photon](photon.md) — prove bounded management/SDK lifecycle and own Photon
   managed-shared user, webhook, typing, delivery, rollback, and recovery procedures.
+- [Alchemy infrastructure](alchemy-infrastructure.md) — adopt and reconcile
+  retained Vercel/Photon configuration through dedicated remote state while
+  preserving Vercel Git deployment ownership.
 - [Incident and revocation](incident-revocation.md) — contain agent incidents,
   route revocation to the owning provider, and prove recovery without exposing
   secrets.
