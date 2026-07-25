@@ -288,7 +288,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's authorized inventory section.",
-        "currentResult": "inconclusive: repository observables passed, but no accepted direct provider receipt exists; the task remains pending."
+        "currentResult": "inconclusive: both principals and all non-Marketplace metadata reads resolved under the approved envelope, but both authenticated Vercel paths returned 403 for the one Marketplace installation resource read. The canonical command failed closed before its second read, artifact and bounded receipt; the task remains pending."
       },
       "implementationNotes": [
         "Resolve the current authenticated principal, Vercel team/projects, environment targets/types, domains, integration/configuration/resource/database IDs, deployment/protection metadata, Photon project/platform/service/users/webhooks/lines/billing, and current Preview/Production credential ownership.",
@@ -375,6 +375,50 @@
         "providerActions": "Only Photon and Vercel authenticated-principal reads were attempted. No resource inventory read, provider write, credential refresh/change, deployment, promotion, webhook mutation, send, billable action or Production mutation occurred.",
         "artifacts": "No inventory artifact or bounded provider receipt was created. The authority file remains ignored and mode 0600.",
         "downstream": "Unlock 1Password desktop with CLI integration or otherwise place one existing valid personal Vercel credential into secure local custody as VERCEL_INFRASTRUCTURE_ACCESS_TOKEN, then rerun both principal readbacks. The task remains pending, the 30-minute window has not started, and remote-state-and-noop-adoption remains blocked."
+      },
+      "authorizedInventoryExecution": {
+        "status": "inconclusive_marketplace_resource_permission_denied",
+        "observedAt": "2026-07-25T14:34:58Z",
+        "authority": "The user directly approved the fixed read-only envelope and bounded credential custody. Both authenticated principal fingerprints resolved before the first Photon project inventory read at 2026-07-25T14:11:35Z, starting the 30-minute window. Provider reads stopped before expiry. No mutation authority was exercised.",
+        "credentialCustody": "Existing Vercel and Photon inventory credentials were resolved into one root ignored .env.local with mode 0600 and only the three owning Config names. Values were never printed, logged, copied into tracked files or retained in evidence.",
+        "repositoryCorrection": "Commit 711a133 replaces the obsolete private Vercel Marketplace route with environment contentHint decoding followed by the documented installation-resources read. It matches internalId exactly to storeId, maps partnerId as the database identity, deduplicates exact content hints and fails closed on missing or ambiguous matches. The focused contract matrix adds an unmatched-resource and leak rejection.",
+        "requirementProofReplay": [
+          {
+            "requirement": "Fixed read-only authority, exact principals and scoped targets",
+            "directObservable": "Both fixed authority Schemas accepted the ignored mode-0600 envelope; fresh Photon and Vercel identity reads produced one fingerprint each; Photon listed one project with exactly one configured project-ID match; the two linked Vercel projects shared the approved team identity.",
+            "expectedPostcondition": "Exactly one Photon project and the exact two approved Vercel projects are read under the two authenticated principals.",
+            "rejectedFalseGreen": "A valid envelope, linked-project file or successful single-provider login is not sufficient without both fresh principal and target readbacks.",
+            "focusedCommand": "Fixed authority validation, photon whoami/project-list structural check, Vercel GET /v2/user and linked-project identity comparison.",
+            "evidenceOwner": "This authorizedInventoryExecution object and the active plan's resumed authorized inventory section."
+          },
+          {
+            "requirement": "Metadata-only Preview and Production provider inventory with zero writes",
+            "directObservable": "Vercel projects, both projects' domains, environment metadata and deployments returned HTTP 200; Photon project, platform, shared-user, webhook, line and billing reads returned HTTP 200. Read diagnostics retained only status, key shapes and counts. The command exposes no mutation operation.",
+            "expectedPostcondition": "Every accepted topology field traverses its owning Schema and the manifest records providerWrites 0.",
+            "rejectedFalseGreen": "HTTP success for neighbouring resources does not prove the Marketplace binding, a complete manifest or either environment receipt.",
+            "focusedCommand": "Canonical infrastructure:inventory plus bounded status/shape/count diagnostics at the same provider endpoints.",
+            "evidenceOwner": "The private provider Layers, ignored authority execution and this task ledger entry."
+          },
+          {
+            "requirement": "Exact Vercel Marketplace installation/resource/database identity",
+            "directObservable": "Each approved Vercel project returned one unique Marketplace content hint. The documented GET /v1/installations/{integrationConfigurationId}/resources returned HTTP 403 with the persisted personal token. The separately authenticated Executor Vercel connection found one Marketplace configuration and received the same connection_rejected HTTP 403 for its resource read.",
+            "expectedPostcondition": "One exact resource internalId matches each contentHint storeId and supplies the Schema-decoded partnerId database identity.",
+            "rejectedFalseGreen": "The presence of contentHint, a configuration count of one, an obsolete-route 404 or an authenticated connector does not prove the resource/database identity.",
+            "focusedCommand": "Vercel environment metadata plus the documented installation-resources endpoint through both authenticated read paths.",
+            "evidenceOwner": "VercelMarketplaceBindingsLive, its contract test and this execution record."
+          },
+          {
+            "requirement": "Two matching canonical manifests and one Schema-valid redacted receipt per stage",
+            "directObservable": "The Preview canonical command returned only the fixed blocked status and exited 1 before persistence. No Preview or Production artifact exists. The non-receipt stdout capture was deleted.",
+            "expectedPostcondition": "The command completes two reads, classifies equality or drift, writes a mode-0600 Schema-encoded artifact and emits an InfrastructureBoundedReceipt for both stages.",
+            "rejectedFalseGreen": "Successful component reads, repository tests, a blocked JSON line or an absent write are not a manifest digest or bounded receipt.",
+            "focusedCommand": "bun run infrastructure:inventory with sourceSha 711a133 for Preview, followed by artifact/receipt Schema and leak validation; Production was not attempted after the shared Marketplace permission failure.",
+            "evidenceOwner": "No accepted receipt exists; this task and active plan own the explicit non-claim."
+          }
+        ],
+        "providerActions": "Only approved identity and metadata reads occurred. No create, update, delete, rotate, refresh, deploy, promote, send, webhook change, billable operation or Production mutation occurred.",
+        "artifacts": "No canonical inventory artifact or Schema-valid bounded receipt was retained. The invalid blocked-output capture was removed. The authority file and credential file remain ignored and mode 0600.",
+        "downstream": "authorized-read-only-inventory remains pending at a Vercel Marketplace installation-resource read permission gate; remote-state-and-noop-adoption remains blocked. A new bounded read window plus a principal that can read the exact installation resources is required. The formal five-pass audit remains reserved for terminal full-SPEC closeout."
       },
       "implementationImprovementAudit": {
         "requiredPasses": 3,

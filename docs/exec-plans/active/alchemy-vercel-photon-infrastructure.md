@@ -363,6 +363,62 @@ pending; `remote-state-and-noop-adoption` stays blocked.
 | Implementation quality   | Contracts use Schema-derived Type/Encoded values, owner-qualified brands, a named Context service, Config.schema/Redacted credentials, fixed JSON-Schema authority validation, explicit Layers and Schema-encoded file/stdout writes. Photon project names/slugs, phones, assigned numbers, webhook queries, secrets, raw bodies and account metadata are absent from the artifact contract.                                                                                                                                                    |
 | Verification coverage    | Infrastructure typecheck, 14 Vitest tests, 11 Alchemy lifecycle tests, package build, Effect language-service diagnostics and full repository verification passed with the documented process-only synthetic Executor configuration. Closeout found and corrected the ignored authority file's `0644` mode; the command now rejects non-`0600` or oversized authority files before credentials. Live proof remains inconclusive because the precondition defect invalidated discovery and the Vercel `403` stopped the receipt-bearing command. |
 
+## Resumed authorized inventory and exact permission gate
+
+The user approved the fixed read-only envelope and bounded credential custody.
+Both authenticated principals resolved, then the first Photon project read at
+`2026-07-25T14:11:35Z` started the 30-minute window. Existing credentials now
+reside only in the root ignored mode-`0600` `.env.local` under the three owning
+Config names. No value was printed, logged, copied to a tracked file or retained
+in evidence.
+
+The first canonical Preview run exposed one private adapter defect: its
+Marketplace route returned `404`. Commit `711a133` replaces that obsolete route
+with the environment `contentHint` plus documented installation-resources flow,
+decodes both complete envelopes immediately, deduplicates exact hint tuples,
+requires one `internalId === storeId` match, maps `partnerId` to the database
+identity and fails closed on zero or multiple matches. The focused contract test
+adds a mismatched-resource negative case and proves the provider sentinel is not
+leaked.
+
+The corrected canonical run still failed closed. Direct bounded diagnostics
+showed HTTP `200` for Vercel projects, both projects' domains, environment
+metadata and deployments, and for Photon project, platform, shared-user,
+webhook, line and billing reads. Each Vercel project has one unique Marketplace
+content hint, but the documented installation-resources endpoint returned
+`403` with the persisted personal token. The separately authenticated Executor
+Vercel connection found one Marketplace configuration and received the same
+`connection_rejected` `403` for its resource read. This is the exact external
+permission boundary.
+
+The command exited before its required second observation and before artifact or
+receipt persistence. No Preview or Production inventory artifact exists; the
+blocked stdout capture was deleted because it was not a Schema-valid bounded
+receipt. Production was not attempted after the shared Marketplace permission
+failure. Component HTTP successes, one configuration, green repository tests
+and the blocked status are explicitly rejected as proof by proxy. The task stays
+pending, adoption stays blocked, and a new bounded read window plus a principal
+that can read the exact installation resources is required. No provider write,
+credential refresh/change, deployment, promotion, webhook mutation, send,
+billable operation or Production mutation occurred.
+
+### Resumed inventory impact ledger
+
+| Surface                          | Status          | Decision and evidence boundary                                                                                                                                           |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SPEC, tasks and active plan      | Change required | Keep the SPEC proposed and task pending; record the property-level replay, exact Marketplace permission gate, missing second read/artifact/receipt and downstream block. |
+| Architecture and READMEs         | Preserve        | The public boundary is unchanged. The correction remains private to the Vercel live Layer; existing architecture and package README already own that adapter.            |
+| Exports and generated references | Preserve        | No public contract, export or generated owner changed.                                                                                                                   |
+| Runbooks and authority           | Preserve        | Existing read-only runbooks and fixed envelope remain the authority owners. The expired execution is not reusable authority.                                             |
+| Verification journeys and proof  | Change required | Record focused adapter proof and the explicit absence of live manifests/receipts. Do not promote diagnostic status/count evidence into provider-boundary completion.     |
+| Skills and AGENTS                | Preserve        | PRD implementer, docs maintainer and Effect client-wrapper rules remain sufficient; no recurring instruction gap was found.                                              |
+| Lint, config, commands and CI    | Preserve        | The existing command and redacted Config contract remain unchanged. Credentials stay local, ignored and mode `0600`; no hosted credential or CI authority was added.     |
+| Schemas, services and Layers     | Change required | Decode Marketplace content hints and installation resources in the owning live Layer, with exact identity matching and safe typed failures.                              |
+| Tests and fixtures               | Change required | Update the live fixture to the documented endpoint and add unmatched-resource/leak rejection.                                                                            |
+| Receipts and evidence            | Change required | Retain no invalid receipt. Record only redacted status/shape/count evidence and the missing canonical artifact/receipt non-claim.                                        |
+| Rollout, rollback and lifecycle  | Preserve        | No external mutation occurred. Local rollback identity is revert of `711a133` and the later ledger commit; adoption remains closed.                                      |
+| Archive and terminal audit       | Preserve        | The plan remains active. The formal five-pass audit still runs once only at terminal full-SPEC closeout after every task reaches an honest terminal disposition.         |
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on
