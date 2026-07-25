@@ -4,7 +4,9 @@
   "status": "inconclusive",
   "outcome": "not_attempted",
   "lifecycle": {
-    "state": "inconclusive"
+    "state": "superseded",
+    "successor": "docs/evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json",
+    "reason": "Later exact-candidate hosted function, plan, latency, Workflow, provider and restoration readback replaced the earlier unavailable state."
   },
   "externalConsequence": {
     "outcome": "not_attempted",

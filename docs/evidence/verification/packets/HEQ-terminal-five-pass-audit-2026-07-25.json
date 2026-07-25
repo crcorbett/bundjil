@@ -4,7 +4,9 @@
   "status": "proved",
   "outcome": "passed",
   "lifecycle": {
-    "state": "accepted"
+    "state": "superseded",
+    "successor": "docs/evidence/verification/packets/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json",
+    "reason": "Hosted authority and receipt-bearing Preview and Production work reopened the terminal audit lifecycle."
   },
   "externalConsequence": {
     "outcome": "none",

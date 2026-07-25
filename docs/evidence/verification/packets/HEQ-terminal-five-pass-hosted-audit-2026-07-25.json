@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "local",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": {
+    "state": "accepted"
+  },
+  "externalConsequence": {
+    "outcome": "none",
+    "target": "final hosted receipt-bearing repository closeout"
+  },
+  "candidate": {
+    "repositoryCommit": "a3f89877503acb137c0b76b1c09356e4789efe07",
+    "sourceDigest": "4082e63289156bf074852effceccc85d7bde6816948a3c4b7ee45a9287bbf22f",
+    "artifactDigest": "9a8f15ab7299890f1063edc28b6007d2ca54111c971a6960601645a01dfb32c7"
+  },
+  "authority": {
+    "principal": "local repository maintainer",
+    "identitySource": "local Git, accepted hosted successor packets and repository verification process",
+    "externalAccess": "none",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil repository maintainer"
+  },
+  "environment": {
+    "tier": "local",
+    "target": "final hosted receipt-bearing Bundjil closeout for source a3f89877503acb137c0b76b1c09356e4789efe07"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J13-hosted-eve-durability",
+      "status": "passed",
+      "oracle": "The accepted Preview successor proves exact send acceptance before 202, intended-session continuity, bounded deployment-replacement durability, exact Sendblue duplicate suppression and restoration."
+    },
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "inconclusive",
+      "oracle": "Both direct Production provider journeys passed, but the candidate-specific Photon exact duplicate oracle remained unavailable and combined Production was not accepted."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "single replacement terminal five-pass audit on final hosted receipt-bearing state followed by bun run verification",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "Ownership, Effect quality, lifecycle, adversarial proof, documentation and authority agree without upgrading the inconclusive Production oracle.",
+    "target": "Bundjil hosted Eve source a3f89877503acb137c0b76b1c09356e4789efe07 and its accepted successor evidence",
+    "recoveryHint": "Reopen the exact owning task and invalidate dependent evidence when source, Eve, config, authority or hosted state changes.",
+    "detailPath": "docs/evidence/verification/details/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json",
+    "detailSha256": "45a6a372ad4dd78ecd24327d7d2fb6398b40948c64f452e071c4f89529b1cb0f",
+    "postcondition": "All five audit passes are accepted with no findings; Preview remains accepted and combined Production remains explicitly inconclusive."
+  },
+  "externalReadback": {
+    "required": false,
+    "outcome": "not_required",
+    "receipt": "The accepted Preview and inconclusive Production successor packets own the authenticated external readbacks used by this closeout."
+  },
+  "postconditions": [
+    "Eve remains the sole Workflow lifecycle owner and no app-owned Workflow abstraction was introduced.",
+    "Preview acceptance, continuity, deployment replacement, exact Sendblue duplicate suppression and restoration remain directly evidenced.",
+    "Production direct Sendblue and Photon journeys remain directly evidenced without upgrading the missing Photon duplicate oracle.",
+    "The full repository verification passed after all hosted tasks reached terminal state.",
+    "Earlier local-only and blocked packets are lifecycle-superseded by explicit successor packets."
+  ],
+  "limitations": [
+    "Preview deployment replacement did not force a Workflow step retry; every observed step remained attempt one.",
+    "Combined Production remains inconclusive on the candidate-specific Photon exact duplicate oracle.",
+    "No numeric Photon webhook response deadline was established.",
+    "External state can change after the final readback."
+  ],
+  "nonClaims": [
+    "The audit does not prove exactly-once execution, universal availability, every termination mode, or future provider and plan behavior.",
+    "The audit grants no standing deployment, provider, credential, message, promotion, rollback, push, merge or release authority.",
+    "No raw Workflow run ID, hook token, provider payload, phone identity, message content or credential is retained."
+  ],
+  "rollback": {
+    "identity": "repository base e92f8d2508dd927c09cb63eddb50c6ca09904b95; Production dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY; Preview dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr; captured Sendblue and hashed Photon topology",
+    "outcome": "performed",
+    "owner": "Bundjil repository and Channel operators"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json",
+      "sha256": "45a6a372ad4dd78ecd24327d7d2fb6398b40948c64f452e071c4f89529b1cb0f",
+      "provenance": "single five-pass source and evidence audit plus complete repository verification"
+    }
+  ],
+  "observedAt": "2026-07-25T23:36:17Z"
+}

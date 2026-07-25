@@ -78,18 +78,30 @@ operation nor asserts present provider state.
   response. Photon visible typing is observed; Sendblue visible typing remains
   unproved.
 - [`HEQ-timeout-readback-2026-07-25.json`](../evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json)
-  retains the inconclusive exact-candidate Preview timeout/readback gate:
-  local Eve/Nitro ownership and Build Output are proved, while the candidate
-  deployment, effective duration, plan, latency, Workflow, provider,
-  interruption, monitoring, and rollback results are unavailable.
+  retains the superseded local-only timeout gate. Its unavailable hosted state
+  is historical; the successor Preview packet owns current exact-candidate
+  function, plan, latency, Workflow, provider, and restoration readback.
+- [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
+  proves exact send acceptance before `202`, intended-session continuity,
+  deployment-replacement durability, one bounded result, exact Sendblue
+  duplicate suppression, clean bounded logs, and restoration for source
+  `a3f89877503acb137c0b76b1c09356e4789efe07`. Every observed Workflow step
+  remained attempt one, so it does not claim a forced process retry.
 - [`HEQ-production-qualification-blocked-2026-07-25.json`](../evidence/verification/packets/HEQ-production-qualification-blocked-2026-07-25.json)
-  retains the unattempted Production gate. No accepted identical Preview or
-  Production authority exists; the observed older Production deployment and
-  2026-07-23 receipt are not candidate proof.
+  retains the superseded unattempted Production gate.
+- [`HEQ-production-qualification-2026-07-25.json`](../evidence/verification/packets/HEQ-production-qualification-2026-07-25.json)
+  retains accepted direct Sendblue and Photon candidate journeys, complete
+  Sendblue duplicate suppression, monitoring, and restoration. Combined
+  Production remains inconclusive because Photon exposes no exact delivered
+  body or replay control for the candidate-specific duplicate oracle.
 - [`HEQ-terminal-five-pass-audit-2026-07-25.json`](../evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json)
-  retains the single accepted local five-pass closeout and its corrected
-  documentation finding. It does not qualify Preview or Production and grants
-  no external operation authority.
+  retains the superseded local-only five-pass closeout. Later hosted work
+  reopened the terminal lifecycle; its successor packet owns final closeout.
+- [`HEQ-terminal-five-pass-hosted-audit-2026-07-25.json`](../evidence/verification/packets/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json)
+  retains the accepted single replacement audit on final hosted
+  receipt-bearing state. All five passes accepted with no findings; Preview
+  remains accepted and combined Production remains inconclusive on the Photon
+  exact duplicate oracle.
 
 ## Claim boundaries
 
@@ -111,10 +123,12 @@ contract proof. Future Sendblue or Photon sends, Executor reads/resumes,
 deployment/promotion, and incident containment/recovery remain approval-gated
 external journeys. The accepted dual-Channel Production journey is retained
 only in its dated receipt and grants no standing authority for another
-operation. `BND-J13-hosted-eve-durability` owns future immutable Preview
-acceptance, Workflow interruption/resumption, duplicate, and timeout
-qualification; local Build Output and the retained inconclusive timeout
-readback packet do not satisfy it.
+operation. `BND-J13-hosted-eve-durability` is accepted for the dated immutable
+Preview packet's exact boundaries; it does not generalize to a forced process
+retry or future runtime state. The current
+`BND-J12-dual-channel-production` packet is inconclusive only on the missing
+candidate-specific Photon exact duplicate oracle; direct provider success
+does not weaken that oracle.
 
 For an external or approval-gated journey, first use the app-owned runbook:
 [`../../apps/agent/runbooks/README.md`](../../apps/agent/runbooks/README.md) or

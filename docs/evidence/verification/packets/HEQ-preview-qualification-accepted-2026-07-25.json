@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": {
+    "state": "accepted"
+  },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "isolated Vercel Preview deployments dpl_Bs7j8KGDutEhWPcLpSgNSxyi6DiU and dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr"
+  },
+  "candidate": {
+    "repositoryCommit": "a3f89877503acb137c0b76b1c09356e4789efe07",
+    "sourceDigest": "4082e63289156bf074852effceccc85d7bde6816948a3c4b7ee45a9287bbf22f",
+    "artifactDigest": "9a8f15ab7299890f1063edc28b6007d2ca54111c971a6960601645a01dfb32c7"
+  },
+  "authority": {
+    "principal": "Cooper-authorized Bundjil Vercel and Channel operator",
+    "identitySource": "delegated source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 plus authenticated Vercel and provider sessions",
+    "externalAccess": "mutation",
+    "approvalReceipt": "One-run authority for immutable Preview deploy, scoped variables, provider routing, controlled messages, Workflow readback, replacement exercise and restoration.",
+    "rollbackOwner": "Bundjil Vercel and Channel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "isolated Bundjil agent Preview at exact source a3f89877503acb137c0b76b1c09356e4789efe07"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J13-hosted-eve-durability",
+      "status": "passed",
+      "oracle": "Exact send acceptance preceded 202; safe continuity resumed across deployment replacement; bounded work completed once; exact Sendblue redeliveries produced zero second Workflow or outbound result."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "deploy exact Preview source, isolate Sendblue callback, run new/resume/slow/replacement/duplicate journeys, inspect immutable Vercel functions and Workflow, then restore",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "Only exact immutable deployment, safe acceptance, intended-session continuity, Workflow and provider readback establish Preview qualification.",
+    "target": "Bundjil agent Preview source a3f89877503acb137c0b76b1c09356e4789efe07",
+    "recoveryHint": "Restore the sole Sendblue callback, remove branch-scoped proof variables, and resolve the Preview alias to dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr.",
+    "detailPath": "docs/evidence/verification/details/HEQ-hosted-qualification-2026-07-25.json",
+    "detailSha256": "afe89aedbf41e199a6e4090a7b510446e36388940eb3bbb730109349007df282",
+    "postcondition": "Preview is accepted for the observed deployment-replacement and cross-deployment continuity boundary, with provider topology and scoped variables restored."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Vercel function metadata, Workflow CLI, bounded logs, Sendblue delivery readback, provider topology and alias readback were observed for the exact deployment identities."
+  },
+  "postconditions": [
+    "Both __server and the Eve Workflow flow read back as Node 24, 2048 MB and 300 seconds while generated flow max remained max.",
+    "202 followed the exact Eve send acceptance for new, resumed and cross-deployment resumed sessions.",
+    "One 78.321-second bounded Workflow result survived deployment replacement and later traffic resumed the same safe Eve session.",
+    "Three exact signed Sendblue redeliveries produced 204 and zero second Workflow or outbound result.",
+    "The sole Sendblue callback and branch-scoped Preview variable inventory were restored."
+  ],
+  "limitations": [
+    "The replacement exercise did not force a Workflow step retry; every observed step remained attempt one.",
+    "No numeric Photon webhook response deadline was established.",
+    "One bounded deployment replacement does not prove every process crash, platform outage or termination mode."
+  ],
+  "nonClaims": [
+    "READY, local Build Output, waitUntil and a different fallback run are not accepted as proof.",
+    "The rejected two-callback fan-out journey is not used as accepted evidence.",
+    "This packet grants no standing deployment, provider, credential, message, promotion or rollback authority."
+  ],
+  "rollback": {
+    "identity": "Sendblue captured callback plus Preview deployment dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr and zero branch-scoped proof variables",
+    "outcome": "performed",
+    "owner": "Bundjil Vercel and Channel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-hosted-qualification-2026-07-25.json",
+      "sha256": "afe89aedbf41e199a6e4090a7b510446e36388940eb3bbb730109349007df282",
+      "provenance": "authenticated immutable Vercel, Workflow CLI, bounded logs, provider readback and restoration"
+    }
+  ],
+  "observedAt": "2026-07-25T22:58:00Z"
+}

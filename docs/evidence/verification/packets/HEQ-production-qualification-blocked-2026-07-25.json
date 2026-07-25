@@ -4,7 +4,9 @@
   "status": "inconclusive",
   "outcome": "not_attempted",
   "lifecycle": {
-    "state": "inconclusive"
+    "state": "superseded",
+    "successor": "docs/evidence/verification/packets/HEQ-production-qualification-2026-07-25.json",
+    "reason": "Later current authority, exact-source staged deployment, both active-provider journeys and restoration readback replaced the earlier not-attempted state."
   },
   "externalConsequence": {
     "outcome": "not_attempted",
