@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 review_trigger: any active-plan admission, completion, or scope change
 ---
 
@@ -18,3 +18,6 @@ Accepted and superseded plans live in [`../completed`](../completed/).
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation is in progress; Preview subscription proof is pending
   deployment authority.
+- [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md) —
+  implementation is in progress from exact local source; hosted Preview and
+  Production work remains target-authority-gated.

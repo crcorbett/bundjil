@@ -48,6 +48,15 @@ execution. Local build output and a named deployment readback are separate
 proof classes; source does not establish current Vercel bundling, instance
 reuse, scale-out, shutdown, or provider state.
 
+Pinned Eve `0.20.0` owns durable session start/resume and turn child workflows
+behind its route-owned `send()` operation. Bundjil adds no second Workflow or
+raw Workflow client. The current acknowledgement ordering remains tracked by
+the active hosted-Eve execution plan: source-level `send()` resolution is the
+minimum acceptance boundary, while an established continuation must also
+reject a different fallback run. The test command generates ordinary and
+Vercel Build Output and verifies Eve's generated Workflow `max` separately
+from the ordinary function's unset duration; it makes no hosted claim.
+
 The replacement path uses only these app-owned environment namespaces:
 
 | Concern  | Environment names                                                                                                                                                                                                                                     |
@@ -88,6 +97,8 @@ bun run --filter @bundjil/agent preflight:production
 `preflight:production` is a deliberately explicit read-only gate command. It
 emits one bounded receipt plus an integrity-checked sanitized detail artifact;
 it does not grant deployment authority or establish current provider state.
+`test` builds both the ordinary local Nitro output and the Vercel Build Output
+before running fixtures; generated artifacts remain ignored local preflight.
 
 ## Documentation routes
 

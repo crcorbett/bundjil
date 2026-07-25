@@ -3,8 +3,8 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-07-24
-review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, deployment boundary, or external readback change
+last_reviewed: 2026-07-25
+review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, Eve Workflow lifecycle, generated Build Output, deployment boundary, or external readback change
 ---
 
 # Eve agent architecture
@@ -135,6 +135,44 @@ is not durable execution. Current local build proof loads both provider roots;
 future bundle splitting, warm-instance reuse, scale-out, freeze, and shutdown
 remain deployment readback questions.
 
+Pinned and lock-resolved Eve `0.20.0` already owns the durable boundary behind
+the route-owned `send()` operation. `send()` first awaits
+`runtime.deliver()`, whose Workflow runtime awaits `resumeHook` and returns the
+owning run identity. On any delivery rejection, including but not limited to
+Eve's no-active-session error, `send()` can fall through to `runtime.run()`;
+that operation awaits `startWorkflowPreferLatest` for Eve's session
+`workflowEntry`. The session driver dispatches each logical turn through
+`startWorkflowPreferLatest(turnWorkflowReference)`.
+
+```text
+Channel webhook
+  -> EveChannelDispatch
+  -> Eve send()
+     -> deliver() -> resumeHook -> existing owner run
+     |  any delivery rejection -> run() -> startWorkflowPreferLatest
+        -> workflowEntry session driver
+        -> dispatchAndAwaitTurn
+        -> startWorkflowPreferLatest(turnWorkflowReference)
+```
+
+Bundjil must not add an app-owned Workflow, raw Workflow client, queue
+fallback, or mirrored runtime service around this call graph. Resolution of
+`send()` is the earliest source-level Workflow acceptance boundary, but an
+established continuation still requires intended/accepted run convergence:
+Eve's all-error fallback can otherwise resolve through a different new run.
+Source inspection alone does not prove that hosted convergence.
+
+When `VERCEL=1`, Eve directly creates Nitro with the Vercel preset. Eve
+`0.20.0` supplies Build Output framework metadata but exposes no
+Bundjil-facing `vercel.functions` option for the ordinary generated
+`__server`. Eve separately patches the generated Workflow `flow` function to
+Node 24, its namespaced queue trigger, and `maxDuration: "max"`. Bundjil
+preserves those owners and does not guess a `vercel.json` source glob or patch
+generated output. The agent test command creates both ordinary local output
+and Vercel Build Output, then Schema-decodes the generated route/function
+contracts. These are local artifact assertions only; an immutable hosted
+deployment must read back its own mapping and effective durations.
+
 Eve events use the same Channel service:
 
 ```text
@@ -177,7 +215,9 @@ handset-delivered.
   -> independent runtime build caching, concurrency, failure, and recovery
   -> waitUntil ordering plus success/failure/defect/interruption completion
   -> runtime-disposal interruption/finalizers and client-abort independence
-  -> both absolute routes in the Nitro build
+  -> both absolute routes in the ordinary Nitro build
+  -> installed Eve send/session/turn Workflow ownership
+  -> Schema-decoded Vercel flow/__server route and duration output
 ```
 
 Automated tests establish source behavior without provider credentials. They

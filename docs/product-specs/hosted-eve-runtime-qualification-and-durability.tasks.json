@@ -1,6 +1,6 @@
 {
   "title": "Hosted Eve Runtime Qualification And Durable Handoff Tasks",
-  "status": "pending",
+  "status": "in_progress",
   "spec": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
   "harnessContract": {
     "primaryOwner": "bundjil-product-owner",
@@ -424,7 +424,7 @@
     {
       "id": "prove-eve-owned-handoff",
       "title": "Pin and prove Eve-owned workflow acceptance",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": [],
       "findingIds": ["HEQ-F001", "HEQ-F004", "HEQ-F007"],
       "requirementIds": ["HEQ-REQ-003", "HEQ-REQ-010", "HEQ-REQ-016"],
@@ -474,6 +474,14 @@
         "The exact call graph and generated entrypoints are directly proved.",
         "No app Workflow or runtime code change is introduced.",
         "Every claim is bounded to pinned source/local output."
+      ],
+      "completedAt": "2026-07-25",
+      "completionEvidence": [
+        "apps/agent/test/vercel-packaging.test.ts pins eve@0.20.0 and the lock-resolved Nitro version, reads the installed Eve distribution, and directly asserts send awaiting deliver, the all-error fallthrough to run, resumeHook, HookNotFound conversion, startWorkflowPreferLatest, the session workflow, and its turn child workflow.",
+        "The focused packaging fixture runs the repository-root filtered app build and the Vercel Eve build, Schema-decodes the generated routing and function configuration, and asserts both Channel routes, the __server catch-all, Node 24, the Eve queue trigger, the Workflow maxDuration=max field, and the absence of an authored __server duration.",
+        "Installed Eve createApplicationNitro and createEveVercelOptions source prove Eve owns Nitro construction and exposes no vercel.functions seam in 0.20.0. No app Workflow, raw Workflow client, queue fallback, generated-output patch, runtime service, or production behavior change was introduced.",
+        "Focused agent check-types, the 4 packaging tests, the 65-test agent suite, Effect diagnostics, boundary, docs, skills, authority, controls, verification-policy, HGI-307 evaluation, and a fresh full bun run verification passed. The first full run found only packaging-test format drift; bun run fix corrected it and the fresh run passed.",
+        "The source and generated-output receipt is local preflight only. No deployment, provider, webhook, credential, message, Preview, Production, Workflow readback, or other hosted operation occurred."
       ],
       "commitAfterPassing": true
     },

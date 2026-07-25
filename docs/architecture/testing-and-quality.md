@@ -122,6 +122,11 @@ bun run --filter @bundjil/agent preflight:production
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and
   verification.
+- Eve hosted-packaging change: the agent `test` command builds ordinary local
+  Nitro output and then `VERCEL=1` Build Output before running fixtures. Decode
+  the generated configs through Effect Schema and keep them as local artifact
+  proof only; immutable Preview/Production function mapping and duration still
+  require target-owned readback.
 - Critical-journey, proof-packet, receipt, or evidence-lifecycle change: run
   `bun run check:verification`, its focused fixture suite, the affected app
   tests, then root verification. Provider proof remains separately
