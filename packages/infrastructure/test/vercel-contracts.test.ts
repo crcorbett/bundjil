@@ -286,6 +286,8 @@ it.effect(
   () =>
     Effect.gen(function* testVercelLiveContracts() {
       let projectPage = 0;
+      let deploymentPage = 0;
+      const deploymentCursors: (string | null)[] = [];
       const client = HttpClient.make((request) =>
         Effect.sync(() => {
           assert.strictEqual(
@@ -365,20 +367,52 @@ it.effect(
                 ],
               };
             }
+            assert.strictEqual(url.pathname, "/v6/deployments");
+            deploymentPage += 1;
+            let deploymentCursor: string | null = null;
+            for (const [key, value] of request.urlParams) {
+              if (key === "until") {
+                deploymentCursor = value;
+              }
+            }
+            deploymentCursors.push(deploymentCursor);
+            if (deploymentPage === 1) {
+              return {
+                deployments: [
+                  {
+                    uid: "deployment-agent",
+                    projectId: "prj-agent",
+                    target: null,
+                    readyState: "READY",
+                    meta: {
+                      githubCommitSha:
+                        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    },
+                  },
+                ],
+                pagination: { count: 1, next: 123, prev: 124 },
+              };
+            }
             return {
               deployments: [
                 {
-                  uid: "deployment-agent",
+                  uid: "deployment-without-git-provenance",
                   projectId: "prj-agent",
-                  target: "preview",
+                  target: null,
                   readyState: "READY",
-                  alias: ["agent-preview.example.com"],
+                  meta: {},
+                },
+                {
+                  uid: "deployment-production",
+                  projectId: "prj-agent",
+                  target: "production",
+                  readyState: "READY",
                   meta: {
-                    githubCommitSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    githubCommitSha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                   },
                 },
               ],
-              pagination: { next: null },
+              pagination: { count: 2, next: null, prev: 123 },
             };
           })();
           return HttpClientResponse.fromWeb(
@@ -450,6 +484,9 @@ it.effect(
         false
       );
       assert.strictEqual(result.deployments.deployments.length, 1);
+      assert.deepStrictEqual(deploymentCursors, [null, "123"]);
+      assert.strictEqual(result.deployments.deployments[0]?.target, "preview");
+      assert.deepStrictEqual(result.deployments.deployments[0]?.aliases, []);
       assert.strictEqual(
         result.environmentVariables.environmentVariables[0] !== undefined &&
           "value" in result.environmentVariables.environmentVariables[0],

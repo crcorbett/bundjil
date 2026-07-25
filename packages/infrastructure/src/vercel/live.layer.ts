@@ -256,14 +256,21 @@ const VercelDeploymentsSuccessEnvelope = Schema.Struct({
       Schema.Struct({
         uid: VercelDeploymentId,
         projectId: VercelProjectId,
-        target: VercelDeploymentTarget,
+        target: Schema.NullOr(VercelDeploymentTarget),
         readyState: VercelDeploymentStatus,
-        alias: Schema.Array(VercelCanonicalDomain),
-        meta: Schema.Struct({ githubCommitSha: VercelGitSha }),
+        alias: Schema.optional(Schema.Array(VercelCanonicalDomain)),
+        meta: Schema.Struct({
+          githubCommitSha: Schema.optional(VercelGitSha),
+        }),
       })
     ),
     pagination: Schema.Struct({
-      next: Schema.NullOr(VercelPaginationCursor),
+      next: Schema.NullOr(
+        Schema.Union([
+          VercelPaginationCursor,
+          Schema.Int.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(0))),
+        ])
+      ),
     }),
   }),
 });
@@ -991,21 +998,32 @@ export const VercelLive = Layer.effectContext(
             });
           }
           deployments.push(
-            ...response.body.deployments.map((deployment) =>
-              VercelDeploymentObservationAttributes.make({
-                stage: input.stage,
-                teamId: input.teamId,
-                projectId: deployment.projectId,
-                deploymentId: deployment.uid,
-                gitSha: deployment.meta.githubCommitSha,
-                target: deployment.target,
-                status: deployment.readyState,
-                aliases: deployment.alias,
-                ownership: "Unowned",
-              })
-            )
+            ...response.body.deployments.flatMap((deployment) => {
+              const target = deployment.target ?? "preview";
+              return target === input.stage &&
+                deployment.meta.githubCommitSha !== undefined
+                ? [
+                    VercelDeploymentObservationAttributes.make({
+                      stage: input.stage,
+                      teamId: input.teamId,
+                      projectId: deployment.projectId,
+                      deploymentId: deployment.uid,
+                      gitSha: deployment.meta.githubCommitSha,
+                      target,
+                      status: deployment.readyState,
+                      aliases: deployment.alias ?? [],
+                      ownership: "Unowned",
+                    }),
+                  ]
+                : [];
+            })
           );
-          cursor = response.body.pagination.next ?? undefined;
+          cursor =
+            response.body.pagination.next === null
+              ? undefined
+              : VercelPaginationCursor.make(
+                  String(response.body.pagination.next)
+                );
         } while (cursor !== undefined);
         return ListedVercelDeployments.make({ deployments });
       }
