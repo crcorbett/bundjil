@@ -56,8 +56,8 @@ accepted dependency order:
 
 | Task                           | Status    | Current owner and next direct proof                                                                          |
 | ------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------ |
-| `prove-eve-owned-handoff`      | Completed | Installed Eve source plus Schema-decoded generated output; all direct and repository gates passed            |
-| `add-handoff-observability`    | Pending   | Safe Schema-owned acceptance/Exit observations and leak fixtures                                             |
+| `prove-eve-owned-handoff`      | Completed | Commit `bcf59bb`; installed source/generated output proof and all local gates passed                         |
+| `add-handoff-observability`    | Completed | Safe Schema-owned acceptance/Exit observations and 19 focused leak/ordering/lifecycle tests passed           |
 | `correct-202-ordering`         | Pending   | Await exact Eve `send()` acceptance and continuity convergence before `202`                                  |
 | `set-and-readback-timeouts`    | Pending   | Generated-output owner proof, measured local handoff policy, then authority-gated immutable Preview readback |
 | `qualify-final-preview`        | Pending   | Target-owned Vercel/provider/Workflow/interruption authority and immutable Preview packet                    |
@@ -108,6 +108,38 @@ accepted dependency order:
   provider, Preview, Production, Workflow readback, or current-plan-limit claim.
 - Rollback identity is the coherent commit containing this receipt, reverting
   toward starting revision
+  `e92f8d2508dd927c09cb63eddb50c6ca09904b95`.
+
+### `add-handoff-observability`
+
+- `ChannelHandoff` is a named app Service with live and memory Layers. It
+  imports the redacted Channel secret once and produces domain-separated,
+  branded HMAC work/session fingerprints plus Schema-owned attempts,
+  acceptance, timestamp, latency, phase, outcome, response, and Exit values.
+- The live `EveChannelDispatch` keeps Eve's raw `Session` private, decodes its
+  ID once with `EveSessionId`, and returns only safe acceptance after the exact
+  `send()` Promise resolves. No Workflow/runtime client or raw identity is
+  added to an app service.
+- The route records prepared, send-started, send-accepted/rejected, response,
+  and native Fiber Exit phases. Exit is preclassified as success, typed
+  failure, defect, or interruption; errors, Causes, and stacks are never
+  passed to the observer.
+- A delayed-send fixture directly records the existing false ordering:
+  `Prepared`, `SendStarted`, and `Response` exist while `send()` remains
+  pending; `SendAccepted` and `Exit` appear only after release. Separate
+  rejection, defect, and runtime-disposal fixtures prove their exact outcomes.
+- HMAC fixtures prove same-key determinism, cross-key separation, and
+  work/session domain separation. Schema encoding, forbidden-marker, and
+  excess-property fixtures reject retained replay/session IDs, content,
+  continuation/hook tokens, Causes, and stacks.
+- Nineteen focused handoff/route/vertical tests, 68 full agent tests, agent
+  typechecking, Effect diagnostics, and all direct repository policy gates
+  passed. The final repository verification is recorded after this receipt is
+  formatted.
+- Evidence is local only. No hosted log, metric, deployment, provider,
+  credential, message, Preview, Production, or Workflow readback exists.
+- Rollback identity is the coherent commit containing this receipt, reverting
+  after `bcf59bb` toward
   `e92f8d2508dd927c09cb63eddb50c6ca09904b95`.
 
 ## Requirement-to-proof and risk-lens loop

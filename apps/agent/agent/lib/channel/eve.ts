@@ -1,4 +1,4 @@
-import { Effect, Fiber, Schema } from "effect";
+import { Effect, Exit, Fiber, Schema } from "effect";
 import type { ManagedRuntime } from "effect";
 import { defineChannel, POST } from "eve/channels";
 import type { ChannelEvents } from "eve/channels";
@@ -8,6 +8,7 @@ import {
   EveChannelDispatch,
   layerEve as EveChannelDispatchEve,
 } from "./dispatch.js";
+import { ChannelHandoff } from "./handoff.js";
 import {
   ChannelAdapterState,
   ChannelEvent,
@@ -24,7 +25,7 @@ interface ChannelEveContext {
 }
 
 export const makeChannelEveEvents = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>
 ): ChannelEvents<ChannelEveContext> => {
   const presence = (
     state: ChannelMutableAdapterStateEncoded,
@@ -114,7 +115,7 @@ export const makeChannelEveEvents = <E>(
 };
 
 export const makeChannelEveChannel = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>,
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>,
   webhookPath: ChannelWebhookPath,
   proofPolicy: ChannelWebhookProofPolicy
 ) =>
@@ -139,13 +140,29 @@ export const makeChannelEveChannel = <E>(
             if (prepared._tag === "Duplicate") {
               return { response: new Response(null, { status: 204 }) };
             }
+            const handoff = yield* ChannelHandoff;
+            const attempt = yield* handoff.prepared(prepared.prepared.claim);
             const background = Effect.gen(function* dispatchChannelInbound() {
               const dispatch = yield* EveChannelDispatch;
-              yield* dispatch.dispatch(prepared.prepared);
+              yield* dispatch.dispatch(prepared.prepared, attempt);
               yield* channel.completeInbound(prepared.prepared.claim);
             }).pipe(
-              Effect.tapError((error) =>
-                Effect.logError(`Channel inbound failed: ${error._tag}`)
+              Effect.onExit((exit) =>
+                handoff.settled(
+                  attempt,
+                  (() => {
+                    if (Exit.isSuccess(exit)) {
+                      return "succeeded";
+                    }
+                    if (Exit.hasInterrupts(exit)) {
+                      return "interrupted";
+                    }
+                    if (Exit.hasDies(exit)) {
+                      return "defect";
+                    }
+                    return "failed";
+                  })()
+                )
               ),
               Effect.provide(EveChannelDispatchEve(send))
             );
@@ -154,9 +171,11 @@ export const makeChannelEveChannel = <E>(
               query["bundjil-proof"] === "retry-once"
             ) {
               yield* background;
+              yield* handoff.response(attempt, 503);
               return { response: new Response(null, { status: 503 }) };
             }
             return {
+              attempt,
               background,
               response: new Response(null, { status: 202 }),
             };
@@ -185,9 +204,19 @@ export const makeChannelEveChannel = <E>(
             })
           )
         );
-        if ("background" in result) {
+        if (
+          "background" in result &&
+          "attempt" in result &&
+          result.attempt !== undefined
+        ) {
           const fiber = channelRuntime.runFork(result.background);
           waitUntil(Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)));
+          await channelRuntime.runPromise(
+            Effect.gen(function* observeChannelResponse() {
+              const handoff = yield* ChannelHandoff;
+              yield* handoff.response(result.attempt, 202);
+            })
+          );
         }
         return result.response;
       }),

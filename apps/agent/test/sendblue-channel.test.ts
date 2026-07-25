@@ -7,12 +7,22 @@ import {
 } from "@bundjil/channel";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
-import { Deferred, Effect, Layer, ManagedRuntime, Schema } from "effect";
+import {
+  Deferred,
+  Effect,
+  Layer,
+  ManagedRuntime,
+  Redacted,
+  Ref,
+  Schema,
+} from "effect";
 import type { RouteHandlerArgs, Session } from "eve/channels";
 
 import { makeSendblueEveChannel } from "../agent/channels/sendblue.js";
+import type { ChannelHandoff } from "../agent/lib/channel/index.js";
 import {
   Channel,
+  ChannelHandoffMemory,
   ChannelIdentityMemory,
   ChannelLive,
   ChannelReplayMemory,
@@ -24,8 +34,12 @@ import {
   ChannelIdentityRecords,
   ChannelPrepareInboundResult,
   ChannelReplayOptions,
+  ChannelRoutingSecret,
 } from "../agent/lib/channel/schemas.js";
-import type { ChannelMutableAdapterStateEncoded } from "../agent/lib/channel/schemas.js";
+import type {
+  ChannelMutableAdapterStateEncoded,
+  ChannelHandoffObservation,
+} from "../agent/lib/channel/schemas.js";
 
 const fixtures = Effect.gen(function* decodeSendblueChannelFixtures() {
   const accepted = yield* Schema.decodeEffect(ChannelWebhookResult)({
@@ -57,6 +71,9 @@ const fixtures = Effect.gen(function* decodeSendblueChannelFixtures() {
     messageId: "unused-provider-message",
     provider: "sendblue",
   });
+  const routingSecret = yield* Schema.decodeUnknownEffect(ChannelRoutingSecret)(
+    Redacted.make("synthetic-channel-handoff-secret")
+  );
   const prepared = yield* Schema.decodeEffect(ChannelPrepareInboundResult)({
     _tag: "Dispatch",
     prepared: {
@@ -81,16 +98,29 @@ const fixtures = Effect.gen(function* decodeSendblueChannelFixtures() {
       },
     },
   });
-  return { accepted, identities, ignored, prepared, replay, send };
+  return {
+    accepted,
+    identities,
+    ignored,
+    prepared,
+    replay,
+    routingSecret,
+    send,
+  };
 });
 
-const makeRuntime = Effect.fn("SendblueChannelTest.makeRuntime")(function* (
+const makeObservedRuntime = Effect.fn(
+  "SendblueChannelTest.makeObservedRuntime"
+)(function* (
   webhook: Effect.Effect<
     typeof ChannelWebhookResult.Type,
     ChannelWebhookAuthenticationError | ChannelWebhookSchemaError
   >
 ) {
   const fixture = yield* fixtures;
+  const observations = yield* Ref.make<
+    readonly (typeof ChannelHandoffObservation.Type)[]
+  >([]);
   const transport = Layer.succeed(
     ChannelTransport,
     ChannelTransport.of({
@@ -105,27 +135,58 @@ const makeRuntime = Effect.fn("SendblueChannelTest.makeRuntime")(function* (
     ChannelRouterMemory,
     ChannelReplayMemory(fixture.replay).pipe(Layer.provide(PersistenceMemory))
   );
-  return ManagedRuntime.make(ChannelLive.pipe(Layer.provide(dependencies)));
+  const runtime = ManagedRuntime.make(
+    Layer.merge(
+      ChannelLive.pipe(Layer.provide(dependencies)),
+      ChannelHandoffMemory(fixture.routingSecret, observations)
+    )
+  );
+  return { observations, runtime };
+});
+
+const makeRuntime = Effect.fn("SendblueChannelTest.makeRuntime")(function* (
+  webhook: Effect.Effect<
+    typeof ChannelWebhookResult.Type,
+    ChannelWebhookAuthenticationError | ChannelWebhookSchemaError
+  >
+) {
+  return (yield* makeObservedRuntime(webhook)).runtime;
+});
+
+const makeObservedSupervisionRuntime = Effect.fn(
+  "SendblueChannelTest.makeObservedSupervisionRuntime"
+)(function* (completeInbound: Effect.Effect<void>) {
+  const fixture = yield* fixtures;
+  const observations = yield* Ref.make<
+    readonly (typeof ChannelHandoffObservation.Type)[]
+  >([]);
+  const runtime = ManagedRuntime.make(
+    Layer.merge(
+      Layer.succeed(
+        Channel,
+        Channel.of({
+          completeInbound: () => completeInbound,
+          decodeWebhook: () => Effect.succeed(fixture.accepted),
+          handleEvent: () =>
+            Effect.die("channel event is not used in this test"),
+          prepareInbound: () => Effect.succeed(fixture.prepared),
+        })
+      ),
+      ChannelHandoffMemory(fixture.routingSecret, observations)
+    )
+  );
+  return { observations, runtime };
 });
 
 const makeSupervisionRuntime = Effect.fn(
   "SendblueChannelTest.makeSupervisionRuntime"
 )(function* (completeInbound: Effect.Effect<void>) {
-  const fixture = yield* fixtures;
-  return ManagedRuntime.make(
-    Layer.succeed(
-      Channel,
-      Channel.of({
-        completeInbound: () => completeInbound,
-        decodeWebhook: () => Effect.succeed(fixture.accepted),
-        handleEvent: () => Effect.die("channel event is not used in this test"),
-        prepareInbound: () => Effect.succeed(fixture.prepared),
-      })
-    )
-  );
+  return (yield* makeObservedSupervisionRuntime(completeInbound)).runtime;
 });
 
-const routeFor = (runtime: ManagedRuntime.ManagedRuntime<Channel, never>) => {
+const routeFor = <E>(
+  runtime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>
+) => {
   const definition = makeSendblueEveChannel(runtime);
   const [route] = definition.routes;
   if (route === undefined || route.transport === "websocket") {
@@ -240,16 +301,83 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
 );
 
 it.effect(
+  "records the current 202 before a deliberately delayed Eve acceptance",
+  () =>
+    Effect.gen(function* testDelayedChannelHandoffOrdering() {
+      const started = yield* Deferred.make<null>();
+      const release = yield* Deferred.make<null>();
+      const runPromise = Effect.runPromiseWith(yield* Effect.context());
+      const observed = yield* makeObservedSupervisionRuntime(Effect.void);
+      yield* Effect.addFinalizer(() => observed.runtime.disposeEffect);
+
+      const pending: Promise<unknown>[] = [];
+      const response = yield* Effect.promise(() =>
+        routeFor(observed.runtime).handler(request(), {
+          getSession: () => session,
+          params: {},
+          receive: () => Promise.resolve(session),
+          requestIp: null,
+          send: () =>
+            runPromise(
+              Deferred.succeed(started, null).pipe(
+                Effect.andThen(Deferred.await(release)),
+                Effect.as(session)
+              )
+            ),
+          waitUntil: (task) => {
+            pending.push(task);
+          },
+        })
+      );
+      yield* Deferred.await(started);
+      const beforeAcceptance = yield* Ref.get(observed.observations);
+
+      assert.strictEqual(response.status, 202);
+      assert.strictEqual(pending.length, 1);
+      assert.deepStrictEqual(
+        beforeAcceptance.map((observation) => observation._tag),
+        ["Prepared", "SendStarted", "Response"]
+      );
+      assert.strictEqual(
+        beforeAcceptance.some(
+          (observation) => observation._tag === "SendAccepted"
+        ),
+        false
+      );
+
+      yield* Deferred.succeed(release, null);
+      yield* Effect.promise(() => Promise.all(pending));
+      const afterAcceptance = yield* Ref.get(observed.observations);
+      assert.deepStrictEqual(
+        afterAcceptance.map((observation) => observation._tag),
+        ["Prepared", "SendStarted", "Response", "SendAccepted", "Exit"]
+      );
+      const responseObservation = afterAcceptance.find(
+        (observation) => observation._tag === "Response"
+      );
+      const acceptanceObservation = afterAcceptance.find(
+        (observation) => observation._tag === "SendAccepted"
+      );
+      assert.strictEqual(responseObservation?.status, 202);
+      assert.strictEqual(acceptanceObservation?.outcome, "accepted");
+      assert.strictEqual(
+        responseObservation?.workFingerprint,
+        acceptanceObservation?.workFingerprint
+      );
+    }).pipe(Effect.scoped)
+);
+
+it.effect(
   "settles waitUntil after typed failure and defect without another dispatch",
   () =>
     Effect.gen(function* testChannelBackgroundFailureCompletion() {
-      const typedFailureRuntime = yield* makeSupervisionRuntime(Effect.void);
-      const defectRuntime = yield* makeSupervisionRuntime(
+      const typedFailure = yield* makeObservedSupervisionRuntime(Effect.void);
+      const defect = yield* makeObservedSupervisionRuntime(
         Effect.die("synthetic channel completion defect")
       );
       yield* Effect.addFinalizer(() =>
         Effect.all(
-          [typedFailureRuntime.disposeEffect, defectRuntime.disposeEffect],
+          [typedFailure.runtime.disposeEffect, defect.runtime.disposeEffect],
           { discard: true }
         )
       );
@@ -258,7 +386,7 @@ it.effect(
       let typedFailureRegistered = false;
       const typedFailurePending: Promise<unknown>[] = [];
       const typedFailureResponse = yield* Effect.promise(() =>
-        routeFor(typedFailureRuntime)
+        routeFor(typedFailure.runtime)
           .handler(request(), {
             getSession: () => session,
             params: {},
@@ -282,12 +410,28 @@ it.effect(
       assert.strictEqual(typedFailurePending.length, 1);
       yield* Effect.promise(() => Promise.all(typedFailurePending));
       assert.strictEqual(typedFailureSends, 1);
+      const typedFailureObservations = yield* Ref.get(
+        typedFailure.observations
+      );
+      assert.strictEqual(
+        typedFailureObservations.some(
+          (observation) => observation._tag === "SendRejected"
+        ),
+        true
+      );
+      assert.strictEqual(
+        typedFailureObservations.some(
+          (observation) =>
+            observation._tag === "Exit" && observation.outcome === "failed"
+        ),
+        true
+      );
 
       let defectSends = 0;
       let defectRegistered = false;
       const defectPending: Promise<unknown>[] = [];
       const defectResponse = yield* Effect.promise(() =>
-        routeFor(defectRuntime)
+        routeFor(defect.runtime)
           .handler(request(), {
             getSession: () => session,
             params: {},
@@ -311,6 +455,20 @@ it.effect(
       assert.strictEqual(defectPending.length, 1);
       yield* Effect.promise(() => Promise.all(defectPending));
       assert.strictEqual(defectSends, 1);
+      const defectObservations = yield* Ref.get(defect.observations);
+      assert.strictEqual(
+        defectObservations.some(
+          (observation) => observation._tag === "SendAccepted"
+        ),
+        true
+      );
+      assert.strictEqual(
+        defectObservations.some(
+          (observation) =>
+            observation._tag === "Exit" && observation.outcome === "defect"
+        ),
+        true
+      );
     }).pipe(Effect.scoped)
 );
 
@@ -320,18 +478,18 @@ it.effect(
     Effect.gen(function* testChannelBackgroundRuntimeDisposal() {
       const started = yield* Deferred.make<null>();
       const finalized = yield* Deferred.make<null>();
-      const runtime = yield* makeSupervisionRuntime(
+      const observed = yield* makeObservedSupervisionRuntime(
         Deferred.succeed(started, null).pipe(
           Effect.andThen(Effect.never),
           Effect.ensuring(Deferred.succeed(finalized, null).pipe(Effect.asVoid))
         )
       );
-      yield* Effect.addFinalizer(() => runtime.disposeEffect);
+      yield* Effect.addFinalizer(() => observed.runtime.disposeEffect);
 
       let sends = 0;
       const pending: Promise<unknown>[] = [];
       const response = yield* Effect.promise(() =>
-        routeFor(runtime).handler(request(), {
+        routeFor(observed.runtime).handler(request(), {
           getSession: () => session,
           params: {},
           receive: () => Promise.resolve(session),
@@ -348,10 +506,18 @@ it.effect(
       assert.strictEqual(response.status, 202);
       assert.strictEqual(pending.length, 1);
       yield* Deferred.await(started);
-      yield* runtime.disposeEffect;
+      yield* observed.runtime.disposeEffect;
       yield* Deferred.await(finalized);
       yield* Effect.promise(() => Promise.all(pending));
       assert.strictEqual(sends, 1);
+      const observations = yield* Ref.get(observed.observations);
+      assert.strictEqual(
+        observations.some(
+          (observation) =>
+            observation._tag === "Exit" && observation.outcome === "interrupted"
+        ),
+        true
+      );
     }).pipe(Effect.scoped)
 );
 
@@ -430,8 +596,14 @@ it.effect("returns 503 when routing fails before dispatch", () =>
       ),
       ChannelReplayMemory(fixture.replay).pipe(Layer.provide(PersistenceMemory))
     );
+    const observations = yield* Ref.make<
+      readonly (typeof ChannelHandoffObservation.Type)[]
+    >([]);
     const runtime = ManagedRuntime.make(
-      ChannelLive.pipe(Layer.provide(dependencies))
+      Layer.merge(
+        ChannelLive.pipe(Layer.provide(dependencies)),
+        ChannelHandoffMemory(fixture.routingSecret, observations)
+      )
     );
     yield* Effect.addFinalizer(() => runtime.disposeEffect);
     const route = routeFor(runtime);

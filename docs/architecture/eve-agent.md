@@ -103,10 +103,15 @@ POST /eve/v1/sendblue/webhook              POST /eve/v1/photon/webhook
                    -> ChannelRouter.route
                    -> ChannelReplay.claimInbound
                    -> AtomicKeyValueStore.transact
+                   -> ChannelHandoff.prepared (safe work fingerprint)
                    -> accepted background Effect
                    -> provider ManagedRuntime.runFork
                    -> EveChannelDispatchEve.dispatch
+                   -> ChannelHandoff.sendStarted
+                   -> Eve send()
+                   -> ChannelHandoff.sendAccepted/sendRejected
                    -> Channel.completeInbound
+                   -> ChannelHandoff.settled from Fiber Exit
                    -> Fiber.await completion under Eve waitUntil
 ```
 
@@ -120,11 +125,30 @@ Request preparation runs with the concrete provider runtime's `runPromise`.
 Accepted work starts before the handler resolves with that runtime's
 `runFork`, so the runtime Scope owns the root Fiber. Eve receives exactly one
 `Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid))` completion Promise.
-`Fiber.await` observes success, typed failure, defect, or interruption without
-turning an already returned `202` into another response failure. Client abort
-does not cancel accepted work; runtime disposal interrupts it and runs
-cooperative finalizers. The adapter constructs or disposes no runtime per
-request and adds no Channel-wide timeout or retry.
+The Channel-owned handoff observer classifies the native `Exit` as succeeded,
+typed failure, defect, or interruption without retaining its error, Cause, or
+stack. This settlement remains separate from Eve acceptance and cannot turn an
+already returned `202` into another response failure. Client abort does not
+cancel accepted work; runtime disposal interrupts it and runs cooperative
+finalizers. The adapter constructs or disposes no runtime per request and adds
+no Channel-wide timeout or retry.
+
+`ChannelHandoff` imports the redacted Channel routing secret once per concrete
+runtime and uses domain-separated HMAC inputs to derive distinct branded work
+and Eve-session fingerprints. Its Schema-owned prepared, send-started,
+send-accepted/rejected, response, and Exit observations contain only those
+fingerprints, bounded epoch/latency numbers, phases, outcomes, and response
+status. Raw replay/session/run IDs, provider identity, content, continuation or
+hook tokens, inputs/outputs, URLs, secrets, errors, Causes, and stacks do not
+enter the observation contract. The memory Layer supplies deterministic phase
+and leak fixtures without exposing a logger or Eve runtime client.
+
+This observability slice deliberately preserves the current acknowledgement
+semantics: the route starts and registers the background Fiber, records the
+`202` response phase, and can return while Eve `send()` is still pending. The
+delayed-send fixture records `Response` before `SendAccepted`, making that
+known false ordering directly visible for the next task rather than presenting
+the fingerprint or Fiber as durable acceptance.
 
 Installed Eve exposes no authored Channel-module teardown hook during local
 cache replacement or development-server close, and Vercel exposes no
@@ -213,7 +237,9 @@ handset-delivered.
   -> identity, routing, concurrent atomic replay, immutable state
   -> provider substitution through live/memory composition roots
   -> independent runtime build caching, concurrency, failure, and recovery
-  -> waitUntil ordering plus success/failure/defect/interruption completion
+  -> deterministic HMAC separation and Schema/forbidden-marker fixtures
+  -> delayed send proving current response-before-acceptance ordering
+  -> send rejection plus Exit success/failure/defect/interruption observations
   -> runtime-disposal interruption/finalizers and client-abort independence
   -> both absolute routes in the ordinary Nitro build
   -> installed Eve send/session/turn Workflow ownership

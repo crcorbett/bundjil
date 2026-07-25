@@ -8,6 +8,7 @@ import {
   layerLive as ChannelConfigLive,
   loadSendblueConfig,
 } from "./config.js";
+import { layerLive as ChannelHandoffLive } from "./handoff.js";
 import { channelServices } from "./runtime.js";
 
 export const SendblueChannelRuntimeLive = Layer.unwrap(
@@ -17,8 +18,11 @@ export const SendblueChannelRuntimeLive = Layer.unwrap(
     const transport = SendblueTransportLive(sendblue).pipe(
       Layer.provide(FetchHttpClient.layer)
     );
-    return ChannelLive.pipe(
-      Layer.provide(Layer.merge(transport, channelServices(config)))
+    return Layer.merge(
+      ChannelLive.pipe(
+        Layer.provide(Layer.merge(transport, channelServices(config)))
+      ),
+      ChannelHandoffLive(config.routingSecret)
     );
   })
 ).pipe(Layer.provide(ChannelConfigLive));

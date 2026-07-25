@@ -23,10 +23,17 @@ export { makeChannelEveChannel, makeChannelEveEvents } from "./eve.js";
 export {
   EveChannelDispatchError,
   ChannelConfigError,
+  ChannelHandoffObservationError,
   ChannelIdentityError,
   ChannelReplayError,
   ChannelRoutingError,
 } from "./errors.js";
+export {
+  ChannelHandoff,
+  layerLive as ChannelHandoffLive,
+  layerMemory as ChannelHandoffMemory,
+} from "./handoff.js";
+export type { ChannelHandoffShape } from "./handoff.js";
 export {
   ChannelIdentity,
   layerLive as ChannelIdentityLive,
@@ -51,6 +58,11 @@ export {
   ChannelEvent,
   ChannelEventOutcome,
   ChannelEventResult,
+  ChannelHandoffAcceptance,
+  ChannelHandoffAttempt,
+  ChannelHandoffLatency,
+  ChannelHandoffObservation,
+  ChannelHandoffTimestamp,
   ChannelIdentityRecord,
   ChannelIdentityRecords,
   ChannelOutboundCoordinates,
@@ -64,9 +76,11 @@ export {
   ChannelReplayPrefix,
   ChannelReplayRecord,
   ChannelRoutingSecret,
+  ChannelSessionFingerprint,
   ChannelStateV1,
   ChannelWebhookProofPolicy,
   ChannelWebhookQuery,
+  ChannelWorkFingerprint,
 } from "./schemas.js";
 export type {
   ChannelAdapterStateEncoded,

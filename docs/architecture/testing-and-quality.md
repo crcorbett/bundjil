@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -382,6 +382,12 @@ decodes it through the owning Effect Schema boundary. Record no request body or
 model output. Any hosted or provider observation belongs in a dated,
 target-owned proof receipt with a source identity, `observedAt`, limitations,
 and non-claims. It never grants deployment or mutation authority.
+
+Channel handoff observability tests must use the decoded app contract and
+memory Layer to prove HMAC determinism/key separation, exact phase ordering,
+native Exit classification, and forbidden-marker absence. A `202`, started
+Fiber, registered `waitUntil`, safe fingerprint, or generated Workflow
+function is not a substitute for the delayed `send()` acceptance oracle.
 
 ## Workflow and authority policy
 

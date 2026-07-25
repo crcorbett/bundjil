@@ -488,7 +488,7 @@
     {
       "id": "add-handoff-observability",
       "title": "Add safe Eve handoff and Exit observability",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["prove-eve-owned-handoff"],
       "findingIds": ["HEQ-F002", "HEQ-F003"],
       "requirementIds": [
@@ -536,6 +536,16 @@
         "Direct safe handoff and Exit observables exist.",
         "Current 202 ordering is measurable without changing semantics.",
         "No raw identity or runtime client escapes."
+      ],
+      "completedAt": "2026-07-25",
+      "completionEvidence": [
+        "ChannelHandoff is a named app Service with explicit live and memory Layers. It imports the redacted Channel secret once, applies domain-separated HMAC inputs, and returns only branded work/session fingerprints plus Schema-owned attempts, acceptance, phase/outcome, timestamp and latency contracts.",
+        "EveChannelDispatch keeps the raw Eve Session inside the live adapter, decodes Session.id once with EveSessionId, and returns a safe ChannelHandoffAcceptance after the exact send Promise resolves. No Eve or Workflow client, queue, runtime, raw Session, provider value, error, Cause or stack escapes the adapter.",
+        "The route records Prepared, SendStarted, SendAccepted/SendRejected, Response and native Fiber Exit phases. Exit is preclassified as succeeded, typed failure, defect or interruption before observation, so retained data contains no raw error or Cause and acceptance remains distinct from settlement.",
+        "A deterministic delayed-send route fixture records Prepared, SendStarted and Response while send remains pending, then SendAccepted and Exit only after release. Separate fixtures directly prove rejected send, completion defect and runtime-disposal interruption outcomes without changing the current acknowledgement semantics.",
+        "Focused channel-handoff, route and vertical tests passed 19 tests; the full agent suite passed 68 tests after both normal and Vercel Eve builds. Agent check-types, Effect language-server diagnostics, boundary, docs, skills, authority, controls, verification-policy and HGI-307 gates passed.",
+        "Schema encoding and excess-property fixtures reject forbidden observation fields and assert retained evidence contains no replay/session identity, message marker, content, continuation/hook token, Cause or stack. HMAC fixtures prove same-key determinism, cross-key separation and work/session domain separation.",
+        "All evidence is local. No hosted log query, metric readback, deployment, provider, Preview, Production, credential, message or Workflow operation occurred."
       ],
       "commitAfterPassing": true
     },
