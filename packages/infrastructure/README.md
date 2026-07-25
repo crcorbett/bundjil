@@ -53,6 +53,13 @@ exact-ID rollback deletion, and retains the project setting for explicit
 prior-value reconciliation. The normal adoption stack cannot access these
 write services.
 
+Vercel Git linking is a project-global, runbook-owned bootstrap and is not part
+of the Preview Alchemy configuration Layer. Before an exact `bundjil-agent`
+link mutation, `infrastructure:vercel-git-link-authority` validates a separate
+mode-`0600` envelope against the shared harness and the fixed Git-link policy.
+Its rollback restores the observed absent-link state by disconnecting only the
+exact `github:crcorbett/bundjil` link.
+
 The live inventory executable is the only place that composes both provider
 read Layers. It validates the fixed authority envelope and the narrower
 read-only Preview/Production policy before resolving credentials, decodes one
@@ -79,6 +86,7 @@ bun run infrastructure:preview-drift
 bun run infrastructure:preview-repair
 bun run infrastructure:preview-rollback-plan
 bun run infrastructure:preview-rollback
+bun run infrastructure:vercel-git-link-authority
 bun alchemy deploy --stage preview --dry-run --adopt
 bun alchemy deploy --stage preview --adopt --yes
 bun alchemy plan --stage preview

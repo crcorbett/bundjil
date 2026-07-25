@@ -76,7 +76,8 @@
     "infrastructure:preview-repair": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
     "infrastructure:preview-drift": "bun --env-file=.env.local --conditions=@bundjil/source run packages/infrastructure/scripts/preview-configuration-drift.ts",
     "infrastructure:preview-rollback-plan": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
-    "infrastructure:preview-rollback": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --yes"
+    "infrastructure:preview-rollback": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
+    "infrastructure:vercel-git-link-authority": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/validate-vercel-git-link-authority.ts"
   },
   "devDependencies": {
     "@bundjil/infrastructure": "workspace:*",

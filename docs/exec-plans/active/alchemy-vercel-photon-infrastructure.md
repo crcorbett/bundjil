@@ -592,29 +592,39 @@ desired phase produced a false rollback no-op; the accepted command leaves
 ordinary desired as the Config default and supplies rollback only as the
 process-scoped phase.
 
+After implementation commit `eb11b738b353c59715feb15044ff2a337b7d9084` was
+pushed, two decoded deployment-list readbacks returned no matching SHA. A
+separate authenticated project read then found no `link` field. This reopened
+the owner as `PVC-003`: a branch push cannot prove Vercel Git ownership while
+the exact project is unlinked. The correction keeps project-global Git
+bootstrap outside the Preview Alchemy Layer, adds a distinct fixed authority
+policy covering both environments, requires absent-link/read-after-connect
+proof, and preserves exact-link disconnect as rollback. No deployment-create
+or promotion call is admitted.
+
 | Requirement                      | Direct observable and expected postcondition                                                                                               | Plausible false green rejected                                                                               | Focused command/readback                                    | Evidence owner and current result                      |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------ |
 | Exact target and before identity | Team/project readback resolves one `bundjil-agent`; both feedback fields are `null`; disposable key match count is zero on both projects   | Project link, name match, credential presence, or absence on only one project                                | Authenticated project GET and target-filtered env list      | Fixed authority plus before/rollback readbacks; passed |
 | Preview-only reversible scope    | Preview becomes `true` while Production stays `null`; one fixed non-secret Preview env key may change; proxy remains a control             | Trusting the property name, request body, or response without reading Production; `PVC-001` rejected exactly | Complete request/response decode and both-project readbacks | Corrected live adapter and provider contract; passed   |
 | Drift and rollback               | Desired becomes true, direct drift false, sync detects/repairs true, rollback restores null; disposable key is deleted by exact created ID | Successful PATCH, ordinary plan, a mock drift test, or key absence without stable-ID cleanup                 | Alchemy plan/deploy/sync plus provider before/after reads   | Native live lifecycle and rollback; passed             |
-| Vercel Git deployment ownership  | A pushed immutable task commit, not Alchemy, creates the observed Preview deployment; no promotion runs                                    | Existing deployment, manual API deploy, state entry, or READY status without Git SHA                         | Git push then deployment readback by exact commit SHA       | Deployment receipt; pending                            |
+| Vercel Git deployment ownership  | An exact project link and pushed immutable task commit, not Alchemy, create the observed Preview deployment; no promotion runs             | Existing deployment, unlinked branch push, manual API deploy, state entry, or READY status without Git SHA   | Link readback, Git push, deployment readback by exact SHA   | `PVC-003` correction and deployment receipt; pending   |
 
 ### Preview configuration impact ledger
 
-| Surface                          | Status          | Decision and evidence                                                                                                                                                                       |
-| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and docs            | Change required | Add the separately composed Preview-only configuration graph, keep the adoption graph read-only, and record the Production guard correction here and in the runbook.                        |
-| READMEs                          | Change required | Root and package READMEs route the new authority-gated commands and keep current provider evidence out of README scope.                                                                     |
-| Exports and generated references | Change required | Export named Preview Schemas, services, live/memory Layers and Resources through `@bundjil/infrastructure/vercel`; TypeScript build output remains generated and untracked.                 |
-| Runbooks and authority           | Change required | `apps/agent/runbooks/alchemy-infrastructure.md` owns plan/apply/drift/repair/rollback; the ignored fixed authority names every exact read, mutation, Git push, stop condition and rollback. |
-| Verification journeys and proof  | Change required | Add stable `BND-J13-preview-infrastructure-convergence`, command mapping, fixed authority policy, bounded ignored receipt owner and direct false-green oracles.                             |
-| Skills and AGENTS                | Preserve        | The repository-local implementer, docs, Effect client and package rules were applied; no repeated unowned failure changes the skills or `AGENTS.md`.                                        |
-| Lint, config, commands, and CI   | Change required | Add root/package Preview commands and extend the executable verification-policy inventory from twelve to thirteen journeys; no CI workflow or standing external authority changes.          |
-| Schemas, services, and Layers    | Change required | Add Preview-literal stage contracts, branded value/key/IDs, safe tagged errors, exact production guard, named operations and isolated live/mock provider graphs.                            |
-| Tests and fixtures               | Change required | Add complete-envelope HTTP tests plus native Alchemy no-op/update/drift/uncertain/eventual/retain/rollback tests with Production and secret-leak negatives.                                 |
-| SPEC, tasks, and plan            | Change required | Keep this task open through immutable Git deployment observation; record `PVC-001` and `PVC-002`, corrections and exact provider lifecycle evidence now.                                    |
-| Receipts and evidence            | Change required | Retain only Schema-valid mode-`0600` redacted authority/receipt artifacts; no credential or provider value is retained.                                                                     |
-| Rollout, rollback, and archive   | Change required | Live rollback restored the exact prior state; the plan remains active and the formal five-pass audit stays terminal-only after every SPEC task completes.                                   |
+| Surface                          | Status          | Decision and evidence                                                                                                                                                                  |
+| -------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | Add the separately composed Preview-only configuration graph, keep the adoption graph read-only, and record the Production guard correction here and in the runbook.                   |
+| READMEs                          | Change required | Root and package READMEs route the new authority-gated commands and keep current provider evidence out of README scope.                                                                |
+| Exports and generated references | Change required | Export named Preview Schemas, services, live/memory Layers and Resources through `@bundjil/infrastructure/vercel`; TypeScript build output remains generated and untracked.            |
+| Runbooks and authority           | Change required | The runbook owns plan/apply/drift/repair/rollback and the distinct project-global Git-link bootstrap; separate fixed authorities prevent the Git link from broadening Preview Alchemy. |
+| Verification journeys and proof  | Change required | Add stable `BND-J13-preview-infrastructure-convergence`, command mapping, fixed authority policy, bounded ignored receipt owner and direct false-green oracles.                        |
+| Skills and AGENTS                | Preserve        | The repository-local implementer, docs, Effect client and package rules were applied; no repeated unowned failure changes the skills or `AGENTS.md`.                                   |
+| Lint, config, commands, and CI   | Change required | Add root/package Preview commands and extend the executable verification-policy inventory from twelve to thirteen journeys; no CI workflow or standing external authority changes.     |
+| Schemas, services, and Layers    | Change required | Add Preview-literal stage contracts, branded value/key/IDs, safe tagged errors, exact production guard, named operations and isolated live/mock provider graphs.                       |
+| Tests and fixtures               | Change required | Add complete-envelope HTTP tests plus native Alchemy no-op/update/drift/uncertain/eventual/retain/rollback tests with Production and secret-leak negatives.                            |
+| SPEC, tasks, and plan            | Change required | Keep this task open through immutable Git deployment observation; record `PVC-001`, `PVC-002`, `PVC-003`, their corrections and exact provider lifecycle evidence now.                 |
+| Receipts and evidence            | Change required | Retain only Schema-valid mode-`0600` redacted authority/receipt artifacts; no credential or provider value is retained.                                                                |
+| Rollout, rollback, and archive   | Change required | Live rollback restored the exact prior state; the plan remains active and the formal five-pass audit stays terminal-only after every SPEC task completes.                              |
 
 The formal five-pass audit remains deferred until all SPEC tasks finish.
 

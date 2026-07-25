@@ -148,6 +148,16 @@ verification gates must pass before the first write.
 7. After the coherent implementation commit is pushed, observe only the
    Vercel Git-created Preview deployment whose `githubCommitSha` equals that
    immutable commit. Do not call a deployment-create or promotion operation.
+   If authenticated project readback shows the exact project has no Git link,
+   stop deployment polling. Validate the distinct mode-`0600`
+   `tmp/proof/vercel-git-link.authority.json` with
+   `bun run infrastructure:vercel-git-link-authority`, connect only
+   `bundjil-agent` to `github:crcorbett/bundjil` through the supported Vercel
+   Git surface, and read back that exact link before another branch push.
+   This project-global bootstrap names both Preview and Production in its
+   separate authority; it does not authorize a deployment create, promotion,
+   Production configuration write, alias change, or deletion. Its rollback is
+   to disconnect only that exact link and read back the prior absent-link state.
 
 Every mutation is read-before/write/read-after. Encode at the exact provider
 boundary, decode the complete response immediately, and stop on a mismatched

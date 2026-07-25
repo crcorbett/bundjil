@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/bundjil-vercel-git-link-authority.v1.json",
+  "title": "Bundjil Vercel Git link authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "mutation" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": {
+      "const": [
+        "read exact bundjil-agent Vercel project Git link metadata",
+        "connect only bundjil-agent to github:crcorbett/bundjil after absent-link readback",
+        "read exact bundjil-agent Vercel project Git link metadata after connect",
+        "disconnect only that exact Git link to restore the absent-link rollback state"
+      ]
+    },
+    "resources": {
+      "const": [
+        "vercel:team_1LX7ZujbijowTv8J9k0aU7nD:project:prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "vercel:project:bundjil-agent:git:github:crcorbett/bundjil"
+      ]
+    },
+    "environments": { "const": ["preview", "production"] }
+  }
+}
