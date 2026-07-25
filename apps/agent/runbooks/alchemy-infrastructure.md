@@ -31,6 +31,16 @@ The Photon project is currently one shared Free physical identity observed in
 both state stages. That is migration state, not Preview/Production Photon
 isolation and not authority to mutate it.
 
+`@bundjil/infrastructure/photon` now contains the dormant
+`PhotonWebhookBindingSink` required before an isolated Preview webhook can be
+created. The sink accepts one decoded Preview binding write and projects its
+Vercel acknowledgement to a safe secret reference. It is not permission or a
+command: do not invoke it until the isolated Photon task has a separately
+authenticated Free Preview project, an exact approved non-Production user,
+fixed authority, an immutable callback candidate, and captured rollback
+identities. A missing approved user is a stop; never substitute either user
+from the shared project.
+
 ## Preconditions and authority gate
 
 Before resolving a credential, record and validate one task-scoped authority

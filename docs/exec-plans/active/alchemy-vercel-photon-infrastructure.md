@@ -639,6 +639,71 @@ reuse this receipt as Photon isolation, secret-custody, signed-ingress, Channel
 or handset proof. The formal five-pass audit remains deferred until all SPEC
 tasks finish.
 
+## Isolated Photon Preview
+
+`isolated-photon-preview-spike` is in progress. The first repository slice
+implements the previously missing binding-custody boundary without performing
+a provider mutation. `@bundjil/infrastructure/photon` owns one
+`PhotonWebhookBindingSink` operation over decoded
+`PhotonWebhookBindingWrite.Type`; it returns only a safe `SecretReference`.
+The live Layer encodes exactly the agent's two sensitive Preview Vercel
+bindings and decodes the full acknowledgement. The memory Layer retains only
+stable IDs and the safe reference.
+
+The current external stop is narrower than repository or provider
+credentials: neither the task authority nor any ignored environment file
+names an exact approved non-Production E.164 shared-user identity. The
+existing shared Photon project has two users, and the SPEC forbids reusing
+either identity or that namespace for Preview. No Photon project, platform,
+user, webhook, line, billing, message, Vercel environment, deployment, DNS,
+Sendblue, or Production mutation has occurred in this slice.
+
+### Binding-custody requirement replay
+
+| Material requirement                              | Direct observable and expected postcondition                                                                                                                                                                                                                                                                                                                                         | Plausible false green rejected                                                                                                                                             | Focused command and evidence owner                                                                                   | Result                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Owner-specific Effect boundary                    | The exported service has one named operation receiving one decoded composite write and returning `SecretReference`; safe tagged errors carry retry and certainty. No raw client, callback, URL, primitive ID/value parameter or provider result crosses the boundary.                                                                                                                | A generic secret callback, a pair of primitive parameters, or an exported Vercel client could pass a happy-path test while violating ownership.                            | Infrastructure typecheck and boundary scan; `src/photon/webhook-binding.ts` plus package export map.                 | Passed.                                                            |
+| Exact outward encoding and acknowledgement decode | The HTTP contract test observes one POST with `teamId`, `upsert=true`, exactly two `sensitive` Preview entries, and the create-only value only at the encoded request boundary; the complete response is decoded and projected immediately.                                                                                                                                          | A neighbouring Vercel setting test, a request-count assertion, or a 201 without exact keys/targets would not prove the sink.                                               | `bunx vitest run test/photon-webhook-binding.test.ts`; live adapter and focused test own the evidence.               | Passed.                                                            |
+| Secret-safe state and result                      | Memory snapshots and live results contain stable identities and one safe reference; leak sentinels are absent from snapshots, errors and outward results.                                                                                                                                                                                                                            | Redaction in console output alone would not prevent a secret entering state or a receipt.                                                                                  | Focused codec/leak tests plus `Inspectable` scans; production Schemas own both forms.                                | Passed.                                                            |
+| Timeout-after-write certainty                     | The forced timeout commits one binding, returns `readbackRequired`, and a retry by the same composite identity returns the existing reference with write count exactly one.                                                                                                                                                                                                          | A second successful write or a test that merely catches an error could hide duplicate persistence.                                                                         | Memory timeout test and write-count control.                                                                         | Passed.                                                            |
+| Vercel partial failure                            | A forced one-of-two acknowledgement records no converged binding and returns uncertain outcome; live partial acknowledgement is also rejected.                                                                                                                                                                                                                                       | Treating the webhook-ID half as success would strand an unusable callback and lose the only secret.                                                                        | Memory and HTTP partial-failure tests.                                                                               | Passed for repository simulation; no live provider write occurred. |
+| Retry compound policy                             | Known 429/5xx results are eligible for caller-owned bounded backoff; conflicts and validation failures are never retryable; a transport loss or partial write is not blind-backoff eligible and requires physical-identity observation or exact idempotent upsert. This slice adds no internal retry schedule, so attempt bounds, delay and jitter are N/A at this service boundary. | Labelling every failure `backoff`, or automatically replaying a Photon webhook create, would conflate safe Vercel upsert with an uncertain non-idempotent provider create. | Error-contract inspection, timeout/partial/conflict tests and Effect LS/typecheck.                                   | Passed for the sink; Photon create recovery remains unimplemented. |
+| Isolation gate                                    | Environment-key inspection finds credentials but no approved Preview phone identity. The service remains dormant and no shared-project mutation occurs.                                                                                                                                                                                                                              | Provider credentials, historical shared users, or an earlier shared-project Preview receipt do not authorize identity reuse.                                               | Safe key-name-only ignored-env inspection and canonical SPEC/runbook review; task and active plan own the non-claim. | Stopped before Photon mutation as designed.                        |
+
+Focused boundary review found `IPP-BC-001`: the safe tagged error initially
+used an inline `Schema.NonEmptyString` message field. The boundary audit
+rejected that plausible locally typed false green. The owning contract now
+exports `PhotonWebhookBindingFailureMessage`, the error reuses it, and the
+boundary, Effect-language-service and focused package gates reran and passed.
+The exact corrected candidate then passed full `bun run verification`: 90
+tooling tests, type-aware formatting/lint, lint fixture, Knip, all nine
+workspace typechecks, 29 infrastructure Vitest tests, 14 Alchemy lifecycle
+tests, all other workspace tests/builds, and every docs/skills/authority/
+controls/verification-policy gate.
+
+### Isolated Photon Preview impact ledger
+
+| Surface                          | Status          | Decision and evidence                                                                                                                                                                           |
+| -------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | Record the infrastructure-owned cross-provider custody boundary and keep Photon provider mutation private and separate.                                                                         |
+| READMEs                          | Change required | Root and infrastructure READMEs route the dormant sink and state its provider/deployment non-claims. Photon README remains preserved because its public management boundary is still read-only. |
+| Exports and generated references | Change required | Export binding Schemas, service, safe error and live/memory Layers through `@bundjil/infrastructure/photon`; generated build output remains untracked.                                          |
+| Runbooks and authority           | Change required | The Alchemy runbook records the exact approved-user stop. A fixed task authority and provider procedure are still required before invocation.                                                   |
+| Verification journeys and proof  | Preserve        | `BND-J11` remains the signed-ingress/Channel owner; repository sink tests are not a deployment or Channel receipt.                                                                              |
+| Skills and AGENTS                | Preserve        | The repository PRD, docs, Effect-client and package-ownership rules were applied; no repeated unowned failure changes the skills.                                                               |
+| Lint, config, commands and CI    | Preserve        | No standing command, Config key, workflow or CI authority is added in this sub-slice.                                                                                                           |
+| Schemas, services and Layers     | Change required | Add the one composite request, safe error/result, owner-specific service and explicit live/memory Layers.                                                                                       |
+| Tests and fixtures               | Change required | Add seven codec, leak, idempotency, conflict, partial-failure and exact HTTP boundary tests using production contracts.                                                                         |
+| SPEC, tasks and plan             | Change required | Mark the task in progress, record the completed custody sub-slice and the exact approved-user stop.                                                                                             |
+| Receipts and evidence            | Preserve        | No provider receipt is created; source/tests and these canonical owners are repository-only evidence.                                                                                           |
+| Rollout, rollback and archive    | Preserve        | No external write occurred, so external rollback is N/A; revert the eventual coherent repository commit to remove the dormant boundary.                                                         |
+
+Next, implement the Photon Preview lifecycle around this sink and its fixed
+authority. If no exact approved non-Production identity becomes available, the
+task must close with the SPEC's truthful blocked fallback and zero shared-
+project mutation. The terminal five-pass audit remains deferred until all
+tasks reach their final disposition.
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on

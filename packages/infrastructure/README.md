@@ -26,8 +26,14 @@ receipts, and deterministic memory Layers.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and
   stage-scoped state-safe props/attributes for Photon project, iMessage
   platform, shared user, webhook, dedicated-line, and billing observation. It
-  consumes `@bundjil/photon/management`; it does not duplicate Photon HTTP,
-  authentication, DTO, retry, or secret policy and exposes no Photon write.
+  also owns the `PhotonWebhookBindingSink`: one Preview-only decoded binding
+  write, safe tagged failure, and safe `SecretReference` result with live and
+  deterministic memory Layers. The live adapter upserts only the agent's
+  exact Preview webhook ID and create-only signing secret as Vercel sensitive
+  variables, decodes the complete acknowledgement, and never returns or
+  retains the signing value. It consumes `@bundjil/photon/management`; it does
+  not duplicate Photon HTTP, authentication, DTO, retry, or secret policy and
+  exposes no Photon provider write.
 
 Applications do not import this package. Root `alchemy.run.ts` and
 `stacks/**` own stack topology; provider HTTP adapters remain in their owning
@@ -44,6 +50,14 @@ proves exact read/import adoption, no-op convergence, recovery and destructive
 denial. The live adoption path permits R2 state writes but its Vercel and
 Photon adapters expose reads only. It does not create, update, delete, deploy,
 promote, send, or change billing at either provider.
+
+The binding sink is a dormant cross-provider custody boundary until the
+isolated Photon Preview task supplies a separate project, exact approved
+synthetic user, fixed authority and rollback identities. Its repository tests
+prove exact outbound encoding, safe projection, fail-closed conflict,
+timeout-after-write idempotency and partial Vercel acknowledgement handling;
+they do not prove a Photon project, Vercel environment value, deployment,
+signed ingress, Channel response, or handset behavior.
 
 The separate `alchemy.preview.run.ts` entry point owns
 `BundjilPreviewConfigurationSpike`. It validates one mode-`0600` authority

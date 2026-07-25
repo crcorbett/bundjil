@@ -797,7 +797,7 @@
     {
       "id": "isolated-photon-preview-spike",
       "title": "Prove isolated Photon Preview reconciliation",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": [
         "remote-state-and-noop-adoption",
         "preview-vercel-configuration-spike"
@@ -815,7 +815,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's isolated Photon Preview section.",
-        "currentResult": "not_run: blocked by remote-state adoption, Preview Vercel proof, Photon isolation and binding custody."
+        "currentResult": "in_progress: remote-state adoption and Preview Vercel proof passed. The owner-specific binding-custody contract, live/memory Layers, seven focused codec/lifecycle tests and full repository verification pass after correcting IPP-BC-001 at the owner-named error-message Schema. Live Photon reconciliation remains stopped before provider mutation because no exact approved non-Production E.164 user identity is present in the task authority or ignored environment; neither existing shared-project user may be reused."
       },
       "implementationNotes": [
         "Require a separate Preview project, Free shared service, zero dedicated lines, isolated credentials, synthetic approved user, Preview callback, and rollback identities.",
