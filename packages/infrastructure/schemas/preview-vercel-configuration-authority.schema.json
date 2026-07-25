@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/bundjil-preview-vercel-configuration-authority.v1.json",
+  "title": "Bundjil Preview Vercel configuration authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "mutation" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": {
+      "const": [
+        "read exact Vercel project, Preview environment metadata and Git deployment metadata",
+        "set bundjil-agent enablePreviewFeedback to true, false or null while preserving enableProductionFeedback as null",
+        "create one plain Preview-only BUNDJIL_ALCHEMY_PREVIEW_SPIKE environment variable",
+        "delete only the read-back stable ID of BUNDJIL_ALCHEMY_PREVIEW_SPIKE",
+        "read and write only BundjilPreviewConfigurationSpike Preview Alchemy state",
+        "push only the accepted implementation branch for Vercel Git Preview deployment"
+      ]
+    },
+    "resources": {
+      "const": [
+        "vercel:team_1LX7ZujbijowTv8J9k0aU7nD:project:prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "vercel:project:bundjil-agent:setting:enablePreviewFeedback",
+        "vercel:project:bundjil-agent:env:BUNDJIL_ALCHEMY_PREVIEW_SPIKE",
+        "alchemy:BundjilPreviewConfigurationSpike:preview",
+        "git:crcorbett/bundjil:branch:codex/alchemy-vercel-photon-infrastructure"
+      ]
+    },
+    "environments": { "const": ["preview"] }
+  }
+}

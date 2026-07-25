@@ -39,6 +39,7 @@
     "adoption:manifest": "bun --conditions=@bundjil/source run scripts/generate-adoption-manifest.ts",
     "adoption:proof": "bun --conditions=@bundjil/source run scripts/prove-adoption-state.ts",
     "inventory:live": "bun --conditions=@bundjil/source run scripts/inventory-live.ts",
+    "preview:drift": "bun --conditions=@bundjil/source run scripts/preview-configuration-drift.ts",
     "test": "vitest run && bun --conditions=@bundjil/source test test-alchemy"
   },
   "dependencies": {

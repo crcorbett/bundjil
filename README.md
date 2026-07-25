@@ -20,7 +20,8 @@ does not speak for those traditions.
   and its narrow read-only management boundary.
 - `packages/infrastructure` owns private Alchemy stack contracts, custom
   resources, deterministic provider lifecycle tests, and the
-  authority-validated read-only inventory command. Apps do not import it.
+  authority-validated read-only inventory and separately gated Preview
+  configuration commands. Apps do not import it.
 - `packages/eve` owns Eve-facing Schemas and named operations.
 - `packages/codex` owns Codex subscription profile, storage, refresh, and
   private provider contracts.

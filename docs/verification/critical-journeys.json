@@ -366,5 +366,43 @@
     "nonClaims": [
       "A promoted deployment or provider acceptance alone does not prove both journeys, handset delivery, or visible typing."
     ]
+  },
+  {
+    "id": "BND-J13-preview-infrastructure-convergence",
+    "actorOrConsumer": "authorized Bundjil infrastructure operator",
+    "boundary": "Alchemy-owned Preview Vercel configuration and Vercel Git deployment observation",
+    "startingState": "exact Bundjil team and bundjil-agent project read back, enablePreviewFeedback prior value recorded, disposable Preview key absent, fixed mutation authority valid, and dedicated remote state reachable",
+    "inputs": [
+      "one exact Preview project-setting desired value",
+      "one fixed non-secret Preview-only environment metadata resource",
+      "one immutable pushed Git commit SHA"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/alchemy-infrastructure.md",
+    "expectedBehavior": [
+      "Alchemy plans and applies only the setting update and disposable metadata create, then converges to no-op.",
+      "A direct safe setting drift is detected by sync dry-run, repaired once, and converges to unchanged.",
+      "Rollback restores the prior null setting and deletes only the created environment-variable stable ID.",
+      "Vercel Git, not Alchemy, creates the observed Preview deployment for the immutable commit SHA."
+    ],
+    "expectedSideEffects": [
+      "Preview feedback and one non-secret Preview-only variable change temporarily, dedicated Preview state is updated, and one implementation-branch push may trigger a Vercel Git Preview deployment."
+    ],
+    "preservedInvariants": [
+      "Production configuration, deployment promotion, domains, Marketplace bindings, Photon resources and unrelated Vercel projects remain untouched.",
+      "Provider values and credentials never enter state, receipts, tracked files or logs.",
+      "Retained configuration is not deleted without the exact rollback permission."
+    ],
+    "oracle": "A Schema-valid bounded packet binds the fixed authority, before/apply/no-op/drift/repair/rollback readbacks, exact Alchemy state, immutable Git SHA, Vercel Git Preview deployment and Production controls.",
+    "environment": "approval-gated Vercel Preview target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/alchemy-infrastructure.md",
+      "packages/infrastructure/test-alchemy/vercel-preview-configuration-provider.test.ts",
+      "packages/infrastructure/test/vercel-preview-configuration-contracts.test.ts",
+      "tmp/proof/preview-vercel-configuration.receipt.json"
+    ],
+    "nonClaims": [
+      "A local lifecycle matrix, Alchemy state entry, pushed commit or existing deployment does not alone prove live convergence, Vercel Git causality, Production state, runtime health or Photon behavior."
+    ]
   }
 ]

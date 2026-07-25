@@ -4,6 +4,7 @@
     "../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json",
     "../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json",
     "../../alchemy.run.ts",
+    "../../alchemy.preview.run.ts",
     "../../stacks/**/*.ts",
     "./scripts/**/*.ts",
     "./schemas/**/*.json",

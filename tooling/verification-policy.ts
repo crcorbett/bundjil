@@ -77,8 +77,8 @@ export const CriticalJourney = Schema.Struct({
 });
 export type CriticalJourney = typeof CriticalJourney.Type;
 export const CriticalJourneys = Schema.Array(CriticalJourney)
-  .check(Schema.isMinLength(12))
-  .check(Schema.isMaxLength(12));
+  .check(Schema.isMinLength(13))
+  .check(Schema.isMaxLength(13));
 export const CriticalJourneysJson = Schema.fromJsonString(CriticalJourneys);
 
 const CommandMapEntry = Schema.Struct({
@@ -287,6 +287,7 @@ const expectedJourneyIds = [
   "BND-J10-incident-revocation-recovery",
   "BND-J11-photon-accepted-message-typing",
   "BND-J12-dual-channel-production",
+  "BND-J13-preview-infrastructure-convergence",
 ] as const;
 
 const prohibitedOutput =

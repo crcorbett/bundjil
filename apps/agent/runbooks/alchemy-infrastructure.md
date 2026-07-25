@@ -52,6 +52,15 @@ only by owning `Config.schema` boundaries:
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.
 
+The Preview configuration stack additionally requires the ignored fixed
+authority path plus exact non-secret target metadata:
+
+- `BUNDJIL_PREVIEW_CONFIGURATION_AUTHORITY_PATH`;
+- `BUNDJIL_PREVIEW_VERCEL_TEAM_ID`;
+- `BUNDJIL_PREVIEW_VERCEL_PROJECT_ID`;
+- `BUNDJIL_PREVIEW_VERCEL_ENVIRONMENT_KEY`;
+- `BUNDJIL_PREVIEW_VERCEL_ENVIRONMENT_VALUE`.
+
 Never print, export, persist in a tracked file, or copy a value into a receipt.
 Stop on multiple candidate principals, teams, projects, buckets, credentials,
 Photon projects, manifests, or physical identities.
@@ -103,12 +112,48 @@ object writes do not authorize a Vercel or Photon mutation.
 
 ## Configuration and drift
 
-For a separately approved apply, record the immutable before identity and safe
-rollback value for every property. Read before writing, encode at the exact
-provider boundary, decode the complete response immediately, read after
-writing, and require a deterministic second no-op. A drift exercise must name
-the direct-provider mutation separately, detect the exact property with
-`sync --dry-run`, repair it once, and prove the accepted value again.
+For the approved Preview spike, first require exact readback of team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, project
+`prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, `enablePreviewFeedback: null`, and zero
+Preview matches for `BUNDJIL_ALCHEMY_PREVIEW_SPIKE`. The fixed authority must
+validate and the local provider matrix, Effect diagnostics, boundaries, and
+verification gates must pass before the first write.
+
+1. Run `bun run infrastructure:preview-plan`. Stop unless it reports exactly
+   one `PreviewFeedback` update and one `PreviewEnvironmentMetadata` create,
+   with no Production, deployment, promotion, replacement, or deletion.
+2. Run `bun run infrastructure:preview-apply`, then read back the same team and
+   project. Require `enablePreviewFeedback: true`,
+   `enableProductionFeedback: null`, plus exactly one plain, non-sensitive,
+   Preview-only key and retain its created stable ID without its value. The
+   write contract sends both feedback fields so Vercel cannot infer a
+   Production change from an omitted field.
+3. Run `bun run infrastructure:preview-plan` and
+   `bun run infrastructure:preview-sync`. Require all no-op/unchanged.
+4. Run `bun run infrastructure:preview-drift`. Its separately composed direct
+   provider service requires Preview `true` and Production `null`, sets only
+   Preview to `false` while explicitly preserving Production `null`, and reads
+   both back before returning. Then run
+   `bun run infrastructure:preview-sync`. Require only `PreviewFeedback`
+   `drifted`; the disposable environment resource must be unchanged.
+5. Run `bun run infrastructure:preview-repair`, read back `true`, then run two
+   consecutive `bun run infrastructure:preview-sync` commands and require
+   unchanged.
+6. Run `bun run infrastructure:preview-rollback-plan`. Stop unless it contains
+   one feedback update to the recorded prior value and deletion of only the
+   disposable environment resource. Run
+   `bun run infrastructure:preview-rollback`, read back
+   `enablePreviewFeedback: null` and zero key matches, then require a
+   deterministic rollback no-op.
+7. After the coherent implementation commit is pushed, observe only the
+   Vercel Git-created Preview deployment whose `githubCommitSha` equals that
+   immutable commit. Do not call a deployment-create or promotion operation.
+
+Every mutation is read-before/write/read-after. Encode at the exact provider
+boundary, decode the complete response immediately, and stop on a mismatched
+identity, ambiguous key, unexpected plan action, or uncertain outcome after
+bounded observation. Retain Schema-valid mode-`0600` authority and receipt
+artifacts under ignored `tmp/proof/**`.
 
 Do not let Alchemy create, deploy, or promote Vercel Git deployments. Do not
 create or mutate Photon projects, dedicated lines, billing, users, webhooks,

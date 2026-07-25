@@ -651,7 +651,23 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Preview Vercel spike section.",
-        "currentResult": "ready_not_run: remote-state-and-noop-adoption is accepted. The next slice must select one reversible non-secret Preview-only property, validate a fresh exact authority envelope, record before/rollback identity, and prove apply, drift detection/repair, Production non-change and Vercel Git deployment ownership."
+        "currentResult": "in_progress_deployment_observation: exact Preview authority validated; full repository verification passed before writes. Live plan/apply/no-op, direct drift, sync detection/repair, two unchanged syncs and rollback completed against bundjil-agent. The final safe resource ID was 8jrS3AIVoAvFh0Y3; rollback restored Preview and Production feedback to null and deleted the exact disposable key while bundjil-codex-proxy stayed unchanged. The first apply exposed Vercel coupling of an omitted Production field; rollback succeeded, the owner was reopened, the adapter now explicitly sends and verifies enableProductionFeedback:null, focused tests and full verification reran, and the corrected live lifecycle passed. Repository commit/push plus exact Vercel Git Preview deployment observation and bounded receipt remain before acceptance.",
+        "findings": [
+          {
+            "id": "PVC-001",
+            "owner": "preview-vercel-configuration-spike",
+            "finding": "The first live PATCH sent only enablePreviewFeedback; Vercel also changed enableProductionFeedback from null to true.",
+            "correction": "Rolled back both fields and the exact disposable environment ID, added productionGuard to the canonical props/attributes/set contract, encoded both fields at the outward PATCH, verified both in the response/readback, and added positive/negative assertions before rerunning full verification and the complete live lifecycle.",
+            "status": "corrected_and_reverified"
+          },
+          {
+            "id": "PVC-002",
+            "owner": "preview-vercel-configuration-spike",
+            "finding": "An explicit desired phase in .env.local overrode the inline rollback command and produced a false no-op.",
+            "correction": "Removed the stored phase so Config defaults ordinary commands to desired while the rollback process value is authoritative; the corrected rollback plan showed exactly one update and one exact-ID deletion and live readback restored the prior state.",
+            "status": "corrected_and_reverified"
+          }
+        ]
       },
       "implementationNotes": [
         "Select non-secret Preview-only configuration with a recorded before value and safe rollback. Do not begin with Production, domains, Marketplace, auth tokens, or provider secrets.",

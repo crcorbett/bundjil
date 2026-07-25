@@ -564,6 +564,60 @@ candidate passed the complete repository verification gate, including Effect
 language-service diagnostics, all policy/boundary checks, 90 tooling tests,
 Knip, nine package typechecks and fifteen Turbo build/test tasks.
 
+## Preview Vercel configuration spike
+
+The provider lifecycle and rollback are complete; immutable Git deployment
+observation remains. Authenticated readback selected only `bundjil-agent`
+(`prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`) under the accepted Bundjil team. The
+mode-`0600` authority passed the shared and task-specific fixed contracts before
+credentials resolved.
+
+The first live apply found `PVC-001`: Vercel coupled an omitted
+`enableProductionFeedback` field and changed it from `null` to `true`. The
+operator stopped before drift, restored both feedback fields to `null`, deleted
+only the created disposable variable, and proved both project controls clean.
+The owner was reopened. The corrected provider now carries
+`productionGuard: null` through branded props, attributes, service input,
+outward request, complete response decode, state and readback. Focused tests and
+the complete repository verification reran before the second apply.
+
+The corrected lifecycle set Preview feedback to `true` while Production stayed
+`null`, created one plain Preview-only variable with stable ID
+`8jrS3AIVoAvFh0Y3`, converged to plan/sync no-op, induced only Preview feedback
+`false`, detected one feedback update with environment no-op, repaired it, and
+converged through two unchanged syncs. Rollback then restored both feedback
+fields to `null` and deleted only that stable ID. `bundjil-codex-proxy` remained
+unchanged throughout. `PVC-002` corrected command precedence after the stored
+desired phase produced a false rollback no-op; the accepted command leaves
+ordinary desired as the Config default and supplies rollback only as the
+process-scoped phase.
+
+| Requirement                      | Direct observable and expected postcondition                                                                                               | Plausible false green rejected                                                                               | Focused command/readback                                    | Evidence owner and current result                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------ |
+| Exact target and before identity | Team/project readback resolves one `bundjil-agent`; both feedback fields are `null`; disposable key match count is zero on both projects   | Project link, name match, credential presence, or absence on only one project                                | Authenticated project GET and target-filtered env list      | Fixed authority plus before/rollback readbacks; passed |
+| Preview-only reversible scope    | Preview becomes `true` while Production stays `null`; one fixed non-secret Preview env key may change; proxy remains a control             | Trusting the property name, request body, or response without reading Production; `PVC-001` rejected exactly | Complete request/response decode and both-project readbacks | Corrected live adapter and provider contract; passed   |
+| Drift and rollback               | Desired becomes true, direct drift false, sync detects/repairs true, rollback restores null; disposable key is deleted by exact created ID | Successful PATCH, ordinary plan, a mock drift test, or key absence without stable-ID cleanup                 | Alchemy plan/deploy/sync plus provider before/after reads   | Native live lifecycle and rollback; passed             |
+| Vercel Git deployment ownership  | A pushed immutable task commit, not Alchemy, creates the observed Preview deployment; no promotion runs                                    | Existing deployment, manual API deploy, state entry, or READY status without Git SHA                         | Git push then deployment readback by exact commit SHA       | Deployment receipt; pending                            |
+
+### Preview configuration impact ledger
+
+| Surface                          | Status          | Decision and evidence                                                                                                                                                                       |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | Add the separately composed Preview-only configuration graph, keep the adoption graph read-only, and record the Production guard correction here and in the runbook.                        |
+| READMEs                          | Change required | Root and package READMEs route the new authority-gated commands and keep current provider evidence out of README scope.                                                                     |
+| Exports and generated references | Change required | Export named Preview Schemas, services, live/memory Layers and Resources through `@bundjil/infrastructure/vercel`; TypeScript build output remains generated and untracked.                 |
+| Runbooks and authority           | Change required | `apps/agent/runbooks/alchemy-infrastructure.md` owns plan/apply/drift/repair/rollback; the ignored fixed authority names every exact read, mutation, Git push, stop condition and rollback. |
+| Verification journeys and proof  | Change required | Add stable `BND-J13-preview-infrastructure-convergence`, command mapping, fixed authority policy, bounded ignored receipt owner and direct false-green oracles.                             |
+| Skills and AGENTS                | Preserve        | The repository-local implementer, docs, Effect client and package rules were applied; no repeated unowned failure changes the skills or `AGENTS.md`.                                        |
+| Lint, config, commands, and CI   | Change required | Add root/package Preview commands and extend the executable verification-policy inventory from twelve to thirteen journeys; no CI workflow or standing external authority changes.          |
+| Schemas, services, and Layers    | Change required | Add Preview-literal stage contracts, branded value/key/IDs, safe tagged errors, exact production guard, named operations and isolated live/mock provider graphs.                            |
+| Tests and fixtures               | Change required | Add complete-envelope HTTP tests plus native Alchemy no-op/update/drift/uncertain/eventual/retain/rollback tests with Production and secret-leak negatives.                                 |
+| SPEC, tasks, and plan            | Change required | Keep this task open through immutable Git deployment observation; record `PVC-001` and `PVC-002`, corrections and exact provider lifecycle evidence now.                                    |
+| Receipts and evidence            | Change required | Retain only Schema-valid mode-`0600` redacted authority/receipt artifacts; no credential or provider value is retained.                                                                     |
+| Rollout, rollback, and archive   | Change required | Live rollback restored the exact prior state; the plan remains active and the formal five-pass audit stays terminal-only after every SPEC task completes.                                   |
+
+The formal five-pass audit remains deferred until all SPEC tasks finish.
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on

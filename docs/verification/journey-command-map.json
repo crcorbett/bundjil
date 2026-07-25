@@ -99,6 +99,14 @@
       "claimScope": "approval_gated",
       "procedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
       "externalReadback": "required for Vercel and both providers; each handset observation remains separate"
+    },
+    {
+      "journeyId": "BND-J13-preview-infrastructure-convergence",
+      "environment": "approval-gated Vercel Preview target",
+      "command": "follow the Preview configuration, drift, rollback and Vercel Git observation procedure in apps/agent/runbooks/alchemy-infrastructure.md",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/alchemy-infrastructure.md",
+      "externalReadback": "required before and after every provider mutation, after rollback, and for the exact immutable Vercel Git deployment SHA"
     }
   ]
 }

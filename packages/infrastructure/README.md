@@ -12,14 +12,17 @@ receipts, and deterministic memory Layers.
   memory plus sanitized inventory contracts without a provider client or
   credential escape hatch.
 - `@bundjil/infrastructure/testing` exports decoded fixture Effects.
-- `@bundjil/infrastructure/vercel` exports only Vercel read/import Schemas,
-  named services, safe operation errors, lazy credential and live/memory
-  Layers, and retained custom Resources. The private HTTP adapter encodes
+- `@bundjil/infrastructure/vercel` exports Vercel read/import Schemas, named
+  services, safe operation errors, lazy credential and live/memory Layers,
+  retained custom Resources, and one separately composed Preview-only
+  configuration capability. The private HTTP adapter encodes
   scoped requests, decodes complete response envelopes, exhausts pagination,
   omits environment values, resolves Marketplace identity through Vercel's
-  customer storage catalog, projects its secret-bearing provider envelope
-  immediately into safe binding identities, and contains no Git deployment or
-  promotion operation.
+  customer storage catalog and projects its secret-bearing provider envelope
+  immediately into safe binding identities. The Preview capability can set
+  only `enablePreviewFeedback` and create/delete one plain Preview-only
+  environment metadata identity under a fixed authority contract. It contains
+  no Git deployment, promotion, Production, domain, or Marketplace mutation.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and
   stage-scoped state-safe props/attributes for Photon project, iMessage
   platform, shared user, webhook, dedicated-line, and billing observation. It
@@ -42,6 +45,14 @@ denial. The live adoption path permits R2 state writes but its Vercel and
 Photon adapters expose reads only. It does not create, update, delete, deploy,
 promote, send, or change billing at either provider.
 
+The separate `alchemy.preview.run.ts` entry point owns
+`BundjilPreviewConfigurationSpike`. It validates one mode-`0600` authority
+artifact against both fixed contracts before resolving credentials, composes
+the write-capable Layer only for that stack, opts the disposable variable into
+exact-ID rollback deletion, and retains the project setting for explicit
+prior-value reconciliation. The normal adoption stack cannot access these
+write services.
+
 The live inventory executable is the only place that composes both provider
 read Layers. It validates the fixed authority envelope and the narrower
 read-only Preview/Production policy before resolving credentials, decodes one
@@ -61,6 +72,13 @@ bun run --filter=@bundjil/infrastructure build
 bun run infrastructure:inventory
 bun run infrastructure:adoption-manifest
 bun run infrastructure:adoption-proof
+bun run infrastructure:preview-plan
+bun run infrastructure:preview-apply
+bun run infrastructure:preview-sync
+bun run infrastructure:preview-drift
+bun run infrastructure:preview-repair
+bun run infrastructure:preview-rollback-plan
+bun run infrastructure:preview-rollback
 bun alchemy deploy --stage preview --dry-run --adopt
 bun alchemy deploy --stage preview --adopt --yes
 bun alchemy plan --stage preview

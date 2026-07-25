@@ -9,7 +9,7 @@ review_trigger: app, auth, provider, deployment, messaging, approval, recovery, 
 
 # Bundjil verification
 
-This is the canonical route for the twelve consumer-visible critical journeys,
+This is the canonical route for the thirteen consumer-visible critical journeys,
 proof packet contract, bounded command receipts, retained evidence index, and
 recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
@@ -31,6 +31,11 @@ operation nor asserts present provider state.
   mode-`0600` `tmp/proof/**` while the active SPEC remains open. The task
   ledger and active plan retain the sanitized summary; state, provider,
   deployment, runtime, Channel, and handset claims remain separate.
+- Preview configuration journey `BND-J13-preview-infrastructure-convergence`
+  binds the fixed authority, native Alchemy plan/apply/sync/rollback sequence,
+  direct provider readbacks, immutable Git SHA and Vercel Git deployment
+  observation. Local provider matrices and remote state alone are false-green
+  rejections, not provider-bound proof.
 - [`evidence-index.json`](evidence-index.json) owns retention classes,
   provenance fields, lifecycle transitions, and the directory for packets.
 - [`harness-epochs.md`](harness-epochs.md) owns epoch identity,
