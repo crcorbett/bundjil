@@ -484,6 +484,26 @@ and complete source/Preview readback. If Photon would move or disrupt the source
 binding, the adaptation stops without mutation. No second retained user or
 Production topology change is accepted.
 
+The approved adaptation reached its genuine-origin gate without sending a
+message. Fresh Photon readback preserved the source and adopted Preview
+bindings, created exactly one rollout-owned temporary Preview user, and
+returned one assigned-route fingerprint. A second query-controlled Preview
+callback was registered, its four sensitive values were rebound, and exact Git
+source `9f40dc44ae96433828d6b37bec87cf853c8d3523` produced READY deployment
+`dpl_4BjAP2bNCAyoc44y4SRgNiJin8TP`; the branch alias accepted a protected,
+valid-signature unsupported event with an empty `204`. The fingerprint-matched
+Mac then resolved the exact assigned route, but Messages classified it only as
+SMS. Native AppleScript and JXA queries for the Messages services timed out
+without returning a service or buddy even though System Settings readback
+showed the actual `node` invoker's narrow Messages Automation permission
+already enabled. ChatGPT's separate Messages toggle remained off and was not
+changed because it did not own the bounded invocation. No SMS fallback,
+message, Photon event, Eve dispatch, outbound response or typing claim is
+accepted. Rollback first restored the stable callback values in Vercel; it must
+next prove a fresh stable deployment, wait through the provider retry horizon,
+delete only the proof callback and temporary user, and restore the original
+one-user/one-webhook topology before this attempt can close.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

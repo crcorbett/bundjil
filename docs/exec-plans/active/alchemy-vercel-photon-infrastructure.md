@@ -788,13 +788,29 @@ user. Final source and Preview inventories must restore the one-adopted-user
 topology. A moved source binding, duplicate/ambiguous user, or uncertain create
 or delete remains a stop.
 
-Do not synthesize an identity, guess a recipient, or use the shared source
-project to manufacture proof. Until the temporary-user journey and exact
-restoration pass, the later stable-binding/no-op/drift/rollback matrix remains
-dependency-blocked rather than falsely accepted.
-The selected user is adopted; no later slice may delete it, add a second user,
-or weaken source readback. The terminal five-pass audit remains deferred until
-all tasks reach their final disposition.
+That adaptation created one temporary Preview user only after fresh source and
+adopted-binding readback, then registered one query-controlled proof callback.
+Exact source `9f40dc44ae96433828d6b37bec87cf853c8d3523` produced READY deployment
+`dpl_4BjAP2bNCAyoc44y4SRgNiJin8TP`, and its branch alias accepted the
+valid-signature unsupported-event probe with an empty `204`. The full assigned
+route stayed in process custody and matched its approved fingerprint, but
+Messages advertised only SMS. The native `iMessage` service path was then
+queried through AppleScript and JXA with bounded timeouts; neither returned a
+service count or buddy. System Settings readback proved the actual `node`
+invoker already had only Messages Automation enabled. ChatGPT's separate
+Messages toggle was off, was not the bounded invoker, and was not changed. No
+message was sent and no Photon callback, Eve dispatch, response or typing
+oracle ran. Rollback has restored the stable four-value Vercel binding; the
+proof callback and temporary user remain intentionally retained until a fresh
+stable deployment succeeds and the retry horizon drains.
+
+Do not synthesize an identity, guess a recipient, use SMS, or use the shared
+source project to manufacture proof. Until exact restoration passes, the later
+stable-binding/no-op/drift/rollback matrix remains dependency-blocked rather
+than falsely accepted. The adopted user must not be deleted or changed; only
+the exact rollout-created temporary user may be removed after drain and
+readback. The terminal five-pass audit remains deferred until all tasks reach
+their final disposition.
 
 ## Repository-authorized five-pass audit
 

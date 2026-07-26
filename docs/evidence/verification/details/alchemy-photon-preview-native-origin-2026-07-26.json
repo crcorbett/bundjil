@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "taskId": "isolated-photon-preview-spike",
+  "observedAt": "2026-07-26T10:07:25.000Z",
+  "authority": {
+    "principal": "Cooper-approved Codex operator using authenticated Photon, Vercel, local Messages, and narrow macOS Automation readback",
+    "scope": "One genuine Preview-only iMessage journey from the exact controlled Messages identity; SMS and Production excluded",
+    "approvalReceipt": "source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1"
+  },
+  "providerMutation": {
+    "temporaryUserCreated": true,
+    "temporaryUserFingerprint": "ef705f6724a383f6575cdb7c55d79152c3036581ca50fe5e7ee9ecd7eedb3954",
+    "temporarySenderFingerprint": "82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5",
+    "assignedRouteFingerprint": "0809669fba7cf6164486add33143457d5a1c3120ef91b937a4c98e69663200c3",
+    "postCreateInventoryDigest": "2ad51bba278457ddd9885fa7babdf1dd50bc3a462a147941511f87b31cba60e5",
+    "proofWebhookCreated": true,
+    "proofBindingArtifactMode": "0600",
+    "stableWebhookPreserved": true,
+    "sourceBindingUnchanged": true,
+    "adoptedPreviewBindingUnchanged": true
+  },
+  "deploymentReadback": {
+    "repositoryCommit": "9f40dc44ae96433828d6b37bec87cf853c8d3523",
+    "deploymentId": "dpl_4BjAP2bNCAyoc44y4SRgNiJin8TP",
+    "ready": true,
+    "aliasError": false,
+    "protectedSignedUnsupportedEventStatus": 204,
+    "protectedSignedUnsupportedEventBodyBytes": 0
+  },
+  "messagesReadback": {
+    "startIdentityFingerprint": "82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5",
+    "assignedRouteFingerprint": "0809669fba7cf6164486add33143457d5a1c3120ef91b937a4c98e69663200c3",
+    "exactRecipientResolved": true,
+    "uiService": "SMS",
+    "messageSent": false,
+    "messagesAccountSettingsChanged": false
+  },
+  "nativeServiceReadback": {
+    "appleScriptServiceCountReturned": false,
+    "jxaServiceCountReturned": false,
+    "boundedAttemptsTimedOut": true,
+    "nodeMessagesAutomationPermission": "on",
+    "chatGptMessagesAutomationPermission": "off-preserved",
+    "permissionChanged": false,
+    "buddyResolvedUnderIMessageService": false
+  },
+  "rollback": {
+    "stableVercelBindingRestored": true,
+    "freshStableDeploymentPending": true,
+    "retryDrainPending": true,
+    "proofWebhookDeletionPending": true,
+    "temporaryUserDeletionPending": true,
+    "targetFinalInventoryDigest": "9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f"
+  },
+  "result": {
+    "status": "inconclusive",
+    "reason": "The exact assigned route did not resolve as native iMessage and the bounded native Messages service query returned no service or buddy.",
+    "productionChanged": false
+  },
+  "nonClaims": [
+    "An SMS-capable recipient chip is not an iMessage delivery proof.",
+    "A valid signed unsupported-event probe is not a real Channel journey.",
+    "No Photon event, same-event retry, Eve completion, outbound response, typing transition, or handset delivery occurred."
+  ]
+}
