@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "production",
+  "status": "inconclusive",
+  "outcome": "inconclusive",
+  "lifecycle": {
+    "state": "inconclusive"
+  },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "staged Production deployment dpl_Fuj45YfLqeDML777jenp231EMYea at exact source a3f89877503acb137c0b76b1c09356e4789efe07"
+  },
+  "candidate": {
+    "repositoryCommit": "a3f89877503acb137c0b76b1c09356e4789efe07",
+    "sourceDigest": "4082e63289156bf074852effceccc85d7bde6816948a3c4b7ee45a9287bbf22f",
+    "artifactDigest": "9a8f15ab7299890f1063edc28b6007d2ca54111c971a6960601645a01dfb32c7"
+  },
+  "authority": {
+    "principal": "Cooper-authorized Bundjil Vercel and Channel operator",
+    "identitySource": "delegated source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 plus authenticated Vercel, Sendblue, Photon and handset sessions",
+    "externalAccess": "mutation",
+    "approvalReceipt": "One-run authority for staged Production deploy, bounded active-provider journeys, provider and Workflow readback, monitoring and restoration.",
+    "rollbackOwner": "Bundjil Vercel and Channel operator"
+  },
+  "environment": {
+    "tier": "production",
+    "target": "staged Bundjil Production candidate at dpl_Fuj45YfLqeDML777jenp231EMYea; stable Production pointer retained dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "inconclusive",
+      "oracle": "Sendblue passed direct and exact-duplicate oracles; Photon passed direct ingress, Eve, SDK, typing, release and handset boundaries, but its exact candidate-specific duplicate oracle was unavailable."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "stage clean exact-source Production deployment, run isolated Sendblue and Photon journeys with immutable function and Workflow readback, monitor, then restore aliases and provider topology",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Every active provider requires a candidate-specific direct journey and exact duplicate oracle before combined Production acceptance.",
+    "target": "Bundjil staged Production candidate dpl_Fuj45YfLqeDML777jenp231EMYea",
+    "recoveryHint": "Repeat only the Photon exact-real-event replay when Photon exposes a safe delivered-body or replay readback; do not synthesize an identity or weaken the oracle.",
+    "detailPath": "docs/evidence/verification/details/HEQ-hosted-qualification-2026-07-25.json",
+    "detailSha256": "afe89aedbf41e199a6e4090a7b510446e36388940eb3bbb730109349007df282",
+    "postcondition": "Both direct provider journeys passed and all mutations were restored, but combined Production qualification remains inconclusive on Photon duplicate suppression."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Vercel functions, Workflow CLI, Sendblue API, Photon API/dashboard, candidate logs, handset result and final alias/provider topology were read back."
+  },
+  "postconditions": [
+    "Clean candidate dpl_Fuj45YfLqeDML777jenp231EMYea matches exact source and exposes 300-second __server and Workflow functions.",
+    "Sendblue returned 202 after acceptance, completed one Workflow turn and outbound result, and suppressed two exact signed redeliveries.",
+    "Photon returned 202 after acceptance, completed one Workflow turn, one SDK send, typing start/stop and resource release, with one delivered handset result.",
+    "Candidate error and fatal log queries were empty for the bounded windows.",
+    "Sendblue and Photon topology match captured before-state; Production and Preview aliases resolve to their rollback identities."
+  ],
+  "limitations": [
+    "Photon exposes no documented replay endpoint; its authenticated dashboard exposes topology but not the exact delivered body or replay control.",
+    "No synthetic Photon event or new identifier was accepted as duplicate proof.",
+    "The official stable Production pointer was never promoted and remained dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY."
+  ],
+  "nonClaims": [
+    "The direct Photon journey does not upgrade the missing exact duplicate oracle.",
+    "Historical Production replay proof is not reused as candidate-specific actuality.",
+    "This packet grants no standing deployment, provider, credential, message, promotion or rollback authority."
+  ],
+  "rollback": {
+    "identity": "Production dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY; Preview dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr; captured Sendblue and hashed Photon topology",
+    "outcome": "performed",
+    "owner": "Bundjil Vercel and Channel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-hosted-qualification-2026-07-25.json",
+      "sha256": "afe89aedbf41e199a6e4090a7b510446e36388940eb3bbb730109349007df282",
+      "provenance": "authenticated staged Vercel, Workflow CLI, provider API/dashboard, bounded logs, handset and restoration readback"
+    }
+  ],
+  "observedAt": "2026-07-25T23:22:17Z"
+}

@@ -1,4 +1,5 @@
-import { Effect, Fiber, Schema } from "effect";
+import { EveSessionId } from "@bundjil/eve";
+import { Effect, Exit, Match, Schema } from "effect";
 import type { ManagedRuntime } from "effect";
 import { defineChannel, POST } from "eve/channels";
 import type { ChannelEvents } from "eve/channels";
@@ -8,6 +9,7 @@ import {
   EveChannelDispatch,
   layerEve as EveChannelDispatchEve,
 } from "./dispatch.js";
+import { ChannelHandoff } from "./handoff.js";
 import {
   ChannelAdapterState,
   ChannelEvent,
@@ -20,11 +22,12 @@ import type {
 } from "./schemas.js";
 
 interface ChannelEveContext {
+  readonly sessionId: string;
   readonly state: ChannelMutableAdapterStateEncoded;
 }
 
 export const makeChannelEveEvents = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>
 ): ChannelEvents<ChannelEveContext> => {
   const presence = (
     state: ChannelMutableAdapterStateEncoded,
@@ -45,6 +48,35 @@ export const makeChannelEveEvents = <E>(
           snapshot: result.state,
         });
         state.snapshot = encoded.snapshot;
+      })
+    );
+
+  const settleSession = (
+    state: ChannelMutableAdapterStateEncoded,
+    sessionId: string,
+    outcome: "completed" | "failed"
+  ) =>
+    channelRuntime.runPromise(
+      Effect.gen(function* settleChannelSession() {
+        const channel = yield* Channel;
+        const handoff = yield* ChannelHandoff;
+        const decodedState =
+          yield* Schema.decodeEffect(ChannelAdapterState)(state);
+        const decodedSessionId =
+          yield* Schema.decodeUnknownEffect(EveSessionId)(sessionId);
+        const sessionFingerprint =
+          yield* handoff.fingerprintSession(decodedSessionId);
+        yield* channel.handleEvent({
+          _tag: "PresenceRequested",
+          action: "stop",
+          conversation: decodedState.snapshot.conversation,
+        });
+        const settlement = yield* channel.settleSession(
+          decodedState.snapshot.conversation,
+          sessionFingerprint,
+          outcome
+        );
+        yield* handoff.sessionTerminal(sessionFingerprint, outcome, settlement);
       })
     );
 
@@ -93,10 +125,10 @@ export const makeChannelEveEvents = <E>(
       );
     },
     "session.completed"(_event, channel) {
-      return presence(channel.state, "stop");
+      return settleSession(channel.state, channel.sessionId, "completed");
     },
     "session.failed"(_event, channel) {
-      return presence(channel.state, "stop");
+      return settleSession(channel.state, channel.sessionId, "failed");
     },
     "session.waiting"(_event, channel) {
       return presence(channel.state, "stop");
@@ -114,17 +146,17 @@ export const makeChannelEveEvents = <E>(
 };
 
 export const makeChannelEveChannel = <E>(
-  channelRuntime: ManagedRuntime.ManagedRuntime<Channel, E>,
+  channelRuntime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>,
   webhookPath: ChannelWebhookPath,
   proofPolicy: ChannelWebhookProofPolicy
 ) =>
   defineChannel<ChannelMutableAdapterStateEncoded, ChannelEveContext>({
-    context(state) {
-      return { state };
+    context(state, session) {
+      return { sessionId: session.id, state };
     },
     events: makeChannelEveEvents(channelRuntime),
     routes: [
-      POST(webhookPath, async (request, { send, waitUntil }) => {
+      POST(webhookPath, async (request, { send }) => {
         const result = await channelRuntime.runPromise(
           Effect.gen(function* handleChannelWebhook() {
             const query = yield* Schema.decodeUnknownEffect(
@@ -139,29 +171,109 @@ export const makeChannelEveChannel = <E>(
             if (prepared._tag === "Duplicate") {
               return { response: new Response(null, { status: 204 }) };
             }
-            const background = Effect.gen(function* dispatchChannelInbound() {
-              const dispatch = yield* EveChannelDispatch;
-              yield* dispatch.dispatch(prepared.prepared);
-              yield* channel.completeInbound(prepared.prepared.claim);
-            }).pipe(
-              Effect.tapError((error) =>
-                Effect.logError(`Channel inbound failed: ${error._tag}`)
+            const handoff = yield* ChannelHandoff;
+            const attempt = yield* handoff
+              .prepared(prepared.prepared.claim)
+              .pipe(
+                Effect.catchTag("ChannelHandoffObservationError", (error) =>
+                  channel
+                    .retryInbound(prepared.prepared.claim)
+                    .pipe(Effect.andThen(Effect.fail(error)))
+                )
+              );
+            const convergence = yield* Effect.gen(
+              function* dispatchChannelInbound() {
+                const dispatch = yield* EveChannelDispatch;
+                const acceptance = yield* dispatch.dispatch(
+                  prepared.prepared,
+                  attempt
+                );
+                const accepted = yield* channel.acceptInbound(
+                  prepared.prepared.claim,
+                  prepared.prepared.continuationToken,
+                  acceptance
+                );
+                yield* handoff.converged(attempt, accepted);
+                return accepted;
+              }
+            ).pipe(
+              Effect.onExit((exit) => {
+                const settlement = handoff.settled(
+                  attempt,
+                  (() => {
+                    if (Exit.isSuccess(exit)) {
+                      return "succeeded";
+                    }
+                    if (Exit.hasInterrupts(exit)) {
+                      return "interrupted";
+                    }
+                    if (Exit.hasDies(exit)) {
+                      return "defect";
+                    }
+                    return "failed";
+                  })()
+                );
+                if (!(Exit.hasInterrupts(exit) || Exit.hasDies(exit))) {
+                  return settlement;
+                }
+                return channel.uncertainInbound(prepared.prepared.claim).pipe(
+                  Effect.catchTag("ChannelReplayError", () =>
+                    Effect.logError("ChannelInboundUncertainRetentionFailed")
+                  ),
+                  Effect.andThen(settlement)
+                );
+              }),
+              Effect.provide(EveChannelDispatchEve(send)),
+              Effect.catchTag("EveChannelDispatchError", (error) =>
+                Match.value(error.reason).pipe(
+                  Match.when("rejected", () =>
+                    channel.retryInbound(prepared.prepared.claim)
+                  ),
+                  Match.when("acceptance-uncertain", () =>
+                    channel.uncertainInbound(prepared.prepared.claim)
+                  ),
+                  Match.when("acceptance-timeout", () =>
+                    channel.uncertainInbound(prepared.prepared.claim)
+                  ),
+                  Match.exhaustive,
+                  Effect.andThen(Effect.void)
+                )
               ),
-              Effect.provide(EveChannelDispatchEve(send))
+              Effect.catchTag("ChannelReplayError", () =>
+                channel.uncertainInbound(prepared.prepared.claim).pipe(
+                  Effect.catchTag("ChannelReplayError", () => Effect.void),
+                  Effect.andThen(Effect.void)
+                )
+              ),
+              Effect.catchTag("ChannelHandoffObservationError", () =>
+                channel.uncertainInbound(prepared.prepared.claim).pipe(
+                  Effect.catchTag("ChannelReplayError", () => Effect.void),
+                  Effect.andThen(Effect.void)
+                )
+              )
             );
+            if (
+              convergence === undefined ||
+              convergence._tag === "ContinuityUncertain"
+            ) {
+              yield* handoff.response(attempt, 503);
+              return { response: new Response(null, { status: 503 }) };
+            }
             if (
               proofPolicy === "provider-retry" &&
               query["bundjil-proof"] === "retry-once"
             ) {
-              yield* background;
+              yield* handoff.response(attempt, 503);
               return { response: new Response(null, { status: 503 }) };
             }
-            return {
-              background,
-              response: new Response(null, { status: 202 }),
-            };
+            yield* handoff.response(attempt, 202);
+            return { response: new Response(null, { status: 202 }) };
           }).pipe(
             Effect.catchTags({
+              ChannelHandoffObservationError: () =>
+                Effect.succeed({
+                  response: new Response(null, { status: 503 }),
+                }),
               ChannelIdentityError: () =>
                 Effect.succeed({
                   response: new Response(null, { status: 204 }),
@@ -185,10 +297,6 @@ export const makeChannelEveChannel = <E>(
             })
           )
         );
-        if ("background" in result) {
-          const fiber = channelRuntime.runFork(result.background);
-          waitUntil(Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid)));
-        }
         return result.response;
       }),
     ],

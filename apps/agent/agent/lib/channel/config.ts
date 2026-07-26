@@ -3,19 +3,23 @@ import { SendblueConfig } from "@bundjil/sendblue";
 import { UpstashPersistenceOptions } from "@bundjil/store/upstash";
 import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
 
+import { channelHandoffTimeoutDefault } from "./constants.js";
 import { ChannelConfigError } from "./errors.js";
 import {
+  ChannelHandoffTimeout,
   ChannelIdentityRecords,
   ChannelReplayOptions,
   ChannelRoutingSecret,
 } from "./schemas.js";
 import type {
+  ChannelHandoffTimeout as ChannelHandoffTimeoutType,
   ChannelIdentityRecords as ChannelIdentityRecordsType,
   ChannelReplayOptions as ChannelReplayOptionsType,
   ChannelRoutingSecret as ChannelRoutingSecretType,
 } from "./schemas.js";
 
 export interface ChannelConfigShape {
+  readonly handoffTimeout: ChannelHandoffTimeoutType;
   readonly identities: ChannelIdentityRecordsType;
   readonly replay: ChannelReplayOptionsType;
   readonly routingSecret: ChannelRoutingSecretType;
@@ -34,6 +38,10 @@ const identitiesConfig = Config.schema(
 
 export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
   const values = yield* Effect.all({
+    handoffTimeout: Config.schema(
+      ChannelHandoffTimeout,
+      "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"
+    ).pipe(Config.withDefault(channelHandoffTimeoutDefault)),
     identities: identitiesConfig,
     replayLeaseMilliseconds: Config.schema(
       ChannelReplayOptions.fields.leaseMilliseconds,
@@ -66,6 +74,7 @@ export const loadChannelConfig = Effect.gen(function* loadChannelConfig() {
   });
 
   return ChannelConfig.of({
+    handoffTimeout: values.handoffTimeout,
     identities: Redacted.value(values.identities),
     replay: {
       leaseMilliseconds: values.replayLeaseMilliseconds,

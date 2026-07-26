@@ -3,8 +3,8 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-07-24
-review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, deployment boundary, or external readback change
+last_reviewed: 2026-07-25
+review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, Eve Workflow lifecycle, generated Build Output, deployment boundary, or external readback change
 ---
 
 # Eve agent architecture
@@ -63,12 +63,13 @@ environment currently configures or serves.
   composition root in that JavaScript module instance, an absolute route
   identity, and one provider Layer selection. They do not share a Context,
   Scope, build fiber, or `Layer.MemoMap`.
-- `agent/lib/channel/**` owns the shared Eve adapter, status mapping,
-  supervised accepted Fiber, `waitUntil` completion, identity, HMAC routing,
-  atomic replay, immutable `ChannelStateV1`, outbound/presence policy, and
-  exact encoded snapshot assignment. The adapter receives the concrete
-  provider runtime and performs the minimum Effect interpretation at Eve's
-  JavaScript boundary; no domain service receives a runtime.
+- `agent/lib/channel/**` owns the shared Eve adapter, status mapping, bounded
+  acceptance wait, safe handoff/session observations, identity, HMAC routing,
+  atomic replay and continuity fencing, immutable `ChannelStateV1`,
+  outbound/presence policy, and exact encoded snapshot assignment. The adapter
+  receives the concrete provider runtime and performs the minimum Effect
+  interpretation at Eve's JavaScript boundary; no domain service receives a
+  runtime.
 - Provider input is authenticated and decoded once in its owning package.
   Only decoded `@bundjil/channel` values cross into app policy; provider DTOs,
   raw SDK values, callbacks, Promises, and secrets remain private.
@@ -103,37 +104,134 @@ POST /eve/v1/sendblue/webhook              POST /eve/v1/photon/webhook
                    -> ChannelRouter.route
                    -> ChannelReplay.claimInbound
                    -> AtomicKeyValueStore.transact
-                   -> accepted background Effect
-                   -> provider ManagedRuntime.runFork
+                   -> ChannelHandoff.prepared (safe work fingerprint)
                    -> EveChannelDispatchEve.dispatch
-                   -> Channel.completeInbound
-                   -> Fiber.await completion under Eve waitUntil
+                   -> ChannelHandoff.sendStarted
+                   -> await Eve send() within the handoff deadline
+                   -> ChannelHandoff.sendAccepted/sendRejected
+                   -> ChannelReplay.acceptInbound atomic continuity fence
+                   -> new/resumed convergence or uncertain quarantine
+                   -> ChannelHandoff.settled from native Effect Exit
+                   -> ChannelHandoff.response
+                   -> 202 only for converged acceptance
 ```
 
 The provider Layer authenticates exact ingress before one complete payload
-decode. Accepted ingress returns `202`; ignored or duplicate ingress returns
-`204`; authentication, authenticated-payload, and replay/routing failures map
-to `401`, `400`, and `503`. Deployment Protection is a separate boundary and
-never substitutes for provider authentication.
+decode. Converged Eve acceptance returns `202`; ignored, exact duplicate, and
+retained uncertain ingress returns `204`; authentication,
+authenticated-payload, and replay/routing/acceptance failures map to `401`,
+`400`, and `503`. Deployment Protection is a separate boundary and never
+substitutes for provider authentication.
 
-Request preparation runs with the concrete provider runtime's `runPromise`.
-Accepted work starts before the handler resolves with that runtime's
-`runFork`, so the runtime Scope owns the root Fiber. Eve receives exactly one
-`Effect.runPromise(Fiber.await(fiber).pipe(Effect.asVoid))` completion Promise.
-`Fiber.await` observes success, typed failure, defect, or interruption without
-turning an already returned `202` into another response failure. Client abort
-does not cancel accepted work; runtime disposal interrupts it and runs
-cooperative finalizers. The adapter constructs or disposes no runtime per
-request and adds no Channel-wide timeout or retry.
+Request preparation and the exact Eve `send()` operation run with the concrete
+provider runtime's `runPromise`. The route does not acknowledge in a
+background Fiber and registers no critical `waitUntil` work. Its native Effect
+`Exit` is classified as succeeded, typed failure, defect, or interruption
+without retaining the error, Cause, or stack. Client abort does not cancel the
+already-started acceptance operation; runtime disposal interrupts it and runs
+cooperative finalizers without producing `202`. The adapter constructs or
+disposes no runtime per request and adds no Channel-wide retry.
+
+`ChannelHandoff` imports the redacted Channel routing secret once per concrete
+runtime and uses domain-separated HMAC inputs to derive distinct branded work
+and Eve-session fingerprints. Its Schema-owned prepared, send-started,
+send-accepted/rejected, response, and Exit observations contain only those
+fingerprints, bounded epoch/latency numbers, phases, outcomes, and response
+status. Raw replay/session/run IDs, provider identity, content, continuation or
+hook tokens, inputs/outputs, URLs, secrets, errors, Causes, and stacks do not
+enter the observation contract. The memory Layer supplies deterministic phase
+and leak fixtures without exposing a logger or Eve runtime client.
+
+The handoff deadline is an app-owned product acknowledgement target, decoded
+as a positive Effect `Duration` from
+`BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS`. Its documented local default
+is 15 seconds: below Sendblue's last documented 45-second response deadline,
+while leaving the provider retry path available. This is not a provider
+requirement, hosted latency measurement, Vercel function-duration readback,
+Workflow step duration, Sandbox idle timeout, or session lifetime. A timeout
+interrupts only the local wait, records a safe timeout phase, retains the
+inbound claim as outcome-uncertain, returns `503`, and never blind-retries the
+possibly accepted Eve write.
+
+The four clocks are intentionally separate:
+
+| Clock                               | Owner                                                                         | Current repository value                                                     | Hosted/provider bound                                                                                       | Required readback                                                  |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Webhook-to-Eve acceptance           | Bundjil Channel config and `ChannelHandoff`                                   | Positive `Effect.Duration`; 15-second product default                        | Sendblue currently documents a 45-second response window; no numeric Photon requirement is established      | Cold/warm new and resume distributions for the immutable candidate |
+| Eve Workflow/turn invocation        | Eve Workflow-generated function and the operation-specific model/tool adapter | Eve flow remains `maxDuration: "max"`; no app model/tool ceiling is accepted | Effective plan maximum and measured model/tool/provider distributions are unknown                           | Workflow run/function detail for the exact candidate               |
+| Vercel ordinary `__server` function | Eve-created Nitro Build Output, then Vercel project/deployment precedence     | Local generated `.vc-config.json` omits `maxDuration`                        | Project default, Fluid setting, plan, and effective deployment value are unavailable from repository source | Exact immutable deployment resource/function readback              |
+| Vercel Sandbox lifecycle            | Eve Sandbox invocation                                                        | Eve upstream default is 30 minutes of inactivity                             | Plan/runtime limits can change independently                                                                | Read only when a Sandbox-backed journey requires it                |
+
+Session retention and closure form a fifth product lifecycle policy, not a
+function timeout. No clock borrows the value of another. The 15-second handoff
+default is passed through Turbo's agent build environment allowlist, but it is
+not accepted as a hosted latency or function-duration value until the named
+readbacks exist.
+
+The atomic continuity record owns the last accepted session fingerprint per
+continuation token. No prior owner is a deliberate new start. A matching
+accepted fingerprint is a resume. A different fingerprint while an owner is
+active is a continuity fork: the inbound claim is quarantined and the route
+returns `503`, even though Eve `send()` resolved. A terminal session event
+retires only its matching owner; a stale terminal event cannot clear a newer
+owner. Failed terminal settlement additionally retains a safe failure marker
+for the configured replay lifetime. The next authenticated event can create a
+new owner after that matching failed session is retired.
 
 Installed Eve exposes no authored Channel-module teardown hook during local
 cache replacement or development-server close, and Vercel exposes no
-repository-observable per-instance shutdown callback. A replaced local module
-or terminated hosted instance may therefore be abandoned without app-owned
-runtime disposal. `waitUntil` extends work only within the host lifetime and
-is not durable execution. Current local build proof loads both provider roots;
-future bundle splitting, warm-instance reuse, scale-out, freeze, and shutdown
-remain deployment readback questions.
+repository-observable per-instance shutdown callback. `waitUntil` remains only
+an ordinary-function lifetime extension and is not used for critical
+acceptance or durable execution. Current local build proof loads both provider
+roots; future bundle splitting, warm-instance reuse, scale-out, freeze, and
+shutdown remain deployment readback questions.
+
+Pinned and lock-resolved Eve `0.20.0` already owns the durable boundary behind
+the route-owned `send()` operation. `send()` first awaits
+`runtime.deliver()`, whose Workflow runtime awaits `resumeHook` and returns the
+owning run identity. On any delivery rejection, including but not limited to
+Eve's no-active-session error, `send()` can fall through to `runtime.run()`;
+that operation awaits `startWorkflowPreferLatest` for Eve's session
+`workflowEntry`. The session driver dispatches each logical turn through
+`startWorkflowPreferLatest(turnWorkflowReference)`.
+
+```text
+Channel webhook
+  -> EveChannelDispatch
+  -> Eve send()
+     -> deliver() -> resumeHook -> existing owner run
+     |  any delivery rejection -> run() -> startWorkflowPreferLatest
+        -> workflowEntry session driver
+        -> dispatchAndAwaitTurn
+        -> startWorkflowPreferLatest(turnWorkflowReference)
+```
+
+Bundjil must not add an app-owned Workflow, raw Workflow client, queue
+fallback, or mirrored runtime service around this call graph. Resolution of
+`send()` is the earliest source-level Workflow acceptance boundary, but an
+established continuation still requires intended/accepted run convergence:
+Eve's all-error fallback can otherwise resolve through a different new run.
+Source inspection alone does not prove that hosted convergence.
+
+When `VERCEL=1`, Eve directly creates Nitro with the Vercel preset. Eve
+`0.20.0` supplies Build Output framework metadata but exposes no
+Bundjil-facing `vercel.functions` option for the ordinary generated
+`__server`. Eve separately patches the generated Workflow `flow` function to
+Node 24, its namespaced queue trigger, and `maxDuration: "max"`. Bundjil
+preserves those owners and does not guess a `vercel.json` source glob or patch
+generated output. The agent test command creates both ordinary local output
+and Vercel Build Output, then Schema-decodes the generated route/function
+contracts. These are local artifact assertions only; an immutable hosted
+deployment must read back its own mapping and effective durations.
+
+Vercel's supported Nitro configuration owner is
+`defineNitroConfig({ vercel: { functions: { maxDuration }}})`. Because Eve
+creates Nitro internally and exposes no application input for that object in
+`0.20.0`, Bundjil cannot use the supported seam without an upstream Eve
+change. A source `vercel.json` glob must name a real source entrypoint and
+therefore cannot safely target the generated `__server`. Until measurements
+show a need and a supported Eve seam exists, retain the effective project
+default as an explicit hosted blocker rather than patching Build Output.
 
 Eve events use the same Channel service:
 
@@ -154,10 +252,12 @@ message.completed
 ```
 
 Presence stops on authorization-required, input-requested, waiting, terminal
-turn, and terminal session events. Persisted state remains only the immutable
-conversation snapshot; provider typing state is not persisted or repaired by
-an app state machine. Outbound provider success means `accepted`, never
-handset-delivered.
+turn, and terminal session events. Terminal session events also fingerprint
+the Eve session identity and owner-fence continuity retirement. Persisted Eve
+state remains only the immutable conversation snapshot; replay storage owns
+the separate continuity/failure records. Provider typing state is not
+persisted or repaired by an app state machine. Outbound provider success means
+`accepted`, never handset-delivered.
 
 ## Test call graphs
 
@@ -175,9 +275,15 @@ handset-delivered.
   -> identity, routing, concurrent atomic replay, immutable state
   -> provider substitution through live/memory composition roots
   -> independent runtime build caching, concurrency, failure, and recovery
-  -> waitUntil ordering plus success/failure/defect/interruption completion
+  -> deterministic HMAC separation and Schema/forbidden-marker fixtures
+  -> delayed send withholding 202 plus concurrent exact-duplicate suppression
+  -> new/resumed convergence and fallback continuity-fork quarantine
+  -> send rejection/timeout plus Exit failure/defect/interruption observations
+  -> terminal failure retention, matching repair, and stale-settlement fencing
   -> runtime-disposal interruption/finalizers and client-abort independence
-  -> both absolute routes in the Nitro build
+  -> both absolute routes in the ordinary Nitro build
+  -> installed Eve send/session/turn Workflow ownership
+  -> Schema-decoded Vercel flow/__server route and duration output
 ```
 
 Automated tests establish source behavior without provider credentials. They

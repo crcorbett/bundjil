@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "inconclusive",
+  "outcome": "not_attempted",
+  "lifecycle": {
+    "state": "superseded",
+    "successor": "docs/evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json",
+    "reason": "Later exact-candidate hosted function, plan, latency, Workflow, provider and restoration readback replaced the earlier unavailable state."
+  },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "isolated Preview candidate for eb9fd67d7282e1d7675232ee4f440e8ddf76a696"
+  },
+  "candidate": {
+    "repositoryCommit": "eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+    "sourceDigest": "384dcf6ae67c901803725b7b4e388deb48aa6c6c912893c28e0c667e2c91a442",
+    "artifactDigest": "144d4b0ba708cc8da7bf2fff3731de34a50cdcda2afdff86be8c0d6d2b83df66"
+  },
+  "authority": {
+    "principal": "local repository maintainer with authenticated Vercel read-only connector",
+    "identitySource": "local Git plus connector-resolved personal Vercel team",
+    "externalAccess": "read_only",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil agent operator under a future target-owned receipt"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "absent immutable Preview deployment for eb9fd67d7282e1d7675232ee4f440e8ddf76a696"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J13-hosted-eve-durability",
+      "status": "inconclusive",
+      "oracle": "Local output and older deployment inventory cannot prove exact-candidate acceptance, interruption, duplicate or timeout behavior."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "build and inspect local Eve output, then read current Vercel project and deployment metadata",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Only a pushed immutable candidate with exact function and Workflow readback may establish hosted timeout ownership.",
+    "target": "Bundjil agent candidate eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+    "recoveryHint": "Attach one-run Preview, provider, Workflow-read, interruption and rollback authority, then deploy and read the exact candidate.",
+    "detailPath": "docs/evidence/verification/details/HEQ-timeout-readback-2026-07-25.json",
+    "detailSha256": "262db878feac3b5cc524bb85bf925c4e3ab8995df4b15ea211573038f6a448ff",
+    "postcondition": "Supported local owners are proved; hosted duration, latency, Workflow and provider results remain unavailable."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "unavailable",
+    "receipt": "The returned deployment inventory contains no deployment for eb9fd67d7282e1d7675232ee4f440e8ddf76a696."
+  },
+  "postconditions": [
+    "Eve remains the sole Workflow owner and generated flow maximum duration plus queue trigger remain unchanged.",
+    "No guessed __server override or generated-output patch was added.",
+    "The exact authority and evidence gate for Preview qualification is retained."
+  ],
+  "limitations": [
+    "The latest observed Vercel deployment is older Production source 2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b.",
+    "Effective function duration, plan and Fluid setting were absent from available readback.",
+    "Cold and warm acceptance, model, tool, provider, interruption, Workflow run, alert and rollback observations are unavailable."
+  ],
+  "nonClaims": [
+    "Local Build Output and an older READY deployment do not prove Preview or Production.",
+    "This packet does not authorize deployment, messaging, provider mutation, interruption, promotion or rollback.",
+    "No push, deployment, provider call, message, Workflow run, interruption, promotion, rollback or merge occurred."
+  ],
+  "rollback": {
+    "identity": "revert eb9fd67d7282e1d7675232ee4f440e8ddf76a696 after the earlier coherent handoff commits",
+    "outcome": "unavailable",
+    "owner": "Bundjil repository maintainer; hosted rollback requires the target owner"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-timeout-readback-2026-07-25.json",
+      "sha256": "262db878feac3b5cc524bb85bf925c4e3ab8995df4b15ea211573038f6a448ff",
+      "provenance": "local generated output, repository verification, and authenticated Vercel read-only metadata"
+    }
+  ],
+  "observedAt": "2026-07-25T17:24:18Z"
+}

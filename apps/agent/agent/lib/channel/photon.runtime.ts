@@ -7,16 +7,20 @@ import {
   layerLive as ChannelConfigLive,
   loadPhotonConfig,
 } from "./config.js";
+import { layerLive as ChannelHandoffLive } from "./handoff.js";
 import { channelServices } from "./runtime.js";
 
 export const PhotonChannelRuntimeLive = Layer.unwrap(
   Effect.gen(function* makePhotonChannelRuntime() {
     const config = yield* ChannelConfig;
     const photon = yield* loadPhotonConfig;
-    return ChannelLive.pipe(
-      Layer.provide(
-        Layer.merge(PhotonTransportLive(photon), channelServices(config))
-      )
+    return Layer.merge(
+      ChannelLive.pipe(
+        Layer.provide(
+          Layer.merge(PhotonTransportLive(photon), channelServices(config))
+        )
+      ),
+      ChannelHandoffLive(config.routingSecret, config.handoffTimeout)
     );
   })
 ).pipe(Layer.provide(ChannelConfigLive));

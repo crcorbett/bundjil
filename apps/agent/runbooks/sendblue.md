@@ -3,8 +3,8 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-21
-review_trigger: Sendblue account, line, webhook, signature, sender identity, routing, replay store, delivery, or typing behavior change
+last_reviewed: 2026-07-25
+review_trigger: Sendblue account, line, webhook, response deadline, signature, sender identity, deployment, Workflow, routing, replay store, delivery, or typing behavior change
 ---
 
 # Operate Sendblue ingress and delivery
@@ -15,6 +15,11 @@ Use this runbook for Sendblue account/webhook metadata, the agent webhook at
 `POST /eve/v1/sendblue/webhook`, and its Upstash-backed replay boundary. An
 HTTP `202` means accepted dispatch scheduling; it does not prove Eve completed
 processing or that a handset received a message.
+Sendblue currently documents a 45-second webhook response window and up to
+three retries for timeout or `5xx`. Re-read that provider-owned value at the
+time of hosted qualification. Bundjil's 15-second Eve-handoff target is a
+product default inside that last-documented window, not a Sendblue requirement
+or a measured hosted guarantee.
 
 ## Preconditions
 
@@ -99,9 +104,12 @@ webhook URLs, routing material, replay keys, or raw provider responses.
 
 7. Record webhook outcomes by status class: ignored/duplicate `204`, accepted
    dispatch `202`, invalid signature `401`, schema failure `400`, and
-   replay/routing failure `503`. Keep provider acceptance, Eve processing, and
-   handset delivery as separate claims. Treat `DeliveryUncertain` as unknown;
-   never retry blindly.
+   replay/routing/handoff failure `503`. Correlate `202` only with the safe
+   fingerprint whose exact Eve `send()` acceptance and intended-session
+   convergence preceded it. A timeout or uncertain send retains the claim and
+   relies on provider redelivery for suppression/readback; it is never blindly
+   retried in-process. Keep provider acceptance, Eve processing, and handset
+   delivery as separate claims. Treat `DeliveryUncertain` as unknown.
 
 8. For the exact approved direct conversation, call typing `start` with the
    configured bounded duration and then typing `stop`. Decode the complete
@@ -112,9 +120,11 @@ webhook URLs, routing material, replay keys, or raw provider responses.
 
 ## Evidence and postcondition
 
-Retain source/deployment identity, sanitized account/line and webhook-host
+Retain source/deployment identity, current provider response deadline,
+sanitized account/line and webhook-host
 inventory, replay-database metadata, `observedAt`, one approved operation,
-HTTP/result shapes, non-sensitive counts, separate ingress, Eve, outbound,
+HTTP/result shapes, safe acceptance/response ordering and intended/accepted
+session convergence, non-sensitive counts, separate ingress, Eve, outbound,
 typing-start, typing-stop, delivery, and handset-display claims, limitations,
 and non-claims. Use `BND-J05-sendblue-accepted-message` and, for the combined
 Production result, `BND-J12-dual-channel-production`. This runbook does not

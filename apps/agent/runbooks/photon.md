@@ -3,8 +3,8 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-23
-review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, shared-user, webhook, deployment, typing, resource lifecycle, or output contract change
+last_reviewed: 2026-07-25
+review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, shared-user, webhook, response deadline, deployment, Workflow, typing, resource lifecycle, or output contract change
 ---
 
 # Operate Photon Channel rollout
@@ -59,6 +59,12 @@ Sources: [Photon pricing](https://photon.codes/pricing),
 [API introduction](https://photon.codes/docs/api-reference/introduction),
 [webhook lifecycle](https://photon.codes/docs/webhooks/managing-webhooks), and
 [rate limit](https://photon.codes/docs/api-reference/rate-limit).
+
+No numeric Photon webhook response deadline is established by this repository
+or the currently cited provider sources. Do not substitute Sendblue's
+45-second value, Vercel function duration, or Bundjil's 15-second handoff
+target. A hosted qualification must read a current Photon-owned deadline or
+retain that bound as inconclusive.
 
 ## Preconditions and stop conditions
 
@@ -218,9 +224,12 @@ duplicate suppression, Preview, Production, or durable process supervision.
 
 1. Attach `photon-inbound` and `photon-outbound` authority, exact pushed source
    and immutable deployment/config identities, fresh replay/routing namespace
-   fingerprints, the approved test conversation, and rollback references.
+   fingerprints, the current provider response deadline when available, the
+   approved test conversation, and rollback references.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
-   authentication, fresh claim, one Eve dispatch/completion, participant-based
+   authentication, fresh claim, exact Eve `send()` acceptance before `202`,
+   intended/accepted session convergence, one Eve dispatch/completion,
+   participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK
    release without retaining body, content, phone, assigned routing number,
    project, user, webhook, Space, or message values. A group event must return

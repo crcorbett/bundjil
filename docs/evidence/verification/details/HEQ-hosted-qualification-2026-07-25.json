@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "taskIds": [
+    "set-and-readback-timeouts",
+    "qualify-final-preview",
+    "qualify-production-candidate"
+  ],
+  "observedAt": "2026-07-25T23:22:17Z",
+  "candidate": {
+    "repositoryCommit": "a3f89877503acb137c0b76b1c09356e4789efe07",
+    "sourceDigest": "4082e63289156bf074852effceccc85d7bde6816948a3c4b7ee45a9287bbf22f",
+    "artifactDigest": "9a8f15ab7299890f1063edc28b6007d2ca54111c971a6960601645a01dfb32c7",
+    "startingCommit": "e92f8d2508dd927c09cb63eddb50c6ca09904b95"
+  },
+  "timeoutReadback": {
+    "plan": "hobby",
+    "ordinaryFunction": {
+      "name": "__server",
+      "runtime": "nodejs24.x",
+      "memoryMegabytes": 2048,
+      "effectiveDurationSeconds": 300
+    },
+    "workflowFunction": {
+      "name": ".well-known/workflow/v1/flow",
+      "runtime": "nodejs24.x",
+      "memoryMegabytes": 2048,
+      "effectiveDurationSeconds": 300,
+      "generatedMaximum": "max"
+    },
+    "handoffProductDefaultMilliseconds": 15000,
+    "sendblueResponseWindowSeconds": 45,
+    "photonNumericResponseDeadline": null,
+    "decision": "Retain the effective hosted default. Pinned Eve 0.20 exposes no supported Bundjil-facing Nitro function override, both functions read back at the plan maximum, measured handoff and bounded work fit, and no override need was observed."
+  },
+  "preview": {
+    "status": "accepted",
+    "sourceDeployment": "dpl_Bs7j8KGDutEhWPcLpSgNSxyi6DiU",
+    "replacementDeployment": "dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr",
+    "sourceMatchesCandidate": true,
+    "acceptance": {
+      "newSessionMilliseconds": 619,
+      "resumeMilliseconds": 221,
+      "crossDeploymentResumeMilliseconds": 893,
+      "responseAfterAcceptance": true,
+      "continuity": "The replacement route returned Resumed with the same safe session fingerprint, while the turn child remained pinned to the original Eve Workflow deployment.",
+      "workflowRunFingerprints": [
+        "38dfa5dfd98923bb",
+        "ffd79ee9a9b6c8e2",
+        "faf75461f7801bb7",
+        "d2cd024b7cd3cbf4"
+      ]
+    },
+    "boundedWork": {
+      "durationMilliseconds": 78321,
+      "sequentialReadOnlyOperations": 8,
+      "replacementReadyBeforeFinalControlStep": true,
+      "workflowAttempt": 1,
+      "resultCount": 1,
+      "claim": "A supported immutable deployment replacement occurred during bounded work; the same Workflow run stayed version-pinned and a later route invocation resumed the same Eve session.",
+      "nonClaim": "The running step was not process-killed and did not retry; this proves deployment replacement durability and cross-deployment session continuity, not every crash or retry mode."
+    },
+    "duplicate": {
+      "provider": "sendblue",
+      "exactSignedRedeliveries": 3,
+      "duplicateStatuses": [204, 204, 204],
+      "additionalWorkflowRuns": 0,
+      "additionalOutboundResults": 0
+    },
+    "providerResult": {
+      "outboundResults": 1,
+      "providerStatus": "DELIVERED"
+    },
+    "rejectedEvidence": [
+      "An initial fan-out topology sent one inbound event to both Preview and Production and produced two outbound responses. It was rejected, the provider was isolated to one Preview callback, and no claim uses that journey."
+    ],
+    "restoration": {
+      "sendblueMatchesCapturedBefore": true,
+      "branchScopedPreviewVariablesRemaining": 0,
+      "previewAliasDeployment": "dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr"
+    }
+  },
+  "production": {
+    "status": "inconclusive",
+    "candidateDeployment": "dpl_Fuj45YfLqeDML777jenp231EMYea",
+    "rejectedDirtyCandidate": "dpl_3X28gKZXyyjrfFJ2FmYcWS1gk9AE",
+    "sourceMatchesCandidate": true,
+    "stableProductionDeploymentBeforeAndAfter": "dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY",
+    "sendblue": {
+      "status": "accepted",
+      "handoffMilliseconds": 836,
+      "responseMilliseconds": 1049,
+      "responseAfterAcceptance": true,
+      "workflowRunFingerprint": "8f738a11b7eb059a",
+      "exactSignedRedeliveries": 2,
+      "additionalWorkflowRuns": 0,
+      "additionalOutboundResults": 0,
+      "outboundResults": 1,
+      "typingStartAccepted": true,
+      "typingStopAccepted": true
+    },
+    "photon": {
+      "status": "accepted_direct_journey_only",
+      "handoffMilliseconds": 691,
+      "responseMilliseconds": 903,
+      "responseAfterAcceptance": true,
+      "workflowRunFingerprint": "b60a682de9886a59",
+      "workflowCompleted": true,
+      "outboundSdkSendCount": 1,
+      "handsetResults": 1,
+      "typingStartAccepted": true,
+      "typingStopAccepted": true,
+      "sdkReleaseAccepted": true,
+      "exactDuplicateOracle": "unavailable",
+      "duplicateLimitation": "Photon documents no replay endpoint and its authenticated dashboard exposes webhook topology but not the exact delivered body or replay control. No synthetic identity was substituted."
+    },
+    "monitoring": {
+      "candidateErrorLogs": 0,
+      "candidateFatalLogs": 0,
+      "previewSignatureAtProductionCallbackStatus": 401
+    },
+    "restoration": {
+      "sendblueMatchesCapturedBefore": true,
+      "photonTopologyMatchesCapturedBefore": true,
+      "productionAliasDeployment": "dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY",
+      "previewAliasDeployment": "dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr",
+      "photonWebhookCount": 2,
+      "sendblueReceiveWebhookCount": 1
+    }
+  },
+  "authority": {
+    "sourceThread": "019f3c64-2576-70c2-90c0-e6b212f79ee1",
+    "scope": "one immutable Preview, one staged Production candidate, bounded Sendblue and Photon journeys, exact provider readback, and immediate restoration",
+    "standingAuthorityAfterRun": false
+  },
+  "limitations": [
+    "No numeric Photon webhook response deadline was available from authenticated provider readback.",
+    "Preview deployment replacement did not force a step retry; all observed Workflow steps completed on attempt one.",
+    "The combined Production packet is inconclusive because the exact candidate-specific Photon duplicate oracle is unavailable.",
+    "One-run evidence does not prove exactly-once execution, universal availability, every termination mode, or future provider and plan behavior."
+  ],
+  "nonClaims": [
+    "READY, local Build Output, waitUntil, aggregate green tests, and fallback Eve runs are not used as hosted proof.",
+    "Production was not promoted: the official stable Production pointer remained on the captured rollback deployment.",
+    "No retained evidence contains provider credentials, message content, phone identities, raw Workflow run IDs, hook tokens, or raw provider payloads."
+  ]
+}

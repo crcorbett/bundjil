@@ -1,5 +1,5 @@
 import { assert, it } from "@effect/vitest";
-import { ConfigProvider, Effect, Redacted, Schema } from "effect";
+import { ConfigProvider, Duration, Effect, Redacted, Schema } from "effect";
 
 import {
   loadChannelConfig,
@@ -7,6 +7,7 @@ import {
   loadSendblueConfig,
 } from "../agent/lib/channel/config.js";
 import {
+  ChannelHandoffTimeout,
   ChannelIdentityRecords,
   ChannelReplayOptions,
   ChannelRoutingSecret,
@@ -38,8 +39,44 @@ it.effect("loads only the fresh redacted channel environment", () =>
       Schema.is(ChannelRoutingSecret)(config.routingSecret),
       true
     );
+    assert.strictEqual(
+      Schema.is(ChannelHandoffTimeout)(config.handoffTimeout),
+      true
+    );
+    assert.strictEqual(Duration.toMillis(config.handoffTimeout), 15_000);
     assert.strictEqual(config.replay.prefix, "v1:");
     assert.strictEqual(config.store.keyPrefix, "bundjil:channel:v1:");
+  })
+);
+
+it.effect("loads an explicit positive handoff Duration", () =>
+  Effect.gen(function* testChannelHandoffTimeoutConfig() {
+    const config = yield* loadChannelConfig.pipe(
+      Effect.provide(
+        configLayer({
+          ...currentEnvironment,
+          BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS: "12000",
+        })
+      )
+    );
+
+    assert.strictEqual(Duration.toMillis(config.handoffTimeout), 12_000);
+  })
+);
+
+it.effect("rejects a non-positive handoff Duration", () =>
+  Effect.gen(function* testInvalidChannelHandoffTimeoutConfig() {
+    const exit = yield* loadChannelConfig.pipe(
+      Effect.provide(
+        configLayer({
+          ...currentEnvironment,
+          BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS: "0",
+        })
+      ),
+      Effect.exit
+    );
+
+    assert.strictEqual(exit._tag, "Failure");
   })
 );
 

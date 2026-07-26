@@ -366,5 +366,41 @@
     "nonClaims": [
       "A promoted deployment or provider acceptance alone does not prove both journeys, handset delivery, or visible typing."
     ]
+  },
+  {
+    "id": "BND-J13-hosted-eve-durability",
+    "actorOrConsumer": "Bundjil agent operator and approved Channel test conversations",
+    "boundary": "immutable Preview Eve send acceptance, Workflow session and turn ownership, interruption recovery, duplicate convergence, and timeout separation",
+    "startingState": "one exact pushed candidate, isolated Preview target, fresh replay namespace, provider and Workflow read authority, approved bounded interruption, rollback identity, and sanitized packet path are attached",
+    "inputs": [
+      "cold and warm new-session plus existing-session events",
+      "one deliberately slow bounded model or tool step",
+      "one approved interruption and exact provider redelivery"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/deploy-promote.md, apps/agent/runbooks/sendblue.md, and apps/agent/runbooks/photon.md",
+    "expectedBehavior": [
+      "The route returns 202 only after exact Eve send acceptance and intended-session convergence, then the same Workflow run owns its turn child.",
+      "The bounded step resumes from its named checkpoint after interruption, and exact redelivery produces no second Eve turn or external response.",
+      "Webhook handoff, ordinary function, Workflow step, Sandbox, and session-lifetime clocks retain distinct owners and readbacks."
+    ],
+    "expectedSideEffects": [
+      "An approved Preview deployment, bounded provider message, model or tool invocation, interruption, and provider redelivery may occur."
+    ],
+    "preservedInvariants": [
+      "Eve 0.20 remains the sole Workflow lifecycle owner and its generated flow keeps max duration and queue trigger ownership.",
+      "No raw run, hook, provider, content, secret, error, Cause, or stack enters retained evidence.",
+      "A fallback new run, warm reuse, local Build Output, or deployment READY state cannot satisfy the durability oracle."
+    ],
+    "oracle": "One Preview packet binds exact Git/deployment/function identities, safe acceptance ordering, same-run interruption recovery, zero duplicate effects, bounded logs, monitoring, rollback, limitations, and non-claims.",
+    "environment": "approval-gated isolated Preview target",
+    "authority": "mutation",
+    "evidence": [
+      "apps/agent/runbooks/deploy-promote.md",
+      "docs/verification/templates/preview.json",
+      "docs/verification/templates/messaging.json"
+    ],
+    "nonClaims": [
+      "Repository tests, local Build Output, historical deployments, one warm run, or one provider cannot prove Preview durability or Production."
+    ]
   }
 ]

@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-agent-architecture-owner
@@ -14,9 +14,10 @@ task_ledger: hosted-eve-runtime-qualification-and-durability.tasks.json
 
 ## Status and decision
 
-This SPEC is proposed implementation and qualification intent. It authorises no
-runtime change, deployment, provider operation, credential use, message,
-promotion, or rollback.
+This SPEC is current implementation and qualification intent. The attached
+implementation authority permits repository code, tests, documentation and
+local coherent commits only. It authorises no deployment, provider operation,
+credential use, message, promotion, rollback, push, or merge.
 
 Fresh review of pinned Eve `0.20.0` corrects the earlier architecture premise:
 Eve already owns the Workflow SDK lifecycle. Eve starts a durable session
@@ -539,7 +540,7 @@ after their scripts and verification owners exist.
 | Tests/fixtures                    | Change required                                         | Add direct delayed/rejected send, 202 ordering, acceptance identity, duplicate, interruption, timeout and leak fixtures.                                                                             |
 | Monitoring                        | Change required                                         | Add safe handoff latency/outcome, workflow-run correlation, terminal failure/alert and duplicate metrics.                                                                                            |
 | Rollout/rollback                  | Change required                                         | Preserve compatible Eve runs, replay state and uncertain sends; define timeout/config rollback and fresh readback.                                                                                   |
-| Active/completed plan lifecycle   | Preserve now                                            | Create an active plan only when implementation begins; terminal audit closes it after accepted receipts.                                                                                             |
+| Active/completed plan lifecycle   | Change required                                         | The canonical active plan tracks serial implementation, receipts and authority gates; terminal audit closes or retains it according to the final task states.                                        |
 | Frontend/browser/accessibility    | Evidenced N/A                                           | No React, browser rendering, URL state, visible UI or accessibility contract changes in this SPEC.                                                                                                   |
 | Package release/publication       | Evidenced N/A                                           | No tag, npm publication, public release or package versioning is requested.                                                                                                                          |
 
