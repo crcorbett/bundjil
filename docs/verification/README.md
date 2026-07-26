@@ -98,6 +98,12 @@ operation nor asserts present provider state.
   Spectrum adapter/version and Photon's registered-target allowlist contract,
   and localizes the denial to shared transport authorization or route binding.
   It is read-only diagnosis, not a send, provider repair, or Channel proof.
+- [`alchemy-photon-outbound-debug-verification-2026-07-26.md`](alchemy-photon-outbound-debug-verification-2026-07-26.md)
+  proves the approved Apple handle through Photon's iMessage debug bot,
+  distinguishes the registered outbound target from its assigned inbound
+  shared line, reproduces the corrected registered-target denial, retains the
+  secret-free support packet, and proves exact temporary-user cleanup. It is a
+  blocked provider receipt, not outbound delivery or Channel proof.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

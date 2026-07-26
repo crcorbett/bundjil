@@ -903,6 +903,65 @@ not justified by the current evidence. The read-only receipt is
 | Rollout and rollback             | Change required | One temporary user/callback were created and exactly removed after stable rebind/drain; original digest and one-user/one-webhook topology are restored.                      |
 | Lifecycle and archive pointers   | Preserve        | The plan remains active, no archive pointer changes, and the earlier five-pass checkpoint remains explicitly non-terminal.                                                   |
 
+### Photon debug-line corrective verification
+
+The approved Preview-only corrective slice proved the intended Apple handle
+through Photon's own debug bot before recreating the temporary user. The bot's
+E.164 GUID/address matched candidate fingerprint `82ac258d…4c5`; SMS, an
+unverified Messages start identity and a registered-handle mismatch are
+therefore rejected.
+
+Two baseline inventories matched digest `9e6108d5…88a3f`. Reconciliation created
+one temporary Preview user at fingerprint `104f9ab4…418`, retained the adopted
+user and source bindings, and produced two matching post-create inventories at
+digest `21f343bc…32e9`. The stable callback was preserved and no Vercel binding
+or deployment changed.
+
+The first negative-control call used the assigned Photon shared line as the
+direct-Space participant and failed with `ValidationError`, transport status
+`3`, `retryable=false`, no provider message identity and zero retries. This
+reopened the proof owner: an assigned line is the inbound destination, not the
+registered outbound target. The corrected single call used the exact
+debug-verified registered Apple handle and reproduced `AuthenticationError`,
+`internalError`, status `7` (`PERMISSION_DENIED`) and `retryable=false`. No
+provider message identity or delivery exists.
+
+Two post-failure inventories matched `21f343bc…32e9`. Cleanup deleted only the
+temporary user, removed its ignored mode-`0600` custody value, and two final
+inventories restored `9e6108d5…88a3f`, one adopted Preview user, one stable
+callback and unchanged source bindings. The support packet at
+`docs/verification/alchemy-photon-outbound-debug-verification-2026-07-26.md`
+asks Photon to distinguish and repair project-target binding/allowlist cache,
+concurrent-project identity fencing and transport-token authorization. Handle
+registration is no longer a live hypothesis. The task remains in progress;
+outbound delivery, Channel ingress/replay/Eve/outbound/typing/handset,
+Production and the terminal audit remain unclaimed.
+
+### Corrective verification impact ledger
+
+| Surface                         | Status          | Decision and proof boundary                                                                                                                                                                |
+| ------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture and docs           | Preserve        | No package or runtime graph changed; the target identity distinction is operational proof policy.                                                                                          |
+| READMEs and exports             | Preserve        | Public package contracts, exports and commands did not change.                                                                                                                             |
+| Runbooks and authority          | Change required | The Photon runbook now names registered Apple handle versus assigned shared line and rejects their transposition. Existing Preview authority was exercised; Production remained untouched. |
+| Verification journeys and proof | Change required | Add the debug-handle, negative-control, corrected denial, support packet and exact rollback receipt.                                                                                       |
+| Skills and AGENTS               | Preserve        | Repository-local PRD, docs, Effect-client and Computer Use contracts were applied; no reusable instruction defect was found.                                                               |
+| Lint, config, commands and CI   | Preserve        | No tracked executable configuration or command changed.                                                                                                                                    |
+| Schemas, services and Layers    | Preserve        | Existing decoded management identities and `PhotonClient` boundary performed the reads and single sends; no raw client or DTO escaped.                                                     |
+| Tests and fixtures              | Preserve        | Provider truth is retained as a bounded receipt; no local mock can substitute for the denial or delivery.                                                                                  |
+| SPEC, tasks and plan            | Change required | Record direct debug proof, identity false green, provider denial, blocked status, support prerequisite and terminal-audit non-claim.                                                       |
+| Receipts and evidence           | Change required | Retain fingerprints, timestamps, safe codes, digests, support question and non-claims; retain no full identity, secret or message.                                                         |
+| Rollout and rollback            | Change required | Exactly one temporary user was created and removed; original digest and one-user/one-callback topology were restored twice.                                                                |
+| Lifecycle and archive pointers  | Preserve        | The plan stays active and the formal five-pass audit remains terminal-only.                                                                                                                |
+
+### Corrective slice review lenses
+
+| Lens                                  | Result                        | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph              | Passed                        | Photon management reads/mutations remained in `PhotonManagement`; the corrected message attempt remained in `PhotonClient.sendMessage`; SDK instances and raw credentials stayed private. The app runbook owns the consequential procedure, the receipt owns the observation, and Production was not reached.                                                                                                                                                     |
+| Effect and provider quality           | Passed                        | Existing branded identities, redacted Config, decoded service outputs, safe tagged errors, scoped SDK release and explicit live Layers were reused. The tracked diff adds no raw client, callback escape, primitive public contract, DTO mirror, unsafe cast, manual provider reader, switch/instanceof policy or helper sprawl.                                                                                                                                  |
+| Verification and false-green coverage | Passed for the blocked result | Direct oracles proved the debug handle, two-pass baseline/create/failure/cleanup topology, assigned-line rejection, exact registered-target denial, zero automatic retries, no provider message identity and final restoration. Photon typecheck/build and 35 tests; Effect LS; boundary, docs, skills, authority, controls and verification-policy checks; leak scans; and `bun run verification` passed. Delivery and downstream Channel claims remain blocked. |
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on

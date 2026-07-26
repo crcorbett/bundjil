@@ -580,6 +580,31 @@ fingerprint-only comparison, ranked internal hypotheses, support packet,
 smallest retry and non-claims are retained in
 `docs/verification/alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`.
 
+The bounded corrective verification exhausted the debug-line prerequisite.
+Photon's bot received one explicitly iMessage-labelled debug command and
+reported the same E.164 GUID/address as controlled candidate fingerprint
+`82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5`.
+Fresh readback then created exactly one temporary Preview user, preserved the
+adopted/source bindings, and converged twice at digest
+`21f343bcef7cd86c3f1e9312d7a4536c7d3b3be98a001a6f2854768e03aa32e9`.
+One negative-control call proved that the assigned Photon line is not the
+outbound participant: it failed with validation status `3`. The exact
+registered Apple handle is the SDK target; the assigned line is only the user's
+inbound destination. The corrected registered-handle call still failed once
+with `AuthenticationError`, `internalError`, transport status `7`
+(`PERMISSION_DENIED`) and `retryable=false`, with no provider message identity
+and zero automatic retries.
+
+Two post-failure inventories retained the temporary binding, exact cleanup
+deleted only that user, and two final inventories restored the original digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+Handle registration is now excluded. Photon support must trace the isolated
+project-target binding, allowlist cache, concurrent-project identity fencing or
+transport-token authorization before another send. The secret-free packet and
+exact question are retained in
+`docs/verification/alchemy-photon-outbound-debug-verification-2026-07-26.md`.
+Outbound delivery and every downstream Channel oracle remain unproved.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

@@ -275,7 +275,12 @@ duplicate suppression, Preview, Production, or durable process supervision.
    When a cold Messages composition to that assigned route remains SMS-only,
    an explicitly approved Preview proof may first use the temporary Preview
    project/user to send one bounded outbound Photon message to the exact
-   registered test recipient. Resolve the direct Space through the existing
+   registered test recipient. The SDK participant is the registered Apple
+   handle (`user.phoneNumber`), never the assigned Photon shared line
+   (`user.assignedPhoneNumber`); the assigned line is only the destination for
+   the user's inbound message. Require Photon's debug bot to report the exact
+   registered Apple handle before sending, and treat the assigned-line target
+   as a rejected false green. Resolve the direct Space through the existing
    `@bundjil/photon` SDK boundary, keep content and full identities only in
    secure process custody, and require provider acceptance without retrying an
    uncertain send. This outbound delivery may activate an iMessage
