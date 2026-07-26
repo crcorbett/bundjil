@@ -80,6 +80,10 @@ ledger. Repository-local evaluated skills are read from the epoch's exact Git
 base commit rather than the mutable working tree; external skill identities
 remain the epoch's stored digest receipts. Current skill behavior is owned by
 the repository skill-policy checks and a separately qualified successor epoch.
+GitHub CI therefore checks out full repository history before running
+verification; a shallow checkout cannot supply the intentionally historical
+skill object and must not be treated as an evaluator failure or bypassed by
+weakening the epoch identity.
 The command reads repository evidence only, writes bounded detail to
 `tmp/harness-evaluation-report.json`, and grants no provider or mutation
 authority. Epoch identity and metric interpretation are owned by

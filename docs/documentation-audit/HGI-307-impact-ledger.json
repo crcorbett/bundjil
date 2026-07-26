@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 192,
-    "sortedPathSha256": "ff190f2f4bf0709a6f07fd90bd03acab6a1cb94682667e2cf598c283665f0e2c"
+    "pathCount": 197,
+    "sortedPathSha256": "6018e39967da55f1d7906b8631e3a619d7841fea071cd3a780574d7fc2b01661"
   },
   "readmeInventory": {
     "pathCount": 22,
@@ -25,7 +25,7 @@
       ],
       "evidence": [
         "Added the canonical epoch/effectiveness standards, accepted typed epoch, exact impact ledger, and retained fresh reports.",
-        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, the Eve implementation plan expanded it to 180 paths, and the Alchemy SPEC/task/active-plan slice expanded it to 182 paths. Runtime closeout added the completed plan and returned the Eve work to completed history while preserving the Alchemy plan as current intent; the implementation-audit feedback receipt then expanded the combined corpus to 184 paths. The hosted Eve qualification SPEC and sibling task ledger expanded the corpus to 186 paths; its admitted active execution plan expanded accounting to 187 paths. The retained hosted Eve timeout detail plus inconclusive Preview and Production packets expanded accounting to 190 paths; the single terminal audit detail and local closeout packet expand final accounting to 192 paths. These path-accounting corrections change neither the scenario manifest, expected owners, historical skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
+        "The 2026-07-22 lifecycle correction re-inventoried the 163-path docs corpus after accepted harness provenance moved out of active intent. The 2026-07-24 Photon merge correction re-inventoried 177 paths, the accepted Eve runtime-ownership SPEC and task list expanded the corpus to 179 paths, the Eve implementation plan expanded it to 180 paths, and the Alchemy SPEC/task/active-plan slice expanded it to 182 paths. Runtime closeout added the completed plan and returned the Eve work to completed history while preserving the Alchemy plan as current intent; the implementation-audit feedback receipt then expanded the combined corpus to 184 paths. The hosted Eve qualification SPEC and sibling task ledger expanded the corpus to 186 paths; its admitted active execution plan expanded accounting to 187 paths. The retained hosted Eve timeout detail plus inconclusive Preview and Production packets expanded accounting to 190 paths; the single terminal audit detail and local closeout packet expanded accounting to 192 paths. The hosted qualification detail, accepted Preview and inconclusive Production successors, and replacement terminal-audit detail and packet expand current accounting to 197 paths. These path-accounting corrections change neither the scenario manifest, expected owners, historical skill bytes, nor worker reports; the original HGI-307 acceptance receipt remains historical evidence for its 161-path candidate."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."
@@ -115,7 +115,7 @@
       "decision": "changed",
       "ownerPaths": ["package.json", ".github/workflows/ci.yml"],
       "evidence": [
-        "The existing CI-owned root verification command now runs eval:hgi-307 before package tests."
+        "The CI-owned root verification command runs eval:hgi-307 before package tests, and checkout retains full Git history so the evaluator can read repository-local skill bytes from the epoch's exact base commit."
       ],
       "limitations": [
         "Repository source proves workflow wiring, not a hosted GitHub run, token, or external consequence."
