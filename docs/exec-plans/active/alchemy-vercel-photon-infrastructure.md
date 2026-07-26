@@ -708,6 +708,20 @@ in ignored mode-`0600` custody. Its safe fingerprint is
 `32f231e1106e391ace5581eb03ed811f7c2659b0a54aab6472728a0e8aa9199e`;
 the value and callback query are absent from receipts.
 
+Corrected commit `2436ddbd04ef07015fff7b1d1e4d68a03a65d5b6`
+produced READY non-Production deployment
+`dpl_C8Wrg6fKK5ztsTonQuFZcN8TXLWo`. A protected valid-signature unsupported
+event returned exact `204` without redirect or body; this proves the recovered
+webhook ID/secret without Channel dispatch or outbound SDK acquisition.
+
+Stable cutover then created a second temporary webhook with fingerprint
+`d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b`.
+Readback found two total webhooks. Explicit `stableCallbackCutover` rebound the
+new ID/secret and returned `cutoverPendingIngress`; both exact webhooks and
+mode-`0600` artifacts remain available for rollback. The next immutable
+deployment must prove the stable signature before the documented roughly
+3.5-minute retry horizon starts and the old callback can be deleted.
+
 ### Binding-custody requirement replay
 
 | Material requirement                              | Direct observable and expected postcondition                                                                                                                                                                                                                                                                                                       | Plausible false green rejected                                                                                                                                                                        | Focused command and evidence owner                                                                                                                            | Result                                                                                                                              |
@@ -748,12 +762,12 @@ controls/verification-policy gate.
 | Receipts and evidence            | Change required | Route separate sanitized isolation and webhook-binding receipts; retain only fingerprints, metadata identities, limitations, non-claims and rollback identity.                          |
 | Rollout, rollback and archive    | Change required | Retain the Preview project/user/webhook and recovery artifact while deployment/signed proof is open; rollback protects adopted users and removes only exact rollout-created identities. |
 
-Next, commit and push the corrected recovery candidate so Vercel Git creates a
-deployment with the recovered Preview values. Require a bypassed valid signed
-`204`, then replace the protected immutable bootstrap callback with one stable
-protected Preview callback under the exact delete/create, lossless secret
-handoff and rollback procedure. Keep the artifact until the stable callback
-deployment passes. Then run the bounded Channel/no-op/drift/rollback matrix.
+Next, commit and push the stable-cutover candidate so Vercel Git creates a
+deployment with the stable callback values. Require a protected valid signed
+`204`, wait through Photon's documented maximum retry horizon, then delete
+only the old immutable callback and its artifact. Keep the stable artifact
+until cleanup readback passes. Then run the bounded Channel/no-op/drift/rollback
+matrix.
 The selected user is adopted; no later slice may delete it, add a second user,
 or weaken source readback. The terminal five-pass audit remains deferred until
 all tasks reach their final disposition.

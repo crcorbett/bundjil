@@ -133,3 +133,9 @@ identities may be recovered once by setting
 `BUNDJIL_PHOTON_BINDING_RECOVERY_MODE=signedIngressMismatch`. The command
 rewrites the same decoded values through the owner sink and retains the source
 artifact until a later immutable deployment proves signed ingress.
+
+For the later lossless stable callback replacement, use
+`BUNDJIL_PHOTON_BINDING_RECOVERY_MODE=stableCallbackCutover` only while the old
+webhook and its artifact remain available for rollback. The command retains
+the new artifact and returns `cutoverPendingIngress`; delete neither callback
+nor artifact until the new immutable deployment passes signed proof.

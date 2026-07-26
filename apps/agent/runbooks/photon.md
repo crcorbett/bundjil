@@ -232,6 +232,12 @@ duplicate suppression, Preview, Production, or durable process supervision.
    owner-sink recovery after all four Preview-only sensitive metadata
    identities are read back. Keep the artifact until a later immutable
    deployment returns the expected signed response.
+   For a stable callback replacement, create the new exact callback while the
+   old one and its artifact remain intact, then set
+   `BUNDJIL_PHOTON_BINDING_RECOVERY_MODE=stableCallbackCutover` to bind the new
+   ID/secret. Require a new immutable deployment and signed `2xx`, wait through
+   the provider's documented maximum retry horizon, and only then delete the
+   old exact callback. Never collapse the two secret artifacts during cutover.
    The command blocks an existing target rather than adopting a lost
    write-only secret and reconciles an uncertain create by exact URL inventory.
    Replace an isolated zero-traffic callback by running

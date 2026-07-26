@@ -68,7 +68,10 @@ const PhotonPreviewWebhookBindingReceipt = Schema.Union([
     environmentBindingCount: Schema.Literal(4),
     secretReferencePersisted: Schema.Literal(true),
     sourceBindingRemoved: Schema.Literal(false),
-    status: Schema.Literal("recoveredPendingIngress"),
+    status: Schema.Literals([
+      "cutoverPendingIngress",
+      "recoveredPendingIngress",
+    ]),
   }),
 ]);
 
@@ -101,7 +104,7 @@ const photonProjectSecretConfig = Config.schema(
   "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
 );
 const recoveryModeConfig = Config.schema(
-  Schema.Literal("signedIngressMismatch"),
+  Schema.Literals(["signedIngressMismatch", "stableCallbackCutover"]),
   "BUNDJIL_PHOTON_BINDING_RECOVERY_MODE"
 ).pipe(Config.option);
 
@@ -165,10 +168,10 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
   );
   const existingBindings = exactPhotonBindings(before.environmentVariables);
   const isInitialBinding = existingBindings.length === 0;
-  const isObservedRecovery =
+  const isAuthorizedExistingBindingWrite =
     Option.isSome(recoveryMode) &&
     isExactPreviewBindingMetadata(existingBindings);
-  if (!isInitialBinding && !isObservedRecovery) {
+  if (!isInitialBinding && !isAuthorizedExistingBindingWrite) {
     return yield* Effect.fail("binding-already-present");
   }
 
@@ -197,12 +200,17 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
     return yield* Effect.fail("binding-readback-invalid");
   }
 
-  if (isObservedRecovery) {
+  if (isAuthorizedExistingBindingWrite) {
     return PhotonPreviewWebhookBindingReceipt.make({
       environmentBindingCount: 4,
       secretReferencePersisted: true,
       sourceBindingRemoved: false,
-      status: "recoveredPendingIngress",
+      status: Option.exists(
+        recoveryMode,
+        (mode) => mode === "stableCallbackCutover"
+      )
+        ? "cutoverPendingIngress"
+        : "recoveredPendingIngress",
     });
   }
 

@@ -69,19 +69,38 @@ mode-`0600` custody. Its safe fingerprint is
 `32f231e1106e391ace5581eb03ed811f7c2659b0a54aab6472728a0e8aa9199e`.
 No bypass value or callback query is retained here.
 
+Corrected commit `2436ddbd04ef07015fff7b1d1e4d68a03a65d5b6`
+then produced exact non-Production deployment
+`dpl_C8Wrg6fKK5ztsTonQuFZcN8TXLWo`. It reached `READY` with no alias error. A
+protected valid-signature unsupported event returned `204` with no redirect or
+body, proving the recovered webhook ID/secret on that immutable deployment.
+The unsupported event acquires no outbound Photon SDK and dispatches no
+Channel message.
+
+The lossless stable-callback cutover then created one second temporary webhook
+while preserving the old webhook and artifact. The new stable callback carries
+the protection bypass only in its provider-custodied query and has safe webhook
+fingerprint
+`d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b`.
+Fresh registration readback observed two total webhooks. The exact new
+ID/secret replaced the four Vercel Preview values through
+`stableCallbackCutover`; the owner returned `cutoverPendingIngress` and both
+mode-`0600` artifacts remain available for rollback.
+
 ## Current non-claims and recovery
 
-The current receipt proves the exact Git deployment, one Photon webhook, four
-Vercel metadata identities, the scoped protection-bypass identity, and a
-bounded value-recovery write. It does not prove a deployment built after the
-recovery, a valid Photon signature, signed ingress, replay disposition, Channel
+The current receipt proves exact Git deployment `2436ddb`, one protected valid
+signature `204`, two transient Photon webhook identities, four Vercel metadata
+identities, the scoped protection-bypass identity, and bounded recovery/cutover
+writes. It does not yet prove a deployment built with the stable webhook
+values, provider delivery to that callback, replay disposition, Channel
 processing, provider send, handset behavior, Production state, no-op/drift
 repair, retry drain, or cleanup.
 
 Keep the recovery artifact mode `0600` until a new immutable Preview
-deployment proves signed Photon ingress. If the new deployment fails, retain
-the artifact and exact webhook fingerprint; do not replay the sink or create a
-second webhook. Rollback must first stop ingress and drain the provider retry
-horizon, then remove only the four exact Vercel metadata identities and the
-one rollout-created webhook. The adopted Preview user and source project/users
-remain protected.
+deployment proves signed Photon ingress. If the stable deployment fails,
+retain both artifacts and both exact webhook fingerprints; do not replay the
+sink or create a third webhook. Photon documents up to six attempts, jittered
+backoff and a worst-case delivery window of about 3.5 minutes. After stable
+signed proof, wait through that horizon before deleting only the old immutable
+callback. The adopted Preview user and source project/users remain protected.

@@ -385,7 +385,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-25 isolation and webhook-binding receipts read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines, one rollout-created Preview webhook, four sensitive Preview-only Vercel metadata identities, one explicit owner-sink recovery, and one note-scoped automation-bypass fingerprint. The initial 401 was correctly classified as Vercel Authentication. A new deployment and signed ingress are still required before value convergence, stable callback cutover, or recovery-artifact removal."
+        "evidence": "The 2026-07-25 isolation and webhook-binding receipts read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines, four sensitive Preview-only Vercel metadata identities, one note-scoped automation-bypass fingerprint, and READY deployment dpl_C8Wrg6fKK5ztsTonQuFZcN8TXLWo with protected valid-signature 204. Stable cutover currently retains old/new artifacts and two webhook fingerprints while a new deployment, stable signed proof and the documented retry drain remain open."
       }
     },
     {

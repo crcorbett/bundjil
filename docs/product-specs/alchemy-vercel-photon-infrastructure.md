@@ -447,6 +447,17 @@ note-scoped automation bypass is separately custodied for the protected
 Preview callback; its value and callback query remain absent from tracked
 artifacts.
 
+Corrected commit `2436ddb` produced a READY non-Production deployment whose
+protected valid-signature unsupported event returned exact `204`, proving the
+recovered webhook ID/secret without Channel dispatch or SDK acquisition. A
+lossless stable-callback cutover then created one second temporary webhook at
+safe fingerprint
+`d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b`,
+preserved the old webhook and both mode-`0600` artifacts, and rebound the new
+ID/secret through explicit `stableCallbackCutover`. A new immutable deployment,
+stable signed proof and the documented retry drain remain required before the
+old callback may be deleted.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,
