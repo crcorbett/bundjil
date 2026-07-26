@@ -272,6 +272,18 @@ duplicate suppression, Preview, Production, or durable process supervision.
    exact assigned routing identity. After the journey and retry drain, delete
    only the temporary user by stable ID and require complete source/Preview
    readback to restore the one-adopted-user topology.
+   When a cold Messages composition to that assigned route remains SMS-only,
+   an explicitly approved Preview proof may first use the temporary Preview
+   project/user to send one bounded outbound Photon message to the exact
+   registered test recipient. Resolve the direct Space through the existing
+   `@bundjil/photon` SDK boundary, keep content and full identities only in
+   secure process custody, and require provider acceptance without retrying an
+   uncertain send. This outbound delivery may activate an iMessage
+   conversation in Messages, but it is not ingress proof: Photon webhooks are
+   inbound-only and do not echo outbound messages. Reply through the Messages
+   UI only when that exact conversation explicitly identifies iMessage; never
+   send through an SMS-labelled composer. Only the resulting signed inbound
+   callback may satisfy the Channel ingress oracle.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK

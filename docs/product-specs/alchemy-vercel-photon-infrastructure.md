@@ -472,6 +472,19 @@ typing start/stop and handset limitations. No synthetic identity, guessed
 recipient or shared source-project conversation may substitute for that direct
 observable.
 
+Cooper additionally approved one outbound-first handshake for the isolated
+Preview journey. Current Photon documentation states that shared-service
+outbound routing resolves the project and exact target phone, while webhooks
+emit inbound messages only and never echo outbound sends. The rollout may
+therefore recreate the bounded temporary Preview user and callback, send one
+uniquely identifiable non-sensitive outbound Photon message to the exact
+registered test recipient, and use only the resulting Messages conversation
+to attempt the genuine inbound reply. Provider acceptance or appearance in
+Messages is not Bundjil ingress proof. The Messages composer must explicitly
+identify iMessage before the reply is sent; SMS remains forbidden. The signed
+inbound callback, same-event retry, Eve completion, outbound response, typing
+and delivery readbacks remain the required oracles.
+
 Cooper has approved one narrower Preview-only topology adaptation for that
 journey. Fresh readback must first prove that the local Messages start identity
 is an existing controlled candidate, remains non-disruptively available to

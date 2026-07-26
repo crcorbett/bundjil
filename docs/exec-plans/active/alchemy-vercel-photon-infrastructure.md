@@ -821,6 +821,21 @@ the exact rollout-created temporary user may be removed after drain and
 readback. The terminal five-pass audit remains deferred until all tasks reach
 their final disposition.
 
+The resumed 2026-07-26 decision adds one outbound-first handshake without
+weakening that oracle. Fresh official Photon documentation and the pinned
+repository adapter agree that the Preview project can resolve a direct Space
+from the exact registered recipient and send outbound, while Photon webhooks
+emit inbound messages only and never echo an outbound send. After fresh
+baseline readback, the rollout may recreate only the bounded temporary user and
+query-controlled callback, send one uniquely identifiable non-sensitive Photon
+message to the registered test recipient, and inspect the resulting exact
+conversation through Computer Use. Provider acceptance and Messages appearance
+remain insufficient; a reply is allowed only when the composer explicitly says
+iMessage, never SMS, and only its signed inbound callback can begin the
+Channel/retry/Eve/outbound/typing proof. Full identities, content and
+conversation/message coordinates stay in secure process custody. Exact callback
+and user rollback remains mandatory whether the handshake succeeds or stops.
+
 ## Repository-authorized five-pass audit
 
 This 2026-07-24 interim checkpoint audited the first three repository slices on
