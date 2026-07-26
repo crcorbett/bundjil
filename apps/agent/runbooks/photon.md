@@ -244,6 +244,12 @@ duplicate suppression, Preview, Production, or durable process supervision.
    `delete:environment-webhook` against the exact old URL, proving zero exact
    matches, then registering the exact new URL. Never delete by hostname or
    count alone.
+   After stable signed proof, retry-horizon drain and final one-webhook
+   readback, move the surviving ID and signing secret into the approved ignored
+   mode-`0600` `.env.local` custody. Delete both temporary binding artifacts
+   and discard the retired callback's signing secret only after that readback;
+   never retain a second recovery copy or write either value to a tracked
+   receipt.
 5. Read back service, platform, shared-user, and webhook topology. The accepted
    desired state is service type `shared`, zero dedicated lines, one exact
    approved shared user, and one exact environment webhook. Do not delete
@@ -254,6 +260,9 @@ duplicate suppression, Preview, Production, or durable process supervision.
 1. Attach `photon-inbound` and `photon-outbound` authority, exact pushed source
    and immutable deployment/config identities, fresh replay/routing namespace
    fingerprints, the approved test conversation, and rollback references.
+   Stop when no exact approved Preview conversation identity is present. A
+   synthetic event identity, guessed recipient, or shared source-project
+   conversation is not provider-bound Channel proof.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK

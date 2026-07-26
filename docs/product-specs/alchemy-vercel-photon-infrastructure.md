@@ -454,9 +454,23 @@ lossless stable-callback cutover then created one second temporary webhook at
 safe fingerprint
 `d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b`,
 preserved the old webhook and both mode-`0600` artifacts, and rebound the new
-ID/secret through explicit `stableCallbackCutover`. A new immutable deployment,
-stable signed proof and the documented retry drain remain required before the
-old callback may be deleted.
+ID/secret through explicit `stableCallbackCutover`. Commit `8089076` then
+produced a READY non-Production deployment whose immutable URL and stable
+branch alias each returned exact protected valid-signature `204` for the
+unsupported-event no-op. After the documented retry horizon, cleanup deleted
+only the old callback by exact URL and fresh readback found one stable webhook
+at that fingerprint. Two post-cutover candidate inventories matched and
+retained both the source and isolated Preview user bindings. Stable credentials
+remain only in ignored mode-`0600` local custody and Vercel's sensitive Preview
+environment; both temporary binding artifacts and the retired signing secret
+were removed after readback.
+
+The Preview task remains open at the hosted Channel proof boundary. It requires
+one exact approved test conversation to prove real provider delivery,
+same-event retry/replay disposition, Eve completion, one outbound result,
+typing start/stop and handset limitations. No synthetic identity, guessed
+recipient or shared source-project conversation may substitute for that direct
+observable.
 
 ## Canonical Schema and Effect contracts
 

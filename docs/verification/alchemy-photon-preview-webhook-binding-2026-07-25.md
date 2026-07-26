@@ -3,10 +3,10 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-infrastructure-owner
-observed_at: 2026-07-25T23:27:00Z
-artifact_git_identity: a8c2672cbf58f4ee04c9a3db29b58710fff92953
+observed_at: 2026-07-26T09:14:31Z
+artifact_git_identity: 8089076fa7282f97878042a484f4ce033d9aa9e9
 environment: bundjil-photon-preview-webhook-binding
-review_trigger: replace with a later receipt after signed ingress and cleanup
+review_trigger: replace after the later approved real Channel journey or callback change
 ---
 
 # Alchemy Photon Preview webhook binding receipt — 2026-07-25
@@ -28,8 +28,8 @@ Fresh Preview inventory established zero webhooks before mutation. The
 authorized registration created one exact callback. Its stable webhook
 fingerprint is
 `fd778595f7780dd9cd74a5eb6c467a518e92eebf48668fafda967ee68d709c19`;
-the full ID and create-only signing secret remain only in a mode-`0600`
-ignored recovery artifact.
+the full ID and create-only signing secret were kept only in a mode-`0600`
+ignored recovery artifact during recovery and cutover.
 
 The owner-specific Vercel sink then sent one bulk upsert for exactly these
 Preview-only sensitive bindings:
@@ -85,22 +85,51 @@ fingerprint
 Fresh registration readback observed two total webhooks. The exact new
 ID/secret replaced the four Vercel Preview values through
 `stableCallbackCutover`; the owner returned `cutoverPendingIngress` and both
-mode-`0600` artifacts remain available for rollback.
+mode-`0600` artifacts remained available for rollback.
 
-## Current non-claims and recovery
+## Stable callback convergence and cleanup
 
-The current receipt proves exact Git deployment `2436ddb`, one protected valid
-signature `204`, two transient Photon webhook identities, four Vercel metadata
-identities, the scoped protection-bypass identity, and bounded recovery/cutover
-writes. It does not yet prove a deployment built with the stable webhook
-values, provider delivery to that callback, replay disposition, Channel
-processing, provider send, handset behavior, Production state, no-op/drift
-repair, retry drain, or cleanup.
+Cutover commit `8089076fa7282f97878042a484f4ce033d9aa9e9` produced exact
+non-Production deployment `dpl_7F5K7LBqM9vjJsX29vWZB7btp75y`. It reached
+`READY`, included the stable branch alias, and had no alias error. Protected
+valid-signature unsupported-event probes against both the immutable deployment
+and stable alias returned exact `204` with no redirect or response body.
 
-Keep the recovery artifact mode `0600` until a new immutable Preview
-deployment proves signed Photon ingress. If the stable deployment fails,
-retain both artifacts and both exact webhook fingerprints; do not replay the
-sink or create a third webhook. Photon documents up to six attempts, jittered
-backoff and a worst-case delivery window of about 3.5 minutes. After stable
-signed proof, wait through that horizon before deleting only the old immutable
-callback. The adopted Preview user and source project/users remain protected.
+The retry drain began at `2026-07-26T09:07:56Z` and completed after
+`2026-07-26T09:11:33Z`, beyond Photon's documented worst-case delivery window
+of about 3.5 minutes. A fresh stable-alias signed probe again returned exact
+`204`. Cleanup then deleted only the old immutable callback by exact URL:
+read-before-delete found one exact match and read-after-delete found zero.
+Fresh management readback found one remaining stable callback with fingerprint
+`d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b`.
+
+Two fresh candidate inventories after cutover matched digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`;
+the source and isolated Preview user bindings remained unchanged. The final
+stable webhook ID and secret are held only in the ignored mode-`0600`
+`.env.local` and Vercel's sensitive Preview environment. After exact cleanup
+readback, the two temporary mode-`0600` binding artifacts were deleted and the
+retired callback's signing secret was discarded. The adopted Preview user and
+source project/users remain protected.
+
+## Current non-claims and next gate
+
+This receipt proves exact stable deployment identity, protected signed ingress
+for the unsupported-event no-op, retry-horizon drain, one-callback cleanup,
+four sensitive Preview metadata identities, unchanged source/Preview user
+bindings, and bounded recovery/cutover writes. It does not prove an actual
+Photon delivery, same-event retry/replay disposition, Eve dispatch or
+completion, an outbound provider result, typing start/stop, handset delivery,
+Production state, the later stable-binding lifecycle, or terminal SPEC
+closeout.
+
+The hosted Channel journey requires one exact approved Preview test
+conversation. No such conversation identity is present in the current
+authority/readback evidence. A synthetic identity, guessed recipient, or the
+shared source project is not a valid substitute. The task therefore remains
+in progress at that exact gate; the formal five-pass audit has not run.
+
+## Sources
+
+- [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)
+- [Photon webhook events](https://photon.codes/docs/webhooks/events)

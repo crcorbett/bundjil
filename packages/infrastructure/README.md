@@ -139,3 +139,10 @@ For the later lossless stable callback replacement, use
 webhook and its artifact remain available for rollback. The command retains
 the new artifact and returns `cutoverPendingIngress`; delete neither callback
 nor artifact until the new immutable deployment passes signed proof.
+After signed proof, the full documented retry drain and exact one-webhook
+cleanup readback, keep the surviving ID/secret only in approved ignored
+mode-`0600` `.env.local` custody and Vercel's sensitive Preview environment.
+Delete both temporary binding artifacts and discard the retired callback
+secret. The later hosted Channel proof still requires an exact approved
+Preview conversation; never substitute a synthetic identity, guessed
+recipient, or the shared source project.

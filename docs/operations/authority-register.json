@@ -385,7 +385,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-25 isolation and webhook-binding receipts read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines, four sensitive Preview-only Vercel metadata identities, one note-scoped automation-bypass fingerprint, and READY deployment dpl_C8Wrg6fKK5ztsTonQuFZcN8TXLWo with protected valid-signature 204. Stable cutover currently retains old/new artifacts and two webhook fingerprints while a new deployment, stable signed proof and the documented retry drain remain open."
+        "evidence": "The 2026-07-25 isolation and updated webhook-binding receipts read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines, four sensitive Preview-only Vercel metadata identities and one note-scoped automation-bypass fingerprint. READY deployment dpl_7F5K7LBqM9vjJsX29vWZB7btp75y returned protected valid-signature 204 at both immutable and stable callback identities. After the documented retry drain, cleanup removed only the old exact callback and fresh readback found one stable webhook at safe fingerprint d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b. Two post-cutover candidate inventories matched with source and Preview bindings unchanged. Hosted Channel proof remains unavailable until one exact approved Preview test conversation is supplied; no synthetic, guessed or shared-source conversation is accepted."
       }
     },
     {
