@@ -563,6 +563,23 @@ capability for the exact isolated Preview project credential is the smallest
 remaining external prerequisite. This does not satisfy the hosted Channel
 proof and does not trigger the terminal five-pass audit.
 
+The 2026-07-26 read-only diagnosis narrows that prerequisite. Photon documents
+Free/shared outbound to an exact recipient as supported only when the target is
+a registered user of that project and the registered handle exactly matches
+the handle Apple presents. The failed temporary user satisfied management
+readback and assignment, both working and isolated projects expose the same
+Free/shared/iMessage-enabled/zero-line posture, and both accepted Production
+and failed Preview artifacts use Spectrum `12.3.0` through the same Bundjil
+adapter. No outbound-enable or approval control is documented or surfaced in
+the authenticated dashboard flow. Because the one registered-target send still
+received `PERMISSION_DENIED`, the next owner is Photon's shared-router or
+transport-token trace after the exact target is revalidated with Photon's
+debug-line handle oracle. A plan upgrade, dedicated line, credential rotation
+or project recreation is not an accepted diagnostic substitute. The
+fingerprint-only comparison, ranked internal hypotheses, support packet,
+smallest retry and non-claims are retained in
+`docs/verification/alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

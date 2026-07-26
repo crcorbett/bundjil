@@ -93,6 +93,11 @@ operation nor asserts present provider state.
   stable redeployment, retry drain, exact cleanup, matching restored
   inventories, and unchanged adopted/source bindings. It is an inconclusive
   genuine-origin result, not Channel or terminal SPEC proof.
+- [`alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`](alchemy-photon-outbound-permission-diagnosis-2026-07-26.md)
+  compares the working and isolated Free/shared topologies, confirms the same
+  Spectrum adapter/version and Photon's registered-target allowlist contract,
+  and localizes the denial to shared transport authorization or route binding.
+  It is read-only diagnosis, not a send, provider repair, or Channel proof.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

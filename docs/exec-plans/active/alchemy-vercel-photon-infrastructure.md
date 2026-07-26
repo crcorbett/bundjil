@@ -869,6 +869,22 @@ outbound-iMessage-capable credential for the same isolated Preview project, or
 a provider correction enabling that capability. The task and plan remain open;
 the terminal five-pass audit has not run.
 
+Fresh read-only diagnosis on 2026-07-26 rejects a missing dashboard switch,
+inactive Free plan, disabled iMessage platform, required dedicated line,
+different SDK version and different Bundjil adapter as explanations. Photon
+documents Free/shared sends to registered project users, provided the
+registered target exactly matches Apple's iMessage handle. The temporary
+Preview user was assigned before the failed send, but the shared transport
+still returned `PERMISSION_DENIED`; Photon's management API exposes no
+outbound-capability or binding-health flag, and no separate send-enable control
+is documented or surfaced in the authenticated dashboard flow. The next
+provider boundary is therefore: validate the exact Apple handle through
+Photon's debug line, then ask Photon support to trace and repair the shared
+project-target binding, allowlist cache or transport-token authorization. A
+Business upgrade, dedicated line, credential rotation or project recreation is
+not justified by the current evidence. The read-only receipt is
+`docs/verification/alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`.
+
 ### Outbound-first handshake impact ledger
 
 | Surface                          | Status          | Decision and evidence                                                                                                                                                        |
@@ -877,13 +893,13 @@ the terminal five-pass audit has not run.
 | READMEs                          | Preserve        | Existing Photon and agent README owner/command maps remain accurate; exact operation and limitation stay in the runbook and proof owner.                                     |
 | Exports and generated references | Preserve        | No package boundary or generated reference changed; the attempt used the existing Photon client and management services.                                                     |
 | Runbooks and authority           | Change required | The runbook already owns the outbound-first stop conditions; this plan records the exercised Preview-only authority and provider denial without broadening it.               |
-| Verification journeys and proof  | Change required | The dated native-origin receipt records direct Space success, send denial, Messages absence, exact rollback and all remaining non-claims.                                    |
+| Verification journeys and proof  | Change required | The native-origin receipt records the denial/rollback; the read-only diagnosis records the registered-target contract, topology comparison, support boundary and non-claims. |
 | Skills and AGENTS                | Preserve        | PRD, docs, Effect-client, package-ownership and Computer Use contracts were applied; no reusable process defect requires instruction changes.                                |
 | Lint, config, commands and CI    | Preserve        | No tracked config, command or CI change occurred. Secure process-only values and existing mode-`0600` custody were used and removed as required.                             |
 | Schemas, services and Layers     | Preserve        | Existing decoded Photon identities, private SDK boundary, named management operations and live Layers handled the attempt; no new DTO or escape hatch was added.             |
 | Tests and fixtures               | Preserve        | No repository code changed. Focused package checks and full verification rerun against the receipt-bearing candidate; provider denial remains provider evidence, not a mock. |
-| SPEC, tasks and plan             | Change required | Keep `isolated-photon-preview-spike` in progress at the exact outbound-permission prerequisite; terminal audit remains deferred.                                             |
-| Receipts and evidence            | Change required | Update only fingerprint-safe metadata, immutable deployment identities, provider error classification, rollback and non-claims; retain no full identity or message content.  |
+| SPEC, tasks and plan             | Change required | Keep `isolated-photon-preview-spike` in progress at the exact shared-transport trace prerequisite; terminal audit remains deferred.                                          |
+| Receipts and evidence            | Change required | Retain fingerprint-safe topology, exact SDK/version path, provider contract, support repair boundary, rollback and non-claims; retain no full identity or message content.   |
 | Rollout and rollback             | Change required | One temporary user/callback were created and exactly removed after stable rebind/drain; original digest and one-user/one-webhook topology are restored.                      |
 | Lifecycle and archive pointers   | Preserve        | The plan remains active, no archive pointer changes, and the earlier five-pass checkpoint remains explicitly non-terminal.                                                   |
 
