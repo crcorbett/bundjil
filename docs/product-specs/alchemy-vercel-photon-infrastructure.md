@@ -416,6 +416,17 @@ project. Never detach an existing binding to make the spike pass. If every
 controlled identity is provider-exclusive, retain the isolated Preview stop
 and record that provider constraint instead of weakening project isolation.
 
+The 2026-07-25 provider bootstrap created a separate Free
+`bundjil-preview` project. Photon enabled managed-shared iMessage and
+automatically seeded the earlier adopted controlled identity during project
+creation; no separate user-create request ran. Source readback retained the
+original binding and assignment, while Preview used a separate project
+credential, user UUID, and assigned routing identity. Because deleting the
+seeded user or adding a second user would be more disruptive, the isolated
+Preview topology adopts that provider-seeded user by safe fingerprint. The
+dated verification receipt owns the exact redacted before/after and rollback
+identity; webhook, deployment, Channel, and Production proof remain open.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

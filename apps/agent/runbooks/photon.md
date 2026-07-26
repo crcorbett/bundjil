@@ -197,6 +197,13 @@ duplicate suppression, Preview, Production, or durable process supervision.
    availability, call the idempotent shared-user create once, then read back
    one exact stable user ID and an assigned routing number without retaining
    either phone value. Re-read the source project's binding after creation.
+   Photon project creation may automatically seed the authenticated
+   principal's controlled shared user. Treat that as a provider mutation:
+   fingerprint and read back the seeded user, its assignment, and the source
+   binding before any later user operation. Adopt it only when the source
+   binding is unchanged and retaining it is less disruptive than deletion or
+   adding another user. Never call create merely because the runbook expected
+   an initially empty project.
    More than one exact match, an unavailable or exclusive identity, any source
    binding change, a dedicated service, or an uncertain postcondition is a
    stop.

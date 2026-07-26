@@ -372,11 +372,11 @@
       "identitySource": "Photon Basic-auth project readback plus the accepted source, active rollout task, and current Codex approval receipt",
       "operation": "List and reconcile the exact project Free managed-shared service, one approved shared user, platform, and environment-scoped webhooks required by the Channel rollout",
       "resource": "Approved Photon project, shared iMessage service, one adopted or rollout-created shared user, zero dedicated lines, and exact Preview/Production webhook records",
-      "environment": "Task-scoped Preview then Production rollout on 2026-07-21; each resource is named by stable provider identity in the protected operation receipt",
+      "environment": "Task-scoped isolated Preview then separately reconciled Production under the accepted Alchemy infrastructure SPEC; each resource is named by stable provider identity in the protected operation receipt",
       "status": "bounded",
-      "durationRevocation": "Management mutation authority ended when promote-and-prove-dual-channel-production completed. Runtime credentials remain only under the separate inbound/outbound envelopes; rotate or revoke them on target drift, incident, or user revocation.",
-      "approvalBoundary": "The user's direct 2026-07-21 approval permits Photon CRUD for this rollout; dedicated lines, billing-policy, unrelated project/resource, contact, message-history, and future operations are excluded from the accepted Free topology",
-      "approvalReceipt": "Current Codex task in source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 plus docs/product-specs/photon-channel-provider.tasks.json",
+      "durationRevocation": "One serial Alchemy infrastructure continuation ending when the accepted SPEC reaches terminal closeout or Cooper revokes it; runtime credentials remain under separate inbound/outbound envelopes and are revoked on target drift, incident, or user revocation.",
+      "approvalBoundary": "Cooper's direct continuation approval in source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1 permits exact Bundjil Preview/Production project, Free shared-user, webhook and configuration reconciliation plus bounded proof and rollback. Dedicated lines, billing-policy changes, unrelated resources, contact/message-history access, destructive source-user changes, unbounded billing, and main-branch merge remain excluded.",
+      "approvalReceipt": "Current Codex task in source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1, docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json, and the current dated verification receipt",
       "auditEvidence": "Sanitized authenticated project/service/platform/shared-user/webhook counts and states, observedAt, stable-ID fingerprints, exact operation, postcondition, and rollback ownership",
       "rollback": "Delete only a rollout-created webhook or shared user by its stable ID, preserve adopted users, restore prior platform state only when changed by this rollout, and read back the complete approved inventory",
       "stopCondition": "Stop on credential mode, project mismatch, non-shared service, ambiguous shared-user identity, unavailable identity, write-only secret loss, provider error, unavailable readback, or uncertain deletion",
@@ -385,7 +385,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-23 staged and accepted receipts read back shared Free service, iMessage enabled, the exact approved user among two preserved users, zero dedicated lines, and one Production plus one Preview webhook"
+        "evidence": "The 2026-07-25 isolation receipt and current owner-named inventory read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines and zero Preview webhooks; webhook and deployment proof remain open"
       }
     },
     {

@@ -13,9 +13,10 @@ send, and typing presence.
 - `@bundjil/photon/live` exports the scoped live Layer.
 - `@bundjil/photon/memory` exports the provider-neutral memory Layer.
 - `@bundjil/photon/management` exports the read-only Photon management
-  Schemas, six named observation services, operation-specific safe errors,
-  lazy redacted credential service, and explicit live/memory Layers required
-  by Alchemy. It exports no mutation operation.
+  Schemas, six named resource-observation services, one owner-named controlled
+  candidate inventory service, operation-specific safe errors, lazy redacted
+  credential services, and explicit live/memory Layers required by Alchemy.
+  It exports no mutation operation.
 
 Spectrum clients, Spaces, callbacks, SDK/Zod values, raw provider failures,
 Basic-auth construction, management URLs, provider DTOs, and operator
@@ -122,6 +123,14 @@ bun run --filter @bundjil/photon build
 
 These commands are repository proof only. They do not configure Photon or
 prove a deployed webhook, provider send, or handset delivery.
+
+`bun run infrastructure:photon-candidate-inventory` loads the ignored source
+and Preview project credentials plus one selected safe fingerprint, performs
+two complete sequential source/Preview shared-user and availability reads, and
+emits only a Schema-encoded fingerprint manifest when both digests match and
+the selected Preview binding is unique. Every failure emits only
+`{"status":"blocked"}`. The command performs no provider write and retains no
+phone, assigned routing identity, project secret, provider body, or raw error.
 
 The separately authorised, provider-only lifecycle command is
 `bun run --filter @bundjil/photon proof:provider`. It follows the
