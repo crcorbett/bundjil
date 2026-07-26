@@ -775,12 +775,23 @@ controls/verification-policy gate.
 | Receipts and evidence            | Change required | Route separate sanitized isolation and webhook-binding receipts; retain only fingerprints, metadata identities, limitations, non-claims and rollback identity.                          |
 | Rollout, rollback and archive    | Change required | Retain the Preview project/user/stable webhook; rollback protects adopted users and removes only exact rollout-created identities after readback. Temporary cutover artifacts are gone. |
 
-The next accepted boundary is one exact approved Preview test conversation.
-Use it to run the bounded provider-delivery, same-event retry/replay, Channel,
-outbound, typing and handset journey. Do not synthesize an identity, guess a
-recipient, or use the shared source project to manufacture proof. Until that
-identity is available, the later stable-binding/no-op/drift/rollback matrix
-remains dependency-blocked rather than falsely accepted.
+Fresh autonomous-origin preflight found no provider route from the adopted
+registered sender: Sendblue's authenticated line fingerprint differed, and the
+local Messages start identity was another existing controlled candidate.
+Cooper approved one exact Preview-only adaptation for that candidate. Before
+mutation, require fresh shared availability and unchanged source binding; then
+create one temporary rollout-owned Preview user while preserving the adopted
+user. Use only its assigned routing identity for one genuine Messages-origin
+journey, run the same-event provider retry, outbound, typing and delivery
+oracles, wait through the retry drain, and delete only that exact temporary
+user. Final source and Preview inventories must restore the one-adopted-user
+topology. A moved source binding, duplicate/ambiguous user, or uncertain create
+or delete remains a stop.
+
+Do not synthesize an identity, guess a recipient, or use the shared source
+project to manufacture proof. Until the temporary-user journey and exact
+restoration pass, the later stable-binding/no-op/drift/rollback matrix remains
+dependency-blocked rather than falsely accepted.
 The selected user is adopted; no later slice may delete it, add a second user,
 or weaken source readback. The terminal five-pass audit remains deferred until
 all tasks reach their final disposition.

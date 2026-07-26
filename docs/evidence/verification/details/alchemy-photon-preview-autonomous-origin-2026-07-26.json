@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "isolated-photon-preview-spike",
+  "observedAt": "2026-07-26T09:42:30.000Z",
+  "candidate": {
+    "repositoryCommit": "f9ce5147223f9a153d3eb63cc0783bec035567ce",
+    "deployedCommit": "8089076fa7282f97878042a484f4ce033d9aa9e9",
+    "stableWebhookFingerprint": "d24567746bb03623f86e5f8b3d43449dc56a6cb374788c482e1fcab56b35913b"
+  },
+  "authority": {
+    "principal": "Cooper-approved Codex operator using authenticated Photon, Sendblue, and local Messages readback",
+    "scope": "One genuine Preview direct-text journey from the exact registered user identity, with no Production or shared-resource mutation",
+    "approvalReceipt": "source thread 019f3c64-2576-70c2-90c0-e6b212f79ee1"
+  },
+  "photonReadback": {
+    "candidateInventoryDigest": "9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f",
+    "selectedRegisteredSenderFingerprint": "db23193a557af142d3ba0dd0d010e062e1f67928388875bf989369d1c0587ad4",
+    "previewAssignedRecipientFingerprint": "db49756e7d25c982a6bcd60c2139da5a4f895c788f33c5af2c0cdfc57b710c0d",
+    "matchingSequentialInventories": true,
+    "sourceBindingUnchanged": true,
+    "previewBindingPresent": true
+  },
+  "sendblueReadback": {
+    "authenticatedLineFingerprint": "6a6a862e44d7968617f7ef46413ce71851c8c134f8c65d26ea8201f4319b25b9",
+    "observedControlledContactFingerprint": "82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5",
+    "authenticatedLineMatchesRegisteredSender": false,
+    "sampledMessageCount": 100,
+    "sampledService": "iMessage"
+  },
+  "messagesReadback": {
+    "startNewConversationsIdentityFingerprint": "82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5",
+    "selectedConversationRecipientFingerprint": "d403977963ff5f060675d5dd2824a790caf39f7ea2c314e519df500702d46b49",
+    "startIdentityMatchesRegisteredSender": false,
+    "selectedRecipientMatchesPreviewAssignedRecipient": false,
+    "accountSettingsChanged": false
+  },
+  "result": {
+    "status": "inconclusive",
+    "messageSent": false,
+    "webhookChanged": false,
+    "deploymentChanged": false,
+    "providerIdentityChanged": false,
+    "productionChanged": false,
+    "reason": "No authenticated existing origin could send from the adopted registered Preview user identity before the explicitly approved temporary-user adaptation."
+  },
+  "resumeTrigger": {
+    "status": "satisfied",
+    "decision": "Cooper explicitly approved one temporary rollout-owned Preview user for the fingerprint-matched local Messages start identity.",
+    "requiredSourceBindingFingerprint": "020cc192c042e0f4cbdffaaa533448c5bacf767f8a3eb7cd0402e52883d12d29",
+    "temporarySenderFingerprint": "82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5"
+  },
+  "limitations": [
+    "The readback proves only current fingerprint relationships and provider-origin capability for the sampled authenticated surfaces.",
+    "No actual Photon delivery, provider retry, Eve completion, outbound response, typing transition, or handset result occurred."
+  ],
+  "nonClaims": [
+    "A Sendblue contact observation does not prove Sendblue can originate from that contact identity.",
+    "A prior Messages conversation does not prove the currently signed-in account controls the isolated Preview sender."
+  ]
+}

@@ -263,6 +263,15 @@ duplicate suppression, Preview, Production, or durable process supervision.
    Stop when no exact approved Preview conversation identity is present. A
    synthetic event identity, guessed recipient, or shared source-project
    conversation is not provider-bound Channel proof.
+   When the approved local Messages start identity is a different existing
+   controlled candidate, first prove its exact fingerprint, shared
+   availability and unchanged source binding. Under an explicit Preview-only
+   temporary-user envelope, create exactly one rollout-owned Preview shared
+   user for that identity while preserving the adopted user. Stop if Photon
+   moves the source binding, returns an ambiguous user or cannot read back the
+   exact assigned routing identity. After the journey and retry drain, delete
+   only the temporary user by stable ID and require complete source/Preview
+   readback to restore the one-adopted-user topology.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK

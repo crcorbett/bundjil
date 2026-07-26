@@ -472,6 +472,18 @@ typing start/stop and handset limitations. No synthetic identity, guessed
 recipient or shared source-project conversation may substitute for that direct
 observable.
 
+Cooper has approved one narrower Preview-only topology adaptation for that
+journey. Fresh readback must first prove that the local Messages start identity
+is an existing controlled candidate, remains non-disruptively available to
+Preview, and keeps its source binding unchanged. The rollout may then create
+exactly one temporary shared user for that identity in the isolated Preview
+project without deleting or changing the adopted user. The temporary user is
+rollout-owned, exists only for the genuine provider-delivered Channel journey,
+and must be removed by exact stable user identity after callback retry drain
+and complete source/Preview readback. If Photon would move or disrupt the source
+binding, the adaptation stops without mutation. No second retained user or
+Production topology change is accepted.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,
