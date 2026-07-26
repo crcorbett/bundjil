@@ -4,7 +4,6 @@ import {
   PhotonProjectId,
   PhotonProjectSecret,
   PhotonWebhookId,
-  PhotonWebhookSecret,
 } from "@bundjil/photon/config";
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
@@ -16,6 +15,8 @@ import {
   Exit,
   FileSystem,
   Layer,
+  Option,
+  Redacted,
   Schema,
 } from "effect";
 
@@ -53,15 +54,23 @@ const PhotonWebhookBindingPath = Schema.NonEmptyString.pipe(
 
 const PhotonWebhookBindingFile = Schema.Struct({
   webhookId: PhotonWebhookId,
-  webhookSecret: PhotonWebhookSecret,
+  webhookSecret: Schema.NonEmptyString,
 });
 
-const PhotonPreviewWebhookBindingReceipt = Schema.Struct({
-  environmentBindingCount: Schema.Literal(4),
-  secretReferencePersisted: Schema.Literal(true),
-  sourceBindingRemoved: Schema.Literal(true),
-  status: Schema.Literal("bound"),
-});
+const PhotonPreviewWebhookBindingReceipt = Schema.Union([
+  Schema.Struct({
+    environmentBindingCount: Schema.Literal(4),
+    secretReferencePersisted: Schema.Literal(true),
+    sourceBindingRemoved: Schema.Literal(true),
+    status: Schema.Literal("bound"),
+  }),
+  Schema.Struct({
+    environmentBindingCount: Schema.Literal(4),
+    secretReferencePersisted: Schema.Literal(true),
+    sourceBindingRemoved: Schema.Literal(false),
+    status: Schema.Literal("recoveredPendingIngress"),
+  }),
+]);
 
 const PhotonPreviewWebhookBindingSuccess = Schema.Struct({
   receipt: PhotonPreviewWebhookBindingReceipt,
@@ -91,6 +100,10 @@ const photonProjectSecretConfig = Config.schema(
   PhotonProjectSecret,
   "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
 );
+const recoveryModeConfig = Config.schema(
+  Schema.Literal("signedIngressMismatch"),
+  "BUNDJIL_PHOTON_BINDING_RECOVERY_MODE"
+).pipe(Config.option);
 
 const requiredKeys = [
   PhotonProjectIdEnvironmentKey,
@@ -106,12 +119,27 @@ const exactPhotonBindings = (
     requiredKeys.some((key) => key === candidate.key)
   );
 
+const isExactPreviewBindingMetadata = (
+  bindings: readonly VercelEnvironmentVariableAttributes[]
+) =>
+  bindings.length === requiredKeys.length &&
+  requiredKeys.every(
+    (key) => bindings.filter((candidate) => candidate.key === key).length === 1
+  ) &&
+  bindings.every(
+    (candidate) =>
+      candidate.sensitive &&
+      candidate.targets.length === 1 &&
+      candidate.targets[0] === "preview"
+  );
+
 const command = Effect.gen(function* bindPhotonPreviewWebhook() {
   const bindingPath = yield* bindingPathConfig;
   const teamId = yield* teamIdConfig;
   const vercelProjectId = yield* vercelProjectIdConfig;
   const photonProjectId = yield* photonProjectIdConfig;
   const projectSecret = yield* photonProjectSecretConfig;
+  const recoveryMode = yield* recoveryModeConfig;
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(bindingPath);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 16n * 1024n) {
@@ -135,7 +163,12 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
       projectId: vercelProjectId,
     })
   );
-  if (exactPhotonBindings(before.environmentVariables).length !== 0) {
+  const existingBindings = exactPhotonBindings(before.environmentVariables);
+  const isInitialBinding = existingBindings.length === 0;
+  const isObservedRecovery =
+    Option.isSome(recoveryMode) &&
+    isExactPreviewBindingMetadata(existingBindings);
+  if (!isInitialBinding && !isObservedRecovery) {
     return yield* Effect.fail("binding-already-present");
   }
 
@@ -148,7 +181,7 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
       photonProjectId,
       projectSecret,
       webhookId: binding.webhookId,
-      signingSecret: binding.webhookSecret,
+      signingSecret: Redacted.make(binding.webhookSecret),
     })
   );
 
@@ -160,20 +193,17 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
     })
   );
   const exactBindings = exactPhotonBindings(observed.environmentVariables);
-  if (
-    exactBindings.length !== requiredKeys.length ||
-    requiredKeys.some(
-      (key) =>
-        exactBindings.filter((candidate) => candidate.key === key).length !== 1
-    ) ||
-    exactBindings.some(
-      (candidate) =>
-        !candidate.sensitive ||
-        candidate.targets.length !== 1 ||
-        candidate.targets[0] !== "preview"
-    )
-  ) {
+  if (!isExactPreviewBindingMetadata(exactBindings)) {
     return yield* Effect.fail("binding-readback-invalid");
+  }
+
+  if (isObservedRecovery) {
+    return PhotonPreviewWebhookBindingReceipt.make({
+      environmentBindingCount: 4,
+      secretReferencePersisted: true,
+      sourceBindingRemoved: false,
+      status: "recoveredPendingIngress",
+    });
   }
 
   yield* fileSystem.remove(bindingPath);

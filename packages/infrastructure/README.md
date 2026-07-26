@@ -127,3 +127,9 @@ owner-specific sink. It reads the exact metadata before and after the write,
 blocks rather than replaying any pre-existing or partial binding, and removes
 the recovery artifact only after the complete acknowledgement and metadata
 readback pass.
+
+After a direct signed-ingress mismatch, the exact four existing metadata
+identities may be recovered once by setting
+`BUNDJIL_PHOTON_BINDING_RECOVERY_MODE=signedIngressMismatch`. The command
+rewrites the same decoded values through the owner sink and retains the source
+artifact until a later immutable deployment proves signed ingress.

@@ -17,10 +17,10 @@ Pushing implementation commit
 `a8c2672cbf58f4ee04c9a3db29b58710fff92953` caused Vercel Git to create
 Preview deployment `dpl_9kmc9i6zgZT4nDi1pKmddJUwd6CA` for exact project
 `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`. The deployment reached `READY`, remained
-non-Production, and had no alias error. An unauthenticated invalid POST to its
-exact `/eve/v1/photon/webhook` route returned the application-owned `401`
-signature rejection with no redirect. This proves public routing to the
-signature boundary, not a valid Photon signature.
+non-Production, and had no alias error. Later response-envelope inspection
+corrected the first unauthenticated `401`: Vercel Authentication, not the
+application signature boundary, rejected the request. No public Photon-route
+claim is retained for that deployment.
 
 ## Provider mutations and readback
 
@@ -53,12 +53,28 @@ This is a timeout/partial-acknowledgement recovery state, not final
 convergence. The repository command now reads before writing and blocks when
 any of the four identities already exists, preventing blind replay.
 
+The recovery review found that Vercel's decoded upsert acknowledgement may use
+status `200` as well as create status `201`, and that the binding-file ingress
+must decode its encoded secret string before wrapping the owner service Type
+as `Redacted`. The corrected adapter covers both success statuses. One
+explicit `signedIngressMismatch` recovery used the existing four exact
+metadata identities, rewrote the same values through the owner sink, returned
+`recoveredPendingIngress`, and retained the mode-`0600` artifact.
+
+Vercel Authentication remained the next ingress fence. The project already
+contained unrelated automation-bypass entries, so none was guessed or reused.
+One note-scoped `bundjil-photon-preview-webhook` automation bypass was created
+under the approved credential authority and stored only in ignored
+mode-`0600` custody. Its safe fingerprint is
+`32f231e1106e391ace5581eb03ed811f7c2659b0a54aab6472728a0e8aa9199e`.
+No bypass value or callback query is retained here.
+
 ## Current non-claims and recovery
 
-The current receipt proves the exact Git deployment, public signature
-boundary, one Photon webhook, and four Vercel metadata identities. It does not
-prove the encrypted values, a deployment built after the environment change,
-a valid Photon signature, signed ingress, replay disposition, Channel
+The current receipt proves the exact Git deployment, one Photon webhook, four
+Vercel metadata identities, the scoped protection-bypass identity, and a
+bounded value-recovery write. It does not prove a deployment built after the
+recovery, a valid Photon signature, signed ingress, replay disposition, Channel
 processing, provider send, handset behavior, Production state, no-op/drift
 repair, retry drain, or cleanup.
 

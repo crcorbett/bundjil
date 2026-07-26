@@ -222,6 +222,16 @@ duplicate suppression, Preview, Production, or durable process supervision.
    If the Vercel acknowledgement is uncertain but exact metadata exists,
    retain the file, block replay, deploy through Vercel Git, and require signed
    ingress before deleting the recovery copy.
+   If Vercel Authentication fences Preview, create or select only an explicitly
+   approved note-scoped automation bypass. For a provider that cannot set a
+   header, place it only in the protected callback query, keep the value in
+   ignored mode-`0600` custody, and retain only its safe fingerprint. Never
+   guess among unrelated bypass entries.
+   A direct signed-ingress mismatch may set
+   `BUNDJIL_PHOTON_BINDING_RECOVERY_MODE=signedIngressMismatch` for one exact
+   owner-sink recovery after all four Preview-only sensitive metadata
+   identities are read back. Keep the artifact until a later immutable
+   deployment returns the expected signed response.
    The command blocks an existing target rather than adopting a lost
    write-only secret and reconciles an uncertain create by exact URL inventory.
    Replace an isolated zero-traffic callback by running

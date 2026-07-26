@@ -90,7 +90,7 @@ const VercelPhotonWebhookBindingCreatedEnvironment = Schema.Struct({
 });
 
 const VercelPhotonWebhookBindingSuccessEnvelope = Schema.Struct({
-  status: Schema.Literal(201),
+  status: Schema.Literals([200, 201]),
   headers: PhotonWebhookBindingResponseHeaders,
   body: Schema.Struct({
     created: Schema.Union([
@@ -255,7 +255,7 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
           )
         )
       );
-      if (response.status !== 201) {
+      if ("error" in response.body) {
         return yield* knownFailure(
           "persistPreviewWebhookBinding",
           failureReason(response.status),

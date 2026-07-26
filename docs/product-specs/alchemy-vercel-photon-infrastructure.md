@@ -436,6 +436,17 @@ Schema contract. The create-only recovery artifact therefore remains mode
 recovery state, not convergence: a new Git deployment and valid signed ingress
 must prove the configured values before the artifact can be removed.
 
+Response-envelope inspection later corrected two false greens. The initial
+`401` was Vercel Authentication rather than application signature rejection,
+and the binding-file ingress had attempted to decode its encoded JSON secret
+string as an already decoded `Redacted` Type. The owner now decodes the string
+once, immediately redacts it, accepts documented Vercel upsert status
+`200|201`, and permits one explicit `signedIngressMismatch` recovery only when
+all four exact Preview-only sensitive metadata identities already exist. A
+note-scoped automation bypass is separately custodied for the protected
+Preview callback; its value and callback query remain absent from tracked
+artifacts.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

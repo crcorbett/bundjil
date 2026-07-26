@@ -324,6 +324,59 @@ it.effect(
     })
 );
 
+it.effect(
+  "accepts the documented 200 acknowledgement for an exact upsert",
+  () =>
+    Effect.gen(function* testPhotonWebhookBindingUpsertContract() {
+      const input = yield* fixture;
+      const mockClient = HttpClient.make((request) =>
+        Effect.sync(() => {
+          if (request.body._tag !== "Uint8Array") {
+            throw new Error("Expected one encoded Vercel JSON request.");
+          }
+          const body = Schema.decodeUnknownSync(
+            Schema.fromJsonString(
+              Schema.Array(
+                Schema.Struct({
+                  key: Schema.String,
+                  value: Schema.String,
+                  type: Schema.String,
+                  target: Schema.Array(Schema.String),
+                })
+              )
+            )
+          )(new TextDecoder().decode(request.body.body));
+          return HttpClientResponse.fromWeb(
+            request,
+            Response.json(
+              {
+                created: body.map((entry, index) => ({
+                  id: `env-upsert-${index}`,
+                  key: entry.key,
+                  type: entry.type,
+                  target: entry.target,
+                  sensitive: true,
+                })),
+                failed: [],
+              },
+              { status: 200 }
+            )
+          );
+        })
+      );
+
+      const result = yield* PhotonWebhookBindingSink.pipe(
+        Effect.flatMap((sink) => sink.persistPreviewWebhookBinding(input)),
+        Effect.provide(layerLive(mockClient))
+      );
+
+      assert.strictEqual(
+        result.owner,
+        "bundjil-agent-preview-vercel-environment"
+      );
+    })
+);
+
 it.effect("classifies a partial Vercel acknowledgement as uncertain", () =>
   Effect.gen(function* testPhotonWebhookBindingLivePartialFailure() {
     const input = yield* fixture;
