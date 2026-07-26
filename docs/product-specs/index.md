@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-26
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -16,6 +16,10 @@ context.
 
 ## Proposed
 
+- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
+  reviewed implementation intent for deterministic Effect time, pragmatic
+  state/collection ownership, and four narrow existing-plugin lint rules;
+  implementation awaits an active plan and explicit authority.
 - [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md) —
   reviewed proof intent for `202` after Eve-owned intended-session Workflow
   acceptance, Eve/Nitro-owned generated-function timeout readback, and a
