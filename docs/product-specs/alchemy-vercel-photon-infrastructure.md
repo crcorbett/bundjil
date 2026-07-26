@@ -531,6 +531,38 @@ mode-`0600` binding artifacts were removed; stable credential custody remains
 the ignored mode-`0600` `.env.local` and Vercel's sensitive Preview metadata.
 The Channel proof remains unproved at the genuine iMessage-origin boundary.
 
+The authorized outbound-first handshake then reran from that restored baseline.
+Fresh source and adopted-user readback passed; one new temporary Preview user
+and one query-controlled callback were created while preserving the accepted
+user and stable callback. Two inventories matched post-create digest
+`e4ab75194439bcf5d61a0ffc8ac2a5eaf3955a807da4dce82bf3a1e8c0a090a4`.
+Exact source `d30509172a2810c2a3e27b893dffc63a0fd0c569` produced READY
+deployment `dpl_2GPBK8DJqTAc3M6AQrdkjcfCokP4`, and its protected stable alias
+returned a valid-signature unsupported-event `204`.
+
+The scoped Photon client acquired successfully and resolved the exact direct
+Space, but the one bounded outbound send was denied with
+`AuthenticationError`, provider code `internalError`, transport status `7`
+(`PERMISSION_DENIED`), and `retryable=false`. No retry ran. Computer Use
+readback then found no exact Messages conversation for the assigned route, so
+no iMessage-labelled composer, reply, inbound callback, Eve dispatch, outbound
+agent response or typing action existed.
+
+Rollback rebound the stable four sensitive values before cleanup. Exact source
+`fdba650e66854bd12f70c0b4e6c01e741f310aee` produced READY deployment
+`dpl_4bsT55Mgt52JEswwzzTEY3LfWhwN`; protected stable-alias probes returned
+empty `204` responses, with the final probe more than the documented retry
+horizon after rebind. Cleanup deleted only the proof callback and temporary
+user, removed all three temporary custody artifacts, restored one adopted
+Preview user plus one stable callback, and returned the canonical inventory to
+the original digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`
+with both source bindings unchanged. The task is now blocked at the provider's
+outbound permission boundary; enabling or correcting outbound iMessage
+capability for the exact isolated Preview project credential is the smallest
+remaining external prerequisite. This does not satisfy the hosted Channel
+proof and does not trigger the terminal five-pass audit.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

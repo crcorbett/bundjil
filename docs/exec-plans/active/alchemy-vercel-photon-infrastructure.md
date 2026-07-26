@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-26
 review_trigger: task status, Alchemy/provider capability, state/secret decision, authority, rollout, rollback, or proof change
 spec: ../../product-specs/alchemy-vercel-photon-infrastructure.md
 task_ledger: ../../product-specs/alchemy-vercel-photon-infrastructure.tasks.json
@@ -59,8 +59,12 @@ list-omitted deployment aliases and a separately created Preview Photon project
 remain unknown. `remote-state-and-noop-adoption` is now accepted: the dedicated
 R2 state store contains the exact 106 Preview and 69 Production logical
 identities, both stages converge to no-op, and the read-only provider adapters
-record zero transport writes. `preview-vercel-configuration-spike` is now the
-current task.
+record zero transport writes. `isolated-photon-preview-spike` is now the
+current task. Its project/user isolation and stable callback lifecycle are
+proved, but the hosted Channel journey is blocked because Photon denied the
+bounded outbound-first Preview send before an iMessage-return conversation
+could be established. Exact rollback restored the original one-user,
+one-webhook topology and canonical inventory digest.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -835,6 +839,53 @@ iMessage, never SMS, and only its signed inbound callback can begin the
 Channel/retry/Eve/outbound/typing proof. Full identities, content and
 conversation/message coordinates stay in secure process custody. Exact callback
 and user rollback remains mandatory whether the handshake succeeds or stops.
+
+That handshake stopped at a narrower provider boundary. Fresh source/adopted
+readback passed, one new temporary Preview user and one query-controlled
+callback were created, and two post-create inventories matched digest
+`e4ab75194439bcf5d61a0ffc8ac2a5eaf3955a807da4dce82bf3a1e8c0a090a4`.
+Exact source `d30509172a2810c2a3e27b893dffc63a0fd0c569` produced READY
+deployment `dpl_2GPBK8DJqTAc3M6AQrdkjcfCokP4`, whose protected stable alias
+returned exact signed `204`.
+
+The scoped SDK acquired and the exact direct Space resolved, rejecting a
+missing-client or ambiguous-recipient false green. The one outbound send then
+failed with `AuthenticationError`, provider code `internalError`, transport
+status `7` (`PERMISSION_DENIED`) and `retryable=false`. It was not retried.
+Messages readback found no exact conversation for the assigned route, so no
+iMessage reply was entered or sent and the signed inbound/Eve/response/typing
+oracles did not run.
+
+Stable values were rebound before cleanup. Exact rollback source
+`fdba650e66854bd12f70c0b4e6c01e741f310aee` produced READY deployment
+`dpl_4bsT55Mgt52JEswwzzTEY3LfWhwN`; signed stable-alias probes returned
+empty `204`, with the final readback beyond the retry horizon after rebind.
+Cleanup deleted only the exact proof callback and temporary user, removed three
+temporary custody artifacts, and restored one adopted Preview user, one stable
+callback and canonical inventory digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`
+with both source bindings unchanged. The exact remaining prerequisite is an
+outbound-iMessage-capable credential for the same isolated Preview project, or
+a provider correction enabling that capability. The task and plan remain open;
+the terminal five-pass audit has not run.
+
+### Outbound-first handshake impact ledger
+
+| Surface                          | Status          | Decision and evidence                                                                                                                                                        |
+| -------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | SPEC and plan now separate SDK/Space resolution, provider send acceptance, Messages conversation activation and signed inbound ingress.                                      |
+| READMEs                          | Preserve        | Existing Photon and agent README owner/command maps remain accurate; exact operation and limitation stay in the runbook and proof owner.                                     |
+| Exports and generated references | Preserve        | No package boundary or generated reference changed; the attempt used the existing Photon client and management services.                                                     |
+| Runbooks and authority           | Change required | The runbook already owns the outbound-first stop conditions; this plan records the exercised Preview-only authority and provider denial without broadening it.               |
+| Verification journeys and proof  | Change required | The dated native-origin receipt records direct Space success, send denial, Messages absence, exact rollback and all remaining non-claims.                                    |
+| Skills and AGENTS                | Preserve        | PRD, docs, Effect-client, package-ownership and Computer Use contracts were applied; no reusable process defect requires instruction changes.                                |
+| Lint, config, commands and CI    | Preserve        | No tracked config, command or CI change occurred. Secure process-only values and existing mode-`0600` custody were used and removed as required.                             |
+| Schemas, services and Layers     | Preserve        | Existing decoded Photon identities, private SDK boundary, named management operations and live Layers handled the attempt; no new DTO or escape hatch was added.             |
+| Tests and fixtures               | Preserve        | No repository code changed. Focused package checks and full verification rerun against the receipt-bearing candidate; provider denial remains provider evidence, not a mock. |
+| SPEC, tasks and plan             | Change required | Keep `isolated-photon-preview-spike` in progress at the exact outbound-permission prerequisite; terminal audit remains deferred.                                             |
+| Receipts and evidence            | Change required | Update only fingerprint-safe metadata, immutable deployment identities, provider error classification, rollback and non-claims; retain no full identity or message content.  |
+| Rollout and rollback             | Change required | One temporary user/callback were created and exactly removed after stable rebind/drain; original digest and one-user/one-webhook topology are restored.                      |
+| Lifecycle and archive pointers   | Preserve        | The plan remains active, no archive pointer changes, and the earlier five-pass checkpoint remains explicitly non-terminal.                                                   |
 
 ## Repository-authorized five-pass audit
 
