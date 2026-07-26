@@ -504,6 +504,20 @@ next prove a fresh stable deployment, wait through the provider retry horizon,
 delete only the proof callback and temporary user, and restore the original
 one-user/one-webhook topology before this attempt can close.
 
+That rollback is complete. Exact source
+`fd630e98e18207c9765d7e4854e14dc1d2e29f90` produced READY deployment
+`dpl_4aa6EGdJ7NTnYQjBDdKgJj2HjPNR`; stable-alias signed probes returned empty
+`204` responses before and after a drain longer than the documented
+approximately 3.5-minute retry horizon. Cleanup deleted only the proof
+callback and rollout-created temporary user, then fresh readback found one
+stable webhook and one adopted Preview user. Two canonical candidate
+inventories matched the original digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`,
+with the source and adopted Preview bindings unchanged. Both temporary
+mode-`0600` binding artifacts were removed; stable credential custody remains
+the ignored mode-`0600` `.env.local` and Vercel's sensitive Preview metadata.
+The Channel proof remains unproved at the genuine iMessage-origin boundary.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

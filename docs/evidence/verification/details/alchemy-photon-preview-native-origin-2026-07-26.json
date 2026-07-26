@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "taskId": "isolated-photon-preview-spike",
-  "observedAt": "2026-07-26T10:07:25.000Z",
+  "observedAt": "2026-07-26T10:15:42.032Z",
   "authority": {
     "principal": "Cooper-approved Codex operator using authenticated Photon, Vercel, local Messages, and narrow macOS Automation readback",
     "scope": "One genuine Preview-only iMessage journey from the exact controlled Messages identity; SMS and Production excluded",
@@ -46,16 +46,29 @@
   },
   "rollback": {
     "stableVercelBindingRestored": true,
-    "freshStableDeploymentPending": true,
-    "retryDrainPending": true,
-    "proofWebhookDeletionPending": true,
-    "temporaryUserDeletionPending": true,
-    "targetFinalInventoryDigest": "9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f"
+    "freshStableDeploymentId": "dpl_4aa6EGdJ7NTnYQjBDdKgJj2HjPNR",
+    "freshStableDeploymentSource": "fd630e98e18207c9765d7e4854e14dc1d2e29f90",
+    "stableAliasProbeBeforeDrainStatus": 204,
+    "stableAliasProbeAfterDrainStatus": 204,
+    "retryDrainStartedAt": "2026-07-26T10:10:34.334Z",
+    "retryDrainCompletedAt": "2026-07-26T10:14:22.978Z",
+    "proofWebhookDeleted": true,
+    "temporaryUserDeleted": true,
+    "adoptedUserPreserved": true,
+    "finalSharedUserCount": 1,
+    "finalWebhookCount": 1,
+    "firstFinalInventoryObservedAt": "2026-07-26T10:15:39.056Z",
+    "secondFinalInventoryObservedAt": "2026-07-26T10:15:42.032Z",
+    "finalInventoriesMatching": true,
+    "finalInventoryDigest": "9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f",
+    "temporaryArtifactsRemoved": true,
+    "stableCredentialCustodyMode": "0600"
   },
   "result": {
     "status": "inconclusive",
     "reason": "The exact assigned route did not resolve as native iMessage and the bounded native Messages service query returned no service or buddy.",
-    "productionChanged": false
+    "productionChanged": false,
+    "previewTopologyRestored": true
   },
   "nonClaims": [
     "An SMS-capable recipient chip is not an iMessage delivery proof.",

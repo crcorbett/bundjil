@@ -800,9 +800,18 @@ service count or buddy. System Settings readback proved the actual `node`
 invoker already had only Messages Automation enabled. ChatGPT's separate
 Messages toggle was off, was not the bounded invoker, and was not changed. No
 message was sent and no Photon callback, Eve dispatch, response or typing
-oracle ran. Rollback has restored the stable four-value Vercel binding; the
-proof callback and temporary user remain intentionally retained until a fresh
-stable deployment succeeds and the retry horizon drains.
+oracle ran. Rollback restored the stable four-value Vercel binding and produced
+READY deployment `dpl_4aa6EGdJ7NTnYQjBDdKgJj2HjPNR` from exact source
+`fd630e98e18207c9765d7e4854e14dc1d2e29f90`. Stable-alias signed probes
+returned empty `204` responses before and after a drain longer than the
+documented approximately 3.5-minute retry horizon. Cleanup then deleted only
+the proof callback and exact rollout-created temporary user. Two final
+canonical inventories matched original digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`,
+preserved both source bindings and the adopted Preview binding, and restored
+one Preview user plus one stable webhook. Temporary mode-`0600` artifacts were
+removed; stable custody remains in ignored `.env.local` and Vercel sensitive
+Preview metadata.
 
 Do not synthesize an identity, guess a recipient, use SMS, or use the shared
 source project to manufacture proof. Until exact restoration passes, the later

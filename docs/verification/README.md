@@ -82,10 +82,17 @@ operation nor asserts present provider state.
   identity. It does not yet prove a webhook, Vercel binding, deployment,
   signed ingress, Channel journey, handset result, Production, or cleanup.
 - [`alchemy-photon-preview-webhook-binding-2026-07-25.md`](alchemy-photon-preview-webhook-binding-2026-07-25.md)
-  records the exact READY Git deployment, public signature boundary, one
-  rollout-created webhook, four Preview-only sensitive Vercel metadata
-  identities, uncertain acknowledgement, retained recovery artifact, and
-  no-replay stop. Signed ingress and value convergence remain unproved.
+  records the exact READY Git deployment, corrected protected signature
+  boundary, one rollout-created stable webhook, four Preview-only sensitive
+  Vercel metadata identities, lossless callback cutover, retry drain, exact old
+  callback cleanup, and stable signed `204` ingress. The real Channel journey,
+  handset result and Production remain unproved.
+- [`alchemy-photon-preview-native-origin-2026-07-26.md`](alchemy-photon-preview-native-origin-2026-07-26.md)
+  records the temporary-user/query-callback adaptation, exact route's SMS-only
+  classification, bounded native Messages service failure, zero message send,
+  stable redeployment, retry drain, exact cleanup, matching restored
+  inventories, and unchanged adopted/source bindings. It is an inconclusive
+  genuine-origin result, not Channel or terminal SPEC proof.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed
