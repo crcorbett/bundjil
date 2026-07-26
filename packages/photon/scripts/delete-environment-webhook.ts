@@ -14,7 +14,7 @@ import {
   PhotonEnvironmentWebhookDeletionReceipt,
 } from "../src/environment-webhook.js";
 import { layerPhotonManagementLive } from "../src/operator-management.js";
-import { loadPhotonProviderProofConfig } from "../src/provider-proof.js";
+import { loadPhotonPreviewProviderConfig } from "../src/provider-proof.js";
 
 declare const process: { exitCode: number | undefined };
 
@@ -27,7 +27,7 @@ const PhotonEnvironmentWebhookDeletionBlocked = Schema.Struct({
 });
 
 const command = Effect.gen(function* deleteEnvironmentWebhookCommand() {
-  const config = yield* loadPhotonProviderProofConfig;
+  const config = yield* loadPhotonPreviewProviderConfig;
   const webhookUrl = yield* Config.schema(
     Schema.URLFromString,
     "BUNDJIL_PHOTON_WEBHOOK_URL"

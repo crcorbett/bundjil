@@ -40,12 +40,29 @@ const projectSecretConfig = Config.schema(
   PhotonProjectSecret,
   "PHOTON_PROJECT_SECRET"
 );
+const previewProjectIdConfig = Config.schema(
+  PhotonProjectId,
+  "BUNDJIL_PHOTON_PREVIEW_PROJECT_ID"
+);
+const previewProjectSecretConfig = Config.schema(
+  PhotonProjectSecret,
+  "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
+);
 
 export const loadPhotonProviderProofConfig = Effect.gen(
   function* loadPhotonProviderProofConfig() {
     return {
       projectId: yield* projectIdConfig,
       projectSecret: yield* projectSecretConfig,
+    };
+  }
+);
+
+export const loadPhotonPreviewProviderConfig = Effect.gen(
+  function* loadPhotonPreviewProviderConfig() {
+    return {
+      projectId: yield* previewProjectIdConfig,
+      projectSecret: yield* previewProjectSecretConfig,
     };
   }
 );

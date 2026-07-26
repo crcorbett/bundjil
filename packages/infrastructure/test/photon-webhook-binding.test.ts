@@ -13,12 +13,14 @@ import {
 import { VercelCredentials } from "../src/vercel/index.js";
 
 const signingSecretSentinel = "photon-preview-signing-secret-sentinel";
+const projectSecretSentinel = "photon-preview-project-secret-sentinel";
 
 const fixture = Schema.decodeUnknownEffect(PhotonWebhookBindingWrite)({
   stage: "preview",
   teamId: "team-preview",
   vercelProjectId: "prj-agent",
   photonProjectId: "00000000-0000-4000-8000-000000000001",
+  projectSecret: Redacted.make(projectSecretSentinel),
   webhookId: "00000000-0000-4000-8000-000000000002",
   signingSecret: Redacted.make(signingSecretSentinel),
 });
@@ -48,12 +50,20 @@ it.effect(
         Redacted.value(encoded.signingSecret),
         signingSecretSentinel
       );
+      assert.strictEqual(
+        Redacted.value(encoded.projectSecret),
+        projectSecretSentinel
+      );
       const decoded = yield* Schema.decodeEffect(PhotonWebhookBindingWrite)(
         encoded
       );
       assert.strictEqual(
         Redacted.value(decoded.signingSecret),
         signingSecretSentinel
+      );
+      assert.strictEqual(
+        Redacted.value(decoded.projectSecret),
+        projectSecretSentinel
       );
 
       const result = yield* Effect.gen(function* persistBinding() {
@@ -66,6 +76,7 @@ it.effect(
       );
       const safeResult = Inspectable.toStringUnknown(result);
       assert.strictEqual(safeResult.includes(signingSecretSentinel), false);
+      assert.strictEqual(safeResult.includes(projectSecretSentinel), false);
       assert.strictEqual(
         result.owner,
         "bundjil-agent-preview-vercel-environment"
@@ -190,7 +201,7 @@ it.effect("rejects a cross-webhook overwrite", () =>
 );
 
 it.effect(
-  "encodes the exact two Preview bindings and projects the provider acknowledgement",
+  "encodes the exact four Preview bindings and projects the provider acknowledgement",
   () =>
     Effect.gen(function* testPhotonWebhookBindingLiveContract() {
       const input = yield* fixture;
@@ -222,6 +233,8 @@ it.effect(
               Schema.Array(
                 Schema.Struct({
                   key: Schema.Literals([
+                    "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+                    "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
                     "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
                     "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
                   ]),
@@ -232,7 +245,13 @@ it.effect(
               )
             )
           )(body);
-          assert.strictEqual(decoded.length, 2);
+          assert.strictEqual(decoded.length, 4);
+          assert.strictEqual(
+            decoded.find(
+              (entry) => entry.key === "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+            )?.value,
+            projectSecretSentinel
+          );
           assert.strictEqual(
             decoded.find(
               (entry) => entry.key === "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
@@ -244,6 +263,22 @@ it.effect(
             Response.json(
               {
                 created: [
+                  {
+                    id: "env-photon-project-id",
+                    key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+                    type: "sensitive",
+                    target: ["preview"],
+                    sensitive: true,
+                    value: input.photonProjectId,
+                  },
+                  {
+                    id: "env-photon-project-secret",
+                    key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+                    type: "sensitive",
+                    target: ["preview"],
+                    sensitive: true,
+                    value: projectSecretSentinel,
+                  },
                   {
                     id: "env-photon-webhook-id",
                     key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
@@ -280,6 +315,10 @@ it.effect(
       assert.strictEqual(String(result.revision), String(input.webhookId));
       assert.strictEqual(
         Inspectable.toStringUnknown(result).includes(signingSecretSentinel),
+        false
+      );
+      assert.strictEqual(
+        Inspectable.toStringUnknown(result).includes(projectSecretSentinel),
         false
       );
     })
@@ -323,6 +362,10 @@ it.effect("classifies a partial Vercel acknowledgement as uncertain", () =>
     assert.strictEqual(Exit.isFailure(exit), true);
     assert.strictEqual(
       Inspectable.toStringUnknown(exit).includes(signingSecretSentinel),
+      false
+    );
+    assert.strictEqual(
+      Inspectable.toStringUnknown(exit).includes(projectSecretSentinel),
       false
     );
   })

@@ -385,7 +385,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-25 isolation receipt and current owner-named inventory read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines and zero Preview webhooks; webhook and deployment proof remain open"
+        "evidence": "The 2026-07-25 isolation and webhook-binding receipts read back the separate Free Preview project, one provider-seeded concurrent approved user, unchanged source binding, zero dedicated lines, one rollout-created Preview webhook, and four sensitive Preview-only Vercel metadata identities. The Vercel acknowledgement remains uncertain; a new deployment and signed ingress are still required before value convergence or recovery-artifact removal."
       }
     },
     {

@@ -34,6 +34,11 @@ export const PhotonWebhookIdEnvironmentKey = VercelEnvironmentVariableKey.make(
 );
 export const PhotonWebhookSecretEnvironmentKey =
   VercelEnvironmentVariableKey.make("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET");
+export const PhotonProjectIdEnvironmentKey = VercelEnvironmentVariableKey.make(
+  "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"
+);
+export const PhotonProjectSecretEnvironmentKey =
+  VercelEnvironmentVariableKey.make("BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET");
 
 const PhotonWebhookBindingResponseHeaders = Schema.Struct({
   "x-ratelimit-remaining": Schema.optional(Schema.String),
@@ -58,6 +63,8 @@ const PhotonWebhookBindingFailureEnvelope = Schema.Struct({
 
 const VercelPhotonWebhookBindingEnvironmentRequest = Schema.Struct({
   key: Schema.Union([
+    Schema.Literal("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"),
+    Schema.Literal("BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"),
     Schema.Literal("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID"),
     Schema.Literal("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"),
   ]),
@@ -68,7 +75,7 @@ const VercelPhotonWebhookBindingEnvironmentRequest = Schema.Struct({
 
 const VercelPhotonWebhookBindingRequest = Schema.Array(
   VercelPhotonWebhookBindingEnvironmentRequest
-).pipe(Schema.check(Schema.isLengthBetween(2, 2)));
+).pipe(Schema.check(Schema.isLengthBetween(4, 4)));
 
 const VercelPhotonWebhookBindingCreatedEnvironment = Schema.Struct({
   id: VercelEnvironmentVariableId,
@@ -205,6 +212,18 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
         HttpClientRequest.setUrlParam("upsert", "true"),
         HttpClientRequest.schemaBodyJson(VercelPhotonWebhookBindingRequest)([
           {
+            key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+            value: encoded.photonProjectId,
+            type: "sensitive",
+            target: ["preview"],
+          },
+          {
+            key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+            value: Redacted.value(encoded.projectSecret),
+            type: "sensitive",
+            target: ["preview"],
+          },
+          {
             key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
             value: encoded.webhookId,
             type: "sensitive",
@@ -245,6 +264,14 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
       }
 
       const created = Array.ensure(response.body.created);
+      const projectIdEntries = Array.filter(
+        created,
+        (candidate) => candidate.key === PhotonProjectIdEnvironmentKey
+      );
+      const projectSecretEntries = Array.filter(
+        created,
+        (candidate) => candidate.key === PhotonProjectSecretEnvironmentKey
+      );
       const webhookIdEntries = Array.filter(
         created,
         (candidate) => candidate.key === PhotonWebhookIdEnvironmentKey
@@ -255,7 +282,9 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
       );
       if (
         response.body.failed.length !== 0 ||
-        created.length !== 2 ||
+        created.length !== 4 ||
+        projectIdEntries.length !== 1 ||
+        projectSecretEntries.length !== 1 ||
         webhookIdEntries.length !== 1 ||
         secretEntries.length !== 1
       ) {
@@ -263,20 +292,28 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
           "Vercel returned a partial Preview Photon binding acknowledgement."
         );
       }
+      const [projectIdEntry] = projectIdEntries;
+      const [projectSecretEntry] = projectSecretEntries;
       const [webhookIdEntry] = webhookIdEntries;
       const [secretEntry] = secretEntries;
       if (
+        projectIdEntry === undefined ||
+        projectSecretEntry === undefined ||
         webhookIdEntry === undefined ||
         secretEntry === undefined ||
+        !exactPreviewTarget(projectIdEntry.target) ||
+        !exactPreviewTarget(projectSecretEntry.target) ||
         !exactPreviewTarget(webhookIdEntry.target) ||
         !exactPreviewTarget(secretEntry.target) ||
+        projectIdEntry.sensitive === false ||
+        projectSecretEntry.sensitive === false ||
         webhookIdEntry.sensitive === false ||
         secretEntry.sensitive === false
       ) {
         return yield* knownFailure(
           "persistPreviewWebhookBinding",
           "invalidResponse",
-          "Vercel did not acknowledge two exact Preview-only sensitive bindings."
+          "Vercel did not acknowledge four exact Preview-only sensitive bindings."
         );
       }
 

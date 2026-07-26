@@ -151,10 +151,13 @@ contains only counts, actions, service type, and assignment presence.
 new exact `BUNDJIL_PHOTON_WEBHOOK_URL` only when no matching webhook exists. It
 writes the create-only ID and signing secret to the absolute
 `BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH` with mode `0600`, verifies provider and
-file readback, and emits only a sanitized receipt. The operator must bind the
-artifact directly to the approved environment and remove it after readback; an
-existing target or lost write-only secret blocks instead of replacing or
-adopting it.
+file readback, and emits only a sanitized receipt. The root
+`infrastructure:photon-preview-webhook-register` command resolves only the
+ignored Preview project credential. The operator passes the artifact to
+`infrastructure:photon-preview-webhook-binding`; an existing target or lost
+write-only secret blocks instead of replacing or adopting it. An uncertain
+create receives three bounded exponentially backed-off, jittered observations,
+is never blindly replayed, and preserves an observed endpoint.
 
 `bun run --filter @bundjil/photon delete:environment-webhook` deletes only one
 exact `BUNDJIL_PHOTON_WEBHOOK_URL` and requires zero matching records on

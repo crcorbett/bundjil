@@ -23,7 +23,7 @@ import {
   PhotonManagement,
 } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
-import { loadPhotonProviderProofConfig } from "../src/provider-proof.js";
+import { loadPhotonPreviewProviderConfig } from "../src/provider-proof.js";
 import { PhotonWebhookId } from "../src/schemas.js";
 
 declare const process: { exitCode: number | undefined };
@@ -52,7 +52,7 @@ const PhotonEnvironmentWebhookBlocked = Schema.Struct({
 });
 
 const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
-  const config = yield* loadPhotonProviderProofConfig;
+  const config = yield* loadPhotonPreviewProviderConfig;
   const webhookUrl = yield* Config.schema(
     Schema.URLFromString,
     "BUNDJIL_PHOTON_WEBHOOK_URL"

@@ -38,6 +38,8 @@ export {
 } from "./webhook-binding-memory.layer.js";
 export {
   layerPhotonWebhookBindingSinkLive,
+  PhotonProjectIdEnvironmentKey,
+  PhotonProjectSecretEnvironmentKey,
   PhotonWebhookBindingSinkLive,
   PhotonWebhookIdEnvironmentKey,
   PhotonWebhookSecretEnvironmentKey,

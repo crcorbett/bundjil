@@ -2,6 +2,7 @@
 
 import {
   PhotonProjectId,
+  PhotonProjectSecret,
   PhotonWebhookId,
   PhotonWebhookSecret,
 } from "@bundjil/photon/config";
@@ -24,6 +25,7 @@ export const PhotonWebhookBindingWrite = Schema.Struct({
   teamId: VercelTeamId,
   vercelProjectId: VercelProjectId,
   photonProjectId: PhotonProjectId,
+  projectSecret: PhotonProjectSecret,
   webhookId: PhotonWebhookId,
   signingSecret: PhotonWebhookSecret,
 });

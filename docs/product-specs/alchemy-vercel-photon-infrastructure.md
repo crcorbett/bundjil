@@ -427,6 +427,15 @@ Preview topology adopts that provider-seeded user by safe fingerprint. The
 dated verification receipt owns the exact redacted before/after and rollback
 identity; webhook, deployment, Channel, and Production proof remain open.
 
+The later Preview callback slice created one rollout-owned webhook against the
+exact READY Git deployment and attempted one four-value sensitive Preview
+binding. Vercel metadata readback found the project ID/secret and webhook
+ID/secret identities, but the write acknowledgement failed its complete
+Schema contract. The create-only recovery artifact therefore remains mode
+`0600`, and read-before-write blocks any replay. This is an accepted uncertain
+recovery state, not convergence: a new Git deployment and valid signed ingress
+must prove the configured values before the artifact can be removed.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

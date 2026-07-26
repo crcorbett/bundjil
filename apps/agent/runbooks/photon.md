@@ -214,9 +214,14 @@ duplicate suppression, Preview, Production, or durable process supervision.
    set the absolute mode-`0600` temporary
    `BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH` and exact
    `BUNDJIL_PHOTON_WEBHOOK_URL`, then run
-   `bun run --filter @bundjil/photon register:environment-webhook`. Bind the
-   returned file's ID and secret directly to the target through stdin, verify
-   variable metadata, and delete the temporary file. Never print either value.
+   `bun run infrastructure:photon-preview-webhook-register`. Pass the returned
+   file to `bun run infrastructure:photon-preview-webhook-binding`. The sink
+   binds project ID/secret and webhook ID/secret as four sensitive Preview-only
+   variables, verifies exact metadata, and deletes the temporary file only
+   after the complete acknowledgement passes. Never print any value.
+   If the Vercel acknowledgement is uncertain but exact metadata exists,
+   retain the file, block replay, deploy through Vercel Git, and require signed
+   ingress before deleting the recovery copy.
    The command blocks an existing target rather than adopting a lost
    write-only secret and reconciles an uncertain create by exact URL inventory.
    Replace an isolated zero-traffic callback by running

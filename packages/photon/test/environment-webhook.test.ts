@@ -1,5 +1,6 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { Effect, Fiber, Layer, Redacted, Schema } from "effect";
+import * as TestClock from "effect/testing/TestClock";
 
 import {
   deletePhotonEnvironmentWebhook,
@@ -89,6 +90,87 @@ it.effect(
 
       assert.strictEqual(Schema.is(PhotonProviderProofError)(error), true);
       assert.strictEqual(error.reason, "resourceConflict");
+    })
+);
+
+it.effect(
+  "preserves an endpoint observed after an uncertain create without blind replay",
+  () =>
+    Effect.gen(function* preserveUncertainEnvironmentWebhook() {
+      const fixture = yield* fixtures;
+      const webhookUrl = new URL("https://preview.example.invalid/webhook");
+      let webhooks: {
+        readonly id: typeof PhotonWebhookId.Type;
+        readonly webhookUrl: URL;
+      }[] = [];
+      let registerCount = 0;
+      let deleteCount = 0;
+      const management = PhotonManagement.of({
+        ...unusedOperations,
+        deleteWebhook: () =>
+          Effect.sync(() => {
+            deleteCount += 1;
+          }),
+        listWebhooks: () => Effect.sync(() => webhooks),
+        registerWebhook: () =>
+          Effect.gen(function* uncertainCreate() {
+            registerCount += 1;
+            webhooks = [{ id: fixture.webhookId, webhookUrl }];
+            return yield* new PhotonProviderProofError({
+              operation: "registerWebhook",
+              reason: "requestFailed",
+            });
+          }),
+      });
+
+      const error = yield* registerPhotonEnvironmentWebhook(webhookUrl).pipe(
+        Effect.provide(Layer.succeed(PhotonManagement, management)),
+        Effect.flip
+      );
+
+      assert.strictEqual(error.reason, "resourceConflict");
+      assert.strictEqual(registerCount, 1);
+      assert.strictEqual(deleteCount, 0);
+      assert.strictEqual(webhooks.length, 1);
+    })
+);
+
+it.effect(
+  "bounds post-write observation and never retries an unobserved create",
+  () =>
+    Effect.gen(function* boundUnobservedEnvironmentWebhook() {
+      const webhookUrl = new URL("https://preview.example.invalid/webhook");
+      let listCount = 0;
+      let registerCount = 0;
+      const management = PhotonManagement.of({
+        ...unusedOperations,
+        deleteWebhook: () => Effect.die("unexpected delete"),
+        listWebhooks: () =>
+          Effect.sync(() => {
+            listCount += 1;
+            return [];
+          }),
+        registerWebhook: () =>
+          Effect.gen(function* failedCreate() {
+            registerCount += 1;
+            return yield* new PhotonProviderProofError({
+              operation: "registerWebhook",
+              reason: "requestFailed",
+            });
+          }),
+      });
+
+      const fiber = yield* registerPhotonEnvironmentWebhook(webhookUrl).pipe(
+        Effect.provide(Layer.succeed(PhotonManagement, management)),
+        Effect.flip,
+        Effect.forkChild
+      );
+      yield* TestClock.adjust("1 second");
+      const error = yield* Fiber.join(fiber);
+
+      assert.strictEqual(error.reason, "requestFailed");
+      assert.strictEqual(registerCount, 1);
+      assert.strictEqual(listCount, 4);
     })
 );
 

@@ -100,6 +100,7 @@ bun run infrastructure:preview-drift
 bun run infrastructure:preview-repair
 bun run infrastructure:preview-rollback-plan
 bun run infrastructure:preview-rollback
+bun run infrastructure:photon-preview-webhook-binding
 bun run infrastructure:vercel-git-link-authority
 bun alchemy deploy --stage preview --dry-run --adopt
 bun alchemy deploy --stage preview --adopt --yes
@@ -118,3 +119,11 @@ side-effect-free adoption plan. Follow the
 [Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
+
+`infrastructure:photon-preview-webhook-binding` consumes the mode-`0600`
+create-only Photon webhook artifact and writes the project ID/secret plus
+webhook ID/secret as four sensitive Preview-only Vercel variables through the
+owner-specific sink. It reads the exact metadata before and after the write,
+blocks rather than replaying any pre-existing or partial binding, and removes
+the recovery artifact only after the complete acknowledgement and metadata
+readback pass.

@@ -78,6 +78,8 @@
     "infrastructure:preview-rollback-plan": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
     "infrastructure:preview-rollback": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
     "infrastructure:photon-candidate-inventory": "bun --env-file=.env.local run --filter @bundjil/photon inventory:candidates",
+    "infrastructure:photon-preview-webhook-register": "bun --env-file=.env.local run --filter @bundjil/photon register:environment-webhook",
+    "infrastructure:photon-preview-webhook-binding": "bun --env-file=.env.local run --filter @bundjil/infrastructure photon:bind-preview-webhook",
     "infrastructure:vercel-git-link-authority": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/validate-vercel-git-link-authority.ts"
   },
   "devDependencies": {

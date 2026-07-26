@@ -1,4 +1,4 @@
-import { Effect, Exit, Schema } from "effect";
+import { Effect, Exit, Schedule, Schema } from "effect";
 
 import { PhotonManagement } from "./operator-management.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
@@ -35,6 +35,41 @@ export const PhotonEnvironmentWebhookDeletionReceipt = Schema.Struct({
 });
 export type PhotonEnvironmentWebhookDeletionReceipt =
   typeof PhotonEnvironmentWebhookDeletionReceipt.Type;
+
+const observeEnvironmentWebhookAfterWrite = Effect.fn(
+  "PhotonEnvironmentWebhook.observeAfterWrite"
+)(function* (webhookUrl: URL) {
+  const management = yield* PhotonManagement;
+  return yield* management.listWebhooks().pipe(
+    Effect.flatMap((webhooks) => {
+      const matching = webhooks.filter(
+        (webhook) => webhook.webhookUrl.href === webhookUrl.href
+      );
+      if (matching.length === 0) {
+        return Effect.fail(
+          new PhotonProviderProofError({
+            operation: "assert",
+            reason: "requestFailed",
+          })
+        );
+      }
+      if (matching.length > 1) {
+        return Effect.fail(
+          new PhotonProviderProofError({
+            operation: "assert",
+            reason: "resourceConflict",
+          })
+        );
+      }
+      return Effect.succeed({ matching: matching[0], webhooks });
+    }),
+    Effect.retry({
+      times: 2,
+      schedule: Schedule.exponential("10 millis").pipe(Schedule.jittered),
+      while: (failure) => failure.reason === "requestFailed",
+    })
+  );
+});
 
 export const deletePhotonEnvironmentWebhook = Effect.fn(
   "PhotonEnvironmentWebhook.delete"
@@ -85,26 +120,23 @@ export const registerPhotonEnvironmentWebhook = Effect.fn(
 
   const createExit = yield* Effect.exit(management.registerWebhook(webhookUrl));
   if (Exit.isFailure(createExit)) {
-    const residual = yield* management.listWebhooks();
-    yield* Effect.forEach(
-      residual.filter((webhook) => webhook.webhookUrl.href === webhookUrl.href),
-      (webhook) => management.deleteWebhook(webhook.id),
-      { concurrency: 1, discard: true }
+    const observed = yield* Effect.exit(
+      observeEnvironmentWebhookAfterWrite(webhookUrl)
     );
+    if (Exit.isSuccess(observed)) {
+      return yield* new PhotonProviderProofError({
+        operation: "registerWebhook",
+        reason: "resourceConflict",
+      });
+    }
     return yield* new PhotonProviderProofError({
       operation: "registerWebhook",
       reason: "requestFailed",
     });
   }
 
-  const final = yield* management.listWebhooks();
-  const matching = final.filter(
-    (webhook) =>
-      webhook.id === createExit.value.id &&
-      webhook.webhookUrl.href === webhookUrl.href
-  );
-  if (matching.length !== 1) {
-    yield* management.deleteWebhook(createExit.value.id);
+  const observed = yield* observeEnvironmentWebhookAfterWrite(webhookUrl);
+  if (observed.matching?.id !== createExit.value.id) {
     return yield* new PhotonProviderProofError({
       operation: "assert",
       reason: "resourceConflict",
@@ -117,7 +149,7 @@ export const registerPhotonEnvironmentWebhook = Effect.fn(
       webhookSecret: createExit.value.signingSecret,
     }),
     receipt: PhotonEnvironmentWebhookReceipt.make({
-      finalWebhookCount: final.length,
+      finalWebhookCount: observed.webhooks.length,
       managementAuthenticated: true,
       preexistingWebhookCount: baseline.length,
       status: "registered",

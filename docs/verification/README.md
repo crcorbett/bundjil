@@ -81,6 +81,11 @@ operation nor asserts present provider state.
   unchanged source binding, isolated credential custody, and rollback
   identity. It does not yet prove a webhook, Vercel binding, deployment,
   signed ingress, Channel journey, handset result, Production, or cleanup.
+- [`alchemy-photon-preview-webhook-binding-2026-07-25.md`](alchemy-photon-preview-webhook-binding-2026-07-25.md)
+  records the exact READY Git deployment, public signature boundary, one
+  rollout-created webhook, four Preview-only sensitive Vercel metadata
+  identities, uncertain acknowledgement, retained recovery artifact, and
+  no-replay stop. Signed ingress and value convergence remain unproved.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed
