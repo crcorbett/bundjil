@@ -521,6 +521,16 @@ provider/handset proof. The source-project conversation, Sendblue conversation,
 current Mac identity, SMS-only temporary route, direct-Space resolution,
 outbound invocation and synthetic callbacks are rejected false greens.
 
+The separately authorized 2026-07-28 Computer Use inspection confirmed this
+gate directly. Messages details separated Sendblue `6a6a862e…` from source
+Photon `d4039779…`; both existing conversations exposed iMessage, and the
+debug-bot row identified the current Mac start identity `82ac258d…` on the
+iMessage service. No conversation for retained Preview assigned line
+`db49756e…` was present, while current Mac identity `82ac258d…` still did not
+match the retained Preview registered identity. The send gate failed before
+composition: no message was typed or sent, no duplicate count was observed,
+and no provider state changed.
+
 The least disruptive next operator action is to use the device/account owning
 the retained Preview registered identity. If it is unavailable, the product
 owner must explicitly choose either reconfiguring Preview around an existing

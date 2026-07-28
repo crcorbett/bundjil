@@ -115,6 +115,12 @@ operation nor asserts present provider state.
   next Preview proof to the exact retained-user identity or an explicit
   topology decision. It performs no provider operation and proves no new
   Channel result.
+- [`alchemy-photon-preview-messages-ui-gate-2026-07-28.md`](alchemy-photon-preview-messages-ui-gate-2026-07-28.md)
+  records the bounded Computer Use inspection of the Sendblue and source
+  Photon iMessage conversations, the current Mac start-identity mismatch, the
+  absent retained Preview conversation, and the resulting stop before
+  composition. No message, duplicate count, provider mutation, or Preview
+  Channel result occurred.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

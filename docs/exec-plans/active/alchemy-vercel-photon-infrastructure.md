@@ -69,7 +69,12 @@ topology and canonical inventory digest. The next proof requires the
 device/account owning the retained Preview identity, or an explicit product
 choice between Preview topology reconfiguration and a provider-supported
 non-disruptive cross-project reference. No cold outbound retry, support
-contact, upgrade or mutation is the standing next step.
+contact, upgrade or mutation is the standing next step. A bounded 2026-07-28
+Computer Use inspection confirmed Sendblue and source Photon directly in
+Messages, the current Mac's iMessage start identity, and the absence of the
+retained Preview conversation. The exact identity gate failed before
+composition, so no message was typed or sent and no duplicate count was
+observed.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -1058,6 +1063,71 @@ process-local synthetic Executor URL/key fixture, made no provider request, and
 passed HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture,
 Knip, all nine workspace typechecks and all fifteen Turbo build/test tasks.
 This is repository proof only; it does not upgrade the blocked Preview journey.
+
+## 2026-07-28 bounded Messages UI gate
+
+Cooper authorized the bundled Computer Use plugin to inspect Messages and send
+one inbound-first Preview message only if the exact Preview sender, exact
+assigned recipient, and iMessage transport were all proven. The bounded
+inspection confirmed the `Bundjil` conversation as Sendblue recipient
+`6a6a862e…`, the unnamed source Photon conversation as `d4039779…`, and both
+existing composers as iMessage. The Messages debug-bot row identified the
+current Mac start identity as `82ac258d…` on the iMessage service.
+
+The retained Preview conversation was absent from the visible inventory, and
+current Mac identity `82ac258d…` still differs from the identity registered to
+retained Preview user `db23193a…`. The exact sender and recipient gates
+therefore failed before composition. No text was typed, no message was sent,
+no SMS or cold outbound path was used, and no reply, delivery, or duplicate
+count exists for this observation. The Messages search was cleared after
+inspection. No Photon, Vercel, credential, user, callback, deployment,
+Production, or support operation occurred.
+
+### Messages gate requirement replay
+
+| Requirement                   | Direct observable and expected postcondition                                                                 | Plausible false green rejected                                                           | Focused command/readback                                                  | Evidence owner and result                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Conversation ownership        | Details resolve `Bundjil` to Sendblue `6a6a862e…` and source Photon to `d4039779…`                           | Display name, iMessage label, or neighbouring accepted reply treated as isolated Preview | Computer Use conversation search, details, and composer inspection        | `docs/verification/alchemy-photon-preview-messages-ui-gate-2026-07-28.md`; passed for classification |
+| Exact sender                  | Current start identity must equal the identity registered to Preview user `db23193a…`                        | Any controlled Mac identity or source-project identity treated as interchangeable        | Computer Use debug-bot row plus retained fingerprint-only inventory       | Failed safely: current identity is `82ac258d…`                                                       |
+| Exact recipient and transport | Selected recipient must be `db49756e…` and its composer must say iMessage                                    | Source `d4039779…`, Sendblue, missing conversation, SMS, or uncertain recipient          | Computer Use visible conversation inventory and exact composer inspection | Failed before composition: retained Preview conversation absent                                      |
+| Message and duplicate proof   | One admitted event yields bounded delivery and duplicate observations                                        | Recording zero duplicates when no event was admitted                                     | No-send readback and restored Messages list                               | Not admitted; no message or duplicate count                                                          |
+| Safety and rollback           | No external mutation; Messages returns to ordinary list; existing restored provider digest remains unchanged | UI inspection treated as provider readback or topology proof                             | Search clear and final no-send state                                      | Passed for repository/UI scope only                                                                  |
+
+### Messages gate docs-maintainer impact ledger
+
+| Surface                                   | Status          | Decision and proof boundary                                                                                                                                                                                 |
+| ----------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and durable docs             | Preserve        | No runtime, package, provider, or Layer graph changed. The SPEC records only the newly observed gate result.                                                                                                |
+| READMEs, exports and generated references | Preserve        | No public contract, export, command, or generated API changed.                                                                                                                                              |
+| Runbooks and authority                    | Preserve        | `apps/agent/runbooks/photon.md` already requires the exact registered Preview identity, exact assigned line, iMessage composer, and stop on mismatch or SMS. The runbook correctly caused the no-send stop. |
+| Verification journeys and proof           | Change required | Add the fingerprint-only Messages UI receipt and route it from the verification index and current correction owner.                                                                                         |
+| Skills and AGENTS                         | Preserve        | PRD, docs-maintainer, and Computer Use contracts were applied; no reusable instruction defect was found.                                                                                                    |
+| Lint, config, commands and CI             | Preserve        | No executable configuration or workflow changed.                                                                                                                                                            |
+| Schemas, services and Layers              | Preserve        | No provider adapter, SDK boundary, Schema, service, or Layer changed.                                                                                                                                       |
+| Tests and fixtures                        | Preserve        | Local mocks cannot prove Messages identity or delivery. No event was admitted, so no duplicate fixture or runtime assertion changed.                                                                        |
+| SPEC, tasks and plan                      | Change required | Record the direct UI gate, exact no-send result, rejected false greens, and pending operator identity/product choice.                                                                                       |
+| Receipts and evidence                     | Change required | Add one dated receipt with safe fingerprints, no-send result, limitations, rollback, and non-claims.                                                                                                        |
+| Rollout and rollback                      | Preserve        | No rollout occurred. Existing one-user/one-callback restored digest remains the provider rollback identity; Messages search was cleared.                                                                    |
+| Lifecycle and archive pointers            | Change required | Keep the task and plan active, route the new supporting receipt, and defer the formal terminal five-pass audit.                                                                                             |
+| Documentation audit inventory             | Change required | The new receipt expands the docs corpus from 192 to 193 paths; recompute the sorted-path digest from the changed tree.                                                                                      |
+
+### Messages gate review lenses
+
+| Lens                                  | Result                        | Evidence                                                                                                                                                                                                                                                                                               |
+| ------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ownership and call graph              | Passed for the blocked result | Messages UI owns the observed conversation/service state; Photon inventory owns the retained Preview identity mapping; the SPEC/task/plan own current intent; the app runbook owns the stop procedure; the dated receipt owns this observation.                                                        |
+| Effect and provider quality           | N/A with evidence             | No code, provider call, SDK boundary, Config, Schema, Service, Layer, adapter, DTO, cast, mapper, helper, or outward request changed.                                                                                                                                                                  |
+| Verification and false-green coverage | Passed for the blocked result | Direct UI details separated Sendblue from source Photon, the debug row proved the active iMessage identity, the absent Preview conversation and identity mismatch blocked composition, and the receipt explicitly rejects zero-duplicate, source, Sendblue, SMS, and uncertain-recipient false greens. |
+
+Focused JSON decode, docs inventory digest readback, docs,
+verification-policy, authority, controls, skills, Effect language-service,
+boundary, and diff checks passed. Full repository verification used only the
+documented process-local synthetic Executor URL/key fixture, made no provider
+request, and passed HGI-307, 90 tooling tests, type-aware format/lint, the lint
+fixture, Knip, all nine workspace typechecks, and all fifteen Turbo build/test
+tasks. The same full gate is rerun after this exact receipt-bearing ledger
+update before commit. These checks prove repository consistency only; they do
+not upgrade the blocked Messages or Preview provider result.
 
 ## Repository-authorized five-pass audit
 

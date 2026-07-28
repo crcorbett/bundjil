@@ -86,6 +86,23 @@ No plan upgrade, dedicated line, credential rotation, project recreation, user
 move, SMS fallback, or support contact follows automatically from this
 correction.
 
+## Bounded Messages UI confirmation
+
+The separately authorized 2026-07-28 Computer Use inspection confirmed the
+conversation map directly in Messages. The `Bundjil` details view resolved to
+Sendblue fingerprint `6a6a862e…`; the unnamed source Photon conversation
+resolved to `d4039779…`; both exposed an `iMessage` composer. The Messages
+debug-bot row showed current Mac start identity `82ac258d…` on the iMessage
+service. No conversation for retained Preview assigned line `db49756e…` was
+present, and the current Mac identity still differs from the identity
+registered to retained Preview user `db23193a…`.
+
+The sender, recipient, and exact-transport gates therefore did not all pass.
+No message was typed or sent, no duplicate count was observed, and the
+Messages search was cleared after inspection. The bounded observation and its
+non-claims are retained in
+[`alchemy-photon-preview-messages-ui-gate-2026-07-28.md`](alchemy-photon-preview-messages-ui-gate-2026-07-28.md).
+
 ## Limitations, rollback, and non-claims
 
 The provider topology remains exactly at the previously proved rollback:
