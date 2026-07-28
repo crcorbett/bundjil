@@ -573,6 +573,15 @@ with rollback, retry-drain, sole-Production-callback, unchanged-user, and
 zero-fan-out readback. The bounded evidence is
 `docs/verification/alchemy-photon-shared-sender-topology-readback-2026-07-29.md`.
 
+Fresh Vercel deployment-by-URL readback removes the route ambiguity:
+`2083611d…` is the READY Preview-target callback and `72cac9b5…` is the READY
+Production-target callback. Only `2083611d…` is eligible for later retirement.
+Its create-only signing secret is absent from current mode-`0600` custody;
+current Preview metadata belongs to isolated callback `d2456774…`, and the
+local 1Password CLI was unavailable. Before deletion, either recover the exact
+retired secret or obtain explicit acceptance that the removal is irreversible.
+Stable ID and URL custody without the signing value do not satisfy rollback.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,

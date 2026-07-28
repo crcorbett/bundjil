@@ -113,6 +113,16 @@ registration remains untested; separate source-project authority is required
 to retire only the preserved Preview callback before this decision's live
 capability and journey proof can resume.
 
+Subsequent read-only deployment-by-URL resolution now directly maps
+`2083611d…` to a READY Preview target and `72cac9b5…` to a READY Production
+target in the Bundjil agent project. The obsolete callback is no longer
+ambiguous. Its create-only signing secret is not in current mode-`0600`
+custody, current Preview metadata belongs to isolated callback `d2456774…`,
+and 1Password was unavailable for further custody discovery. Retirement
+therefore also requires recovered secret custody or separate acceptance that
+deleting `2083611d…` is irreversible; identifying its URL and stable ID alone
+is not rollback proof.
+
 ## Official sources
 
 - [Photon managed-shared routing](https://photon.codes/blog/how-we-rebuilt-our-shared-imessage-routing-to-handle-10m-messages-a-day)

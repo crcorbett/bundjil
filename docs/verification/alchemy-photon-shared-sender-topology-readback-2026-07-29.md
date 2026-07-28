@@ -31,6 +31,21 @@ also matched across both reads. No full project, phone, assigned destination,
 webhook URL, credential, signing secret, Space, conversation, event, or message
 identity was retained.
 
+Two further read-only cross-provider resolutions removed the callback-ownership
+ambiguity:
+
+| Source webhook | Vercel owner readback                                                                                  | Query   |
+| -------------- | ------------------------------------------------------------------------------------------------------ | ------- |
+| `2083611d…`    | Bundjil agent project, READY Preview target, deployment fingerprint `fd4545ec…`, Git SHA `a3f8987…`    | present |
+| `72cac9b5…`    | Bundjil agent project, READY Production target, deployment fingerprint `2cd0940b…`, Git SHA `e92f8d2…` | absent  |
+
+The lookup resolved each protected callback origin through Vercel's
+deployment-by-URL read endpoint inside process custody. Neither full origin nor
+deployment identity was emitted or retained. This directly identifies
+`2083611d…` as the preserved source-project Preview callback and
+`72cac9b5…` as the Production callback; the earlier receipt is no longer the
+only ownership evidence.
+
 The fresh controlled-candidate inventory separately retained digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
 Current Messages sender `82ac258d…` remains bound to unchanged source user
@@ -40,11 +55,11 @@ duplicate cross-project registration.
 
 ## Isolation blocker and no-mutation decision
 
-The accepted 2026-07-23 Production receipt identifies the two source-project
-callbacks as one Production callback plus one preserved Preview callback.
-Photon documents that a project event is delivered to every webhook registered
-on that project. Fresh count and stable-ID readback therefore establish that
-the required postcondition—traffic to the source/Production destination reaches
+Fresh Vercel target readback identifies the two source-project callbacks as one
+Production callback plus one preserved Preview callback. Photon documents that
+a project event is delivered to every webhook registered on that project.
+Fresh count, stable-ID, and target readback therefore establish that the
+required postcondition—traffic to the source/Production destination reaches
 Production only—cannot currently be proved.
 
 The current authority explicitly forbids source/Production mutation. The
@@ -65,11 +80,12 @@ during this read-only slice.
 The smallest next operation is a separately approved source-project callback
 retirement, not a Preview user change:
 
-1. identify the exact preserved Preview callback among `2083611d…` and
-   `72cac9b5…` by current route and deployment ownership;
-2. prove the other callback is the sole accepted Production route and capture
-   immutable rollback identity plus retained signing-secret custody;
-3. prove the retiring callback has no required traffic, wait through Photon's
+1. target only preserved Preview callback `2083611d…`; retain Production
+   callback `72cac9b5…` unchanged;
+2. capture immutable rollback identity and recover retained signing-secret
+   custody for `2083611d…`, or explicitly authorize irreversible retirement
+   after accepting that the create-only value cannot be restored;
+3. prove `2083611d…` has no required traffic, wait through Photon's
    retry horizon, and delete only that exact source-project Preview callback;
 4. read back one unchanged Production callback, both unchanged source users and
    assignments, and zero Preview-environment fan-out; and
@@ -80,16 +96,26 @@ That operation mutates the source/Production Photon project and was not
 authorized here. No upgrade, billing change, dedicated line, credential
 rotation, Vercel mutation, or Production deployment is implicated.
 
+Current ignored mode-`0600` custody contains the isolated Preview webhook
+`d2456774…`, not source Preview webhook `2083611d…`. The current Vercel
+Preview metadata is owned by that isolated callback, and provider metadata
+cannot return an earlier create-only signing value. The local 1Password CLI was
+unavailable during this readback. Therefore exact signing-secret rollback for
+`2083611d…` is not yet proved. No deletion should run under the existing
+runbook until custody is recovered or Cooper separately accepts the
+irreversible retirement boundary.
+
 ## Requirement replay
 
-| Material requirement           | Direct observable and expected postcondition                                                                                   | Plausible false green rejected                                               | Result and owner                                       |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
-| Separate project ownership     | Two authenticated project credentials return distinct project fingerprints and unchanged user sets                             | Different credentials without isolated callbacks                             | Passed for inventory; this receipt                     |
-| Zero dedicated lines           | The actual management `lines` endpoint returns zero in both projects                                                           | The reconciliation summary's hard-coded zero                                 | Passed; this receipt                                   |
-| Environment-isolated callbacks | Source owns one Production callback only; Preview owns one Preview callback only                                               | Two callbacks in one source project or a separate Preview callback alone     | Failed before mutation; source still has two callbacks |
-| Shared-sender capability       | Sender `82ac258d…` gains a distinct Preview binding without source change                                                      | Availability, second UUID, or prior seeded user                              | Not attempted because isolation failed first           |
-| Bounded inbound journey        | Exact Preview recipient is iMessage and yields one Preview response, zero Production response, and exact duplicate disposition | SMS, source reply, synthetic event, or aggregate suite                       | Not admitted                                           |
-| Rollback                       | No state changes when a prerequisite fails                                                                                     | Running the permitted Preview create despite an impossible acceptance oracle | Passed: zero external mutations                        |
+| Material requirement           | Direct observable and expected postcondition                                                                                   | Plausible false green rejected                                               | Result and owner                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Separate project ownership     | Two authenticated project credentials return distinct project fingerprints and unchanged user sets                             | Different credentials without isolated callbacks                             | Passed for inventory; this receipt                                                                      |
+| Zero dedicated lines           | The actual management `lines` endpoint returns zero in both projects                                                           | The reconciliation summary's hard-coded zero                                 | Passed; this receipt                                                                                    |
+| Environment-isolated callbacks | Source owns one Production callback only; Preview owns one Preview callback only                                               | Two callbacks in one source project or a separate Preview callback alone     | Failed before mutation; `2083611d…` is Preview-target and `72cac9b5…` is Production-target              |
+| Retirement rollback custody    | Exact obsolete callback can be restored from retained create-only secret custody, or irreversible loss is separately accepted  | Callback URL/ID alone treated as signing-secret rollback                     | Failed: current mode-`0600` and Vercel ownership do not prove the retired secret; 1Password unavailable |
+| Shared-sender capability       | Sender `82ac258d…` gains a distinct Preview binding without source change                                                      | Availability, second UUID, or prior seeded user                              | Not attempted because isolation failed first                                                            |
+| Bounded inbound journey        | Exact Preview recipient is iMessage and yields one Preview response, zero Production response, and exact duplicate disposition | SMS, source reply, synthetic event, or aggregate suite                       | Not admitted                                                                                            |
+| Rollback                       | No state changes when a prerequisite fails                                                                                     | Running the permitted Preview create despite an impossible acceptance oracle | Passed: zero external mutations                                                                         |
 
 ## Repository verification
 

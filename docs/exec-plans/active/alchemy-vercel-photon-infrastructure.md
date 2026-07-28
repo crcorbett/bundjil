@@ -1215,12 +1215,26 @@ operator stopped before the otherwise permitted Preview shared-user create.
 No provider write, Vercel action, Messages action, callback probe, or message
 occurred. Duplicate cross-project registration remains untested.
 
+Two additional read-only deployment-by-URL resolutions directly classify
+`2083611d…` as a READY Preview-target callback at Git SHA `a3f8987…` and
+`72cac9b5…` as a READY Production-target callback at `e92f8d2…`, both in the
+Bundjil agent project. The exact obsolete callback is therefore known without
+printing either origin. Current mode-`0600` custody holds isolated Preview
+callback `d2456774…`, not `2083611d…`; current Vercel Preview metadata belongs
+to the isolated callback, and the local 1Password CLI was unavailable. Because
+Photon signing secrets are create-only, stable ID/URL custody cannot provide
+exact restoration. Any later retirement requires recovered signing custody or
+separate explicit acceptance of irreversible deletion in addition to
+source-project mutation authority and traffic/drain proof.
+
 ### Live-readback requirement replay
 
 | Requirement               | Direct observable and expected postcondition                                                                         | Plausible false green rejected                                                          | Command/readback and owner                                                                                                            | Result                                                        |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | Complete project state    | Two matching project-scoped reads expose platform, full users, full webhooks, actual lines, and billing              | Reconciliation summary hard-coded line count or one partial read                        | Photon management services plus candidate inventory; `docs/verification/alchemy-photon-shared-sender-topology-readback-2026-07-29.md` | Passed for inventory                                          |
 | Source callback isolation | Source has exactly one Production callback before any Preview user write                                             | Distinct Preview project, available sender, or two source callbacks treated as isolated | Fresh stable-ID/route fingerprints plus accepted Production callback classification                                                   | Failed: source has Production plus preserved Preview callback |
+| Callback ownership        | Exact obsolete callback resolves to Preview target while the retained callback resolves to Production target         | Query presence or historical receipt alone                                              | Two Vercel deployment-by-URL resolutions without emitting origins                                                                     | Passed: retire only `2083611d…`; preserve `72cac9b5…`         |
+| Retirement rollback       | Create-only signing value exists in approved custody, or irreversible deletion is separately accepted                | Stable ID/URL described as exact signing rollback                                       | Mode-`0600` key/fingerprint audit, current Vercel metadata ownership and 1Password availability check                                 | Failed: secret custody unproved; 1Password unavailable        |
 | Preview mutation gate     | Preview create runs only after source isolation is already satisfiable                                               | Exercising mutation merely because it is authorized                                     | Fail-closed runbook gate and zero-write provider readback                                                                             | Passed: mutation not admitted                                 |
 | Shared-sender support     | Same sender gains one distinct Preview route without source change                                                   | Availability, prior seeded user, or another Apple identity                              | One future bounded Preview create after callback blocker is removed                                                                   | Not run                                                       |
 | Channel journey           | Exact Preview route is iMessage and yields one Preview response, zero Production response, one duplicate disposition | SMS, source reply, synthetic webhook, or aggregate response                             | Future Computer Use and signed provider/runtime readback                                                                              | Not run                                                       |

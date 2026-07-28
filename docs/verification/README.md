@@ -129,10 +129,11 @@ operation nor asserts present provider state.
 - [`alchemy-photon-shared-sender-topology-readback-2026-07-29.md`](alchemy-photon-shared-sender-topology-readback-2026-07-29.md)
   records two matching sanitized project reads, actual zero dedicated-line
   results, unchanged source and Preview users, one stable isolated Preview
-  callback, and two source callbacks. The accepted Production receipt
-  identifies those source callbacks as Production plus preserved Preview, so
-  project-wide fan-out blocked the required isolation before any Preview user
-  mutation or Messages send.
+  callback, and two source callbacks. Fresh deployment-by-URL readback maps
+  `2083611d…` to Preview and `72cac9b5…` to Production; project-wide fan-out
+  blocked the required isolation before any Preview user mutation or Messages
+  send. The obsolete callback's create-only signing-secret rollback custody
+  remains unproved.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

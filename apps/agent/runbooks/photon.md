@@ -204,6 +204,13 @@ duplicate suppression, Preview, Production, or durable process supervision.
    ownership, immutable rollback and signing-secret custody, traffic/drain
    evidence, deletion by stable ID, then one-callback and unchanged-user
    readback. Do not infer permission from the later Preview-user authority.
+   Current target readback identifies `2083611d…` as the preserved Preview
+   callback and `72cac9b5…` as Production. Treat only `2083611d…` as eligible
+   for retirement. Its URL and stable ID are not sufficient rollback because
+   Photon signing secrets are create-only. If exact signing-secret custody
+   cannot be recovered, require separate explicit acceptance of irreversible
+   retirement; never describe a recreated callback with a new secret as exact
+   restoration.
    Match the exact redacted sender, check shared availability without treating
    availability as capability proof, call the idempotent Preview shared-user
    create at most once, then read back one exact Preview user and its assigned
