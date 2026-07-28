@@ -74,7 +74,11 @@ Computer Use inspection confirmed Sendblue and source Photon directly in
 Messages, the current Mac's iMessage start identity, and the absence of the
 retained Preview conversation. The exact identity gate failed before
 composition, so no message was typed or sent and no duplicate count was
-observed.
+observed. Cooper's 2026-07-29 product decision now requires that same current
+Mac sender in both separate Photon projects with distinct assigned
+destinations and isolated webhooks. Fresh provider readback must prove current
+duplicate cross-project support without changing the source binding before any
+Preview send.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -1128,6 +1132,127 @@ fixture, Knip, all nine workspace typechecks, and all fifteen Turbo build/test
 tasks. The same full gate is rerun after this exact receipt-bearing ledger
 update before commit. These checks prove repository consistency only; they do
 not upgrade the blocked Messages or Preview provider result.
+
+## 2026-07-29 shared-sender, separate-destination decision
+
+Cooper accepted one mandatory topology for `isolated-photon-preview-spike`:
+current controlled sender `82ac258d…` remains unchanged in the working
+source/Production Photon project and is also registered non-disruptively in the
+separate Preview project. Each project has separate credentials, a distinct
+Photon-assigned destination, and its own environment webhook. Sending to the
+source/Production destination reaches only Production; sending to the Preview
+destination reaches only Preview.
+
+Another Apple identity/device is rejected. A single Photon project with both
+environment callbacks is rejected because Photon documents that one project
+event is delivered to every webhook registered on that project. Official
+Photon shared-routing material says inbound ownership is resolved from
+destination plus sender; fresh management readback must still prove that the
+current API admits the same sender concurrently across projects.
+
+Before mutation, capture full fingerprint-only source and Preview baselines.
+Then perform at most one idempotent Preview shared-user create for the exact
+sender, immediately re-read both projects, and require an unchanged source
+binding plus a distinct Preview destination. Reconcile an uncertain create by
+observation, never blind replay. Stop and clean up only the exact
+rollout-created Preview resource after drain if the provider rejects duplicate
+registration, changes the source binding, assigns SMS-only, or cannot establish
+the exact postcondition.
+
+Only after the Messages start identity, exact Preview destination, and
+iMessage composer all match may one bounded inbound-first message be sent.
+Acceptance then requires signed Preview webhook ingress, exactly one Preview
+response, zero Production response, exact same-event duplicate disposition,
+and complete post-journey source/Preview readback. A passing stable Preview
+binding is retained; Production remains untouched.
+
+### Shared-sender decision requirement replay
+
+| Requirement                   | Direct observable and expected postcondition                                                                                            | Plausible false green rejected                                                               | Focused command/readback                                                                           | Evidence owner and result                                                                            |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| One sender, separate projects | Sender `82ac258d…` exists in both project inventories while source stable user/destination remain unchanged                             | Availability result, second UUID alone, or source move                                       | Full source/Preview management baselines, one bounded Preview reconcile, immediate double readback | `docs/verification/alchemy-photon-shared-sender-topology-decision-2026-07-29.md`; live proof pending |
+| Distinct destinations         | Preview assigned destination differs from source `d4039779…` and resolves as iMessage                                                   | Same destination, missing route, or SMS-only route                                           | Provider user readback plus exact Messages recipient/composer inspection                           | Pending; no send until passed                                                                        |
+| Environment isolation         | Preview event names only Preview webhook/environment; Production observes zero response                                                 | Two webhooks in one project, synthetic callback, or aggregate response count                 | Signed callback detail, Preview replay owner, source/Production negative readback                  | Pending                                                                                              |
+| Bounded message               | One inbound-first message from `82ac258d…` to exact Preview destination produces one response                                           | Cold outbound, source conversation, Sendblue, another Apple identity, or uncertain recipient | Bundled Computer Use after all gates, followed by provider/runtime readback                        | Pending                                                                                              |
+| Lifecycle and rollback        | Successful stable Preview binding is retained; failed/temporary Preview resource alone is removed after drain; source remains unchanged | Blind retry, adopted-user deletion, or Production repair                                     | Before/after stable-ID fingerprints, retry horizon, exact cleanup and two final inventories        | Pending                                                                                              |
+
+### Shared-sender decision docs-maintainer impact ledger
+
+| Surface                                   | Status          | Decision and proof boundary                                                                                                                                                          |
+| ----------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture and durable docs             | Preserve        | Existing provider/app ownership remains correct. The accepted topology belongs to SPEC intent, runbook procedure, and dated decision evidence.                                       |
+| READMEs, exports and generated references | Preserve        | No public package contract, export, command, or generated API changed.                                                                                                               |
+| Runbooks and authority                    | Change required | Replace the prior retained-user-device choice with exact shared-sender duplicate-registration, source-preservation, distinct-destination, isolation, send, and cleanup gates.        |
+| Verification journeys and proof           | Change required | Add the decision receipt now and a separate dated live capability/journey receipt after provider execution. Preserve prior no-send and SMS-only evidence.                            |
+| Skills and AGENTS                         | Preserve        | PRD, docs-maintainer, Effect client-boundary, and Computer Use contracts cover the work; no reusable instruction change is required.                                                 |
+| Lint, config, commands and CI             | Preserve        | No executable policy or workflow changed in this decision slice.                                                                                                                     |
+| Schemas, services and Layers              | Preserve        | Existing Photon management and Channel boundaries own the future read/mutation/send operations; no adapter change is yet required.                                                   |
+| Tests and fixtures                        | Preserve        | Local fixtures cannot prove live duplicate registration or routing isolation. Existing lifecycle tests remain required before provider acceptance.                                   |
+| SPEC, tasks and plan                      | Change required | Record the product decision, direct proof oracle, false greens, authority, stop conditions, and deferred terminal audit.                                                             |
+| Receipts and evidence                     | Change required | Add a safe fingerprint-only decision receipt; later retain exact live before/after identities without full numbers, secrets, message content, Space or event IDs.                    |
+| Rollout and rollback                      | Change required | Starting rollback remains one adopted Preview user, one stable callback and unchanged source. Future rollback removes only exact rollout-created failed/temporary Preview resources. |
+| Lifecycle and archive pointers            | Change required | Keep `isolated-photon-preview-spike` active; preserve earlier receipts as observations and route the new accepted decision.                                                          |
+| Documentation audit inventory             | Change required | The decision receipt expands the docs corpus from 193 to 194 paths; recompute the sorted-path digest.                                                                                |
+
+## 2026-07-29 shared-sender live readback and stop gate
+
+Two consecutive authenticated, Schema-owned reads returned the same sanitized
+state. Source/Production is Free managed-shared with two unchanged users, zero
+actual dedicated lines, and two stable webhooks `2083611d…`/`72cac9b5…`.
+Isolated Preview is Free managed-shared with one adopted user, zero actual
+dedicated lines, and sole stable webhook `d2456774…`, matching ignored
+mode-`0600` custody. Candidate inventory digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`
+still maps sender `82ac258d…` to unchanged source destination `d4039779…`,
+reports it available, and finds no Preview binding.
+
+The accepted Production receipt classifies the two source callbacks as one
+Production callback plus one preserved Preview callback. Because Photon fans
+every project event to every project webhook, the required
+Production-destination-to-Production-only postcondition cannot currently pass.
+The authority for this slice prohibited any source/Production mutation, so the
+operator stopped before the otherwise permitted Preview shared-user create.
+No provider write, Vercel action, Messages action, callback probe, or message
+occurred. Duplicate cross-project registration remains untested.
+
+### Live-readback requirement replay
+
+| Requirement               | Direct observable and expected postcondition                                                                         | Plausible false green rejected                                                          | Command/readback and owner                                                                                                            | Result                                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Complete project state    | Two matching project-scoped reads expose platform, full users, full webhooks, actual lines, and billing              | Reconciliation summary hard-coded line count or one partial read                        | Photon management services plus candidate inventory; `docs/verification/alchemy-photon-shared-sender-topology-readback-2026-07-29.md` | Passed for inventory                                          |
+| Source callback isolation | Source has exactly one Production callback before any Preview user write                                             | Distinct Preview project, available sender, or two source callbacks treated as isolated | Fresh stable-ID/route fingerprints plus accepted Production callback classification                                                   | Failed: source has Production plus preserved Preview callback |
+| Preview mutation gate     | Preview create runs only after source isolation is already satisfiable                                               | Exercising mutation merely because it is authorized                                     | Fail-closed runbook gate and zero-write provider readback                                                                             | Passed: mutation not admitted                                 |
+| Shared-sender support     | Same sender gains one distinct Preview route without source change                                                   | Availability, prior seeded user, or another Apple identity                              | One future bounded Preview create after callback blocker is removed                                                                   | Not run                                                       |
+| Channel journey           | Exact Preview route is iMessage and yields one Preview response, zero Production response, one duplicate disposition | SMS, source reply, synthetic webhook, or aggregate response                             | Future Computer Use and signed provider/runtime readback                                                                              | Not run                                                       |
+
+### Live-readback docs-maintainer impact ledger
+
+| Surface                                   | Status          | Decision and proof boundary                                                                                                          |
+| ----------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture and durable docs             | Preserve        | Package/provider ownership is unchanged; the stop gate belongs to current SPEC, runbook, plan, and evidence.                         |
+| READMEs, exports and generated references | Preserve        | No public package contract, export, command, or generated surface changed.                                                           |
+| Runbooks and authority                    | Change required | Require one source Production callback before Preview mutation and separately authorize exact preserved-Preview-callback retirement. |
+| Verification journeys and proof           | Change required | Add the sanitized live-readback receipt and preserve the decision receipt as authority rather than provider truth.                   |
+| Skills and AGENTS                         | Preserve        | PRD, docs-maintainer, Effect wrapper, and Computer Use contracts were applied; no reusable guidance defect was found.                |
+| Lint, config, commands and CI             | Preserve        | The temporary diagnostic used public Schema-owned services and was removed; no executable surface remains.                           |
+| Schemas, services and Layers              | Preserve        | Existing management services supplied the complete reads; no raw client or new boundary was needed.                                  |
+| Tests and fixtures                        | Preserve        | Local fixtures cannot prove current provider topology; repository verification still guards unchanged contracts.                     |
+| SPEC, tasks and plan                      | Change required | Record the current two-webhook stop result, zero writes, untested duplicate registration, and exact next authority.                  |
+| Receipts and evidence                     | Change required | Add one safe fingerprint-only provider receipt; retain no full IDs, URLs, numbers, credentials, or messages.                         |
+| Rollout and rollback                      | Preserve        | No rollout occurred; source and Preview topology remained unchanged across matching reads.                                           |
+| Lifecycle and archive pointers            | Change required | Keep `isolated-photon-preview-spike` open and defer all dependent tasks and the terminal audit.                                      |
+| Documentation audit inventory             | Change required | The live receipt expands the docs corpus from 194 to 195 paths; recompute the sorted-path digest.                                    |
+
+Focused Effect setup, boundaries, docs, skills, authority, controls,
+verification policy, Photon typecheck, all 35 Photon tests, Photon build, JSON,
+docs-inventory digest, and diff checks passed. Complete repository verification
+used only the documented process-local synthetic Executor URL/key fixture and
+passed HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture,
+Knip, all nine workspace typechecks, and all fifteen Turbo build/test tasks.
+The same complete gate is rerun after this exact receipt-bearing ledger update
+before commit. These checks prove repository consistency only, not live
+duplicate registration, message delivery, callback isolation, or response
+counts.
 
 ## Repository-authorized five-pass audit
 

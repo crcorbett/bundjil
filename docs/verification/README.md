@@ -121,6 +121,18 @@ operation nor asserts present provider state.
   absent retained Preview conversation, and the resulting stop before
   composition. No message, duplicate count, provider mutation, or Preview
   Channel result occurred.
+- [`alchemy-photon-shared-sender-topology-decision-2026-07-29.md`](alchemy-photon-shared-sender-topology-decision-2026-07-29.md)
+  records the accepted one-sender, two-project, distinct-destination topology,
+  its live duplicate-registration and isolated-routing proof gates, bounded
+  Preview authority, rollback, and non-claims. It is a product/authority
+  decision, not current provider-state or journey proof.
+- [`alchemy-photon-shared-sender-topology-readback-2026-07-29.md`](alchemy-photon-shared-sender-topology-readback-2026-07-29.md)
+  records two matching sanitized project reads, actual zero dedicated-line
+  results, unchanged source and Preview users, one stable isolated Preview
+  callback, and two source callbacks. The accepted Production receipt
+  identifies those source callbacks as Production plus preserved Preview, so
+  project-wide fan-out blocked the required isolation before any Preview user
+  mutation or Messages send.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

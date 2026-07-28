@@ -51,18 +51,17 @@ The Messages search was cleared and the app was returned to its ordinary
 conversation list. No SMS, cold outbound-first attempt, uncertain-recipient
 send, or provider-side operation occurred.
 
-This receipt confirms the exact blocker already owned by the conversation
-topology correction: the current Mac cannot originate from the Apple identity
-registered to retained Preview user `db23193a…`. The smallest non-mutating next
-action is to use the device/account that owns that identity and send one
-explicitly iMessage-labelled inbound message to assigned Preview line
-`db49756e…`.
+This receipt confirms the exact blocker that existed at its observation time:
+the current Mac could not originate from the Apple identity registered to
+retained Preview user `db23193a…`.
 
-If that device/account is unavailable, the product owner must explicitly
-choose either isolated Preview topology reconfiguration around an
-operator-originable controlled identity, with full adoption, isolation, and
-rollback proof, or a Photon-supported non-disruptive duplicate cross-project
-assignment/reference investigation. This receipt authorizes neither choice.
+Cooper's later 2026-07-29 product decision selects a different required
+topology: register the current controlled sender `82ac258d…` non-disruptively
+in both separate projects, with distinct assigned destinations and isolated
+webhooks. The decision and new proof oracle are owned by
+[`alchemy-photon-shared-sender-topology-decision-2026-07-29.md`](alchemy-photon-shared-sender-topology-decision-2026-07-29.md).
+This receipt remains valid evidence of the earlier no-send gate and does not
+prove that the newly selected topology is supported.
 
 The stable rollback remains the previously proved isolated Preview topology:
 one adopted user, one stable callback, unchanged source bindings, and restored

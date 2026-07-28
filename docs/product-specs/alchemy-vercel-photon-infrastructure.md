@@ -512,14 +512,15 @@ entitlement. Therefore the prior `PERMISSION_DENIED` receipt remains valid
 negative evidence for cold outbound-first on managed shared, not proof that
 ordinary Photon reply delivery is broken.
 
-The correct Preview Channel oracle is inbound-first from the device/account
-owning the exact Apple identity registered to Preview user `db23193a…`, sent
-through an explicitly iMessage-labelled composer to that user's own assigned
-Preview line `db49756e…`. Only the resulting signed Preview callback may begin
-the same-event replay, Eve completion, one outbound reply, typing and
-provider/handset proof. The source-project conversation, Sendblue conversation,
-current Mac identity, SMS-only temporary route, direct-Space resolution,
-outbound invocation and synthetic callbacks are rejected false greens.
+The 2026-07-29 product decision makes one controlled iMessage sender mandatory
+for both environments. Production and Preview must remain separate Photon
+projects with separate credentials, distinct Photon-assigned destination
+lines, and separate environment webhook routing. Sending from the one sender
+to the Production destination must reach only Production; sending from the
+same sender to the Preview destination must reach only Preview. Another Apple
+identity/device is not an accepted solution. Two callbacks in one Photon
+project are also rejected because one project event fans out to every
+registered webhook.
 
 The separately authorized 2026-07-28 Computer Use inspection confirmed this
 gate directly. Messages details separated Sendblue `6a6a862e…` from source
@@ -531,17 +532,46 @@ match the retained Preview registered identity. The send gate failed before
 composition: no message was typed or sent, no duplicate count was observed,
 and no provider state changed.
 
-The least disruptive next operator action is to use the device/account owning
-the retained Preview registered identity. If it is unavailable, the product
-owner must explicitly choose either reconfiguring Preview around an existing
-operator-originable controlled identity, with full isolation and rollback
-proof, or asking Photon to confirm a non-disruptive duplicate cross-project
-assignment/reference mechanism. No support contact, plan upgrade, dedicated
-line, credential rotation, project recreation or topology mutation follows
-without that decision. The current correction and preserved non-claims are
-retained in
-`docs/verification/alchemy-photon-conversation-topology-correction-2026-07-28.md`.
+Official Photon material now says shared inbound ownership resolves from the
+pair of Photon destination number plus sender number. The live management API
+must still prove that the same sender can be registered concurrently across
+the two projects without moving or changing the source binding. Under the
+accepted authority, first read both complete topologies and source binding,
+then perform at most the minimum Preview-only user adoption/create needed for
+that sender and read back a distinct Preview destination. Stop before a send
+if duplicate registration is rejected, the source changes, the route is SMS,
+or isolated routing remains ambiguous.
+
+Only after the current Mac identity `82ac258d…` equals the Preview user,
+the distinct Preview destination is exact, and Messages labels that exact
+conversation iMessage may one bounded inbound-first message begin the signed
+Preview callback, one Preview response, zero Production response, and exact
+duplicate-disposition proof. Preserve a passing stable Preview binding; delete
+only rollout-created failed or temporary Preview resources after drain and
+exact readback. The decision and non-claims are retained in
+`docs/verification/alchemy-photon-shared-sender-topology-decision-2026-07-29.md`.
 The task remains open and the terminal five-pass audit has not run.
+
+Two consecutive live management reads on 2026-07-29 stopped this accepted
+journey before mutation. Source/Production remains Free managed-shared with two
+unchanged users, zero actual dedicated lines, and two webhooks
+`2083611d…`/`72cac9b5…`; isolated Preview remains Free managed-shared with one
+adopted user, zero actual dedicated lines, and its sole stable webhook
+`d2456774…`. Candidate inventory still maps sender `82ac258d…` to unchanged
+source destination `d4039779…`, reports it available, and finds no Preview
+binding.
+
+The accepted Production receipt identifies the source webhooks as one
+Production callback plus one preserved Preview callback. Photon fans a project
+event to every project webhook, so the mandatory Production-only destination
+postcondition is impossible while that preserved callback remains. Current
+authority prohibited source/Production mutation; no Preview user create,
+Messages action, provider write, or message occurred. The duplicate
+cross-project registration question remains untested. Resume only after
+separate authority retires the exact preserved source-project Preview callback
+with rollback, retry-drain, sole-Production-callback, unchanged-user, and
+zero-fan-out readback. The bounded evidence is
+`docs/verification/alchemy-photon-shared-sender-topology-readback-2026-07-29.md`.
 
 ## Canonical Schema and Effect contracts
 

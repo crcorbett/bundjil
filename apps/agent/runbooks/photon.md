@@ -187,16 +187,30 @@ duplicate suppression, Preview, Production, or durable process supervision.
    fingerprints. Never infer an owned resource from list order, creation time,
    phone identity, assigned routing number, or partial ID.
 3. Require service type `shared`, zero dedicated lines, and iMessage enabled.
-   Inventory approved controlled identities by safe fingerprint and prove each
-   candidate's current Photon project/user binding without retaining a full
-   number. Prefer an unbound test/non-Production candidate. For a bound
-   candidate, prove Photon permits concurrent reference from the isolated
-   Preview project without detach, reassignment, disablement, or delivery
-   change before calling create. Never move an existing binding merely to pass
-   the spike. Match the selected exact redacted identity, check shared
-   availability, call the idempotent shared-user create once, then read back
-   one exact stable user ID and an assigned routing number without retaining
-   either phone value. Re-read the source project's binding after creation.
+   The accepted topology uses one controlled sender in two separate Photon
+   projects. Capture the source/Production user's stable ID, sender fingerprint,
+   assigned-destination fingerprint, project fingerprint, platform state and
+   webhook topology before any Preview write. Capture the complete Preview
+   baseline separately. Official Photon material says shared inbound ownership
+   resolves from destination plus sender, but the live management API must
+   still prove duplicate cross-project registration.
+   Before a Preview user write, also require the source project to have exactly
+   one accepted Production callback. The 2026-07-29 readback found two stable
+   source callbacks; the accepted Production receipt identifies them as one
+   Production callback plus one preserved Preview callback. Because Photon
+   fans an event to every webhook in a project, stop before Preview mutation
+   while both remain. Retiring the preserved callback is a separate
+   source/Production mutation: require explicit authority, exact current route
+   ownership, immutable rollback and signing-secret custody, traffic/drain
+   evidence, deletion by stable ID, then one-callback and unchanged-user
+   readback. Do not infer permission from the later Preview-user authority.
+   Match the exact redacted sender, check shared availability without treating
+   availability as capability proof, call the idempotent Preview shared-user
+   create at most once, then read back one exact Preview user and its assigned
+   destination without retaining either phone value. Immediately re-read the
+   source project and require its stable user, sender, destination, platform and
+   webhook fingerprints to remain unchanged. Require the Preview destination
+   to differ from the source destination.
    Photon project creation may automatically seed the authenticated
    principal's controlled shared user. Treat that as a provider mutation:
    fingerprint and read back the seeded user, its assignment, and the source
@@ -204,9 +218,13 @@ duplicate suppression, Preview, Production, or durable process supervision.
    binding is unchanged and retaining it is less disruptive than deletion or
    adding another user. Never call create merely because the runbook expected
    an initially empty project.
-   More than one exact match, an unavailable or exclusive identity, any source
-   binding change, a dedicated service, or an uncertain postcondition is a
-   stop.
+   More than one exact match, a duplicate-registration rejection, an SMS-only
+   assignment, an unavailable or exclusive identity, any source binding
+   change, a dedicated service, or an uncertain postcondition is a stop.
+   Reconcile an uncertain create by exact Preview and source readback; never
+   replay it blindly. Delete only the exact rollout-created Preview user after
+   retry drain when the accepted topology was not established. Preserve a
+   successful stable Preview user only after every isolation gate passes.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
@@ -263,26 +281,23 @@ duplicate suppression, Preview, Production, or durable process supervision.
    Stop when no exact approved Preview conversation identity is present. A
    synthetic event identity, guessed recipient, or shared source-project
    conversation is not provider-bound Channel proof.
-   The sending device/account must own the exact Apple identity registered to
-   the isolated Preview user. Read back that user and its assigned Preview line
-   by safe fingerprint, then send one bounded direct text from an explicitly
-   iMessage-labelled composer to that user's own assigned line. Stop if the
-   current Messages identity differs from the registered Preview identity or
-   the composer says SMS. Do not substitute a Sendblue conversation, a
-   source-project Photon conversation, a different controlled identity, a
-   temporary SMS-only route, a synthetic callback, or a cold outbound-first
-   SDK call.
-   If no operator-controlled device/account owns the retained Preview identity,
-   stop for an explicit product decision. The allowed decision space is either
-   to reconfigure isolated Preview around an operator-originable controlled
-   identity with complete adoption/isolation/rollback proof, or to ask Photon
-   whether a non-disruptive duplicate cross-project assignment/reference is
-   supported. Current pricing lists cold outreach only for
-   Business/Enterprise dedicated offerings; Free/Pro direct-messaging access
-   is not proof of cold-outbound entitlement. Do not retry a retained
-   `PERMISSION_DENIED`, contact support, upgrade, buy a line, rotate
-   credentials, recreate a project or mutate topology without that decision
-   and its own authority.
+   The sending device/account must use the same exact Apple identity retained
+   by the source/Production project and newly proved in Preview. Read back both
+   user/destination pairs by safe fingerprint. Select only the distinct Preview
+   destination, then send one bounded direct text from an explicitly
+   iMessage-labelled composer. Stop if the current Messages identity differs
+   from the approved shared sender, the selected recipient differs from the
+   Preview destination, or the composer says SMS. Do not substitute a Sendblue
+   conversation, the source/Production Photon destination, another controlled
+   identity, a synthetic callback, or a cold outbound-first SDK call.
+   Require the signed event to identify only the Preview webhook/environment,
+   one Preview response, zero Production response, and exact same-event
+   duplicate disposition. Two callbacks in one Photon project are forbidden
+   because a project event fans out to every registered webhook.
+   Current pricing lists cold outreach only for Business/Enterprise dedicated
+   offerings; Free/Pro direct-messaging access is not proof of cold-outbound
+   entitlement. Do not upgrade, buy a line, rotate credentials, recreate a
+   project, mutate Production, or change billing.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK

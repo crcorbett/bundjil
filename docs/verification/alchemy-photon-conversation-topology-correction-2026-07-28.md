@@ -86,6 +86,14 @@ No plan upgrade, dedicated line, credential rotation, project recreation, user
 move, SMS fallback, or support contact follows automatically from this
 correction.
 
+Cooper's later 2026-07-29 product decision supersedes this receipt's next-path
+choice while preserving every observed conversation and cold-outbound fact.
+The required topology now registers current sender `82ac258d…`
+non-disruptively in both separate projects, with distinct assigned
+destinations and separate webhooks. The new decision and live proof gates are
+owned by
+[`alchemy-photon-shared-sender-topology-decision-2026-07-29.md`](alchemy-photon-shared-sender-topology-decision-2026-07-29.md).
+
 ## Bounded Messages UI confirmation
 
 The separately authorized 2026-07-28 Computer Use inspection confirmed the
