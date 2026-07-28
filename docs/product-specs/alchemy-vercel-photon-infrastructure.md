@@ -4,7 +4,7 @@ lifecycle: proposed
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-24
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-28
 review_trigger: Alchemy version or provider support, Vercel or Photon API, deployment topology, storage binding, secret custody, authority, rollout, rollback, or proof-contract change
 ---
 
@@ -472,138 +472,66 @@ typing start/stop and handset limitations. No synthetic identity, guessed
 recipient or shared source-project conversation may substitute for that direct
 observable.
 
-Cooper additionally approved one outbound-first handshake for the isolated
-Preview journey. Current Photon documentation states that shared-service
-outbound routing resolves the project and exact target phone, while webhooks
-emit inbound messages only and never echo outbound sends. The rollout may
-therefore recreate the bounded temporary Preview user and callback, send one
-uniquely identifiable non-sensitive outbound Photon message to the exact
-registered test recipient, and use only the resulting Messages conversation
-to attempt the genuine inbound reply. Provider acceptance or appearance in
-Messages is not Bundjil ingress proof. The Messages composer must explicitly
-identify iMessage before the reply is sent; SMS remains forbidden. The signed
-inbound callback, same-event retry, Eve completion, outbound response, typing
-and delivery readbacks remain the required oracles.
-
-Cooper has approved one narrower Preview-only topology adaptation for that
-journey. Fresh readback must first prove that the local Messages start identity
-is an existing controlled candidate, remains non-disruptively available to
-Preview, and keeps its source binding unchanged. The rollout may then create
-exactly one temporary shared user for that identity in the isolated Preview
-project without deleting or changing the adopted user. The temporary user is
-rollout-owned, exists only for the genuine provider-delivered Channel journey,
-and must be removed by exact stable user identity after callback retry drain
-and complete source/Preview readback. If Photon would move or disrupt the source
-binding, the adaptation stops without mutation. No second retained user or
-Production topology change is accepted.
-
-The approved adaptation reached its genuine-origin gate without sending a
-message. Fresh Photon readback preserved the source and adopted Preview
-bindings, created exactly one rollout-owned temporary Preview user, and
-returned one assigned-route fingerprint. A second query-controlled Preview
-callback was registered, its four sensitive values were rebound, and exact Git
-source `9f40dc44ae96433828d6b37bec87cf853c8d3523` produced READY deployment
-`dpl_4BjAP2bNCAyoc44y4SRgNiJin8TP`; the branch alias accepted a protected,
-valid-signature unsupported event with an empty `204`. The fingerprint-matched
-Mac then resolved the exact assigned route, but Messages classified it only as
-SMS. Native AppleScript and JXA queries for the Messages services timed out
-without returning a service or buddy even though System Settings readback
-showed the actual `node` invoker's narrow Messages Automation permission
-already enabled. ChatGPT's separate Messages toggle remained off and was not
-changed because it did not own the bounded invocation. No SMS fallback,
-message, Photon event, Eve dispatch, outbound response or typing claim is
-accepted. Rollback first restored the stable callback values in Vercel; it must
-next prove a fresh stable deployment, wait through the provider retry horizon,
-delete only the proof callback and temporary user, and restore the original
-one-user/one-webhook topology before this attempt can close.
-
-That rollback is complete. Exact source
-`fd630e98e18207c9765d7e4854e14dc1d2e29f90` produced READY deployment
-`dpl_4aa6EGdJ7NTnYQjBDdKgJj2HjPNR`; stable-alias signed probes returned empty
-`204` responses before and after a drain longer than the documented
-approximately 3.5-minute retry horizon. Cleanup deleted only the proof
-callback and rollout-created temporary user, then fresh readback found one
-stable webhook and one adopted Preview user. Two canonical candidate
-inventories matched the original digest
-`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`,
-with the source and adopted Preview bindings unchanged. Both temporary
-mode-`0600` binding artifacts were removed; stable credential custody remains
-the ignored mode-`0600` `.env.local` and Vercel's sensitive Preview metadata.
-The Channel proof remains unproved at the genuine iMessage-origin boundary.
-
-The authorized outbound-first handshake then reran from that restored baseline.
-Fresh source and adopted-user readback passed; one new temporary Preview user
-and one query-controlled callback were created while preserving the accepted
-user and stable callback. Two inventories matched post-create digest
-`e4ab75194439bcf5d61a0ffc8ac2a5eaf3955a807da4dce82bf3a1e8c0a090a4`.
-Exact source `d30509172a2810c2a3e27b893dffc63a0fd0c569` produced READY
-deployment `dpl_2GPBK8DJqTAc3M6AQrdkjcfCokP4`, and its protected stable alias
-returned a valid-signature unsupported-event `204`.
-
-The scoped Photon client acquired successfully and resolved the exact direct
-Space, but the one bounded outbound send was denied with
-`AuthenticationError`, provider code `internalError`, transport status `7`
-(`PERMISSION_DENIED`), and `retryable=false`. No retry ran. Computer Use
-readback then found no exact Messages conversation for the assigned route, so
-no iMessage-labelled composer, reply, inbound callback, Eve dispatch, outbound
-agent response or typing action existed.
-
-Rollback rebound the stable four sensitive values before cleanup. Exact source
-`fdba650e66854bd12f70c0b4e6c01e741f310aee` produced READY deployment
-`dpl_4bsT55Mgt52JEswwzzTEY3LfWhwN`; protected stable-alias probes returned
-empty `204` responses, with the final probe more than the documented retry
-horizon after rebind. Cleanup deleted only the proof callback and temporary
-user, removed all three temporary custody artifacts, restored one adopted
-Preview user plus one stable callback, and returned the canonical inventory to
-the original digest
-`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`
-with both source bindings unchanged. The task is now blocked at the provider's
-outbound permission boundary; enabling or correcting outbound iMessage
-capability for the exact isolated Preview project credential is the smallest
-remaining external prerequisite. This does not satisfy the hosted Channel
-proof and does not trigger the terminal five-pass audit.
-
-The 2026-07-26 read-only diagnosis narrows that prerequisite. Photon documents
-Free/shared outbound to an exact recipient as supported only when the target is
-a registered user of that project and the registered handle exactly matches
-the handle Apple presents. The failed temporary user satisfied management
-readback and assignment, both working and isolated projects expose the same
-Free/shared/iMessage-enabled/zero-line posture, and both accepted Production
-and failed Preview artifacts use Spectrum `12.3.0` through the same Bundjil
-adapter. No outbound-enable or approval control is documented or surfaced in
-the authenticated dashboard flow. Because the one registered-target send still
-received `PERMISSION_DENIED`, the next owner is Photon's shared-router or
-transport-token trace after the exact target is revalidated with Photon's
-debug-line handle oracle. A plan upgrade, dedicated line, credential rotation
-or project recreation is not an accepted diagnostic substitute. The
-fingerprint-only comparison, ranked internal hypotheses, support packet,
-smallest retry and non-claims are retained in
-`docs/verification/alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`.
-
-The bounded corrective verification exhausted the debug-line prerequisite.
-Photon's bot received one explicitly iMessage-labelled debug command and
-reported the same E.164 GUID/address as controlled candidate fingerprint
-`82ac258dac9ee2fbdf7430c0e8a1177433ea236c06cd045ffe8683af1a0cc4c5`.
-Fresh readback then created exactly one temporary Preview user, preserved the
-adopted/source bindings, and converged twice at digest
-`21f343bcef7cd86c3f1e9312d7a4536c7d3b3be98a001a6f2854768e03aa32e9`.
-One negative-control call proved that the assigned Photon line is not the
-outbound participant: it failed with validation status `3`. The exact
-registered Apple handle is the SDK target; the assigned line is only the user's
-inbound destination. The corrected registered-handle call still failed once
-with `AuthenticationError`, `internalError`, transport status `7`
-(`PERMISSION_DENIED`) and `retryable=false`, with no provider message identity
-and zero automatic retries.
-
-Two post-failure inventories retained the temporary binding, exact cleanup
-deleted only that user, and two final inventories restored the original digest
+The later Preview-only topology adaptation tested whether the current Mac
+Apple identity could establish the isolated journey without disturbing its
+source binding. It created only one rollout-owned temporary Preview user and
+one query-controlled callback, preserved the adopted user and stable callback,
+and stopped before an SMS-only Messages route could send. A separately
+authorized cold outbound-first attempt then resolved a direct Space but
+returned `AuthenticationError`, provider code `internalError`, transport
+status `7` (`PERMISSION_DENIED`) and `retryable=false`; it returned no provider
+message identity and ran no retry. Exact cleanup restored one adopted Preview
+user, one stable callback, unchanged source bindings, and canonical inventory
+digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
-Handle registration is now excluded. Photon support must trace the isolated
-project-target binding, allowlist cache, concurrent-project identity fencing or
-transport-token authorization before another send. The secret-free packet and
-exact question are retained in
-`docs/verification/alchemy-photon-outbound-debug-verification-2026-07-26.md`.
-Outbound delivery and every downstream Channel oracle remain unproved.
+The retained receipts own the immutable deployment, callback, drain, cleanup,
+and negative-send detail.
+
+Fresh Messages and live candidate inventory supplied on 2026-07-28 correct the
+diagnosis. The Messages conversation named `Bundjil` is Sendblue at recipient
+fingerprint `6a6a862e…`; it is not Photon. The successful Photon conversation
+is the unnamed assigned line `d4039779…`, mapped to original/source project
+`ad20033f…` and current Mac Apple handle `82ac258d…`. Its transcript and the
+accepted 2026-07-22/23 receipts are inbound-first: the registered user messages
+the assigned line, then Bundjil replies through the provider-created
+conversation. A source-project cold outbound attempt also failed at the
+shared boundary on 2026-07-22, so the denied cold send is neither a general
+reply outage nor uniquely a Preview regression.
+
+The retained isolated Preview user `db23193a…` maps to assigned line
+`db49756e…` and a different Apple identity. The current Mac identity cannot
+originate that retained user's journey. The temporary Preview binding for Mac
+identity `82ac258d…` mapped to `0809669f…`, which Messages classified as
+SMS-only; it is not an iMessage proof route. SMS remains forbidden.
+
+Current Photon pricing lists direct-messaging API access for Free and Pro
+managed-shared tiers, but lists cold outreach only for Business and Enterprise
+dedicated offerings. The shared-project registered-user troubleshooting rule
+constrains an admitted target; it does not guarantee cold outbound-first
+entitlement. Therefore the prior `PERMISSION_DENIED` receipt remains valid
+negative evidence for cold outbound-first on managed shared, not proof that
+ordinary Photon reply delivery is broken.
+
+The correct Preview Channel oracle is inbound-first from the device/account
+owning the exact Apple identity registered to Preview user `db23193a…`, sent
+through an explicitly iMessage-labelled composer to that user's own assigned
+Preview line `db49756e…`. Only the resulting signed Preview callback may begin
+the same-event replay, Eve completion, one outbound reply, typing and
+provider/handset proof. The source-project conversation, Sendblue conversation,
+current Mac identity, SMS-only temporary route, direct-Space resolution,
+outbound invocation and synthetic callbacks are rejected false greens.
+
+The least disruptive next operator action is to use the device/account owning
+the retained Preview registered identity. If it is unavailable, the product
+owner must explicitly choose either reconfiguring Preview around an existing
+operator-originable controlled identity, with full isolation and rollback
+proof, or asking Photon to confirm a non-disruptive duplicate cross-project
+assignment/reference mechanism. No support contact, plan upgrade, dedicated
+line, credential rotation, project recreation or topology mutation follows
+without that decision. The current correction and preserved non-claims are
+retained in
+`docs/verification/alchemy-photon-conversation-topology-correction-2026-07-28.md`.
+The task remains open and the terminal five-pass audit has not run.
 
 ## Canonical Schema and Effect contracts
 

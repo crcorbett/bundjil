@@ -91,19 +91,30 @@ operation nor asserts present provider state.
   records the temporary-user/query-callback adaptation, exact route's SMS-only
   classification, bounded native Messages service failure, zero message send,
   stable redeployment, retry drain, exact cleanup, matching restored
-  inventories, and unchanged adopted/source bindings. It is an inconclusive
-  genuine-origin result, not Channel or terminal SPEC proof.
+  inventories, and unchanged adopted/source bindings. Its outbound diagnosis
+  is corrected by the 2026-07-28 topology receipt; the SMS-only and denied-send
+  observations remain negative evidence, not Channel or terminal SPEC proof.
 - [`alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`](alchemy-photon-outbound-permission-diagnosis-2026-07-26.md)
   compares the working and isolated Free/shared topologies, confirms the same
-  Spectrum adapter/version and Photon's registered-target allowlist contract,
-  and localizes the denial to shared transport authorization or route binding.
-  It is read-only diagnosis, not a send, provider repair, or Channel proof.
+  Spectrum adapter/version and Photon's registered-target allowlist contract.
+  It is superseded for current diagnosis; retain it only as read-only
+  cold-outbound negative evidence, not a general send outage, provider repair,
+  or Channel proof.
 - [`alchemy-photon-outbound-debug-verification-2026-07-26.md`](alchemy-photon-outbound-debug-verification-2026-07-26.md)
   proves the approved Apple handle through Photon's iMessage debug bot,
   distinguishes the registered outbound target from its assigned inbound
   shared line, reproduces the corrected registered-target denial, retains the
-  secret-free support packet, and proves exact temporary-user cleanup. It is a
-  blocked provider receipt, not outbound delivery or Channel proof.
+  conditional secret-free support packet, and proves exact temporary-user
+  cleanup. It is superseded for current routing and remains negative
+  cold-outbound evidence, not outbound delivery or Channel proof.
+- [`alchemy-photon-conversation-topology-correction-2026-07-28.md`](alchemy-photon-conversation-topology-correction-2026-07-28.md)
+  is the current diagnosis owner. It separates Sendblue, source Photon and
+  isolated Preview conversations; proves accepted Photon replies are
+  inbound-first; distinguishes managed-shared direct messaging from dedicated
+  cold outreach; retains the denied sends as negative evidence; and routes the
+  next Preview proof to the exact retained-user identity or an explicit
+  topology decision. It performs no provider operation and proves no new
+  Channel result.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

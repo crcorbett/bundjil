@@ -263,32 +263,26 @@ duplicate suppression, Preview, Production, or durable process supervision.
    Stop when no exact approved Preview conversation identity is present. A
    synthetic event identity, guessed recipient, or shared source-project
    conversation is not provider-bound Channel proof.
-   When the approved local Messages start identity is a different existing
-   controlled candidate, first prove its exact fingerprint, shared
-   availability and unchanged source binding. Under an explicit Preview-only
-   temporary-user envelope, create exactly one rollout-owned Preview shared
-   user for that identity while preserving the adopted user. Stop if Photon
-   moves the source binding, returns an ambiguous user or cannot read back the
-   exact assigned routing identity. After the journey and retry drain, delete
-   only the temporary user by stable ID and require complete source/Preview
-   readback to restore the one-adopted-user topology.
-   When a cold Messages composition to that assigned route remains SMS-only,
-   an explicitly approved Preview proof may first use the temporary Preview
-   project/user to send one bounded outbound Photon message to the exact
-   registered test recipient. The SDK participant is the registered Apple
-   handle (`user.phoneNumber`), never the assigned Photon shared line
-   (`user.assignedPhoneNumber`); the assigned line is only the destination for
-   the user's inbound message. Require Photon's debug bot to report the exact
-   registered Apple handle before sending, and treat the assigned-line target
-   as a rejected false green. Resolve the direct Space through the existing
-   `@bundjil/photon` SDK boundary, keep content and full identities only in
-   secure process custody, and require provider acceptance without retrying an
-   uncertain send. This outbound delivery may activate an iMessage
-   conversation in Messages, but it is not ingress proof: Photon webhooks are
-   inbound-only and do not echo outbound messages. Reply through the Messages
-   UI only when that exact conversation explicitly identifies iMessage; never
-   send through an SMS-labelled composer. Only the resulting signed inbound
-   callback may satisfy the Channel ingress oracle.
+   The sending device/account must own the exact Apple identity registered to
+   the isolated Preview user. Read back that user and its assigned Preview line
+   by safe fingerprint, then send one bounded direct text from an explicitly
+   iMessage-labelled composer to that user's own assigned line. Stop if the
+   current Messages identity differs from the registered Preview identity or
+   the composer says SMS. Do not substitute a Sendblue conversation, a
+   source-project Photon conversation, a different controlled identity, a
+   temporary SMS-only route, a synthetic callback, or a cold outbound-first
+   SDK call.
+   If no operator-controlled device/account owns the retained Preview identity,
+   stop for an explicit product decision. The allowed decision space is either
+   to reconfigure isolated Preview around an operator-originable controlled
+   identity with complete adoption/isolation/rollback proof, or to ask Photon
+   whether a non-disruptive duplicate cross-project assignment/reference is
+   supported. Current pricing lists cold outreach only for
+   Business/Enterprise dedicated offerings; Free/Pro direct-messaging access
+   is not proof of cold-outbound entitlement. Do not retry a retained
+   `PERMISSION_DENIED`, contact support, upgrade, buy a line, rotate
+   credentials, recreate a project or mutate topology without that decision
+   and its own authority.
 2. Send one bounded inbound direct-text DM through Photon. Record signed
    authentication, fresh claim, one Eve dispatch/completion, participant-based
    direct-Space reconstruction, one outbound provider result, and scoped SDK

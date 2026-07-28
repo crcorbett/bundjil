@@ -1,15 +1,24 @@
 ---
 document_type: proof-receipt
-lifecycle: evidence
+lifecycle: superseded
 authority: supporting
 owner: bundjil-photon-provider-owner
 observed_at: 2026-07-26T20:00:27Z
 artifact_git_identity: f50cd32a508f5d9f5ecc9e90c6ee3b03dae311a9
 environment: bundjil-photon-outbound-permission-diagnosis
-review_trigger: replace after Photon support identifies the shared-transport cause or a later bounded outbound verification changes the result
+successor: docs/verification/alchemy-photon-conversation-topology-correction-2026-07-28.md
+superseded_reason: fresh Messages and inventory evidence separates inbound-first shared replies from unproved cold outbound-first entitlement
+review_trigger: retain as negative cold-outbound evidence; use the successor for current diagnosis and next action
 ---
 
 # Alchemy Photon outbound-permission diagnosis — 2026-07-26
+
+> **Lifecycle correction (2026-07-28):** the observed
+> `PERMISSION_DENIED` remains valid negative evidence for a cold
+> outbound-first managed-shared send. It is not evidence of a general Photon
+> reply outage, a Preview-only regression, or a provider defect requiring
+> repair. Current diagnosis and next action are owned by
+> [`alchemy-photon-conversation-topology-correction-2026-07-28.md`](alchemy-photon-conversation-topology-correction-2026-07-28.md).
 
 ## Read-only scope
 
@@ -52,17 +61,15 @@ deployment-specific runtime proof.
 
 ## Provider contract and repository path
 
-Photon's current pricing contract gives Free and Pro projects full direct
-messaging iMessage API access through managed shared lines. Its troubleshooting
-contract narrows shared outbound further: a Free or Pro project may message
-only a recipient registered as a user of that exact project, using the exact
-handle Apple uses for iMessage. The prescribed self-service checks are the
-project Users page and Photon's debug line. No separate outbound-enable or
-approval control is documented or surfaced in the authenticated Free/shared
-getting-started flow; that flow is inbound-first and describes the assigned
-line as replying only to added users. Business adds a dedicated line and
-cold-outreach capability, but the published Free/shared contract does not
-require Business for one registered target.
+Photon's current pricing contract gives Free and Pro projects direct-messaging
+iMessage API access through managed shared lines, while listing cold outreach
+only for Business and Enterprise dedicated offerings. The troubleshooting
+contract says a shared project may address only a recipient registered as a
+user of that exact project, using the exact handle Apple uses for iMessage.
+That allowlist rule narrows an otherwise admitted send; it does not guarantee
+that Free/shared includes cold outbound-first initiation. The published
+getting-started and deliverability paths prefer inbound-first, and the accepted
+Bundjil receipts prove replies only after the registered user initiated.
 
 Both the accepted Production artifact and the failed isolated Preview artifact
 pin `@spectrum-ts/core@12.3.0`, `@spectrum-ts/imessage@12.3.0`, and
@@ -84,17 +91,20 @@ RPC also stopped below the management/token plane. This distinction matters:
 an inbound-created conversation has a provider-established shared-route
 binding that the failed outbound-first attempt did not have.
 
-## Diagnosis and fix boundary
+## Superseded diagnosis and corrected boundary
 
-The confirmed cause boundary is a Photon shared-transport authorization or
-route-binding failure for outbound-first delivery, not an inactive plan,
-disabled iMessage platform, missing line purchase, invalid management
-credential, different SDK version, different Bundjil adapter, or broad Photon
-outage. Photon reports all systems operational, but that does not prove this
-project-specific binding.
+The original diagnosis correctly localized the denial to cold outbound-first
+shared transport rather than ordinary management authentication or SDK
+construction. It incorrectly treated the remaining boundary as a provider
+defect to repair. Fresh conversation mapping shows that all successful Bundjil
+Photon sends were replies in inbound-created conversations, while cold
+outbound-first attempts failed on both the source and isolated Preview
+projects. Current pricing separately advertises cold outreach only for
+Business/Enterprise dedicated offerings.
 
-The exact internal cause is not externally observable. Ranked provider-side
-possibilities are:
+The retained provider-side hypotheses below remain possible explanations only
+if the product later asks Photon whether duplicate cross-project assignment or
+cold initiation should work:
 
 1. the shared proxy has no current project-target binding, or its allowlist
    cache did not converge, despite management readback showing the temporary
@@ -105,58 +115,44 @@ possibilities are:
 3. the issued shared transport token lacks the required outbound permission
    for this project or RPC.
 
-The public troubleshooting path must be exhausted before another send:
+Do not repeat the cold send as the next verification. The correct Preview path
+is:
 
-1. Recreate the bounded Preview user only under the existing mutation
-   authority and read back its stable assignment.
-2. Use Photon's debug line from the exact controlled Apple sender to establish
-   the handle Apple actually presents; require an exact match to the registered
-   Preview user.
-3. If the match passes, give Photon support the project ID, exact observation
-   time, exact safe error string, target and debug handles, SDK/runtime
-   versions, and the assigned user identity through secure support custody.
-   Ask Photon to trace and repair the shared outbound project-target binding or
-   transport-token authorization. Photon documents email/Discord escalation
-   for failures that remain after the user-handle checks.
-4. If requested by Photon, enable Spectrum messaging telemetry for one
-   separately authorized bounded retry so Photon can inspect provider
-   initialization, Space resolution, and send spans. Telemetry is not a
-   dashboard toggle and is disabled in the current Bundjil adapter.
+1. Use the device/account owning the exact Apple identity registered to the
+   retained Preview user and send one explicitly iMessage-labelled inbound
+   message to that user's own assigned Preview line.
+2. If that device/account is unavailable, obtain an explicit product decision
+   to reconfigure Preview around an operator-originable identity or to ask
+   Photon about a non-disruptive duplicate cross-project reference.
+3. Preserve the adopted user and source binding until that decision. Never use
+   the SMS-only temporary route or a source-project conversation as proof.
 
 Do not rotate the credential, recreate the project, buy a dedicated line, or
 upgrade the plan as a diagnostic shortcut. Those actions do not follow from
-the observed evidence. If Photon instead confirms that new outbound
-conversations are intentionally unsupported on Free/shared despite its current
-published contracts, the supported choices become inbound-first proof or a
-dedicated Business line, and the SPEC must be revised before either topology
-change.
+the observed evidence, and no support contact is the standing next step.
 
-## Smallest verification after repair
+## Smallest verification after the operator identity is available
 
-After Photon confirms the binding or entitlement repair, perform one
-Preview-only bounded verification:
+Perform one Preview-only bounded inbound-first verification:
 
 1. re-read the unchanged source and isolated baselines;
-2. create one exact temporary registered Preview user and wait for stable
-   assignment plus provider-confirmed binding convergence;
-3. send one non-sensitive outbound text through the existing SDK without
-   automatic retry and require a provider message identity plus iMessage
-   conversation/delivery readback;
-4. treat that result only as outbound proof because outbound messages do not
-   echo through Photon webhooks;
-5. reply only from an iMessage-labelled conversation and require the signed
-   Preview callback, Eve completion, outbound response, typing transitions,
-   and delivery readbacks for the full Channel proof; and
-6. restore the stable callback and one-user topology with exact cleanup and
-   source/Preview readback.
+2. prove the sending device/account owns the retained Preview user's exact
+   registered Apple identity;
+3. from an explicitly iMessage-labelled composer, send one non-sensitive
+   inbound text to that user's own assigned Preview line;
+4. require the signed Preview callback, Eve completion, one outbound reply,
+   same-event retry suppression, typing transitions, and separate provider and
+   handset readbacks; and
+5. retain the one-user/one-callback topology unless an explicit later product
+   decision authorizes a different isolated Preview topology.
 
 ## Limitations and non-claims
 
-This diagnosis did not retrieve sensitive Vercel plaintext, exercise the debug
-line, obtain a Photon support trace, send a message, prove a current
-project-target binding, or change any provider state. It does not prove the
-ranked internal cause, outbound delivery, Channel ingress, replay disposition,
-Eve completion, typing, handset delivery, Production state, or terminal SPEC
+This diagnosis did not retrieve sensitive Vercel plaintext, obtain a Photon
+support trace, prove cold-outbound entitlement, or change any provider state.
+Its denied send remains negative evidence only. It does not prove a provider
+defect, outbound delivery, Channel ingress, replay disposition, Eve
+completion, typing, handset delivery, Production state, or terminal SPEC
 closeout. The owning task remains in progress, and the terminal five-pass
 audit has not run.
 

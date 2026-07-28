@@ -1,15 +1,24 @@
 ---
 document_type: proof-receipt
-lifecycle: evidence
+lifecycle: superseded
 authority: supporting
 owner: bundjil-photon-provider-owner
 observed_at: 2026-07-26T21:32:32Z
 artifact_git_identity: fcbf62c5d7f488fb16e25b5f9bbbb299c4fae44c
 environment: bundjil-photon-preview-outbound-debug-verification
-review_trigger: replace after Photon support traces or repairs the isolated Preview shared-route denial
+successor: docs/verification/alchemy-photon-conversation-topology-correction-2026-07-28.md
+superseded_reason: fresh conversation topology proves the denial concerns cold outbound-first managed-shared traffic rather than ordinary reply delivery
+review_trigger: retain as negative cold-outbound evidence; use the successor for current diagnosis and next action
 ---
 
 # Alchemy Photon outbound debug verification — 2026-07-26
+
+> **Lifecycle correction (2026-07-28):** the handle match, exact temporary
+> topology, zero-retry denial, and rollback remain valid observations. The
+> denial is negative evidence for cold outbound-first managed-shared traffic,
+> not a general Photon send outage or a Preview-only regression. Current
+> diagnosis is owned by
+> [`alchemy-photon-conversation-topology-correction-2026-07-28.md`](alchemy-photon-conversation-topology-correction-2026-07-28.md).
 
 ## Scope and authority
 
@@ -72,12 +81,13 @@ identity. Therefore no iMessage delivery, Messages return conversation,
 webhook ingress, Eve completion, agent response, typing or handset result is
 claimed.
 
-The debug match excludes handle registration as the cause. The confirmed
-remaining boundary is Photon shared-route project-target authorization or
-binding after an assigned user has converged. The exact internal defect remains
-provider-owned.
+The debug match excludes a handle typo for this denied cold send. It does not
+establish a Free/shared cold-outbound entitlement. Fresh evidence also records
+a source-project cold outbound denial, while successful Photon sends are
+inbound-first replies. The exact internal transport interpretation remains
+provider-owned and is not the standing blocker for the Preview Channel proof.
 
-## Secret-free Photon support packet
+## Retained conditional Photon support packet
 
 Transmit the full values below only through Photon's secure support custody.
 The repository retains fingerprints and bounded metadata:
@@ -96,7 +106,9 @@ The repository retains fingerprints and bounded metadata:
 | Runtime                             | Bun; `@spectrum-ts/core@12.3.0`; `@spectrum-ts/imessage@12.3.0`; `@grpc/grpc-js@1.14.4` |
 | Retry disposition                   | one corrected send call; zero automatic retries; no provider message identity           |
 
-Photon support must answer:
+Only if the product owner chooses to investigate a non-disruptive duplicate
+cross-project reference or cold-initiation entitlement should Photon support
+answer:
 
 > The exact Free/shared target is assigned as a user of this project and
 > Photon's debug bot reports the same Apple E.164 handle. Why does the shared
@@ -107,8 +119,9 @@ Photon support must answer:
 > authorization for this project. Please identify the provider-side repair and
 > the readback that proves it before another send.
 
-Do not rotate credentials, recreate the project, upgrade the plan or purchase a
-dedicated line without that provider evidence.
+Do not contact support, rotate credentials, recreate the project, upgrade the
+plan or purchase a dedicated line without that explicit product decision and
+separate authority.
 
 ## Exact cleanup and non-claims
 
@@ -120,10 +133,11 @@ The source bindings and adopted Preview user remained unchanged, final Preview
 topology is one adopted user plus one stable callback, and the temporary handle
 was removed from ignored mode-`0600` custody.
 
-The task remains blocked at Photon support. This receipt does not prove
-outbound-first acceptance, inbound-first reply, Channel ingress, replay,
-delivery, Eve, typing, handset, Production or terminal SPEC closeout. The
-formal five-pass audit has not run.
+The task is not blocked on mandatory Photon support. It is blocked on the
+operator identity/topology choice recorded by the successor receipt. This
+receipt does not prove outbound-first acceptance, Preview inbound-first reply,
+Channel ingress, replay, delivery, Eve, typing, handset, Production or
+terminal SPEC closeout. The formal five-pass audit has not run.
 
 ## Sources
 

@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-26
+last_reviewed: 2026-07-28
 review_trigger: task status, Alchemy/provider capability, state/secret decision, authority, rollout, rollback, or proof change
 spec: ../../product-specs/alchemy-vercel-photon-infrastructure.md
 task_ledger: ../../product-specs/alchemy-vercel-photon-infrastructure.tasks.json
@@ -61,10 +61,15 @@ R2 state store contains the exact 106 Preview and 69 Production logical
 identities, both stages converge to no-op, and the read-only provider adapters
 record zero transport writes. `isolated-photon-preview-spike` is now the
 current task. Its project/user isolation and stable callback lifecycle are
-proved, but the hosted Channel journey is blocked because Photon denied the
-bounded outbound-first Preview send before an iMessage-return conversation
-could be established. Exact rollback restored the original one-user,
-one-webhook topology and canonical inventory digest.
+proved. Fresh Messages and candidate inventory correct the current boundary:
+accepted Photon traffic is inbound-first on the source project, while the
+retained isolated Preview user belongs to a different Apple identity than the
+current Mac. Exact rollback restored the original one-user, one-webhook
+topology and canonical inventory digest. The next proof requires the
+device/account owning the retained Preview identity, or an explicit product
+choice between Preview topology reconfiguration and a provider-supported
+non-disruptive cross-project reference. No cold outbound retry, support
+contact, upgrade or mutation is the standing next step.
 
 On 2026-07-25, the clean feature branch preserved `0a08767`, `43af287` and
 `65f4d7b`, committed the prepared inventory implementation as `c54c499`, and
@@ -825,11 +830,13 @@ the exact rollout-created temporary user may be removed after drain and
 readback. The terminal five-pass audit remains deferred until all tasks reach
 their final disposition.
 
-The resumed 2026-07-26 decision adds one outbound-first handshake without
-weakening that oracle. Fresh official Photon documentation and the pinned
-repository adapter agree that the Preview project can resolve a direct Space
-from the exact registered recipient and send outbound, while Photon webhooks
-emit inbound messages only and never echo an outbound send. After fresh
+The following 2026-07-26 outbound-first attempt is retained as historical
+execution evidence. Its then-current capability diagnosis and next step are
+superseded by the 2026-07-28 conversation-topology correction below. The
+approved attempt tested whether the Preview project could resolve a direct
+Space and send cold outbound to an exact registered recipient, while retaining
+the signed inbound callback as the only ingress oracle because Photon webhooks
+never echo outbound sends. After fresh
 baseline readback, the rollout may recreate only the bounded temporary user and
 query-controlled callback, send one uniquely identifiable non-sensitive Photon
 message to the registered test recipient, and inspect the resulting exact
@@ -864,23 +871,22 @@ Cleanup deleted only the exact proof callback and temporary user, removed three
 temporary custody artifacts, and restored one adopted Preview user, one stable
 callback and canonical inventory digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`
-with both source bindings unchanged. The exact remaining prerequisite is an
-outbound-iMessage-capable credential for the same isolated Preview project, or
-a provider correction enabling that capability. The task and plan remain open;
-the terminal five-pass audit has not run.
+with both source bindings unchanged. At the time, the attempted next
+prerequisite was an outbound-iMessage-capable isolated credential or provider
+correction. The 2026-07-28 correction below supersedes that conclusion; the
+task and plan remain open, and the terminal five-pass audit has not run.
 
-Fresh read-only diagnosis on 2026-07-26 rejects a missing dashboard switch,
+The read-only diagnosis recorded on 2026-07-26 rejected a missing dashboard switch,
 inactive Free plan, disabled iMessage platform, required dedicated line,
 different SDK version and different Bundjil adapter as explanations. Photon
-documents Free/shared sends to registered project users, provided the
+documents an allowlist rule for Free/shared sends to registered project users, provided the
 registered target exactly matches Apple's iMessage handle. The temporary
 Preview user was assigned before the failed send, but the shared transport
 still returned `PERMISSION_DENIED`; Photon's management API exposes no
 outbound-capability or binding-health flag, and no separate send-enable control
-is documented or surfaced in the authenticated dashboard flow. The next
-provider boundary is therefore: validate the exact Apple handle through
-Photon's debug line, then ask Photon support to trace and repair the shared
-project-target binding, allowlist cache or transport-token authorization. A
+is documented or surfaced in the authenticated dashboard flow. That diagnosis
+then routed the next step to debug-line validation and Photon support. The
+2026-07-28 correction below supersedes support as the standing next step. A
 Business upgrade, dedicated line, credential rotation or project recreation is
 not justified by the current evidence. The read-only receipt is
 `docs/verification/alchemy-photon-outbound-permission-diagnosis-2026-07-26.md`.
@@ -961,6 +967,97 @@ Production and the terminal audit remain unclaimed.
 | Ownership and call graph              | Passed                        | Photon management reads/mutations remained in `PhotonManagement`; the corrected message attempt remained in `PhotonClient.sendMessage`; SDK instances and raw credentials stayed private. The app runbook owns the consequential procedure, the receipt owns the observation, and Production was not reached.                                                                                                                                                     |
 | Effect and provider quality           | Passed                        | Existing branded identities, redacted Config, decoded service outputs, safe tagged errors, scoped SDK release and explicit live Layers were reused. The tracked diff adds no raw client, callback escape, primitive public contract, DTO mirror, unsafe cast, manual provider reader, switch/instanceof policy or helper sprawl.                                                                                                                                  |
 | Verification and false-green coverage | Passed for the blocked result | Direct oracles proved the debug handle, two-pass baseline/create/failure/cleanup topology, assigned-line rejection, exact registered-target denial, zero automatic retries, no provider message identity and final restoration. Photon typecheck/build and 35 tests; Effect LS; boundary, docs, skills, authority, controls and verification-policy checks; leak scans; and `bun run verification` passed. Delivery and downstream Channel claims remain blocked. |
+
+## 2026-07-28 conversation-topology correction
+
+Fresh fingerprint-safe Messages inspection and live candidate inventory
+supplied by Cooper reopen the diagnosis within
+`isolated-photon-preview-spike`. No provider read, mutation, send, support
+contact, deployment or Production operation occurred in this correction.
+
+The named Messages conversation `Bundjil` resolves to Sendblue recipient
+fingerprint `6a6a862e…`; it is not Photon. The successful Photon conversation
+is unnamed assigned line `d4039779…`, mapped to original/source project
+`ad20033f…` and current Mac Apple handle `82ac258d…`. Its transcript and the
+accepted 2026-07-22/23 receipts are inbound-first: the registered user sends
+first, then Bundjil replies in the provider-created conversation.
+
+The retained isolated Preview user `db23193a…` owns assigned line
+`db49756e…` and a different Apple identity. Current Mac identity `82ac258d…`
+cannot originate that journey. Its rollout-created temporary Preview route
+`0809669f…` was SMS-only, and SMS remains forbidden. The cold outbound-first
+Preview call returned `PERMISSION_DENIED`; a source-project cold outbound
+attempt had also failed at the shared gRPC boundary on 2026-07-22. These are
+valid negative cold-outbound observations, not a general Photon reply outage
+or a Preview-only regression.
+
+Current Photon pricing lists direct-messaging API access on Free and Pro
+managed-shared tiers, but cold outreach only on Business and Enterprise
+dedicated offerings. The registered-user troubleshooting rule is an allowlist
+condition, not a guarantee of cold-outbound entitlement. The prior diagnosis
+and debug receipts are therefore superseded for current routing while retained
+as negative evidence.
+
+The exact Preview proof is now inbound-first from the device/account owning the
+Apple identity registered to user `db23193a…`, sent from an explicitly
+iMessage-labelled composer to assigned line `db49756e…`. The resulting signed
+Preview callback remains the only entry to the replay/Eve/outbound/typing
+journey. Sendblue, the source Photon conversation, current Mac identity, the
+SMS-only temporary route, direct-Space resolution, cold outbound invocation
+and synthetic callbacks are rejected false greens.
+
+The least disruptive next operator path is the device/account owning the
+retained Preview identity. If it is unavailable, the product owner must choose
+one of two alternatives before mutation: reconfigure isolated Preview around
+an operator-originable controlled identity with full adoption/isolation and
+rollback proof; or ask Photon to confirm a non-disruptive duplicate
+cross-project assignment/reference. No support contact, upgrade, line
+purchase, credential rotation, project recreation or topology change follows
+automatically.
+
+### Conversation-topology requirement replay
+
+| Requirement              | Direct observable and expected postcondition                                                                                                                         | Plausible false green rejected                                                                             | Focused command/readback                                                                   | Evidence owner and result                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Conversation ownership   | Supplied Messages mapping separates Sendblue `6a6a862e…`, source Photon `d4039779…`, and isolated Preview `db49756e…`; exact provider/channel owner remains distinct | Conversation display name or a neighbouring accepted receipt                                               | Fresh Messages mapping plus live fingerprint-only candidate inventory                      | `docs/verification/alchemy-photon-conversation-topology-correction-2026-07-28.md`; passed for classification |
+| Direction and capability | Accepted transcripts show inbound user first and agent reply second; pricing separates managed-shared direct messaging from dedicated cold outreach                  | Treating “direct messaging” or a registered-user allowlist as cold-outbound entitlement                    | Accepted 2026-07-22/23 receipts plus current pricing/troubleshooting/deliverability review | Correction receipt; passed for current policy boundary                                                       |
+| Preview origin           | Device/account owning retained Preview user `db23193a…` sends iMessage to `db49756e…`, producing one signed Preview callback                                         | Current Mac `82ac258d…`, source conversation, SMS-only `0809669f…`, outbound SDK call or synthetic webhook | Future exact identity readback and explicitly iMessage-labelled inbound journey            | Blocked pending operator identity/product choice                                                             |
+| Negative-send retention  | `PERMISSION_DENIED` remains addressable with exact zero-retry and rollback evidence                                                                                  | Recasting it as ordinary reply failure, Preview regression or provider repair mandate                      | Superseded receipts plus final restored inventory digest                                   | Passed as negative cold-outbound evidence                                                                    |
+| Safety and lifecycle     | One adopted Preview user, one stable callback and unchanged source bindings remain the rollback baseline                                                             | Support, upgrade or topology mutation inferred from documentation work                                     | Existing two-read restored inventory; no provider operation in this slice                  | Passed; terminal audit remains deferred                                                                      |
+
+### Conversation-topology docs-maintainer impact ledger
+
+| Surface                                   | Status          | Decision and proof boundary                                                                                                                                                        |
+| ----------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and durable docs             | Preserve        | Runtime ownership and Effect/provider graphs did not change; the correction belongs to current SPEC intent, operational proof procedure and dated evidence.                        |
+| READMEs, exports and generated references | Preserve        | No public contract, export, command or generated API changed.                                                                                                                      |
+| Runbooks and authority                    | Change required | Replace cold-outbound bootstrap with the exact inbound-first Preview identity oracle and explicit product-decision stop. Existing authority does not trigger a provider operation. |
+| Verification journeys and proof           | Change required | Add the correction receipt, preserve negative denied-send receipts as superseded evidence, and reject cross-channel/source/SMS/cold-send proof by proxy.                           |
+| Skills and AGENTS                         | Preserve        | Existing PRD/docs ownership and proof contracts detected the correction; no reusable workflow defect requires a skill change.                                                      |
+| Lint, config, commands and CI             | Preserve        | Documentation-only correction changes no executable configuration or workflow.                                                                                                     |
+| Schemas, services and Layers              | Preserve        | No provider adapter or service contract changed.                                                                                                                                   |
+| Tests and fixtures                        | Preserve        | Repository tests cannot prove conversation ownership; accepted receipts and supplied live evidence own the claim. No fixture changed.                                              |
+| SPEC, tasks and plan                      | Change required | Reopen the current diagnosis, record the inbound-first oracle, exact operator choice, false greens and terminal-audit non-claim.                                                   |
+| Receipts and evidence                     | Change required | Add one current correction receipt; mark the two overbroad diagnosis receipts superseded while preserving their negative observations and exact successor.                         |
+| Rollout and rollback                      | Preserve        | No rollout occurred. The existing one-user/one-callback restored digest remains the rollback identity.                                                                             |
+| Lifecycle and archive pointers            | Change required | Route current diagnosis through the correction receipt; keep the plan active and formal five-pass audit terminal-only.                                                             |
+
+### Correction review lenses
+
+| Lens                                  | Result                                 | Evidence                                                                                                                                                                                                                                                      |
+| ------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph              | Passed                                 | SPEC/task/plan own current intent; `apps/agent/runbooks/photon.md` owns the repeatable procedure; dated receipts own observed conversations and denied sends. Sendblue, source Photon and isolated Preview are distinct.                                      |
+| Effect and provider quality           | N/A with evidence                      | No code, Schema, Config, Service, Layer, SDK boundary or outward request changed. Existing `PhotonClient` remains private and the denied send is not retried.                                                                                                 |
+| Verification and false-green coverage | Passed for the corrected blocked state | Direct evidence maps each conversation and direction, current pricing distinguishes cold outreach, the runbook rejects SMS/source/Sendblue/outbound/synthetic substitutes, and exact rollback remains retained. The genuine Preview journey remains unproved. |
+
+Repository closeout decoded both changed JSON owners and passed docs,
+verification-policy, authority, controls, skills, Effect language-service and
+boundary checks. The first full verification rerun correctly stopped at the
+absent Executor build endpoint. The accepted rerun used only the documented
+process-local synthetic Executor URL/key fixture, made no provider request, and
+passed HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture,
+Knip, all nine workspace typechecks and all fifteen Turbo build/test tasks.
+This is repository proof only; it does not upgrade the blocked Preview journey.
 
 ## Repository-authorized five-pass audit
 

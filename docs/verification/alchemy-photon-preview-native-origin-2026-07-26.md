@@ -11,6 +11,13 @@ review_trigger: replace only after a later approved genuine iMessage-origin jour
 
 # Alchemy Photon Preview native-origin receipt — 2026-07-26
 
+> **Diagnosis correction (2026-07-28):** the temporary route's SMS-only
+> classification and denied cold outbound-first call remain valid negative
+> evidence. Fresh conversation mapping proves the working Photon path is an
+> inbound-first source-project conversation, not this isolated Preview
+> topology. The current Preview oracle and operator choice are owned by
+> [`alchemy-photon-conversation-topology-correction-2026-07-28.md`](alchemy-photon-conversation-topology-correction-2026-07-28.md).
+
 ## First native-origin attempt
 
 Fresh fingerprint-only Photon readback proved the controlled Mac Messages
@@ -69,11 +76,13 @@ Vercel's sensitive Preview metadata.
 
 ## Outbound-first handshake attempt
 
-Fresh official Photon documentation and the repository boundary agree that an
-outbound direct Space send may establish a conversation, but that Photon
-webhooks emit inbound messages only and do not echo outbound sends. The second
-attempt therefore retained the signed inbound callback as the only ingress
-oracle and treated outbound acceptance or Messages appearance as insufficient.
+The second attempt tested whether a cold outbound direct Space send could
+establish a conversation. Photon webhooks emit inbound messages only and do
+not echo outbound sends, so the attempt correctly retained the signed inbound
+callback as the only ingress oracle and treated outbound acceptance or
+Messages appearance as insufficient. Later pricing and topology evidence
+qualifies the premise: direct messaging does not itself prove Free/shared cold
+outreach entitlement.
 
 The canonical baseline inventory matched the original digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
@@ -132,16 +141,19 @@ iMessage enabled, zero dedicated lines, one adopted Preview user and one
 stable callback. The proof callback, temporary user and all three temporary
 mode-`0600` custody artifacts are gone.
 
-## Current limitation
+## Corrected current limitation
 
 The isolated lifecycle and exact rollback are proved, but the required real
-Channel journey is blocked at Photon's outbound permission boundary. The
-Preview credential can authenticate management, acquire the SDK and resolve
-the exact direct Space, but the provider currently denies the send before it
-can establish an iMessage-return conversation. The smallest external
-prerequisite is Photon enabling or correcting outbound iMessage send capability
-for this exact isolated Preview project credential, or issuing a
-provider-supported outbound-capable credential scoped to that same project.
+Channel journey is blocked at its genuine inbound origin. Retained Preview user
+fingerprint `db23193a…` owns assigned-line fingerprint `db49756e…` and an Apple
+identity different from the current Mac identity `82ac258d…`. The Mac cannot
+originate the retained user's Preview journey; its temporary assigned route
+`0809669f…` was SMS-only. The least disruptive prerequisite is the
+device/account owning the retained Preview user's registered Apple identity
+sending an explicitly iMessage-labelled inbound message to its own Preview
+assigned line. If that identity is unavailable, the product owner must choose
+either an isolated Preview topology reconfiguration or a Photon-supported
+non-disruptive duplicate cross-project reference before any mutation.
 
 No inbound Photon event, provider retry, Eve dispatch/completion, outbound
 agent response, typing transition, delivery or handset behavior is claimed.
