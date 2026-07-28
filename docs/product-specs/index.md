@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-26
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -13,6 +13,13 @@ Current implementation intent requires both an active SPEC/task here and an
 entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
+
+## Proposed
+
+- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
+  reviewed implementation intent for deterministic Effect time, pragmatic
+  state/collection ownership, and four narrow existing-plugin lint rules;
+  implementation awaits an active plan and explicit authority.
 
 ## Current
 
