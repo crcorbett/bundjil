@@ -1330,10 +1330,12 @@ for ignored, duplicate and identity-rejected inputs, and returned `401`
 without an authentication disposition. The current slice adds the
 identity-free `ChannelWebhookDisposition` oracle at the owning Channel adapter.
 Its direct route tests cover every disposition/status class and reject
-participant/message leakage. This is repository observability only until an
-immutable Preview deployment and signed safe probe prove the exact runtime
-record. It does not classify the prior provider requests or make another
-message eligible.
+participant/message leakage. Immutable Preview deployment `310dc759…` reached
+READY; one exact signed unsupported-event probe returned `204` with no
+redirect, location or body, and deployment-scoped logs contained exactly one
+`ignored`/`unsupportedEvent` disposition with zero forbidden
+identity/signature/bypass tokens. It does not classify the prior provider
+requests or make another message eligible.
 
 The acceptance gate therefore failed closed. After the retry horizon, guarded
 cleanup deleted only rollout user `0e2e2abe…`/assignment `0809669f…`. Two
@@ -1344,14 +1346,13 @@ bindings, adopted Preview user `46b1fb0c…`, assignment `db49756e…`, and Prev
 callback `d2456774…`. No billing, paid line, credential, Vercel configuration,
 deployment, Production user/assignment, or adopted Preview resource changed.
 
-The task remains in progress. First deploy and prove the safe disposition
-oracle with the existing signed unsupported-event fixture. The later provider
-slice still requires separately authorized Preview Vercel routing-identity
-overwrite, an exact canonical-principal decision, immutable deployment
-readback and new bounded message authority before the user may be recreated or
-another message sent. Preserve the existing Preview callback configuration.
-The terminal five-pass audit remains deferred until the complete SPEC is
-honestly terminal.
+The task remains in progress. The safe disposition oracle is deployed and
+proved. The later provider slice still requires separately authorized Preview
+Vercel routing-identity overwrite, an exact canonical-principal decision,
+immutable deployment readback and new bounded message authority before the
+user may be recreated or another message sent. Preserve the existing Preview
+callback configuration. The terminal five-pass audit remains deferred until
+the complete SPEC is honestly terminal.
 
 ### Requirement-to-proof replay
 
@@ -1363,7 +1364,7 @@ honestly terminal.
 | iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                    | Passed for one bounded delivery                       |
 | Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                      | Passed for invocation isolation                       |
 | Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                  | Passed for ID/secret/path coherence only              |
-| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; later immutable signed probe and runtime log      | Repository tests passed; deployed proof pending       |
+| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log  | Passed at `310dc759…`                                 |
 | Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Vercel API/CLI/dashboard plus Agent Run/local-custody searches                | Blocked: write-only value; canonical principal absent |
 | Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime statuses and app owner mapping                                  | Failed; `204`/`401`, no `202`                         |
 | Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory             | Passed                                                |
@@ -1435,7 +1436,8 @@ tooling, lint, Knip and nine-workspace typecheck gates, plus all 63 agent tests,
 all 35 Photon tests and all fifteen Turbo tasks. Its synthetic Executor Config
 fixture made no external request. This proves the repository call graph and
 safe-log contract only; immutable Preview deployment and signed-log readback
-remain pending.
+are now passed at `310dc759…`, while the historical provider requests remain
+unclassified.
 
 ## Repository-authorized five-pass audit
 

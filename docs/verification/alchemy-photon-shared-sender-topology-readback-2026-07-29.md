@@ -129,11 +129,18 @@ participant and message leak sentinels are absent. An HTTP status, a logger
 construction test or a neighbouring provider assertion is not accepted as
 proof.
 
-This correction does not retroactively classify the historical `204` or
-`401`. Until the exact source is deployed and a signed safe probe produces the
-matching disposition record, it is repository evidence only. Another real
-message remains ineligible without the later exact routing-directory decision,
-immutable deployment readback and new bounded message authority.
+Immutable Preview deployment `310dc759…` reached READY. At
+`2026-07-30T02:28:08.325Z`, one exact signed unsupported-event probe against
+the stable branch callback returned `204` with no redirect, location or body.
+The exact deployment log window contained one
+`ChannelWebhookDisposition`, classified `ignored` with reason
+`unsupportedEvent`, and zero participant, principal, message-sentinel,
+signature or protection-bypass tokens.
+
+This proves the disposition oracle at the deployed safe callback. It does not
+retroactively classify the historical `204` or `401`. Another real message
+remains ineligible without the later exact routing-directory decision,
+immutable configuration readback and new bounded message authority.
 
 The exact repository candidate passed Effect language-service diagnostics,
 boundary, docs, skills, authority, controls and verification-policy gates,
@@ -177,7 +184,7 @@ configuration, deployment, or Production environment changed.
 | iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient     | Passed for one bounded handset/provider delivery; Computer Use                      |
 | Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Passed for callback invocation isolation; Vercel runtime logs                       |
 | Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
-| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Repository direct route fixtures passed; immutable deployed proof pending           |
+| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`              |
 | Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Blocked: Vercel value is write-only and the canonical principal was not recovered   |
 | Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: exact responses were `204` and `401`; no accepted dispatch                  |
 | Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                          |
