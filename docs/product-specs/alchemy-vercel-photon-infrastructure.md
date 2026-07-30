@@ -1691,3 +1691,41 @@ It is not a comparative harness campaign. A pass, worker, command or finding
 count is not acceptance proof. Any expansion into DNS mutation, Photon project
 or dedicated-line lifecycle, automatic drift apply, Sendblue management, or a
 new secret backend requires a SPEC amendment before code or provider work.
+
+## 2026-07-30 live provider-contract qualification
+
+Commit `52434d479c99bcbc1e23bdf6ee5a1a0df1165c99` reached READY on
+immutable Preview deployment `DAcSftdx…`. Three signed, identity-free fixtures
+directly proved the corrected boundary: exact lowercase `imessage` continued
+to `ignored/nonInbound`; display-case `iMessage` failed closed as
+`spacePlatform/caseVariant`; and an absent event header failed closed as
+`eventHeader/missing`. Deployment-scoped log search found no synthetic
+identity or content sentinel.
+
+Two pre-write Photon inventories matched restored digest `9e6108d5…`. One
+owner reconciliation created only Preview shared user `8c3ce2b0…` for approved
+sender `82ac258d…`, with distinct Preview destination `0809669f…`. Two
+post-write inventories matched `eec3f46c…`; source user `020cc192…`, source
+destination `d4039779…`, adopted Preview user `46b1fb0c…`, and stable Preview
+callback `d2456774…` remained unchanged.
+
+Computer Use proved the exact sender and destination fingerprints, an
+`iMessage`/Encrypted composer, one outgoing proof fingerprint `623a3978…`,
+and one Delivered marker. The provider emitted one signed request that returned
+`202 acceptedForDispatch`. A separate request returned `401` with the new
+value-free diagnosis `eventHeader/missing`; it is not a signature failure and
+is not accepted as the same-event duplicate. The workflow runtime then proved
+direct-Space resolution, typing start, one outbound `sendMessage`, typing stop,
+SDK release, and final workflow `200`. The Messages observer had not rendered
+the agent reply at the latest readback, so handset response delivery remains
+unproved.
+
+The same-event duplicate gate now uses the accepted Preview-only
+`bundjil-proof=retry-once` cutover. A temporary callback was created alongside
+the stable callback, its create-only binding remains in mode-`0600` rollback
+custody, and Vercel Preview metadata was changed under
+`stableCallbackCutover`. The stable callback is retained until an immutable
+cutover deployment, one bounded provider retry journey, the full retry
+horizon, stable-binding restoration, and exact temporary-callback deletion
+all pass. This is in-progress provider evidence, not terminal SPEC proof; the
+formal five-pass audit has not run.

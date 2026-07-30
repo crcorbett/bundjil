@@ -1669,3 +1669,44 @@ the integrated terminal result and closes every finding at its earliest owner,
 and exact Git identity and verification evidence are recorded. This is not a
 comparative harness campaign. A pass/worker/command count or successful local
 plan is not completion.
+
+## Live lowercase-contract qualification and retry cutover
+
+The exact correction commit
+`52434d479c99bcbc1e23bdf6ee5a1a0df1165c99` reached READY as immutable
+Preview deployment `DAcSftdx…`. The hosted property matrix passed without
+proof by proxy:
+
+| Requirement              | Direct observable                                                    | Rejected false green                           | Result                         |
+| ------------------------ | -------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------ |
+| Exact platform literal   | Signed lowercase `imessage` reaches `ignored/nonInbound`             | Unit fixture or conflicting `iMessage` example | Passed on immutable deployment |
+| Case variant             | Signed `iMessage` records `spacePlatform/caseVariant`                | Case-fold acceptance or raw value logging      | Passed                         |
+| Required-header presence | Missing event header records `eventHeader/missing` and returns `401` | Aggregate `headers` checkpoint or status alone | Passed                         |
+| Leak boundary            | Deployment logs contain no synthetic identity/content sentinel       | Logger construction or local encode only       | Passed                         |
+
+Two baseline inventories matched `9e6108d5…`. One Preview-only owner
+reconciliation created user `8c3ce2b0…` with destination `0809669f…` for
+sender `82ac258d…`; two immediate inventories matched `eec3f46c…` and proved
+the source binding, adopted Preview user, and stable callback unchanged.
+Computer Use then proved the exact fingerprint pair, `iMessage`/Encrypted,
+one outgoing proof `623a3978…`, Delivered, and no SMS.
+
+The live request returned `202 acceptedForDispatch`. A distinct request
+returned `401 eventHeader/missing`; no signature failure is claimed. The
+workflow deployment recorded direct-Space resolution, typing start, one
+outbound send, typing stop, releases, and final `200`. Handset receipt of the
+agent reply was not visible at the latest observer read and remains a separate
+non-claim.
+
+For the required same-event duplicate proof, the plan is now at a reversible
+Preview-only cutover: one temporary query-controlled callback exists beside
+stable callback `d2456774…`; its create-only binding remains mode `0600`; and
+the four sensitive Preview variables were rebound with
+`stableCallbackCutover`. The next immutable deployment must pass a signed safe
+probe before one additional bounded iMessage. That journey must return one
+intentional `503`, one provider retry of the same event identity, one
+`duplicate` `204`, one total Eve dispatch, and one total external response.
+After the retry horizon, restore the stable binding, deploy and prove it,
+delete only the temporary callback, and either retain the stable Preview user
+after every acceptance gate or delete only `8c3ce2b0…` on failure. Production
+remains unchanged. The terminal five-pass audit remains deferred.

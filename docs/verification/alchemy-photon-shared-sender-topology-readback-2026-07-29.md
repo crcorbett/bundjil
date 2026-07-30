@@ -467,6 +467,52 @@ the failed live `204`/`401` boundary into accepted ingress, Eve completion,
 outbound response, replay, typing, or terminal SPEC proof. The task remains
 open, and the single terminal five-pass audit has not run.
 
+## Lowercase-contract live qualification
+
+Commit `52434d479c99bcbc1e23bdf6ee5a1a0df1165c99` reached READY on immutable
+Preview deployment `DAcSftdx…`. Signed hosted fixtures returned:
+
+- `204 ignored/nonInbound` for exact lowercase `imessage`;
+- `204 ignored/unsupportedService` plus
+  `spacePlatform/caseVariant` for `iMessage`; and
+- `401 authenticationRejected` plus `eventHeader/missing` when the event
+  header was absent.
+
+The deployment log contained no synthetic identity/content sentinel. These
+results prove the deployed platform and header classifiers; they do not prove
+provider delivery.
+
+Two fresh pre-write inventories matched `9e6108d5…`. The owner reconciliation
+created only Preview user `8c3ce2b0…` for sender `82ac258d…`, with distinct
+destination `0809669f…`. Two complete post-write inventories matched
+`eec3f46c…`; source user `020cc192…`/destination `d4039779…`, adopted Preview
+user `46b1fb0c…`/destination `db49756e…`, and stable Preview callback
+`d2456774…` were unchanged.
+
+Computer Use proved exact sender and recipient fingerprints, an
+`iMessage`/Encrypted composer, exactly one outgoing proof fingerprint
+`623a3978…`, one Delivered marker, and no SMS. The immutable Preview route
+returned one signed `202 acceptedForDispatch`. A separate request returned
+`401` and was classified exactly `eventHeader/missing`; this disproves the
+earlier aggregate `headers` diagnosis and does not establish a signature
+failure or same-event duplicate.
+
+The workflow runtime subsequently recorded direct-Space resolution, typing
+start, one outbound `sendMessage`, typing stop, resource releases, and a final
+workflow `200`. The Messages observer did not yet show the agent response, so
+handset response delivery remains unproved even though provider send
+acceptance passed.
+
+The required duplicate journey is in a reversible cutover. One temporary
+`bundjil-proof=retry-once` callback was created beside the stable callback, its
+new create-only ID/secret remain in mode-`0600` custody, and the four sensitive
+Preview variables were rebound under `stableCallbackCutover`. Neither callback
+has been deleted. The next immutable deployment must pass signed ingress
+before another bounded iMessage. After one intentional `503`, same-event
+provider retry, duplicate `204`, one total response, and the retry horizon, the
+stable binding must be restored and proved before deleting only the temporary
+callback. Production remains unchanged.
+
 ## Sources
 
 - [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)
