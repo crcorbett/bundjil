@@ -700,6 +700,36 @@ the explicit provider-value leak sentinel. This proves deployed diagnostic
 observability only; it neither classifies the historical requests nor proves a
 Photon-originated event.
 
+Cooper then approved one bounded real retry against final deployment
+`6bVHqBib…` at source `654c5ac…`. Preview created only rollout user
+`ab4f5f8d…` for sender `82ac258d…`, assigned distinct destination
+`0809669f…`, and preserved source user `020cc192…`/destination `d4039779…`
+plus adopted Preview user `46b1fb0c…`/destination `db49756e…`. Messages proved
+the exact selected start identity, an explicit iMessage composer, one outgoing
+iMessage container and one Delivered marker for safe message fingerprint
+`605f8245…`; no SMS path was used.
+
+The real deployment recorded one separate `204`
+`ignored/unsupportedService` request at `spacePlatform`, then one `401`
+`authenticationRejected` request at `headers`. Neither request reached
+`acceptedForDispatch`; there was no Eve completion, outbound response,
+same-event duplicate, typing or later retry-horizon callback. The latest
+Production deployment had no same-window row, but no Production positive
+control ran, so zero Production response is not claimed. This confirms that
+the repeat blocker is at the provider/application contract boundary: one
+request presents a non-exact top-level iMessage space platform and another
+fails required-header decoding. The observed value and exact header failure
+remain intentionally unknown.
+
+After the horizon, stable-ID cleanup deleted only rollout user `ab4f5f8d…`.
+Two independent post-cleanup inventories each restored canonical digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`,
+preserving both source bindings, the adopted Preview binding, callbacks,
+service/platform, plans, credentials, deployments and Vercel state. Another
+create or send is ineligible without Photon/provider evidence resolving both
+closed checkpoints and a separately bounded authority. The accepted Channel
+journey and terminal five-pass audit remain open.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.

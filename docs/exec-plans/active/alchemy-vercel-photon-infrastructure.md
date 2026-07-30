@@ -1387,19 +1387,19 @@ complete SPEC is honestly terminal.
 
 ### Requirement-to-proof replay
 
-| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                   | Result                                                    |
-| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt    | Passed                                                    |
-| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt           | Passed; exact restoration intentionally impossible        |
-| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                    | Passed for provider capability                            |
-| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                       | Passed for one bounded delivery                           |
-| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                         | Preview observed; Production-zero not conclusively proved |
-| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                     | Passed for ID/secret/path coherence only                  |
-| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log     | Passed at `310dc759…`                                     |
-| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval, mode-`0600` mapping digest, metadata readback and immutable safe probe | Passed for new Preview mapping/deployment                 |
-| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime dispositions and app owner mapping                                 | Failed; unsupportedService/authenticationRejected         |
-| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory                | Passed                                                    |
-| Provider checkpoint diagnosis | One closed checkpoint identifies the first authentication or platform boundary    | Status alone, value logging, permissive decoding, or secret change    | Photon transport fixture matrix, immutable deployment and exact scoped logs      | Passed synthetically at `AB9G854g…`; provider retry gated |
+| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                   | Result                                                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt    | Passed                                                                                                       |
+| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt           | Passed; exact restoration intentionally impossible                                                           |
+| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                    | Passed for provider capability                                                                               |
+| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                       | Passed for one bounded delivery                                                                              |
+| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                         | Preview observed; Production-zero not conclusively proved                                                    |
+| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                     | Passed for ID/secret/path coherence only                                                                     |
+| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log     | Passed at `310dc759…`                                                                                        |
+| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval, mode-`0600` mapping digest, metadata readback and immutable safe probe | Passed for new Preview mapping/deployment                                                                    |
+| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime dispositions and app owner mapping                                 | Failed; unsupportedService/authenticationRejected                                                            |
+| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory                | Passed                                                                                                       |
+| Provider checkpoint diagnosis | One closed checkpoint identifies the first authentication or platform boundary    | Status alone, value logging, permissive decoding, or secret change    | Photon transport fixture matrix, immutable deployment and exact scoped logs      | Synthetic matrix passed at `AB9G854g…`; real retry localized to `spacePlatform` and `headers` at `6bVHqBib…` |
 
 ### Read-only diagnosis review lenses
 
@@ -1440,6 +1440,74 @@ closed checkpoint and zero occurrences of the provider-value leak sentinel.
 This closes the repository/deployment diagnostic slice only. The historical
 wire values, accepted Channel journey, same-event retry, response, typing and
 Production-zero proof remain unproved.
+
+Cooper approved the exact bounded retry envelope on 2026-07-30. It permits one
+Preview-only shared-user recreation for sender `82ac258d…`, immediate
+unchanged-source and distinct-destination readback, one fail-closed
+iMessage-only inbound send, exact Preview/Production runtime readback, one
+bounded Eve/reply/replay journey, retry-horizon observation, and deletion of
+only the rollout-created user on failure. A fully accepted isolated topology
+may be retained. Production mutation, SMS, cold outbound, billing, credentials,
+Vercel configuration, unrelated resources, main merge, and the terminal audit
+remain excluded.
+
+Two fresh candidate-inventory commands at `2026-07-30T03:50Z` each completed
+two matching reads with restored digest `9e6108d5…`. The sender remains
+source-bound, Preview-available, and absent from Preview; the adopted Preview
+user and callback remain unchanged. Final deployment `6bVHqBib…` at source
+`654c5ac…` is READY, owns the branch alias, and had no unexpected callback
+after the safe probe. These are eligibility gates, not journey proof.
+
+The approved retry then created only Preview rollout user `ab4f5f8d…` with
+distinct destination `0809669f…`. Immediate inventory retained source user
+`020cc192…`/destination `d4039779…` and adopted Preview user
+`46b1fb0c…`/destination `db49756e…`. Computer Use proved the selected Messages
+start identity was sender `82ac258d…`, the exact Preview destination composer
+said iMessage, and message fingerprint `605f8245…` produced exactly one
+outgoing iMessage container, one Delivered marker, and no SMS container.
+
+The deployed application failed closed before dispatch. Deployment
+`6bVHqBib…` recorded one `204` `ignored/unsupportedService` request at exact
+checkpoint `spacePlatform` and one separate `401`
+`authenticationRejected` request at exact checkpoint `headers`. No
+`acceptedForDispatch`, Eve completion, outbound response, duplicate, typing, or
+additional callback appeared through the conservative retry horizon. The
+latest Production deployment had no row in the same window, but there was no
+same-window Production positive control, so zero Production response is not
+claimed.
+
+After the horizon, a stable-ID guard selected only rollout user `ab4f5f8d…`.
+The owner service deleted that one user and read back the Preview user count
+from two to one. Two independent post-cleanup candidate inventories at
+`2026-07-30T04:14Z` each restored digest `9e6108d5…`, with both source bindings,
+the adopted Preview user, both webhooks, service/platform, plans, credentials,
+deployments, and Vercel state preserved. This closes the authorized retry and
+rollback slice, not the task: the provider/application contract mismatch,
+accepted Channel journey, same-event replay, response, typing, Production-zero
+proof, and terminal audit remain open.
+
+### Bounded retry docs-maintainer impact ledger
+
+| Surface                                                              | Status          | Decision and evidence                                                                                                                                                                           |
+| -------------------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture, SPEC, tasks and active plan                            | Change required | Record the repeated real boundary at `spacePlatform` and `headers`, keep the task in progress, and preserve provider/application ownership without weakening accepted literals.                 |
+| READMEs, exports, generated references, schemas, services and Layers | Preserve        | No public or executable repository boundary changed; the existing named management and private transport owners were used unchanged.                                                            |
+| Runbooks and authority                                               | Change required | Record the consumed bounded authority, one-send constraint, closed stop, provider-escalation packet, and no-recreate/no-resend gate.                                                            |
+| Verification journey, receipts and proof                             | Change required | Retain the one-send/Delivered observable, exact deployed checkpoints, missing acceptance evidence, retry-horizon result, exact cleanup and restored digest.                                     |
+| Skills and AGENTS                                                    | Preserve        | Existing PRD, docs-maintainer, Effect-client, package-structure and Computer Use rules covered the slice; no reusable instruction gap was found.                                                |
+| Lint, config, commands, CI, tests and fixtures                       | Preserve        | No executable tracked bytes changed. Existing focused and full checks remain mandatory because docs and task owners changed.                                                                    |
+| Rollout, rollback and lifecycle                                      | Change required | Delete only rollout user `ab4f5f8d…`, preserve adopted/source resources, retain the active plan and proposed SPEC, and defer the single formal five-pass audit until the full SPEC is terminal. |
+| Documentation audit inventory and archive pointers                   | Preserve        | No tracked document path, README count, lifecycle class or archive pointer changed; the inventory digest remains current.                                                                       |
+
+Effect language-service, boundary, docs, skills, authority, controls and
+verification-policy gates passed. Photon typecheck/build and 23 focused tests
+passed. One parallel Channel command began before Photon `dist` existed and
+failed at module resolution; after the Photon build completed, the exact
+12-test Channel command passed. Full `bun run verification` then passed on the
+receipt-bearing candidate: HGI-307, 90 tooling tests, type-aware format/lint,
+the lint fixture, Knip, all nine workspace typechecks, all 37 Photon tests, all
+63 agent tests and all fifteen Turbo tasks. The process-local synthetic
+Executor fixture made no external request.
 
 ### Retry-policy replay
 

@@ -269,6 +269,21 @@ duplicate suppression, Preview, Production, or durable process supervision.
    digest twice. Preserve the approved new Preview routing mapping and
    deployment, but do not recreate or resend until the Photon platform/signature
    mismatch has direct evidence and a new bounded authority.
+   Cooper approved one further bounded retry after deployment of the private
+   checkpoint diagnostic. It again created only the exact Preview rollout user,
+   preserved both source bindings and the adopted Preview user, and sent one
+   exact iMessage-only inbound message. The final deployment recorded two
+   separate requests: `ignored/unsupportedService` at `spacePlatform`, then
+   `authenticationRejected` at `headers`. No accepted dispatch, Eve work,
+   response, duplicate or typing row appeared through the retry horizon.
+   Guarded cleanup deleted only rollout user `ab4f5f8d…` and two independent
+   inventories restored digest `9e6108d5…`. Do not recreate or resend again
+   without provider evidence explaining why a genuine Messages iMessage
+   produces a non-`iMessage` top-level space platform and a separate request
+   that fails required-header decoding. An escalation packet may name only
+   project/webhook/deployment fingerprints, timestamps, the two closed
+   checkpoints and HTTP classes; it must not include the message, phone,
+   assigned line, provider payload, header values, signature or credential.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only

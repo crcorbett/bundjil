@@ -3,8 +3,8 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T03:46:07.457Z
-artifact_git_identity: 7e29cc9a90ffbcfa0793cad3e8cea6a3088fe9a2
+observed_at: 2026-07-30T04:14:14.776Z
+artifact_git_identity: 654c5ac23e3b5095d7742935a2d52bbf9f9273ea
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
@@ -227,6 +227,98 @@ contained exactly one `headers`, `webhookId`, `timestamp`, `signature`,
 provider-value leak sentinel. This evidence does not retroactively classify
 the historical requests, authorize a provider retry, prove Photon-originated
 ingress, or satisfy the Channel journey.
+
+## Approved bounded journey retry
+
+Cooper approved the exact proposed retry envelope in this Codex thread on
+2026-07-30. It authorizes one Preview-only shared-user recreation for sender
+`82ac258d…`, unchanged source-binding and distinct-destination readback, one
+explicitly iMessage-labelled inbound-first send, signed webhook/runtime
+readback, one bounded Eve/reply/replay journey, retry-horizon observation, and
+deletion of only the rollout-created user on failure. A fully accepted stable
+Preview topology may be retained. Production mutation, SMS, cold outbound,
+billing or paid lines, credential changes, Vercel configuration, unrelated
+resources, main merge, and terminal audit are excluded.
+
+Immediately before this approval slice, two candidate-inventory commands each
+performed two sequential reads and returned restored digest `9e6108d5…`.
+Sender `82ac258d…` remained source-bound, Preview-available, and absent from
+Preview. The adopted Preview user/callback remained unchanged. Deployment
+`6bVHqBib…` at source `654c5ac…` remained READY on the branch alias, and no
+unexpected callback appeared after the final safe probe. These facts establish
+write eligibility only; they do not claim create, send, ingress, response,
+replay, retention, or cleanup.
+
+## Approved bounded retry result and rollback
+
+One owner reconciliation created only Preview rollout user `ab4f5f8d…` with
+distinct destination `0809669f…`. Immediate candidate inventory retained the
+source binding `020cc192…`/`d4039779…` and adopted Preview binding
+`46b1fb0c…`/`db49756e…`; the source and Preview project fingerprints remained
+`ad20033f…` and `37cf2944…`.
+
+Read-only Messages Settings proved the selected start identity was exact sender
+`82ac258d…`. The new conversation targeted exact Preview destination
+`0809669f…` and the composer explicitly said iMessage. One non-sensitive
+message whose retained safe fingerprint is `605f8245…` was sent once. The
+accessibility tree contained exactly one outgoing iMessage container, two
+text-node representations of that same container, one Delivered marker, and
+zero SMS containers. The duplicated text nodes are not two sends.
+
+The final Preview deployment `6bVHqBib…` at source `654c5ac…` received two
+separate requests:
+
+| Request | HTTP/application disposition       | Private boundary checkpoint |
+| ------- | ---------------------------------- | --------------------------- |
+| First   | `204` `ignored/unsupportedService` | `spacePlatform`             |
+| Second  | `401` `authenticationRejected`     | `headers`                   |
+
+There was no `acceptedForDispatch`, Eve completion, outbound response,
+same-event duplicate, typing, or additional callback through the conservative
+retry horizon. Messages exposed no incoming reply. The latest Production
+deployment returned no log row in the same window, but the window lacked an
+independent Production positive control; this receipt therefore records zero
+observed Production traffic, not proof of zero Production response.
+
+The first checkpoint means only that the decoded top-level `space.platform`
+was not exact accepted literal `iMessage`; it does not retain or infer the
+observed value. The second means required-header decoding failed before
+webhook-ID, timestamp, or signature checks; it does not identify which required
+header was missing or malformed. The two requests cannot be described as an
+accepted event plus provider retry: Photon's documented `2xx` terminal rule
+still applies.
+
+After the retry horizon, cleanup re-read the exact sender/user/destination and
+preservation guards, then called the named `PhotonManagement.deleteSharedUser`
+operation for only rollout user `ab4f5f8d…`. Decoded delete success and
+immediate list readback reduced Preview users from two to one. Two independent
+post-cleanup candidate inventories at `2026-07-30T04:14Z` each performed two
+matching reads and restored digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+Sender `82ac258d…` is again absent from Preview and unchanged in source;
+adopted Preview user `46b1fb0c…` remains. No webhook, platform, service, plan,
+billing, credential, deployment, Vercel configuration, or Production resource
+was mutated.
+
+The authorized retry is complete and failed closed. It directly repeats and
+narrows the live provider/application mismatch, but it does not prove accepted
+ingress, identity resolution, Eve completion, one reply, replay, typing, or
+environment-isolated Production-zero behavior. The owning task remains open
+for Photon/provider contract resolution, and the terminal five-pass audit has
+not run.
+
+Focused verification passed Effect language-service, boundary, docs, skills,
+authority, controls and verification-policy gates; Photon typecheck/build and
+23 lifecycle/transport tests; and the exact 12-test Channel vertical command.
+The first Channel command was started in parallel before Photon `dist` existed
+and failed at module resolution; it was not an application failure and the
+same command passed after the owning package build completed. Full
+`bun run verification` then passed on the receipt-bearing candidate with
+HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, all
+nine workspace typechecks, all 37 Photon tests, all 63 agent tests, and all
+fifteen Turbo tasks. The process-local synthetic Executor fixture made no
+external request. These repository checks do not upgrade the failed provider
+journey.
 
 ## Repository disposition-oracle correction
 
