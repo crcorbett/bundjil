@@ -1724,8 +1724,50 @@ No inbound agent-response row appeared in Messages, and no further callback or
 workflow appeared through the 225-second horizon. Provider acceptance,
 same-event duplicate suppression, typing operations, and one outbound send are
 proved; handset response delivery is not. The retention gate therefore fails
-closed. Vercel metadata now again contains the original stable callback values.
-The next exact commit/deployment must pass signed stable ingress before cleanup
-deletes only the temporary callback and rollout user, preserves the adopted
-Preview user and source topology, and restores baseline digest `9e6108d5…`
-twice.
+closed.
+
+The rollback is complete. Vercel Preview metadata was restored to the original
+stable callback values. Immutable restoration deployment `2yxUAv6i…` at exact
+source `8cf0c1e…` reached READY on the branch alias, and a signed safe probe
+returned `204` with exact `ignored/unsupportedEvent`. The owner delete then
+removed only the temporary query-controlled callback and read back zero exact
+URL matches. A stable-ID/fingerprint guard removed only rollout user
+`8c3ce2b0…` and destination `0809669f…`, leaving the adopted Preview user.
+
+Two independent inventories at `2026-07-30T09:47Z` each restored exact digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+The final management inspection returned one adopted user, one stable callback,
+shared service, iMessage enabled, and zero dedicated lines. Source/Production
+bindings and callback were unchanged. The three exact mode-`0600` ephemeral
+sender/cutover/restore artifacts were deleted after readback; stable credential
+custody remains in the ignored local environment and Vercel Preview secret
+store.
+
+### Bounded retry rollback docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Final evidence                                                                                                                                                                                      |
+| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and call graph                   | Preserve        | No package, service, Layer, app ownership, Vercel Git deployment ownership, or Preview/Production routing boundary changed.                                                                         |
+| READMEs, exports and generated references     | Preserve        | No public command, export, generated owner, or package purpose changed.                                                                                                                             |
+| Runbooks, authority and controls              | Preserve        | `apps/agent/runbooks/photon.md` already owns signed cutover, retry drain, exact deletion, and final topology gates; this slice executed that accepted envelope without changing policy.             |
+| Verification journey and receipt              | Change required | The dated shared-sender receipt now records restoration deployment, signed stable ingress, exact callback/user cleanup, restored digest, handset non-claim, and the unclassified auxiliary request. |
+| Schemas, services, Layers, tests and fixtures | Preserve        | No repository implementation changed after the lowercase/header correction; existing focused fixtures remain the direct property proofs.                                                            |
+| SPEC, task ledger and active plan             | Change required | Record rollback complete while keeping `isolated-photon-preview-spike` open because handset response delivery and retained stable topology are not proved.                                          |
+| Credentials, rollout and rollback             | Change required | Record approved durable custody, removal of three exact ephemeral artifacts, one-user/one-callback restoration, unchanged Production, and no unresolved provider write.                             |
+| Lifecycle and terminal audit                  | Preserve        | The plan remains active; three downstream tasks remain pending and the one formal five-pass audit stays terminal-only.                                                                              |
+
+This closes the authorized retry/rollback slice, not
+`isolated-photon-preview-spike`. The provider/runtime journey passed through
+outbound provider acceptance, but handset receipt of that response did not.
+The independent request is proved only as `eventHeader/missing`; its semantic
+purpose remains unclassified. No additional message, Production mutation, main
+merge, or terminal audit is justified by this receipt.
+
+The exact receipt candidate passed strict Effect language-service diagnostics,
+19 focused Photon transport/reconciliation tests, the exact 12-test Channel
+fixture, every routed policy gate, and complete `bun run verification`. The
+full gate included HGI-307, 90 tooling tests, type-aware lint/format, Knip, all
+nine workspace typechecks, all 38 Photon tests, all 63 agent tests, 30
+infrastructure Vitest tests plus 14 Alchemy lifecycle tests, and all fifteen
+Turbo tasks. The process-local synthetic Executor fixture made no external
+request.

@@ -3,8 +3,8 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T09:06:37Z
-artifact_git_identity: 80a957024f872822e866c294fcd160b18b16e841
+observed_at: 2026-07-30T09:49:22Z
+artifact_git_identity: 8cf0c1ef66ce0cbaf50d2ab180a6300e810aedf7
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
@@ -537,11 +537,56 @@ after the duplicate. The exact claim is therefore:
 - the Preview topology is not eligible for stable retention.
 
 The original stable callback values are restored in Vercel metadata from
-retained ignored custody. Both provider callbacks and both mode-`0600`
-artifacts remain pending an immutable restoration deployment and signed probe.
-After that probe, cleanup must delete only the temporary retry callback and
-rollout user `8c3ce2b0…`, then require two inventories matching baseline
-`9e6108d5…`.
+retained ignored custody.
+
+## Stable restoration and exact cleanup
+
+Immutable Preview restoration deployment `2yxUAv6i…` at exact source
+`8cf0c1e…` reached READY with the branch alias and no alias error. A signed
+identity-free unsupported-event probe through the stable callback returned
+client `204`; the exact deployment record contained
+`ignored/unsupportedEvent`. This is stable callback ID/secret/path proof, not
+message or handset proof.
+
+The owner delete then selected the temporary query-controlled callback by its
+exact URL, deleted only that callback, and read back zero matching callbacks.
+A separate stable-ID/fingerprint guard selected rollout user `8c3ce2b0…`,
+proved its assignment fingerprint `0809669f…`, deleted only that user, and
+read back one remaining adopted Preview user with no matching controlled
+sender.
+
+Two independent candidate inventories at `2026-07-30T09:47Z` each returned
+matching first/second observations and exact baseline digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+The final management inspection returned one shared user, one webhook, shared
+service, iMessage enabled, and zero dedicated lines. Source user
+`020cc192…`/destination `d4039779…`, adopted Preview user
+`46b1fb0c…`/destination `db49756e…`, and the stable callbacks remained
+unchanged. No Production resource or configuration changed.
+
+The exact mode-`0600` sender, temporary callback binding, and stable restore
+artifacts were removed after those reads and cannot be recovered. Their durable
+stable credential values remain in the approved ignored local environment and
+Vercel Preview secret store; no tracked receipt contains them.
+
+The bounded journey therefore proves signed lowercase ingress, one workflow,
+one typing start/stop sequence, one provider send, one intentional `503`, one
+same-event provider retry, and one duplicate `204`. It does not prove handset
+receipt of the agent response. The separate request class remains proved only
+as `eventHeader/missing`; no semantic purpose or provider defect is inferred.
+Because the handset retention gate failed, the shared-sender Preview user was
+not retained. The task stays open, downstream Production work stays pending,
+and the terminal five-pass audit has not run.
+
+The exact rollback receipt candidate passed strict Effect language-service
+diagnostics; 19 focused Photon transport/reconciliation tests; the exact
+12-test Channel fixture; every boundary, documentation, skill, authority,
+control and verification-policy gate; and complete `bun run verification`.
+The full gate included HGI-307, 90 tooling tests, type-aware lint/format, Knip,
+all nine workspace typechecks, all 38 Photon tests, all 63 agent tests, 30
+infrastructure Vitest tests plus 14 Alchemy lifecycle tests, and all fifteen
+Turbo tasks. The process-local synthetic Executor fixture made no external
+request.
 
 ## Sources
 

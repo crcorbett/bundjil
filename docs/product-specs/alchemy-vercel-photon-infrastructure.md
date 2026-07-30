@@ -1744,8 +1744,30 @@ The Messages observer still showed zero inbound response rows after the
 provider send, so handset response delivery remains unproved. No further
 provider callback or workflow appeared through 225 seconds after the duplicate.
 The acceptance gate therefore requires rollback rather than stable retention.
-The original four sensitive Preview callback values have been restored in
-Vercel metadata from retained custody; both provider callbacks and both
-mode-`0600` artifacts remain until an immutable restoration deployment passes
-signed ingress. Only then may cleanup delete the temporary retry callback and
-rollout user `8c3ce2b0…`.
+The original four sensitive Preview callback values were restored in Vercel
+metadata from retained custody. Immutable restoration deployment `2yxUAv6i…`
+at exact source `8cf0c1e…` reached READY on the branch alias, and a signed
+identity-free safe probe returned `204` with exact
+`ignored/unsupportedEvent` application disposition.
+
+After that proof, the owner delete removed only the temporary query-controlled
+callback and read back zero matches for its exact URL. A stable-ID/fingerprint
+guard then removed only rollout user `8c3ce2b0…` and destination
+`0809669f…`; the adopted Preview user remained. Two independent inventories at
+`2026-07-30T09:47Z` each matched the original digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+The final management readback returned shared service, iMessage enabled, zero
+dedicated lines, one adopted Preview user, and one stable Preview callback.
+Source/Production users, assignments, callback, deployments, and configuration
+were unchanged. The three exact mode-`0600` sender/cutover/restore custody
+artifacts were removed after readback; stable credentials remain only in the
+approved ignored local environment and Vercel Preview secret store.
+
+This closes the bounded retry and rollback slice. It proves lowercase provider
+acceptance, signed Preview ingress, one Eve workflow, typing operations, one
+provider send, one same-event retry, and duplicate suppression. It does not
+prove handset receipt of the agent response, classify the independent
+`eventHeader/missing` request beyond that exact missing-header observation, or
+complete the isolated Preview task. Stable shared-sender retention remains
+ineligible, later SPEC tasks remain pending, and the terminal five-pass audit
+has not run.
