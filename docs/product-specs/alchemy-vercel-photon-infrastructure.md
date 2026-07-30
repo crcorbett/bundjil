@@ -1716,9 +1716,14 @@ and one Delivered marker. The provider emitted one signed request that returned
 value-free diagnosis `eventHeader/missing`; it is not a signature failure and
 is not accepted as the same-event duplicate. The workflow runtime then proved
 direct-Space resolution, typing start, one outbound `sendMessage`, typing stop,
-SDK release, and final workflow `200`. The Messages observer had not rendered
-the agent reply at the latest readback, so handset response delivery remains
-unproved.
+SDK release, and final workflow `200`. The first Messages observer inspected
+only the ingress-destination conversation. Cooper's two screenshots plus a
+fresh read-only Messages inspection later proved that the reply arrived in a
+separate iMessage conversation: ingress destination `0809669f…` contained the
+outgoing proof correlation `623a3978…`, while outbound origin `d4039779…`
+contained a grey reply naming that exact correlation and the expected Bundjil
+package result. Handset delivery is therefore proved; the earlier non-claim was
+a same-conversation false negative.
 
 The same-event duplicate gate now uses the accepted Preview-only
 `bundjil-proof=retry-once` cutover. A temporary callback was created alongside
@@ -1740,10 +1745,15 @@ one final workflow `200`. Requests from the retained old callback failed closed
 at `webhookId`; the independent provider request class again failed at
 `eventHeader/missing`. Neither class dispatched work.
 
-The Messages observer still showed zero inbound response rows after the
-provider send, so handset response delivery remains unproved. No further
-provider callback or workflow appeared through 225 seconds after the duplicate.
-The acceptance gate therefore requires rollback rather than stable retention.
+The Messages observer initially showed zero inbound response rows in the
+ingress-destination conversation. A later correlation-based inspection across
+Messages conversations proved the `6cafe0e7…` reply in the separate
+outbound-origin conversation. No further provider callback or workflow appeared
+through 225 seconds after the duplicate. The retry, duplicate and
+single-response gates therefore pass. Rollback was nevertheless completed
+before this correction because the observer had used the wrong conversation as
+its handset oracle; stable retention now requires minimum Preview-user
+re-adoption and exact unchanged-topology readback, not another model call.
 The original four sensitive Preview callback values were restored in Vercel
 metadata from retained custody. Immutable restoration deployment `2yxUAv6i…`
 at exact source `8cf0c1e…` reached READY on the branch alias, and a signed
@@ -1765,9 +1775,23 @@ approved ignored local environment and Vercel Preview secret store.
 
 This closes the bounded retry and rollback slice. It proves lowercase provider
 acceptance, signed Preview ingress, one Eve workflow, typing operations, one
-provider send, one same-event retry, and duplicate suppression. It does not
-prove handset receipt of the agent response, classify the independent
-`eventHeader/missing` request beyond that exact missing-header observation, or
-complete the isolated Preview task. Stable shared-sender retention remains
-ineligible, later SPEC tasks remain pending, and the terminal five-pass audit
-has not run.
+provider send, one same-event retry, duplicate suppression and handset receipt
+of both exact correlated responses. The independent `eventHeader/missing`
+request remains classified only by that exact missing-header observation.
+
+Photon's current Managed Shared contract places inbound and outbound traffic
+behind a central proxy. The application supplies the target participant, while
+the pinned shared-mode SDK exposes neither an outbound `from` selector nor a
+message-history/origin read API. A distinct provider-selected origin and
+separate Messages conversation are therefore compatible with the public
+contract and are not evidence that Bundjil addressed the wrong participant or
+that Production executed. The observed choice of origin `d4039779…` is not
+documented as a stable cross-project guarantee, so it remains provider-managed
+observed routing rather than a configurable Bundjil invariant.
+
+The earlier cleanup was exact but was triggered by a false-negative handset
+oracle. The isolated Preview task remains open only until the minimum
+shared-sender Preview binding is re-adopted and two fresh inventories prove its
+stable identity, distinct ingress destination, unchanged source binding and
+unchanged callback. Later SPEC tasks remain pending, and the terminal five-pass
+audit has not run.

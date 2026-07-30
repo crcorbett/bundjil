@@ -424,7 +424,12 @@ duplicate suppression, Preview, Production, or durable process supervision.
    for each; an unsupported no-op, timeout, provider rejection, ambiguous
    participant/Space, or release failure blocks a visible-typing claim.
 5. Record provider acceptance, Eve completion, handset message delivery, and
-   handset typing display as four separate boundaries. If a safe device
+   handset typing display as four separate boundaries. For Managed Shared
+   service, search all iMessage conversations by the bounded correlation
+   fingerprint: the provider-selected outbound origin can create a conversation
+   separate from the ingress destination, and a same-conversation-only search
+   is not a valid negative oracle. Keep both numbers and message content in
+   secure observer custody and retain only fingerprints. If a safe device
    observer is unavailable, mark the handset boundaries unproved rather than
    upgrading SDK acceptance.
 6. For Preview use `BND-J11-photon-accepted-message-typing`. For Production,

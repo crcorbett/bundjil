@@ -499,9 +499,10 @@ failure or same-event duplicate.
 
 The workflow runtime subsequently recorded direct-Space resolution, typing
 start, one outbound `sendMessage`, typing stop, resource releases, and a final
-workflow `200`. The Messages observer did not yet show the agent response, so
-handset response delivery remains unproved even though provider send
-acceptance passed.
+workflow `200`. The first Messages observer inspected only the
+ingress-destination conversation. Cooper's screenshots plus a fresh read-only
+Messages inspection later proved that the response arrived in a separate
+iMessage conversation.
 
 The required duplicate journey is in a reversible cutover. One temporary
 `bundjil-proof=retry-once` callback was created beside the stable callback, its
@@ -527,14 +528,21 @@ workflow, one direct-Space resolution sequence, typing start/stop, one outbound
 callback's event failed closed at `webhookId`; two independent request rows
 failed at `eventHeader/missing`. Those rejection classes produced no dispatch.
 
-The Messages observer still showed zero inbound response rows after the
-provider send. No additional callback or workflow appeared through 225 seconds
-after the duplicate. The exact claim is therefore:
+The Messages observer still showed zero inbound response rows in the
+ingress-destination conversation. No additional callback or workflow appeared
+through 225 seconds after the duplicate. A later correlation-based inspection
+across Messages conversations established the exact handset outcome:
 
 - accepted signed ingress, one Eve workflow, typing operations, one provider
   send, same-event retry, and duplicate suppression are proved;
-- handset response delivery is not proved; and
-- the Preview topology is not eligible for stable retention.
+- ingress destination `0809669f…` contains outgoing correlations
+  `623a3978…` and `6cafe0e7…`;
+- a separate conversation from provider origin `d4039779…` contains grey
+  replies naming those exact correlations and the expected Bundjil package
+  result; and
+- handset response delivery is proved. Inspecting only the ingress-destination
+  conversation was a false-negative oracle, not evidence of wrong-recipient
+  delivery.
 
 The original stable callback values are restored in Vercel metadata from
 retained ignored custody.
@@ -571,12 +579,26 @@ Vercel Preview secret store; no tracked receipt contains them.
 
 The bounded journey therefore proves signed lowercase ingress, one workflow,
 one typing start/stop sequence, one provider send, one intentional `503`, one
-same-event provider retry, and one duplicate `204`. It does not prove handset
-receipt of the agent response. The separate request class remains proved only
-as `eventHeader/missing`; no semantic purpose or provider defect is inferred.
-Because the handset retention gate failed, the shared-sender Preview user was
-not retained. The task stays open, downstream Production work stays pending,
-and the terminal five-pass audit has not run.
+same-event provider retry, one duplicate `204`, and handset receipt of both
+exact correlated replies. The separate request class remains proved only as
+`eventHeader/missing`; no semantic purpose or provider defect is inferred.
+
+Current Photon Managed Shared documentation places traffic behind a central
+proxy, and the pinned shared-mode SDK exposes neither an outbound `from`
+selector nor an origin/history read API. Bundjil supplied the decoded
+participant and could not select `d4039779…`; a provider-selected origin and
+separate handset conversation are compatible with the public contract. The
+exact reuse of that source-assigned fingerprint is not publicly documented as
+a stable cross-project guarantee, so it is recorded as observed
+provider-managed routing, not as a Bundjil configuration invariant or
+Production workflow execution.
+
+The shared-sender Preview user was deleted only because the original handset
+oracle failed falsely. The task stays open until minimum re-adoption restores
+that user and two fresh inventories prove the distinct Preview ingress
+destination, unchanged source binding and unchanged stable callback. No second
+model call is required. Downstream work and the terminal five-pass audit remain
+pending.
 
 The exact rollback receipt candidate passed strict Effect language-service
 diagnostics; 19 focused Photon transport/reconciliation tests; the exact
@@ -590,6 +612,8 @@ request.
 
 ## Sources
 
+- [Photon Managed Shared routing](https://photon.codes/blog/how-we-rebuilt-our-shared-imessage-routing-to-handle-10m-messages-a-day)
+- [Photon plans and Managed Shared service](https://photon.codes/pricing)
 - [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)
 - [Photon webhook troubleshooting](https://photon.codes/docs/webhooks/troubleshooting)
 - [Photon webhook events and project fan-out](https://photon.codes/docs/webhooks/events)

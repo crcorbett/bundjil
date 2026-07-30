@@ -1694,9 +1694,10 @@ one outgoing proof `623a3978…`, Delivered, and no SMS.
 The live request returned `202 acceptedForDispatch`. A distinct request
 returned `401 eventHeader/missing`; no signature failure is claimed. The
 workflow deployment recorded direct-Space resolution, typing start, one
-outbound send, typing stop, releases, and final `200`. Handset receipt of the
-agent reply was not visible at the latest observer read and remains a separate
-non-claim.
+outbound send, typing stop, releases, and final `200`. The first handset
+observer inspected only the ingress-destination conversation. Cooper's
+screenshots plus a fresh read-only Messages inspection later proved the exact
+correlated reply in a separate outbound-origin iMessage conversation.
 
 For the required same-event duplicate proof, the plan is now at a reversible
 Preview-only cutover: one temporary query-controlled callback exists beside
@@ -1720,11 +1721,13 @@ only an expected `webhookId` rejection during cutover, while the independent
 provider request class again produced `eventHeader/missing`. Neither failure
 dispatched.
 
-No inbound agent-response row appeared in Messages, and no further callback or
-workflow appeared through the 225-second horizon. Provider acceptance,
-same-event duplicate suppression, typing operations, and one outbound send are
-proved; handset response delivery is not. The retention gate therefore fails
-closed.
+No inbound agent-response row appeared in the ingress-destination Messages
+conversation, and no further callback or workflow appeared through the
+225-second horizon. The later cross-conversation inspection found the exact
+`623a3978…` and `6cafe0e7…` correlations in grey handset replies from provider
+origin `d4039779…`. Provider acceptance, same-event duplicate suppression,
+typing operations, one outbound send and handset delivery are proved. The
+same-conversation-only observer was a false-negative retention gate.
 
 The rollback is complete. Vercel Preview metadata was restored to the original
 stable callback values. Immutable restoration deployment `2yxUAv6i…` at exact
@@ -1745,23 +1748,28 @@ store.
 
 ### Bounded retry rollback docs-maintainer impact ledger
 
-| Surface                                       | Decision        | Final evidence                                                                                                                                                                                      |
-| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and call graph                   | Preserve        | No package, service, Layer, app ownership, Vercel Git deployment ownership, or Preview/Production routing boundary changed.                                                                         |
-| READMEs, exports and generated references     | Preserve        | No public command, export, generated owner, or package purpose changed.                                                                                                                             |
-| Runbooks, authority and controls              | Preserve        | `apps/agent/runbooks/photon.md` already owns signed cutover, retry drain, exact deletion, and final topology gates; this slice executed that accepted envelope without changing policy.             |
-| Verification journey and receipt              | Change required | The dated shared-sender receipt now records restoration deployment, signed stable ingress, exact callback/user cleanup, restored digest, handset non-claim, and the unclassified auxiliary request. |
-| Schemas, services, Layers, tests and fixtures | Preserve        | No repository implementation changed after the lowercase/header correction; existing focused fixtures remain the direct property proofs.                                                            |
-| SPEC, task ledger and active plan             | Change required | Record rollback complete while keeping `isolated-photon-preview-spike` open because handset response delivery and retained stable topology are not proved.                                          |
-| Credentials, rollout and rollback             | Change required | Record approved durable custody, removal of three exact ephemeral artifacts, one-user/one-callback restoration, unchanged Production, and no unresolved provider write.                             |
-| Lifecycle and terminal audit                  | Preserve        | The plan remains active; three downstream tasks remain pending and the one formal five-pass audit stays terminal-only.                                                                              |
+| Surface                                       | Decision        | Final evidence                                                                                                                                                                                                |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and call graph                   | Preserve        | No package, service, Layer, app ownership, Vercel Git deployment ownership, or Preview/Production routing boundary changed.                                                                                   |
+| READMEs, exports and generated references     | Preserve        | No public command, export, generated owner, or package purpose changed.                                                                                                                                       |
+| Runbooks, authority and controls              | Change required | The handset oracle now searches all iMessage conversations by correlation because Managed Shared replies can use a provider-selected origin; signed cutover, retry drain and exact deletion remain unchanged. |
+| Verification journey and receipt              | Change required | The dated shared-sender receipt records exact cross-conversation handset evidence, restoration deployment, signed stable ingress, exact cleanup, restored digest and the unclassified auxiliary request.      |
+| Schemas, services, Layers, tests and fixtures | Preserve        | No repository implementation changed after the lowercase/header correction; existing focused fixtures remain the direct property proofs.                                                                      |
+| SPEC, task ledger and active plan             | Change required | Correct the handset false negative and keep `isolated-photon-preview-spike` open only for minimum stable Preview-user re-adoption and exact topology readback.                                                |
+| Credentials, rollout and rollback             | Change required | Record approved durable custody, removal of three exact ephemeral artifacts, one-user/one-callback restoration, unchanged Production, and no unresolved provider write.                                       |
+| Lifecycle and terminal audit                  | Preserve        | The plan remains active; three downstream tasks remain pending and the one formal five-pass audit stays terminal-only.                                                                                        |
 
-This closes the authorized retry/rollback slice, not
-`isolated-photon-preview-spike`. The provider/runtime journey passed through
-outbound provider acceptance, but handset receipt of that response did not.
-The independent request is proved only as `eventHeader/missing`; its semantic
-purpose remains unclassified. No additional message, Production mutation, main
-merge, or terminal audit is justified by this receipt.
+This closes the authorized retry/rollback journey but not yet
+`isolated-photon-preview-spike`. The provider/runtime journey and the
+correlation-based handset journey both pass. In Managed Shared mode the pinned
+SDK supplies the target participant but exposes no outbound `from` selector;
+the provider-selected origin `d4039779…` and separate conversation are
+compatible with that boundary. Exact cross-project origin selection is not a
+documented stable guarantee and is not treated as Production execution. The
+independent request remains proved only as `eventHeader/missing`. No additional
+model call is justified; the next operation is minimum Preview-user re-adoption
+with exact source/Preview readback. Production mutation, main merge and the
+terminal audit remain out of this slice.
 
 The exact receipt candidate passed strict Effect language-service diagnostics,
 19 focused Photon transport/reconciliation tests, the exact 12-test Channel
