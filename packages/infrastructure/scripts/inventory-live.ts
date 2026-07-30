@@ -2,9 +2,8 @@ import { createHash } from "node:crypto";
 import { dirname, isAbsolute } from "node:path";
 
 import {
-  PhotonManagementCredentialsLive,
+  PhotonManagementCredentials,
   PhotonManagementLive,
-  PhotonProjectId,
 } from "@bundjil/photon/management";
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
@@ -38,6 +37,7 @@ import {
   InfrastructureInventoryTarget,
   InfrastructureObservedManifest,
   loadInfrastructureCommandConfig,
+  loadInfrastructurePhotonCredentials,
 } from "../src/index.js";
 import {
   VercelCredentialsLive,
@@ -89,11 +89,6 @@ const sourceShaConfig = Config.schema(
   InfrastructureInventorySourceSha,
   "BUNDJIL_INFRASTRUCTURE_SOURCE_SHA"
 );
-const photonProjectIdConfig = Config.schema(
-  PhotonProjectId,
-  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID"
-);
-
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 
@@ -139,13 +134,15 @@ const runInventory = Effect.gen(
     const projectIds = yield* projectIdsConfig;
     const principalFingerprint = yield* principalFingerprintConfig;
     const sourceSha = yield* sourceShaConfig;
-    const photonProjectId = yield* photonProjectIdConfig;
+    const photonCredentials = yield* loadInfrastructurePhotonCredentials(
+      input.stage
+    );
     const inventory = yield* InfrastructureInventory;
     const target = InfrastructureInventoryTarget.make({
       stage: input.stage,
       vercelTeamId: teamId,
       vercelProjectIds: projectIds,
-      photonProjectId,
+      photonProjectId: photonCredentials.projectId,
     });
 
     const first = yield* inventory.read(target);
@@ -253,7 +250,16 @@ const providerLayers = Layer.merge(
     Layer.provide(BunHttpClient.layer)
   ),
   PhotonManagementLive.pipe(
-    Layer.provide(PhotonManagementCredentialsLive),
+    Layer.provide(
+      Layer.succeed(
+        PhotonManagementCredentials,
+        loadInfrastructureCommandConfig.pipe(
+          Effect.flatMap((input) =>
+            loadInfrastructurePhotonCredentials(input.stage)
+          )
+        )
+      )
+    ),
     Layer.provide(BunHttpClient.layer)
   )
 );

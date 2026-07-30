@@ -120,6 +120,13 @@ side-effect-free adoption plan. Follow the
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
 
+The inventory executable selects Photon credentials by the decoded stage:
+`preview` requires the isolated `BUNDJIL_PHOTON_PREVIEW_*` pair, while `prod`
+requires the source/Production `BUNDJIL_PHOTON_MANAGEMENT_*` pair. It does not
+load the other stage's credential. A Preview artifact containing the
+Production Photon project, or vice versa, is a stage-isolation failure and
+must not become an adoption manifest.
+
 `infrastructure:photon-preview-webhook-binding` consumes the mode-`0600`
 create-only Photon webhook artifact and writes the project ID/secret plus
 webhook ID/secret as four sensitive Preview-only Vercel variables through the

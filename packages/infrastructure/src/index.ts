@@ -29,7 +29,10 @@ export {
   verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
 export { layerLiveReadOnlyAdoptionProviders } from "./adoption-live.layer.js";
-export { loadInfrastructureCommandConfig } from "./config.js";
+export {
+  loadInfrastructureCommandConfig,
+  loadInfrastructurePhotonCredentials,
+} from "./config.js";
 export {
   canonicalizeInfrastructureObservedManifest,
   InfrastructureInventory,

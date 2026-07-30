@@ -1,4 +1,9 @@
-import { Config, Effect, Option } from "effect";
+import {
+  PhotonManagementCredentialsValue,
+  PhotonProjectId,
+  PhotonProjectSecret,
+} from "@bundjil/photon/management";
+import { Config, Effect, Match, Option } from "effect";
 
 import {
   AdoptionManifestDigest,
@@ -8,6 +13,7 @@ import {
   InfrastructureStackName,
   InfrastructureStage,
 } from "./schemas.js";
+import type { InfrastructureStage as InfrastructureStageType } from "./schemas.js";
 
 const infrastructureStackConfig = Config.schema(
   InfrastructureStackName,
@@ -35,6 +41,50 @@ const infrastructureManifestDigestConfig = Config.schema(
   AdoptionManifestDigest,
   "BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST"
 ).pipe(Config.option);
+
+const previewPhotonCredentials = Config.all({
+  projectId: Config.schema(
+    PhotonProjectId,
+    "BUNDJIL_PHOTON_PREVIEW_PROJECT_ID"
+  ),
+  projectSecret: Config.schema(
+    PhotonProjectSecret,
+    "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
+  ),
+});
+
+const productionPhotonCredentials = Config.all({
+  projectId: Config.schema(
+    PhotonProjectId,
+    "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID"
+  ),
+  projectSecret: Config.schema(
+    PhotonProjectSecret,
+    "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET"
+  ),
+});
+
+export const loadInfrastructurePhotonCredentials = Effect.fn(
+  "InfrastructurePhotonCredentials.load"
+)((stage: InfrastructureStageType) =>
+  Match.value(stage).pipe(
+    Match.when("preview", () =>
+      previewPhotonCredentials.pipe(
+        Effect.map((credentials) =>
+          PhotonManagementCredentialsValue.make(credentials)
+        )
+      )
+    ),
+    Match.when("prod", () =>
+      productionPhotonCredentials.pipe(
+        Effect.map((credentials) =>
+          PhotonManagementCredentialsValue.make(credentials)
+        )
+      )
+    ),
+    Match.exhaustive
+  )
+);
 
 export const loadInfrastructureCommandConfig = Effect.gen(
   function* loadInfrastructureCommandConfigOperation() {

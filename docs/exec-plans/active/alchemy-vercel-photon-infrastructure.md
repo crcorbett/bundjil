@@ -1801,6 +1801,35 @@ add cost and risk without proving a new property.
 `isolated-photon-preview-spike` is complete. The next serial owner is
 `stable-bindings-and-deployment-observation`.
 
+## Stable-binding stage-isolation correction
+
+The requirement-to-proof replay found that the canonical Preview inventory
+still composed `PhotonManagementCredentialsLive`, whose Config owner is the
+source/Production pair. No live stable-binding apply is eligible while the
+Preview manifest points at the wrong Photon project.
+
+The current repository slice routes the decoded stage through one named
+redacted Config operation and uses its result for both the live Photon Layer
+and inventory target. Preview and Production tests each omit the opposite
+credential entirely, reject proof by shared local custody, and scan the
+rendered value for the secret sentinel.
+
+| Surface                          | Decision        | Current evidence                                                                                                    |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Architecture and call graph      | Change required | Inventory remains the sole cross-provider composition edge; its Photon credential is now selected by decoded stage. |
+| READMEs and commands             | Change required | The infrastructure README states the exact Preview/Production Config ownership and wrong-stage stop condition.      |
+| Exports and generated references | Change required | Export the named Config operation; no provider client, raw credential, DTO or generated reference is added.         |
+| Runbooks, authority and controls | Preserve        | The existing read-only inventory envelope remains sufficient; no provider write has occurred.                       |
+| Verification journey and receipt | Change required | Historical Preview inventory is explicitly ineligible; fresh stage-correct provider evidence remains required.      |
+| Schemas, services and Layers     | Change required | Reuse Photon Schema/credential service and Config; the live SDK/HTTP boundary is unchanged.                         |
+| Tests and fixtures               | Change required | Add opposite-stage-missing and secret-render rejection for both stage branches.                                     |
+| SPEC, tasks and active plan      | Change required | Reopen the stable-binding owner as in progress at the earliest incorrect manifest input.                            |
+| Secrets, rollout and rollback    | Preserve        | No value leaves Redacted Config and no provider mutation ran; local rollback is revert of the correction commit.    |
+| Lifecycle and terminal audit     | Preserve        | Stable bindings remain in progress; Production, drift closeout and terminal five-pass audit remain pending.         |
+
+The next step is full verification, a coherent prerequisite commit, and a
+fresh exact-SHA Preview inventory before adoption planning.
+
 The exact receipt candidate passed strict Effect language-service diagnostics,
 19 focused Photon transport/reconciliation tests, the exact 12-test Channel
 fixture, every routed policy gate, and complete `bun run verification`. The

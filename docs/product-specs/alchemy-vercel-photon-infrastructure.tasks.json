@@ -937,7 +937,7 @@
     {
       "id": "stable-bindings-and-deployment-observation",
       "title": "Adopt stable env, Marketplace, storage, and inter-service bindings",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": [
         "preview-vercel-configuration-spike",
         "isolated-photon-preview-spike"
@@ -953,7 +953,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's stable bindings section.",
-        "currentResult": "not_run: blocked by the Preview spikes."
+        "currentResult": "in progress. The first requirement-to-proof replay rejected the historical Preview inventory because its executable hard-wired the source/Production Photon credential for both stages. The repository correction selects only the isolated BUNDJIL_PHOTON_PREVIEW_* credential for decoded preview and only BUNDJIL_PHOTON_MANAGEMENT_* for decoded prod, and uses that same selected project for both the live Photon Layer and inventory target. Focused tests prove each branch succeeds with the opposite credential absent and never renders its secret. No provider mutation has occurred. Full verification, an exact-SHA fresh Preview inventory, adoption plan/apply/no-op sync, stable env/Marketplace/namespace readback and immutable deployment observation remain required before acceptance."
       },
       "implementationNotes": [
         "Derive the exact env inventory from every Config owner and Vercel readback; remove no key based only on a stale README or alias.",

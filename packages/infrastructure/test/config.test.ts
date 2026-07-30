@@ -1,7 +1,10 @@
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Exit, Inspectable, Redacted } from "effect";
 
-import { loadInfrastructureCommandConfig } from "../src/config.js";
+import {
+  loadInfrastructureCommandConfig,
+  loadInfrastructurePhotonCredentials,
+} from "../src/config.js";
 import {
   SyntheticProviderCredentials,
   SyntheticProviderCredentialsLive,
@@ -90,6 +93,56 @@ it.effect(
         ConfigProvider.fromUnknown({
           BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID: "r2-access-sentinel",
           BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "r2-secret-sentinel",
+        })
+      )
+    )
+);
+
+it.effect(
+  "selects the isolated Preview Photon credential without requiring Production",
+  () =>
+    Effect.gen(function* testPreviewPhotonCredentials() {
+      const config = yield* loadInfrastructurePhotonCredentials("preview");
+      assert.strictEqual(config.projectId, "preview-photon-project");
+      assert.strictEqual(Redacted.isRedacted(config.projectSecret), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(config).includes(
+          "preview-photon-secret-sentinel"
+        ),
+        false
+      );
+    }).pipe(
+      Effect.provideService(
+        ConfigProvider.ConfigProvider,
+        ConfigProvider.fromUnknown({
+          BUNDJIL_PHOTON_PREVIEW_PROJECT_ID: "preview-photon-project",
+          BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET:
+            "preview-photon-secret-sentinel",
+        })
+      )
+    )
+);
+
+it.effect(
+  "selects the source Production Photon credential without requiring Preview",
+  () =>
+    Effect.gen(function* testProductionPhotonCredentials() {
+      const config = yield* loadInfrastructurePhotonCredentials("prod");
+      assert.strictEqual(config.projectId, "production-photon-project");
+      assert.strictEqual(Redacted.isRedacted(config.projectSecret), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(config).includes(
+          "production-photon-secret-sentinel"
+        ),
+        false
+      );
+    }).pipe(
+      Effect.provideService(
+        ConfigProvider.ConfigProvider,
+        ConfigProvider.fromUnknown({
+          BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID: "production-photon-project",
+          BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET:
+            "production-photon-secret-sentinel",
         })
       )
     )

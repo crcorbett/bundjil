@@ -1823,3 +1823,26 @@ neighbouring Production reply are rejected false greens. Production,
 credentials, callbacks, deployments, billing and dedicated lines were not
 mutated. Stable-binding work may now begin; the terminal five-pass audit
 remains deferred.
+
+## Stable-binding execution
+
+The first stable-binding requirement replay reopened the inventory owner before
+any Vercel or Alchemy mutation: `scripts/inventory-live.ts` used the
+source/Production Photon credential for both decoded stages. Consequently, the
+accepted historical Preview adoption manifest could not represent the isolated
+Preview project and is not eligible for stable-binding adoption.
+
+The repository correction introduces one stage-scoped redacted Config
+operation. Decoded `preview` selects only `BUNDJIL_PHOTON_PREVIEW_PROJECT_ID`
+and `BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET`; decoded `prod` selects only the
+existing `BUNDJIL_PHOTON_MANAGEMENT_*` pair. The selected credential supplies
+both the live Photon Layer and `InfrastructureInventoryTarget`, preventing
+target/client mismatch. Focused tests prove each stage succeeds without the
+other stage's credential and never renders its secret.
+
+This is a prerequisite, not stable-binding acceptance. After the correction is
+committed and fully verified, the next direct observable is a fresh Preview
+inventory whose two reads contain Preview project `37cf2944…`, retained users
+`46b1fb0c…` and `b95e88f6…`, stable callback `d2456774…`, and zero dedicated
+lines. The historical source-project Preview manifest, local tests, or one
+component read are rejected false greens.
