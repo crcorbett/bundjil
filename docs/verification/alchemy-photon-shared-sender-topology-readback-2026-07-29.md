@@ -76,6 +76,41 @@ evidence, but neither proves accepted Bundjil ingress or a Channel journey.
 The task must not claim one Preview response, replay handling, Eve completion,
 outbound delivery, or visible typing.
 
+## Read-only application-boundary diagnosis
+
+An exact valid-signature unsupported-event probe against the stable callback on
+source commit `1f8600d79c60ae5451ee09cd4d7bab2f158e0b4e` returned `204` with no
+redirect or body. The matching deployment log contained that one `204` and no
+other result. This directly proves that the deployed Preview runtime resolves
+the retained callback ID, signing-secret custody and exact path. It does not
+explain the provider-originated `401`, prove the provider request used the same
+signature inputs, or prove message acceptance.
+
+Authenticated reads through three Vercel surfaces produced the same
+write-only result for the sensitive Preview
+`BUNDJIL_CHANNEL_ROUTING_IDENTITIES` record:
+
+- the environment API returned exact metadata but no decrypted value;
+- `vercel env pull` emitted an empty redacted value into an ephemeral file
+  that was deleted immediately; and
+- the dashboard editor exposed no readable current value and was cancelled
+  without saving.
+
+Nine Production Photon Agent Run details and traces from the accepted journey
+window contained no `principalId`. Exact-key searches found no local ignored
+env or process-environment copy. Sanitized inspection of retained task-session
+records found code, fixtures and later read-only probes only; it did not yield
+the configured owner value. No value, message, full participant identity,
+credential, run identity or trace content was retained in this receipt.
+
+The existing directory therefore cannot be appended or merged. The next
+Preview configuration must be an intentional overwrite under separate Vercel
+authority and must use either an exact owner-supplied canonical principal ID or
+an explicit product decision adopting a new stable Preview principal ID. A
+test fixture, guessed owner string, neighbouring Production run or successful
+signed `204` is rejected as proof by proxy. The existing webhook configuration
+remains preserved.
+
 ## Cleanup and restored topology
 
 After the message window exceeded the retry horizon, cleanup guarded the exact
@@ -110,6 +145,8 @@ configuration, deployment, or Production environment changed.
 | Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender      | Passed for provider capability; candidate inventories and Photon reads              |
 | iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient   | Passed for one bounded handset/provider delivery; Computer Use                      |
 | Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts              | Passed for callback invocation isolation; Vercel runtime logs                       |
+| Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt        | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
+| Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal          | Blocked: Vercel value is write-only and the canonical principal was not recovered   |
 | Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite          | Failed: exact responses were `204` and `401`; no accepted dispatch                  |
 | Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                  | Not proved                                                                          |
 | Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user    | Passed; guarded delete and two-read candidate inventory                             |
@@ -139,9 +176,9 @@ verification-policy, Photon typecheck, all 35 Photon tests, Photon build, JSON,
 inventory-digest, diff, and secret/full-identity leak checks passed. Complete
 `bun run verification` used only the documented process-local synthetic
 Executor fixture and passed HGI-307, 90 tooling tests, type-aware format/lint,
-the lint fixture, Knip, all nine workspace typechecks, and all fifteen Turbo
-build/test tasks. The complete gate is rerun after this exact verification
-statement becomes the commit candidate.
+the lint fixture, Knip, all nine workspace typechecks, 62 agent tests, all 35
+Photon tests, and all fifteen Turbo build/test tasks. The fixture made no
+Executor request.
 
 Repository checks prove owner and policy consistency only. They do not upgrade
 the failed live `204`/`401` boundary into accepted ingress, Eve completion,

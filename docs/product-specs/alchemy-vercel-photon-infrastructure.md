@@ -606,17 +606,36 @@ Photon callback invocations, and there was no accepted `202`, Eve
 dispatch/completion, outbound response, typing proof, or same-event duplicate
 disposition. Preview routing-identity metadata predates the new binding; the
 available safe logs do not distinguish the exact ignored/duplicate identity
-branch or explain the second authentication failure. After the retry horizon,
-cleanup deleted only rollout-created user `0e2e2abe…` and restored the original
-candidate digest
+branch or explain the second authentication failure. A later exact
+valid-signature unsupported-event probe against the stable callback on source
+commit `1f8600d79c60ae5451ee09cd4d7bab2f158e0b4e` returned `204` without a
+redirect or body. That directly proves the deployed Preview callback ID,
+signing-secret custody and path are internally coherent; it does not explain
+the provider-originated `401` or prove an accepted message.
+
+Authenticated Vercel API, CLI and dashboard reads then established that the
+sensitive Preview `BUNDJIL_CHANNEL_ROUTING_IDENTITIES` value is write-only:
+the API returned its metadata with no value, `vercel env pull` produced an
+empty redacted value, and the dashboard editor exposed no readable current
+value. Nine Production Photon Agent Run details and traces retained no
+`principalId`; no local environment, process environment or retained
+repository-task session record contained a recoverable owner value. Therefore
+the current directory cannot be merged or appended safely. Replacing it
+requires a separately approved Preview-only Vercel write and either the exact
+owner-supplied canonical principal ID or an explicit product decision adopting
+a new stable Preview principal ID. A guessed principal, a neighbouring test
+fixture or a successful signed `204` is not an acceptable substitute.
+
+After the retry horizon, cleanup deleted only rollout-created user
+`0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
 Source retains only `72cac9b5…`; Preview retains adopted user `46b1fb0c…` and
 callback `d2456774…`. The next slice must correct and deploy the owning Preview
-routing/webhook configuration under separate Vercel authority before repeating
-the bounded inbound-first journey. It must not recreate the user or send until
-that configuration is proven to include the intended identity and exact
-signing custody. The task remains open and the terminal five-pass audit has not
-run.
+routing-identity configuration under separate Vercel authority before
+repeating the bounded inbound-first journey. It must not recreate the user or
+send until that configuration is proven to include the intended identity and
+an exact stable principal. The existing webhook configuration remains
+preserved. The task remains open and the terminal five-pass audit has not run.
 
 ## Canonical Schema and Effect contracts
 

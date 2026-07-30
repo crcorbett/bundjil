@@ -241,10 +241,16 @@ duplicate suppression, Preview, Production, or durable process supervision.
    returned `204` and `401`, zero Production invocations, and no accepted
    `202`/Eve response. Cleanup removed only the rollout-created Preview user and
    restored the original candidate digest. Before repeating, require separate
-   authority to reconcile Preview routing-identity and webhook-signing metadata,
-   an immutable deployment readback, and an exact signed fixture. Provider
-   registration or handset delivery cannot substitute for those application
-   gates.
+   authority to overwrite the Preview routing-identity directory, an exact
+   owner-supplied canonical principal ID or explicit new-principal product
+   decision, and immutable deployment readback. Preserve the existing webhook
+   configuration: the final `1f8600d…` deployment returned exact `204` for a
+   valid-signature unsupported-event probe, proving callback ID/secret/path
+   coherence. Vercel API, CLI and dashboard reads expose the sensitive routing
+   value as write-only, while Production Agent Run detail/trace retains no
+   `principalId`; do not guess, merge against an empty read, or infer the value
+   from tests. Provider registration, callback configuration or handset
+   delivery cannot substitute for accepted application ingress.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
