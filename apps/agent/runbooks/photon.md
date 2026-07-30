@@ -251,6 +251,14 @@ duplicate suppression, Preview, Production, or durable process supervision.
    `principalId`; do not guess, merge against an empty read, or infer the value
    from tests. Provider registration, callback configuration or handset
    delivery cannot substitute for accepted application ingress.
+   Cooper approved one complete Preview-only replacement on 2026-07-30. Use
+   only the one-record mapping in ignored mode-`0600` custody: controlled
+   sender `82ac258d…`, opaque principal fingerprint `1b41b326…`, sanitized
+   mapping digest `96971a51…`. Replace the entire Preview value, deploy one new
+   immutable candidate, and prove the exact route before recreating the shared
+   user. Stop on any mapping digest, target, deployment, or callback mismatch.
+   The envelope excludes Production, billing, SMS, cold outbound, credential
+   rotation, main merge, and unrelated mutation.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only

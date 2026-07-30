@@ -641,6 +641,18 @@ owner-supplied canonical principal ID or an explicit product decision adopting
 a new stable Preview principal ID. A guessed principal, a neighbouring test
 fixture or a successful signed `204` is not an acceptable substitute.
 
+Cooper supplied that exact product and mutation decision on 2026-07-30. The
+complete Preview-only routing directory will be replaced with one record for
+controlled sender `82ac258d…` and a newly generated opaque stable principal
+whose safe fingerprint is `1b41b326…`. The exact mapping is retained only in
+ignored mode-`0600` local custody; its sanitized digest is `96971a51…`.
+Approval covers the resulting Preview deployment/readback, one minimal Preview
+shared-user reconciliation, and one bounded inbound-first iMessage/replay
+journey with exact cleanup on failure. It does not authorize Production,
+billing, SMS, cold outbound, credential rotation, a main merge, or unrelated
+mutation. The overwrite is not accepted until one immutable deployment proves
+the new directory at the owning route.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
@@ -651,8 +663,9 @@ repeating the bounded inbound-first journey. It must not recreate the user or
 send until that configuration is proven to include the intended identity and
 an exact stable principal, and a new bounded message authority is recorded.
 The safe disposition oracle is deployed and proved; the existing webhook
-configuration remains preserved. The task remains open and the terminal
-five-pass audit has not run.
+configuration remains preserved. That decision and message authority are now
+recorded, but the task remains open until deployment and the provider journey
+pass. The terminal five-pass audit has not run.
 
 ## Canonical Schema and Effect contracts
 

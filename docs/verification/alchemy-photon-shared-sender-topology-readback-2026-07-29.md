@@ -111,6 +111,28 @@ test fixture, guessed owner string, neighbouring Production run or successful
 signed `204` is rejected as proof by proxy. The existing webhook configuration
 remains preserved.
 
+## Approved routing-directory resume
+
+On 2026-07-30 Cooper explicitly approved generating a new opaque stable
+Preview Channel principal and replacing the complete Preview-only routing
+directory with the one controlled-sender record. The generated principal has
+safe fingerprint `1b41b326…`; the exact one-record mapping has sanitized
+digest `96971a51…` and is retained only in ignored mode-`0600` local custody.
+A fresh pre-mutation candidate inventory at
+`2026-07-30T02:47:16.046Z` matched the restored digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`,
+showed sender `82ac258d…` unchanged in the source project and available in
+Preview, and retained the adopted Preview user/callback.
+
+The bounded envelope authorizes the complete Preview-only overwrite, one
+resulting immutable deployment/readback, one minimal Preview shared-user
+reconciliation, and one inbound-first iMessage/replay journey with exact
+cleanup on failure. Production, billing, SMS, cold outbound, credential
+rotation, main merge, and unrelated mutation remain excluded. This section is
+authority and precondition evidence only; it does not claim the overwrite,
+deployment, user, message, replay, Eve completion, or stable topology has
+succeeded.
+
 ## Repository disposition-oracle correction
 
 The owning Channel route previously collapsed ignored, duplicate and
@@ -175,20 +197,20 @@ configuration, deployment, or Production environment changed.
 
 ## Requirement replay
 
-| Material requirement                  | Direct observable and expected postcondition                                               | Plausible false green rejected                                | Result and evidence owner                                                           |
-| ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| No required obsolete-callback traffic | Exact callback/path has zero rows and a positive-control request becomes one row           | Empty project-wide logs or an unverified zero count           | Passed before deletion; this receipt and Vercel runtime logs                        |
-| Exact callback retirement             | Only `2083611d…` disappears; `72cac9b5…` and source users remain                           | Deleting by count, hostname, or list order                    | Passed after 225-second drain; Photon management readback                           |
-| Retirement rollback                   | Irreversible secret loss is explicitly accepted and recorded                               | Stable ID/URL described as exact signing-secret restoration   | Passed for authorized irreversible retirement; exact restoration remains impossible |
-| Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender        | Passed for provider capability; candidate inventories and Photon reads              |
-| iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient     | Passed for one bounded handset/provider delivery; Computer Use                      |
-| Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Passed for callback invocation isolation; Vercel runtime logs                       |
-| Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
-| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`              |
-| Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Blocked: Vercel value is write-only and the canonical principal was not recovered   |
-| Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: exact responses were `204` and `401`; no accepted dispatch                  |
-| Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                          |
-| Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user      | Passed; guarded delete and two-read candidate inventory                             |
+| Material requirement                  | Direct observable and expected postcondition                                               | Plausible false green rejected                                | Result and evidence owner                                                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| No required obsolete-callback traffic | Exact callback/path has zero rows and a positive-control request becomes one row           | Empty project-wide logs or an unverified zero count           | Passed before deletion; this receipt and Vercel runtime logs                         |
+| Exact callback retirement             | Only `2083611d…` disappears; `72cac9b5…` and source users remain                           | Deleting by count, hostname, or list order                    | Passed after 225-second drain; Photon management readback                            |
+| Retirement rollback                   | Irreversible secret loss is explicitly accepted and recorded                               | Stable ID/URL described as exact signing-secret restoration   | Passed for authorized irreversible retirement; exact restoration remains impossible  |
+| Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender        | Passed for provider capability; candidate inventories and Photon reads               |
+| iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient     | Passed for one bounded handset/provider delivery; Computer Use                       |
+| Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Passed for callback invocation isolation; Vercel runtime logs                        |
+| Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance    |
+| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`               |
+| Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Passed for approval and mode-`0600` custody; immutable Preview proof remains pending |
+| Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: exact responses were `204` and `401`; no accepted dispatch                   |
+| Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                           |
+| Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user      | Passed; guarded delete and two-read candidate inventory                              |
 
 ## Retry and effect-certainty replay
 

@@ -1325,6 +1325,16 @@ requires an exact owner-supplied canonical principal ID or an explicit product
 decision to adopt a new stable Preview principal ID. Guessing from examples or
 neighbouring tests is forbidden.
 
+Cooper approved the intentional replacement on 2026-07-30. One opaque stable
+Preview principal was generated and retained only with the exact controlled
+sender mapping in ignored mode-`0600` local custody. Its safe fingerprint is
+`1b41b326…`; the one-record mapping digest is `96971a51…`. The granted envelope
+authorizes the complete Preview-only routing-directory overwrite, the
+resulting immutable deployment/readback, one minimal Preview shared-user
+reconciliation, and one bounded inbound-first iMessage/replay journey with
+exact cleanup on failure. It excludes Production, billing, SMS, cold outbound,
+credential rotation, main merge, and unrelated mutation.
+
 Repository tracing then found that the route returned the same unlogged `204`
 for ignored, duplicate and identity-rejected inputs, and returned `401`
 without an authentication disposition. The current slice adds the
@@ -1347,27 +1357,26 @@ callback `d2456774…`. No billing, paid line, credential, Vercel configuration,
 deployment, Production user/assignment, or adopted Preview resource changed.
 
 The task remains in progress. The safe disposition oracle is deployed and
-proved. The later provider slice still requires separately authorized Preview
-Vercel routing-identity overwrite, an exact canonical-principal decision,
-immutable deployment readback and new bounded message authority before the
-user may be recreated or another message sent. Preserve the existing Preview
-callback configuration. The terminal five-pass audit remains deferred until
-the complete SPEC is honestly terminal.
+proved, and the routing/principal/message authority gate is now satisfied.
+The user may be recreated only after the approved Preview overwrite reaches a
+new immutable deployment and the exact route proves the intended identity.
+Preserve the existing Preview callback configuration. The terminal five-pass
+audit remains deferred until the complete SPEC is honestly terminal.
 
 ### Requirement-to-proof replay
 
-| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                | Result                                                |
-| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------- |
-| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt | Passed                                                |
-| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt        | Passed; exact restoration intentionally impossible    |
-| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                 | Passed for provider capability                        |
-| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                    | Passed for one bounded delivery                       |
-| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                      | Passed for invocation isolation                       |
-| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                  | Passed for ID/secret/path coherence only              |
-| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log  | Passed at `310dc759…`                                 |
-| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Vercel API/CLI/dashboard plus Agent Run/local-custody searches                | Blocked: write-only value; canonical principal absent |
-| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime statuses and app owner mapping                                  | Failed; `204`/`401`, no `202`                         |
-| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory             | Passed                                                |
+| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                | Result                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt | Passed                                                  |
+| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt        | Passed; exact restoration intentionally impossible      |
+| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                 | Passed for provider capability                          |
+| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                    | Passed for one bounded delivery                         |
+| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                      | Passed for invocation isolation                         |
+| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                  | Passed for ID/secret/path coherence only                |
+| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log  | Passed at `310dc759…`                                   |
+| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval receipt plus mode-`0600` one-record custody and safe mapping digest  | Passed for decision/custody; Preview deployment pending |
+| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime statuses and app owner mapping                                  | Failed; `204`/`401`, no `202`                           |
+| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory             | Passed                                                  |
 
 ### Read-only diagnosis review lenses
 
@@ -1403,22 +1412,22 @@ the complete SPEC is honestly terminal.
 
 ### Slice docs-maintainer impact ledger
 
-| Surface                          | Status          | Decision and evidence                                                                                                                                             |
-| -------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and docs            | Change required | Runtime ownership is unchanged, but the SPEC/plan/runbook/evidence now own the safe disposition oracle and its deployment/non-claim boundary.                     |
-| READMEs                          | Preserve        | No purpose, public boundary, or command map changed. Exact operations and limitations remain in the runbook and receipt.                                          |
-| Exports and generated references | Preserve        | No code, export, generated artifact, or reference owner changed.                                                                                                  |
-| Runbooks and authority           | Change required | Narrow the next mutation boundary to Preview routing identities and preserve the proved callback configuration; require principal decision plus Vercel authority. |
-| Verification journeys and proof  | Change required | Add stable signed callback proof, write-only API/CLI/dashboard reads, Agent Run/local-custody negative evidence, and exact non-claims to the receipt.             |
-| Skills and AGENTS                | Preserve        | PRD implementer, docs maintainer, Effect wrapper, package ownership, and Computer Use contracts were applied; no reusable instruction defect emerged.             |
-| Lint, config, commands and CI    | Preserve        | No tracked config/command/CI change occurred. Operational reads and owner services used existing boundaries.                                                      |
-| Schemas, services and Layers     | Preserve        | Existing Schema-owned Photon management and candidate-inventory services handled every provider operation; no raw client or new contract was added.               |
-| Tests and fixtures               | Change required | Direct route tests exercise every disposition/status class, accepted/retry controls, and participant/message leak sentinels; they do not prove provider traffic.  |
-| SPEC, tasks and plan             | Change required | Record the write-only directory, unavailable canonical principal, proved callback path, exact next Vercel authority need, and terminal-only audit.                |
-| Receipts                         | Change required | Retain only safe fingerprints, bounded metadata, exact status counts, read-only custody observables, rollback limitation, and non-claims.                         |
-| Rollout and rollback             | Preserve        | No new provider mutation occurred; restored digest/topology and the accepted irreversible callback loss remain the current rollback identity.                     |
-| Lifecycle and archive pointers   | Preserve        | The SPEC/task/plan remain active; no completed/archive pointer changes; formal five-pass audit remains terminal-only.                                             |
-| Documentation audit inventory    | Preserve        | No docs/README path was added, moved, or removed; recompute the unchanged 195-path digest from the candidate.                                                     |
+| Surface                          | Status          | Decision and evidence                                                                                                                                            |
+| -------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | Runtime ownership is unchanged, but the SPEC/plan/runbook/evidence now own the safe disposition oracle and its deployment/non-claim boundary.                    |
+| READMEs                          | Preserve        | No purpose, public boundary, or command map changed. Exact operations and limitations remain in the runbook and receipt.                                         |
+| Exports and generated references | Preserve        | No code, export, generated artifact, or reference owner changed.                                                                                                 |
+| Runbooks and authority           | Change required | Record the approved Preview overwrite/new-principal envelope while preserving the proved callback configuration and Production exclusions.                       |
+| Verification journeys and proof  | Change required | Add principal/mapping fingerprints, immutable deployment proof, provider journey evidence, cleanup or retained-topology state, and exact non-claims.             |
+| Skills and AGENTS                | Preserve        | PRD implementer, docs maintainer, Effect wrapper, package ownership, and Computer Use contracts were applied; no reusable instruction defect emerged.            |
+| Lint, config, commands and CI    | Preserve        | No tracked config/command/CI change occurred. Operational reads and owner services used existing boundaries.                                                     |
+| Schemas, services and Layers     | Preserve        | Existing Schema-owned Photon management and candidate-inventory services handled every provider operation; no raw client or new contract was added.              |
+| Tests and fixtures               | Change required | Direct route tests exercise every disposition/status class, accepted/retry controls, and participant/message leak sentinels; they do not prove provider traffic. |
+| SPEC, tasks and plan             | Change required | Record the approved new-principal decision, complete Preview overwrite, exact journey gates, result, and terminal-only audit.                                    |
+| Receipts                         | Change required | Retain only safe fingerprints, bounded metadata, exact status/disposition counts, deployment identity, rollback limitation, and non-claims.                      |
+| Rollout and rollback             | Change required | Preserve the current digest/topology before mutation; remove only a rollout-created Preview user after drain if any gate fails.                                  |
+| Lifecycle and archive pointers   | Preserve        | The SPEC/task/plan remain active; no completed/archive pointer changes; formal five-pass audit remains terminal-only.                                            |
+| Documentation audit inventory    | Preserve        | No docs/README path was added, moved, or removed; recompute the unchanged 195-path digest from the candidate.                                                    |
 
 Focused Effect language-service, boundary, docs, skills, authority, controls,
 verification-policy, Photon typecheck, all 35 Photon tests, Photon build, JSON,
