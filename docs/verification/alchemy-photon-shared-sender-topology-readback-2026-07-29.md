@@ -3,8 +3,8 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T03:33:17.089Z
-artifact_git_identity: 29467f1b26e3255f4ffa64e9e25f7f79c6f5bbe6
+observed_at: 2026-07-30T03:46:07.457Z
+artifact_git_identity: 7e29cc9a90ffbcfa0793cad3e8cea6a3088fe9a2
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
@@ -218,9 +218,15 @@ the cross-app Channel fixture, Effect language-service diagnostics, and every
 routed repository policy gate pass. Full `bun run verification` also passes
 with the process-local synthetic Executor fixture; the documentation audit
 checked 272 routed files with zero findings. Deployment and safe synthetic
-checkpoint probes remain pending. This repository evidence does not
-retroactively classify the historical requests, authorize a provider retry,
-or prove accepted Channel ingress.
+checkpoint probes then ran against immutable Preview deployment `AB9G854g…`,
+which reached READY from exact source `7e29cc9…`. The eight requests returned
+the expected four `401` and four `204` classes. Deployment-scoped logs
+contained exactly one `headers`, `webhookId`, `timestamp`, `signature`,
+`spacePlatform`, `messagePlatform`, `senderPlatform`, and
+`messageSpacePlatform` record, with zero occurrences of the explicit
+provider-value leak sentinel. This evidence does not retroactively classify
+the historical requests, authorize a provider retry, prove Photon-originated
+ingress, or satisfy the Channel journey.
 
 ## Repository disposition-oracle correction
 
@@ -296,7 +302,7 @@ configuration, deployment, or Production environment changed.
 | Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Preview observed; Production-zero lacks a same-window positive control              |
 | Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
 | Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`              |
-| Provider checkpoint diagnosis         | Exact first failed auth/platform checkpoint with no observed value                         | Status alone, permissive decode, secret change, or value log  | Focused repository matrix passed; deployment remains pending                        |
+| Provider checkpoint diagnosis         | Exact first failed auth/platform checkpoint with no observed value                         | Status alone, permissive decode, secret change, or value log  | Synthetic deployed matrix passed at `AB9G854g…`; real provider event remains gated  |
 | Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Passed for approved mapping custody and immutable Preview deployment                |
 | Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: unsupportedService/authenticationRejected; no accepted dispatch             |
 | Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                          |

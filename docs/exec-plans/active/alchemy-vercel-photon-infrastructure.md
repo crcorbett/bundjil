@@ -1399,7 +1399,7 @@ complete SPEC is honestly terminal.
 | Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval, mode-`0600` mapping digest, metadata readback and immutable safe probe | Passed for new Preview mapping/deployment                 |
 | Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime dispositions and app owner mapping                                 | Failed; unsupportedService/authenticationRejected         |
 | Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory                | Passed                                                    |
-| Provider checkpoint diagnosis | One closed checkpoint identifies the first authentication or platform boundary    | Status alone, value logging, permissive decoding, or secret change    | Photon transport fixture matrix and private diagnostic Schema                    | Focused repository checks passed; deployment pending      |
+| Provider checkpoint diagnosis | One closed checkpoint identifies the first authentication or platform boundary    | Status alone, value logging, permissive decoding, or secret change    | Photon transport fixture matrix, immutable deployment and exact scoped logs      | Passed synthetically at `AB9G854g…`; provider retry gated |
 
 ### Read-only diagnosis review lenses
 
@@ -1432,6 +1432,14 @@ checkpoint diagnostic at the Photon transport boundary. All four
 authentication checkpoints and all four official iMessage platform positions
 receive independent direct tests; a value-leak sentinel must remain absent
 after Schema encoding. Another real message is not authorized by this slice.
+
+Immutable Preview deployment `AB9G854g…` at source `7e29cc9…` reached READY.
+The eight-case synthetic matrix returned the expected four `401` and four
+`204` responses. Exact deployment-scoped logs contained one record for each
+closed checkpoint and zero occurrences of the provider-value leak sentinel.
+This closes the repository/deployment diagnostic slice only. The historical
+wire values, accepted Channel journey, same-event retry, response, typing and
+Production-zero proof remain unproved.
 
 ### Retry-policy replay
 

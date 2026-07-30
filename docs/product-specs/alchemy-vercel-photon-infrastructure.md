@@ -692,6 +692,14 @@ checkpoint independently and reject a value-leak sentinel. No public package
 contract changes, provider value logging, case-folding, SMS acceptance,
 signing-secret change, or real-message replay is implied by this correction.
 
+The diagnostic deployed from source `7e29cc9…` and reached READY as immutable
+Preview deployment `AB9G854g…`. Eight synthetic requests produced the exact
+four authentication checkpoints and four platform checkpoints with their
+expected `401`/`204` classes. Deployment-scoped log search found zero copies of
+the explicit provider-value leak sentinel. This proves deployed diagnostic
+observability only; it neither classifies the historical requests nor proves a
+Photon-originated event.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
