@@ -259,6 +259,16 @@ duplicate suppression, Preview, Production, or durable process supervision.
    user. Stop on any mapping digest, target, deployment, or callback mismatch.
    The envelope excludes Production, billing, SMS, cold outbound, credential
    rotation, main merge, and unrelated mutation.
+   The authorized attempt reached READY deployment `687e5a7d…`, passed the
+   signed safe probe, and recreated the distinct Preview destination without
+   source change. Messages proved the exact sender, recipient,
+   iMessage/Encrypted composer, and Delivered state. The real callback then
+   returned `ignored/unsupportedService` plus `authenticationRejected`, with no
+   accepted work or response. After a 239-second drain, cleanup removed only
+   rollout user `19489599…`/destination `0809669f…` and restored the provider
+   digest twice. Preserve the approved new Preview routing mapping and
+   deployment, but do not recreate or resend until the Photon platform/signature
+   mismatch has direct evidence and a new bounded authority.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only

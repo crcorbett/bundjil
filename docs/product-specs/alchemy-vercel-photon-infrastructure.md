@@ -653,6 +653,28 @@ billing, SMS, cold outbound, credential rotation, a main merge, or unrelated
 mutation. The overwrite is not accepted until one immutable deployment proves
 the new directory at the owning route.
 
+That bounded attempt is now complete and failed closed. Preview sensitive
+metadata updated, deployment fingerprint `687e5a7d…` at source `29467f1…`
+reached READY, and a signed safe probe produced exactly
+`ignored/unsupportedEvent`. The same sender was then registered again as
+rollout user `19489599…` with distinct destination `0809669f…`, while its
+source binding remained unchanged. Computer Use proved the exact sender and
+recipient, an iMessage/Encrypted composer, and Delivered for one bounded
+inbound-first message. The real application window contained one
+`ignored/unsupportedService` and one `authenticationRejected` disposition,
+zero accepted dispatch, zero Eve completion/response, and zero exact duplicate.
+Official Photon event documentation says the iMessage payload's space,
+message, sender, and nested-space platform fields are `iMessage`; the observed
+closed disposition therefore records a provider/runtime contract mismatch
+without guessing which wire field differed.
+
+After 239 seconds, longer than the documented retry horizon, cleanup deleted
+only rollout user `19489599…`/destination `0809669f…`. Two subsequent
+candidate-inventory commands each restored digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+The approved one-record Preview routing mapping and immutable deployment remain
+for diagnosis; the overwritten write-only value cannot be reconstructed.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
@@ -663,9 +685,10 @@ repeating the bounded inbound-first journey. It must not recreate the user or
 send until that configuration is proven to include the intended identity and
 an exact stable principal, and a new bounded message authority is recorded.
 The safe disposition oracle is deployed and proved; the existing webhook
-configuration remains preserved. That decision and message authority are now
-recorded, but the task remains open until deployment and the provider journey
-pass. The terminal five-pass audit has not run.
+configuration remains preserved. The task remains open at the exact
+unsupported-service/authentication provider boundary; another user create or
+message requires a separately bounded authority after that mismatch is
+resolved. The terminal five-pass audit has not run.
 
 ## Canonical Schema and Effect contracts
 

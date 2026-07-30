@@ -3,8 +3,8 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T01:29:13.671Z
-artifact_git_identity: 39161312f73d4f59630db437cab6ad5a8c3d5f0b
+observed_at: 2026-07-30T03:01:30.693Z
+artifact_git_identity: 29467f1b26e3255f4ffa64e9e25f7f79c6f5bbe6
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
@@ -133,6 +133,64 @@ authority and precondition evidence only; it does not claim the overwrite,
 deployment, user, message, replay, Eve completion, or stable topology has
 succeeded.
 
+## Resumed Preview journey and rollback
+
+The approved Preview-sensitive metadata update completed at
+`2026-07-30T02:51:07.479Z`. Immutable deployment fingerprint `687e5a7d…` at
+source `29467f1…` reached READY. A signed unsupported-event probe returned
+`204` with no redirect, location or body, and its exact deployment log
+contained one `ignored/unsupportedEvent` disposition with zero retained
+participant, principal, signature or bypass fingerprints.
+
+One owner reconciliation then created rollout Preview user `19489599…` with
+destination `0809669f…`. Two-read inventory digest `89282717…` proved sender
+`82ac258d…` remained bound to unchanged source destination `d4039779…`, gained
+the distinct Preview destination, and preserved the adopted Preview
+user/callback, shared service and zero dedicated lines.
+
+Computer Use re-read the selected Messages conversation and provider custody
+before sending. The signed-in Messages identity fingerprint matched
+`82ac258d…`, the recipient matched `0809669f…`, and the composer explicitly
+showed iMessage/Encrypted. One bounded message fingerprint `4961806c3e06…`
+was sent and displayed Delivered. The transcript contained no agent reply.
+Full sender, destination, message content, conversation, Space and message
+identities remained in process/provider custody and were cleared after
+readback.
+
+The application acceptance gate failed closed at
+`2026-07-30T02:56:38Z`. The exact Preview deployment window contained one
+`ignored/unsupportedService` disposition and one
+`authenticationRejected` disposition, with no `acceptedForDispatch`,
+`duplicate`, provider-retry control, Eve completion, response or typing
+evidence. The rows contained none of the retained fingerprint/signature/bypass
+sentinels. The Production deployment window contained zero rows, but its log
+surface had no same-window positive control; that is retained as a limitation,
+not a proved zero-Production-response claim.
+
+Current official Photon event documentation says an iMessage webhook carries
+`iMessage` in the top-level space, message, sender and nested-space platform
+fields. The safe app disposition proves at least one observed provider value
+did not satisfy that contract; it does not identify the exact field or justify
+case-folding, SMS acceptance, payload retention, another message, or a
+repository decoder change. The separate authentication rejection likewise
+does not identify a signature input mismatch.
+
+No retry or additional callback appeared during a 239-second observation,
+longer than the documented approximately 3.5-minute retry horizon. Guarded
+cleanup then deleted only rollout user `19489599…`/destination `0809669f…`.
+Two subsequent candidate-inventory commands each matched the restored digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+Source users/assignments and sole Production callback, adopted Preview user,
+Preview callback, service, platform, lines, billing and credentials remained
+unchanged.
+
+The approved one-record Preview routing mapping and immutable deployment
+remain for diagnosis. Exact restoration of the overwritten write-only routing
+value is impossible by the accepted product decision; its replacement remains
+recoverable from ignored mode-`0600` custody. No second message, SMS, cold
+outbound, Production mutation, billing change, credential operation or main
+merge occurred.
+
 ## Repository disposition-oracle correction
 
 The owning Channel route previously collapsed ignored, duplicate and
@@ -197,20 +255,20 @@ configuration, deployment, or Production environment changed.
 
 ## Requirement replay
 
-| Material requirement                  | Direct observable and expected postcondition                                               | Plausible false green rejected                                | Result and evidence owner                                                            |
-| ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| No required obsolete-callback traffic | Exact callback/path has zero rows and a positive-control request becomes one row           | Empty project-wide logs or an unverified zero count           | Passed before deletion; this receipt and Vercel runtime logs                         |
-| Exact callback retirement             | Only `2083611d…` disappears; `72cac9b5…` and source users remain                           | Deleting by count, hostname, or list order                    | Passed after 225-second drain; Photon management readback                            |
-| Retirement rollback                   | Irreversible secret loss is explicitly accepted and recorded                               | Stable ID/URL described as exact signing-secret restoration   | Passed for authorized irreversible retirement; exact restoration remains impossible  |
-| Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender        | Passed for provider capability; candidate inventories and Photon reads               |
-| iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient     | Passed for one bounded handset/provider delivery; Computer Use                       |
-| Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Passed for callback invocation isolation; Vercel runtime logs                        |
-| Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance    |
-| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`               |
-| Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Passed for approval and mode-`0600` custody; immutable Preview proof remains pending |
-| Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: exact responses were `204` and `401`; no accepted dispatch                   |
-| Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                           |
-| Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user      | Passed; guarded delete and two-read candidate inventory                              |
+| Material requirement                  | Direct observable and expected postcondition                                               | Plausible false green rejected                                | Result and evidence owner                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| No required obsolete-callback traffic | Exact callback/path has zero rows and a positive-control request becomes one row           | Empty project-wide logs or an unverified zero count           | Passed before deletion; this receipt and Vercel runtime logs                        |
+| Exact callback retirement             | Only `2083611d…` disappears; `72cac9b5…` and source users remain                           | Deleting by count, hostname, or list order                    | Passed after 225-second drain; Photon management readback                           |
+| Retirement rollback                   | Irreversible secret loss is explicitly accepted and recorded                               | Stable ID/URL described as exact signing-secret restoration   | Passed for authorized irreversible retirement; exact restoration remains impossible |
+| Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender        | Passed for provider capability; candidate inventories and Photon reads              |
+| iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient     | Passed for one bounded handset/provider delivery; Computer Use                      |
+| Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Preview observed; Production-zero lacks a same-window positive control              |
+| Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
+| Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`              |
+| Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Passed for approved mapping custody and immutable Preview deployment                |
+| Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: unsupportedService/authenticationRejected; no accepted dispatch             |
+| Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                          |
+| Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user      | Passed; guarded delete and two-read candidate inventory                             |
 
 ## Retry and effect-certainty replay
 

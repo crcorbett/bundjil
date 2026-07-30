@@ -1335,6 +1335,27 @@ reconciliation, and one bounded inbound-first iMessage/replay journey with
 exact cleanup on failure. It excludes Production, billing, SMS, cold outbound,
 credential rotation, main merge, and unrelated mutation.
 
+The bounded resume completed and failed closed. Preview sensitive metadata
+updated, immutable deployment fingerprint `687e5a7d…` at source `29467f1…`
+reached READY, and its signed safe probe produced exactly
+`ignored/unsupportedEvent`. One owner reconciliation created Preview user
+`19489599…`/destination `0809669f…` while source sender `82ac258d…` remained
+unchanged. Computer Use re-proved the exact sender, recipient,
+iMessage/Encrypted composer, and Delivered state. Exact runtime readback then
+contained one `ignored/unsupportedService` and one
+`authenticationRejected`, with no `acceptedForDispatch`, Eve completion,
+response, typing or duplicate disposition. The current official Photon event
+contract says every iMessage platform field is `iMessage`; no available safe
+observable identifies which provider wire field differed.
+
+After a 239-second retry-horizon drain, guarded cleanup deleted only rollout
+user `19489599…`/destination `0809669f…`. Two subsequent candidate inventories
+each restored digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+The approved new Preview routing mapping and immutable deployment remain;
+restoration of the prior write-only mapping is impossible by the accepted
+product decision.
+
 Repository tracing then found that the route returned the same unlogged `204`
 for ignored, duplicate and identity-rejected inputs, and returned `401`
 without an authentication disposition. The current slice adds the
@@ -1356,27 +1377,28 @@ bindings, adopted Preview user `46b1fb0c…`, assignment `db49756e…`, and Prev
 callback `d2456774…`. No billing, paid line, credential, Vercel configuration,
 deployment, Production user/assignment, or adopted Preview resource changed.
 
-The task remains in progress. The safe disposition oracle is deployed and
-proved, and the routing/principal/message authority gate is now satisfied.
-The user may be recreated only after the approved Preview overwrite reaches a
-new immutable deployment and the exact route proves the intended identity.
-Preserve the existing Preview callback configuration. The terminal five-pass
-audit remains deferred until the complete SPEC is honestly terminal.
+The task remains in progress at the exact provider/application mismatch. The
+safe disposition oracle and new Preview routing deployment are proved, but the
+real provider event is not accepted. Preserve the new routing mapping,
+immutable deployment and existing Preview callback. Do not recreate the user
+or send again without separately bounded authority after the platform/signature
+mismatch is resolved. The terminal five-pass audit remains deferred until the
+complete SPEC is honestly terminal.
 
 ### Requirement-to-proof replay
 
-| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                | Result                                                  |
-| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
-| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt | Passed                                                  |
-| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt        | Passed; exact restoration intentionally impossible      |
-| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                 | Passed for provider capability                          |
-| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                    | Passed for one bounded delivery                         |
-| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                      | Passed for invocation isolation                         |
-| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                  | Passed for ID/secret/path coherence only                |
-| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log  | Passed at `310dc759…`                                   |
-| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval receipt plus mode-`0600` one-record custody and safe mapping digest  | Passed for decision/custody; Preview deployment pending |
-| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime statuses and app owner mapping                                  | Failed; `204`/`401`, no `202`                           |
-| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory             | Passed                                                  |
+| Material requirement          | Direct observable and expected postcondition                                      | Plausible false green rejected                                        | Focused command/evidence owner                                                   | Result                                                    |
+| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| No required obsolete traffic  | Exact deployment/path returns zero rows and a probe becomes one row               | Empty project-wide log service                                        | Vercel exact-path logs plus one `404` positive control; shared-sender receipt    | Passed                                                    |
+| Exact irreversible retirement | Only `2083611d…` disappears after drain; `72cac9b5…` and users remain             | Delete by hostname/count or claiming URL/ID restores a signing secret | Owner delete command plus complete Photon reads; shared-sender receipt           | Passed; exact restoration intentionally impossible        |
+| Shared-sender capability      | Same sender gains a distinct Preview route while source binding remains unchanged | Availability, another sender, or second UUID alone                    | One create plus complete source/Preview candidate inventories                    | Passed for provider capability                            |
+| iMessage-only send            | Exact Preview destination shows `iMessage` and `Delivered`                        | SMS, Sendblue, source destination, or uncertain recipient             | Computer Use fail-closed composer/readback                                       | Passed for one bounded delivery                           |
+| Environment isolation         | Preview receives callbacks and Production receives zero                           | Separate projects without runtime counts                              | Exact Vercel environment/status readback                                         | Preview observed; Production-zero not conclusively proved |
+| Callback configuration        | Exact valid-signature fixture reaches the stable callback and returns `204`       | Metadata presence, a READY deployment or historic receipt             | Stable callback probe and exact deployment logs at `1f8600d`                     | Passed for ID/secret/path coherence only                  |
+| Disposition observability     | Each route result emits one safe exact disposition with no identity/content       | HTTP status alone or a neighbouring unit assertion                    | `channel-vertical.test.ts`; immutable signed probe and deployment-scoped log     | Passed at `310dc759…`                                     |
+| Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval, mode-`0600` mapping digest, metadata readback and immutable safe probe | Passed for new Preview mapping/deployment                 |
+| Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime dispositions and app owner mapping                                 | Failed; unsupportedService/authenticationRejected         |
+| Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory                | Passed                                                    |
 
 ### Read-only diagnosis review lenses
 
@@ -1425,7 +1447,7 @@ audit remains deferred until the complete SPEC is honestly terminal.
 | Tests and fixtures               | Change required | Direct route tests exercise every disposition/status class, accepted/retry controls, and participant/message leak sentinels; they do not prove provider traffic. |
 | SPEC, tasks and plan             | Change required | Record the approved new-principal decision, complete Preview overwrite, exact journey gates, result, and terminal-only audit.                                    |
 | Receipts                         | Change required | Retain only safe fingerprints, bounded metadata, exact status/disposition counts, deployment identity, rollback limitation, and non-claims.                      |
-| Rollout and rollback             | Change required | Preserve the current digest/topology before mutation; remove only a rollout-created Preview user after drain if any gate fails.                                  |
+| Rollout and rollback             | Change required | The 239-second drain and guarded delete restored the provider digest twice; retain the approved new Preview mapping/deployment and record irreversibility.       |
 | Lifecycle and archive pointers   | Preserve        | The SPEC/task/plan remain active; no completed/archive pointer changes; formal five-pass audit remains terminal-only.                                            |
 | Documentation audit inventory    | Preserve        | No docs/README path was added, moved, or removed; recompute the unchanged 195-path digest from the candidate.                                                    |
 
