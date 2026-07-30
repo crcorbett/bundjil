@@ -133,10 +133,19 @@ export const makeChannelEveChannel = <E>(
             const channel = yield* Channel;
             const decoded = yield* channel.decodeWebhook(request);
             if (decoded._tag === "Ignored") {
+              yield* Effect.logInfo("ChannelWebhookDisposition", {
+                webhookPath,
+                disposition: "ignored",
+                reason: decoded.reason,
+              });
               return { response: new Response(null, { status: 204 }) };
             }
             const prepared = yield* channel.prepareInbound(decoded.message);
             if (prepared._tag === "Duplicate") {
+              yield* Effect.logInfo("ChannelWebhookDisposition", {
+                webhookPath,
+                disposition: "duplicate",
+              });
               return { response: new Response(null, { status: 204 }) };
             }
             const background = Effect.gen(function* dispatchChannelInbound() {
@@ -154,34 +163,70 @@ export const makeChannelEveChannel = <E>(
               query["bundjil-proof"] === "retry-once"
             ) {
               yield* background;
+              yield* Effect.logInfo("ChannelWebhookDisposition", {
+                webhookPath,
+                disposition: "providerRetryRequested",
+              });
               return { response: new Response(null, { status: 503 }) };
             }
+            yield* Effect.logInfo("ChannelWebhookDisposition", {
+              webhookPath,
+              disposition: "acceptedForDispatch",
+            });
             return {
               background,
               response: new Response(null, { status: 202 }),
             };
           }).pipe(
             Effect.catchTags({
-              ChannelIdentityError: () =>
-                Effect.succeed({
-                  response: new Response(null, { status: 204 }),
-                }),
-              ChannelReplayError: () =>
-                Effect.succeed({
-                  response: new Response(null, { status: 503 }),
-                }),
-              ChannelRoutingError: () =>
-                Effect.succeed({
-                  response: new Response(null, { status: 503 }),
-                }),
+              ChannelIdentityError: (error) =>
+                Effect.logInfo("ChannelWebhookDisposition", {
+                  webhookPath,
+                  disposition: "identityRejected",
+                  reason: error.reason,
+                }).pipe(
+                  Effect.as({
+                    response: new Response(null, { status: 204 }),
+                  })
+                ),
+              ChannelReplayError: (error) =>
+                Effect.logWarning("ChannelWebhookDisposition", {
+                  webhookPath,
+                  disposition: "replayFailed",
+                  operation: error.operation,
+                }).pipe(
+                  Effect.as({
+                    response: new Response(null, { status: 503 }),
+                  })
+                ),
+              ChannelRoutingError: (error) =>
+                Effect.logWarning("ChannelWebhookDisposition", {
+                  webhookPath,
+                  disposition: "routingFailed",
+                  reason: error.reason,
+                }).pipe(
+                  Effect.as({
+                    response: new Response(null, { status: 503 }),
+                  })
+                ),
               ChannelWebhookAuthenticationError: () =>
-                Effect.succeed({
-                  response: new Response(null, { status: 401 }),
-                }),
+                Effect.logWarning("ChannelWebhookDisposition", {
+                  webhookPath,
+                  disposition: "authenticationRejected",
+                }).pipe(
+                  Effect.as({
+                    response: new Response(null, { status: 401 }),
+                  })
+                ),
               ChannelWebhookSchemaError: () =>
-                Effect.succeed({
-                  response: new Response(null, { status: 400 }),
-                }),
+                Effect.logWarning("ChannelWebhookDisposition", {
+                  webhookPath,
+                  disposition: "schemaRejected",
+                }).pipe(
+                  Effect.as({
+                    response: new Response(null, { status: 400 }),
+                  })
+                ),
             })
           )
         );

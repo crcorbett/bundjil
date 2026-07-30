@@ -613,6 +613,18 @@ redirect or body. That directly proves the deployed Preview callback ID,
 signing-secret custody and path are internally coherent; it does not explain
 the provider-originated `401` or prove an accepted message.
 
+The owning Channel adapter now requires a safe
+`ChannelWebhookDisposition` record for every returned route class. The record
+contains only the branded webhook path, a closed disposition literal and any
+applicable closed ignore/identity/routing reason or replay operation. Focused
+tests distinguish ignored, duplicate, identity rejection, authentication
+rejection, schema rejection, replay failure, routing failure, accepted
+dispatch and the provider-retry control, while proving that participant and
+message sentinels are absent. This repository correction removes status-only
+ambiguity for a later deployed callback; it does not retroactively classify
+the historical `204`/`401`, recover the write-only routing directory, or
+authorize another message.
+
 Authenticated Vercel API, CLI and dashboard reads then established that the
 sensitive Preview `BUNDJIL_CHANNEL_ROUTING_IDENTITIES` value is write-only:
 the API returned its metadata with no value, `vercel env pull` produced an
@@ -633,9 +645,11 @@ Source retains only `72cac9b5…`; Preview retains adopted user `46b1fb0c…` an
 callback `d2456774…`. The next slice must correct and deploy the owning Preview
 routing-identity configuration under separate Vercel authority before
 repeating the bounded inbound-first journey. It must not recreate the user or
-send until that configuration is proven to include the intended identity and
-an exact stable principal. The existing webhook configuration remains
-preserved. The task remains open and the terminal five-pass audit has not run.
+send until the disposition oracle is deployed, that configuration is proven
+to include the intended identity and an exact stable principal, and a new
+bounded message authority is recorded. The existing webhook configuration
+remains preserved. The task remains open and the terminal five-pass audit has
+not run.
 
 ## Canonical Schema and Effect contracts
 

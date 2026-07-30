@@ -320,13 +320,22 @@ duplicate suppression, Preview, Production, or durable process supervision.
    one Preview response, zero Production response, and exact same-event
    duplicate disposition. Two callbacks in one Photon project are forbidden
    because a project event fans out to every registered webhook.
-   Classify every exact route response before accepting the journey: `202` is
-   accepted dispatch, `204` is ignored/duplicate or disallowed identity, `401`
-   is webhook authentication failure, `400` is schema failure, and `503` is a
-   replay/routing failure or the admitted retry-once control. One `204` plus one
-   `401` does not prove a duplicate retry, even when Messages shows Delivered
-   and Production receives zero callbacks. Stop, preserve the status/time
-   metadata, drain, and remove only rollout-created failed topology.
+   Classify every exact route response and its matching
+   `ChannelWebhookDisposition` record before accepting the journey. The record
+   contains only the branded webhook path, a closed disposition literal, and,
+   where applicable, a closed ignore/identity/routing reason or replay
+   operation; it must not contain a participant, principal, message, provider
+   identity, signature, credential, URL query, or request content. `202` plus
+   `acceptedForDispatch` is accepted for background dispatch; `204` must be
+   exactly `ignored`, `duplicate`, or `identityRejected`; `401` must be
+   `authenticationRejected`; `400` must be `schemaRejected`; and `503` must be
+   `replayFailed`, `routingFailed`, or the admitted
+   `providerRetryRequested` control. Status alone is rejected as proof by
+   proxy. One `204` plus one `401` does not prove a duplicate retry, even when
+   Messages shows Delivered and Production receives zero callbacks. If the
+   deployed source predates this oracle or no matching record exists, stop,
+   preserve the status/time metadata, drain, and remove only rollout-created
+   failed topology.
    Current pricing lists cold outreach only for Business/Enterprise dedicated
    offerings; Free/Pro direct-messaging access is not proof of cold-outbound
    entitlement. Do not upgrade, buy a line, rotate credentials, recreate a

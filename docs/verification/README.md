@@ -135,7 +135,9 @@ operation nor asserts present provider state.
   Channel acceptance, guarded temporary-user cleanup, restored canonical
   inventory digest, exact signing-secret rollback limitation, final stable
   callback ID/secret/path proof, and the remaining write-only Preview
-  routing-directory plus canonical-principal boundary.
+  routing-directory plus canonical-principal boundary. Its current successor
+  slice adds an identity-free route-disposition oracle; that remains
+  repository-only until immutable deployment plus signed-log readback.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

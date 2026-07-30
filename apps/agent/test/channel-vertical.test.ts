@@ -2,14 +2,24 @@ import {
   ChannelOutboundText,
   ChannelSendAccepted,
   ChannelTransport,
+  ChannelWebhookAuthenticationError,
   ChannelWebhookResult,
+  ChannelWebhookSchemaError,
 } from "@bundjil/channel";
 import { layerMemory as ChannelTransportMemory } from "@bundjil/channel/memory";
 import { layerMemory as PhotonTransportMemory } from "@bundjil/photon/memory";
 import { layerMemory as SendblueTransportMemory } from "@bundjil/sendblue/memory";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
-import { Array, Effect, Layer, ManagedRuntime, Schema, pipe } from "effect";
+import {
+  Array,
+  Effect,
+  Layer,
+  Logger,
+  ManagedRuntime,
+  Schema,
+  pipe,
+} from "effect";
 import type { RouteHandlerArgs, Session } from "eve/channels";
 
 import {
@@ -17,9 +27,11 @@ import {
   ChannelAdapterState,
   ChannelIdentityMemory,
   ChannelLive,
+  ChannelReplayError,
   ChannelReplayMemory,
   ChannelRouter,
   ChannelRouterMemory,
+  ChannelRoutingError,
   EveChannelDispatch,
   EveChannelDispatchFailureMemory,
   EveChannelDispatchMemory,
@@ -31,6 +43,11 @@ import {
   ChannelReplayOptions,
 } from "../agent/lib/channel/schemas.js";
 import type { ChannelAdapterStateEncoded } from "../agent/lib/channel/schemas.js";
+
+const dispositionLogger = (messages: globalThis.Array<unknown>) =>
+  Logger.make(({ message }) => {
+    messages.push(message);
+  });
 
 const fixtures = Effect.gen(function* decodeChannelVerticalFixtures() {
   const webhook = yield* Schema.decodeEffect(ChannelWebhookResult)({
@@ -84,6 +101,14 @@ const channelLayer = fixtures.pipe(
     return ChannelLive.pipe(Layer.provide(dependencies));
   })
 );
+
+const makeObservedRuntime = <R, E>(
+  layer: Layer.Layer<R, E>,
+  messages: globalThis.Array<unknown>
+) =>
+  ManagedRuntime.make(
+    Layer.mergeAll(layer, Logger.layer([dispositionLogger(messages)]))
+  );
 
 const makeSession = (): Session => ({
   continuationToken: "channel:v1:photon:conversation-1",
@@ -316,7 +341,8 @@ it.effect(
     Effect.scoped(
       Effect.gen(function* testPhotonProviderRetryProof() {
         const layer = yield* channelLayer;
-        const runtime = ManagedRuntime.make(layer);
+        const messages: globalThis.Array<unknown> = [];
+        const runtime = makeObservedRuntime(layer, messages);
         yield* Effect.addFinalizer(() =>
           Effect.promise(() => runtime.dispose())
         );
@@ -354,6 +380,232 @@ it.effect(
         assert.strictEqual(first.status, 503);
         assert.strictEqual(retry.status, 204);
         assert.strictEqual(sendCount, 1);
+        assert.deepStrictEqual(messages, [
+          [
+            "ChannelWebhookDisposition",
+            {
+              webhookPath: "/eve/v1/photon/webhook",
+              disposition: "providerRetryRequested",
+            },
+          ],
+          [
+            "ChannelWebhookDisposition",
+            {
+              webhookPath: "/eve/v1/photon/webhook",
+              disposition: "duplicate",
+            },
+          ],
+        ]);
+        return yield* Effect.void;
+      })
+    )
+);
+
+it.effect(
+  "records distinct identity-free dispositions for each safe rejection",
+  () =>
+    Effect.scoped(
+      Effect.gen(function* testChannelWebhookDispositionObservability() {
+        const fixture = yield* fixtures;
+        const ignored = yield* Schema.decodeEffect(ChannelWebhookResult)({
+          _tag: "Ignored",
+          reason: "unsupportedEvent",
+        });
+        const untrusted = yield* Schema.decodeEffect(ChannelWebhookResult)({
+          _tag: "Accepted",
+          message: {
+            ...fixture.message,
+            conversation: {
+              ...fixture.message.conversation,
+              participantId: "participant-leak-sentinel",
+            },
+            text: "message-leak-sentinel",
+          },
+        });
+        const ignoredLayer = ChannelLive.pipe(
+          Layer.provide(
+            Layer.mergeAll(
+              ChannelTransportMemory({
+                webhook: ignored,
+                send: fixture.send,
+                presence: "accepted",
+              }),
+              ChannelIdentityMemory(fixture.identities),
+              ChannelRouterMemory,
+              ChannelReplayMemory(fixture.replay).pipe(
+                Layer.provide(PersistenceMemory)
+              )
+            )
+          )
+        );
+        const identityLayer = ChannelLive.pipe(
+          Layer.provide(
+            Layer.mergeAll(
+              ChannelTransportMemory({
+                webhook: untrusted,
+                send: fixture.send,
+                presence: "accepted",
+              }),
+              ChannelIdentityMemory(fixture.identities),
+              ChannelRouterMemory,
+              ChannelReplayMemory(fixture.replay).pipe(
+                Layer.provide(PersistenceMemory)
+              )
+            )
+          )
+        );
+        const authenticationLayer = Layer.succeed(
+          Channel,
+          Channel.of({
+            decodeWebhook: () =>
+              Effect.fail(
+                new ChannelWebhookAuthenticationError({
+                  provider: "photon",
+                  operation: "decodeWebhook",
+                  reason: "authentication",
+                  retry: "never",
+                })
+              ),
+            prepareInbound: () => Effect.die("not reached"),
+            completeInbound: () => Effect.void,
+            handleEvent: () => Effect.die("not reached"),
+          })
+        );
+        const schemaLayer = Layer.succeed(
+          Channel,
+          Channel.of({
+            decodeWebhook: () =>
+              Effect.fail(
+                new ChannelWebhookSchemaError({
+                  provider: "photon",
+                  operation: "decodeWebhook",
+                  reason: "invalidPayload",
+                  retry: "never",
+                })
+              ),
+            prepareInbound: () => Effect.die("not reached"),
+            completeInbound: () => Effect.void,
+            handleEvent: () => Effect.die("not reached"),
+          })
+        );
+        const replayLayer = Layer.succeed(
+          Channel,
+          Channel.of({
+            decodeWebhook: () => Effect.succeed(fixture.webhook),
+            prepareInbound: () =>
+              Effect.fail(new ChannelReplayError({ operation: "claim" })),
+            completeInbound: () => Effect.void,
+            handleEvent: () => Effect.die("not reached"),
+          })
+        );
+        const routingLayer = Layer.succeed(
+          Channel,
+          Channel.of({
+            decodeWebhook: () => Effect.succeed(fixture.webhook),
+            prepareInbound: () =>
+              Effect.fail(new ChannelRoutingError({ reason: "unavailable" })),
+            completeInbound: () => Effect.void,
+            handleEvent: () => Effect.die("not reached"),
+          })
+        );
+        const cases = [
+          {
+            expected: {
+              disposition: "ignored",
+              reason: "unsupportedEvent",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: ignoredLayer,
+            status: 204,
+          },
+          {
+            expected: {
+              disposition: "identityRejected",
+              reason: "notAllowed",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: identityLayer,
+            status: 204,
+          },
+          {
+            expected: {
+              disposition: "authenticationRejected",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: authenticationLayer,
+            status: 401,
+          },
+          {
+            expected: {
+              disposition: "schemaRejected",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: schemaLayer,
+            status: 400,
+          },
+          {
+            expected: {
+              disposition: "replayFailed",
+              operation: "claim",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: replayLayer,
+            status: 503,
+          },
+          {
+            expected: {
+              disposition: "routingFailed",
+              reason: "unavailable",
+              webhookPath: "/eve/v1/photon/webhook",
+            },
+            layer: routingLayer,
+            status: 503,
+          },
+        ] as const;
+
+        for (const testCase of cases) {
+          const messages: globalThis.Array<unknown> = [];
+          const runtime = makeObservedRuntime(testCase.layer, messages);
+          const definition = makeChannelEveChannel(
+            runtime,
+            "/eve/v1/photon/webhook",
+            "disabled"
+          );
+          const [route] = definition.routes;
+          if (route === undefined || route.transport === "websocket") {
+            return yield* Effect.die("Photon HTTP route required");
+          }
+          yield* Effect.addFinalizer(() =>
+            Effect.promise(() => runtime.dispose())
+          );
+          const response = yield* Effect.promise(() =>
+            route.handler(
+              new Request("https://example.invalid/eve/v1/photon/webhook"),
+              makeRouteArgs(
+                () => Promise.reject(new Error("send not expected")),
+                () => {
+                  throw new Error("background dispatch not expected");
+                }
+              )
+            )
+          );
+
+          assert.strictEqual(response.status, testCase.status);
+          assert.deepStrictEqual(messages, [
+            ["ChannelWebhookDisposition", testCase.expected],
+          ]);
+          const encodedMessages = yield* Schema.encodeEffect(
+            Schema.UnknownFromJsonString
+          )(messages);
+          assert.strictEqual(
+            encodedMessages.includes("participant-leak-sentinel"),
+            false
+          );
+          assert.strictEqual(
+            encodedMessages.includes("message-leak-sentinel"),
+            false
+          );
+        }
         return yield* Effect.void;
       })
     )
@@ -363,7 +615,8 @@ it.effect("keeps the Sendblue acknowledgement path proof-disabled", () =>
   Effect.scoped(
     Effect.gen(function* testSendblueRetryProofDisabled() {
       const layer = yield* channelLayer;
-      const runtime = ManagedRuntime.make(layer);
+      const messages: globalThis.Array<unknown> = [];
+      const runtime = makeObservedRuntime(layer, messages);
       yield* Effect.addFinalizer(() => Effect.promise(() => runtime.dispose()));
       const definition = makeChannelEveChannel(
         runtime,
@@ -395,6 +648,15 @@ it.effect("keeps the Sendblue acknowledgement path proof-disabled", () =>
       }
 
       assert.strictEqual(response.status, 202);
+      assert.deepStrictEqual(messages, [
+        [
+          "ChannelWebhookDisposition",
+          {
+            webhookPath: "/eve/v1/sendblue/webhook",
+            disposition: "acceptedForDispatch",
+          },
+        ],
+      ]);
       return yield* Effect.void;
     })
   )
