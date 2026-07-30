@@ -1486,6 +1486,57 @@ rollback slice, not the task: the provider/application contract mismatch,
 accepted Channel journey, same-event replay, response, typing, Production-zero
 proof, and terminal audit remain open.
 
+### Resumed provider-contract correction
+
+Current primary contracts identify the platform failure as a Bundjil literal
+defect. Pinned `@spectrum-ts/imessage@12.3.0` defines the cloud provider ID as
+lowercase `imessage`, and the current Photon provider guide agrees. The current
+webhook event example still uses `iMessage`, so that example is rejected as a
+proof-by-proxy for the installed platform contract. The owning ingress adapter
+will accept only exact `imessage` at all four positions; no case-folding or
+dual-literal compatibility is admitted.
+
+The second provider request remains unclassified. Photon documents timestamp
+and signature as the signature-verification inputs, and documents event plus
+webhook ID on normal delivery, but retained Photon/Vercel surfaces do not
+expose the historical request headers. The next repository slice therefore
+adds only closed missing-or-malformed classifications for each required header
+and exact-accepted/known-alternative/case-variant/unknown classification for a
+rejected platform. Values, payloads, identities, signatures, URLs and
+credentials remain forbidden. A deployed synthetic matrix is required before
+the newly approved bounded Preview qualification can consume another live
+event.
+
+| Requirement                      | Direct observable                                                                                        | Rejected plausible false green                                              | Focused command/evidence owner                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Exact platform contract          | All four decoded platform positions require exact lowercase `imessage`                                   | Webhook example display casing, case-folding, or accepting two spellings    | Pinned SDK/provider guide plus Photon transport fixtures; package/SPEC owners   |
+| Header cause classification      | Each header boundary reports only one exact header and `missing` or `malformed`                          | Aggregate `headers`, status `401`, signature guess, or retained raw value   | Photon transport fixture matrix and private diagnostic Schema                   |
+| Rejected-platform classification | A rejection reports only exact accepted, known alternative, case variant, or unknown                     | Logging the observed value or treating every non-match as SMS               | Photon transport fixture matrix and encoded sentinel-absence assertion          |
+| Hosted qualification eligibility | Immutable diagnostic deployment passes direct synthetic cases before one bounded Preview-only live event | Local suite, READY alone, historical `204`/`401`, or another handset marker | Deployment-scoped synthetic requests/logs; verification receipt and active plan |
+
+### Provider-contract correction docs-maintainer impact ledger
+
+| Surface                                                            | Status          | Decision and evidence                                                                                                                                                       |
+| ------------------------------------------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture, SPEC, tasks and active plan                          | Change required | Record exact lowercase `imessage` ownership, the still-unclassified second request, direct proof contract, authority and pending hosted qualification.                      |
+| READMEs, exports and generated references                          | Change required | Update the Photon README's private diagnostic and exact platform contract; preserve public exports and generated references.                                                |
+| Runbooks and authority                                             | Change required | Route the new Preview-first mutation/message authority through exact read-before-write, deployed-diagnostic, bounded-send, drain and retain-or-rollback gates.              |
+| Verification journeys and proof                                    | Change required | Record primary-contract conflict, proven Bundjil literal defect, value-free diagnostic coverage and remaining hosted/live non-claims.                                       |
+| Skills and AGENTS                                                  | Preserve        | Existing PRD, docs-maintainer, Effect client-wrapper and package-structure contracts cover this correction; no reusable skill or AGENTS change is evidenced.                |
+| Lint, config, commands and CI                                      | Preserve        | No command, config or CI surface changes; existing focused and complete repository gates remain mandatory.                                                                  |
+| Schemas, services, Layers, tests and fixtures                      | Change required | Correct only the private ingress literal/classifier and header decoding diagnostic; keep SDK/client/Layer/public service ownership unchanged and add direct negative tests. |
+| SPEC/tasks/plan, receipts, rollout, rollback and lifecycle/archive | Change required | Keep the task/plan open, update the receipt and proof replay, record zero provider mutation in this repository slice, preserve prior rollback, and defer terminal audit.    |
+| Documentation inventory                                            | Preserve        | No document or README path is added, moved or removed; inventory counts must be recomputed only if the docs check reports a structural change.                              |
+
+Strict Effect language-service diagnostics, Photon typecheck/build, all 38
+Photon tests, the 12-test cross-app Channel fixture, every routed policy gate,
+HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, all
+nine workspace typechecks, all 63 agent tests and all fifteen Turbo build/test
+tasks pass on the receipt-bearing candidate. Complete verification used only
+the documented process-local synthetic Executor fixture and made no provider
+request. Hosted deployment and live qualification remain separate pending
+evidence.
+
 ### Bounded retry docs-maintainer impact ledger
 
 | Surface                                                              | Status          | Decision and evidence                                                                                                                                                                           |

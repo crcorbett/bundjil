@@ -30,12 +30,19 @@ failures do not cross it. Webhook signing state is `ObservedUnknown` because
 list readback cannot recover the create-only secret.
 
 Webhook rejection diagnostics are also private to the transport adapter. Each
-authentication rejection records only the closed failed checkpoint
-(`headers`, `webhookId`, `timestamp`, or `signature`), and each unsupported
-iMessage payload records only the first closed platform checkpoint. Observed
-header and platform values, raw bodies, identities, signatures, URLs, and
-credentials never enter the record. This diagnostic Schema is intentionally
-absent from the package root and config exports.
+required-header rejection records only the exact header checkpoint and
+`missing` or `malformed`; later authentication checks record only `webhookId`,
+`timestamp`, or `signature`. Each unsupported payload records only the first
+closed platform checkpoint plus `knownAlternative`, `caseVariant`, or
+`unknown`. Observed header and platform values, raw bodies, identities,
+signatures, URLs, and credentials never enter the record. This diagnostic
+Schema is intentionally absent from the package root and config exports.
+
+The pinned cloud provider's canonical platform ID is exact lowercase
+`imessage`. The adapter requires that literal at the top-level space, message,
+sender, and nested message-space positions. It does not accept the display
+spelling `iMessage`, case-fold values, or admit the separate
+`local_imessage` provider.
 
 The existing bounded operator workflows remain internal and separately
 authority-gated. They may reconcile the Free managed-shared iMessage service,

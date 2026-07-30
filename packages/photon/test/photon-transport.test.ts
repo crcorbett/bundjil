@@ -31,10 +31,14 @@ import {
   PhotonConfig,
   PhotonMessagesWebhook,
   PhotonWebhookBodyLimitBytes,
+  PhotonWebhookPlatform,
   PhotonWebhookPayload,
 } from "../src/schemas.js";
 import { layerTransport } from "../src/transport.layer.js";
-import { PhotonWebhookBoundaryDiagnostic } from "../src/webhook-diagnostics.js";
+import {
+  classifyPhotonWebhookPlatform,
+  PhotonWebhookBoundaryDiagnostic,
+} from "../src/webhook-diagnostics.js";
 
 const webhookId = "60d6d04f-f9fa-4a7b-9c97-37c9c90ce91c";
 const webhookSecret = "test-photon-webhook-secret";
@@ -51,19 +55,19 @@ const fixtures = Effect.gen(function* decodePhotonFixtures() {
     event: "messages",
     space: {
       id: "opaque-space-1",
-      platform: "iMessage",
+      platform: "imessage",
       type: "dm",
       phone: "shared",
     },
     message: {
       id: "stable-message-1",
-      platform: "iMessage",
+      platform: "imessage",
       direction: "inbound",
       timestamp: "2026-07-21T12:00:00.000Z",
-      sender: { id: "+14155550100", platform: "iMessage" },
+      sender: { id: "+14155550100", platform: "imessage" },
       space: {
         id: "opaque-space-1",
-        platform: "iMessage",
+        platform: "imessage",
         type: "dm",
         phone: "shared",
       },
@@ -85,28 +89,41 @@ const fixtures = Effect.gen(function* decodePhotonFixtures() {
 const request = (
   body: string,
   options?: {
-    readonly event?: string;
-    readonly id?: string;
+    readonly event?: string | null;
+    readonly id?: string | null;
     readonly secret?: string;
-    readonly signature?: string;
-    readonly timestamp?: number;
+    readonly signature?: string | null;
+    readonly timestamp?: number | string | null;
   }
 ) => {
-  const timestamp = options?.timestamp ?? 0;
+  const timestamp =
+    options && "timestamp" in options ? options.timestamp : (0 as const);
+  const signingTimestamp = typeof timestamp === "number" ? timestamp : 0;
   const signature =
-    options?.signature ??
-    `v0=${createHmac("sha256", options?.secret ?? webhookSecret)
-      .update(`v0:${timestamp}:${body}`)
-      .digest("hex")}`;
+    options && "signature" in options
+      ? options.signature
+      : `v0=${createHmac("sha256", options?.secret ?? webhookSecret)
+          .update(`v0:${signingTimestamp}:${body}`)
+          .digest("hex")}`;
+  const headers = new Headers({ "content-type": "application/json" });
+  const event =
+    options && "event" in options ? options.event : ("messages" as const);
+  const id = options && "id" in options ? options.id : webhookId;
+  if (event !== null) {
+    headers.set("x-spectrum-event", event);
+  }
+  if (id !== null) {
+    headers.set("x-spectrum-webhook-id", id);
+  }
+  if (timestamp !== null) {
+    headers.set("x-spectrum-timestamp", String(timestamp));
+  }
+  if (signature !== null) {
+    headers.set("x-spectrum-signature", signature);
+  }
   return new Request("https://example.invalid/photon", {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-spectrum-event": options?.event ?? "messages",
-      "x-spectrum-signature": signature,
-      "x-spectrum-timestamp": String(timestamp),
-      "x-spectrum-webhook-id": options?.id ?? webhookId,
-    },
+    headers,
     body,
   });
 };
@@ -191,10 +208,49 @@ it.effect(
       const fixture = yield* fixtures;
       const cases = [
         {
-          checkpoint: "headers",
-          webhookRequest: new Request("https://example.invalid/photon", {
-            method: "POST",
-            body: fixture.encodedWebhook,
+          checkpoint: "eventHeader",
+          classification: "missing",
+          webhookRequest: request(fixture.encodedWebhook, { event: null }),
+        },
+        {
+          checkpoint: "eventHeader",
+          classification: "malformed",
+          webhookRequest: request(fixture.encodedWebhook, { event: "" }),
+        },
+        {
+          checkpoint: "webhookIdHeader",
+          classification: "missing",
+          webhookRequest: request(fixture.encodedWebhook, { id: null }),
+        },
+        {
+          checkpoint: "webhookIdHeader",
+          classification: "malformed",
+          webhookRequest: request(fixture.encodedWebhook, {
+            id: "header-leak-sentinel",
+          }),
+        },
+        {
+          checkpoint: "timestampHeader",
+          classification: "missing",
+          webhookRequest: request(fixture.encodedWebhook, { timestamp: null }),
+        },
+        {
+          checkpoint: "timestampHeader",
+          classification: "malformed",
+          webhookRequest: request(fixture.encodedWebhook, {
+            timestamp: "not-a-timestamp",
+          }),
+        },
+        {
+          checkpoint: "signatureHeader",
+          classification: "missing",
+          webhookRequest: request(fixture.encodedWebhook, { signature: null }),
+        },
+        {
+          checkpoint: "signatureHeader",
+          classification: "malformed",
+          webhookRequest: request(fixture.encodedWebhook, {
+            signature: "not-a-signature",
           }),
         },
         {
@@ -215,11 +271,11 @@ it.effect(
         },
       ] as const;
 
-      for (const { checkpoint, webhookRequest } of cases) {
+      for (const testCase of cases) {
         const messages: globalThis.Array<unknown> = [];
         const error = yield* Effect.gen(function* decodeWebhook() {
           const transport = yield* ChannelTransport;
-          return yield* transport.decodeWebhook(webhookRequest);
+          return yield* transport.decodeWebhook(testCase.webhookRequest);
         }).pipe(
           Effect.provide(
             Layer.mergeAll(
@@ -234,16 +290,60 @@ it.effect(
           Schema.is(ChannelWebhookAuthenticationError)(error),
           true
         );
+        const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type =
+          "classification" in testCase
+            ? {
+                disposition: "authenticationRejected",
+                checkpoint: testCase.checkpoint,
+                classification: testCase.classification,
+              }
+            : {
+                disposition: "authenticationRejected",
+                checkpoint: testCase.checkpoint,
+              };
         assert.deepStrictEqual(messages, [
-          [
-            "PhotonWebhookBoundaryDisposition",
-            {
-              disposition: "authenticationRejected",
-              checkpoint,
-            } satisfies typeof PhotonWebhookBoundaryDiagnostic.Type,
-          ],
+          ["PhotonWebhookBoundaryDisposition", diagnostic],
         ]);
+        const encodedDiagnostic = yield* Schema.encodeEffect(
+          Schema.fromJsonString(
+            Schema.Tuple([
+              Schema.Literal("PhotonWebhookBoundaryDisposition"),
+              PhotonWebhookBoundaryDiagnostic,
+            ])
+          )
+        )(["PhotonWebhookBoundaryDisposition", diagnostic]);
+        assert.strictEqual(
+          encodedDiagnostic.includes("header-leak-sentinel"),
+          false
+        );
       }
+    })
+);
+
+it.effect(
+  "classifies platform contracts without retaining unknown values",
+  () =>
+    Effect.sync(() => {
+      assert.strictEqual(
+        classifyPhotonWebhookPlatform(PhotonWebhookPlatform.make("imessage")),
+        "exactAccepted"
+      );
+      assert.strictEqual(
+        classifyPhotonWebhookPlatform(
+          PhotonWebhookPlatform.make("local_imessage")
+        ),
+        "knownAlternative"
+      );
+      assert.strictEqual(
+        classifyPhotonWebhookPlatform(PhotonWebhookPlatform.make("iMessage")),
+        "caseVariant"
+      );
+      assert.strictEqual(
+        classifyPhotonWebhookPlatform(
+          PhotonWebhookPlatform.make("platform-leak-sentinel")
+        ),
+        "unknown"
+      );
     })
 );
 
@@ -285,14 +385,14 @@ it.effect("records the exact closed iMessage platform checkpoint", () =>
       ...messagesWebhook,
       space: {
         ...messagesWebhook.space,
-        platform: "platform-leak-sentinel",
+        platform: PhotonWebhookPlatform.make("platform-leak-sentinel"),
       },
     });
     const messagePlatform = yield* encode({
       ...messagesWebhook,
       message: {
         ...messagesWebhook.message,
-        platform: "platform-leak-sentinel",
+        platform: PhotonWebhookPlatform.make("platform-leak-sentinel"),
       },
     });
     const senderPlatform = yield* encode({
@@ -301,7 +401,7 @@ it.effect("records the exact closed iMessage platform checkpoint", () =>
         ...messagesWebhook.message,
         sender: {
           ...messagesWebhook.message.sender,
-          platform: "platform-leak-sentinel",
+          platform: PhotonWebhookPlatform.make("platform-leak-sentinel"),
         },
       },
     });
@@ -311,18 +411,58 @@ it.effect("records the exact closed iMessage platform checkpoint", () =>
         ...messagesWebhook.message,
         space: {
           ...messagesWebhook.message.space,
-          platform: "platform-leak-sentinel",
+          platform: PhotonWebhookPlatform.make("platform-leak-sentinel"),
         },
       },
     });
+    const caseVariantPlatform = yield* encode({
+      ...messagesWebhook,
+      space: {
+        ...messagesWebhook.space,
+        platform: PhotonWebhookPlatform.make("iMessage"),
+      },
+    });
+    const knownAlternativePlatform = yield* encode({
+      ...messagesWebhook,
+      space: {
+        ...messagesWebhook.space,
+        platform: PhotonWebhookPlatform.make("local_imessage"),
+      },
+    });
     const cases = [
-      { body: spacePlatform, checkpoint: "spacePlatform" },
-      { body: messagePlatform, checkpoint: "messagePlatform" },
-      { body: senderPlatform, checkpoint: "senderPlatform" },
-      { body: messageSpacePlatform, checkpoint: "messageSpacePlatform" },
+      {
+        body: spacePlatform,
+        checkpoint: "spacePlatform",
+        classification: "unknown",
+      },
+      {
+        body: messagePlatform,
+        checkpoint: "messagePlatform",
+        classification: "unknown",
+      },
+      {
+        body: senderPlatform,
+        checkpoint: "senderPlatform",
+        classification: "unknown",
+      },
+      {
+        body: messageSpacePlatform,
+        checkpoint: "messageSpacePlatform",
+        classification: "unknown",
+      },
+      {
+        body: caseVariantPlatform,
+        checkpoint: "spacePlatform",
+        classification: "caseVariant",
+      },
+      {
+        body: knownAlternativePlatform,
+        checkpoint: "spacePlatform",
+        classification: "knownAlternative",
+      },
     ] as const;
 
-    for (const { body, checkpoint } of cases) {
+    for (const { body, checkpoint, classification } of cases) {
       const messages: globalThis.Array<unknown> = [];
       const result = yield* Effect.gen(function* decodeWebhook() {
         const transport = yield* ChannelTransport;
@@ -346,6 +486,7 @@ it.effect("records the exact closed iMessage platform checkpoint", () =>
           {
             disposition: "unsupportedService",
             checkpoint,
+            classification,
           } satisfies typeof PhotonWebhookBoundaryDiagnostic.Type,
         ],
       ]);

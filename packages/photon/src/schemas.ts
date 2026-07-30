@@ -72,9 +72,11 @@ export const PhotonConfig = Schema.Struct({
 export type PhotonConfig = typeof PhotonConfig.Type;
 export type PhotonConfigEncoded = typeof PhotonConfig.Encoded;
 
-const PhotonWebhookEvent = Schema.NonEmptyString;
+export const PhotonWebhookEvent = Schema.NonEmptyString;
 const PhotonWebhookSpaceId = Schema.NonEmptyString;
-const PhotonWebhookPlatform = Schema.NonEmptyString;
+export const PhotonWebhookPlatform = Schema.NonEmptyString.pipe(
+  Schema.brand("@bundjil/photon/PhotonWebhookPlatform")
+);
 const PhotonWebhookSpaceType = Schema.NonEmptyString;
 const PhotonWebhookSpacePhone = Schema.NonEmptyString;
 const PhotonWebhookMessageId = Schema.NonEmptyString;
@@ -84,12 +86,12 @@ const PhotonWebhookSenderId = Schema.NonEmptyString;
 const PhotonWebhookText = Schema.String;
 const PhotonSdkMessageId = Schema.NonEmptyString;
 
-const PhotonWebhookTimestamp = Schema.NumberFromString.pipe(
+export const PhotonWebhookTimestamp = Schema.NumberFromString.pipe(
   Schema.check(Schema.isInt()),
   Schema.check(Schema.isGreaterThanOrEqualTo(0))
 );
 
-const PhotonWebhookSignature = Schema.String.check(
+export const PhotonWebhookSignature = Schema.String.check(
   Schema.isPattern(/^v0=[0-9a-f]{64}$/)
 );
 

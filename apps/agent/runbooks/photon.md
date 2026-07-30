@@ -284,6 +284,17 @@ duplicate suppression, Preview, Production, or durable process supervision.
    project/webhook/deployment fingerprints, timestamps, the two closed
    checkpoints and HTTP classes; it must not include the message, phone,
    assigned line, provider payload, header values, signature or credential.
+   The resumed diagnosis proves that pinned `@spectrum-ts/imessage@12.3.0`
+   owns exact lowercase platform ID `imessage`; correct and deploy that owner
+   boundary first. Cooper's latest authority then permits the minimum
+   Preview-only shared-user reconciliation and bounded message needed for
+   live qualification. Before that write, require two matching inventories,
+   unchanged source/Production topology, exact Preview callback/deployment
+   identity, and deployed value-free header/platform diagnostics. Keep the
+   send count bounded, require explicit iMessage, observe the retry horizon,
+   and retain a passing topology or delete only the rollout-created failed
+   user after exact readback. A materially broader or irreversible action
+   remains a report-before-execute stop.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
@@ -372,10 +383,17 @@ duplicate suppression, Preview, Production, or durable process supervision.
    When the Photon adapter returns `ignored/unsupportedService`, require one
    matching `PhotonWebhookBoundaryDisposition` naming only the first failed
    platform checkpoint: `spacePlatform`, `messagePlatform`,
-   `senderPlatform`, or `messageSpacePlatform`. When it returns
-   `authenticationRejected`, require exactly one of `headers`, `webhookId`,
-   `timestamp`, or `signature`. The record must never contain the observed
-   value, request body, header, identity, signature, URL, or credential.
+   `senderPlatform`, or `messageSpacePlatform`, plus only
+   `knownAlternative`, `caseVariant`, or `unknown`. Pinned
+   `@spectrum-ts/imessage@12.3.0` and the current provider guide define exact
+   accepted platform ID `imessage`; the current webhook example's `iMessage`
+   spelling is a conflicting example, not an accepted compatibility literal.
+   When the adapter returns `authenticationRejected`, a required-header
+   failure must name exactly `eventHeader`, `webhookIdHeader`,
+   `timestampHeader`, or `signatureHeader` plus `missing` or `malformed`.
+   Later verification failures name only `webhookId`, `timestamp`, or
+   `signature`. The record must never contain the observed value, request body,
+   header, identity, signature, URL, or credential.
    A checkpoint localizes the owning boundary only; it does not authorize
    case-folding, accepting SMS, changing a signing secret, or replaying a real
    message.

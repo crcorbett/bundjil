@@ -730,6 +730,29 @@ create or send is ineligible without Photon/provider evidence resolving both
 closed checkpoints and a separately bounded authority. The accepted Channel
 journey and terminal five-pass audit remain open.
 
+The resumed provider-contract diagnosis establishes one repository defect and
+one still-unclassified provider request. The pinned
+`@spectrum-ts/imessage@12.3.0` cloud provider owns platform ID `imessage`, and
+Photon's current provider guide states that same lowercase ID. The current
+webhook event example still shows `iMessage`; that documentation conflict
+cannot override the installed owner contract plus the repeated live
+`spacePlatform` rejection. The Photon ingress owner must therefore accept only
+exact lowercase `imessage` at all four platform positions. It must not
+case-fold or retain the legacy display spelling.
+
+The separate `headers` rejection is not evidence that signature verification,
+the webhook secret, or a particular required header failed. Current primary
+material says Spectrum signature verification requires timestamp, signature
+and raw body, while the delivery contract also documents event and webhook ID
+headers. Neither Photon management nor retained Vercel logs expose the
+historical request headers. Before another provider event, replace the
+aggregate checkpoint with a private closed classification for the exact
+missing or malformed required header and classify a rejected platform only as
+exact accepted, known alternative, case variant or unknown. Never log a header
+value, platform value, payload, identity, signature, URL or credential. Deploy
+and prove that diagnostic before using the newly approved bounded Preview
+qualification authority.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.

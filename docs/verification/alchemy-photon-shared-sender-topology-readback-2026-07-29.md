@@ -3,8 +3,8 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T04:14:14.776Z
-artifact_git_identity: 654c5ac23e3b5095d7742935a2d52bbf9f9273ea
+observed_at: 2026-07-30T09:06:37Z
+artifact_git_identity: 80a957024f872822e866c294fcd160b18b16e841
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
@@ -228,6 +228,39 @@ provider-value leak sentinel. This evidence does not retroactively classify
 the historical requests, authorize a provider retry, prove Photon-originated
 ingress, or satisfy the Channel journey.
 
+## Resumed provider-contract diagnosis
+
+The pinned installed SDK resolves the platform failure without retaining the
+historical value. `@spectrum-ts/imessage@12.3.0` defines its provider as exact
+lowercase `imessage`, and Photon's current provider guide states that cloud
+iMessage uses that ID. Photon's current webhook event example still spells
+the field `iMessage`. The example and installed provider contract therefore
+conflict; the installed owner contract plus the repeated `spacePlatform`
+rejection makes Bundjil's exact `iMessage` check defective. The corrected
+adapter accepts only `imessage` at all four positions and does not case-fold or
+accept both spellings.
+
+The separate provider-originated `401` remains unclassified. Photon's current
+signature contract requires timestamp, signature and exact body bytes, while
+the delivery contract also documents event and webhook-ID headers. Photon
+management exposes no delivery-attempt metadata, and retained Vercel logs
+contain no header presence. The repository correction therefore does not
+guess a missing header or change signature policy. It replaces aggregate
+`headers` with exact required-header plus `missing|malformed`, and classifies a
+rejected platform only as `knownAlternative|caseVariant|unknown`. Direct
+fixtures cover all eight header presence/shape properties, all later
+authentication checks, all four platform positions and all four platform
+classes. Schema encoding rejects explicit header/platform leak sentinels.
+Effect language-service diagnostics report zero findings; Photon typecheck and
+all 38 package tests pass. The exact receipt-bearing candidate also passes
+boundaries, docs, skills, authority, controls, verification policy, HGI-307,
+90 tooling tests, type-aware format/lint, the lint fixture, Knip, all nine
+workspace typechecks, all 63 agent tests, all 38 Photon tests and all fifteen
+Turbo build/test tasks with only the process-local synthetic Executor fixture.
+Deployment and a new provider event remain pending, so the exact cause of the
+second request, accepted ingress, Eve response, duplicate, typing and
+environment-isolated Production-zero behavior are not claimed.
+
 ## Approved bounded journey retry
 
 Cooper approved the exact proposed retry envelope in this Codex thread on
@@ -439,4 +472,5 @@ open, and the single terminal five-pass audit has not run.
 - [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)
 - [Photon webhook troubleshooting](https://photon.codes/docs/webhooks/troubleshooting)
 - [Photon webhook events and project fan-out](https://photon.codes/docs/webhooks/events)
+- [Photon Spectrum provider IDs](https://photon.codes/docs/spectrum-ts/providers)
 - [Dual-Channel Production acceptance receipt](channel-production-accepted-2026-07-23.md)

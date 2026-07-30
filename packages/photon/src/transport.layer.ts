@@ -21,13 +21,20 @@ import { Clock, Effect, Layer, Option, Redacted, Schema } from "effect";
 import { PhotonClient } from "./client.js";
 import {
   PhotonWebhookBodyLimitBytes,
-  PhotonWebhookHeaders,
+  PhotonWebhookEvent,
   PhotonMessagesWebhook,
   PhotonWebhookPayload,
+  PhotonWebhookSignature,
+  PhotonWebhookTimestamp,
   PhotonTextContent,
+  PhotonWebhookId,
 } from "./schemas.js";
-import type { PhotonConfig } from "./schemas.js";
-import type { PhotonWebhookBoundaryDiagnostic } from "./webhook-diagnostics.js";
+import type { PhotonConfig, PhotonWebhookHeaders } from "./schemas.js";
+import { classifyPhotonWebhookPlatform } from "./webhook-diagnostics.js";
+import type {
+  PhotonWebhookBoundaryDiagnostic,
+  PhotonWebhookPlatformClassification,
+} from "./webhook-diagnostics.js";
 
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
 const acceptedPresence: ChannelPresenceResultType = "accepted";
@@ -41,10 +48,7 @@ const authenticationError = () =>
   });
 
 const authenticationFailure = (
-  checkpoint: Extract<
-    typeof PhotonWebhookBoundaryDiagnostic.Type,
-    { readonly disposition: "authenticationRejected" }
-  >["checkpoint"]
+  checkpoint: "webhookId" | "timestamp" | "signature"
 ) => {
   const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type = {
     disposition: "authenticationRejected",
@@ -55,15 +59,43 @@ const authenticationFailure = (
   );
 };
 
+const authenticationHeaderFailure = (
+  checkpoint: Extract<
+    typeof PhotonWebhookBoundaryDiagnostic.Type,
+    {
+      readonly disposition: "authenticationRejected";
+      readonly classification: unknown;
+    }
+  >["checkpoint"],
+  classification: Extract<
+    typeof PhotonWebhookBoundaryDiagnostic.Type,
+    {
+      readonly disposition: "authenticationRejected";
+      readonly classification: unknown;
+    }
+  >["classification"]
+) => {
+  const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type = {
+    disposition: "authenticationRejected",
+    checkpoint,
+    classification,
+  };
+  return Effect.logWarning("PhotonWebhookBoundaryDisposition", diagnostic).pipe(
+    Effect.andThen(Effect.fail(authenticationError()))
+  );
+};
+
 const unsupportedService = (
   checkpoint: Extract<
     typeof PhotonWebhookBoundaryDiagnostic.Type,
     { readonly disposition: "unsupportedService" }
-  >["checkpoint"]
+  >["checkpoint"],
+  classification: Exclude<PhotonWebhookPlatformClassification, "exactAccepted">
 ): Effect.Effect<ChannelWebhookResultType> => {
   const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type = {
     disposition: "unsupportedService",
     checkpoint,
+    classification,
   };
   return Effect.logInfo("PhotonWebhookBoundaryDisposition", diagnostic).pipe(
     Effect.as(
@@ -109,14 +141,60 @@ export const layerTransport = (config: PhotonConfig) =>
       return ChannelTransport.of({
         decodeWebhook: Effect.fn("PhotonTransport.decodeWebhook")(
           function* (request) {
-            const headers = yield* Schema.decodeUnknownEffect(
-              PhotonWebhookHeaders
-            )({
-              event: request.headers.get("x-spectrum-event"),
-              webhookId: request.headers.get("x-spectrum-webhook-id"),
-              timestamp: request.headers.get("x-spectrum-timestamp"),
-              signature: request.headers.get("x-spectrum-signature"),
-            }).pipe(Effect.catch(() => authenticationFailure("headers")));
+            const event = yield* Schema.decodeUnknownEffect(PhotonWebhookEvent)(
+              request.headers.get("x-spectrum-event")
+            ).pipe(
+              Effect.catch(() =>
+                authenticationHeaderFailure(
+                  "eventHeader",
+                  request.headers.has("x-spectrum-event")
+                    ? "malformed"
+                    : "missing"
+                )
+              )
+            );
+            const webhookId = yield* Schema.decodeUnknownEffect(
+              PhotonWebhookId
+            )(request.headers.get("x-spectrum-webhook-id")).pipe(
+              Effect.catch(() =>
+                authenticationHeaderFailure(
+                  "webhookIdHeader",
+                  request.headers.has("x-spectrum-webhook-id")
+                    ? "malformed"
+                    : "missing"
+                )
+              )
+            );
+            const timestamp = yield* Schema.decodeUnknownEffect(
+              PhotonWebhookTimestamp
+            )(request.headers.get("x-spectrum-timestamp")).pipe(
+              Effect.catch(() =>
+                authenticationHeaderFailure(
+                  "timestampHeader",
+                  request.headers.has("x-spectrum-timestamp")
+                    ? "malformed"
+                    : "missing"
+                )
+              )
+            );
+            const signature = yield* Schema.decodeUnknownEffect(
+              PhotonWebhookSignature
+            )(request.headers.get("x-spectrum-signature")).pipe(
+              Effect.catch(() =>
+                authenticationHeaderFailure(
+                  "signatureHeader",
+                  request.headers.has("x-spectrum-signature")
+                    ? "malformed"
+                    : "missing"
+                )
+              )
+            );
+            const headers: typeof PhotonWebhookHeaders.Type = {
+              event,
+              webhookId,
+              timestamp,
+              signature,
+            };
             if (headers.webhookId !== config.webhookId) {
               return yield* authenticationFailure("webhookId");
             }
@@ -160,17 +238,38 @@ export const layerTransport = (config: PhotonConfig) =>
               }
               return { _tag: "Ignored", reason: "unsupportedEvent" };
             }
-            if (payload.space.platform !== "iMessage") {
-              return yield* unsupportedService("spacePlatform");
+            const spacePlatform = classifyPhotonWebhookPlatform(
+              payload.space.platform
+            );
+            if (spacePlatform !== "exactAccepted") {
+              return yield* unsupportedService("spacePlatform", spacePlatform);
             }
-            if (payload.message.platform !== "iMessage") {
-              return yield* unsupportedService("messagePlatform");
+            const messagePlatform = classifyPhotonWebhookPlatform(
+              payload.message.platform
+            );
+            if (messagePlatform !== "exactAccepted") {
+              return yield* unsupportedService(
+                "messagePlatform",
+                messagePlatform
+              );
             }
-            if (payload.message.sender.platform !== "iMessage") {
-              return yield* unsupportedService("senderPlatform");
+            const senderPlatform = classifyPhotonWebhookPlatform(
+              payload.message.sender.platform
+            );
+            if (senderPlatform !== "exactAccepted") {
+              return yield* unsupportedService(
+                "senderPlatform",
+                senderPlatform
+              );
             }
-            if (payload.message.space.platform !== "iMessage") {
-              return yield* unsupportedService("messageSpacePlatform");
+            const messageSpacePlatform = classifyPhotonWebhookPlatform(
+              payload.message.space.platform
+            );
+            if (messageSpacePlatform !== "exactAccepted") {
+              return yield* unsupportedService(
+                "messageSpacePlatform",
+                messageSpacePlatform
+              );
             }
             if (
               payload.message.space.id !== payload.space.id ||
