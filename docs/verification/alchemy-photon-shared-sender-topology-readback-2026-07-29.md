@@ -513,6 +513,36 @@ provider retry, duplicate `204`, one total response, and the retry horizon, the
 stable binding must be restored and proved before deleting only the temporary
 callback. Production remains unchanged.
 
+The retry deployment `87YLdwPi…` at source `8f3076c…` reached READY with the
+branch alias and passed one signed `ignored/unsupportedEvent` probe. Computer
+Use then proved exact sender and recipient fingerprints, an
+`iMessage`/Encrypted composer, one outgoing proof fingerprint `6cafe0e7…`,
+Delivered, and no SMS.
+
+The accepted provider event returned one intentional
+`503 providerRetryRequested`. Photon redelivered the same event and the replay
+owner returned one `204 duplicate`. Project-wide runtime readback recorded one
+workflow, one direct-Space resolution sequence, typing start/stop, one outbound
+`sendMessage`, resource releases, and final workflow `200`. The retained old
+callback's event failed closed at `webhookId`; two independent request rows
+failed at `eventHeader/missing`. Those rejection classes produced no dispatch.
+
+The Messages observer still showed zero inbound response rows after the
+provider send. No additional callback or workflow appeared through 225 seconds
+after the duplicate. The exact claim is therefore:
+
+- accepted signed ingress, one Eve workflow, typing operations, one provider
+  send, same-event retry, and duplicate suppression are proved;
+- handset response delivery is not proved; and
+- the Preview topology is not eligible for stable retention.
+
+The original stable callback values are restored in Vercel metadata from
+retained ignored custody. Both provider callbacks and both mode-`0600`
+artifacts remain pending an immutable restoration deployment and signed probe.
+After that probe, cleanup must delete only the temporary retry callback and
+rollout user `8c3ce2b0…`, then require two inventories matching baseline
+`9e6108d5…`.
+
 ## Sources
 
 - [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)

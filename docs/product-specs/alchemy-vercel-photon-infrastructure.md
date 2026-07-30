@@ -1729,3 +1729,23 @@ cutover deployment, one bounded provider retry journey, the full retry
 horizon, stable-binding restoration, and exact temporary-callback deletion
 all pass. This is in-progress provider evidence, not terminal SPEC proof; the
 formal five-pass audit has not run.
+
+The retry-controlled deployment `87YLdwPi…` at source `8f3076c…` passed an
+exact signed unsupported-event probe before use. One additional bounded
+iMessage proof `6cafe0e7…` was Delivered. Its accepted event completed exactly
+once and returned the intentional `503 providerRetryRequested`; Photon then
+redelivered the same event into one `204 duplicate`. Project-wide runtime
+readback contained one workflow, one typing sequence, one outbound send, and
+one final workflow `200`. Requests from the retained old callback failed closed
+at `webhookId`; the independent provider request class again failed at
+`eventHeader/missing`. Neither class dispatched work.
+
+The Messages observer still showed zero inbound response rows after the
+provider send, so handset response delivery remains unproved. No further
+provider callback or workflow appeared through 225 seconds after the duplicate.
+The acceptance gate therefore requires rollback rather than stable retention.
+The original four sensitive Preview callback values have been restored in
+Vercel metadata from retained custody; both provider callbacks and both
+mode-`0600` artifacts remain until an immutable restoration deployment passes
+signed ingress. Only then may cleanup delete the temporary retry callback and
+rollout user `8c3ce2b0…`.

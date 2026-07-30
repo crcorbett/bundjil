@@ -1710,3 +1710,22 @@ After the retry horizon, restore the stable binding, deploy and prove it,
 delete only the temporary callback, and either retain the stable Preview user
 after every acceptance gate or delete only `8c3ce2b0…` on failure. Production
 remains unchanged. The terminal five-pass audit remains deferred.
+
+The retry deployment `87YLdwPi…` at source `8f3076c…` passed signed safe
+ingress. Proof `6cafe0e7…` was an explicit Delivered iMessage. Its valid event
+produced one `503 providerRetryRequested`, then one same-event
+`204 duplicate`; one workflow recorded one start/stop typing sequence, one
+outbound send, releases, and final `200`. The retained old callback produced
+only an expected `webhookId` rejection during cutover, while the independent
+provider request class again produced `eventHeader/missing`. Neither failure
+dispatched.
+
+No inbound agent-response row appeared in Messages, and no further callback or
+workflow appeared through the 225-second horizon. Provider acceptance,
+same-event duplicate suppression, typing operations, and one outbound send are
+proved; handset response delivery is not. The retention gate therefore fails
+closed. Vercel metadata now again contains the original stable callback values.
+The next exact commit/deployment must pass signed stable ingress before cleanup
+deletes only the temporary callback and rollout user, preserves the adopted
+Preview user and source topology, and restores baseline digest `9e6108d5…`
+twice.
