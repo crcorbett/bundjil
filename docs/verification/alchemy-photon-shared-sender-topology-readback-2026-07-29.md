@@ -600,6 +600,32 @@ destination, unchanged source binding and unchanged stable callback. No second
 model call is required. Downstream work and the terminal five-pass audit remain
 pending.
 
+## Stable retention correction
+
+Two pre-write candidate manifests matched baseline digest `9e6108d5…` and
+proved controlled sender `82ac258d…` source-bound, Preview-unbound and
+Preview-available. One owner reconciliation created only Preview user
+`b95e88f6…`; the provider reused qualified destination `0809669f…`. The
+source user/destination, adopted Preview user/destination, Preview callback,
+service and platform were byte-for-byte unchanged under their fingerprint
+manifests.
+
+Two post-write candidate commands at `2026-07-30T13:00Z` each completed two
+sequential source/Preview reads. All four observations matched manifest digest
+`76f0b5c9279d0d60c75529df096e6e84507e896f41dfc2edae937e5f51a9df81`.
+A second reconciliation at `2026-07-30T13:01:44.505Z` returned `adopted`,
+with two Preview users before and after and assignment present. This directly
+proves create-once, read-after-write convergence and semantic no-op adoption.
+
+The retained destination fingerprint is identical to the ingress destination
+used by proof correlations `623a3978…` and `6cafe0e7…`; their signed ingress,
+single Eve dispatch, outbound response, typing, intentional retry, duplicate
+suppression and handset receipt therefore qualify the retained binding without
+another message or model call. Production, Vercel, callbacks, credentials,
+billing and dedicated lines were not mutated. The isolated Preview task is
+accepted; exact outbound-origin choice remains provider-managed and is not
+promoted to a stable cross-project guarantee.
+
 The exact rollback receipt candidate passed strict Effect language-service
 diagnostics; 19 focused Photon transport/reconciliation tests; the exact
 12-test Channel fixture; every boundary, documentation, skill, authority,

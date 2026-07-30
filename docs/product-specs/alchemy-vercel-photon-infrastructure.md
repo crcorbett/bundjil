@@ -1795,3 +1795,31 @@ shared-sender Preview binding is re-adopted and two fresh inventories prove its
 stable identity, distinct ingress destination, unchanged source binding and
 unchanged callback. Later SPEC tasks remain pending, and the terminal five-pass
 audit has not run.
+
+## 2026-07-30 stable Preview retention
+
+The pre-write candidate manifest matched baseline digest `9e6108d5…` twice and
+proved sender `82ac258d…` source-bound, Preview-unbound and Preview-available.
+One owner reconciliation then created Preview user `b95e88f6…`; Photon reused
+the previously qualified destination `0809669f…`. The source user
+`020cc192…` and destination `d4039779…`, adopted Preview user `46b1fb0c…`
+and destination `db49756e…`, stable Preview callback `d2456774…`, shared
+service and enabled iMessage platform remained unchanged.
+
+Two post-write candidate commands, each containing two sequential complete
+reads, matched manifest digest `76f0b5c9…` at `2026-07-30T13:00Z`. A second
+reconciliation returned `adopted` with two users before and after, proving
+semantic no-op convergence without another create. Because the retained
+destination is the exact `0809669f…` route used by both already accepted
+correlated handset journeys, the stable-retention gate does not repeat an Eve
+model call or provider message.
+
+The isolated Preview task is accepted. Its direct observables are the exact
+provider create/readback, matching four-read manifest evidence, idempotent
+adoption, the already qualified signed ingress/workflow/retry/duplicate/typing
+journey, and correlation-based handset receipt. Availability alone, a created
+user ID, same-conversation-only Messages inspection, aggregate tests, or a
+neighbouring Production reply are rejected false greens. Production,
+credentials, callbacks, deployments, billing and dedicated lines were not
+mutated. Stable-binding work may now begin; the terminal five-pass audit
+remains deferred.

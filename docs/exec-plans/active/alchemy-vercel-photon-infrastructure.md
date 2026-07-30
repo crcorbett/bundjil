@@ -1771,6 +1771,36 @@ model call is justified; the next operation is minimum Preview-user re-adoption
 with exact source/Preview readback. Production mutation, main merge and the
 terminal audit remain out of this slice.
 
+## Stable Preview re-adoption and task acceptance
+
+Two pre-write complete candidate manifests matched baseline digest
+`9e6108d5…` and proved sender `82ac258d…` source-bound, Preview-unbound and
+Preview-available. One exact owner reconciliation created Preview user
+`b95e88f6…` and recovered the previously qualified destination `0809669f…`.
+The source binding, adopted Preview user, stable Preview callback, shared
+service and enabled platform remained unchanged.
+
+Two post-write candidate commands each performed two sequential complete reads
+and matched digest `76f0b5c9…`. A second reconciliation returned `adopted` with
+two users before and after, proving the semantic no-op property without another
+create. The retained route is the same fingerprint used by both already
+accepted signed/handset journeys, so another message or Eve model call would
+add cost and risk without proving a new property.
+
+| Surface                                       | Decision        | Stable-retention evidence                                                                                                           |
+| --------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture, ownership and call graph        | Preserve        | Source/Production and Preview remain separate projects, credentials, destinations and callbacks; Vercel Git ownership is unchanged. |
+| READMEs, exports and generated references     | Preserve        | No public package boundary, command or generated reference changed.                                                                 |
+| Runbook, authority and controls               | Preserve        | The existing Preview user-reconciliation envelope authorized this exact one-write/readback/no-op slice.                             |
+| Verification journey and proof receipt        | Change required | Record exact create, recovered route, four matching post-write reads, no-op adoption and the corrected handset oracle.              |
+| Schemas, services, Layers, tests and fixtures | Preserve        | The previously verified owner reconciliation and candidate-inventory boundaries were used unchanged.                                |
+| SPEC, tasks and active plan                   | Change required | Accept `isolated-photon-preview-spike` and unblock stable bindings.                                                                 |
+| Secrets, rollout and rollback                 | Preserve        | Full sender identity stayed process-local; stable credentials stayed in ignored/provider custody; no rollback is pending.           |
+| Lifecycle and terminal audit                  | Preserve        | Three downstream tasks remain; the formal five-pass audit remains terminal-only.                                                    |
+
+`isolated-photon-preview-spike` is complete. The next serial owner is
+`stable-bindings-and-deployment-observation`.
+
 The exact receipt candidate passed strict Effect language-service diagnostics,
 19 focused Photon transport/reconciliation tests, the exact 12-test Channel
 fixture, every routed policy gate, and complete `bun run verification`. The
