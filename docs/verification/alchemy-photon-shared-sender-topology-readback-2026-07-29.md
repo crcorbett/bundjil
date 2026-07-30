@@ -3,137 +3,154 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-28T17:30:48Z
-artifact_git_identity: 12157bcfeacf49b516c176f7d85868cf4c0f0ac9
+observed_at: 2026-07-30T01:29:13.671Z
+artifact_git_identity: 39161312f73d4f59630db437cab6ad5a8c3d5f0b
 environment: bundjil-photon-shared-sender-topology-readback
-review_trigger: source-project webhook retirement, Preview duplicate-registration attempt, Photon routing-contract change, or a new topology decision
+review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
 ---
 
-# Alchemy Photon shared-sender topology readback — 2026-07-29
+# Alchemy Photon shared-sender topology readback — 2026-07-29/30
 
-## Readback result
+## Source callback retirement
 
-Under Cooper's bounded read and Preview-mutation authority, two consecutive
-Schema-owned Photon management reads returned matching sanitized topologies:
+The 2026-07-29 baseline found source/Production project `ad20033f…` with
+unchanged users `020cc192…` and `a78d3af6…`, Production callback
+`72cac9b5…`, and obsolete Preview-target callback `2083611d…`. Isolated
+Preview project `37cf2944…` retained adopted user `46b1fb0c…` and stable
+callback `d2456774…`. Both projects were Free managed-shared, iMessage was
+enabled, and the live lines endpoint returned zero dedicated lines.
 
-| Property            | Source/Production project              | Isolated Preview project                 |
-| ------------------- | -------------------------------------- | ---------------------------------------- |
-| Project fingerprint | `ad20033f…`                            | `37cf2944…`                              |
-| Plan and service    | Free, managed shared, iMessage enabled | Free, managed shared, iMessage enabled   |
-| Shared users        | two unchanged stable user fingerprints | one adopted user fingerprint `46b1fb0c…` |
-| Webhooks            | two: `2083611d…` and `72cac9b5…`       | one stable callback `d2456774…`          |
-| Dedicated lines     | zero from the live lines endpoint      | zero from the live lines endpoint        |
-| Billing mutation    | none; cancellation false               | none; cancellation false                 |
+Cooper then explicitly accepted the irreversible loss of the obsolete
+callback's unavailable create-only signing secret and authorized retirement
+of `2083611d…` only. Exact Vercel deployment/path logs contained zero requests
+over the available 30-day window. A single read-only `GET` positive-control
+probe to the same immutable callback returned `404` and produced exactly one
+log row. This rejects the false green where an empty project-wide log service
+is mistaken for no traffic and proves the exact callback/path had no observed
+required traffic before retirement.
 
-The isolated Preview callback fingerprint equals the exact stable webhook ID
-held in ignored mode-`0600` custody. The two source callback route projections
-also matched across both reads. No full project, phone, assigned destination,
-webhook URL, credential, signing secret, Space, conversation, event, or message
-identity was retained.
+The owner command deleted exactly one matching source callback. Immediate and
+post-drain reads returned only Production callback `72cac9b5…`, both unchanged
+source users and assignments, shared service, and iMessage enabled. The drain
+waited 225 seconds, longer than Photon's documented approximately 3.5-minute
+maximum webhook retry horizon. The final 2026-07-30 readback again returned
+that sole callback and the same two source bindings.
 
-Two further read-only cross-provider resolutions removed the callback-ownership
-ambiguity:
+The deletion is intentionally irreversible: stable ID/URL custody cannot
+restore the create-only signing secret, and no replacement callback was
+created. Production callback `72cac9b5…`, every source user/assignment,
+credential, platform, billing property, deployment, and Vercel setting was
+preserved.
 
-| Source webhook | Vercel owner readback                                                                                  | Query   |
-| -------------- | ------------------------------------------------------------------------------------------------------ | ------- |
-| `2083611d…`    | Bundjil agent project, READY Preview target, deployment fingerprint `fd4545ec…`, Git SHA `a3f8987…`    | present |
-| `72cac9b5…`    | Bundjil agent project, READY Production target, deployment fingerprint `2cd0940b…`, Git SHA `e92f8d2…` | absent  |
+## Duplicate registration and bounded iMessage journey
 
-The lookup resolved each protected callback origin through Vercel's
-deployment-by-URL read endpoint inside process custody. Neither full origin nor
-deployment identity was emitted or retained. This directly identifies
-`2083611d…` as the preserved source-project Preview callback and
-`72cac9b5…` as the Production callback; the earlier receipt is no longer the
-only ownership evidence.
+After source isolation passed, one exact Preview create registered controlled
+sender `82ac258d…` without altering its source user `020cc192…` or source
+destination `d4039779…`. Preview returned rollout-created user `0e2e2abe…`
+and distinct assigned destination `0809669f…`; the adopted Preview user
+`46b1fb0c…` and callback `d2456774…` remained unchanged. This proves the
+provider currently permits non-disruptive duplicate registration across the
+two projects. It does not by itself prove application routing or a stable
+deployable topology.
 
-The fresh controlled-candidate inventory separately retained digest
+Computer Use resolved the exact assigned Preview destination in Messages.
+The composer explicitly displayed `iMessage`, never SMS, before one bounded
+non-sensitive inbound-first message was sent. Messages then displayed a
+`Delivered` state. Full phone values, message content, conversation, Space,
+event, and message identities remained in secure process/provider custody.
+
+Exact Vercel runtime readback for the message window recorded one Preview
+callback response `204` and one Preview callback response `401`; the
+Production environment recorded zero Photon callback invocations. There was
+no accepted `202`, Eve dispatch/completion, outbound agent response, typing
+proof, or exact same-event duplicate disposition. The Preview routing-identity
+metadata was last updated on 2026-07-22, before the rollout-created user and
+route existed. The app owner maps `204` to ignored/duplicate or disallowed
+identity and `401` to webhook authentication failure; the available logs do
+not safely distinguish the exact `204` branch or explain why Photon emitted
+the second request.
+
+The observed postcondition therefore failed closed. iMessage delivery to the
+Preview assigned line and zero Production invocation are direct provider/UI
+evidence, but neither proves accepted Bundjil ingress or a Channel journey.
+The task must not claim one Preview response, replay handling, Eve completion,
+outbound delivery, or visible typing.
+
+## Cleanup and restored topology
+
+After the message window exceeded the retry horizon, cleanup guarded the exact
+rollout-created sender, user, assignment, adopted user, and sole Preview
+callback before deletion. It deleted only Preview user `0e2e2abe…` and read
+back one retained Preview user `46b1fb0c…`, assignment `db49756e…`, and
+callback `d2456774…`.
+
+Two consecutive candidate inventories then matched the original digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
-Current Messages sender `82ac258d…` remains bound to unchanged source user
-`020cc192…` and source destination `d4039779…`; it is reported available but
-has no Preview binding. Availability is only a precondition and does not prove
-duplicate cross-project registration.
+The final complete readback at `2026-07-30T01:29:13.671Z` retained:
 
-## Isolation blocker and no-mutation decision
+| Property         | Source/Production        | Isolated Preview         |
+| ---------------- | ------------------------ | ------------------------ |
+| Project          | `ad20033f…`              | `37cf2944…`              |
+| Users            | `020cc192…`, `a78d3af6…` | `46b1fb0c…`              |
+| Assignments      | `6e61cb74…`, `d4039779…` | `db49756e…`              |
+| Webhooks         | `72cac9b5…` only         | `d2456774…` only         |
+| Service/platform | shared; iMessage enabled | shared; iMessage enabled |
 
-Fresh Vercel target readback identifies the two source-project callbacks as one
-Production callback plus one preserved Preview callback. Photon documents that
-a project event is delivered to every webhook registered on that project.
-Fresh count, stable-ID, and target readback therefore establish that the
-required postcondition—traffic to the source/Production destination reaches
-Production only—cannot currently be proved.
-
-The current authority explicitly forbids source/Production mutation. The
-operator consequently stopped before the otherwise authorized Preview
-shared-user create. No Photon user, webhook, line, project, platform, plan, or
-credential changed; no Vercel operation, deployment, Messages action, SMS,
-cold outbound call, callback probe, or message send occurred. Computer Use was
-not opened because the provider-isolation prerequisite had already failed.
-
-This is not evidence that Photon rejects one sender across two projects. The
-duplicate-registration question remains untested. It is also not evidence that
-the existing source callbacks are unhealthy, that the isolated Preview
-callback received traffic, or that any Production or Preview response occurred
-during this read-only slice.
-
-## Required next authority
-
-The smallest next operation is a separately approved source-project callback
-retirement, not a Preview user change:
-
-1. target only preserved Preview callback `2083611d…`; retain Production
-   callback `72cac9b5…` unchanged;
-2. capture immutable rollback identity and recover retained signing-secret
-   custody for `2083611d…`, or explicitly authorize irreversible retirement
-   after accepting that the create-only value cannot be restored;
-3. prove `2083611d…` has no required traffic, wait through Photon's
-   retry horizon, and delete only that exact source-project Preview callback;
-4. read back one unchanged Production callback, both unchanged source users and
-   assignments, and zero Preview-environment fan-out; and
-5. only then attempt the one bounded Preview duplicate-registration operation
-   and the exact iMessage-only journey from the decision receipt.
-
-That operation mutates the source/Production Photon project and was not
-authorized here. No upgrade, billing change, dedicated line, credential
-rotation, Vercel mutation, or Production deployment is implicated.
-
-Current ignored mode-`0600` custody contains the isolated Preview webhook
-`d2456774…`, not source Preview webhook `2083611d…`. The current Vercel
-Preview metadata is owned by that isolated callback, and provider metadata
-cannot return an earlier create-only signing value. The local 1Password CLI was
-unavailable during this readback. Therefore exact signing-secret rollback for
-`2083611d…` is not yet proved. No deletion should run under the existing
-runbook until custody is recovered or Cooper separately accepts the
-irreversible retirement boundary.
+No shared/Production user or assignment, adopted Preview user, retained
+callback, credential, plan, billing setting, dedicated line, Vercel
+configuration, deployment, or Production environment changed.
 
 ## Requirement replay
 
-| Material requirement           | Direct observable and expected postcondition                                                                                   | Plausible false green rejected                                               | Result and owner                                                                                        |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Separate project ownership     | Two authenticated project credentials return distinct project fingerprints and unchanged user sets                             | Different credentials without isolated callbacks                             | Passed for inventory; this receipt                                                                      |
-| Zero dedicated lines           | The actual management `lines` endpoint returns zero in both projects                                                           | The reconciliation summary's hard-coded zero                                 | Passed; this receipt                                                                                    |
-| Environment-isolated callbacks | Source owns one Production callback only; Preview owns one Preview callback only                                               | Two callbacks in one source project or a separate Preview callback alone     | Failed before mutation; `2083611d…` is Preview-target and `72cac9b5…` is Production-target              |
-| Retirement rollback custody    | Exact obsolete callback can be restored from retained create-only secret custody, or irreversible loss is separately accepted  | Callback URL/ID alone treated as signing-secret rollback                     | Failed: current mode-`0600` and Vercel ownership do not prove the retired secret; 1Password unavailable |
-| Shared-sender capability       | Sender `82ac258d…` gains a distinct Preview binding without source change                                                      | Availability, second UUID, or prior seeded user                              | Not attempted because isolation failed first                                                            |
-| Bounded inbound journey        | Exact Preview recipient is iMessage and yields one Preview response, zero Production response, and exact duplicate disposition | SMS, source reply, synthetic event, or aggregate suite                       | Not admitted                                                                                            |
-| Rollback                       | No state changes when a prerequisite fails                                                                                     | Running the permitted Preview create despite an impossible acceptance oracle | Passed: zero external mutations                                                                         |
+| Material requirement                  | Direct observable and expected postcondition                                               | Plausible false green rejected                              | Result and evidence owner                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| No required obsolete-callback traffic | Exact callback/path has zero rows and a positive-control request becomes one row           | Empty project-wide logs or an unverified zero count         | Passed before deletion; this receipt and Vercel runtime logs                        |
+| Exact callback retirement             | Only `2083611d…` disappears; `72cac9b5…` and source users remain                           | Deleting by count, hostname, or list order                  | Passed after 225-second drain; Photon management readback                           |
+| Retirement rollback                   | Irreversible secret loss is explicitly accepted and recorded                               | Stable ID/URL described as exact signing-secret restoration | Passed for authorized irreversible retirement; exact restoration remains impossible |
+| Duplicate registration                | `82ac258d…` gains distinct Preview user/destination while source binding remains unchanged | Availability, second UUID, or adopted different sender      | Passed for provider capability; candidate inventories and Photon reads              |
+| iMessage-only origin                  | Exact Preview destination resolves in an `iMessage` composer and shows delivery            | SMS, Sendblue, source destination, or uncertain recipient   | Passed for one bounded handset/provider delivery; Computer Use                      |
+| Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts              | Passed for callback invocation isolation; Vercel runtime logs                       |
+| Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite          | Failed: exact responses were `204` and `401`; no accepted dispatch                  |
+| Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                  | Not proved                                                                          |
+| Rollback                              | Only rollout-created Preview user is removed and original digest returns                   | Retaining a failed topology or deleting the adopted user    | Passed; guarded delete and two-read candidate inventory                             |
+
+## Retry and effect-certainty replay
+
+- Eligibility: the obsolete callback delete became eligible only after the
+  positive-controlled traffic oracle and explicit irreversible authority.
+  The Preview user create became eligible only after sole-Production-callback
+  readback. No message retry was eligible after the failed acceptance result.
+- Bounded attempts: one callback delete, one Preview shared-user create, one
+  iMessage send, and one exact Preview user delete ran. No blind mutation or
+  message retry ran.
+- Backoff and jitter: no provider operation returned a transient/rate-limit
+  result requiring a retry schedule. The fixed retry-horizon drain was an
+  observation window, not request replay.
+- Idempotent versus uncertain effects: both deletes returned decoded success
+  and received exact readback. The create returned decoded success and was
+  reconciled by complete source/Preview inventory before use.
+- Observation after write: each mutation was followed by complete owning
+  provider readback; the final two-read digest proves cleanup convergence.
 
 ## Repository verification
 
 Focused Effect setup, boundary, docs, skills, authority, controls,
 verification-policy, Photon typecheck, all 35 Photon tests, Photon build, JSON,
-inventory-digest, and diff checks passed. Complete repository verification used
-only the documented process-local synthetic Executor URL/key fixture and
-passed HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture,
-Knip, all nine workspace typechecks, and all fifteen Turbo build/test tasks.
-The complete gate was rerun after this receipt and task-ledger statement became
-the exact commit candidate.
+inventory-digest, diff, and secret/full-identity leak checks passed. Complete
+`bun run verification` used only the documented process-local synthetic
+Executor fixture and passed HGI-307, 90 tooling tests, type-aware format/lint,
+the lint fixture, Knip, all nine workspace typechecks, and all fifteen Turbo
+build/test tasks. The complete gate is rerun after this exact verification
+statement becomes the commit candidate.
 
-These repository checks prove owner and policy consistency only. They do not
-upgrade the live blocked topology into duplicate-registration, message,
-callback, response, or environment-isolation proof.
+Repository checks prove owner and policy consistency only. They do not upgrade
+the failed live `204`/`401` boundary into accepted ingress, Eve completion,
+outbound response, replay, typing, or terminal SPEC proof. The task remains
+open, and the single terminal five-pass audit has not run.
 
 ## Sources
 
-- [Photon managed-shared routing](https://photon.codes/blog/how-we-rebuilt-our-shared-imessage-routing-to-handle-10m-messages-a-day)
+- [Photon webhook delivery and retries](https://photon.codes/docs/webhooks/delivery)
+- [Photon webhook troubleshooting](https://photon.codes/docs/webhooks/troubleshooting)
 - [Photon webhook events and project fan-out](https://photon.codes/docs/webhooks/events)
 - [Dual-Channel Production acceptance receipt](channel-production-accepted-2026-07-23.md)

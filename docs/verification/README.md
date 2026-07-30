@@ -127,13 +127,14 @@ operation nor asserts present provider state.
   Preview authority, rollback, and non-claims. It is a product/authority
   decision, not current provider-state or journey proof.
 - [`alchemy-photon-shared-sender-topology-readback-2026-07-29.md`](alchemy-photon-shared-sender-topology-readback-2026-07-29.md)
-  records two matching sanitized project reads, actual zero dedicated-line
-  results, unchanged source and Preview users, one stable isolated Preview
-  callback, and two source callbacks. Fresh deployment-by-URL readback maps
-  `2083611d…` to Preview and `72cac9b5…` to Production; project-wide fan-out
-  blocked the required isolation before any Preview user mutation or Messages
-  send. The obsolete callback's create-only signing-secret rollback custody
-  remains unproved.
+  records the positive-controlled no-traffic oracle, explicitly irreversible
+  retirement of obsolete source Preview callback `2083611d…`, retry drain, and
+  sole preserved Production callback `72cac9b5…`. It also records the
+  non-disruptive duplicate Preview registration, one exact iMessage Delivered
+  send, Preview `204`/`401` and zero Production callback invocations, failed
+  Channel acceptance, guarded temporary-user cleanup, restored canonical
+  inventory digest, exact signing-secret rollback limitation, and remaining
+  Vercel configuration boundary.
 - [`channel-production-staged-2026-07-23.md`](channel-production-staged-2026-07-23.md)
   proves the exact clean dual-Channel Production candidate, source/config and
   rollback identities, provider inventories, signed route fixtures, and passed

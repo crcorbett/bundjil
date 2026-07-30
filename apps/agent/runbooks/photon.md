@@ -195,21 +195,22 @@ duplicate suppression, Preview, Production, or durable process supervision.
    resolves from destination plus sender, but the live management API must
    still prove duplicate cross-project registration.
    Before a Preview user write, also require the source project to have exactly
-   one accepted Production callback. The 2026-07-29 readback found two stable
-   source callbacks; the accepted Production receipt identifies them as one
-   Production callback plus one preserved Preview callback. Because Photon
-   fans an event to every webhook in a project, stop before Preview mutation
-   while both remain. Retiring the preserved callback is a separate
-   source/Production mutation: require explicit authority, exact current route
-   ownership, immutable rollback and signing-secret custody, traffic/drain
-   evidence, deletion by stable ID, then one-callback and unchanged-user
-   readback. Do not infer permission from the later Preview-user authority.
-   Current target readback identifies `2083611d…` as the preserved Preview
-   callback and `72cac9b5…` as Production. Treat only `2083611d…` as eligible
-   for retirement. Its URL and stable ID are not sufficient rollback because
-   Photon signing secrets are create-only. If exact signing-secret custody
-   cannot be recovered, require separate explicit acceptance of irreversible
-   retirement; never describe a recreated callback with a new secret as exact
+   one accepted Production callback. Photon fans an event to every webhook in a
+   project, so multiple environment callbacks in the source project are a stop.
+   Retiring a callback is a separate source/Production mutation: require
+   explicit authority, exact current route ownership, rollback/signing-secret
+   custody or separately accepted irreversible loss, traffic/drain evidence,
+   deletion by stable ID, then one-callback and unchanged-user readback. Do not
+   infer permission from later Preview-user authority.
+   The 2026-07-30 authorized retirement targeted only `2083611d…` and preserved
+   Production callback `72cac9b5…`. Its no-required-traffic oracle queried the
+   exact deployment/path, then sent one non-mutating `GET` positive control and
+   required the count to change from zero to one. A zero from project-wide or
+   unresponsive logs is not proof. The owner command deleted the exact callback
+   only after that oracle; complete reads after 225 seconds retained sole
+   `72cac9b5…` and both source users/assignments. Because the create-only secret
+   was unavailable, Cooper explicitly accepted that exact restoration is
+   impossible. Never describe a recreated callback with a new secret as exact
    restoration.
    Match the exact redacted sender, check shared availability without treating
    availability as capability proof, call the idempotent Preview shared-user
@@ -232,6 +233,18 @@ duplicate suppression, Preview, Production, or durable process supervision.
    replay it blindly. Delete only the exact rollout-created Preview user after
    retry drain when the accepted topology was not established. Preserve a
    successful stable Preview user only after every isolation gate passes.
+   The 2026-07-30 bounded check proved that source sender `82ac258d…` can be
+   registered concurrently in Preview with a distinct assigned destination
+   while the source binding stays unchanged. Fresh Messages UI classified that
+   destination as iMessage and showed one Delivered send. Do not retain this as
+   an accepted stable topology by itself: exact Preview runtime readback
+   returned `204` and `401`, zero Production invocations, and no accepted
+   `202`/Eve response. Cleanup removed only the rollout-created Preview user and
+   restored the original candidate digest. Before repeating, require separate
+   authority to reconcile Preview routing-identity and webhook-signing metadata,
+   an immutable deployment readback, and an exact signed fixture. Provider
+   registration or handset delivery cannot substitute for those application
+   gates.
 4. Confirm the immutable Vercel target serves
    `/eve/v1/photon/webhook` over public HTTPS without redirects. List webhooks
    before create. Adopt an exact environment URL only when its write-only
@@ -301,6 +314,13 @@ duplicate suppression, Preview, Production, or durable process supervision.
    one Preview response, zero Production response, and exact same-event
    duplicate disposition. Two callbacks in one Photon project are forbidden
    because a project event fans out to every registered webhook.
+   Classify every exact route response before accepting the journey: `202` is
+   accepted dispatch, `204` is ignored/duplicate or disallowed identity, `401`
+   is webhook authentication failure, `400` is schema failure, and `503` is a
+   replay/routing failure or the admitted retry-once control. One `204` plus one
+   `401` does not prove a duplicate retry, even when Messages shows Delivered
+   and Production receives zero callbacks. Stop, preserve the status/time
+   metadata, drain, and remove only rollout-created failed topology.
    Current pricing lists cold outreach only for Business/Enterprise dedicated
    offerings; Free/Pro direct-messaging access is not proof of cold-outbound
    entitlement. Do not upgrade, buy a line, rotate credentials, recreate a

@@ -582,6 +582,42 @@ local 1Password CLI was unavailable. Before deletion, either recover the exact
 retired secret or obtain explicit acceptance that the removal is irreversible.
 Stable ID and URL custody without the signing value do not satisfy rollback.
 
+Cooper provided that exact irreversible-retirement authority on 2026-07-30.
+The exact obsolete callback/path had zero Vercel runtime rows over the
+available 30-day window; a single non-mutating `GET` positive-control probe
+returned `404` and produced exactly one row, rejecting an empty-log-service
+false green. The owner command then deleted only `2083611d…`. Immediate and
+post-drain reads beyond Photon's approximately 3.5-minute retry horizon
+returned sole source callback `72cac9b5…`, both unchanged source
+users/assignments, shared service, and iMessage enabled. Exact restoration of
+the retired callback remains impossible because the accepted lost create-only
+signing secret cannot be reconstructed.
+
+The now-isolated Preview check registered sender `82ac258d…` exactly once,
+creating Preview user `0e2e2abe…` with distinct destination `0809669f…` while
+the source binding remained unchanged. This directly proves current
+non-disruptive duplicate cross-project registration. Messages resolved that
+exact destination as `iMessage`, never SMS, and showed `Delivered` for one
+bounded inbound-first test.
+
+The application acceptance gate nevertheless failed closed. Exact Preview
+runtime readback recorded one `204` and one `401`, Production recorded zero
+Photon callback invocations, and there was no accepted `202`, Eve
+dispatch/completion, outbound response, typing proof, or same-event duplicate
+disposition. Preview routing-identity metadata predates the new binding; the
+available safe logs do not distinguish the exact ignored/duplicate identity
+branch or explain the second authentication failure. After the retry horizon,
+cleanup deleted only rollout-created user `0e2e2abe…` and restored the original
+candidate digest
+`9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.
+Source retains only `72cac9b5…`; Preview retains adopted user `46b1fb0c…` and
+callback `d2456774…`. The next slice must correct and deploy the owning Preview
+routing/webhook configuration under separate Vercel authority before repeating
+the bounded inbound-first journey. It must not recreate the user or send until
+that configuration is proven to include the intended identity and exact
+signing custody. The task remains open and the terminal five-pass audit has not
+run.
+
 ## Canonical Schema and Effect contracts
 
 Every exported request, result, resource props, resource attributes, manifest,
