@@ -675,6 +675,23 @@ candidate-inventory commands each restored digest
 The approved one-record Preview routing mapping and immutable deployment remain
 for diagnosis; the overwritten write-only value cannot be reconstructed.
 
+Read-only deployment-log diagnosis on 2026-07-30 proved that the historical
+`ignored/unsupportedService` response and `authenticationRejected` response
+were two distinct requests 696 milliseconds apart. Photon's delivery contract
+states that any `2xx` terminates an attempt, so the later `401` is not a retry
+caused by the earlier `204`. Authenticated Preview dashboard readback exposed
+one retained webhook but no delivery-attempt detail or repair control. The
+historical records therefore remain safely unclassified.
+
+Before another provider event, the private Photon adapter must deploy an
+identity-free checkpoint diagnostic. Unsupported-service records may identify
+only the first of the four official iMessage platform positions, and
+authentication records may identify only header decoding, webhook ID,
+timestamp, or signature verification. Direct tests must exercise every
+checkpoint independently and reject a value-leak sentinel. No public package
+contract changes, provider value logging, case-folding, SMS acceptance,
+signing-secret change, or real-message replay is implied by this correction.
+
 After the retry horizon, cleanup deleted only rollout-created user
 `0e2e2abe…` and restored the original candidate digest
 `9e6108d55bd6801b1d7e041d98cfbdce4587f39c0d0d3384ffad7bc2f7488a3f`.

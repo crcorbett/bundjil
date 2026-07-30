@@ -354,6 +354,16 @@ duplicate suppression, Preview, Production, or durable process supervision.
    deployed source predates this oracle or no matching record exists, stop,
    preserve the status/time metadata, drain, and remove only rollout-created
    failed topology.
+   When the Photon adapter returns `ignored/unsupportedService`, require one
+   matching `PhotonWebhookBoundaryDisposition` naming only the first failed
+   platform checkpoint: `spacePlatform`, `messagePlatform`,
+   `senderPlatform`, or `messageSpacePlatform`. When it returns
+   `authenticationRejected`, require exactly one of `headers`, `webhookId`,
+   `timestamp`, or `signature`. The record must never contain the observed
+   value, request body, header, identity, signature, URL, or credential.
+   A checkpoint localizes the owning boundary only; it does not authorize
+   case-folding, accepting SMS, changing a signing secret, or replaying a real
+   message.
    Current pricing lists cold outreach only for Business/Enterprise dedicated
    offerings; Free/Pro direct-messaging access is not proof of cold-outbound
    entitlement. Do not upgrade, buy a line, rotate credentials, recreate a

@@ -3,7 +3,7 @@ document_type: proof-receipt
 lifecycle: evidence
 authority: supporting
 owner: bundjil-photon-provider-owner
-observed_at: 2026-07-30T03:01:30.693Z
+observed_at: 2026-07-30T03:33:17.089Z
 artifact_git_identity: 29467f1b26e3255f4ffa64e9e25f7f79c6f5bbe6
 environment: bundjil-photon-shared-sender-topology-readback
 review_trigger: Photon callback traffic, Preview routing/configuration change, shared-sender retry, or a new topology decision
@@ -191,6 +191,37 @@ recoverable from ignored mode-`0600` custody. No second message, SMS, cold
 outbound, Production mutation, billing change, credential operation or main
 merge occurred.
 
+## Read-only boundary diagnosis and correction candidate
+
+Exact deployment logs proved that the `204` occurred at
+`2026-07-30T02:56:38.255Z` and the `401` at
+`2026-07-30T02:56:38.951Z`: two distinct requests 696 milliseconds apart.
+Photon documents any `2xx` as terminal, so the later `401` cannot be a retry
+caused by the earlier `204`. Authenticated Preview dashboard readback showed
+one retained webhook and no delivery-attempt detail or repair control. Neither
+surface exposes the historical wire platform value or failed authentication
+input.
+
+The repository candidate based on
+`deb52f41590145f981e781452b1f51efe199e468` adds one private
+`PhotonWebhookBoundaryDisposition` record at the owning transport boundary.
+Authentication rejections name only `headers`, `webhookId`, `timestamp`, or
+`signature`; unsupported-service results name only `spacePlatform`,
+`messagePlatform`, `senderPlatform`, or `messageSpacePlatform`. Direct tests
+exercise each checkpoint independently and prove that an explicit
+provider-value sentinel is absent after Schema encoding. The diagnostic does
+not enter package exports and never records the observed value, headers, body,
+identity, URL, signature, or credential.
+
+Focused Photon typecheck, the direct 14-test transport fixture, Photon build,
+the cross-app Channel fixture, Effect language-service diagnostics, and every
+routed repository policy gate pass. Full `bun run verification` also passes
+with the process-local synthetic Executor fixture; the documentation audit
+checked 272 routed files with zero findings. Deployment and safe synthetic
+checkpoint probes remain pending. This repository evidence does not
+retroactively classify the historical requests, authorize a provider retry,
+or prove accepted Channel ingress.
+
 ## Repository disposition-oracle correction
 
 The owning Channel route previously collapsed ignored, duplicate and
@@ -265,6 +296,7 @@ configuration, deployment, or Production environment changed.
 | Environment isolation                 | Preview path receives the test and Production receives zero invocation                     | Separate projects without exact runtime counts                | Preview observed; Production-zero lacks a same-window positive control              |
 | Callback configuration                | Stable valid-signature fixture reaches exact path and returns `204`                        | Metadata presence, READY state or historical receipt          | Passed for ID/secret/path coherence at `1f8600d`; not provider-message acceptance   |
 | Safe disposition oracle               | Exact route branch emits one identity-free disposition record                              | HTTP status alone, logger construction, or adjacent assertion | Passed in direct fixtures and one signed deployed probe at `310dc759…`              |
+| Provider checkpoint diagnosis         | Exact first failed auth/platform checkpoint with no observed value                         | Status alone, permissive decode, secret change, or value log  | Focused repository matrix passed; deployment remains pending                        |
 | Routing-directory custody             | Existing value is readable or an exact owner replacement is approved                       | Redacted reads, test fixture or inferred principal            | Passed for approved mapping custody and immutable Preview deployment                |
 | Accepted Channel ingress              | Preview returns `202` and produces one Eve completion/response                             | `204`, `401`, handset delivery, or aggregate suite            | Failed: unsupportedService/authenticationRejected; no accepted dispatch             |
 | Retry/duplicate proof                 | Same provider event is retried with one dispatch and one response                          | Two unrelated requests or synthetic replay                    | Not proved                                                                          |

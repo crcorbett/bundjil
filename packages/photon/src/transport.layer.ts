@@ -9,9 +9,13 @@ import {
   ChannelUnavailableError,
   ChannelUnsupportedOperationError,
   ChannelWebhookAuthenticationError,
+  ChannelWebhookResult,
   ChannelWebhookSchemaError,
 } from "@bundjil/channel";
-import type { ChannelPresenceResultType } from "@bundjil/channel";
+import type {
+  ChannelPresenceResultType,
+  ChannelWebhookResult as ChannelWebhookResultType,
+} from "@bundjil/channel";
 import { Clock, Effect, Layer, Option, Redacted, Schema } from "effect";
 
 import { PhotonClient } from "./client.js";
@@ -23,6 +27,7 @@ import {
   PhotonTextContent,
 } from "./schemas.js";
 import type { PhotonConfig } from "./schemas.js";
+import type { PhotonWebhookBoundaryDiagnostic } from "./webhook-diagnostics.js";
 
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
 const acceptedPresence: ChannelPresenceResultType = "accepted";
@@ -34,6 +39,41 @@ const authenticationError = () =>
     reason: "authentication",
     retry: "never",
   });
+
+const authenticationFailure = (
+  checkpoint: Extract<
+    typeof PhotonWebhookBoundaryDiagnostic.Type,
+    { readonly disposition: "authenticationRejected" }
+  >["checkpoint"]
+) => {
+  const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type = {
+    disposition: "authenticationRejected",
+    checkpoint,
+  };
+  return Effect.logWarning("PhotonWebhookBoundaryDisposition", diagnostic).pipe(
+    Effect.andThen(Effect.fail(authenticationError()))
+  );
+};
+
+const unsupportedService = (
+  checkpoint: Extract<
+    typeof PhotonWebhookBoundaryDiagnostic.Type,
+    { readonly disposition: "unsupportedService" }
+  >["checkpoint"]
+): Effect.Effect<ChannelWebhookResultType> => {
+  const diagnostic: typeof PhotonWebhookBoundaryDiagnostic.Type = {
+    disposition: "unsupportedService",
+    checkpoint,
+  };
+  return Effect.logInfo("PhotonWebhookBoundaryDisposition", diagnostic).pipe(
+    Effect.as(
+      ChannelWebhookResult.make({
+        _tag: "Ignored",
+        reason: "unsupportedService",
+      })
+    )
+  );
+};
 
 const webhookSchemaError = () =>
   new ChannelWebhookSchemaError({
@@ -76,16 +116,16 @@ export const layerTransport = (config: PhotonConfig) =>
               webhookId: request.headers.get("x-spectrum-webhook-id"),
               timestamp: request.headers.get("x-spectrum-timestamp"),
               signature: request.headers.get("x-spectrum-signature"),
-            }).pipe(Effect.mapError(authenticationError));
+            }).pipe(Effect.catch(() => authenticationFailure("headers")));
             if (headers.webhookId !== config.webhookId) {
-              return yield* authenticationError();
+              return yield* authenticationFailure("webhookId");
             }
             const now = yield* Clock.currentTimeMillis;
             if (
               Math.abs(Math.floor(now / 1000) - headers.timestamp) >
               config.webhookToleranceSeconds
             ) {
-              return yield* authenticationError();
+              return yield* authenticationFailure("timestamp");
             }
             const buffer = yield* Effect.tryPromise({
               try: () => request.arrayBuffer(),
@@ -102,7 +142,7 @@ export const layerTransport = (config: PhotonConfig) =>
               config.webhookSecret
             );
             if (!authenticated) {
-              return yield* authenticationError();
+              return yield* authenticationFailure("signature");
             }
             const bodyText = yield* Effect.try({
               try: () => textDecoder.decode(body),
@@ -120,13 +160,17 @@ export const layerTransport = (config: PhotonConfig) =>
               }
               return { _tag: "Ignored", reason: "unsupportedEvent" };
             }
-            if (
-              payload.space.platform !== "iMessage" ||
-              payload.message.platform !== "iMessage" ||
-              payload.message.sender.platform !== "iMessage" ||
-              payload.message.space.platform !== "iMessage"
-            ) {
-              return { _tag: "Ignored", reason: "unsupportedService" };
+            if (payload.space.platform !== "iMessage") {
+              return yield* unsupportedService("spacePlatform");
+            }
+            if (payload.message.platform !== "iMessage") {
+              return yield* unsupportedService("messagePlatform");
+            }
+            if (payload.message.sender.platform !== "iMessage") {
+              return yield* unsupportedService("senderPlatform");
+            }
+            if (payload.message.space.platform !== "iMessage") {
+              return yield* unsupportedService("messageSpacePlatform");
             }
             if (
               payload.message.space.id !== payload.space.id ||

@@ -17,6 +17,7 @@ import {
   Effect,
   Fiber,
   Layer,
+  Logger,
   Option,
   Redacted,
   Result,
@@ -33,6 +34,7 @@ import {
   PhotonWebhookPayload,
 } from "../src/schemas.js";
 import { layerTransport } from "../src/transport.layer.js";
+import { PhotonWebhookBoundaryDiagnostic } from "../src/webhook-diagnostics.js";
 
 const webhookId = "60d6d04f-f9fa-4a7b-9c97-37c9c90ce91c";
 const webhookSecret = "test-photon-webhook-secret";
@@ -109,6 +111,11 @@ const request = (
   });
 };
 
+const boundaryLogger = (messages: globalThis.Array<unknown>) =>
+  Logger.make(({ message }) => {
+    messages.push(message);
+  });
+
 const successClient = PhotonClient.of({
   sendMessage: () => Effect.succeed({ id: "provider-message-1" }),
   setPresence: () => Effect.sync(() => {}),
@@ -177,6 +184,69 @@ it.effect("authenticates signed bytes before decoding the payload", () =>
   })
 );
 
+it.effect(
+  "records one closed checkpoint for each authentication rejection",
+  () =>
+    Effect.gen(function* testPhotonAuthenticationDiagnostics() {
+      const fixture = yield* fixtures;
+      const cases = [
+        {
+          checkpoint: "headers",
+          webhookRequest: new Request("https://example.invalid/photon", {
+            method: "POST",
+            body: fixture.encodedWebhook,
+          }),
+        },
+        {
+          checkpoint: "webhookId",
+          webhookRequest: request(fixture.encodedWebhook, {
+            id: "00000000-0000-0000-0000-000000000000",
+          }),
+        },
+        {
+          checkpoint: "timestamp",
+          webhookRequest: request(fixture.encodedWebhook, { timestamp: 301 }),
+        },
+        {
+          checkpoint: "signature",
+          webhookRequest: request(fixture.encodedWebhook, {
+            secret: "wrong-secret",
+          }),
+        },
+      ] as const;
+
+      for (const { checkpoint, webhookRequest } of cases) {
+        const messages: globalThis.Array<unknown> = [];
+        const error = yield* Effect.gen(function* decodeWebhook() {
+          const transport = yield* ChannelTransport;
+          return yield* transport.decodeWebhook(webhookRequest);
+        }).pipe(
+          Effect.provide(
+            Layer.mergeAll(
+              layer(fixture.config),
+              Logger.layer([boundaryLogger(messages)])
+            )
+          ),
+          Effect.flip
+        );
+
+        assert.strictEqual(
+          Schema.is(ChannelWebhookAuthenticationError)(error),
+          true
+        );
+        assert.deepStrictEqual(messages, [
+          [
+            "PhotonWebhookBoundaryDisposition",
+            {
+              disposition: "authenticationRejected",
+              checkpoint,
+            } satisfies typeof PhotonWebhookBoundaryDiagnostic.Type,
+          ],
+        ]);
+      }
+    })
+);
+
 it.effect("rejects stale signatures and bounded or malformed bodies", () =>
   Effect.gen(function* testPhotonPayloadFailures() {
     const fixture = yield* fixtures;
@@ -199,6 +269,109 @@ it.effect("rejects stale signatures and bounded or malformed bodies", () =>
     );
     assert.strictEqual(Schema.is(ChannelWebhookSchemaError)(malformed), true);
     assert.strictEqual(Schema.is(ChannelWebhookSchemaError)(oversized), true);
+  })
+);
+
+it.effect("records the exact closed iMessage platform checkpoint", () =>
+  Effect.gen(function* testPhotonPlatformDiagnostics() {
+    const fixture = yield* fixtures;
+    const messagesWebhook = Schema.is(PhotonMessagesWebhook)(fixture.webhook)
+      ? fixture.webhook
+      : yield* Effect.die("messages fixture required");
+    const encode = Schema.encodeEffect(
+      Schema.fromJsonString(PhotonWebhookPayload)
+    );
+    const spacePlatform = yield* encode({
+      ...messagesWebhook,
+      space: {
+        ...messagesWebhook.space,
+        platform: "platform-leak-sentinel",
+      },
+    });
+    const messagePlatform = yield* encode({
+      ...messagesWebhook,
+      message: {
+        ...messagesWebhook.message,
+        platform: "platform-leak-sentinel",
+      },
+    });
+    const senderPlatform = yield* encode({
+      ...messagesWebhook,
+      message: {
+        ...messagesWebhook.message,
+        sender: {
+          ...messagesWebhook.message.sender,
+          platform: "platform-leak-sentinel",
+        },
+      },
+    });
+    const messageSpacePlatform = yield* encode({
+      ...messagesWebhook,
+      message: {
+        ...messagesWebhook.message,
+        space: {
+          ...messagesWebhook.message.space,
+          platform: "platform-leak-sentinel",
+        },
+      },
+    });
+    const cases = [
+      { body: spacePlatform, checkpoint: "spacePlatform" },
+      { body: messagePlatform, checkpoint: "messagePlatform" },
+      { body: senderPlatform, checkpoint: "senderPlatform" },
+      { body: messageSpacePlatform, checkpoint: "messageSpacePlatform" },
+    ] as const;
+
+    for (const { body, checkpoint } of cases) {
+      const messages: globalThis.Array<unknown> = [];
+      const result = yield* Effect.gen(function* decodeWebhook() {
+        const transport = yield* ChannelTransport;
+        return yield* transport.decodeWebhook(request(body));
+      }).pipe(
+        Effect.provide(
+          Layer.mergeAll(
+            layer(fixture.config),
+            Logger.layer([boundaryLogger(messages)])
+          )
+        )
+      );
+
+      assert.deepStrictEqual(result, {
+        _tag: "Ignored",
+        reason: "unsupportedService",
+      });
+      assert.deepStrictEqual(messages, [
+        [
+          "PhotonWebhookBoundaryDisposition",
+          {
+            disposition: "unsupportedService",
+            checkpoint,
+          } satisfies typeof PhotonWebhookBoundaryDiagnostic.Type,
+        ],
+      ]);
+      const logMessages = yield* Schema.decodeUnknownEffect(
+        Schema.Array(
+          Schema.Tuple([
+            Schema.Literal("PhotonWebhookBoundaryDisposition"),
+            PhotonWebhookBoundaryDiagnostic,
+          ])
+        )
+      )(messages);
+      const encodedMessages = yield* Schema.encodeEffect(
+        Schema.fromJsonString(
+          Schema.Array(
+            Schema.Tuple([
+              Schema.Literal("PhotonWebhookBoundaryDisposition"),
+              PhotonWebhookBoundaryDiagnostic,
+            ])
+          )
+        )
+      )(logMessages);
+      assert.strictEqual(
+        encodedMessages.includes("platform-leak-sentinel"),
+        false
+      );
+    }
   })
 );
 

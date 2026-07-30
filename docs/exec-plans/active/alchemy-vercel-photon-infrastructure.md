@@ -1399,6 +1399,7 @@ complete SPEC is honestly terminal.
 | Routing-directory custody     | Existing sensitive value is readable or an exact owner replacement is approved    | Empty/redacted reads, test principal or inferred neighbour            | Approval, mode-`0600` mapping digest, metadata readback and immutable safe probe | Passed for new Preview mapping/deployment                 |
 | Accepted Channel journey      | Preview returns `202`, completes Eve, sends one response, and proves replay       | `204`, `401`, handset delivery, or aggregate suite                    | Exact runtime dispositions and app owner mapping                                 | Failed; unsupportedService/authenticationRejected         |
 | Cleanup                       | Only rollout user is deleted and the original digest/topology returns             | Retaining failed topology or deleting adopted state                   | Guarded delete, final complete read, two-read candidate inventory                | Passed                                                    |
+| Provider checkpoint diagnosis | One closed checkpoint identifies the first authentication or platform boundary    | Status alone, value logging, permissive decoding, or secret change    | Photon transport fixture matrix and private diagnostic Schema                    | Focused repository checks passed; deployment pending      |
 
 ### Read-only diagnosis review lenses
 
@@ -1421,6 +1422,17 @@ complete SPEC is honestly terminal.
   None of those observables substitutes for the still-failed `202`/Eve/replay
   journey.
 
+Read-only deployment logs further proved that the historical `204` and `401`
+were distinct requests 696 milliseconds apart. Photon documents every `2xx`
+as terminal, so the `401` was not a retry caused by the `204`. The authenticated
+Preview dashboard showed one retained webhook but no delivery-attempt detail
+or repair toggle. The current repository candidate therefore keeps the
+historical provider values unclassified and adds a private, identity-free
+checkpoint diagnostic at the Photon transport boundary. All four
+authentication checkpoints and all four official iMessage platform positions
+receive independent direct tests; a value-leak sentinel must remain absent
+after Schema encoding. Another real message is not authorized by this slice.
+
 ### Retry-policy replay
 
 | Property                            | Direct evidence and result                                                                                                                                                                                         |
@@ -1434,22 +1446,22 @@ complete SPEC is honestly terminal.
 
 ### Slice docs-maintainer impact ledger
 
-| Surface                          | Status          | Decision and evidence                                                                                                                                            |
-| -------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and docs            | Change required | Runtime ownership is unchanged, but the SPEC/plan/runbook/evidence now own the safe disposition oracle and its deployment/non-claim boundary.                    |
-| READMEs                          | Preserve        | No purpose, public boundary, or command map changed. Exact operations and limitations remain in the runbook and receipt.                                         |
-| Exports and generated references | Preserve        | No code, export, generated artifact, or reference owner changed.                                                                                                 |
-| Runbooks and authority           | Change required | Record the approved Preview overwrite/new-principal envelope while preserving the proved callback configuration and Production exclusions.                       |
-| Verification journeys and proof  | Change required | Add principal/mapping fingerprints, immutable deployment proof, provider journey evidence, cleanup or retained-topology state, and exact non-claims.             |
-| Skills and AGENTS                | Preserve        | PRD implementer, docs maintainer, Effect wrapper, package ownership, and Computer Use contracts were applied; no reusable instruction defect emerged.            |
-| Lint, config, commands and CI    | Preserve        | No tracked config/command/CI change occurred. Operational reads and owner services used existing boundaries.                                                     |
-| Schemas, services and Layers     | Preserve        | Existing Schema-owned Photon management and candidate-inventory services handled every provider operation; no raw client or new contract was added.              |
-| Tests and fixtures               | Change required | Direct route tests exercise every disposition/status class, accepted/retry controls, and participant/message leak sentinels; they do not prove provider traffic. |
-| SPEC, tasks and plan             | Change required | Record the approved new-principal decision, complete Preview overwrite, exact journey gates, result, and terminal-only audit.                                    |
-| Receipts                         | Change required | Retain only safe fingerprints, bounded metadata, exact status/disposition counts, deployment identity, rollback limitation, and non-claims.                      |
-| Rollout and rollback             | Change required | The 239-second drain and guarded delete restored the provider digest twice; retain the approved new Preview mapping/deployment and record irreversibility.       |
-| Lifecycle and archive pointers   | Preserve        | The SPEC/task/plan remain active; no completed/archive pointer changes; formal five-pass audit remains terminal-only.                                            |
-| Documentation audit inventory    | Preserve        | No docs/README path was added, moved, or removed; recompute the unchanged 195-path digest from the candidate.                                                    |
+| Surface                          | Status          | Decision and evidence                                                                                                                                      |
+| -------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and docs            | Change required | Runtime ownership is unchanged, but the SPEC/plan/runbook/evidence now own the safe disposition oracle and its deployment/non-claim boundary.              |
+| READMEs                          | Change required | The Photon package owner now records the private checkpoint diagnostic and confirms it is not a public export.                                             |
+| Exports and generated references | Preserve        | No code, export, generated artifact, or reference owner changed.                                                                                           |
+| Runbooks and authority           | Change required | Record the approved Preview overwrite/new-principal envelope while preserving the proved callback configuration and Production exclusions.                 |
+| Verification journeys and proof  | Change required | Add principal/mapping fingerprints, immutable deployment proof, provider journey evidence, cleanup or retained-topology state, and exact non-claims.       |
+| Skills and AGENTS                | Preserve        | PRD implementer, docs maintainer, Effect wrapper, package ownership, and Computer Use contracts were applied; no reusable instruction defect emerged.      |
+| Lint, config, commands and CI    | Preserve        | No tracked config/command/CI change occurred. Operational reads and owner services used existing boundaries.                                               |
+| Schemas, services and Layers     | Change required | Add one private closed diagnostic Schema at the existing Photon transport; public services, Layers, config, SDK custody, and exports remain unchanged.     |
+| Tests and fixtures               | Change required | Direct route tests cover every route disposition plus all eight private provider checkpoints and reject participant/message/provider-value leak sentinels. |
+| SPEC, tasks and plan             | Change required | Record the approved new-principal decision, complete Preview overwrite, exact journey gates, result, and terminal-only audit.                              |
+| Receipts                         | Change required | Retain only safe fingerprints, bounded metadata, exact status/disposition counts, deployment identity, rollback limitation, and non-claims.                |
+| Rollout and rollback             | Change required | The 239-second drain and guarded delete restored the provider digest twice; retain the approved new Preview mapping/deployment and record irreversibility. |
+| Lifecycle and archive pointers   | Preserve        | The SPEC/task/plan remain active; no completed/archive pointer changes; formal five-pass audit remains terminal-only.                                      |
+| Documentation audit inventory    | Preserve        | No docs/README path was added, moved, or removed; the candidate audit passed for all 272 routed files with zero findings.                                  |
 
 Focused Effect language-service, boundary, docs, skills, authority, controls,
 verification-policy, Photon typecheck, all 35 Photon tests, Photon build, JSON,

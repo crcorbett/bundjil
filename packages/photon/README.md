@@ -29,6 +29,14 @@ values, billing/customer identifiers, provider bodies, SDK values, and raw
 failures do not cross it. Webhook signing state is `ObservedUnknown` because
 list readback cannot recover the create-only secret.
 
+Webhook rejection diagnostics are also private to the transport adapter. Each
+authentication rejection records only the closed failed checkpoint
+(`headers`, `webhookId`, `timestamp`, or `signature`), and each unsupported
+iMessage payload records only the first closed platform checkpoint. Observed
+header and platform values, raw bodies, identities, signatures, URLs, and
+credentials never enter the record. This diagnostic Schema is intentionally
+absent from the package root and config exports.
+
 The existing bounded operator workflows remain internal and separately
 authority-gated. They may reconcile the Free managed-shared iMessage service,
 one exact approved shared user, platform state, and one webhook by stable
