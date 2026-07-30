@@ -5,7 +5,7 @@ import { Unowned } from "alchemy/AdoptPolicy";
 import { isResolved } from "alchemy/Diff";
 import * as Provider from "alchemy/Provider";
 import { Resource as makeResource } from "alchemy/Resource";
-import { Array, Effect, Layer, Match, Schema } from "effect";
+import { Array, Effect, Layer, Match, Schedule, Schema } from "effect";
 
 import {
   VercelDeploymentsReadError,
@@ -39,6 +39,7 @@ import {
   ObserveVercelMarketplaceBinding,
   ObserveVercelProject,
   ObserveVercelProjectDomain,
+  VercelEnvironmentVariableAttributes,
 } from "./schemas.js";
 import {
   VercelDeployments,
@@ -47,11 +48,66 @@ import {
   VercelMarketplaceBindings,
   VercelProjects,
 } from "./services.js";
+import {
+  ResolveVercelPreviewPhotonValue,
+  UpdateVercelStableEnvironmentVariable,
+  VercelPreviewPhotonBindingValues,
+  VercelPreviewPhotonEnvironmentKey,
+  VercelStableEnvironmentBindings,
+  VercelStableEnvironmentWriteError,
+} from "./stable-environment.js";
 
 const missingVercelResource = undefined;
 const VercelReadOnlyNoopDiff = Schema.Struct({
   action: Schema.Literal("noop"),
 });
+const VercelEnvironmentUpdateDiff = Schema.Struct({
+  action: Schema.Literal("update"),
+});
+
+const sameTargets = (left: readonly string[], right: readonly string[]) =>
+  left.length === right.length &&
+  left.every((target, index) => target === right[index]);
+
+const sameValueOwnership = (
+  left: VercelEnvironmentVariablePropsType["desired"],
+  right: VercelEnvironmentVariablePropsType["desired"]
+) => {
+  if (left === undefined || right === undefined) {
+    return left === right;
+  }
+  if (
+    left.key !== right.key ||
+    left.type !== right.type ||
+    left.gitBranch !== right.gitBranch ||
+    !sameTargets(left.targets, right.targets) ||
+    left.valueOwnership._tag !== right.valueOwnership._tag
+  ) {
+    return false;
+  }
+  if (
+    left.valueOwnership._tag !== "Managed" ||
+    right.valueOwnership._tag !== "Managed"
+  ) {
+    return true;
+  }
+  return (
+    left.valueOwnership.reference.owner ===
+      right.valueOwnership.reference.owner &&
+    left.valueOwnership.reference.reference ===
+      right.valueOwnership.reference.reference &&
+    left.valueOwnership.reference.revision ===
+      right.valueOwnership.reference.revision
+  );
+};
+
+const environmentReadFailure = (message: string) =>
+  new VercelEnvironmentVariablesReadError({
+    operation: "observeEnvironmentVariable",
+    reason: "invalidResponse",
+    retry: "never",
+    message,
+  });
 
 const requireFoundProject = Effect.fn("requireFoundProject")(
   (observation: VercelProjectObservationType) =>
@@ -296,20 +352,44 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
           );
         return yield* Match.value(observation).pipe(
           Match.tag("Missing", () => Effect.succeed(missingVercelResource)),
-          Match.tag("Found", ({ attributes }) =>
-            Effect.succeed(
-              output === undefined ? Unowned(attributes) : attributes
-            )
-          ),
+          Match.tag("Found", ({ attributes }) => {
+            const valueOwnership =
+              output !== undefined &&
+              output.providerUpdatedAt !== undefined &&
+              output.providerUpdatedAt === attributes.providerUpdatedAt
+                ? output.valueOwnership
+                : {
+                    _tag: "ObservedUnknown" as const,
+                    configured: true as const,
+                  };
+            const current = VercelEnvironmentVariableAttributes.make({
+              ...attributes,
+              valueOwnership,
+              deploymentRequired:
+                output !== undefined &&
+                output.providerUpdatedAt !== undefined &&
+                output.providerUpdatedAt === attributes.providerUpdatedAt
+                  ? output.deploymentRequired
+                  : false,
+              ownership: output === undefined ? "Unowned" : "Owned",
+            });
+            return Effect.succeed(
+              output === undefined ? Unowned(current) : current
+            );
+          }),
           Match.exhaustive
         );
       }),
-      diff: Effect.fn("VercelEnvironmentVariableProvider.diff")(({ news }) =>
-        Effect.sync(() =>
-          isResolved(news)
-            ? VercelReadOnlyNoopDiff.make({ action: "noop" })
-            : missingVercelResource
-        )
+      diff: Effect.fn("VercelEnvironmentVariableProvider.diff")(
+        ({ news, olds }) =>
+          Effect.sync(() => {
+            if (!isResolved(news)) {
+              return missingVercelResource;
+            }
+            return sameValueOwnership(news.desired, olds.desired)
+              ? VercelReadOnlyNoopDiff.make({ action: "noop" })
+              : VercelEnvironmentUpdateDiff.make({ action: "update" });
+          })
       ),
       reconcile: Effect.fn("VercelEnvironmentVariableProvider.reconcile")(
         function* ({ news }) {
@@ -318,7 +398,7 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
             yield* environmentVariables.observeEnvironmentVariable(
               ObserveVercelEnvironmentVariable.make(news)
             );
-          return yield* Match.value(observation).pipe(
+          const attributes = yield* Match.value(observation).pipe(
             Match.tag("Missing", () =>
               Effect.fail(
                 new VercelEnvironmentVariablesReadError({
@@ -330,6 +410,173 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
               )
             ),
             Match.tag("Found", ({ attributes }) => Effect.succeed(attributes)),
+            Match.exhaustive
+          );
+          if (news.desired === undefined) {
+            return attributes;
+          }
+          if (
+            attributes.key !== news.desired.key ||
+            attributes.type !== news.desired.type ||
+            attributes.gitBranch !== news.desired.gitBranch ||
+            !sameTargets(attributes.targets, news.desired.targets)
+          ) {
+            return yield* environmentReadFailure(
+              "The observed Vercel environment metadata does not match the desired physical binding."
+            );
+          }
+          return yield* Match.value(news.desired.valueOwnership).pipe(
+            Match.tag("ObservedUnknown", (valueOwnership) =>
+              Effect.succeed(
+                VercelEnvironmentVariableAttributes.make({
+                  ...attributes,
+                  valueOwnership,
+                  deploymentRequired: false,
+                  ownership: "Owned",
+                })
+              )
+            ),
+            Match.tag("Absent", () =>
+              Effect.fail(
+                new VercelStableEnvironmentWriteError({
+                  operation: "updateStableEnvironmentVariable",
+                  reason: "protected",
+                  retry: "never",
+                  certainty: { _tag: "Known" },
+                  message:
+                    "An absent stable environment value cannot delete a retained binding.",
+                })
+              )
+            ),
+            Match.tag("Managed", (valueOwnership) =>
+              Effect.gen(function* reconcileManagedStableEnvironment() {
+                if (
+                  news.stage !== "preview" ||
+                  news.desired?.type !== "sensitive" ||
+                  news.desired.targets.length !== 1 ||
+                  news.desired.targets[0] !== "preview"
+                ) {
+                  return yield* new VercelStableEnvironmentWriteError({
+                    operation: "updateStableEnvironmentVariable",
+                    reason: "unsupportedBinding",
+                    retry: "never",
+                    certainty: { _tag: "Known" },
+                    message:
+                      "Managed stable writes are restricted to exact sensitive Preview bindings.",
+                  });
+                }
+                const key = yield* Schema.decodeUnknownEffect(
+                  VercelPreviewPhotonEnvironmentKey
+                )(news.desired.key).pipe(
+                  Effect.mapError(
+                    () =>
+                      new VercelStableEnvironmentWriteError({
+                        operation: "updateStableEnvironmentVariable",
+                        reason: "unsupportedBinding",
+                        retry: "never",
+                        certainty: { _tag: "Known" },
+                        message:
+                          "This environment key is not an approved Preview Photon managed binding.",
+                      })
+                  )
+                );
+                const values = yield* VercelPreviewPhotonBindingValues;
+                const value = yield* values.resolvePreviewPhotonValue(
+                  ResolveVercelPreviewPhotonValue.make({
+                    environmentVariableId: news.environmentVariableId,
+                    key,
+                    valueOwnership: {
+                      _tag: "Managed",
+                      reference: valueOwnership.reference,
+                    },
+                  })
+                );
+                const bindings = yield* VercelStableEnvironmentBindings;
+                const updated = yield* bindings
+                  .updateStableEnvironmentVariable(
+                    UpdateVercelStableEnvironmentVariable.make({
+                      stage: "preview",
+                      teamId: news.teamId,
+                      projectId: news.projectId,
+                      environmentVariableId: news.environmentVariableId,
+                      key,
+                      type: "sensitive",
+                      targets: ["preview"],
+                      valueOwnership: {
+                        _tag: "Managed",
+                        reference: valueOwnership.reference,
+                      },
+                      value,
+                      previousProviderUpdatedAt: attributes.providerUpdatedAt,
+                    })
+                  )
+                  .pipe(
+                    Effect.retry({
+                      times: 2,
+                      schedule: Schedule.exponential("100 millis").pipe(
+                        Schedule.jittered
+                      ),
+                      while: (failure) =>
+                        failure.certainty._tag === "Known" &&
+                        (failure.reason === "rateLimited" ||
+                          failure.reason === "transient"),
+                    })
+                  );
+                return yield* environmentVariables
+                  .observeEnvironmentVariable(
+                    ObserveVercelEnvironmentVariable.make({
+                      stage: news.stage,
+                      teamId: news.teamId,
+                      projectId: news.projectId,
+                      environmentVariableId: news.environmentVariableId,
+                    })
+                  )
+                  .pipe(
+                    Effect.flatMap((readback) =>
+                      readback._tag === "Found" &&
+                      readback.attributes.key === updated.key &&
+                      readback.attributes.type === updated.type &&
+                      sameTargets(
+                        readback.attributes.targets,
+                        updated.targets
+                      ) &&
+                      readback.attributes.providerUpdatedAt ===
+                        updated.providerUpdatedAt
+                        ? Effect.succeed(
+                            VercelEnvironmentVariableAttributes.make({
+                              ...readback.attributes,
+                              valueOwnership: {
+                                _tag: "Managed",
+                                reference: valueOwnership.reference,
+                              },
+                              deploymentRequired: true,
+                              ownership: "Owned",
+                            })
+                          )
+                        : Effect.fail(
+                            new VercelStableEnvironmentWriteError({
+                              operation: "updateStableEnvironmentVariable",
+                              reason: "transient",
+                              retry: "backoff",
+                              certainty: {
+                                _tag: "Uncertain",
+                                recovery: "observeByPhysicalIdentity",
+                              },
+                              message:
+                                "The stable environment readback has not converged to the acknowledged provider revision.",
+                            })
+                          )
+                    ),
+                    Effect.retry({
+                      times: 3,
+                      schedule: Schedule.exponential("100 millis").pipe(
+                        Schedule.jittered
+                      ),
+                      while: (failure) => failure.retry === "backoff",
+                    })
+                  );
+              })
+            ),
             Match.exhaustive
           );
         }

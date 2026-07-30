@@ -82,6 +82,8 @@ const vercelInventory = VercelReadOnlyInventory.make({
       type: "sensitive",
       targets: ["preview"],
       sensitive: true,
+      valueOwnership: { _tag: "ObservedUnknown", configured: true },
+      deploymentRequired: false,
       ownership: "Unowned",
     },
   ],

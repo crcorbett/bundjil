@@ -1,4 +1,9 @@
 export {
+  loadVercelStableEnvironmentAuthority,
+  VercelStableEnvironmentAuthorityPath,
+  type VercelStableEnvironmentAuthorityPathEncoded,
+} from "./stable-environment-authority.js";
+export {
   CreateVercelPreviewEnvironmentMetadata,
   type CreateVercelPreviewEnvironmentMetadataEncoded,
   DeleteVercelPreviewEnvironmentMetadata,
@@ -68,6 +73,40 @@ export {
   layerVercelPreviewConfigurationLive,
   layerVercelPreviewConfigurationLiveProviders,
 } from "./preview-configuration-live-providers.js";
+export {
+  VercelPreviewPhotonBindingValuesLive,
+  VercelStableEnvironmentBindingsLive,
+} from "./stable-environment-live.layer.js";
+export {
+  layerVercelStableEnvironmentMemory,
+  VercelStableEnvironmentMemoryConfig,
+  VercelStableEnvironmentMemoryFailureMode,
+  VercelStableEnvironmentMemoryValue,
+} from "./stable-environment-memory.layer.js";
+export {
+  previewPhotonSecretReference,
+  ResolveVercelPreviewPhotonValue,
+  type ResolveVercelPreviewPhotonValueEncoded,
+  UpdateVercelStableEnvironmentVariable,
+  type UpdateVercelStableEnvironmentVariableEncoded,
+  VercelManagedEnvironmentValue,
+  type VercelManagedEnvironmentValueEncoded,
+  VercelPreviewPhotonBindingValues,
+  VercelPreviewPhotonBindingValuesDenied,
+  type VercelPreviewPhotonBindingValuesShape,
+  VercelPreviewPhotonEnvironmentKey,
+  type VercelPreviewPhotonEnvironmentKeyEncoded,
+  VercelPreviewPhotonSecretOwner,
+  VercelStableEnvironmentBindings,
+  VercelStableEnvironmentBindingsDenied,
+  type VercelStableEnvironmentBindingsShape,
+  VercelStableEnvironmentFailureReason,
+  VercelStableEnvironmentOperation,
+  VercelStableEnvironmentReadError,
+  VercelStableEnvironmentValue,
+  type VercelStableEnvironmentValueEncoded,
+  VercelStableEnvironmentWriteError,
+} from "./stable-environment.js";
 export {
   VercelDeploymentsReadError,
   VercelDomainsReadError,
@@ -147,6 +186,8 @@ export {
   type VercelEnvironmentTargetEncoded,
   VercelEnvironmentVariableAttributes,
   type VercelEnvironmentVariableAttributesEncoded,
+  VercelEnvironmentVariableDesiredState,
+  type VercelEnvironmentVariableDesiredStateEncoded,
   VercelEnvironmentVariableId,
   type VercelEnvironmentVariableIdEncoded,
   VercelEnvironmentVariableKey,
@@ -157,6 +198,8 @@ export {
   type VercelEnvironmentVariablePropsEncoded,
   VercelEnvironmentVariableType,
   type VercelEnvironmentVariableTypeEncoded,
+  VercelEnvironmentVariableUpdatedAt,
+  type VercelEnvironmentVariableUpdatedAtEncoded,
   VercelGitBranch,
   type VercelGitBranchEncoded,
   VercelGitSha,

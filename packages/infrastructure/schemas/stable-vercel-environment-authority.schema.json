@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/bundjil-stable-vercel-environment-authority.v1.json",
+  "title": "Bundjil stable Preview Vercel environment authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "mutation" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": {
+      "const": [
+        "read exact Preview Vercel project, environment, Marketplace and Git deployment metadata",
+        "update only the four existing sensitive Preview Photon environment bindings by exact environment ID",
+        "read and write only BundjilInfrastructure Preview Alchemy state",
+        "push only the accepted implementation branch for Vercel Git Preview deployment",
+        "observe only Vercel Git-created Preview deployments without create or promotion"
+      ]
+    },
+    "resources": {
+      "const": [
+        "vercel:project:bundjil-agent:environment:preview",
+        "vercel:project:bundjil-agent:marketplace:read-only",
+        "vercel:project:bundjil-codex-proxy:environment:read-only",
+        "vercel:project:bundjil-codex-proxy:marketplace:read-only",
+        "alchemy:BundjilInfrastructure:preview",
+        "git:crcorbett/bundjil:branch:codex/alchemy-vercel-photon-infrastructure",
+        "photon:isolated-preview-project:read-only"
+      ]
+    },
+    "environments": { "const": ["preview"] }
+  }
+}

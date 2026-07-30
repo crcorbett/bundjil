@@ -1,4 +1,5 @@
 import { Array, Context, Effect, Layer, Option, pipe, Ref } from "effect";
+/* oxlint-disable unicorn/no-array-method-this-argument -- Effect Array data-first combinators are not native Array methods with thisArg. */
 
 import { VercelProjectsReadError } from "./errors.js";
 import {
@@ -8,7 +9,10 @@ import {
   ListedVercelProjectDomains,
   ListedVercelProjects,
   VercelDeploymentObservation,
+  VercelEnvironmentVariableAttributes,
+  VercelEnvironmentVariableKey,
   VercelEnvironmentVariableObservation,
+  VercelEnvironmentVariableUpdatedAt,
   VercelMarketplaceBindingObservation,
   VercelProjectDomainObservation,
   VercelProjectDiscovery,
@@ -36,10 +40,16 @@ import {
   VercelMarketplaceBindings,
   VercelProjects,
 } from "./services.js";
+import type { UpdateVercelStableEnvironmentVariable } from "./stable-environment.js";
 
 export interface VercelMemoryControlShape {
   readonly snapshot: Effect.Effect<VercelReadOnlyInventoryType>;
   readonly providerWriteCount: Effect.Effect<number>;
+  readonly stableEnvironmentAttemptCount: Effect.Effect<number>;
+  readonly recordStableEnvironmentAttempt: Effect.Effect<void>;
+  readonly updateEnvironmentVariable: (
+    input: UpdateVercelStableEnvironmentVariable
+  ) => Effect.Effect<typeof VercelEnvironmentVariableAttributes.Type>;
 }
 
 export class VercelMemoryControl extends Context.Service<
@@ -52,6 +62,55 @@ export const layerVercelMemory = (inventory: VercelReadOnlyInventoryType) =>
     Effect.gen(function* makeVercelMemory() {
       const state = yield* Ref.make(inventory);
       const providerWrites = yield* Ref.make(0);
+      const stableEnvironmentAttempts = yield* Ref.make(0);
+      const updateEnvironmentVariable = Effect.fn(
+        "VercelMemoryControl.updateEnvironmentVariable"
+      )(function* (input: UpdateVercelStableEnvironmentVariable) {
+        const current = yield* Ref.get(state);
+        const existing = Array.findFirst(
+          current.environmentVariables,
+          (environmentVariable) =>
+            environmentVariable.stage === input.stage &&
+            environmentVariable.teamId === input.teamId &&
+            environmentVariable.projectId === input.projectId &&
+            environmentVariable.environmentVariableId ===
+              input.environmentVariableId
+        );
+        if (existing._tag === "None") {
+          return yield* Effect.die(
+            "The stable environment memory fixture is missing its exact physical identity."
+          );
+        }
+        const providerUpdatedAt = VercelEnvironmentVariableUpdatedAt.make(
+          (existing.value.providerUpdatedAt ?? 0) + 1
+        );
+        const updated = VercelEnvironmentVariableAttributes.make({
+          ...existing.value,
+          key: VercelEnvironmentVariableKey.make(input.key),
+          type: input.type,
+          targets: input.targets,
+          sensitive: true,
+          providerUpdatedAt,
+          valueOwnership: input.valueOwnership,
+          deploymentRequired: true,
+          ownership: "Owned",
+        });
+        yield* Ref.update(state, (candidate) =>
+          VercelReadOnlyInventory.make({
+            ...candidate,
+            environmentVariables: Array.map(
+              candidate.environmentVariables,
+              (environmentVariable) =>
+                environmentVariable.environmentVariableId ===
+                input.environmentVariableId
+                  ? updated
+                  : environmentVariable
+            ),
+          })
+        );
+        yield* Ref.update(providerWrites, (count) => count + 1);
+        return updated;
+      });
 
       const observeProject = Effect.fn("VercelProjectsMemory.observeProject")(
         function* (input: ObserveVercelProject) {
@@ -360,6 +419,12 @@ export const layerVercelMemory = (inventory: VercelReadOnlyInventoryType) =>
               Effect.map((current) => VercelReadOnlyInventory.make(current))
             ),
             providerWriteCount: Ref.get(providerWrites),
+            stableEnvironmentAttemptCount: Ref.get(stableEnvironmentAttempts),
+            recordStableEnvironmentAttempt: Ref.update(
+              stableEnvironmentAttempts,
+              (count) => count + 1
+            ),
+            updateEnvironmentVariable,
           })
         )
       );

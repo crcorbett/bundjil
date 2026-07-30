@@ -12,6 +12,7 @@ import { Effect, Exit, Layer, Schema } from "effect";
 import {
   layerVercelMemory,
   layerVercelReadOnlyProviders,
+  VercelPreviewPhotonBindingValuesDenied,
   VercelDeploymentObservationResource,
   VercelEnvironmentVariable,
   VercelInventoryScope,
@@ -20,6 +21,7 @@ import {
   VercelProject,
   VercelProjectDomain,
   VercelReadOnlyInventory,
+  VercelStableEnvironmentBindingsDenied,
 } from "../src/vercel/index.js";
 
 const fixture = Effect.gen(function* decodeVercelProviderFixture() {
@@ -64,6 +66,8 @@ const fixture = Effect.gen(function* decodeVercelProviderFixture() {
         type: "sensitive",
         targets: ["preview"],
         sensitive: true,
+        valueOwnership: { _tag: "ObservedUnknown", configured: true },
+        deploymentRequired: false,
         ownership: "Unowned",
       },
     ],
@@ -158,7 +162,11 @@ const fixture = Effect.gen(function* decodeVercelProviderFixture() {
 const decoded = await Effect.runPromise(fixture);
 const memory = layerVercelMemory(decoded.inventory);
 const providers = Layer.merge(
-  layerVercelReadOnlyProviders(decoded.scope).pipe(Layer.provide(memory)),
+  layerVercelReadOnlyProviders(decoded.scope).pipe(
+    Layer.provide(VercelPreviewPhotonBindingValuesDenied),
+    Layer.provide(VercelStableEnvironmentBindingsDenied),
+    Layer.provide(memory)
+  ),
   memory
 );
 const { test } = Test.make({ providers, stage: "preview" });

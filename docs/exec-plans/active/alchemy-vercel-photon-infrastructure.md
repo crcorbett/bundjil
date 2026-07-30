@@ -1862,3 +1862,60 @@ nine workspace typechecks, all 38 Photon tests, all 63 agent tests, 30
 infrastructure Vitest tests plus 14 Alchemy lifecycle tests, and all fifteen
 Turbo tasks. The process-local synthetic Executor fixture made no external
 request.
+
+## Stable Preview binding ownership candidate
+
+The next requirement replay rejected the historical binding sink as the
+long-lived owner. Stable reconciliation now stays on the same adopted
+`VercelEnvironmentVariable` logical and physical identity. Its desired
+contract exhaustively distinguishes `Managed`, `ObservedUnknown`, and
+`Absent`: only the four existing sensitive Preview Photon variables can be
+Managed, every other value remains metadata-only, and Absent cannot delete a
+retained binding. Managed reference identity is the exact Vercel environment
+ID and its value revision is the immutable source SHA.
+
+The write-capable Layer is reachable only from `alchemy.stable.run.ts`, after a
+distinct mode-`0600` fixed authority and exact managed manifest both validate.
+It resolves the four already-custodied values from owner Config only at the
+PATCH adapter, decodes the complete acknowledgement immediately, and returns
+only metadata, revision ownership, and `deploymentRequired`. The ordinary
+adoption entry point composes denied value/write Layers.
+
+Direct tests reject proof by broad suite: the managed profile selects exactly
+four keys and not the internal bearer; wrong owner/reference and malformed
+acknowledgement fail; known pre-write transient failure makes three total
+exponential-jitter attempts and zero writes; an uncertain timeout after the
+exact write makes one attempt and stops; partial one-project failure resumes
+with the first physical identity no-op. Marketplace ambiguity/datastore retain
+remain owned by their existing read-only tests. Live acceptance still requires
+exact-commit inventory and adoption convergence, a four-update-only plan,
+provider acknowledgements, fresh metadata readback, fixed receipts, namespace
+continuity, no-op sync, and a distinct Vercel Git-created immutable deployment.
+
+### Stable-binding candidate docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                       |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and call graph                   | Change required | One existing environment Resource owns read/import and managed reconcile; Vercel Git alone owns deployment creation and promotion.          |
+| READMEs, exports and generated references     | Change required | Export the named stable contracts/Layers/authority path and document three root commands; no client or credential escape hatch is exported. |
+| Runbooks, authority and controls              | Change required | Add exact four-write authority, retry/uncertainty stops, readback, deployment observation and prior-revision rollback.                      |
+| Verification journeys and proof               | Change required | Extend the fixed state receipt for the managed profile and retain a separate fresh inventory/deployment observation.                        |
+| Skills, AGENTS, lint, config, commands and CI | Change required | Existing skills/AGENTS/CI policy is preserved; root commands and Config names are added and must pass every routed gate.                    |
+| Schemas, services and Layers                  | Change required | Add Schema-derived desired state, branded update revision, safe errors, named value/write services, explicit denied/live/memory Layers.     |
+| Tests and fixtures                            | Change required | Add profile, authority, exact HTTP, leak, no-op/update, policy rejection, retry, uncertainty and partial-failure cases.                     |
+| SPEC, tasks and active plan                   | Change required | Keep the task in progress and record direct observables plus rejected false greens property-by-property.                                    |
+| Secrets, receipts, rollout and rollback       | Change required | Values remain in ignored/provider custody; receipt retains revisions only; rollback reapplies the externally retained prior revision.       |
+| Lifecycle, archive and terminal audit         | Preserve        | Production and drift tasks remain downstream; the single formal five-pass audit remains terminal-only.                                      |
+| Documentation audit inventory                 | Preserve        | No documentation path was added or removed; `check:docs` recomputes and validates the current 272 routed files from the changed tree.       |
+
+No stable provider mutation has occurred in this repository candidate.
+The exact repository candidate passed the complete `bun run verification`
+gate with the documented process-only synthetic Executor fixture and no
+Executor request. Evidence includes Effect language-service diagnostics,
+boundary/docs/skills/authority/controls/verification-policy and HGI-307
+checks, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, all
+nine workspace typechecks, infrastructure's 37 Vitest and 19 Alchemy lifecycle
+tests, and all fifteen Turbo build/test tasks. Live acceptance remains
+separate: exact-commit inventory/adoption convergence, the four-update-only
+plan and apply, provider readback/no-op sync, namespace continuity, fixed
+receipts, and a distinct immutable Vercel Git deployment have not yet run.

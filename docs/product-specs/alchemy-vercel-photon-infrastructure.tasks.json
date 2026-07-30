@@ -953,7 +953,76 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's stable bindings section.",
-        "currentResult": "in progress. The requirement-to-proof replay rejected both the historical Preview inventory and the downstream adoption edge: inventory, adoption and state-proof must all authenticate to the Photon project selected by the decoded stage. The repository correction selects only the isolated BUNDJIL_PHOTON_PREVIEW_* credential for preview and only BUNDJIL_PHOTON_MANAGEMENT_* for prod, uses the same selected project for the live Layer and target, and writes the fixed receipt itself as a distinct mode-0600 artifact. Focused config tests prove each stage succeeds with the opposite credential absent and never renders its secret; package typecheck and 32 Vitest plus 14 Alchemy tests pass. No provider mutation has occurred. Full verification, a new exact-commit receipt-bearing Preview inventory, adoption plan/apply/no-op sync, stable env/Marketplace/namespace readback and immutable deployment observation remain required before acceptance."
+        "currentResult": "in progress. Stage-correct inventory, adoption and state proof are committed and a fresh two-read Preview inventory at 2962171 selected isolated project fingerprint 37cf2944…, two retained users, one callback and zero dedicated lines. The current repository candidate preserves the same Vercel environment Resource identities while adding explicit desired value ownership: exactly four existing Preview Photon keys may become Managed; every other value stays ObservedUnknown, Absent is protected, and the single internal bearer is rejected. A distinct fixed authority policy, immediate Config resolution, exact PATCH encoder, complete acknowledgement decoder, bounded known retry with jitter, fail-closed uncertain outcome, deployment-required result, deterministic memory Layers and fixed receipt path are implemented. Focused proof passes typecheck, contract, authority, manifest-profile and five Alchemy lifecycle cases. The exact candidate also passes Effect language-service diagnostics, every routed policy gate, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, all nine workspace typechecks, infrastructure's 37 Vitest and 19 Alchemy lifecycle tests, and all fifteen Turbo build/test tasks. No stable provider mutation has occurred. Exact-commit inventory/adoption convergence, four-update live plan/apply/readback/no-op sync, Marketplace/namespace continuity, fixed receipts and new immutable deployment observation remain required before acceptance."
+      },
+      "repositoryImplementationEvidence": {
+        "status": "candidate_pending_live_acceptance",
+        "requirementProofReplay": [
+          {
+            "requirement": "One exact owner and physical identity per stable environment binding",
+            "directObservable": "The existing VercelEnvironmentVariable Resource receives optional desired metadata and keeps team, project and environment ID in stables; no second resource or provider owns the same environment identity.",
+            "expectedPostcondition": "Read/import adoption and managed reconciliation address the same physical environment ID.",
+            "rejectedFalseGreen": "A second value sink, key-only lookup or neighbouring project key is not ownership continuity.",
+            "focusedCommand": "Infrastructure typecheck, boundary scan and vercel-stable-environment-provider.test.ts managed lifecycle.",
+            "evidenceOwner": "packages/infrastructure/src/vercel/providers.ts, schemas.ts and the stable Alchemy test."
+          },
+          {
+            "requirement": "Managed, ObservedUnknown and Absent value ownership are exhaustive and value-free",
+            "directObservable": "The managed adoption profile selects exactly four approved Preview Photon keys, binds reference to environment ID and revision to source SHA; the internal bearer and all other keys remain ObservedUnknown. Provider state and receipts contain revisions and metadata but no value.",
+            "expectedPostcondition": "Only the four approved existing bindings can update; unknown values remain unread and absent cannot delete.",
+            "rejectedFalseGreen": "Configured=true, a sensitive flag, a matching key name or secret custody alone is not Managed ownership.",
+            "focusedCommand": "adoption-manifest.test.ts managed-profile matrix, observed/absent/bearer Alchemy test and credential-value leak scan.",
+            "evidenceOwner": "packages/infrastructure/src/adoption-manifest.ts, stable-environment.ts and their focused tests."
+          },
+          {
+            "requirement": "Task-scoped authority validates before credential or provider access",
+            "directObservable": "alchemy.stable.run.ts joins the manifest loader with a mode-0600 fixed authority loader whose policy permits only four exact Preview updates, Preview state, branch push and read-only observations.",
+            "expectedPostcondition": "Production, deletion, bearer, Marketplace/datastore mutation, Photon mutation, deployment creation and promotion are unreachable.",
+            "rejectedFalseGreen": "The broad harness envelope, credential presence, repository permission or a valid manifest alone is not stable-write authority.",
+            "focusedCommand": "vercel-stable-environment-authority.test.ts plus malformed path/mode policy and check:authority.",
+            "evidenceOwner": "stable-vercel-environment-authority.schema.json and stable-environment-authority.ts."
+          },
+          {
+            "requirement": "Provider boundary resolves write-only values at the exact outward adapter",
+            "directObservable": "Four Config.schema owners decode Photon identities/secrets, the resolver requires exact owner/reference/key, PATCH encodes sensitive Preview metadata and value, and the response Schema omits provider value before returning safe attributes.",
+            "expectedPostcondition": "No raw client, callback, DTO, unchecked response, primitive public identity or value projection escapes the Layer.",
+            "rejectedFalseGreen": "A mocked update, redacted log or incomplete 2xx response is not exact outward encoding and complete acknowledgement decoding.",
+            "focusedCommand": "vercel-stable-environment-contracts.test.ts exact request, malformed acknowledgement, wrong-reference and leak-sentinel cases plus Effect LS.",
+            "evidenceOwner": "stable-environment-live.layer.ts and its contract test."
+          },
+          {
+            "requirement": "Retry eligibility, bound, backoff and jitter are property-by-property",
+            "directObservable": "Only known rateLimited/transient write failures enter Schedule.exponential(100 millis).pipe(Schedule.jittered) with times 2, producing at most three attempts. The memory pre-write timeout test observes three attempts and zero writes.",
+            "expectedPostcondition": "Eligible known transient failures are bounded; policy, identity, malformed and uncertain failures are not retried.",
+            "rejectedFalseGreen": "A general retry helper, eventual success or one neighbouring retry assertion does not prove eligibility, bound, backoff and jitter.",
+            "focusedCommand": "vercel-stable-environment-provider.test.ts pre-write timeout plus source inspection and lint.",
+            "evidenceOwner": "packages/infrastructure/src/vercel/providers.ts and stable-environment-memory.layer.ts."
+          },
+          {
+            "requirement": "Uncertain timeout-after-write is not blindly retried",
+            "directObservable": "The memory writer mutates the exact physical identity then returns certainty Uncertain/readbackRequired; the Alchemy test observes one attempt and one write. Vercel metadata cannot prove the write-only value, so recovery is operator review with prior and candidate values retained.",
+            "expectedPostcondition": "No automatic second write follows an uncertain acknowledgement.",
+            "rejectedFalseGreen": "A changed updatedAt, idempotent-looking key or later metadata read is not proof of the stored secret value.",
+            "focusedCommand": "vercel-stable-environment-provider.test.ts timeout-after-write case.",
+            "evidenceOwner": "stable-environment-memory.layer.ts, providers.ts and the stable runbook."
+          },
+          {
+            "requirement": "Partial one-project failure preserves accepted progress without duplicate write",
+            "directObservable": "The two-resource memory journey accepts the first exact write, fails the second before mutation, then plans the first no-op and writes only the second on resume; total provider writes are two.",
+            "expectedPostcondition": "Recovery converges each physical identity once.",
+            "rejectedFalseGreen": "A successful second run without per-resource write counts can conceal duplicate mutation.",
+            "focusedCommand": "vercel-stable-environment-provider.test.ts partial failure journey.",
+            "evidenceOwner": "The stable Alchemy lifecycle test and VercelMemoryControl counters."
+          },
+          {
+            "requirement": "Marketplace/datastore retention, namespace continuity and deployment ownership stay separate",
+            "directObservable": "Marketplace providers remain read-only retain Resources, no datastore operation is added, the stable entry point rejects any non-environment managed class, and every successful update returns deploymentRequired true for later Vercel Git observation.",
+            "expectedPostcondition": "No store recreation/detach, application-data read, deployment create or promotion occurs; a new immutable Git deployment is required before runtime claims.",
+            "rejectedFalseGreen": "A READY historical deployment, unchanged Marketplace count, Alchemy apply success or local test is not the new deployment/continuity proof.",
+            "focusedCommand": "Existing Marketplace ambiguity/retain tests, fresh provider inventory, stable plan/apply/sync, state receipt and exact-SHA deployment readback.",
+            "evidenceOwner": "Vercel Marketplace provider tests, ignored receipts, this task and the active plan."
+          }
+        ]
       },
       "implementationNotes": [
         "Derive the exact env inventory from every Config owner and Vercel readback; remove no key based only on a stale README or alias.",

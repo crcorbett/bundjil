@@ -10,6 +10,10 @@ import { loadInfrastructurePhotonCredentials } from "./config.js";
 import { layerPhotonReadOnlyProviders } from "./photon/providers.js";
 import { VercelLive, VercelCredentialsLive } from "./vercel/live.layer.js";
 import { layerVercelReadOnlyProviders } from "./vercel/providers.js";
+import {
+  VercelPreviewPhotonBindingValuesDenied,
+  VercelStableEnvironmentBindingsDenied,
+} from "./vercel/stable-environment.js";
 
 export const layerLiveReadOnlyAdoptionProviders = (
   scopes: AdoptionProviderScopes
@@ -31,6 +35,8 @@ export const layerLiveReadOnlyAdoptionProviders = (
 
   const readOnlyProviders = Layer.merge(
     layerVercelReadOnlyProviders(scopes.vercel).pipe(
+      Layer.provide(VercelPreviewPhotonBindingValuesDenied),
+      Layer.provide(VercelStableEnvironmentBindingsDenied),
       Layer.provide(liveProviderServices)
     ),
     layerPhotonReadOnlyProviders(scopes.photon).pipe(

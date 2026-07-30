@@ -1855,3 +1855,31 @@ inventory whose two reads contain Preview project `37cf2944…`, retained users
 `46b1fb0c…` and `b95e88f6…`, stable callback `d2456774…`, and zero dedicated
 lines. The historical source-project Preview manifest, local tests, or one
 component read are rejected false greens.
+
+The stable owner must reuse each adopted Vercel environment Resource rather
+than introduce a second sink or key-only owner. Its desired state classifies
+the exact four existing Preview Photon values as `Managed`, with the
+environment ID as reference and immutable source SHA as revision. All other
+values remain `ObservedUnknown`; `Absent` cannot delete retained metadata, and
+the single internal bearer remains outside this task because the applications
+do not accept an overlap set.
+
+The stable entry point requires a separate fixed mode-`0600` authority before
+Config or provider access. The live Layer resolves each write-only value only
+at the exact PATCH adapter, encodes sensitive Preview metadata, decodes the
+complete acknowledgement, and returns no value. Known 429/5xx failures receive
+at most three total attempts with exponential jitter. An uncertain
+timeout-after-write is never retried blindly: metadata cannot prove a
+write-only value, so both candidate and prior values remain in external custody
+for operator classification.
+
+Repository proof must directly cover the exact managed profile, wrong
+owner/reference, malformed acknowledgement, observed/absent/bearer rejection,
+retry eligibility/bound/backoff/jitter, one-attempt uncertain outcome,
+partial-one-project recovery, Marketplace ambiguity, datastore retention and
+the deployment-required result. Live acceptance additionally requires a
+four-update-only plan, exact read-after-write acknowledgements, fixed receipts,
+fresh two-read inventory, no-op plan and sync, unchanged namespaces/data
+identities, and a new Vercel Git-created immutable deployment. Neither an
+Alchemy apply, historical READY deployment, broad verification suite nor
+neighbouring Photon journey proves those live postconditions.

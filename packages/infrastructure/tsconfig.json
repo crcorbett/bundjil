@@ -5,6 +5,7 @@
     "../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json",
     "../../alchemy.run.ts",
     "../../alchemy.preview.run.ts",
+    "../../alchemy.stable.run.ts",
     "../../stacks/**/*.ts",
     "./scripts/**/*.ts",
     "./schemas/**/*.json",

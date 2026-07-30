@@ -14,8 +14,9 @@ receipts, and deterministic memory Layers.
 - `@bundjil/infrastructure/testing` exports decoded fixture Effects.
 - `@bundjil/infrastructure/vercel` exports Vercel read/import Schemas, named
   services, safe operation errors, lazy credential and live/memory Layers,
-  retained custom Resources, and one separately composed Preview-only
-  configuration capability. The private HTTP adapter encodes
+  retained custom Resources, one separately composed Preview-only
+  configuration capability, and one separately composed stable-binding
+  capability. The private HTTP adapters encode
   scoped requests, decodes complete response envelopes, exhausts pagination,
   omits environment values, resolves Marketplace identity through Vercel's
   customer storage catalog and projects its secret-bearing provider envelope
@@ -23,6 +24,13 @@ receipts, and deterministic memory Layers.
   only `enablePreviewFeedback` and create/delete one plain Preview-only
   environment metadata identity under a fixed authority contract. It contains
   no Git deployment, promotion, Production, domain, or Marketplace mutation.
+  The stable-binding capability updates only the four existing sensitive
+  Preview Photon environment identities by exact Vercel environment ID. It
+  resolves each already-custodied value only at the PATCH boundary, records a
+  branded value revision without the value, decodes the complete
+  acknowledgement immediately, and leaves every ObservedUnknown, Absent,
+  Marketplace, datastore, bearer, Production, deployment, and promotion
+  boundary read-only.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and
   stage-scoped state-safe props/attributes for Photon project, iMessage
   platform, shared user, webhook, dedicated-line, and billing observation. It
@@ -93,6 +101,9 @@ bun run --filter=@bundjil/infrastructure build
 bun run infrastructure:inventory
 bun run infrastructure:adoption-manifest
 bun run infrastructure:adoption-proof
+bun run infrastructure:stable-preview-plan
+bun run infrastructure:stable-preview-apply
+bun run infrastructure:stable-preview-sync
 bun run infrastructure:preview-plan
 bun run infrastructure:preview-apply
 bun run infrastructure:preview-sync
@@ -121,6 +132,22 @@ manifest, validated authority, and dedicated R2 Config named by
 [Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
+
+Stable Preview commands require the same accepted stage-correct inventory and
+manifest plus `BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=previewPhotonManaged`
+and a separate mode-`0600`
+`BUNDJIL_STABLE_ENVIRONMENT_AUTHORITY_PATH`. The authority policy permits
+updates only to the four existing `BUNDJIL_CHANNEL_PHOTON_*` identities in
+`bundjil-agent`; the source SHA is the value revision. The plan must contain
+exactly four updates and no create, replace, delete, bearer, Marketplace,
+datastore, Photon, Production, deployment-create, or promotion action. Known
+429/5xx failures receive at most three total attempts with exponential jitter;
+an uncertain timeout after write is never retried blindly because Vercel
+metadata cannot prove a write-only value. After apply, require exact provider
+acknowledgements, fresh metadata-only inventory, a no-op plan, two unchanged
+sync dry-runs, and `infrastructure:adoption-proof` with the managed profile.
+The four `deploymentRequired` results require a distinct new Vercel Git
+deployment before runtime claims.
 
 The inventory executable selects Photon credentials by the decoded stage:
 `preview` requires the isolated `BUNDJIL_PHOTON_PREVIEW_*` pair, while `prod`

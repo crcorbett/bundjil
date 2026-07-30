@@ -16,9 +16,16 @@ import {
   SyntheticPhysicalResourceId,
 } from "./schemas.js";
 import {
+  SecretOwner,
+  SecretReference,
+  SecretReferenceId,
+  SecretRevision,
+} from "./secret-reference.js";
+import {
   VercelCanonicalDomain,
   VercelDeploymentId,
   VercelEnvironmentVariableId,
+  VercelEnvironmentVariableDesiredState,
   VercelIntegrationConfigurationId,
   VercelIntegrationId,
   VercelMarketplaceDatabaseId,
@@ -90,6 +97,7 @@ const VercelEnvironmentAdoptionManifestResource = Schema.Struct({
     projectId: VercelProjectId,
     environmentVariableId: VercelEnvironmentVariableId,
   }),
+  desired: VercelEnvironmentVariableDesiredState,
 });
 
 const VercelMarketplaceAdoptionManifestResource = Schema.Struct({
@@ -274,10 +282,27 @@ export type AdoptionProviderScopes = typeof AdoptionProviderScopes.Type;
 export type AdoptionProviderScopesEncoded =
   typeof AdoptionProviderScopes.Encoded;
 
+export const AdoptionBindingProfile = Schema.Literals([
+  "observedOnly",
+  "previewPhotonManaged",
+]);
+export type AdoptionBindingProfile = typeof AdoptionBindingProfile.Type;
+export type AdoptionBindingProfileEncoded =
+  typeof AdoptionBindingProfile.Encoded;
+
 const logicalId = Schema.decodeUnknownEffect(AlchemyLogicalResourceId);
+const managedPreviewPhotonKeys = new Set([
+  "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+  "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
+  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+]);
 
 export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
-  function* (artifact: InfrastructureInventoryArtifact) {
+  function* (
+    artifact: InfrastructureInventoryArtifact,
+    bindingProfile: AdoptionBindingProfile = "observedOnly"
+  ) {
     const digest = yield* Schema.decodeUnknownEffect(AdoptionManifestDigest)(
       artifact.manifestDigest
     );
@@ -328,30 +353,54 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
     const vercelEnvironmentVariables = yield* Effect.forEach(
       artifact.manifest.vercel.environmentVariables,
       (environmentVariable) =>
-        logicalId(
-          `vercel-environment:${environmentVariable.projectId}:${environmentVariable.environmentVariableId}`
-        ).pipe(
-          Effect.map((resourceLogicalId) =>
-            AdoptionManifestResource.make({
-              stage,
-              provider: "vercel",
-              resourceKind: "vercelEnvironmentVariable",
-              logicalId: resourceLogicalId,
-              physicalId: {
-                teamId: environmentVariable.teamId,
-                projectId: environmentVariable.projectId,
-                environmentVariableId:
-                  environmentVariable.environmentVariableId,
-              },
-              owner: {
-                _tag: "VercelTeam",
-                teamId: environmentVariable.teamId,
-              },
-              removalPolicy: "retain",
-              observedMetadataDigest: digest,
-            })
-          )
-        )
+        Effect.gen(function* buildVercelEnvironmentManifestResource() {
+          const valueOwnership =
+            bindingProfile === "previewPhotonManaged" &&
+            artifact.manifest.stage === "preview" &&
+            managedPreviewPhotonKeys.has(environmentVariable.key)
+              ? {
+                  _tag: "Managed" as const,
+                  reference: SecretReference.make({
+                    owner: yield* Schema.decodeUnknownEffect(SecretOwner)(
+                      "@bundjil/infrastructure/vercel/preview-photon"
+                    ),
+                    reference: yield* Schema.decodeUnknownEffect(
+                      SecretReferenceId
+                    )(environmentVariable.environmentVariableId),
+                    revision: yield* Schema.decodeUnknownEffect(SecretRevision)(
+                      artifact.sourceSha
+                    ),
+                  }),
+                }
+              : ({ _tag: "ObservedUnknown", configured: true } as const);
+          const resourceLogicalId = yield* logicalId(
+            `vercel-environment:${environmentVariable.projectId}:${environmentVariable.environmentVariableId}`
+          );
+          return AdoptionManifestResource.make({
+            stage,
+            provider: "vercel",
+            resourceKind: "vercelEnvironmentVariable",
+            logicalId: resourceLogicalId,
+            physicalId: {
+              teamId: environmentVariable.teamId,
+              projectId: environmentVariable.projectId,
+              environmentVariableId: environmentVariable.environmentVariableId,
+            },
+            desired: VercelEnvironmentVariableDesiredState.make({
+              key: environmentVariable.key,
+              type: environmentVariable.type,
+              targets: environmentVariable.targets,
+              gitBranch: environmentVariable.gitBranch,
+              valueOwnership,
+            }),
+            owner: {
+              _tag: "VercelTeam",
+              teamId: environmentVariable.teamId,
+            },
+            removalPolicy: "retain",
+            observedMetadataDigest: digest,
+          });
+        })
     );
     const vercelMarketplaceBindings = yield* Effect.forEach(
       artifact.manifest.vercel.marketplaceBindings,
@@ -566,9 +615,10 @@ export const verifyAdoptionManifestAgainstInventory = Effect.fn(
   "AdoptionManifest.verifyAgainstInventory"
 )(function* (
   artifact: InfrastructureInventoryArtifact,
-  candidate: AdoptionManifest
+  candidate: AdoptionManifest,
+  bindingProfile: AdoptionBindingProfile = "observedOnly"
 ) {
-  const expected = yield* buildAdoptionManifest(artifact);
+  const expected = yield* buildAdoptionManifest(artifact, bindingProfile);
   const encodedExpected =
     yield* Schema.encodeEffect(AdoptionManifestJson)(expected);
   const encodedCandidate =

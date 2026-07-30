@@ -32,7 +32,73 @@ const decodeInventoryFixture = Schema.decodeUnknownEffect(
     vercel: {
       projects: [],
       domains: [],
-      environmentVariables: [],
+      environmentVariables: [
+        {
+          stage: "preview",
+          teamId: "team-preview",
+          projectId: "prj-agent",
+          environmentVariableId: "env-photon-project",
+          key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+          type: "sensitive",
+          targets: ["preview"],
+          sensitive: true,
+          valueOwnership: { _tag: "ObservedUnknown", configured: true },
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+        {
+          stage: "preview",
+          teamId: "team-preview",
+          projectId: "prj-agent",
+          environmentVariableId: "env-photon-project-secret",
+          key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+          type: "sensitive",
+          targets: ["preview"],
+          sensitive: true,
+          valueOwnership: { _tag: "ObservedUnknown", configured: true },
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+        {
+          stage: "preview",
+          teamId: "team-preview",
+          projectId: "prj-agent",
+          environmentVariableId: "env-photon-webhook",
+          key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
+          type: "sensitive",
+          targets: ["preview"],
+          sensitive: true,
+          valueOwnership: { _tag: "ObservedUnknown", configured: true },
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+        {
+          stage: "preview",
+          teamId: "team-preview",
+          projectId: "prj-agent",
+          environmentVariableId: "env-photon-webhook-secret",
+          key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+          type: "sensitive",
+          targets: ["preview"],
+          sensitive: true,
+          valueOwnership: { _tag: "ObservedUnknown", configured: true },
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+        {
+          stage: "preview",
+          teamId: "team-preview",
+          projectId: "prj-agent",
+          environmentVariableId: "env-internal-token",
+          key: "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+          type: "sensitive",
+          targets: ["preview"],
+          sensitive: true,
+          valueOwnership: { _tag: "ObservedUnknown", configured: true },
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+      ],
       marketplaceBindings: [],
       deployments: [],
     },
@@ -71,10 +137,15 @@ it.effect(
       const inventory = yield* decodeInventoryFixture;
       const manifest = yield* buildAdoptionManifest(inventory);
       assert.strictEqual(manifest.stage, "preview");
-      assert.strictEqual(manifest.resources.length, 3);
+      assert.strictEqual(manifest.resources.length, 8);
       assert.deepStrictEqual(
         manifest.resources.map((resource) => resource.resourceKind),
         [
+          "vercelEnvironmentVariable",
+          "vercelEnvironmentVariable",
+          "vercelEnvironmentVariable",
+          "vercelEnvironmentVariable",
+          "vercelEnvironmentVariable",
           "photonProjectObservation",
           "photonPlatformConfiguration",
           "photonBillingObservation",
@@ -95,6 +166,52 @@ it.effect(
         decoded
       );
       assert.deepStrictEqual(verified, manifest);
+    })
+);
+
+it.effect(
+  "classifies only the four exact Preview Photon bindings as managed",
+  () =>
+    Effect.gen(function* testManagedPreviewPhotonProfile() {
+      const inventory = yield* decodeInventoryFixture;
+      const manifest = yield* buildAdoptionManifest(
+        inventory,
+        "previewPhotonManaged"
+      );
+      const environmentResources = manifest.resources.filter(
+        (resource) => resource.resourceKind === "vercelEnvironmentVariable"
+      );
+      const managed = environmentResources.filter(
+        (resource) => resource.desired.valueOwnership._tag === "Managed"
+      );
+      assert.strictEqual(managed.length, 4);
+      assert.strictEqual(
+        managed.every(
+          (resource) =>
+            resource.desired.valueOwnership._tag === "Managed" &&
+            resource.desired.valueOwnership.reference.owner ===
+              "@bundjil/infrastructure/vercel/preview-photon" &&
+            String(resource.desired.valueOwnership.reference.reference) ===
+              String(resource.physicalId.environmentVariableId) &&
+            String(resource.desired.valueOwnership.reference.revision) ===
+              String(inventory.sourceSha)
+        ),
+        true
+      );
+      const internalToken = environmentResources.find(
+        (resource) =>
+          resource.desired.key === "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"
+      );
+      assert.strictEqual(
+        internalToken?.desired.valueOwnership._tag,
+        "ObservedUnknown"
+      );
+      const wrongProfile = yield* verifyAdoptionManifestAgainstInventory(
+        inventory,
+        manifest,
+        "observedOnly"
+      ).pipe(Effect.exit);
+      assert.strictEqual(Exit.isFailure(wrongProfile), true);
     })
 );
 

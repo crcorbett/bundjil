@@ -4,6 +4,7 @@ import {
   InfrastructureOwnershipState,
   InfrastructureStage,
 } from "../schemas.js";
+import { SecretOwnership } from "../secret-reference.js";
 
 export const VercelTeamId = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/vercel/VercelTeamId")
@@ -33,6 +34,17 @@ export type VercelEnvironmentVariableKey =
   typeof VercelEnvironmentVariableKey.Type;
 export type VercelEnvironmentVariableKeyEncoded =
   typeof VercelEnvironmentVariableKey.Encoded;
+
+export const VercelEnvironmentVariableUpdatedAt = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThanOrEqualTo(0)),
+  Schema.brand(
+    "@bundjil/infrastructure/vercel/VercelEnvironmentVariableUpdatedAt"
+  )
+);
+export type VercelEnvironmentVariableUpdatedAt =
+  typeof VercelEnvironmentVariableUpdatedAt.Type;
+export type VercelEnvironmentVariableUpdatedAtEncoded =
+  typeof VercelEnvironmentVariableUpdatedAt.Encoded;
 
 export const VercelGitBranch = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/vercel/VercelGitBranch")
@@ -325,11 +337,26 @@ export type ListedVercelProjectDomains = typeof ListedVercelProjectDomains.Type;
 export type ListedVercelProjectDomainsEncoded =
   typeof ListedVercelProjectDomains.Encoded;
 
+export const VercelEnvironmentVariableDesiredState = Schema.Struct({
+  key: VercelEnvironmentVariableKey,
+  type: VercelEnvironmentVariableType,
+  targets: Schema.Array(VercelEnvironmentTarget).pipe(
+    Schema.check(Schema.isMinLength(1))
+  ),
+  gitBranch: Schema.optional(VercelGitBranch),
+  valueOwnership: SecretOwnership,
+});
+export type VercelEnvironmentVariableDesiredState =
+  typeof VercelEnvironmentVariableDesiredState.Type;
+export type VercelEnvironmentVariableDesiredStateEncoded =
+  typeof VercelEnvironmentVariableDesiredState.Encoded;
+
 export const VercelEnvironmentVariableProps = Schema.Struct({
   stage: InfrastructureStage,
   teamId: VercelTeamId,
   projectId: VercelProjectId,
   environmentVariableId: VercelEnvironmentVariableId,
+  desired: Schema.optional(VercelEnvironmentVariableDesiredState),
 });
 export type VercelEnvironmentVariableProps =
   typeof VercelEnvironmentVariableProps.Type;
@@ -346,6 +373,9 @@ export const VercelEnvironmentVariableAttributes = Schema.Struct({
   targets: Schema.Array(VercelEnvironmentTarget),
   gitBranch: Schema.optional(VercelGitBranch),
   sensitive: Schema.Boolean,
+  providerUpdatedAt: Schema.optional(VercelEnvironmentVariableUpdatedAt),
+  valueOwnership: SecretOwnership,
+  deploymentRequired: Schema.Boolean,
   ownership: InfrastructureOwnershipState,
 });
 export type VercelEnvironmentVariableAttributes =

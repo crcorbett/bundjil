@@ -13,6 +13,7 @@ import {
 } from "effect";
 
 import {
+  AdoptionBindingProfile,
   AdoptionManifestJson,
   buildAdoptionManifest,
   InfrastructureInventoryArtifactJson,
@@ -45,11 +46,16 @@ const adoptionPathConfig = Config.schema(
   AdoptionArtifactPath,
   "BUNDJIL_INFRASTRUCTURE_ADOPTION_PATH"
 );
+const bindingProfileConfig = Config.schema(
+  AdoptionBindingProfile,
+  "BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE"
+).pipe(Config.withDefault("observedOnly"));
 
 const generateAdoptionManifest = Effect.gen(
   function* generateAdoptionManifestOperation() {
     const inventoryPath = yield* inventoryPathConfig;
     const adoptionPath = yield* adoptionPathConfig;
+    const bindingProfile = yield* bindingProfileConfig;
     if (inventoryPath === adoptionPath) {
       return yield* Effect.fail("adoption-path-conflicts-with-inventory");
     }
@@ -65,7 +71,7 @@ const generateAdoptionManifest = Effect.gen(
     const inventory = yield* Schema.decodeUnknownEffect(
       InfrastructureInventoryArtifactJson
     )(inventoryText, { onExcessProperty: "error" });
-    const manifest = yield* buildAdoptionManifest(inventory);
+    const manifest = yield* buildAdoptionManifest(inventory, bindingProfile);
     const manifestText =
       yield* Schema.encodeEffect(AdoptionManifestJson)(manifest);
     yield* fileSystem.makeDirectory(dirname(adoptionPath), {

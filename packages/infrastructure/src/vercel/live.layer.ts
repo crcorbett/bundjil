@@ -50,6 +50,7 @@ import {
   VercelEnvironmentVariableKey,
   VercelEnvironmentVariableObservation,
   VercelEnvironmentVariableType,
+  VercelEnvironmentVariableUpdatedAt,
   VercelGitBranch,
   VercelGitSha,
   VercelIntegrationConfigurationId,
@@ -201,6 +202,7 @@ const VercelEnvironmentVariablesSuccessEnvelope = Schema.Struct({
         target: Schema.Array(VercelEnvironmentTarget),
         gitBranch: Schema.optional(VercelGitBranch),
         sensitive: Schema.optional(Schema.Boolean),
+        updatedAt: Schema.optional(VercelEnvironmentVariableUpdatedAt),
         contentHint: Schema.optional(VercelMarketplaceContentHint),
       })
     ),
@@ -709,6 +711,12 @@ export const VercelLive = Layer.effectContext(
                   environmentVariable.type === "sensitive" ||
                   environmentVariable.type === "encrypted" ||
                   environmentVariable.type === "secret",
+                providerUpdatedAt: environmentVariable.updatedAt,
+                valueOwnership: {
+                  _tag: "ObservedUnknown",
+                  configured: true,
+                },
+                deploymentRequired: false,
                 ownership: "Unowned",
               })
             )

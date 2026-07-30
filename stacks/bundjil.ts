@@ -65,6 +65,7 @@ const deployAdoptionResource = (
         VercelEnvironmentVariable(candidate.logicalId, {
           stage: candidate.stage,
           ...candidate.physicalId,
+          desired: candidate.desired,
         }),
       vercelMarketplaceBinding: (candidate) =>
         VercelMarketplaceBinding(candidate.logicalId, {

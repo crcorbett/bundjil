@@ -69,6 +69,8 @@ const rawInventory = {
       targets: ["preview"],
       gitBranch: "codex/alchemy-vercel-photon-infrastructure",
       sensitive: true,
+      valueOwnership: { _tag: "ObservedUnknown", configured: true },
+      deploymentRequired: false,
       ownership: "Unowned",
     },
   ],

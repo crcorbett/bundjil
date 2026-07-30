@@ -11,6 +11,8 @@ export {
   type SecretRevisionEncoded,
 } from "./secret-reference.js";
 export {
+  AdoptionBindingProfile,
+  type AdoptionBindingProfileEncoded,
   AdoptionManifest,
   AdoptionManifestBuildError,
   AdoptionManifestBuildMessage,
@@ -29,6 +31,13 @@ export {
   verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
 export { layerLiveReadOnlyAdoptionProviders } from "./adoption-live.layer.js";
+export {
+  AdoptionCommand,
+  type AdoptionCommandEncoded,
+  loadAdoptionCommand,
+} from "./adoption-command.js";
+export { layerLiveStableAdoptionProviders } from "./stable-adoption-live.layer.js";
+export { validateStableAdoptionCommand } from "./stable-adoption-command.js";
 export {
   loadInfrastructureCommandConfig,
   loadInfrastructurePhotonCredentials,

@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-30
 review_trigger: Alchemy stack, remote state, Vercel or Photon provider boundary, adoption manifest, credential, drift, apply, rollback, or revocation change
 ---
 
@@ -27,9 +27,10 @@ The stack's stable identities are:
 - Alchemy stack `BundjilInfrastructure`, with distinct `preview` and `prod`
   stages.
 
-The Photon project is currently one shared Free physical identity observed in
-both state stages. That is migration state, not Preview/Production Photon
-isolation and not authority to mutate it.
+Preview inventory and state must name the isolated Preview Photon project;
+Production inventory and state must name the source/Production Photon project.
+One project observed in both state stages is a stage-isolation failure, not
+migration proof.
 
 `@bundjil/infrastructure/photon` now contains the dormant
 `PhotonWebhookBindingSink` required before an isolated Preview webhook can be
@@ -129,6 +130,61 @@ Photon projects, manifests, or physical identities.
 
 The Vercel and Photon adoption adapters expose metadata reads only. State
 object writes do not authorize a Vercel or Photon mutation.
+
+## Stable Preview bindings
+
+Stable binding starts only after stage-correct no-write adoption is current and
+the isolated Photon Preview journey is accepted. Generate a second manifest
+from that exact inventory with
+`BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=previewPhotonManaged`. It must classify
+exactly the four existing `bundjil-agent`
+`BUNDJIL_CHANNEL_PHOTON_{PROJECT_ID,PROJECT_SECRET,WEBHOOK_ID,WEBHOOK_SECRET}`
+environment identities as `Managed`; every other environment value remains
+`ObservedUnknown`. The managed reference owner is fixed, its reference is the
+exact Vercel environment ID, and its revision is the immutable source SHA.
+
+Validate a distinct mode-`0600`
+`BUNDJIL_STABLE_ENVIRONMENT_AUTHORITY_PATH`. Its fixed policy permits only the
+four exact Preview PATCH operations, Preview Alchemy state, read-only
+Marketplace/Photon metadata, branch push, and observation of Vercel
+Git-created deployments. It grants no Production, bearer, Marketplace,
+datastore, Photon, deployment-create, promotion, delete, or secret-read
+operation.
+
+1. Run `bun run infrastructure:stable-preview-plan`. Stop unless it reports
+   exactly four updates on the already adopted environment physical IDs and
+   zero create, replace, delete, or other update.
+2. Capture the externally retained prior four values and their revision in
+   approved secret custody. Run
+   `bun run infrastructure:stable-preview-apply`. Each provider request must
+   target the same environment ID with `sensitive` and `preview`, then decode a
+   complete acknowledgement with a new provider revision. Values must never
+   appear in stdout, Alchemy state, receipts, plans, or tracked files.
+3. A known 429 or 5xx receives exponential jitter and at most three total
+   attempts. A malformed response, identity mismatch, 4xx policy failure, or
+   timeout after a possible write is fail-closed. Never blindly retry an
+   uncertain write: Vercel metadata can show an update timestamp but cannot
+   prove the write-only value. Preserve both candidate and prior values and
+   require operator classification before another apply.
+4. Run a fresh two-read Preview inventory, then
+   `bun run infrastructure:stable-preview-plan` and two
+   `bun run infrastructure:stable-preview-sync` commands. Require all no-op or
+   unchanged, exact key/type/target/provider-revision readback, the same two
+   Marketplace/database identities, and the same Photon project/users/webhook.
+   Run `bun run infrastructure:adoption-proof` with
+   `BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=previewPhotonManaged`; retain its
+   fixed-contract receipt alongside the inventory receipt.
+5. Environment updates affect only new deployments. Push the coherent
+   receipt-bearing branch commit and observe a distinct Vercel Git-created
+   Preview deployment for each affected project whose source SHA is exact and
+   status is `READY`. Do not create or promote a deployment. Deployment
+   readiness remains distinct from runtime, Channel, and handset proof.
+
+Rollback reapplies the externally retained prior value revision to the same
+four environment IDs under a new authority receipt, requires provider
+acknowledgements, creates a new immutable Git deployment, and repeats
+readback. Do not claim Vercel retains two active values for the same key and
+target.
 
 ## Configuration and drift
 

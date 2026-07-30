@@ -218,7 +218,7 @@ const runInventory = Effect.gen(
       detailArtifacts: [{ path: artifactPath, sha256: artifactDigest }],
       limitations: [
         "Provider readback is point-in-time metadata, not deployment or Channel proof.",
-        "Shared Photon project observation does not authorize a Preview project create.",
+        "Inventory readback does not authorize Photon project creation.",
       ],
       nonClaims: [
         "This receipt proves no deployment, promotion, webhook mutation, send, delivery, handset result, or future provider state.",
