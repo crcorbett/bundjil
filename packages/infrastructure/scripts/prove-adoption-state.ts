@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import { dirname, isAbsolute } from "node:path";
 /* oxlint-disable unicorn/no-array-method-this-argument -- Effect.forEach is a data-first Effect combinator, not Array.prototype.forEach. */
 
-import { PhotonProjectSecret } from "@bundjil/photon/management";
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { State } from "alchemy/State";
@@ -28,6 +27,7 @@ import {
   InfrastructureStage,
   layerAlchemyR2State,
   loadAlchemyR2StateConfig,
+  loadInfrastructurePhotonCredentials,
 } from "../src/index.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
 
@@ -80,11 +80,6 @@ const vercelAccessTokenConfig = Config.schema(
   VercelAccessToken,
   "VERCEL_INFRASTRUCTURE_ACCESS_TOKEN"
 );
-const photonProjectSecretConfig = Config.schema(
-  PhotonProjectSecret,
-  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET"
-);
-
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 
@@ -179,11 +174,12 @@ const runAdoptionStateProof = Effect.gen(
         resource.status === "updated"
     );
     const stateConfig = yield* loadAlchemyR2StateConfig;
+    const photonCredentials = yield* loadInfrastructurePhotonCredentials(stage);
     const credentials = [
       stateConfig.accessKeyId,
       stateConfig.secretAccessKey,
       yield* vercelAccessTokenConfig,
-      yield* photonProjectSecretConfig,
+      photonCredentials.projectSecret,
     ];
     const serializedState = yield* Schema.encodeEffect(
       Schema.fromJsonString(Schema.Unknown)

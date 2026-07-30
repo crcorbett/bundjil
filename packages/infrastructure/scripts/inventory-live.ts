@@ -73,6 +73,10 @@ const artifactPathConfig = Config.schema(
   InventoryArtifactPath,
   "BUNDJIL_INFRASTRUCTURE_INVENTORY_PATH"
 );
+const receiptPathConfig = Config.schema(
+  InventoryArtifactPath,
+  "BUNDJIL_INFRASTRUCTURE_RECEIPT_PATH"
+);
 const teamIdConfig = Config.schema(
   VercelTeamId,
   "BUNDJIL_INFRASTRUCTURE_VERCEL_TEAM_ID"
@@ -127,7 +131,12 @@ const runInventory = Effect.gen(
     const authorityPath = yield* authorityPathConfig;
     yield* readAndValidateAuthority(authorityPath);
     const artifactPath = yield* artifactPathConfig;
-    if (artifactPath === authorityPath) {
+    const receiptPath = yield* receiptPathConfig;
+    if (
+      artifactPath === authorityPath ||
+      receiptPath === authorityPath ||
+      receiptPath === artifactPath
+    ) {
       return yield* Effect.fail("artifact-path-conflicts-with-authority");
     }
     const teamId = yield* teamIdConfig;
@@ -240,6 +249,15 @@ const runInventory = Effect.gen(
     yield* fileSystem.writeFileString(artifactPath, artifactJson, {
       mode: 0o600,
     });
+    yield* fileSystem.chmod(artifactPath, 0o600);
+    yield* fileSystem.makeDirectory(dirname(receiptPath), {
+      recursive: true,
+      mode: 0o700,
+    });
+    yield* fileSystem.writeFileString(receiptPath, receiptJson, {
+      mode: 0o600,
+    });
+    yield* fileSystem.chmod(receiptPath, 0o600);
     return receiptJson;
   }
 );

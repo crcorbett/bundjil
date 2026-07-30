@@ -62,6 +62,16 @@ only by owning `Config.schema` boundaries:
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.
 
+Preview inventory, adoption, and state proof use the distinct
+`BUNDJIL_PHOTON_PREVIEW_PROJECT_ID` and
+`BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET` pair. The decoded stage selects exactly
+one pair; do not make both pairs mandatory and do not substitute the
+source/Production pair when Preview custody is unavailable. The inventory
+command also requires a distinct
+`BUNDJIL_INFRASTRUCTURE_RECEIPT_PATH`; the command writes both inventory and
+receipt as mode-`0600` Schema-valid artifacts. Captured stdout and a receipt
+from another source revision are not evidence.
+
 The Preview configuration stack additionally requires the ignored fixed
 authority path plus exact non-secret target metadata:
 

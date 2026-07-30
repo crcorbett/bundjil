@@ -1830,6 +1830,30 @@ rendered value for the secret sentinel.
 The next step is full verification, a coherent prerequisite commit, and a
 fresh exact-SHA Preview inventory before adoption planning.
 
+## Stage-correct adoption and durable inventory receipt
+
+The next requirement replay rejected proof by a stage-correct inventory alone.
+The live adoption Layer and state-proof leak scan still authenticated through
+the source/Production Photon Config owner for both stages. That would let a
+Preview manifest name one project while its provider reads targeted another.
+
+The correction selects the same decoded-stage Photon credential in inventory,
+adoption and state proof. The inventory command now writes its fixed-contract
+receipt to a separate validated mode-`0600` path after its owning Effect Schema
+encoder and harness validation; stdout remains operator feedback only.
+
+| Surface                           | Decision        | Direct evidence and rejected false green                                                                                                                  |
+| --------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and call graph       | Change required | All three provider composition edges select the decoded stage. A correct manifest paired with a wrong authenticated project is explicitly rejected.       |
+| READMEs and commands              | Change required | Document the distinct receipt path and make the command—not shell redirection—the durable writer.                                                         |
+| Runbooks and authority            | Preserve        | The existing read-only inventory/adoption envelope remains the authority owner; no provider write is added.                                               |
+| Verification journeys and receipt | Change required | Regenerate the exact-commit Preview artifact and receipt. A stale receipt beside a fresh artifact is not accepted proof.                                  |
+| Schemas, services and Layers      | Change required | Reuse the stage-owned redacted Config operation and Photon credential service; no raw SDK/client or new DTO crosses the boundary.                         |
+| Tests and fixtures                | Preserve        | Existing opposite-stage-missing and secret-render tests exercise the shared Config operation; package typecheck and complete provider matrices must pass. |
+| SPEC, tasks and active plan       | Change required | Keep stable bindings in progress until exact provider evidence, adoption convergence, bindings and deployment observations all pass directly.             |
+| Secrets, rollout and rollback     | Preserve        | No provider mutation occurs; rollback is the prerequisite commit revert and discarded ignored artifacts.                                                  |
+| Lifecycle and terminal audit      | Preserve        | Production, drift closeout and the one terminal five-pass audit remain downstream.                                                                        |
+
 The exact receipt candidate passed strict Effect language-service diagnostics,
 19 focused Photon transport/reconciliation tests, the exact 12-test Channel
 fixture, every routed policy gate, and complete `bun run verification`. The

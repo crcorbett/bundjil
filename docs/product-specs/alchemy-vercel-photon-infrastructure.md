@@ -1189,6 +1189,15 @@ metadata while value ownership remains blocked. A protected apply resolves
 only the `Managed` variant through an owner-specific Config/credential Layer.
 Vercel's documented decrypt endpoints remain forbidden to this workflow.
 
+Inventory, adoption, and state-proof adapters select Photon credentials from
+the decoded stage before composing the live Layer. Preview uses only the
+isolated Preview credential pair; Production uses only the source/Production
+pair. A stage-correct manifest authenticated against the other Photon project
+is a hard isolation failure, even when every provider operation is read-only.
+The inventory executable persists both the Schema-encoded manifest and its
+fixed-contract receipt as distinct mode-`0600` artifacts; captured stdout is
+not a durable evidence owner.
+
 Before any Bundjil-owned state projection, fixture, plan receipt, or manifest
 is written, it is encoded through its canonical `Encoded` contract. On read,
 that same artifact is decoded once before policy decisions. Alchemy's native

@@ -109,13 +109,15 @@ bun alchemy sync --stage preview --dry-run
 ```
 
 `infrastructure:inventory` additionally requires the accepted task-scoped
-authority file, source/principal identities, exact Vercel team/project scope,
-and the redacted Vercel and Photon credential configuration named by
-`scripts/inventory-live.ts`. Adoption additionally requires the exact accepted
-inventory digest, stage-specific mode-`0600` manifest, validated authority,
-and dedicated R2 Config named by `src/state/r2-state.ts`. The installed
-Alchemy beta has no `plan --adopt`; use `deploy --dry-run --adopt` for the
-side-effect-free adoption plan. Follow the
+authority file, distinct mode-`0600` inventory and receipt paths,
+source/principal identities, exact Vercel team/project scope, and the redacted
+Vercel and Photon credential configuration named by
+`scripts/inventory-live.ts`. It writes the already Schema-encoded fixed receipt
+itself; captured stdout is not the durable evidence owner. Adoption additionally
+requires the exact accepted inventory digest, stage-specific mode-`0600`
+manifest, validated authority, and dedicated R2 Config named by
+`src/state/r2-state.ts`. The installed Alchemy beta has no `plan --adopt`; use
+`deploy --dry-run --adopt` for the side-effect-free adoption plan. Follow the
 [Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
@@ -126,6 +128,10 @@ requires the source/Production `BUNDJIL_PHOTON_MANAGEMENT_*` pair. It does not
 load the other stage's credential. A Preview artifact containing the
 Production Photon project, or vice versa, is a stage-isolation failure and
 must not become an adoption manifest.
+
+The live adoption Layer and state-proof leak scan apply the same stage
+selection. Passing a stage-correct inventory to a Layer that authenticates as
+the other Photon project is a hard failure, not partial adoption proof.
 
 `infrastructure:photon-preview-webhook-binding` consumes the mode-`0600`
 create-only Photon webhook artifact and writes the project ID/secret plus
