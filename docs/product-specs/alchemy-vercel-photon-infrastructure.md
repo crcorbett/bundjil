@@ -2132,6 +2132,25 @@ authority, retain its create-only secret, reapply all four values, stage the
 candidate, and require signed live proof before promotion or original-webhook
 retirement.
 
+The authorized live recovery created one parallel Production callback while
+preserving the original callback and both shared users. Fresh two-read
+inventory proved the two-callback topology and no unrelated change. The
+create-only pair entered ignored mode-`0600` custody. Observed-only adoption
+converged the 73-resource topology with zero provider writes; the corrected
+managed apply then changed exactly the four Production environment revisions.
+Fresh inventory, an all-73-no-op post-plan and two all-73-no-op native syncs
+passed. The managed-state receipt proves four acknowledgements,
+deployment-required 4 and zero credential matches.
+
+That first receipt exposed a second durable correction: Production cannot use
+the Preview rollback claim that prior values are externally retained. Its
+rollback identity is the last-known-good immutable Production deployment plus
+the original Photon callback. A failed staged candidate is not deployed or
+promoted; a failed promoted candidate restores that prior deployment and
+callback. Vercel metadata cannot reconstruct the overwritten write-only values.
+Any later complete revision must come from independent custody under new
+authority.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

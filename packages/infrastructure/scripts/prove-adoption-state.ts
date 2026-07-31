@@ -318,6 +318,11 @@ const runAdoptionStateProof = Effect.gen(
             resource.props.desired.valueOwnership.reference.revision ===
               resource.attr.valueOwnership.reference.revision
         ));
+    const stageLabel = Match.value(stage).pipe(
+      Match.when("preview", () => "Preview" as const),
+      Match.when("prod", () => "Production" as const),
+      Match.exhaustive
+    );
     const exactState =
       state.id === "s3" &&
       version === 5 &&
@@ -348,7 +353,7 @@ const runAdoptionStateProof = Effect.gen(
       status: "passed",
       claim:
         bindingProfile !== "observedOnly"
-          ? `Authorized stable ${stage} Photon environment bindings produced exact provider acknowledgements in dedicated remote state.`
+          ? `Authorized stable ${stageLabel} Photon environment bindings produced exact provider acknowledgements in dedicated remote state.`
           : "Authorized no-write adoption persisted the exact accepted manifest in dedicated remote state and converged to no-op.",
       target: `alchemy:BundjilInfrastructure:${stage}`,
       candidateIdentity,
@@ -381,7 +386,7 @@ const runAdoptionStateProof = Effect.gen(
         "Every persisted resource has the exact stage and completed adoption status.",
         "Preview and Production coexist as distinct stages in the dedicated state store.",
         bindingProfile !== "observedOnly"
-          ? `Only the four existing ${stage} Photon environment identities have managed ownership; every other Vercel and Photon resource remains read-only and retained.`
+          ? `Only the four existing ${stageLabel} Photon environment identities have managed ownership; every other Vercel and Photon resource remains read-only and retained.`
           : "The live Vercel and Photon adoption adapters expose read transports only.",
       ],
       detailArtifacts: [{ path: manifestPath, sha256: manifestDigest }],
@@ -394,10 +399,24 @@ const runAdoptionStateProof = Effect.gen(
       nonClaims: [
         "This receipt proves no Vercel deployment, promotion, runtime health, Photon mutation, Channel delivery, handset result, or future provider state.",
       ],
-      rollbackOrRecovery:
-        bindingProfile !== "observedOnly"
-          ? "Use the externally retained prior value revision, reapply it to the same four exact environment IDs under a new authority receipt, read back acknowledgements, and require a new immutable deployment; Vercel does not retain two active values for one key and target."
-          : "Retain the R2 state and provider resources; revert the desired Git revision, dry-run plan and sync, then replace the exact bucket-scoped credential only through create-readback-cutover-revoke.",
+      rollbackOrRecovery: Match.value(bindingProfile).pipe(
+        Match.when(
+          "observedOnly",
+          () =>
+            "Retain the R2 state and provider resources; revert the desired Git revision, dry-run plan and sync, then replace the exact bucket-scoped credential only through create-readback-cutover-revoke."
+        ),
+        Match.when(
+          "previewPhotonManaged",
+          () =>
+            "Use the externally retained prior value revision, reapply it to the same four exact environment IDs under a new authority receipt, read back acknowledgements, and require a new immutable deployment; Vercel does not retain two active values for one key and target."
+        ),
+        Match.when(
+          "productionPhotonManaged",
+          () =>
+            "Preserve the last-known-good Production deployment and original Photon callback through staged qualification. If the candidate fails, do not deploy or promote it; after promotion, restore the prior immutable deployment and original callback. The overwritten write-only environment values cannot be reconstructed from Vercel metadata, so establish any later revision only from complete independent custody under a new authority receipt."
+        ),
+        Match.exhaustive
+      ),
       observedAt,
     });
     const receiptText = yield* Schema.encodeEffect(

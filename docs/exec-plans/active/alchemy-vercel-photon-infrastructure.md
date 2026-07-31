@@ -2355,6 +2355,48 @@ docs-maintainer's 272-file inventory and the complete repository verification
 pass on the recovery candidate. No Photon mutation or deployment occurred
 during this repository correction.
 
+#### Live Production stable-binding recovery
+
+After recovery commits `cea22f1d184fe18d335a117c2f7d5a7d5940795f`
+and `0e4e1b5146d7bb1bf66c8df85616ba95886a0129`, the first parallel-create
+attempt blocked before provider access because the workspace-filter runner
+resolved the repository-relative authority path from the package directory.
+The binding artifact remained absent and fresh exact-source inventory at
+`26a1090dcfdf1d3c5ee010aed70fa9322d2589fa` retained one webhook. Root command
+commit `26a1090dcfdf1d3c5ee010aed70fa9322d2589fa` corrected that call boundary and
+passed complete verification.
+
+Under the fixed parallel-create authority, Photon then registered one exact
+Production cutover callback. Its safe URL fingerprint is `07032a93971c…`; the
+create-only webhook and secret fingerprints are `cfe12c3e0929…` and
+`4c0dab2ad155…`. The fixed receipt records one preexisting and two final
+webhooks, authenticated management and exact readback. Fresh two-read inventory
+proved the original callback unchanged, the rollout callback present, both
+users and zero lines unchanged, and no Vercel, deployment, domain, Marketplace,
+platform or billing change. The new pair moved into ignored mode-`0600`
+`.env.local` custody; the create artifact remains mode `0600` through cutover.
+
+Observed-only post-cutover adoption contained five state updates—four
+environment bindings returning from the failed managed attempt to observed
+ownership plus the new callback—and 68 no-ops, with zero create/delete/replace
+and read-only provider Layers. Apply converged to 73 no-ops. The repaired
+managed plan then contained exactly four expected updates and 69 no-ops.
+Apply returned eight successful lifecycle steps. Fresh inventory changed
+exactly those four provider revisions and retained every other Vercel/Photon
+surface. The post-plan and two native sync dry-runs each returned 73 no-ops.
+The managed-state receipt proves state `s3`, version 5, 73 resources, four
+provider acknowledgements, four deployment-required results and zero
+credential-value matches.
+
+Receipt review found `PROD-STABLE-002`: its shared Preview rollback sentence
+incorrectly claimed that the overwritten Production values were externally
+retained. The proof owner now emits a Production-specific rollback: preserve
+the current immutable deployment and original callback; do not deploy a failed
+candidate; if a later promoted candidate fails, restore the prior immutable
+deployment/original callback; never claim Vercel metadata can reconstruct
+write-only values. This correction must be committed and receive one final
+four-value source-revision convergence cycle before staged deployment.
+
 ### Production stable-binding docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Trigger, earliest owner, verification and non-claim                                                                                                                                                                                                               |
