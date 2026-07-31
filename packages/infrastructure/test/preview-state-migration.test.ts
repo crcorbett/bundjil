@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { inMemoryState, State } from "alchemy/State";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Redacted, Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -12,6 +12,7 @@ import {
   makePreviewStateMigrationLayer,
   PreviewStateMigration,
   PreviewStateMigrationPolicy,
+  PreviewStateForbiddenValue,
   PreviewStateResourceFingerprint,
   PreviewStateResourceType,
   SyntheticPhysicalResourceId,
@@ -109,6 +110,24 @@ const seedState = Effect.gen(function* seedPreviewState() {
 });
 
 describe("Preview state migration", () => {
+  it("keeps forbidden credential sentinels redacted at the leak-scan boundary", async () => {
+    const accepted = await Effect.runPromise(
+      Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(
+        Redacted.make("credential-sentinel")
+      )
+    );
+    const rejected = await Effect.runPromise(
+      Effect.exit(
+        Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(
+          "credential-sentinel"
+        )
+      )
+    );
+
+    expect(Redacted.value(accepted)).toBe("credential-sentinel");
+    expect(rejected._tag).toBe("Failure");
+  });
+
   it("backs up and retires only the exact stale row, then restores exactly", async () => {
     const result = await Effect.runPromise(
       Effect.gen(function* exactMigrationJourney() {

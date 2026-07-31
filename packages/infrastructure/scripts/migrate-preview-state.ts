@@ -155,7 +155,7 @@ const runPreviewStateMigration = Effect.gen(
       ],
       (value) =>
         Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(
-          Redacted.value(value)
+          Redacted.make(Redacted.value(value))
         )
     );
     const backupStore = makePreviewStateBackupStoreLive(

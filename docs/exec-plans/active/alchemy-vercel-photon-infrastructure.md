@@ -1951,7 +1951,7 @@ backup/result contracts, named backup/migration services, explicit live and
 memory Layers, credential-value scan, bounded receipt and root command. Two
 focused memory journeys pass exact backup-before-retire/readback/extra-row
 cleanup/restore and reject a changed stale fingerprint before backup or
-deletion. Infrastructure typecheck, 39 Vitest tests, 19 Alchemy lifecycle
+deletion. Infrastructure typecheck, 40 Vitest tests, 19 Alchemy lifecycle
 tests and `check:docs` pass. The live plan command then reproduced 106 current,
 147 desired, seven exact stale and 99 retained rows, emitted a fixed
 mode-`0600` zero-provider-write receipt, and wrote no backup in plan mode.
@@ -1976,3 +1976,11 @@ remains the final gate before live state retirement.
 | Secrets, rollout and rollback                | Change required | Retain the complete ignored mode-`0600` backup, scan known credential values, and restore it exactly if adoption cannot converge.                      |
 | Lifecycle, archive and terminal audit        | Preserve        | The plan remains active; downstream Production/drift work and the single terminal five-pass audit remain pending.                                      |
 | Documentation inventory and archive pointers | Preserve        | No documentation path or lifecycle route changes; `check:docs` must recompute the current routed inventory from this tree.                             |
+
+The first immutable-candidate plan after push failed closed before state
+readback because the credential leak scan revealed then decoded a primitive
+into its `Schema.Redacted` contract. No state or provider write and no backup
+occurred. The owning adapter now re-wraps the value in Redacted custody at the
+immediate scan boundary. A third focused test accepts the Redacted form and
+rejects the raw-string false green; the plan must be repeated from a coherent
+pushed correction before retirement.
