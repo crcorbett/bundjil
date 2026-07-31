@@ -10,7 +10,6 @@ import {
   ConfigProvider,
   Console,
   Effect,
-  Exit,
   FileSystem,
   Layer,
   Match,
@@ -21,6 +20,7 @@ import {
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import stableEnvironmentAuthorityPolicy from "../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
+import { ManagedStableEnvironmentStateResource } from "../src/adoption-proof.js";
 import {
   AdoptionBindingProfile,
   AdoptionManifestJson,
@@ -33,11 +33,7 @@ import {
   loadAlchemyR2StateConfig,
   loadInfrastructurePhotonCredentials,
 } from "../src/index.js";
-import {
-  VercelAccessToken,
-  VercelEnvironmentVariableAttributes,
-  VercelEnvironmentVariableDesiredState,
-} from "../src/vercel/index.js";
+import { VercelAccessToken } from "../src/vercel/index.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -88,14 +84,26 @@ const bindingProfileConfig = Config.schema(
   "BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE"
 ).pipe(Config.withDefault("observedOnly"));
 
-const StableEnvironmentStateResource = Schema.Struct({
-  logicalId: AlchemyLogicalResourceId,
-  status: Schema.Literal("updated"),
-  props: Schema.Struct({
-    desired: VercelEnvironmentVariableDesiredState,
-  }),
-  output: VercelEnvironmentVariableAttributes,
-});
+const AdoptionProofBlockedReason = Schema.Literals([
+  "authority-invalid",
+  "authority-input-invalid",
+  "binding-profile-mismatch",
+  "configuration-invalid",
+  "credential-custody-invalid",
+  "managed-state-attributes-invalid",
+  "manifest-invalid",
+  "manifest-stage-mismatch",
+  "proof-input-invalid",
+  "proof-path-conflict",
+  "receipt-write-failed",
+  "receipt-incompatible",
+  "remote-state-read-failed",
+  "remote-state-shape-invalid",
+  "remote-state-proof-failed",
+  "remote-state-resource-missing",
+  "unclassified",
+]);
+
 const PersistedStateResourceIdentity = Schema.Struct({
   logicalId: AlchemyLogicalResourceId,
   status: Schema.String,
@@ -125,12 +133,21 @@ const readFixedContractArtifact = Effect.fn(
 const runAdoptionStateProof = Effect.gen(
   // oxlint-disable-next-line complexity -- This foreground proof keeps authority, state, leak, receipt, and custody stops in one linear Effect.
   function* runAdoptionStateProofOperation() {
-    const authorityPath = yield* authorityPathConfig;
-    const manifestPath = yield* manifestPathConfig;
-    const receiptPath = yield* receiptPathConfig;
-    const stage = yield* stageConfig;
-    const candidateIdentity = yield* candidateIdentityConfig;
-    const bindingProfile = yield* bindingProfileConfig;
+    const {
+      authorityPath,
+      bindingProfile,
+      candidateIdentity,
+      manifestPath,
+      receiptPath,
+      stage,
+    } = yield* Effect.all({
+      authorityPath: authorityPathConfig,
+      bindingProfile: bindingProfileConfig,
+      candidateIdentity: candidateIdentityConfig,
+      manifestPath: manifestPathConfig,
+      receiptPath: receiptPathConfig,
+      stage: stageConfig,
+    }).pipe(Effect.mapError(() => "configuration-invalid" as const));
     if (
       authorityPath === manifestPath ||
       authorityPath === receiptPath ||
@@ -139,10 +156,14 @@ const runAdoptionStateProof = Effect.gen(
       return yield* Effect.fail("proof-path-conflict");
     }
 
-    const authorityText = yield* readFixedContractArtifact(authorityPath);
+    const authorityText = yield* readFixedContractArtifact(authorityPath).pipe(
+      Effect.mapError(() => "authority-input-invalid" as const)
+    );
     const authority = yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(Schema.Unknown)
-    )(authorityText);
+    )(authorityText).pipe(
+      Effect.mapError(() => "authority-input-invalid" as const)
+    );
     const validateAuthority = new Ajv2020({
       allErrors: true,
       strict: false,
@@ -160,11 +181,13 @@ const runAdoptionStateProof = Effect.gen(
       return yield* Effect.fail("authority-invalid");
     }
 
-    const manifestText = yield* readFixedContractArtifact(manifestPath);
+    const manifestText = yield* readFixedContractArtifact(manifestPath).pipe(
+      Effect.mapError(() => "manifest-invalid" as const)
+    );
     const manifest = yield* Schema.decodeUnknownEffect(AdoptionManifestJson)(
       manifestText,
       { onExcessProperty: "error" }
-    );
+    ).pipe(Effect.mapError(() => "manifest-invalid" as const));
     if (manifest.stage !== stage) {
       return yield* Effect.fail("manifest-stage-mismatch");
     }
@@ -183,14 +206,24 @@ const runAdoptionStateProof = Effect.gen(
     }
 
     const resolveState = yield* State;
-    const state = yield* resolveState;
-    const version = yield* state.getVersion();
-    const stacks = yield* state.listStacks();
-    const stages = yield* state.listStages("BundjilInfrastructure");
-    const fqns = yield* state.list({
-      stack: "BundjilInfrastructure",
-      stage,
-    });
+    const state = yield* resolveState.pipe(
+      Effect.mapError(() => "remote-state-read-failed" as const)
+    );
+    const version = yield* state
+      .getVersion()
+      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+    const stacks = yield* state
+      .listStacks()
+      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+    const stages = yield* state
+      .listStages("BundjilInfrastructure")
+      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+    const fqns = yield* state
+      .list({
+        stack: "BundjilInfrastructure",
+        stage,
+      })
+      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
     const resources = yield* Effect.forEach(fqns, (fqn) =>
       state
         .get({
@@ -205,14 +238,14 @@ const runAdoptionStateProof = Effect.gen(
               : Effect.succeed(resource)
           )
         )
-    );
+    ).pipe(Effect.mapError(() => "remote-state-read-failed" as const));
     const decodedResourceIdentities = yield* Effect.forEach(
       resources,
       (resource) =>
         Schema.decodeUnknownEffect(PersistedStateResourceIdentity)(resource, {
           onExcessProperty: "ignore",
         })
-    );
+    ).pipe(Effect.mapError(() => "remote-state-shape-invalid" as const));
     const persistedLogicalIds = decodedResourceIdentities.map(
       (resource) => resource.logicalId
     );
@@ -230,12 +263,18 @@ const runAdoptionStateProof = Effect.gen(
     const stateStatusesMatch = decodedResourceIdentities.every(
       (resource) => resource.status === "updated"
     );
-    const stateConfig = yield* loadAlchemyR2StateConfig;
-    const photonCredentials = yield* loadInfrastructurePhotonCredentials(stage);
+    const stateConfig = yield* loadAlchemyR2StateConfig.pipe(
+      Effect.mapError(() => "credential-custody-invalid" as const)
+    );
+    const photonCredentials = yield* loadInfrastructurePhotonCredentials(
+      stage
+    ).pipe(Effect.mapError(() => "credential-custody-invalid" as const));
     const credentials = [
       stateConfig.accessKeyId,
       stateConfig.secretAccessKey,
-      yield* vercelAccessTokenConfig,
+      yield* vercelAccessTokenConfig.pipe(
+        Effect.mapError(() => "credential-custody-invalid" as const)
+      ),
       photonCredentials.projectSecret,
     ];
     const serializedState = yield* Schema.encodeEffect(
@@ -247,7 +286,7 @@ const runAdoptionStateProof = Effect.gen(
     const managedStateResources =
       bindingProfile === "previewPhotonManaged"
         ? yield* Effect.forEach(managedManifestResources, (expected) =>
-            Schema.decodeUnknownEffect(StableEnvironmentStateResource)(
+            Schema.decodeUnknownEffect(ManagedStableEnvironmentStateResource)(
               resources[
                 decodedResourceIdentities.findIndex(
                   (resource) => resource.logicalId === expected.logicalId
@@ -255,6 +294,8 @@ const runAdoptionStateProof = Effect.gen(
               ],
               { onExcessProperty: "ignore" }
             )
+          ).pipe(
+            Effect.mapError(() => "managed-state-attributes-invalid" as const)
           )
         : [];
     const managedStateMatches =
@@ -263,11 +304,11 @@ const runAdoptionStateProof = Effect.gen(
         managedStateResources.every(
           (resource) =>
             resource.props.desired.valueOwnership._tag === "Managed" &&
-            resource.output.valueOwnership._tag === "Managed" &&
-            resource.output.deploymentRequired &&
-            resource.output.providerUpdatedAt !== undefined &&
+            resource.attr.valueOwnership._tag === "Managed" &&
+            resource.attr.deploymentRequired &&
+            resource.attr.providerUpdatedAt !== undefined &&
             resource.props.desired.valueOwnership.reference.revision ===
-              resource.output.valueOwnership.reference.revision
+              resource.attr.valueOwnership.reference.revision
         ));
     const exactState =
       state.id === "s3" &&
@@ -353,10 +394,10 @@ const runAdoptionStateProof = Effect.gen(
     });
     const receiptText = yield* Schema.encodeEffect(
       InfrastructureBoundedReceiptJson
-    )(receipt);
+    )(receipt).pipe(Effect.mapError(() => "receipt-write-failed" as const));
     const receiptEncoded = yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(Schema.Unknown)
-    )(receiptText);
+    )(receiptText).pipe(Effect.mapError(() => "receipt-write-failed" as const));
     const validateReceipt = new Ajv2020({
       allErrors: true,
       strict: false,
@@ -367,14 +408,20 @@ const runAdoptionStateProof = Effect.gen(
     }
 
     const fileSystem = yield* FileSystem.FileSystem;
-    yield* fileSystem.makeDirectory(dirname(receiptPath), {
-      recursive: true,
-      mode: 0o700,
-    });
-    yield* fileSystem.writeFileString(receiptPath, receiptText, {
-      mode: 0o600,
-    });
-    yield* fileSystem.chmod(receiptPath, 0o600);
+    yield* fileSystem
+      .makeDirectory(dirname(receiptPath), {
+        recursive: true,
+        mode: 0o700,
+      })
+      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
+    yield* fileSystem
+      .writeFileString(receiptPath, receiptText, {
+        mode: 0o600,
+      })
+      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
+    yield* fileSystem
+      .chmod(receiptPath, 0o600)
+      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
     return Match.value(bindingProfile).pipe(
       Match.when("observedOnly", () => ({
         status: "passed" as const,
@@ -399,17 +446,22 @@ const runAdoptionStateProof = Effect.gen(
   }
 );
 
-const main = Effect.exit(runAdoptionStateProof).pipe(
-  Effect.flatMap((exit) =>
-    Exit.isSuccess(exit)
-      ? Console.log(exit.value)
-      : Console.error('{"status":"blocked"}').pipe(
-          Effect.andThen(
-            Effect.sync(() => {
-              process.exitCode = 1;
-            })
-          )
-        )
+const main = runAdoptionStateProof.pipe(
+  Effect.flatMap(Console.log),
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
+  Effect.catch((error) =>
+    Console.error({
+      status: "blocked" as const,
+      reason: Schema.is(AdoptionProofBlockedReason)(error)
+        ? error
+        : AdoptionProofBlockedReason.make("unclassified"),
+    }).pipe(
+      Effect.andThen(
+        Effect.sync(() => {
+          process.exitCode = 1;
+        })
+      )
+    )
   ),
   Effect.provide(
     Layer.mergeAll(

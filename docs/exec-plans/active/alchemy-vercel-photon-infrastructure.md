@@ -2103,3 +2103,53 @@ environment ID already owns identity. Its focused Schema fixture must reject
 an extra key with excess-property checking and still require the acknowledgement
 to return the exact expected key. Commit/push, complete verification and a
 fresh exact-SHA gate precede one corrected attempt.
+
+Commit `99cf80b88b3c0c6a07239559f517b0a15088ba50` passed that gate.
+The corrected provider apply acknowledged all four exact environment updates;
+fresh two-read inventory proved four changed provider revisions; and the
+managed post-plan plus two sync dry-runs each returned all 155 resources as
+no-op. Marketplace, Photon and namespace observations remained continuous.
+
+The fixed managed-state receipt nevertheless failed closed before writing its
+artifact. Its original CLI collapsed the cause to `blocked`; a bounded
+secret-free reason classifier narrowed the failure to the managed Resource
+attributes. Direct inspection of the persisted Alchemy contract proves
+attributes live under `attr`, while the managed-only oracle incorrectly
+expected `output`. The observed-only profile never decoded that field, so its
+earlier receipt could not prove this branch. Reopen the receipt owner and
+decode `attr` through the existing
+`VercelEnvironmentVariableAttributes` Schema. A receipt that accepts an
+`output` mirror, omits managed ownership/deployment-required evidence, or
+reports only a generic blocked result is a rejected false green.
+
+| Requirement                         | Direct observable and expected postcondition                                                                          | Rejected false green                                                                  | Focused evidence owner                                       | Status   |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------- |
+| Exact managed provider convergence  | Four acknowledgements, four changed revisions, one no-op plan and two no-op syncs                                     | Alchemy success without fresh exact-ID readback                                       | Ignored apply/inventory artifacts and managed plan/sync logs | Passed   |
+| Persisted managed-state receipt     | State Resource `attr` decodes as exact managed Vercel attributes and matches desired revision for all four identities | Reading nonexistent `output`, accepting an output-only fixture or observed-only proof | Adoption proof command and focused persisted-shape fixture   | Reopened |
+| Safe diagnostic classification      | Failure output contains one fixed reason and no provider/state value                                                  | Generic `blocked`, parse detail, raw state or credential text                         | Live fail-closed proof command and fixed reason Schema       | Passed   |
+| Deployment observation and closeout | A later Git-created immutable deployment binds the accepted source/config state                                       | Historical READY metadata or the Alchemy apply itself                                 | Fresh exact-SHA inventory and task receipt                   | Pending  |
+
+The corrected live receipt now passes with 155 exact Preview Resources, four
+managed provider acknowledgements, `deploymentRequired` on all four and zero
+credential-value matches. Its mode-`0600` fixed artifact names the exact
+candidate and manifest digest while preserving provider, deployment, runtime,
+Channel and handset non-claims. The focused persisted-shape fixture accepts
+only `attr` and rejects an `output` mirror. Effect LS, all 43 infrastructure
+Vitest tests, 19 Alchemy lifecycle tests, every routed policy gate and the
+complete `bun run verification` suite pass on the correction candidate.
+
+### Managed receipt correction docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                               |
+| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | The proof reads only Alchemy R2 state and existing Config custody; it adds no provider client, write, deployment or promotion edge.                 |
+| READMEs, exports and generated references     | Preserve        | The root command and public package map remain unchanged; the private proof Schema is test-owned and no generated reference changes.                |
+| Runbooks, authority and controls              | Preserve        | The existing mode-`0600` stable authority remains the exact owner; no new operation or authority expansion occurs.                                  |
+| Verification journeys and proof               | Change required | The fixed receipt now proves managed persisted attributes directly and retains explicit deployment/runtime/Channel/handset non-claims.              |
+| Skills, AGENTS, lint, config, commands and CI | Preserve        | Existing repository contracts and command names remain current; Effect LS, routed gates and full verification must pass before commit.              |
+| Schemas, services and Layers                  | Change required | Add one private Effect Schema for the actual Alchemy `attr` contract; reuse existing logical-ID, desired-state and Vercel attribute Schemas.        |
+| Tests and fixtures                            | Change required | Add an exact persisted-`attr` fixture and reject the plausible `output`-mirror false green.                                                         |
+| SPEC, tasks and active plan                   | Change required | Record the provider success, reopened receipt oracle, exact correction and remaining immutable-deployment gate in the same slice.                   |
+| Secrets, receipts, rollout and rollback       | Change required | The fixed mode-`0600` receipt records revisions/counts only and scans known credentials; prior-revision rollback custody remains external.          |
+| Lifecycle, archive and terminal audit         | Preserve        | Stable bindings remain in progress until deployment observation; Production, drift closeout and the one terminal five-pass audit remain downstream. |
+| Documentation inventory and archive pointers  | Preserve        | No docs path or lifecycle pointer changes; `check:docs` recomputes the current routed inventory from this tree.                                     |

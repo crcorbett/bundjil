@@ -1995,3 +1995,33 @@ reject an extra key rather than strip it. A successful request with a changed
 key, a generic 2xx, or a mock that ignores excess fields is a rejected false
 green. One corrected provider attempt remains gated by coherent commit/push,
 full verification and fresh exact-SHA adoption.
+
+Commit `99cf80b88b3c0c6a07239559f517b0a15088ba50` passed the corrected
+gate. The provider acknowledged all four exact updates; fresh two-read
+inventory proved four changed provider revisions; and the managed post-plan
+plus two native sync dry-runs each converged all 155 resources to no-op.
+Marketplace, Photon and namespace observations remained continuous.
+
+The managed fixed receipt then exposed a repository oracle defect rather than
+a provider failure. Its secret-free failure classifier identified the managed
+state attributes, and direct persisted-state contract inspection proved that
+Alchemy Resource attributes are stored under `attr`, not `output`. The
+observed-only profile never traversed this managed-only branch. Correct the
+receipt to decode `attr` through the existing
+`VercelEnvironmentVariableAttributes` Schema and add a fixture that rejects an
+`output` mirror. A generic blocked result, an output-only local DTO or the
+earlier observed-only receipt cannot prove managed state. Stable-binding
+acceptance remains open until the corrected fixed receipt, complete
+verification, coherent commit/push and distinct immutable Git deployment
+observation pass.
+
+The corrected receipt rerun passes against live Alchemy state: 155 exact
+Preview Resources, four managed acknowledgements, deployment-required evidence
+for all four and zero credential-value matches. Its fixed artifact binds
+candidate `99cf80b88b3c0c6a07239559f517b0a15088ba50` and manifest digest
+`a8fcfd1e…0618`, while explicitly making no deployment, runtime, Photon
+mutation, Channel or handset claim. Effect LS, the two exact persisted-state
+fixtures, all 43 infrastructure Vitest tests, 19 Alchemy lifecycle tests,
+every routed policy gate and complete repository verification pass. The
+stable task still requires a coherent commit/push and a distinct Vercel
+Git-created immutable deployment observation.
