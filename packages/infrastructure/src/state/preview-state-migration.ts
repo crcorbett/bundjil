@@ -9,6 +9,7 @@ import {
   Effect,
   FileSystem,
   Layer,
+  Match,
   Redacted,
   Schema,
 } from "effect";
@@ -107,6 +108,7 @@ export const PreviewStateMigrationFailureReason = Schema.Literals([
   "backupReadFailed",
   "retirementFailed",
   "retirementReadbackMismatch",
+  "retirementRecoveryMismatch",
   "restoreDeleteFailed",
   "restoreWriteFailed",
   "restoreComparisonFailed",
@@ -365,9 +367,9 @@ export const makePreviewStateMigrationLayer = (
         }
       );
 
-      const prepare = Effect.fn("PreviewStateMigration.prepare")(function* (
-        manifest: AdoptionManifest
-      ) {
+      const validateBoundary = Effect.fn(
+        "PreviewStateMigration.validateBoundary"
+      )(function* (manifest: AdoptionManifest) {
         if (manifest.stage !== policy.stage) {
           return yield* migrationError(
             "stageMismatch",
@@ -390,7 +392,15 @@ export const makePreviewStateMigrationLayer = (
             "The state-store contract version is not accepted."
           );
         }
-        const resources = yield* readResources();
+        return yield* Effect.void;
+      });
+
+      const prepareResources = Effect.fn(
+        "PreviewStateMigration.prepareResources"
+      )(function* (
+        manifest: AdoptionManifest,
+        resources: readonly PreviewStateBackupResource[]
+      ) {
         const desired = new Set<string>(
           manifest.resources.map((resource) => resource.logicalId)
         );
@@ -479,6 +489,87 @@ export const makePreviewStateMigrationLayer = (
         } as const;
       });
 
+      const prepare = Effect.fn("PreviewStateMigration.prepare")(function* (
+        manifest: AdoptionManifest
+      ) {
+        yield* validateBoundary(manifest);
+        const resources = yield* readResources();
+        return yield* prepareResources(manifest, resources);
+      });
+
+      const resumeRetirement = Effect.fn(
+        "PreviewStateMigration.resumeRetirement"
+      )(function* (manifest: AdoptionManifest) {
+        yield* validateBoundary(manifest);
+        const current = yield* readResources();
+        const expectedRetainedCount =
+          policy.currentCount - policy.staleFingerprints.length;
+        if (current.length !== expectedRetainedCount) {
+          return yield* migrationError(
+            "retirementRecoveryMismatch",
+            "State retirement recovery did not find the exact post-write count.",
+            {
+              observedCount: current.length,
+              expectedCount: expectedRetainedCount,
+            }
+          );
+        }
+        const backup = yield* backupStore.load;
+        if (
+          backup.stage !== policy.stage ||
+          backup.manifestDigest !== manifest.digest ||
+          backup.resources.length !== policy.currentCount
+        ) {
+          return yield* migrationError(
+            "retirementRecoveryMismatch",
+            "State retirement recovery did not match the exact backup boundary."
+          );
+        }
+        const prepared = yield* prepareResources(manifest, backup.resources);
+        const staleFqns = new Set(
+          prepared.stale.map((resource) => resource.fqn)
+        );
+        const expectedRetained = prepared.resources.filter(
+          (resource) => !staleFqns.has(resource.fqn)
+        );
+        const currentEncoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(Schema.Array(PreviewStateBackupResource))
+        )(
+          current.toSorted((left, right) => left.fqn.localeCompare(right.fqn))
+        ).pipe(
+          Effect.mapError(() =>
+            migrationError(
+              "retirementRecoveryMismatch",
+              "State retirement recovery could not compare retained rows."
+            )
+          )
+        );
+        const expectedEncoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(Schema.Array(PreviewStateBackupResource))
+        )(
+          expectedRetained.toSorted((left, right) =>
+            left.fqn.localeCompare(right.fqn)
+          )
+        ).pipe(
+          Effect.mapError(() =>
+            migrationError(
+              "retirementRecoveryMismatch",
+              "State retirement recovery could not compare the backup."
+            )
+          )
+        );
+        if (sha256(currentEncoded) !== sha256(expectedEncoded)) {
+          return yield* migrationError(
+            "retirementRecoveryMismatch",
+            "State retirement recovery did not match every retained row."
+          );
+        }
+        return PreviewStateMigrationResult.make({
+          ...prepared.result,
+          status: "retired",
+        });
+      });
+
       return PreviewStateMigration.of({
         plan: (manifest) =>
           prepare(manifest).pipe(Effect.map(({ result }) => result)),
@@ -522,7 +613,17 @@ export const makePreviewStateMigrationLayer = (
               ...prepared.result,
               status: "retired",
             });
-          }),
+          }).pipe(
+            /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catchTag handles the typed Effect failure channel after the named retirement Effect. */
+            Effect.catchTag("PreviewStateMigrationError", (error) =>
+              Match.value(error.reason).pipe(
+                Match.when("currentCountMismatch", () =>
+                  resumeRetirement(manifest)
+                ),
+                Match.orElse(() => Effect.fail(error))
+              )
+            )
+          ),
         restore: Effect.gen(function* restorePreviewState() {
           const backup = yield* backupStore.load;
           const current = yield* readResources();

@@ -2054,6 +2054,24 @@ fixed mode-`0600` receipt; it wrote no backup and changed no state or provider
 resource. State retirement remains gated on a verified, pushed implementation
 candidate plus fresh exact-source inventory and repetition of the same plan.
 
+The pushed candidate repeated the exact inventory and state plan. Its
+authorized apply persisted the complete 69-row mode-`0600` backup and direct
+readback proves the exact stale row is absent with 68 rows remaining, but no
+apply receipt was emitted. Treat this as an uncertain outcome after the state
+write, not accepted completion. The state boundary must resume only when the
+backup, manifest digest, stage, original discontinuity and every retained row
+match exactly; it must issue no second delete and emit the fixed receipt.
+Mismatch requires fail-closed restore, and no adoption may run before this
+recovery proof passes.
+
+The bounded recovery now passes. The same apply command recognized only the
+exact 68-row post-state, loaded the complete 69-row backup, revalidated the
+69/72/one-fingerprint original discontinuity and compared every retained row.
+It issued no second delete and emitted the missing mode-`0600` fixed receipt
+with zero provider writes; a following read remained at 68 rows. This proves
+state-only retirement and recovery, not adoption, provider convergence,
+stable Production configuration, deployment, runtime or Channel behavior.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

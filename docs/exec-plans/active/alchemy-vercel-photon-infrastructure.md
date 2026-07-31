@@ -2226,6 +2226,31 @@ the committed `PreviewStateMigration`/`PreviewStateBackupStore` services
 without duplicate exports. The final restarted gate passes every routed policy,
 type, lint, Knip and test boundary.
 
+After push, exact-source two-read inventory repeated the same digest and 72
+resources, and the state plan repeated the accepted 69/72/one-fingerprint
+postconditions. The authorized apply wrote the complete 69-row mode-`0600`
+backup and fresh state readback proved 68 rows, but the process emitted no
+apply receipt. This is an uncertain-after-state-write partial failure: do not
+repeat delete, claim accepted state correction, or restore blindly. Reopen the
+state service to recognize only the exact post-retirement count, load and
+validate the exact backup against the same manifest/policy, compare every
+retained row, issue zero further delete calls, and emit the missing fixed
+receipt. Any backup, digest, stage, count, fingerprint or retained-row mismatch
+must fail closed and route to exact restore.
+
+The recovery implementation adds a named, typed after-write path. Focused
+tests prove exact resume and reject an altered retained row. Re-running the
+same apply against the 68-row post-state loaded the complete backup, re-proved
+the original 69/72/one-fingerprint discontinuity, compared all 68 retained
+rows, issued no second delete and emitted the missing fixed receipt. The
+receipt is mode `0600`, records 69 original, 72 desired, one stale, 68 retained
+and zero provider writes, and validates against the fixed bounded-receipt
+contract. A subsequent direct state read remained 68. Effect LS, focused tests,
+docs-maintainer and the complete repository verification pass for the recovery
+slice. Adoption is still blocked until this slice is committed/pushed, fresh
+exact-source inventory runs and the adoption plan proves zero replacement and
+delete.
+
 ### Production state-correction docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |

@@ -131,6 +131,14 @@ Photon projects, manifests, or physical identities.
    delete. Stop on any other count, type, fingerprint, stage, status or
    removal policy.
 
+   If apply reaches the exact post-retirement count but its fixed receipt is
+   absent, do not restore or repeat a delete blindly. Re-run the same apply
+   command with the same manifest, backup, authority and candidate. Recovery is
+   accepted only when the complete backup proves the original discontinuity
+   and every retained row matches the live post-state byte-for-byte; that path
+   issues no delete and emits the missing receipt. Any backup, stage, digest,
+   count, fingerprint or retained-row mismatch stops for exact restore.
+
 4. Under the same unexpired authority, adopt one stage at a time:
 
    ```sh

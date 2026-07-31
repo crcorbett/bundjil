@@ -144,6 +144,7 @@ describe("Preview state migration", () => {
         const migration = yield* PreviewStateMigration;
         const planned = yield* migration.plan(manifest);
         const retired = yield* migration.retire(manifest);
+        const resumed = yield* migration.retire(manifest);
         const resolveState = yield* State;
         const state = yield* resolveState;
         const afterRetire = yield* state.list({
@@ -178,6 +179,7 @@ describe("Preview state migration", () => {
         return {
           planned,
           retired,
+          resumed,
           restored,
           afterRetire,
           afterRestore,
@@ -195,6 +197,13 @@ describe("Preview state migration", () => {
       providerWrites: 0,
     });
     expect(result.retired.status).toBe("retired");
+    expect(result.resumed).toMatchObject({
+      status: "retired",
+      currentCount: 4,
+      retainedCount: 3,
+      staleCount: 1,
+      providerWrites: 0,
+    });
     expect(result.afterRetire.toSorted()).toStrictEqual([
       "desired-1",
       "desired-2",
@@ -244,6 +253,36 @@ describe("Preview state migration", () => {
 
     expect(remaining.exit._tag).toBe("Failure");
     expect(remaining.fqns).toHaveLength(4);
+  });
+
+  it("fails closed when after-write recovery does not match every retained row", async () => {
+    const result = await Effect.runPromise(
+      Effect.gen(function* rejectAlteredRetainedStateJourney() {
+        yield* seedState();
+        const migration = yield* PreviewStateMigration;
+        yield* migration.retire(manifest);
+        const resolveState = yield* State;
+        const state = yield* resolveState;
+        yield* state.set({
+          stack: "BundjilInfrastructure",
+          stage: "preview",
+          fqn: "desired-1",
+          value: {
+            ...makeStateResource("desired-1", "DesiredObservation"),
+            attr: { identity: "altered-after-retirement" },
+          },
+        });
+        const error = yield* migration.retire(manifest).pipe(Effect.flip);
+        const fqns = yield* state.list({
+          stack: "BundjilInfrastructure",
+          stage: "preview",
+        });
+        return { error, fqns };
+      }).pipe(Effect.provide(makeLayers()))
+    );
+
+    expect(result.error.reason).toBe("retirementRecoveryMismatch");
+    expect(result.fqns).toHaveLength(3);
   });
 
   it("keeps Production state and manifests isolated while restoring exactly", async () => {
