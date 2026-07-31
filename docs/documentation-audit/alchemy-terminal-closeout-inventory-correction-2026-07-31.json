@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "taskId": "alchemy-vercel-photon-infrastructure-terminal-closeout",
+  "status": "passed",
+  "observedAt": "2026-07-31T16:20:00.000Z",
+  "trigger": "The terminal five-pass audit completed the Alchemy infrastructure SPEC, moved its execution plan to historical ownership and added this successor path-accounting correction.",
+  "docsInventory": {
+    "pathCount": 200,
+    "sortedPathSha256": "8a2e497fef0222c29f243ed17f0397318d16527af8a7f52ebb1b34ef03e48182"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+    "docs/product-specs/index.md",
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/completed/README.md",
+    "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The terminal audit and lifecycle move do not change the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and earlier drift correction remain bound to their recorded candidates. This successor records only the terminal routed path set.",
+    "nonClaim": "This correction does not prove hosted workflow settings or execution, provider state, alert delivery, automatic repair, deployment, message, billing or future availability."
+  },
+  "checks": [
+    {
+      "command": "bun run check:docs",
+      "status": "passed",
+      "result": "The terminal candidate passed documentation policy across the routed corpus."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The terminal 200-path docs and 23-path README inventories passed all twelve scenarios and nine impact areas."
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed",
+      "result": "The exact receipt-bearing terminal candidate passed the complete repository verification suite."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "The final closeout commit identity is recorded after verification."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No provider read/write, workflow dispatch, deployment, message, billing, credential or Production operation is authorised by this file."
+  ]
+}

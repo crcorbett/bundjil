@@ -1121,7 +1121,7 @@
     {
       "id": "drift-ci-monitoring-and-closeout",
       "title": "Complete drift CI, monitoring, documentation, and fresh review",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["production-adoption-and-rollout"],
       "invariantIds": [
         "HC-OUTCOME-001",
@@ -1138,10 +1138,172 @@
       ],
       "description": "Add report-only plan plus native sync --dry-run workflows, bounded observability and alerts for owned failure classes, close every documentation/authority/proof owner, and run one fresh formal five-pass audit after all implementation tasks are integrated. Pass, worker, command, token, duration, and finding counts are coordination or activity data, not acceptance proof.",
       "requirementProofReplay": {
-        "status": "required_before_acceptance",
+        "status": "passed",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract before the one fresh terminal five-pass audit.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's terminal closeout section.",
-        "currentResult": "in_progress: every dependency is accepted. Commit b4bc6e1 added the typed report-only control; live qualification reopened two false-green owners. Commit 40970b49fde5139f36a5cef00ae6e07795e3c45b narrows native attribute decoding to the owning Vercel environment kind, classifies manifest-absent plan rows by fingerprinted provider type, emits bounded phase-only failure diagnostics, propagates manifest retain policy through the Alchemy RemovalPolicy Service, and adds a direct retained-retirement/zero-write lifecycle test. That exact commit passed full repository verification with 98 tooling tests, 70 infrastructure Vitest tests, 21 Alchemy lifecycle tests, all nine typechecks and all fifteen Turbo tasks using only the process-local synthetic Executor fixture, then was pushed to the task branch. Two fresh mode-0600 BND-J14 runs bound to 40970b4 and receipt-bearing alchemy-stable-preview-99cf80b-after-apply.json produced the same normalized classification hash bec4e76e…: desired plan 155 no-op, native sync 155 unchanged, 111 accepted metadata rows, zero blocking/report rows, 44 unknownSecretRevision rows, and zero provider writes. Overall status remains honestly inconclusive because Vercel metadata cannot prove write-only secret values or revisions; no repair, apply, deployment, Photon mutation or Production access occurred. The stale ignored current manifest remains retained negative evidence only. Workflow source/local execution does not prove hosted GitHub environment/secrets/settings/run/schedule or alert delivery. The final repository proof reconciliation, single terminal five-pass audit, lifecycle/archive move, final verification and closeout commit remain pending."
+        "currentResult": "passed: commit 40970b49fde5139f36a5cef00ae6e07795e3c45b passed the complete repository gate and two fresh mode-0600 BND-J14 runs bound to that exact source plus the receipt-bearing post-apply manifest. Both runs produced normalized classification hash bec4e76e…: desired plan 155 no-op, native sync 155 unchanged, 111 accepted metadata rows, zero blocking/report rows, 44 unknownSecretRevision rows and zero provider writes. The inconclusive disposition is accepted because provider metadata cannot prove write-only values or revisions. Commit 6eb4db60551d8b9ceac851957a74bf8a857e001a records that boundary. The one terminal five-pass audit then passed after correcting stale lifecycle/index text and a displaced historical Production ledger; the SPEC, ledger and plan now route through implemented/completed history. Hosted GitHub settings, secrets, environment, scheduled execution, alert delivery, automatic repair and future provider state remain explicit non-claims."
+      },
+      "fivePassAudit": {
+        "status": "passed",
+        "baselineCommit": "6eb4db60551d8b9ceac851957a74bf8a857e001a",
+        "closeoutCommit": "the commit containing this terminal ledger and completed execution plan",
+        "passes": [
+          {
+            "id": "ownership-and-call-graph",
+            "status": "passed",
+            "filesInspected": [
+              "alchemy.run.ts",
+              "alchemy.preview.run.ts",
+              "alchemy.stable.run.ts",
+              "stacks/bundjil.ts",
+              "stacks/preview-vercel-configuration.ts",
+              "packages/infrastructure/README.md",
+              "packages/infrastructure/src",
+              "packages/photon/README.md",
+              "packages/photon/src/management",
+              "packages/photon/src/transport.layer.ts",
+              "apps/agent/agent/lib/channel",
+              "apps/agent/runbooks/alchemy-infrastructure.md",
+              "apps/agent/runbooks/deploy-promote.md",
+              "apps/agent/runbooks/photon.md"
+            ],
+            "commands": [
+              "git fetch origin main; inspect merge-base, graph and complete origin/main...HEAD name-status diff",
+              "scan infrastructure/photon imports, exports, Service/Layer/Resource graph and stage ownership",
+              "scan Preview/Production/imported/retained/read-only/runbook-owned/deployment/promotion boundaries"
+            ],
+            "findings": [
+              "Root stacks alone own topology; applications never import @bundjil/infrastructure.",
+              "Infrastructure owns state-safe Alchemy providers, Photon owns its named management and runtime boundaries, and private provider clients do not escape.",
+              "Alchemy stable configuration/state/drift, Vercel Git deployments, and app-owned promotion/rollback remain separate; Preview and Production have distinct stages, manifests, state, credentials and authority."
+            ],
+            "corrections": [],
+            "evidence": "Direct import/call-graph scans and cross-stage fixtures reject package-name, one-stage and deployment-as-state false greens.",
+            "nonClaims": "Repository ownership does not establish current provider state or standing authority."
+          },
+          {
+            "id": "effect-and-provider-implementation-quality",
+            "status": "passed",
+            "filesInspected": [
+              "packages/infrastructure/src",
+              "packages/infrastructure/scripts",
+              "packages/photon/src",
+              "stacks",
+              "alchemy.run.ts",
+              "alchemy.preview.run.ts",
+              "alchemy.stable.run.ts"
+            ],
+            "commands": [
+              "scan public exports and owner Type/Encoded decode/encode boundaries",
+              "scan Config.schema, Redacted, Schema tagged errors, Effect error pipes, Service and Layer construction",
+              "scan raw clients/callbacks, helper sprawl, casts, manual JSON/readers/mappers, DTO mirrors, primitive public contracts, switch and instanceof policy"
+            ],
+            "findings": [
+              "Vercel, Photon, signed-ingress, Alchemy state and native-drift inputs decode once at their owning adapter and outward requests/receipts encode at the exact boundary.",
+              "No raw client, generic callback, helper/common/utils module, unsafe cast, instanceof/switch policy, primitive semantic public identity or unchecked DTO escapes.",
+              "Named lazy Effects, safe Schema/Data errors, Config.schema and Redacted custody are retained."
+            ],
+            "corrections": [],
+            "evidence": "The only suppression is the documented adjacent Spectrum 12.3.0 exact-optional declaration exception, covered by package and consumer typechecks.",
+            "nonClaims": "A passing typecheck alone was not treated as boundary-quality proof."
+          },
+          {
+            "id": "lifecycle-state-and-security-correctness",
+            "status": "passed",
+            "filesInspected": [
+              "packages/infrastructure/src/providers.ts",
+              "packages/infrastructure/src/vercel",
+              "packages/infrastructure/src/photon",
+              "packages/infrastructure/src/state",
+              "packages/infrastructure/src/drift.ts",
+              "packages/infrastructure/test",
+              "packages/infrastructure/test-alchemy",
+              "packages/photon/test",
+              "tmp/proof/alchemy-drift-preview-40970b4-run1.receipt.json",
+              "tmp/proof/alchemy-drift-preview-40970b4-run2.receipt.json"
+            ],
+            "commands": [
+              "scan and exercise identity/adoption/no-op/drift/retain/delete/pagination/retry/eventual-consistency/timeout/partial-failure/secret/billing policies",
+              "inspect mode-0600 exact-source drift reports and receipts"
+            ],
+            "findings": [
+              "Stable identities, adoption/no-op and local-state recovery avoid duplicate writes; manifest retain policies reach Alchemy RemovalPolicy.",
+              "Pagination exhausts, known retryable reads use bounded exponential jitter, known non-retryable failures stay one attempt, and uncertain writes require observation.",
+              "Write-only secrets remain redacted/inconclusive; project, line, billing and deletion operations fail closed."
+            ],
+            "corrections": [],
+            "evidence": "Lifecycle tests cover pre-write timeout, timeout-after-write, eventual consistency, partial recovery, exact rollback and retained retirement with zero writes; both live drift receipts record zero writes.",
+            "nonClaims": "Desired no-op and unchanged metadata do not prove write-only value equality."
+          },
+          {
+            "id": "verification-and-adversarial-coverage",
+            "status": "passed",
+            "filesInspected": [
+              "packages/infrastructure/test",
+              "packages/infrastructure/test-alchemy",
+              "packages/photon/test",
+              "apps/agent/test/channel-vertical.test.ts",
+              "apps/agent/test/production-preflight.test.ts",
+              "tooling",
+              "docs/verification/critical-journeys.json"
+            ],
+            "commands": [
+              "bun run check:effect-setup && bun run check:boundaries",
+              "bun run --filter=@bundjil/infrastructure test",
+              "bun run --filter=@bundjil/photon test",
+              "bun run --cwd apps/agent vitest run test/channel-vertical.test.ts test/production-preflight.test.ts",
+              "bun run check:docs && bun run check:skills && bun run check:authority && bun run check:controls && bun run check:verification && bun run eval:hgi-307",
+              "bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && git diff --check"
+            ],
+            "findings": [
+              "No missing negative test was found across malformed, cross-brand/stage, ambiguity, leak, uncertain-outcome, retry, eventual-consistency, no-write adoption, drift-source and destructive-denial matrices.",
+              "One initial agent focus used unsupported filter syntax after provider matrices passed."
+            ],
+            "corrections": [
+              "Reran the agent focus with the app-owned --cwd command; 32 tests passed."
+            ],
+            "evidence": "Effect/boundary checks, 70 infrastructure Vitest tests, 21 Alchemy lifecycle tests, 41 Photon tests, 32 agent tests, 98 tooling tests, all policy gates, type-aware lint, lint fixture, Knip, nine typechecks and diff check passed.",
+            "nonClaims": "Mocks, aggregate suites and neighbouring assertions were not substituted for provider-bound journey receipts."
+          },
+          {
+            "id": "documentation-authority-and-closeout",
+            "status": "passed",
+            "filesInspected": [
+              "docs/README.md",
+              "docs/architecture",
+              "README.md",
+              "packages/infrastructure/README.md",
+              "packages/photon/README.md",
+              "apps/agent/runbooks",
+              "docs/operations",
+              "docs/standards",
+              "docs/verification",
+              "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+              "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+              "docs/product-specs/index.md",
+              "docs/exec-plans/active/README.md",
+              "docs/exec-plans/completed/README.md",
+              "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+              "docs/documentation-audit/HGI-307-impact-ledger.json"
+            ],
+            "commands": [
+              "inspect lifecycle, authority, proof, rollback and exact Git owners",
+              "recompute tracked documentation and README path inventories",
+              "rerun docs, skills, authority, controls, verification, HGI-307 and full repository verification on the terminal candidate"
+            ],
+            "findings": [
+              "Active/product indexes retained the resolved initial Vercel 403.",
+              "A displaced Production state ledger after the drift closeout falsely said Production remained blocked.",
+              "SPEC/task/plan lifecycle, completed pointers and terminal documentation inventory were unreconciled."
+            ],
+            "corrections": [
+              "Removed stale current entries and the displaced ledger.",
+              "Set implemented/completed/historical lifecycle, moved the plan to completed history and added a dated successor inventory without rewriting historical HGI evidence."
+            ],
+            "evidence": "The completed plan owns the full docs-maintainer ledger, ordered rollback chain, exact proof limits and final verification result.",
+            "nonClaims": "No hosted GitHub setting, schedule, alert delivery, automatic repair, future provider state or write-only secret reconstruction is claimed."
+          }
+        ]
       },
       "implementationNotes": [
         "PR CI runs repository checks, provider-memory tests, a read-only Preview plan, and native sync --dry-run. Protected Preview/Production apply jobs remain separate and approval-gated.",

@@ -1,16 +1,28 @@
 ---
 document_type: execution-plan
-lifecycle: active
-authority: canonical
+lifecycle: historical
+authority: supporting
 owner: bundjil-product-owner
-last_reviewed: 2026-07-28
+last_reviewed: 2026-07-31
 review_trigger: task status, Alchemy/provider capability, state/secret decision, authority, rollout, rollback, or proof change
 spec: ../../product-specs/alchemy-vercel-photon-infrastructure.md
 task_ledger: ../../product-specs/alchemy-vercel-photon-infrastructure.tasks.json
 started: 2026-07-24
+completed: 2026-07-31
 ---
 
 # Alchemy Infrastructure For Vercel And Photon
+
+## Completed closeout
+
+All ten accepted tasks were implemented serially. Repository contracts,
+Preview and Production provider qualification, retained Alchemy state, stable
+Vercel configuration, distinct Git deployment ownership, dual-Channel
+Production proof, report-only drift classification, and exact rollback
+boundaries reached their task-owned terminal states. The terminal audit below
+ran once after the complete implementation and live evidence state was
+available. It does not convert historical receipts into current provider truth
+or standing authority.
 
 ## Current trajectory
 
@@ -2815,18 +2827,228 @@ handset behavior. The last implementation task remains in progress only for
 the final proof reconciliation, one fresh terminal five-pass audit,
 lifecycle/archive move, exact final verification and closeout commit.
 
-### Production state-correction docs-maintainer impact ledger
+## Terminal five-pass audit
 
-| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |
-| --------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and provider call graph          | Change required | Generalize the existing R2-state-only service by decoded stage; Vercel and Photon provider transports remain unreachable and provider writes zero. |
-| READMEs, exports and generated references     | Change required | Add one Production state command and document generic stage-owned Config; no client, raw state handle or generated reference escapes.              |
-| Runbooks, authority and controls              | Change required | Add exact one-fingerprint Production policy, full backup, readback, restore and stop conditions under a distinct fixed authority.                  |
-| Verification journeys and proof               | Change required | Prove Production plan/apply/restore and the subsequent zero-create/replace/delete adoption plan with fixed receipts.                               |
-| Skills, AGENTS, lint, config, commands and CI | Change required | Reuse repository contracts; the new root command and stage config must pass Effect LS and every routed policy gate.                                |
-| Schemas, services and Layers                  | Change required | Reuse the state Resource Schema and backup service while making stage a Schema-decoded policy field; add exact Production live Layer.              |
-| Tests and fixtures                            | Change required | Run the same backup/retire/restore/mismatch matrix for Production and reject Preview/Production cross-stage manifests.                             |
-| SPEC, tasks and active plan                   | Change required | Keep Production in progress at the earliest failed zero-delete prerequisite.                                                                       |
-| Secrets, receipts, rollout and rollback       | Change required | Scan known credentials, retain a complete ignored backup and fixed receipt, and restore exactly if adoption cannot converge.                       |
-| Lifecycle, archive and terminal audit         | Preserve        | Production provider apply remains blocked; drift closeout and the single terminal five-pass audit remain downstream.                               |
-| Documentation inventory and archive pointers  | Preserve        | No docs path or lifecycle route changes; recompute the existing routed inventory from the changed tree.                                            |
+Audit baseline:
+`6eb4db60551d8b9ceac851957a74bf8a857e001a`, already pushed to
+`origin/codex/alchemy-vercel-photon-infrastructure`. The merge base with fresh
+`origin/main` was `ff73113524fa63ce8d9951a215f6f56c33660f2e`; the branch
+contained 86 task commits and a 195-file implementation diff before terminal
+lifecycle reconciliation.
+
+### Pass 1 — ownership and call graph
+
+Status: passed with no correction.
+
+Files inspected:
+
+- root `alchemy.run.ts`, `alchemy.preview.run.ts`, `alchemy.stable.run.ts` and
+  `stacks/**`;
+- `packages/infrastructure/{README.md,package.json,src/index.ts,src/service.ts,
+src/providers.ts,src/photon/**,src/vercel/**,src/state/**}`;
+- `packages/photon/{README.md,package.json,src/index.ts,src/management/**,
+src/transport.layer.ts}`;
+- `apps/agent/agent/lib/channel/**`, the Alchemy/Photon/deploy runbooks, the
+  architecture owners, and the complete `origin/main...HEAD` name-status diff.
+
+Commands included fresh `git fetch origin main`, merge-base/log/name-status
+inspection, provider/import scans, Service/Layer/Resource call-graph scans, and
+ownership-term scans for Preview, Production, imported, retained, read-only,
+runbook-owned, deployment, promotion, Marketplace, billing and dedicated
+lines.
+
+Findings and evidence:
+
+- root stack files alone own topology; applications import Channel/Photon
+  runtime contracts but never `@bundjil/infrastructure`;
+- infrastructure owns state-safe Alchemy providers and consumes Photon's named
+  read boundary; private Vercel and Photon clients do not escape;
+- Alchemy owns stable configuration/state/drift, Vercel Git and app runbooks
+  own immutable deployment/promotion/rollback, and retained/read-only/provider
+  observations have no write edge;
+- Preview and Production choose distinct decoded stages, manifests, state,
+  credentials and authority contracts; compile/runtime fixtures reject
+  cross-stage identities.
+
+Rejected false greens were package names without import proof, one environment
+read standing in for both stages, a Git deployment treated as Alchemy state,
+and imported observations treated as mutation ownership.
+
+### Pass 2 — Effect and provider implementation quality
+
+Status: passed with no correction.
+
+Files inspected:
+
+- all TypeScript under `packages/infrastructure/src`,
+  `packages/infrastructure/scripts`, `packages/photon/src`, `stacks/**` and the
+  three root Alchemy entry points;
+- public export maps for infrastructure root, `/vercel`, `/photon`, Photon
+  root and Photon `/management`;
+- focused error, Config, live/memory Layer, transport, provider and drift
+  implementations.
+
+Boundary matrix:
+
+| Boundary                     | Type/Encoded and decode owner                                                                                          | Encode owner and exception                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Vercel management reads      | owned request/response Schemas in `vercel/schemas.ts`; `vercel/live.layer.ts` decodes unknown HTTP envelopes once      | the same live adapter encodes request contracts immediately before HTTP                              |
+| Vercel Preview/stable writes | decoded owner Types in `configuration.ts` and `stable-environment.ts`; live Layers decode acknowledgements immediately | live Layers encode exact PATCH bodies and unwrap Redacted values only at HTTP                        |
+| Photon management reads      | owner Schemas in `@bundjil/photon/management`; `management/live.layer.ts` decodes provider envelopes once              | the same adapter encodes named operation inputs before HTTP                                          |
+| Photon signed ingress        | `transport.layer.ts` verifies raw bytes/headers, then decodes the canonical webhook Type once                          | outbound Channel operations encode SDK inputs inside the private client boundary                     |
+| Alchemy state/resources      | branded props/attributes and manifest Schemas decode at scripts/stack ingress                                          | provider/resource adapters encode fixed receipts and persisted state at their exact outward boundary |
+| Native drift results         | `report-drift.ts` decodes desired-plan and sync results into owned drift Types                                         | it Schema-encodes only fingerprinted reports and fixed receipts                                      |
+
+Commands scanned for raw client/SDK exports, callbacks, `as any`,
+`as unknown as`, unsafe casts, `instanceof`, `switch`, manual JSON readers,
+DTO mirrors, primitive semantic public contracts, Object-based mapper policy,
+helper/common/utils files, Config/Redacted use, Schema decode/encode owners,
+tagged errors, Effect error pipelines and Service/Layer construction.
+
+Findings and evidence:
+
+- no raw provider client, generic callback escape hatch, helper/common/utils
+  module, unsafe cast, `instanceof`/`switch` policy, primitive branded public
+  identity or unchecked provider DTO crosses a public boundary;
+- operations are named, lazy Effect programs with safe Schema/Data errors and
+  errors handled in the following pipe;
+- secrets use `Config.schema` plus Redacted custody and unwrap only at the
+  provider adapter;
+- the only suppression is the adjacent documented `@ts-expect-error` for
+  Spectrum 12.3.0's exact-optional `events` declaration mismatch; package and
+  consumer typechecks cover it.
+
+Rejected false greens were typechecking without boundary inspection, a private
+HTTP schema mistaken for a public DTO, and an import alias ending in `Type`
+mistaken for a cast.
+
+### Pass 3 — lifecycle, state and security correctness
+
+Status: passed with no correction.
+
+Files inspected:
+
+- infrastructure provider, memory/live Layer, adoption, state migration,
+  stable environment, webhook binding, drift and receipt owners;
+- Photon management/transport/reconciliation owners;
+- all infrastructure Vitest and native Alchemy lifecycle tests, Photon tests,
+  fixed authority Schemas and the mode-`0600` BND-J14 receipts.
+
+Commands scanned and exercised stable identity, adoption, no-op/update/
+replacement/delete classification, retain policies, pagination cursors,
+retry schedules, attempt bounds, exponential jitter, uncertainty,
+eventual-consistency readback, timeout-after-write, partial failure, secret
+leak sentinels, billing/dedicated-line denial and cross-stage rejection.
+
+Findings and evidence:
+
+- physical identities and stage brands are stable; adoption/no-op and local
+  state-loss recovery do not duplicate writes;
+- every manifest removal policy now reaches Alchemy's `RemovalPolicy` Service;
+  retirement tests settle retained resources with zero provider writes;
+- list adapters exhaust provider pagination; known rate/transient reads use
+  bounded exponential jitter, known non-retryable failures stay one attempt,
+  and uncertain writes require observation rather than blind replay;
+- tests cover pre-write timeout, timeout-after-write, eventual consistency,
+  partial acknowledgement/recovery and exact rollback;
+- write-only secret values never enter state or receipts; unknown revisions
+  stay inconclusive; project/line/billing/deletion operations fail closed.
+
+The exact ignored drift reports and receipts were mode `0600`, bound to
+`40970b49…`, and recorded zero writes. Rejected false greens were desired no-op
+as proof of write-only equality, retained state as deletion permission, and an
+eventual successful read as proof that no uncertain write occurred.
+
+### Pass 4 — verification and adversarial coverage
+
+Status: passed after correcting one command invocation; no product test gap was
+found and no implementation owner was reopened.
+
+Files inspected:
+
+- all tests under `packages/infrastructure/test`,
+  `packages/infrastructure/test-alchemy`, `packages/photon/test`;
+- agent Channel vertical and Production preflight fixtures;
+- workflow/authority/control/verification policy tests and BND-J14 owners.
+
+Commands and results:
+
+- Effect language-service and boundary checks passed;
+- infrastructure passed 70 Vitest tests and 21 native Alchemy lifecycle tests;
+- Photon passed 41 tests;
+- agent Channel/preflight focus passed 32 tests;
+- docs, skills, authority, controls, verification and HGI-307 gates passed;
+- 98 tooling tests, type-aware lint, lint fixture, Knip, all nine typechecks
+  and `git diff --check` passed.
+
+The first agent focus used unsupported `--filter ... vitest` syntax after the
+provider matrices had passed. It was corrected to the app-owned
+`bun run --cwd apps/agent vitest run ...` command and passed. This was an audit
+command correction, not a repository finding.
+
+Coverage directly includes malformed/case/platform/header/signature inputs,
+cross-brand/stage compile failures, ambiguity, pagination, secret leak
+sentinels, same-event identity, uncertain outcomes, provider retry bounds,
+eventual consistency, no-write adoption, drift source separation and
+fail-closed destructive/billable operations. No missing negative test was
+found. Aggregate suite success, neighbouring assertions and local mocks were
+rejected as substitutes for the provider-bound receipts already owned by their
+journeys.
+
+### Pass 5 — documentation, authority and closeout
+
+Status: passed after reopening and correcting the documentation/lifecycle
+owner.
+
+Files inspected:
+
+- `docs/README.md`, routed architecture and verification owners;
+- root, agent, infrastructure and Photon READMEs;
+- target runbooks, authority model/register, automation/control registers,
+  workflow lock and critical journeys;
+- this SPEC, task ledger, active/completed plan indexes, product index,
+  documentation audit owner, live receipt pointers and rollback sections.
+
+Findings:
+
+1. the active plan and product indexes still described the long-resolved
+   initial Vercel principal `403`;
+2. a historical Production state-correction impact ledger was displaced after
+   the terminal drift section and falsely said Production remained blocked;
+3. the SPEC/task/plan lifecycle, completed indexes and terminal documentation
+   inventory had not yet been reconciled.
+
+Corrections:
+
+- removed the stale active/current entries and routed this work through
+  implemented history;
+- removed the displaced blocked-state ledger;
+- set the SPEC/task lifecycle to implemented/completed, moved the plan to
+  completed history, added this independent five-pass record and recomputed a
+  dated successor inventory without rewriting the earlier HGI-307 epoch.
+
+The docs-maintainer closeout ledger is:
+
+| Surface                              | Decision and evidence                                                                   |
+| ------------------------------------ | --------------------------------------------------------------------------------------- |
+| Architecture/call graph              | Preserve; Pass 1 matched current routed owners                                          |
+| READMEs/exports/generated references | Preserve behavior; lifecycle indexes changed; no public export or generated API changed |
+| Runbooks/authority/controls          | Preserve executable envelopes; history grants no standing authority                     |
+| Verification/proof                   | Change required; terminal pass evidence and exact non-claims added                      |
+| Skills/AGENTS                        | Preserve; no instruction or skill byte changed                                          |
+| Lint/config/commands/CI              | Preserve implementation; final gates rerun after lifecycle edits                        |
+| Schemas/services/Layers              | Preserve; Passes 2–3 found no correction                                                |
+| Tests/fixtures                       | Preserve; Pass 4 found no missing negative                                              |
+| SPEC/tasks/plan                      | Change required; implemented/completed/historical lifecycle reconciled                  |
+| Receipts/secrets/rollout/rollback    | Preserve ignored mode-`0600` receipts and fingerprint-only tracked evidence             |
+| Archive/inventory                    | Change required; completed-plan pointer and successor path digest added                 |
+
+Rollback identity is ordered repository reversion from the terminal closeout
+commit through `6eb4db6`, `40970b4`, `b4bc6e1`, `5b1d4e7` and `715c19f`;
+provider rollback remains the exact task-owned retained deployments, state
+backups and documented irreversible callback limitation. No new provider
+mutation occurred during drift qualification or audit.
+
+Remaining non-claims: hosted GitHub settings/secrets/environment, scheduled
+workflow execution, alert delivery, automatic repair, future provider state,
+and reconstruction of write-only Vercel or retired Photon secret material.

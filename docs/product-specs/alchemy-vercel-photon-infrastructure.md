@@ -1,14 +1,25 @@
 ---
 document_type: product-specification
-lifecycle: proposed
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-product-owner
 created: 2026-07-24
-last_reviewed: 2026-07-28
+last_reviewed: 2026-07-31
 review_trigger: Alchemy version or provider support, Vercel or Photon API, deployment topology, storage binding, secret custody, authority, rollout, rollback, or proof-contract change
 ---
 
 # Alchemy Infrastructure For Vercel And Photon
+
+## Implementation status
+
+The accepted repository and provider rollout is implemented on
+`codex/alchemy-vercel-photon-infrastructure`. All ten ledger tasks reached
+completed state after the exact-source report-only drift qualification and one
+fresh terminal five-pass audit. The completed execution plan retains the
+ordered pass evidence, corrections, exact proof boundaries, rollback chain and
+Git identity. This history is not standing authority for another provider
+read, write, deployment, message, credential, billing or Production
+operation.
 
 ## Decision and intended outcome
 
@@ -550,7 +561,8 @@ duplicate-disposition proof. Preserve a passing stable Preview binding; delete
 only rollout-created failed or temporary Preview resources after drain and
 exact readback. The decision and non-claims are retained in
 `docs/verification/alchemy-photon-shared-sender-topology-decision-2026-07-29.md`.
-The task remains open and the terminal five-pass audit has not run.
+At this checkpoint the task remained open and the terminal five-pass audit had
+not run.
 
 Two consecutive live management reads on 2026-07-29 stopped this accepted
 journey before mutation. Source/Production remains Free managed-shared with two
@@ -762,11 +774,11 @@ routing-identity configuration under separate Vercel authority before
 repeating the bounded inbound-first journey. It must not recreate the user or
 send until that configuration is proven to include the intended identity and
 an exact stable principal, and a new bounded message authority is recorded.
-The safe disposition oracle is deployed and proved; the existing webhook
-configuration remains preserved. The task remains open at the exact
-unsupported-service/authentication provider boundary; another user create or
-message requires a separately bounded authority after that mismatch is
-resolved. The terminal five-pass audit has not run.
+The safe disposition oracle was deployed and proved; the existing webhook
+configuration remained preserved. At this checkpoint the task stayed open at
+the exact unsupported-service/authentication provider boundary; another user
+create or message required separately bounded authority after that mismatch
+was resolved. The terminal five-pass audit had not run.
 
 ## Canonical Schema and Effect contracts
 
@@ -1594,9 +1606,10 @@ active plan covers only repository-authorized commits `0a08767`, `43af287`,
 and `65f4d7b` plus its local audit correction. It is not the final SPEC audit.
 Implementation later resumed with an authority-validated inventory command,
 but the first live attempt remained inconclusive after the Vercel
-current-principal read returned `403`; no accepted inventory receipt exists
-and the task remains pending. Run the formal five passes once, from scratch,
-only as the terminal closeout stage after every SPEC task is complete.
+current-principal read returned `403`; at that checkpoint no accepted inventory
+receipt existed and the task remained pending. The required formal five passes
+were reserved for one from-scratch terminal closeout after every SPEC task was
+complete.
 
 ## Acceptance criteria
 
@@ -2336,3 +2349,24 @@ The dated bounded owner is
 
 The next serial owner is `drift-ci-monitoring-and-closeout`. This acceptance
 does not run or satisfy the terminal whole-SPEC five-pass audit.
+
+## Terminal implementation closeout
+
+The final report-only drift boundary reused the stage-owned Alchemy stack,
+decoded native desired-plan and sync results, classified every observation
+without a parallel provider engine, and performed zero provider writes. Two
+exact-source Preview reads at `40970b49…` and post-apply manifest digest
+`a8fcfd1e…` returned the same normalized classification hash `bec4e76e…`:
+155 desired no-ops, 155 native unchanged observations, 111 accepted metadata
+rows, zero blocking or report rows, and 44 `unknownSecretRevision` rows.
+Overall status correctly remains `inconclusive` because Vercel metadata cannot
+prove write-only values or revisions.
+
+The terminal audit then passed its five independent ownership, Effect/provider
+quality, lifecycle/security, adversarial verification, and
+documentation/authority passes. Its documentation pass corrected stale active
+index text, removed a displaced historical Production ledger from the drift
+closeout, moved the plan to completed history, and recomputed the terminal
+documentation inventory. Hosted GitHub environment/secrets/settings actuality,
+a scheduled drift run, alert delivery, future provider state, and any
+automatic repair remain explicit non-claims.

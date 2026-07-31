@@ -16,6 +16,11 @@ Implementation-audit feedback promotion:
 
 - [`implementation-audit-feedback-2026-07-24.json`](implementation-audit-feedback-2026-07-24.json)
 
+Alchemy infrastructure lifecycle accounting:
+
+- [`alchemy-drift-control-inventory-correction-2026-07-31.json`](alchemy-drift-control-inventory-correction-2026-07-31.json)
+- [`alchemy-terminal-closeout-inventory-correction-2026-07-31.json`](alchemy-terminal-closeout-inventory-correction-2026-07-31.json)
+
 Current HGI-300 receipts:
 
 - [`corpus-inventory.json`](corpus-inventory.json)
