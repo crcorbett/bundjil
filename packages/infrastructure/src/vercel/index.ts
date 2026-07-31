@@ -85,6 +85,7 @@ export {
 } from "./stable-environment-memory.layer.js";
 export {
   previewPhotonSecretReference,
+  productionPhotonSecretReference,
   ResolveVercelPreviewPhotonValue,
   type ResolveVercelPreviewPhotonValueEncoded,
   UpdateVercelStableEnvironmentVariable,
@@ -97,6 +98,7 @@ export {
   VercelPreviewPhotonEnvironmentKey,
   type VercelPreviewPhotonEnvironmentKeyEncoded,
   VercelPreviewPhotonSecretOwner,
+  VercelProductionPhotonSecretOwner,
   VercelStableEnvironmentBindings,
   VercelStableEnvironmentBindingsDenied,
   type VercelStableEnvironmentBindingsShape,

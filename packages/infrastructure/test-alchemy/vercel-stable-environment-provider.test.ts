@@ -214,6 +214,7 @@ const stableConfig = async (
     Schema.decodeUnknownEffect(VercelStableEnvironmentMemoryConfig)({
       values: [
         {
+          stage: "preview",
           environmentVariableId: agentEnvironmentVariableId,
           key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
           valueOwnership: managedValueOwnership(
@@ -223,6 +224,7 @@ const stableConfig = async (
           value: Redacted.make("agent-value-one"),
         },
         {
+          stage: "preview",
           environmentVariableId: agentEnvironmentVariableId,
           key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
           valueOwnership: managedValueOwnership(
@@ -232,6 +234,7 @@ const stableConfig = async (
           value: Redacted.make("agent-value-two"),
         },
         {
+          stage: "preview",
           environmentVariableId: proxyEnvironmentVariableId,
           key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
           valueOwnership: managedValueOwnership(
@@ -460,5 +463,155 @@ afterWriteTimeoutHarness.test.provider(
       const control = yield* VercelMemoryControl;
       expect(yield* control.stableEnvironmentAttemptCount).toBe(1);
       expect(yield* control.providerWriteCount).toBe(1);
+    })
+);
+
+const productionTeamId = "team-production";
+const productionProjectId = "prj-agent-production";
+const productionEnvironmentVariableId = "env-production-photon-project";
+const productionManagedValueOwnership = {
+  _tag: "Managed",
+  reference: {
+    owner: "@bundjil/infrastructure/vercel/production-photon",
+    reference: productionEnvironmentVariableId,
+    revision: revisionOne,
+  },
+} as const;
+const productionFixture = await Effect.runPromise(
+  Effect.gen(function* decodeProductionStableEnvironmentFixture() {
+    const inventory = yield* Schema.decodeUnknownEffect(
+      VercelReadOnlyInventory
+    )({
+      projects: [
+        {
+          stage: "prod",
+          teamId: productionTeamId,
+          projectId: productionProjectId,
+          name: "bundjil-agent",
+          framework: "vite",
+          rootDirectory: "apps/agent",
+          ownership: "Unowned",
+        },
+      ],
+      domains: [],
+      environmentVariables: [
+        {
+          stage: "prod",
+          teamId: productionTeamId,
+          projectId: productionProjectId,
+          environmentVariableId: productionEnvironmentVariableId,
+          key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+          type: "sensitive",
+          targets: ["production"],
+          sensitive: true,
+          providerUpdatedAt: 40,
+          valueOwnership: observedValueOwnership,
+          deploymentRequired: false,
+          ownership: "Unowned",
+        },
+      ],
+      marketplaceBindings: [],
+      deployments: [],
+    });
+    const scope = yield* Schema.decodeUnknownEffect(VercelInventoryScope)({
+      projects: [
+        {
+          stage: "prod",
+          teamId: productionTeamId,
+          projectId: productionProjectId,
+        },
+      ],
+    });
+    const observed = yield* Schema.decodeUnknownEffect(
+      VercelEnvironmentVariableProps
+    )({
+      stage: "prod",
+      teamId: productionTeamId,
+      projectId: productionProjectId,
+      environmentVariableId: productionEnvironmentVariableId,
+      desired: {
+        key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+        type: "sensitive",
+        targets: ["production"],
+        valueOwnership: observedValueOwnership,
+      },
+    });
+    const managed = yield* Schema.decodeUnknownEffect(
+      VercelEnvironmentVariableProps
+    )({
+      stage: "prod",
+      teamId: productionTeamId,
+      projectId: productionProjectId,
+      environmentVariableId: productionEnvironmentVariableId,
+      desired: {
+        key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+        type: "sensitive",
+        targets: ["production"],
+        valueOwnership: productionManagedValueOwnership,
+      },
+    });
+    return { inventory, scope, observed, managed };
+  })
+);
+const productionMemory = layerVercelMemory(productionFixture.inventory);
+const productionStable = layerVercelStableEnvironmentMemory(
+  await Effect.runPromise(
+    Schema.decodeUnknownEffect(VercelStableEnvironmentMemoryConfig)({
+      values: [
+        {
+          stage: "prod",
+          environmentVariableId: productionEnvironmentVariableId,
+          key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+          valueOwnership: productionManagedValueOwnership,
+          value: Redacted.make("production-value-one"),
+        },
+      ],
+      failureMode: "none",
+      failureProjectIds: [],
+    })
+  )
+).pipe(Layer.provide(productionMemory));
+const productionHarness = Test.make({
+  providers: Layer.mergeAll(
+    layerVercelReadOnlyProviders(productionFixture.scope).pipe(
+      Layer.provide(productionStable),
+      Layer.provide(productionMemory)
+    ),
+    productionStable,
+    productionMemory
+  ),
+  stage: "prod",
+});
+
+productionHarness.test.provider(
+  "updates an adopted Production binding without crossing into Preview custody",
+  (stack) =>
+    Effect.gen(function* proveProductionStableEnvironmentLifecycle() {
+      yield* stack.deploy(
+        VercelEnvironmentVariable(
+          "ProductionStablePhotonProject",
+          productionFixture.observed
+        ).pipe(adopt(true))
+      );
+      const updated = yield* stack.deploy(
+        VercelEnvironmentVariable(
+          "ProductionStablePhotonProject",
+          productionFixture.managed
+        )
+      );
+      expect(updated.stage).toBe("prod");
+      expect(updated.targets).toEqual(["production"]);
+      const noOp = yield* stack.plan(
+        VercelEnvironmentVariable(
+          "ProductionStablePhotonProject",
+          productionFixture.managed
+        )
+      );
+      expect(
+        Record.values(noOp.resources).every(
+          (resource) => resource.action === "noop"
+        )
+      ).toBe(true);
+      expect(yield* (yield* VercelMemoryControl).providerWriteCount).toBe(1);
     })
 );

@@ -109,6 +109,9 @@ bun run infrastructure:production-state-migration
 bun run infrastructure:stable-preview-plan
 bun run infrastructure:stable-preview-apply
 bun run infrastructure:stable-preview-sync
+bun run infrastructure:stable-production-plan
+bun run infrastructure:stable-production-apply
+bun run infrastructure:stable-production-sync
 bun run infrastructure:preview-plan
 bun run infrastructure:preview-apply
 bun run infrastructure:preview-sync
@@ -165,6 +168,23 @@ acknowledgements, fresh metadata-only inventory, a no-op plan, two unchanged
 sync dry-runs, and `infrastructure:adoption-proof` with the managed profile.
 The four `deploymentRequired` results require a distinct new Vercel Git
 deployment before runtime claims.
+
+Stable Production commands reuse the same typed boundary with
+`BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=productionPhotonManaged`, a distinct
+mode-`0600` Production authority envelope and the exact Production manifest.
+The root commands explicitly bind `prod`, rebuild the package, and load the
+ignored mode-`0600` `tmp/proof/vercel-production.env.local` custody file. Only
+the four existing Production `bundjil-agent`
+`BUNDJIL_CHANNEL_PHOTON_*` values are resolved, at the immediate PATCH
+boundary; all other values in that provider-generated snapshot are
+unreachable from this service. The plan must report exactly four in-place
+updates and zero create, replacement, delete or other update. After
+acknowledgement, fresh inventory, no-op plan, two unchanged sync dry-runs and
+the fixed managed adoption proof, create one distinct staged Production
+deployment with `vercel deploy --prod --skip-domain`. Require exact source,
+Production target and `READY` readback while the current domains and
+Production alias remain unchanged. Promotion is a separate, later runbook
+decision.
 
 The inventory executable selects Photon credentials by the decoded stage:
 `preview` requires the isolated `BUNDJIL_PHOTON_PREVIEW_*` pair, while `prod`

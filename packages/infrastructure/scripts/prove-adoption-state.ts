@@ -19,6 +19,7 @@ import {
 
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
+import productionStableEnvironmentAuthorityPolicy from "../schemas/production-stable-vercel-environment-authority.schema.json" with { type: "json" };
 import stableEnvironmentAuthorityPolicy from "../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
 import { ManagedStableEnvironmentStateResource } from "../src/adoption-proof.js";
 import {
@@ -176,7 +177,13 @@ const runAdoptionStateProof = Effect.gen(
           allErrors: true,
           strict: false,
           validateFormats: false,
-        }).compile(stableEnvironmentAuthorityPolicy)(authority))
+        }).compile(stableEnvironmentAuthorityPolicy)(authority)) ||
+      (bindingProfile === "productionPhotonManaged" &&
+        !new Ajv2020({
+          allErrors: true,
+          strict: false,
+          validateFormats: false,
+        }).compile(productionStableEnvironmentAuthorityPolicy)(authority))
     ) {
       return yield* Effect.fail("authority-invalid");
     }
@@ -199,7 +206,8 @@ const runAdoptionStateProof = Effect.gen(
     if (
       (bindingProfile === "observedOnly" &&
         managedManifestResources.length !== 0) ||
-      (bindingProfile === "previewPhotonManaged" &&
+      ((bindingProfile === "previewPhotonManaged" ||
+        bindingProfile === "productionPhotonManaged") &&
         managedManifestResources.length !== 4)
     ) {
       return yield* Effect.fail("binding-profile-mismatch");
@@ -284,7 +292,7 @@ const runAdoptionStateProof = Effect.gen(
       serializedState.includes(Redacted.value(credential))
     ).length;
     const managedStateResources =
-      bindingProfile === "previewPhotonManaged"
+      bindingProfile !== "observedOnly"
         ? yield* Effect.forEach(managedManifestResources, (expected) =>
             Schema.decodeUnknownEffect(ManagedStableEnvironmentStateResource)(
               resources[
@@ -339,8 +347,8 @@ const runAdoptionStateProof = Effect.gen(
       schemaVersion: "1",
       status: "passed",
       claim:
-        bindingProfile === "previewPhotonManaged"
-          ? "Authorized stable Preview Photon environment bindings produced exact provider acknowledgements in dedicated remote state."
+        bindingProfile !== "observedOnly"
+          ? `Authorized stable ${stage} Photon environment bindings produced exact provider acknowledgements in dedicated remote state.`
           : "Authorized no-write adoption persisted the exact accepted manifest in dedicated remote state and converged to no-op.",
       target: `alchemy:BundjilInfrastructure:${stage}`,
       candidateIdentity,
@@ -354,7 +362,7 @@ const runAdoptionStateProof = Effect.gen(
         "state-stacks:BundjilInfrastructure,BundjilPreviewConfigurationSpike",
         `manifest-digest:${manifest.digest}`,
         `resource-count:${fqns.length}`,
-        ...(bindingProfile === "previewPhotonManaged"
+        ...(bindingProfile !== "observedOnly"
           ? [
               "managed-provider-acknowledgements:4",
               "managed-deployment-required:4",
@@ -372,14 +380,14 @@ const runAdoptionStateProof = Effect.gen(
         "The remote state contains exactly the accepted stage logical identities.",
         "Every persisted resource has the exact stage and completed adoption status.",
         "Preview and Production coexist as distinct stages in the dedicated state store.",
-        bindingProfile === "previewPhotonManaged"
-          ? "Only the four existing Preview Photon environment identities have managed ownership; every other Vercel and Photon resource remains read-only and retained."
+        bindingProfile !== "observedOnly"
+          ? `Only the four existing ${stage} Photon environment identities have managed ownership; every other Vercel and Photon resource remains read-only and retained.`
           : "The live Vercel and Photon adoption adapters expose read transports only.",
       ],
       detailArtifacts: [{ path: manifestPath, sha256: manifestDigest }],
       limitations: [
         "The installed Alchemy CLI has no plan --adopt option; deploy --dry-run --adopt supplied the side-effect-free adoption plan.",
-        bindingProfile === "previewPhotonManaged"
+        bindingProfile !== "observedOnly"
           ? "Provider acknowledgements and state do not prove the separate live plan, fresh inventory, no-op sync, immutable deployment or runtime configuration."
           : "Adoption state is stage-scoped point-in-time evidence and does not substitute one Photon project for another.",
       ],
@@ -387,7 +395,7 @@ const runAdoptionStateProof = Effect.gen(
         "This receipt proves no Vercel deployment, promotion, runtime health, Photon mutation, Channel delivery, handset result, or future provider state.",
       ],
       rollbackOrRecovery:
-        bindingProfile === "previewPhotonManaged"
+        bindingProfile !== "observedOnly"
           ? "Use the externally retained prior value revision, reapply it to the same four exact environment IDs under a new authority receipt, read back acknowledgements, and require a new immutable deployment; Vercel does not retain two active values for one key and target."
           : "Retain the R2 state and provider resources; revert the desired Git revision, dry-run plan and sync, then replace the exact bucket-scoped credential only through create-readback-cutover-revoke.",
       observedAt,
@@ -433,6 +441,15 @@ const runAdoptionStateProof = Effect.gen(
         providerWrites: 0,
       })),
       Match.when("previewPhotonManaged", () => ({
+        status: "passed" as const,
+        stage,
+        stateStore: state.id,
+        stateVersion: version,
+        resourceCount: fqns.length,
+        credentialLeakCount,
+        providerAcknowledgements: managedStateResources.length,
+      })),
+      Match.when("productionPhotonManaged", () => ({
         status: "passed" as const,
         stage,
         stateStore: state.id,

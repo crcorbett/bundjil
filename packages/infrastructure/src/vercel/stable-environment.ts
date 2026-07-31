@@ -48,6 +48,7 @@ export type VercelManagedEnvironmentValueEncoded =
   typeof VercelManagedEnvironmentValue.Encoded;
 
 export const ResolveVercelPreviewPhotonValue = Schema.Struct({
+  stage: Schema.Literals(["preview", "prod"]),
   environmentVariableId: VercelEnvironmentVariableId,
   key: VercelPreviewPhotonEnvironmentKey,
   valueOwnership: VercelManagedEnvironmentValue,
@@ -57,20 +58,31 @@ export type ResolveVercelPreviewPhotonValue =
 export type ResolveVercelPreviewPhotonValueEncoded =
   typeof ResolveVercelPreviewPhotonValue.Encoded;
 
-export const UpdateVercelStableEnvironmentVariable = Schema.Struct({
-  stage: Schema.Literal("preview"),
+const StableEnvironmentVariableFields = {
   teamId: VercelTeamId,
   projectId: VercelProjectId,
   environmentVariableId: VercelEnvironmentVariableId,
   key: VercelPreviewPhotonEnvironmentKey,
   type: Schema.Literal("sensitive"),
-  targets: Schema.Tuple([Schema.Literal("preview")]),
   valueOwnership: VercelManagedEnvironmentValue,
   value: VercelStableEnvironmentValue,
   previousProviderUpdatedAt: Schema.optional(
     VercelEnvironmentVariableUpdatedAt
   ),
-});
+};
+
+export const UpdateVercelStableEnvironmentVariable = Schema.Union([
+  Schema.Struct({
+    ...StableEnvironmentVariableFields,
+    stage: Schema.Literal("preview"),
+    targets: Schema.Tuple([Schema.Literal("preview")]),
+  }),
+  Schema.Struct({
+    ...StableEnvironmentVariableFields,
+    stage: Schema.Literal("prod"),
+    targets: Schema.Tuple([Schema.Literal("production")]),
+  }),
+]);
 export type UpdateVercelStableEnvironmentVariable =
   typeof UpdateVercelStableEnvironmentVariable.Type;
 export type UpdateVercelStableEnvironmentVariableEncoded =
@@ -200,12 +212,25 @@ export const VercelPreviewPhotonBindingValuesDenied = Layer.succeed(
 export const VercelPreviewPhotonSecretOwner = SecretOwner.make(
   "@bundjil/infrastructure/vercel/preview-photon"
 );
+export const VercelProductionPhotonSecretOwner = SecretOwner.make(
+  "@bundjil/infrastructure/vercel/production-photon"
+);
 export const previewPhotonSecretReference = (
   environmentVariableId: typeof VercelEnvironmentVariableId.Type,
   revision: typeof SecretRevision.Type
 ) =>
   SecretReference.make({
     owner: VercelPreviewPhotonSecretOwner,
+    reference: SecretReferenceId.make(environmentVariableId),
+    revision,
+  });
+
+export const productionPhotonSecretReference = (
+  environmentVariableId: typeof VercelEnvironmentVariableId.Type,
+  revision: typeof SecretRevision.Type
+) =>
+  SecretReference.make({
+    owner: VercelProductionPhotonSecretOwner,
     reference: SecretReferenceId.make(environmentVariableId),
     revision,
   });

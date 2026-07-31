@@ -4,7 +4,9 @@ import { Effect, Exit, Schema } from "effect";
 import {
   AdoptionManifest,
   buildAdoptionManifest,
+  InfrastructureCommandInput,
   InfrastructureInventoryArtifact,
+  validateStableAdoptionCommand,
   verifyAdoptionManifestAgainstInventory,
 } from "../src/index.js";
 
@@ -212,6 +214,87 @@ it.effect(
         "observedOnly"
       ).pipe(Effect.exit);
       assert.strictEqual(Exit.isFailure(wrongProfile), true);
+    })
+);
+
+it.effect(
+  "classifies only the four exact Production Photon bindings under distinct custody",
+  () =>
+    Effect.gen(function* testManagedProductionPhotonProfile() {
+      const previewInventory = yield* decodeInventoryFixture;
+      const encoded = yield* Schema.encodeEffect(
+        InfrastructureInventoryArtifact
+      )(previewInventory);
+      const inventory = yield* Schema.decodeUnknownEffect(
+        InfrastructureInventoryArtifact
+      )({
+        ...encoded,
+        manifest: {
+          ...encoded.manifest,
+          stage: "prod",
+          vercel: {
+            ...encoded.manifest.vercel,
+            environmentVariables:
+              encoded.manifest.vercel.environmentVariables.map((resource) => ({
+                ...resource,
+                stage: "prod",
+                targets: ["production"],
+              })),
+          },
+        },
+      });
+      const manifest = yield* buildAdoptionManifest(
+        inventory,
+        "productionPhotonManaged"
+      );
+      const input = yield* Schema.decodeUnknownEffect(
+        InfrastructureCommandInput
+      )({
+        stack: "BundjilInfrastructure",
+        stage: "prod",
+        mode: "plan",
+        manifestPath: "tmp/proof/production-manifest.json",
+        manifestDigest: manifest.digest,
+      });
+      const validated = yield* validateStableAdoptionCommand({
+        input,
+        manifest,
+      });
+      assert.deepStrictEqual(validated, manifest);
+      const environmentResources = manifest.resources.filter(
+        (resource) => resource.resourceKind === "vercelEnvironmentVariable"
+      );
+      const managed = environmentResources.filter(
+        (resource) => resource.desired.valueOwnership._tag === "Managed"
+      );
+      assert.strictEqual(managed.length, 4);
+      assert.strictEqual(
+        managed.every(
+          (resource) =>
+            resource.desired.valueOwnership._tag === "Managed" &&
+            resource.desired.valueOwnership.reference.owner ===
+              "@bundjil/infrastructure/vercel/production-photon" &&
+            resource.desired.targets.length === 1 &&
+            resource.desired.targets[0] === "production"
+        ),
+        true
+      );
+      const previewProfile = yield* buildAdoptionManifest(
+        inventory,
+        "previewPhotonManaged"
+      ).pipe(Effect.exit);
+      assert.strictEqual(Exit.isFailure(previewProfile), true);
+      const previewInput = yield* Schema.decodeUnknownEffect(
+        InfrastructureCommandInput
+      )({
+        ...input,
+        stage: "preview",
+      });
+      const crossStageCommand = yield* validateStableAdoptionCommand({
+        input: previewInput,
+        manifest,
+      }).pipe(Effect.exit);
+      assert.strictEqual(Exit.isFailure(crossStageCommand), true);
     })
 );
 

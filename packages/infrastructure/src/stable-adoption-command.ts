@@ -8,6 +8,7 @@ import { VercelEnvironmentVariableId } from "./vercel/schemas.js";
 import {
   VercelPreviewPhotonEnvironmentKey,
   VercelPreviewPhotonSecretOwner,
+  VercelProductionPhotonSecretOwner,
 } from "./vercel/stable-environment.js";
 
 const expectedManagedKeys = new Set<string>([
@@ -26,13 +27,24 @@ export const validateStableAdoptionCommand = Effect.fn(
   "StableAdoptionCommand.validate"
 )(function* ({ input, manifest }: AdoptionCommand) {
   if (
-    input.stage !== "preview" ||
-    (input.mode !== "plan" && input.mode !== "apply" && input.mode !== "sync")
+    input.mode !== "plan" &&
+    input.mode !== "apply" &&
+    input.mode !== "sync"
   ) {
     return yield* failConfiguration(
-      "Stable environment bindings are restricted to Preview plan, apply, or sync."
+      "Stable environment bindings require a stage-owned plan, apply, or sync."
     );
   }
+  const expectedTarget = Match.value(input.stage).pipe(
+    Match.when("preview", () => "preview" as const),
+    Match.when("prod", () => "production" as const),
+    Match.exhaustive
+  );
+  const expectedOwner = Match.value(input.stage).pipe(
+    Match.when("preview", () => VercelPreviewPhotonSecretOwner),
+    Match.when("prod", () => VercelProductionPhotonSecretOwner),
+    Match.exhaustive
+  );
   const environmentResources = manifest.resources.filter(
     (resource) => resource.resourceKind === "vercelEnvironmentVariable"
   );
@@ -55,13 +67,13 @@ export const validateStableAdoptionCommand = Effect.fn(
           if (
             resource.desired.type !== "sensitive" ||
             resource.desired.targets.length !== 1 ||
-            resource.desired.targets[0] !== "preview" ||
+            resource.desired.targets[0] !== expectedTarget ||
             resource.desired.gitBranch !== undefined ||
-            ownership.reference.owner !== VercelPreviewPhotonSecretOwner ||
+            ownership.reference.owner !== expectedOwner ||
             !Schema.is(VercelPreviewPhotonEnvironmentKey)(resource.desired.key)
           ) {
             return yield* failConfiguration(
-              "A managed Preview Photon binding has invalid metadata or custody ownership."
+              "A managed Photon binding has invalid stage metadata or custody ownership."
             );
           }
           const encodedReference = yield* Schema.encodeEffect(
@@ -96,7 +108,7 @@ export const validateStableAdoptionCommand = Effect.fn(
     [...expectedManagedKeys].some((key) => !managedKeys.has(key))
   ) {
     return yield* failConfiguration(
-      "The stable manifest must manage exactly the four Preview Photon bindings in one Vercel project."
+      "The stable manifest must manage exactly the four stage-owned Photon bindings in one Vercel project."
     );
   }
   return manifest;

@@ -2270,6 +2270,59 @@ runtime health, Channel delivery or future provider state. The task remains in
 progress at the stable-configuration implementation and exact Production
 authority boundary.
 
+### Production stable Photon binding slice
+
+The first Production managed slice is intentionally limited to the same four
+proven Photon runtime binding classes: project ID, project secret, webhook ID
+and webhook secret on the exact existing `bundjil-agent` Production records.
+Fresh inventory proves one record per key, `sensitive` type, Production-only
+target and one owning project. The exact linked project produced an ignored
+mode-`0600` Production env snapshot containing those four keys exactly once;
+only key presence was emitted. Values remain process-local and must never enter
+Alchemy state, receipts, logs, tracked files or provider readback claims.
+
+Proxy bearer/cipher, model/Executor, routing/replay, Sendblue, datastore,
+project/domain, Marketplace and Photon provider resources remain observed,
+retained or runbook-owned. The single-token proxy contract still blocks bearer
+rotation. This slice adds no Photon provider mutation and no Production alias
+or promotion.
+
+| Requirement                       | Direct observable and expected postcondition                                                                                                                       | Plausible false green rejected                                                                    | Focused command/evidence owner                                   |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Exact managed scope               | Managed manifest has exactly four existing agent environment identities, approved keys, `sensitive` type and `production` target; all other values remain observed | Key-name match without exact ID/project/target/type, or sweeping every Production secret          | Manifest unit/command tests; SPEC/task/plan                      |
+| Custody and write-only values     | Ignored mode-`0600` provider snapshot has four unique keys; values resolve only at the PATCH boundary and never appear in state/receipt/logs                       | Vercel metadata readback treated as value proof, or secret copied into tracked state              | Config/contract/leak tests; ignored custody metadata             |
+| Authority and isolation           | A distinct fixed Production authority validates; Preview authority and cross-stage manifest are rejected                                                           | Broad mutation delegation or the Preview authority accepted for Production                        | AJV authority matrix; runbook/authority owner                    |
+| Retry eligibility and bound       | Only known 429/5xx pre-response failures retry; at most three total attempts with exponential jitter                                                               | Retrying 4xx, identity failures, or calling aggregate tests proof of every retry property         | Stable provider retry tests and Effect provider harness          |
+| Uncertain outcome and observation | Timeout after possible write is not blindly retried; exact-ID metadata observation must converge to the acknowledged revision before acceptance                    | Assuming a timeout failed, or accepting key/type/target without provider revision equality        | Uncertain-write/partial-failure harness and live readback        |
+| Convergence and deployment        | Plan has four updates and no create/replace/delete; apply acknowledgements pass; provider inventory changes four revisions; plan plus two syncs become no-op       | State-only no-op, one provider acknowledgement, Preview deployment, or alias treated as proof     | Fixed adoption receipt plus exact provider inventory and plans   |
+| Staged Production candidate       | `vercel deploy --prod --skip-domain` creates a Production-environment READY deployment without domain assignment; promotion remains separate                       | Feature-branch Preview build, current Production alias, or deploy success without target readback | Agent deployment runbook and bounded deployment receipt/readback |
+
+The repository implementation now adds the Production binding profile, exact
+stage/target/owner request union, `Config.schema` custody, fixed authority
+policy, Production root commands and the complete runbook. Focused manifest,
+authority, live HTTP and Alchemy provider matrices pass, including cross-stage
+rejection, no-op convergence, retry bounds, partial recovery and
+uncertain-after-write non-retry. Effect language-service setup,
+docs-maintainer's 272-file inventory and the complete repository verification
+pass on this candidate. This is repository proof only: no stable Production
+provider update or staged deployment has yet occurred, so the task remains in
+progress at fresh exact-source inventory and the four-update live plan.
+
+### Production stable-binding docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Trigger, earliest owner, verification and non-claim                                                                                                                                                                                    |
+| --------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | Existing Effect/provider architecture already owns decoded stage, private SDK transport and managed-versus-observed boundaries; focused provider tests prove the new Production branch without changing the durable architecture.      |
+| READMEs, exports and generated references     | Change required | `packages/infrastructure/README.md` adds the three Production commands and staged-deployment boundary; the existing Vercel export surface gains only the Production owner/reference, with no raw client or generated-reference change. |
+| Runbooks, authority and controls              | Change required | `apps/agent/runbooks/alchemy-infrastructure.md` owns exact plan/apply/readback/staged-deploy/rollback steps; a fixed Production authority Schema rejects Preview, promotion and broader-resource envelopes.                            |
+| Verification journeys and proof               | Change required | Direct unit/provider matrices cover exact target, stage custody, retries, uncertain writes, partial recovery and no-op; live receipt owners remain ignored `tmp/proof/**` artifacts and do not yet claim provider convergence.         |
+| Skills, AGENTS, lint, config, commands and CI | Change required | Repository skills and `AGENTS.md` are preserved; root commands bind stage explicitly, rebuild before access and load only ignored custody. Effect LS and all routed policy gates remain mandatory.                                     |
+| Schemas, services and Layers                  | Change required | Add `productionPhotonManaged`, a Production `SecretOwner`, stage-discriminated request contracts and Production `Config.schema` custody; keep named Effects, private HTTP client and explicit live/memory Layers.                      |
+| Tests and fixtures                            | Change required | Add Production manifest/authority/live-contract/Alchemy matrices plus cross-stage negatives. Existing Preview, timeout and partial-failure fixtures remain authoritative for shared policy properties.                                 |
+| SPEC, tasks and active plan                   | Change required | Record the exact four-binding slice and keep `production-adoption-and-rollout` in progress until live acknowledgements, convergence and staged deployment readback pass.                                                               |
+| Secrets, receipts, rollout and rollback       | Change required | Preserve mode-`0600` value and state backups, emit only Schema-valid redacted receipts, retain candidate/prior revisions and do not promote or alias the staged deployment in this slice.                                              |
+| Lifecycle, archive and terminal audit         | Preserve        | The active plan and proposed SPEC stay open. Drift/closeout and the one fresh terminal five-pass audit remain downstream; repository tests are not provider or deployment proof.                                                       |
+
 ### Production state-correction docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |

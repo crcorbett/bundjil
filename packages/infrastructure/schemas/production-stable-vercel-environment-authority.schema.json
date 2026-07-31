@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bundjil.dev/schemas/production-stable-vercel-environment-authority.schema.json",
+  "title": "Bundjil stable Production Vercel environment authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "mutation" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": {
+      "const": [
+        "read exact Production Vercel project, environment, Marketplace and deployment metadata",
+        "update only the four existing sensitive Production Photon environment bindings by exact environment ID",
+        "read and write only BundjilInfrastructure Production Alchemy state",
+        "create one staged bundjil-agent Production deployment with domains skipped",
+        "observe only the staged Production deployment without alias or promotion"
+      ]
+    },
+    "resources": {
+      "const": [
+        "vercel:project:bundjil-agent:environment:production",
+        "vercel:project:bundjil-agent:deployment:staged-production",
+        "vercel:project:bundjil-agent:marketplace:read-only",
+        "vercel:project:bundjil-codex-proxy:environment:read-only",
+        "vercel:project:bundjil-codex-proxy:marketplace:read-only",
+        "alchemy:BundjilInfrastructure:prod",
+        "photon:source-production-project:read-only"
+      ]
+    },
+    "environments": { "const": ["production"] }
+  }
+}

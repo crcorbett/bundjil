@@ -25,6 +25,7 @@ import {
   UpdateVercelStableEnvironmentVariable,
   VercelPreviewPhotonBindingValues,
   VercelPreviewPhotonSecretOwner,
+  VercelProductionPhotonSecretOwner,
   VercelStableEnvironmentBindings,
   VercelStableEnvironmentReadError,
   VercelStableEnvironmentWriteError,
@@ -75,27 +76,50 @@ const VercelStableEnvironmentEnvelope = Schema.Union([
   VercelStableEnvironmentFailureEnvelope,
 ]);
 
-const VercelStableEnvironmentRequest = Schema.Struct({
-  target: Schema.Tuple([Schema.Literal("preview")]),
-  type: Schema.Literal("sensitive"),
-  value: Schema.NonEmptyString,
-});
+const VercelStableEnvironmentRequest = Schema.Union([
+  Schema.Struct({
+    target: Schema.Tuple([Schema.Literal("preview")]),
+    type: Schema.Literal("sensitive"),
+    value: Schema.NonEmptyString,
+  }),
+  Schema.Struct({
+    target: Schema.Tuple([Schema.Literal("production")]),
+    type: Schema.Literal("sensitive"),
+    value: Schema.NonEmptyString,
+  }),
+]);
 
-const projectIdConfig = Config.schema(
+const previewProjectIdConfig = Config.schema(
   PhotonProjectId,
   "BUNDJIL_PHOTON_PREVIEW_PROJECT_ID"
 );
-const projectSecretConfig = Config.schema(
+const previewProjectSecretConfig = Config.schema(
   PhotonProjectSecret,
   "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
 );
-const webhookIdConfig = Config.schema(
+const previewWebhookIdConfig = Config.schema(
   PhotonWebhookId,
   "BUNDJIL_PHOTON_PREVIEW_WEBHOOK_ID"
 );
-const webhookSecretConfig = Config.schema(
+const previewWebhookSecretConfig = Config.schema(
   PhotonWebhookSecret,
   "BUNDJIL_PHOTON_PREVIEW_WEBHOOK_SECRET"
+);
+const productionProjectIdConfig = Config.schema(
+  PhotonProjectId,
+  "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"
+);
+const productionProjectSecretConfig = Config.schema(
+  PhotonProjectSecret,
+  "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+);
+const productionWebhookIdConfig = Config.schema(
+  PhotonWebhookId,
+  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID"
+);
+const productionWebhookSecretConfig = Config.schema(
+  PhotonWebhookSecret,
+  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
 );
 
 const stableEnvironmentUrl = (path: string) =>
@@ -177,7 +201,11 @@ export const VercelPreviewPhotonBindingValuesLive = Layer.succeed(
       );
       if (
         input.valueOwnership.reference.owner !==
-          VercelPreviewPhotonSecretOwner ||
+          Match.value(input.stage).pipe(
+            Match.when("preview", () => VercelPreviewPhotonSecretOwner),
+            Match.when("prod", () => VercelProductionPhotonSecretOwner),
+            Match.exhaustive
+          ) ||
         encodedReference !== encodedEnvironmentVariableId
       ) {
         return yield* new VercelStableEnvironmentReadError({
@@ -189,20 +217,44 @@ export const VercelPreviewPhotonBindingValuesLive = Layer.succeed(
             "The managed Preview Photon reference does not match the target environment identity.",
         });
       }
-      return yield* Match.value(input.key).pipe(
-        Match.when("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID", () =>
-          projectIdConfig.pipe(Effect.map(Redacted.make))
+      return yield* Match.value(input.stage).pipe(
+        Match.when("preview", () =>
+          Match.value(input.key).pipe(
+            Match.when("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID", () =>
+              previewProjectIdConfig.pipe(Effect.map(Redacted.make))
+            ),
+            Match.when(
+              "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+              () => previewProjectSecretConfig
+            ),
+            Match.when("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID", () =>
+              previewWebhookIdConfig.pipe(Effect.map(Redacted.make))
+            ),
+            Match.when(
+              "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+              () => previewWebhookSecretConfig
+            ),
+            Match.exhaustive
+          )
         ),
-        Match.when(
-          "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
-          () => projectSecretConfig
-        ),
-        Match.when("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID", () =>
-          webhookIdConfig.pipe(Effect.map(Redacted.make))
-        ),
-        Match.when(
-          "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
-          () => webhookSecretConfig
+        Match.when("prod", () =>
+          Match.value(input.key).pipe(
+            Match.when("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID", () =>
+              productionProjectIdConfig.pipe(Effect.map(Redacted.make))
+            ),
+            Match.when(
+              "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+              () => productionProjectSecretConfig
+            ),
+            Match.when("BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID", () =>
+              productionWebhookIdConfig.pipe(Effect.map(Redacted.make))
+            ),
+            Match.when(
+              "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+              () => productionWebhookSecretConfig
+            ),
+            Match.exhaustive
+          )
         ),
         Match.exhaustive,
         Effect.mapError(
@@ -213,7 +265,7 @@ export const VercelPreviewPhotonBindingValuesLive = Layer.succeed(
               retry: "never",
               certainty: { _tag: "Known" },
               message:
-                "The exact managed Preview Photon value is unavailable from Config custody.",
+                "The exact managed Photon value is unavailable from stage-owned Config custody.",
             })
         )
       );
@@ -256,11 +308,21 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
         )
       ).pipe(
         HttpClientRequest.setUrlParam("teamId", encoded.teamId),
-        HttpClientRequest.schemaBodyJson(VercelStableEnvironmentRequest)({
-          target: ["preview"],
-          type: "sensitive",
-          value: Redacted.value(input.value),
-        }),
+        HttpClientRequest.schemaBodyJson(VercelStableEnvironmentRequest)(
+          Match.value(encoded.stage).pipe(
+            Match.when("preview", () => ({
+              target: ["preview"] as const,
+              type: "sensitive" as const,
+              value: Redacted.value(input.value),
+            })),
+            Match.when("prod", () => ({
+              target: ["production"] as const,
+              type: "sensitive" as const,
+              value: Redacted.value(input.value),
+            })),
+            Match.exhaustive
+          )
+        ),
         Effect.mapError(() =>
           writeFailure(
             "updateStableEnvironmentVariable",
@@ -302,7 +364,7 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
         response.body.key !== input.key ||
         response.body.type !== "sensitive" ||
         response.body.target.length !== 1 ||
-        response.body.target[0] !== "preview" ||
+        response.body.target[0] !== input.targets[0] ||
         response.body.sensitive === false
       ) {
         return yield* writeFailure(

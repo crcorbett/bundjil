@@ -34,6 +34,7 @@ export type VercelStableEnvironmentMemoryFailureMode =
   typeof VercelStableEnvironmentMemoryFailureMode.Type;
 
 export const VercelStableEnvironmentMemoryValue = Schema.Struct({
+  stage: Schema.Literals(["preview", "prod"]),
   environmentVariableId: VercelEnvironmentVariableId,
   key: VercelPreviewPhotonEnvironmentKey,
   valueOwnership: VercelManagedEnvironmentValue,
@@ -90,6 +91,7 @@ export const layerVercelStableEnvironmentMemory = (
     const match = Array.findFirst(
       config.values,
       (candidate) =>
+        candidate.stage === input.stage &&
         candidate.environmentVariableId === input.environmentVariableId &&
         candidate.key === input.key &&
         candidate.valueOwnership.reference.owner ===
@@ -103,7 +105,7 @@ export const layerVercelStableEnvironmentMemory = (
       onNone: () =>
         Effect.fail(
           readFailure(
-            "The memory value does not match the managed Preview Photon reference."
+            "The memory value does not match the stage-owned managed Photon reference."
           )
         ),
       onSome: (candidate) => Effect.succeed(candidate.value),
@@ -146,6 +148,7 @@ export const layerVercelStableEnvironmentMemory = (
         const configured = Array.findFirst(
           config.values,
           (candidate) =>
+            candidate.stage === input.stage &&
             candidate.environmentVariableId === input.environmentVariableId &&
             candidate.key === input.key &&
             candidate.valueOwnership.reference.owner ===

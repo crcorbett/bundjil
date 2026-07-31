@@ -269,6 +269,7 @@ export class AdoptionManifestBuildError extends Schema.TaggedErrorClass<Adoption
       "photonProjectMissing",
       "photonPlatformMissing",
       "candidateMismatch",
+      "bindingProfileStageMismatch",
     ]),
     message: AdoptionManifestBuildMessage,
   }
@@ -285,13 +286,14 @@ export type AdoptionProviderScopesEncoded =
 export const AdoptionBindingProfile = Schema.Literals([
   "observedOnly",
   "previewPhotonManaged",
+  "productionPhotonManaged",
 ]);
 export type AdoptionBindingProfile = typeof AdoptionBindingProfile.Type;
 export type AdoptionBindingProfileEncoded =
   typeof AdoptionBindingProfile.Encoded;
 
 const logicalId = Schema.decodeUnknownEffect(AlchemyLogicalResourceId);
-const managedPreviewPhotonKeys = new Set([
+const managedPhotonKeys = new Set([
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
   "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
@@ -307,6 +309,17 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
       artifact.manifestDigest
     );
     const { stage } = artifact.manifest;
+    if (
+      (bindingProfile === "previewPhotonManaged" && stage !== "preview") ||
+      (bindingProfile === "productionPhotonManaged" && stage !== "prod")
+    ) {
+      return yield* new AdoptionManifestBuildError({
+        reason: "bindingProfileStageMismatch",
+        message: AdoptionManifestBuildMessage.make(
+          "The managed Photon binding profile does not match the inventory stage."
+        ),
+      });
+    }
     const vercelProjects = yield* Effect.forEach(
       artifact.manifest.vercel.projects,
       (project) =>
@@ -355,14 +368,25 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
       (environmentVariable) =>
         Effect.gen(function* buildVercelEnvironmentManifestResource() {
           const valueOwnership =
-            bindingProfile === "previewPhotonManaged" &&
-            artifact.manifest.stage === "preview" &&
-            managedPreviewPhotonKeys.has(environmentVariable.key)
+            bindingProfile !== "observedOnly" &&
+            managedPhotonKeys.has(environmentVariable.key)
               ? {
                   _tag: "Managed" as const,
                   reference: SecretReference.make({
                     owner: yield* Schema.decodeUnknownEffect(SecretOwner)(
-                      "@bundjil/infrastructure/vercel/preview-photon"
+                      Match.value(stage).pipe(
+                        Match.when(
+                          "preview",
+                          () =>
+                            "@bundjil/infrastructure/vercel/preview-photon" as const
+                        ),
+                        Match.when(
+                          "prod",
+                          () =>
+                            "@bundjil/infrastructure/vercel/production-photon" as const
+                        ),
+                        Match.exhaustive
+                      )
                     ),
                     reference: yield* Schema.decodeUnknownEffect(
                       SecretReferenceId

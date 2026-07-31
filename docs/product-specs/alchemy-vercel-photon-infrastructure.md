@@ -2083,6 +2083,32 @@ credential-value matches and zero provider writes. The 69-row pre-retirement
 backup remains rollback custody. Stable managed Production configuration,
 deployment, promotion, runtime and Channel proof remain open.
 
+The accepted first managed Production slice is limited to the exact four
+existing `bundjil-agent` Photon runtime bindings: project ID, project secret,
+webhook ID and webhook secret. Inventory must prove one sensitive,
+Production-only record per key in the exact project. Values come from an
+ignored mode-`0600` provider snapshot, resolve only at the Vercel PATCH
+boundary, and never enter Alchemy state, receipts, tracked files or value
+readback claims. A distinct Production secret owner and fixed authority are
+mandatory; Preview ownership/authority must fail closed.
+
+All proxy bearer/cipher, model/Executor, routing/replay, Sendblue, datastore,
+project/domain, Marketplace and Photon provider resources remain observed,
+retained or runbook-owned. The single-token proxy contract still blocks bearer
+rotation. The managed plan must contain exactly four in-place updates and no
+create/replacement/delete. Each provider acknowledgement and exact metadata
+revision must pass before an all-no-op plan and two unchanged syncs. The staged
+candidate uses Vercel's supported `--prod --skip-domain` path so Production
+environment values are built without assigning Production domains; promotion
+and aliasing remain separate runbook operations.
+
+The repository boundary implements this profile with stage-discriminated
+Schema contracts, Production-only secret ownership, `Config.schema` custody,
+an explicit live/memory Layer matrix and a fixed Production authority policy.
+Focused checks and complete repository verification pass. This does not yet
+prove a provider update, revision convergence or staged Production deployment;
+those claims require fresh exact-source plan/apply/readback evidence.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

@@ -1,10 +1,12 @@
 import { isAbsolute } from "node:path";
 
 import { Ajv2020 } from "ajv/dist/2020.js";
-import { Config, Effect, FileSystem, Schema } from "effect";
+import { Config, Effect, FileSystem, Match, Schema } from "effect";
 
 import authorityEnvelopeSchema from "../../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import productionStableEnvironmentAuthorityPolicy from "../../schemas/production-stable-vercel-environment-authority.schema.json" with { type: "json" };
 import stableEnvironmentAuthorityPolicy from "../../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
+import { InfrastructureStage } from "../schemas.js";
 
 export const VercelStableEnvironmentAuthorityPath = Schema.String.pipe(
   Schema.check(
@@ -31,10 +33,15 @@ const authorityPathConfig = Config.schema(
   VercelStableEnvironmentAuthorityPath,
   "BUNDJIL_STABLE_ENVIRONMENT_AUTHORITY_PATH"
 );
+const stageConfig = Config.schema(
+  InfrastructureStage,
+  "BUNDJIL_INFRASTRUCTURE_STAGE"
+);
 
 export const loadVercelStableEnvironmentAuthority = Effect.gen(
   function* loadVercelStableEnvironmentAuthorityOperation() {
     const path = yield* authorityPathConfig;
+    const stage = yield* stageConfig;
     const fileSystem = yield* FileSystem.FileSystem;
     const metadata = yield* fileSystem.stat(path);
     if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
@@ -51,7 +58,13 @@ export const loadVercelStableEnvironmentAuthority = Effect.gen(
     } as const;
     if (
       !new Ajv2020(options).compile(authorityEnvelopeSchema)(authority) ||
-      !new Ajv2020(options).compile(stableEnvironmentAuthorityPolicy)(authority)
+      !new Ajv2020(options).compile(
+        Match.value(stage).pipe(
+          Match.when("preview", () => stableEnvironmentAuthorityPolicy),
+          Match.when("prod", () => productionStableEnvironmentAuthorityPolicy),
+          Match.exhaustive
+        )
+      )(authority)
     ) {
       return yield* Effect.fail("stable-environment-authority-invalid");
     }

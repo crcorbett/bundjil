@@ -225,6 +225,56 @@ acknowledgements, creates a new immutable Git deployment, and repeats
 readback. Do not claim Vercel retains two active values for the same key and
 target.
 
+## Stable Production bindings
+
+Production begins only after observed-only adoption is accepted with a
+zero-create, zero-replacement and zero-delete post-plan. Generate the exact
+Production manifest with
+`BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=productionPhotonManaged`. It may mark
+only the four existing sensitive, Production-targeted `bundjil-agent`
+`BUNDJIL_CHANNEL_PHOTON_{PROJECT_ID,PROJECT_SECRET,WEBHOOK_ID,WEBHOOK_SECRET}`
+identities managed under the Production secret owner. Every other Vercel and
+Photon resource remains observed, retained or runbook-owned.
+
+Validate the distinct mode-`0600` Production stable authority. It permits
+those four exact updates, stage-owned Alchemy state, read-only topology, and
+one staged Production deployment with domains skipped. It does not permit a
+domain assignment, alias, promotion, bearer rotation, Photon mutation,
+deletion or broader secret sweep.
+
+1. Retain a complete mode-`0600` provider custody snapshot and the accepted
+   pre-retirement state backup. Run
+   `bun run infrastructure:stable-production-plan`. Stop unless the plan has
+   exactly four updates on the accepted physical IDs and every other one of
+   the 72 resources is no-op. Reject create, replacement, delete, Preview
+   target, wrong owner, wrong project, wrong key or any additional update.
+2. Run `bun run infrastructure:stable-production-apply`. Each request must
+   use the exact existing environment ID, `sensitive` type and `production`
+   target, omit the immutable key, and decode a complete acknowledgement. A
+   known 429/5xx may receive exponential jitter and at most three total
+   attempts. Do not retry a 4xx, identity mismatch, malformed response or
+   uncertain timeout after a possible write.
+3. Immediately run two fresh inventory reads. Require the same topology and
+   exactly four changed provider revisions, then run
+   `bun run infrastructure:stable-production-plan` and two
+   `bun run infrastructure:stable-production-sync` commands. All 72 resources
+   must converge to no-op/unchanged. Run
+   `bun run infrastructure:adoption-proof` with the Production managed
+   profile and require four acknowledgements, zero secret matches and zero
+   unclassified provider writes.
+4. From the clean, pushed receipt-bearing source, create one deployment with
+   `vercel deploy --prod --skip-domain`. Read back exact source, Production
+   target and `READY` status, and prove that no domain or current Production
+   alias moved. This is a staged candidate only; do not promote or assign an
+   alias in this slice.
+
+Rollback reapplies only the externally retained prior revision to the same
+four IDs under fresh bounded authority, requires acknowledgement and
+metadata convergence, and creates another immutable staged deployment.
+Because values are write-only, metadata alone cannot prove their contents.
+Retain both prior and candidate custody until later runtime qualification
+accepts or rolls back the staged candidate.
+
 ## Configuration and drift
 
 For the approved Preview spike, first require exact readback of team

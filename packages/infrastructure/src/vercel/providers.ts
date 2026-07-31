@@ -450,11 +450,15 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
             ),
             Match.tag("Managed", (valueOwnership) =>
               Effect.gen(function* reconcileManagedStableEnvironment() {
+                const target = Match.value(news.stage).pipe(
+                  Match.when("preview", () => "preview" as const),
+                  Match.when("prod", () => "production" as const),
+                  Match.exhaustive
+                );
                 if (
-                  news.stage !== "preview" ||
                   news.desired?.type !== "sensitive" ||
                   news.desired.targets.length !== 1 ||
-                  news.desired.targets[0] !== "preview"
+                  news.desired.targets[0] !== target
                 ) {
                   return yield* new VercelStableEnvironmentWriteError({
                     operation: "updateStableEnvironmentVariable",
@@ -462,7 +466,7 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
                     retry: "never",
                     certainty: { _tag: "Known" },
                     message:
-                      "Managed stable writes are restricted to exact sensitive Preview bindings.",
+                      "Managed stable writes are restricted to exact stage-owned sensitive bindings.",
                   });
                 }
                 const key = yield* Schema.decodeUnknownEffect(
@@ -476,13 +480,14 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
                         retry: "never",
                         certainty: { _tag: "Known" },
                         message:
-                          "This environment key is not an approved Preview Photon managed binding.",
+                          "This environment key is not an approved Photon managed binding.",
                       })
                   )
                 );
                 const values = yield* VercelPreviewPhotonBindingValues;
                 const value = yield* values.resolvePreviewPhotonValue(
                   ResolveVercelPreviewPhotonValue.make({
+                    stage: news.stage,
                     environmentVariableId: news.environmentVariableId,
                     key,
                     valueOwnership: {
@@ -492,8 +497,8 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
                   })
                 );
                 const bindings = yield* VercelStableEnvironmentBindings;
-                const updated = yield* bindings
-                  .updateStableEnvironmentVariable(
+                const update = Match.value(news.stage).pipe(
+                  Match.when("preview", () =>
                     UpdateVercelStableEnvironmentVariable.make({
                       stage: "preview",
                       teamId: news.teamId,
@@ -509,7 +514,28 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
                       value,
                       previousProviderUpdatedAt: attributes.providerUpdatedAt,
                     })
-                  )
+                  ),
+                  Match.when("prod", () =>
+                    UpdateVercelStableEnvironmentVariable.make({
+                      stage: "prod",
+                      teamId: news.teamId,
+                      projectId: news.projectId,
+                      environmentVariableId: news.environmentVariableId,
+                      key,
+                      type: "sensitive",
+                      targets: ["production"],
+                      valueOwnership: {
+                        _tag: "Managed",
+                        reference: valueOwnership.reference,
+                      },
+                      value,
+                      previousProviderUpdatedAt: attributes.providerUpdatedAt,
+                    })
+                  ),
+                  Match.exhaustive
+                );
+                const updated = yield* bindings
+                  .updateStableEnvironmentVariable(update)
                   .pipe(
                     Effect.retry({
                       times: 2,
