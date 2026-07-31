@@ -1898,3 +1898,32 @@ The command must support exact restoration of the complete pre-migration state
 and must not compose Vercel or Photon provider transports. A retained provider
 delete action, whole-stage clear without a complete backup, or successful
 adoption after an unrecorded state edit is a rejected false green.
+
+Commit `0689b63041a895dbd2fc428f23e0298c216b05a0` then proved the
+corrected exact-two-stack receipt, repeated the authorized Preview inventory
+twice at one matching manifest digest, converged 150 observed resources through
+apply plus two no-op syncs, and passed the exact managed adoption proof with
+zero credential matches and zero provider writes. The stable plan qualified
+exactly four updates and 146 no-ops.
+
+The first stable apply failed closed on all four Vercel PATCH requests before
+any acknowledgement. It recorded four known
+`VercelStableEnvironmentWriteError` failures, zero updated transitions and no
+credential-value match in its mode-`0600` log. A fresh authorized two-read
+inventory returned the same manifest digest and proved the exact four managed
+environment physical identities and provider update revisions unchanged.
+Therefore no stable value update is observed and blind retry remains
+ineligible.
+
+Current official Vercel SDK documentation confirms that the selected
+`PATCH /v9/projects/{idOrName}/env/{id}` operation accepts optional `key`,
+`target`, `type` and `value` fields, including `type: sensitive`. Omitting the
+key or treating the request model as unsupported is not evidence-backed.
+Before another bounded attempt, the live adapter must preserve the provider
+HTTP status and only bounded error-field presence in its safe tagged failure,
+never the provider message, code, value or request secret. Focused tests must
+prove that diagnostic boundary and reject a raw provider-error leak. The next
+attempt is eligible only from a coherent verified commit and fresh exact-SHA
+manifest; its result must distinguish permission/policy rejection from an
+incomplete acknowledgement. A green repository suite, a valid request model,
+or unchanged metadata alone does not prove write capability.

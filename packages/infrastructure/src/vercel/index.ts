@@ -102,6 +102,8 @@ export {
   type VercelStableEnvironmentBindingsShape,
   VercelStableEnvironmentFailureReason,
   VercelStableEnvironmentOperation,
+  VercelStableEnvironmentProviderFailure,
+  VercelStableEnvironmentProviderStatus,
   VercelStableEnvironmentReadError,
   VercelStableEnvironmentValue,
   type VercelStableEnvironmentValueEncoded,

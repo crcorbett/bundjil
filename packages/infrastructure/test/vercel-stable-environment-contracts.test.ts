@@ -210,3 +210,45 @@ it.effect(
       assert.strictEqual(Exit.isFailure(malformed), true);
     })
 );
+
+it.effect(
+  "retains only bounded provider rejection metadata and never renders raw provider error fields",
+  () =>
+    Effect.gen(function* testStableEnvironmentProviderRejection() {
+      const decoded = yield* fixture;
+      const rejectedClient = HttpClient.make((request) =>
+        Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            Response.json(
+              {
+                error: {
+                  code: "provider-code-sentinel",
+                  message: "provider-message-sentinel",
+                },
+              },
+              { status: 403 }
+            )
+          )
+        )
+      );
+      const rejection = yield* Effect.gen(function* rejectProviderResponse() {
+        const bindings = yield* VercelStableEnvironmentBindings;
+        return yield* bindings
+          .updateStableEnvironmentVariable(decoded.update)
+          .pipe(Effect.flip);
+      }).pipe(Effect.provide(bindingLayer(rejectedClient)));
+      assert.deepStrictEqual(rejection.providerFailure, {
+        status: 403,
+        codePresent: true,
+        messagePresent: true,
+      });
+      const rendered = Inspectable.toStringUnknown(rejection);
+      assert.strictEqual(rendered.includes("provider-code-sentinel"), false);
+      assert.strictEqual(rendered.includes("provider-message-sentinel"), false);
+      assert.strictEqual(
+        rendered.includes("preview-photon-project-value"),
+        false
+      );
+    })
+);

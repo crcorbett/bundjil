@@ -33,6 +33,7 @@ import {
 import type {
   VercelStableEnvironmentFailureReason,
   VercelStableEnvironmentOperation,
+  VercelStableEnvironmentProviderFailure,
   ResolveVercelPreviewPhotonValue,
 } from "./stable-environment.js";
 
@@ -127,7 +128,8 @@ const writeFailure = (
   operation: VercelStableEnvironmentOperation,
   reason: VercelStableEnvironmentFailureReason,
   message: string,
-  uncertain = false
+  uncertain = false,
+  providerFailure?: VercelStableEnvironmentProviderFailure
 ) =>
   new VercelStableEnvironmentWriteError({
     operation,
@@ -136,6 +138,7 @@ const writeFailure = (
     certainty: uncertain
       ? { _tag: "Uncertain", recovery: "operatorReview" }
       : { _tag: "Known" },
+    ...(providerFailure === undefined ? {} : { providerFailure }),
     message,
   });
 
@@ -288,7 +291,13 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
         return yield* writeFailure(
           "updateStableEnvironmentVariable",
           failureReason(response.status),
-          "Vercel rejected the stable environment update."
+          "Vercel rejected the stable environment update.",
+          false,
+          {
+            status: response.status,
+            codePresent: response.body.error.code !== undefined,
+            messagePresent: response.body.error.message !== undefined,
+          }
         );
       }
       if (

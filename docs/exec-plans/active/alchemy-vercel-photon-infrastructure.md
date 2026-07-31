@@ -2003,3 +2003,39 @@ zero. Correct the oracle to require both exact known stacks and reject any
 third stack. A one-stack pass, arbitrary extra-stack acceptance, or broad
 no-op plan is a rejected false green; the fixed receipt must be rerun from the
 coherent pushed correction.
+
+### Stable Preview provider rejection diagnosis
+
+Commit `0689b63041a895dbd2fc428f23e0298c216b05a0` passed the corrected
+two-stack receipt and exact-source adoption sequence. Two independent
+authorized inventory commands produced one matching manifest digest. Adoption
+converged 150 resources, its post-plan and both sync dry-runs were all no-op,
+and the managed-profile receipt found zero credential-value matches and zero
+provider writes. The stable plan then reported exactly four updates and 146
+no-ops.
+
+The first stable apply stopped with four known provider rejections, four failed
+transitions, zero acknowledged updates and no credential-value match in the
+mode-`0600` log. A fresh authorized inventory containing two sequential reads
+returned the same manifest digest; comparison against the pre-attempt artifact
+proved all four exact target IDs and provider update revisions unchanged.
+This is direct evidence of no observed mutation, not proof that Vercel can
+perform the write.
+
+Official Vercel SDK documentation confirms the chosen PATCH operation and
+permits the encoded `key`, Preview `target`, `sensitive` type and value fields.
+The next implementation slice therefore preserves only a bounded provider
+status plus error-code/message presence in the safe tagged error. Raw provider
+error strings and values remain private to the adapter. A focused 4xx fixture
+must prove the exact status survives while sentinel code/message text cannot
+escape. After a coherent verified commit and fresh exact-SHA manifest, one
+bounded apply may distinguish credential/authorization policy from response
+contract failure; no retry is eligible before then.
+
+| Requirement                        | Direct observable and expected postcondition                                                                          | Rejected false green                                                                         | Focused evidence owner                                        | Status      |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------- |
+| No partial stable mutation         | Fresh inventory keeps the four target IDs and provider revisions unchanged after the failed apply                     | Zero `updated` log lines without provider readback                                           | Ignored before/after inventory artifacts and stable apply log | Passed      |
+| Supported outward request contract | Current official SDK model accepts the exact PATCH path and all four encoded fields                                   | Sensitive-variable UI prose or an assumed omitted key                                        | Official Vercel SDK models and live adapter                   | Passed      |
+| Safe rejection classification      | Tagged failure retains bounded HTTP status and field-presence booleans while raw code/message sentinels do not render | Generic `requestFailed`, transport status alone, or logging the provider body                | Stable Schema, live Layer and focused HTTP fixture            | In progress |
+| Retry eligibility                  | Known 4xx remains one attempt/never; uncertain write remains readback-required; only bounded known 429/5xx may retry  | Re-running all four writes because the manifest still plans updates                          | Provider lifecycle tests, safe live result and runbook        | Blocked     |
+| Task lifecycle and terminal audit  | Stable task remains in progress; Production, drift closeout and one terminal five-pass audit remain downstream        | Accepting from adoption/no-op proof without live stable acknowledgements and new deployments | SPEC task ledger, this plan and later receipt owners          | Preserved   |

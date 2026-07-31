@@ -96,11 +96,26 @@ export const VercelStableEnvironmentFailureReason = Schema.Literals([
 export type VercelStableEnvironmentFailureReason =
   typeof VercelStableEnvironmentFailureReason.Type;
 
+export const VercelStableEnvironmentProviderStatus = Schema.Literals([
+  400, 401, 403, 404, 409, 412, 429, 500, 502, 503, 504,
+]);
+export type VercelStableEnvironmentProviderStatus =
+  typeof VercelStableEnvironmentProviderStatus.Type;
+
+export const VercelStableEnvironmentProviderFailure = Schema.Struct({
+  status: VercelStableEnvironmentProviderStatus,
+  codePresent: Schema.Boolean,
+  messagePresent: Schema.Boolean,
+});
+export type VercelStableEnvironmentProviderFailure =
+  typeof VercelStableEnvironmentProviderFailure.Type;
+
 const VercelStableEnvironmentErrorFields = {
   operation: VercelStableEnvironmentOperation,
   reason: VercelStableEnvironmentFailureReason,
   retry: InfrastructureRetryClass,
   certainty: InfrastructureOutcomeCertainty,
+  providerFailure: Schema.optional(VercelStableEnvironmentProviderFailure),
   message: Schema.NonEmptyString,
 };
 
