@@ -364,7 +364,8 @@
     "evidence": [
       "apps/agent/runbooks/deploy-promote.md",
       "docs/verification/templates/production.json",
-      "docs/verification/templates/messaging.json"
+      "docs/verification/templates/messaging.json",
+      "docs/verification/channel-production-accepted-2026-07-31.md"
     ],
     "nonClaims": [
       "A promoted deployment or provider acceptance alone does not prove both journeys, handset delivery, or visible typing."

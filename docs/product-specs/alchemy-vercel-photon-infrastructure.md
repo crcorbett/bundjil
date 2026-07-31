@@ -2272,3 +2272,59 @@ Runtime health, alias traffic, Channel behavior, handset delivery and future
 provider state remain separate non-claims. The next serial owner is Production
 adoption and rollout, beginning with fresh read-only topology, exact Production
 authority and a zero-replacement/no-delete plan.
+
+### Current dual-Channel Production acceptance
+
+The Production rollout task is accepted on the current stable deployment, not
+by reusing the historical 2026-07-23 packet. Stable alias readback resolves to
+READY deployment fingerprint `6e31c487…` at exact source `53cbb77…`; fresh
+root health is `200`.
+
+The Photon packet remains the corrected cutover result: one candidate
+`202 acceptedForDispatch`, one obsolete-callback `401
+authenticationRejected` at `webhookId`, one workflow, one typing lifecycle,
+one provider response, one handset reply, zero rollback traffic and no late
+second effect through fourteen minutes. Only obsolete callback `72cac9b5…`
+was then irreversibly deleted. Candidate callback `cfe12c3e…` remains the sole
+Production callback, and Alchemy state converged to 72 resources with plan plus
+two syncs all no-op. Exact obsolete-callback restoration is impossible because
+its create-only secret is unavailable.
+
+The independent Sendblue packet used line fingerprint `6a6a862e…`, current Mac
+sender fingerprint `82ac258d…`, and correlation fingerprint `037fa8fc…`.
+Computer Use proved the exact recipient and an iMessage composer before one
+bounded send. Authenticated provider readback through
+`2026-07-31T14:53:16.865Z` contained exactly one inbound `RECEIVED` iMessage
+and one outbound `DELIVERED` iMessage with no downgrade. The stable deployment
+recorded one `202 acceptedForDispatch`, three successful Workflow requests,
+zero second callback, and zero error/fatal records. Workflow fingerprint
+`3cd4fe35…` completed two `turnStep` phases and one
+`sendTurnControlStep` in 20 seconds.
+
+The Channel lifecycle returns and awaits the provider operations:
+`turn.started` requests typing start, terminal visible `message.completed`
+sends the response, and `turn.completed` requests typing stop. Completion of
+the exact workflow therefore establishes provider-accepted start, send and
+stop at the exercised runtime boundary; provider readback independently
+establishes the single delivered outbound iMessage. Computer Use showed one
+Delivered marker and exactly one reply container. Sendblue handset-visible
+typing was not watched and remains unproved.
+
+The final authorized Production inventory performed two complete sequential
+reads at `2026-07-31T14:57:31.663Z` and reproduced manifest digest
+`aa033024…`: two exact Vercel projects, two Photon shared users, one Photon
+callback, zero Photon lines, unchanged repeat-read, and zero provider writes.
+The dated bounded owner is
+`docs/verification/channel-production-accepted-2026-07-31.md`.
+
+| Material requirement      | Direct observable and expected postcondition                                                          | Plausible false green rejected                                                      | Focused evidence owner                                |
+| ------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Stable execution          | Alias resolves READY `6e31c487…` at source `53cbb77…` and root is `200`                               | Branch head, Preview deployment, alias mutation, or health alone                    | Vercel deployment readback and stable-root request    |
+| Separate providers        | Current Photon and Sendblue packets each bind ingress, workflow, provider and handset evidence        | Historical packet, one provider, or aggregate deployment health                     | BND-J12 and the dated Production receipt              |
+| Sendblue once-only effect | One inbound, one accepted callback, one completed workflow, one outbound, zero second callback        | Provider status, handset reply, or aggregate `2xx` count alone                      | Sendblue API, deployment logs and Workflow run        |
+| Typing lifecycle          | Exact Workflow completion plus awaited Channel event mapping establishes provider-accepted start/stop | Local fixture alone, outbound delivery, or visible-typing claim without observation | Workflow `3cd4fe35…`, Channel owner and focused tests |
+| No-op topology            | Two reads match `aa033024…` with one callback and zero writes                                         | Pre-message or single-read inventory                                                | Schema-valid inventory receipt                        |
+| Rollback                  | Vercel rollback deployments remain; obsolete Photon callback is explicitly unrecoverable              | Reconstructing secrets from metadata or claiming unavailable custody                | Production runbook and cutover receipt                |
+
+The next serial owner is `drift-ci-monitoring-and-closeout`. This acceptance
+does not run or satisfy the terminal whole-SPEC five-pass audit.

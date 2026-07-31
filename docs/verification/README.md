@@ -150,6 +150,11 @@ operation nor asserts present provider state.
   provider typing start/stop, rollback readiness, and zero second external
   response. Photon visible typing is observed; Sendblue visible typing remains
   unproved.
+- [`channel-production-accepted-2026-07-31.md`](channel-production-accepted-2026-07-31.md)
+  proves the current Alchemy-owned Production topology, exact immutable Vercel
+  source, corrected Photon callback cutover and retirement, an independent
+  Sendblue iMessage journey, final two-read no-op inventory, rollback limits,
+  and separate handset-visible-typing non-claims.
 
 ## Claim boundaries
 

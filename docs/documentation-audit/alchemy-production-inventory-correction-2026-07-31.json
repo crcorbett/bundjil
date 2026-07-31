@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "taskId": "alchemy-vercel-photon-infrastructure-production-closeout",
+  "status": "passed",
+  "observedAt": "2026-07-31T15:05:02.525Z",
+  "trigger": "The current dual-Channel Production acceptance added one dated verification receipt and changed the executable docs path inventory.",
+  "docsInventory": {
+    "pathCount": 197,
+    "sortedPathSha256": "624c66ccec19b9ded848fe92cacbc340a83d63aeccd246897a149e2a8c94fbfd"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/verification/channel-production-accepted-2026-07-31.md",
+    "docs/verification/README.md",
+    "docs/verification/critical-journeys.json",
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+    "docs/exec-plans/active/alchemy-vercel-photon-infrastructure.md",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The new receipt and current-owner pointers change path accounting but do not change the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions, or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and validation remain bound to their recorded candidate. This correction updates only the executable current path inventory.",
+    "nonClaim": "This inventory correction does not prove Photon, Sendblue, Vercel, deployment, message, handset, or future provider state."
+  },
+  "checks": [
+    {
+      "command": "bun run check:docs",
+      "status": "passed",
+      "result": "The corrected candidate passed the documentation policy across 273 routed files."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The first full verification correctly rejected the stale 195-path inventory; the corrected 197-path docs and 23-path README inventories passed all twelve scenarios and nine impact areas."
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed",
+      "result": "The corrected candidate passed Effect setup, boundaries, 273-file docs policy, skills, authority, controls, verification policy, HGI-307, 90 tooling tests, type-aware format/lint, the lint fixture, Knip, all nine workspace typechecks and all fifteen Turbo build/test tasks."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "The terminal Alchemy five-pass audit remains downstream and has not run."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No provider read, write, deployment, message, billing, credential, or Production operation is authorised by this file."
+  ]
+}

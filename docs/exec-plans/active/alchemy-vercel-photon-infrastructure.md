@@ -2404,12 +2404,12 @@ callback routes read back on the candidate. Post-promotion readback must prove
 both aliases converge on the accepted deployment before the bounded live
 fanout/deduplication journey.
 
-| Requirement                         | Direct observable and expected postcondition                                                               | Plausible false green rejected                                                          | Focused command/evidence owner                                       |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Pre-promotion candidate integrity   | Exact candidate URL returns signed safe `204` with ignored disposition, zero dispatch and zero error/fatal | A real message racing two deployments, HTTP status alone, or stable-alias response      | Candidate request plus deployment-scoped logs; deploy runbook        |
-| Post-promotion callback convergence | Both exact callback URLs resolve to the promoted deployment and one replay namespace                       | Alias promotion alone, one callback read, or assuming project fanout is ordered         | Vercel deployment/API and Photon callback readback                   |
-| Live fanout deduplication           | One event yields one accepted dispatch, one duplicate disposition and exactly one external response        | Two `2xx` statuses, one handset reply without callback attribution, or aggregate counts | BND-J12 packet, exact runtime logs, replay/provider/handset readback |
-| Lossless retirement                 | Original callback is deleted only after proof, conservative drain and exact candidate-only readback        | Early delete, unavailable secret treated as restorable, or count-only topology          | Photon owner delete/readback command and rollback receipt            |
+| Requirement                         | Direct observable and expected postcondition                                                                                | Plausible false green rejected                                                                                                    | Focused command/evidence owner                                |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Pre-promotion candidate integrity   | Exact candidate URL returns signed safe `204` with ignored disposition, zero dispatch and zero error/fatal                  | A real message racing two deployments, HTTP status alone, or stable-alias response                                                | Candidate request plus deployment-scoped logs; deploy runbook |
+| Post-promotion callback convergence | Both exact callback URLs resolve to the promoted deployment and one replay namespace                                        | Alias promotion alone, one callback read, or assuming project fanout is ordered                                                   | Vercel deployment/API and Photon callback readback            |
+| Live fanout disposition             | One event yields one candidate acceptance, one obsolete-callback authentication rejection and exactly one external response | Calling the pre-replay `401` a duplicate, two `2xx` statuses, one handset reply without callback attribution, or aggregate counts | BND-J12 packet, exact runtime logs, provider/handset readback |
+| Lossless retirement                 | Original callback is deleted only after proof, conservative drain and exact candidate-only readback                         | Early delete, unavailable secret treated as restorable, or count-only topology                                                    | Photon owner delete/readback command and rollback receipt     |
 
 | Requirement                     | Direct observable and expected postcondition                                                                                    | Plausible false green rejected                                                           | Focused command/evidence owner                             |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -2626,6 +2626,81 @@ four-value source-revision convergence cycle before staged deployment.
 | SPEC, tasks and active plan                   | Change required | Record the exact four-binding slice and keep `production-adoption-and-rollout` in progress until live acknowledgements, convergence and staged deployment readback pass.                                                                                          |
 | Secrets, receipts, rollout and rollback       | Change required | Preserve mode-`0600` independent value custody and state backup, retain the current deployment/original webhook through lossless cutover, emit only Schema-valid redacted receipts, and block deployment while any placeholder remains.                           |
 | Lifecycle, archive and terminal audit         | Preserve        | The active plan and proposed SPEC stay open. Drift/closeout and the one fresh terminal five-pass audit remain downstream; repository tests are not provider or deployment proof.                                                                                  |
+
+#### Current dual-Channel Production acceptance
+
+The current stable alias resolves to READY deployment fingerprint
+`6e31c487…` at exact source `53cbb77…`; root health is `200`. The pushed
+repository correction at `715c19f…` retains that immutable runtime source and
+records the completed Photon cutover, exact callback retirement, 72-resource
+Alchemy convergence and full verification.
+
+The independent Sendblue journey then passed on the same stable deployment.
+Provider preflight retained one secret-bearing HTTPS `receive` callback at the
+stable Sendblue path, line fingerprint `6a6a862e…`, account fingerprint
+`18ecd39f…`, and one available integration store attached to both exact Bundjil
+projects. Computer Use resolved the same line, showed an iMessage composer and
+sent one bounded message with correlation fingerprint `037fa8fc…`.
+
+Authenticated provider readback through `2026-07-31T14:53:16.865Z` contained
+exactly one inbound `RECEIVED` iMessage and one outbound `DELIVERED` iMessage,
+both without downgrade. The stable deployment recorded one
+`202 acceptedForDispatch`, three Workflow `200` rows, no second callback and no
+error/fatal row. Exact Workflow fingerprint `3cd4fe35…` completed in 20
+seconds with two completed `turnStep` phases and one completed
+`sendTurnControlStep`. The owned Channel mapping awaits typing start on
+`turn.started`, the outbound send on terminal visible `message.completed`, and
+typing stop on `turn.completed`; successful exact-run completion therefore
+establishes provider-accepted start/send/stop at the exercised runtime boundary.
+Messages showed one Delivered iMessage and exactly one reply container.
+Handset-visible Sendblue typing was not observed and remains a non-claim.
+
+The final Production inventory passed two complete reads at
+`2026-07-31T14:57:31.663Z` with unchanged digest `aa033024…`, two Vercel
+projects, two Photon shared users, one Photon callback, zero Photon lines and
+zero provider writes. The stable alias remained on `6e31c487…` at source
+`53cbb77…`. The current bounded owner is
+`docs/verification/channel-production-accepted-2026-07-31.md`.
+
+| Requirement       | Direct observable and expected postcondition                                                                    | Plausible false green rejected                                          | Focused command/readback and evidence owner                | Status                                                        |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| Stable deployment | Alias resolves READY `6e31c487…` at source `53cbb77…`; root `200`                                               | Branch head, Preview deployment, alias write, or health alone           | Vercel deployment API plus root request                    | Passed                                                        |
+| Photon Production | One candidate acceptance, one obsolete-callback authentication rejection, one effect/response, exact retirement | Calling `401` a duplicate, BND-J11 by proxy, or handset-only proof      | Production cutover receipt and candidate logs              | Passed                                                        |
+| Sendblue ingress  | One exact inbound yields one `202`, one workflow and zero second callback through drain                         | Provider `RECEIVED`, handset reply, or aggregate `2xx`                  | Sendblue API and deployment-scoped logs                    | Passed                                                        |
+| Sendblue outbound | One outbound is `DELIVERED` iMessage, no downgrade; one reply container                                         | Runtime completion, provider `SENT`, SMS, or neighbouring conversation  | Sendblue API and Computer Use                              | Passed                                                        |
+| Sendblue typing   | Exact workflow completes the awaited start/send/stop event mapping                                              | Local test, delivery alone, or visible-typing claim without observation | Vercel Workflow event UI, Channel source and focused tests | Passed at provider/runtime boundary; handset display unproved |
+| Final topology    | Two complete reads match `aa033024…` with one callback and zero writes                                          | Pre-message or single-read inventory                                    | `infrastructure:inventory` fixed receipt                   | Passed                                                        |
+| Rollback          | Public/callback rollback deployments retained; obsolete Photon callback unrecoverable                           | Reconstructing write-only values or claiming exact callback restoration | Production runbook and dated receipt                       | Passed with explicit irreversible limit                       |
+
+#### Production closeout docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                          |
+| --------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | Vercel Git remains deployment owner; Alchemy remains stable configuration/state owner; Sendblue and Photon remain separate Channel transports. |
+| READMEs, exports and generated references     | Preserve        | No package public surface, export, command or generated reference changed.                                                                     |
+| Runbooks, authority and controls              | Preserve        | Existing runbooks and exact authority envelopes governed all live operations; no standing authority expands.                                   |
+| Verification journeys and proof               | Change required | BND-J12 and the new dated receipt bind both current Production provider packets and their separate non-claims.                                 |
+| Skills, AGENTS, lint, config, commands and CI | Preserve        | Repository skills, controls and commands remain sufficient.                                                                                    |
+| Schemas, services and Layers                  | Preserve        | No runtime contract changed; current Type/Encoded, Service and Layer owners were exercised.                                                    |
+| Tests and fixtures                            | Preserve        | Existing focused provider/Channel matrices remain direct contract evidence; live proof is not replaced by mocks.                               |
+| SPEC, tasks and active plan                   | Change required | `production-adoption-and-rollout` becomes completed only after both journeys and final inventory.                                              |
+| Secrets, receipts, rollout and rollback       | Change required | Raw evidence remains ignored mode `0600`; tracked evidence contains fingerprints and bounded metadata only.                                    |
+| Lifecycle, archive and terminal audit         | Preserve        | `drift-ci-monitoring-and-closeout` is next; the terminal five-pass audit has not run.                                                          |
+
+`production-adoption-and-rollout` is accepted. The next serial task is
+`drift-ci-monitoring-and-closeout`; formal five-pass review remains reserved
+for the terminal whole-SPEC closeout.
+
+Focused Sendblue typecheck plus 9 tests and agent typecheck plus 66 tests
+passed. The first full verification correctly rejected the stale HGI-307 docs
+inventory; docs-maintainer added the dated path-accounting correction and
+recomputed the exact 197-path docs plus 23-path README digests. The
+receipt-bearing candidate then passed Effect language-service setup; boundary,
+273-file documentation, skill, authority, control, verification-policy and
+HGI-307 gates; 90 tooling tests; type-aware formatting/lint; the lint fixture;
+Knip; all nine workspace typechecks; and all fifteen Turbo build/test tasks.
+The full run used only the process-local synthetic Executor fixture and made no
+Executor request.
 
 ### Production state-correction docs-maintainer impact ledger
 

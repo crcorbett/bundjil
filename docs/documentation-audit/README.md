@@ -127,6 +127,7 @@ HGI-307 harness requalification and repository closeout evidence:
 - [`HGI-307-candidate.json`](HGI-307-candidate.json)
 - [`HGI-307-impact-ledger.json`](HGI-307-impact-ledger.json)
 - [`HGI-307-validation.json`](HGI-307-validation.json)
+- [`alchemy-production-inventory-correction-2026-07-31.json`](alchemy-production-inventory-correction-2026-07-31.json)
 - [`../verification/hgi-307-epoch.json`](../verification/hgi-307-epoch.json)
 - [`../../tooling/evals/hgi-307/scenarios.json`](../../tooling/evals/hgi-307/scenarios.json)
 - [`hgi-307/`](hgi-307/)
@@ -137,6 +138,11 @@ clocks. Initial failed or inconclusive journey dispositions remain retained as
 evidence; parent acceptance records whether each result chose the safe bounded
 decision. BND-J02 and HGI-309 remain explicitly deferred and no external state
 is inferred.
+
+The 2026-07-31 Alchemy Production closeout adds one current dual-Channel
+receipt and this dated path-accounting correction. It updates only the
+executable current docs inventory; it does not rewrite or requalify the
+historical HGI-307 epoch.
 
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state
