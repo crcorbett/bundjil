@@ -493,7 +493,7 @@ describe("Production promotion preflight", () => {
             },
           },
         }).pipe(Effect.runSync)
-      ).toThrow("rollback must differ");
+      ).toThrow("rollback must differ from the staged candidate");
       expect(() =>
         decode({
           ...channelCandidateStaged,

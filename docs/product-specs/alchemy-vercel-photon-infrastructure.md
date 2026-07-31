@@ -2190,6 +2190,14 @@ preflight must carry both exact callback deployment targets, require each to
 equal the staged candidate, and preserve the distinct callback-alias prior
 target as rollback before another promotion.
 
+The route-bound correction at `e75d83b…` distinguishes current callback targets
+from the staged candidate. Before the callback alias moves, both current targets
+legitimately equal the retained callback rollback deployment; that snapshot must
+decode and fail the candidate-target postcondition, not fail merely because its
+current target equals rollback. The rollback target instead must differ from the
+staged candidate. This candidate-aware refinement is required independently at
+both staged and promotion checkpoints.
+
 That first receipt exposed a second durable correction: Production cannot use
 the Preview rollback claim that prior values are externally retained. Its
 rollback identity is the last-known-good immutable Production deployment plus

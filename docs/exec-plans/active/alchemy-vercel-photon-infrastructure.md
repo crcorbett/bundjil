@@ -2418,6 +2418,26 @@ fanout/deduplication journey.
 | Route-bound promotion preflight | `ParallelCutover` decodes only when both callback target IDs equal the candidate and rollback target differs                    | Count-only topology, one route read, shared stale target, or rollback equal to candidate | Effect Schema negative fixtures and sanitized snapshot     |
 | No premature Production traffic | Candidate safe probe is the only pre-promotion request; no real provider event occurs until callback and stable routes converge | A handset reply or aggregate `2xx` count generated while callbacks hit another runtime   | Candidate-scoped logs and bounded provider journey receipt |
 
+Commit `e75d83b…` implemented and pushed the first route-bound preflight. Fresh
+two-read Production inventory matched at 73 resources, the exact four managed
+bindings advanced, non-environment topology remained unchanged, and the
+post-plan plus two syncs converged to 73 no-ops. One staged deployment
+fingerprinted `dbf9281f11e8…` is `READY`, Production-targeted, exact-source and
+unaliased. Root `200`, unsigned Photon `401`, signed identity-free safe `204`,
+one ignored/unsupported disposition, and zero dispatch/error/fatal records
+passed. Public stable remained on `dpl_DfAb…`; both callback routes remained on
+the retained callback-alias rollback deployment.
+
+The first deliberately stale-route snapshot then exposed a candidate-awareness
+error in the new refinement before alias mutation. The inner topology compared
+rollback to the callbacks' current deployment, but current callback targets
+legitimately equal rollback before the alias moves. The corrected shape keeps
+the two current targets as direct observables, rejects mixed targets internally,
+requires both to equal the staged candidate in the outer staged/promotion
+checks, and separately requires rollback to differ from that staged candidate.
+Focused negative fixtures and complete verification must pass before committing
+this correction and generating the pre-alias rejection again.
+
 #### Production write-only custody finding and recovery
 
 Fresh exact-source inventory at repository commit

@@ -262,14 +262,6 @@ const PhotonWebhookTopology = Schema.Union([
           ? undefined
           : "Parallel Photon cutover callback routes must resolve to one deployment."
       )
-    ),
-    Schema.check(
-      Schema.makeFilter((topology) =>
-        topology.callbackRollbackDeploymentId !==
-        topology.candidateCallbackDeploymentId
-          ? undefined
-          : "Parallel Photon cutover callback rollback must differ from the candidate."
-      )
     )
   ),
 ]);
@@ -281,6 +273,13 @@ const parallelCallbackRoutesMatchCandidate = (
   webhookTopology._tag === "Stable" ||
   (webhookTopology.candidateCallbackDeploymentId === candidateDeploymentId &&
     webhookTopology.originalCallbackDeploymentId === candidateDeploymentId);
+
+const parallelCallbackRollbackDiffersCandidate = (
+  webhookTopology: typeof PhotonWebhookTopology.Type,
+  candidateDeploymentId: typeof ImmutableDeploymentReference.Type
+) =>
+  webhookTopology._tag === "Stable" ||
+  webhookTopology.callbackRollbackDeploymentId !== candidateDeploymentId;
 
 const ChannelInventory = Schema.Struct({
   legacyBindingsPresent: Schema.Literal(false),
@@ -351,6 +350,16 @@ export const ChannelCandidateStagedPreflightSnapshot = Schema.Struct({
         ? undefined
         : "Parallel Photon cutover callback routes must resolve to the staged candidate."
     )
+  ),
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      parallelCallbackRollbackDiffersCandidate(
+        snapshot.channel.photon.webhookTopology,
+        snapshot.candidateAgent.deploymentId
+      )
+        ? undefined
+        : "Parallel Photon cutover callback rollback must differ from the staged candidate."
+    )
   )
 );
 
@@ -376,6 +385,16 @@ export const ChannelProductionPromotionPreflightSnapshot = Schema.Struct({
       )
         ? undefined
         : "Parallel Photon cutover callback routes must resolve to the staged candidate."
+    )
+  ),
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      parallelCallbackRollbackDiffersCandidate(
+        snapshot.channel.photon.webhookTopology,
+        snapshot.candidateAgent.deploymentId
+      )
+        ? undefined
+        : "Parallel Photon cutover callback rollback must differ from the staged candidate."
     )
   )
 );
