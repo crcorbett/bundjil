@@ -76,12 +76,15 @@ const NativeDesiredPlanResource = Schema.Struct({
   action: Schema.Literals(["create", "update", "replace", "noop"]),
   resource: Schema.Struct({
     LogicalId: Schema.NonEmptyString,
+    Type: Schema.NonEmptyString,
   }),
 });
 const NativeDesiredPlanDeletion = Schema.Struct({
   action: Schema.Literal("delete"),
   resource: Schema.Struct({
     LogicalId: Schema.NonEmptyString,
+    RemovalPolicy: Schema.optional(Schema.Literals(["destroy", "retain"])),
+    Type: Schema.NonEmptyString,
   }),
 });
 const NativeDesiredPlan = Schema.Struct({
@@ -92,6 +95,71 @@ const DriftAttributeProjection = Schema.Struct({
   ownership: Schema.optional(InfrastructureOwnershipState),
   valueOwnership: Schema.optional(SecretOwnership),
 });
+const InfrastructureDriftNativePhase = Schema.Literals([
+  "desiredPlan",
+  "desiredPlanDecode",
+  "desiredPlanObservation",
+  "nativeSync",
+  "nativeSyncDecode",
+  "nativeSyncObservation",
+]);
+class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
+  "InfrastructureDriftNativeBoundaryError",
+  { phase: InfrastructureDriftNativePhase }
+) {}
+
+const resourceKindFromNativeType = (resourceType: string) =>
+  Match.value(resourceType).pipe(
+    Match.when(
+      "Bundjil.Infrastructure.SyntheticResource",
+      () => "syntheticResource" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.VercelProject",
+      () => "vercelProject" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.VercelProjectDomain",
+      () => "vercelDomain" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.VercelEnvironmentVariable",
+      () => "vercelEnvironmentVariable" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.VercelMarketplaceBinding",
+      () => "vercelMarketplaceBinding" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.VercelDeploymentObservation",
+      () => "vercelDeploymentObservation" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonProjectObservation",
+      () => "photonProjectObservation" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonPlatformConfiguration",
+      () => "photonPlatformConfiguration" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonSharedUser",
+      () => "photonSharedUser" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonWebhookObservation",
+      () => "photonWebhookObservation" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonLineObservation",
+      () => "photonLineObservation" as const
+    ),
+    Match.when(
+      "Bundjil.Infrastructure.PhotonBillingObservation",
+      () => "photonBillingObservation" as const
+    ),
+    Match.orElse(() => "infrastructureStack" as const)
+  );
 
 const authorityPathConfig = Config.schema(
   InfrastructureDriftArtifactPath,
@@ -120,6 +188,34 @@ const stageConfig = Config.schema(
 
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
+
+const unavailableNativeResult = (stage: typeof InfrastructureStage.Type) => ({
+  desiredPlan: { _tag: "NotExposed" as const },
+  observations: [
+    InfrastructureDriftObservation.make({
+      action: "unavailable",
+      attempts: { _tag: "NotExposed" },
+      baselineDisposition: "rejected",
+      certainty: {
+        _tag: "Uncertain",
+        recovery: "operatorReview",
+      },
+      diffClass: "unknown",
+      duration: { _tag: "NotExposed" },
+      ownership: "Unknown",
+      providerRead: "performed",
+      readback: "unavailable",
+      resourceFingerprint: InfrastructureDriftResourceFingerprint.make(
+        sha256("alchemy:BundjilInfrastructure:preview")
+      ),
+      resourceKind: "infrastructureStack",
+      retry: "never",
+      secretRevision: "notApplicable",
+      source: "nativeSync",
+      stage,
+    }),
+  ],
+});
 
 const readAuthority = Effect.fn("InfrastructureDriftAuthority.read")(function* (
   path: typeof InfrastructureDriftArtifactPath.Type
@@ -157,18 +253,18 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
     const manifestResource = manifest.resources.find(
       (candidate) => candidate.logicalId === resource.logicalId
     );
-    if (manifestResource === undefined) {
-      return yield* Effect.fail("manifest-resource-missing");
-    }
+    const resourceKind =
+      manifestResource?.resourceKind ?? "infrastructureStack";
     const projection =
-      resource.attr === undefined
+      resource.attr === undefined ||
+      resourceKind !== "vercelEnvironmentVariable"
         ? undefined
         : yield* Schema.decodeUnknownEffect(DriftAttributeProjection)(
             resource.attr
           );
     const ownership = projection?.ownership ?? "Unknown";
     const secretRevision = Match.value({
-      resourceKind: manifestResource.resourceKind,
+      resourceKind,
       valueOwnership: projection?.valueOwnership,
     }).pipe(
       Match.when(
@@ -199,7 +295,7 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
       resourceFingerprint: InfrastructureDriftResourceFingerprint.make(
         sha256(resource.fqn)
       ),
-      resourceKind: manifestResource.resourceKind,
+      resourceKind,
       retry: "backoff",
       secretRevision,
       source: "nativeSync",
@@ -210,45 +306,51 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
 
 const toPlanObservation = Effect.fn(
   "InfrastructureDesiredPlanObservation.decode"
-)(function* (
+)(function (
   manifest: AdoptionManifest,
   stage: typeof InfrastructureStage.Type,
   fqn: string,
   logicalId: string,
-  action: "create" | "update" | "replace" | "delete"
+  resourceType: string,
+  action: "create" | "update" | "replace" | "delete",
+  removalPolicy: "destroy" | "retain" | undefined
 ) {
   const manifestResource = manifest.resources.find(
     (candidate) => candidate.logicalId === logicalId
   );
-  if (manifestResource === undefined) {
-    return yield* Effect.fail("manifest-resource-missing");
-  }
-  return InfrastructureDriftObservation.make({
-    action: action === "create" ? "missing" : "drifted",
-    attempts: { _tag: "Observed", count: 0 },
-    baselineDisposition: "rejected",
-    certainty: { _tag: "Known" },
-    diffClass: Match.value(action).pipe(
-      Match.when("update", () => "update" as const),
-      Match.when(
-        (value) => value === "replace" || value === "delete",
-        () => "replace" as const
+  return Effect.succeed(
+    InfrastructureDriftObservation.make({
+      action: action === "create" ? "missing" : "drifted",
+      attempts: { _tag: "Observed", count: 0 },
+      baselineDisposition: "rejected",
+      certainty: { _tag: "Known" },
+      diffClass: Match.value(action).pipe(
+        Match.when("update", () => "update" as const),
+        Match.when(
+          (value) =>
+            value === "replace" ||
+            (value === "delete" && removalPolicy !== "retain"),
+          () => "replace" as const
+        ),
+        Match.when("delete", () => "update" as const),
+        Match.orElse(() => "unknown" as const)
       ),
-      Match.orElse(() => "unknown" as const)
-    ),
-    duration: { _tag: "NotExposed" },
-    ownership: "Unknown",
-    providerRead: "performed",
-    readback: "available",
-    resourceFingerprint: InfrastructureDriftResourceFingerprint.make(
-      sha256(fqn)
-    ),
-    resourceKind: manifestResource.resourceKind,
-    retry: "never",
-    secretRevision: "notApplicable",
-    source: "desiredPlan",
-    stage,
-  });
+      duration: { _tag: "NotExposed" },
+      ownership: "Unknown",
+      providerRead: "performed",
+      readback: "available",
+      resourceFingerprint: InfrastructureDriftResourceFingerprint.make(
+        sha256(fqn)
+      ),
+      resourceKind:
+        manifestResource?.resourceKind ??
+        resourceKindFromNativeType(resourceType),
+      retry: "never",
+      secretRevision: "notApplicable",
+      source: "desiredPlan",
+      stage,
+    })
+  );
 });
 
 const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
@@ -260,9 +362,26 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
     makeStableInfrastructureStack(manifest),
     (stack) =>
       Effect.gen(function* () {
-        const desiredPlan = yield* AlchemyPlan.make(stack);
-        const desired =
-          yield* Schema.decodeUnknownEffect(NativeDesiredPlan)(desiredPlan);
+        const desiredPlan = yield* AlchemyPlan.make(stack).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "desiredPlan",
+              })
+            )
+          )
+        );
+        const desired = yield* Schema.decodeUnknownEffect(NativeDesiredPlan)(
+          desiredPlan
+        ).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "desiredPlanDecode",
+              })
+            )
+          )
+        );
         const desiredResources = Object.entries(desired.resources);
         const desiredDeletions = Object.entries(desired.deletions);
         const planObservations = yield* Effect.forEach(
@@ -275,6 +394,8 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
                       action: resource.action,
                       fqn,
                       logicalId: resource.resource.LogicalId,
+                      removalPolicy: undefined,
+                      resourceType: resource.resource.Type,
                     } as const,
                   ]
             ),
@@ -282,24 +403,66 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
               action: resource.action,
               fqn,
               logicalId: resource.resource.LogicalId,
+              removalPolicy: resource.resource.RemovalPolicy,
+              resourceType: resource.resource.Type,
             })),
           ],
-          ({ action, fqn, logicalId }) =>
-            toPlanObservation(manifest, stage, fqn, logicalId, action),
+          ({ action, fqn, logicalId, removalPolicy, resourceType }) =>
+            toPlanObservation(
+              manifest,
+              stage,
+              fqn,
+              logicalId,
+              resourceType,
+              action,
+              removalPolicy
+            ),
           { concurrency: 1 }
+        ).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "desiredPlanObservation",
+              })
+            )
+          )
         );
         const native = yield* AlchemySync.plan({
           name: stack.name,
           stage: stack.stage,
-        });
+        }).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "nativeSync",
+              })
+            )
+          )
+        );
         const decoded = yield* Schema.decodeUnknownEffect(NativeSyncResult)(
           native.result,
           { onExcessProperty: "error" }
+        ).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "nativeSyncDecode",
+              })
+            )
+          )
         );
         const syncObservations = yield* Effect.forEach(
           Record.values(decoded.resources),
           (resource) => toObservation(manifest, acceptUnowned, stage, resource),
           { concurrency: 1 }
+        ).pipe(
+          Effect.catchCause(() =>
+            Effect.fail(
+              new InfrastructureDriftNativeBoundaryError({
+                phase: "nativeSyncObservation",
+              })
+            )
+          )
         );
         return {
           desiredPlan: {
@@ -394,35 +557,13 @@ const program = Effect.gen(function* () {
   const command = yield* loadAdoptionCommand;
   const manifest = yield* validateStableAdoptionCommand(command);
   const native = yield* runNativeSync(manifest, acceptUnowned, stage).pipe(
-    Effect.catch(() =>
-      Effect.succeed({
-        desiredPlan: { _tag: "NotExposed" as const },
-        observations: [
-          InfrastructureDriftObservation.make({
-            action: "unavailable",
-            attempts: { _tag: "NotExposed" },
-            baselineDisposition: "rejected",
-            certainty: {
-              _tag: "Uncertain",
-              recovery: "operatorReview",
-            },
-            diffClass: "unknown",
-            duration: { _tag: "NotExposed" },
-            ownership: "Unknown",
-            providerRead: "performed",
-            readback: "unavailable",
-            resourceFingerprint: InfrastructureDriftResourceFingerprint.make(
-              sha256("alchemy:BundjilInfrastructure:preview")
-            ),
-            resourceKind: "infrastructureStack",
-            retry: "never",
-            secretRevision: "notApplicable",
-            source: "nativeSync",
-            stage,
-          }),
-        ],
-      })
-    )
+    Effect.catchTag("InfrastructureDriftNativeBoundaryError", ({ phase }) =>
+      Console.error({
+        phase,
+        reason: "native-drift-readback-failed" as const,
+      }).pipe(Effect.as(unavailableNativeResult(stage)))
+    ),
+    Effect.catch(() => Effect.succeed(unavailableNativeResult(stage)))
   );
   const { observations } = native;
   const report = yield* buildInfrastructureDriftReport(

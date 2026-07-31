@@ -297,6 +297,13 @@ export type InfrastructureDriftReceiptInputEncoded =
 const categoryFor = (observation: InfrastructureDriftObservation) =>
   Match.value(observation).pipe(
     Match.when(
+      ({ action, diffClass, source }) =>
+        source === "desiredPlan" &&
+        action === "drifted" &&
+        diffClass === "replace",
+      () => InfrastructureDriftCategory.make("destructiveDrift")
+    ),
+    Match.when(
       ({ action, source }) =>
         source === "desiredPlan" && action !== "unchanged",
       () => InfrastructureDriftCategory.make("desiredStatePlanChange")

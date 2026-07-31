@@ -1320,6 +1320,14 @@ are:
 - secret revision unknown;
 - external deployment drift.
 
+Every report binds the receipt-bearing post-apply manifest and digest. A
+mutable local filename such as `current` is not an acceptance owner and cannot
+replace that receipt identity. Native sync may report unchanged metadata for a
+write-only Vercel environment value while the value/revision itself remains
+unobservable; that row stays `secret revision unknown` and the bounded report
+stays inconclusive rather than inferring equality from the desired plan or
+neighbouring metadata.
+
 Only the first two accepted in-place classes may become later automation
 candidates through the controls admission process.
 

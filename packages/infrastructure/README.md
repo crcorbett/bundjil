@@ -154,10 +154,14 @@ artifacts.
 `infrastructure:drift-report` requires
 `BUNDJIL_INFRASTRUCTURE_DRIFT_{AUTHORITY,REPORT,RECEIPT}_PATH`,
 `BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA`, and exact Preview stage/manifest
-configuration. The authority, manifest, provider/state credential file, report,
-and receipt remain mode-`0600` custody. Exit `0` means a classified `no_op` or
+configuration. The manifest must be the receipt-bearing post-apply baseline;
+an ignored `current` filename is not proof when its digest or resource set
+differs. The authority, manifest, provider/state credential file, report, and
+receipt remain mode-`0600` custody. Exit `0` means a classified `no_op` or
 accepted report-only result; exit `1` means blocking drift; exit `2` means an
-inconclusive or rejected boundary. None authorizes repair. Follow the
+inconclusive or rejected boundary. Write-only Vercel values remain
+`unknownSecretRevision` even when the desired plan and metadata sync are
+unchanged. None authorizes repair. Follow the
 [report-only procedure](../../apps/agent/runbooks/alchemy-infrastructure.md#report-only-drift-and-monitoring);
 workflow source alone does not prove GitHub settings, secrets, a hosted run, or
 alert delivery.

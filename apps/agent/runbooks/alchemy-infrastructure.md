@@ -384,10 +384,13 @@ The report-only path wraps the same stable stack, stage-owned R2 state, native
 desired plan, and native Alchemy `sync --dry-run`. It does not own repair.
 Before every run:
 
-1. Bind the exact source SHA and accepted Preview manifest to a one-run
-   authority envelope that validates against both the fixed harness contract
-   and
+1. Bind the exact source SHA and the receipt-bearing post-apply Preview
+   manifest plus its decoded digest to a one-run authority envelope that
+   validates against both the fixed harness contract and
    `packages/infrastructure/schemas/drift-report-authority.schema.json`.
+   A filename containing `current` is convenience custody only and is not an
+   evidence owner: stop if it differs from the last accepted post-apply
+   manifest or receipt.
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
@@ -408,6 +411,12 @@ Before every run:
    result remain `NotExposed`; if native execution fails before returning a
    plan, the plan itself remains `NotExposed` and the bounded result is
    inconclusive rather than fabricated zero counts.
+   Vercel sensitive environment values are write-only at this boundary. A
+   desired plan may prove their persisted desired references are unchanged,
+   and native sync may prove their metadata is unchanged, but neither proves
+   the remote value or revision; classify those rows `unknownSecretRevision`
+   and keep the overall report inconclusive unless a separately accepted
+   custody/readback contract proves the value.
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
    None is repair authority. Missing or stale runs, signed-ingress/replay/send/

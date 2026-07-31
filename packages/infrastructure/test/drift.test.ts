@@ -240,7 +240,7 @@ describe("infrastructure drift report", () => {
 
   it("classifies a desired-state plan change separately from live drift", async () => {
     const input = {
-      ...observation({ action: "drifted", diffClass: "replace" }),
+      ...observation({ action: "drifted", diffClass: "update" }),
       source: "desiredPlan" as const,
     };
     const report = await reportFor([
@@ -248,6 +248,21 @@ describe("infrastructure drift report", () => {
     ]);
     expect(report.findings[0]?.category).toBe("desiredStatePlanChange");
     expect(report.findings[0]?.source).toBe("desiredPlan");
+  });
+
+  it("keeps a destructive desired-state removal blocking", async () => {
+    const input = {
+      ...observation({ action: "drifted", diffClass: "replace" }),
+      source: "desiredPlan" as const,
+    };
+    const report = await reportFor([
+      InfrastructureDriftObservation.make(input),
+    ]);
+    expect(report.findings[0]).toMatchObject({
+      category: "destructiveDrift",
+      disposition: "blocking",
+      source: "desiredPlan",
+    });
   });
 
   it("keeps unavailable, unknown-secret and skipped reads inconclusive", async () => {

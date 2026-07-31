@@ -21,6 +21,7 @@ import {
   VercelProject,
   VercelProjectDomain,
 } from "@bundjil/infrastructure/vercel";
+import { RemovalPolicy } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
 import { Config, Effect, Match, Schema } from "effect";
 
@@ -107,7 +108,8 @@ const deployAdoptionResource = (
           stage: candidate.stage,
           ...candidate.physicalId,
         }),
-    })
+    }),
+    Effect.provideService(RemovalPolicy, resource.removalPolicy)
   );
 
 export const BundjilInfrastructureStack = (manifest: AdoptionManifest) =>
