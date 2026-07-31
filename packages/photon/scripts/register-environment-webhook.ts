@@ -2,6 +2,7 @@ import { dirname, isAbsolute } from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
+import { Ajv2020 } from "ajv/dist/2020.js";
 import {
   Config,
   ConfigProvider,
@@ -10,10 +11,13 @@ import {
   Exit,
   FileSystem,
   Layer,
+  Match,
   Redacted,
   Schema,
 } from "effect";
 
+import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import productionWebhookCutoverAuthorityPolicy from "../schemas/production-webhook-cutover-authority.schema.json" with { type: "json" };
 import {
   PhotonEnvironmentWebhookReceipt,
   registerPhotonEnvironmentWebhook,
@@ -23,7 +27,7 @@ import {
   PhotonManagement,
 } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
-import { loadPhotonPreviewProviderConfig } from "../src/provider-proof.js";
+import { loadPhotonEnvironmentWebhookProviderConfig } from "../src/provider-proof.js";
 import { PhotonWebhookId } from "../src/schemas.js";
 
 declare const process: { exitCode: number | undefined };
@@ -35,6 +39,20 @@ const PhotonWebhookBindingPath = Schema.NonEmptyString.pipe(
     )
   ),
   Schema.brand("@bundjil/photon/PhotonWebhookBindingPath")
+);
+
+const PhotonWebhookAuthorityPath = Schema.String.pipe(
+  Schema.check(
+    Schema.makeFilter((value) =>
+      value.length > 0 &&
+      value.length <= 240 &&
+      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      !isAbsolute(value) &&
+      !value.split("/").includes("..")
+        ? undefined
+        : "Photon webhook authority path must be safe and repository-relative."
+    )
+  )
 );
 
 const PhotonWebhookBindingFile = Schema.Struct({
@@ -52,7 +70,10 @@ const PhotonEnvironmentWebhookBlocked = Schema.Struct({
 });
 
 const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
-  const config = yield* loadPhotonPreviewProviderConfig;
+  const stage = yield* Config.schema(
+    Schema.Literals(["preview", "prod"]),
+    "BUNDJIL_PHOTON_WEBHOOK_STAGE"
+  ).pipe(Config.withDefault("preview"));
   const webhookUrl = yield* Config.schema(
     Schema.URLFromString,
     "BUNDJIL_PHOTON_WEBHOOK_URL"
@@ -62,6 +83,49 @@ const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
     "BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH"
   );
   const fileSystem = yield* FileSystem.FileSystem;
+  yield* Match.value(stage).pipe(
+    Match.when("preview", () => Effect.void),
+    Match.when("prod", () =>
+      Effect.gen(function* validateProductionWebhookAuthority() {
+        const authorityPath = yield* Config.schema(
+          PhotonWebhookAuthorityPath,
+          "BUNDJIL_PHOTON_WEBHOOK_AUTHORITY_PATH"
+        );
+        const metadata = yield* fileSystem.stat(authorityPath);
+        if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
+          return yield* new PhotonProviderProofError({
+            operation: "assert",
+            reason: "requestFailed",
+          });
+        }
+        const authority = yield* fileSystem
+          .readFileString(authorityPath)
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Unknown))
+            )
+          );
+        const options = {
+          allErrors: true,
+          strict: false,
+          validateFormats: false,
+        } as const;
+        if (
+          !new Ajv2020(options).compile(authorityEnvelopeSchema)(authority) ||
+          !new Ajv2020(options).compile(
+            productionWebhookCutoverAuthorityPolicy
+          )(authority)
+        ) {
+          return yield* new PhotonProviderProofError({
+            operation: "assert",
+            reason: "requestFailed",
+          });
+        }
+        return yield* Effect.void;
+      })
+    ),
+    Match.exhaustive
+  );
   if (yield* fileSystem.exists(bindingPath)) {
     return yield* new PhotonProviderProofError({
       operation: "writeWebhookBinding",
@@ -69,6 +133,7 @@ const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
     });
   }
 
+  const config = yield* loadPhotonEnvironmentWebhookProviderConfig;
   const result = yield* registerPhotonEnvironmentWebhook(webhookUrl).pipe(
     Effect.provide(
       layerPhotonManagementLive(config.projectId, config.projectSecret).pipe(

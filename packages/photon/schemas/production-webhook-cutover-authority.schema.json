@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bundjil.dev/schemas/production-webhook-cutover-authority.schema.json",
+  "title": "Bundjil Production Photon parallel-webhook cutover authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": { "const": "mutation" },
+    "approvalRequired": { "const": true },
+    "approvalReceipt": { "type": "string", "minLength": 1 },
+    "operations": {
+      "const": [
+        "read exact Production Photon webhook topology",
+        "create one parallel Production webhook at the exact approved callback URL",
+        "read back the exact new webhook while preserving the original webhook",
+        "persist the create-only binding only in the exact mode-0600 local artifact"
+      ]
+    },
+    "resources": {
+      "const": [
+        "photon:source-production-project:webhooks",
+        "photon:source-production-project:webhook:original:retain",
+        "local:tmp/proof:production-webhook-binding"
+      ]
+    },
+    "environments": { "const": ["production"] }
+  }
+}

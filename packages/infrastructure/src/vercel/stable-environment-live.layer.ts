@@ -107,19 +107,19 @@ const previewWebhookSecretConfig = Config.schema(
 );
 const productionProjectIdConfig = Config.schema(
   PhotonProjectId,
-  "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"
+  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID"
 );
 const productionProjectSecretConfig = Config.schema(
   PhotonProjectSecret,
-  "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET"
 );
 const productionWebhookIdConfig = Config.schema(
   PhotonWebhookId,
-  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID"
+  "BUNDJIL_PHOTON_PRODUCTION_WEBHOOK_ID"
 );
 const productionWebhookSecretConfig = Config.schema(
   PhotonWebhookSecret,
-  "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
+  "BUNDJIL_PHOTON_PRODUCTION_WEBHOOK_SECRET"
 );
 
 const stableEnvironmentUrl = (path: string) =>

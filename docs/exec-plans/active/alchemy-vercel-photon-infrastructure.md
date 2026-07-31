@@ -2308,20 +2308,67 @@ pass on this candidate. This is repository proof only: no stable Production
 provider update or staged deployment has yet occurred, so the task remains in
 progress at fresh exact-source inventory and the four-update live plan.
 
+#### Production write-only custody finding and recovery
+
+Fresh exact-source inventory at repository commit
+`0223ecc4d3e23029627ce3b2db556864254d874a` initially repeated the prior
+topology and digest `e46fe2d9…804b`. The managed manifest contained exactly
+four Production bindings and the plan contained those four updates plus 68
+no-ops.
+
+The value preflight then exposed `PROD-STABLE-001`: Vercel's Production env
+pull returned the same non-secret write-only placeholder for all four sensitive
+variables. Its safe fingerprint was `3930fb7a9a99…`; it matched neither the
+independently custodied Photon management identity nor live webhook fingerprint
+`72cac9b51f8b…`. This is consistent with Vercel's documented
+[non-readable sensitive-variable contract](https://vercel.com/docs/environment-variables/sensitive-environment-variables).
+The repository adapter incorrectly treated any non-empty project ID or secret
+as custody, so the aggregate plan and earlier key-presence check were false
+greens.
+
+The first apply failed closed when the placeholder could not decode as a
+`PhotonWebhookId`, but fresh exact-ID metadata proved a partial write before
+that failure: provider revisions advanced for the project ID, project secret
+and webhook secret; the webhook ID did not advance. No deployment, alias,
+domain, Marketplace or Photon resource changed. Existing deployments retain
+their baked environment values, so current Production traffic remains on the
+last-known-good deployment and original webhook. New Production deployment is
+blocked until recovery.
+
+The root correction removes the Vercel pull from Production value custody.
+Production project values now resolve only from the independently custodied
+Photon management pair, and webhook values only from a create-only
+`BUNDJIL_PHOTON_PRODUCTION_{WEBHOOK_ID,WEBHOOK_SECRET}` pair. Tests inject the
+provider placeholder alongside correct independent custody, prove that it is
+ignored, and prove placeholder-only custody fails. Because the old webhook
+secret is not recoverable from Vercel and its environment record has already
+advanced, exact recovery requires the runbook's lossless callback cutover:
+retain the old webhook and current deployment; create one parallel exact
+Production callback under separate Photon authority; capture its ID/secret
+once; reapply all four values; stage a new deployment; and defer promotion plus
+old-webhook retirement until signed live proof passes.
+
+The independent-custody correction, stage-owned Photon registration boundary,
+fixed parallel-create authority, placeholder-only negative and focused
+Production config/provider matrices pass. Effect language-service diagnostics,
+docs-maintainer's 272-file inventory and the complete repository verification
+pass on the recovery candidate. No Photon mutation or deployment occurred
+during this repository correction.
+
 ### Production stable-binding docs-maintainer impact ledger
 
-| Surface                                       | Decision        | Trigger, earliest owner, verification and non-claim                                                                                                                                                                                    |
-| --------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and provider call graph          | Preserve        | Existing Effect/provider architecture already owns decoded stage, private SDK transport and managed-versus-observed boundaries; focused provider tests prove the new Production branch without changing the durable architecture.      |
-| READMEs, exports and generated references     | Change required | `packages/infrastructure/README.md` adds the three Production commands and staged-deployment boundary; the existing Vercel export surface gains only the Production owner/reference, with no raw client or generated-reference change. |
-| Runbooks, authority and controls              | Change required | `apps/agent/runbooks/alchemy-infrastructure.md` owns exact plan/apply/readback/staged-deploy/rollback steps; a fixed Production authority Schema rejects Preview, promotion and broader-resource envelopes.                            |
-| Verification journeys and proof               | Change required | Direct unit/provider matrices cover exact target, stage custody, retries, uncertain writes, partial recovery and no-op; live receipt owners remain ignored `tmp/proof/**` artifacts and do not yet claim provider convergence.         |
-| Skills, AGENTS, lint, config, commands and CI | Change required | Repository skills and `AGENTS.md` are preserved; root commands bind stage explicitly, rebuild before access and load only ignored custody. Effect LS and all routed policy gates remain mandatory.                                     |
-| Schemas, services and Layers                  | Change required | Add `productionPhotonManaged`, a Production `SecretOwner`, stage-discriminated request contracts and Production `Config.schema` custody; keep named Effects, private HTTP client and explicit live/memory Layers.                      |
-| Tests and fixtures                            | Change required | Add Production manifest/authority/live-contract/Alchemy matrices plus cross-stage negatives. Existing Preview, timeout and partial-failure fixtures remain authoritative for shared policy properties.                                 |
-| SPEC, tasks and active plan                   | Change required | Record the exact four-binding slice and keep `production-adoption-and-rollout` in progress until live acknowledgements, convergence and staged deployment readback pass.                                                               |
-| Secrets, receipts, rollout and rollback       | Change required | Preserve mode-`0600` value and state backups, emit only Schema-valid redacted receipts, retain candidate/prior revisions and do not promote or alias the staged deployment in this slice.                                              |
-| Lifecycle, archive and terminal audit         | Preserve        | The active plan and proposed SPEC stay open. Drift/closeout and the one fresh terminal five-pass audit remain downstream; repository tests are not provider or deployment proof.                                                       |
+| Surface                                       | Decision        | Trigger, earliest owner, verification and non-claim                                                                                                                                                                                                               |
+| --------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | Existing Effect/provider architecture already owns decoded stage, private SDK transport and managed-versus-observed boundaries; focused provider tests prove the new Production branch without changing the durable architecture.                                 |
+| READMEs, exports and generated references     | Change required | `packages/infrastructure/README.md` adds the three Production commands and staged-deployment boundary; the existing Vercel export surface gains only the Production owner/reference, with no raw client or generated-reference change.                            |
+| Runbooks, authority and controls              | Change required | `apps/agent/runbooks/alchemy-infrastructure.md` owns exact cutover/plan/apply/readback/staged-deploy/rollback steps; fixed stable-binding and parallel-webhook Schemas reject Preview, original deletion, promotion and broader-resource envelopes.               |
+| Verification journeys and proof               | Change required | Direct unit/provider matrices cover exact target, independent stage custody, provider-placeholder rejection, retries, uncertain writes, partial recovery and no-op; live receipt owners remain ignored `tmp/proof/**` artifacts and do not yet claim convergence. |
+| Skills, AGENTS, lint, config, commands and CI | Change required | Repository skills and `AGENTS.md` are preserved; root commands bind stage explicitly, rebuild before access and load only ignored custody. Effect LS and all routed policy gates remain mandatory.                                                                |
+| Schemas, services and Layers                  | Change required | Add `productionPhotonManaged`, a Production `SecretOwner`, stage-discriminated request contracts and Production `Config.schema` custody; keep named Effects, private HTTP client and explicit live/memory Layers.                                                 |
+| Tests and fixtures                            | Change required | Add Production manifest/authority/live-contract/Alchemy matrices plus cross-stage negatives. Existing Preview, timeout and partial-failure fixtures remain authoritative for shared policy properties.                                                            |
+| SPEC, tasks and active plan                   | Change required | Record the exact four-binding slice and keep `production-adoption-and-rollout` in progress until live acknowledgements, convergence and staged deployment readback pass.                                                                                          |
+| Secrets, receipts, rollout and rollback       | Change required | Preserve mode-`0600` independent value custody and state backup, retain the current deployment/original webhook through lossless cutover, emit only Schema-valid redacted receipts, and block deployment while any placeholder remains.                           |
+| Lifecycle, archive and terminal audit         | Preserve        | The active plan and proposed SPEC stay open. Drift/closeout and the one fresh terminal five-pass audit remain downstream; repository tests are not provider or deployment proof.                                                                                  |
 
 ### Production state-correction docs-maintainer impact ledger
 

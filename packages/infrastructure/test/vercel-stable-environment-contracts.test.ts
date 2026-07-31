@@ -255,7 +255,21 @@ it.effect(
         ConfigProvider.fromEnv({
           env: {
             BUNDJIL_CHANNEL_PHOTON_PROJECT_ID:
+              "provider-write-only-placeholder",
+            BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET:
+              "provider-write-only-placeholder",
+            BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID:
+              "provider-write-only-placeholder",
+            BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET:
+              "provider-write-only-placeholder",
+            BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID:
               "production-photon-project-value",
+            BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET:
+              "production-photon-project-secret",
+            BUNDJIL_PHOTON_PRODUCTION_WEBHOOK_ID:
+              "44444444-4444-4444-8444-444444444444",
+            BUNDJIL_PHOTON_PRODUCTION_WEBHOOK_SECRET:
+              "production-photon-webhook-secret",
           },
         })
       );
@@ -270,6 +284,56 @@ it.effect(
       assert.strictEqual(
         Redacted.value(resolved),
         "production-photon-project-value"
+      );
+      const productionWebhookSecret = yield* Effect.gen(
+        function* resolveProductionWebhookSecret() {
+          const values = yield* VercelPreviewPhotonBindingValues;
+          return yield* values.resolvePreviewPhotonValue(
+            ResolveVercelPreviewPhotonValue.make({
+              ...decoded.resolve,
+              key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+            })
+          );
+        }
+      ).pipe(
+        Effect.provide(
+          Layer.merge(VercelPreviewPhotonBindingValuesLive, config)
+        )
+      );
+      assert.strictEqual(
+        Redacted.value(productionWebhookSecret),
+        "production-photon-webhook-secret"
+      );
+      const [productionProjectSecret, productionWebhookId] = yield* Effect.gen(
+        function* resolveRemainingProductionValues() {
+          const values = yield* VercelPreviewPhotonBindingValues;
+          return yield* Effect.all([
+            values.resolvePreviewPhotonValue(
+              ResolveVercelPreviewPhotonValue.make({
+                ...decoded.resolve,
+                key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
+              })
+            ),
+            values.resolvePreviewPhotonValue(
+              ResolveVercelPreviewPhotonValue.make({
+                ...decoded.resolve,
+                key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
+              })
+            ),
+          ]);
+        }
+      ).pipe(
+        Effect.provide(
+          Layer.merge(VercelPreviewPhotonBindingValuesLive, config)
+        )
+      );
+      assert.strictEqual(
+        Redacted.value(productionProjectSecret),
+        "production-photon-project-secret"
+      );
+      assert.strictEqual(
+        Redacted.value(productionWebhookId),
+        "44444444-4444-4444-8444-444444444444"
       );
 
       const client = HttpClient.make((request) =>
@@ -339,6 +403,36 @@ it.effect(
         )
       );
       assert.strictEqual(Exit.isFailure(previewOwnerForProduction), true);
+
+      const placeholderOnlyConfig = ConfigProvider.layer(
+        ConfigProvider.fromEnv({
+          env: {
+            BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET:
+              "provider-write-only-placeholder",
+          },
+        })
+      );
+      const placeholderOnly = yield* Effect.gen(
+        function* rejectProviderWriteOnlyPlaceholder() {
+          const values = yield* VercelPreviewPhotonBindingValues;
+          return yield* values
+            .resolvePreviewPhotonValue(
+              ResolveVercelPreviewPhotonValue.make({
+                ...decoded.resolve,
+                key: "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
+              })
+            )
+            .pipe(Effect.exit);
+        }
+      ).pipe(
+        Effect.provide(
+          Layer.merge(
+            VercelPreviewPhotonBindingValuesLive,
+            placeholderOnlyConfig
+          )
+        )
+      );
+      assert.strictEqual(Exit.isFailure(placeholderOnly), true);
     })
 );
 

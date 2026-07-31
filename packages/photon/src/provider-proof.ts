@@ -1,4 +1,4 @@
-import { Config, Effect, Exit, Redacted, Schema } from "effect";
+import { Config, Effect, Exit, Match, Redacted, Schema } from "effect";
 
 import { PhotonLifecycleProbe } from "./lifecycle-probe.js";
 import { PhotonManagement } from "./operator-management.js";
@@ -48,6 +48,18 @@ const previewProjectSecretConfig = Config.schema(
   PhotonProjectSecret,
   "BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET"
 );
+const productionProjectIdConfig = Config.schema(
+  PhotonProjectId,
+  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID"
+);
+const productionProjectSecretConfig = Config.schema(
+  PhotonProjectSecret,
+  "BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET"
+);
+const environmentWebhookStageConfig = Config.schema(
+  Schema.Literals(["preview", "prod"]),
+  "BUNDJIL_PHOTON_WEBHOOK_STAGE"
+).pipe(Config.withDefault("preview"));
 
 export const loadPhotonProviderProofConfig = Effect.gen(
   function* loadPhotonProviderProofConfig() {
@@ -66,6 +78,26 @@ export const loadPhotonPreviewProviderConfig = Effect.gen(
     };
   }
 );
+
+export const loadPhotonProductionProviderConfig = Effect.gen(
+  function* loadPhotonProductionProviderConfig() {
+    return {
+      projectId: yield* productionProjectIdConfig,
+      projectSecret: yield* productionProjectSecretConfig,
+    };
+  }
+);
+
+export const loadPhotonEnvironmentWebhookProviderConfig =
+  environmentWebhookStageConfig.pipe(
+    Effect.flatMap((stage) =>
+      Match.value(stage).pipe(
+        Match.when("preview", () => loadPhotonPreviewProviderConfig),
+        Match.when("prod", () => loadPhotonProductionProviderConfig),
+        Match.exhaustive
+      )
+    )
+  );
 
 export const provePhotonProvider = (
   projectId: PhotonProjectIdType,

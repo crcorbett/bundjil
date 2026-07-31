@@ -1,10 +1,13 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 
 import { PhotonLifecycleProbe } from "../src/lifecycle-probe.js";
 import { PhotonManagement } from "../src/operator-management.js";
 import { PhotonProviderProofError } from "../src/provider-proof.error.js";
-import { provePhotonProvider } from "../src/provider-proof.js";
+import {
+  loadPhotonEnvironmentWebhookProviderConfig,
+  provePhotonProvider,
+} from "../src/provider-proof.js";
 import { PhotonProjectId, PhotonWebhookId } from "../src/schemas.js";
 
 const proofWebhookUrl = new URL(
@@ -33,6 +36,33 @@ const unusedProvisioningOperations = {
   setIMessagePlatformEnabled: () =>
     Effect.die("unused setIMessagePlatformEnabled"),
 } as const;
+
+it.effect(
+  "selects only the stage-owned Photon credential pair for environment webhooks",
+  () =>
+    Effect.gen(function* selectProductionEnvironmentWebhookCredentials() {
+      const config = yield* loadPhotonEnvironmentWebhookProviderConfig;
+      assert.strictEqual(String(config.projectId), "production-project");
+      assert.strictEqual(
+        Redacted.value(config.projectSecret),
+        "production-secret"
+      );
+    }).pipe(
+      Effect.provide(
+        ConfigProvider.layer(
+          ConfigProvider.fromEnv({
+            env: {
+              BUNDJIL_PHOTON_WEBHOOK_STAGE: "prod",
+              BUNDJIL_PHOTON_PREVIEW_PROJECT_ID: "preview-project",
+              BUNDJIL_PHOTON_PREVIEW_PROJECT_SECRET: "preview-secret",
+              BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID: "production-project",
+              BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET: "production-secret",
+            },
+          })
+        )
+      )
+    )
+);
 
 it.effect(
   "proves create, read, SDK lifecycle, delete, and restored topology",

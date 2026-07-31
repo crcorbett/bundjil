@@ -174,6 +174,17 @@ write-only secret blocks instead of replacing or adopting it. An uncertain
 create receives three bounded exponentially backed-off, jittered observations,
 is never blindly replayed, and preserves an observed endpoint.
 
+The Production recovery commands set
+`BUNDJIL_PHOTON_WEBHOOK_STAGE=prod` and resolve only the independently
+custodied `BUNDJIL_PHOTON_MANAGEMENT_*` pair:
+`infrastructure:photon-production-webhook-register` creates one exact parallel
+callback and `infrastructure:photon-production-webhook-delete` later removes
+only that exact URL. Production registration is permitted only by the
+lossless-cutover runbook after a write-only secret is unavailable. It retains
+the original callback, writes the new create-only binding to an absolute
+mode-`0600` path, and emits no ID, secret or URL. Deletion remains blocked
+until signed proof and retry drain pass.
+
 `bun run --filter @bundjil/photon delete:environment-webhook` deletes only one
 exact `BUNDJIL_PHOTON_WEBHOOK_URL` and requires zero matching records on
 readback. Zero or multiple matches block; it never selects by list order,

@@ -242,8 +242,13 @@ one staged Production deployment with domains skipped. It does not permit a
 domain assignment, alias, promotion, bearer rotation, Photon mutation,
 deletion or broader secret sweep.
 
-1. Retain a complete mode-`0600` provider custody snapshot and the accepted
-   pre-retirement state backup. Run
+1. Retain the accepted pre-retirement state backup. Resolve the Production
+   project pair from independent Photon management custody and the webhook pair
+   from the create-only Photon webhook artifact into ignored mode-`0600`
+   `.env.local`. Do not treat a Vercel Production env pull as value custody:
+   [sensitive variables are non-readable after creation](https://vercel.com/docs/environment-variables/sensitive-environment-variables).
+   All four independently custodied values must pass their owning Schemas
+   before the first provider write. Run
    `bun run infrastructure:stable-production-plan`. Stop unless the plan has
    exactly four updates on the accepted physical IDs and every other one of
    the 72 resources is no-op. Reject create, replacement, delete, Preview
@@ -268,12 +273,33 @@ deletion or broader secret sweep.
    alias moved. This is a staged candidate only; do not promote or assign an
    alias in this slice.
 
-Rollback reapplies only the externally retained prior revision to the same
-four IDs under fresh bounded authority, requires acknowledgement and
-metadata convergence, and creates another immutable staged deployment.
-Because values are write-only, metadata alone cannot prove their contents.
-Retain both prior and candidate custody until later runtime qualification
-accepts or rolls back the staged candidate.
+When all prior values are independently retained, rollback reapplies only that
+prior revision to the same four IDs under fresh bounded authority, requires
+acknowledgement and metadata convergence, and creates another immutable staged
+deployment. If any prior sensitive value is not independently retained, never
+pretend Vercel metadata can recover it. Preserve the last-known-good immutable
+deployment and callback as runtime rollback, then use the lossless cutover
+below to establish a new complete candidate revision. Metadata alone cannot
+prove write-only contents.
+
+If any write occurs before a later custody failure, classify it as partial
+failure from fresh exact-ID metadata. Do not assume the failed command wrote
+nothing. Existing deployments retain their baked environment values, so keep
+the current Production alias and its Photon callback unchanged. When the prior
+webhook secret is not independently recoverable, repair by the lossless
+callback cutover: under separate exact Photon authority, create one parallel
+callback while retaining the old callback by running
+`bun run infrastructure:photon-production-webhook-register` with the exact
+`BUNDJIL_PHOTON_WEBHOOK_URL` and an absent absolute mode-`0600`
+`BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH`. Also set the exact mode-`0600`
+`BUNDJIL_PHOTON_WEBHOOK_AUTHORITY_PATH`; the fixed Production policy permits
+only parallel create/readback/local custody and preserves the original
+callback. Store the create-only ID/secret in `.env.local` as the Production
+webhook pair, re-run the four-value apply, create a staged deployment, and
+require signed live proof before any promotion or old-callback retirement.
+After proof and drain, delete only the exact retired URL with
+`bun run infrastructure:photon-production-webhook-delete`. Never deploy a
+candidate while any configured value is a provider write-only placeholder.
 
 ## Configuration and drift
 

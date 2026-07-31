@@ -1,5 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["./scripts/**/*.ts", "./src/**/*.ts", "./test/**/*.ts"],
-  "compilerOptions": { "strictNullChecks": true }
+  "include": [
+    "../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json",
+    "./schemas/**/*.json",
+    "./scripts/**/*.ts",
+    "./src/**/*.ts",
+    "./test/**/*.ts"
+  ],
+  "compilerOptions": {
+    "rootDir": "../..",
+    "strictNullChecks": true
+  }
 }

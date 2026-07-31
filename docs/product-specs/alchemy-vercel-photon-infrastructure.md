@@ -2109,6 +2109,29 @@ Focused checks and complete repository verification pass. This does not yet
 prove a provider update, revision convergence or staged Production deployment;
 those claims require fresh exact-source plan/apply/readback evidence.
 
+Production value custody must be independent of Vercel sensitive-variable
+readback. Vercel documents sensitive values as non-readable after creation, and
+the first live Production preflight confirmed that its env pull projected one
+common write-only placeholder for all four values. The earlier key-presence
+gate and broad non-empty project/secret codecs were insufficient: the first
+apply advanced the project-ID, project-secret and webhook-secret revisions
+before the placeholder webhook ID failed its UUID codec. No deployment was
+created, so the current Production deployment retains its baked values, but a
+new Production deployment is prohibited until recovery.
+
+The corrected Production Config boundary reads the project pair only from
+`BUNDJIL_PHOTON_MANAGEMENT_{PROJECT_ID,PROJECT_SECRET}` and the webhook pair
+only from create-only
+`BUNDJIL_PHOTON_PRODUCTION_{WEBHOOK_ID,WEBHOOK_SECRET}` custody. Provider
+placeholders are never a fallback. Because the old webhook secret is
+non-readable and its environment revision already advanced, recovery uses the
+accepted lossless callback replacement rather than guessing or deploying a
+partial configuration: retain the original webhook and last-known-good
+deployment, create one parallel Production callback under separate exact
+authority, retain its create-only secret, reapply all four values, stage the
+candidate, and require signed live proof before promotion or original-webhook
+retirement.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

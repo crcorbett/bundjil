@@ -172,19 +172,20 @@ deployment before runtime claims.
 Stable Production commands reuse the same typed boundary with
 `BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=productionPhotonManaged`, a distinct
 mode-`0600` Production authority envelope and the exact Production manifest.
-The root commands explicitly bind `prod`, rebuild the package, and load the
-ignored mode-`0600` `tmp/proof/vercel-production.env.local` custody file. Only
-the four existing Production `bundjil-agent`
-`BUNDJIL_CHANNEL_PHOTON_*` values are resolved, at the immediate PATCH
-boundary; all other values in that provider-generated snapshot are
-unreachable from this service. The plan must report exactly four in-place
-updates and zero create, replacement, delete or other update. After
-acknowledgement, fresh inventory, no-op plan, two unchanged sync dry-runs and
-the fixed managed adoption proof, create one distinct staged Production
-deployment with `vercel deploy --prod --skip-domain`. Require exact source,
-Production target and `READY` readback while the current domains and
-Production alias remain unchanged. Promotion is a separate, later runbook
-decision.
+The root commands explicitly bind `prod` and rebuild the package. Values come
+only from independently custodied
+`BUNDJIL_PHOTON_MANAGEMENT_{PROJECT_ID,PROJECT_SECRET}` and
+`BUNDJIL_PHOTON_PRODUCTION_{WEBHOOK_ID,WEBHOOK_SECRET}` configuration in the
+ignored mode-`0600` `.env.local`; they resolve at the immediate PATCH boundary.
+Never use `vercel env pull` as value custody for sensitive variables: Vercel
+documents them as non-readable after creation, and its downloaded placeholder
+is not the stored value. The plan must report exactly four in-place updates
+and zero create, replacement, delete or other update. After acknowledgement,
+fresh inventory, no-op plan, two unchanged sync dry-runs and the fixed managed
+adoption proof, create one distinct staged Production deployment with
+`vercel deploy --prod --skip-domain`. Require exact source, Production target
+and `READY` readback while the current domains and Production alias remain
+unchanged. Promotion is a separate, later runbook decision.
 
 The inventory executable selects Photon credentials by the decoded stage:
 `preview` requires the isolated `BUNDJIL_PHOTON_PREVIEW_*` pair, while `prod`
