@@ -233,6 +233,27 @@ const DistinctChannelNamespaces = Schema.Struct({
   )
 );
 
+const PhotonWebhookTopology = Schema.Union([
+  Schema.TaggedStruct("Stable", {
+    webhookCount: Schema.Literal(1),
+    webhookFingerprint: OpaqueIdentityFingerprint,
+  }),
+  Schema.TaggedStruct("ParallelCutover", {
+    candidateWebhookFingerprint: OpaqueIdentityFingerprint,
+    originalWebhookFingerprint: OpaqueIdentityFingerprint,
+    webhookCount: Schema.Literal(2),
+  }).pipe(
+    Schema.check(
+      Schema.makeFilter((topology) =>
+        topology.candidateWebhookFingerprint !==
+        topology.originalWebhookFingerprint
+          ? undefined
+          : "Parallel Photon cutover callbacks must have distinct identities."
+      )
+    )
+  ),
+]);
+
 const ChannelInventory = Schema.Struct({
   legacyBindingsPresent: Schema.Literal(false),
   legacyReplayRead: Schema.Literal(false),
@@ -242,7 +263,7 @@ const ChannelInventory = Schema.Struct({
     dedicatedLineCount: Schema.Literal(0),
     platformEnabled: Schema.Literal(true),
     serviceType: Schema.Literal("shared"),
-    webhookCount: Schema.Literal(1),
+    webhookTopology: PhotonWebhookTopology,
   }),
   sendblue: Schema.Struct({
     lineReady: Schema.Literal(true),
@@ -258,7 +279,15 @@ const channelInventoryReadyFields = {
 export const ChannelInventoryReadyPreflightSnapshot = Schema.Struct({
   ...channelInventoryReadyFields,
   stage: Schema.Literal("channel-inventory-ready"),
-});
+}).pipe(
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      snapshot.channel.photon.webhookTopology._tag === "Stable"
+        ? undefined
+        : "Channel inventory must reach the stable Photon callback topology before staging."
+    )
+  )
+);
 
 const stagedChannelCandidateFields = {
   ...channelInventoryReadyFields,

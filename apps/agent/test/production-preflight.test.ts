@@ -259,7 +259,11 @@ const channelInventory = {
     dedicatedLineCount: 0,
     platformEnabled: true,
     serviceType: "shared",
-    webhookCount: 1,
+    webhookTopology: {
+      _tag: "Stable",
+      webhookCount: 1,
+      webhookFingerprint: fingerprint("f"),
+    },
   },
   sendblue: { lineReady: true, receiveWebhookCount: 1 },
 } as const;
@@ -272,6 +276,18 @@ const channelInventoryReady = {
 
 const channelCandidateStaged = {
   ...channelInventoryReady,
+  channel: {
+    ...channelInventoryReady.channel,
+    photon: {
+      ...channelInventoryReady.channel.photon,
+      webhookTopology: {
+        _tag: "ParallelCutover",
+        candidateWebhookFingerprint: fingerprint("0"),
+        originalWebhookFingerprint: fingerprint("f"),
+        webhookCount: 2,
+      },
+    },
+  },
   candidateAgent: {
     configFingerprint: fingerprint("e"),
     deploymentId: "dpl_channelcandidate",
@@ -386,6 +402,56 @@ describe("Production promotion preflight", () => {
       }).pipe(Effect.runSync)
     ).toThrow("Unexpected key");
   });
+
+  vitestIt(
+    "rejects a parallel Photon cutover before the staged candidate checkpoint",
+    () => {
+      expect(() =>
+        decode({
+          ...channelInventoryReady,
+          channel: channelCandidateStaged.channel,
+        }).pipe(Effect.runSync)
+      ).toThrow("stable Photon callback topology");
+    }
+  );
+
+  vitestIt(
+    "rejects a bare two-webhook count and ambiguous parallel callback identities",
+    () => {
+      expect(() =>
+        decode({
+          ...channelCandidateStaged,
+          channel: {
+            ...channelCandidateStaged.channel,
+            photon: {
+              approvedSharedUserCount: 1,
+              dedicatedLineCount: 0,
+              platformEnabled: true,
+              serviceType: "shared",
+              webhookCount: 2,
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("webhookCount");
+      expect(() =>
+        decode({
+          ...channelCandidateStaged,
+          channel: {
+            ...channelCandidateStaged.channel,
+            photon: {
+              ...channelCandidateStaged.channel.photon,
+              webhookTopology: {
+                _tag: "ParallelCutover",
+                candidateWebhookFingerprint: fingerprint("f"),
+                originalWebhookFingerprint: fingerprint("f"),
+                webhookCount: 2,
+              },
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("distinct identities");
+    }
+  );
 
   it.effect(
     "rejects missing clean Channel bindings, legacy bindings, and candidate drift",

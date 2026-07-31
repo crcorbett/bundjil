@@ -2297,6 +2297,33 @@ or promotion.
 | Convergence and deployment        | Plan has four updates and no create/replace/delete; apply acknowledgements pass; provider inventory changes four revisions; plan plus two syncs become no-op       | State-only no-op, one provider acknowledgement, Preview deployment, or alias treated as proof     | Fixed adoption receipt plus exact provider inventory and plans   |
 | Staged Production candidate       | `vercel deploy --prod --skip-domain` creates a Production-environment READY deployment without domain assignment; promotion remains separate                       | Feature-branch Preview build, current Production alias, or deploy success without target readback | Agent deployment runbook and bounded deployment receipt/readback |
 
+The first exact-source staged candidate was `READY`, Production-targeted,
+unaliased and bound by provider metadata to `f204ee3…`; the previously serving
+deployment and all its aliases remained unchanged. Root health returned `200`,
+unsigned Photon ingress returned `401`, and one signed identity-free
+unsupported-event probe returned `204` with
+`ignored/unsupportedEvent`, zero Eve dispatch capability and zero error/fatal
+logs. The canonical inventory remained internally stable and all
+non-deployment topology was unchanged, but correctly omitted this CLI-created
+candidate because its deployment reader admits only `githubCommitSha`.
+Direct Vercel deployment readback therefore owns this stage observation.
+
+That replay reopened the Production preflight owner before promotion:
+`channel-candidate-staged` hard-coded one Photon webhook while the accepted
+lossless recovery must preserve two exact callbacks until live cutover proof.
+The smallest correction replaces the count-only field with a discriminated,
+fingerprinted `Stable` or `ParallelCutover` topology, rejects duplicate
+fingerprints and rejects a premature parallel topology at
+`channel-inventory-ready`. The `f204ee3…` candidate remains unaliased and is
+superseded; a new pushed correction candidate, repeated four-value
+convergence, staged deployment and preflight are required.
+
+| Requirement                    | Direct observable and expected postcondition                                                                                         | Plausible false green rejected                                                                | Focused command/evidence owner                    | Status                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
+| Immutable staged deployment    | Provider API returns exact source metadata, Production target, `READY`, zero aliases; stable-domain deployment identity is unchanged | CLI success text, canonical inventory omission, or current alias treated as the new candidate | Vercel inspect/API and stable-domain readback     | Passed for superseded `f204ee3…` candidate |
+| Candidate Photon configuration | Root `200`, unsigned `401`, signed unsupported-event `204`, exact ignored disposition, no error/fatal log                            | HTTP `204` without disposition, synthetic dispatch, or stable-domain response                 | Candidate URL plus bounded runtime-log readback   | Passed without Eve/model/provider send     |
+| Lossless callback topology     | Preflight decodes either one fingerprinted stable callback or exact distinct original-plus-candidate cutover                         | Bare webhook count `2`, equal fingerprints, or deleting the original before proof             | Production preflight Schema and negative fixtures | Reopened for source correction             |
+
 The repository implementation now adds the Production binding profile, exact
 stage/target/owner request union, `Config.schema` custody, fixed authority
 policy, Production root commands and the complete runbook. Focused manifest,
@@ -2304,9 +2331,26 @@ authority, live HTTP and Alchemy provider matrices pass, including cross-stage
 rejection, no-op convergence, retry bounds, partial recovery and
 uncertain-after-write non-retry. Effect language-service setup,
 docs-maintainer's 272-file inventory and the complete repository verification
-pass on this candidate. This is repository proof only: no stable Production
-provider update or staged deployment has yet occurred, so the task remains in
-progress at fresh exact-source inventory and the four-update live plan.
+passed before the first live slice. Stable Production bindings and one
+superseded unaliased candidate are now provider-proved as recorded above. The
+task remains in progress at the preflight correction, a new exact-source
+four-binding convergence, replacement staged candidate and promotion gates.
+
+### Production staged-preflight correction impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                                           |
+| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | The correction changes only the app-owned preflight Schema and runbook gate; Vercel deployment remains runbook-owned and Photon/Vercel clients are unchanged.   |
+| READMEs, exports and generated references     | Preserve        | No public command, export, package purpose or generated reference changes.                                                                                      |
+| Runbooks, authority and controls              | Change required | Both Production runbooks now encode the exact stable-versus-parallel callback precondition. Existing authority remains bounded; no alias or promotion occurred. |
+| Verification journeys and proof               | Change required | Record the exact candidate/source/target/alias and signed safe-probe observations separately from canonical inventory, runtime traffic and promotion.           |
+| Skills, AGENTS, lint, config, commands and CI | Preserve        | Existing repository skills, commands and policy gates remain the owners; no workflow or standing authority changes.                                             |
+| Schemas, services and Layers                  | Change required | Replace the count-only Photon preflight field with a native Effect Schema tagged union and distinct-identity refinement. No service or Layer changes.           |
+| Tests and fixtures                            | Change required | Accept stable and parallel staged fixtures; reject bare count, equal fingerprints and premature parallel inventory.                                             |
+| SPEC, tasks and active plan                   | Change required | Keep Production in progress at `PROD-STAGE-001` and route the corrected exact-source replay next.                                                               |
+| Secrets, receipts, rollout and rollback       | Change required | Preserve both callbacks, current serving deployment and mode-`0600` custody; the first candidate stays unaliased and superseded.                                |
+| Lifecycle, archive and terminal audit         | Preserve        | The SPEC and plan remain active; drift closeout and the one terminal five-pass audit remain downstream.                                                         |
+| Documentation inventory and archive pointers  | Preserve        | No documentation path or lifecycle pointer changes; `check:docs` recomputes the same 272-file corpus.                                                           |
 
 #### Production write-only custody finding and recovery
 

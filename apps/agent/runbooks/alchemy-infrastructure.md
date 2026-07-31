@@ -273,6 +273,14 @@ deletion or broader secret sweep.
    alias moved. This is a staged candidate only; do not promote or assign an
    alias in this slice.
 
+   When lossless write-only-secret recovery is active, the staged Production
+   preflight must encode `ParallelCutover` with the exact distinct safe
+   fingerprints of the preserved original callback and candidate callback.
+   The ordinary stable topology encodes one callback and its fingerprint.
+   Neither a bare count nor the parallel topology at the earlier
+   `channel-inventory-ready` checkpoint is accepted. Two callbacks remain a
+   temporary cutover state, not the final desired topology.
+
 When all prior values are independently retained, rollback reapplies only that
 prior revision to the same four IDs under fresh bounded authority, requires
 acknowledgement and metadata convergence, and creates another immutable staged

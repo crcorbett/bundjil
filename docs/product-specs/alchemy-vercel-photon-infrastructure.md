@@ -2142,6 +2142,17 @@ Fresh inventory, an all-73-no-op post-plan and two all-73-no-op native syncs
 passed. The managed-state receipt proves four acknowledgements,
 deployment-required 4 and zero credential matches.
 
+The first staged Production deployment replay exposed a downstream preflight
+defect before promotion. `channel-candidate-staged` still required the old
+one-webhook steady state even though this accepted write-only-secret recovery
+must preserve the original callback alongside the candidate callback through
+signed qualification. The corrected contract distinguishes one fingerprinted
+`Stable` callback from an exact two-fingerprint `ParallelCutover`; equal
+fingerprints, a bare count of two, or a parallel topology at
+`channel-inventory-ready` fail closed. The original callback remains live
+until post-promotion provider proof, retry drain and exact surviving-callback
+readback.
+
 That first receipt exposed a second durable correction: Production cannot use
 the Preview rollback claim that prior values are externally retained. Its
 rollback identity is the last-known-good immutable Production deployment plus

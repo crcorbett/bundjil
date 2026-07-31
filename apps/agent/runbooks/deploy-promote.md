@@ -122,15 +122,15 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 4. Enforce the stages in order; no later checkpoint substitutes for an earlier
    one:
 
-   | Stage                             | Required postcondition before the next stage                                                                                                                                   |
-   | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-   | `before-first-mutation`           | Both Production activations absent; clean pushed SHA; exact projects/protection; read-only inventory                                                                           |
-   | `proxy-provisioned`               | Proxy configured `live`; required metadata bindings; separate Preview/Production subject, namespace, cipher, profile, lock, and fence identity; encrypted stored-profile proof |
-   | `proxy-accepted-agent-configured` | Accepted immutable proxy matches pushed SHA/config/stable alias; agent uses `codex-proxy`, Vercel OIDC, no anonymous/deployed-local fallback, and a separate bearer            |
-   | `agent-accepted-rollback-ready`   | Accepted immutable agent plus distinct current/previous deployment and config references for both apps                                                                         |
-   | `channel-inventory-ready`         | New-only Channel bindings present; legacy bindings/data absent; Preview/Production namespace fingerprints distinct; exact healthy Sendblue and Photon inventories              |
-   | `channel-candidate-staged`        | One pushed immutable candidate serves both routes with domains skipped; stable alias remains on the recorded current deployment                                                |
-   | `channel-production-promotion`    | Candidate source/config/routes accepted; soak and rollback drill complete; Production activation remains false immediately before the approved promote                         |
+   | Stage                             | Required postcondition before the next stage                                                                                                                                                                                                                      |
+   | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `before-first-mutation`           | Both Production activations absent; clean pushed SHA; exact projects/protection; read-only inventory                                                                                                                                                              |
+   | `proxy-provisioned`               | Proxy configured `live`; required metadata bindings; separate Preview/Production subject, namespace, cipher, profile, lock, and fence identity; encrypted stored-profile proof                                                                                    |
+   | `proxy-accepted-agent-configured` | Accepted immutable proxy matches pushed SHA/config/stable alias; agent uses `codex-proxy`, Vercel OIDC, no anonymous/deployed-local fallback, and a separate bearer                                                                                               |
+   | `agent-accepted-rollback-ready`   | Accepted immutable agent plus distinct current/previous deployment and config references for both apps                                                                                                                                                            |
+   | `channel-inventory-ready`         | New-only Channel bindings present; legacy bindings/data absent; Preview/Production namespace fingerprints distinct; exact healthy Sendblue and stable one-callback Photon inventories                                                                             |
+   | `channel-candidate-staged`        | One pushed immutable candidate serves both routes with domains skipped; stable alias remains on the recorded current deployment; Photon is either the accepted stable callback or an explicit original-plus-candidate parallel cutover with distinct fingerprints |
+   | `channel-production-promotion`    | Candidate source/config/routes accepted; soak and rollback drill complete; Production activation remains false immediately before the approved promote; any parallel Photon cutover still preserves both exact callbacks                                          |
 
    The accepted proxy and current rollback agent retain their own observed
    source identities during the Channel stages. They are not required to match
@@ -163,6 +163,15 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    both provider journeys through the stable domain and bind them to
    `BND-J12-dual-channel-production`; a deployment status alone is
    insufficient.
+
+   A write-only Photon-secret recovery may legitimately carry two Production
+   callbacks through the staged and promotion preflights: the exact original
+   callback plus one distinct candidate callback. Encode that as the
+   `ParallelCutover` topology with both safe fingerprints. A bare count of two,
+   duplicate fingerprints, or a parallel topology at
+   `channel-inventory-ready` fails closed. Retire the original callback only
+   after promotion, signed provider traffic, retry-horizon drain, and exact
+   surviving-callback readback.
 
 ## Evidence and postcondition
 
