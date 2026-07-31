@@ -2072,6 +2072,17 @@ with zero provider writes; a following read remained at 68 rows. This proves
 state-only retirement and recovery, not adoption, provider convergence,
 stable Production configuration, deployment, runtime or Channel behavior.
 
+Recovery commit `307064e7fa64a6146a93cafc7a4b396d75abe54f`
+was pushed before the next exact-source read. Production inventory retained
+digest `e46fe2d9…804b` and 72 resources. The adoption plan contained 49 state
+updates, 23 no-ops and zero create/replacement/delete; apply persisted only
+Alchemy state through read-only provider Layers. Its post-plan was 72 no-op,
+the required sync dry-runs were unchanged, and the fixed adoption receipt
+proves state version 5, all 72 logical IDs, stage-correct completed state, zero
+credential-value matches and zero provider writes. The 69-row pre-retirement
+backup remains rollback custody. Stable managed Production configuration,
+deployment, promotion, runtime and Channel proof remain open.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

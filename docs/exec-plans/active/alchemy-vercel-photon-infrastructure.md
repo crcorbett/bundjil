@@ -2251,6 +2251,25 @@ slice. Adoption is still blocked until this slice is committed/pushed, fresh
 exact-source inventory runs and the adoption plan proves zero replacement and
 delete.
 
+Recovery commit `307064e7fa64a6146a93cafc7a4b396d75abe54f`
+was pushed before adoption. Fresh two-read Production inventory at that exact
+source retained manifest digest `e46fe2d9…804b`, 72 resources and zero provider
+writes. The next dry-run contained 49 state updates, 23 no-ops and zero create,
+replacement or delete. Adoption then persisted the four missing and 45 changed
+observations through the Alchemy state boundary while the provider Layers
+remained read-only. The post-plan returned all 72 resources no-op, the required
+sync dry-runs completed unchanged, and the fixed mode-`0600` adoption receipt
+proves state store `s3`, version 5, 72 exact logical IDs, completed status,
+stage isolation, zero credential-value matches and zero provider writes. The
+complete 69-row pre-retirement backup remains the rollback identity until the
+Production task closes.
+
+This accepts only observed Production adoption. It does not prove stable
+managed Production configuration, a new Production deployment, promotion,
+runtime health, Channel delivery or future provider state. The task remains in
+progress at the stable-configuration implementation and exact Production
+authority boundary.
+
 ### Production state-correction docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |
