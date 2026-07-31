@@ -12,6 +12,7 @@ import {
   FileSystem,
   Layer,
   Match,
+  Option,
   Redacted,
   Schema,
 } from "effect";
@@ -134,12 +135,79 @@ const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
   }
 
   const config = yield* loadPhotonEnvironmentWebhookProviderConfig;
+  const managementLayer = layerPhotonManagementLive(
+    config.projectId,
+    config.projectSecret
+  ).pipe(Layer.provide(BunHttpClient.layer));
+  const management = yield* PhotonManagement.pipe(
+    Effect.provide(managementLayer)
+  );
+  const preservedWebhookId = yield* Match.value(stage).pipe(
+    Match.when("preview", () => Effect.succeed(Option.none())),
+    Match.when("prod", () =>
+      Config.schema(
+        PhotonWebhookId,
+        "BUNDJIL_PHOTON_PRODUCTION_ORIGINAL_WEBHOOK_ID"
+      ).pipe(Effect.map(Option.some))
+    ),
+    Match.exhaustive
+  );
+  yield* Option.match(preservedWebhookId, {
+    onNone: () => Effect.void,
+    onSome: (webhookId) =>
+      management.listWebhooks().pipe(
+        Effect.flatMap((webhooks) =>
+          Match.value(
+            webhooks.length === 1 && webhooks[0]?.id === webhookId
+          ).pipe(
+            Match.when(true, () => Effect.void),
+            Match.when(
+              false,
+              () =>
+                new PhotonProviderProofError({
+                  operation: "assert",
+                  reason: "resourceConflict",
+                })
+            ),
+            Match.exhaustive
+          )
+        )
+      ),
+  });
   const result = yield* registerPhotonEnvironmentWebhook(webhookUrl).pipe(
-    Effect.provide(
-      layerPhotonManagementLive(config.projectId, config.projectSecret).pipe(
-        Layer.provide(BunHttpClient.layer)
+    Effect.provide(managementLayer)
+  );
+  const topologyAccepted = yield* Option.match(preservedWebhookId, {
+    onNone: () => Effect.succeed(true),
+    onSome: (preservedId) =>
+      management
+        .listWebhooks()
+        .pipe(
+          Effect.map(
+            (webhooks) =>
+              webhooks.length === 2 &&
+              webhooks.some((webhook) => webhook.id === preservedId) &&
+              webhooks.some(
+                (webhook) =>
+                  webhook.id === result.binding.webhookId &&
+                  webhook.webhookUrl.href === webhookUrl.href
+              )
+          )
+        ),
+  });
+  yield* Match.value(topologyAccepted).pipe(
+    Match.when(true, () => Effect.void),
+    Match.when(false, () =>
+      management.deleteWebhook(result.binding.webhookId).pipe(
+        Effect.andThen(
+          new PhotonProviderProofError({
+            operation: "assert",
+            reason: "topologyNotRestored",
+          })
+        )
       )
-    )
+    ),
+    Match.exhaustive
   );
   const webhookSecret = Redacted.value(result.binding.webhookSecret);
   const binding = yield* Schema.encodeEffect(
@@ -173,13 +241,6 @@ const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
     persisted.value.webhookSecret !== webhookSecret
   ) {
     yield* fileSystem.remove(bindingPath).pipe(Effect.catch(() => Effect.void));
-    const management = yield* PhotonManagement.pipe(
-      Effect.provide(
-        layerPhotonManagementLive(config.projectId, config.projectSecret).pipe(
-          Layer.provide(BunHttpClient.layer)
-        )
-      )
-    );
     yield* management.deleteWebhook(result.binding.webhookId);
     return yield* new PhotonProviderProofError({
       operation: "writeWebhookBinding",

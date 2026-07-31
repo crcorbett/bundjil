@@ -294,7 +294,11 @@ callback while retaining the old callback by running
 `BUNDJIL_PHOTON_WEBHOOK_BINDING_PATH`. Also set the exact mode-`0600`
 `BUNDJIL_PHOTON_WEBHOOK_AUTHORITY_PATH`; the fixed Production policy permits
 only parallel create/readback/local custody and preserves the original
-callback. Store the create-only ID/secret in `.env.local` as the Production
+callback. Set
+`BUNDJIL_PHOTON_PRODUCTION_ORIGINAL_WEBHOOK_ID` from the fresh exact readback;
+the command requires one matching pre-create callback and exactly that original
+plus the rollout-created callback afterward. Store the create-only ID/secret
+in `.env.local` as the Production
 webhook pair, re-run the four-value apply, create a staged deployment, and
 require signed live proof before any promotion or old-callback retirement.
 After proof and drain, delete only the exact retired URL with
