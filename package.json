@@ -87,8 +87,8 @@
     "infrastructure:stable-production-sync": "bun run --filter @bundjil/infrastructure build && BUNDJIL_INFRASTRUCTURE_STAGE=prod BUNDJIL_INFRASTRUCTURE_MODE=sync bun alchemy sync alchemy.stable.run.ts --stage prod --env-file .env.local --dry-run --yes",
     "infrastructure:photon-candidate-inventory": "bun --env-file=.env.local run --filter @bundjil/photon inventory:candidates",
     "infrastructure:photon-preview-webhook-register": "bun --env-file=.env.local run --filter @bundjil/photon register:environment-webhook",
-    "infrastructure:photon-production-webhook-register": "BUNDJIL_PHOTON_WEBHOOK_STAGE=prod bun --env-file=.env.local run --filter @bundjil/photon register:environment-webhook",
-    "infrastructure:photon-production-webhook-delete": "BUNDJIL_PHOTON_WEBHOOK_STAGE=prod bun --env-file=.env.local run --filter @bundjil/photon delete:environment-webhook",
+    "infrastructure:photon-production-webhook-register": "BUNDJIL_PHOTON_WEBHOOK_STAGE=prod bun --env-file=.env.local run packages/photon/scripts/register-environment-webhook.ts",
+    "infrastructure:photon-production-webhook-delete": "BUNDJIL_PHOTON_WEBHOOK_STAGE=prod bun --env-file=.env.local run packages/photon/scripts/delete-environment-webhook.ts",
     "infrastructure:photon-preview-webhook-binding": "bun --env-file=.env.local run --filter @bundjil/infrastructure photon:bind-preview-webhook",
     "infrastructure:vercel-git-link-authority": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/validate-vercel-git-link-authority.ts"
   },
