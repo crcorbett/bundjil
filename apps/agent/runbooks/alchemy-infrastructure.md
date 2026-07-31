@@ -311,10 +311,15 @@ webhook pair, re-run the four-value apply, create a staged deployment, and
 require a candidate-specific signed identity-free safe probe before promotion.
 Do not send a real pre-promotion Photon message while the two callbacks resolve
 to different deployments: project fanout makes that a replay race, not a
-candidate-only proof. Immediately after promotion, require both exact callback
-URLs to resolve to the accepted deployment, one bounded real event to produce
-one accepted dispatch plus one duplicate and exactly one response, then drain
-the retry horizon. Delete only the exact retired URL with
+candidate-only proof. When both callbacks share a provider-facing Vercel alias
+that is distinct from the stable domain, read its exact current immutable target
+as rollback and, under exact alias authority, assign only that alias to the
+candidate. Require both callback routes to resolve to the candidate before
+promotion while the stable alias stays on its rollback deployment. Immediately
+after promotion, require both aliases to resolve to the accepted deployment,
+then one bounded real event to produce one accepted dispatch plus one duplicate
+and exactly one response. Drain the retry horizon and delete only the exact
+retired URL with
 `bun run infrastructure:photon-production-webhook-delete`. Never deploy a
 candidate while any configured value is a provider write-only placeholder.
 

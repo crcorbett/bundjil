@@ -282,7 +282,11 @@ const channelCandidateStaged = {
       ...channelInventoryReady.channel.photon,
       webhookTopology: {
         _tag: "ParallelCutover",
+        callbackOriginFingerprint: fingerprint("1"),
+        callbackRollbackDeploymentId: "dpl_callbackrollback",
+        candidateCallbackDeploymentId: "dpl_channelcandidate",
         candidateWebhookFingerprint: fingerprint("0"),
+        originalCallbackDeploymentId: "dpl_channelcandidate",
         originalWebhookFingerprint: fingerprint("f"),
         webhookCount: 2,
       },
@@ -442,7 +446,11 @@ describe("Production promotion preflight", () => {
               ...channelCandidateStaged.channel.photon,
               webhookTopology: {
                 _tag: "ParallelCutover",
+                callbackOriginFingerprint: fingerprint("1"),
+                callbackRollbackDeploymentId: "dpl_callbackrollback",
+                candidateCallbackDeploymentId: "dpl_channelcandidate",
                 candidateWebhookFingerprint: fingerprint("f"),
+                originalCallbackDeploymentId: "dpl_channelcandidate",
                 originalWebhookFingerprint: fingerprint("f"),
                 webhookCount: 2,
               },
@@ -450,6 +458,58 @@ describe("Production promotion preflight", () => {
           },
         }).pipe(Effect.runSync)
       ).toThrow("distinct identities");
+    }
+  );
+
+  vitestIt(
+    "rejects stale, mixed, or non-restorable parallel callback routes",
+    () => {
+      expect(() =>
+        decode({
+          ...channelCandidateStaged,
+          channel: {
+            ...channelCandidateStaged.channel,
+            photon: {
+              ...channelCandidateStaged.channel.photon,
+              webhookTopology: {
+                ...channelCandidateStaged.channel.photon.webhookTopology,
+                originalCallbackDeploymentId: "dpl_stalecallback",
+              },
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("resolve to one deployment");
+      expect(() =>
+        decode({
+          ...channelCandidateStaged,
+          channel: {
+            ...channelCandidateStaged.channel,
+            photon: {
+              ...channelCandidateStaged.channel.photon,
+              webhookTopology: {
+                ...channelCandidateStaged.channel.photon.webhookTopology,
+                callbackRollbackDeploymentId: "dpl_channelcandidate",
+              },
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("rollback must differ");
+      expect(() =>
+        decode({
+          ...channelCandidateStaged,
+          channel: {
+            ...channelCandidateStaged.channel,
+            photon: {
+              ...channelCandidateStaged.channel.photon,
+              webhookTopology: {
+                ...channelCandidateStaged.channel.photon.webhookTopology,
+                candidateCallbackDeploymentId: "dpl_stalecallback",
+                originalCallbackDeploymentId: "dpl_stalecallback",
+              },
+            },
+          },
+        }).pipe(Effect.runSync)
+      ).toThrow("resolve to the staged candidate");
     }
   );
 

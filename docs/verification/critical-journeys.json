@@ -337,7 +337,7 @@
     "id": "BND-J12-dual-channel-production",
     "actorOrConsumer": "Production deployment operator and approved Sendblue/Photon test conversations",
     "boundary": "stable Vercel alias plus both clean Channel provider routes and their provider-accepted typing lifecycles",
-    "startingState": "one accepted staged Production deployment, stable alias, rollback references, fresh namespace, approval, reconciled webhooks, and either Stable topology or the exact bounded original-plus-candidate ParallelCutover are attached",
+    "startingState": "one staged Production deployment, stable and callback-alias rollback references, fresh namespace, approval, reconciled webhooks, and either Stable topology or the exact bounded ParallelCutover are attached",
     "inputs": [
       "one bounded Sendblue ingress/outbound/typing journey",
       "one bounded Photon ingress/outbound/typing journey",
@@ -347,7 +347,7 @@
     "expectedBehavior": [
       "The stable alias resolves to the accepted immutable deployment and both final webhook routes avoid redirects.",
       "Each provider processes one turn once and reports outbound plus typing start/stop outcomes at the exact claimed boundary.",
-      "When Photon uses ParallelCutover, both callbacks resolve to the accepted deployment and one event yields one accepted dispatch, one duplicate disposition, and exactly one external response before drain and original-callback retirement."
+      "When Photon uses ParallelCutover, both callback routes and the stable alias resolve to the accepted deployment; one event yields one accepted dispatch, one duplicate, and exactly one response before drain and original-callback retirement."
     ],
     "expectedSideEffects": [
       "The accepted deployment is promoted and one approved message plus two typing operations per provider may occur."

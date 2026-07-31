@@ -161,9 +161,17 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    duplicate a full journey. Before promotion require only an exact
    candidate-URL signed, identity-free unsupported-event probe, its closed
    ignored disposition, zero dispatch/outbound capability, and zero error or
-   fatal logs. The full Photon journey moves to the immediate post-promotion
-   gate, where fresh readback must prove both exact callback URLs resolve to the
-   same accepted deployment and its one Production replay namespace.
+   fatal logs.
+
+   Fresh readback must also resolve each exact callback origin to an immutable
+   deployment. If both callbacks use one provider-facing Vercel alias distinct
+   from the stable domain, record that alias by safe fingerprint and its exact
+   current deployment as rollback. Under an explicit exact-alias authority,
+   assign only that callback alias to the candidate, then require both callback
+   routes to resolve to the candidate while the stable alias remains on its
+   recorded rollback deployment. Stop on a stale/mixed route or any other alias
+   change. Do not send a real message in this window. The full Photon journey
+   remains at the immediate post-promotion gate.
 
 7. Immediately repeat the project/list/inspect readbacks, resolve the stable
    alias to the accepted immutable deployment, retain the passed pre-promotion
@@ -213,6 +221,11 @@ horizons, and quarantine the new replay namespace so delayed deliveries cannot
 cross the intentional continuity break. Never reintroduce legacy source,
 environment names, state, or replay readers. Revoke the Vercel session/token
 separately when required.
+
+For a `ParallelCutover` with a distinct provider-facing callback alias, rollback
+also restores only that exact alias to its recorded prior immutable deployment
+and reads back both callback routes. Restoring the public stable alias alone is
+not Photon rollback proof.
 
 ## Stop and escalation
 

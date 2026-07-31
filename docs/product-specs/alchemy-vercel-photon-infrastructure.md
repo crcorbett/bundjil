@@ -2132,9 +2132,14 @@ authority, retain its create-only secret, reapply all four values, stage the
 candidate, and require a candidate-specific signed identity-free safe probe
 before promotion. Photon project events fan out to every callback, so a real
 message while the original and candidate callbacks resolve to different
-deployments is a replay race rather than candidate-only proof. Immediately
-after promotion, fresh readback must prove both exact callback URLs resolve to
-the accepted deployment and one Production replay namespace; one bounded real
+deployments is a replay race rather than candidate-only proof. Before promotion,
+fresh readback must prove both exact callback routes resolve to the staged
+candidate. When those routes share a provider-facing alias distinct from the
+public stable alias, the exact callback alias and its prior immutable target are
+separate rollback identities; only that exact alias may be reassigned to the
+candidate under bounded authority. Immediately after promotion, fresh readback
+must prove the callback alias and public stable alias both resolve to the
+accepted deployment and one Production replay namespace; one bounded real
 event must then produce one accepted dispatch, one duplicate disposition and
 exactly one response before retry drain or original-webhook retirement.
 
@@ -2170,6 +2175,20 @@ also exposed the proof-sequencing contradiction above before any live message
 or alias mutation. The correction deliberately supersedes this candidate:
 the next pushed exact-source candidate must repeat the safe probe and staged
 preflight, then follow the post-promotion fanout/deduplication proof.
+
+The next exact-source replay at `00d203e…` converged all four bindings and 73
+managed resources, passed two unchanged syncs, and produced staged deployment
+`dpl_H8JM…`. Its exact-source, target, safe-probe, staged and promotion
+preflights passed. The first public stable-alias promotion then exposed a
+second false green before any live message: both Photon callback routes shared
+a different provider-facing alias pinned to retained deployment `dpl_E5bp…`
+at source `e92f8d2…`, so neither callback reached the promoted candidate. The
+public stable alias was immediately restored to `dpl_DfAb…`; Photon, Sendblue,
+environment, credential and message state remained unchanged. Callback
+identities alone therefore cannot prove execution ownership. The reopened
+preflight must carry both exact callback deployment targets, require each to
+equal the staged candidate, and preserve the distinct callback-alias prior
+target as rollback before another promotion.
 
 That first receipt exposed a second durable correction: Production cannot use
 the Preview rollback claim that prior values are externally retained. Its

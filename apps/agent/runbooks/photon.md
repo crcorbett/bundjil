@@ -366,11 +366,15 @@ duplicate suppression, Preview, Production, or durable process supervision.
    because a project event fans out to every registered webhook. The sole
    exception is the bounded Production write-only-secret `ParallelCutover`:
    both callbacks must be preserved until promotion, no real pre-promotion
-   message is permitted, and fresh post-promotion readback must prove both URLs
-   resolve to the same accepted deployment and replay namespace. One bounded
-   event must then produce one accepted dispatch, one duplicate disposition,
-   exactly one response, and no callback on another deployment before drain
-   and exact original-callback retirement.
+   message is permitted, and fresh pre-promotion readback must prove both
+   callback routes resolve to the candidate. A shared provider-facing callback
+   alias is reassigned only under exact alias authority with its prior immutable
+   target retained as rollback. Fresh post-promotion readback must prove that
+   callback alias and the public stable alias resolve to the same accepted
+   deployment and replay namespace. One bounded event must then produce one
+   accepted dispatch, one duplicate disposition, exactly one response, and no
+   callback on another deployment before drain and exact original-callback
+   retirement.
    Classify every exact route response and its matching
    `ChannelWebhookDisposition` record before accepting the journey. The record
    contains only the branded webhook path, a closed disposition literal, and,

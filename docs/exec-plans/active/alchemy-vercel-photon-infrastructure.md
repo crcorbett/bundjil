@@ -2381,12 +2381,42 @@ exact original-callback retirement proceed. This source correction supersedes
 the unaliased `8132366…` candidate; a new pushed candidate, safe probe and
 preflight are required.
 
+Exact-source replay at `00d203e…` then converged the four managed bindings and
+all 73 resources, passed two unchanged native syncs, and produced unaliased
+Production candidate `dpl_H8JM…`. Exact-source, target, root, unsigned-ingress,
+signed-safe-probe, staged and promotion preflight evidence passed. The first
+public stable-alias promotion nevertheless failed the callback execution-owner
+postcondition before any live message: fresh Vercel readback showed both Photon
+callback origins share a separate provider-facing alias whose immutable target
+remained retained deployment `dpl_E5bp…` at source `e92f8d2…`. The public
+stable alias was immediately restored to `dpl_DfAb…`; its exact deployment,
+source and root health passed, and no Photon, Sendblue, environment, credential
+or message mutation occurred.
+
+This finding reopens the Production preflight owner again. A
+`ParallelCutover` snapshot must bind the candidate and original callback routes
+to exact immutable deployment IDs, require both to equal the staged candidate,
+and carry the distinct provider-facing callback-alias prior deployment as
+rollback. Under exact-alias authority, only that callback alias may move to the
+candidate before promotion; the public stable alias remains on its rollback
+deployment and no real message is sent. Promotion may proceed only after both
+callback routes read back on the candidate. Post-promotion readback must prove
+both aliases converge on the accepted deployment before the bounded live
+fanout/deduplication journey.
+
 | Requirement                         | Direct observable and expected postcondition                                                               | Plausible false green rejected                                                          | Focused command/evidence owner                                       |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | Pre-promotion candidate integrity   | Exact candidate URL returns signed safe `204` with ignored disposition, zero dispatch and zero error/fatal | A real message racing two deployments, HTTP status alone, or stable-alias response      | Candidate request plus deployment-scoped logs; deploy runbook        |
 | Post-promotion callback convergence | Both exact callback URLs resolve to the promoted deployment and one replay namespace                       | Alias promotion alone, one callback read, or assuming project fanout is ordered         | Vercel deployment/API and Photon callback readback                   |
 | Live fanout deduplication           | One event yields one accepted dispatch, one duplicate disposition and exactly one external response        | Two `2xx` statuses, one handset reply without callback attribution, or aggregate counts | BND-J12 packet, exact runtime logs, replay/provider/handset readback |
 | Lossless retirement                 | Original callback is deleted only after proof, conservative drain and exact candidate-only readback        | Early delete, unavailable secret treated as restorable, or count-only topology          | Photon owner delete/readback command and rollback receipt            |
+
+| Requirement                     | Direct observable and expected postcondition                                                                                    | Plausible false green rejected                                                           | Focused command/evidence owner                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Callback execution ownership    | Both exact callback origins resolve to the staged candidate before public promotion                                             | Distinct webhook IDs, candidate health, or public stable-alias promotion                 | Vercel callback-origin inspect plus Production preflight   |
+| Callback-alias rollback         | Exact callback alias fingerprint and prior immutable target are retained, distinct from candidate, and restorable               | Treating public stable rollback as Photon callback rollback                              | Deploy runbook and exact alias/deployment readback         |
+| Route-bound promotion preflight | `ParallelCutover` decodes only when both callback target IDs equal the candidate and rollback target differs                    | Count-only topology, one route read, shared stale target, or rollback equal to candidate | Effect Schema negative fixtures and sanitized snapshot     |
+| No premature Production traffic | Candidate safe probe is the only pre-promotion request; no real provider event occurs until callback and stable routes converge | A handset reply or aggregate `2xx` count generated while callbacks hit another runtime   | Candidate-scoped logs and bounded provider journey receipt |
 
 #### Production write-only custody finding and recovery
 

@@ -239,7 +239,11 @@ const PhotonWebhookTopology = Schema.Union([
     webhookFingerprint: OpaqueIdentityFingerprint,
   }),
   Schema.TaggedStruct("ParallelCutover", {
+    callbackOriginFingerprint: OpaqueIdentityFingerprint,
+    callbackRollbackDeploymentId: ImmutableDeploymentReference,
+    candidateCallbackDeploymentId: ImmutableDeploymentReference,
     candidateWebhookFingerprint: OpaqueIdentityFingerprint,
+    originalCallbackDeploymentId: ImmutableDeploymentReference,
     originalWebhookFingerprint: OpaqueIdentityFingerprint,
     webhookCount: Schema.Literal(2),
   }).pipe(
@@ -250,9 +254,33 @@ const PhotonWebhookTopology = Schema.Union([
           ? undefined
           : "Parallel Photon cutover callbacks must have distinct identities."
       )
+    ),
+    Schema.check(
+      Schema.makeFilter((topology) =>
+        topology.candidateCallbackDeploymentId ===
+        topology.originalCallbackDeploymentId
+          ? undefined
+          : "Parallel Photon cutover callback routes must resolve to one deployment."
+      )
+    ),
+    Schema.check(
+      Schema.makeFilter((topology) =>
+        topology.callbackRollbackDeploymentId !==
+        topology.candidateCallbackDeploymentId
+          ? undefined
+          : "Parallel Photon cutover callback rollback must differ from the candidate."
+      )
     )
   ),
 ]);
+
+const parallelCallbackRoutesMatchCandidate = (
+  webhookTopology: typeof PhotonWebhookTopology.Type,
+  candidateDeploymentId: typeof ImmutableDeploymentReference.Type
+) =>
+  webhookTopology._tag === "Stable" ||
+  (webhookTopology.candidateCallbackDeploymentId === candidateDeploymentId &&
+    webhookTopology.originalCallbackDeploymentId === candidateDeploymentId);
 
 const ChannelInventory = Schema.Struct({
   legacyBindingsPresent: Schema.Literal(false),
@@ -313,6 +341,16 @@ export const ChannelCandidateStagedPreflightSnapshot = Schema.Struct({
         ? undefined
         : "Staged candidate must not already own the stable alias."
     )
+  ),
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      parallelCallbackRoutesMatchCandidate(
+        snapshot.channel.photon.webhookTopology,
+        snapshot.candidateAgent.deploymentId
+      )
+        ? undefined
+        : "Parallel Photon cutover callback routes must resolve to the staged candidate."
+    )
   )
 );
 
@@ -328,6 +366,16 @@ export const ChannelProductionPromotionPreflightSnapshot = Schema.Struct({
       snapshot.candidateAgent.deploymentId !== snapshot.stableAliasDeploymentId
         ? undefined
         : "Promotion candidate must not already own the stable alias."
+    )
+  ),
+  Schema.check(
+    Schema.makeFilter((snapshot) =>
+      parallelCallbackRoutesMatchCandidate(
+        snapshot.channel.photon.webhookTopology,
+        snapshot.candidateAgent.deploymentId
+      )
+        ? undefined
+        : "Parallel Photon cutover callback routes must resolve to the staged candidate."
     )
   )
 );
