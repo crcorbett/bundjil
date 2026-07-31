@@ -2025,3 +2025,19 @@ fixtures, all 43 infrastructure Vitest tests, 19 Alchemy lifecycle tests,
 every routed policy gate and complete repository verification pass. The
 stable task still requires a coherent commit/push and a distinct Vercel
 Git-created immutable deployment observation.
+
+Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
+the implementation branch. Fresh authorized two-read inventory passed at
+manifest digest `fc2c4dba…071b` and observed exactly one Git-created
+`bundjil-agent` Preview deployment for that source, terminal `READY`, with safe
+deployment fingerprint `4bc91efd3c5c…`. It has no alias; no promotion or
+deployment-create API was used.
+
+The stable-binding task is accepted. Four exact provider acknowledgements,
+four changed revisions, one managed no-op plan, two unchanged sync dry-runs,
+the fixed managed-state receipt, preserved Marketplace/Photon namespace
+observations and the distinct immutable deployment each passed directly.
+Runtime health, alias traffic, Channel behavior, handset delivery and future
+provider state remain separate non-claims. The next serial owner is Production
+adoption and rollout, beginning with fresh read-only topology, exact Production
+authority and a zero-replacement/no-delete plan.

@@ -937,7 +937,7 @@
     {
       "id": "stable-bindings-and-deployment-observation",
       "title": "Adopt stable env, Marketplace, storage, and inter-service bindings",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": [
         "preview-vercel-configuration-spike",
         "isolated-photon-preview-spike"
@@ -953,7 +953,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's stable bindings section.",
-        "currentResult": "in progress. Commit 99cf80b88b3c0c6a07239559f517b0a15088ba50 is pushed and fully verified. Its fresh exact-SHA inventory/adoption gate qualified exactly four managed updates, the corrected exact-ID PATCH omitted immutable key, all four provider acknowledgements passed, fresh two-read inventory proved four changed revisions, and the managed post-plan plus two sync dry-runs each converged all 155 resources to no-op. Marketplace, Photon and namespace observations remained continuous. The fixed receipt initially failed closed because its managed-only oracle expected output while Alchemy persists Resource attributes under attr. The corrected owner decodes attr through the existing VercelEnvironmentVariableAttributes Schema, rejects an output-only mirror, and emits only a fixed secret-free failure class. The live rerun passed 155 exact Preview resources, four managed provider acknowledgements, deploymentRequired on all four and zero credential-value matches. Effect LS, the exact two-test persisted-state fixture, all 43 infrastructure Vitest tests, 19 Alchemy lifecycle tests, every routed policy gate and complete bun run verification pass. Coherent commit/push and a distinct immutable Git-created deployment observation remain required before acceptance."
+        "currentResult": "passed. Commit 99cf80b88b3c0c6a07239559f517b0a15088ba50 qualified exactly four managed Preview updates; the corrected exact-ID PATCH omitted immutable key; all four provider acknowledgements passed; fresh two-read inventory proved four changed revisions; and the managed post-plan plus two sync dry-runs each converged all 155 resources to no-op. Marketplace, Photon and namespace observations remained continuous. The managed receipt correction at pushed commit 42e3cd52686c407ee3fbe982e0d383629922ad80 decodes Alchemy attr through the existing VercelEnvironmentVariableAttributes Schema, rejects an output-only mirror and emits only a fixed secret-free failure class. Its live receipt passed 155 exact Preview resources, four managed acknowledgements, deploymentRequired on all four and zero credential-value matches. Fresh repeated inventory at manifest digest fc2c4dba…071b observed exactly one bundjil-agent Git-created Preview deployment for that commit, terminal READY, deployment fingerprint 4bc91efd3c5c…, with no alias or promotion. Effect LS, 43 infrastructure Vitest tests, 19 Alchemy lifecycle tests, every routed policy gate and complete bun run verification pass. No Marketplace/datastore, bearer, Photon, Production, deployment-create or promotion mutation occurred; runtime, Channel and future-provider claims remain excluded."
       },
       "repositoryImplementationEvidence": {
         "status": "candidate_pending_live_acceptance",
@@ -1058,7 +1058,7 @@
     {
       "id": "production-adoption-and-rollout",
       "title": "Apply the accepted stable configuration to Production",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["stable-bindings-and-deployment-observation"],
       "invariantIds": [
         "HC-OUTCOME-001",
@@ -1071,7 +1071,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's Production rollout section.",
-        "currentResult": "not_run: blocked by stable Preview bindings and deployment observation."
+        "currentResult": "in progress: stable Preview bindings and the distinct Git-created deployment observation passed. Re-read current Production topology, exact target-owned authority and rollback identities before any mutation. A zero-replacement/no-delete plan, property-by-property requirement replay and new Production authority validation remain mandatory; Preview success is not proof by proxy."
       },
       "implementationNotes": [
         "Bind immutable main SHA, state revision, adoption manifest, Vercel/Photon principals, current rollback deployments, and approved operation list.",

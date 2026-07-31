@@ -2153,3 +2153,23 @@ complete `bun run verification` suite pass on the correction candidate.
 | Secrets, receipts, rollout and rollback       | Change required | The fixed mode-`0600` receipt records revisions/counts only and scans known credentials; prior-revision rollback custody remains external.          |
 | Lifecycle, archive and terminal audit         | Preserve        | Stable bindings remain in progress until deployment observation; Production, drift closeout and the one terminal five-pass audit remain downstream. |
 | Documentation inventory and archive pointers  | Preserve        | No docs path or lifecycle pointer changes; `check:docs` recomputes the current routed inventory from this tree.                                     |
+
+Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
+the implementation branch after the exact full verification gate. One fresh
+authorized inventory command performed two sequential reads, passed at
+manifest digest `fc2c4dba…071b`, and observed exactly one Git-created
+`bundjil-agent` Preview deployment for that source. The deployment is terminal
+`READY` with safe fingerprint `4bc91efd3c5c…`; it has no alias and no
+promotion was requested. No deployment-create API, Marketplace/datastore,
+bearer, Photon or Production mutation occurred.
+
+`stable-bindings-and-deployment-observation` is accepted. The fixed receipt,
+fresh provider readback, managed no-op plan, two unchanged sync dry-runs,
+namespace continuity and distinct immutable deployment each prove their own
+postcondition directly. They do not prove runtime health, alias traffic,
+Channel behavior, handset delivery or future provider state.
+
+The next serial owner is `production-adoption-and-rollout`. It starts with
+fresh read-only topology, exact Production authority and rollback preflight.
+The passed Preview task, a READY deployment or historical Production receipts
+cannot substitute for the required zero-replacement/no-delete Production plan.
