@@ -272,8 +272,9 @@ const runAdoptionStateProof = Effect.gen(
     const exactState =
       state.id === "s3" &&
       version === 5 &&
-      stacks.length === 1 &&
-      stacks[0] === "BundjilInfrastructure" &&
+      stacks.length === 2 &&
+      stacks.includes("BundjilInfrastructure") &&
+      stacks.includes("BundjilPreviewConfigurationSpike") &&
       stages.length === 2 &&
       stages.includes("preview") &&
       stages.includes("prod") &&
@@ -309,6 +310,7 @@ const runAdoptionStateProof = Effect.gen(
       observations: [
         `state-store:${state.id}`,
         `state-version:${version}`,
+        "state-stacks:BundjilInfrastructure,BundjilPreviewConfigurationSpike",
         `manifest-digest:${manifest.digest}`,
         `resource-count:${fqns.length}`,
         ...(bindingProfile === "previewPhotonManaged"

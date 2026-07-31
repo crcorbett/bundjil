@@ -1984,3 +1984,22 @@ occurred. The owning adapter now re-wraps the value in Redacted custody at the
 immediate scan boundary. A third focused test accepts the Redacted form and
 rejects the raw-string false green; the plan must be repeated from a coherent
 pushed correction before retirement.
+
+Commit `4d4024e698460a14d320f5cb3f9c884a8e7bc37b` then passed the
+exact state plan, wrote the complete mode-`0600` backup, retired only the seven
+accepted state rows, and read back 99 with zero provider writes. The subsequent
+adoption dry-run contained 96 updates, 51 no-ops and zero create, replace or
+delete; apply completed 192 lifecycle transitions; the post-plan and both
+native sync dry-runs each returned all 147 resources as no-op.
+
+The fixed receipt command rejected after those provider/state postconditions
+because its older oracle required one stack in the dedicated bucket. Fresh
+readback proved exactly two known stacks and zero unknown stacks:
+`BundjilInfrastructure` plus the separately owned retained
+`BundjilPreviewConfigurationSpike`. All 147 target rows matched the manifest
+logical IDs, Preview props and completed statuses; state store/version and both
+Preview/Production stages matched; the exact credential-value leak count was
+zero. Correct the oracle to require both exact known stacks and reject any
+third stack. A one-stack pass, arbitrary extra-stack acceptance, or broad
+no-op plan is a rejected false green; the fixed receipt must be rerun from the
+coherent pushed correction.
