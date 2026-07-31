@@ -1883,3 +1883,18 @@ fresh two-read inventory, no-op plan and sync, unchanged namespaces/data
 identities, and a new Vercel Git-created immutable deployment. Neither an
 Alchemy apply, historical READY deployment, broad verification suite nor
 neighbouring Photon journey proves those live postconditions.
+
+Fresh exact-source adoption planning on 2026-07-30 found a one-time state
+discontinuity before any provider write: Preview remote state still contains
+seven retained source-project Photon observations, while the stage-correct
+manifest owns the isolated Preview project. The resulting seven-delete plan is
+not eligible for adoption even though those providers retain physical
+resources. Correct the state boundary first under an exact state-only
+authority: back up every current Preview state row to ignored mode-`0600`
+custody, prove the seven obsolete rows are completed `retain` Photon
+observations and absent from the new manifest, remove only those seven state
+rows, and verify the next adoption plan has zero create, replace, or delete.
+The command must support exact restoration of the complete pre-migration state
+and must not compose Vercel or Photon provider transports. A retained provider
+delete action, whole-stage clear without a complete backup, or successful
+adoption after an unrecorded state edit is a rejected false green.

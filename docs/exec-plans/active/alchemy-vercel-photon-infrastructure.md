@@ -1919,3 +1919,60 @@ tests, and all fifteen Turbo build/test tasks. Live acceptance remains
 separate: exact-commit inventory/adoption convergence, the four-update-only
 plan and apply, provider readback/no-op sync, namespace continuity, fixed
 receipts, and a distinct immutable Vercel Git deployment have not yet run.
+
+### Preview state-discontinuity correction
+
+Exact commit `7f856e605326683185eca56590b9eda4a0c6ed91` produced two
+matching read-only Preview inventories at manifest digest `16861b7d…`: two
+Vercel projects, 48 environment observations, two Marketplace bindings, 87
+deployment observations, isolated Photon project `37cf2944…`, two users, one
+webhook and zero lines. The mode-`0600` artifact and fixed receipt agree and
+record zero writes.
+
+The observed-only adoption dry-run stopped before apply with 96 updates, 51
+no-ops and seven deletes. Read-only remote-state inspection found 106 completed
+retain rows and classified the seven manifest-absent entries as one Photon
+billing, one platform, one project, two shared-user and two webhook
+observations. They belong to the stale source-project Preview state recorded
+before stage-correct credential routing. Treating `retain` as permission to
+apply a delete plan would weaken the accepted zero-delete gate.
+
+The corrective slice must back up all 106 Preview rows to ignored
+mode-`0600` custody, validate an exact state-only authority, remove only the
+seven fingerprinted stale FQNs, and read back the remaining 99 rows before
+another adoption plan. Its restore mode must delete any rows absent from the
+backup and reset every backed-up row, recreating the exact pre-migration state
+without composing Vercel or Photon transports. The correction is accepted only
+when focused plan/apply/restore tests pass and the next live adoption dry-run
+contains zero create, replace and delete. No provider mutation has occurred.
+
+The repository candidate implements that fixed authority, Schema-derived
+backup/result contracts, named backup/migration services, explicit live and
+memory Layers, credential-value scan, bounded receipt and root command. Two
+focused memory journeys pass exact backup-before-retire/readback/extra-row
+cleanup/restore and reject a changed stale fingerprint before backup or
+deletion. Infrastructure typecheck, 39 Vitest tests, 19 Alchemy lifecycle
+tests and `check:docs` pass. The live plan command then reproduced 106 current,
+147 desired, seven exact stale and 99 retained rows, emitted a fixed
+mode-`0600` zero-provider-write receipt, and wrote no backup in plan mode.
+The exact correction candidate also passed complete `bun run verification`:
+Effect language-service and every routed policy gate, 90 tooling tests,
+type-aware format/lint, the lint fixture, Knip, all nine workspace typechecks
+and all fifteen Turbo build/test tasks. A coherent pushed correction commit
+remains the final gate before live state retirement.
+
+### Preview state-discontinuity docs-maintainer impact ledger
+
+| Surface                                      | Decision        | Direct evidence or preserved boundary                                                                                                                  |
+| -------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture and provider call graph         | Preserve        | The correction composes only the Alchemy R2 state service; Vercel and Photon provider Layers remain unreachable and provider writes are fixed at zero. |
+| READMEs, exports, generated references       | Change required | Export the named state contracts/Layers and document the one root command; no generated reference or raw state client is exposed.                      |
+| Runbook, authority and controls              | Change required | Add the exact seven-fingerprint state-only procedure, complete backup, readback, stop conditions and restore trigger under a distinct fixed authority. |
+| Verification journeys and receipts           | Change required | Prove plan, backup-before-retire, exact row/content restore, mismatch rejection and the subsequent zero-create/replace/delete adoption plan directly.  |
+| Skills, AGENTS, lint, config and CI          | Preserve        | Existing repository skills, agent policy, lint and CI remain authoritative; the new Config-owned command must pass every routed gate.                  |
+| Schemas, services and Layers                 | Change required | Add branded identities, exact backup/result contracts, safe error, named migration/backup services and explicit live/memory Layers.                    |
+| Tests and fixtures                           | Change required | Create the memory-state fixture, including stale-fingerprint rejection and a changed retained row plus unexpected-row false green before restore.      |
+| SPEC, tasks and active plan                  | Change required | Record the one-time discontinuity without accepting the stable-binding task before provider-bound adoption and binding evidence.                       |
+| Secrets, rollout and rollback                | Change required | Retain the complete ignored mode-`0600` backup, scan known credential values, and restore it exactly if adoption cannot converge.                      |
+| Lifecycle, archive and terminal audit        | Preserve        | The plan remains active; downstream Production/drift work and the single terminal five-pass audit remain pending.                                      |
+| Documentation inventory and archive pointers | Preserve        | No documentation path or lifecycle route changes; `check:docs` must recompute the current routed inventory from this tree.                             |

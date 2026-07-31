@@ -101,6 +101,7 @@ bun run --filter=@bundjil/infrastructure build
 bun run infrastructure:inventory
 bun run infrastructure:adoption-manifest
 bun run infrastructure:adoption-proof
+bun run infrastructure:preview-state-migration
 bun run infrastructure:stable-preview-plan
 bun run infrastructure:stable-preview-apply
 bun run infrastructure:stable-preview-sync

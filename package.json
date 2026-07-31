@@ -70,6 +70,7 @@
     "infrastructure:adoption-manifest": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/generate-adoption-manifest.ts",
     "infrastructure:adoption-proof": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/prove-adoption-state.ts",
     "infrastructure:inventory": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/inventory-live.ts",
+    "infrastructure:preview-state-migration": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/migrate-preview-state.ts",
     "infrastructure:preview-plan": "bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --adopt --yes",
     "infrastructure:preview-apply": "bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --adopt --yes",
     "infrastructure:preview-sync": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",

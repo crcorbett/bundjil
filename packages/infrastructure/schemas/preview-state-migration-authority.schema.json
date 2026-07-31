@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bundjil.dev/schemas/preview-state-migration-authority.schema.json",
+  "title": "Bundjil Preview state migration authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "environments",
+    "resources",
+    "operations",
+    "readback",
+    "rollback",
+    "stopConditions"
+  ],
+  "properties": {
+    "externalAccess": {
+      "const": "mutation"
+    },
+    "environments": {
+      "const": ["preview"]
+    },
+    "resources": {
+      "const": [
+        "alchemy:BundjilInfrastructure:preview:state-only",
+        "state-fqn-sha256:7b05e660d39ec05e43f904f5f42e58073dc0f03a9c60aba76ce19f2384148dd1",
+        "state-fqn-sha256:02b1212b6bfc0cee23fb5321a2367d7a873dca8826178892c0a3f8f0ec4ea5e8",
+        "state-fqn-sha256:b4b05ed6e1d56fbd2468cedd5fc3af065eca961288e8b18fca651d8e8ff695a2",
+        "state-fqn-sha256:8b858599bad0b7048d84757fb89e59a13cb5b7dc68b895b7828dd069cc7dd518",
+        "state-fqn-sha256:1ca10a09a30373fc034a66259027527895978b4e84a0927b25cc89e88fca02ad",
+        "state-fqn-sha256:0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1",
+        "state-fqn-sha256:5ef46e0a632363f9256f1729c1696c0a48c2fa3a3dc667c6c148e0aedb892cf5"
+      ]
+    },
+    "operations": {
+      "const": [
+        "read and back up all BundjilInfrastructure Preview Alchemy state rows",
+        "delete only the seven exact manifest-absent retained state rows",
+        "restore the complete exact pre-migration Preview state from the retained backup"
+      ]
+    },
+    "readback": {
+      "contains": {
+        "const": "require 106 rows before, 99 rows after retirement, and zero provider transport calls"
+      }
+    },
+    "rollback": {
+      "contains": {
+        "const": "restore every backed-up row and remove only rows absent from the backup"
+      }
+    },
+    "stopConditions": {
+      "allOf": [
+        {
+          "contains": {
+            "const": "state version, stack, stage, manifest digest, row count, status, retain policy, type or fingerprint mismatch"
+          }
+        },
+        {
+          "contains": {
+            "const": "any Vercel, Photon, deployment, credential, billing, webhook or message operation"
+          }
+        }
+      ]
+    }
+  }
+}
