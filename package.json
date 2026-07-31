@@ -77,6 +77,7 @@
     "infrastructure:preview-sync": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
     "infrastructure:preview-repair": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
     "infrastructure:preview-drift": "bun --env-file=.env.local --conditions=@bundjil/source run packages/infrastructure/scripts/preview-configuration-drift.ts",
+    "infrastructure:drift-report": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/report-drift.ts",
     "infrastructure:preview-rollback-plan": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
     "infrastructure:preview-rollback": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
     "infrastructure:stable-preview-plan": "bun run --filter @bundjil/infrastructure build && BUNDJIL_INFRASTRUCTURE_STAGE=preview BUNDJIL_INFRASTRUCTURE_MODE=plan bun alchemy deploy alchemy.stable.run.ts --stage preview --env-file .env.local --dry-run --yes",

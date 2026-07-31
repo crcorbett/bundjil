@@ -408,5 +408,43 @@
     "nonClaims": [
       "A local lifecycle matrix, Alchemy state entry, pushed commit or existing deployment does not alone prove live convergence, Vercel Git causality, Production state, runtime health or Photon behavior."
     ]
+  },
+  {
+    "id": "BND-J14-preview-infrastructure-drift-report",
+    "actorOrConsumer": "authorized Bundjil infrastructure operator and repository maintainer",
+    "boundary": "report-only native Alchemy Preview desired plan and provider drift observation",
+    "startingState": "exact source SHA, accepted Preview manifest, stage-owned remote state, fixed read-only authority and provider/state credential custody are available",
+    "inputs": [
+      "one immutable source SHA",
+      "one accepted Preview adoption manifest",
+      "one fixed Preview-only read authority"
+    ],
+    "stepsOrProcedureOwner": "apps/agent/runbooks/alchemy-infrastructure.md#report-only-drift-and-monitoring",
+    "expectedBehavior": [
+      "The adapter runs the native desired plan and native sync dry-run against the same stable Preview stack and keeps their observations distinct.",
+      "Every observation is fingerprinted and classified as normalization, unowned, missing, in-place, destructive, unavailable or ambiguous, unknown-secret, skipped-read, deployment, or desired-plan change.",
+      "Blocking drift fails, unavailable or incomplete readback is inconclusive, and only a fully observed accepted classification can be no-op or passed.",
+      "The command writes one Schema-valid specialized report and one fixed-contract bounded receipt without calling apply, reconcile, repair, deploy, promote, Photon mutation, or Production."
+    ],
+    "expectedSideEffects": [
+      "Two mode-0600 local evidence artifacts may be written; provider writes remain zero."
+    ],
+    "preservedInvariants": [
+      "Vercel Git remains deployment owner, retained/imported/read-only resources remain protected, and Preview credentials or state cannot target Production.",
+      "Physical identities are fingerprinted and credentials, provider payloads, phones, messages, query URLs, error causes, and write-only values are absent from reports.",
+      "Workflow source, a local run, or a classified finding grants no repair authority and proves no hosted GitHub setting, secret, run, future provider state, or alert delivery."
+    ],
+    "oracle": "A fixed authority plus exact-source bounded packet contains a native desired-plan summary, classified native-sync findings, zero provider writes, explicit missing-data fields, and claim-matched result/non-claims.",
+    "environment": "approval-gated read-only Vercel/Photon Preview target",
+    "authority": "read_only",
+    "evidence": [
+      "apps/agent/runbooks/alchemy-infrastructure.md",
+      "packages/infrastructure/test/drift.test.ts",
+      ".github/workflows/infrastructure-drift.yml",
+      "tmp/proof/infrastructure-drift.receipt.json"
+    ],
+    "nonClaims": [
+      "Repository fixtures or workflow source do not prove a hosted run, GitHub environment/secret availability, current provider state, Production, repair, runtime health, Channel behavior, handset delivery, or alert delivery."
+    ]
   }
 ]

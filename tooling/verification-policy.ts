@@ -77,8 +77,8 @@ export const CriticalJourney = Schema.Struct({
 });
 export type CriticalJourney = typeof CriticalJourney.Type;
 export const CriticalJourneys = Schema.Array(CriticalJourney)
-  .check(Schema.isMinLength(13))
-  .check(Schema.isMaxLength(13));
+  .check(Schema.isMinLength(14))
+  .check(Schema.isMaxLength(14));
 export const CriticalJourneysJson = Schema.fromJsonString(CriticalJourneys);
 
 const CommandMapEntry = Schema.Struct({
@@ -288,6 +288,7 @@ const expectedJourneyIds = [
   "BND-J11-photon-accepted-message-typing",
   "BND-J12-dual-channel-production",
   "BND-J13-preview-infrastructure-convergence",
+  "BND-J14-preview-infrastructure-drift-report",
 ] as const;
 
 const prohibitedOutput =
@@ -327,10 +328,10 @@ const auditJourneyInventory = (
   if (ids.length !== expectedJourneyIds.length) {
     add(
       "JOURNEY_COUNT",
-      "The inventory contains exactly ten critical journeys.",
+      "The inventory contains exactly fourteen critical journeys.",
       "docs/verification/critical-journeys.json",
-      "Restore the ten canonical Bundjil journey IDs.",
-      "Exactly ten journeys are present."
+      "Restore the fourteen canonical Bundjil journey IDs.",
+      "Exactly fourteen journeys are present."
     );
   }
   for (const id of expectedJourneyIds) {

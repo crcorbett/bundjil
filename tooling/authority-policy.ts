@@ -144,12 +144,19 @@ export interface AuthorityPolicyOptions {
 const requiredWorkflowPaths = [
   ".github/workflows/ci.yml",
   ".github/workflows/claude.yml",
+  ".github/workflows/infrastructure-drift.yml",
   ".github/workflows/release.yml",
 ] as const;
 
 const requiredAuthorityRecords = [
   {
     id: "github-ci",
+    status: "bounded",
+    surface: "workflow",
+    target: "github-actions",
+  },
+  {
+    id: "github-infrastructure-drift",
     status: "bounded",
     surface: "workflow",
     target: "github-actions",
@@ -287,12 +294,14 @@ const approvedWorkflowsByAction: Readonly<Record<string, readonly string[]>> = {
   "actions/checkout": requiredWorkflowPaths,
   "actions/setup-node": [
     ".github/workflows/ci.yml",
+    ".github/workflows/infrastructure-drift.yml",
     ".github/workflows/release.yml",
   ],
   "anthropics/claude-code-action": [".github/workflows/claude.yml"],
   "changesets/action": [".github/workflows/release.yml"],
   "oven-sh/setup-bun": [
     ".github/workflows/ci.yml",
+    ".github/workflows/infrastructure-drift.yml",
     ".github/workflows/release.yml",
   ],
 };
@@ -344,9 +353,9 @@ const inventoryFindings = (
         "AUTH-WORKFLOW-INVENTORY",
         "GitHub workflow inventory is exact and excludes autonomous review loops",
         ".github/workflows/**",
-        "Keep only ci.yml, claude.yml, and release.yml; retire auto-review workflows",
+        "Keep only ci.yml, claude.yml, infrastructure-drift.yml, and release.yml; retire auto-review workflows",
         `Missing: ${missing.join(", ") || "none"}; unexpected: ${unexpected.join(", ") || "none"}`,
-        "Exactly the three approved workflow paths remain"
+        "Exactly the four approved workflow paths remain"
       )
     );
   }
@@ -568,6 +577,148 @@ const ciFindings = (
         "Remove secret and id-token references from CI",
         "CI workflow mentions a prohibited secret or id-token scope",
         "CI has no secret or id-token capability"
+      )
+    );
+  }
+  return issues;
+};
+
+// oxlint-disable-next-line complexity -- The admitted workflow policy intentionally checks every independent authority property in one auditable pass.
+const infrastructureDriftFindings = (
+  workflow: AuthorityWorkflow
+): readonly AuthorityFinding[] => {
+  const permissions = readMapping(workflow.document, "permissions");
+  const concurrency = readMapping(workflow.document, "concurrency");
+  const trigger = readMapping(workflow.document, "on");
+  const pullRequest = readMapping(trigger, "pull_request");
+  const branches = pullRequest?.["branches"];
+  const schedule = trigger?.["schedule"];
+  const exactSchedule =
+    Array.isArray(schedule) &&
+    schedule.length === 1 &&
+    isMapping(schedule[0]) &&
+    schedule[0]["cron"] === "17 3 * * 1";
+  const exactPullRequest =
+    Array.isArray(branches) && branches.length === 1 && branches[0] === "main";
+  const hasManualDispatch =
+    trigger !== undefined && Object.hasOwn(trigger, "workflow_dispatch");
+  const secretReferences = [
+    ...workflow.content.matchAll(/secrets\.([A-Z0-9_]+)/g),
+  ].map((match) => match[1]);
+  const expectedSecrets = [
+    "BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON",
+    "BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE",
+    "BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON",
+  ];
+  const issues: AuthorityFinding[] = [];
+  if (!exactPermissions(permissions, { contents: "read" })) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-PERMISSIONS",
+        "Infrastructure drift has contents-read authority only",
+        workflow.path,
+        "Set root permissions to exactly contents: read",
+        "Infrastructure drift permissions are widened, missing, or not exact",
+        "The report-only worker has no repository write or OIDC authority"
+      )
+    );
+  }
+  if (concurrency?.["cancel-in-progress"] !== true) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-CONCURRENCY",
+        "Infrastructure drift cancels stale runs",
+        workflow.path,
+        "Set concurrency.cancel-in-progress: true",
+        `Observed cancellation policy: ${String(concurrency?.["cancel-in-progress"])}`,
+        "One current report remains for the source/ref"
+      )
+    );
+  }
+  if (!exactPullRequest || !exactSchedule || !hasManualDispatch) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-TRIGGER",
+        "Infrastructure drift has one exact pull-request, schedule, and manual read-only signal",
+        workflow.path,
+        "Restore main pull requests, cron 17 3 * * 1, and workflow_dispatch",
+        "The report-only signal set or schedule drifted",
+        "Only the three accepted bounded signals start the worker"
+      )
+    );
+  }
+  if (
+    !/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/.test(
+      workflow.content
+    ) ||
+    !/github\.event\.pull_request\.head\.repo\.full_name\s*==\s*github\.repository/.test(
+      workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-TARGET",
+        "Infrastructure drift is exact-repository and same-repository-PR only",
+        workflow.path,
+        "Restore the exact repository and fork exclusion gates",
+        "The repository or fork boundary is absent",
+        "Read-only credentials are never exposed to an untrusted fork"
+      )
+    );
+  }
+  if (
+    !/environment:\s*infrastructure-read-only-preview/.test(workflow.content) ||
+    !/BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE:\s*preview/.test(workflow.content) ||
+    !/BUNDJIL_INFRASTRUCTURE_STAGE:\s*preview/.test(workflow.content) ||
+    /\bprod(?:uction)?\b/i.test(
+      workflow.content.replaceAll(
+        /BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA:[^\n]+/g,
+        ""
+      )
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-STAGE",
+        "Infrastructure drift is Preview-only and cannot address Production",
+        workflow.path,
+        "Use only the infrastructure-read-only-preview environment and preview stage",
+        "Preview environment/stage is missing or a Production target appears",
+        "The report-only worker cannot select Production"
+      )
+    );
+  }
+  if (
+    secretReferences.length !== expectedSecrets.length ||
+    expectedSecrets.some((secret) => !secretReferences.includes(secret))
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-CUSTODY",
+        "Infrastructure drift resolves exactly three bounded secret artifacts",
+        workflow.path,
+        "Reference only the authority, environment, and manifest secret artifacts",
+        `Observed secret references: ${secretReferences.join(", ") || "none"}`,
+        "No provider credential value or additional secret surface is declared"
+      )
+    );
+  }
+  if (
+    !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
+      workflow.content
+    ) ||
+    /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/i.test(
+      workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-MUTATION",
+        "Infrastructure drift runs only the report boundary and has no repair path",
+        workflow.path,
+        "Keep only infrastructure:drift-report and remove apply, repair, rollback, Photon, Production, and OIDC paths",
+        "The exact report command is absent or a prohibited mutation surface appears",
+        "The worker can plan, observe, classify, and report but cannot apply"
       )
     );
   }
@@ -804,6 +955,9 @@ const workflowFindings = (
   switch (workflow.path) {
     case ".github/workflows/ci.yml": {
       return [...common, ...ciFindings(workflow)];
+    }
+    case ".github/workflows/infrastructure-drift.yml": {
+      return [...common, ...infrastructureDriftFindings(workflow)];
     }
     case ".github/workflows/release.yml": {
       return [...common, ...releaseFindings(workflow)];

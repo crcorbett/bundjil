@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-31
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -64,6 +64,30 @@ automation fallback.
 - **Stop, rollback, and escalation:** a failed or unavailable check stops
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
+
+### Preview infrastructure drift — report-only automation
+
+- **Signal and target:** same-repository pull requests for `main`, one weekly
+  schedule, or manual dispatch observe only
+  `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.
+- **Principal and authority:** `contents: read` plus one protected
+  `infrastructure-read-only-preview` environment. Its three secret artifacts
+  contain the fixed authority, provider/state environment, and accepted
+  manifest. The job has no OIDC, apply, reconcile, repair, deployment,
+  promotion, Production, Photon mutation, billing, or write-token authority.
+- **Duration and convergence:** one 20-minute run per repository and pull
+  request/ref; a newer candidate cancels a stale run. Native desired plan and
+  native `sync --dry-run` remain distinct sources. Blocking drift fails;
+  unavailable, ambiguous, skipped, or unknown-secret observations are
+  inconclusive.
+- **Evidence:** one mode-`0600` specialized classified report and one
+  fixed-contract bounded receipt. Source review and a local run prove neither
+  current GitHub settings/secrets nor hosted execution/provider actuality.
+- **Stop, rollback, and escalation:** stage/identity/authority drift, any write
+  path, malformed output, blocking drift, or inconclusive readback stops the
+  run. Disable the workflow or revoke its read-only environment under separate
+  GitHub-setting authority; no provider rollback exists because provider writes
+  are fixed at zero. Escalate a classified provider finding to its owner.
 
 ### Release pull request — disabled pending external authority epoch
 

@@ -165,6 +165,7 @@ const requiredControls = [
 
 const requiredAutomations = new Map([
   ["github-ci", "admitted"],
+  ["github-infrastructure-drift", "report_only"],
   ["github-release-pr", "disabled_pending_proof"],
   ["github-claude-interactive", "foreground_only"],
   ["github-claude-auto-review", "retired"],

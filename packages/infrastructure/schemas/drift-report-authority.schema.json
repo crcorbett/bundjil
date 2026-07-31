@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/bundjil-drift-report-authority.v1.json",
+  "title": "Bundjil report-only infrastructure drift authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "localWrite",
+    "approvalRequired",
+    "approvalReceipt",
+    "operations",
+    "resources",
+    "environments"
+  ],
+  "properties": {
+    "externalAccess": {
+      "const": "read_only"
+    },
+    "localWrite": {
+      "const": true
+    },
+    "approvalRequired": {
+      "const": true
+    },
+    "approvalReceipt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operations": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 2,
+      "maxItems": 2,
+      "allOf": [
+        {
+          "contains": {
+            "const": "alchemy-plan-preview-read-only"
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "const": "alchemy-sync-preview-dry-run"
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    },
+    "resources": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 3,
+      "items": {
+        "enum": [
+          "alchemy:BundjilInfrastructure:preview",
+          "r2:bundjil-alchemy-state:bundjil/v1",
+          "vercel:bundjil-preview-read-only",
+          "photon:bundjil-preview-read-only"
+        ]
+      }
+    },
+    "environments": {
+      "const": ["preview"]
+    }
+  }
+}

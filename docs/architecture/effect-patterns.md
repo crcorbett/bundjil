@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-31
 review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
@@ -111,6 +111,14 @@ by stable physical identity with bounded readback, and native Alchemy `sync`
 remains the drift engine. Provider credentials remain lazy `Context.Service`
 Effects backed by `Config.schema` and `Redacted` so Layer construction performs
 no credential read.
+
+Report-only drift wraps that native engine rather than remapping provider
+state through a parallel service. The adapter decodes the native desired plan
+and sync result once, fingerprints physical identities before persistence,
+classifies each observation through `Match`, and encodes only its owned report
+and bounded receipt at the file boundary. Native fields that do not expose
+attempts or duration stay explicitly `NotExposed`; missing observation data is
+not invented.
 
 The Vercel read/import boundary applies this per operation: encode one
 owner-qualified request immediately before team/project/query assignment,

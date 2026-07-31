@@ -9,7 +9,7 @@ review_trigger: app, auth, provider, deployment, messaging, approval, recovery, 
 
 # Bundjil verification
 
-This is the canonical route for the thirteen consumer-visible critical journeys,
+This is the canonical route for the fourteen consumer-visible critical journeys,
 proof packet contract, bounded command receipts, retained evidence index, and
 recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
@@ -36,6 +36,12 @@ operation nor asserts present provider state.
   direct provider readbacks, immutable Git SHA and Vercel Git deployment
   observation. Local provider matrices and remote state alone are false-green
   rejections, not provider-bound proof.
+- Preview report-only journey `BND-J14-preview-infrastructure-drift-report`
+  binds one exact source and read-only authority to native desired-plan and
+  sync-dry-run observations, fingerprinted classifications, zero provider
+  writes, and explicit missing-data/non-claims. Workflow source and local
+  fixtures are not hosted-run, external-setting, current-provider, repair, or
+  alert-delivery proof.
 - [`evidence-index.json`](evidence-index.json) owns retention classes,
   provenance fields, lifecycle transitions, and the directory for packets.
 - [`harness-epochs.md`](harness-epochs.md) owns epoch identity,

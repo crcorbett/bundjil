@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-31
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -189,6 +189,10 @@ plane.
   providers, adoption manifests, bounded receipts, lazy credential contracts,
   deterministic memory Layers, and the cross-provider sanitized inventory
   service/artifact contract;
+- owns the fingerprint-only drift observation/report codecs and the
+  authority-validated report adapter around the same root stack, native
+  desired plan, and native `sync --dry-run`; it does not implement a second
+  drift engine or expose repair;
 - keeps root stack topology in `alchemy.run.ts` and `stacks/**`, provider
   clients private to their eventual owning adapters, and Vercel Git deployment
   ownership outside Alchemy configuration reconciliation;
@@ -204,6 +208,11 @@ plane.
   inventory executable. That command accepts exact branded target identities,
   performs two sequential reads, persists only a Schema-encoded mode-`0600`
   artifact, and has no provider mutation capability;
+- composes stage-owned state plus read-only provider Layers in the Preview
+  drift-report executable only after its fixed authority validates. Desired
+  plan changes and native provider observations remain distinct sources;
+  unavailable, skipped, ambiguous, or write-only-secret observations fail
+  inconclusive rather than being normalized to no-op;
 - keeps the root stack on ignored local Alchemy state and the synthetic
   provider only. Local plan, sync, Vercel contract, and memory-adoption
   evidence is repository proof, not Vercel tenant, Photon, Preview,

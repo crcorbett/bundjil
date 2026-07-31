@@ -378,6 +378,55 @@ verification gates must pass before the first write.
    Production configuration write, alias change, or deletion. Its rollback is
    to disconnect only that exact link and read back the prior absent-link state.
 
+## Report-only drift and monitoring
+
+The report-only path wraps the same stable stack, stage-owned R2 state, native
+desired plan, and native Alchemy `sync --dry-run`. It does not own repair.
+Before every run:
+
+1. Bind the exact source SHA and accepted Preview manifest to a one-run
+   authority envelope that validates against both the fixed harness contract
+   and
+   `packages/infrastructure/schemas/drift-report-authority.schema.json`.
+   Require external access `read_only`, local report writes only, Preview as
+   the sole environment, and exactly the native plan plus sync-dry-run
+   operations.
+2. Provide the authority, manifest, provider/state environment file, output
+   report, and bounded-receipt paths only through mode-`0600` custody. Never
+   put credentials in workflow YAML, tracked files, command arguments, stdout,
+   report fields, or receipts.
+3. Run `bun run infrastructure:drift-report`. The command validates the
+   authority before provider/state resolution, rejects every non-Preview stage,
+   decodes native output once, fingerprints physical identities, and emits
+   only classified metadata. It never calls apply, reconcile, repair, deploy,
+   promote, Photon mutation, or Production.
+4. Interpret desired-state plan changes separately from native provider
+   observation. Require explicit classifications for expected normalization,
+   unowned, missing, in-place, destructive, unavailable/ambiguous readback,
+   unknown secret revision, skipped provider read, deployment drift, and
+   desired-plan change. Native attempts or duration absent from the pinned
+   result remain `NotExposed`; if native execution fails before returning a
+   plan, the plan itself remains `NotExposed` and the bounded result is
+   inconclusive rather than fabricated zero counts.
+5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
+   is blocking drift, and exit `2` is inconclusive or a rejected boundary.
+   None is repair authority. Missing or stale runs, signed-ingress/replay/send/
+   typing failures, Photon inventory/billing failures, and report failures are
+   operator signals; Photon exposes no alert-policy or persistent delivery-log
+   management API, and no alert transport is claimed by this procedure.
+
+The desired GitHub workflow is `.github/workflows/infrastructure-drift.yml`.
+It is limited to same-repository pull requests, one weekly schedule, and manual
+dispatch; uses `contents: read`, one protected read-only Preview environment,
+exact secret artifacts, bounded concurrency, and a 20-minute timeout; and
+executes only the report command. Workflow source does not prove the GitHub
+environment, secret metadata, settings, a hosted run, or alert delivery.
+Current external settings and any hosted qualification require fresh
+authenticated readback under the authority model. Rollback is to disable the
+workflow or revoke its read-only environment under separately authorized
+GitHub-setting authority; no provider rollback is needed because the command
+performs zero provider writes.
+
 Every mutation is read-before/write/read-after. Encode at the exact provider
 boundary, decode the complete response immediately, and stop on a mismatched
 identity, ambiguous key, unexpected plan action, or uncertain outcome after

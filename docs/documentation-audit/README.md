@@ -128,6 +128,7 @@ HGI-307 harness requalification and repository closeout evidence:
 - [`HGI-307-impact-ledger.json`](HGI-307-impact-ledger.json)
 - [`HGI-307-validation.json`](HGI-307-validation.json)
 - [`alchemy-production-inventory-correction-2026-07-31.json`](alchemy-production-inventory-correction-2026-07-31.json)
+- [`alchemy-drift-control-inventory-correction-2026-07-31.json`](alchemy-drift-control-inventory-correction-2026-07-31.json)
 - [`../verification/hgi-307-epoch.json`](../verification/hgi-307-epoch.json)
 - [`../../tooling/evals/hgi-307/scenarios.json`](../../tooling/evals/hgi-307/scenarios.json)
 - [`hgi-307/`](hgi-307/)
@@ -143,6 +144,12 @@ The 2026-07-31 Alchemy Production closeout adds one current dual-Channel
 receipt and this dated path-accounting correction. It updates only the
 executable current docs inventory; it does not rewrite or requalify the
 historical HGI-307 epoch.
+
+The report-only Alchemy drift slice adds one fixed control owner and one dated
+path-accounting correction, producing the exact 199-path docs and 23-path
+README inventories. It updates only current repository accounting; it proves
+no hosted GitHub run, external setting, provider state, drift, repair, or alert
+delivery and does not requalify the historical HGI-307 epoch.
 
 The accepted local defaults grant no provider or operation authority. The
 source receipt is content-addressed by every decision record; the Eve live-state

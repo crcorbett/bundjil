@@ -27,8 +27,9 @@ command, and routing map.
 - [Photon](photon.md) — prove bounded management/SDK lifecycle and own Photon
   managed-shared user, webhook, typing, delivery, rollback, and recovery procedures.
 - [Alchemy infrastructure](alchemy-infrastructure.md) — adopt and reconcile
-  retained Vercel/Photon configuration through dedicated remote state while
-  preserving Vercel Git deployment ownership.
+  retained Vercel/Photon configuration through dedicated remote state, run
+  report-only Preview drift observation, and preserve Vercel Git deployment
+  ownership.
 - [Incident and revocation](incident-revocation.md) — contain agent incidents,
   route revocation to the owning provider, and prove recovery without exposing
   secrets.

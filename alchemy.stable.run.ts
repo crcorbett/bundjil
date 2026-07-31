@@ -9,6 +9,7 @@ import {
   loadAdoptionCommand,
   validateStableAdoptionCommand,
 } from "@bundjil/infrastructure";
+import type { AdoptionManifest } from "@bundjil/infrastructure";
 import { loadVercelStableEnvironmentAuthority } from "@bundjil/infrastructure/vercel";
 import * as Alchemy from "alchemy";
 import { Config, Effect, Schema } from "effect";
@@ -20,28 +21,34 @@ const failConfiguration = (message: string) =>
     Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
   );
 
-export default Effect.all({
-  authorityPath: loadVercelStableEnvironmentAuthority,
-  command: loadAdoptionCommand,
-}).pipe(
-  Effect.flatMap(({ command }) => validateStableAdoptionCommand(command)),
-  Effect.flatMap((manifest) =>
-    adoptionManifestProviderScopes(manifest).pipe(
-      Effect.catch(() =>
-        failConfiguration(
-          "The stable manifest does not define the exact provider scopes."
-        )
-      ),
-      Effect.flatMap((scopes) =>
-        Alchemy.Stack(
-          "BundjilInfrastructure",
-          {
-            providers: layerLiveStableAdoptionProviders(scopes),
-            state: layerAlchemyR2State,
-          },
-          BundjilInfrastructureStack(manifest)
-        )
+export const makeStableInfrastructureStack = Effect.fn(
+  "StableInfrastructureStack.make"
+)((manifest: AdoptionManifest) =>
+  adoptionManifestProviderScopes(manifest).pipe(
+    Effect.catch(() =>
+      failConfiguration(
+        "The stable manifest does not define the exact provider scopes."
+      )
+    ),
+    Effect.flatMap((scopes) =>
+      Alchemy.Stack(
+        "BundjilInfrastructure",
+        {
+          providers: layerLiveStableAdoptionProviders(scopes),
+          state: layerAlchemyR2State,
+        },
+        BundjilInfrastructureStack(manifest)
       )
     )
   )
 );
+
+export const loadStableInfrastructureStack = Effect.all({
+  authorityPath: loadVercelStableEnvironmentAuthority,
+  command: loadAdoptionCommand,
+}).pipe(
+  Effect.flatMap(({ command }) => validateStableAdoptionCommand(command)),
+  Effect.flatMap(makeStableInfrastructureStack)
+);
+
+export default loadStableInfrastructureStack;

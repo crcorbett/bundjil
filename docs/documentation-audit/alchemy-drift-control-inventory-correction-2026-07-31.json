@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "taskId": "alchemy-vercel-photon-infrastructure-drift-control",
+  "status": "passed",
+  "observedAt": "2026-07-31T15:45:33.000Z",
+  "trigger": "The report-only infrastructure drift control adds one current control owner and this dated path-accounting correction.",
+  "docsInventory": {
+    "pathCount": 199,
+    "sortedPathSha256": "e750b9febfa1b2fb5da81a333043edb1708123816672f7207596845d50897bfc"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/standards/alchemy-infrastructure-drift.control.json",
+    "docs/standards/controls.md",
+    "docs/operations/automation-register.md",
+    "docs/operations/authority-register.json",
+    "docs/verification/critical-journeys.json",
+    "docs/verification/journey-command-map.json",
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+    "docs/exec-plans/active/alchemy-vercel-photon-infrastructure.md",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The report-only control, workflow policy, BND-J14 journey and executable current-owner paths do not change the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and validation remain bound to their recorded candidate. This correction updates only the executable current path inventory.",
+    "nonClaim": "This inventory correction does not prove GitHub settings or execution, Vercel, Photon, drift, alert delivery, deployment, message, handset, billing or future provider state."
+  },
+  "checks": [
+    {
+      "command": "bun run check:docs",
+      "status": "passed",
+      "result": "The implementation candidate passed the documentation policy across 273 routed files."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The first focused evaluation correctly rejected the stale 197-path inventory; the corrected 199-path docs and 23-path README inventories then passed all twelve scenarios and nine impact areas."
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed",
+      "result": "The repository implementation candidate passed Effect setup, boundaries, the 273-file docs policy, 175-file and 16-mirror skills policy, four-workflow authority, eight controls and fifteen automations, fourteen journeys, HGI-307, 98 tooling tests, type-aware format/lint, the lint fixture, Knip, all nine workspace typechecks, 69 infrastructure Vitest tests, 20 Alchemy lifecycle tests and all fifteen Turbo tasks using only the process-local synthetic Executor fixture."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "The live exact-source drift readback and terminal Alchemy five-pass audit remain downstream."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No workflow dispatch, provider read/write, deployment, message, billing, credential or Production operation is authorised by this file."
+  ]
+}

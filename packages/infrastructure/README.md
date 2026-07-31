@@ -9,8 +9,8 @@ receipts, and deterministic memory Layers.
 
 - `@bundjil/infrastructure` exports the owned Schema, service, receipt,
   adoption, Config, credential, synthetic Resource, provider, and deterministic
-  memory plus sanitized inventory contracts without a provider client or
-  credential escape hatch.
+  memory plus sanitized inventory and drift-report contracts without a
+  provider client or credential escape hatch.
 - `@bundjil/infrastructure/testing` exports decoded fixture Effects.
 - `@bundjil/infrastructure/vercel` exports Vercel read/import Schemas, named
   services, safe operation errors, lazy credential and live/memory Layers,
@@ -93,6 +93,15 @@ mode-`0600` Schema-encoded artifact, and emits one bounded receipt. It contains
 no provider write operation. A blocked or absent artifact establishes no
 current provider state.
 
+The report-only drift executable reuses the same stable stack factory and
+stage-owned remote state. After validating the fixed Preview-only authority it
+decodes native desired-plan and `sync --dry-run` results, fingerprints physical
+identities, classifies owned failure states, and writes one specialized report
+plus one fixed-contract bounded receipt with mode `0600`. It never calls
+reconcile, apply, repair, deploy, promote, or Production. Desired-state changes
+remain separate from live observations; unavailable, ambiguous, skipped, or
+unknown-secret readback is inconclusive.
+
 ## Commands
 
 Run from the repository root:
@@ -112,6 +121,7 @@ bun run infrastructure:stable-preview-sync
 bun run infrastructure:stable-production-plan
 bun run infrastructure:stable-production-apply
 bun run infrastructure:stable-production-sync
+bun run infrastructure:drift-report
 bun run infrastructure:preview-plan
 bun run infrastructure:preview-apply
 bun run infrastructure:preview-sync
@@ -140,6 +150,17 @@ manifest, validated authority, and dedicated R2 Config named by
 [Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
+
+`infrastructure:drift-report` requires
+`BUNDJIL_INFRASTRUCTURE_DRIFT_{AUTHORITY,REPORT,RECEIPT}_PATH`,
+`BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA`, and exact Preview stage/manifest
+configuration. The authority, manifest, provider/state credential file, report,
+and receipt remain mode-`0600` custody. Exit `0` means a classified `no_op` or
+accepted report-only result; exit `1` means blocking drift; exit `2` means an
+inconclusive or rejected boundary. None authorizes repair. Follow the
+[report-only procedure](../../apps/agent/runbooks/alchemy-infrastructure.md#report-only-drift-and-monitoring);
+workflow source alone does not prove GitHub settings, secrets, a hosted run, or
+alert delivery.
 
 Both state-migration commands use the same stage-owned executable and require
 `BUNDJIL_STATE_MIGRATION_STAGE`, exact mode-`0600`

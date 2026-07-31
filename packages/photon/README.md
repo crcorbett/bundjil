@@ -139,6 +139,13 @@ bun run --filter @bundjil/photon build
 These commands are repository proof only. They do not configure Photon or
 prove a deployed webhook, provider send, or handset delivery.
 
+The Alchemy report-only drift command may observe Photon project, platform,
+shared-user, webhook, dedicated-line, and billing resources through the same
+decoded management boundary and native Alchemy `sync --dry-run`. It adds no
+Photon client or mutation path here. Photon exposes no alert-policy or
+persistent delivery-log management resource, so the workflow can classify
+inventory/readback failure but cannot claim provider alert delivery.
+
 `bun run infrastructure:photon-candidate-inventory` loads the ignored source
 and Preview project credentials plus one selected safe fingerprint, performs
 two complete sequential source/Preview shared-user and availability reads, and

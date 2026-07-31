@@ -1121,7 +1121,7 @@
     {
       "id": "drift-ci-monitoring-and-closeout",
       "title": "Complete drift CI, monitoring, documentation, and fresh review",
-      "status": "pending",
+      "status": "in_progress",
       "dependsOn": ["production-adoption-and-rollout"],
       "invariantIds": [
         "HC-OUTCOME-001",
@@ -1141,7 +1141,7 @@
         "status": "required_before_acceptance",
         "scope": "Replay every applicable material SPEC requirement and compound-policy property through the top-level taskAcceptanceProofContract before the one fresh terminal five-pass audit.",
         "evidenceOwner": "This task object's requirementProofReplay evidence and the active plan's terminal closeout section.",
-        "currentResult": "not_run: terminal closeout is blocked by every earlier pending task."
+        "currentResult": "in_progress: every dependency is accepted. The repository candidate now adds a typed fingerprint-only drift report and actual fixed-contract receipt builder around the shared stable stack, native desired plan and native sync dry-run; a fixed Preview-only authority; BND-J14; a report-only control/automation/authority record; and a same-repository PR, weekly and manual workflow with exact read-only custody and zero repair edge. Direct fixtures independently reject permissions, concurrency, trigger, repository/fork, stage, secret-surface and mutation drift; classify every required native observation plus desired-plan changes; reject malformed/leaking artifacts; validate the actual receipt against the fixed harness contract; and retain native failure as inconclusive with plan NotExposed rather than inventing zero counts. The exact implementation candidate passed full repository verification with 98 tooling tests, 69 infrastructure Vitest tests, 20 Alchemy lifecycle tests, all nine typechecks and all fifteen Turbo tasks using only the process-local synthetic Executor fixture. The exact-source live Preview report, hosted GitHub settings/run proof, lifecycle closeout and terminal five-pass audit remain pending; workflow source, local fixtures and full repository success are not provider proof by proxy."
       },
       "implementationNotes": [
         "PR CI runs repository checks, provider-memory tests, a read-only Preview plan, and native sync --dry-run. Protected Preview/Production apply jobs remain separate and approval-gated.",

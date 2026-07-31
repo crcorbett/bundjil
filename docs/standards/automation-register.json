@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-07-31",
   "reviewTrigger": "signal, state, authority, proof, cost, false-positive, convergence, stopping, escalation, rollback, or accepted-outcome change",
   "records": [
     {
@@ -40,6 +40,45 @@
       "carryingCost": "Hosted duration, maintenance, false-positive review, and human attention per accepted candidate.",
       "selfFeedbackExcluded": true,
       "nonClaim": "Local parity and source desired state do not prove a hosted run, token, check, or accepted candidate."
+    },
+    {
+      "id": "github-infrastructure-drift",
+      "fixturePaths": [
+        ".github/workflows/infrastructure-drift.yml",
+        "docs/standards/alchemy-infrastructure-drift.control.json",
+        "packages/infrastructure/test/drift.test.ts",
+        "tooling/authority-policy-audit.test.ts"
+      ],
+      "state": "report_only",
+      "signal": "Same-repository pull request for main, exact weekly schedule, or one manual read-only dispatch.",
+      "stateOwner": "GitHub run/check identity externally; source SHA and fingerprint-only report/receipt within one runner.",
+      "durableState": "One current classified report per source/ref; newer work cancels stale work and no provider state is written.",
+      "principal": "Ephemeral GitHub Actions job using the exact infrastructure-read-only-preview environment and three named secret artifacts.",
+      "authorityOwner": "docs/operations/authority-register.json#github-infrastructure-drift and docs/standards/alchemy-infrastructure-drift.control.json.",
+      "operation": "Run one native desired plan and one native Sync.plan dry-run for Preview, classify the result and persist local mode-0600 evidence only.",
+      "resource": "Exact accepted Bundjil Preview Alchemy state and manifest-bound Vercel/Photon metadata.",
+      "environment": "GitHub-hosted Preview report-only worker; Production is rejected.",
+      "duration": "One run, at most 20 minutes.",
+      "convergence": "No-op requires zero desired-plan changes and only accepted native-sync findings; all other classes fail, report or remain inconclusive without repair.",
+      "proof": "Source/stage/authority fingerprints, desired-plan counts, per-resource category/disposition, provider-writes:0, Schema-valid bounded receipt and hosted run/check identity if observed.",
+      "stopping": "Stop on fork input, target/stage drift, missing custody, plan change, live drift, ambiguous/unavailable/skipped read, unknown secret revision, provider write, leak, timeout or stale run.",
+      "escalation": "Repository owner, security/automation maintainer, Alchemy state owner and exact provider owner.",
+      "rollback": "No provider rollback. Revert source or separately disable/revoke the exact read-only environment and artifacts, then read back GitHub settings.",
+      "acceptedOutcome": "The exact source receives one claim-matched no-op or classified report without provider/state mutation; run or finding count alone is not success.",
+      "metrics": {
+        "acceptedOutcome": "No-op or human-accepted classified outcomes bound to exact source and resource fingerprints.",
+        "falsePositive": "Findings disproved by unchanged repeated readback or an accepted provider-normalization fixture.",
+        "feedbackLatency": "Signal to first classified report.",
+        "synchronousHumanAttention": "Review and separately authorized repair time only.",
+        "workerDuration": "Bounded report run duration; per-resource native attempt duration remains NotExposed."
+      },
+      "publication": "GitHub run/check and fingerprint-only report disposition only; no issue, comment, provider, state, deployment or alert mutation.",
+      "reviewTrigger": "Alchemy/provider contract, workflow, authority, secret, stage, state, classification, false positive, cost, missing run or alert-owner change.",
+      "retirement": "Retire if accepted outcomes do not justify provider reads/cost or a smaller provider-owned control proves the same postcondition.",
+      "externalReadback": "Unavailable and inconclusive while the workflow remains only on the unmerged task branch; no GitHub environment, secret, schedule or hosted run is claimed.",
+      "carryingCost": "One weekly read-only run, same-repository pull-request runs, hosted duration and human review attention.",
+      "selfFeedbackExcluded": true,
+      "nonClaim": "Source, local tests and a report file do not prove hosted execution, alert delivery, future no-drift, repair, deployment, promotion or Production state."
     },
     {
       "id": "github-release-pr",

@@ -22,7 +22,8 @@ does not speak for those traditions.
   resources, deterministic provider lifecycle tests, and the
   authority-validated read-only inventory and separately gated Preview
   configuration commands, including the dormant owner-specific Photon webhook
-  binding sink. Apps do not import it.
+  binding sink and the report-only Preview drift classifier around native
+  Alchemy plan/sync. Apps do not import it.
 - `packages/eve` owns Eve-facing Schemas and named operations.
 - `packages/codex` owns Codex subscription profile, storage, refresh, and
   private provider contracts.

@@ -3,7 +3,7 @@ document_type: control-register
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-maintainer
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-31
 review_trigger: control finding, false positive, automation loop, boundary exception, accepted-outcome, carrying-cost, or retirement change
 ---
 
@@ -60,10 +60,21 @@ condition. `foreground_only`, `disabled_pending_proof`, `retired`, and
 The machine register distinguishes admitted read-only CI and the bounded
 Sendblue inbound runtime from disabled release and Codex-proxy paths,
 foreground interactive Claude/deployment/provider operations, retired automatic
-Claude review, and report-only documentation freshness. It does not schedule a
-new worker or enable an external capability. GitHub and providers remain
-authoritative for current settings, identities, runs, state, cost, and
-consequences; HGI-309 owns any separately approved authenticated readback.
+Claude review, report-only documentation freshness, and report-only Preview
+infrastructure drift. The latter wraps native Alchemy plan/sync observation,
+fails closed on blocking or inconclusive classifications, and has no repair
+edge. This register does not itself schedule a worker or enable an external
+capability. GitHub and providers remain authoritative for current settings,
+identities, runs, state, cost, and consequences; HGI-309 owns any separately
+approved authenticated readback.
+
+The infrastructure drift control is
+[`alchemy-infrastructure-drift.control.json`](alchemy-infrastructure-drift.control.json).
+It records its signal, durable state, exact read-only authority, convergence,
+proof, bounded failure, repair owner, cost, review trigger, stop/rollback,
+retirement, and disconfirming evidence against the fixed control-record
+contract. A workflow file, green command, run count, or local fixture cannot
+promote it beyond `report_only`.
 
 ## Report-only freshness
 

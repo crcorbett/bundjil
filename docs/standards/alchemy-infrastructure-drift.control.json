@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1",
+  "id": "ALCHEMY-DRIFT-REPORT-ONLY",
+  "kind": "automation",
+  "failureClass": "Unobserved or falsely accepted Alchemy Preview desired-state and live-state drift",
+  "evidence": [
+    ".github/workflows/infrastructure-drift.yml",
+    "packages/infrastructure/src/drift.ts",
+    "packages/infrastructure/test/drift.test.ts",
+    "tooling/authority-policy-audit.test.ts",
+    "tooling/control-policy.test.ts"
+  ],
+  "earliestOwner": "packages/infrastructure/src/drift.ts",
+  "acceptedMechanism": "One Preview-only native Alchemy desired plan plus Sync.plan dry-run is classified through an Effect Schema report, wrapped by the fixed bounded receipt, and published only as a report-only GitHub run/check disposition.",
+  "signal": "Pull request for main, the exact weekly schedule, or one manual read-only dispatch.",
+  "durableState": "The exact source SHA, GitHub run/check identity, fingerprint-only classified report and bounded receipt for that run.",
+  "authority": "docs/operations/authority-register.json#github-infrastructure-drift and the workflow-bound fixed read-only authority envelope.",
+  "convergence": "One current report per source/ref; newer work cancels stale work; no-op requires zero desired-plan changes and accepted native-sync observations.",
+  "proofPerRun": "Schema-valid source/stage/authority fingerprints, desired-plan counts, classified per-resource findings, provider-writes:0, command disposition and GitHub run/check identity when externally observed.",
+  "boundedFailure": "Twenty-minute job timeout, exact repository/fork gate, Preview-only stage, three exact secret bindings, fail-closed missing custody, and nonzero failed or inconclusive status.",
+  "repairRoute": "No automatic repair. A human opens the target-owned Alchemy runbook, obtains exact apply authority, re-reads state, repairs one accepted property and proves convergence.",
+  "falsePositiveCost": "One read-only provider run plus human review of a fingerprint-only finding; no provider or state write.",
+  "carryingCost": "One weekly read-only run plus same-repository pull-request runs, bounded hosted duration and review attention.",
+  "reviewTrigger": "Alchemy version, state shape, provider read contract, secret binding, workflow trigger, stage, classification, false positive, cost, missing run, or alert-owner change.",
+  "stopAndRollback": "Stop on widened permission, Production target, missing or ambiguous readback, secret leak, unexpected plan class, provider write, stale run, or missing receipt. Revert the workflow source or separately disable/revoke its read-only environment and credentials.",
+  "retirementCondition": "Retire if the signal no longer detects actionable drift, carrying cost exceeds accepted value, or a smaller earlier provider-owned control proves the same postcondition.",
+  "disconfirmingEvidence": [
+    "A green repository suite without a native provider read does not prove no drift.",
+    "A successful command or run without classified resource postconditions does not prove convergence.",
+    "A current report does not prove a future run, alert delivery, provider availability, or repair."
+  ],
+  "remindersToRetire": [
+    "Remove provisional drift scheduling prose once the executable workflow, typed registers and runbook are current."
+  ]
+}

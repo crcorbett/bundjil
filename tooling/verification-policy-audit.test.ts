@@ -218,7 +218,7 @@ const codes = (current: VerificationSnapshot) =>
   report(current).findings.map((finding) => finding.code);
 
 describe("verification policy", () => {
-  it("accepts the current ten journey inventory and command map", () => {
+  it("accepts the current fourteen journey inventory and command map", () => {
     expect(report(snapshot()).ok).toBeTruthy();
   });
 

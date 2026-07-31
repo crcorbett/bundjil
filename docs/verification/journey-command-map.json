@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-verification-owner",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-07-31",
   "reviewTrigger": "critical journey, app command, runbook, environment, or authority change",
   "commands": [
     {
@@ -107,6 +107,14 @@
       "claimScope": "approval_gated",
       "procedureOwner": "apps/agent/runbooks/alchemy-infrastructure.md",
       "externalReadback": "required before and after every provider mutation, after rollback, and for the exact immutable Vercel Git deployment SHA"
+    },
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "environment": "approval-gated read-only Vercel/Photon Preview target",
+      "command": "bun run infrastructure:drift-report under apps/agent/runbooks/alchemy-infrastructure.md#report-only-drift-and-monitoring",
+      "claimScope": "approval_gated",
+      "procedureOwner": "apps/agent/runbooks/alchemy-infrastructure.md",
+      "externalReadback": "required for current provider drift; workflow source and local fixtures do not prove a hosted run or external settings"
     }
   ]
 }

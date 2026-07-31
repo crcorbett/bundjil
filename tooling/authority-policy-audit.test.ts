@@ -46,6 +46,43 @@ jobs:
 `
   );
 
+const infrastructureDrift = () =>
+  workflow(
+    ".github/workflows/infrastructure-drift.yml",
+    `name: Infrastructure Drift
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: infrastructure-drift-
+  cancel-in-progress: true
+jobs:
+  preview-report:
+    if: github.repository == 'crcorbett/bundjil' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    environment: infrastructure-read-only-preview
+    env:
+      BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_STAGE: preview
+      DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
+      DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
+      DRIFT_MANIFEST_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+    steps:
+      - uses: actions/checkout@${pins["actions/checkout"]}
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@${pins["actions/setup-node"]}
+      - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
+      - run: bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report
+`
+  );
+
 const release = () =>
   workflow(
     ".github/workflows/release.yml",
@@ -107,6 +144,12 @@ jobs:
 const authorityRows = [
   {
     id: "github-ci",
+    status: "bounded",
+    surface: "workflow",
+    target: "github-actions",
+  },
+  {
+    id: "github-infrastructure-drift",
     status: "bounded",
     surface: "workflow",
     target: "github-actions",
@@ -273,6 +316,7 @@ const actionRows = [
     approvedWorkflows: [
       ".github/workflows/ci.yml",
       ".github/workflows/claude.yml",
+      ".github/workflows/infrastructure-drift.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["actions/checkout"],
@@ -281,6 +325,7 @@ const actionRows = [
     action: "actions/setup-node",
     approvedWorkflows: [
       ".github/workflows/ci.yml",
+      ".github/workflows/infrastructure-drift.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["actions/setup-node"],
@@ -289,6 +334,7 @@ const actionRows = [
     action: "oven-sh/setup-bun",
     approvedWorkflows: [
       ".github/workflows/ci.yml",
+      ".github/workflows/infrastructure-drift.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["oven-sh/setup-bun"],
@@ -330,9 +376,10 @@ const snapshot = (): AuthoritySnapshot => ({
   repositoryPaths: [
     ".github/workflows/ci.yml",
     ".github/workflows/claude.yml",
+    ".github/workflows/infrastructure-drift.yml",
     ".github/workflows/release.yml",
   ],
-  workflows: [ci(), claude(), release()],
+  workflows: [ci(), claude(), infrastructureDrift(), release()],
 });
 
 const run = (input = snapshot()) =>
@@ -389,6 +436,21 @@ describe("HGI-304 authority policy", () => {
           "Bash(git push); deploy; approve; resume"
         )
     );
+    broken = withWorkflow(
+      broken,
+      ".github/workflows/infrastructure-drift.yml",
+      (content) =>
+        content
+          .replace("contents: read", "contents: write")
+          .replace(
+            "BUNDJIL_INFRASTRUCTURE_STAGE: preview",
+            "BUNDJIL_INFRASTRUCTURE_STAGE: prod"
+          )
+          .replace(
+            "infrastructure:drift-report",
+            "infrastructure:stable-production-apply"
+          )
+    );
     const codes = new Set(run(broken).findings.map((issue) => issue.code));
     for (const code of [
       "AUTH-WORKFLOW-INVENTORY",
@@ -400,10 +462,86 @@ describe("HGI-304 authority policy", () => {
       "AUTH-ACTION-PIN",
       "AUTH-CLAUDE-MUTATION",
       "AUTH-CLAUDE-CONVERGENCE",
+      "AUTH-DRIFT-PERMISSIONS",
+      "AUTH-DRIFT-STAGE",
+      "AUTH-DRIFT-MUTATION",
     ]) {
       expect([...codes]).toContain(code);
     }
   });
+
+  it.each([
+    [
+      "widened repository permission",
+      "AUTH-DRIFT-PERMISSIONS",
+      (content: string) => content.replace("contents: read", "contents: write"),
+    ],
+    [
+      "stale-run cancellation disabled",
+      "AUTH-DRIFT-CONCURRENCY",
+      (content: string) =>
+        content.replace(
+          "cancel-in-progress: true",
+          "cancel-in-progress: false"
+        ),
+    ],
+    [
+      "schedule changed",
+      "AUTH-DRIFT-TRIGGER",
+      (content: string) => content.replace("17 3 * * 1", "17 3 * * 2"),
+    ],
+    [
+      "repository gate changed",
+      "AUTH-DRIFT-TARGET",
+      (content: string) =>
+        content.replace("crcorbett/bundjil", "other/repository"),
+    ],
+    [
+      "fork exclusion removed",
+      "AUTH-DRIFT-TARGET",
+      (content: string) =>
+        content.replace(
+          "github.event.pull_request.head.repo.full_name == github.repository",
+          "true"
+        ),
+    ],
+    [
+      "Preview stage changed",
+      "AUTH-DRIFT-STAGE",
+      (content: string) =>
+        content.replace(
+          "BUNDJIL_INFRASTRUCTURE_STAGE: preview",
+          "BUNDJIL_INFRASTRUCTURE_STAGE: prod"
+        ),
+    ],
+    [
+      "additional secret surface added",
+      "AUTH-DRIFT-CUSTODY",
+      (content: string) =>
+        `${content}\n# $` +
+        "{{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_EXTRA }}\n",
+    ],
+    [
+      "report command changed to apply",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          "infrastructure:drift-report",
+          "infrastructure:stable-production-apply"
+        ),
+    ],
+  ])(
+    "rejects drift property independently: %s",
+    (_name, expectedCode, mutate) => {
+      const broken = withWorkflow(
+        snapshot(),
+        ".github/workflows/infrastructure-drift.yml",
+        mutate
+      );
+      const codes = new Set(run(broken).findings.map((issue) => issue.code));
+      expect(codes).toContain(expectedCode);
+    }
+  );
 
   it("rejects indirect Claude mentions and drift in any accepted authority-record classification", () => {
     const base = snapshot();

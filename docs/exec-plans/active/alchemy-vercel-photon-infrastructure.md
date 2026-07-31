@@ -2702,6 +2702,64 @@ Knip; all nine workspace typechecks; and all fifteen Turbo build/test tasks.
 The full run used only the process-local synthetic Executor fixture and made no
 Executor request.
 
+## Drift, CI, monitoring and terminal closeout
+
+`drift-ci-monitoring-and-closeout` is now in progress after every dependency
+reached accepted state. Initial inventory found proven provider-memory and
+native-sync behavior, but no admitted report-only PR/scheduled drift workflow,
+complete classified drift receipt, or terminal five-pass record. This slice
+will add the smallest typed report-only boundary and exact workflow/control
+policy before any terminal audit claim. The formal five-pass audit remains
+reserved for the final receipt-bearing implementation state.
+
+### Drift implementation requirement-to-proof replay
+
+| Material requirement                         | Direct observable and expected postcondition                                                                                                 | Plausible false green rejected                                                                            | Focused command/evidence owner                                                       | Current result                                                   |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Native ownership and source separation       | One shared stable stack produces a decoded desired plan and decoded native `Sync.plan`; every finding records its exact source               | A parallel drift engine, direct-provider mapper, ordinary plan presented as provider drift                | `report-drift.ts`, `alchemy.stable.run.ts`, focused typecheck and drift fixtures     | Passed locally; live exact-source read remains pending           |
+| Preview-only authority                       | Both fixed Schemas require read-only external access, local evidence writes, exact plan/sync operations/resources and Preview                | An available credential, accepted SPEC, Production target, apply name, missing approval or broad resource | `drift-report-authority.schema.json` and property-specific authority fixtures        | Passed                                                           |
+| Workflow permissions and target              | Exact `contents: read`, protected Preview environment, same repository/fork gate and three secret artifacts                                  | Read-only label with widened permission, untrusted fork, added secret, Production string or OIDC          | `authority-policy.ts` plus eight independent negative workflow fixtures              | Passed                                                           |
+| Bounded signals and stale-run convergence    | Main pull request, weekly `17 3 * * 1`, manual dispatch, 20-minute timeout and cancellation are exact                                        | Any cron, uncancelled run, unbounded timeout or neighbouring CI job                                       | Workflow decoder/policy and independent trigger/concurrency negatives                | Passed                                                           |
+| Zero-write report boundary                   | The workflow invokes only `infrastructure:drift-report`; command uses plan and sync-plan then writes mode-`0600` artifacts                   | Green workflow containing apply, repair, rollback, Photon mutation, deployment or promotion               | Exact workflow mutation scan, adapter call graph and runbook                         | Passed locally; provider writes must remain zero in live receipt |
+| Drift classification                         | Normalization, unowned, missing, in-place, destructive, unavailable/ambiguous, unknown-secret, skipped and deployment each classify directly | One generic “drift” flag, inferred state, or a neighbouring lifecycle assertion                           | Nine table-driven `drift.test.ts` cases                                              | Passed                                                           |
+| Desired-state classification                 | Create/update/replace/delete plan actions remain `desiredStatePlanChange` and never become live sync evidence                                | Successful plan, persisted state or desired change called provider drift                                  | Dedicated source-separation fixture                                                  | Passed                                                           |
+| Accepted/no-op/fail/inconclusive disposition | Reviewed normalization/unowned findings can no-op; blocking findings fail; unavailable/skipped/unknown-secret stay inconclusive              | Exit zero alone, missing readback normalized to unchanged, or unowned state silently accepted             | Status and accepted-unowned tests plus report encoder                                | Passed                                                           |
+| Safe telemetry and bounded receipt           | Resource IDs are SHA-256 fingerprints; absent attempts/duration/plan are `NotExposed`; actual receipt validates fixed contract               | Raw FQN/provider body/error/value, invented zero counts, or a hand-written receipt-shaped fixture         | Codec roundtrip/leak/malformed tests, native-failure test and actual receipt builder | Passed                                                           |
+| Structured control and verification owners   | Fixed control, authority, receipt and BND-J14 journey contracts decode through current repository owners                                     | Markdown-only policy, BND-J13 claim collision, or broad suite as proof by proxy                           | Package fixed-contract tests plus authority/control/verification gates               | Passed                                                           |
+| Monitoring and alert boundary                | Workflow/run failure is a report signal; provider alert-policy/persistent-log API and alert transport remain explicit non-claims             | Source file claimed as hosted scheduling, missing-run alert, provider alert delivery or repair            | Control/register/runbook/README non-claims and policy fixtures                       | Passed as repository policy; hosted readback remains pending     |
+| Documentation inventory                      | Current sorted inventories equal 199 docs paths and 23 README paths with a dated correction                                                  | Copying the previous 197 count or rewriting the historical HGI-307 epoch                                  | `check:docs`, `eval:hgi-307`, dated inventory correction                             | Passed                                                           |
+| Terminal lifecycle                           | Live receipt, full verification, five independent audit passes, final reconciliation and archive occur on exact final state                  | Earlier interim audit, repository implementation commit, local report or neighbour task acceptance        | Task ledger, this plan and terminal closeout owner                                   | Pending                                                          |
+
+### Drift implementation docs-maintainer impact ledger
+
+| Surface                                  | Decision        | Direct evidence or preserved boundary                                                                                                                       |
+| ---------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph     | Change required | Route the shared stable stack, native desired-plan/native-sync wrapper and distinct Vercel Git ownership; no parallel provider transport or repair edge.    |
+| READMEs                                  | Change required | Root/infrastructure/Photon and agent runbook index route the new command and its zero-write/no-alert non-claims; `apps/agent/README.md` remains unchanged.  |
+| Exports and generated references         | Change required | Export canonical drift codecs, branded artifact path and builders; build output stays generated/untracked and no provider client escapes.                   |
+| Runbooks, authority and controls         | Change required | Add exact Preview report procedure, fixed authority, report-only workflow/automation/control records, stop/rollback and external-settings non-claims.       |
+| Verification journeys and proof          | Change required | Add BND-J14 and its command map; keep BND-J13 mutation/convergence distinct; live detail and bounded receipt remain ignored until accepted.                 |
+| Skills and AGENTS                        | Preserve        | Existing repository-local implementer, docs-maintainer, Effect wrapper and package-structure rules remain current; no skill or agent instruction changed.   |
+| Lint, config, commands and CI            | Change required | Add root/package drift-report commands, exact workflow inventory/action pins and semantic policy negatives; existing CI continues repository verification.  |
+| Schemas, services and Layers             | Change required | Add Schema-derived observation/report/receipt input contracts and reuse stage-owned state plus existing live provider Layers; no new raw client or DTO.     |
+| Tests and fixture lifecycle              | Change required | Add malformed/compatibility/leak/classification/authority/control/receipt fixtures; review on Alchemy/native result or fixed-contract change.               |
+| SPEC, tasks and active plan              | Change required | Keep this final task in progress through exact-source live readback, full verification and the single terminal five-pass audit.                             |
+| Receipts, secrets and evidence retention | Change required | Persist only mode-`0600` fingerprint reports/receipts; authority, manifest and environment custody stay ignored and credential values never enter evidence. |
+| Rollout, rollback and provider authority | Change required | Report-only Preview readback uses existing authority; zero provider writes means rollback is artifact disposal/workflow revocation, not provider mutation.  |
+| Lifecycle and archive pointers           | Preserve        | SPEC and plan remain active; no terminal audit, completed-plan move, archived pointer or full-SPEC completion is claimed yet.                               |
+| Documentation inventory                  | Change required | Add the control and dated correction, recompute 199 docs/23 README paths and preserve the original HGI-307 epoch as historical evidence only.               |
+
+The first full verification attempt stopped at the known agent configuration
+precondition because the shell lacked the synthetic Executor endpoint; no
+Executor or provider request occurred. The accepted rerun used only the
+documented process-local synthetic endpoint/key and passed Effect LS, every
+boundary/docs/skills/authority/controls/verification/HGI-307 gate, 98 tooling
+tests, type-aware format/lint, the lint fixture, Knip, all nine workspace
+typechecks, 69 infrastructure Vitest tests, 20 Alchemy lifecycle tests and all
+fifteen Turbo tasks. This accepts the repository implementation candidate only;
+the exact-source live Preview report, hosted workflow actuality, terminal audit
+and lifecycle closeout remain pending.
+
 ### Production state-correction docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |

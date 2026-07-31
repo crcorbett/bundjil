@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-31
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -141,6 +141,14 @@ bun run --filter @bundjil/agent preflight:production
   secret/phone leakage. Live acceptance still requires fresh
   credential-backed readback through the target-owned runbooks; a blocked
   credential preflight remains inconclusive.
+- Report-only infrastructure drift changes additionally test the fixed
+  Preview-only authority and control records; native-plan/source separation;
+  normalization, unowned, missing, in-place, destructive, unavailable,
+  ambiguous, unknown-secret, skipped-read, and deployment classifications;
+  bounded receipt encoding; Production/apply rejection; and secret/raw-ID leak
+  sentinels. A local fixture or workflow source does not prove a hosted run,
+  external settings, credential availability, current provider state, or alert
+  delivery.
 - Eve tool change: run `@bundjil/eve` tests when contracts change,
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-25",
+  "lastReviewed": "2026-07-31",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -26,6 +26,30 @@
         "availability": "unavailable",
         "outcome": "inconclusive",
         "evidence": "No authenticated current GitHub workflow/settings/run readback was performed in HGI-304"
+      }
+    },
+    {
+      "id": "github-infrastructure-drift",
+      "surface": "workflow",
+      "target": "github-actions",
+      "principal": "Ephemeral GitHub Actions Preview drift job with exact read-only environment custody",
+      "identitySource": "GitHub-issued job identity for crcorbett/bundjil at the exact source SHA plus the infrastructure-read-only-preview environment and three named secret artifacts",
+      "operation": "Read exact Preview Alchemy state and Vercel/Photon metadata, compute one native desired plan and one native sync dry-run, and persist a sanitized report-only receipt",
+      "resource": "alchemy:BundjilInfrastructure:preview, R2 bundjil-alchemy-state prefix bundjil/v1, and exact Bundjil Preview Vercel/Photon resources encoded by the accepted manifest",
+      "environment": "Preview only; same-repository pull requests, weekly schedule, or one manual read-only dispatch",
+      "status": "bounded",
+      "durationRevocation": "One run, maximum 20 minutes; newer source/ref work cancels stale work; revoke the three environment secret artifacts or disable the exact workflow under separate settings authority",
+      "approvalBoundary": "The accepted Alchemy SPEC, fixed read-only authority artifact, exact Preview manifest and infrastructure-read-only-preview environment permit metadata reads and local mode-0600 receipts only; no tool output or finding grants repair authority",
+      "approvalReceipt": "The fixed authority envelope named by BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON plus exact source/run identity when externally observed",
+      "auditEvidence": "Schema-valid fingerprint-only desired-plan counts, native-sync classifications, provider-writes:0, bounded receipt and GitHub run/check identity when available",
+      "rollback": "No provider rollback is required. Revert the workflow source or separately disable the workflow and revoke only its read-only environment artifacts, then read back GitHub settings",
+      "stopCondition": "Stop on fork input, repository/stage mismatch, Production target, missing or ambiguous readback, unknown secret revision, skipped provider read, unexpected desired-plan action, credential leak, provider write, timeout, stale run, or invalid receipt",
+      "escalation": "Bundjil repository owner, security/automation maintainer, Alchemy state owner and exact Vercel/Photon provider owners",
+      "nonClaim": "Checked-in source and local fixtures do not prove the environment, secrets, hosted run, check, provider availability, no future drift, alert delivery, repair, deployment, promotion, or Production state",
+      "readback": {
+        "availability": "unavailable",
+        "outcome": "inconclusive",
+        "evidence": "The workflow exists only on the unmerged task branch; no authenticated GitHub environment, secret-binding, schedule, or hosted-run readback is claimed"
       }
     },
     {
