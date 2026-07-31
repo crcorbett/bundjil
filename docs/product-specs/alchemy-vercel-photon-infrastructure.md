@@ -1977,3 +1977,21 @@ All three commands own the preflight; rebuilding manually or proving only the
 parent resolver remains a rejected false green. The next provider attempt
 remains ineligible until this corrected command contract is committed, pushed,
 fully verified, and followed by a fresh exact-SHA gate.
+
+Commit `b4e3bc74841ff4a831f9f6c679bfeb2687635a6c` made the command
+preflight durable. Its exact-SHA inventory stabilized after one classified
+deployment transition, observed adoption converged 154 resources, and the
+managed plan qualified four updates plus 150 no-ops. The rebuilt live adapter
+then produced the first authoritative provider classification: all four writes
+failed with HTTP `400`, with provider code and message fields present. Fresh
+passed two-read inventory proved the four physical IDs and revisions unchanged.
+
+Current primary Vercel documentation states that an existing sensitive
+environment variable permits value and environment edits but its key cannot be
+edited. The SDK edit request marks `key` optional. Because the exact environment
+ID already owns identity, Bundjil must omit `key` while retaining Preview
+target, sensitive type and write-only value. The focused request Schema must
+reject an extra key rather than strip it. A successful request with a changed
+key, a generic 2xx, or a mock that ignores excess fields is a rejected false
+green. One corrected provider attempt remains gated by coherent commit/push,
+full verification and fresh exact-SHA adoption.

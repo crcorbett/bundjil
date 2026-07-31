@@ -24,7 +24,6 @@ import {
 import {
   UpdateVercelStableEnvironmentVariable,
   VercelPreviewPhotonBindingValues,
-  VercelPreviewPhotonEnvironmentKey,
   VercelPreviewPhotonSecretOwner,
   VercelStableEnvironmentBindings,
   VercelStableEnvironmentReadError,
@@ -77,7 +76,6 @@ const VercelStableEnvironmentEnvelope = Schema.Union([
 ]);
 
 const VercelStableEnvironmentRequest = Schema.Struct({
-  key: VercelPreviewPhotonEnvironmentKey,
   target: Schema.Tuple([Schema.Literal("preview")]),
   type: Schema.Literal("sensitive"),
   value: Schema.NonEmptyString,
@@ -259,7 +257,6 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
       ).pipe(
         HttpClientRequest.setUrlParam("teamId", encoded.teamId),
         HttpClientRequest.schemaBodyJson(VercelStableEnvironmentRequest)({
-          key: encoded.key,
           target: ["preview"],
           type: "sensitive",
           value: Redacted.value(input.value),

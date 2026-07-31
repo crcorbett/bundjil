@@ -65,7 +65,7 @@ const bindingLayer = (client: HttpClient.HttpClient) =>
   );
 
 it.effect(
-  "encodes one exact Preview PATCH, decodes the full acknowledgement, and never projects the provider value",
+  "omits the immutable sensitive key, decodes the full acknowledgement, and never projects the provider value",
   () =>
     Effect.gen(function* testStableEnvironmentLiveContract() {
       const decoded = yield* fixture;
@@ -86,20 +86,21 @@ it.effect(
           const body = Schema.decodeUnknownSync(
             Schema.fromJsonString(
               Schema.Struct({
-                key: Schema.Literal("BUNDJIL_CHANNEL_PHOTON_PROJECT_ID"),
                 target: Schema.Tuple([Schema.Literal("preview")]),
                 type: Schema.Literal("sensitive"),
                 value: Schema.Literal("preview-photon-project-value"),
               })
             )
-          )(new TextDecoder().decode(request.body.body));
+          )(new TextDecoder().decode(request.body.body), {
+            onExcessProperty: "error",
+          });
           assert.deepStrictEqual(body.target, ["preview"]);
           return HttpClientResponse.fromWeb(
             request,
             Response.json(
               {
                 id: "env-photon-project",
-                key: body.key,
+                key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
                 type: "sensitive",
                 target: ["preview"],
                 sensitive: true,

@@ -30,7 +30,8 @@ receipts, and deterministic memory Layers.
   branded value revision without the value, decodes the complete
   acknowledgement immediately, and leaves every ObservedUnknown, Absent,
   Marketplace, datastore, bearer, Production, deployment, and promotion
-  boundary read-only. Rejections expose only the bounded HTTP status and
+  boundary read-only. The PATCH addresses the exact environment ID and omits
+  the immutable sensitive-variable key. Rejections expose only the bounded HTTP status and
   provider error-field presence; raw provider codes, messages, and values
   remain private to the adapter.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and

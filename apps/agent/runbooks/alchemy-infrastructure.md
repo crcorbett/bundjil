@@ -168,9 +168,10 @@ operation.
 2. Capture the externally retained prior four values and their revision in
    approved secret custody. Run
    `bun run infrastructure:stable-preview-apply`. Each provider request must
-   target the same environment ID with `sensitive` and `preview`, then decode a
-   complete acknowledgement with a new provider revision. Values must never
-   appear in stdout, Alchemy state, receipts, plans, or tracked files.
+   target the same environment ID with `sensitive` and `preview`, omit the
+   immutable sensitive-variable key, then decode a complete acknowledgement
+   with a new provider revision. Values must never appear in stdout, Alchemy
+   state, receipts, plans, or tracked files.
 3. A known 429 or 5xx receives exponential jitter and at most three total
    attempts. A malformed response, identity mismatch, 4xx policy failure, or
    timeout after a possible write is fail-closed. Never blindly retry an

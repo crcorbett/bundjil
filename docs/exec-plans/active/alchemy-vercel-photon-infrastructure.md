@@ -2087,3 +2087,19 @@ show all three scripts own that preflight and the resulting compiled message
 matches source. A manual build, a parent-only resolver result, or a green suite
 without command composition is rejected. Commit/push plus a new exact-SHA gate
 remain prerequisites to one bounded attempt.
+
+Commit `b4e3bc74841ff4a831f9f6c679bfeb2687635a6c` then passed the build
+preflight and full suite. Exact-SHA inventory stabilized after one deployment
+transition; observed adoption converged 154 resources; the managed plan
+reported four updates and 150 no-ops. The rebuilt adapter classified all four
+provider rejections as HTTP `400`, each with code/message fields present.
+Fresh passed two-read inventory proved the four exact revisions unchanged and
+the raw log was removed.
+
+Official Vercel sensitive-variable documentation resolves the 400 boundary:
+value and environment are editable, but key is immutable; the SDK request
+model makes key optional. The adapter must omit key because the exact
+environment ID already owns identity. Its focused Schema fixture must reject
+an extra key with excess-property checking and still require the acknowledgement
+to return the exact expected key. Commit/push, complete verification and a
+fresh exact-SHA gate precede one corrected attempt.
