@@ -308,8 +308,13 @@ the command requires one matching pre-create callback and exactly that original
 plus the rollout-created callback afterward. Store the create-only ID/secret
 in `.env.local` as the Production
 webhook pair, re-run the four-value apply, create a staged deployment, and
-require signed live proof before any promotion or old-callback retirement.
-After proof and drain, delete only the exact retired URL with
+require a candidate-specific signed identity-free safe probe before promotion.
+Do not send a real pre-promotion Photon message while the two callbacks resolve
+to different deployments: project fanout makes that a replay race, not a
+candidate-only proof. Immediately after promotion, require both exact callback
+URLs to resolve to the accepted deployment, one bounded real event to produce
+one accepted dispatch plus one duplicate and exactly one response, then drain
+the retry horizon. Delete only the exact retired URL with
 `bun run infrastructure:photon-production-webhook-delete`. Never deploy a
 candidate while any configured value is a provider write-only placeholder.
 

@@ -2352,6 +2352,42 @@ four-binding convergence, replacement staged candidate and promotion gates.
 | Lifecycle, archive and terminal audit         | Preserve        | The SPEC and plan remain active; drift closeout and the one terminal five-pass audit remain downstream.                                                         |
 | Documentation inventory and archive pointers  | Preserve        | No documentation path or lifecycle pointer changes; `check:docs` recomputes the same 272-file corpus.                                                           |
 
+#### Production parallel-callback proof sequencing
+
+Fresh exact-source replay at `8132366…` converged the four managed bindings,
+all 73 Alchemy resources, two unchanged syncs and a replacement unaliased
+Production candidate. Candidate readback proved `READY`, exact source, root
+`200`, unsigned Photon `401`, one signed identity-free unsupported-event `204`,
+the exact ignored disposition, and zero dispatch/error/fatal records. Current
+Vercel metadata, the accepted identity receipt, unchanged write-only record
+revisions, the independently custodied Preview routing overwrite, Photon
+topology and Sendblue readback produced a mode-`0600`
+`channel-candidate-staged` snapshot; its preflight passed with no rejection.
+
+The requirement-to-proof replay then rejected a live pre-promotion Photon
+journey as a false green. Photon fans one project event to both callbacks; while
+the original callback resolves to the last-known-good deployment and the
+candidate callback resolves to the staged deployment, the event can race two
+runtimes or dispatch twice if namespaces differ. Deleting or muting the
+original would also destroy the accepted lossless rollback boundary.
+
+The corrected sequence preserves both callbacks and requires only the signed
+identity-free safe probe before promotion. After promotion, both exact callback
+URLs must resolve to the same accepted deployment and Production replay
+namespace. One bounded real event must produce exactly one fresh accepted
+dispatch, one duplicate disposition, one external response, zero second
+effect, and no callback on another deployment. Only then may retry drain and
+exact original-callback retirement proceed. This source correction supersedes
+the unaliased `8132366…` candidate; a new pushed candidate, safe probe and
+preflight are required.
+
+| Requirement                         | Direct observable and expected postcondition                                                               | Plausible false green rejected                                                          | Focused command/evidence owner                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Pre-promotion candidate integrity   | Exact candidate URL returns signed safe `204` with ignored disposition, zero dispatch and zero error/fatal | A real message racing two deployments, HTTP status alone, or stable-alias response      | Candidate request plus deployment-scoped logs; deploy runbook        |
+| Post-promotion callback convergence | Both exact callback URLs resolve to the promoted deployment and one replay namespace                       | Alias promotion alone, one callback read, or assuming project fanout is ordered         | Vercel deployment/API and Photon callback readback                   |
+| Live fanout deduplication           | One event yields one accepted dispatch, one duplicate disposition and exactly one external response        | Two `2xx` statuses, one handset reply without callback attribution, or aggregate counts | BND-J12 packet, exact runtime logs, replay/provider/handset readback |
+| Lossless retirement                 | Original callback is deleted only after proof, conservative drain and exact candidate-only readback        | Early delete, unavailable secret treated as restorable, or count-only topology          | Photon owner delete/readback command and rollback receipt            |
+
 #### Production write-only custody finding and recovery
 
 Fresh exact-source inventory at repository commit

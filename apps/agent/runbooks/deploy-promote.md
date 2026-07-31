@@ -148,10 +148,22 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    inline secret flags, or an unreviewed prebuilt artifact.
 
 6. Before promotion, execute the Sendblue and Photon runbooks against the
-   immutable candidate URL. Require signed ingress, replay suppression, Eve
-   completion, outbound acceptance, typing start, typing stop, and scoped
-   resource release for each provider. A provider-accepted result does not
-   establish handset delivery or typing display.
+   immutable candidate URL. For the ordinary one-callback `Stable` topology,
+   require signed ingress, replay suppression, Eve completion, outbound
+   acceptance, typing start, typing stop, and scoped resource release for each
+   provider. A provider-accepted result does not establish handset delivery or
+   typing display.
+
+   A write-only-secret `ParallelCutover` is different: Photon fans one project
+   event to both callbacks, so a real pre-promotion message can race the
+   last-known-good deployment and the candidate or produce two effects if their
+   replay namespaces differ. Do not send that message or call a candidate
+   duplicate a full journey. Before promotion require only an exact
+   candidate-URL signed, identity-free unsupported-event probe, its closed
+   ignored disposition, zero dispatch/outbound capability, and zero error or
+   fatal logs. The full Photon journey moves to the immediate post-promotion
+   gate, where fresh readback must prove both exact callback URLs resolve to the
+   same accepted deployment and its one Production replay namespace.
 
 7. Immediately repeat the project/list/inspect readbacks, resolve the stable
    alias to the accepted immutable deployment, retain the passed pre-promotion
@@ -162,7 +174,13 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    [`docs/verification`](../../../docs/verification/README.md) packet. Repeat
    both provider journeys through the stable domain and bind them to
    `BND-J12-dual-channel-production`; a deployment status alone is
-   insufficient.
+   insufficient. During `ParallelCutover`, the one bounded Photon event must
+   yield two signed callback observations on that exact deployment, one fresh
+   accepted dispatch, one duplicate disposition, and exactly one external
+   response. Any second dispatch/response, callback on another deployment,
+   missing duplicate, or replay-namespace ambiguity triggers rollback. Only
+   after that proof, the documented retry-horizon drain, and exact callback
+   readback may the original callback be retired.
 
    A write-only Photon-secret recovery may legitimately carry two Production
    callbacks through the staged and promotion preflights: the exact original

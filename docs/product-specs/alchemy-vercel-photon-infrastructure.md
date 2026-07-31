@@ -2129,8 +2129,14 @@ accepted lossless callback replacement rather than guessing or deploying a
 partial configuration: retain the original webhook and last-known-good
 deployment, create one parallel Production callback under separate exact
 authority, retain its create-only secret, reapply all four values, stage the
-candidate, and require signed live proof before promotion or original-webhook
-retirement.
+candidate, and require a candidate-specific signed identity-free safe probe
+before promotion. Photon project events fan out to every callback, so a real
+message while the original and candidate callbacks resolve to different
+deployments is a replay race rather than candidate-only proof. Immediately
+after promotion, fresh readback must prove both exact callback URLs resolve to
+the accepted deployment and one Production replay namespace; one bounded real
+event must then produce one accepted dispatch, one duplicate disposition and
+exactly one response before retry drain or original-webhook retirement.
 
 The authorized live recovery created one parallel Production callback while
 preserving the original callback and both shared users. Fresh two-read
@@ -2152,6 +2158,18 @@ fingerprints, a bare count of two, or a parallel topology at
 `channel-inventory-ready` fail closed. The original callback remains live
 until post-promotion provider proof, retry drain and exact surviving-callback
 readback.
+
+The exact-source replacement candidate at `8132366…` was `READY`,
+Production-targeted and unaliased while the stable alias remained on
+`dpl_DfAb…`. Its root returned `200`, unsigned Photon ingress returned `401`,
+and one signed identity-free unsupported event returned `204` with the exact
+ignored disposition and zero dispatch/error/fatal records. A mode-`0600`
+sanitized `channel-candidate-staged` snapshot passed with no rejection after
+fresh deployment, environment-record, Photon and Sendblue readback. That gate
+also exposed the proof-sequencing contradiction above before any live message
+or alias mutation. The correction deliberately supersedes this candidate:
+the next pushed exact-source candidate must repeat the safe probe and staged
+preflight, then follow the post-promotion fanout/deduplication proof.
 
 That first receipt exposed a second durable correction: Production cannot use
 the Preview rollback claim that prior values are externally retained. Its

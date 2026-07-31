@@ -363,7 +363,14 @@ duplicate suppression, Preview, Production, or durable process supervision.
    Require the signed event to identify only the Preview webhook/environment,
    one Preview response, zero Production response, and exact same-event
    duplicate disposition. Two callbacks in one Photon project are forbidden
-   because a project event fans out to every registered webhook.
+   because a project event fans out to every registered webhook. The sole
+   exception is the bounded Production write-only-secret `ParallelCutover`:
+   both callbacks must be preserved until promotion, no real pre-promotion
+   message is permitted, and fresh post-promotion readback must prove both URLs
+   resolve to the same accepted deployment and replay namespace. One bounded
+   event must then produce one accepted dispatch, one duplicate disposition,
+   exactly one response, and no callback on another deployment before drain
+   and exact original-callback retirement.
    Classify every exact route response and its matching
    `ChannelWebhookDisposition` record before accepting the journey. The record
    contains only the branded webhook path, a closed disposition literal, and,
