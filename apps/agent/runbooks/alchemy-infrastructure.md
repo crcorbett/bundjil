@@ -109,11 +109,27 @@ Photon projects, manifests, or physical identities.
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run
    `infrastructure:preview-state-migration` first under its distinct fixed
-   authority. Plan must prove 106 completed retained rows and the seven exact
-   fingerprinted Photon rows; apply must persist the complete mode-`0600`
-   backup before removing only those state rows and read back 99. Restore mode
-   is the exact rollback until the next adoption reaches no-op. This command
-   composes Alchemy state only and authorizes no provider delete.
+   authority. Set `BUNDJIL_STATE_MIGRATION_STAGE=preview` and the exact
+   `BUNDJIL_STATE_MIGRATION_{AUTHORITY,BACKUP,RECEIPT}_PATH` plus
+   `BUNDJIL_STATE_MIGRATION_{MODE,CANDIDATE}` Config. Plan must prove 106
+   completed retained rows and the seven exact fingerprinted Photon rows;
+   apply must persist the complete mode-`0600` backup before removing only
+   those state rows and read back 99. Restore mode is the exact rollback until
+   the next adoption reaches no-op. This command composes Alchemy state only
+   and authorizes no provider delete.
+
+   If the first current Production plan reveals the accepted one-row
+   discontinuity, run `infrastructure:production-state-migration` with the
+   same Config names and `BUNDJIL_STATE_MIGRATION_STAGE=prod` under the
+   Production-specific fixed authority. Plan must prove exactly 69 current
+   state rows, 72 desired manifest resources, one retained Photon webhook type
+   and fingerprint, and zero provider transports. Apply must back up all 69
+   rows before retiring only that state row and read back 68. Restore must
+   exactly recover all backed-up rows and remove only rows absent from the
+   backup. The following adoption is expected to reconcile four desired
+   resources absent from state and must still contain zero replacement or
+   delete. Stop on any other count, type, fingerprint, stage, status or
+   removal policy.
 
 4. Under the same unexpired authority, adopt one stage at a time:
 

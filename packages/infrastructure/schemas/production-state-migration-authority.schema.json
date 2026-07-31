@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bundjil.dev/schemas/production-state-migration-authority.schema.json",
+  "title": "Bundjil Production state migration authority policy",
+  "type": "object",
+  "required": [
+    "externalAccess",
+    "environments",
+    "resources",
+    "operations",
+    "readback",
+    "rollback",
+    "stopConditions"
+  ],
+  "properties": {
+    "externalAccess": {
+      "const": "mutation"
+    },
+    "environments": {
+      "const": ["production"]
+    },
+    "resources": {
+      "const": [
+        "alchemy:BundjilInfrastructure:prod:state-only",
+        "state-fqn-sha256:0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1"
+      ]
+    },
+    "operations": {
+      "const": [
+        "read and back up all BundjilInfrastructure Production Alchemy state rows",
+        "delete only the one exact manifest-absent retained state row",
+        "restore the complete exact pre-migration Production state from the retained backup"
+      ]
+    },
+    "readback": {
+      "contains": {
+        "const": "require 69 rows before, 68 rows after retirement, and zero provider transport calls"
+      }
+    },
+    "rollback": {
+      "contains": {
+        "const": "restore every backed-up row and remove only rows absent from the backup"
+      }
+    },
+    "stopConditions": {
+      "allOf": [
+        {
+          "contains": {
+            "const": "state version, stack, stage, manifest digest, row count, status, retain policy, type or fingerprint mismatch"
+          }
+        },
+        {
+          "contains": {
+            "const": "any Vercel, Photon, deployment, credential, billing, webhook or message operation"
+          }
+        }
+      ]
+    }
+  }
+}

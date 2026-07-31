@@ -17,6 +17,7 @@ import type { AdoptionManifest } from "../adoption-manifest.js";
 import {
   AdoptionManifestDigest,
   AlchemyLogicalResourceId,
+  InfrastructureStage,
 } from "../schemas.js";
 
 const sha256 = (value: string) =>
@@ -86,6 +87,36 @@ export type PreviewStateMigrationErrorMessage =
 export type PreviewStateMigrationErrorMessageEncoded =
   typeof PreviewStateMigrationErrorMessage.Encoded;
 
+export const PreviewStateMigrationFailureReason = Schema.Literals([
+  "stateListFailed",
+  "stateReadFailed",
+  "stateRowMissing",
+  "stateRowInvalid",
+  "stageMismatch",
+  "stateVersionUnavailable",
+  "stateVersionMismatch",
+  "currentCountMismatch",
+  "desiredCountMismatch",
+  "staleCountMismatch",
+  "staleTypeMismatch",
+  "staleFingerprintMismatch",
+  "backupUnavailable",
+  "backupEncodeFailed",
+  "backupCredentialLeak",
+  "backupWriteFailed",
+  "backupReadFailed",
+  "retirementFailed",
+  "retirementReadbackMismatch",
+  "restoreDeleteFailed",
+  "restoreWriteFailed",
+  "restoreComparisonFailed",
+  "restoreMismatch",
+]);
+export type PreviewStateMigrationFailureReason =
+  typeof PreviewStateMigrationFailureReason.Type;
+export type PreviewStateMigrationFailureReasonEncoded =
+  typeof PreviewStateMigrationFailureReason.Encoded;
+
 export const PreviewStateForbiddenValue = Schema.Redacted(
   Schema.NonEmptyString.pipe(
     Schema.brand("@bundjil/infrastructure/state/PreviewStateForbiddenValue")
@@ -133,7 +164,7 @@ export type PreviewStateBackupResourceEncoded =
 export const PreviewStateBackup = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
   stack: Schema.Literal("BundjilInfrastructure"),
-  stage: Schema.Literal("preview"),
+  stage: InfrastructureStage,
   stateVersion: Schema.Literal(5),
   manifestDigest: AdoptionManifestDigest,
   resources: Schema.Array(PreviewStateBackupResource),
@@ -156,6 +187,7 @@ export type PreviewStateMigrationResultEncoded =
   typeof PreviewStateMigrationResult.Encoded;
 
 export const PreviewStateMigrationPolicy = Schema.Struct({
+  stage: InfrastructureStage,
   currentCount: PositiveInt,
   desiredCount: PositiveInt,
   staleFingerprints: Schema.NonEmptyArray(PreviewStateResourceFingerprint),
@@ -169,12 +201,24 @@ export type PreviewStateMigrationPolicyEncoded =
 export class PreviewStateMigrationError extends Data.TaggedError(
   "PreviewStateMigrationError"
 )<{
+  readonly reason: PreviewStateMigrationFailureReason;
   readonly message: PreviewStateMigrationErrorMessage;
+  readonly observedCount?: number;
+  readonly expectedCount?: number;
 }> {}
 
-const migrationError = (message: string) =>
+const migrationError = (
+  reason: PreviewStateMigrationFailureReason,
+  message: string,
+  counts?: {
+    readonly observedCount: number;
+    readonly expectedCount: number;
+  }
+) =>
   new PreviewStateMigrationError({
+    reason,
     message: PreviewStateMigrationErrorMessage.make(message),
+    ...counts,
   });
 
 export class PreviewStateBackupStore extends Context.Service<
@@ -207,6 +251,7 @@ export class PreviewStateMigration extends Context.Service<
 >()("@bundjil/infrastructure/state/PreviewStateMigration") {}
 
 const CanonicalPreviewStateMigrationPolicy = PreviewStateMigrationPolicy.make({
+  stage: "preview",
   currentCount: 106,
   desiredCount: 147,
   staleResourceTypes: [
@@ -271,28 +316,35 @@ export const makePreviewStateMigrationLayer = (
           const fqns = yield* state
             .list({
               stack: "BundjilInfrastructure",
-              stage: "preview",
+              stage: policy.stage,
             })
             .pipe(
               Effect.mapError(() =>
-                migrationError("Preview state identities could not be listed.")
+                migrationError(
+                  "stateListFailed",
+                  "Preview state identities could not be listed."
+                )
               )
             );
           return yield* Effect.forEach(fqns, (fqn) =>
             state
               .get({
                 stack: "BundjilInfrastructure",
-                stage: "preview",
+                stage: policy.stage,
                 fqn,
               })
               .pipe(
                 Effect.mapError(() =>
-                  migrationError("A Preview state row could not be read.")
+                  migrationError(
+                    "stateReadFailed",
+                    "A Preview state row could not be read."
+                  )
                 ),
                 Effect.flatMap((resource) =>
                   resource === undefined
                     ? Effect.fail(
                         migrationError(
+                          "stateRowMissing",
                           "A listed Preview state row was missing."
                         )
                       )
@@ -302,6 +354,7 @@ export const makePreviewStateMigrationLayer = (
                       ).pipe(
                         Effect.mapError(() =>
                           migrationError(
+                            "stateRowInvalid",
                             "A Preview state row was not a completed retained resource."
                           )
                         )
@@ -315,20 +368,25 @@ export const makePreviewStateMigrationLayer = (
       const prepare = Effect.fn("PreviewStateMigration.prepare")(function* (
         manifest: AdoptionManifest
       ) {
-        if (manifest.stage !== "preview") {
+        if (manifest.stage !== policy.stage) {
           return yield* migrationError(
-            "State migration requires a Preview manifest."
+            "stageMismatch",
+            "State migration requires the exact policy-owned stage manifest."
           );
         }
         const version = yield* state
           .getVersion()
           .pipe(
             Effect.mapError(() =>
-              migrationError("The state-store version could not be read.")
+              migrationError(
+                "stateVersionUnavailable",
+                "The state-store version could not be read."
+              )
             )
           );
         if (version !== 5) {
           return yield* migrationError(
+            "stateVersionMismatch",
             "The state-store contract version is not accepted."
           );
         }
@@ -347,20 +405,55 @@ export const makePreviewStateMigrationLayer = (
           .toSorted();
         const expectedStaleTypes = policy.staleResourceTypes.toSorted();
         const expectedStaleFingerprints = policy.staleFingerprints.toSorted();
+        if (resources.length !== policy.currentCount) {
+          return yield* migrationError(
+            "currentCountMismatch",
+            "State does not match the exact accepted stage discontinuity.",
+            {
+              observedCount: resources.length,
+              expectedCount: policy.currentCount,
+            }
+          );
+        }
+        if (manifest.resources.length !== policy.desiredCount) {
+          return yield* migrationError(
+            "desiredCountMismatch",
+            "State does not match the exact accepted stage discontinuity.",
+            {
+              observedCount: manifest.resources.length,
+              expectedCount: policy.desiredCount,
+            }
+          );
+        }
+        if (stale.length !== policy.staleFingerprints.length) {
+          return yield* migrationError(
+            "staleCountMismatch",
+            "State does not match the exact accepted stage discontinuity.",
+            {
+              observedCount: stale.length,
+              expectedCount: policy.staleFingerprints.length,
+            }
+          );
+        }
         if (
-          resources.length !== policy.currentCount ||
-          manifest.resources.length !== policy.desiredCount ||
-          stale.length !== policy.staleFingerprints.length ||
           staleTypes.some(
             (resourceType, index) => resourceType !== expectedStaleTypes[index]
-          ) ||
+          )
+        ) {
+          return yield* migrationError(
+            "staleTypeMismatch",
+            "State does not match the exact accepted stage discontinuity."
+          );
+        }
+        if (
           staleFingerprints.some(
             (resourceFingerprint, index) =>
               resourceFingerprint !== expectedStaleFingerprints[index]
           )
         ) {
           return yield* migrationError(
-            "Preview state does not match the exact accepted discontinuity."
+            "staleFingerprintMismatch",
+            "State does not match the exact accepted stage discontinuity."
           );
         }
         return {
@@ -378,7 +471,7 @@ export const makePreviewStateMigrationLayer = (
           backup: PreviewStateBackup.make({
             schemaVersion: "1",
             stack: "BundjilInfrastructure",
-            stage: "preview",
+            stage: policy.stage,
             stateVersion: 5,
             manifestDigest: manifest.digest,
             resources,
@@ -399,12 +492,13 @@ export const makePreviewStateMigrationLayer = (
                 state
                   .delete({
                     stack: "BundjilInfrastructure",
-                    stage: "preview",
+                    stage: policy.stage,
                     fqn: resource.fqn,
                   })
                   .pipe(
                     Effect.mapError(() =>
                       migrationError(
+                        "retirementFailed",
                         "An obsolete Preview state row could not be retired."
                       )
                     )
@@ -420,6 +514,7 @@ export const makePreviewStateMigrationLayer = (
               )
             ) {
               return yield* migrationError(
+                "retirementReadbackMismatch",
                 "Preview state retirement did not reach the exact readback."
               );
             }
@@ -446,6 +541,7 @@ export const makePreviewStateMigrationLayer = (
                 .pipe(
                   Effect.mapError(() =>
                     migrationError(
+                      "restoreDeleteFailed",
                       "A post-migration Preview state row could not be removed during restore."
                     )
                   )
@@ -483,6 +579,7 @@ export const makePreviewStateMigrationLayer = (
                 .pipe(
                   Effect.mapError(() =>
                     migrationError(
+                      "restoreWriteFailed",
                       "A backed-up Preview state row could not be restored."
                     )
                   )
@@ -506,6 +603,7 @@ export const makePreviewStateMigrationLayer = (
           ).pipe(
             Effect.mapError(() =>
               migrationError(
+                "restoreComparisonFailed",
                 "The restored Preview state could not be compared with its backup."
               )
             )
@@ -519,6 +617,7 @@ export const makePreviewStateMigrationLayer = (
           ).pipe(
             Effect.mapError(() =>
               migrationError(
+                "restoreComparisonFailed",
                 "The Preview state backup could not be compared with restored state."
               )
             )
@@ -532,6 +631,7 @@ export const makePreviewStateMigrationLayer = (
             sha256(restoredEncoded) !== sha256(backupEncoded)
           ) {
             return yield* migrationError(
+              "restoreMismatch",
               "Preview state restore did not match the exact backup."
             );
           }
@@ -553,6 +653,27 @@ export const PreviewStateMigrationLive = makePreviewStateMigrationLayer(
   CanonicalPreviewStateMigrationPolicy
 );
 
+const CanonicalProductionStateMigrationPolicy =
+  PreviewStateMigrationPolicy.make({
+    stage: "prod",
+    currentCount: 69,
+    desiredCount: 72,
+    staleResourceTypes: [
+      PreviewStateResourceType.make(
+        "Bundjil.Infrastructure.PhotonWebhookObservation"
+      ),
+    ],
+    staleFingerprints: [
+      PreviewStateResourceFingerprint.make(
+        "0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1"
+      ),
+    ],
+  });
+
+export const ProductionStateMigrationLive = makePreviewStateMigrationLayer(
+  CanonicalProductionStateMigrationPolicy
+);
+
 export const makePreviewStateBackupStoreMemory = () => {
   let retainedBackup: PreviewStateBackup | undefined;
   return Layer.succeed(
@@ -564,7 +685,12 @@ export const makePreviewStateBackupStoreMemory = () => {
         }),
       load: Effect.suspend(() =>
         retainedBackup === undefined
-          ? Effect.fail(migrationError("No Preview state backup is retained."))
+          ? Effect.fail(
+              migrationError(
+                "backupUnavailable",
+                "No Preview state backup is retained."
+              )
+            )
           : Effect.succeed(retainedBackup)
       ),
     })
@@ -586,7 +712,10 @@ export const makePreviewStateBackupStoreLive = (
               Schema.fromJsonString(PreviewStateBackup)
             )(backup).pipe(
               Effect.mapError(() =>
-                migrationError("The Preview state backup could not be encoded.")
+                migrationError(
+                  "backupEncodeFailed",
+                  "The Preview state backup could not be encoded."
+                )
               )
             );
             if (
@@ -595,6 +724,7 @@ export const makePreviewStateBackupStoreLive = (
               )
             ) {
               return yield* migrationError(
+                "backupCredentialLeak",
                 "The Preview state backup contains a forbidden credential value."
               );
             }
@@ -610,6 +740,7 @@ export const makePreviewStateBackupStoreLive = (
                 Effect.andThen(fileSystem.chmod(path, 0o600)),
                 Effect.mapError(() =>
                   migrationError(
+                    "backupWriteFailed",
                     "The Preview state backup could not be written."
                   )
                 ),
@@ -623,6 +754,7 @@ export const makePreviewStateBackupStoreLive = (
             metadata.size > 2n * 1024n * 1024n
           ) {
             return yield* migrationError(
+              "backupReadFailed",
               "The Preview state backup is not a bounded mode-0600 file."
             );
           }
@@ -632,7 +764,10 @@ export const makePreviewStateBackupStoreLive = (
           )(encoded, { onExcessProperty: "error" });
         }).pipe(
           Effect.mapError(() =>
-            migrationError("The Preview state backup could not be loaded.")
+            migrationError(
+              "backupReadFailed",
+              "The Preview state backup could not be loaded."
+            )
           )
         ),
       });

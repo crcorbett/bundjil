@@ -2173,3 +2173,71 @@ The next serial owner is `production-adoption-and-rollout`. It starts with
 fresh read-only topology, exact Production authority and rollback preflight.
 The passed Preview task, a READY deployment or historical Production receipts
 cannot substitute for the required zero-replacement/no-delete Production plan.
+
+## Production adoption and rollout
+
+Fresh exact-source Production inventory at commit
+`81e4556450f010bb1356ab1a18f9740ef97f4bd5` performed two matching
+provider reads at manifest digest `e46fe2d9…804b`: 72 retained resources, two
+Vercel projects, two Marketplace bindings, the source/Production Photon
+project, two shared users, one current webhook and zero dedicated lines. The
+fixed receipt records zero writes and no deployment, mutation, runtime,
+Channel or future-state claim.
+
+The first side-effect-free observed-only adoption plan stopped with 49 state
+updates, 23 no-ops and one delete. The single manifest-absent row is a
+completed retained Photon webhook observation in Production Alchemy state.
+`retain` protects its physical provider resource; it does not permit an
+Alchemy delete plan to pass the Production zero-delete gate. No provider or
+state mutation occurred.
+
+Before any Production apply, generalize the proven state-only migration
+boundary to a decoded stage and bind a new exact policy. A first live plan
+correctly failed closed on `currentCountMismatch`: its direct state-store
+readback proved 69 completed retained rows, not 73. The earlier 73 was the
+Alchemy plan's total action count—72 desired resources plus one stale delete—
+and was a false-green proxy for persisted row count. The corrected policy
+requires 69 current state rows, 72 desired manifest resources, one Photon
+webhook resource type and one safe FQN fingerprint. Plan must prove those exact
+postconditions. Apply must write a complete mode-`0600` backup before retiring
+only that state row, read back 68, and support exact restore of every original
+row plus removal of any post-migration row. The next adoption plan may
+reconcile the four desired resources absent from state but must contain zero
+replacement and delete. A retain line in Alchemy output, total action count,
+the earlier Preview migration, a manual state edit or a later green adoption
+is rejected proof by proxy.
+
+The corrected live plan then passed with 69 current rows, 72 desired resources,
+one stale row, 68 retained rows, the exact accepted safe fingerprint and zero
+provider writes. Its fixed, mode-`0600` receipt validates against the
+repository bounded-receipt contract. No backup was written in plan mode and no
+state or provider mutation occurred. The code/docs candidate must pass complete
+verification and be pushed before fresh exact-source inventory regenerates the
+Production manifest and repeats this plan; only that pushed candidate may
+advance to backup-first state retirement.
+
+Focused typecheck, five migration/authority tests, Effect language-service
+setup, docs-maintainer's 272-file inventory and the complete repository
+verification pass on the receipt-bearing candidate. The first complete run
+found one active-plan formatting issue; the restarted run then found redundant
+generic compatibility exports through Knip. Both owning findings were fixed:
+the plan is repository-formatted and the generalized Production Layer reuses
+the committed `PreviewStateMigration`/`PreviewStateBackupStore` services
+without duplicate exports. The final restarted gate passes every routed policy,
+type, lint, Knip and test boundary.
+
+### Production state-correction docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |
+| --------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Change required | Generalize the existing R2-state-only service by decoded stage; Vercel and Photon provider transports remain unreachable and provider writes zero. |
+| READMEs, exports and generated references     | Change required | Add one Production state command and document generic stage-owned Config; no client, raw state handle or generated reference escapes.              |
+| Runbooks, authority and controls              | Change required | Add exact one-fingerprint Production policy, full backup, readback, restore and stop conditions under a distinct fixed authority.                  |
+| Verification journeys and proof               | Change required | Prove Production plan/apply/restore and the subsequent zero-create/replace/delete adoption plan with fixed receipts.                               |
+| Skills, AGENTS, lint, config, commands and CI | Change required | Reuse repository contracts; the new root command and stage config must pass Effect LS and every routed policy gate.                                |
+| Schemas, services and Layers                  | Change required | Reuse the state Resource Schema and backup service while making stage a Schema-decoded policy field; add exact Production live Layer.              |
+| Tests and fixtures                            | Change required | Run the same backup/retire/restore/mismatch matrix for Production and reject Preview/Production cross-stage manifests.                             |
+| SPEC, tasks and active plan                   | Change required | Keep Production in progress at the earliest failed zero-delete prerequisite.                                                                       |
+| Secrets, receipts, rollout and rollback       | Change required | Scan known credentials, retain a complete ignored backup and fixed receipt, and restore exactly if adoption cannot converge.                       |
+| Lifecycle, archive and terminal audit         | Preserve        | Production provider apply remains blocked; drift closeout and the single terminal five-pass audit remain downstream.                               |
+| Documentation inventory and archive pointers  | Preserve        | No docs path or lifecycle route changes; recompute the existing routed inventory from the changed tree.                                            |

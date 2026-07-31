@@ -2026,6 +2026,34 @@ every routed policy gate and complete repository verification pass. The
 stable task still requires a coherent commit/push and a distinct Vercel
 Git-created immutable deployment observation.
 
+Fresh Production inventory at commit
+`81e4556450f010bb1356ab1a18f9740ef97f4bd5` produced two matching
+metadata reads at manifest digest `e46fe2d9…804b`, 72 retained resources and
+zero writes. Its first side-effect-free adoption plan stopped with 49 updates,
+23 no-ops and one delete. The delete is one manifest-absent completed retained
+Photon webhook observation in Production Alchemy state; no provider or state
+mutation occurred.
+
+Production cannot proceed by treating `retain` as permission for that plan.
+Generalize the proven state-only migration boundary to decoded stage and bind
+an exact Production policy. The first live state plan rejected the earlier
+`73` precondition and directly proved 69 completed retained state rows; `73`
+was the adoption plan's 72 desired actions plus one stale delete, not a state
+row count. Require 69 current state rows, 72 desired manifest resources and
+the one webhook fingerprint, write a complete mode-`0600` backup before
+retiring only that state row, read back 68, and support exact restore. The
+following adoption may reconcile four desired resources absent from state but
+must have zero replacement and delete. The earlier Preview migration, an
+unrecorded state edit, aggregate action count or a later successful adoption
+cannot substitute for these direct postconditions.
+
+The corrected Production state-only plan passed with 69 current rows, 72
+desired manifest resources, one stale row, 68 retained rows, the exact accepted
+safe webhook fingerprint and zero provider writes. Plan mode wrote only its
+fixed mode-`0600` receipt; it wrote no backup and changed no state or provider
+resource. State retirement remains gated on a verified, pushed implementation
+candidate plus fresh exact-source inventory and repetition of the same plan.
+
 Commit `42e3cd52686c407ee3fbe982e0d383629922ad80` was pushed only to
 the implementation branch. Fresh authorized two-read inventory passed at
 manifest digest `fc2c4dba…071b` and observed exactly one Git-created

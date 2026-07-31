@@ -25,7 +25,10 @@ const digest = AdoptionManifestDigest.make(
   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 );
 
-const makeManifestResource = (logicalId: string) => ({
+const makeManifestResource = (
+  logicalId: string,
+  stage: "preview" | "prod" = "preview"
+) => ({
   provider: "synthetic" as const,
   resourceKind: "syntheticResource" as const,
   owner: {
@@ -35,13 +38,17 @@ const makeManifestResource = (logicalId: string) => ({
   physicalId: {
     resourceId: SyntheticPhysicalResourceId.make(`physical-${logicalId}`),
   },
-  stage: "preview" as const,
+  stage,
   logicalId: AlchemyLogicalResourceId.make(logicalId),
   removalPolicy: "retain" as const,
   observedMetadataDigest: digest,
 });
 
-const makeStateResource = (logicalId: string, resourceType: string) => ({
+const makeStateResource = (
+  logicalId: string,
+  resourceType: string,
+  stage: "preview" | "prod" = "preview"
+) => ({
   resourceType,
   namespace: undefined,
   fqn: logicalId,
@@ -51,7 +58,7 @@ const makeStateResource = (logicalId: string, resourceType: string) => ({
   status: "updated" as const,
   downstream: [],
   bindings: [],
-  props: { stage: "preview" },
+  props: { stage },
   attr: { identity: `physical-${logicalId}` },
   removalPolicy: "retain" as const,
 });
@@ -72,6 +79,7 @@ const manifest = AdoptionManifest.make({
 const staleFingerprint = PreviewStateResourceFingerprint.make(sha256("stale"));
 
 const policy = PreviewStateMigrationPolicy.make({
+  stage: "preview",
   currentCount: 4,
   desiredCount: 5,
   staleFingerprints: [staleFingerprint],
@@ -88,26 +96,27 @@ const makeLayers = () => {
   return Layer.merge(dependencies, migration);
 };
 
-const seedState = Effect.gen(function* seedPreviewState() {
-  const resolveState = yield* State;
-  const state = yield* resolveState;
-  yield* Effect.forEach(
-    [
-      makeStateResource("desired-1", "DesiredObservation"),
-      makeStateResource("desired-2", "DesiredObservation"),
-      makeStateResource("desired-3", "DesiredObservation"),
-      makeStateResource("stale", "StalePhotonObservation"),
-    ],
-    (resource) =>
-      state.set({
-        stack: "BundjilInfrastructure",
-        stage: "preview",
-        fqn: resource.fqn,
-        value: resource,
-      }),
-    { discard: true }
-  );
-});
+const seedState = (stage: "preview" | "prod" = "preview") =>
+  Effect.gen(function* seedStateOperation() {
+    const resolveState = yield* State;
+    const state = yield* resolveState;
+    yield* Effect.forEach(
+      [
+        makeStateResource("desired-1", "DesiredObservation", stage),
+        makeStateResource("desired-2", "DesiredObservation", stage),
+        makeStateResource("desired-3", "DesiredObservation", stage),
+        makeStateResource("stale", "StalePhotonObservation", stage),
+      ],
+      (resource) =>
+        state.set({
+          stack: "BundjilInfrastructure",
+          stage,
+          fqn: resource.fqn,
+          value: resource,
+        }),
+      { discard: true }
+    );
+  });
 
 describe("Preview state migration", () => {
   it("keeps forbidden credential sentinels redacted at the leak-scan boundary", async () => {
@@ -131,7 +140,7 @@ describe("Preview state migration", () => {
   it("backs up and retires only the exact stale row, then restores exactly", async () => {
     const result = await Effect.runPromise(
       Effect.gen(function* exactMigrationJourney() {
-        yield* seedState;
+        yield* seedState();
         const migration = yield* PreviewStateMigration;
         const planned = yield* migration.plan(manifest);
         const retired = yield* migration.retire(manifest);
@@ -220,7 +229,7 @@ describe("Preview state migration", () => {
 
     const remaining = await Effect.runPromise(
       Effect.gen(function* rejectMismatchJourney() {
-        yield* seedState;
+        yield* seedState();
         const service = yield* PreviewStateMigration;
         const exit = yield* Effect.exit(service.retire(manifest));
         const resolveState = yield* State;
@@ -235,5 +244,67 @@ describe("Preview state migration", () => {
 
     expect(remaining.exit._tag).toBe("Failure");
     expect(remaining.fqns).toHaveLength(4);
+  });
+
+  it("keeps Production state and manifests isolated while restoring exactly", async () => {
+    const productionManifest = AdoptionManifest.make({
+      schemaVersion: "1",
+      stage: "prod",
+      digest,
+      resources: [
+        makeManifestResource("desired-1", "prod"),
+        makeManifestResource("desired-2", "prod"),
+        makeManifestResource("desired-3", "prod"),
+        makeManifestResource("desired-4", "prod"),
+        makeManifestResource("desired-5", "prod"),
+      ],
+    });
+    const productionPolicy = PreviewStateMigrationPolicy.make({
+      ...policy,
+      stage: "prod",
+    });
+    const state = inMemoryState();
+    const backup = makePreviewStateBackupStoreMemory();
+    const dependencies = Layer.merge(state, backup);
+    const migration = makePreviewStateMigrationLayer(productionPolicy).pipe(
+      Layer.provide(dependencies)
+    );
+
+    const result = await Effect.runPromise(
+      Effect.gen(function* productionMigrationJourney() {
+        yield* seedState("prod");
+        const service = yield* PreviewStateMigration;
+        const previewMismatch = yield* Effect.exit(service.plan(manifest));
+        const retired = yield* service.retire(productionManifest);
+        const restored = yield* service.restore;
+        const resolveState = yield* State;
+        const stateService = yield* resolveState;
+        const productionFqns = yield* stateService.list({
+          stack: "BundjilInfrastructure",
+          stage: "prod",
+        });
+        const previewFqns = yield* stateService.list({
+          stack: "BundjilInfrastructure",
+          stage: "preview",
+        });
+        return {
+          previewMismatch,
+          retired,
+          restored,
+          productionFqns,
+          previewFqns,
+        };
+      }).pipe(Effect.provide(Layer.merge(dependencies, migration)))
+    );
+
+    expect(result.previewMismatch._tag).toBe("Failure");
+    expect(result.retired).toMatchObject({
+      status: "retired",
+      staleCount: 1,
+      providerWrites: 0,
+    });
+    expect(result.restored.status).toBe("restored");
+    expect(result.productionFqns).toHaveLength(4);
+    expect(result.previewFqns).toHaveLength(0);
   });
 });

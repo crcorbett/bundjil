@@ -105,6 +105,7 @@ bun run infrastructure:inventory
 bun run infrastructure:adoption-manifest
 bun run infrastructure:adoption-proof
 bun run infrastructure:preview-state-migration
+bun run infrastructure:production-state-migration
 bun run infrastructure:stable-preview-plan
 bun run infrastructure:stable-preview-apply
 bun run infrastructure:stable-preview-sync
@@ -136,6 +137,15 @@ manifest, validated authority, and dedicated R2 Config named by
 [Alchemy infrastructure runbook](../../apps/agent/runbooks/alchemy-infrastructure.md);
 never put credential values on stdout or commit ignored `tmp/proof/**`
 artifacts.
+
+Both state-migration commands use the same stage-owned executable and require
+`BUNDJIL_STATE_MIGRATION_STAGE`, exact mode-`0600`
+`BUNDJIL_STATE_MIGRATION_{AUTHORITY,BACKUP,RECEIPT}_PATH`,
+`BUNDJIL_STATE_MIGRATION_MODE`, and
+`BUNDJIL_STATE_MIGRATION_CANDIDATE`. Preview and Production select distinct
+fixed authority policies and exact live Layers. The service reads and writes
+only the named Alchemy stage, backs up every row before retirement, supports
+exact restore, scans known credentials, and composes no provider transport.
 
 Stable Preview commands require the same accepted stage-correct inventory and
 manifest plus `BUNDJIL_INFRASTRUCTURE_BINDING_PROFILE=previewPhotonManaged`
