@@ -1945,3 +1945,20 @@ fixture must prove those bounded observables survive the actual rendered
 failure and raw sentinels do not. Another write is ineligible until that
 observable correction is committed, pushed, fully verified, and a new
 exact-SHA inventory/adoption cycle passes.
+
+The next exact-SHA cycle exposed a command-path defect before diagnosis:
+`bun run infrastructure:stable-preview-apply` resolved the ignored compiled
+package, whose stale live adapter still carried the generic error message,
+rather than the committed source export. The four requests again failed
+closed; fresh two-read inventory proved all four exact physical identities and
+provider revisions unchanged. A successful repository suite or corrected
+source file is not proof of the live adapter when the provider command can
+resolve stale build output.
+
+The three stable root commands must execute Alchemy under
+`--conditions=@bundjil/source`. This makes the provider boundary the exact
+committed source candidate without trusting an ignored build artifact. Focused
+command inspection must prove the condition is present on plan, apply and
+sync; a manual one-off source flag or rebuilt local `dist/**` is rejected proof
+by proxy. Another provider attempt remains ineligible until this command owner
+is committed, pushed and fully verified.

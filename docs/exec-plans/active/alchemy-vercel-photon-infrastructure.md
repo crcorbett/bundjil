@@ -2058,3 +2058,19 @@ summary. The correction now places only HTTP status and code/message-presence
 booleans in the error message as well as its typed fields; raw provider
 strings and values remain private. Focused and full verification, coherent
 commit/push, and a new exact-SHA gate are required before one further attempt.
+
+The pushed rendered-diagnostic candidate then passed a new exact-SHA inventory,
+152-resource observed adoption and four-update-only managed plan. Its apply
+still emitted the old generic message. Direct source/build inspection found
+the live command resolved ignored `packages/infrastructure/dist/**`, whose
+compiled adapter predated the committed source correction. Fresh authorized
+two-read inventory again proved all four exact target IDs and provider
+revisions unchanged; deployment-observation churn changed the whole-manifest
+digest but not the stable write targets. The raw apply log was removed.
+
+The earliest durable command owner now places
+`--conditions=@bundjil/source` on stable plan, apply and sync. That binds each
+live request to the exact committed source candidate and prevents a green suite
+plus stale build from becoming a false provider observable. The next slice
+must verify all three scripts, pass the full suite, commit/push, regenerate the
+exact-SHA manifest and only then perform one bounded attempt.

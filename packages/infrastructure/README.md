@@ -146,7 +146,9 @@ exactly four updates and no create, replace, delete, bearer, Marketplace,
 datastore, Photon, Production, deployment-create, or promotion action. Known
 429/5xx failures receive at most three total attempts with exponential jitter;
 an uncertain timeout after write is never retried blindly because Vercel
-metadata cannot prove a write-only value. After apply, require exact provider
+metadata cannot prove a write-only value. The three stable root scripts resolve
+this package through `@bundjil/source`; a stale ignored `dist/**` build cannot
+govern a live request. After apply, require exact provider
 acknowledgements, fresh metadata-only inventory, a no-op plan, two unchanged
 sync dry-runs, and `infrastructure:adoption-proof` with the managed profile.
 The four `deploymentRequired` results require a distinct new Vercel Git
