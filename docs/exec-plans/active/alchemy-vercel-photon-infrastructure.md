@@ -2074,3 +2074,16 @@ live request to the exact committed source candidate and prevents a green suite
 plus stale build from becoming a false provider observable. The next slice
 must verify all three scripts, pass the full suite, commit/push, regenerate the
 exact-SHA manifest and only then perform one bounded attempt.
+
+The parent source condition was not sufficient. Direct resolution under the
+parent returned `src/**`, but Alchemy's execution child still loaded the old
+compiled adapter; the fourth failed write set therefore remained invalid for
+status diagnosis. Fresh passed two-read inventory proved all four target
+revisions unchanged, and the raw log was removed.
+
+Plan, apply and sync now build `@bundjil/infrastructure` as their first
+fail-closed command and only start Alchemy after success. Direct evidence must
+show all three scripts own that preflight and the resulting compiled message
+matches source. A manual build, a parent-only resolver result, or a green suite
+without command composition is rejected. Commit/push plus a new exact-SHA gate
+remain prerequisites to one bounded attempt.

@@ -1962,3 +1962,18 @@ command inspection must prove the condition is present on plan, apply and
 sync; a manual one-off source flag or rebuilt local `dist/**` is rejected proof
 by proxy. Another provider attempt remains ineligible until this command owner
 is committed, pushed and fully verified.
+
+That source-condition hypothesis was then disproved directly. The parent Bun
+process resolved the source export, but Alchemy's execution child still loaded
+the package's ignored compiled adapter; its stack locations and generic message
+were exact evidence. The four requests again failed closed, and a fresh passed
+two-read inventory proved all four target revisions unchanged. The raw log was
+removed.
+
+The stable root commands must instead rebuild
+`@bundjil/infrastructure` before Alchemy starts and stop if that build fails.
+This makes the child-resolved public package the exact current source output.
+All three commands own the preflight; rebuilding manually or proving only the
+parent resolver remains a rejected false green. The next provider attempt
+remains ineligible until this corrected command contract is committed, pushed,
+fully verified, and followed by a fresh exact-SHA gate.

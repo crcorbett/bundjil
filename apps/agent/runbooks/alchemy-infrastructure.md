@@ -163,8 +163,8 @@ operation.
 1. Run `bun run infrastructure:stable-preview-plan`. Stop unless it reports
    exactly four updates on the already adopted environment physical IDs and
    zero create, replace, delete, or other update. Use the root command as
-   written: its source export condition prevents an ignored stale `dist/**`
-   package from governing the provider request.
+   written: it rebuilds `@bundjil/infrastructure` before provider access so
+   Alchemy's child process cannot resolve an ignored stale `dist/**` adapter.
 2. Capture the externally retained prior four values and their revision in
    approved secret custody. Run
    `bun run infrastructure:stable-preview-apply`. Each provider request must
