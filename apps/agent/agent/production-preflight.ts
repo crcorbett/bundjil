@@ -266,21 +266,6 @@ const PhotonWebhookTopology = Schema.Union([
   ),
 ]);
 
-const parallelCallbackRoutesMatchCandidate = (
-  webhookTopology: typeof PhotonWebhookTopology.Type,
-  candidateDeploymentId: typeof ImmutableDeploymentReference.Type
-) =>
-  webhookTopology._tag === "Stable" ||
-  (webhookTopology.candidateCallbackDeploymentId === candidateDeploymentId &&
-    webhookTopology.originalCallbackDeploymentId === candidateDeploymentId);
-
-const parallelCallbackRollbackDiffersCandidate = (
-  webhookTopology: typeof PhotonWebhookTopology.Type,
-  candidateDeploymentId: typeof ImmutableDeploymentReference.Type
-) =>
-  webhookTopology._tag === "Stable" ||
-  webhookTopology.callbackRollbackDeploymentId !== candidateDeploymentId;
-
 const ChannelInventory = Schema.Struct({
   legacyBindingsPresent: Schema.Literal(false),
   legacyReplayRead: Schema.Literal(false),
@@ -340,26 +325,6 @@ export const ChannelCandidateStagedPreflightSnapshot = Schema.Struct({
         ? undefined
         : "Staged candidate must not already own the stable alias."
     )
-  ),
-  Schema.check(
-    Schema.makeFilter((snapshot) =>
-      parallelCallbackRoutesMatchCandidate(
-        snapshot.channel.photon.webhookTopology,
-        snapshot.candidateAgent.deploymentId
-      )
-        ? undefined
-        : "Parallel Photon cutover callback routes must resolve to the staged candidate."
-    )
-  ),
-  Schema.check(
-    Schema.makeFilter((snapshot) =>
-      parallelCallbackRollbackDiffersCandidate(
-        snapshot.channel.photon.webhookTopology,
-        snapshot.candidateAgent.deploymentId
-      )
-        ? undefined
-        : "Parallel Photon cutover callback rollback must differ from the staged candidate."
-    )
   )
 );
 
@@ -376,28 +341,30 @@ export const ChannelProductionPromotionPreflightSnapshot = Schema.Struct({
         ? undefined
         : "Promotion candidate must not already own the stable alias."
     )
-  ),
-  Schema.check(
-    Schema.makeFilter((snapshot) =>
-      parallelCallbackRoutesMatchCandidate(
-        snapshot.channel.photon.webhookTopology,
-        snapshot.candidateAgent.deploymentId
-      )
-        ? undefined
-        : "Parallel Photon cutover callback routes must resolve to the staged candidate."
-    )
-  ),
-  Schema.check(
-    Schema.makeFilter((snapshot) =>
-      parallelCallbackRollbackDiffersCandidate(
-        snapshot.channel.photon.webhookTopology,
-        snapshot.candidateAgent.deploymentId
-      )
-        ? undefined
-        : "Parallel Photon cutover callback rollback must differ from the staged candidate."
-    )
   )
 );
+
+const parallelCallbackPolicyViolations = (
+  snapshot:
+    | typeof ChannelCandidateStagedPreflightSnapshot.Type
+    | typeof ChannelProductionPromotionPreflightSnapshot.Type
+) => {
+  const topology = snapshot.channel.photon.webhookTopology;
+  return topology._tag === "Stable"
+    ? []
+    : [
+        ...(topology.candidateCallbackDeploymentId ===
+          snapshot.candidateAgent.deploymentId &&
+        topology.originalCallbackDeploymentId ===
+          snapshot.candidateAgent.deploymentId
+          ? []
+          : ["channel-photon-callback-target-mismatch"]),
+        ...(topology.callbackRollbackDeploymentId !==
+        snapshot.candidateAgent.deploymentId
+          ? []
+          : ["channel-photon-callback-rollback-candidate-collision"]),
+      ];
+};
 
 export const ProductionPreflightSnapshot = Schema.Union([
   BeforeFirstMutationPreflightSnapshot,
@@ -670,6 +637,7 @@ export const preflightProductionPromotion = Effect.fn(
                             snapshot.rollback.agent.current.deploymentId
                               ? []
                               : ["channel-stable-alias-rollback-mismatch"]),
+                            ...parallelCallbackPolicyViolations(snapshot),
                           ]
                         : []),
                     ]),

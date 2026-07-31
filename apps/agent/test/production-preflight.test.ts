@@ -461,26 +461,27 @@ describe("Production promotion preflight", () => {
     }
   );
 
-  vitestIt(
+  it.effect(
     "rejects stale, mixed, or non-restorable parallel callback routes",
-    () => {
-      expect(() =>
-        decode({
-          ...channelCandidateStaged,
-          channel: {
-            ...channelCandidateStaged.channel,
-            photon: {
-              ...channelCandidateStaged.channel.photon,
-              webhookTopology: {
-                ...channelCandidateStaged.channel.photon.webhookTopology,
-                originalCallbackDeploymentId: "dpl_stalecallback",
+    () =>
+      Effect.gen(function* () {
+        assert.throws(() => {
+          decode({
+            ...channelCandidateStaged,
+            channel: {
+              ...channelCandidateStaged.channel,
+              photon: {
+                ...channelCandidateStaged.channel.photon,
+                webhookTopology: {
+                  ...channelCandidateStaged.channel.photon.webhookTopology,
+                  originalCallbackDeploymentId: "dpl_stalecallback",
+                },
               },
             },
-          },
-        }).pipe(Effect.runSync)
-      ).toThrow("resolve to one deployment");
-      expect(() =>
-        decode({
+          }).pipe(Effect.runSync);
+        }, /resolve to one deployment/);
+
+        const rollbackCollision = yield* decode({
           ...channelCandidateStaged,
           channel: {
             ...channelCandidateStaged.channel,
@@ -492,10 +493,12 @@ describe("Production promotion preflight", () => {
               },
             },
           },
-        }).pipe(Effect.runSync)
-      ).toThrow("rollback must differ from the staged candidate");
-      expect(() =>
-        decode({
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+        assert.deepStrictEqual(rollbackCollision.rejected, [
+          "channel-photon-callback-rollback-candidate-collision",
+        ]);
+
+        const staleCallbacks = yield* decode({
           ...channelCandidateStaged,
           channel: {
             ...channelCandidateStaged.channel,
@@ -508,9 +511,11 @@ describe("Production promotion preflight", () => {
               },
             },
           },
-        }).pipe(Effect.runSync)
-      ).toThrow("resolve to the staged candidate");
-    }
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+        assert.deepStrictEqual(staleCallbacks.rejected, [
+          "channel-photon-callback-target-mismatch",
+        ]);
+      })
   );
 
   it.effect(

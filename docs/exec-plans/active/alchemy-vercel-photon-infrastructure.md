@@ -2431,12 +2431,14 @@ the retained callback-alias rollback deployment.
 The first deliberately stale-route snapshot then exposed a candidate-awareness
 error in the new refinement before alias mutation. The inner topology compared
 rollback to the callbacks' current deployment, but current callback targets
-legitimately equal rollback before the alias moves. The corrected shape keeps
-the two current targets as direct observables, rejects mixed targets internally,
-requires both to equal the staged candidate in the outer staged/promotion
-checks, and separately requires rollback to differ from that staged candidate.
-Focused negative fixtures and complete verification must pass before committing
-this correction and generating the pre-alias rejection again.
+legitimately equal rollback before the alias moves. A second replay showed that
+candidate equality implemented as a Schema refinement produced only generic
+`snapshot-invalid` evidence. The corrected ownership keeps the two current
+targets as direct observables and rejects mixed targets in Schema, while the
+named preflight Effect separately classifies callback-target mismatch and
+rollback/candidate collision. Focused negative fixtures and complete
+verification must pass before committing this correction and generating the
+exact pre-alias policy rejection again.
 
 #### Production write-only custody finding and recovery
 
