@@ -291,7 +291,7 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
         return yield* writeFailure(
           "updateStableEnvironmentVariable",
           failureReason(response.status),
-          "Vercel rejected the stable environment update.",
+          `Vercel rejected the stable environment update (status ${response.status}; code present: ${response.body.error.code !== undefined}; message present: ${response.body.error.message !== undefined}).`,
           false,
           {
             status: response.status,

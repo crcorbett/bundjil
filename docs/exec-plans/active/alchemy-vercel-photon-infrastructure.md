@@ -2039,3 +2039,22 @@ contract failure; no retry is eligible before then.
 | Safe rejection classification      | Tagged failure retains bounded HTTP status and field-presence booleans while raw code/message sentinels do not render | Generic `requestFailed`, transport status alone, or logging the provider body                | Stable Schema, live Layer and focused HTTP fixture            | In progress |
 | Retry eligibility                  | Known 4xx remains one attempt/never; uncertain write remains readback-required; only bounded known 429/5xx may retry  | Re-running all four writes because the manifest still plans updates                          | Provider lifecycle tests, safe live result and runbook        | Blocked     |
 | Task lifecycle and terminal audit  | Stable task remains in progress; Production, drift closeout and one terminal five-pass audit remain downstream        | Accepting from adoption/no-op proof without live stable acknowledgements and new deployments | SPEC task ledger, this plan and later receipt owners          | Preserved   |
+
+The first diagnostic commit preserved the bounded fields on the Effect tagged
+error, but Alchemy's failure rendering emitted only its message. A fresh
+exact-SHA inventory added one Git-created deployment observation while keeping
+all four target revisions unchanged. Observed adoption converged 151 resources;
+the first sync was all no-op, the second encountered one read-only invalid
+deployment envelope, and one bounded repeat was again 151 no-op. The failed
+read remains classified transient evidence rather than being erased by its
+successful repeat.
+
+The managed plan again qualified four updates and 147 no-ops. Its one allowed
+apply attempt failed all four writes. Fresh two-read inventory proved the same
+manifest digest and all four exact target revisions unchanged. The
+mode-`0600` log contained Alchemy-rendered non-secret provider IDs, so it is
+not eligible as a redacted proof artifact and will be deleted after this safe
+summary. The correction now places only HTTP status and code/message-presence
+booleans in the error message as well as its typed fields; raw provider
+strings and values remain private. Focused and full verification, coherent
+commit/push, and a new exact-SHA gate are required before one further attempt.

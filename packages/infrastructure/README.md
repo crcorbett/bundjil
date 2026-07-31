@@ -30,7 +30,9 @@ receipts, and deterministic memory Layers.
   branded value revision without the value, decodes the complete
   acknowledgement immediately, and leaves every ObservedUnknown, Absent,
   Marketplace, datastore, bearer, Production, deployment, and promotion
-  boundary read-only.
+  boundary read-only. Rejections expose only the bounded HTTP status and
+  provider error-field presence; raw provider codes, messages, and values
+  remain private to the adapter.
 - `@bundjil/infrastructure/photon` exports six retained Alchemy Resources and
   stage-scoped state-safe props/attributes for Photon project, iMessage
   platform, shared user, webhook, dedicated-line, and billing observation. It

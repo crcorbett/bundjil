@@ -250,5 +250,11 @@ it.effect(
         rendered.includes("preview-photon-project-value"),
         false
       );
+      assert.strictEqual(
+        rendered.includes(
+          "status 403; code present: true; message present: true"
+        ),
+        true
+      );
     })
 );

@@ -1927,3 +1927,21 @@ attempt is eligible only from a coherent verified commit and fresh exact-SHA
 manifest; its result must distinguish permission/policy rejection from an
 incomplete acknowledgement. A green repository suite, a valid request model,
 or unchanged metadata alone does not prove write capability.
+
+The first diagnostic candidate retained the bounded fields on the tagged error,
+but Alchemy rendered only the error message. A fresh exact-SHA adoption cycle
+converged 151 observed resources, with one classified transient deployment-list
+decode failure followed by an identical all-no-op read. The managed plan again
+qualified exactly four updates and 147 no-ops. Its single apply attempt failed
+all four writes; fresh two-read inventory again proved the exact four provider
+revisions unchanged. The raw mode-`0600` apply log contained only non-secret
+provider identity values from Alchemy's plan rendering, not credential
+secrets, but it is not a redacted evidence owner and must be discarded after a
+safe summary is retained.
+
+The tagged failure message must therefore include the same bounded status and
+presence booleans while omitting provider code, message and value. A focused
+fixture must prove those bounded observables survive the actual rendered
+failure and raw sentinels do not. Another write is ineligible until that
+observable correction is committed, pushed, fully verified, and a new
+exact-SHA inventory/adoption cycle passes.

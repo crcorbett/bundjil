@@ -174,7 +174,10 @@ operation.
    timeout after a possible write is fail-closed. Never blindly retry an
    uncertain write: Vercel metadata can show an update timestamp but cannot
    prove the write-only value. Preserve both candidate and prior values and
-   require operator classification before another apply.
+   require operator classification before another apply. The safe failure must
+   retain the HTTP status and error-field presence only; raw provider codes,
+   messages, request values, and credential material must not enter logs or
+   receipts.
 4. Run a fresh two-read Preview inventory, then
    `bun run infrastructure:stable-preview-plan` and two
    `bun run infrastructure:stable-preview-sync` commands. Require all no-op or
