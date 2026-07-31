@@ -413,7 +413,7 @@
     "id": "BND-J14-preview-infrastructure-drift-report",
     "actorOrConsumer": "authorized Bundjil infrastructure operator and repository maintainer",
     "boundary": "report-only native Alchemy Preview desired plan and provider drift observation",
-    "startingState": "exact source SHA, accepted Preview manifest, stage-owned remote state, fixed read-only authority and provider/state credential custody are available",
+    "startingState": "exact source SHA, receipt-bearing post-apply Preview manifest and digest, stage-owned remote state, fixed read-only authority and provider/state credential custody are available",
     "inputs": [
       "one immutable source SHA",
       "one accepted Preview adoption manifest",

@@ -2795,6 +2795,26 @@ runs must then bind that exact commit and post-apply manifest. Workflow source
 still does not prove a hosted environment, secrets, schedule, run or alert
 delivery, and the formal terminal five-pass audit has not run.
 
+Commit `40970b49fde5139f36a5cef00ae6e07795e3c45b` then passed the complete
+repository gate with 98 tooling tests, 70 infrastructure Vitest tests, 21
+Alchemy lifecycle tests, all nine typechecks and all fifteen Turbo tasks and
+was pushed to the task branch. Two fresh BND-J14 runs bound to that exact
+commit, the post-apply manifest digest `a8fcfd1e…` and one exact Preview
+read-only authority. Both mode-`0600` reports produced normalized
+classification hash `bec4e76e…`: desired plan 155 no-op, native sync 155
+unchanged, 111 accepted metadata rows, zero blocking/report rows, 44
+`unknownSecretRevision` rows and zero provider writes. The bounded receipt
+status is therefore `inconclusive`, not `no_op`: Vercel's metadata response
+cannot prove any write-only value or revision even when persisted desired
+references and observed metadata are unchanged.
+
+This accepts the live report boundary and its fail-closed non-claim. It does
+not prove hosted GitHub environment/secret/settings actuality, a scheduled
+run, alert delivery, future provider state, repair, Production, Channel or
+handset behavior. The last implementation task remains in progress only for
+the final proof reconciliation, one fresh terminal five-pass audit,
+lifecycle/archive move, exact final verification and closeout commit.
+
 ### Production state-correction docs-maintainer impact ledger
 
 | Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                              |
