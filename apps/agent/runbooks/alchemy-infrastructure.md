@@ -317,8 +317,14 @@ as rollback and, under exact alias authority, assign only that alias to the
 candidate. Require both callback routes to resolve to the candidate before
 promotion while the stable alias stays on its rollback deployment. Immediately
 after promotion, require both aliases to resolve to the accepted deployment,
-then one bounded real event to produce one accepted dispatch plus one duplicate
-and exactly one response. Drain the retry horizon and delete only the exact
+then one bounded real event to produce one accepted dispatch through the
+candidate callback, one `authenticationRejected` disposition at `webhookId`
+through the preserved original callback, and exactly one response. The
+rejection is mandatory when the original callback's create-only signing secret
+is unavailable: it proves that the old route reached the candidate but cannot
+enter the replay namespace. Do not claim a duplicate disposition for a request
+that failed authentication. Require zero second effect and zero callback on
+either rollback deployment, drain the retry horizon, and delete only the exact
 retired URL with
 `bun run infrastructure:photon-production-webhook-delete`. Never deploy a
 candidate while any configured value is a provider write-only placeholder.

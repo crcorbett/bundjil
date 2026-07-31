@@ -11,7 +11,7 @@ const productionAuthority = {
   environments: ["production"],
   resources: [
     "alchemy:BundjilInfrastructure:prod:state-only",
-    "state-fqn-sha256:0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1",
+    "state-fqn-sha256:5ef46e0a632363f9256f1729c1696c0a48c2fa3a3dc667c6c148e0aedb892cf5",
   ],
   operations: [
     "read and back up all BundjilInfrastructure Production Alchemy state rows",
@@ -19,7 +19,7 @@ const productionAuthority = {
     "restore the complete exact pre-migration Production state from the retained backup",
   ],
   readback: [
-    "require 69 rows before, 68 rows after retirement, and zero provider transport calls",
+    "require 73 rows before, 72 rows after retirement, and zero provider transport calls",
   ],
   rollback: [
     "restore every backed-up row and remove only rows absent from the backup",
@@ -55,6 +55,25 @@ describe("state migration authority", () => {
         resources: [
           "alchemy:BundjilInfrastructure:prod:state-only",
           "state-fqn-sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        ],
+      }),
+      false
+    );
+    assert.strictEqual(
+      validateProduction({
+        ...productionAuthority,
+        resources: [
+          "alchemy:BundjilInfrastructure:prod:state-only",
+          "state-fqn-sha256:0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1",
+        ],
+      }),
+      false
+    );
+    assert.strictEqual(
+      validateProduction({
+        ...productionAuthority,
+        readback: [
+          "require 69 rows before, 68 rows after retirement, and zero provider transport calls",
         ],
       }),
       false

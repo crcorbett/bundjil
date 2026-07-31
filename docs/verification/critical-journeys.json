@@ -347,7 +347,9 @@
     "expectedBehavior": [
       "The stable alias resolves to the accepted immutable deployment and both final webhook routes avoid redirects.",
       "Each provider processes one turn once and reports outbound plus typing start/stop outcomes at the exact claimed boundary.",
-      "When Photon uses ParallelCutover, both callback routes and the stable alias resolve to the accepted deployment; one event yields one accepted dispatch, one duplicate, and exactly one response before drain and original-callback retirement."
+      "When Photon uses ParallelCutover, both callback routes and the stable alias resolve to the accepted deployment before one bounded event.",
+      "The candidate callback yields one accepted dispatch; the original callback yields authenticationRejected at webhookId because its create-only secret is unavailable.",
+      "Exactly one effect and response occur before drain and original-callback retirement; a request rejected before replay admission is not claimed as a duplicate."
     ],
     "expectedSideEffects": [
       "The accepted deployment is promoted and one approved message plus two typing operations per provider may occur."

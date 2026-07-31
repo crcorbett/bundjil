@@ -2140,8 +2140,12 @@ separate rollback identities; only that exact alias may be reassigned to the
 candidate under bounded authority. Immediately after promotion, fresh readback
 must prove the callback alias and public stable alias both resolve to the
 accepted deployment and one Production replay namespace; one bounded real
-event must then produce one accepted dispatch, one duplicate disposition and
-exactly one response before retry drain or original-webhook retirement.
+event must then produce one accepted dispatch through the candidate callback,
+one `authenticationRejected` disposition at `webhookId` through the preserved
+original callback, zero second effect and exactly one response before retry
+drain or original-webhook retirement. Because the original callback's
+create-only signing secret is unavailable, that request cannot enter the replay
+namespace and cannot truthfully prove a duplicate disposition.
 
 The authorized live recovery created one parallel Production callback while
 preserving the original callback and both shared users. Fresh two-read
@@ -2199,6 +2203,50 @@ rollback target instead must differ from the staged candidate. The owning
 Schema validates the complete sanitized topology and internal route consistency;
 the named preflight Effect classifies both candidate-aware policies
 independently at the staged and promotion checkpoints.
+
+The exact-source candidate at `53cbb77…` completed the route-bound recovery.
+Fresh readback proved the public stable alias and both callback routes resolved
+to the same candidate while preserving distinct public and callback rollback
+deployments. The callback-alias rollback drill restored the prior target and
+then the candidate exactly before public promotion. One bounded real Production
+iMessage with correlation fingerprint `b4efa594…` was sent only after current
+Mac sender `82ac258d…`, source-project user `020cc192…`, assigned destination
+`d4039779…` and an explicit iMessage composer matched. At
+`2026-07-31T13:53:44.278Z`, the candidate deployment observed one `202
+acceptedForDispatch` and a separate `401 authenticationRejected` at
+`webhookId`. The workflow completed on the same candidate with successful
+typing start/stop and one Photon `sendMessage`; the handset showed Delivered,
+Read and exactly one correlated reply. Both rollback deployments recorded zero
+requests in the event window.
+
+This live result corrects the earlier ParallelCutover oracle before irreversible
+retirement. The preserved original callback signs with the unavailable original
+create-only secret, while the candidate runtime owns only the newly custodied
+callback ID/secret pair. The old request therefore fails before replay
+admission. Treating its `401` as a duplicate would be a false green. The
+cutover-specific direct observable is one candidate acceptance, one exact old
+callback authentication rejection, one effect/response, zero rollback traffic
+and no late second effect through the conservative drain. Generic same-event
+retry/duplicate behavior remains independently proved by the accepted BND-J11
+Preview retry journey.
+
+No runtime row changed through `2026-07-31T14:07:38.335Z`, more than fourteen
+minutes after the event. Two fresh inventories retained the exact two-callback
+digest. Under the explicit irreversible authority, the operator compared both
+full webhook IDs in secure process custody and deleted only original callback
+`72cac9b5…`; immediate and two independent readbacks retained only candidate
+`cfe12c3e…`, both users, zero lines and manifest digest `aa033024…`.
+Restoration of the original callback remains impossible because its
+create-only secret is unavailable.
+
+The Alchemy state owner then planned exact 73-to-72 retirement of the original
+callback row fingerprint `5ef46e0a…` with zero provider writes. The first apply
+persisted the full mode-`0600` backup but emitted no receipt, so completion was
+not inferred. Its observation-first recovery compared the 72-row state,
+73-row backup and 72-resource manifest, performed no second delete and emitted
+the fixed receipt. The managed post-plan and two native syncs each returned 72
+no-ops. The final adoption receipt proves state version 5, 72 resources, four
+managed acknowledgements and zero credential leaks.
 
 That first receipt exposed a second durable correction: Production cannot use
 the Preview rollback claim that prior values are externally retained. Its

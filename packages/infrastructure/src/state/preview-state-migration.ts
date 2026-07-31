@@ -757,7 +757,7 @@ export const PreviewStateMigrationLive = makePreviewStateMigrationLayer(
 const CanonicalProductionStateMigrationPolicy =
   PreviewStateMigrationPolicy.make({
     stage: "prod",
-    currentCount: 69,
+    currentCount: 73,
     desiredCount: 72,
     staleResourceTypes: [
       PreviewStateResourceType.make(
@@ -766,7 +766,7 @@ const CanonicalProductionStateMigrationPolicy =
     ],
     staleFingerprints: [
       PreviewStateResourceFingerprint.make(
-        "0f7472767c87d78ee9863e7e560527be52a17d4f58ef6c8a2dc3faeda5c789a1"
+        "5ef46e0a632363f9256f1729c1696c0a48c2fa3a3dc667c6c148e0aedb892cf5"
       ),
     ],
   });

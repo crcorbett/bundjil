@@ -2440,6 +2440,89 @@ rollback/candidate collision. Focused negative fixtures and complete
 verification must pass before committing this correction and generating the
 exact pre-alias policy rejection again.
 
+#### Production post-promotion live-cutover correction
+
+Commit `53cbb77…` passed the corrected route-bound preflight, exact callback
+alias rollback drill and public promotion. Fresh readback proved the public
+stable alias and both callback origins resolved to candidate deployment
+fingerprint `6e31c487…`; the public rollback remains `8a4202c3…` and callback
+rollback remains `2cd0940b…`.
+
+Fresh Photon candidate inventory matched digest `76f0b5c9…` across two reads.
+It mapped current Mac sender `82ac258d…` to source user `020cc192…` and
+Production destination `d4039779…`. Computer Use independently observed the
+same sender fingerprint, exact destination fingerprint and an iMessage
+composer. One bounded message with correlation fingerprint `b4efa594…` was
+sent at `2026-07-31T13:53:39.578Z`.
+
+At `13:53:44.278Z`, both callback routes reached the candidate. The newly
+custodied candidate callback returned `202 acceptedForDispatch`; the preserved
+original callback returned `401 authenticationRejected` at `webhookId`.
+Workflow readback showed successful typing start/stop and one Photon
+`sendMessage`. Messages showed Delivered, Read and exactly one correlated
+reply. Neither rollback deployment received a request.
+
+This reopens only the cutover oracle, not the runtime implementation. The
+original callback's create-only secret is unavailable, so the candidate cannot
+authenticate that request and the replay owner never sees it. A duplicate
+claim would be proof by proxy. The corrected Production cutover accepts one
+candidate dispatch plus the exact old-callback authentication rejection, one
+effect/response, zero rollback traffic and zero late second effect after drain.
+BND-J11 retains the independent same-event retry/duplicate proof.
+
+| Requirement                   | Direct observable and expected postcondition                                                                   | Plausible false green rejected                                                               | Focused command/evidence owner                                            | Status                         |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------ |
+| Sender/destination/transport  | Current sender `82ac258d…`, source binding `020cc192…`/`d4039779…` and iMessage composer match before one send | Preview route, neighbouring conversation, SMS or provider inventory alone                    | Fresh candidate inventory plus Computer Use secure fingerprint comparison | Passed                         |
+| Candidate callback ingress    | One `202 acceptedForDispatch` on candidate deployment                                                          | HTTP aggregate, public alias health or handset reply                                         | Candidate-scoped Vercel logs and callback-route readback                  | Passed                         |
+| Original callback disposition | One `401 authenticationRejected` at `webhookId` on the same candidate                                          | Calling the pre-replay rejection a duplicate                                                 | Candidate boundary diagnostics plus unavailable-secret custody record     | Passed                         |
+| One effect and response       | One workflow, typing start/stop, one successful Photon send and one correlated handset reply                   | SDK acquire alone, two correlation text nodes or aggregate workflow status                   | Vercel structured logs plus Messages Delivered/Read and reply count       | Passed through 14-minute drain |
+| Rollback isolation            | Zero event-window request rows on public and callback rollback deployments                                     | Assuming alias assignment moved every route                                                  | Deployment-scoped Vercel log readback                                     | Passed                         |
+| Original callback retirement  | No late second effect through drain; delete only original `72cac9b5…`; read back sole candidate callback       | Early deletion, count-only selection or pretending exact secret restoration remains possible | Photon delete owner, inventory and state-only retirement receipts         | Passed; irreversible           |
+
+The candidate logs remained unchanged through `2026-07-31T14:07:38.335Z`:
+one accepted callback, one original-callback authentication rejection, three
+workflow requests, one typing start, two safe typing stops, one provider send,
+zero duplicate, zero error and zero late row. Two fresh pre-delete inventories
+matched digest `ce52911f…` with two callbacks. Under the exact mode-`0600`
+irreversible authority, the owner compared the full provider IDs, deleted only
+original callback `72cac9b5…`, and immediately read back sole candidate
+`cfe12c3e…`. Two post-delete inventories matched digest `aa033024…`, retained
+both users, zero lines and zero provider writes.
+
+The provider deletion left one expected retained Alchemy row. The fixed
+Production state policy was advanced from the completed historical
+`69`-to-`68` correction to exact current `73`-to-`72` retirement of FQN
+fingerprint `5ef46e0a…`. Focused typecheck and six state/authority tests passed.
+Plan observed exactly one stale retained Photon webhook row. The first apply
+wrote the full 73-row backup but emitted no receipt, so it was classified
+uncertain-after-write. The bounded recovery path compared the 72-row post-state
+to the full backup and manifest, issued no second delete, and emitted the fixed
+receipt. A following managed plan and two native syncs each returned 72 no-ops;
+the adoption receipt proves state version 5, 72 resources, four managed
+acknowledgements and zero credential leaks.
+
+The exact receipt-bearing repository candidate passed Effect language-service
+diagnostics; boundary, documentation, skill, authority, control,
+verification-policy and HGI-307 gates; 90 tooling tests; type-aware
+format/lint; the lint fixture; Knip; all nine workspace typechecks; and all
+fifteen Turbo build/test tasks. The complete rerun used only the documented
+process-local synthetic Executor URL/key fixture and made no Executor request.
+
+### Production live-cutover docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Direct evidence or preserved boundary                                                                                                                                                                 |
+| --------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and provider call graph          | Preserve        | Both routes reached the same candidate; the finding changes proof semantics, not runtime ownership.                                                                                                   |
+| READMEs, exports and generated references     | Preserve        | No package boundary, export, public command or generated reference changed.                                                                                                                           |
+| Runbooks, authority and controls              | Change required | The Production runbook now rejects a duplicate claim for an authentication-rejected original callback and retains the same exact delete gate.                                                         |
+| Verification journeys and proof               | Change required | BND-J12 records accepted plus authentication-rejected fanout, one effect/response and rollback isolation; BND-J11 remains the duplicate owner.                                                        |
+| Skills, AGENTS, lint, config, commands and CI | Preserve        | Existing repository skills and checks remain sufficient; no standing automation or authority expands.                                                                                                 |
+| Schemas, services and Layers                  | Change required | The Channel boundary correctly rejects the unknown webhook identity before replay admission; the fixed Production state-migration policy advances to the exact 73-to-72 original-callback retirement. |
+| Tests and fixtures                            | Change required | Existing boundary fixtures distinguish authentication rejection from duplicate; the state authority fixture rejects the retired prior-row fingerprint and any count other than exact 73-to-72.        |
+| SPEC, tasks and active plan                   | Change required | This section and the task ledger record the live oracle correction before retirement.                                                                                                                 |
+| Secrets, receipts, rollout and rollback       | Change required | Preserve mode-`0600` raw evidence and both rollback identities; original secret remains unavailable and deletion remains irreversible.                                                                |
+| Lifecycle, archive and terminal audit         | Preserve        | Production remains in progress through drain, exact retirement, Sendblue proof and closeout; terminal five-pass audit has not run.                                                                    |
+
 #### Production write-only custody finding and recovery
 
 Fresh exact-source inventory at repository commit
