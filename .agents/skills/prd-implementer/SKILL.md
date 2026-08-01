@@ -35,14 +35,26 @@ Read in this order:
    has started
 6. the relevant routed files in `docs/architecture/`
 
+## Suggest one implementation goal
+
+When an approved SPEC has multiple implementation tasks and no active goal,
+suggest creating one goal for implementing the whole SPEC to verified
+completion. Present the proposed objective in user-facing language and create
+the goal only after the user explicitly requests or confirms it.
+
+Use the SPEC's accepted tasks as sequential milestones inside that one goal;
+do not create a separate goal for every task. Continue an existing matching
+goal instead of replacing it. Keep the goal active until all accepted tasks,
+documentation reconciliation, terminal review, and closeout verification are
+complete. Goal state coordinates persistence across turns; it never replaces
+the canonical task ledger, acceptance evidence, or proof receipts.
+
 ## Default Rules
 
 - Implement in small, end-to-end slices.
 - When a task list exists, keep one primary trajectory accountable and
   implement one accepted task at a time. Delegate only an independently
   provable slice, fresh/adversarial review, or explicitly disjoint work.
-- Use a goal only when the user explicitly requests one. A goal or subagent
-  count is coordination state, never acceptance proof.
 - Treat any historical `implementationImprovementAuditCounter` as a set of risk
   lenses, not a fixed pass floor. Ownership, implementation quality, and proof
   must pass regardless of turn count.

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "taskId": "terminal-five-pass-audit",
+  "observedAt": "2026-07-25T23:36:17Z",
+  "candidate": {
+    "repositoryCommit": "a3f89877503acb137c0b76b1c09356e4789efe07",
+    "sourceDigest": "4082e63289156bf074852effceccc85d7bde6816948a3c4b7ee45a9287bbf22f",
+    "artifactDigest": "9a8f15ab7299890f1063edc28b6007d2ca54111c971a6960601645a01dfb32c7",
+    "startingCommit": "e92f8d2508dd927c09cb63eddb50c6ca09904b95"
+  },
+  "audit": {
+    "invocationCount": 1,
+    "supersedes": "docs/evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json",
+    "result": "accepted on hosted receipt-bearing state",
+    "passes": [
+      {
+        "pass": 1,
+        "name": "ownership and call graph",
+        "result": "accepted",
+        "evidence": [
+          "Authored webhook code still delegates through EveChannelDispatch to the injected Eve send operation.",
+          "Pinned and installed Eve still own deliver or run, resumeHook, startWorkflowPreferLatest, session Workflow and turn child dispatch.",
+          "Hosted Workflow run fingerprints remained bound to Eve-owned Workflow deployments.",
+          "No app-owned Workflow client, wrapper, queue fallback, mirrored service or generated-output patch was added."
+        ]
+      },
+      {
+        "pass": 2,
+        "name": "Effect quality",
+        "result": "accepted",
+        "evidence": [
+          "The hosted slice changed no runtime boundary or provider client.",
+          "Existing ingress Schema decoding, branded semantic identities, safe tagged errors, Config.schema and explicit Layers remain intact.",
+          "No unsafe cast, manual object reader, instanceof policy or Effect retry was added.",
+          "Provider and SDK clients remain private to their existing adapters."
+        ]
+      },
+      {
+        "pass": 3,
+        "name": "boundary and lifecycle correctness",
+        "result": "accepted",
+        "evidence": [
+          "Preview and both Production direct journeys record SendAccepted before 202.",
+          "Cross-deployment Preview continuity matched the existing safe session fingerprint; a fallback new run was not accepted as resume proof.",
+          "Exact Sendblue redelivery produced zero second Workflow and outbound result in Preview and Production.",
+          "The replacement exercise remained attempt one and the Production Photon exact duplicate oracle remained inconclusive rather than overstated."
+        ]
+      },
+      {
+        "pass": 4,
+        "name": "adversarial verification",
+        "result": "accepted",
+        "evidence": [
+          "The initial two-callback Preview fan-out and the dirty Production candidate are retained as rejected evidence.",
+          "READY, local Build Output, waitUntil, aggregate green tests, and historical or fallback runs were not promoted into hosted proof.",
+          "Authenticated Vercel functions, Workflow CLI, bounded logs, provider APIs/dashboard, handset and final restoration readbacks own the external claims.",
+          "The complete repository verification passed after focused packet, docs, verification, boundary, Effect, skills, authority and controls gates."
+        ]
+      },
+      {
+        "pass": 5,
+        "name": "documentation authority and closeout",
+        "result": "accepted",
+        "evidence": [
+          "The task ledger, active plan, verification router, hosted detail and successor packets agree on accepted Preview and inconclusive combined Production.",
+          "Earlier blocked and local-audit packets are lifecycle-superseded with explicit successors rather than silently rewritten.",
+          "Sendblue and hashed Photon topology match captured before-state; Production and Preview aliases match rollback identities.",
+          "One-run external authority is consumed, no credentials or message content are retained, and no standing deploy, provider, promotion, rollback or merge authority is claimed."
+        ]
+      }
+    ]
+  },
+  "findings": [],
+  "preAuditCorrection": {
+    "finding": "The first focused verification-policy check rejected an unsupported command receipt outcome in the new Production packet.",
+    "action": "Changed only the command receipt outcome to the supported blocked classification while preserving the packet's top-level inconclusive result.",
+    "recheck": "Focused verification policy passed before the terminal audit started."
+  },
+  "terminalTaskStates": [
+    {
+      "taskId": "prove-eve-owned-handoff",
+      "status": "completed"
+    },
+    {
+      "taskId": "add-handoff-observability",
+      "status": "completed"
+    },
+    {
+      "taskId": "correct-202-ordering",
+      "status": "completed"
+    },
+    {
+      "taskId": "set-and-readback-timeouts",
+      "status": "completed"
+    },
+    {
+      "taskId": "qualify-final-preview",
+      "status": "completed"
+    },
+    {
+      "taskId": "qualify-production-candidate",
+      "status": "completed_with_inconclusive_aggregate"
+    }
+  ],
+  "checks": [
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "rollback": {
+    "repositoryBase": "e92f8d2508dd927c09cb63eddb50c6ca09904b95",
+    "productionDeployment": "dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY",
+    "previewDeployment": "dpl_B6AK64qmEAeTkBVgQUx3o1Yq6dhr",
+    "providerState": "Captured sole Sendblue callback and two unchanged hashed Photon callbacks."
+  },
+  "limitations": [
+    "Preview deployment replacement did not force a step retry; every observed step remained attempt one.",
+    "Combined Production remains inconclusive on the candidate-specific Photon exact duplicate oracle.",
+    "No numeric Photon webhook response deadline was available.",
+    "External state can change after the final readback."
+  ],
+  "nonClaims": [
+    "The audit does not prove exactly-once execution, universal availability, every termination mode, or future provider and plan behavior.",
+    "The audit grants no standing deployment, provider, credential, message, promotion, rollback, push, merge or release authority.",
+    "No raw Workflow run ID, hook token, provider payload, phone identity, message content or credential is retained."
+  ]
+}

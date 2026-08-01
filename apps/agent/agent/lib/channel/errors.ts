@@ -1,5 +1,6 @@
 export { EveChannelDispatchError } from "./errors/dispatch-error.js";
 export { ChannelConfigError } from "./errors/config-error.js";
+export { ChannelHandoffObservationError } from "./errors/handoff-observation-error.js";
 export { ChannelIdentityError } from "./errors/identity-error.js";
 export { ChannelReplayError } from "./errors/replay-error.js";
 export { ChannelRoutingError } from "./errors/routing-error.js";

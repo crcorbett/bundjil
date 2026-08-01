@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "taskId": "set-and-readback-timeouts",
+  "observedAt": "2026-07-25T17:24:18Z",
+  "candidate": {
+    "repositoryCommit": "eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+    "sourceDigest": "384dcf6ae67c901803725b7b4e388deb48aa6c6c912893c28e0c667e2c91a442",
+    "artifactDigest": "144d4b0ba708cc8da7bf2fff3731de34a50cdcda2afdff86be8c0d6d2b83df66"
+  },
+  "localBuildOutput": {
+    "classification": "local preflight only",
+    "routeConfigSha256": "2473026e2f3d85c90bd356bb500f034b37b3014010e4ced6ebcfb46e89a12a3b",
+    "serverFunctionConfigSha256": "5681e89475c2437a6b28e3fd9ec3d4501cc0176038dbbb97841904a1bbf09021",
+    "workflowFunctionConfigSha256": "c2cd50e401beff0ef2eff577add3d306aff605dcd2792c4a7eb18c2277a0afab",
+    "workflowManifestSha256": "cce3c92ebbea801dee8f4600ffb06652481521d868313b4d270b678b3674b3b6",
+    "serverFunction": {
+      "runtime": "nodejs24.x",
+      "maxDuration": "unset",
+      "queueTrigger": false
+    },
+    "workflowFunction": {
+      "runtime": "nodejs24.x",
+      "maxDuration": "max",
+      "queueTrigger": true,
+      "retryAfterSeconds": 5
+    }
+  },
+  "supportedOwnerDecision": {
+    "nitroOwner": "Eve 0.20 createApplicationNitro and createEveVercelOptions",
+    "supportedVercelSeam": "Nitro vercel.functions.maxDuration",
+    "bundjilFacingSeam": "unavailable in Eve 0.20",
+    "decision": "retain effective project default pending exact candidate readback and measured need",
+    "rejected": [
+      "guessed vercel.json source glob for generated __server",
+      "generated Build Output patch",
+      "app-owned Workflow wrapper",
+      "Sandbox timeout substituted for function duration"
+    ]
+  },
+  "readOnlyVercelObservation": {
+    "projectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+    "projectName": "bundjil-agent",
+    "nodeVersion": "24.x",
+    "returnedProjectLiveField": false,
+    "latestDeploymentId": "dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG",
+    "latestDeploymentTarget": "production",
+    "latestDeploymentState": "READY",
+    "latestDeploymentSourceCommit": "2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b",
+    "latestDeploymentObservedCreatedAt": "2026-07-23T00:08:28.313Z",
+    "latestDeploymentRuntimeType": "LAMBDAS",
+    "latestDeploymentRegion": "iad1",
+    "latestDeploymentMatchesCandidate": false,
+    "candidatePresentInReturnedTwentyDeploymentInventory": false,
+    "effectiveFunctionDurationReturned": false,
+    "accountPlanReturned": false,
+    "fieldLimitation": "The connector does not define the project live field as Fluid Compute state; no such inference is made."
+  },
+  "providerDeadlineReadback": {
+    "sendblue": {
+      "source": "https://docs.sendblue.com/getting-started/webhooks/",
+      "responseWindowSeconds": 45,
+      "retryCount": 3,
+      "classification": "current provider documentation, not target account readback"
+    },
+    "photon": {
+      "source": "current cited Photon documentation set",
+      "responseWindowSeconds": null,
+      "classification": "no numeric provider requirement established"
+    }
+  },
+  "vercelContractReferences": [
+    "https://vercel.com/docs/functions/configuring-functions/duration",
+    "https://vercel.com/docs/build-output-api/v3/primitives",
+    "https://vercel.com/docs/fluid-compute"
+  ],
+  "fourClockResults": [
+    {
+      "clock": "webhook-to-Eve acceptance",
+      "owner": "Bundjil Channel config and ChannelHandoff",
+      "configuredValue": "15-second product default as positive Effect Duration",
+      "measuredDistribution": "unavailable without immutable candidate Preview journey",
+      "result": "blocked"
+    },
+    {
+      "clock": "Workflow and model-tool invocation",
+      "owner": "Eve Workflow function and operation-specific adapter",
+      "configuredValue": "Workflow max; no accepted model or tool ceiling",
+      "measuredDistribution": "unavailable without Workflow run authority",
+      "result": "blocked"
+    },
+    {
+      "clock": "ordinary Vercel __server function",
+      "owner": "Eve-created Nitro output then Vercel deployment precedence",
+      "configuredValue": "local generated maxDuration unset",
+      "measuredDistribution": "effective candidate value and plan unavailable",
+      "result": "blocked"
+    },
+    {
+      "clock": "Vercel Sandbox lifecycle",
+      "owner": "Eve Sandbox invocation",
+      "configuredValue": "upstream default remains separate",
+      "measuredDistribution": "not required for the local handoff claim",
+      "result": "inconclusive"
+    }
+  ],
+  "verification": [
+    "Agent packaging fixture Schema-decodes Turbo admission plus ordinary and Workflow function contracts.",
+    "Agent typecheck, Effect setup, boundary, docs, skills, authority, controls, verification policy, HGI-307, formatting, Knip, eight workspace typechecks, ninety tooling tests, and fourteen workspace test tasks passed.",
+    "The complete agent suite rebuilt ordinary and Vercel output and passed seventy-three tests."
+  ],
+  "authorityGates": [
+    "Push exact candidate commit.",
+    "Attach target-owned isolated Preview deployment authority.",
+    "Attach provider message and readback authority for each active provider.",
+    "Attach Workflow run-read and bounded interruption authority.",
+    "Attach exact rollback target, owner, observation window, and sanitized packet path."
+  ],
+  "limitations": [
+    "No candidate deployment exists in the returned Vercel inventory.",
+    "No cold or warm new-session, existing-session resume, model, tool, or provider latency distribution was measured.",
+    "No effective candidate function duration, Fluid setting, plan, Workflow run, alert, or rollback was read back."
+  ],
+  "nonClaims": [
+    "The older READY Production deployment is not evidence for this candidate.",
+    "Local Build Output does not prove Preview or Production configuration.",
+    "No deployment, provider mutation, webhook, credential, message, Workflow run, interruption, promotion, rollback, push, or merge occurred."
+  ]
+}

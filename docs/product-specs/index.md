@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-26
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -14,11 +14,21 @@ entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
 ledgers remain beside their SPECs for provenance; they are not default current
 context.
 
+## Proposed
+
+- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
+  reviewed implementation intent for deterministic Effect time, pragmatic
+  state/collection ownership, and four narrow existing-plugin lint rules;
+  implementation awaits an active plan and explicit authority.
+
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   implementation in progress; Preview subscription-endpoint proof remains
   pending explicit deployment authority.
+- [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md) —
+  local implementation and proof are active; Preview interruption and
+  Production qualification remain target-authority-gated.
 
 ## Implemented or superseded history
 

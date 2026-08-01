@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "taskId": "alchemy-vercel-photon-infrastructure-main-integration",
+  "status": "passed",
+  "observedAt": "2026-08-01T01:18:41.000Z",
+  "trigger": "Current origin/main added durable ChannelHandoff runtime ownership, hosted Eve qualification evidence and Effect-native runtime policy after the Alchemy infrastructure branch completed, requiring a semantic source integration and unique-path inventory reconciliation.",
+  "docsInventory": {
+    "pathCount": 216,
+    "sortedPathSha256": "1057f81c7b42c7f3f651e2a67af3e60b21b08b54e5a4ba16d4b3fca994b600b9"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "apps/agent/agent/lib/channel/eve.ts",
+    "apps/agent/runbooks/deploy-promote.md",
+    "apps/agent/runbooks/photon.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/verification/README.md",
+    "docs/verification/critical-journeys.json",
+    "docs/verification/journey-command-map.json",
+    "tooling/verification-policy.ts",
+    "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+    "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "impactLedger": [
+    {
+      "surface": "architecture, services, Layers and call graph",
+      "decision": "changed",
+      "evidence": "ChannelHandoff remains the owner of acceptance, convergence, response and terminal settlement while the existing secret-free ChannelWebhookDisposition observation remains attached to the same outcomes."
+    },
+    {
+      "surface": "runbooks, authority, receipts and rollback",
+      "decision": "changed",
+      "evidence": "The integrated promotion and Photon procedures retain both durable-handoff clocks and the accepted Alchemy callback, replay, proof and rollback gates; historical authority remains non-standing."
+    },
+    {
+      "surface": "verification journeys, tests and policy",
+      "decision": "changed",
+      "evidence": "The inventory retains all fifteen unique full journey identities, including hosted Eve durability and both infrastructure convergence/drift contracts, with direct command owners and focused runtime tests."
+    },
+    {
+      "surface": "READMEs, exports, generated references, skills, AGENTS, lint, config, CI and provider schemas",
+      "decision": "preserved",
+      "evidence": "No integration-only public export, generated API, skill, instruction, provider DTO, credential, workflow authority or CI exception was added."
+    },
+    {
+      "surface": "SPEC, task ledger, completed plan and archive pointers",
+      "decision": "changed",
+      "evidence": "A source-integration addendum records exact parents, conflict ownership, verification and non-claims without rerunning or rewriting either historical terminal audit."
+    }
+  ],
+  "reviewFindings": [
+    {
+      "finding": "The retained Photon runbook still described acceptedForDispatch as background dispatch and did not name the new fail-closed handoff dispositions.",
+      "correction": "The integrated route now emits handoffContinuityUncertain for its distinct 503 outcome, and the runbook binds acceptedForDispatch to handoff acceptance plus intended-session convergence while listing both handoff failure dispositions.",
+      "verification": "Focused Channel tests and the complete repository gate are rerun after this correction."
+    }
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The merge changes current source and documentation ownership but not the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The Alchemy terminal audit remains bound to f301722 and the hosted Eve terminal audit remains bound to its dated packet. This integration validates their combined repository state only.",
+    "nonClaim": "No provider read/write, deployment, workflow execution, message, credential, billing or Production state was refreshed by source integration."
+  },
+  "checks": [
+    {
+      "command": "focused conflict-surface checks",
+      "status": "passed",
+      "result": "Effect language-service and boundary checks, agent typecheck, 77 agent tests, 15 focused runtime/continuity tests, 11 verification-policy adversarial tests, and docs/skills/authority/controls/verification/HGI gates passed."
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed",
+      "result": "The integrated candidate passed 98 tooling tests, type-aware formatting/lint, lint fixtures, Knip, all nine typechecks and all fifteen Turbo test tasks with the process-local synthetic Executor fixture."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "The final merge commit identity is recorded after verification."
+  ],
+  "nonClaims": [
+    "Neither earlier five-pass audit is represented as a fresh audit of external state.",
+    "No provider, deployment, message, credential, billing or Production operation is authorised by this file."
+  ]
+}

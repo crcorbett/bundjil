@@ -3052,3 +3052,44 @@ mutation occurred during drift qualification or audit.
 Remaining non-claims: hosted GitHub settings/secrets/environment, scheduled
 workflow execution, alert delivery, automatic repair, future provider state,
 and reconstruction of write-only Vercel or retired Photon secret material.
+
+## 2026-08-01 current-main source integration
+
+This completed plan was integrated with current `origin/main` after that line
+added ChannelHandoff runtime ownership, hosted Eve durability qualification and
+Effect-native runtime policy. The merge preserves ChannelHandoff as the owner
+of ingress acceptance, convergence, response and terminal settlement; retains
+the infrastructure branch's secret-free webhook disposition observations; and
+keeps all fifteen full critical-journey identities and command owners.
+
+Docs-maintainer integration ledger:
+
+| Surface                                       | Decision        | Integrated evidence                                                                                                                             |
+| --------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture, schemas, services and Layers    | Change required | Compose current ChannelHandoff ownership with the existing disposition oracle; focused Channel tests own the observable.                        |
+| Runbooks, authority, controls and rollback    | Change required | Preserve hosted durability clocks plus Alchemy callback, retry, cutover and rollback gates; no historical authority becomes standing authority. |
+| Verification journeys, proof and fixtures     | Change required | Retain hosted Eve durability and both infrastructure convergence/drift journeys; exact full IDs remain unique and all map to direct owners.     |
+| READMEs, exports and generated references     | Preserve        | Current main README/public-boundary changes are retained; the integration adds no export or generated-reference change.                         |
+| Skills, AGENTS, lint, config, commands and CI | Preserve        | Current-main hardening is retained without an integration exception or weakened gate.                                                           |
+| Provider implementation and lifecycle         | Preserve        | No Vercel, Photon, Sendblue, deployment, credential, billing or Production operation occurs during source integration.                          |
+| SPEC, tasks, plan, receipts and archive       | Change required | This addendum, task result and dated documentation-inventory correction own the combined source state without rewriting either terminal audit.  |
+
+The merge must pass focused runtime, verification-policy, docs, skills,
+authority, controls and HGI checks followed by complete repository verification.
+That evidence proves source compatibility only. Provider receipts remain bound
+to their original immutable candidates and observation times.
+
+The integrated candidate passed Effect language-service and boundary checks,
+agent typecheck, 77 agent tests, 15 focused runtime/continuity tests, 11
+verification-policy adversarial tests, all routed policy/HGI gates, 98 tooling
+tests, type-aware format/lint, the lint fixture, Knip, all nine workspace
+typechecks and all fifteen Turbo test tasks. The app suite used only the
+process-local synthetic Executor configuration; no external provider operation
+was performed.
+
+Final diff review found one semantic documentation mismatch: the Photon
+runbook still called `acceptedForDispatch` background dispatch and omitted the
+new fail-closed handoff outcomes. The route now records
+`handoffContinuityUncertain` for that distinct `503`, and the runbook names
+handoff acceptance plus intended-session convergence and both handoff failure
+dispositions. Focused and complete verification were rerun after the fix.

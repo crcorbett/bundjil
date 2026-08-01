@@ -1,9 +1,10 @@
 import { ChannelTransport } from "@bundjil/channel";
 import type {
+  ChannelConversationType,
+  ChannelDeliveryUncertainError,
+  ChannelInboundTextMessageType,
   ChannelPresenceError,
   ChannelSendError,
-  ChannelInboundTextMessageType,
-  ChannelDeliveryUncertainError,
 } from "@bundjil/channel";
 import { Context, Effect, Layer, Match } from "effect";
 
@@ -16,10 +17,16 @@ import { ChannelIdentity } from "./identity.js";
 import { ChannelReplay } from "./replay.js";
 import { ChannelRouter } from "./router.js";
 import type {
+  ChannelContinuationToken,
   ChannelEvent,
   ChannelEventResult,
+  ChannelHandoffAcceptance,
+  ChannelInboundAcceptance,
   ChannelPrepareInboundResult,
   ChannelReplayClaim,
+  ChannelSessionFingerprint,
+  ChannelSessionSettlement,
+  ChannelSessionTerminalOutcome,
 } from "./schemas.js";
 
 export type ChannelPrepareInboundError =
@@ -37,9 +44,25 @@ export interface ChannelShape {
   readonly prepareInbound: (
     message: ChannelInboundTextMessageType
   ) => Effect.Effect<ChannelPrepareInboundResult, ChannelPrepareInboundError>;
-  readonly completeInbound: (
+  readonly acceptInbound: (
+    claim: ChannelReplayClaim,
+    continuationToken: ChannelContinuationToken,
+    acceptance: ChannelHandoffAcceptance
+  ) => Effect.Effect<ChannelInboundAcceptance, ChannelReplayError>;
+  readonly retryInbound: (
     claim: ChannelReplayClaim
   ) => Effect.Effect<void, ChannelReplayError>;
+  readonly uncertainInbound: (
+    claim: ChannelReplayClaim
+  ) => Effect.Effect<void, ChannelReplayError>;
+  readonly settleSession: (
+    conversation: ChannelConversationType,
+    sessionFingerprint: ChannelSessionFingerprint,
+    outcome: ChannelSessionTerminalOutcome
+  ) => Effect.Effect<
+    ChannelSessionSettlement,
+    ChannelReplayError | ChannelRoutingError
+  >;
   readonly handleEvent: (
     event: ChannelEvent
   ) => Effect.Effect<ChannelEventResult, ChannelHandleEventError>;
@@ -58,6 +81,7 @@ export const layerLive = Layer.effect(
     const replay = yield* ChannelReplay;
 
     return Channel.of({
+      acceptInbound: replay.acceptInbound,
       decodeWebhook: transport.decodeWebhook,
       prepareInbound: Effect.fn("Channel.prepareInbound")(function* (message) {
         const principalId = yield* identity.resolve(
@@ -90,7 +114,18 @@ export const layerLive = Layer.effect(
           Match.exhaustive
         );
       }),
-      completeInbound: replay.complete,
+      retryInbound: replay.retryable,
+      settleSession: Effect.fn("Channel.settleSession")(
+        function* (conversation, sessionFingerprint, outcome) {
+          const continuationToken = yield* router.route(conversation);
+          return yield* replay.settleSession(
+            continuationToken,
+            sessionFingerprint,
+            outcome
+          );
+        }
+      ),
+      uncertainInbound: replay.uncertain,
       handleEvent: Effect.fn("Channel.handleEvent")(function* (event) {
         return yield* Match.value(event).pipe(
           Match.tag("PresenceRequested", ({ action, conversation }) =>

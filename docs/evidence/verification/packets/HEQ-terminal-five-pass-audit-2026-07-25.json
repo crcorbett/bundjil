@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "kind": "local",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": {
+    "state": "superseded",
+    "successor": "docs/evidence/verification/packets/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json",
+    "reason": "Hosted authority and receipt-bearing Preview and Production work reopened the terminal audit lifecycle."
+  },
+  "externalConsequence": {
+    "outcome": "none",
+    "target": "no external target"
+  },
+  "candidate": {
+    "repositoryCommit": "865365d5529a388a312ce11c8183c06625f31241",
+    "sourceDigest": "9b009c20393ed7fad5a4f9f3eac5bda761b5186108aab92e9a2f6ee0dcde6f76",
+    "artifactDigest": "144d4b0ba708cc8da7bf2fff3731de34a50cdcda2afdff86be8c0d6d2b83df66"
+  },
+  "authority": {
+    "principal": "local repository maintainer",
+    "identitySource": "local Git and repository verification process",
+    "externalAccess": "none",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil repository maintainer"
+  },
+  "environment": {
+    "tier": "local",
+    "target": "Bundjil repository closeout at 865365d5529a388a312ce11c8183c06625f31241"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J13-hosted-eve-durability",
+      "status": "inconclusive",
+      "oracle": "The local implementation contract passes; immutable Preview acceptance, interruption and duplicate proof remain unavailable."
+    },
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "blocked",
+      "oracle": "No accepted identical Preview, candidate Production deployment, authority or per-provider Production journey exists."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "single terminal five-pass audit followed by focused finding repair and complete repository verification",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "Ownership, Effect quality, lifecycle, adversarial proof, documentation and authority agree without upgrading hosted claims.",
+    "target": "Bundjil hosted Eve implementation and retained blocked qualification outcomes",
+    "recoveryHint": "Reopen the exact owning task and invalidate dependent evidence when source, Eve, config, authority or hosted state changes.",
+    "detailPath": "docs/evidence/verification/details/HEQ-terminal-five-pass-audit-2026-07-25.json",
+    "detailSha256": "83b7a86e3559763fd871ba84de66fd6953c67fa056613c1d60d904a733a16492",
+    "postcondition": "Repository implementation is accepted locally; Preview and Production remain explicitly blocked."
+  },
+  "externalReadback": {
+    "required": false,
+    "outcome": "not_required",
+    "receipt": "Retained external packets own their separate inconclusive readback claims."
+  },
+  "postconditions": [
+    "The exact Eve send acceptance boundary, continuity fence and timeout uncertainty contract pass local proof.",
+    "Supported timeout ownership is documented without a guessed override.",
+    "All hosted tasks retain terminal blocked outcomes and exact authority gates.",
+    "The single terminal audit finding is corrected and its focused recheck passes."
+  ],
+  "limitations": [
+    "No candidate Preview or Production deployment, Workflow run, latency, interruption, provider, monitoring or rollback result exists.",
+    "Local proof does not establish exactly-once execution, availability, warm topology or every termination mode."
+  ],
+  "nonClaims": [
+    "This packet does not qualify Preview or Production.",
+    "This packet grants no deployment, provider, credential, message, interruption, promotion, rollback, push or merge authority.",
+    "Historical Production evidence remains bound to its original candidate and observation."
+  ],
+  "rollback": {
+    "identity": "ordered reversion from 865365d5529a388a312ce11c8183c06625f31241 to e92f8d2508dd927c09cb63eddb50c6ca09904b95",
+    "outcome": "ready",
+    "owner": "Bundjil repository maintainer"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/HEQ-terminal-five-pass-audit-2026-07-25.json",
+      "sha256": "83b7a86e3559763fd871ba84de66fd6953c67fa056613c1d60d904a733a16492",
+      "provenance": "single five-pass source audit, focused documentation repair and complete repository verification"
+    }
+  ],
+  "observedAt": "2026-07-25T17:31:47Z"
+}

@@ -1,0 +1,599 @@
+{
+  "title": "Effect-native runtime patterns and lint enforcement tasks",
+  "spec": "docs/product-specs/effect-native-runtime-patterns-and-lint-enforcement.md",
+  "status": "proposed",
+  "draftBase": {
+    "ref": "main",
+    "sha": "e92f8d2508dd927c09cb63eddb50c6ca09904b95",
+    "runtimeBranchRef": "origin/codex/eve-runtime-qualification",
+    "runtimeBranchSha": "238f0334a69b0d4b9cd1d449322c7f31195504be",
+    "researchDate": "2026-07-26"
+  },
+  "authority": {
+    "implementation": "not-authorized",
+    "providerOperations": "not-authorized",
+    "deployment": "not-authorized",
+    "commitPushMerge": "not-authorized",
+    "activePlan": "absent-until-explicit-implementation-authority"
+  },
+  "principles": [
+    "Decode unknown input once at ingress with the owning Effect Schema, pass Contract.Type, and encode Contract.Encoded only at egress.",
+    "Use strict but pragmatic Effect code: flat, linear, sequential, lazy, composable, and explicit about absence and failure.",
+    "Choose time, state, collection, Layer, and optionality primitives by owned semantics rather than API-count goals.",
+    "Extend Bundjil's existing Oxlint plugin, Effect language service, and boundary audit; do not add another lint runner or wrapper.",
+    "Every lint rule requires one AST invariant, exact ownership, positive and negative unit plus installed-plugin fixtures, a false-positive matrix, migration, and safe autofix decision.",
+    "Do not create pass-through services, generic collection transforms, DTO mirrors, manual readers, unsafe casts, or helper/common/utils sprawl.",
+    "Run one mandatory five-pass audit only after all future implementation tasks are complete."
+  ],
+  "acceptedFindings": [
+    {
+      "id": "ENP-FND-001",
+      "decision": "Add narrow time and timer lint and migrate only Effect-clock-owned tests; preserve exact live host proof.",
+      "requirementIds": ["ENP-REQ-002", "ENP-REQ-006", "ENP-REQ-007"],
+      "taskIds": [
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns"
+      ]
+    },
+    {
+      "id": "ENP-FND-002",
+      "decision": "Add scoped async/await confinement and object-form Effect.tryPromise rejection mapping.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-006"],
+      "taskIds": [
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns"
+      ]
+    },
+    {
+      "id": "ENP-FND-003",
+      "decision": "Add one import-aware runtime execution ownership rule and reject a duplicate second rule.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-006", "ENP-REQ-007"],
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns"
+      ]
+    },
+    {
+      "id": "ENP-FND-004",
+      "decision": "Use state transition and collection semantic evidence rather than Ref adjacency, native collection, index, or helper-name lint.",
+      "requirementIds": ["ENP-REQ-003", "ENP-REQ-004", "ENP-REQ-007"],
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "review-state-and-collection-targets"
+      ]
+    },
+    {
+      "id": "ENP-FND-005",
+      "decision": "Copy or adapt four exact Site rules and explicitly classify every other Site Effect rule.",
+      "requirementIds": ["ENP-REQ-006", "ENP-REQ-010"],
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "add-narrow-lint-rules-disabled"
+      ]
+    },
+    {
+      "id": "ENP-FND-006",
+      "decision": "Pin implementation decisions to lock-resolved Effect beta.74 and reopen research on dependency change.",
+      "requirementIds": ["ENP-REQ-003", "ENP-REQ-004", "ENP-REQ-009"],
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "review-state-and-collection-targets",
+        "enable-rules-and-reconcile-docs"
+      ]
+    },
+    {
+      "id": "ENP-FND-007",
+      "decision": "Sequence implementation after the actual Eve runtime integration state and preserve completed branch proof.",
+      "requirementIds": ["ENP-REQ-008", "ENP-REQ-010"],
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "migrate-targeted-effect-patterns",
+        "review-state-and-collection-targets"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "ENP-REQ-001",
+      "requirement": "Preserve one-decode/one-encode Effect Schema boundary provenance, branded identities, safe tagged errors, redacted Config, and explicit live/mock Layers.",
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "migrate-targeted-effect-patterns",
+        "enable-rules-and-reconcile-docs",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Boundary audit and affected adapter tests show decoded service inputs and encoded outward values.",
+      "expectedPostcondition": "No lint or migration weakens Bundjil's boundary contracts.",
+      "falseGreenRejected": "Typecheck or lint success without direct adapter proof.",
+      "focusedCommandOrProcedureOwner": "bun run check:boundaries plus affected provider/package tests",
+      "evidenceOwner": "Boundary migration receipt",
+      "limitationsAndNonClaims": "Repository proof does not establish provider actuality."
+    },
+    {
+      "id": "ENP-REQ-002",
+      "requirement": "Runtime time uses Effect Clock and Effect-clock tests use TestClock without wall-clock sleeps; genuine host-time proof is exact and bounded.",
+      "taskIds": [
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns",
+        "enable-rules-and-reconcile-docs"
+      ],
+      "directObservable": "Deterministic attempt, timestamp, timeout, and retry traces complete under TestClock; exact host exceptions remain registered.",
+      "expectedPostcondition": "Effect-owned test outcomes are independent of host wall time.",
+      "falseGreenRejected": "A fast test, a fixed real sleep, or Date comparison that happens to pass.",
+      "focusedCommandOrProcedureOwner": "Lint fixtures and affected package TestClock tests",
+      "evidenceOwner": "Timing receipt",
+      "limitationsAndNonClaims": "Only the tested virtual schedule is proved."
+    },
+    {
+      "id": "ENP-REQ-003",
+      "requirement": "Every state cell has a Layer/service owner, lifetime, concurrency, transition, serialization, and observability decision; cohesive fields transition atomically and independent owners remain separate.",
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "review-state-and-collection-targets",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Transition tables and focused concurrency tests show no torn cohesive state and preserve independent state owners.",
+      "expectedPostcondition": "State shape matches domain atomicity and lifetime.",
+      "falseGreenRejected": "Counting Refs or passing only sequential tests.",
+      "focusedCommandOrProcedureOwner": "Affected state service tests and Layer call-graph review",
+      "evidenceOwner": "State ownership receipt",
+      "limitationsAndNonClaims": "In-process state is not durable across processes."
+    },
+    {
+      "id": "ENP-REQ-004",
+      "requirement": "Choose Array, Chunk, HashMap, HashSet, native collections, records, Option, and Schema non-empty contracts by the SPEC decision matrix without cosmetic rewrites.",
+      "taskIds": [
+        "review-state-and-collection-targets",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Every collection migration names immutable update, equality, typed absence, cardinality, order, or measured persistent-sequence value and proves it in focused tests.",
+      "expectedPostcondition": "Collections carry domain semantics without conversion ceremony.",
+      "falseGreenRejected": "Reduced native constructor count or increased Effect import count.",
+      "focusedCommandOrProcedureOwner": "Affected package tests and migration decision table",
+      "evidenceOwner": "Collection decision receipt",
+      "limitationsAndNonClaims": "No repository-wide performance claim."
+    },
+    {
+      "id": "ENP-REQ-005",
+      "requirement": "Keep primary Effects flat, lazy, linear, sequential, composable, and free of nested runtime execution, pass-through services, and helper sprawl.",
+      "taskIds": [
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns",
+        "enable-rules-and-reconcile-docs",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Language-service and lint findings are zero and focused call-graph review shows runtime execution only at named boundaries.",
+      "expectedPostcondition": "Service code returns Effects and app/framework adapters own execution.",
+      "falseGreenRejected": "Pretty pipelines, fewer lines, or a wrapper that only renames another operation.",
+      "focusedCommandOrProcedureOwner": "check:effect-setup, lint tests, and affected service tests",
+      "evidenceOwner": "Effect flow receipt",
+      "limitationsAndNonClaims": "Readability retains bounded reviewer judgment."
+    },
+    {
+      "id": "ENP-REQ-006",
+      "requirement": "Implement four narrow Bundjil Oxlint rules with AST invariants, scopes, positive/negative unit and installed-plugin fixtures, current-finding classification, false-positive matrices, migration, exact stale exceptions, and no unsafe autofix.",
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "add-narrow-lint-rules-disabled",
+        "enable-rules-and-reconcile-docs"
+      ],
+      "directObservable": "Each rule rejects exact negative fixtures, accepts exact positive/exception fixtures, and stale exceptions fail.",
+      "expectedPostcondition": "Rules are durable and actionable without a debt baseline.",
+      "falseGreenRejected": "Visitor-object tests alone or linting only the current clean source.",
+      "focusedCommandOrProcedureOwner": "bun run test:lint and installed Oxlint fixture invocation",
+      "evidenceOwner": "Lint rule receipt",
+      "limitationsAndNonClaims": "AST rules are intentionally not type or data-flow complete."
+    },
+    {
+      "id": "ENP-REQ-007",
+      "requirement": "Migrate only findings mapped to a concrete failure while preserving wire behavior, persistent bytes and keys, error tags, service identities, Layer ownership, and test intent.",
+      "taskIds": [
+        "migrate-targeted-effect-patterns",
+        "review-state-and-collection-targets",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Finding inventory links each source edit to focused behavioural or compatibility proof.",
+      "expectedPostcondition": "No working code is rewritten solely for style.",
+      "falseGreenRejected": "Bulk codemod, formatter, or all-tests success without finding provenance.",
+      "focusedCommandOrProcedureOwner": "Affected package commands and compatibility fixtures",
+      "evidenceOwner": "Targeted migration receipt",
+      "limitationsAndNonClaims": "Untouched code is not re-proved."
+    },
+    {
+      "id": "ENP-REQ-008",
+      "requirement": "Sequence implementation after the actual eve-runtime-qualification integration state, refresh citations and findings, and preserve accepted branch proof.",
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "migrate-targeted-effect-patterns",
+        "review-state-and-collection-targets"
+      ],
+      "directObservable": "Implementation receipt names the exact final base SHA and resolves handoff timing, nested dispatch, observation Ref, and cardinality targets against merged source.",
+      "expectedPostcondition": "No stale line-based change is applied to the read-only branch.",
+      "falseGreenRejected": "Using origin branch name or old diff as current source truth.",
+      "focusedCommandOrProcedureOwner": "Git identity and read-only source/call-graph review",
+      "evidenceOwner": "Integration inventory receipt",
+      "limitationsAndNonClaims": "Does not re-qualify hosted runtime behaviour."
+    },
+    {
+      "id": "ENP-REQ-009",
+      "requirement": "Update earliest durable docs and skills only where final implementation proves a change; record Change required, Preserve, or evidenced N/A across the impact ledger.",
+      "taskIds": [
+        "enable-rules-and-reconcile-docs",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Docs ledger, source, rule IDs, commands, and skills agree and policy audits pass.",
+      "expectedPostcondition": "No duplicated handbook or stale policy remains.",
+      "falseGreenRejected": "Updating only AGENTS.md, one README, or the SPEC.",
+      "focusedCommandOrProcedureOwner": "bun run check:docs and bun run check:skills",
+      "evidenceOwner": "Docs-maintainer receipt",
+      "limitationsAndNonClaims": "Documentation proof does not prove runtime."
+    },
+    {
+      "id": "ENP-REQ-010",
+      "requirement": "Retain a complete direct requirement-to-proof contract for every requirement and lint rule.",
+      "taskIds": [
+        "refresh-integrated-inventory",
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns",
+        "review-state-and-collection-targets",
+        "enable-rules-and-reconcile-docs",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "Every requirement and rule has observable, postcondition, false green, procedure owner, evidence owner, and limitation.",
+      "expectedPostcondition": "Proof is routed to the exact owner.",
+      "falseGreenRejected": "Broad suite success as a boundary proxy.",
+      "focusedCommandOrProcedureOwner": "Task-ledger parse and PRD review",
+      "evidenceOwner": "Traceability receipt",
+      "limitationsAndNonClaims": "Traceability is not behaviour."
+    },
+    {
+      "id": "ENP-REQ-011",
+      "requirement": "Run focused slice proof and terminal bun run verification plus git diff --check on the final candidate.",
+      "taskIds": [
+        "enable-rules-and-reconcile-docs",
+        "terminal-five-pass-audit"
+      ],
+      "directObservable": "One exact candidate has fresh focused and terminal command receipts.",
+      "expectedPostcondition": "The accepted implementation passes repository gates.",
+      "falseGreenRejected": "Old output, a different SHA, or partial workspace checks.",
+      "focusedCommandOrProcedureOwner": "Bundjil verification owner",
+      "evidenceOwner": "Terminal verification receipt",
+      "limitationsAndNonClaims": "No provider or deployment claim."
+    },
+    {
+      "id": "ENP-REQ-012",
+      "requirement": "Run one mandatory five-pass implementation audit after every future implementation task is complete; findings reopen owners and invalidate stale evidence.",
+      "taskIds": ["terminal-five-pass-audit"],
+      "directObservable": "One ordered five-pass receipt is newer than every dependency receipt.",
+      "expectedPostcondition": "Architecture, Effect semantics, lint, proof, and docs/cleanup are jointly accepted.",
+      "falseGreenRejected": "Per-task fixed ritual or a pre-implementation review.",
+      "focusedCommandOrProcedureOwner": "Terminal audit task",
+      "evidenceOwner": "Five-pass closeout receipt",
+      "limitationsAndNonClaims": "The audit grants no deployment or provider authority."
+    }
+  ],
+  "lintRules": [
+    {
+      "id": "bundjil/no-ambient-time-in-effect",
+      "classification": "copy-adapt",
+      "siteSourceRule": "effect/no-ambient-time-or-random",
+      "astInvariant": "In configured Effect-owned source and tests, reject Date.now, zero-argument new Date, global or node:timers/node:timers/promises setTimeout and setInterval, and Bun.sleep; in @effect/vitest tests also reject exact TestClock.withLive time escapes unless the exact host-boundary owner is registered.",
+      "scopeOwner": "lint/oxlint-plugin.ts and oxlint.config.ts",
+      "positiveFixtures": [
+        "Clock.currentTimeMillis",
+        "fork plus TestClock.adjust plus Fiber.join",
+        "new Date(explicitEpoch)",
+        "fixed decoded epoch",
+        "registered subprocess host-time proof"
+      ],
+      "negativeFixtures": [
+        "Date.now in Effect source",
+        "zero-argument new Date",
+        "global and imported setTimeout in Effect source or @effect/vitest",
+        "global and imported setInterval in Effect source or @effect/vitest",
+        "Bun.sleep in Effect source or @effect/vitest",
+        "TestClock.withLive around a time operation"
+      ],
+      "falsePositiveRisk": "Host-process deadlines, benchmarks, certificate/system-clock integration, and child-process proof.",
+      "migration": "Use fixed decoded epochs or Clock/TestClock; register exact path/symbol host proof with owner, reason, observable, and removal trigger.",
+      "autofix": "none-semantic-clock-and-yield-ownership"
+    },
+    {
+      "id": "bundjil/no-async-await-in-effect-service",
+      "classification": "copy-adapt",
+      "siteSourceRule": "effect/no-async-await-promise",
+      "astInvariant": "Reject async functions, await, and new Promise in configured Effect service source unless the function is the direct Effect.promise callback or the try callback of object-form Effect.tryPromise.",
+      "scopeOwner": "lint/oxlint-plugin.ts and exact service/runtime config scopes",
+      "positiveFixtures": [
+        "flat Effect.gen service operation",
+        "direct Effect.promise callback",
+        "Effect.tryPromise object try callback with catch",
+        "named host runtime exclusion"
+      ],
+      "negativeFixtures": [
+        "async service operation",
+        "await nested in service function",
+        "new Promise in service",
+        "async helper outside Effect Promise boundary"
+      ],
+      "falsePositiveRisk": "Framework or SDK callback that must return Promise and CLI top-level boundary.",
+      "migration": "Return Effects or move Promise ingress to the live/framework adapter; keep exact runtime exclusions.",
+      "autofix": "none-laziness-cancellation-error-and-owner-semantics"
+    },
+    {
+      "id": "bundjil/require-try-promise-catch",
+      "classification": "copy-adapt",
+      "siteSourceRule": "effect/no-bare-effect-try-promise",
+      "astInvariant": "Import-aware Effect.tryPromise calls require one object expression containing both try and catch.",
+      "scopeOwner": "lint/oxlint-plugin.ts across app/package production and boundary-model tests",
+      "positiveFixtures": [
+        "namespace and direct import object form with try and catch",
+        "unrelated local tryPromise identifier",
+        "Effect.promise for documented infallible Promise"
+      ],
+      "negativeFixtures": [
+        "namespace bare function overload",
+        "aliased direct import bare function overload",
+        "object missing catch"
+      ],
+      "falsePositiveRisk": "A genuinely infallible Promise boundary using the wrong Effect constructor.",
+      "migration": "Use Effect.promise only for documented infallibility or add the owner safe tagged error.",
+      "autofix": "none-tool-cannot-invent-owning-error"
+    },
+    {
+      "id": "bundjil/no-runtime-execution-outside-boundary",
+      "classification": "copy-adapt",
+      "siteSourceRule": "effect/no-runtime-execution-outside-boundaries",
+      "astInvariant": "Import-aware Effect.runPromise, runPromiseExit, runFork, runSync, runSyncExit, ManagedRuntime.make, and BunRuntime.runMain calls fail outside exact app runtime, main, server, CLI, script, test, and registered framework adapter owners.",
+      "scopeOwner": "lint/oxlint-plugin.ts, oxlint.config.ts, and one narrow runtime-owner registry only if globs cannot express exact framework symbols",
+      "positiveFixtures": [
+        "app main",
+        "package CLI script",
+        "test-owned runtime",
+        "registered channel framework adapter",
+        "unrelated method name"
+      ],
+      "negativeFixtures": [
+        "service runPromise",
+        "package logic ManagedRuntime.make",
+        "aliased direct run import",
+        "nested service runtime execution"
+      ],
+      "falsePositiveRisk": "Framework callback that cannot return Effect and requires a module-scoped ManagedRuntime bridge.",
+      "migration": "Return Effect values or inject the boundary-owned runtime; register exact adapter symbol, Layer owner, disposal path, and test.",
+      "autofix": "none-runtime-lifetime-and-error-semantics"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "refresh-integrated-inventory",
+      "title": "Refresh the exact integrated inventory and freeze implementation decisions",
+      "status": "pending",
+      "dependsOn": [],
+      "description": "After explicit implementation authority and after the Eve runtime branch integration state is known, rebase the investigation on the exact candidate, refresh all source findings, and freeze each lint/state/collection decision before code changes.",
+      "implementationNotes": [
+        "Create an active execution plan; record exact Git identity and keep provider/runtime actuality separate.",
+        "Re-run Bundjil, Site, and Effect-version inventories. Do not assume Site or upstream source is unchanged.",
+        "Resolve the handoff nested generator, observation Ref, independent environment Refs, exact-cardinality fixture, and runtime execution targets against merged source.",
+        "For every current lint finding record owner, failure mode, accepted migration or exact exception, false-positive class, and focused proof.",
+        "For every state candidate record one transition table, Layer identity/sharing, scope, concurrency, serialization, and observability decision.",
+        "For every collection candidate record the material semantic value or Preserve decision.",
+        "Invoke effect-client-wrapper for every provider/SDK adapter touched by the proposed migration shape."
+      ],
+      "proofContract": {
+        "directObservable": "A dated inventory names exact source SHA, Effect version, rule corpus, all findings, decisions, and no unexplained item.",
+        "expectedPostcondition": "Implementation starts from current source and frozen narrow invariants.",
+        "falseGreenRejected": "Using this draft's counts, old line numbers, branch name, or Site policy as current truth.",
+        "focusedCommandOrProcedureOwner": "Git identity, rg/source review, effect setup and boundary inventory",
+        "evidenceOwner": "Active-plan inventory receipt",
+        "limitationsAndNonClaims": "Inventory does not prove future behaviour."
+      },
+      "completionCriteria": [
+        "Every lint finding is migrate, exact exception, or rejected-rule evidence.",
+        "Every proposed state/collection edit has domain evidence; cosmetic edits are removed.",
+        "No provider operation or runtime branch mutation occurs."
+      ]
+    },
+    {
+      "id": "add-narrow-lint-rules-disabled",
+      "title": "Add the four narrow lint rules and fixtures while disabled for production source",
+      "status": "pending",
+      "dependsOn": ["refresh-integrated-inventory"],
+      "description": "Extend the existing Bundjil Oxlint JavaScript plugin with import-aware rules, focused visitor tests, installed-Oxlint fixtures, and exact exception staleness without changing runtime code or enabling a debt baseline.",
+      "implementationNotes": [
+        "Keep rule implementations in lint/oxlint-plugin.ts unless size proves one lint-owned module split; do not create a plugin package or generic framework.",
+        "Update lint/oxlint-plugin.test.ts with positive and negative visitor or RuleTester cases for every syntax branch, aliased/direct imports, unrelated identifiers, scopes, and exceptions while retaining tagged-error coverage.",
+        "Create lint/oxlint-plugin.integration.test.ts, lint/fixtures/effect-native.config.json, and positive/negative source plus @effect/vitest fixture files; update lint/vitest.config.ts to discover both exact test owners.",
+        "Run installed Oxlint against the fixtures and assert stable diagnostic IDs, non-zero negative exit, and zero-diagnostic positive exit.",
+        "Make exact exceptions fail when the target symbol/path or triggering syntax disappears.",
+        "Keep rules disabled against repository source until targeted migrations are accepted.",
+        "Do not implement the rejected collection, Ref adjacency, helper-name, non-empty index, switch, or universal Match/Option rules.",
+        "Ship no autofix."
+      ],
+      "proofContract": {
+        "directObservable": "Every rule's exact negative fixture fails with its stable rule ID; every positive and exact exception fixture passes; stale exceptions fail.",
+        "expectedPostcondition": "The lint engine proves only the four specified invariants.",
+        "falseGreenRejected": "Directly calling visitor functions without installed Oxlint integration or linting only current source.",
+        "focusedCommandOrProcedureOwner": "bun run test:lint and explicit installed-Oxlint fixture invocation",
+        "evidenceOwner": "Lint infrastructure receipt",
+        "limitationsAndNonClaims": "Disabled rules do not yet protect production source."
+      },
+      "completionCriteria": [
+        "AST, scope, messages, fixtures, false positives, migration text, and no-autofix decision match the SPEC.",
+        "Existing tagged-error, boundary, language-service, and package compatibility fixtures remain intact; stale exact exceptions and fixtures retire only with replacement coverage.",
+        "No second runner, broad ignore, numeric debt baseline, or generic lint wrapper is introduced."
+      ]
+    },
+    {
+      "id": "migrate-targeted-effect-patterns",
+      "title": "Migrate deterministic timing, Promise ingress, and runtime execution targets",
+      "status": "pending",
+      "dependsOn": ["add-narrow-lint-rules-disabled"],
+      "description": "Apply only inventory-approved migrations for Clock/TestClock, Promise boundaries, and runtime execution while preserving services, provider contracts, and runtime behaviour.",
+      "implementationNotes": [
+        "Replace Effect-owned Date.now fixtures with fixed decoded epochs or Clock/TestClock-driven values; preserve exact live host/process tests.",
+        "Use fork-adjust-or-setTime-join for sleeping, timeout, retry, and Schedule assertions and verify attempt/timestamp traces.",
+        "Move async/await and Promise ingress to named live/framework adapters and use Effect.tryPromise object form with safe tagged errors.",
+        "Return Effects from service/package logic; retain ManagedRuntime/run* only at named app, CLI, test, or registered framework owners with disposal proof.",
+        "Flatten accepted nested Effect execution where it materially improves the primary flow; do not extract one-use helpers.",
+        "Preserve provider wire payloads, error tags, service keys, persistent bytes, and Layer identities with direct fixtures."
+      ],
+      "proofContract": {
+        "directObservable": "Approved findings are zero or exact exceptions, deterministic timing traces pass without live wait, and runtime execution occurs only at named owners.",
+        "expectedPostcondition": "Time, Promise, and execution lifetimes are explicit Effect concerns.",
+        "falseGreenRejected": "Replacing Date.now with another ambient primitive, wrapping Promise in a helper, or moving runPromise to a pass-through adapter.",
+        "focusedCommandOrProcedureOwner": "Affected package tests, check:effect-setup, check:boundaries, and disabled-rule finding report",
+        "evidenceOwner": "Targeted Effect migration receipt",
+        "limitationsAndNonClaims": "Repository fixtures do not prove provider or hosted behaviour."
+      },
+      "completionCriteria": [
+        "Every edit maps to one inventory finding and focused proof.",
+        "All genuine host-time/runtime exceptions are exact, tested, and stale-checked.",
+        "No raw provider DTO, primitive semantic config, unchecked cast, helper sprawl, or provider operation is introduced."
+      ]
+    },
+    {
+      "id": "review-state-and-collection-targets",
+      "title": "Review and migrate only evidence-backed state and collection targets",
+      "status": "pending",
+      "dependsOn": [
+        "refresh-integrated-inventory",
+        "migrate-targeted-effect-patterns"
+      ],
+      "description": "Apply the decision matrix to the refreshed state/collection corpus, preserving clear current exemplars and changing only targets with demonstrated atomicity, lifetime, equality, absence, cardinality, order, or persistent-sequence value.",
+      "implementationNotes": [
+        "Use one immutable state record when a transition table proves shared atomic invariants; keep independently owned Refs separate.",
+        "Use Ref for pure atomic transitions, SynchronizedRef for required serialized/effectful transitions, SubscriptionRef for real streams, ScopedRef for replaceable resources, and Context.Reference for v4 dynamically scoped defaults.",
+        "Do not introduce Atom or @effect-atom into backend/runtime code.",
+        "Use Schema.NonEmptyArray only for at-least-one contracts; use tuples/checks for exact cardinality and preserve legitimately empty arrays.",
+        "Use HashMap/HashSet only where immutable update, Equal/Hash, typed absence, or set algebra is materially useful; preserve native collection owners and deterministic ordering contracts.",
+        "Use Chunk only for measured persistent concatenation or a native API owner.",
+        "Keep Option, decoded optional fields, Option.match, Match, and ordinary if composition in their distinct domains."
+      ],
+      "proofContract": {
+        "directObservable": "Every changed target has a decision row and focused atomicity/order/absence/cardinality/lifetime test; every preserved target has a reason.",
+        "expectedPostcondition": "State and collections express domain semantics without dogmatic conversion.",
+        "falseGreenRejected": "Fewer Refs, no native Map/Set, more Chunk/Option/Match, or passing sequential tests alone.",
+        "focusedCommandOrProcedureOwner": "Affected state/package test owners and transition/decision receipts",
+        "evidenceOwner": "State and collection receipt",
+        "limitationsAndNonClaims": "No universal performance or concurrency guarantee beyond tested owners."
+      },
+      "completionCriteria": [
+        "No adjacent-Ref, native-collection, array-method, Option, Match, Chunk, or non-empty migration lacks domain proof.",
+        "Layer identity, scope, sharing, finalization, serialization, and observability are recorded for stateful services.",
+        "The store memory Layer remains a positive exemplar unless new evidence identifies a defect."
+      ]
+    },
+    {
+      "id": "enable-rules-and-reconcile-docs",
+      "title": "Enable zero-debt rules and reconcile durable documentation",
+      "status": "pending",
+      "dependsOn": [
+        "add-narrow-lint-rules-disabled",
+        "migrate-targeted-effect-patterns",
+        "review-state-and-collection-targets"
+      ],
+      "description": "Enable the four rules at error only after zero unexplained findings, update earliest durable docs and justified skills, and run focused plus full repository verification.",
+      "implementationNotes": [
+        "Enable exact app/package/test scopes with no numeric debt baseline or broad ignore.",
+        "Update effect-patterns and testing-and-quality with accepted API/version guidance, rule IDs, fixtures, exceptions, and direct proof.",
+        "Update repo structure, READMEs, AGENTS, or skills only where the docs-impact ledger and final implementation prove a durable change.",
+        "Invoke docs-maintainer and classify every ledger surface Change required, Preserve, or evidenced N/A.",
+        "Run affected package checks, lint tests, Effect/boundary/docs/skills checks, Ultracite, and terminal bun run verification.",
+        "Record exact Git identity and keep provider/runtime claims separate."
+      ],
+      "proofContract": {
+        "directObservable": "Rules run at error with zero unexplained findings; focused checks and bun run verification pass; docs and skills name the same invariants and commands.",
+        "expectedPostcondition": "Future regressions fail the existing repository gate with actionable diagnostics.",
+        "falseGreenRejected": "Rules left warning/disabled, broad ignores, stale exceptions, docs-only success, or verification from another SHA.",
+        "focusedCommandOrProcedureOwner": "Lint, documentation, skills, boundary, Effect setup, affected packages, and root verification owners",
+        "evidenceOwner": "Enablement and docs-maintainer receipt",
+        "limitationsAndNonClaims": "No deployment or provider actuality is proved."
+      },
+      "completionCriteria": [
+        "All four rules are error-level in their exact approved scopes.",
+        "Docs-impact ledger is reconciled without duplicated handbook text.",
+        "Focused checks, bun run verification, task JSON parse, and git diff --check pass."
+      ]
+    },
+    {
+      "id": "terminal-five-pass-audit",
+      "title": "Run one terminal five-pass implementation audit and closeout",
+      "status": "pending",
+      "dependsOn": ["enable-rules-and-reconcile-docs"],
+      "description": "After every implementation task is complete, audit the final receipt-bearing candidate once; reopen every finding at its owner and rerun affected proof before repeating the terminal audit.",
+      "passes": [
+        {
+          "order": 1,
+          "name": "architecture-boundaries",
+          "scope": "Architecture, package/service/Layer ownership, call graphs, Schema ingress/egress, provider adapters, branded identities, safe errors, Config, and live/mock Layers."
+        },
+        {
+          "order": 2,
+          "name": "effect-semantics",
+          "scope": "Effect flatness/laziness, Clock/TestClock, deadlines/retries, Ref family, cohesive state, Layer memoization/scope, collections, absence, concurrency, serialization, and observability."
+        },
+        {
+          "order": 3,
+          "name": "lint-false-positives",
+          "scope": "AST invariants, imports/aliases, scopes, unit and installed-plugin fixtures, current findings, exceptions/staleness, false-positive matrix, migrations, and absence of unsafe autofix."
+        },
+        {
+          "order": 4,
+          "name": "tests-proof",
+          "scope": "Focused adversarial tests, state/time/order/cardinality/runtime proofs, package gates, boundary/effect checks, terminal verification, exact Git identity, and limitations."
+        },
+        {
+          "order": 5,
+          "name": "docs-skills-cleanup",
+          "scope": "Docs-impact ledger, architecture, testing rules, READMEs, AGENTS/skills only where justified, dead exceptions, unused helpers/wrappers, lifecycle/index/plan closeout, and non-goals."
+        }
+      ],
+      "implementationNotes": [
+        "Do not run this terminal audit after each task.",
+        "A finding reopens its owning task and invalidates affected downstream receipts.",
+        "After corrections, rerun focused proof, terminal verification when affected, and one new ordered terminal audit.",
+        "Do not grant provider, deployment, release, commit, push, or merge authority through audit success."
+      ],
+      "proofContract": {
+        "directObservable": "One ordered five-pass receipt is newer than all task and verification evidence and records zero unresolved findings.",
+        "expectedPostcondition": "The final candidate is accepted across architecture, Effect semantics, lint, proof, and durable docs/cleanup.",
+        "falseGreenRejected": "A fixed pass after each slice, a pre-implementation review, or stale evidence after a correction.",
+        "focusedCommandOrProcedureOwner": "Active-plan terminal audit procedure",
+        "evidenceOwner": "Five-pass closeout receipt",
+        "limitationsAndNonClaims": "Audit acceptance grants no external operation authority."
+      },
+      "completionCriteria": [
+        "All five ordered passes are recorded once after dependencies.",
+        "Every finding is resolved at its owner with refreshed proof.",
+        "SPEC, task ledger, product index, active/completed plan lifecycle, docs ledger, and exact Git identity agree."
+      ]
+    }
+  ],
+  "draftVerification": [
+    "bun run fix",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check",
+    "git diff --check"
+  ],
+  "futureTerminalVerification": [
+    "bun run check:effect-setup",
+    "bun run test:lint",
+    "bun run check:boundaries",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "nonGoals": [
+    "No runtime or lint implementation in this drafting task.",
+    "No provider, deployment, credential, webhook, release, commit, push, or merge operation.",
+    "No wholesale Site lint import.",
+    "No universal conversion to Chunk, HashMap, HashSet, Option, Match, Atom, one Ref, or non-empty arrays.",
+    "No helper/common/utils sprawl, pass-through services, generic collection transforms, DTO mirrors, manual object readers, unchecked casts, or unsafe autofixes.",
+    "No modification or hosted requalification of origin/codex/eve-runtime-qualification."
+  ]
+}

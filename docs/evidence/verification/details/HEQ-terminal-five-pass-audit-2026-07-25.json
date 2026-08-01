@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "taskId": "terminal-five-pass-audit",
+  "observedAt": "2026-07-25T17:31:47Z",
+  "candidate": {
+    "repositoryCommit": "865365d5529a388a312ce11c8183c06625f31241",
+    "sourceDigest": "9b009c20393ed7fad5a4f9f3eac5bda761b5186108aab92e9a2f6ee0dcde6f76",
+    "artifactDigest": "144d4b0ba708cc8da7bf2fff3731de34a50cdcda2afdff86be8c0d6d2b83df66",
+    "startingCommit": "e92f8d2508dd927c09cb63eddb50c6ca09904b95"
+  },
+  "audit": {
+    "invocationCount": 1,
+    "result": "accepted with one corrected documentation finding",
+    "passes": [
+      {
+        "pass": 1,
+        "name": "ownership and call graph",
+        "result": "accepted",
+        "evidence": [
+          "Authored webhook code delegates through EveChannelDispatch to the injected Eve send operation.",
+          "Installed Eve send awaits deliver or run; deliver awaits resumeHook and run awaits startWorkflowPreferLatest.",
+          "The session driver dispatches the turn child through startWorkflowPreferLatest.",
+          "No app-owned Workflow client, wrapper, queue fallback or mirrored lifecycle service exists."
+        ]
+      },
+      {
+        "pass": 2,
+        "name": "Effect quality",
+        "result": "accepted",
+        "evidence": [
+          "Unknown webhook, Eve session, config and store data cross Schema-owned boundaries once.",
+          "Public operations use named Context services, branded semantic identities, safe tagged errors, Config.schema and explicit live or memory Layers.",
+          "The inspected Channel implementation contains no unsafe cast, manual JSON reader, raw semantic id string, instanceof policy or Effect retry.",
+          "Primary Effects remain flat, lazy, linear and operation-owned."
+        ]
+      },
+      {
+        "pass": 3,
+        "name": "boundary and lifecycle correctness",
+        "result": "accepted",
+        "evidence": [
+          "The route returns 202 only after exact Eve send acceptance and atomic New or Resumed continuity convergence.",
+          "Rejected, timed out, interrupted, defective, replay-failed, observation-failed or continuity-uncertain handoff returns no 202.",
+          "Outcome-uncertain writes retain the claim and are never blindly retried.",
+          "Matching terminal settlement alone retires the continuity owner; stale settlement cannot clear a successor."
+        ]
+      },
+      {
+        "pass": 4,
+        "name": "adversarial verification",
+        "result": "accepted for repository and local Build Output scope",
+        "evidence": [
+          "Direct fixtures cover delayed send, new and resumed acceptance, continuity fork, concurrent duplicate, rejection, timeout, defect, interruption, request abort, terminal failure, repair and stale settlement.",
+          "Packaging fixtures decode the Turbo handoff config admission, ordinary function unset duration, Workflow max duration and queue trigger.",
+          "The final complete repository verification passed ninety tooling tests, eight typechecks and fourteen workspace test tasks including seventy-three agent tests.",
+          "Preview durability and Production remain blocked rather than inferred from local or historical proof."
+        ]
+      },
+      {
+        "pass": 5,
+        "name": "documentation authority and closeout",
+        "result": "accepted after focused correction",
+        "evidence": [
+          "The SPEC task ledger, active plan, architecture, app README, runbooks, thirteen-journey policy, retained packets and authority non-claims agree.",
+          "Timeout, Preview and Production tasks have terminal blocked outcomes with exact gates and no standing authority.",
+          "One stale HGI docs-path inventory finding was corrected from 187 to 190 paths before dependency closeout; HGI, docs, verification and controls rechecks passed.",
+          "This terminal detail and its local packet expand the final inventory to 192 paths without changing the accepted historical HGI receipt or any hosted outcome.",
+          "No deployment, provider, webhook, credential, message, interruption, promotion, rollback, push or merge operation occurred."
+        ]
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "HEQ-AUDIT-001",
+      "owner": "set-and-readback-timeouts documentation impact closeout",
+      "severity": "closeout",
+      "observed": "Three retained evidence paths made the HGI docs inventory stale at 187 paths.",
+      "action": "Reopened the documentation owner, corrected count and digest to 190 paths, then reran focused HGI, docs, verification and controls checks.",
+      "result": "closed",
+      "invalidatedEvidence": "No runtime or hosted packet; only the stale pre-correction inventory claim was invalidated."
+    }
+  ],
+  "terminalTaskStates": [
+    {
+      "taskId": "prove-eve-owned-handoff",
+      "status": "completed"
+    },
+    {
+      "taskId": "add-handoff-observability",
+      "status": "completed"
+    },
+    {
+      "taskId": "correct-202-ordering",
+      "status": "completed"
+    },
+    {
+      "taskId": "set-and-readback-timeouts",
+      "status": "blocked"
+    },
+    {
+      "taskId": "qualify-final-preview",
+      "status": "blocked"
+    },
+    {
+      "taskId": "qualify-production-candidate",
+      "status": "blocked"
+    }
+  ],
+  "checks": [
+    "bun run check:effect-setup",
+    "bun run check:boundaries",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run eval:hgi-307",
+    "bun run test:boundaries",
+    "bun run check",
+    "bun run test:lint",
+    "bun run knip",
+    "bun run check-types",
+    "bun run test"
+  ],
+  "rollback": {
+    "repository": [
+      "865365d5529a388a312ce11c8183c06625f31241",
+      "eb9fd67d7282e1d7675232ee4f440e8ddf76a696",
+      "4313890e84ee2af1793a369702d6c500ae3ad419",
+      "5c67398",
+      "bcf59bb"
+    ],
+    "base": "e92f8d2508dd927c09cb63eddb50c6ca09904b95",
+    "hosted": "No candidate was deployed; current observed Production remains older read-only context and requires its own rollback authority."
+  },
+  "limitations": [
+    "The audit accepts repository implementation and retained blocked outcomes, not hosted durability.",
+    "No candidate Preview or Production function, Workflow run, latency, interruption, provider, monitoring or rollback result exists.",
+    "External state can change after the retained read-only observation."
+  ],
+  "nonClaims": [
+    "The audit grants no deployment, provider, credential, message, interruption, promotion, rollback, push or merge authority.",
+    "Local fixtures and Build Output do not prove Preview, Production, exactly-once execution, availability or every termination mode.",
+    "The audit was not rerun after each slice; this detail records the single terminal invocation and its focused finding repair."
+  ]
+}

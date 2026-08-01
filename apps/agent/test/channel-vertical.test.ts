@@ -17,6 +17,8 @@ import {
   Layer,
   Logger,
   ManagedRuntime,
+  Redacted,
+  Ref,
   Schema,
   pipe,
 } from "effect";
@@ -25,6 +27,8 @@ import type { RouteHandlerArgs, Session } from "eve/channels";
 import {
   Channel,
   ChannelAdapterState,
+  ChannelHandoff,
+  ChannelHandoffMemory,
   ChannelIdentityMemory,
   ChannelLive,
   ChannelReplayError,
@@ -41,8 +45,12 @@ import {
   ChannelIdentityRecords,
   ChannelOutboundCoordinates,
   ChannelReplayOptions,
+  ChannelRoutingSecret,
 } from "../agent/lib/channel/schemas.js";
-import type { ChannelAdapterStateEncoded } from "../agent/lib/channel/schemas.js";
+import type {
+  ChannelAdapterStateEncoded,
+  ChannelHandoffObservation,
+} from "../agent/lib/channel/schemas.js";
 
 const dispositionLogger = (messages: globalThis.Array<unknown>) =>
   Logger.make(({ message }) => {
@@ -79,28 +87,44 @@ const fixtures = Effect.gen(function* decodeChannelVerticalFixtures() {
     turnId: "turn-1",
     sequence: 0,
   });
+  const routingSecret = yield* Schema.decodeUnknownEffect(ChannelRoutingSecret)(
+    Redacted.make("synthetic-channel-handoff-secret")
+  );
   const message =
     webhook._tag === "Accepted"
       ? webhook.message
       : yield* Effect.die("accepted fixture required");
-  return { webhook, message, send, identities, replay, coordinates };
+  return {
+    webhook,
+    message,
+    send,
+    identities,
+    replay,
+    coordinates,
+    routingSecret,
+  };
 });
 
-const channelLayer = fixtures.pipe(
-  Effect.map((fixture) => {
-    const dependencies = Layer.mergeAll(
-      ChannelTransportMemory({
-        webhook: fixture.webhook,
-        send: fixture.send,
-        presence: "accepted",
-      }),
-      ChannelIdentityMemory(fixture.identities),
-      ChannelRouterMemory,
-      ChannelReplayMemory(fixture.replay).pipe(Layer.provide(PersistenceMemory))
-    );
-    return ChannelLive.pipe(Layer.provide(dependencies));
-  })
-);
+const channelLayer = Effect.gen(function* makeChannelTestLayer() {
+  const fixture = yield* fixtures;
+  const observations = yield* Ref.make<
+    readonly (typeof ChannelHandoffObservation.Type)[]
+  >([]);
+  const dependencies = Layer.mergeAll(
+    ChannelTransportMemory({
+      webhook: fixture.webhook,
+      send: fixture.send,
+      presence: "accepted",
+    }),
+    ChannelIdentityMemory(fixture.identities),
+    ChannelRouterMemory,
+    ChannelReplayMemory(fixture.replay).pipe(Layer.provide(PersistenceMemory))
+  );
+  return Layer.merge(
+    ChannelLive.pipe(Layer.provide(dependencies)),
+    ChannelHandoffMemory(fixture.routingSecret, observations)
+  );
+});
 
 const makeObservedRuntime = <R, E>(
   layer: Layer.Layer<R, E>,
@@ -225,6 +249,7 @@ it.effect(
       const result = yield* Effect.gen(function* runAcceptedVerticalJourney() {
         const channel = yield* Channel;
         const dispatch = yield* EveChannelDispatch;
+        const handoff = yield* ChannelHandoff;
         const decoded = yield* channel.decodeWebhook(
           new Request("https://example.invalid/webhook")
         );
@@ -237,8 +262,13 @@ it.effect(
         if (prepared._tag !== "Dispatch") {
           return yield* Effect.die("dispatch required");
         }
-        yield* dispatch.dispatch(prepared.prepared);
-        yield* channel.completeInbound(prepared.prepared.claim);
+        const attempt = yield* handoff.prepared(prepared.prepared.claim);
+        const acceptance = yield* dispatch.dispatch(prepared.prepared, attempt);
+        yield* channel.acceptInbound(
+          prepared.prepared.claim,
+          prepared.prepared.continuationToken,
+          acceptance
+        );
         return prepared.prepared;
       }).pipe(Effect.provide(Layer.mergeAll(layer, EveChannelDispatchMemory)));
 
@@ -467,7 +497,10 @@ it.effect(
                 })
               ),
             prepareInbound: () => Effect.die("not reached"),
-            completeInbound: () => Effect.void,
+            acceptInbound: () => Effect.die("not reached"),
+            retryInbound: () => Effect.die("not reached"),
+            uncertainInbound: () => Effect.die("not reached"),
+            settleSession: () => Effect.die("not reached"),
             handleEvent: () => Effect.die("not reached"),
           })
         );
@@ -484,7 +517,10 @@ it.effect(
                 })
               ),
             prepareInbound: () => Effect.die("not reached"),
-            completeInbound: () => Effect.void,
+            acceptInbound: () => Effect.die("not reached"),
+            retryInbound: () => Effect.die("not reached"),
+            uncertainInbound: () => Effect.die("not reached"),
+            settleSession: () => Effect.die("not reached"),
             handleEvent: () => Effect.die("not reached"),
           })
         );
@@ -494,7 +530,10 @@ it.effect(
             decodeWebhook: () => Effect.succeed(fixture.webhook),
             prepareInbound: () =>
               Effect.fail(new ChannelReplayError({ operation: "claim" })),
-            completeInbound: () => Effect.void,
+            acceptInbound: () => Effect.die("not reached"),
+            retryInbound: () => Effect.die("not reached"),
+            uncertainInbound: () => Effect.die("not reached"),
+            settleSession: () => Effect.die("not reached"),
             handleEvent: () => Effect.die("not reached"),
           })
         );
@@ -504,7 +543,10 @@ it.effect(
             decodeWebhook: () => Effect.succeed(fixture.webhook),
             prepareInbound: () =>
               Effect.fail(new ChannelRoutingError({ reason: "unavailable" })),
-            completeInbound: () => Effect.void,
+            acceptInbound: () => Effect.die("not reached"),
+            retryInbound: () => Effect.die("not reached"),
+            uncertainInbound: () => Effect.die("not reached"),
+            settleSession: () => Effect.die("not reached"),
             handleEvent: () => Effect.die("not reached"),
           })
         );
@@ -565,7 +607,16 @@ it.effect(
 
         for (const testCase of cases) {
           const messages: globalThis.Array<unknown> = [];
-          const runtime = makeObservedRuntime(testCase.layer, messages);
+          const observations = yield* Ref.make<
+            readonly (typeof ChannelHandoffObservation.Type)[]
+          >([]);
+          const runtime = makeObservedRuntime(
+            Layer.merge(
+              testCase.layer,
+              ChannelHandoffMemory(fixture.routingSecret, observations)
+            ),
+            messages
+          );
           const definition = makeChannelEveChannel(
             runtime,
             "/eve/v1/photon/webhook",
@@ -669,11 +720,13 @@ it.effect("reports request-scoped Eve dispatch failure", () =>
     const exit = yield* Effect.gen(function* dispatchInbound() {
       const channel = yield* Channel;
       const dispatch = yield* EveChannelDispatch;
+      const handoff = yield* ChannelHandoff;
       const prepared = yield* channel.prepareInbound(fixture.message);
       if (prepared._tag !== "Dispatch") {
         return yield* Effect.die("dispatch required");
       }
-      return yield* dispatch.dispatch(prepared.prepared);
+      const attempt = yield* handoff.prepared(prepared.prepared.claim);
+      return yield* dispatch.dispatch(prepared.prepared, attempt);
     }).pipe(
       Effect.provide(Layer.mergeAll(layer, EveChannelDispatchFailureMemory)),
       Effect.exit

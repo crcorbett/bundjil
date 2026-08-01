@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-01
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -80,6 +80,10 @@ ledger. Repository-local evaluated skills are read from the epoch's exact Git
 base commit rather than the mutable working tree; external skill identities
 remain the epoch's stored digest receipts. Current skill behavior is owned by
 the repository skill-policy checks and a separately qualified successor epoch.
+GitHub CI therefore checks out full repository history before running
+verification; a shallow checkout cannot supply the intentionally historical
+skill object and must not be treated as an evaluator failure or bypassed by
+weakening the epoch identity.
 The command reads repository evidence only, writes bounded detail to
 `tmp/harness-evaluation-report.json`, and grants no provider or mutation
 authority. Epoch identity and metric interpretation are owned by
@@ -153,6 +157,11 @@ bun run --filter @bundjil/agent preflight:production
   `@bundjil/agent` tests, `@bundjil/agent build`, then verification.
 - Runtime config change: run app typecheck, app tests, app build, and
   verification.
+- Eve hosted-packaging change: the agent `test` command builds ordinary local
+  Nitro output and then `VERCEL=1` Build Output before running fixtures. Decode
+  the generated configs through Effect Schema and keep them as local artifact
+  proof only; immutable Preview/Production function mapping and duration still
+  require target-owned readback.
 - Critical-journey, proof-packet, receipt, or evidence-lifecycle change: run
   `bun run check:verification`, its focused fixture suite, the affected app
   tests, then root verification. Provider proof remains separately
@@ -408,6 +417,12 @@ decodes it through the owning Effect Schema boundary. Record no request body or
 model output. Any hosted or provider observation belongs in a dated,
 target-owned proof receipt with a source identity, `observedAt`, limitations,
 and non-claims. It never grants deployment or mutation authority.
+
+Channel handoff observability tests must use the decoded app contract and
+memory Layer to prove HMAC determinism/key separation, exact phase ordering,
+native Exit classification, and forbidden-marker absence. A `202`, started
+Fiber, registered `waitUntil`, safe fingerprint, or generated Workflow
+function is not a substitute for the delayed `send()` acceptance oracle.
 
 ## Workflow and authority policy
 

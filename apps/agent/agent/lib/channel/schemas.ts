@@ -8,7 +8,7 @@ import {
 } from "@bundjil/channel";
 import { EveSessionId, EveTurnId } from "@bundjil/eve";
 import { AtomicKeyValueStoreValue } from "@bundjil/store";
-import { Schema } from "effect";
+import { Duration, Schema } from "effect";
 
 export const ChannelWebhookPath = Schema.Literals([
   "/eve/v1/sendblue/webhook",
@@ -50,10 +50,150 @@ export const ChannelReplayKey = Schema.NonEmptyString.pipe(
 );
 export type ChannelReplayKey = typeof ChannelReplayKey.Type;
 
+const ChannelHandoffFingerprint = Schema.String.pipe(
+  Schema.check(Schema.isPattern(/^[0-9a-f]{64}$/))
+);
+
+export const ChannelWorkFingerprint = ChannelHandoffFingerprint.pipe(
+  Schema.brand("@bundjil/agent/ChannelWorkFingerprint")
+);
+export type ChannelWorkFingerprint = typeof ChannelWorkFingerprint.Type;
+
+export const ChannelSessionFingerprint = ChannelHandoffFingerprint.pipe(
+  Schema.brand("@bundjil/agent/ChannelSessionFingerprint")
+);
+export type ChannelSessionFingerprint = typeof ChannelSessionFingerprint.Type;
+
+export const ChannelHandoffTimestamp = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThanOrEqualTo(0))
+);
+export type ChannelHandoffTimestamp = typeof ChannelHandoffTimestamp.Type;
+
+export const ChannelHandoffLatency = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThanOrEqualTo(0))
+);
+export type ChannelHandoffLatency = typeof ChannelHandoffLatency.Type;
+
+export const ChannelHandoffExitOutcome = Schema.Literals([
+  "succeeded",
+  "failed",
+  "defect",
+  "interrupted",
+]);
+export type ChannelHandoffExitOutcome = typeof ChannelHandoffExitOutcome.Type;
+
+export const ChannelHandoffAttempt = Schema.Struct({
+  preparedAtEpochMilliseconds: ChannelHandoffTimestamp,
+  workFingerprint: ChannelWorkFingerprint,
+});
+export type ChannelHandoffAttempt = typeof ChannelHandoffAttempt.Type;
+
+export const ChannelHandoffAcceptance = Schema.Struct({
+  acceptedAtEpochMilliseconds: ChannelHandoffTimestamp,
+  sessionFingerprint: ChannelSessionFingerprint,
+  workFingerprint: ChannelWorkFingerprint,
+});
+export type ChannelHandoffAcceptance = typeof ChannelHandoffAcceptance.Type;
+
+export const ChannelHandoffTimeout = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThan(0)),
+  Schema.decodeTo(Schema.DurationFromMillis),
+  Schema.check(
+    Schema.makeFilter(
+      (timeout) => Number.isSafeInteger(Duration.toMillis(timeout)),
+      {
+        expected: "a positive finite whole-millisecond handoff Duration",
+      }
+    )
+  )
+);
+export type ChannelHandoffTimeout = typeof ChannelHandoffTimeout.Type;
+
+export const ChannelInboundAcceptance = Schema.Union([
+  Schema.TaggedStruct("New", {
+    acceptance: ChannelHandoffAcceptance,
+  }),
+  Schema.TaggedStruct("Resumed", {
+    acceptance: ChannelHandoffAcceptance,
+  }),
+  Schema.TaggedStruct("ContinuityUncertain", {
+    acceptance: ChannelHandoffAcceptance,
+  }),
+]);
+export type ChannelInboundAcceptance = typeof ChannelInboundAcceptance.Type;
+
+export const ChannelSessionTerminalOutcome = Schema.Literals([
+  "completed",
+  "failed",
+]);
+export type ChannelSessionTerminalOutcome =
+  typeof ChannelSessionTerminalOutcome.Type;
+
+export const ChannelSessionSettlement = Schema.Literals(["retired", "stale"]);
+export type ChannelSessionSettlement = typeof ChannelSessionSettlement.Type;
+
+const ChannelHandoffObservationBase = {
+  latencyMilliseconds: ChannelHandoffLatency,
+  observedAtEpochMilliseconds: ChannelHandoffTimestamp,
+  workFingerprint: ChannelWorkFingerprint,
+};
+
+export const ChannelHandoffObservation = Schema.Union([
+  Schema.TaggedStruct("Prepared", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literal("pending"),
+  }),
+  Schema.TaggedStruct("SendStarted", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literal("pending"),
+  }),
+  Schema.TaggedStruct("SendAccepted", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literal("accepted"),
+    sessionFingerprint: ChannelSessionFingerprint,
+  }),
+  Schema.TaggedStruct("SendRejected", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literals(["rejected", "timeout", "uncertain"]),
+  }),
+  Schema.TaggedStruct("Response", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literals(["accepted", "retryable"]),
+    status: Schema.Literals([202, 503]),
+  }),
+  Schema.TaggedStruct("Exit", {
+    ...ChannelHandoffObservationBase,
+    outcome: ChannelHandoffExitOutcome,
+  }),
+  Schema.TaggedStruct("Continuity", {
+    ...ChannelHandoffObservationBase,
+    outcome: Schema.Literals(["New", "Resumed", "ContinuityUncertain"]),
+    sessionFingerprint: ChannelSessionFingerprint,
+  }),
+  Schema.TaggedStruct("SessionTerminal", {
+    observedAtEpochMilliseconds: ChannelHandoffTimestamp,
+    outcome: ChannelSessionTerminalOutcome,
+    sessionFingerprint: ChannelSessionFingerprint,
+    settlement: ChannelSessionSettlement,
+  }),
+]);
+export type ChannelHandoffObservation = typeof ChannelHandoffObservation.Type;
+
 export const ChannelReplayRecord = Schema.Struct({
   status: Schema.Literals(["claimed", "complete", "uncertain"]),
 });
 export type ChannelReplayRecord = typeof ChannelReplayRecord.Type;
+
+export const ChannelContinuityRecord = Schema.Struct({
+  sessionFingerprint: ChannelSessionFingerprint,
+});
+export type ChannelContinuityRecord = typeof ChannelContinuityRecord.Type;
+
+export const ChannelTerminalFailureRecord = Schema.Struct({
+  status: Schema.Literal("failed"),
+});
+export type ChannelTerminalFailureRecord =
+  typeof ChannelTerminalFailureRecord.Type;
 
 export const ChannelReplayClaim = Schema.Struct({
   key: ChannelReplayKey,
