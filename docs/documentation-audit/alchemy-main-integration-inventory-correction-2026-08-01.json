@@ -2,7 +2,13 @@
   "schemaVersion": 1,
   "taskId": "alchemy-vercel-photon-infrastructure-main-integration",
   "status": "passed",
-  "observedAt": "2026-08-01T01:18:41.000Z",
+  "targetRevision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+  "parentRevisions": [
+    "f30172290a83bd7ce39dedf9ce57ef88883867d6",
+    "a270116f30aeb20d2087484c4f3fd4051f442897"
+  ],
+  "targetTree": "485c5264cec04c7db3683921d47a1d3b69042c45",
+  "preMergeCandidateObservedAt": "2026-08-01T01:18:41.000Z",
   "trigger": "Current origin/main added durable ChannelHandoff runtime ownership, hosted Eve qualification evidence and Effect-native runtime policy after the Alchemy infrastructure branch completed, requiring a semantic source integration and unique-path inventory reconciliation.",
   "docsInventory": {
     "pathCount": 216,
@@ -66,7 +72,7 @@
     "historicalBoundary": "The Alchemy terminal audit remains bound to f301722 and the hosted Eve terminal audit remains bound to its dated packet. This integration validates their combined repository state only.",
     "nonClaim": "No provider read/write, deployment, workflow execution, message, credential, billing or Production state was refreshed by source integration."
   },
-  "checks": [
+  "preMergeCandidateChecks": [
     {
       "command": "focused conflict-surface checks",
       "status": "passed",
@@ -78,9 +84,25 @@
       "result": "The integrated candidate passed 98 tooling tests, type-aware formatting/lint, lint fixtures, Knip, all nine typechecks and all fifteen Turbo test tasks with the process-local synthetic Executor fixture."
     }
   ],
+  "preMergeCandidateLimitation": "These checks ran on the integrated candidate before the final merge identity existed and were not rerun on the final merge object.",
+  "postMergeReadOnlyChecks": [
+    {
+      "command": "git show -s --format='%H %P' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
+      "status": "passed",
+      "observedAt": "2026-08-01T07:47:03.000Z",
+      "result": "4fc8ba1750524581c281ad97351bf0b1e6e29631 f30172290a83bd7ce39dedf9ce57ef88883867d6 a270116f30aeb20d2087484c4f3fd4051f442897"
+    },
+    {
+      "command": "git show -s --format='%T' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
+      "status": "passed",
+      "observedAt": "2026-08-01T07:47:03.000Z",
+      "result": "485c5264cec04c7db3683921d47a1d3b69042c45"
+    }
+  ],
+  "postMergeReadOnlyLimitation": "These checks observe Git identity and tree only; they do not rerun verification or refresh provider, deployment, messaging, credential, billing, Preview, Production, or external state.",
   "limitations": [
     "Path count and digest establish repository accounting only.",
-    "The final merge commit identity is recorded after verification."
+    "The candidate verification was not rerun on the final merge object; only its exact Git identity and tree were observed after merge."
   ],
   "nonClaims": [
     "Neither earlier five-pass audit is represented as a fresh audit of external state.",

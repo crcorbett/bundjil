@@ -218,8 +218,14 @@ const codes = (current: VerificationSnapshot) =>
   report(current).findings.map((finding) => finding.code);
 
 describe("verification policy", () => {
-  it("accepts the current fifteen journey inventory and command map", () => {
+  it("accepts the canonical journey inventory and command map", () => {
     expect(report(snapshot()).ok).toBeTruthy();
+  });
+
+  it("rejects a missing canonical journey inventory entry", () => {
+    const missing = { ...snapshot(), journeys: journeys.slice(1) };
+    expect(codes(missing)).toContain("JOURNEY_COUNT");
+    expect(codes(missing)).toContain("JOURNEY_ID");
   });
 
   it("decodes every packet template through the Effect Schema", () => {

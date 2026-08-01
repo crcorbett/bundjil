@@ -1,0 +1,450 @@
+{
+  "schemaVersion": "1",
+  "id": "AUDIT-BUNDJIL-STRUCTURE-2026-08-01",
+  "profile": ".agents/skills/docs-maintainer/references/repository-profile.md",
+  "target": {
+    "repository": "crcorbett/bundjil",
+    "path": "/Users/cooper/.codex/worktrees/b894/bundjil",
+    "revision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+    "branch": "main",
+    "upstream": "origin/main",
+    "worktreeState": "clean",
+    "observedAt": "2026-08-01T02:24:39Z"
+  },
+  "lifecyclePhase": "post-merge structural audit with accepted repository corrections in implementation",
+  "acceptedLocalDecisions": [
+    "The audit is bound only to merged and pushed main revision 4fc8ba1750524581c281ad97351bf0b1e6e29631; both local main and origin/main resolved to that object at scope capture.",
+    "packages/infrastructure owns private Alchemy resources, state-safe contracts, Vercel adapters, and composition over the existing @bundjil/photon management boundary; apps do not consume @bundjil/infrastructure.",
+    "Vercel Git remains deployment owner while Alchemy owns only the declared stable configuration, adoption, state, and report-only drift boundaries documented by the repository.",
+    "ChannelHandoff and ChannelReplay own webhook-to-Eve acceptance and continuity; the provider-specific Sendblue and Photon modules remain thin composition adapters.",
+    "The fifteen complete critical-journey IDs are the repository identities; historical proof and completed plans are trajectory evidence only and grant no standing authority.",
+    "Cooper's 2026-08-01 implementation delegation accepts FINDING-001 through FINDING-004, accepts count-free routing from FINDING-006, and requires an evidence-backed preserve or defer decision for optional FINDING-005."
+  ],
+  "externalObservations": [],
+  "claimedJobs": [
+    "Route a maintainer from repository guidance to one current architecture, SPEC, execution, runbook, proof, and lifecycle owner.",
+    "Read, adopt, plan, converge, observe drift in, and roll back the exact stage-scoped Alchemy/Vercel/Photon infrastructure without confusing source proof with provider actuality.",
+    "Accept authenticated Sendblue or Photon ingress once, hand it to Eve with continuity fencing, deliver the resulting provider operation, and retain a bounded rollback/recovery route.",
+    "Resolve private @bundjil packages consistently from TypeScript source during workspace development and from built exports at package boundaries.",
+    "Run repository-owned quality, authority, control, documentation, verification, and package checks and retain only claim-matched evidence."
+  ],
+  "representativeJourneyIds": [
+    "BND-J11-photon-accepted-message-typing",
+    "BND-J12-dual-channel-production",
+    "BND-J13-preview-infrastructure-convergence",
+    "BND-J14-preview-infrastructure-drift-report",
+    "BND-J13-hosted-eve-durability"
+  ],
+  "acceptedOutcomes": [
+    "A maintainer can identify one present-tense continuation without loading a completed plan or stale task ledger as current policy.",
+    "The repository source exposes stage-isolated infrastructure plans, sequential resource composition, observe-first provider adapters, explicit rollback identity, and no implicit deployment ownership.",
+    "The Channel route returns 202 only after Eve send acceptance and intended-session continuity convergence; uncertain work remains retryable or quarantined without blind replay.",
+    "Each public package concept has one semantic Schema owner and one deliberate export path under the @bundjil/source, types, and default conditions.",
+    "Local checks prove only the source and fixture claims they execute; provider, deployment, delivery, and Production claims remain outside this audit."
+  ],
+  "proofBoundaries": [
+    "Git-object inventory and diff inspection prove only the exact tracked source at the target revision.",
+    "Schema, type, memory-layer, and test inspection prove repository contracts and fixture intent, not a hosted runtime.",
+    "Runbook and authority inspection proves repository-owned procedure and gating text, not current authorization or external state.",
+    "Historical packets and completed plans establish trajectory and dated provenance only.",
+    "The structured audit validator proves artifact shape and accepted-finding crosswalk completeness only.",
+    "Repository verification commands require the target worktree's dependencies; failure to resolve a dependency is a local verification limitation, not proof of a source defect."
+  ],
+  "inventoryGroups": [
+    {
+      "id": "tracked-target",
+      "selection": "Every path returned by git ls-tree -r --name-only for target revision 4fc8ba1750524581c281ad97351bf0b1e6e29631.",
+      "count": 863,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    },
+    {
+      "id": "agent-guidance-skills",
+      "selection": "AGENTS.md, CLAUDE.md, .agents/**, and .claude/** at the target revision.",
+      "count": 199,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    },
+    {
+      "id": "readmes",
+      "selection": "Every tracked path whose basename is README.md.",
+      "count": 23,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    },
+    {
+      "id": "docs-all",
+      "selection": "Every tracked docs/** path, with all paths inventoried and current, affected, contradictory, generated-owner, and trajectory owners selected for deep read.",
+      "count": 216,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#documentation-impact-ledger",
+      "status": "accounted"
+    },
+    {
+      "id": "active-planning-decisions",
+      "selection": "Tracked docs/product-specs/**, docs/exec-plans/active/**, and docs/decisions/** paths; this accounting group intentionally includes historical SPEC/task ledgers so lifecycle routing can be reconciled.",
+      "count": 41,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    },
+    {
+      "id": "governance-proof-controls",
+      "selection": "Tracked docs/verification/**, docs/documentation-audit/**, docs/standards/**, and docs/operations/** paths present before this audit.",
+      "count": 132,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#documentation-impact-ledger",
+      "status": "accounted"
+    },
+    {
+      "id": "history-evidence",
+      "selection": "Tracked docs/exec-plans/completed/** and docs/evidence/** paths, used only as targeted trajectory or historical evidence.",
+      "count": 32,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    },
+    {
+      "id": "manifests-config-schemas-stacks",
+      "selection": "Tracked package manifests, tsconfig/turbo/vercel manifests, JSON Schema files, root alchemy entrypoints, and stacks/**.",
+      "count": 53,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#package-and-infrastructure-result",
+      "status": "accounted"
+    },
+    {
+      "id": "quality-ci-release",
+      "selection": "Tracked .github/**, tooling/**, test/tests/test-alchemy directories, and named TypeScript/JSON quality, build, deployment, and release configuration paths; groups may overlap by audit lens.",
+      "count": 152,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#verification",
+      "status": "accounted"
+    },
+    {
+      "id": "representative-code-pool",
+      "selection": "Tracked TypeScript and TSX under apps/**, packages/**, and stacks/**, statically scanned before risk-based deep reads.",
+      "count": 324,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#job-traces",
+      "status": "accounted"
+    },
+    {
+      "id": "infrastructure-owned-surface",
+      "selection": "Tracked packages/infrastructure/**, packages/photon/**, stacks/**, root alchemy entrypoints, and .github/workflows/infrastructure-drift.yml at the final target.",
+      "count": 138,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#package-and-infrastructure-result",
+      "status": "accounted"
+    },
+    {
+      "id": "alchemy-branch-delta",
+      "selection": "Every path changed from common ancestor ff73113524fa63ce8d9951a215f6f56c33660f2e to infrastructure parent f30172290a83bd7ce39dedf9ce57ef88883867d6.",
+      "count": 198,
+      "artifact": "docs/documentation-audit/bundjil-structural-audit-2026-08-01.md#corpus-accounting",
+      "status": "accounted"
+    }
+  ],
+  "deepReads": [
+    {
+      "path": "AGENTS.md",
+      "classification": "current",
+      "reason": "Repository task map, semantic ownership, documentation routing, verification, and authority contract."
+    },
+    {
+      "path": "docs/README.md",
+      "classification": "canonical",
+      "reason": "Sole documentation lifecycle and owner router."
+    },
+    {
+      "path": "docs/documentation-audit/README.md",
+      "classification": "canonical",
+      "reason": "Owner for dated audit/accounting artifacts and their non-policy boundary."
+    },
+    {
+      "path": "docs/architecture/repo-structure.md",
+      "classification": "canonical",
+      "reason": "Current package, import, export, source-condition, and ownership rules."
+    },
+    {
+      "path": "docs/architecture/effect-patterns.md",
+      "classification": "canonical",
+      "reason": "Current Schema, Config, service, Layer, adapter, helper, and provider-boundary rules."
+    },
+    {
+      "path": "docs/architecture/eve-agent.md",
+      "classification": "affected",
+      "reason": "Current ChannelHandoff/Eve call graph and compatibility owner."
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "classification": "canonical",
+      "reason": "Current verification command and claim-boundary owner."
+    },
+    {
+      "path": "docs/standards/controls.md",
+      "classification": "canonical",
+      "reason": "Earliest durable control, feedback, carrying-cost, and retirement owner."
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "classification": "canonical",
+      "reason": "Authority, readback, receipt identity, rollback, and lifecycle owner."
+    },
+    {
+      "path": "docs/operations/authority-register.json",
+      "classification": "generated_owner",
+      "reason": "Machine-readable static authority envelopes."
+    },
+    {
+      "path": "docs/operations/automation-register.md",
+      "classification": "canonical",
+      "reason": "Workflow admission, action identity, stop, rollback, and non-claim owner."
+    },
+    {
+      "path": "docs/verification/README.md",
+      "classification": "canonical",
+      "reason": "Critical-journey, proof-packet, receipt, and claim-boundary router."
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "classification": "generated_owner",
+      "reason": "Exact inventory for the fifteen current critical journeys."
+    },
+    {
+      "path": "docs/verification/journey-command-map.json",
+      "classification": "generated_owner",
+      "reason": "Current journey-to-command/runbook mapping."
+    },
+    {
+      "path": "docs/product-specs/index.md",
+      "classification": "contradictory",
+      "reason": "Canonical current/implemented SPEC routing conflicts with task and plan lifecycle state."
+    },
+    {
+      "path": "docs/exec-plans/active/README.md",
+      "classification": "contradictory",
+      "reason": "Canonical active-plan route omits Hosted Eve while its SPEC remains current."
+    },
+    {
+      "path": "docs/exec-plans/completed/README.md",
+      "classification": "contradictory",
+      "reason": "Canonical completed-plan route contains Hosted Eve and Alchemy while their ledgers retain in-progress state."
+    },
+    {
+      "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+      "classification": "affected",
+      "reason": "Implemented infrastructure decision and final lifecycle narrative."
+    },
+    {
+      "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+      "classification": "contradictory",
+      "reason": "All ten tasks are completed while the ledger root remains in_progress."
+    },
+    {
+      "path": "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+      "classification": "trajectory_evidence",
+      "reason": "Completed plan, terminal audit trajectory, and merge-integration addendum; not present policy."
+    },
+    {
+      "path": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
+      "classification": "contradictory",
+      "reason": "SPEC declares current implementation intent despite completed-plan routing and fully completed tasks."
+    },
+    {
+      "path": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.tasks.json",
+      "classification": "contradictory",
+      "reason": "All seven tasks are completed while the ledger root remains in_progress."
+    },
+    {
+      "path": "docs/exec-plans/completed/hosted-eve-runtime-qualification-and-durability.md",
+      "classification": "historical_evidence",
+      "reason": "Completed Hosted Eve implementation and qualification provenance."
+    },
+    {
+      "path": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+      "classification": "contradictory",
+      "reason": "Integration receipt claims exact parent/final identity coverage but contains no final merge revision or parent fields."
+    },
+    {
+      "path": "packages/infrastructure/package.json",
+      "classification": "affected",
+      "reason": "Private package boundary, exports, source conditions, scripts, and dependency direction."
+    },
+    {
+      "path": "packages/infrastructure/README.md",
+      "classification": "contradictory",
+      "reason": "Package README contains exact operator procedures also owned by the Alchemy runbook."
+    },
+    {
+      "path": "packages/infrastructure/src/index.ts",
+      "classification": "affected",
+      "reason": "Root public export surface and duplicate Vercel identity exports."
+    },
+    {
+      "path": "packages/infrastructure/src/schemas.ts",
+      "classification": "contradictory",
+      "reason": "Root Vercel identity brands duplicate the provider-subpath semantic owners."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/schemas.ts",
+      "classification": "affected",
+      "reason": "Provider-specific Vercel semantic identity and DTO owner."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/live.layer.ts",
+      "classification": "affected",
+      "reason": "Vercel credentials, complete-response decoding, and service Layer boundary."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/configuration-live.layer.ts",
+      "classification": "affected",
+      "reason": "Preview configuration provider adapter and operation isolation."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/preview-configuration-authority.ts",
+      "classification": "affected",
+      "reason": "One of several duplicated authority-file validation implementations."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/stable-environment-authority.ts",
+      "classification": "affected",
+      "reason": "Second package-level authority-file validation implementation with the same envelope policy."
+    },
+    {
+      "path": "packages/infrastructure/scripts/inventory-live.ts",
+      "classification": "affected",
+      "reason": "Representative script authority, artifact, receipt, Config, and provider read path."
+    },
+    {
+      "path": "packages/infrastructure/scripts/report-drift.ts",
+      "classification": "affected",
+      "reason": "BND-J14 report-only execution, classification, evidence, and authority path."
+    },
+    {
+      "path": "packages/photon/package.json",
+      "classification": "affected",
+      "reason": "Photon export subpaths and infrastructure dependency direction."
+    },
+    {
+      "path": "packages/photon/README.md",
+      "classification": "contradictory",
+      "reason": "Package README repeats provider lifecycle and Production recovery procedures owned by the Photon runbook."
+    },
+    {
+      "path": "packages/photon/src/management/live.layer.ts",
+      "classification": "affected",
+      "reason": "Photon management credentials, provider request/response, and Layer boundary."
+    },
+    {
+      "path": "packages/photon/scripts/register-environment-webhook.ts",
+      "classification": "affected",
+      "reason": "Representative cross-package authority validation and create-only binding custody path."
+    },
+    {
+      "path": "alchemy.run.ts",
+      "classification": "affected",
+      "reason": "Root read-only adoption stack composition."
+    },
+    {
+      "path": "alchemy.preview.run.ts",
+      "classification": "affected",
+      "reason": "Preview-only configuration entrypoint and stage guard."
+    },
+    {
+      "path": "alchemy.stable.run.ts",
+      "classification": "affected",
+      "reason": "Stable adoption entrypoint and explicit authority validation."
+    },
+    {
+      "path": "stacks/bundjil.ts",
+      "classification": "affected",
+      "reason": "Sequential manifest-to-resource composition and stage equivalence guard."
+    },
+    {
+      "path": "apps/agent/agent/lib/channel/eve.ts",
+      "classification": "affected",
+      "reason": "Representative ingress-to-Eve acceptance and response boundary after merge reconciliation."
+    },
+    {
+      "path": "apps/agent/agent/lib/channel/dispatch.ts",
+      "classification": "affected",
+      "reason": "Eve send acceptance, session ID decode, timeout, and safe failure translation."
+    },
+    {
+      "path": "apps/agent/agent/lib/channel/handoff.ts",
+      "classification": "affected",
+      "reason": "Safe acceptance, continuity, response, and terminal observation service."
+    },
+    {
+      "path": "apps/agent/agent/lib/channel/channel.ts",
+      "classification": "affected",
+      "reason": "Provider-neutral replay, routing, outbound, and presence policy."
+    },
+    {
+      "path": "apps/agent/agent/lib/channel/schemas.ts",
+      "classification": "affected",
+      "reason": "Canonical branded Channel/Eve boundary contracts."
+    },
+    {
+      "path": "apps/agent/test/channel-vertical.test.ts",
+      "classification": "affected",
+      "reason": "Representative full Channel ingress/dispatch/response fixture."
+    },
+    {
+      "path": "apps/agent/test/channel-continuity.test.ts",
+      "classification": "affected",
+      "reason": "Continuity fencing and uncertain-session fixture."
+    },
+    {
+      "path": "apps/agent/test/vercel-packaging.test.ts",
+      "classification": "affected",
+      "reason": "Generated Vercel route/function and Eve lifecycle ownership fixture."
+    },
+    {
+      "path": "apps/agent/runbooks/alchemy-infrastructure.md",
+      "classification": "canonical",
+      "reason": "Exact infrastructure authority, operation, evidence, rollback, and stopping procedure owner."
+    },
+    {
+      "path": "apps/agent/runbooks/photon.md",
+      "classification": "canonical",
+      "reason": "Exact Photon management, messaging, cutover, proof, and rollback procedure owner."
+    },
+    {
+      "path": "tooling/documentation-policy.ts",
+      "classification": "generated_owner",
+      "reason": "Documentation route, lifecycle, README, and contradiction enforcement."
+    },
+    {
+      "path": "tooling/verification-policy.ts",
+      "classification": "generated_owner",
+      "reason": "Fifteen-journey inventory and proof policy enforcement."
+    }
+  ],
+  "authority": {
+    "inspection": "read_only",
+    "localMutation": true,
+    "externalAccess": "none",
+    "approvalReceipt": "User delegation dated 2026-08-01 permits the accepted repository corrections in an isolated worktree and explicitly excludes all external or provider mutation."
+  },
+  "exclusions": [
+    "Provider reality, credentials, dashboards, billing, webhooks, deployments, messages, external logs, and current Production or Preview state.",
+    "Implementation, refactoring, file moves, provider changes, deployment, publication, messaging, commit, push, merge, or finding acceptance.",
+    "Ignored and generated node_modules, dist, .turbo, .vercel, tmp, caches, credential files, and local proof artifacts.",
+    "Exhaustive deep reading of completed plans and retained proof; those paths were inventoried and only directly relevant trajectory evidence was deep-read.",
+    "Mutable upstream documentation or provider claims not already present as repository evidence at the target revision."
+  ],
+  "stopConditions": [
+    "Stop finding analysis if HEAD, local main, or origin/main no longer resolves to the supplied target revision.",
+    "Stop before changing any source, configuration, provider, deployment, documentation owner, plan, task ledger, or lifecycle route outside the four audit artifacts.",
+    "Stop before accepting a finding or producing implementation tasks until Cooper records a decision.",
+    "Stop any repository verification that would require installing dependencies or otherwise creating files beyond the four permitted audit artifacts.",
+    "Stop any external access or operation because the audit has no provider authority."
+  ],
+  "limitations": [
+    "The audit is a static repository review plus repository-owned local checks; it cannot establish external actuality.",
+    "The target worktree has no node_modules directory, so Bun checks that import workspace dependencies cannot run without a disallowed dependency-state mutation; this is recorded as unverified rather than treated as a source failure.",
+    "Git path inventories establish presence and accounting, not semantic correctness; risk-based deep reads and representative jobs provide the semantic evidence.",
+    "Historical evidence was sampled only where it bears directly on current ownership, lifecycle, compatibility, or proof claims.",
+    "Line references bind to the exact target revision and will drift after later edits."
+  ],
+  "nonClaims": [
+    "No provider, deployment, runtime, message, delivery, billing, secret, Production, Preview, GitHub setting, or external workflow state was read or changed.",
+    "No finding is accepted, scheduled, implemented, verified in production, or authorized for implementation.",
+    "A green schema validator would prove only artifact conformance, not agreement with the findings.",
+    "Preserve findings do not assert that every uninspected line is defect-free.",
+    "The audit does not reuse preceding terminal audits as proof of the final merged target."
+  ]
+}

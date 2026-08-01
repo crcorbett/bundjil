@@ -1,6 +1,6 @@
 {
   "title": "Hosted Eve Runtime Qualification And Durable Handoff Tasks",
-  "status": "in_progress",
+  "status": "completed",
   "spec": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
   "harnessContract": {
     "primaryOwner": "bundjil-product-owner",

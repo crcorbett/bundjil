@@ -1,11 +1,11 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-product-owner
 implementation_owner: bundjil-agent-architecture-owner
 verification_owner: bundjil-agent-operator
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-01
 review_trigger: Eve, Workflow SDK, Vercel build output, Channel acknowledgement, timeout, provider, or authority change
 task_ledger: hosted-eve-runtime-qualification-and-durability.tasks.json
 ---
@@ -14,10 +14,14 @@ task_ledger: hosted-eve-runtime-qualification-and-durability.tasks.json
 
 ## Status and decision
 
-This SPEC is current implementation and qualification intent. The attached
-implementation authority permits repository code, tests, documentation and
-local coherent commits only. It authorises no deployment, provider operation,
-credential use, message, promotion, rollback, push, or merge.
+This SPEC is retained terminal repository implementation and qualification
+history. All seven task-ledger entries completed, Preview was accepted for the
+observed deployment-replacement and cross-deployment continuity boundary, and
+combined Production qualification remains inconclusive because Photon did not
+provide a candidate-specific exact duplicate oracle. That limitation is not
+current implementation intent, a provider-success claim, or authority to
+deploy, operate a provider, use credentials, send a message, promote, roll
+back, push, or merge.
 
 Fresh review of pinned Eve `0.20.0` corrects the earlier architecture premise:
 Eve already owns the Workflow SDK lifecycle. Eve starts a durable session
@@ -25,7 +29,7 @@ workflow, resumes it through a workflow hook, and starts every turn as a child
 workflow. Bundjil must not wrap an Eve turn in a second app-owned Vercel
 Workflow unless future pinned-source evidence proves a missing boundary.
 
-The remaining acknowledgement defect is narrower:
+The implemented acknowledgement correction was narrower:
 
 1. the Bundjil webhook prepares and claims inbound work;
 2. it starts an Effect Fiber that calls Eve `send()`;
@@ -35,7 +39,7 @@ The remaining acknowledgement defect is narrower:
 
 `waitUntil` protects that in-process handoff only until the ordinary webhook
 function reaches its own invocation duration. It does not move the `202`
-boundary. The required correction is to return `202` only after the exact Eve
+boundary. The implemented correction returns `202` only after the exact Eve
 `send()` call has resolved, its opaque session/run identity is observable, and
 an existing-session delivery has not silently become a different new session.
 The later Eve turn, tools, model calls, pauses, and replies remain Eve-owned

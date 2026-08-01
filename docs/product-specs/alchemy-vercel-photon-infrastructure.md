@@ -789,7 +789,7 @@ Schemas remain private to the exact live adapter.
 
 ```ts
 export const VercelProjectId = Schema.NonEmptyString.pipe(
-  Schema.brand("@bundjil/infrastructure/VercelProjectId")
+  Schema.brand("@bundjil/infrastructure/vercel/VercelProjectId")
 );
 export type VercelProjectId = typeof VercelProjectId.Type;
 export type VercelProjectIdEncoded = typeof VercelProjectId.Encoded;

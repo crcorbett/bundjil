@@ -3074,22 +3074,14 @@ Docs-maintainer integration ledger:
 | Provider implementation and lifecycle         | Preserve        | No Vercel, Photon, Sendblue, deployment, credential, billing or Production operation occurs during source integration.                          |
 | SPEC, tasks, plan, receipts and archive       | Change required | This addendum, task result and dated documentation-inventory correction own the combined source state without rewriting either terminal audit.  |
 
-The merge must pass focused runtime, verification-policy, docs, skills,
-authority, controls and HGI checks followed by complete repository verification.
-That evidence proves source compatibility only. Provider receipts remain bound
-to their original immutable candidates and observation times.
-
-The integrated candidate passed Effect language-service and boundary checks,
-agent typecheck, 77 agent tests, 15 focused runtime/continuity tests, 11
-verification-policy adversarial tests, all routed policy/HGI gates, 98 tooling
-tests, type-aware format/lint, the lint fixture, Knip, all nine workspace
-typechecks and all fifteen Turbo test tasks. The app suite used only the
-process-local synthetic Executor configuration; no external provider operation
-was performed.
-
-Final diff review found one semantic documentation mismatch: the Photon
-runbook still called `acceptedForDispatch` background dispatch and omitted the
-new fail-closed handoff outcomes. The route now records
-`handoffContinuityUncertain` for that distinct `503`, and the runbook names
-handoff acceptance plus intended-session convergence and both handoff failure
-dispositions. Focused and complete verification were rerun after the fix.
+The revision-bound
+[integration receipt](../../documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json)
+binds final merge `4fc8ba1750524581c281ad97351bf0b1e6e29631` to ordered
+parents `f30172290a83bd7ce39dedf9ce57ef88883867d6` and
+`a270116f30aeb20d2087484c4f3fd4051f442897`. Its
+`preMergeCandidateChecks` preserve the candidate checks performed before the
+final merge object existed; those checks were not rerun on the merge. Its
+`postMergeReadOnlyChecks` observe exact Git identity and tree only. Neither
+phase refreshes provider, deployment, message, credential, billing, Preview,
+Production, or other external state, and historical provider receipts remain
+bound to their original immutable candidates and observation times.

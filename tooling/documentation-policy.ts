@@ -69,6 +69,63 @@ const OccurrenceControlDecisionJson = Schema.fromJsonString(
     state: Schema.String,
   })
 );
+const TaskLedgerJson = Schema.fromJsonString(
+  Schema.Struct({ status: Schema.NonEmptyString })
+);
+const AlchemyMainIntegrationReceiptJson = Schema.fromJsonString(
+  Schema.Struct({
+    parentRevisions: Schema.Tuple([
+      Schema.Literal("f30172290a83bd7ce39dedf9ce57ef88883867d6"),
+      Schema.Literal("a270116f30aeb20d2087484c4f3fd4051f442897"),
+    ]),
+    postMergeReadOnlyChecks: Schema.Tuple([
+      Schema.Struct({
+        command: Schema.Literal(
+          "git show -s --format='%H %P' 4fc8ba1750524581c281ad97351bf0b1e6e29631"
+        ),
+        observedAt: Schema.NonEmptyString,
+        result: Schema.Literal(
+          "4fc8ba1750524581c281ad97351bf0b1e6e29631 f30172290a83bd7ce39dedf9ce57ef88883867d6 a270116f30aeb20d2087484c4f3fd4051f442897"
+        ),
+        status: Schema.Literal("passed"),
+      }),
+      Schema.Struct({
+        command: Schema.Literal(
+          "git show -s --format='%T' 4fc8ba1750524581c281ad97351bf0b1e6e29631"
+        ),
+        observedAt: Schema.NonEmptyString,
+        result: Schema.Literal("485c5264cec04c7db3683921d47a1d3b69042c45"),
+        status: Schema.Literal("passed"),
+      }),
+    ]),
+    postMergeReadOnlyLimitation: Schema.Literal(
+      "These checks observe Git identity and tree only; they do not rerun verification or refresh provider, deployment, messaging, credential, billing, Preview, Production, or external state."
+    ),
+    preMergeCandidateChecks: Schema.Tuple([
+      Schema.Struct({
+        command: Schema.NonEmptyString,
+        result: Schema.NonEmptyString,
+        status: Schema.Literal("passed"),
+      }),
+      Schema.Struct({
+        command: Schema.NonEmptyString,
+        result: Schema.NonEmptyString,
+        status: Schema.Literal("passed"),
+      }),
+    ]),
+    preMergeCandidateLimitation: Schema.Literal(
+      "These checks ran on the integrated candidate before the final merge identity existed and were not rerun on the final merge object."
+    ),
+    preMergeCandidateObservedAt: Schema.NonEmptyString,
+    schemaVersion: Schema.Literal(1),
+    status: Schema.Literal("passed"),
+    targetRevision: Schema.Literal("4fc8ba1750524581c281ad97351bf0b1e6e29631"),
+    targetTree: Schema.Literal("485c5264cec04c7db3683921d47a1d3b69042c45"),
+    taskId: Schema.Literal(
+      "alchemy-vercel-photon-infrastructure-main-integration"
+    ),
+  })
+);
 
 export interface DocumentationPolicyOptions {
   readonly detailPath: string;
@@ -376,6 +433,137 @@ const lifecycleFindings = (
             ),
           ];
     });
+
+const crossOwnerLifecycleFindings = (
+  files: readonly DocumentationFile[]
+): readonly DocumentationFinding[] => {
+  const activePlans = files.filter(
+    (file) =>
+      /^docs\/exec-plans\/active\/.+\.md$/.test(file.path) &&
+      !file.path.endsWith("/README.md")
+  );
+  const currentSpecFindings = files
+    .filter(
+      (file) =>
+        /^docs\/product-specs\/(?!index\.md$).+\.md$/.test(file.path) &&
+        parseFrontmatter(file)?.["lifecycle"] === "current" &&
+        parseFrontmatter(file)?.["task_ledger"] !== undefined
+    )
+    .flatMap((spec) => {
+      const matchingPlans = activePlans.filter((plan) => {
+        const planSpec = parseFrontmatter(plan)?.["spec"];
+        return (
+          planSpec !== undefined &&
+          posix.normalize(posix.join(posix.dirname(plan.path), planSpec)) ===
+            spec.path
+        );
+      });
+      return matchingPlans.length === 1
+        ? []
+        : [
+            finding(
+              "DOC-CURRENT-SPEC-PLAN",
+              "Every current task-backed SPEC has exactly one active execution plan",
+              "bundjil-product-owner",
+              spec.path,
+              "Add exactly one active plan whose spec frontmatter resolves to this SPEC, or move terminal work to implemented history",
+              `Matching active plans: ${matchingPlans.length}`
+            ),
+          ];
+    });
+  const completedPlanFindings = files
+    .filter(
+      (file) =>
+        /^docs\/exec-plans\/completed\/.+\.md$/.test(file.path) &&
+        !file.path.endsWith("/README.md") &&
+        parseFrontmatter(file)?.["task_ledger"] !== undefined
+    )
+    .flatMap((plan) => {
+      const taskLedgerReference = parseFrontmatter(plan)?.["task_ledger"];
+      if (taskLedgerReference === undefined) {
+        return [];
+      }
+      const taskLedgerPath = posix.normalize(
+        posix.join(posix.dirname(plan.path), taskLedgerReference)
+      );
+      const taskLedger = files.find((file) => file.path === taskLedgerPath);
+      if (taskLedger === undefined) {
+        return [
+          finding(
+            "DOC-COMPLETED-PLAN-LEDGER",
+            "Every completed-route plan resolves a terminal task ledger",
+            "bundjil-product-owner",
+            plan.path,
+            "Restore the referenced task ledger or correct task_ledger frontmatter",
+            `Missing task ledger ${taskLedgerPath}`
+          ),
+        ];
+      }
+      const decoded = Schema.decodeUnknownResult(TaskLedgerJson)(
+        taskLedger.content
+      );
+      if (Result.isFailure(decoded)) {
+        return [
+          finding(
+            "DOC-COMPLETED-PLAN-LEDGER",
+            "Every completed-route plan resolves a Schema-valid terminal task ledger",
+            "bundjil-product-owner",
+            taskLedgerPath,
+            "Repair the task-ledger JSON through its owning Schema contract",
+            String(decoded.failure)
+          ),
+        ];
+      }
+      return decoded.success.status === "in_progress"
+        ? [
+            finding(
+              "DOC-COMPLETED-PLAN-LEDGER",
+              "A completed-route plan cannot retain an in-progress task ledger",
+              "bundjil-product-owner",
+              taskLedgerPath,
+              "Set the ledger root to its evidenced terminal state or restore the plan to active routing",
+              `Completed plan ${plan.path} references ledger status in_progress`
+            ),
+          ]
+        : [];
+    });
+  return [...currentSpecFindings, ...completedPlanFindings];
+};
+
+const alchemyMainIntegrationReceiptFindings = (
+  files: readonly DocumentationFile[]
+): readonly DocumentationFinding[] => {
+  const receiptPath =
+    "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json";
+  const receipt = files.find((file) => file.path === receiptPath);
+  if (receipt === undefined) {
+    return [
+      finding(
+        "DOC-INTEGRATION-RECEIPT",
+        "The Alchemy main-integration receipt remains present and revision-bound",
+        "bundjil-repository-owner",
+        receiptPath,
+        "Restore the dated receipt at its canonical path",
+        "The canonical receipt is missing"
+      ),
+    ];
+  }
+  const decoded = Schema.decodeUnknownResult(AlchemyMainIntegrationReceiptJson)(
+    receipt.content
+  );
+  return Result.isSuccess(decoded)
+    ? []
+    : [
+        finding(
+          "DOC-INTEGRATION-RECEIPT",
+          "The Alchemy main-integration receipt binds the exact merge, ordered parents, tree, candidate checks, and post-merge Git-only observations",
+          "bundjil-repository-owner",
+          receiptPath,
+          "Restore exact target identity, ordered parents, phase-separated checks, and explicit non-claims",
+          String(decoded.failure)
+        ),
+      ];
+};
 
 const successorFindings = (
   files: readonly DocumentationFile[],
@@ -1025,6 +1213,8 @@ export const auditDocumentation = (
       "Completed-plan inventory"
     ),
     ...lifecycleFindings(snapshot.files),
+    ...crossOwnerLifecycleFindings(snapshot.files),
+    ...alchemyMainIntegrationReceiptFindings(snapshot.files),
     ...successorFindings(snapshot.files, snapshot.repositoryPaths),
     ...readmeFindings(snapshot),
     ...commandFindings(snapshot),

@@ -11,9 +11,18 @@ import type {
   ProductionInfrastructureStateRevision,
   SecretReferenceId,
   SyntheticPhysicalResourceId,
+  // @ts-expect-error Vercel deployment identities are exported only from /vercel
+  VercelDeploymentId as RetiredRootVercelDeploymentId,
+  // @ts-expect-error Vercel project identities are exported only from /vercel
+  VercelProjectId as RetiredRootVercelProjectId,
+} from "../src/index.js";
+import type {
   VercelDeploymentId,
   VercelProjectId,
-} from "../src/index.js";
+} from "../src/vercel/index.js";
+
+declare const retiredRootProjectId: RetiredRootVercelProjectId;
+declare const retiredRootDeploymentId: RetiredRootVercelDeploymentId;
 
 declare const logicalId: AlchemyLogicalResourceId;
 declare const physicalId: SyntheticPhysicalResourceId;
@@ -53,6 +62,8 @@ const photonProjectFromVercel: PhotonProjectId = vercelProjectId;
 const r2BucketFromAccount: AlchemyR2BucketName = r2AccountId;
 
 void physicalId;
+void retiredRootProjectId;
+void retiredRootDeploymentId;
 void productionRevision;
 void physicalFromLogical;
 void productionFromPreview;

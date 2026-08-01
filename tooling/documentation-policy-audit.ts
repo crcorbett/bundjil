@@ -103,6 +103,9 @@ const selectedDocumentationFile = (path: string) =>
   path.endsWith(".md") ||
   path === "package.json" ||
   /^(apps|packages)\/[^/]+\/package\.json$/.test(path) ||
+  /^docs\/product-specs\/.+\.tasks\.json$/.test(path) ||
+  path ===
+    "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json" ||
   path === "apps/agent/agent/instructions.md" ||
   path === "tooling/documentation/current-owner-policy.json" ||
   path === "docs/documentation-audit/HGI-308-boundary-exceptions.decision.json";

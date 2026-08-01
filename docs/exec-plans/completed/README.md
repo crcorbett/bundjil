@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-01
 review_trigger: any execution-plan completion or archival change
 ---
 
@@ -34,6 +34,7 @@ authority for a new operation. Current work lives only under
 | [Repository naming cleanup](repo-naming-cleanup.md)                                                        | Implemented migration                                                       |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                                            | Implemented channel rollout history                                         |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                                                | Implemented feature rollout history                                         |
+| [Structural audit corrections](structural-audit-corrections.md)                                            | Accepted repository corrections; terminal five-pass audit passed            |
 | [Vercel production promotion](vercel-production-promotion.md)                                              | Completed rollout evidence; not current Vercel truth                        |
 
 Read one only when its provenance is necessary.

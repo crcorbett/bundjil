@@ -1,6 +1,6 @@
 {
   "title": "Alchemy Infrastructure For Vercel And Photon Tasks",
-  "status": "in_progress",
+  "status": "completed",
   "spec": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
   "harnessContract": {
     "sourceClassification": "research-backed product decision; not audit-derived",

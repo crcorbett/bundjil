@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "decisionId": "structural-audit-authority-artifact-decision-2026-08-01",
+  "findingId": "FINDING-005",
+  "targetRevision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+  "observedAt": "2026-08-01T08:03:48.000Z",
+  "decision": "deferred",
+  "inspectedCallSites": [
+    {
+      "path": "packages/infrastructure/src/vercel/stable-environment-authority.ts",
+      "role": "Loads one stage-selected stable-environment authority envelope.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters.",
+      "maximumBytes": 65536,
+      "resultAndErrorBoundary": "Returns the branded authority path and maps every metadata, JSON, envelope, or stage-policy failure to stable-environment-authority-invalid."
+    },
+    {
+      "path": "packages/infrastructure/src/vercel/preview-configuration-authority.ts",
+      "role": "Validates the Preview configuration authority before decoding the remaining configuration input.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters.",
+      "maximumBytes": 65536,
+      "resultAndErrorBoundary": "Returns the branded authority path and maps the authority boundary to preview-configuration-authority-invalid."
+    },
+    {
+      "path": "packages/infrastructure/scripts/inventory-live.ts",
+      "role": "Validates read-only inventory authority before provider reads and separately validates and writes inventory and receipt artifacts.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters, with pairwise authority/artifact/receipt path exclusion.",
+      "maximumBytes": 65536,
+      "resultAndErrorBoundary": "Returns the authority path from validation, then returns encoded receipt JSON after two distinct mode-0600 writes."
+    },
+    {
+      "path": "packages/infrastructure/scripts/migrate-state.ts",
+      "role": "Reads authority and manifest inputs for stage-selected state plan, apply, or restore operations and writes a bounded receipt.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters, with four-way authority/manifest/backup/receipt path exclusion.",
+      "maximumBytes": 2097152,
+      "resultAndErrorBoundary": "Returns the stage migration result, preserves structured observed/expected counts, and maps capability failures through StateMigrationFailure."
+    },
+    {
+      "path": "packages/infrastructure/scripts/prove-adoption-state.ts",
+      "role": "Reads authority and manifest inputs, proves remote-state and credential-leak invariants, and writes one bounded receipt.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters, with three-way authority/manifest/receipt path exclusion.",
+      "maximumBytes": 2097152,
+      "resultAndErrorBoundary": "Returns a binding-profile-specific proof result and deliberately translates configuration, authority, manifest, state, credential, and receipt failures separately."
+    },
+    {
+      "path": "packages/infrastructure/scripts/report-drift.ts",
+      "role": "Validates Preview report-only authority and binds the report to the exact authority artifact bytes.",
+      "pathPolicy": "Repository-relative InfrastructureDriftArtifactPath, bounded to 240 characters.",
+      "maximumBytes": 65536,
+      "resultAndErrorBoundary": "Returns a SHA-256 fingerprint of the raw authority bytes, then writes different report and receipt result shapes."
+    },
+    {
+      "path": "packages/infrastructure/scripts/validate-vercel-git-link-authority.ts",
+      "role": "Validates one project-global Vercel Git-link authority envelope.",
+      "pathPolicy": "Repository-relative, bounded to 240 characters.",
+      "maximumBytes": 65536,
+      "resultAndErrorBoundary": "Emits only a bounded valid-status JSON object and collapses authority-boundary failures to vercel-git-link-authority-invalid."
+    }
+  ],
+  "genuinelyCommonPolicy": [
+    "Authority paths are Schema-decoded before file access.",
+    "Authority inputs require mode 0600, a bounded size, JSON decoding, the shared authority-envelope schema, and one capability-owned task policy.",
+    "Ajv validation is strict-false and accumulates errors without exposing raw authority or validation detail.",
+    "Secret values and raw provider data do not enter receipts or failure output."
+  ],
+  "deliberatelyVariablePolicy": [
+    "Authority-only readers use a 64 KiB ceiling while state migration and adoption proof use a 2 MiB fixed-contract input ceiling because the same reader also admits manifests.",
+    "The drift reader must hash the raw authority bytes before they are discarded; other readers return a branded path or no authority-derived value.",
+    "Some Ajv instances disable format validation and others retain the default; the owning task schemas and historical fixtures determine that choice.",
+    "Stage-selected policy schemas, path-conflict sets, receipt schemas, artifact counts, return shapes, and safe failure vocabularies differ by capability.",
+    "The seven infrastructure authority inputs are repository-relative, while the adjacent Photon webhook boundary deliberately requires an absolute output path; a cross-package API would have to admit both policies.",
+    "State migration preserves structured tagged-error counts, adoption proof translates granular string reasons, and the remaining readers expose different bounded results."
+  ],
+  "sharedApiSurfaceRisk": [
+    "A common reader would need callbacks or strategy parameters for raw-byte fingerprinting, stage-policy selection, task Schema decoding, error translation, and return projection.",
+    "A common writer would need callbacks or branching for one or two outputs, receipt construction, directory custody, chmod sequencing, and capability-specific recovery.",
+    "Those callbacks would move security-relevant control flow away from its call site and create combinations that no current caller needs.",
+    "Generalising across Photon would reverse or widen the existing package boundary and admit absolute-path and create-only-secret custody concerns into infrastructure."
+  ],
+  "currentSupportingTests": [
+    "packages/infrastructure/test/vercel-stable-environment-authority.test.ts",
+    "packages/infrastructure/test/vercel-preview-configuration-contracts.test.ts",
+    "packages/infrastructure/test/inventory.test.ts",
+    "packages/infrastructure/test/state-migration-authority.test.ts",
+    "packages/infrastructure/test/adoption-proof.test.ts",
+    "packages/infrastructure/test/drift.test.ts",
+    "packages/infrastructure/test/vercel-git-link-authority.test.ts",
+    "packages/infrastructure/test/codec.test.ts"
+  ],
+  "preserveBoundary": [
+    "Keep each authority reader, task Schema, size bound, path-conflict rule, result shape, and error mapping at its current capability owner.",
+    "Keep Photon authority and create-only binding custody package-local.",
+    "Do not add a utils, common, or shared module, a new package, or a new public export.",
+    "Do not change current provider, receipt, runbook, authority, or critical-journey behavior."
+  ],
+  "resumeTrigger": "Resume only when at least two current infrastructure callers need the same raw-byte-to-bounded-result operation with identical path policy, size bound, Ajv options, task-policy interface, output count, return shape, and error contract, and a directly tested candidate demonstrably reduces total security-policy surfaces without callbacks or a new public export.",
+  "limitations": [
+    "This is a static repository inspection of the seven infrastructure authority-envelope consumers at the target-derived working tree.",
+    "Supporting tests cover task policies and result contracts unevenly; they do not constitute one cross-caller file-boundary property.",
+    "Deferral retains visible repetition and requires future hardening to be applied deliberately at each owner."
+  ],
+  "nonClaims": [
+    "No shared capability was implemented or proved unsafe in every future design.",
+    "No current caller was shown to accept an invalid authority artifact.",
+    "No provider, credential, state, deployment, messaging, billing, Preview, Production, or external system was read or mutated.",
+    "This decision grants no authority and does not add FINDING-005 to the accepted implementation crosswalk."
+  ]
+}

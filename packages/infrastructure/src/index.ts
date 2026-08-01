@@ -269,9 +269,5 @@ export {
   type SyntheticResourceObservationEncoded,
   SyntheticResourceProps,
   type SyntheticResourcePropsEncoded,
-  VercelDeploymentId,
-  type VercelDeploymentIdEncoded,
-  VercelProjectId,
-  type VercelProjectIdEncoded,
 } from "./schemas.js";
 export { SyntheticResources, type SyntheticResourcesShape } from "./service.js";

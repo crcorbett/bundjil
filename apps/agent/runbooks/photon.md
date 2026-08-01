@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-01
 review_trigger: Photon API, SDK pin, credential path, proof command, authority, platform, shared-user, webhook, response deadline, deployment, Workflow, typing, resource lifecycle, or output contract change
 ---
 
@@ -183,6 +183,16 @@ observation. It does not prove Photon webhooks, Vercel, Eve completion, replay,
 duplicate suppression, Preview, Production, or durable process supervision.
 
 ## Hosted resource reconciliation
+
+`infrastructure:photon-candidate-inventory` is the read-only candidate
+inventory owner. Under task-scoped authority it loads the ignored source and
+Preview project credentials plus one selected safe fingerprint, performs two
+complete sequential shared-user and availability reads for both projects, and
+emits a Schema-encoded fingerprint manifest only when both digests match and
+the selected Preview binding is unique. Every failure emits only
+`{"status":"blocked"}`. It performs no provider write and retains no phone,
+assigned routing identity, project secret, provider body, or raw error; its
+output is not current provider truth beyond the bounded observation.
 
 1. Attach the `photon-management` authority receipt, verify the ignored
    credential file is mode `0600`, load it without printing values, and run the

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "structural-audit-corrections-2026-08-01",
+  "auditId": "AUDIT-BUNDJIL-STRUCTURE-2026-08-01",
+  "targetRevision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+  "branch": "codex/structural-audit-corrections",
+  "observedAt": "2026-08-01T08:15:38.000Z",
+  "status": "passed",
+  "acceptedFindings": [
+    "FINDING-001",
+    "FINDING-002",
+    "FINDING-003",
+    "FINDING-004",
+    "FINDING-006"
+  ],
+  "deferredFindings": [
+    {
+      "findingId": "FINDING-005",
+      "decision": "docs/documentation-audit/structural-audit-authority-artifact-decision-2026-08-01.json",
+      "reason": "Seven inspected authority-envelope consumers do not share two identical callback-free contracts across size, path, raw-byte, Schema, output, result, and error boundaries.",
+      "resumeTrigger": "Resume only when at least two current infrastructure callers need the identical callback-free contract named by the dated decision."
+    }
+  ],
+  "terminalAudit": {
+    "reviewer": "fresh independent Sol high-reasoning review",
+    "status": "passed",
+    "passes": [
+      {
+        "id": 1,
+        "name": "ownership-and-call-graph",
+        "status": "passed",
+        "result": "The accepted crosswalk is exact, Vercel identities have one /vercel public owner, and no runtime or provider call graph was widened."
+      },
+      {
+        "id": 2,
+        "name": "effect-and-provider-quality",
+        "status": "passed",
+        "result": "Native Effect and decoded provider boundaries remain intact; no client, Layer, Config, error, SDK callback, or ingress contract was widened."
+      },
+      {
+        "id": 3,
+        "name": "lifecycle-and-security-correctness",
+        "status": "passed",
+        "result": "Alchemy and Hosted Eve are coherently terminal, Hosted Eve Production qualification remains inconclusive, and the FINDING-005 defer preserves capability-local security policy."
+      },
+      {
+        "id": 4,
+        "name": "verification-and-adversarial-coverage",
+        "status": "passed",
+        "result": "Focused lifecycle, receipt, brand, README, journey-registry, package, boundary, and structured-audit checks include the required negative fixtures and passed before closeout."
+      },
+      {
+        "id": 5,
+        "name": "documentation-authority-and-closeout",
+        "status": "passed",
+        "result": "The merge receipt is revision-bound, README/runbook ownership is narrow, authority remains repository-only, and the tree is ready for final verification and lifecycle routing."
+      }
+    ]
+  },
+  "verification": {
+    "focusedChecks": "passed",
+    "fullCommand": "bun run verification",
+    "fullStatus": "passed",
+    "result": "Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 103 tooling tests, type-aware format/lint, the lint fixture, Knip, all nine workspace typechecks, and all fifteen Turbo test/build tasks passed with the documented process-only synthetic Executor fixture."
+  },
+  "limitations": [
+    "This receipt proves repository structure and local verification only.",
+    "The retained pre-merge candidate checks were not rerun on merge 4fc8ba1750524581c281ad97351bf0b1e6e29631.",
+    "No provider, deployment, credential, webhook, message, billing, Preview, Production, or external state was read or mutated."
+  ],
+  "rollback": "Revert the local structural-audit correction commit as one repository slice; no external rollback is required because no external mutation occurred."
+}

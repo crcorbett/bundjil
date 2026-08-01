@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1",
+  "auditId": "AUDIT-BUNDJIL-STRUCTURE-2026-08-01",
+  "targetRevision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+  "entries": [
+    {
+      "findingId": "FINDING-001",
+      "requirementIds": ["BSA-REQ-001"],
+      "taskIds": ["reconcile-terminal-lifecycle"],
+      "owningPaths": [
+        "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+        "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+        "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
+        "docs/product-specs/hosted-eve-runtime-qualification-and-durability.tasks.json",
+        "docs/product-specs/index.md",
+        "docs/exec-plans/active/README.md",
+        "docs/exec-plans/completed/README.md",
+        "tooling/documentation-policy.ts",
+        "tooling/documentation-policy-audit.test.ts"
+      ],
+      "verification": [
+        "bun run test:boundaries -- tooling/documentation-policy-audit.test.ts",
+        "bun run check:docs",
+        "bun run check:verification"
+      ],
+      "proof": [
+        "Adversarial fixtures reject a current SPEC without an active plan and a completed-route plan whose task ledger remains in_progress.",
+        "docs/documentation-audit/structural-audit-corrections-2026-08-01.receipt.json"
+      ]
+    },
+    {
+      "findingId": "FINDING-002",
+      "requirementIds": ["BSA-REQ-002"],
+      "taskIds": ["bind-main-integration-receipt"],
+      "owningPaths": [
+        "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+        "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+        "tooling/documentation-policy.ts",
+        "tooling/documentation-policy-audit.test.ts"
+      ],
+      "verification": [
+        "git show -s --format='%H %P' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
+        "bun run test:boundaries -- tooling/documentation-policy-audit.test.ts",
+        "bun run check:docs"
+      ],
+      "proof": [
+        "The dated receipt records the merge revision, ordered parents, pre-merge candidate checks, post-merge read-only checks, limitations, and external non-claims.",
+        "A negative fixture rejects reversed parent order or a mismatched merge revision."
+      ]
+    },
+    {
+      "findingId": "FINDING-003",
+      "requirementIds": ["BSA-REQ-003"],
+      "taskIds": ["retire-root-vercel-brands"],
+      "owningPaths": [
+        "packages/infrastructure/src/vercel/schemas.ts",
+        "packages/infrastructure/src/vercel/index.ts",
+        "packages/infrastructure/src/schemas.ts",
+        "packages/infrastructure/src/index.ts",
+        "packages/infrastructure/test/brands.compile.ts",
+        "packages/infrastructure/test/vercel-brands.compile.ts"
+      ],
+      "verification": [
+        "bun run --filter=@bundjil/infrastructure check-types",
+        "bun run --filter=@bundjil/infrastructure test",
+        "bun run --filter=@bundjil/infrastructure build",
+        "bun run check:boundaries",
+        "rg -n '@bundjil/infrastructure/(VercelProjectId|VercelDeploymentId)' packages apps stacks tooling"
+      ],
+      "proof": [
+        "The /vercel compile fixture retains nominal incompatibility checks.",
+        "The root compile fixture no longer imports the retired public identities and the stale brand scan is empty."
+      ]
+    },
+    {
+      "findingId": "FINDING-004",
+      "requirementIds": ["BSA-REQ-004"],
+      "taskIds": ["restore-readme-runbook-ownership"],
+      "owningPaths": [
+        "packages/infrastructure/README.md",
+        "packages/photon/README.md",
+        "apps/agent/runbooks/alchemy-infrastructure.md",
+        "apps/agent/runbooks/photon.md"
+      ],
+      "verification": [
+        "bun run check:docs",
+        "bun run check:skills",
+        "bun run check:authority",
+        "bun run check:verification"
+      ],
+      "proof": [
+        "Each package README contains only purpose, public exports, supported repository checks and command names, claim boundaries, and one app-runbook pointer.",
+        "Unique operator knowledge remains in the app-owned runbook and no README command is treated as authority."
+      ]
+    },
+    {
+      "findingId": "FINDING-006",
+      "requirementIds": ["BSA-REQ-006"],
+      "taskIds": ["remove-journey-count-prose"],
+      "owningPaths": [
+        "docs/README.md",
+        "docs/verification/README.md",
+        "tooling/verification-policy.ts",
+        "tooling/verification-policy-audit.test.ts"
+      ],
+      "verification": [
+        "bun run check:docs",
+        "bun run check:verification",
+        "rg -n -i '\\b(twelve|fifteen|12|15)\\b.{0,80}(journey|journeys)' docs/README.md docs/verification/README.md tooling/verification-policy.ts tooling/verification-policy-audit.test.ts"
+      ],
+      "proof": [
+        "Current routers and policy diagnostics are count-free while the machine-readable journey registry and executable identity check remain authoritative."
+      ]
+    }
+  ]
+}

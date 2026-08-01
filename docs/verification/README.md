@@ -3,15 +3,15 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-01
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
 # Bundjil verification
 
-This is the canonical route for the fifteen consumer-visible critical journeys,
-proof packet contract, bounded command receipts, retained evidence index, and
-recorded harness evaluation epoch.
+This is the canonical route for the consumer-visible critical-journey
+registry, proof packet contract, bounded command receipts, retained evidence
+index, and recorded harness evaluation epoch.
 It describes repository-owned proof structure; it neither grants an external
 operation nor asserts present provider state.
 

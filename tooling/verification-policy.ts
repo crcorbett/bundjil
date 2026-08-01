@@ -329,10 +329,10 @@ const auditJourneyInventory = (
   if (ids.length !== expectedJourneyIds.length) {
     add(
       "JOURNEY_COUNT",
-      "The inventory contains exactly fifteen critical journeys.",
+      "The inventory size matches the canonical journey-ID registry.",
       "docs/verification/critical-journeys.json",
-      "Restore the fifteen canonical Bundjil journey IDs.",
-      "Exactly fifteen journeys are present."
+      "Restore the inventory to the canonical expectedJourneyIds registry.",
+      `Expected ${expectedJourneyIds.length} journeys; received ${ids.length}.`
     );
   }
   for (const id of expectedJourneyIds) {

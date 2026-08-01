@@ -1,0 +1,1174 @@
+{
+  "schemaVersion": "1",
+  "auditId": "AUDIT-BUNDJIL-STRUCTURE-2026-08-01",
+  "targetRevision": "4fc8ba1750524581c281ad97351bf0b1e6e29631",
+  "findings": [
+    {
+      "id": "FINDING-001",
+      "invariantIds": [
+        "HC-OUTCOME-001",
+        "HC-CTX-001",
+        "HC-CTX-002",
+        "HC-REPO-001",
+        "HC-DOC-001",
+        "HC-EVIDENCE-001"
+      ],
+      "priority": "important_correction",
+      "risk": "The merged repository teaches incompatible continuations for two completed workstreams. A maintainer can reasonably treat the Alchemy or Hosted Eve ledger as active, the corresponding plan as completed history, or the Hosted Eve SPEC as current without an active execution plan. That ambiguity makes later work attach to the wrong lifecycle and can revive historical authority or duplicate already-completed work.",
+      "evidence": [
+        {
+          "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+          "lineStart": 1,
+          "lineEnd": 4,
+          "observation": "The ledger root remains status in_progress."
+        },
+        {
+          "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.tasks.json",
+          "lineStart": 1124,
+          "lineEnd": 1149,
+          "observation": "The last of ten tasks is completed and its replay text says lifecycle/index text was corrected and the work routes through completed history."
+        },
+        {
+          "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+          "lineStart": 1,
+          "lineEnd": 20,
+          "observation": "The SPEC lifecycle is implemented and states that all ten tasks completed."
+        },
+        {
+          "path": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.tasks.json",
+          "lineStart": 1,
+          "lineEnd": 4,
+          "observation": "The Hosted Eve ledger root remains status in_progress."
+        },
+        {
+          "path": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.tasks.json",
+          "lineStart": 1018,
+          "lineEnd": 1025,
+          "observation": "The retained Hosted Eve journey is passed after all seven ledger tasks are completed."
+        },
+        {
+          "path": "docs/product-specs/hosted-eve-runtime-qualification-and-durability.md",
+          "lineStart": 1,
+          "lineEnd": 20,
+          "observation": "The Hosted Eve SPEC still declares lifecycle current and current implementation intent."
+        },
+        {
+          "path": "docs/product-specs/index.md",
+          "lineStart": 12,
+          "lineEnd": 15,
+          "observation": "Current intent requires both an active SPEC/task and an active execution-plan entry."
+        },
+        {
+          "path": "docs/product-specs/index.md",
+          "lineStart": 24,
+          "lineEnd": 31,
+          "observation": "Hosted Eve is routed as current."
+        },
+        {
+          "path": "docs/exec-plans/active/README.md",
+          "lineStart": 10,
+          "lineEnd": 17,
+          "observation": "The only active plan is Codex Terra; Hosted Eve has no active-plan entry."
+        },
+        {
+          "path": "docs/exec-plans/completed/README.md",
+          "lineStart": 28,
+          "lineEnd": 33,
+          "observation": "Hosted Eve and Alchemy are both routed through completed history."
+        },
+        {
+          "path": "tooling/documentation-policy.ts",
+          "lineStart": 355,
+          "lineEnd": 377,
+          "observation": "The lifecycle control checks only Markdown files physically under exec-plans/active and does not reconcile SPEC frontmatter, task-ledger root status, and both plan indexes."
+        }
+      ],
+      "lifecycleOrDecision": "Post-merge lifecycle reconciliation for two workstreams whose individual tasks and completed plans are terminal.",
+      "semanticOwner": "docs/product-specs/index.md together with each SPEC/task ledger as the earliest current-intent owner; docs/exec-plans/active/README.md and docs/exec-plans/completed/README.md own execution routing.",
+      "proofGap": "The green documentation and integration checks validate metadata, link coverage, and directory placement but do not assert cross-owner lifecycle equivalence. The integration receipt therefore reported corrected routing while the ledger roots and Hosted Eve current route still contradicted it.",
+      "rootCorrection": "After Cooper chooses each terminal state, make the two ledger roots, SPEC lifecycle/status text, product-spec index, and active/completed plan routes express one state. Add one documentation-policy property that rejects a current SPEC without an active plan and rejects a terminal plan whose ledger root is still in_progress.",
+      "retire": [
+        "The stale in_progress root states after terminal task completion.",
+        "Hosted Eve's simultaneous current-SPEC and completed-plan routing.",
+        "Narrative claims that lifecycle reconciliation passed without a machine-checked cross-owner property."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "Reconcile docs/product-specs/index.md and both execution-plan indexes after the decision."
+          ]
+        },
+        "readmes": {
+          "decision": "preserve",
+          "evidence": [
+            "All 23 READMEs were inventoried; none owns SPEC/task lifecycle."
+          ]
+        },
+        "architecture_standards": {
+          "decision": "preserve",
+          "evidence": [
+            "docs/README.md already defines the correct current-versus-history ownership model."
+          ]
+        },
+        "runbooks": {
+          "decision": "preserve",
+          "evidence": [
+            "Runbooks remain procedure owners and must not absorb planning lifecycle."
+          ]
+        },
+        "proof_evidence": {
+          "decision": "change_required",
+          "evidence": [
+            "The integration correction receipt must record the corrected lifecycle result without rewriting historical provider proof."
+          ]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "The docs-maintainer contract already requires one current owner and a complete lifecycle route."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "change_required",
+          "evidence": [
+            "tooling/documentation-policy.ts needs one cross-owner lifecycle equivalence property and adversarial fixture."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "Both named task-ledger roots and the Hosted Eve/Alchemy SPEC status owners are directly affected."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "Add documentation-policy fixtures for terminal tasks with in_progress roots and current SPECs without active plans."
+          ]
+        },
+        "config_exports": {
+          "decision": "not_applicable",
+          "evidence": ["No runtime config or package export is affected."]
+        },
+        "lifecycle": {
+          "decision": "change_required",
+          "evidence": ["This is the direct owning surface."]
+        },
+        "release_rollback": {
+          "decision": "preserve",
+          "evidence": [
+            "Historical rollback identities remain dated evidence and must not become current authority."
+          ]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "The five representative journey contracts remain valid; only their planning lifecycle route changes."
+          ]
+        }
+      },
+      "verification": [
+        "bun run check:docs",
+        "bun run check:verification",
+        "bun run check:controls",
+        "bun run verification",
+        "Inspect the accepted crosswalk and confirm each current SPEC has exactly one active-plan route or an explicit terminal route."
+      ],
+      "journeyIds": [
+        "BND-J11-photon-accepted-message-typing",
+        "BND-J12-dual-channel-production",
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report",
+        "BND-J13-hosted-eve-durability"
+      ],
+      "authorityOrDecision": "Cooper must decide the terminal lifecycle label for each ledger/SPEC pair before any edit. No provider or deployment authority is required.",
+      "limitations": [
+        "Task completion does not by itself choose among implemented, completed, deferred, or superseded ledger-level semantics.",
+        "Historical proof was not re-evaluated; the finding concerns current repository routing only."
+      ],
+      "nonClaims": [
+        "This finding does not reopen either implementation or provider qualification.",
+        "It does not claim current Preview, Production, Vercel, Photon, or Eve state."
+      ],
+      "decision": "accepted"
+    },
+    {
+      "id": "FINDING-002",
+      "invariantIds": ["HC-OUTCOME-001", "HC-PROOF-001", "HC-EVIDENCE-001"],
+      "priority": "important_correction",
+      "risk": "The only integration correction receipt says it records exact parents and that final merge identity is recorded after verification, yet it contains neither the final merge SHA nor either parent SHA. Readers can mistake source checks run on an integration candidate for proof attached to the final merge object.",
+      "evidence": [
+        {
+          "path": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+          "lineStart": 1,
+          "lineEnd": 14,
+          "observation": "The receipt has task, status, time, and inventory digests but no targetRevision or parent fields."
+        },
+        {
+          "path": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+          "lineStart": 51,
+          "lineEnd": 54,
+          "observation": "The impact ledger claims that the addendum records exact parents."
+        },
+        {
+          "path": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+          "lineStart": 63,
+          "lineEnd": 78,
+          "observation": "Checks are reported for the integrated candidate while historical proof remains bound to older identities."
+        },
+        {
+          "path": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
+          "lineStart": 81,
+          "lineEnd": 84,
+          "observation": "The limitation claims the final merge identity is recorded after verification, but the file ends without it."
+        },
+        {
+          "path": "docs/exec-plans/completed/alchemy-vercel-photon-infrastructure.md",
+          "lineStart": 3056,
+          "lineEnd": 3088,
+          "observation": "The completed-plan addendum reports current-main integration and green verification but names no final merge SHA or exact parent pair."
+        }
+      ],
+      "lifecycleOrDecision": "Final source-integration evidence for merge 4fc8ba1750524581c281ad97351bf0b1e6e29631 with parents f30172290a83bd7ce39dedf9ce57ef88883867d6 and a270116f30aeb20d2087484c4f3fd4051f442897.",
+      "semanticOwner": "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json as the dated integration receipt; the completed plan should route to it rather than duplicate its evidence.",
+      "proofGap": "The receipt shape is bespoke and was checked before the merge object existed. No schema or policy requires final target revision, parent identities, worktree state, or post-merge observation time.",
+      "rootCorrection": "Bind the dated integration receipt to the exact final merge SHA and ordered parents, distinguish pre-merge candidate checks from any post-merge read-only checks, and change the completed-plan addendum to point to that receipt. Do not refresh or broaden provider claims.",
+      "retire": [
+        "The false statement that exact parents are already recorded.",
+        "Duplicated verification prose in the completed plan once the revision-bound receipt is authoritative.",
+        "Any implication that candidate verification automatically binds to a later merge object."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "Correct the dated integration receipt and reduce the completed-plan addendum to a routed summary."
+          ]
+        },
+        "readmes": {
+          "decision": "not_applicable",
+          "evidence": ["No README owns merge evidence."]
+        },
+        "architecture_standards": {
+          "decision": "preserve",
+          "evidence": [
+            "docs/operations/authority-model.md already requires source revision and exact receipt identity."
+          ]
+        },
+        "runbooks": {
+          "decision": "preserve",
+          "evidence": [
+            "No operational procedure changes; provider operations remain out of scope."
+          ]
+        },
+        "proof_evidence": {
+          "decision": "change_required",
+          "evidence": ["This is the direct evidence-identity correction."]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "The docs-maintainer proof contract already requires exact target and claim boundaries."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "change_required",
+          "evidence": [
+            "Admit a small schema or policy check for revision-bound integration receipts if this receipt class is retained."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "An accepted correction should be planned from the receipt owner; historical tasks should only route to it."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "Add an adversarial receipt fixture that omits targetRevision or parents."
+          ]
+        },
+        "config_exports": {
+          "decision": "not_applicable",
+          "evidence": ["No runtime config or export changes."]
+        },
+        "lifecycle": {
+          "decision": "change_required",
+          "evidence": [
+            "The receipt must identify whether checks occurred pre-merge or post-merge."
+          ]
+        },
+        "release_rollback": {
+          "decision": "preserve",
+          "evidence": [
+            "Existing source and provider rollback identities remain separate; do not infer a provider rollback from the merge."
+          ]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "No journey result is refreshed or changed by binding source evidence."
+          ]
+        }
+      },
+      "verification": [
+        "Validate the corrected receipt against its accepted machine-readable contract.",
+        "git show -s --format='%H %P' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
+        "bun run check:docs",
+        "bun run check:controls",
+        "bun run verification"
+      ],
+      "journeyIds": [
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report",
+        "BND-J13-hosted-eve-durability"
+      ],
+      "authorityOrDecision": "Cooper must accept the finding and the receipt class. Read-only Git inspection is sufficient; no external authority is required.",
+      "limitations": [
+        "A corrected revision field cannot prove that every reported command actually ran on that object without command receipts or reproducible rerun evidence.",
+        "The audit did not rerun provider or hosted proof and does not ask the correction to do so."
+      ],
+      "nonClaims": [
+        "The missing identity does not prove that the reported source checks failed.",
+        "Binding the receipt to the merge would not refresh any provider, deployment, delivery, or Production claim."
+      ],
+      "decision": "accepted"
+    },
+    {
+      "id": "FINDING-003",
+      "invariantIds": [
+        "HC-CTX-001",
+        "HC-REPO-001",
+        "HC-BOUNDARY-001",
+        "HC-DEPENDENCY-001"
+      ],
+      "priority": "important_correction",
+      "risk": "@bundjil/infrastructure publicly exports two nominally incompatible VercelProjectId types and two VercelDeploymentId types for the same provider concepts. A consumer can select either the root brand or the /vercel brand, creating parallel semantic owners and avoidable conversion pressure at exactly the identifier boundary branding is meant to protect.",
+      "evidence": [
+        {
+          "path": "packages/infrastructure/src/schemas.ts",
+          "lineStart": 137,
+          "lineEnd": 147,
+          "observation": "The root schema module defines VercelProjectId and VercelDeploymentId with root-level brand identities."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/schemas.ts",
+          "lineStart": 9,
+          "lineEnd": 19,
+          "observation": "The Vercel subpath defines its own VercelProjectId brand."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/schemas.ts",
+          "lineStart": 96,
+          "lineEnd": 100,
+          "observation": "The Vercel subpath defines its own VercelDeploymentId brand."
+        },
+        {
+          "path": "packages/infrastructure/src/index.ts",
+          "lineStart": 250,
+          "lineEnd": 276,
+          "observation": "The root barrel publicly exports the duplicate root Vercel identities."
+        },
+        {
+          "path": "packages/infrastructure/src/adoption-manifest.ts",
+          "lineStart": 25,
+          "lineEnd": 36,
+          "observation": "Production adoption contracts import the /vercel identity owners."
+        },
+        {
+          "path": "packages/infrastructure/src/inventory.ts",
+          "lineStart": 45,
+          "lineEnd": 54,
+          "observation": "Inventory contracts import the /vercel VercelProjectId owner."
+        },
+        {
+          "path": "packages/infrastructure/test/brands.compile.ts",
+          "lineStart": 14,
+          "lineEnd": 41,
+          "observation": "A root compile fixture preserves the duplicate root brands while a separate vercel-brands fixture covers the provider subpath."
+        }
+      ],
+      "lifecycleOrDecision": "Post-integration private package API cleanup before more infrastructure consumers adopt the ambiguous root identities.",
+      "semanticOwner": "packages/infrastructure/src/vercel/schemas.ts and the @bundjil/infrastructure/vercel export path.",
+      "proofGap": "Type checks prove each brand is nominally distinct from unrelated identifiers but do not assert that one provider concept has only one brand/export owner. The second compile fixture makes the duplication look intentional.",
+      "rootCorrection": "Keep the /vercel identities as the sole Vercel owners, remove the root duplicates and their root exports, update the root compile fixture, and search all consumers for the retired brand strings. Preserve the explicit /vercel export map and source conditions.",
+      "retire": [
+        "Retired root Vercel project and deployment identity brands.",
+        "Root barrel exports for those duplicate identities.",
+        "The portion of packages/infrastructure/test/brands.compile.ts that treats the duplicate root brands as canonical."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "Update package-boundary documentation only if it names the retired root identities."
+          ]
+        },
+        "readmes": {
+          "decision": "change_required",
+          "evidence": [
+            "packages/infrastructure/README.md should route Vercel contracts to the /vercel subpath."
+          ]
+        },
+        "architecture_standards": {
+          "decision": "preserve",
+          "evidence": [
+            "The existing single-owner and package-subpath rules already describe the correction."
+          ]
+        },
+        "runbooks": {
+          "decision": "not_applicable",
+          "evidence": [
+            "Operator procedures do not consume these TypeScript brands."
+          ]
+        },
+        "proof_evidence": {
+          "decision": "preserve",
+          "evidence": [
+            "Historical receipts contain encoded provider IDs, not TypeScript brand identities."
+          ]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "Package-structure and Effect boundary skills already require canonical semantic owners."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "preserve",
+          "evidence": [
+            "Boundary and package checks remain applicable; a new global duplicate-brand heuristic is not required for the minimum correction."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "An accepted package API correction must be planned and crosswalked before implementation."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "Update compile fixtures to prove the /vercel brands remain non-interchangeable and root duplicates no longer export."
+          ]
+        },
+        "config_exports": {
+          "decision": "change_required",
+          "evidence": [
+            "This finding directly changes the root export surface while preserving package.json conditions."
+          ]
+        },
+        "lifecycle": {
+          "decision": "not_applicable",
+          "evidence": ["No documentation lifecycle state changes."]
+        },
+        "release_rollback": {
+          "decision": "preserve",
+          "evidence": [
+            "The package is private and version remains repository-local; record a source reversion path in any accepted task."
+          ]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "Infrastructure journey payloads continue to use the same encoded string representation."
+          ]
+        }
+      },
+      "verification": [
+        "rg -n '@bundjil/infrastructure/(vercel/)?Vercel(Project|Deployment)Id|\\bVercel(Project|Deployment)Id\\b' packages apps stacks",
+        "bun run --filter=@bundjil/infrastructure check-types",
+        "bun run --filter=@bundjil/infrastructure test",
+        "bun run --filter=@bundjil/infrastructure build",
+        "bun run check:boundaries",
+        "bun run verification"
+      ],
+      "journeyIds": [
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report"
+      ],
+      "authorityOrDecision": "Cooper must accept the public-surface correction. Repository implementation authority only; no provider authority.",
+      "limitations": [
+        "The package is private and no current app imports @bundjil/infrastructure, so the present runtime consequence is API ambiguity rather than observed production breakage.",
+        "Encoded provider IDs remain strings; the correction concerns TypeScript semantic ownership."
+      ],
+      "nonClaims": [
+        "This finding does not assert that current Vercel requests use the wrong project or deployment.",
+        "It does not require changing provider resources, manifests, state, or credentials."
+      ],
+      "decision": "accepted"
+    },
+    {
+      "id": "FINDING-004",
+      "invariantIds": [
+        "HC-CTX-001",
+        "HC-DOC-001",
+        "HC-AUTH-001",
+        "HC-LIFETIME-001"
+      ],
+      "priority": "important_correction",
+      "risk": "The two infrastructure package READMEs have become secondary operator manuals. They repeat exact environment names, provider commands, retries, cutover sequencing, Production staging, secret custody, and cleanup rules already owned by 470-line app runbooks. This creates two plausible procedure owners and makes safety-critical instructions expensive to reconcile.",
+      "evidence": [
+        {
+          "path": "AGENTS.md",
+          "lineStart": 66,
+          "lineEnd": 75,
+          "observation": "Repository instructions restrict app/package READMEs to purpose, public boundaries, and public commands; exact operations belong in app runbooks."
+        },
+        {
+          "path": "packages/infrastructure/README.md",
+          "lineStart": 105,
+          "lineEnd": 138,
+          "observation": "The README lists a broad operator command surface including direct Alchemy plan, adopt, apply, and sync commands."
+        },
+        {
+          "path": "packages/infrastructure/README.md",
+          "lineStart": 140,
+          "lineEnd": 167,
+          "observation": "The README specifies exact authority paths, evidence custody, exit semantics, and drift procedure detail."
+        },
+        {
+          "path": "packages/infrastructure/README.md",
+          "lineStart": 169,
+          "lineEnd": 213,
+          "observation": "The README specifies migration variables, stable Preview/Production apply rules, retry semantics, credential custody, and staged deployment sequencing."
+        },
+        {
+          "path": "packages/infrastructure/README.md",
+          "lineStart": 226,
+          "lineEnd": 251,
+          "observation": "The README specifies webhook binding recovery, stable callback cutover, cleanup, and hosted proof sequencing."
+        },
+        {
+          "path": "packages/photon/README.md",
+          "lineStart": 149,
+          "lineEnd": 182,
+          "observation": "The Photon README specifies candidate inventory, provider lifecycle, reconcile, registration, uncertain-create handling, and binding transfer procedure."
+        },
+        {
+          "path": "packages/photon/README.md",
+          "lineStart": 184,
+          "lineEnd": 203,
+          "observation": "The Photon README specifies Production recovery registration/deletion and exact reconciliation constraints."
+        },
+        {
+          "path": "apps/agent/runbooks/alchemy-infrastructure.md",
+          "lineStart": 1,
+          "lineEnd": 20,
+          "observation": "A canonical target-owned Alchemy infrastructure runbook already exists."
+        },
+        {
+          "path": "apps/agent/runbooks/photon.md",
+          "lineStart": 1,
+          "lineEnd": 20,
+          "observation": "A canonical target-owned Photon runbook already exists."
+        }
+      ],
+      "lifecycleOrDecision": "Current documentation ownership after the infrastructure rollout; operational detail should converge on runbooks while package READMEs remain stable maps.",
+      "semanticOwner": "apps/agent/runbooks/alchemy-infrastructure.md and apps/agent/runbooks/photon.md for procedures; package READMEs for purpose, exports, repository-safe commands, and pointers.",
+      "proofGap": "Documentation checks verify links, command existence, frontmatter, and selected contradictions but do not classify README paragraphs by authority/procedure content. The integration receipt explicitly preserved READMEs without testing the repository's own README/runbook ownership rule.",
+      "rootCorrection": "Diff both package READMEs against their runbooks, move only genuinely unique operational knowledge to the owning runbook, then reduce each README to purpose, export map, local package checks, public command names, claim boundaries, and one runbook pointer. Add a narrow policy fixture for exact operational env/procedure blocks in package READMEs if the recurrence merits a control.",
+      "retire": [
+        "Duplicated environment-variable inventories in package READMEs.",
+        "README-level apply, migration, Production staging, webhook cutover, retry-drain, and cleanup procedures.",
+        "Duplicated claim/authority prose once a single runbook and verification owner is linked."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "Documentation ownership must converge without deleting historical proof."
+          ]
+        },
+        "readmes": {
+          "decision": "change_required",
+          "evidence": [
+            "packages/infrastructure/README.md and packages/photon/README.md are the direct correction targets."
+          ]
+        },
+        "architecture_standards": {
+          "decision": "preserve",
+          "evidence": [
+            "AGENTS.md and docs/README.md already define the correct split."
+          ]
+        },
+        "runbooks": {
+          "decision": "preserve",
+          "evidence": [
+            "Retain the two app runbooks as procedure owners; add only unique knowledge discovered during deduplication."
+          ]
+        },
+        "proof_evidence": {
+          "decision": "preserve",
+          "evidence": [
+            "Proof packets and dated receipts remain separate and must not move into READMEs."
+          ]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "docs-maintainer already distinguishes README, runbook, authority, and proof surfaces."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "change_required",
+          "evidence": [
+            "Consider one narrow documentation-policy fixture only after the correction demonstrates a stable failure class."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "An accepted documentation consolidation requires a bounded task and explicit retention check."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "If promoted, add adversarial documentation-policy fixtures for exact procedure blocks in package READMEs."
+          ]
+        },
+        "config_exports": {
+          "decision": "preserve",
+          "evidence": [
+            "Package exports and actual command definitions remain unchanged."
+          ]
+        },
+        "lifecycle": {
+          "decision": "preserve",
+          "evidence": [
+            "The package READMEs remain current package maps and runbooks remain current procedure owners."
+          ]
+        },
+        "release_rollback": {
+          "decision": "preserve",
+          "evidence": [
+            "Runbooks retain release, rollback, revocation, and stopping detail."
+          ]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "Journey records continue to point to runbooks, not READMEs."
+          ]
+        }
+      },
+      "verification": [
+        "bun run check:docs",
+        "bun run check:skills",
+        "bun run check:authority",
+        "bun run check:verification",
+        "rg -n 'BUNDJIL_|bun alchemy|vercel deploy|rollback|cutover|delete' packages/infrastructure/README.md packages/photon/README.md",
+        "bun run verification"
+      ],
+      "journeyIds": [
+        "BND-J11-photon-accepted-message-typing",
+        "BND-J12-dual-channel-production",
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report"
+      ],
+      "authorityOrDecision": "Cooper must accept the documentation consolidation and decide whether a new policy control is worth its carrying cost. No provider authority.",
+      "limitations": [
+        "Some command names are legitimate public package-map content; acceptance should distinguish names/pointers from executable procedure detail.",
+        "The audit did not line-by-line compare every runbook sentence for exact equivalence, so unique knowledge must be preserved during any later edit."
+      ],
+      "nonClaims": [
+        "This finding does not say the documented procedures are operationally wrong.",
+        "It does not authorize running any listed command."
+      ],
+      "decision": "accepted"
+    },
+    {
+      "id": "FINDING-005",
+      "invariantIds": [
+        "HC-CTX-001",
+        "HC-REPO-001",
+        "HC-FEEDBACK-001",
+        "HC-LIFETIME-001"
+      ],
+      "priority": "optional_improvement",
+      "risk": "Mode-0600 file bounds, repository-relative path checks, JSON decoding, harness-envelope AJV compilation, policy validation, and receipt encoding are repeated across at least eleven infrastructure/Photon paths. The implementations already vary in size limit, validateFormats option, error translation, and absolute-versus-relative path policy. Future authority hardening must be repeated correctly in many places.",
+      "evidence": [
+        {
+          "path": "packages/infrastructure/src/vercel/stable-environment-authority.ts",
+          "lineStart": 11,
+          "lineEnd": 73,
+          "observation": "This owner defines a path Schema, mode/size check, JSON decode, envelope compilation, stage policy selection, and string failure."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/preview-configuration-authority.ts",
+          "lineStart": 25,
+          "lineEnd": 44,
+          "observation": "A second Vercel owner repeats the same repository-relative path policy."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/preview-configuration-authority.ts",
+          "lineStart": 93,
+          "lineEnd": 119,
+          "observation": "The second owner repeats mode/size, JSON decode, AJV options, envelope and policy validation."
+        },
+        {
+          "path": "packages/infrastructure/scripts/inventory-live.ts",
+          "lineStart": 53,
+          "lineEnd": 79,
+          "observation": "The inventory script repeats a generic safe artifact path Schema for authority, output, and receipt paths."
+        },
+        {
+          "path": "packages/infrastructure/scripts/inventory-live.ts",
+          "lineStart": 99,
+          "lineEnd": 123,
+          "observation": "The inventory script repeats mode/size, JSON decode, and two AJV compilers with slightly different options."
+        },
+        {
+          "path": "packages/photon/scripts/register-environment-webhook.ts",
+          "lineStart": 36,
+          "lineEnd": 57,
+          "observation": "The Photon script has separate absolute binding and relative authority path policies."
+        },
+        {
+          "path": "packages/photon/scripts/register-environment-webhook.ts",
+          "lineStart": 90,
+          "lineEnd": 125,
+          "observation": "The Photon Production branch repeats authority metadata, JSON decode, envelope/policy compilation, and adapter-specific error translation."
+        }
+      ],
+      "lifecycleOrDecision": "Investigation completed with an evidence-backed defer decision; preserve current capability-local ownership until the exact resume trigger is met.",
+      "semanticOwner": "The seven existing infrastructure authority-envelope consumers remain their own security-boundary owners; Photon remains adapter-local.",
+      "proofGap": "The dated decision tables common and deliberately variable behavior. No callback-free candidate with identical size, path, Schema, output, return, and error contracts was found across at least two current callers.",
+      "rootCorrection": "Deferred. Preserve call-site Schemas, size bounds, path rules, raw-byte handling, result shapes, and tagged-error mapping. Resume only under the trigger in structural-audit-authority-artifact-decision-2026-08-01.json; do not add a generic utils/common/shared module, public export, or reversed Photon dependency.",
+      "retire": [
+        "Repeated infrastructure repository-relative path filters where the admitted syntax is identical.",
+        "Repeated infrastructure mode-0600/stat/JSON/envelope compilation sequences.",
+        "Repeated bounded-receipt JSON validation and mode-0600 write/chmod sequences where policy is identical."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "The dated defer decision records current owners, intentional parameters, limitations, and the exact resume trigger."
+          ]
+        },
+        "readmes": {
+          "decision": "preserve",
+          "evidence": [
+            "Do not add helper implementation detail to package READMEs."
+          ]
+        },
+        "architecture_standards": {
+          "decision": "preserve",
+          "evidence": [
+            "The existing helper-admission rule permits reuse for a real security boundary and forbids a generic shared module."
+          ]
+        },
+        "runbooks": {
+          "decision": "preserve",
+          "evidence": ["Procedure and authority requirements remain unchanged."]
+        },
+        "proof_evidence": {
+          "decision": "preserve",
+          "evidence": [
+            "Receipt schemas and historical evidence remain unchanged."
+          ]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "No skill change is needed unless the extracted capability becomes a repository-wide pattern."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "not_applicable",
+          "evidence": [
+            "This is not suitable for a broad lint rule; focused tests own the property."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "The investigation task is terminal as deferred; create no refactor task until the exact resume trigger is met."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "Current supporting tests remain capability-owned; no speculative cross-caller fixture is added without a candidate API."
+          ]
+        },
+        "config_exports": {
+          "decision": "preserve",
+          "evidence": [
+            "Keep the capability internal to @bundjil/infrastructure; do not expand public exports."
+          ]
+        },
+        "lifecycle": {
+          "decision": "not_applicable",
+          "evidence": ["No lifecycle route changes."]
+        },
+        "release_rollback": {
+          "decision": "change_required",
+          "evidence": [
+            "No implementation changed, so source or provider rollback is not required."
+          ]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "BND-J13 and BND-J14 procedure and proof contracts remain unchanged."
+          ]
+        }
+      },
+      "verification": [
+        "bun run --filter=@bundjil/infrastructure check-types",
+        "bun run --filter=@bundjil/infrastructure test",
+        "bun run --filter=@bundjil/infrastructure build",
+        "bun run --filter=@bundjil/photon test",
+        "bun run check:authority",
+        "bun run check:controls",
+        "bun run verification"
+      ],
+      "journeyIds": [
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report"
+      ],
+      "authorityOrDecision": "Deferred by structural-audit-authority-artifact-decision-2026-08-01.json. The investigation grants no implementation or provider authority.",
+      "limitations": [
+        "Different size bounds, output paths, and absolute-path needs may be deliberate and must remain parameters rather than be flattened.",
+        "A cross-package abstraction may cost more than the remaining Photon-local duplication and is not recommended by this finding."
+      ],
+      "nonClaims": [
+        "The repeated implementations are not shown to accept invalid authority today.",
+        "This finding does not recommend a broad helper/shared package."
+      ],
+      "decision": "deferred"
+    },
+    {
+      "id": "FINDING-006",
+      "invariantIds": ["HC-CTX-001", "HC-DOC-001", "HC-FEEDBACK-001"],
+      "priority": "optional_improvement",
+      "risk": "The canonical docs router still says there are twelve journeys while both the verification router and executable policy own fifteen. Duplicated literal counts have already drifted and can make repository navigation understate the proof surface even when the machine-readable registry is correct.",
+      "evidence": [
+        {
+          "path": "docs/README.md",
+          "lineStart": 58,
+          "lineEnd": 64,
+          "observation": "The canonical documentation router describes twelve named journeys."
+        },
+        {
+          "path": "docs/verification/README.md",
+          "lineStart": 10,
+          "lineEnd": 16,
+          "observation": "The verification router describes fifteen consumer-visible journeys."
+        },
+        {
+          "path": "tooling/verification-policy.ts",
+          "lineStart": 323,
+          "lineEnd": 335,
+          "observation": "Executable verification policy requires exactly fifteen journeys."
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "lineStart": 304,
+          "lineEnd": 459,
+          "observation": "The registry includes the five Channel, infrastructure, and Hosted Eve journeys added at the end of the fifteen-item inventory."
+        }
+      ],
+      "lifecycleOrDecision": "Current documentation routing after the journey inventory expanded to fifteen.",
+      "semanticOwner": "docs/verification/critical-journeys.json for inventory size; docs/README.md should route to it without owning a duplicated literal unless tooling checks the literal.",
+      "proofGap": "check:verification validates the JSON inventory and command map but does not compare the docs router sentence; check:docs checks links and metadata but not this semantic count.",
+      "rootCorrection": "Prefer count-free router text such as named critical journeys, or derive/check the literal against the registry. Keep the exact number in one machine-readable owner and one verification-router statement only if useful.",
+      "retire": [
+        "The stale Twelve named journeys literal in docs/README.md.",
+        "Any future independently maintained journey-count literals outside the registry/control owner."
+      ],
+      "surfaces": {
+        "docs": {
+          "decision": "change_required",
+          "evidence": [
+            "Correct the docs/README.md route and keep docs/verification/README.md aligned with the registry."
+          ]
+        },
+        "readmes": {
+          "decision": "not_applicable",
+          "evidence": ["No app/package README owns the journey count."]
+        },
+        "architecture_standards": {
+          "decision": "not_applicable",
+          "evidence": ["No architecture rule changes."]
+        },
+        "runbooks": {
+          "decision": "preserve",
+          "evidence": [
+            "Runbooks continue to own procedures for individual journeys."
+          ]
+        },
+        "proof_evidence": {
+          "decision": "preserve",
+          "evidence": [
+            "The registry and existing proof packets remain unchanged."
+          ]
+        },
+        "skills": {
+          "decision": "preserve",
+          "evidence": [
+            "The docs-maintainer contract already requires one owner."
+          ]
+        },
+        "lint_config_ci": {
+          "decision": "change_required",
+          "evidence": [
+            "Optionally add one registry-to-router assertion only if the literal remains."
+          ]
+        },
+        "spec_tasks": {
+          "decision": "change_required",
+          "evidence": [
+            "If accepted, include this small correction in the documentation ownership task rather than a standalone rollout."
+          ]
+        },
+        "tests_fixtures": {
+          "decision": "change_required",
+          "evidence": [
+            "If a literal remains, add an adversarial changed-count fixture."
+          ]
+        },
+        "config_exports": {
+          "decision": "not_applicable",
+          "evidence": ["No runtime config or package export impact."]
+        },
+        "lifecycle": {
+          "decision": "not_applicable",
+          "evidence": ["No lifecycle state changes."]
+        },
+        "release_rollback": {
+          "decision": "not_applicable",
+          "evidence": ["No release or rollback impact."]
+        },
+        "critical_journeys": {
+          "decision": "preserve",
+          "evidence": [
+            "All fifteen complete journey IDs and command mappings remain unchanged."
+          ]
+        }
+      },
+      "verification": [
+        "bun run check:docs",
+        "bun run check:verification",
+        "bun run verification"
+      ],
+      "journeyIds": [
+        "BND-J11-photon-accepted-message-typing",
+        "BND-J12-dual-channel-production",
+        "BND-J13-preview-infrastructure-convergence",
+        "BND-J14-preview-infrastructure-drift-report",
+        "BND-J13-hosted-eve-durability"
+      ],
+      "authorityOrDecision": "Optional documentation correction; Cooper can accept it independently or fold it into FINDING-001 or FINDING-004. No external authority.",
+      "limitations": [
+        "The complete journey IDs are unique even though two use the BND-J13 numeric prefix; this finding does not require renumbering retained evidence.",
+        "The stale count does not change executable command mapping."
+      ],
+      "nonClaims": [
+        "This does not invalidate any journey or historical packet.",
+        "It does not assert external journey success."
+      ],
+      "decision": "accepted"
+    }
+  ],
+  "foundationsToPreserve": [
+    {
+      "id": "PRESERVE-001",
+      "summary": "Preserve the private @bundjil package boundaries, explicit provider subpaths, NodeNext .js imports, and ordered @bundjil/source/types/default export conditions. The infrastructure dependency points toward Photon management, and apps do not use infrastructure as a runtime service locator.",
+      "evidence": [
+        {
+          "path": "packages/infrastructure/package.json",
+          "lineStart": 1,
+          "lineEnd": 35,
+          "observation": "The package is private and exposes root, testing, vercel, and photon paths with ordered source, types, and default conditions."
+        },
+        {
+          "path": "packages/infrastructure/package.json",
+          "lineStart": 48,
+          "lineEnd": 55,
+          "observation": "Infrastructure depends on @bundjil/photon and does not invert that dependency."
+        },
+        {
+          "path": "packages/photon/package.json",
+          "lineStart": 14,
+          "lineEnd": 39,
+          "observation": "Photon exposes deliberate config/live/management/memory subpaths with the same source conditions."
+        },
+        {
+          "path": "docs/architecture/repo-structure.md",
+          "lineStart": 354,
+          "lineEnd": 375,
+          "observation": "Current rules require owning-package Schemas, no app imports from packages, aligned exports, explicit provider-heavy subpaths, .js imports, and @bundjil/source."
+        }
+      ],
+      "owner": "docs/architecture/repo-structure.md plus each package.json export map"
+    },
+    {
+      "id": "PRESERVE-002",
+      "summary": "Preserve the Effect provider boundaries: owner-branded Schema inputs, complete response-envelope decoding, Config.schema/redacted credential Effects, safe tagged failures, flat named operations, and explicit live/memory Layers. No raw Vercel or Photon client is exported.",
+      "evidence": [
+        {
+          "path": "docs/architecture/effect-patterns.md",
+          "lineStart": 75,
+          "lineEnd": 113,
+          "observation": "The canonical provider boundary requires decoded contracts, immediate encoding/decoding, redacted Config, safe errors, and explicit Layers."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/live.layer.ts",
+          "lineStart": 88,
+          "lineEnd": 101,
+          "observation": "Vercel credentials are loaded through Config.schema behind a Context service and live Layer."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/live.layer.ts",
+          "lineStart": 134,
+          "lineEnd": 164,
+          "observation": "Vercel success and failure response envelopes are Schema-owned."
+        },
+        {
+          "path": "packages/infrastructure/src/vercel/live.layer.ts",
+          "lineStart": 299,
+          "lineEnd": 315,
+          "observation": "The live adapter begins a named flat operation by encoding the owner request and mapping safe errors."
+        },
+        {
+          "path": "packages/photon/src/management/live.layer.ts",
+          "lineStart": 94,
+          "lineEnd": 114,
+          "observation": "Photon management credentials are Config.schema values behind a Context service and live Layer."
+        },
+        {
+          "path": "packages/photon/src/management/live.layer.ts",
+          "lineStart": 340,
+          "lineEnd": 359,
+          "observation": "The Photon live adapter encodes the owner request and maps safe typed failures at the operation boundary."
+        }
+      ],
+      "owner": "docs/architecture/effect-patterns.md, @bundjil/infrastructure/vercel, and @bundjil/photon/management"
+    },
+    {
+      "id": "PRESERVE-003",
+      "summary": "Preserve the ChannelHandoff/Eve compatibility achieved by the merge: provider input is decoded at ingress, replay is claimed before send, Eve acceptance and session identity are decoded before 202, continuity is fenced, uncertain work remains retained, and safe observations contain fingerprints rather than raw content or provider identifiers.",
+      "evidence": [
+        {
+          "path": "apps/agent/agent/lib/channel/dispatch.ts",
+          "lineStart": 53,
+          "lineEnd": 136,
+          "observation": "Dispatch records send start, encodes state, awaits Eve send, decodes EveSessionId, records acceptance, and classifies timeout/uncertainty."
+        },
+        {
+          "path": "apps/agent/agent/lib/channel/eve.ts",
+          "lineStart": 159,
+          "lineEnd": 207,
+          "observation": "The route decodes query and provider webhook input, rejects ignored/duplicate work, prepares handoff, dispatches, and converges replay continuity."
+        },
+        {
+          "path": "apps/agent/agent/lib/channel/eve.ts",
+          "lineStart": 208,
+          "lineEnd": 291,
+          "observation": "Exit and uncertainty are retained and only converged acceptance returns 202."
+        },
+        {
+          "path": "apps/agent/agent/lib/channel/handoff.ts",
+          "lineStart": 216,
+          "lineEnd": 289,
+          "observation": "Handoff acceptance, continuity, terminal, response, and exit observations use decoded branded fingerprints and bounded outcomes."
+        },
+        {
+          "path": "docs/architecture/eve-agent.md",
+          "lineStart": 93,
+          "lineEnd": 154,
+          "observation": "The architecture call graph and claim boundary match the implementation and keep provider/runtime assertions separate."
+        }
+      ],
+      "owner": "apps/agent/agent/lib/channel/** and docs/architecture/eve-agent.md"
+    },
+    {
+      "id": "PRESERVE-004",
+      "summary": "Preserve the stage and ownership guards in the Alchemy entrypoints: configuration is decoded before stack construction, stable authority is explicit, manifest stage must equal the CLI stage, resources deploy sequentially, removal policy is per resource, and Vercel Git—not Alchemy—remains deployment owner.",
+      "evidence": [
+        {
+          "path": "alchemy.run.ts",
+          "lineStart": 21,
+          "lineEnd": 48,
+          "observation": "The read/adoption entrypoint rejects managed values, derives exact scopes, and injects read-only providers and stage-owned state."
+        },
+        {
+          "path": "alchemy.preview.run.ts",
+          "lineStart": 14,
+          "lineEnd": 40,
+          "observation": "The Preview entrypoint decodes its input before composing only Preview configuration providers."
+        },
+        {
+          "path": "alchemy.stable.run.ts",
+          "lineStart": 24,
+          "lineEnd": 52,
+          "observation": "The stable entrypoint loads authority and command, validates the stable command, and then constructs the stack."
+        },
+        {
+          "path": "stacks/bundjil.ts",
+          "lineStart": 115,
+          "lineEnd": 138,
+          "observation": "The stack decodes Stage, rejects manifest mismatch, and deploys manifest resources sequentially."
+        },
+        {
+          "path": "docs/product-specs/alchemy-vercel-photon-infrastructure.md",
+          "lineStart": 26,
+          "lineEnd": 34,
+          "observation": "The accepted repository decision keeps Vercel Git as deployment owner and separates promotion/rollback."
+        }
+      ],
+      "owner": "root Alchemy entrypoints, stacks/**, and packages/infrastructure"
+    },
+    {
+      "id": "PRESERVE-005",
+      "summary": "Preserve the repository's explicit truth layers: local source and fixtures, dated evidence, authority, external readback, deployment, provider acceptance, delivery, and Production are not interchangeable. Runbooks own procedures, verification owns journey oracles, and historical packets grant no standing authority.",
+      "evidence": [
+        {
+          "path": "docs/verification/README.md",
+          "lineStart": 190,
+          "lineEnd": 221,
+          "observation": "The verification owner separates local proof, external readback, accepted historical packets, and future authority."
+        },
+        {
+          "path": "docs/operations/authority-model.md",
+          "lineStart": 110,
+          "lineEnd": 121,
+          "observation": "Receipts require source revision, journey, environment, readback, limitations, rollback, and do not become standing actuality."
+        },
+        {
+          "path": "AGENTS.md",
+          "lineStart": 66,
+          "lineEnd": 75,
+          "observation": "Repository guidance separates README maps, runbooks, authority rationale/registers, controls, and proof."
+        },
+        {
+          "path": "docs/architecture/eve-agent.md",
+          "lineStart": 289,
+          "lineEnd": 310,
+          "observation": "Source tests do not prove hosted/provider state and operations require runbooks plus fresh readback."
+        }
+      ],
+      "owner": "docs/README.md, docs/operations/**, docs/verification/**, and target-owned app runbooks"
+    }
+  ],
+  "limitations": [
+    "The audit is bound to target revision 4fc8ba1750524581c281ad97351bf0b1e6e29631 and line references will drift after edits.",
+    "The target worktree lacks node_modules, so Bun checks that import Effect or other workspace dependencies could not execute without a dependency-state mutation outside the four-file audit allowance.",
+    "Static source, Schema, test, and runbook inspection cannot establish provider, deployment, delivery, billing, Production, Preview, or hosted workflow actuality.",
+    "All 863 tracked paths were inventoried, but completed history and retained evidence were deep-read only when directly relevant to current ownership, lifecycle, compatibility, or proof.",
+    "No finding has been accepted; root corrections and verification commands are proposed designs, not implementation instructions with authority."
+  ],
+  "nonClaims": [
+    "No provider, deployment, credential, message, billing, GitHub setting, external workflow, Preview, or Production system was accessed or changed.",
+    "No source, configuration, provider, runbook, lifecycle owner, test, skill, or policy was implemented or refactored.",
+    "Green artifact validation does not establish that Cooper accepts a finding.",
+    "Historical audits and packets are trajectory evidence only and were not treated as proof of the final merged target.",
+    "Foundations to preserve do not assert that the entire repository is defect-free."
+  ]
+}

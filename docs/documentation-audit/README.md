@@ -3,7 +3,7 @@ document_type: audit-index
 lifecycle: evidence
 authority: supporting
 owner: bundjil-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-01
 review_trigger: any HGI corpus, route, decision, reconciliation, acceptance receipt, or lifecycle correction
 ---
 
@@ -15,6 +15,15 @@ not own current policy or provider truth; use [`../README.md`](../README.md).
 Implementation-audit feedback promotion:
 
 - [`implementation-audit-feedback-2026-07-24.json`](implementation-audit-feedback-2026-07-24.json)
+
+2026-08-01 structural audit and accepted scope:
+
+- [`bundjil-structural-audit-2026-08-01.md`](bundjil-structural-audit-2026-08-01.md)
+- [`bundjil-structural-audit-2026-08-01.scope.json`](bundjil-structural-audit-2026-08-01.scope.json)
+- [`bundjil-structural-audit-2026-08-01.findings.json`](bundjil-structural-audit-2026-08-01.findings.json)
+- [`bundjil-structural-audit-2026-08-01.accepted-findings.json`](bundjil-structural-audit-2026-08-01.accepted-findings.json)
+- [`structural-audit-authority-artifact-decision-2026-08-01.json`](structural-audit-authority-artifact-decision-2026-08-01.json)
+- [`structural-audit-corrections-2026-08-01.receipt.json`](structural-audit-corrections-2026-08-01.receipt.json)
 
 Alchemy infrastructure lifecycle accounting:
 

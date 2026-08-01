@@ -134,18 +134,6 @@ export type SyntheticPhysicalResourceId =
 export type SyntheticPhysicalResourceIdEncoded =
   typeof SyntheticPhysicalResourceId.Encoded;
 
-export const VercelProjectId = Schema.NonEmptyString.pipe(
-  Schema.brand("@bundjil/infrastructure/VercelProjectId")
-);
-export type VercelProjectId = typeof VercelProjectId.Type;
-export type VercelProjectIdEncoded = typeof VercelProjectId.Encoded;
-
-export const VercelDeploymentId = Schema.NonEmptyString.pipe(
-  Schema.brand("@bundjil/infrastructure/VercelDeploymentId")
-);
-export type VercelDeploymentId = typeof VercelDeploymentId.Type;
-export type VercelDeploymentIdEncoded = typeof VercelDeploymentId.Encoded;
-
 export const PreviewInfrastructureStateRevision = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/PreviewInfrastructureStateRevision")
 );
