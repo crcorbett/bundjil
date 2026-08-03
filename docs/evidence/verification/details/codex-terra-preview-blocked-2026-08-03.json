@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-blocked",
+  "observedAt": "2026-08-03T04:25:50Z",
+  "candidate": {
+    "repositoryCommit": "f1b11907c29464423ddcb3ffabac6bf9f0694770",
+    "sourceArchiveSha256": "d4dbe95278798106b28bbda23cc029f0878b7b605ed834c3c9813b19b4644735",
+    "candidateFingerprintSha256": "c23565fd74ac5d4ca1fd6bbdd4451fdbe7b4a3e2be0c68fb905193ecdfd2a9f8",
+    "proxyDeploymentId": "dpl_AbUnezoqf4Xd4dv39vogZg2AQVLv",
+    "agentDeploymentId": "dpl_AZ43mz4yfyGi3ffDdvfuyjdF8kLB"
+  },
+  "authority": {
+    "scope": "One personal Vercel Preview rollout and bounded subscription probe.",
+    "access": "mutation",
+    "production": "not authorized or changed"
+  },
+  "configurationReadback": {
+    "proxy": {
+      "environment": "preview",
+      "sourceBuild": true,
+      "readyState": "READY",
+      "mode": "live",
+      "reasoningEffort": "high",
+      "healthStatus": 503,
+      "healthReady": false,
+      "reasoningVariable": {
+        "key": "BUNDJIL_CODEX_PROXY_REASONING_EFFORT",
+        "type": "encrypted",
+        "target": "preview"
+      }
+    },
+    "agent": {
+      "environment": "preview",
+      "sourceBuild": true,
+      "readyState": "READY",
+      "modelId": "bundjil-codex-proxy/gpt-5.6-terra",
+      "contextWindowTokens": 1050000,
+      "modelVariable": {
+        "key": "BUNDJIL_CODEX_PROXY_MODEL",
+        "type": "encrypted",
+        "target": "preview"
+      },
+      "contextVariable": {
+        "key": "BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS",
+        "type": "encrypted",
+        "target": "preview"
+      }
+    }
+  },
+  "journey": {
+    "proxyProof": {
+      "command": "bun run --filter @bundjil/codex-proxy proof:preview",
+      "classification": "request_failed",
+      "status": "blocked",
+      "exitCode": 1,
+      "requestAttempted": true
+    },
+    "agentInfo": {
+      "authorization": "Vercel OIDC bearer",
+      "status": 200,
+      "modelIdentityMatched": true,
+      "contextWindowMatched": true
+    }
+  },
+  "blockedPredicates": [
+    "The immutable Preview proxy health endpoint was live and high but not ready (503).",
+    "Preview lacks an isolated encrypted Codex profile, cipher, and persistence configuration with a stored-profile proof.",
+    "The proof command could not pass Vercel Deployment Protection with the configured proof-only bypass, so it did not observe the proxy auth or subscription SSE predicates.",
+    "No minimal Eve session or stream replay was sent because upstream readiness was false."
+  ],
+  "nonClaims": [
+    "No Codex subscription endpoint acceptance, authenticated SSE, token refresh, or reasoning request was proven.",
+    "No provider credential, profile ciphertext, OAuth material, prompt, response body, token value, or protected URL is retained.",
+    "No Production configuration, deployment, promotion, or rollback was performed."
+  ],
+  "rollback": "The prior Preview deployments and values remain the rollback reference; this attempt added Preview-only target configuration and did not promote either app."
+}

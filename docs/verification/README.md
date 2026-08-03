@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-03
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -165,6 +165,11 @@ operation nor asserts present provider state.
   retains the superseded local-only timeout gate. Its unavailable hosted state
   is historical; the successor Preview packet owns current exact-candidate
   function, plan, latency, Workflow, provider, and restoration readback.
+- [`codex-terra-preview-blocked-2026-08-03.json`](../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
+  retains the exact source-built Codex proxy and agent Preview candidates,
+  high-effort and protected Terra/context readback, plus the non-ready proxy
+  stop. It does not prove Codex subscription acceptance, SSE completion, Eve
+  session/replay, or any Production result.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

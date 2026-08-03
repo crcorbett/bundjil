@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-03
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -24,8 +24,9 @@ context.
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  implementation in progress; Preview subscription-endpoint proof remains
-  pending explicit deployment authority.
+  implementation is complete; the authorized Preview rollout is blocked on an
+  isolated stored-profile/persistence/cipher configuration and proof-only
+  deployment-protection access. Subscription acceptance remains unproved.
 
 ## Implemented or superseded history
 

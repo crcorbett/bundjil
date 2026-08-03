@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "Codex subscription completion through the immutable Preview proxy"
+  },
+  "candidate": {
+    "repositoryCommit": "f1b11907c29464423ddcb3ffabac6bf9f0694770",
+    "sourceDigest": "d4dbe95278798106b28bbda23cc029f0878b7b605ed834c3c9813b19b4644735",
+    "artifactDigest": "c23565fd74ac5d4ca1fd6bbdd4451fdbe7b4a3e2be0c68fb905193ecdfd2a9f8"
+  },
+  "authority": {
+    "principal": "Cooper, personal Vercel owner",
+    "identitySource": "explicit task authority and authenticated Vercel personal team",
+    "externalAccess": "mutation",
+    "approvalReceipt": "delegated task authority recorded 2026-08-03",
+    "rollbackOwner": "Bundjil Vercel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "bundjil-codex-proxy and bundjil-agent immutable Preview candidates"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "blocked",
+      "oracle": "Proxy was live and high but returned 503 not-ready before authenticated subscription SSE could be observed."
+    },
+    {
+      "journeyId": "BND-J13-preview-infrastructure-convergence",
+      "status": "passed",
+      "oracle": "Both source-built Vercel Preview candidates reached READY at the exact repository commit."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "bun run --filter @bundjil/codex-proxy proof:preview",
+    "outcome": "blocked",
+    "exitCode": 1,
+    "invariant": "Live, ready proxy health and protected authenticated SSE are required before subscription acceptance.",
+    "target": "bundjil-codex-proxy immutable Preview candidate",
+    "recoveryHint": "Provision an isolated Preview profile, cipher and persistence store, then refresh the proof-only bypass and rerun with a new packet.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-blocked-2026-08-03.json",
+    "detailSha256": "f81f3c73a15373eebb2eaf14cc32d69a1bc562340edd2c5ba897281aa9a7578b",
+    "postcondition": "Preview deployments remain READY; subscription completion is unproved and Production remains unchanged."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Authenticated Vercel deployment, configuration metadata, health, and protected Eve info readback are retained in the sanitized detail."
+  },
+  "postconditions": [
+    "The proxy Preview effort is high and the agent reports the exact Terra model identity and context window.",
+    "The subscription proof remains blocked before an upstream request or Eve session completion.",
+    "Production was not mutated."
+  ],
+  "limitations": [
+    "The candidate fingerprint is a digest of immutable deployment identities and source, not a Vercel build-artifact digest.",
+    "The blocked command did not prove bearer controls, SSE completion, subscription acceptance, or stream replay."
+  ],
+  "nonClaims": [
+    "No provider payload, credential, token, profile, prompt, response, or chain-of-thought is retained.",
+    "This blocked Preview packet grants no authority for profile provisioning, Vercel configuration, or Production promotion."
+  ],
+  "rollback": {
+    "identity": "Previous Preview deployments and values remain the recorded rollback reference.",
+    "outcome": "ready",
+    "owner": "Bundjil Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-preview-blocked-2026-08-03.json",
+      "sha256": "f81f3c73a15373eebb2eaf14cc32d69a1bc562340edd2c5ba897281aa9a7578b",
+      "provenance": "authenticated Vercel metadata, bounded local probe receipt, and protected OIDC info readback"
+    }
+  ],
+  "observedAt": "2026-08-03T04:25:50Z"
+}

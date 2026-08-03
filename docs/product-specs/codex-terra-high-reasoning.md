@@ -310,6 +310,25 @@ identity, one successful private proxy request, and a completed subscription
 SSE response. The command must continue to exit nonzero with `status:
 "blocked"` on any failed predicate.
 
+### 2026-08-03 authorized Preview result
+
+The authorized Preview stage deployed source-built proxy and agent candidates
+from `f1b11907c29464423ddcb3ffabac6bf9f0694770`. Vercel metadata readback
+established the Preview-only high-effort proxy setting and encrypted agent
+Terra/context settings. A protected Eve info readback established
+`bundjil-codex-proxy/gpt-5.6-terra` and `1050000`.
+
+The acceptance criterion remains unmet. The immutable proxy returned `503`
+with `mode: live`, `reasoningEffort: high`, and `ok: false`; the bounded
+proxy proof consequently recorded `request_failed` and did not observe bearer
+or SSE predicates. The current Preview project lacks an isolated stored
+profile, persistence namespace, and cipher configuration, and the configured
+proof-only Vercel protection bypass did not admit the proof command. Do not
+reuse Production credentials or profile state to bypass those missing
+boundaries. The dated packet
+[`codex-terra-preview-blocked-2026-08-03.json`](../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
+is the current provider receipt; it retains no secret or payload material.
+
 ## Affected surfaces
 
 - `packages/codex/src/provider/contracts.ts`: named effort and request-policy
