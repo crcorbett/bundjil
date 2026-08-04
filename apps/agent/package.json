@@ -25,6 +25,8 @@
     "@bundjil/sendblue": "workspace:*",
     "@bundjil/store": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
+    "@opentelemetry/api": "^1.9.1",
+    "@vercel/otel": "^2.1.3",
     "ai": "^7.0.16",
     "effect": "catalog:effect",
     "eve": "0.20.0"

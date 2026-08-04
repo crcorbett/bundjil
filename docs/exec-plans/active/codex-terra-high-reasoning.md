@@ -27,8 +27,15 @@ SPEC-required per-session proxy correlation. Vercel's short-lived project OIDC
 token plus CLI protected-call path reached the immutable Preview agent without
 weakening Eve auth. The direct session completed and its durable replay reached
 waiting, but the retained receipt has no per-session proxy request counter to
-independently prove replay did not trigger a second upstream call. Production
-remains out of scope.
+independently prove replay did not trigger a second upstream call. A
+version-matched review of installed Eve `0.20.0` found no supported
+session/turn-derived model transport header resolver: its instrumentation
+runtime context is telemetry-only and hooks are post-durable, observe-only
+callbacks. The reviewed replacement candidate is the native Vercel
+OpenTelemetry trace chain, with W3C propagation restricted to the private
+proxy and inbound context continuation at its HTTP boundary. Process-global,
+async-local, wrapper, static-header, and time-window substitutes are rejected.
+Production remains out of scope.
 
 ## Evidence record
 
@@ -40,16 +47,16 @@ remains out of scope.
 
 ## Downstream-impact ledger
 
-| Surface                                       | Status          | Reason                                                                                                                                                                                            |
-| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture/product docs                     | Change required | Update the SPEC/task state and current runbooks as implementation completes; retain historical gpt-5.5 proof labels.                                                                              |
-| Root, package, and app READMEs/runbooks       | N/A by HGI-300  | Current app README owners intentionally exclude provider actuality and operator runbooks; the SPEC, task ledger, environment sample, and architecture owner retain the target and proof boundary. |
-| `AGENTS.md` and skills                        | N/A             | Current instructions already own this provider/config pattern; no contradiction found.                                                                                                            |
-| Schemas, types, services, Layers, exports     | Change required | Add the provider effort/policy contract and explicit live/test wiring.                                                                                                                            |
-| Lint, diagnostics, boundary rules, CI/scripts | Change required | Test the new source with the existing language-service, boundary, skill, and verification gates; change Turbo/proof script in later slices.                                                       |
-| Tests, fixtures, HTTP/provider evidence       | Change required | Add deterministic mapper/config/handler tests; Preview proof requires separate authority.                                                                                                         |
-| Observability, rollout, migration, rollback   | Change required | Define safe policy observation and target/rollback documentation before any deployment task.                                                                                                      |
-| SPEC, task ledger, active-plan index          | Change required | This active plan and the sibling ledger record accepted task evidence.                                                                                                                            |
+| Surface                                       | Status          | Reason                                                                                                                                                        |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture/product docs                     | Change required | The SPEC/task state now records the installed-Eve API limit and forbids unsafe substitutes. Retain historical gpt-5.5 labels.                                 |
+| Root, package, and app READMEs/runbooks       | Preserve        | No executable proxy/agent or operator procedure changed. Existing README/runbook owners already route this proof; none may claim an unsupported correlation.  |
+| `AGENTS.md` and skills                        | Preserve        | Existing Effect/provider and helper-admission rules reject an unowned bridge or wrapper; no instruction conflict was found.                                   |
+| Schemas, types, services, Layers, exports     | Change required | The trace continuation/config boundary must use owning schemas and named Vercel/Effect adapter operations; it may not leak a raw OTel client.                 |
+| Lint, diagnostics, boundary rules, CI/scripts | Change required | Add focused trace propagation and no-input/output-export tests. Existing rules must reject raw configuration and client escape hatches.                       |
+| Tests, fixtures, HTTP/provider evidence       | Change required | Prove local W3C propagation and one completion span; Preview proof then compares one model attempt before replay with the unchanged trace count after replay. |
+| Observability, rollout, migration, rollback   | Change required | Define restricted propagation, no third-party drain/exporter, CLI trace readback, sanitized receipt, halt/revocation, and no-Production boundary.             |
+| SPEC, task ledger, active-plan index          | Change required | These current owners record the investigation outcome and future admission predicate.                                                                         |
 
 ## Preview receipts
 
@@ -101,13 +108,15 @@ or Eve replay.
 
 ## Remaining external work
 
-- Add a reviewed, safe per-session correlation between an Eve session and the
-  proxy completion boundary, then rerun the bounded replay proof. Do not log
-  prompts, responses, tokens, tool data, or reasoning to satisfy this gate.
+- Add the reviewed native Vercel OpenTelemetry trace boundary: restricted
+  agent-to-proxy propagation, proxy incoming-context continuation, safe
+  completion span, and a trace-count proof before and after `startIndex=0`
+  replay. Do not log prompts, responses, tokens, tool data, raw session/turn
+  IDs, or reasoning to satisfy this gate.
 - Production is excluded. Do not promote, rotate the accepted Preview profile,
   or change channel ingress as part of the correlation work.
 
-## 2026-08-04 terminal audit
+## Superseded 2026-08-04 terminal audit
 
 1. **Ownership and call graph.** The app-owned provider turns its configured
    proxy origin into the fixed `/v1` API root; the proxy still owns its
@@ -122,3 +131,7 @@ or Eve replay.
    proves protected Preview info/session/replay, while the prior proxy receipt
    proves subscription SSE/high. The missing per-session proxy counter remains
    blocked rather than inferred from replay semantics.
+
+The trace-correlation implementation supersedes this three-lens audit. Do not
+close the active task until the mandatory five-pass audit in the task ledger is
+run against the exact deployed Preview artifact and its sanitized receipt.

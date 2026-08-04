@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-codex-proxy-operator
-last_reviewed: 2026-07-21
+last_reviewed: 2026-08-04
 review_trigger: Preview deployment, Vercel protection, proxy route/auth/mode, stored profile, model/reasoning, proof command, or output contract change
 ---
 
@@ -27,6 +27,10 @@ named Preview at `observedAt`; it is never Production proof.
   isolated Preview subject with sanitized stored-profile proof.
 - Obtain authority for the remote model call and any protection bypass use.
   The bypass grants platform access only; it is not the proxy bearer.
+- Confirm the installed Vercel CLI supports `vercel curl --trace` and `vercel
+traces get` for the bounded operator call. Do not configure a browser Session
+  Trace, third-party trace drain/exporter, broad propagation allowlist, or a
+  request/header capture rule for this proof.
 - Do not create a deployment, bypass, profile, or environment variable as part
   of this proof run.
 
@@ -100,6 +104,25 @@ payloads.
    proof JSON, exit status, `observedAt`, and limitations. Do not infer stable
    alias ownership, Production, logs, or source identity from the HTTP response
    alone.
+
+7. For the replay predicate, use one short-lived Vercel project OIDC token and
+   `vercel curl --trace --json` against the immutable Preview agent deployment
+   to create one bounded Eve session. Retain the command's request ID only in
+   operator memory, then use `vercel traces get <request-id> --json` to inspect
+   the trace. Read the session once to completion/waiting, then replay that same
+   stream with `startIndex=0`; capture and inspect a new CLI trace request ID.
+   Require exactly one
+   `bundjil.codex-proxy.model-invocation` span with
+   `bundjil.codex-proxy.sse_completed=true` before the replay and the same
+   count afterwards. Retain only an opaque trace fingerprint, the two counts,
+   the deployment identities, and safe booleans. Do not retain raw trace data,
+   session/turn IDs, trace headers, prompts, responses, tokens, tool values,
+   reasoning, or screenshots containing them.
+
+   Stop as `blocked` if sampling drops either span, the propagated context does
+   not join the immutable agent and proxy candidates, a second model-invocation
+   span appears, the completion attribute is absent/false, or the trace view
+   exposes data outside this runbook's retention rule.
 
 ## Evidence and postcondition
 

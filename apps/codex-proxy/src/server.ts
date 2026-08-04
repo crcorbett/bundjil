@@ -136,6 +136,7 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
       headers: {
         "cache-control": "no-cache, no-transform",
         "x-accel-buffering": "no",
+        "x-bundjil-codex-proxy-model-invocation": "true",
         "x-bundjil-codex-proxy-mode": config.mode,
       },
       status: 200,

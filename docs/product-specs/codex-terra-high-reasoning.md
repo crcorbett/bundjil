@@ -247,14 +247,15 @@ fresh Preview Eve request (OIDC-protected)
   -> mapped encoded Responses request: model gpt-5.6-terra, reasoning.high
   -> subscription endpoint returns accepted SSE HTTP 200
   -> proxy returns OpenAI-compatible SSE through [DONE]
-  -> sanitized trace/log counters correlate one request without payload capture
+  -> sanitized Vercel CLI trace counters correlate one request without payload capture
 ```
 
 ### OIDC caller decision
 
 The Vercel CLI can mint a short-lived development OIDC token for an exact linked
-project with `vercel project token`. `vercel curl` then supplies the separate
-Deployment Protection bypass for an immutable deployment. Together, those
+project with `vercel project token`. `vercel curl --trace` then supplies the
+separate Deployment Protection bypass for an immutable deployment and returns a
+trace request ID which `vercel traces get` can retrieve. Together, those
 Vercel-owned controls are sufficient for this bounded Preview operator proof:
 the agent still validates the OIDC bearer, while the bypass is never treated as
 application authentication.
@@ -314,6 +315,56 @@ field names and existing log owner must be inspected during implementation;
 do not invent an external telemetry service. It must not contain credentials,
 authorization headers, account ids, token values, prompts, request/response
 bodies, tool arguments/results, reasoning text, or chain-of-thought.
+
+### Eve session-to-proxy correlation constraint
+
+Exact replay proof requires a durable join between an Eve session/turn and the
+one proxy request made for a model attempt. Eve does not expose a user-defined
+session-derived HTTP header to the model provider: its supported
+`instrumentation.ts` `step.started` callback receives session, turn, and step
+metadata, but returns AI SDK telemetry runtime context; the OpenAI-compatible
+provider receives static provider headers plus Eve-owned per-call headers.
+Stream hooks are post-durable and observe-only.
+
+The preferred supported join is Vercel OpenTelemetry, not a new proxy store:
+
+```text
+Eve step.started
+  -> ai.eve.turn span with framework session/turn/step attributes
+    -> AI SDK model/fetch span
+      -> W3C traceparent on the private proxy request
+        -> proxy inbound span
+          -> Codex upstream SSE completion span
+```
+
+The agent instrumentation must set `recordInputs: false` and
+`recordOutputs: false`, use `@vercel/otel` with propagation restricted to the
+configured private proxy origin, and create no third-party trace drain or
+exporter. The proxy
+must continue the inbound W3C context at its Vercel HTTP boundary and create
+only a named completion span with the existing safe model/effort/mode/status/
+SSE attributes. The proof operator may inspect the one bounded Preview trace,
+then retain only an opaque trace fingerprint, a model-attempt count of one
+before replay, and an unchanged count after replay. It must not retain raw
+session or turn identifiers, headers, requests, responses, prompts, tokens,
+tool values, reasoning, or exported trace data.
+
+Do not bridge the gap with a process-global value, `AsyncLocalStorage`, an
+unreviewed custom LanguageModel wrapper, a static proof header, or a proxy
+counter keyed only by a time window. Those mechanisms either fail under
+concurrent/replayed Vercel workflow execution or prove a weaker unrelated
+claim. Vercel trace sampling, `traceparent` propagation, and the proxy's
+incoming-context continuation must each be tested locally and read back from
+the exact Preview deployment before this replaces the blocked predicate.
+
+The installed Eve source is the version-matched authority for the direct
+transport limitation. Executor Personal DeepWiki was first attempted against
+the stale `vercel-labs/eve` repository name and could not index it; the
+corrected `vercel/eve` investigation confirms the framework's native telemetry
+runtime context and durable replay model. Vercel's current tracing guidance
+confirms `@vercel/otel` W3C fetch propagation and manual inbound extraction for
+non-Next.js handlers. Re-open the implementation only after the exact package
+types and local trace proof confirm the proposed adapter surface.
 
 Extend the Preview proof command/contract so that it uses the target
 `gpt-5.6-terra` request and reports only sanitized target assertions such as

@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -196,8 +196,10 @@ operation nor asserts present provider state.
   records the protected Preview Eve info, session acceptance, and
   `startIndex=0` durable replay using Vercel's short-lived project OIDC token
   and CLI protection path. It retains event counts and status only; it does
-  not claim Production, channel delivery, a public Eve route, or general
-  external caller capability.
+  not claim Production, channel delivery, a public Eve route, general external
+  caller capability, or that replay made no second upstream call. The current
+  SPEC defines the still-unproven native Vercel OpenTelemetry correlation
+  required for that separate claim.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

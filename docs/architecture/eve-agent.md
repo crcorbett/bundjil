@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-04
 review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, Eve Workflow lifecycle, generated Build Output, deployment boundary, or external readback change
 ---
 
@@ -40,7 +40,11 @@ The source supports two model selections:
 ```text
 Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
   -> gateway model string
-  |  codex-proxy LanguageModel -> apps/codex-proxy /v1/chat/completions
+  |  codex-proxy LanguageModel
+       -> agent/instrumentation.ts records no inputs/outputs
+       -> W3C trace context to the configured private proxy origin only
+       -> apps/codex-proxy /v1/chat/completions
+       -> proxy continues the trace until its SSE response settles
 ```
 
 This describes code wiring only. It does not show which path an external
@@ -51,6 +55,12 @@ environment currently configures or serves.
 - `agent/config.ts` decodes model-provider configuration through Effect Config
   and Schemas; secrets are redacted. `model-provider.ts` owns model
   construction.
+- `agent/instrumentation.ts` is an Eve-owned telemetry boundary, not a model
+  wrapper. It uses the already-decoded selected provider configuration to
+  restrict Vercel OpenTelemetry fetch propagation to the private Codex proxy
+  origin and disables AI SDK input/output capture. The trace exists for the
+  Vercel operator proof only; Bundjil never retains raw session/turn IDs,
+  prompts, responses, tokens, tools, or reasoning in a repository receipt.
 - `workspace_status` bridges Effect Schema once at the Eve edge, delegates to
   `WorkspaceOperations`, and encodes its result at the outward edge.
 - `agent/instructions.md` is an instruction boundary, not an authority source.

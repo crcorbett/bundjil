@@ -13,6 +13,7 @@
     "apps/agent": {
       "entry": [
         "agent/agent.ts",
+        "agent/instrumentation.ts",
         "agent/channels/**/*.ts",
         "agent/tools/**/*.ts",
         "test/**/*.test.ts"

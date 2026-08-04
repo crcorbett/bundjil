@@ -29,6 +29,8 @@
   "dependencies": {
     "@bundjil/codex": "workspace:*",
     "@effect/platform-bun": "catalog:effect",
+    "@opentelemetry/api": "^1.9.1",
+    "@vercel/otel": "^2.1.3",
     "effect": "catalog:effect"
   },
   "devDependencies": {

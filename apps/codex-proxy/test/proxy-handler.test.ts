@@ -931,6 +931,10 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             response.headers.get("x-bundjil-codex-proxy-mode"),
             "live"
           );
+          assert.strictEqual(
+            response.headers.get("x-bundjil-codex-proxy-model-invocation"),
+            "true"
+          );
           assert.match(body, /Live OK\./);
           assert.match(body, /data: \[DONE\]/);
           assert.strictEqual(body.includes("live-access-token"), false);
@@ -974,6 +978,10 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             assert.strictEqual(
               response.headers.get("x-bundjil-codex-proxy-mode"),
               "local"
+            );
+            assert.strictEqual(
+              response.headers.get("x-bundjil-codex-proxy-model-invocation"),
+              "true"
             );
             assert.match(body, /Local OK\./);
             assert.match(body, /data: \[DONE\]/);
