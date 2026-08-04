@@ -125,13 +125,13 @@
       "id": "authorized-preview-subscription-proof",
       "title": "Perform an authorized live Preview subscription-endpoint proof",
       "status": "blocked",
-      "description": "After code is accepted and explicit deployment authority is supplied, deploy source-built personal Preview proxy and agent changes, read back the intended configuration, and make one minimal protected Eve request through the live subscription proxy. The 2026-08-04 successor established encrypted Preview profile storage and a successful private Terra/high subscription SSE proof; the remaining direct Eve session/replay predicate needs a caller-minted Vercel OIDC bearer.",
+      "description": "The authorized Preview stage now proves encrypted profile storage, live Terra/high subscription SSE, protected Eve identity, session completion, and startIndex=0 replay. It remains blocked only on the SPEC-required per-session proxy correlation proving that replay made no second upstream provider call.",
       "implementationNotes": [
         "The 2026-08-04 delegated task supplied scoped Preview mutation authority. Keep Production excluded and stop on any ambiguous target, shared store, cipher, bearer, or protection binding.",
         "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
         "Read back only environment names/safe target values where authorized: proxy high effort, agent Terra model, and 1050000 context. Do not capture secret values.",
         "Use the hardened proof command plus an OIDC-protected Eve request/replay. Correlate safe modelId/reasoningEffort/mode/status/SSE-completed evidence with Vercel logs.",
-        "Do not implement an OIDC workaround in this task. Vercel issues workload identity only in a Vercel function context; an external CLI/API caller and Deployment Protection bypass are not substitutes. A separate reviewed Preview-only in-Vercel proof-caller task is required."
+        "Use `vercel project token` only for the exact linked Preview agent project and `vercel curl` only against the recorded immutable deployment. Do not use a Deployment Protection bypass as application authentication, add a public Eve fallback, or expose a generic caller relay."
       ],
       "mandatoryVerification": [
         "Preview proxy health is live/ready; unauthenticated and invalid bearer checks remain 401; authenticated minimal request returns HTTP 200 text/event-stream with [DONE].",
@@ -150,9 +150,39 @@
         "The missing prerequisite is an isolated Preview Codex stored profile, persistence namespace, and cipher configuration with a usable proof-only Vercel protection path. The task must not copy Production credentials or profile state to satisfy it. See docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json.",
         "The 2026-08-04 authenticated metadata readback found Preview subject/profile/cipher/prefix variables but no Preview-only writable REST store pair accepted by the Effect persistence layer. That metadata-only stop remains historical evidence; see docs/evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json.",
         "Cooper explicitly approved reuse of the existing agent-bound Upstash resource (upstash-kv-apricot-window) for proxy Preview and Production. The proxy uses encrypted KV_REST_API_URL/TOKEN bindings, while Preview and Production retain distinct subject, profile, prefix, cipher, access, deployment, and proof boundaries. See docs/evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json.",
-        "The 2026-08-04 Preview stored-profile proof succeeded with all required encrypted-profile and leak predicates. The source-built proxy deployment dpl_2pnDomby1u7XRoYVsVzah1Nw492u then proved live/ready/high Terra subscription SSE with both 401 controls and no leak. The source-built agent deployment dpl_86QVMipLBHsnLUCHDTFqhR4egJ8E is Ready and targets that immutable proxy. Its session route remains intentionally OIDC-protected; an external bypass request redirects rather than constituting an OIDC proof. See docs/evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json."
+        "The 2026-08-04 Preview stored-profile proof succeeded with all required encrypted-profile and leak predicates. The source-built proxy deployment dpl_2pnDomby1u7XRoYVsVzah1Nw492u then proved live/ready/high Terra subscription SSE with both 401 controls and no leak. The source-built agent deployment dpl_86QVMipLBHsnLUCHDTFqhR4egJ8E is Ready and targets that immutable proxy. Its session route remains intentionally OIDC-protected; an external bypass request redirects rather than constituting an OIDC proof. See docs/evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json.",
+        "The corrected source-built agent deployment dpl_3RbLvhkqACXzuNPMXWoyHfD7PeiP accepted a short-lived Vercel project OIDC token through the Vercel CLI protected-call path. Info reported Terra/1050000, session creation returned 202, and startIndex=0 replay returned 200 with one completed/waiting sequence and no failure. The replay stream correctly remained open after bytes, ending the bounded reader by timeout. The receipt retains no per-session proxy counter, so it cannot independently establish the no-second-upstream-call predicate. See docs/evidence/verification/details/codex-terra-preview-live-eve-2026-08-04.json."
+      ],
+      "acceptedEvidence": [
+        "The Preview proxy proved live/ready/high Terra subscription SSE with authenticated 200 and both 401 controls, while the stored profile remained encrypted and refresh-capable.",
+        "The protected Preview Eve info/session/replay proof reports exact model identity bundjil-codex-proxy/gpt-5.6-terra, context 1050000, session 202, replay 200, message.completed once, session.waiting once, and no failure event.",
+        "The deployed failure was traced to the app-owned OpenAI-compatible base URL omitting /v1. The provider now normalizes the configured origin to /v1, with a focused regression test passing.",
+        "The final repository gate passed with the documented synthetic Executor configuration: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, boundary tests, type-aware lint, lint fixture, Knip, workspace type checks, and workspace tests."
       ],
       "commitAfterPassing": false
+    },
+    {
+      "id": "design-preview-oidc-eve-proof-caller",
+      "title": "Record the optional non-operator OIDC caller design boundary",
+      "status": "completed",
+      "description": "The supported Vercel CLI project-token and protected-curl path is sufficient for the bounded operator Preview proof, so no new caller app is required. Retain this only as a future design gate for non-operator automation.",
+      "implementationNotes": [
+        "Do not implement this unless a non-operator automated caller becomes a product requirement. Before choosing a topology, confirm the installed Eve session/replay request contract, Vercel OIDC request-context token API, and Vercel Trusted Sources configuration/mutation/readback surface.",
+        "The caller must be a distinct app/infrastructure boundary, not an agent route that accepts arbitrary target URLs, prompts, headers, or caller-supplied OIDC. It may target only the recorded immutable Preview agent candidate and fixed bounded proof input.",
+        "Use Effect Schema contracts with Type/Encoded exports at every HTTP/config boundary, a named service with live/mock Layers for the proof invocation, Config.schema with redacted authority material, immediate response decoding, typed tagged failures, and flat sequential Effects. No raw environment access, generic fetch wrapper, manual JSON parser, public string identities, or helper sprawl.",
+        "Define Vercel Trusted Sources as platform access only. It must not replace application OIDC validation, Deployment Protection, the proxy bearer, or Codex profile boundaries. Name expiry, revocation, rollback, and separate Preview/Production scope."
+      ],
+      "mandatoryVerification": [
+        "A reviewed call graph distinguishes caller ingress, Vercel OIDC acquisition, Trusted Sources delivery, Eve OIDC validation, session creation, stream replay from startIndex 0, and safe receipt encoding; it also names the mock/test path.",
+        "Direct negative cases reject external OIDC minting assumptions, missing/invalid OIDC, wrong caller project/environment, untrusted source, mutable/stable alias target, arbitrary prompt/URL relay, and replay that creates a second model call.",
+        "Run the repository-local prd-review and docs-maintainer impact ledger before implementation. Update the target agent/proxy runbooks, authority record, verification journey/packet contracts, and rollback/revocation owner if the reviewed design changes them.",
+        "No Vercel project/function, Trusted Sources rule, Eve authentication change, or external model request was created for this optional design boundary."
+      ],
+      "completionCriteria": [
+        "The bounded operator proof records the exact linked project, immutable deployment, short-lived OIDC token route, and separate protection control without creating a caller application.",
+        "A future non-operator design must prove why the CLI operator path cannot satisfy its requirement before adding a caller."
+      ],
+      "commitAfterPassing": true
     },
     {
       "id": "closeout-and-rollback-readiness",

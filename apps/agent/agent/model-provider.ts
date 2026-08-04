@@ -78,7 +78,7 @@ export const createAgentModel = (
       ({ baseURL, internalToken, model, protectionBypass }) => {
         const provider = createOpenAICompatible({
           apiKey: Redacted.value(internalToken),
-          baseURL: baseURL.toString(),
+          baseURL: new URL("/v1", baseURL).toString(),
           ...(protectionBypass === undefined
             ? {}
             : {

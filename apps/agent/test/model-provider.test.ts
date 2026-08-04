@@ -80,7 +80,7 @@ it.effect(
               env: {
                 BUNDJIL_AGENT_MODEL: "gateway-fixture-model",
                 BUNDJIL_AGENT_MODEL_PROVIDER: "codex-proxy",
-                BUNDJIL_CODEX_PROXY_BASE_URL: "http://127.0.0.1:8787/v1",
+                BUNDJIL_CODEX_PROXY_BASE_URL: "http://127.0.0.1:8787",
                 BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS: "1050000",
                 BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "test-internal-token",
                 BUNDJIL_CODEX_PROXY_MODEL: "gpt-5.6-terra",
@@ -167,7 +167,7 @@ it.effect(
       }
 
       assert.strictEqual(config.model, "gpt-5.6-terra");
-      assert.strictEqual(config.baseURL.href, "http://127.0.0.1:8787/v1");
+      assert.strictEqual(config.baseURL.href, "http://127.0.0.1:8787/");
       assert.strictEqual(config.modelContextWindowTokens, 1_050_000);
       assert.strictEqual(model.modelId, "gpt-5.6-terra");
       assert.strictEqual(model.provider, "bundjil-codex-proxy.chat");

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-live-eve",
+  "observedAt": "2026-08-04T05:36:00Z",
+  "candidate": {
+    "agentDeploymentId": "dpl_3RbLvhkqACXzuNPMXWoyHfD7PeiP",
+    "proxyDeploymentId": "dpl_2pnDomby1u7XRoYVsVzah1Nw492u",
+    "environment": "preview",
+    "sourceMode": "source-built local workspace candidate"
+  },
+  "access": {
+    "agentOidc": "short-lived Vercel project token",
+    "deploymentProtection": "Vercel CLI protected-call path",
+    "publicFallbackAdded": false
+  },
+  "agentProof": {
+    "infoStatus": 200,
+    "modelIdentityTerra": true,
+    "contextWindowTokens": 1050000,
+    "sessionCreateStatus": 202,
+    "streamReplayStatus": 200,
+    "streamExit": "timeout_after_bytes",
+    "eventCounts": {
+      "session.started": 1,
+      "turn.started": 1,
+      "message.received": 1,
+      "step.started": 1,
+      "message.appended": 4,
+      "message.completed": 1,
+      "step.completed": 1,
+      "turn.completed": 1,
+      "session.waiting": 1
+    },
+    "hasCompleted": true,
+    "hasWaiting": true,
+    "hasFailure": false
+  },
+  "relatedProxyProof": {
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json",
+    "modeLive": true,
+    "reasoningEffortHigh": true,
+    "requestedModelTerra": true,
+    "subscriptionSseCompleted": true,
+    "unauthenticatedStatus": 401,
+    "invalidBearerStatus": 401
+  },
+  "remediation": {
+    "issue": "The OpenAI-compatible provider treated the configured proxy origin as an API root and requested /chat/completions.",
+    "fix": "The agent-owned provider now appends its fixed /v1 API root before constructing the model client.",
+    "regressionTest": "The provider test starts from an origin and asserts the resulting request path is /v1/chat/completions."
+  },
+  "limitations": [
+    "The durable stream remained open after session.waiting, so the bounded CLI read ended by timeout after receiving bytes; this is not a failed session.",
+    "The receipt proves one completed session and replay event sequence. It does not retain a per-session proxy request counter, so it does not independently prove the absence of an additional upstream call beyond Eve's replay semantics.",
+    "No Production deployment, profile, request, or channel journey was performed."
+  ],
+  "nonClaims": [
+    "No prompt, response body, raw SSE event, session identifier, bearer, bypass value, OAuth token, profile payload, ciphertext, tool data, or chain-of-thought is retained.",
+    "This does not make Eve public, grant a general external OIDC caller capability, or prove Production."
+  ]
+}

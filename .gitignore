@@ -81,3 +81,5 @@ tmp
 # OpenAPI schemas
 schema.yaml
 schema.json
+.vercel
+.env*

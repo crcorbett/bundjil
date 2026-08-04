@@ -24,10 +24,9 @@ context.
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  implementation is complete; the authorized Preview rollout now uses the
-  existing shared agent Upstash resource with separate Preview profile,
-  prefix, and cipher boundaries. Trusted-local profile and live subscription
-  acceptance remain unproved.
+  Preview is proven with a shared physical Upstash resource and separate
+  Preview profile, prefix, cipher, access, deployment, and proof boundaries.
+  Production remains out of scope.
 
 ## Implemented or superseded history
 

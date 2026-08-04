@@ -13,6 +13,5 @@ Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  repository implementation is complete; the authorized Preview subscription
-  proof uses the existing shared agent Upstash resource with distinct Preview
-  profile/prefix/cipher boundaries; trusted-local profile and live proof remain.
+  final documentation and repository verification are in progress after the
+  accepted Preview subscription and Eve proof; Production remains excluded.

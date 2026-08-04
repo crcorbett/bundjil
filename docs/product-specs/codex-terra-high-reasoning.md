@@ -252,29 +252,18 @@ fresh Preview Eve request (OIDC-protected)
 
 ### OIDC caller decision
 
-Vercel issues workload OIDC tokens only inside a Vercel function request
-context. An external CLI, the Vercel REST API, and a Deployment Protection
-bypass cannot mint or substitute for that bearer. The successful private proxy
-proof therefore does not make the protected Eve session route externally
-callable.
+The Vercel CLI can mint a short-lived development OIDC token for an exact linked
+project with `vercel project token`. `vercel curl` then supplies the separate
+Deployment Protection bypass for an immutable deployment. Together, those
+Vercel-owned controls are sufficient for this bounded Preview operator proof:
+the agent still validates the OIDC bearer, while the bypass is never treated as
+application authentication.
 
-The next implementation may add a Preview-only, in-Vercel proof caller only
-after it has a reviewed design for its own project/function identity and a
-Vercel Trusted Sources rule scoped to the target agent Preview environment.
-It must request the workload token through the Vercel OIDC API at request time,
-send it only to the agent's immutable Preview candidate, and emit a
-schema-encoded receipt containing only status/event counts/model predicates and
-leak booleans. It must not add a public Eve auth fallback, reuse a deployment
-protection bypass as an application bearer, expose an arbitrary URL/prompt
-relay, or use a channel message as a substitute for the direct session/replay
-journey.
-
-Before implementation, verify the installed Eve session request/replay shapes
-and Vercel Trusted Sources configuration surface. The proof caller is a
-separate app/infrastructure boundary and needs its own SPEC task, explicit
-Preview authority, rollback/revocation owner, live/mock Layer design, and
-direct negative tests for wrong target, missing/invalid OIDC, untrusted source,
-and replay duplication.
+This is not a generic external caller capability. The proof may target only the
+recorded immutable Preview agent deployment with a fixed bounded message; it
+must not expose an arbitrary URL, prompt, header, or token relay. A separate
+in-Vercel caller and Vercel Trusted Sources design is only needed if the CLI
+operator proof is unavailable or a non-operator automated caller is required.
 
 ## Migration, rollout, and rollback
 

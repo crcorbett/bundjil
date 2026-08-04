@@ -56,6 +56,9 @@ optional `BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS`. Sendblue configuration
 is owned by the [Sendblue runbook](sendblue.md); do not load it for a journey
 that does not exercise that adapter.
 
+`BUNDJIL_CODEX_PROXY_BASE_URL` is the proxy origin, without `/v1`; the
+app-owned OpenAI-compatible boundary appends its fixed `/v1` API root.
+
 ## Procedure
 
 1. Confirm repository identity and inspect the app boundary:

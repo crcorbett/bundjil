@@ -14,43 +14,29 @@ started: 2026-07-21
 
 ## Current trajectory
 
-Repository implementation is complete. The authorized 2026-08-03 Preview
-rollout deployed both source-built candidates from `f1b11907c29464423ddcb3ffabac6bf9f0694770`,
-set the proxy high-effort and agent Terra/context configuration, and read back
-the protected Eve model identity. The 2026-08-04 metadata-only successors
-recorded that a dedicated Preview resource was unavailable. Cooper then
-explicitly approved use of the agent-bound Upstash resource for proxy
-Preview and Production. Sensitive standard REST metadata now exists on both
-proxy targets.
-
-This removes only the physical-store isolation predicate. Preview and
-Production must still use separate subject, profile, key prefix, cipher,
-access, deployment, and proof boundaries. The next gate is trusted-local
-Preview login plus stored-profile proof, not a paid-plan selection.
+The authorized Preview rollout uses the existing agent-bound Upstash resource
+only for physical storage. Preview and Production retain distinct subject,
+profile, prefix, cipher, access, deployment, and proof boundaries. The
+encrypted Preview profile, live Terra/high subscription SSE, and protected Eve
+session/replay have been proven without a Production action.
 
 ## Current task
 
-Repository tasks 1–3 and 5 are complete. Task
-`authorized-preview-subscription-proof` is active after its authorized
-Preview stage. Perform trusted-local Preview login and stored-profile proof
-against the approved shared store before any deployment or live request; see
-the dated packets.
-
-The stored-profile and proxy phases have now passed. The remaining Eve
-session/replay phase is blocked on a caller-minted Vercel OIDC bearer. Official
-Vercel OIDC is workload identity available only inside a Vercel function
-request context; the external Vercel API and Deployment Protection bypass are
-not equivalent. Do not weaken Eve auth. A separate, reviewed Preview-only
-in-Vercel proof caller with exact Trusted Sources scope is the next design
-task before this plan can resume live session proof.
+Task `authorized-preview-subscription-proof` is now blocked only on the
+SPEC-required per-session proxy correlation. Vercel's short-lived project OIDC
+token plus CLI protected-call path reached the immutable Preview agent without
+weakening Eve auth. The direct session completed and its durable replay reached
+waiting, but the retained receipt has no per-session proxy request counter to
+independently prove replay did not trigger a second upstream call. Production
+remains out of scope.
 
 ## Evidence record
 
-| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve model/context selection.                                                                                                 |
-| Implementation quality   | Tasks 1–3 use schema-derived Type/Encoded contracts, named policy/config services, typed errors, and explicit live/local/test Layers. Proxy configuration is decoded solely in `apps/codex-proxy/src/env.ts`; a fallback provider preserves absent-key `low` without masking invalid input.                                                                       |
-| Verification coverage    | Tasks 1–5 retain their focused/local gates. The current source-built Preview proxy is Ready and its bounded private proof establishes `live`/ready/high, Terra request mapping, both `401` controls, completed subscription SSE, and leak predicates. The current agent is also Ready and targets that immutable proxy; its external Eve session/replay proof remains blocked on a caller-minted Vercel OIDC bearer, which a protection bypass must not replace. |
+| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve model/context selection.                                                                                             |
+| Implementation quality   | Tasks 1–3 use schema-derived Type/Encoded contracts, named policy/config services, typed errors, and explicit live/local/test Layers. Proxy configuration is decoded solely in `apps/codex-proxy/src/env.ts`; a fallback provider preserves absent-key `low` without masking invalid input.                                                                   |
+| Verification coverage    | The source-built Preview proxy proves `live`/ready/high, Terra mapping, both `401` controls, completed subscription SSE, and leak predicates. The corrected source-built agent proves protected Terra/1050000 info, session `202`, and `startIndex=0` replay through completion/waiting without failure. Only per-session proxy correlation remains unproved. |
 
 ## Downstream-impact ledger
 
@@ -113,31 +99,26 @@ or Eve replay.
    checks are rerun at closeout; live subscription SSE and Eve replay remain
    explicit blocked predicates, not inferred coverage.
 
-## Deferred external work
+## Remaining external work
 
-- The shared REST binding is the only provider configuration mutation in the
-  successor attempt; no Deployment, OAuth profile, proxy request, or
-  Production runtime action has followed it.
-- Task `authorized-preview-subscription-proof` is active and gated on
-  trusted-local Preview profile proof, then protected Preview proxy SSE and
-  Eve replay. Physical database separation and a paid plan are no longer
-  predicates under the explicit shared-store decision.
+- Add a reviewed, safe per-session correlation between an Eve session and the
+  proxy completion boundary, then rerun the bounded replay proof. Do not log
+  prompts, responses, tokens, tool data, or reasoning to satisfy this gate.
+- Production is excluded. Do not promote, rotate the accepted Preview profile,
+  or change channel ingress as part of the correlation work.
 
 ## 2026-08-04 terminal audit
 
-1. **Ownership and call graph.** The stop remains at the Vercel persistence
-   boundary. `@bundjil/codex` still accepts only the decoded writable REST
-   configuration; no app, service, Layer, provider route, or deployment was
-   changed to work around it.
-2. **Implementation quality.** This update is evidence-only. The new packet
-   and detail use the existing verified JSON contracts, retain opaque project
-   and deployment identities only, and omit values, credentials, profile
-   material, payloads, and protected endpoints. No helper, wrapper, raw
-   configuration access, schema bypass, lint exception, or UI change was
-   introduced.
-3. **Verification coverage.** `bun run verification` passed after the prior receipt
-   and documentation updates. It validates the Effect language-service,
-   boundaries, docs, skills, authority, controls, proof-packet contract,
-   harness inventory, lint, Knip, type checks, and tests. It does not make the
-   blocked external predicates pass: trusted-local
-   profile proof, protected live SSE, and Eve replay remain separately required.
+1. **Ownership and call graph.** The app-owned provider turns its configured
+   proxy origin into the fixed `/v1` API root; the proxy still owns its
+   OpenAI-compatible route and `@bundjil/codex` owns Responses mapping. No
+   authentication, channel, profile, or Production boundary moved.
+2. **Implementation quality.** The fix is a single provider-boundary URL
+   normalization plus a focused test from an origin input. Evidence retains
+   only opaque deployment IDs, statuses, event counts, and booleans; it omits
+   values, credentials, profiles, payloads, session IDs, and reasoning.
+3. **Verification coverage.** The complete `bun run verification` contract
+   passes with the documented synthetic Executor configuration. The new receipt
+   proves protected Preview info/session/replay, while the prior proxy receipt
+   proves subscription SSE/high. The missing per-session proxy counter remains
+   blocked rather than inferred from replay semantics.

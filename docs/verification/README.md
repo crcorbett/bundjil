@@ -190,8 +190,14 @@ operation nor asserts present provider state.
 - [`codex-terra-preview-live-proxy-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json)
   retains the successful Preview stored-profile and private proxy proof: the
   subscription request mapped Terra/high and completed a bounded SSE stream.
-  The Ready Eve deployment has no externally minted Vercel OIDC caller proof,
-  so this does not claim an Eve session/replay or Production result.
+  It is superseded only for its former Eve-session limitation by the later
+  dedicated Eve receipt; it remains the proxy/profile proof owner.
+- [`codex-terra-preview-live-eve-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-eve-2026-08-04.json)
+  records the protected Preview Eve info, session acceptance, and
+  `startIndex=0` durable replay using Vercel's short-lived project OIDC token
+  and CLI protection path. It retains event counts and status only; it does
+  not claim Production, channel delivery, a public Eve route, or general
+  external caller capability.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue
