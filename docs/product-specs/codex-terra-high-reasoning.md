@@ -326,7 +326,7 @@ metadata, but returns AI SDK telemetry runtime context; the OpenAI-compatible
 provider receives static provider headers plus Eve-owned per-call headers.
 Stream hooks are post-durable and observe-only.
 
-The preferred supported join is Vercel OpenTelemetry, not a new proxy store:
+The initially preferred join was Vercel OpenTelemetry, not a new proxy store:
 
 ```text
 Eve step.started
@@ -349,13 +349,19 @@ before replay, and an unchanged count after replay. It must not retain raw
 session or turn identifiers, headers, requests, responses, prompts, tokens,
 tool values, reasoning, or exported trace data.
 
-Do not bridge the gap with a process-global value, `AsyncLocalStorage`, an
-unreviewed custom LanguageModel wrapper, a static proof header, or a proxy
-counter keyed only by a time window. Those mechanisms either fail under
-concurrent/replayed Vercel workflow execution or prove a weaker unrelated
-claim. Vercel trace sampling, `traceparent` propagation, and the proxy's
-incoming-context continuation must each be tested locally and read back from
-the exact Preview deployment before this replaces the blocked predicate.
+The 2026-08-04 Preview readback falsified this approach as a complete proof:
+the CLI trace captured admission and Workflow enqueue, but Eve's durable worker
+invocation had no retrievable Vercel trace identifier. It therefore did not
+include the model/proxy span. Do not retry this mechanism or treat queue
+activity, timing, or an admission trace as model-call evidence. A replacement
+must create a reviewed application-owned opaque correlation boundary between
+the worker model call and proxy completion before it can replace the blocked
+predicate.
+
+Do not bridge the replacement with a process-global value,
+`AsyncLocalStorage`, a static proof header, or a proxy counter keyed only by a
+time window. Those mechanisms either fail under concurrent/replayed Vercel
+workflow execution or prove a weaker unrelated claim.
 
 The installed Eve source is the version-matched authority for the direct
 transport limitation. Executor Personal DeepWiki was first attempted against
