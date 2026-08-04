@@ -211,10 +211,25 @@ const routeFor = <E>(
 };
 
 const session = {
+  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
   continuationToken: "sendblue:test",
   getEventStream: () => Promise.resolve(new ReadableStream()),
+  getStreamTailIndex: () => Promise.resolve(-1),
   id: "session-test",
 } satisfies Session;
+
+const routeControls = {
+  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
+  clear: () => Promise.resolve({ status: "no_active_session" as const }),
+  compact: () => Promise.resolve({ status: "no_active_session" as const }),
+  reset: () => Promise.resolve({ status: "no_active_session" as const }),
+  resolveActiveSession: (): ReturnType<
+    RouteHandlerArgs<ChannelMutableAdapterStateEncoded>["resolveActiveSession"]
+  > => Promise.resolve<undefined>(globalThis.undefined),
+} satisfies Pick<
+  RouteHandlerArgs<ChannelMutableAdapterStateEncoded>,
+  "cancel" | "clear" | "compact" | "reset" | "resolveActiveSession"
+>;
 
 const request = () =>
   new Request("https://agent.test/eve/v1/sendblue/webhook", {
@@ -271,6 +286,7 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
         sends += 1;
         return Promise.resolve(session);
       },
+      ...routeControls,
       waitUntil: (task) => {
         waitUntilRegistrations += 1;
         void task;
@@ -342,6 +358,7 @@ it.effect(
             )
           );
         },
+        ...routeControls,
         waitUntil: () => {
           waitUntilRegistrations += 1;
         },
@@ -432,6 +449,7 @@ it.effect(
         receive: () => Promise.resolve(session),
         requestIp: null,
         send: () => Promise.resolve(session),
+        ...routeControls,
         waitUntil: () => {},
       } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
       const resumedResponse = yield* Effect.promise(() =>
@@ -507,6 +525,7 @@ it.effect("returns no 202 for rejected or defective pre-response handoff", () =>
           typedFailureSends += 1;
           return Promise.reject(new Error("synthetic send rejection"));
         },
+        ...routeControls,
         waitUntil: () => {
           typedFailureWaitUntilRegistrations += 1;
         },
@@ -544,6 +563,7 @@ it.effect("returns no 202 for rejected or defective pre-response handoff", () =>
           defectSends += 1;
           return Promise.resolve(session);
         },
+        ...routeControls,
         waitUntil: () => {
           defectWaitUntilRegistrations += 1;
         },
@@ -594,6 +614,7 @@ it.effect(
           sends += 1;
           return runPromise(Deferred.await(pending));
         },
+        ...routeControls,
         waitUntil: () => {
           waitUntilRegistrations += 1;
         },
@@ -655,6 +676,7 @@ it.effect(
               sends += 1;
               return Promise.resolve(session);
             },
+            ...routeControls,
             waitUntil: () => {
               waitUntilRegistrations += 1;
             },
@@ -716,6 +738,7 @@ it.effect(
                   sends += 1;
                   return Promise.resolve(session);
                 },
+                ...routeControls,
                 waitUntil: () => {
                   waitUntilRegistrations += 1;
                 },
@@ -780,6 +803,7 @@ it.effect("returns 503 when routing fails before dispatch", () =>
       receive: () => Promise.resolve(session),
       requestIp: null,
       send: () => Promise.resolve(session),
+      ...routeControls,
       waitUntil: () => {},
     } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
 

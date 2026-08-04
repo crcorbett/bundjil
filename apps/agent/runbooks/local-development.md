@@ -58,6 +58,9 @@ that does not exercise that adapter.
 
 `BUNDJIL_CODEX_PROXY_BASE_URL` is the proxy origin, without `/v1`; the
 app-owned OpenAI-compatible boundary appends its fixed `/v1` API root.
+Set `EVE_TRACES_CONTENT=off` when exercising local trace or replay evidence so
+Eve does not capture trace content. This setting is privacy configuration, not
+model or authentication configuration.
 
 ## Procedure
 

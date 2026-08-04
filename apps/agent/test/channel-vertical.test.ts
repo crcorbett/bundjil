@@ -135,8 +135,10 @@ const makeObservedRuntime = <R, E>(
   );
 
 const makeSession = (): Session => ({
+  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
   continuationToken: "channel:v1:photon:conversation-1",
   getEventStream: () => Promise.resolve(new ReadableStream()),
+  getStreamTailIndex: () => Promise.resolve(-1),
   id: "session-1",
 });
 
@@ -144,10 +146,17 @@ const makeRouteArgs = (
   send: RouteHandlerArgs<ChannelAdapterStateEncoded>["send"],
   waitUntil: RouteHandlerArgs<ChannelAdapterStateEncoded>["waitUntil"]
 ): RouteHandlerArgs<ChannelAdapterStateEncoded> => ({
+  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
+  clear: () => Promise.resolve({ status: "no_active_session" as const }),
+  compact: () => Promise.resolve({ status: "no_active_session" as const }),
   getSession: makeSession,
   params: {},
   receive: () => Promise.resolve(makeSession()),
+  reset: () => Promise.resolve({ status: "no_active_session" as const }),
   requestIp: null,
+  resolveActiveSession: (): ReturnType<
+    RouteHandlerArgs<ChannelAdapterStateEncoded>["resolveActiveSession"]
+  > => Promise.resolve<undefined>(globalThis.undefined),
   send,
   waitUntil,
 });

@@ -118,13 +118,19 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Missing function detail, project setting, plan, candidate deployment, or
    measurement makes the packet inconclusive.
 
-   Eve `0.20.0` directly creates Nitro and exposes no Bundjil-facing
+   Eve `0.29.5` directly creates Nitro and exposes no Bundjil-facing
    `vercel.functions` input. Preserve the generated Workflow flow's
    `maxDuration: "max"` and queue trigger. Do not use the Sandbox idle timeout
    as a function value, guess a `vercel.json` glob for generated `__server`,
    patch `.vercel/output`, or treat local Build Output as hosted readback. If
    an ordinary-function override becomes necessary, stop until a supported
    Eve/Nitro seam or separately pinned upstream change exists.
+
+   For the Preview replay-proof stage, require the encrypted
+   `EVE_TRACES_CONTENT=off` binding and read back the exact team's Agent Runs
+   and framework-owned `$eve.*` Workflow-tag surface. This is observability
+   evidence only; it does not authorize a deployment or replace the protected
+   agent/proxy request proof.
 
 4. For the current stage, set `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT` through
    the approved secret/environment mechanism and run:

@@ -10,7 +10,7 @@ const installedEveDirectory = new URL("node_modules/eve/", repositoryDirectory);
 
 const AgentPackage = Schema.Struct({
   dependencies: Schema.Struct({
-    eve: Schema.Literal("0.20.0"),
+    eve: Schema.Literal("0.29.5"),
   }),
 });
 
@@ -19,7 +19,7 @@ const InstalledEvePackage = Schema.Struct({
     nitro: Schema.Literal("3.0.260610-beta"),
   }),
   name: Schema.Literal("eve"),
-  version: Schema.Literal("0.20.0"),
+  version: Schema.Literal("0.29.5"),
 });
 
 const VercelConfig = Schema.Struct({
@@ -45,7 +45,7 @@ const BuildRoute = Schema.Struct({
 const BuildOutputConfig = Schema.Struct({
   framework: Schema.Struct({
     name: Schema.Literal("nitro"),
-    version: Schema.Literal("0.20.0"),
+    version: Schema.Literal("0.29.5"),
   }),
   routes: Schema.Array(BuildRoute),
   version: Schema.Literal(3),
@@ -88,12 +88,11 @@ describe("Vercel packaging", () => {
       )
     );
 
-    expect(packageConfig.dependencies.eve).toBe("0.20.0");
-    expect(lock).toContain(
-      '"eve": ["eve@0.20.0", "", { "dependencies": { "nitro": "3.0.260610-beta" }'
-    );
+    expect(packageConfig.dependencies.eve).toBe("0.29.5");
+    expect(lock).toContain('"eve": ["eve@0.29.5"');
+    expect(lock).toContain('"undici": "8.9.0"');
     expect(installedPackage.name).toBe("eve");
-    expect(installedPackage.version).toBe("0.20.0");
+    expect(installedPackage.version).toBe("0.29.5");
     expect(installedPackage.dependencies.nitro).toBe("3.0.260610-beta");
   });
 
@@ -115,12 +114,10 @@ describe("Vercel packaging", () => {
       "utf-8"
     );
 
-    expect(sendSource).toContain("await t.deliver");
-    expect(sendSource).toContain("await t.run");
-    expect(sendSource).toContain("isRuntimeNoActiveSessionError(e)||log.warn");
-    expect(sendSource).toContain(
-      "deliver failed, falling back to starting a new session"
-    );
+    expect(sendSource).toContain(".deliver(");
+    expect(sendSource).toContain(".run(");
+    expect(sendSource).toContain("isRuntimeNoActiveSessionError(e)");
+    expect(sendSource).toContain("Cannot deliver inputResponses");
     expect(workflowRuntimeSource).toContain(
       "await resumeHook(e.continuationToken"
     );
@@ -130,9 +127,8 @@ describe("Vercel packaging", () => {
     expect(workflowRuntimeSource).toContain(
       "await startWorkflowPreferLatest(workflowEntryReference"
     );
-    expect(workflowEntrySource).toContain(
-      'async function workflowEntry(n){"use workflow"'
-    );
+    expect(workflowEntrySource).toContain("async function workflowEntry(");
+    expect(workflowEntrySource).toContain('"use workflow"');
     expect(workflowEntrySource).toContain("dispatchAndAwaitTurn");
     expect(workflowStepsSource).toContain(
       "await startWorkflowPreferLatest(turnWorkflowReference"
@@ -171,9 +167,12 @@ describe("Vercel packaging", () => {
     expect(turbo.tasks["@bundjil/agent#build"].env).toContain(
       "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"
     );
+    expect(turbo.tasks["@bundjil/agent#build"].env).toContain(
+      "EVE_TRACES_CONTENT"
+    );
     expect(applicationBuilder).toContain("vercel:createEveVercelOptions");
     expect(vercelOptions).toContain(
-      "function createEveVercelOptions(e){if(e)return{config:"
+      "function createEveVercelOptions(e){if(!e.enabled)return"
     );
     expect(vercelOptions).not.toContain("functions:");
   });

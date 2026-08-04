@@ -326,6 +326,15 @@ metadata, but returns AI SDK telemetry runtime context; the OpenAI-compatible
 provider receives static provider headers plus Eve-owned per-call headers.
 Stream hooks are post-durable and observe-only.
 
+### Eve upgrade and evidence boundary
+
+Upgrade the agent from Eve `0.20.0` to `0.29.5` and align `ai` with its
+required `^7.0.38` peer range before another hosted proof. This does not add a
+dynamic per-session proxy-header API: `runtimeContext` remains span metadata,
+not transport metadata. It does add the supported Vercel evidence surface that
+the installed version lacks: framework-owned Workflow run tags and the
+team-gated Agent Runs view.
+
 The initially preferred join was Vercel OpenTelemetry, not a new proxy store:
 
 ```text
@@ -340,13 +349,12 @@ Eve step.started
 The agent instrumentation must set `recordInputs: false` and
 `recordOutputs: false`, use `@vercel/otel` with propagation restricted to the
 configured private proxy origin, and create no third-party trace drain or
-exporter. The proxy
-must continue the inbound W3C context at its Vercel HTTP boundary and create
-only a named completion span with the existing safe model/effort/mode/status/
-SSE attributes. The proof operator may inspect the one bounded Preview trace,
-then retain only an opaque trace fingerprint, a model-attempt count of one
-before replay, and an unchanged count after replay. It must not retain raw
-session or turn identifiers, headers, requests, responses, prompts, tokens,
+exporter. The proxy may continue the inbound W3C context at its Vercel HTTP
+boundary and create only a named completion span with the existing safe
+model/effort/mode/status/SSE attributes. These spans remain restricted
+observability and may not be used as the replay oracle; the hosted proof uses
+the Eve Agent Runs/Workflow-tag surface instead. The operator must not retain
+raw session or turn identifiers, headers, requests, responses, prompts, tokens,
 tool values, reasoning, or exported trace data.
 
 The 2026-08-04 Preview readback falsified this approach as a complete proof:
@@ -354,14 +362,25 @@ the CLI trace captured admission and Workflow enqueue, but Eve's durable worker
 invocation had no retrievable Vercel trace identifier. It therefore did not
 include the model/proxy span. Do not retry this mechanism or treat queue
 activity, timing, or an admission trace as model-call evidence. A replacement
-must create a reviewed application-owned opaque correlation boundary between
-the worker model call and proxy completion before it can replace the blocked
-predicate.
+must instead prove that the exact Preview team exposes Agent Runs and the
+framework-owned `$eve.*` Workflow tags for the worker run. If that surface is
+unavailable, incomplete, or cannot show the model-attempt count before and
+after replay, record `blocked`; do not replace it with a counter or inferred
+trace relationship.
 
 Do not bridge the replacement with a process-global value,
 `AsyncLocalStorage`, a static proof header, or a proxy counter keyed only by a
 time window. Those mechanisms either fail under concurrent/replayed Vercel
 workflow execution or prove a weaker unrelated claim.
+
+The receipt may retain only: Eve/AI SDK versions, immutable Preview deployment
+IDs, an opaque Agent Run or Workflow-run fingerprint, Agent Runs availability,
+the safe `$eve.type`, `$eve.model`, and parent/root relationship predicates,
+the model-attempt count before/after replay, completed/waiting predicates, and
+the known Terra/high configuration predicates. It must not retain raw tags,
+session/turn/run IDs, titles, prompts, responses, reasoning, tool payloads,
+token counts, trace payloads, headers, or screenshots. Set
+`EVE_TRACES_CONTENT=off`; no third-party exporter or trace drain is permitted.
 
 The installed Eve source is the version-matched authority for the direct
 transport limitation. Executor Personal DeepWiki was first attempted against
@@ -369,8 +388,9 @@ the stale `vercel-labs/eve` repository name and could not index it; the
 corrected `vercel/eve` investigation confirms the framework's native telemetry
 runtime context and durable replay model. Vercel's current tracing guidance
 confirms `@vercel/otel` W3C fetch propagation and manual inbound extraction for
-non-Next.js handlers. Re-open the implementation only after the exact package
-types and local trace proof confirm the proposed adapter surface.
+non-Next.js handlers. The upgraded local package and Build Output checks must
+confirm the versioned Eve ownership signals before the hosted Agent Runs proof
+is attempted.
 
 Extend the Preview proof command/contract so that it uses the target
 `gpt-5.6-terra` request and reports only sanitized target assertions such as
@@ -444,8 +464,12 @@ or an Eve journey.
 - `apps/codex-proxy/scripts/prove-preview.ts`, `smoke-test.ts`, handler and
   Preview-proof tests: target and compatibility fixtures; safe proof result.
 - `apps/agent/agent/config.ts`, `model-provider.ts`, model-provider tests,
-  `turbo.json`, and Vercel agent variable ownership: target model identity,
-  1,050,000 context window, and build-env allowlist.
+  `instrumentation.ts`, `package.json`, `turbo.json`, and Vercel agent
+  variable ownership: Eve/AI SDK versions, target model identity, 1,050,000
+  context window, trace-content setting, and build-env allowlist.
+- `package.json`, `bun.lock`, `apps/agent/test/vercel-packaging.test.ts`, and
+  `apps/agent/test/sendblue-build-route.test.ts`: lock-resolved Eve ownership
+  and version-tolerant Build Output assertions.
 - `packages/codex` and proxy tests/fixtures, including direct-provider,
   refresh-capable, response-proof, and handler fixtures that intentionally
   assert an old model. Retain old-value fixtures only where they prove
@@ -499,21 +523,27 @@ or an Eve journey.
    `model: "gpt-5.6-terra"` and `reasoning.effort: "high"` for the target.
 4. Tests prove low-default compatibility, high-target mapping, invalid config,
    Layer composition, exact request encoding, immediate provider-response
-   decoding, no token/body leak, and Eve's exact expected identity.
-5. The new model env is present in the `@bundjil/agent#build` Turbo contract;
-   Preview uses model `gpt-5.6-terra`, context `1050000`, and proxy high
-   effort. All changes have source-built, read-back deployment evidence.
+   decoding, no token/body leak, and the lock-resolved Eve `0.29.5` package
+   plus its generated route/workflow ownership.
+5. The new model env and `EVE_TRACES_CONTENT` are present in the
+   `@bundjil/agent#build` Turbo contract; Preview uses model `gpt-5.6-terra`,
+   context `1050000`, and proxy high effort. All changes have source-built,
+   read-back deployment evidence.
 6. An authorized real Preview request through `bundjil-codex-proxy` in `live`
    mode emits safe high/model/status evidence, receives complete SSE from the
    subscription endpoint, and a protected Eve request reports exactly
    `bundjil-codex-proxy/gpt-5.6-terra`. No credentials, prompts, bodies,
    tokens, account ids, tool data, or chain-of-thought are retained.
-7. Each implementation task records the ownership/call-graph,
+7. Agent Runs and `$eve.*` Workflow tags for the exact Preview worker show one
+   completed model attempt before `startIndex=0` replay and the same attempt
+   count afterwards. If the exact team's surface or count is unavailable, the
+   task remains `blocked`; CLI admission traces and timing are non-claims.
+8. Each implementation task records the ownership/call-graph,
    implementation-quality, and verification-coverage lenses, including flat
    Effect control flow, typed `.pipe(...)` error handling, schema ownership,
    Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
    boundary policy results.
-8. The implementation runs focused tests, Effect language-server diagnostics,
+9. The implementation runs focused tests, Effect language-server diagnostics,
    `bun run check:boundaries`, `bun run check:effect-setup`,
    `bun run check:skills`, and `bun run verification`; all required docs,
    runbooks, environment samples, proof artifacts, and rollout/rollback notes

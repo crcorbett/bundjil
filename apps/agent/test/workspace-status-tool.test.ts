@@ -26,6 +26,7 @@ const unusedToolContext: ToolContext = {
   },
   abortSignal: new AbortController().signal,
   callId: "test-call",
+  toolName: "workspace_status",
   getSandbox: () => Promise.reject(new Error("Sandbox is not used.")),
   getSkill: () => {
     throw new Error("Skills are not used.");

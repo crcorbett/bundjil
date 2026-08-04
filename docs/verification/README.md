@@ -198,8 +198,8 @@ operation nor asserts present provider state.
   and CLI protection path. It retains event counts and status only; it does
   not claim Production, channel delivery, a public Eve route, general external
   caller capability, or that replay made no second upstream call. The current
-  SPEC defines the still-unproven native Vercel OpenTelemetry correlation
-  required for that separate claim.
+  SPEC now requires an Eve `0.29.5` Agent Runs/Workflow-tag proof for that
+  separate claim; the older CLI OpenTelemetry attempt remains negative evidence.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

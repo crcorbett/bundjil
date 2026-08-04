@@ -5,10 +5,6 @@ import { Schema } from "effect";
 import { describe, it } from "vitest";
 
 const outputFile = new URL("../.output/server/index.mjs", import.meta.url);
-const eveOutputFile = new URL(
-  "../.output/server/_libs/eve.mjs",
-  import.meta.url
-);
 const compiledManifestFile = new URL(
   "../.eve/compile/compiled-agent-manifest.json",
   import.meta.url
@@ -39,14 +35,13 @@ const TracedPackage = Schema.Struct({
 describe("Channel build routes", () => {
   it("builds both webhooks at their public absolute routes", async () => {
     const output = await readFile(outputFile, "utf-8");
-    const eveOutput = await readFile(eveOutputFile, "utf-8");
     assert.include(output, 'route: "/eve/v1/sendblue/webhook"');
     assert.include(output, 'route: "/eve/v1/photon/webhook"');
     assert.notInclude(output, 'route: "/webhook"');
-    assert.include(eveOutput, "Channel.prepareInbound");
-    assert.include(eveOutput, "SendblueTransport.sendMessage");
-    assert.include(eveOutput, "PhotonTransport.sendMessage");
-    assert.include(eveOutput, "ChannelReplay.claimInbound");
+    assert.include(output, "Channel.prepareInbound");
+    assert.include(output, "SendblueTransport.sendMessage");
+    assert.include(output, "PhotonTransport.sendMessage");
+    assert.include(output, "ChannelReplay.claimInbound");
   });
 
   it("traces every dynamically resolved Photon gRPC runtime package", async () => {

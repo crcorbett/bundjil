@@ -20,43 +20,43 @@ profile, prefix, cipher, access, deployment, and proof boundaries. The
 encrypted Preview profile, live Terra/high subscription SSE, and protected Eve
 session/replay have been proven without a Production action.
 
+The agent now targets Eve `0.29.5` with AI SDK `^7.0.38` and keeps
+`EVE_TRACES_CONTENT=off` as the Preview privacy requirement. The existing
+OpenTelemetry hooks remain restricted observability; the replay oracle is the
+framework-owned Agent Runs/Workflow-tag surface.
+
 ## Current task
 
-Task `authorized-preview-subscription-proof` is now blocked only on the
-SPEC-required per-session proxy correlation. Vercel's short-lived project OIDC
-token plus CLI protected-call path reached the immutable Preview agent without
-weakening Eve auth. The direct session completed and its durable replay reached
-waiting, but the retained receipt has no per-session proxy request counter to
-independently prove replay did not trigger a second upstream call. A
-version-matched review of installed Eve `0.20.0` found no supported
-session/turn-derived model transport header resolver: its instrumentation
-runtime context is telemetry-only and hooks are post-durable, observe-only
-callbacks. The reviewed replacement candidate is the native Vercel
-OpenTelemetry trace chain, with W3C propagation restricted to the private
-proxy and inbound context continuation at its HTTP boundary. Process-global,
-async-local, wrapper, static-header, and time-window substitutes are rejected.
+Task `authorized-preview-subscription-proof` remains open on the hosted
+per-session proxy correlation. Eve `0.29.5` is installed and the local agent
+Build Output/package checks pass after updating the AI SDK peer range. The
+short-lived project OIDC protected-call path remains the session entry point;
+the hosted proof must now read the exact Preview team's Agent Runs and
+framework-owned `$eve.*` Workflow tags to show one model attempt before replay
+and an unchanged count after `startIndex=0`. Process-global, async-local,
+wrapper, static-header, time-window, and CLI-trace substitutes remain rejected.
 Production remains out of scope.
 
 ## Evidence record
 
-| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve model/context selection.                                                                                             |
-| Implementation quality   | Tasks 1–3 use schema-derived Type/Encoded contracts, named policy/config services, typed errors, and explicit live/local/test Layers. Proxy configuration is decoded solely in `apps/codex-proxy/src/env.ts`; a fallback provider preserves absent-key `low` without masking invalid input.                                                                   |
-| Verification coverage    | The source-built Preview proxy proves `live`/ready/high, Terra mapping, both `401` controls, completed subscription SSE, and leak predicates. The corrected source-built agent proves protected Terra/1050000 info, session `202`, and `startIndex=0` replay through completion/waiting without failure. Only per-session proxy correlation remains unproved. |
+| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve `0.29.5` model/context selection, instrumentation, and the protected session entry point.         |
+| Implementation quality   | The upgrade keeps the existing Effect/schema/provider boundaries unchanged, aligns the AI SDK peer range, keeps `recordInputs`/`recordOutputs` disabled, and adds only the Turbo build-environment contract for `EVE_TRACES_CONTENT`. Packaging assertions now target stable ownership signals rather than minifier-specific bundle paths. |
+| Verification coverage    | Local agent build/package tests pass with the upgraded Eve line. Existing Preview receipts prove proxy high/Terra and protected Eve info/session/replay, but the hosted Agent Runs model-attempt count before/after replay remains unproved.                                                                                               |
 
 ## Downstream-impact ledger
 
-| Surface                                       | Status          | Reason                                                                                                                                                        |
-| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture/product docs                     | Change required | The SPEC/task state now records the installed-Eve API limit and forbids unsafe substitutes. Retain historical gpt-5.5 labels.                                 |
-| Root, package, and app READMEs/runbooks       | Preserve        | No executable proxy/agent or operator procedure changed. Existing README/runbook owners already route this proof; none may claim an unsupported correlation.  |
-| `AGENTS.md` and skills                        | Preserve        | Existing Effect/provider and helper-admission rules reject an unowned bridge or wrapper; no instruction conflict was found.                                   |
-| Schemas, types, services, Layers, exports     | Change required | The trace continuation/config boundary must use owning schemas and named Vercel/Effect adapter operations; it may not leak a raw OTel client.                 |
-| Lint, diagnostics, boundary rules, CI/scripts | Change required | Add focused trace propagation and no-input/output-export tests. Existing rules must reject raw configuration and client escape hatches.                       |
-| Tests, fixtures, HTTP/provider evidence       | Change required | Prove local W3C propagation and one completion span; Preview proof then compares one model attempt before replay with the unchanged trace count after replay. |
-| Observability, rollout, migration, rollback   | Change required | Define restricted propagation, no third-party drain/exporter, CLI trace readback, sanitized receipt, halt/revocation, and no-Production boundary.             |
-| SPEC, task ledger, active-plan index          | Change required | These current owners record the investigation outcome and future admission predicate.                                                                         |
+| Surface                                       | Status          | Reason                                                                                                                                           |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Architecture/product docs                     | Change required | The SPEC/task state now records the installed-Eve API limit and forbids unsafe substitutes. Retain historical gpt-5.5 labels.                    |
+| Root, package, and app READMEs/runbooks       | Change required | Eve version, the Preview trace-content setting, and the Agent Runs proof route changed; app and deployment owners now carry the current pointer. |
+| `AGENTS.md` and skills                        | Preserve        | Existing Effect/provider and helper-admission rules reject an unowned bridge or wrapper; no instruction conflict was found.                      |
+| Schemas, types, services, Layers, exports     | Preserve        | Eve remains a framework boundary; no new service, raw client, schema, or adapter was introduced by the version upgrade.                          |
+| Lint, diagnostics, boundary rules, CI/scripts | Change required | The Turbo build contract and version-aware packaging assertions changed; existing Effect and boundary controls remain applicable.                |
+| Tests, fixtures, HTTP/provider evidence       | Change required | Packaging tests now match the current Eve bundle shape; hosted proof must use Agent Runs/Workflow tags rather than CLI trace counts.             |
+| Observability, rollout, migration, rollback   | Change required | `EVE_TRACES_CONTENT=off`, the framework-owned Agent Runs readback, and the old CLI-trace non-claim are now explicit.                             |
+| SPEC, task ledger, active-plan index          | Change required | These current owners record the investigation outcome and future admission predicate.                                                            |
 
 ## Preview receipts
 
@@ -85,34 +85,46 @@ records the approved sensitive REST binding and its metadata readback. It
 does not prove reachability, OAuth, an encrypted profile, a deployment, SSE,
 or Eve replay.
 
-## Terminal audit
+## Implementation-slice audit
 
-1. **Ownership and call graph.** This slice changes only evidence owners: the
-   product SPEC and task ledger own the target and lifecycle, the active plan
-   owns execution status, and the verification packet/detail own dated
-   provider observation. No provider, Effect service, Layer, schema, request
-   mapper, app route, or component ownership moved.
-2. **Implementation quality.** No TypeScript implementation changed. The
-   retained JSON is schema-validated by the existing verification gate, uses
-   opaque deployment IDs and safe enum/status fields, and deliberately omits
-   variable values, endpoints, bearer material, profiles, prompts, bodies,
-   responses, tool data, and reasoning. There is no new helper, wrapper,
-   manual codec, unsafe cast, raw configuration read, or lint exception.
-3. **Verification coverage.** Vercel readback proves source-built Preview
-   candidates, high configuration, and the protected Eve model/context. The
-   proxy health/readiness and bounded probe prove the stop before upstream
-   completion. Repository documentation, authority, control, verification,
-   Effect setup, boundary, focused package, build, smoke, agent, and harness
-   checks are rerun at closeout; live subscription SSE and Eve replay remain
-   explicit blocked predicates, not inferred coverage.
+1. **Ownership and call graph.** Eve remains the framework-owned runtime;
+   `apps/agent` owns its dependency/build contract and test fixtures, while
+   `apps/codex-proxy` and `@bundjil/codex` remain unchanged provider owners.
+   The package, lockfile, Turbo allowlist, agent runbooks, SPEC, task ledger,
+   and active plan are the affected durable owners. No service, Layer, schema,
+   route, provider client, or Production ownership moved.
+2. **Effect/config/schema/error boundary.** No runtime adapter or provider
+   boundary was widened. The upgrade is dependency and framework-contract
+   work only; typed tests now satisfy Eve's `Session`, `RouteHandlerArgs`, and
+   `ToolContext` requirements without casts, raw SDK clients, manual codecs,
+   or helper abstractions in production code. Existing Effect language-service,
+   boundary, and policy checks remain the applicable controls.
+3. **Async SSE/resource lifetime and durable replay.** The local Build Output
+   assertions still verify Eve-owned channel/workflow construction and all
+   agent channel tests pass. This does not claim hosted subscription SSE,
+   worker execution, or replay idempotency; those remain gated on the exact
+   Preview Agent Runs/Workflow-tag readback.
+4. **Privacy/telemetry/evidence retention.** `EVE_TRACES_CONTENT=off` is an
+   encrypted Preview build variable and is included in the Turbo contract.
+   Existing OTel hooks remain restricted observability with input/output
+   capture disabled. No prompt, response, token, credential, raw tag, session
+   identifier, or trace payload is retained by this slice.
+5. **Verification/docs/rollback/deployment.** Agent and proxy focused tests,
+   typecheck, docs/skills/effect/boundary/authority/control/verification
+   policy gates, and `git diff --check` pass locally. The source-built Preview
+   deployment and Agent Runs proof still need a fresh readback after commit;
+   Production remains excluded. Rollback is the prior pinned Eve package and
+   prior source deployment, with the Preview-only trace variable removable by
+   the target-owned runbook.
 
 ## Remaining external work
 
-- Add the reviewed native Vercel OpenTelemetry trace boundary: restricted
-  agent-to-proxy propagation, proxy incoming-context continuation, safe
-  completion span, and a trace-count proof before and after `startIndex=0`
-  replay. Do not log prompts, responses, tokens, tool data, raw session/turn
-  IDs, or reasoning to satisfy this gate.
+- Commit and source-deploy the Eve `0.29.5` agent with the encrypted Preview
+  `EVE_TRACES_CONTENT=off` variable, then read back the exact Preview team's
+  Agent Runs and `$eve.*` Workflow-tag availability. Use only the accessible
+  safe model, lineage, completion, and attempt-count predicates to compare the
+  original session with `startIndex=0` replay. Do not log prompts, responses,
+  tokens, tool data, raw session/turn IDs, or reasoning to satisfy this gate.
 - Production is excluded. Do not promote, rotate the accepted Preview profile,
   or change channel ingress as part of the correlation work.
 

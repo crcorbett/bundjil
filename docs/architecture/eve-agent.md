@@ -50,6 +50,13 @@ Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
 This describes code wiring only. It does not show which path an external
 environment currently configures or serves.
 
+Preview replay evidence uses Eve's framework-owned Agent Runs and Workflow-tag
+surface. `EVE_TRACES_CONTENT=off` is required for that Preview proof so trace
+content is not captured. OpenTelemetry remains restricted observability for
+safe application spans, but it is not the acceptance oracle for a
+model-attempt count because a CLI admission trace does not necessarily follow
+Eve's queued worker.
+
 ## Boundary invariants
 
 - `agent/config.ts` decodes model-provider configuration through Effect Config
@@ -59,7 +66,7 @@ environment currently configures or serves.
   wrapper. It uses the already-decoded selected provider configuration to
   restrict Vercel OpenTelemetry fetch propagation to the private Codex proxy
   origin and disables AI SDK input/output capture. The trace exists for the
-  Vercel operator proof only; Bundjil never retains raw session/turn IDs,
+  operator's restricted observability only; Bundjil never retains raw session/turn IDs,
   prompts, responses, tokens, tools, or reasoning in a repository receipt.
 - `workspace_status` bridges Effect Schema once at the Eve edge, delegates to
   `WorkspaceOperations`, and encodes its result at the outward edge.
@@ -196,7 +203,7 @@ acceptance or durable execution. Current local build proof loads both provider
 roots; future bundle splitting, warm-instance reuse, scale-out, freeze, and
 shutdown remain deployment readback questions.
 
-Pinned and lock-resolved Eve `0.20.0` already owns the durable boundary behind
+Pinned and lock-resolved Eve `0.29.5` owns the durable boundary behind
 the route-owned `send()` operation. `send()` first awaits
 `runtime.deliver()`, whose Workflow runtime awaits `resumeHook` and returns the
 owning run identity. On any delivery rejection, including but not limited to
@@ -224,7 +231,7 @@ Eve's all-error fallback can otherwise resolve through a different new run.
 Source inspection alone does not prove that hosted convergence.
 
 When `VERCEL=1`, Eve directly creates Nitro with the Vercel preset. Eve
-`0.20.0` supplies Build Output framework metadata but exposes no
+`0.29.5` supplies Build Output framework metadata but exposes no
 Bundjil-facing `vercel.functions` option for the ordinary generated
 `__server`. Eve separately patches the generated Workflow `flow` function to
 Node 24, its namespaced queue trigger, and `maxDuration: "max"`. Bundjil
@@ -237,7 +244,7 @@ deployment must read back its own mapping and effective durations.
 Vercel's supported Nitro configuration owner is
 `defineNitroConfig({ vercel: { functions: { maxDuration }}})`. Because Eve
 creates Nitro internally and exposes no application input for that object in
-`0.20.0`, Bundjil cannot use the supported seam without an upstream Eve
+`0.29.5`, Bundjil cannot use the supported seam without an upstream Eve
 change. A source `vercel.json` glob must name a real source entrypoint and
 therefore cannot safely target the generated `__server`. Until measurements
 show a need and a supported Eve seam exists, retain the effective project

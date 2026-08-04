@@ -54,7 +54,7 @@ or disposes a runtime per request, adds no Channel-wide retry, and does not
 treat a safe fingerprint as hosted durability proof. Local Build Output and a
 named deployment readback remain separate proof classes.
 
-Pinned Eve `0.20.0` owns durable session start/resume and turn child workflows
+Pinned Eve `0.29.5` owns durable session start/resume and turn child workflows
 behind its route-owned `send()` operation. Bundjil adds no second Workflow or
 raw Workflow client. The test command generates ordinary and Vercel Build
 Output and verifies Eve's generated Workflow `max` separately from the
@@ -75,6 +75,7 @@ The replacement path uses only these app-owned environment namespaces:
 | Replay   | `BUNDJIL_CHANNEL_REPLAY_PREFIX`, `BUNDJIL_CHANNEL_REPLAY_LEASE_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_TTL_MILLISECONDS`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL`, `BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN`, `BUNDJIL_CHANNEL_REPLAY_STORE_PREFIX`  |
 | Sendblue | `BUNDJIL_CHANNEL_SENDBLUE_ALLOWED_SERVICES`, `BUNDJIL_CHANNEL_SENDBLUE_API_KEY`, `BUNDJIL_CHANNEL_SENDBLUE_API_SECRET`, `BUNDJIL_CHANNEL_SENDBLUE_LINE`, `BUNDJIL_CHANNEL_SENDBLUE_TYPING_DURATION_MILLIS`, `BUNDJIL_CHANNEL_SENDBLUE_WEBHOOK_SECRET` |
 | Photon   | `BUNDJIL_CHANNEL_PHOTON_PROJECT_ID`, `BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET`, `BUNDJIL_CHANNEL_PHOTON_WEBHOOK_TOLERANCE_SECONDS`                                        |
+| Evidence | `EVE_TRACES_CONTENT` (Preview proof requires the encrypted value `off`; it disables Eve trace content capture and is not a model or auth setting)                                                                                                     |
 
 Secrets are decoded as `Redacted` values through owner Schemas. The state,
 replay prefix, store prefix, routing tokens, and config namespace intentionally
