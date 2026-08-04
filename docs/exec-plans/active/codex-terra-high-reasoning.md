@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 review_trigger: task status, provider effort, Preview proof, authority, or rollback change
 spec: ../../product-specs/codex-terra-high-reasoning.md
 task_ledger: ../../product-specs/codex-terra-high-reasoning.tasks.json
@@ -17,15 +17,17 @@ started: 2026-07-21
 Repository implementation is complete. The authorized 2026-08-03 Preview
 rollout deployed both source-built candidates from `f1b11907c29464423ddcb3ffabac6bf9f0694770`,
 set the proxy high-effort and agent Terra/context configuration, and read back
-the protected Eve model identity. The live subscription proof is blocked: the
-proxy is `live` and `high` but not ready because its Preview profile,
-persistence, and cipher are not provisioned as an isolated configuration.
+the protected Eve model identity. The 2026-08-04 metadata-only successor
+confirmed the remaining isolation gate: no Preview-only writable REST
+persistence binding exists for the encrypted Codex profile. The only writable
+candidate targets Production too and was not reused.
 
 ## Current task
 
 Repository tasks 1–3 and 5 are complete. Task
 `authorized-preview-subscription-proof` is blocked after its authorized
-Preview stage; see the dated packet before any further provider mutation.
+Preview stage. Provision a dedicated Preview REST KV resource before any
+further provider mutation; see the dated packets.
 
 ## Evidence record
 
@@ -48,7 +50,7 @@ Preview stage; see the dated packet before any further provider mutation.
 | Observability, rollout, migration, rollback   | Change required | Define safe policy observation and target/rollback documentation before any deployment task.                                                                                                      |
 | SPEC, task ledger, active-plan index          | Change required | This active plan and the sibling ledger record accepted task evidence.                                                                                                                            |
 
-## 2026-08-03 Preview receipt
+## Preview receipts
 
 The bounded result is
 [`codex-terra-preview-blocked-2026-08-03.json`](../../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json).
@@ -58,6 +60,11 @@ It does not establish Codex subscription acceptance. A successor authority
 must first name the isolated Preview profile, persistence namespace, cipher,
 and proof-only Vercel protection path; it must then rerun the proxy proof and
 minimal Eve session/replay under a new packet identity.
+
+The successor
+[`codex-terra-preview-isolation-blocked-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
+confirms that no Preview-only writable REST store is currently bound. It makes
+no OAuth, deployment, proxy, Eve, or Production claim.
 
 ## Terminal audit
 
@@ -82,7 +89,26 @@ minimal Eve session/replay under a new packet identity.
 
 ## Deferred external work
 
-- No Vercel environment write, deployment, provider request, credential
-  rotation, or Production action has been performed.
-- Task `authorized-preview-subscription-proof` remains pending explicit
-  target-owned deployment authority after repository acceptance.
+- No provider resource, environment, deployment, profile, proxy request, or
+  Production action was performed in the successor attempt.
+- Task `authorized-preview-subscription-proof` remains blocked on a dedicated
+  Preview REST KV resource and its metadata-only isolation readback.
+
+## 2026-08-04 terminal audit
+
+1. **Ownership and call graph.** The stop remains at the Vercel persistence
+   boundary. `@bundjil/codex` still accepts only the decoded writable REST
+   configuration; no app, service, Layer, provider route, or deployment was
+   changed to work around it.
+2. **Implementation quality.** This update is evidence-only. The new packet
+   and detail use the existing verified JSON contracts, retain opaque project
+   and deployment identities only, and omit values, credentials, profile
+   material, payloads, and protected endpoints. No helper, wrapper, raw
+   configuration access, schema bypass, lint exception, or UI change was
+   introduced.
+3. **Verification coverage.** `bun run verification` passed after the receipt
+   and documentation updates. It validates the Effect language-service,
+   boundaries, docs, skills, authority, controls, proof-packet contract,
+   harness inventory, lint, Knip, type checks, and tests. It does not make the
+   blocked external predicates pass: a dedicated Preview store, trusted-local
+   profile proof, protected live SSE, and Eve replay remain separately required.

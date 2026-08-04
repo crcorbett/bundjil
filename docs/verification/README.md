@@ -170,6 +170,11 @@ operation nor asserts present provider state.
   high-effort and protected Terra/context readback, plus the non-ready proxy
   stop. It does not prove Codex subscription acceptance, SSE completion, Eve
   session/replay, or any Production result.
+- [`codex-terra-preview-isolation-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
+  retains the successor metadata-only isolation stop: no Preview-only writable
+  REST store was bound to the encrypted Codex profile boundary, and the only
+  writable candidate also targets Production. It proves no login, deployment,
+  subscription, Eve, replay, or Production result.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

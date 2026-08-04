@@ -329,6 +329,25 @@ boundaries. The dated packet
 [`codex-terra-preview-blocked-2026-08-03.json`](../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
 is the current provider receipt; it retains no secret or payload material.
 
+### 2026-08-04 Preview-isolation readback
+
+The succeeding authorized readback found explicit Preview subject, profile,
+cipher, key-prefix, and high-effort variable metadata on the proxy. It did not
+find either writable REST-store pair accepted by the Effect persistence layer:
+`UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` or
+`KV_REST_API_URL`/`KV_REST_API_TOKEN`. The proxy's remaining legacy KV URL and
+read-only token are not a substitute.
+
+The only available writable REST pair belongs to the agent channel-replay
+configuration and targets both Preview and Production. It must not be copied
+to the Codex Preview profile boundary. This preserves the required environment
+isolation but blocks trusted-local login, stored-profile proof, a new source
+deployment, proxy SSE, and the Eve session/replay journey. The new dated
+packet
+[`codex-terra-preview-isolation-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
+is a metadata-only stop receipt; it does not replace the August 3 packet or
+establish provider acceptance.
+
 ## Affected surfaces
 
 - `packages/codex/src/provider/contracts.ts`: named effort and request-policy

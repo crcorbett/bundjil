@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "Codex subscription completion through an immutable Preview proxy"
+  },
+  "candidate": {
+    "repositoryCommit": "b8b2d51ab68ca4b5c832b75ff57f3823c477ceb6",
+    "sourceDigest": "32d8ae7807e7659a41b61ecd10af75822bd9915cff53fce63da619dbb6cf6147",
+    "artifactDigest": "8358264fec217c3887e1f648996f7568f25f5c6d81f7120460cbe95551d97637"
+  },
+  "authority": {
+    "principal": "Cooper, personal Vercel owner",
+    "identitySource": "explicit delegated task authority and authenticated Vercel personal team",
+    "externalAccess": "mutation",
+    "approvalReceipt": "delegated task authority recorded 2026-08-04",
+    "rollbackOwner": "Bundjil Vercel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "bundjil-codex-proxy Preview profile persistence boundary"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "blocked",
+      "oracle": "A Preview-only writable REST profile store could not be established without reusing a Production-targeted credential."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Authenticated Vercel Preview configuration metadata readback",
+    "outcome": "blocked",
+    "exitCode": 0,
+    "invariant": "The encrypted Codex profile store must use a writable REST store and namespace isolated from Production.",
+    "target": "bundjil-codex-proxy Preview persistence configuration",
+    "recoveryHint": "Provision a dedicated Preview Upstash/Vercel KV REST resource, bind its URL/token only to the proxy Preview target, then repeat trusted-local login and the bounded proof under a new packet.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-isolation-blocked-2026-08-04.json",
+    "detailSha256": "3a3919737fefa4059908921e2dae5ff83c805c94c782ae2753915660e1839205",
+    "postcondition": "No profile, deployment, provider request, or Production mutation occurred."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Authenticated Vercel project environment metadata established the absence of a Preview-only writable REST persistence binding."
+  },
+  "postconditions": [
+    "Preview and Production remain isolated because the shared Production-targeted store was not copied or used.",
+    "The historic 2026-08-03 receipt remains unchanged and the live proof remains unattempted in this successor attempt."
+  ],
+  "limitations": [
+    "Metadata readback proves variable target scopes and presence only; it does not disclose or validate secret values.",
+    "This receipt does not establish the state of a provider resource that has not been provisioned."
+  ],
+  "nonClaims": [
+    "No Codex subscription, OAuth login, encrypted profile, protected proxy request, SSE response, Eve session, replay, or Production result was proven.",
+    "No secret, protected URL, token, cipher key, profile payload, prompt, response, tool data, reasoning, or chain-of-thought is retained."
+  ],
+  "rollback": {
+    "identity": "No mutation occurred; retain the existing Preview candidates and prior blocked packet.",
+    "outcome": "ready",
+    "owner": "Bundjil Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-preview-isolation-blocked-2026-08-04.json",
+      "sha256": "3a3919737fefa4059908921e2dae5ff83c805c94c782ae2753915660e1839205",
+      "provenance": "authenticated personal Vercel project and environment metadata readback"
+    }
+  ],
+  "observedAt": "2026-08-04T03:53:29Z"
+}

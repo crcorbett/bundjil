@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-verification-owner",
-  "lastReviewed": "2026-07-25",
+  "lastReviewed": "2026-08-04",
   "reviewTrigger": "proof, journey, command, provider, retention, or lifecycle change",
   "packetRoot": "docs/evidence/verification/packets/",
   "requiredProvenance": [

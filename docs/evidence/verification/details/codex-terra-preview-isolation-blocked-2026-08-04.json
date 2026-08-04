@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-isolation-blocked",
+  "observedAt": "2026-08-04T03:53:29Z",
+  "candidate": {
+    "repositoryCommit": "b8b2d51ab68ca4b5c832b75ff57f3823c477ceb6",
+    "proxyProjectId": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+    "agentProjectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+    "latestAgentPreviewDeploymentId": "dpl_ts3fDnox1YiMy3BeZEWv2mRBCez1"
+  },
+  "authority": {
+    "scope": "Personal Vercel Preview isolation, trusted-local profile preparation, and bounded subscription proof.",
+    "access": "mutation",
+    "production": "not authorized or changed"
+  },
+  "configurationMetadata": {
+    "proxyPreview": {
+      "reasoningEffort": "high",
+      "subjectProfileCipherPrefixVariablesPresent": true,
+      "acceptedWritableRestStoreVariablesPresent": false,
+      "legacyKvUrlPresent": true,
+      "readOnlyKvTokenPresent": true
+    },
+    "availableRestStoreCandidate": {
+      "owner": "bundjil-agent channel replay configuration",
+      "variableNames": [
+        "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL",
+        "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"
+      ],
+      "targets": ["preview", "production"],
+      "acceptedForCodexPreviewProfile": false
+    }
+  },
+  "blockedPredicates": [
+    "No writable REST store targeted only to Preview is available for the Codex encrypted profile boundary.",
+    "The only available writable REST store candidate is shared with Production and cannot be reused without violating the Preview/Production isolation requirement.",
+    "No isolated persistence binding means trusted-local login, stored-profile proof, Preview deployment, live proxy proof, and Eve session/replay were not attempted."
+  ],
+  "nonClaims": [
+    "No environment value, credential, cipher key, bearer, protection bypass, OAuth material, profile, prompt, response, or provider payload is retained.",
+    "No Vercel environment, deployment, protection setting, provider resource, or Production resource was mutated in this attempt.",
+    "No Codex subscription acceptance, SSE completion, Eve session completion, or replay result was observed."
+  ],
+  "rollback": "No mutation occurred. The prior Preview candidates and the 2026-08-03 blocked receipt remain the rollback reference."
+}

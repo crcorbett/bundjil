@@ -127,7 +127,7 @@
       "status": "blocked",
       "description": "After code is accepted and explicit deployment authority is supplied, deploy source-built personal Preview proxy and agent changes, read back the intended configuration, and make one minimal protected Eve request through the live subscription proxy. The 2026-08-03 authorized Preview stage reached source-built READY deployments but stopped before a subscription request because the proxy was live/high and not ready.",
       "implementationNotes": [
-        "Do not use this task as authority to deploy, mutate Vercel variables, rotate credentials, or perform Production work; obtain target-owned authority first.",
+        "The 2026-08-04 delegated task supplied scoped Preview mutation authority. Keep Production excluded and stop on any ambiguous target, shared store, cipher, bearer, or protection binding.",
         "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
         "Read back only environment names/safe target values where authorized: proxy high effort, agent Terra model, and 1050000 context. Do not capture secret values.",
         "Use the hardened proof command plus an OIDC-protected Eve request/replay. Correlate safe modelId/reasoningEffort/mode/status/SSE-completed evidence with Vercel logs."
@@ -146,7 +146,8 @@
         "The 2026-08-03 personal Vercel Preview rollout created source-built READY proxy deployment dpl_AbUnezoqf4Xd4dv39vogZg2AQVLv and agent deployment dpl_AZ43mz4yfyGi3ffDdvfuyjdF8kLB from f1b11907c29464423ddcb3ffabac6bf9f0694770. Both read back as Preview; no Production target was selected.",
         "Encrypted Preview variables now name proxy high effort and agent gpt-5.6-terra/1050000. Protected Eve info read back exactly bundjil-codex-proxy/gpt-5.6-terra with context 1050000.",
         "Proxy health read back mode live and reasoning high but HTTP 503/ok false. The bounded proof command returned status blocked, classification request_failed, exit 1, and no subscription SSE predicate was observed.",
-        "The missing prerequisite is an isolated Preview Codex stored profile, persistence namespace, and cipher configuration with a usable proof-only Vercel protection path. The task must not copy Production credentials or profile state to satisfy it. See docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json."
+        "The missing prerequisite is an isolated Preview Codex stored profile, persistence namespace, and cipher configuration with a usable proof-only Vercel protection path. The task must not copy Production credentials or profile state to satisfy it. See docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json.",
+        "The 2026-08-04 authenticated metadata readback found Preview subject/profile/cipher/prefix variables but no Preview-only writable REST store pair accepted by the Effect persistence layer. The only writable REST candidate targets both Preview and Production in the channel-replay boundary, so it was not reused. No login, deployment, proxy proof, or Eve replay was attempted. See docs/evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json."
       ],
       "commitAfterPassing": false
     },

@@ -24,9 +24,9 @@ context.
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  implementation is complete; the authorized Preview rollout is blocked on an
-  isolated stored-profile/persistence/cipher configuration and proof-only
-  deployment-protection access. Subscription acceptance remains unproved.
+  implementation is complete; the authorized Preview rollout is blocked on a
+  dedicated Preview writable REST persistence resource for its isolated
+  stored-profile/cipher boundary. Subscription acceptance remains unproved.
 
 ## Implemented or superseded history
 
