@@ -127,10 +127,11 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Eve/Nitro seam or separately pinned upstream change exists.
 
    For the Preview replay-proof stage, require the encrypted
-   `EVE_TRACES_CONTENT=off` binding and read back the exact team's Agent Runs
-   and framework-owned `$eve.*` Workflow-tag surface. This is observability
-   evidence only; it does not authorize a deployment or replace the protected
-   agent/proxy request proof.
+   `EVE_TRACES_CONTENT=off` binding and read back the exact team's accessible
+   Agent Runs model/deployment/lifecycle/step/hook metadata. Record unavailable
+   `$eve.*` Workflow tags or per-session attempt counters as limitations. This
+   is observability evidence only; it does not authorize a deployment or
+   replace the protected agent/proxy request proof.
 
 4. For the current stage, set `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT` through
    the approved secret/environment mechanism and run:

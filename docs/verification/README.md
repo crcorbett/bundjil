@@ -198,8 +198,19 @@ operation nor asserts present provider state.
   and CLI protection path. It retains event counts and status only; it does
   not claim Production, channel delivery, a public Eve route, general external
   caller capability, or that replay made no second upstream call. The current
-  SPEC now requires an Eve `0.29.5` Agent Runs/Workflow-tag proof for that
-  separate claim; the older CLI OpenTelemetry attempt remains negative evidence.
+  SPEC now records the accessible Eve `0.29.5` Agent Runs metadata and keeps
+  the separate no-second-upstream-call claim blocked without a per-session
+  attempt counter; the older CLI OpenTelemetry attempt remains negative
+  evidence.
+- [`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+  records the Eve `0.29.5` protected Preview proof after the upgrade: exact
+  Terra/1050000 info, session completion, identical `startIndex=0` replay
+  event counts, and the accessible Agent Runs model/deployment/lifecycle
+  metadata. The current Vercel surface does not expose `$eve.*` Workflow tags
+  or a per-session model/proxy-attempt count, so the packet remains blocked on
+  the independent no-second-upstream-call predicate. It proves neither
+  Production, channel delivery, public Eve access, nor general caller
+  capability.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

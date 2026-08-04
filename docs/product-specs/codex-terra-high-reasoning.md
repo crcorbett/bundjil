@@ -253,12 +253,12 @@ fresh Preview Eve request (OIDC-protected)
 ### OIDC caller decision
 
 The Vercel CLI can mint a short-lived development OIDC token for an exact linked
-project with `vercel project token`. `vercel curl --trace` then supplies the
-separate Deployment Protection bypass for an immutable deployment and returns a
-trace request ID which `vercel traces get` can retrieve. Together, those
-Vercel-owned controls are sufficient for this bounded Preview operator proof:
-the agent still validates the OIDC bearer, while the bypass is never treated as
-application authentication.
+project with `vercel project token`. The protected `vercel curl` path supplies
+the separate Deployment Protection access for an immutable deployment. Together,
+those Vercel-owned controls are sufficient for this bounded Preview operator
+proof: the agent still validates the OIDC bearer, while platform protection
+access is never treated as application authentication. Trace retrieval is not
+part of the proof because it can expose payload-bearing data.
 
 This is not a generic external caller capability. The proof may target only the
 recorded immutable Preview agent deployment with a fixed bounded message; it
@@ -282,8 +282,10 @@ operator proof is unavailable or a non-operator automated caller is required.
    values only as permitted by Vercel; never print a bearer, profile, cipher,
    OAuth token, prompt, response, or chain-of-thought.
 4. Prove the Preview proxy first, then make a minimal protected Eve request and
-   replay its durable stream with `startIndex=0`. Production is out of scope
-   until Preview evidence is accepted and new authority is supplied.
+   replay its durable stream with `startIndex=0`. Read back only the Vercel
+   Agent Runs model/deployment/lifecycle metadata that the exact team exposes.
+   Production is out of scope until Preview evidence is accepted and new
+   authority is supplied.
 
 Rollback before any Production action restores the previous Preview proxy
 deployment/configuration: `BUNDJIL_CODEX_PROXY_MODEL=gpt-5.5`,
@@ -300,12 +302,13 @@ configuration names, result statuses, and rollback result without values.
 Repository proof, local proof, Vercel deployment proof, and subscription
 endpoint proof are distinct:
 
-| Evidence class          | It proves                                                                                    | It does not prove                                                              |
-| ----------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Repository proof        | schemas, config decoding, Layer composition, mapper encoding, tests                          | a deployed proxy or endpoint acceptance                                        |
-| Local proxy proof       | private HTTP/SSE wiring using mock or local composition                                      | Vercel or hosted subscription acceptance                                       |
-| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity                  | that an upstream request used high unless correlated runtime proof confirms it |
-| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response | Production approval or general public API support                              |
+| Evidence class          | It proves                                                                                                              | It does not prove                                                                           |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Repository proof        | schemas, config decoding, Layer composition, mapper encoding, tests                                                    | a deployed proxy or endpoint acceptance                                                     |
+| Local proxy proof       | private HTTP/SSE wiring using mock or local composition                                                                | Vercel or hosted subscription acceptance                                                    |
+| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity                                            | that an upstream request used high unless correlated runtime proof confirms it              |
+| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response                           | Production approval or general public API support                                           |
+| Eve runtime metadata    | protected info/session/replay results plus accessible Agent Runs model, deployment, lifecycle, step, and hook metadata | a per-session model/proxy attempt count or an independent no-second-upstream-call predicate |
 
 Add a sanitized, request-correlatable observation at the mapper/provider
 boundary (for example Effect span attributes or the established deployment
@@ -331,9 +334,9 @@ Stream hooks are post-durable and observe-only.
 Upgrade the agent from Eve `0.20.0` to `0.29.5` and align `ai` with its
 required `^7.0.38` peer range before another hosted proof. This does not add a
 dynamic per-session proxy-header API: `runtimeContext` remains span metadata,
-not transport metadata. It does add the supported Vercel evidence surface that
-the installed version lacks: framework-owned Workflow run tags and the
-team-gated Agent Runs view.
+not transport metadata. It adds the current Vercel Agent Runs metadata surface,
+but the accessible Personal team view is authoritative only for the fields it
+actually returns rather than for fields described by another dashboard tier.
 
 The initially preferred join was Vercel OpenTelemetry, not a new proxy store:
 
@@ -353,7 +356,7 @@ exporter. The proxy may continue the inbound W3C context at its Vercel HTTP
 boundary and create only a named completion span with the existing safe
 model/effort/mode/status/SSE attributes. These spans remain restricted
 observability and may not be used as the replay oracle; the hosted proof uses
-the Eve Agent Runs/Workflow-tag surface instead. The operator must not retain
+the accessible Eve Agent Runs metadata instead. The operator must not retain
 raw session or turn identifiers, headers, requests, responses, prompts, tokens,
 tool values, reasoning, or exported trace data.
 
@@ -361,12 +364,13 @@ The 2026-08-04 Preview readback falsified this approach as a complete proof:
 the CLI trace captured admission and Workflow enqueue, but Eve's durable worker
 invocation had no retrievable Vercel trace identifier. It therefore did not
 include the model/proxy span. Do not retry this mechanism or treat queue
-activity, timing, or an admission trace as model-call evidence. A replacement
-must instead prove that the exact Preview team exposes Agent Runs and the
-framework-owned `$eve.*` Workflow tags for the worker run. If that surface is
-unavailable, incomplete, or cannot show the model-attempt count before and
-after replay, record `blocked`; do not replace it with a counter or inferred
-trace relationship.
+activity, timing, or an admission trace as model-call evidence. The upgraded
+proof reads the exact Preview team's Agent Runs metadata for model, immutable
+deployment, lifecycle, step, and hook fields. The current accessible surface
+does not expose the framework-owned `$eve.*` Workflow tags or a per-session
+model-attempt count; record those fields as unavailable and keep the strict
+no-second-upstream-call predicate `blocked`. Do not infer it from unchanged
+inventory, timing, process state, or a neighbouring run.
 
 Do not bridge the replacement with a process-global value,
 `AsyncLocalStorage`, a static proof header, or a proxy counter keyed only by a
@@ -374,12 +378,12 @@ time window. Those mechanisms either fail under concurrent/replayed Vercel
 workflow execution or prove a weaker unrelated claim.
 
 The receipt may retain only: Eve/AI SDK versions, immutable Preview deployment
-IDs, an opaque Agent Run or Workflow-run fingerprint, Agent Runs availability,
-the safe `$eve.type`, `$eve.model`, and parent/root relationship predicates,
-the model-attempt count before/after replay, completed/waiting predicates, and
-the known Terra/high configuration predicates. It must not retain raw tags,
-session/turn/run IDs, titles, prompts, responses, reasoning, tool payloads,
-token counts, trace payloads, headers, or screenshots. Set
+IDs, Agent Runs availability, safe model/deployment/lifecycle/step/hook
+metadata, one-hour inventory counts, completed/waiting event predicates, and
+the known Terra/high configuration predicates. It may record the absence of
+framework tags and per-session attempt counters as a limitation. It must not
+retain raw tags, session/turn/run IDs, titles, prompts, responses, reasoning,
+tool payloads, token counts, trace payloads, headers, or screenshots. Set
 `EVE_TRACES_CONTENT=off`; no third-party exporter or trace drain is permitted.
 
 The installed Eve source is the version-matched authority for the direct
@@ -401,6 +405,28 @@ deployed config readback, emitted sanitized high field, exact Eve model
 identity, one successful private proxy request, and a completed subscription
 SSE response. The command must continue to exit nonzero with `status:
 "blocked"` on any failed predicate.
+
+### 2026-08-04 upgraded Preview evidence boundary
+
+The source-built Eve `0.29.5` Preview deployment
+`dpl_EsvxWbAHM6NBCJ82rQYEP8Va7uC1` is Ready and reports the exact
+`bundjil-codex-proxy/gpt-5.6-terra` identity with context `1050000`. The
+protected session returned `202`; both the initial stream and its
+`startIndex=0` replay reached `message.completed` and `session.waiting` with
+the same safe event counts and no failure event. The one-hour Agent Runs
+inventory remained seven Terra runs before and after replay; the selected
+matching run retained the same immutable deployment, model, lifecycle, and
+step/hook metadata.
+
+The accessible Personal Agent Runs surface does not expose `$eve.*` Workflow
+tags or a per-session model-attempt/proxy-request counter. This is the strongest
+current hosted evidence, not proof of zero upstream calls on replay. The dated
+detail and blocked packet
+[`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+and
+[`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+retain that ceiling. The related proxy detail remains the separate owner of
+encrypted-profile and live Terra/high subscription SSE proof.
 
 ### 2026-08-03 authorized Preview result
 
@@ -534,10 +560,14 @@ or an Eve journey.
    subscription endpoint, and a protected Eve request reports exactly
    `bundjil-codex-proxy/gpt-5.6-terra`. No credentials, prompts, bodies,
    tokens, account ids, tool data, or chain-of-thought are retained.
-7. Agent Runs and `$eve.*` Workflow tags for the exact Preview worker show one
-   completed model attempt before `startIndex=0` replay and the same attempt
-   count afterwards. If the exact team's surface or count is unavailable, the
-   task remains `blocked`; CLI admission traces and timing are non-claims.
+7. The exact Preview team's accessible Agent Runs metadata is read before and
+   after `startIndex=0` replay and records model, immutable deployment,
+   lifecycle, step/hook counts, and safe event predicates without payloads. A
+   per-session model/proxy-attempt count or framework-owned `$eve.*` tags are
+   required for the stronger no-second-upstream-call claim; if unavailable, the
+   task remains `blocked` and the receipt records the available metadata plus
+   that limitation. CLI admission traces, timing, process state, and unchanged
+   inventory are non-claims for that stronger predicate.
 8. Each implementation task records the ownership/call-graph,
    implementation-quality, and verification-coverage lenses, including flat
    Effect control flow, typed `.pipe(...)` error handling, schema ownership,

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-live-eve-upgraded",
+  "observedAt": "2026-08-04T09:03:10Z",
+  "candidate": {
+    "repositoryCommit": "02cf2f18219e3bbf07e0e8e856e6218059c5e9ad",
+    "agentDeploymentId": "dpl_EsvxWbAHM6NBCJ82rQYEP8Va7uC1",
+    "proxyDeploymentId": "dpl_2pnDomby1u7XRoYVsVzah1Nw492u",
+    "environment": "preview",
+    "sourceMode": "source-built local workspace candidate",
+    "agentReady": true,
+    "agentRuntime": "nodejs24.x",
+    "agentMaxDurationSeconds": 300,
+    "eveVersion": "0.29.5",
+    "aiSdkLockResolved": "7.0.51"
+  },
+  "access": {
+    "agentOidc": "short-lived Vercel project token",
+    "deploymentProtection": "Vercel CLI protected-call path",
+    "publicFallbackAdded": false,
+    "productionTargeted": false
+  },
+  "configuration": {
+    "eveTracesContentOff": true,
+    "previewEnvironmentVariablesEncrypted": true,
+    "previewEnvironmentVariablesDecrypted": false,
+    "modelIdentityTerra": true,
+    "contextWindowTokens": 1050000,
+    "proxyReasoningEffortHigh": true,
+    "proxyModeLive": true
+  },
+  "agentProof": {
+    "infoStatus": 200,
+    "protectionRedirect": false,
+    "modelIdentity": "bundjil-codex-proxy/gpt-5.6-terra",
+    "sessionCreateStatus": 202,
+    "firstStream": {
+      "envelopeLines": 10,
+      "eventCounts": {
+        "session.started": 1,
+        "turn.started": 1,
+        "message.received": 1,
+        "step.started": 1,
+        "message.appended": 1,
+        "message.completed": 1,
+        "step.completed": 1,
+        "turn.completed": 1,
+        "session.waiting": 1
+      },
+      "hasCompleted": true,
+      "hasWaiting": true,
+      "hasFailure": false,
+      "readerExit": "after_waiting"
+    },
+    "replayStream": {
+      "startIndex": 0,
+      "envelopeLines": 10,
+      "eventCounts": {
+        "session.started": 1,
+        "turn.started": 1,
+        "message.received": 1,
+        "step.started": 1,
+        "message.appended": 1,
+        "message.completed": 1,
+        "step.completed": 1,
+        "turn.completed": 1,
+        "session.waiting": 1
+      },
+      "hasCompleted": true,
+      "hasWaiting": true,
+      "hasFailure": false,
+      "readerExit": "after_waiting"
+    }
+  },
+  "agentRuns": {
+    "surface": "Vercel Preview Agent Runs metadata",
+    "runInventoryBeforeReplay": {
+      "period": "1h",
+      "runCount": 7,
+      "terraRunCount": 7
+    },
+    "runInventoryAfterReplay": {
+      "period": "1h",
+      "runCount": 7,
+      "terraRunCount": 7
+    },
+    "latestMatchingRun": {
+      "model": "bundjil-codex-proxy/gpt-5.6-terra",
+      "status": "running",
+      "startedAt": "2026-08-04T08:52:28.515Z",
+      "deploymentMatch": true,
+      "eventCount": 15,
+      "eventTypeCounts": {
+        "run_created": 1,
+        "run_started": 1,
+        "step_created": 3,
+        "step_started": 3,
+        "step_completed": 3,
+        "hook_created": 3,
+        "hook_received": 1
+      },
+      "eventCountAfterReplayUnchanged": true
+    },
+    "frameworkWorkflowTagsAvailable": false,
+    "perSessionModelAttemptCountAvailable": false,
+    "perSessionProxyRequestCounterAvailable": false,
+    "traceRead": false
+  },
+  "relatedProxyProof": {
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json",
+    "modeLive": true,
+    "reasoningEffortHigh": true,
+    "requestedModelTerra": true,
+    "subscriptionSseCompleted": true,
+    "unauthenticatedStatus": 401,
+    "invalidBearerStatus": 401
+  },
+  "outcome": {
+    "protectedEveSessionAndReplay": true,
+    "availableMetadataSupportsModelAndDeploymentIdentity": true,
+    "strictNoSecondUpstreamCallPredicate": false,
+    "taskAcceptance": "blocked"
+  },
+  "limitations": [
+    "The Vercel Agent Runs metadata surface exposes model, deployment, lifecycle, step, and hook metadata, but not framework-owned $eve.* tags or a per-session model-attempt count.",
+    "The before/after Agent Runs inventory and unchanged run event count do not independently prove that replay made no second request to the proxy.",
+    "The bounded stream reader retained event names/counts only and stopped after session.waiting; no raw stream body or HTTP payload was retained.",
+    "No Production deployment, profile, request, or message-channel journey was performed."
+  ],
+  "nonClaims": [
+    "No prompt, response body, raw stream event, session identifier, bearer, bypass value, OAuth token, profile payload, ciphertext, tool data, trace payload, or chain-of-thought is retained.",
+    "This does not make Eve public, grant a general external OIDC caller capability, or prove Production.",
+    "This does not claim a zero-second upstream proxy call count for replay."
+  ]
+}

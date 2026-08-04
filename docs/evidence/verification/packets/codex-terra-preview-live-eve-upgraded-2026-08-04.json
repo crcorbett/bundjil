@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "Protected Eve session and durable stream replay through the upgraded Preview agent"
+  },
+  "candidate": {
+    "repositoryCommit": "02cf2f18219e3bbf07e0e8e856e6218059c5e9ad",
+    "sourceDigest": "15b6733b84f3da9517500820afa9e1218bbf43e52b78238724e240a0d5684bfb",
+    "artifactDigest": "9541301ff95c644f9980205fa1954487b5b7105e42756966989a79248e0cf910"
+  },
+  "authority": {
+    "principal": "Cooper, personal Vercel owner",
+    "identitySource": "explicit delegated task authority and authenticated Vercel personal team",
+    "externalAccess": "mutation",
+    "approvalReceipt": "2026-08-04 Preview proof authority; Production excluded",
+    "rollbackOwner": "Bundjil Vercel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "bundjil-agent immutable Preview deployment dpl_EsvxWbAHM6NBCJ82rQYEP8Va7uC1 and related private proxy"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "blocked",
+      "oracle": "The upgraded protected Eve session and startIndex=0 replay completed with identical safe event counts, but the accessible Agent Runs metadata has no per-session model-attempt or proxy-request counter."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Protected Vercel OIDC Eve info/session/stream and Agent Runs metadata readback",
+    "outcome": "blocked",
+    "exitCode": 0,
+    "invariant": "A replay proof may claim no second upstream request only when an independent per-session model/proxy attempt oracle is available and unchanged.",
+    "target": "bundjil-agent Preview deployment dpl_EsvxWbAHM6NBCJ82rQYEP8Va7uC1",
+    "recoveryHint": "Provide a supported per-session model/proxy-attempt count; do not substitute traces, timing, process state, or static headers.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json",
+    "detailSha256": "d9c81cc209a9fa49e7a88722f5471641fbc899c222062eb61ed9fdb20d0e25b5",
+    "postcondition": "Preview deployment, protected info, session, replay, model/deployment metadata, and no-failure event counts were observed; the strict no-second-upstream-call predicate remains blocked and Production was not targeted."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Personal Vercel deployment, encrypted Preview variable metadata, protected Eve responses, and Agent Runs metadata were read back without retaining secrets or payloads."
+  },
+  "postconditions": [
+    "The source-built Preview deployment is Ready on Eve 0.29.5 with encrypted Preview trace-content configuration and exact Terra/1050000 model metadata.",
+    "The initial protected session and startIndex=0 replay each reached message.completed and session.waiting with no failure event.",
+    "The one-hour Agent Runs inventory remained seven Terra runs before and after replay, and the selected matching run retained the same deployment and lifecycle metadata.",
+    "Production was not deployed, configured, called, or promoted by this attempt."
+  ],
+  "limitations": [
+    "Agent Runs exposes model, deployment, run lifecycle, step, and hook metadata but not the framework-owned $eve.* Workflow tags or a per-session model-attempt count.",
+    "Unchanged Agent Runs inventory and run event counts do not independently prove that replay made no second request to the proxy.",
+    "The bounded stream reader retained event names/counts only and did not retain HTTP payloads or raw stream envelopes.",
+    "The related proxy receipt remains the separate owner of stored-profile and live Terra/high subscription SSE proof."
+  ],
+  "nonClaims": [
+    "No prompt, response body, raw stream event, session identifier, bearer, bypass value, OAuth token, profile payload, ciphertext, tool data, trace payload, or chain-of-thought is retained.",
+    "This does not make Eve public, grant a general external OIDC caller capability, prove a zero-second upstream replay count, or prove Production.",
+    "Repository and deployment readiness do not establish a current provider or channel state beyond the named observed request."
+  ],
+  "rollback": {
+    "identity": "No provider configuration mutation occurred; the prior Preview deployment/configuration remains the rollback reference.",
+    "outcome": "ready",
+    "owner": "Bundjil Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json",
+      "sha256": "d9c81cc209a9fa49e7a88722f5471641fbc899c222062eb61ed9fdb20d0e25b5",
+      "provenance": "authenticated personal Vercel Preview deployment/readback, protected project OIDC call, safe Eve event counters, and Agent Runs metadata"
+    }
+  ],
+  "observedAt": "2026-08-04T09:03:10Z"
+}

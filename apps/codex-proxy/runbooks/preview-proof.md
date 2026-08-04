@@ -28,10 +28,12 @@ named Preview at `observedAt`; it is never Production proof.
 - Obtain authority for the remote model call and any protection bypass use.
   The bypass grants platform access only; it is not the proxy bearer.
 - Confirm the deployed Eve version is `0.29.5`, `EVE_TRACES_CONTENT=off`, and
-  the exact Preview team exposes Vercel Agent Runs with the framework-owned
-  Workflow-tag view. Do not configure a browser Session Trace, third-party
-  trace drain/exporter, broad propagation allowlist, or a request/header
-  capture rule for this proof.
+  the exact Preview team exposes the accessible Vercel Agent Runs metadata
+  surface. Record whether framework-owned Workflow tags and a per-session
+  attempt count are actually present; do not assume another dashboard tier is
+  available. Do not configure a browser Session Trace, third-party trace
+  drain/exporter, broad propagation allowlist, or a request/header capture rule
+  for this proof.
 - Do not create a deployment, bypass, profile, or environment variable as part
   of this proof run.
 
@@ -110,20 +112,22 @@ payloads.
    the protected `vercel curl --json` path against the immutable Preview agent
    deployment to create one bounded Eve session. Retain the command's request
    ID only in operator memory. Read the session once to completion/waiting,
-   then replay that same stream with `startIndex=0`. In the exact Preview
-   team's Agent Runs view, inspect the worker run identified through the
-   framework-owned `$eve.*` tags and require the configured Terra model, one
-   completed model attempt before replay, and the same count afterwards.
-   Retain only an opaque run fingerprint, the two counts, deployment
-   identities, and safe booleans. Do not retain raw trace data, session/turn
-   IDs, trace headers, prompts, responses, tokens, tool values, reasoning, or
-   screenshots containing them.
+   then replay that same stream with `startIndex=0`. Query the exact Preview
+   team's Agent Runs metadata immediately before and after replay. Record only
+   the one-hour run count, Terra-run count, selected run's model, immutable
+   deployment match, lifecycle status, event/step/hook counts, and safe event
+   booleans. Do not retain raw trace data, session/turn IDs, trace headers,
+   prompts, responses, tokens, tool values, reasoning, or screenshots
+   containing them.
 
-   Stop as `blocked` if Agent Runs or the Workflow-tag view is unavailable,
-   cannot identify the exact worker/model attempt, the count is unavailable or
-   changes after replay, or the view exposes data outside this runbook's
-   retention rule. CLI admission traces, timing, and proxy counters are not
-   substitutes.
+   The currently accessible Vercel Agent Runs surface does not expose the
+   framework-owned `$eve.*` Workflow tags or a per-session model/proxy-attempt
+   count. Treat identical inventory and lifecycle counts as supporting
+   metadata for Eve replay, not as an independent no-second-upstream-call
+   oracle. Keep the task `blocked` for that strict predicate until a supported
+   metadata or provider-owned counter is available. CLI admission traces,
+   timing, process-local state, static headers, and unchanged inventory are
+   not substitutes for a per-session attempt count.
 
 ## Evidence and postcondition
 
