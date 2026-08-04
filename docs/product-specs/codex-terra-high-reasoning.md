@@ -250,6 +250,32 @@ fresh Preview Eve request (OIDC-protected)
   -> sanitized trace/log counters correlate one request without payload capture
 ```
 
+### OIDC caller decision
+
+Vercel issues workload OIDC tokens only inside a Vercel function request
+context. An external CLI, the Vercel REST API, and a Deployment Protection
+bypass cannot mint or substitute for that bearer. The successful private proxy
+proof therefore does not make the protected Eve session route externally
+callable.
+
+The next implementation may add a Preview-only, in-Vercel proof caller only
+after it has a reviewed design for its own project/function identity and a
+Vercel Trusted Sources rule scoped to the target agent Preview environment.
+It must request the workload token through the Vercel OIDC API at request time,
+send it only to the agent's immutable Preview candidate, and emit a
+schema-encoded receipt containing only status/event counts/model predicates and
+leak booleans. It must not add a public Eve auth fallback, reuse a deployment
+protection bypass as an application bearer, expose an arbitrary URL/prompt
+relay, or use a channel message as a substitute for the direct session/replay
+journey.
+
+Before implementation, verify the installed Eve session request/replay shapes
+and Vercel Trusted Sources configuration surface. The proof caller is a
+separate app/infrastructure boundary and needs its own SPEC task, explicit
+Preview authority, rollback/revocation owner, live/mock Layer design, and
+direct negative tests for wrong target, missing/invalid OIDC, untrusted source,
+and replay duplication.
+
 ## Migration, rollout, and rollback
 
 1. Land the schema, policy Layer, config plumbing, fixtures, documentation,

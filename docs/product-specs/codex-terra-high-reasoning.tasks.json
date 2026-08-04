@@ -125,12 +125,13 @@
       "id": "authorized-preview-subscription-proof",
       "title": "Perform an authorized live Preview subscription-endpoint proof",
       "status": "blocked",
-      "description": "After code is accepted and explicit deployment authority is supplied, deploy source-built personal Preview proxy and agent changes, read back the intended configuration, and make one minimal protected Eve request through the live subscription proxy. The 2026-08-03 authorized Preview stage reached source-built READY deployments but stopped before a subscription request because the proxy was live/high and not ready.",
+      "description": "After code is accepted and explicit deployment authority is supplied, deploy source-built personal Preview proxy and agent changes, read back the intended configuration, and make one minimal protected Eve request through the live subscription proxy. The 2026-08-04 successor established encrypted Preview profile storage and a successful private Terra/high subscription SSE proof; the remaining direct Eve session/replay predicate needs a caller-minted Vercel OIDC bearer.",
       "implementationNotes": [
         "The 2026-08-04 delegated task supplied scoped Preview mutation authority. Keep Production excluded and stop on any ambiguous target, shared store, cipher, bearer, or protection binding.",
         "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
         "Read back only environment names/safe target values where authorized: proxy high effort, agent Terra model, and 1050000 context. Do not capture secret values.",
-        "Use the hardened proof command plus an OIDC-protected Eve request/replay. Correlate safe modelId/reasoningEffort/mode/status/SSE-completed evidence with Vercel logs."
+        "Use the hardened proof command plus an OIDC-protected Eve request/replay. Correlate safe modelId/reasoningEffort/mode/status/SSE-completed evidence with Vercel logs.",
+        "Do not implement an OIDC workaround in this task. Vercel issues workload identity only in a Vercel function context; an external CLI/API caller and Deployment Protection bypass are not substitutes. A separate reviewed Preview-only in-Vercel proof-caller task is required."
       ],
       "mandatoryVerification": [
         "Preview proxy health is live/ready; unauthenticated and invalid bearer checks remain 401; authenticated minimal request returns HTTP 200 text/event-stream with [DONE].",
@@ -148,7 +149,8 @@
         "Proxy health read back mode live and reasoning high but HTTP 503/ok false. The bounded proof command returned status blocked, classification request_failed, exit 1, and no subscription SSE predicate was observed.",
         "The missing prerequisite is an isolated Preview Codex stored profile, persistence namespace, and cipher configuration with a usable proof-only Vercel protection path. The task must not copy Production credentials or profile state to satisfy it. See docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json.",
         "The 2026-08-04 authenticated metadata readback found Preview subject/profile/cipher/prefix variables but no Preview-only writable REST store pair accepted by the Effect persistence layer. That metadata-only stop remains historical evidence; see docs/evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json.",
-        "Cooper explicitly approved reuse of the existing agent-bound Upstash resource (upstash-kv-apricot-window) for proxy Preview and Production. Sensitive KV_REST_API_URL/TOKEN metadata now targets both proxy environments. This supersedes only the physical-store predicate: the Preview subject, profile, prefix, cipher, access, deployment, and proof boundaries remain distinct. No login, deployment, proxy proof, or Eve replay has yet been attempted. See docs/evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json."
+        "Cooper explicitly approved reuse of the existing agent-bound Upstash resource (upstash-kv-apricot-window) for proxy Preview and Production. The proxy uses encrypted KV_REST_API_URL/TOKEN bindings, while Preview and Production retain distinct subject, profile, prefix, cipher, access, deployment, and proof boundaries. See docs/evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json.",
+        "The 2026-08-04 Preview stored-profile proof succeeded with all required encrypted-profile and leak predicates. The source-built proxy deployment dpl_2pnDomby1u7XRoYVsVzah1Nw492u then proved live/ready/high Terra subscription SSE with both 401 controls and no leak. The source-built agent deployment dpl_86QVMipLBHsnLUCHDTFqhR4egJ8E is Ready and targets that immutable proxy. Its session route remains intentionally OIDC-protected; an external bypass request redirects rather than constituting an OIDC proof. See docs/evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json."
       ],
       "commitAfterPassing": false
     },

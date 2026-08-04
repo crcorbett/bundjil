@@ -36,6 +36,14 @@ Preview stage. Perform trusted-local Preview login and stored-profile proof
 against the approved shared store before any deployment or live request; see
 the dated packets.
 
+The stored-profile and proxy phases have now passed. The remaining Eve
+session/replay phase is blocked on a caller-minted Vercel OIDC bearer. Official
+Vercel OIDC is workload identity available only inside a Vercel function
+request context; the external Vercel API and Deployment Protection bypass are
+not equivalent. Do not weaken Eve auth. A separate, reviewed Preview-only
+in-Vercel proof caller with exact Trusted Sources scope is the next design
+task before this plan can resume live session proof.
+
 ## Evidence record
 
 | Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                                                  |
