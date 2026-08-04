@@ -22,6 +22,12 @@ confirmed the remaining isolation gate: no Preview-only writable REST
 persistence binding exists for the encrypted Codex profile. The only writable
 candidate targets Production too and was not reused.
 
+The 2026-08-04 successor readback located the existing personal Vercel
+Marketplace Upstash installation and its direct-store provisioning path. The
+free resource request was rejected because the installation has no free Redis
+billing plan. A paid-plan selection and explicit spending approval now gate
+the dedicated Preview resource.
+
 ## Current task
 
 Repository tasks 1–3 and 5 are complete. Task
@@ -66,6 +72,12 @@ The successor
 confirms that no Preview-only writable REST store is currently bound. It makes
 no OAuth, deployment, proxy, Eve, or Production claim.
 
+The further successor
+[`codex-terra-preview-upstash-billing-blocked-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
+records the Marketplace direct-store rejection without creating a billing
+relationship. It requires a named paid-plan approval before provisioning may
+continue.
+
 ## Terminal audit
 
 1. **Ownership and call graph.** This slice changes only evidence owners: the
@@ -92,7 +104,8 @@ no OAuth, deployment, proxy, Eve, or Production claim.
 - No provider resource, environment, deployment, profile, proxy request, or
   Production action was performed in the successor attempt.
 - Task `authorized-preview-subscription-proof` remains blocked on a dedicated
-  Preview REST KV resource and its metadata-only isolation readback.
+  Preview REST KV resource, a named paid Upstash plan, and explicit spending
+  approval.
 
 ## 2026-08-04 terminal audit
 

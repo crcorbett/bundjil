@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-upstash-billing-blocked",
+  "observedAt": "2026-08-04T04:02:52Z",
+  "candidate": {
+    "repositoryCommit": "fccf75402c3e5dbcc4ae1fda3112ee1316d5e9aa",
+    "vercelTeamId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+    "upstashIntegrationConfigurationId": "icfg_ESJCLRNpDm5rTrIAilfgv7A9",
+    "upstashRedisProductId": "iap_gpfB8wWHssmOi6P1"
+  },
+  "authority": {
+    "scope": "Personal Vercel Preview Upstash resource discovery and free-plan provisioning attempt.",
+    "access": "mutation",
+    "production": "not authorized or changed"
+  },
+  "observations": {
+    "marketplaceInstallationPresent": true,
+    "directProvisioningOperationAvailable": true,
+    "requestedResource": {
+      "name": "bundjil-codex-preview",
+      "region": "syd1",
+      "environment": "preview"
+    },
+    "freePlanProvisioning": {
+      "attempted": true,
+      "created": false,
+      "result": "rejected-no-free-billing-plan"
+    },
+    "availablePlanIds": [
+      "paid",
+      "fixed_250mb",
+      "fixed_1gb",
+      "fixed_5gb",
+      "fixed_10gb",
+      "fixed_50gb",
+      "fixed_100gb",
+      "fixed_500gb"
+    ]
+  },
+  "blockedPredicates": [
+    "The existing Vercel Marketplace Upstash installation has no free Redis billing plan.",
+    "Creating any available resource would create a paid subscription or usage-bearing billing relationship, which has not been specifically approved with a spending limit.",
+    "No dedicated Preview REST store exists, so the encrypted profile, trusted-local login, stored-profile proof, proxy deployment, live SSE proof, and Eve replay remain unattempted."
+  ],
+  "nonClaims": [
+    "No Upstash resource, billing plan, project connection, environment variable, profile, credential, OAuth grant, deployment, proxy request, Eve session, replay, or Production resource was created or changed.",
+    "No secret, token, profile, cipher key, prompt, response, protected URL, billing amount, or provider payload is retained."
+  ],
+  "rollback": "The rejected request created no resource. Existing Preview and Production configurations remain unchanged."
+}

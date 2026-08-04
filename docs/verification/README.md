@@ -175,6 +175,11 @@ operation nor asserts present provider state.
   REST store was bound to the encrypted Codex profile boundary, and the only
   writable candidate also targets Production. It proves no login, deployment,
   subscription, Eve, replay, or Production result.
+- [`codex-terra-preview-upstash-billing-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
+  retains the Marketplace direct-store readback: the existing Upstash
+  installation has no free Redis plan, so no paid resource was created without
+  named-plan and spending approval. It proves no profile, proxy, Eve, replay,
+  deployment, or Production result.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

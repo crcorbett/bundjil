@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "Dedicated Preview Upstash Redis resource for the Codex encrypted profile boundary"
+  },
+  "candidate": {
+    "repositoryCommit": "fccf75402c3e5dbcc4ae1fda3112ee1316d5e9aa",
+    "sourceDigest": "b35682187354bf7a0332c50004930a86f37a70d6df97809d63cc0cb277edac44",
+    "artifactDigest": "8358264fec217c3887e1f648996f7568f25f5c6d81f7120460cbe95551d97637"
+  },
+  "authority": {
+    "principal": "Cooper, personal Vercel owner",
+    "identitySource": "explicit delegated task authority and authenticated Vercel personal team",
+    "externalAccess": "mutation",
+    "approvalReceipt": "delegated task authority recorded 2026-08-04; no paid billing approval",
+    "rollbackOwner": "Bundjil Vercel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "bundjil-codex-proxy Preview persistence resource"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "blocked",
+      "oracle": "The correct Marketplace provisioning route rejected the free resource request because no free Upstash Redis plan is available."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Authenticated Vercel Upstash direct-store provisioning with no billing plan",
+    "outcome": "blocked",
+    "exitCode": 0,
+    "invariant": "A dedicated Preview profile store must not create an unapproved paid billing relationship.",
+    "target": "Personal Vercel Marketplace Upstash Redis resource",
+    "recoveryHint": "Approve one named paid Upstash plan with a spending limit, then create and connect one Preview-only resource before continuing the profile and live-proof runbook.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-upstash-billing-blocked-2026-08-04.json",
+    "detailSha256": "0a5cd37308c26d78140b32fc659f43585b9a7be333340ba5def2582cdc8e34b0",
+    "postcondition": "No resource or billing relationship was created."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Authenticated Vercel Marketplace product and billing-plan readback retained in the sanitized detail."
+  },
+  "postconditions": [
+    "The free provision request did not create a resource or connect one to either project.",
+    "Preview and Production remain isolated because no shared credential or paid resource was used."
+  ],
+  "limitations": [
+    "The provider returned plan identities but no price amount, so no cost assertion is retained.",
+    "The receipt does not prove a future paid plan's availability, price, or resource behavior."
+  ],
+  "nonClaims": [
+    "No paid plan, resource, profile, provider request, SSE, Eve session, replay, deployment, or Production result was proven.",
+    "No secret, protected URL, token, profile, cipher key, prompt, response, reasoning, or billing amount is retained."
+  ],
+  "rollback": {
+    "identity": "No resource was created; preserve the existing Preview and Production configurations.",
+    "outcome": "ready",
+    "owner": "Bundjil Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-preview-upstash-billing-blocked-2026-08-04.json",
+      "sha256": "0a5cd37308c26d78140b32fc659f43585b9a7be333340ba5def2582cdc8e34b0",
+      "provenance": "authenticated personal Vercel Marketplace configuration, product, direct-store, and billing-plan readbacks"
+    }
+  ],
+  "observedAt": "2026-08-04T04:02:52Z"
+}
