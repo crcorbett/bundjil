@@ -14,5 +14,5 @@ Accepted and superseded plans live in [`../completed`](../completed/).
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   repository implementation is complete; the authorized Preview subscription
-  proof is blocked on a dedicated Preview writable REST persistence binding
-  for its isolated profile/cipher boundary and its paid-plan approval.
+  proof uses the existing shared agent Upstash resource with distinct Preview
+  profile/prefix/cipher boundaries; trusted-local profile and live proof remain.

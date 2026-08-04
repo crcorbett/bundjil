@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-shared-upstash-binding",
+  "observedAt": "2026-08-04T04:20:00Z",
+  "candidate": {
+    "repositoryCommit": "4bb7531c043fd7e4ab5e421fbf3ce9e069cf9310",
+    "vercelTeamId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+    "proxyProjectId": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+    "agentProjectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+    "sharedStoreId": "store_ES9rxXMBjgKrsO3e"
+  },
+  "authority": {
+    "scope": "Use the existing agent-bound Upstash resource for Codex proxy Preview and Production persistence.",
+    "access": "mutation",
+    "decision": "Cooper explicitly approved the shared resource after the dedicated-store billing stop.",
+    "production": "No Production deployment, profile, request, or configuration value was changed."
+  },
+  "observations": {
+    "agentBinding": {
+      "variableNames": [
+        "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL",
+        "BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"
+      ],
+      "targets": ["preview", "production"],
+      "storeId": "store_ES9rxXMBjgKrsO3e"
+    },
+    "proxyBinding": {
+      "variableNames": ["KV_REST_API_URL", "KV_REST_API_TOKEN"],
+      "targets": ["preview", "production"],
+      "encrypted": true,
+      "repair": "The first copy produced a non-URL placeholder. A second authorized in-memory copy validated the source HTTPS URL and non-empty token before writing only their values. Vercel local pull masks sensitive values, so the final bindings use encrypted variables, enabling the trusted-local profile runbook without retaining values."
+    },
+    "previewBoundary": {
+      "subjectProfilePrefixCipherMetadataPresent": true,
+      "prefix": "bundjil:codex-oauth:preview:",
+      "cipher": "fresh Preview-only encrypted material with a distinct key ID",
+      "productionMetadataTargetExcluded": true
+    },
+    "productionBoundary": {
+      "prefix": "bundjil:codex-oauth:production:",
+      "profile": "unmodified",
+      "cipher": "unmodified"
+    },
+    "marketplaceConnection": {
+      "attempted": true,
+      "result": "internal-error",
+      "fallback": "Authorized in-memory copy through Vercel project environment-variable APIs with post-mutation metadata readback."
+    }
+  },
+  "requiredNextPredicates": [
+    "A source-built Preview proxy and agent deploy from the selected source commit.",
+    "The protected live proxy and Eve journey prove Terra/high subscription SSE and replay separately."
+  ],
+  "nonClaims": [
+    "This binding does not prove the opaque URL/token values are correct, the shared store is reachable, or either environment can read the other environment's state.",
+    "The stored-profile proof establishes only one Preview encrypted profile; it does not establish a deployment, proxy request, subscription response, Eve session, replay, or Production result.",
+    "No secret, token, profile, cipher key, prompt, response, protected URL, or reasoning material is retained."
+  ],
+  "rollback": "Remove KV_REST_API_URL and KV_REST_API_TOKEN from the proxy Preview target, then preserve the historical blocked packets. Do not alter the agent replay binding or Production without separate authority."
+}

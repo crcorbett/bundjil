@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "inconclusive",
+  "outcome": "inconclusive",
+  "lifecycle": { "state": "inconclusive" },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "bundjil-codex-proxy Preview and Production KV_REST_API_URL/TOKEN bindings"
+  },
+  "candidate": {
+    "repositoryCommit": "4bb7531c043fd7e4ab5e421fbf3ce9e069cf9310",
+    "sourceDigest": "8864fdf15dab08f1a18cd4c2357cf4bb46195504bfbdecadb292e2dcf03d290a",
+    "artifactDigest": "8358264fec217c3887e1f648996f7568f25f5c6d81f7120460cbe95551d97637"
+  },
+  "authority": {
+    "principal": "Cooper, personal Vercel owner",
+    "identitySource": "explicit in-thread approval and authenticated Vercel personal team",
+    "externalAccess": "mutation",
+    "approvalReceipt": "shared agent-bound Upstash resource approved for proxy Preview and Production",
+    "rollbackOwner": "Bundjil Vercel operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "Codex proxy encrypted profile boundary sharing the agent-bound Upstash resource"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "inconclusive",
+      "oracle": "Vercel metadata readback confirms sensitive standard REST variable names on both proxy targets; stored-profile and live journey predicates remain unattempted."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Authenticated personal Vercel project environment-variable copy and metadata readback",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "The physical store may be shared only while Preview keeps distinct subject, profile, key-prefix, and cipher metadata.",
+    "target": "Personal bundjil-codex-proxy Preview and Production environment-variable targets",
+    "recoveryHint": "Remove the two proxy KV_REST_API variables from Preview if the subsequent stored-profile proof is not accepted; do not alter the agent replay binding.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-preview-shared-upstash-binding-2026-08-04.json",
+    "detailSha256": "7afd9f934a14a5d38a81fea6bbcfc580549e2310c98509c9a1493b539f00d036",
+    "postcondition": "Encrypted KV_REST_API_URL and KV_REST_API_TOKEN metadata now target both proxy environments; distinct Preview and Production prefixes and a Preview-only cipher support the stored-profile proof."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Authenticated Vercel project environment metadata readback retained in the sanitized detail."
+  },
+  "postconditions": [
+    "The former dedicated-resource billing predicate is superseded only for physical persistence storage.",
+    "Preview and Production still require distinct subject, profile, key-prefix, cipher, access, deployment, and proof boundaries."
+  ],
+  "limitations": [
+    "Metadata readback plus the stored-profile proof does not prove a deployed runtime, proxy request, subscription SSE, Eve session, or replay.",
+    "The Marketplace connection operation returned an internal error; the separately authorized environment-variable path is the only completed binding."
+  ],
+  "nonClaims": [
+    "No deployment, provider request, SSE, Eve session, replay, or Production outcome was proven.",
+    "No secret, protected URL, token, profile, cipher key, prompt, response, reasoning, or billing amount is retained."
+  ],
+  "rollback": {
+    "identity": "Remove the proxy KV_REST_API_URL and KV_REST_API_TOKEN Preview bindings; preserve the agent binding and all historical receipts.",
+    "outcome": "ready",
+    "owner": "Bundjil Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-preview-shared-upstash-binding-2026-08-04.json",
+      "sha256": "7afd9f934a14a5d38a81fea6bbcfc580549e2310c98509c9a1493b539f00d036",
+      "provenance": "authenticated personal Vercel project environment-variable mutation and metadata readback"
+    }
+  ],
+  "observedAt": "2026-08-04T04:20:00Z"
+}

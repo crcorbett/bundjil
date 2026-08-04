@@ -178,8 +178,20 @@ operation nor asserts present provider state.
 - [`codex-terra-preview-upstash-billing-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
   retains the Marketplace direct-store readback: the existing Upstash
   installation has no free Redis plan, so no paid resource was created without
-  named-plan and spending approval. It proves no profile, proxy, Eve, replay,
-  deployment, or Production result.
+  named-plan and spending approval. It is historical after the approved shared
+  store decision and proves no profile, proxy, Eve, replay, deployment, or
+  Production result.
+- [`codex-terra-preview-shared-upstash-binding-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
+  records the approved reuse of the agent-bound Upstash store for proxy
+  Preview and Production, with separate Preview profile/prefix/cipher metadata
+  retained. It proves only sensitive variable-name/target readback, not store
+  reachability, OAuth, encrypted profile isolation, SSE, Eve replay, or a
+  Production result.
+- [`codex-terra-preview-live-proxy-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-proxy-2026-08-04.json)
+  retains the successful Preview stored-profile and private proxy proof: the
+  subscription request mapped Terra/high and completed a bounded SSE stream.
+  The Ready Eve deployment has no externally minted Vercel OIDC caller proof,
+  so this does not claim an Eve session/replay or Production result.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

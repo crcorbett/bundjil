@@ -329,7 +329,7 @@ boundaries. The dated packet
 [`codex-terra-preview-blocked-2026-08-03.json`](../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
 is the current provider receipt; it retains no secret or payload material.
 
-### 2026-08-04 Preview-isolation readback
+### 2026-08-04 Preview persistence decision and binding
 
 The succeeding authorized readback found explicit Preview subject, profile,
 cipher, key-prefix, and high-effort variable metadata on the proxy. It did not
@@ -339,14 +339,21 @@ find either writable REST-store pair accepted by the Effect persistence layer:
 read-only token are not a substitute.
 
 The only available writable REST pair belongs to the agent channel-replay
-configuration and targets both Preview and Production. It must not be copied
-to the Codex Preview profile boundary. This preserves the required environment
-isolation but blocks trusted-local login, stored-profile proof, a new source
-deployment, proxy SSE, and the Eve session/replay journey. The new dated
-packet
+configuration and targets both Preview and Production. Cooper explicitly
+approved reuse of that existing Upstash resource (`upstash-kv-apricot-window`)
+for the proxy, as the agent already does. The proxy now has sensitive
+`KV_REST_API_URL` and `KV_REST_API_TOKEN` metadata on both targets. This
+supersedes the former requirement for a physically dedicated Preview database,
+but not the logical boundary: Preview and Production must retain separate
+subject, profile, key prefix, cipher, access path, deployment, and proof.
+
+The historical metadata-only stop packet
 [`codex-terra-preview-isolation-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
-is a metadata-only stop receipt; it does not replace the August 3 packet or
-establish provider acceptance.
+and billing stop packet remain valid history. The successor binding packet
+[`codex-terra-preview-shared-upstash-binding-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
+records this narrow decision and metadata readback. It does not establish
+store reachability, OAuth, profile isolation, deployment, provider acceptance,
+or an Eve journey.
 
 ## Affected surfaces
 

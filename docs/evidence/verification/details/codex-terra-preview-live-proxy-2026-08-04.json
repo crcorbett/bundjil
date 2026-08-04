@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-preview-live-proxy",
+  "observedAt": "2026-08-04T04:41:00Z",
+  "candidate": {
+    "repositoryCommit": "4bb7531c043fd7e4ab5e421fbf3ce9e069cf9310",
+    "proxyDeploymentId": "dpl_2pnDomby1u7XRoYVsVzah1Nw492u",
+    "agentDeploymentId": "dpl_86QVMipLBHsnLUCHDTFqhR4egJ8E",
+    "environment": "preview"
+  },
+  "storedProfile": {
+    "found": true,
+    "envelopeVersion2": true,
+    "ciphertextPresent": true,
+    "profileKindSubscription": true,
+    "refreshCapable": true,
+    "expiryValid": true,
+    "requiresReauthenticationFalse": true,
+    "markerLeakFalse": true
+  },
+  "proxyProof": {
+    "authenticatedStatus": 200,
+    "authorizationCodeLeak": false,
+    "healthModeLive": true,
+    "healthReady": true,
+    "healthReasoningEffortHigh": true,
+    "healthStatus": 200,
+    "invalidTokenStatus": 401,
+    "rawPayloadLeak": false,
+    "requestedModelTerra": true,
+    "streamContentTypeSse": true,
+    "streamDataLines": 3,
+    "streamDone": true,
+    "tokenLeak": false,
+    "unauthenticatedStatus": 401
+  },
+  "limitations": [
+    "The agent deployment is Ready and configured to use the immutable proxy URL, but its Eve session route requires a Vercel OIDC bearer. A Vercel protection bypass is not an OIDC bearer, so no external Eve session or replay proof is claimed.",
+    "No Production deployment, profile, model call, or message-channel journey was performed."
+  ],
+  "nonClaims": [
+    "No prompt, response body, raw SSE event, bearer, bypass, OAuth token, profile payload, ciphertext, or chain-of-thought is retained.",
+    "This does not prove Eve session completion or replay, stable alias ownership, Production, or general account capability."
+  ]
+}

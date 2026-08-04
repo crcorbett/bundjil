@@ -17,23 +17,24 @@ started: 2026-07-21
 Repository implementation is complete. The authorized 2026-08-03 Preview
 rollout deployed both source-built candidates from `f1b11907c29464423ddcb3ffabac6bf9f0694770`,
 set the proxy high-effort and agent Terra/context configuration, and read back
-the protected Eve model identity. The 2026-08-04 metadata-only successor
-confirmed the remaining isolation gate: no Preview-only writable REST
-persistence binding exists for the encrypted Codex profile. The only writable
-candidate targets Production too and was not reused.
+the protected Eve model identity. The 2026-08-04 metadata-only successors
+recorded that a dedicated Preview resource was unavailable. Cooper then
+explicitly approved use of the agent-bound Upstash resource for proxy
+Preview and Production. Sensitive standard REST metadata now exists on both
+proxy targets.
 
-The 2026-08-04 successor readback located the existing personal Vercel
-Marketplace Upstash installation and its direct-store provisioning path. The
-free resource request was rejected because the installation has no free Redis
-billing plan. A paid-plan selection and explicit spending approval now gate
-the dedicated Preview resource.
+This removes only the physical-store isolation predicate. Preview and
+Production must still use separate subject, profile, key prefix, cipher,
+access, deployment, and proof boundaries. The next gate is trusted-local
+Preview login plus stored-profile proof, not a paid-plan selection.
 
 ## Current task
 
 Repository tasks 1–3 and 5 are complete. Task
-`authorized-preview-subscription-proof` is blocked after its authorized
-Preview stage. Provision a dedicated Preview REST KV resource before any
-further provider mutation; see the dated packets.
+`authorized-preview-subscription-proof` is active after its authorized
+Preview stage. Perform trusted-local Preview login and stored-profile proof
+against the approved shared store before any deployment or live request; see
+the dated packets.
 
 ## Evidence record
 
@@ -41,7 +42,7 @@ further provider mutation; see the dated packets.
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve model/context selection.                                                                                                 |
 | Implementation quality   | Tasks 1–3 use schema-derived Type/Encoded contracts, named policy/config services, typed errors, and explicit live/local/test Layers. Proxy configuration is decoded solely in `apps/codex-proxy/src/env.ts`; a fallback provider preserves absent-key `low` without masking invalid input.                                                                       |
-| Verification coverage    | Tasks 1–5 retain their focused/local gates. The authorized Preview readback proves source-built READY deployments, proxy `live`/`high`, and protected Eve `bundjil-codex-proxy/gpt-5.6-terra` with `1050000`; the bounded proxy proof exited `1` as `request_failed` because health was `503` not-ready. It did not reach subscription SSE or Eve session/replay. |
+| Verification coverage    | Tasks 1–5 retain their focused/local gates. The current source-built Preview proxy is Ready and its bounded private proof establishes `live`/ready/high, Terra request mapping, both `401` controls, completed subscription SSE, and leak predicates. The current agent is also Ready and targets that immutable proxy; its external Eve session/replay proof remains blocked on a caller-minted Vercel OIDC bearer, which a protection bypass must not replace. |
 
 ## Downstream-impact ledger
 
@@ -75,8 +76,13 @@ no OAuth, deployment, proxy, Eve, or Production claim.
 The further successor
 [`codex-terra-preview-upstash-billing-blocked-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
 records the Marketplace direct-store rejection without creating a billing
-relationship. It requires a named paid-plan approval before provisioning may
-continue.
+relationship. It is historical only after the approved shared-store decision.
+
+The current successor
+[`codex-terra-preview-shared-upstash-binding-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
+records the approved sensitive REST binding and its metadata readback. It
+does not prove reachability, OAuth, an encrypted profile, a deployment, SSE,
+or Eve replay.
 
 ## Terminal audit
 
@@ -101,11 +107,13 @@ continue.
 
 ## Deferred external work
 
-- No provider resource, environment, deployment, profile, proxy request, or
-  Production action was performed in the successor attempt.
-- Task `authorized-preview-subscription-proof` remains blocked on a dedicated
-  Preview REST KV resource, a named paid Upstash plan, and explicit spending
-  approval.
+- The shared REST binding is the only provider configuration mutation in the
+  successor attempt; no Deployment, OAuth profile, proxy request, or
+  Production runtime action has followed it.
+- Task `authorized-preview-subscription-proof` is active and gated on
+  trusted-local Preview profile proof, then protected Preview proxy SSE and
+  Eve replay. Physical database separation and a paid plan are no longer
+  predicates under the explicit shared-store decision.
 
 ## 2026-08-04 terminal audit
 
@@ -119,9 +127,9 @@ continue.
    material, payloads, and protected endpoints. No helper, wrapper, raw
    configuration access, schema bypass, lint exception, or UI change was
    introduced.
-3. **Verification coverage.** `bun run verification` passed after the receipt
+3. **Verification coverage.** `bun run verification` passed after the prior receipt
    and documentation updates. It validates the Effect language-service,
    boundaries, docs, skills, authority, controls, proof-packet contract,
    harness inventory, lint, Knip, type checks, and tests. It does not make the
-   blocked external predicates pass: a dedicated Preview store, trusted-local
+   blocked external predicates pass: trusted-local
    profile proof, protected live SSE, and Eve replay remain separately required.

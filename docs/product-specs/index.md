@@ -24,10 +24,10 @@ context.
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  implementation is complete; the authorized Preview rollout is blocked on a
-  dedicated Preview writable REST persistence resource for its isolated
-  stored-profile/cipher boundary and a named paid Upstash plan with spending
-  approval. Subscription acceptance remains unproved.
+  implementation is complete; the authorized Preview rollout now uses the
+  existing shared agent Upstash resource with separate Preview profile,
+  prefix, and cipher boundaries. Trusted-local profile and live subscription
+  acceptance remain unproved.
 
 ## Implemented or superseded history
 
