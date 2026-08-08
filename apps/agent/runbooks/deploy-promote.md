@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-05
 review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
@@ -127,11 +127,13 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Eve/Nitro seam or separately pinned upstream change exists.
 
    For the Preview replay-proof stage, require the encrypted
-   `EVE_TRACES_CONTENT=off` binding and read back the exact team's accessible
-   Agent Runs model/deployment/lifecycle/step/hook metadata. Record unavailable
-   `$eve.*` Workflow tags or per-session attempt counters as limitations. This
-   is observability evidence only; it does not authorize a deployment or
-   replace the protected agent/proxy request proof.
+   `EVE_TRACES_CONTENT=off` binding, the supported Eve-to-provider correlation
+   contract, and the proxy-owned AtomicKeyValueStore receipt binding. Read back
+   the exact team's accessible Agent Runs model/deployment/lifecycle/step/hook
+   metadata and the sanitized receipt phase/ordinal. Record unavailable
+   `$eve.*` Workflow tags as limitations. These are proof predicates only; they
+   do not authorize a deployment or replace the protected agent/proxy request
+   proof.
 
 4. For the current stage, set `BUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT` through
    the approved secret/environment mechanism and run:

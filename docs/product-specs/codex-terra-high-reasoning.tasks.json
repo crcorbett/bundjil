@@ -6,12 +6,18 @@
     "Preview subscription-endpoint proof is required; direct public API, local Codex, mock, and repository-only results are insufficient.",
     "The Codex package owns the Responses effort vocabulary and decoded request policy; apps/codex-proxy owns the environment key and Layer injection; apps/agent owns Eve model selection.",
     "Keep the existing low behavior when the new proxy effort setting is absent, then make high an explicit coordinated Terra rollout setting.",
+    "Correlation and durable proxy evidence are both required for the strict replay claim; logs are supporting diagnostics only.",
+    "Reuse AtomicKeyValueStore with schema-defined transitions; do not use generic KV modify, internal Eve harness imports, static headers, process-local joins, or time-window counters.",
     "Never log, commit, retain, or display credentials, prompts, provider request or response bodies, account ids, tool values, reasoning text, or chain-of-thought."
   ],
   "globalVerification": [
     "bun run check:effect-setup",
     "bun run check:boundaries",
+    "bun run check:docs",
     "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
     "bun run --filter @bundjil/codex check-types",
     "bun run --filter @bundjil/codex test",
     "bun run --filter @bundjil/codex-proxy check-types",
@@ -27,7 +33,7 @@
   "riskLenses": [
     "Ownership and call graph: package provider vocabulary/policy, proxy config/Layer composition, agent model selection, and Preview deployment boundaries remain separate.",
     "Implementation quality: flat meaningful Effect.gen operations, typed .pipe error handling, schema Type/Encoded provenance, named services, safe tagged errors, explicit live/mock Layers, and no unsafe casts/manual readers/helper sprawl.",
-    "Verification coverage: focused schemas/config/mapper/handler/agent tests, direct HTTP and Preview/Eve live evidence, boundary and skill checks, safe observability and rollback readback."
+    "Verification coverage: focused schemas/config/mapper/handler/agent tests, correlation and atomic-receipt lifecycle tests, direct HTTP and Preview/Eve live evidence, boundary and documentation checks, safe observability and rollback readback."
   ],
   "tasks": [
     {
@@ -125,23 +131,23 @@
       "id": "authorized-preview-subscription-proof",
       "title": "Perform an authorized live Preview subscription-endpoint proof",
       "status": "blocked",
-      "description": "The authorized Preview stage proves encrypted profile storage, live Terra/high subscription SSE, protected Eve identity, session completion, and startIndex=0 replay. Upgrade the agent to Eve 0.29.5 and its AI SDK peer range before retrying. The proof reads the exact Preview team's accessible Agent Runs metadata for model, immutable deployment, lifecycle, step/hook counts, and safe event predicates. It remains blocked for the stronger no-second-upstream-call claim because the accessible surface does not expose framework-owned Workflow tags or a per-session model/proxy-attempt count.",
+      "description": "The authorized Preview stage proves encrypted profile storage, live Terra/high subscription SSE, protected Eve identity, session completion, and startIndex=0 replay. The upgraded Agent Runs readback is accepted up to its metadata ceiling, but the strict replay claim remains blocked until the successor correlation and durable-receipt tasks prove a supported Eve-to-provider join and an atomic provider-boundary lifecycle record.",
       "implementationNotes": [
         "The 2026-08-04 delegated task supplied scoped Preview mutation authority. Keep Production excluded and stop on any ambiguous target, shared store, cipher, bearer, or protection binding.",
         "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
         "Read back only environment names/safe target values where authorized: proxy high effort, agent Terra model, and 1050000 context. Do not capture secret values.",
-        "Upgrade Eve to 0.29.5, align the AI SDK peer range, set EVE_TRACES_CONTENT=off, and read the exact Preview team's accessible Agent Runs model/deployment/lifecycle metadata before and after replay. Record unavailable framework tags and per-session attempt counters as limitations. Do not add a trace drain/exporter, raw trace capture, static header, time-proximity counter, or process-local bridge.",
+        "The upgraded Eve 0.29.5/AI SDK proof and the current Agent Runs metadata remain historical lower-bound evidence. Do not close the strict predicate from those fields alone; continue with the supported-correlation and AtomicKeyValueStore receipt tasks. Do not add a trace drain/exporter, raw trace capture, static header, time-proximity counter, or process-local bridge.",
         "Use `vercel project token` only for the exact linked Preview agent project and `vercel curl` only against the recorded immutable deployment. Do not use a Deployment Protection bypass as application authentication, add a public Eve fallback, or expose a generic caller relay."
       ],
       "mandatoryVerification": [
         "Preview proxy health is live/ready; unauthenticated and invalid bearer checks remain 401; authenticated minimal request returns HTTP 200 text/event-stream with [DONE].",
         "The safe proxy observation says high, the proof request is gpt-5.6-terra through live subscription composition, and Vercel runtime evidence contains no credentials, prompts, response payloads, account ids, tool data, reasoning text, or chain-of-thought.",
-        "Protected Eve info reports exactly bundjil-codex-proxy/gpt-5.6-terra and context window 1050000; the accessible Agent Runs surface records the exact Terra model, immutable deployment, lifecycle, and step/hook metadata, one minimal session reaches completion/waiting, and replay leaves the safe event and inventory metadata unchanged. The strict no-second-upstream-call predicate remains blocked without a per-session attempt counter.",
+        "Protected Eve info reports exactly bundjil-codex-proxy/gpt-5.6-terra and context window 1050000; the accessible Agent Runs surface records the exact Terra model, immutable deployment, lifecycle, and step/hook metadata, one minimal session reaches completion/waiting, and replay leaves the safe event and inventory metadata unchanged. This is lower-bound evidence only until the successor tasks add correlation and durable receipt proof.",
         "Perform the terminal five-pass audit after the deployed proof: ownership/call graph; Effect/config/schema/error boundary; async SSE resource lifetime and durable replay; privacy/telemetry/evidence retention; verification/docs/rollback/deployment. Distinguish repository, local, Vercel, and subscription-endpoint proof."
       ],
       "completionCriteria": [
-        "The proof artifact records only deployment identity, Eve/AI SDK versions, safe configuration names/values, observed HTTP statuses, exact model identity, context, high predicate, accessible Agent Runs model/deployment/lifecycle/step/hook metadata, inventory counts, event kinds/counts, and leak booleans. It records unavailable Workflow tags and per-session attempt counters as limitations.",
-        "Any rejection, missing correlation, model mismatch, or leak is recorded as blocked; no Production promotion follows."
+        "The historical proof artifact records only deployment identity, Eve/AI SDK versions, safe configuration names/values, observed HTTP statuses, exact model identity, context, high predicate, accessible Agent Runs model/deployment/lifecycle/step/hook metadata, inventory counts, event kinds/counts, and leak booleans. It records unavailable Workflow tags and per-session attempt counters as limitations.",
+        "Any rejection, missing correlation, missing receipt transition, model mismatch, or leak is recorded as blocked; no Production promotion follows."
       ],
       "blockedEvidence": [
         "The 2026-08-03 personal Vercel Preview rollout created source-built READY proxy deployment dpl_AbUnezoqf4Xd4dv39vogZg2AQVLv and agent deployment dpl_AZ43mz4yfyGi3ffDdvfuyjdF8kLB from f1b11907c29464423ddcb3ffabac6bf9f0694770. Both read back as Preview; no Production target was selected.",
@@ -163,6 +169,116 @@
         "The final repository gate passed with the documented synthetic Executor configuration: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, boundary tests, type-aware lint, lint fixture, Knip, workspace type checks, and workspace tests."
       ],
       "commitAfterPassing": false
+    },
+    {
+      "id": "eve-supported-provider-correlation",
+      "title": "Prove and implement the supported Eve-to-provider correlation seam",
+      "status": "pending",
+      "dependsOn": ["terra-agent-build-and-proof-contract"],
+      "description": "Find a supported public Eve seam that carries an opaque per-attempt or logical-step correlation value to the actual AI SDK provider request. Implement only the smallest schema-owned contract that can be joined at the private proxy; otherwise record a blocked result and do not import Eve internals or invent a transport header.",
+      "implementationNotes": [
+        "Re-read the installed Eve package exports and versioned source, then validate the public seam with the installed API. DeepWiki research is supporting upstream context; the local installed package and generated types are authoritative.",
+        "Test the public instrumentation/defineDynamic/step.started options in a bounded local fixture. A runtimeContext value is telemetry metadata only until a direct provider-fetch test proves that the value reaches the real proxy request.",
+        "If the public API exposes an attempt value, define the owning branded CodexProxyCorrelationId and logical-step key in the canonical provider contract with explicit Type and Encoded exports. Decode unknown header/metadata input exactly once at the owning ingress and pass only decoded values to services.",
+        "Invoke effect-client-wrapper for the provider boundary. Use named operations and explicit live/mock Layers; do not add an internal Eve harness import, static proof header, AsyncLocalStorage, process-global, time-window join, generic fetch wrapper, or raw id: string field.",
+        "Keep raw Eve session/turn/attempt identifiers out of receipts and logs. Derive or receive only an opaque value whose alphabet, length, provenance, and retention are schema-owned and tested."
+      ],
+      "proofContract": {
+        "directObservable": "A versioned public Eve/provider fixture either captures the branded opaque value at the actual provider request or produces a sanitized blocked receipt naming the unavailable seam.",
+        "expectedPostcondition": "The proxy has one supported, schema-decoded correlation contract and no unsupported bridge is present.",
+        "falseGreenRejected": "A runtimeContext span field, internal Eve type import, static header, matching timestamp, or process-local variable treated as provider correlation.",
+        "focusedCommandOrProcedureOwner": "Installed Eve public-export/source inspection, focused agent/provider fetch fixture, Effect language-service diagnostics, and boundary checks",
+        "evidenceOwner": "Current task ledger and correlation investigation receipt",
+        "limitationsAndNonClaims": "A local fixture proves the repository seam only; it does not prove hosted Vercel propagation or subscription acceptance."
+      },
+      "mandatoryVerification": [
+        "The focused fixture proves the correlation value reaches the actual AI SDK/provider request boundary, or exits with status blocked and retains the missing-public-seam non-claim; no internal Eve harness path is imported.",
+        "Schema tests prove branded Type/Encoded forms, unknown ingress decoding, invalid alphabet/length rejection, absence handling, and no raw session/turn/attempt value retention.",
+        "Run Effect language-service diagnostics, affected agent/codex tests and typechecks, bun run check:boundaries, bun run check:effect-setup, bun run check:docs, bun run check:skills, bun run check:authority, bun run check:controls, and bun run check:verification.",
+        "Record ownership/call-graph, implementation-quality, and verification-coverage lenses: flat meaningful Effect.gen, typed .pipe error handling, canonical Schema Type/Encoded boundaries, named service operations, explicit Layers, no casts/manual readers/helper sprawl, and no unexplained boundary findings.",
+        "Invoke docs-maintainer and reconcile the SPEC, task ledger, Eve architecture pointer, affected runbooks, proof contract, and impact ledger before acceptance."
+      ],
+      "completionCriteria": [
+        "A supported correlation seam is proven and implemented with a narrow canonical contract, or the task is explicitly blocked with a dated receipt and no speculative bridge.",
+        "The existing lower-bound Agent Runs proof remains historical support and is not rewritten as strict replay proof."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "proxy-atomic-attempt-receipt",
+      "title": "Add the atomic proxy attempt receipt at the provider lifecycle",
+      "status": "pending",
+      "dependsOn": ["eve-supported-provider-correlation"],
+      "description": "Use the supported correlation value to add a small schema-defined, process-safe attempt receipt at the Bundjil proxy/provider boundary. Reuse AtomicKeyValueStore and the existing Upstash Layer, record the actual provider stream lifecycle, and keep Effect logs as supporting observations only.",
+      "implementationNotes": [
+        "Own CodexProxyAttemptReceipt, its branded key/prefix contract, and the safe phase vocabulary in the existing provider contract owner. Use explicit Type and Encoded forms and one inbound/outbound codec at each boundary.",
+        "Reuse AtomicKeyValueStore.transact with the existing Upstash atomic implementation and an explicit memory Layer. Do not use generic KeyValueStore.modify, read-then-write logic, a new storage wrapper, or the channel replay store.",
+        "Atomically claim an absent logical key, record upstreamStarted immediately before actual provider egress, record provider retry ordinals including 401 refresh retries, and record completed only after the SSE body reaches its terminal marker. Record failed or unknown on observed failure or interruption.",
+        "Place completion/failure observation around actual stream consumption and resource finalization, not merely stream construction. Use Effect.Clock for timestamps and recovery decisions; never read ambient Date.now in the primary Effect.",
+        "On a completed replay, return the durable result without a second provider request. On unknown, fail closed or enter an explicitly owned recovery route. Do not claim exactly-once remote execution without an upstream idempotency contract.",
+        "Emit native Effect.logInfo records after durable transitions with only the branded opaque key, model, effort, mode, phase, ordinal, status, SSE boolean, and bounded timestamp. Never use logs as the durable oracle."
+      ],
+      "productionCallGraph": "HTTP proxy ingress -> OpenAICompatibleProxy named operation -> AtomicKeyValueStore.transact admission -> CodexDirectProvider/CodexHttpClient egress receipt -> SSE stream finalizer -> AtomicKeyValueStore.transact terminal state -> native Effect Logger",
+      "testCallGraph": "synthetic correlated ingress -> OpenAICompatibleProxy test Layer -> AtomicKeyValueStore memory Layer -> controlled mock SSE stream -> replay/concurrent/interrupt fixtures -> schema receipt and safe-log assertions",
+      "proofContract": {
+        "directObservable": "Atomic transaction readback shows one logical-key admission, the expected upstream ordinals, and one terminal state across completion, duplicate replay, concurrent claim, and interruption fixtures.",
+        "expectedPostcondition": "A completed logical replay cannot trigger another provider admission; ambiguous state is retained as unknown and never silently retried.",
+        "falseGreenRejected": "A monotonically increasing process counter, log line count, route invocation count, unchanged inventory, or receipt written before lazy stream consumption treated as upstream proof.",
+        "focusedCommandOrProcedureOwner": "@bundjil/codex and @bundjil/codex-proxy focused tests, AtomicKeyValueStore memory/Upstash composition, Effect Clock/TestClock, and boundary checks",
+        "evidenceOwner": "Proxy attempt-receipt test receipt and current active plan",
+        "limitationsAndNonClaims": "The receipt proves Bundjil admission and recorded egress lifecycle; it does not prove a remote side effect across an unconfirmed crash window without upstream idempotency."
+      },
+      "mandatoryVerification": [
+        "Schema tests cover every phase, Type/Encoded boundary, branded key/prefix, safe-field omission, invalid transaction, and unknown/interruption representation.",
+        "Atomic tests cover absent claim, duplicate replay, concurrent claim conflict, completed replay short-circuit, provider 401 refresh ordinal, upstream failure, early stream close, and unknown recovery refusal using Effect Clock/TestClock.",
+        "The live composition uses the existing Upstash resource only through its target-owned encrypted binding and a new logical prefix; no secret value is printed or retained. The memory Layer is explicit and behaviorally equivalent for tests.",
+        "Run affected package/app tests, typechecks, builds, Effect language-service diagnostics, bun run check:boundaries, bun run check:effect-setup, bun run check:docs, bun run check:skills, bun run check:authority, bun run check:controls, bun run check:verification, and git diff --check.",
+        "Record all three risk lenses and invoke docs-maintainer. Update proxy/provider runbooks with receipt retention, unknown recovery, rollback, revocation, and non-claims; update the proof packet and critical-journey owner."
+      ],
+      "completionCriteria": [
+        "The atomic receipt is the sole strict replay oracle, has no generic persistence abstraction or helper sprawl, and records the actual provider stream lifecycle.",
+        "Logs are documented and tested as supporting diagnostics only; no acceptance path depends on their absence or completeness."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "correlated-preview-replay-proof-and-closeout",
+      "title": "Prove correlated Preview replay and close the strict evidence gap",
+      "status": "pending",
+      "dependsOn": [
+        "eve-supported-provider-correlation",
+        "proxy-atomic-attempt-receipt"
+      ],
+      "description": "Rerun the protected Preview proxy and Eve session/replay journey with the supported correlation seam and durable receipt. Keep repository, deployment, subscription, Eve, log, and receipt claims separate, then run the mandatory terminal five-pass audit and full verification on the exact receipt-bearing state.",
+      "implementationNotes": [
+        "Use the existing target-owned proxy and agent runbooks, the authorized Preview boundary, and the shared Upstash resource only with distinct logical Preview/Production prefixes. Do not promote Production.",
+        "Create a new sanitized proof packet identity. Read back immutable Preview deployment identities, encrypted variable metadata, correlation/receipt prefix metadata, protected Eve info, the live Terra/high proxy result, and the receipt state before and after startIndex=0 replay.",
+        "Require exact model bundjil-codex-proxy/gpt-5.6-terra, context 1050000, high reasoning, successful subscription SSE, one completed logical receipt, and no second provider admission on replay. Treat any unknown state, missing public correlation, missing receipt, or leak as blocked.",
+        "Retain prior blocked packets as historical evidence. Keep prompts, responses, tokens, credentials, raw headers, raw Eve identifiers, traces, and screenshots out of the new packet.",
+        "Run the terminal audit only after the correlation and receipt implementation is complete. The audit must reopen each owner if a finding remains, refresh proof and rollback identity, and distinguish the prior 2026-08-04 lower-bound audit from this new closeout."
+      ],
+      "productionCallGraph": "Protected Preview Eve request -> public Eve correlation -> private Preview proxy -> AtomicKeyValueStore receipt -> Codex subscription SSE -> Eve completion/waiting -> startIndex=0 replay -> receipt and Agent Runs readback",
+      "testCallGraph": "sanitized packet fixture -> proof command schema -> mock receipt/log/provider assertions -> blocked predicates -> exact receipt encoding",
+      "proofContract": {
+        "directObservable": "A new sanitized Preview packet joins the protected Eve attempt to one atomic proxy receipt and shows no second provider admission during durable stream replay.",
+        "expectedPostcondition": "The strict no-second-upstream-call claim is accepted only when correlation, receipt lifecycle, provider-egress observation, and replay predicates all pass.",
+        "falseGreenRejected": "Agent Runs inventory, stable step/hook counts, log absence, queue traces, timing, local proof, mock proof, or a successful 200 without receipt correlation.",
+        "focusedCommandOrProcedureOwner": "Target-owned Preview proxy/agent runbooks, bounded proof command, Vercel readback, Agent Runs readback, and AtomicKeyValueStore receipt query",
+        "evidenceOwner": "New dated verification detail and packet linked from the SPEC and verification README",
+        "limitationsAndNonClaims": "No Production promotion, general Codex subscription availability, exactly-once remote effect, or claim beyond the recorded Preview deployment and retention window."
+      },
+      "mandatoryVerification": [
+        "Run the protected Preview proxy proof and Eve session/replay journey with live mode, high reasoning, exact Terra identity, complete subscription SSE, receipt state, safe logs, and leak checks.",
+        "Read the receipt before and after startIndex=0 replay and prove the same completed logical key has no second provider admission; separately report any provider-side retry ordinal from the original attempt.",
+        "Run bun run check:docs, bun run check:authority, bun run check:controls, bun run check:verification, all focused package/app checks, and bun run verification. Record exact source, deployment, packet, rollback, and authority identities without secrets.",
+        "Perform the mandatory terminal five-pass audit: ownership/call graph; Effect/config/schema/error boundary; async SSE/resource lifetime and durable replay; privacy/telemetry/evidence retention; verification/docs/rollback/deployment. Any finding reopens its owner and blocks closeout.",
+        "Invoke docs-maintainer for final impact-ledger reconciliation and retain explicit limitations, non-claims, rollback, recovery, and next owner."
+      ],
+      "completionCriteria": [
+        "The new packet proves the combined correlation, atomic receipt, provider-egress, protected Eve, and Preview deployment predicates, or records a claim-matched blocked state.",
+        "No Production operation occurs, and the prior accepted lower-bound proof remains historical rather than being overwritten."
+      ],
+      "commitAfterPassing": true
     },
     {
       "id": "design-preview-oidc-eve-proof-caller",

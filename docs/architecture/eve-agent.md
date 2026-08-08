@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, Eve Workflow lifecycle, generated Build Output, deployment boundary, or external readback change
 ---
 
@@ -50,12 +50,21 @@ Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
 This describes code wiring only. It does not show which path an external
 environment currently configures or serves.
 
-Preview replay evidence uses Eve's framework-owned Agent Runs and Workflow-tag
-surface. `EVE_TRACES_CONTENT=off` is required for that Preview proof so trace
-content is not captured. OpenTelemetry remains restricted observability for
-safe application spans, but it is not the acceptance oracle for a
-model-attempt count because a CLI admission trace does not necessarily follow
-Eve's queued worker.
+Preview replay evidence currently uses Eve's framework-owned Agent Runs
+surface as lower-bound metadata. `EVE_TRACES_CONTENT=off` is required for that
+Preview proof so trace content is not captured. OpenTelemetry remains restricted
+observability for safe application spans, but it is not the acceptance oracle
+for a model-attempt count because a CLI admission trace does not necessarily
+follow Eve's queued worker.
+
+The strict replay target is intentionally two-part: a supported public
+Eve-to-provider correlation value must reach the private provider request, and
+the proxy/provider boundary must record the correlated lifecycle through the
+native `AtomicKeyValueStore` service. Native Effect logs support operations but
+are not durable replay evidence. Eve's internal attempt scope, runtime context
+as an HTTP header, process-local state, and generic KV read/modify/write are
+not supported architecture paths. The implementation and proof gates live in
+the [Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
 
 ## Boundary invariants
 

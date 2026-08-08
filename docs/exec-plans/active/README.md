@@ -13,5 +13,5 @@ Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  final documentation and repository verification are in progress after the
-  accepted Preview subscription and Eve proof; Production remains excluded.
+  correlation and atomic proxy-receipt implementation is active after the
+  lower-bound Preview subscription and Eve proof; Production remains excluded.

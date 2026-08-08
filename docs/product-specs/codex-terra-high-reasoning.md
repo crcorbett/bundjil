@@ -4,6 +4,7 @@ lifecycle: proposed
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-20
+last_reviewed: 2026-08-05
 review_trigger: implementation, deployment, environment, or proof change
 ---
 
@@ -80,6 +81,68 @@ deployment contract, tests, docs, and proof tooling. It does not add public
 proxy access, OAuth routes, API-key fallback, a generic Responses API options
 bag, a production deployment, or any provider mutation while this SPEC is
 being written.
+
+The strict replay-evidence gap is a separate follow-on slice. The current
+Preview evidence proves Eve's durable stream replay behavior and the available
+Agent Runs metadata, but it does not prove that replay caused no second request
+at the private proxy or Codex subscription boundary. That claim must remain
+blocked until the correlation and durable-receipt requirements below are
+implemented and verified.
+
+## Correlation and attempt-evidence decision
+
+Implement both controls. They answer different questions and neither is a
+complete substitute for the other:
+
+1. **Eve-to-provider correlation.** A supported public Eve/provider seam must
+   carry an opaque, schema-decoded correlation value to the private proxy. When
+   Eve exposes a public per-attempt identifier, retain it only as a branded
+   `CodexProxyCorrelationId` and distinguish it from the logical step key. A
+   retry of an interrupted Eve step may have a new attempt identifier; a
+   `startIndex=0` stream replay must not create a new model attempt.
+2. **Durable atomic proxy evidence.** The proxy must atomically admit and
+   transition the correlated logical attempt using Bundjil's existing
+   `AtomicKeyValueStore` service. The record is the independent, process-safe
+   evidence that a replay was not admitted as a second logical proxy request.
+3. **Structured logs.** Native Effect logging (`Effect.logInfo`/the configured
+   `Logger`) records safe lifecycle observations using the same opaque key.
+   Logs support diagnosis and provider operations, but are not the strict
+   replay oracle because retention, delivery, and retry duplication are not
+   atomic guarantees.
+
+The durable record must be owned by the proxy/provider boundary, not by an
+unrelated channel replay store. It must record a small schema-defined state
+machine such as `admitted`, `upstreamStarted`, `completed`, `failed`, or
+`unknown`, together with model, reasoning effort, route/mode, safe status, SSE
+completion, and an upstream-attempt ordinal. It must not retain prompts,
+responses, tokens, credentials, account identifiers, raw headers, raw Eve
+session/turn identifiers, or chain-of-thought.
+
+The atomic store is an admission and evidence control, not a promise of
+exactly-once execution against a remote provider. If the process crashes after
+the record says `upstreamStarted` and before completion is recorded, the next
+replay must remain `unknown` and must not automatically issue another request
+unless the upstream supports an idempotency key or a bounded recovery proof
+establishes that no upstream call occurred. A provider 401 refresh retry must
+be represented as a distinct upstream-attempt ordinal, not mistaken for an Eve
+stream replay.
+
+### Options considered
+
+| Option                                                             | Result                     | Reason                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Existing Agent Runs metadata or logs only                          | Supporting evidence        | Useful for diagnosis, but neither surface currently supplies a complete per-session proxy join or durable no-second-request oracle.                                                                                                         |
+| Public Eve attempt/correlation value plus logs                     | Necessary but insufficient | Gives a join when the public seam exists; still depends on log retention and completeness.                                                                                                                                                  |
+| Proxy-generated request ID without Eve correlation                 | Rejected                   | It cannot identify which Eve logical step caused the request.                                                                                                                                                                               |
+| Public Eve correlation plus durable atomic proxy receipt           | **Required target**        | Combines a trustworthy join with process-independent admission and lifecycle evidence.                                                                                                                                                      |
+| Eve internal harness import or static/time-window header           | Rejected                   | Internal `attemptId` types are not a supported authored API; process-local and time-based joins fail under Vercel retries and concurrent work.                                                                                              |
+| `defineDynamic` at `step.started` returning a live `LanguageModel` | Investigation seam only    | It is public and can run before a model call, but the installed API does not expose Eve's internal attempt index or prove that a custom header reaches the actual proxy request. It requires a bounded compatibility spike before adoption. |
+
+The strict acceptance claim is therefore layered: correlation proves the Eve
+join, the atomic receipt proves proxy admission/lifecycle, and the actual
+provider-egress observation proves what was sent upstream. If only one layer is
+available, the receipt must state the narrower claim rather than infer the
+stronger one.
 
 ## Ownership and canonical contracts
 
@@ -239,6 +302,30 @@ Vercel Preview environment values
 ```
 
 ```text
+Future correlation and durable-receipt runtime
+
+Eve public per-attempt/provider seam
+  -> apps/agent correlation codec and provider request metadata
+  -> private proxy ingress decodes CodexProxyCorrelationId once
+  -> OpenAICompatibleProxy admits the logical step through AtomicKeyValueStore
+  -> @bundjil/codex provider egress records upstreamStarted and ordinal
+  -> Codex subscription SSE body is consumed
+  -> stream finalizer atomically records completed/failed/unknown
+  -> native Effect Logger emits the same safe lifecycle fields
+```
+
+```text
+Future correlation and durable-receipt test runtime
+
+synthetic Eve correlation fixture
+  -> schema-decoded proxy request metadata
+  -> AtomicKeyValueStore memory Layer
+  -> mock Codex provider stream with controlled completion/interrupt
+  -> replay of the same logical key
+  -> assert no second admission, correct retry/unknown state, and safe logs
+```
+
+```text
 Required live subscription-endpoint proof
 
 fresh Preview Eve request (OIDC-protected)
@@ -247,7 +334,7 @@ fresh Preview Eve request (OIDC-protected)
   -> mapped encoded Responses request: model gpt-5.6-terra, reasoning.high
   -> subscription endpoint returns accepted SSE HTTP 200
   -> proxy returns OpenAI-compatible SSE through [DONE]
-  -> sanitized Vercel CLI trace counters correlate one request without payload capture
+  -> atomic proxy receipt plus safe provider-egress observation correlate one request without payload capture
 ```
 
 ### OIDC caller decision
@@ -302,32 +389,92 @@ configuration names, result statuses, and rollback result without values.
 Repository proof, local proof, Vercel deployment proof, and subscription
 endpoint proof are distinct:
 
-| Evidence class          | It proves                                                                                                              | It does not prove                                                                           |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Repository proof        | schemas, config decoding, Layer composition, mapper encoding, tests                                                    | a deployed proxy or endpoint acceptance                                                     |
-| Local proxy proof       | private HTTP/SSE wiring using mock or local composition                                                                | Vercel or hosted subscription acceptance                                                    |
-| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity                                            | that an upstream request used high unless correlated runtime proof confirms it              |
-| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response                           | Production approval or general public API support                                           |
-| Eve runtime metadata    | protected info/session/replay results plus accessible Agent Runs model, deployment, lifecycle, step, and hook metadata | a per-session model/proxy attempt count or an independent no-second-upstream-call predicate |
+| Evidence class          | It proves                                                                                                              | It does not prove                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Repository proof        | schemas, config decoding, Layer composition, mapper encoding, tests                                                    | a deployed proxy or endpoint acceptance                                                                 |
+| Local proxy proof       | private HTTP/SSE wiring using mock or local composition                                                                | Vercel or hosted subscription acceptance                                                                |
+| Vercel deployment proof | source-built Preview, exact app/proxy configuration and deployment identity                                            | that an upstream request used high unless correlated runtime proof confirms it                          |
+| Live subscription proof | Preview live proxy sent Terra/high and received a successful streaming subscription response                           | Production approval or general public API support                                                       |
+| Eve runtime metadata    | protected info/session/replay results plus accessible Agent Runs model, deployment, lifecycle, step, and hook metadata | a per-session model/proxy attempt count or an independent no-second-upstream-call predicate             |
+| Structured Effect logs  | safe lifecycle observations correlated to an opaque request key                                                        | durable delivery, complete retention, or exactly-once behavior                                          |
+| Atomic proxy receipt    | process-independent admission and lifecycle state for a correlated logical proxy attempt                               | that an unknown crash window did not reach the remote provider without an upstream idempotency contract |
 
-Add a sanitized, request-correlatable observation at the mapper/provider
-boundary (for example Effect span attributes or the established deployment
-log adapter) with only: `modelId`, `reasoningEffort`, route/mode, upstream
-HTTP status, SSE-completed boolean, and an opaque request correlation id. The
-field names and existing log owner must be inspected during implementation;
-do not invent an external telemetry service. It must not contain credentials,
-authorization headers, account ids, token values, prompts, request/response
-bodies, tool arguments/results, reasoning text, or chain-of-thought.
+Add the sanitized observation at the actual provider-egress lifecycle, not only
+when the HTTP handler creates a lazy stream. The observation may contain only:
+`modelId`, `reasoningEffort`, route/mode, an opaque branded correlation id,
+upstream-attempt ordinal, upstream HTTP status, lifecycle phase, and
+SSE-completed boolean. Use native Effect logging and the existing safe proxy
+observation owner; do not invent an external telemetry service. Complete or
+failure observations must be attached to actual stream consumption/finalization
+so a stream object being created is not mistaken for a completed response.
+Nothing may contain credentials, authorization headers, account ids, token
+values, prompts, request/response bodies, tool arguments/results, reasoning
+text, or chain-of-thought.
 
 ### Eve session-to-proxy correlation constraint
 
-Exact replay proof requires a durable join between an Eve session/turn and the
-one proxy request made for a model attempt. Eve does not expose a user-defined
-session-derived HTTP header to the model provider: its supported
-`instrumentation.ts` `step.started` callback receives session, turn, and step
-metadata, but returns AI SDK telemetry runtime context; the OpenAI-compatible
-provider receives static provider headers plus Eve-owned per-call headers.
-Stream hooks are post-durable and observe-only.
+The current installed Eve public API does not provide the required
+Eve-to-provider correlation transport. Its `instrumentation.ts`
+`step.started` callback receives session, turn, and step metadata, but its
+returned `runtimeContext` is attached to AI SDK telemetry spans rather than
+becoming a provider HTTP header. Stream hooks are post-durable and observe-only.
+Eve's internal attempt scope contains `attemptId` and `attemptIndex`, but the
+internal harness path is not an authored package export and must not be
+imported.
+
+The implementation must first prove one of these supported seams against the
+versioned Eve package:
+
+- a public Eve/provider attempt hook that supplies an opaque per-attempt value
+  to the actual AI SDK model request; or
+- a public `defineDynamic`/`step.started` model seam that returns a live
+  `LanguageModel` and demonstrably carries the branded value to the proxy's
+  real request boundary.
+
+A session/turn/step value may be used as a logical join only after it is
+converted to the owning branded opaque contract and its privacy/retention
+properties are proven. Do not send or retain raw Eve identifiers. If neither
+public seam exists, record the feature as blocked and do not substitute
+`runtimeContext`, a static header, `AsyncLocalStorage`, a process-global, or a
+time-window join.
+
+### Durable proxy-attempt receipt
+
+`@bundjil/store` already owns the named `AtomicKeyValueStore` service and its
+Effect Schema transaction contract. Reuse it with a new proxy-owned key prefix
+and a schema-defined `CodexProxyAttemptReceipt`; do not use generic
+`KeyValueStore.modify`, a read-then-write sequence, a new storage abstraction,
+or the channel replay record for this purpose. The shared Upstash resource may
+remain physically shared, but Preview and Production require distinct logical
+prefixes and separately read-back configuration.
+
+The proxy/provider boundary must perform these transitions with atomic
+conditions and mutations:
+
+1. Claim the logical correlation key only when absent, recording `admitted`.
+2. Record `upstreamStarted` immediately before the actual provider request and
+   include an ordinal for any provider-side retry.
+3. Record `completed` only after the SSE body has been consumed through its
+   terminal marker; record `failed` or `unknown` on an observed failure or
+   interrupted/ambiguous stream.
+4. On a replay of a completed logical key, return the durable result without
+   issuing another provider request. On an `unknown` key, fail closed or enter
+   the explicitly owned recovery path; never silently call upstream again.
+
+Use `Effect.Clock` for observed timestamps and any bounded recovery decision so
+tests do not depend on wall-clock reads. Encode/decode the receipt and
+transaction with the owning Effect Schemas, and keep the live Upstash Layer and
+memory test Layer explicit. A receipt proves the proxy's durable admission and
+recorded egress lifecycle; it cannot prove a remote side effect across a crash
+window unless the upstream idempotency contract is separately established.
+
+### Log and receipt relationship
+
+Emit the safe structured log after the corresponding durable transition, using
+the same opaque correlation value and lifecycle phase. Logs are for operators;
+the atomic receipt is the acceptance oracle. A missing log does not erase a
+receipt, and a log without a matching receipt cannot close the strict replay
+predicate.
 
 ### Eve upgrade and evidence boundary
 
@@ -373,24 +520,32 @@ no-second-upstream-call predicate `blocked`. Do not infer it from unchanged
 inventory, timing, process state, or a neighbouring run.
 
 Do not bridge the replacement with a process-global value,
-`AsyncLocalStorage`, a static proof header, or a proxy counter keyed only by a
-time window. Those mechanisms either fail under concurrent/replayed Vercel
-workflow execution or prove a weaker unrelated claim.
+`AsyncLocalStorage`, a static proof header, an internal Eve harness import, or a
+proxy counter keyed only by a time window. Those mechanisms either fail under
+concurrent/replayed Vercel workflow execution or prove a weaker unrelated
+claim. OpenTelemetry remains useful supporting telemetry only; it is not the
+durable receipt or the replay oracle.
 
 The receipt may retain only: Eve/AI SDK versions, immutable Preview deployment
 IDs, Agent Runs availability, safe model/deployment/lifecycle/step/hook
 metadata, one-hour inventory counts, completed/waiting event predicates, and
-the known Terra/high configuration predicates. It may record the absence of
-framework tags and per-session attempt counters as a limitation. It must not
-retain raw tags, session/turn/run IDs, titles, prompts, responses, reasoning,
-tool payloads, token counts, trace payloads, headers, or screenshots. Set
-`EVE_TRACES_CONTENT=off`; no third-party exporter or trace drain is permitted.
+the known Terra/high configuration predicates. The new correlation/receipt
+proof may retain only branded opaque keys, lifecycle phases, attempt ordinals,
+safe model/effort/mode/status/SSE fields, and bounded timestamps according to
+the receipt retention policy. It must not retain raw tags, session/turn/run IDs,
+titles, prompts, responses, reasoning, tool payloads, token counts, trace
+payloads, headers, or screenshots. Set `EVE_TRACES_CONTENT=off`; no third-party
+exporter or trace drain is permitted.
 
 The installed Eve source is the version-matched authority for the direct
 transport limitation. Executor Personal DeepWiki was first attempted against
 the stale `vercel-labs/eve` repository name and could not index it; the
 corrected `vercel/eve` investigation confirms the framework's native telemetry
-runtime context and durable replay model. Vercel's current tracing guidance
+runtime context and durable replay model, and identifies an internal
+`InstrumentationAttemptScope` containing `attemptId`/`attemptIndex` that is not
+part of the public authored API. DeepWiki's extension guidance therefore
+supports a public Eve/provider seam as the preferred correlation route, not an
+internal harness import. Vercel's current tracing guidance
 confirms `@vercel/otel` W3C fetch propagation and manual inbound extraction for
 non-Next.js handlers. The upgraded local package and Build Output checks must
 confirm the versioned Eve ownership signals before the hosted Agent Runs proof
@@ -475,8 +630,11 @@ or an Eve journey.
 
 ## Affected surfaces
 
-- `packages/codex/src/provider/contracts.ts`: named effort and request-policy
-  schemas plus Type/Encoded exports.
+- `packages/codex/src/provider/contracts.ts`: named effort, request-policy,
+  branded correlation, and attempt-receipt schemas plus Type/Encoded exports.
+- `packages/store/src/atomic-key-value-store.service.ts` and the existing
+  Upstash Layer: reuse the atomic transaction service for proxy-owned receipt
+  state; no generic KV mutation or second persistence abstraction.
 - `packages/codex/src/provider/request-mapper.ts`: injected decoded policy,
   no hard-coded low.
 - `packages/codex/src/provider/proof.ts` and `config.ts`: align direct proof
@@ -492,7 +650,8 @@ or an Eve journey.
 - `apps/agent/agent/config.ts`, `model-provider.ts`, model-provider tests,
   `instrumentation.ts`, `package.json`, `turbo.json`, and Vercel agent
   variable ownership: Eve/AI SDK versions, target model identity, 1,050,000
-  context window, trace-content setting, and build-env allowlist.
+  context window, trace-content setting, build-env allowlist, and the supported
+  correlation seam if one is available.
 - `package.json`, `bun.lock`, `apps/agent/test/vercel-packaging.test.ts`, and
   `apps/agent/test/sendblue-build-route.test.ts`: lock-resolved Eve ownership
   and version-tolerant Build Output assertions.
@@ -502,20 +661,21 @@ or an Eve journey.
   compatibility and label them accordingly.
 - `README.md`, `packages/codex/README.md`, `apps/codex-proxy/README.md`,
   `apps/agent/README.md`, `.env.example`, `docs/architecture/eve-agent.md`,
-  Vercel Preview runbook sections, this SPEC/task ledger, and the index.
+  Vercel Preview runbook sections, proxy/provider recovery sections, proof
+  packet/journey contracts, this SPEC/task ledger, and the index.
 
 ## Downstream impact ledger
 
-| Surface                                                                   | Status                | Reason                                                                                                                                                                          |
-| ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Canonical architecture and product docs                                   | Change required       | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth.                                              |
-| Root README and affected app/package READMEs/runbooks                     | Change required       | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits.                                                                        |
-| `AGENTS.md`, repo skills, instruction surfaces                            | N/A                   | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction.                                  |
-| Schemas, public types, service contracts, Layers, exports                 | Change required       | Name effort/policy schema, decoded services, live/test Layers, runtime/index exports.                                                                                           |
-| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts         | Change required       | Exercise language service and existing policy scripts; update Turbo's build environment contract and Preview proof script/tests. No boundary exception is expected.             |
-| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required       | Test low-default compatibility and high-target encoding; Preview HTTP/Eve proof must be live and sanitized. Browser evidence is N/A because this changes no visible browser UI. |
-| Observability, rollout, migration, rollback artifacts                     | Change required       | Add safe model/effort/status evidence, Preview progression, and exact rollback procedure.                                                                                       |
-| SPEC index, task ledger, active execution plan                            | Change required / N/A | Add this current SPEC and sibling ledger now; do not create an active execution plan until implementation begins.                                                               |
+| Surface                                                                   | Status          | Reason                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canonical architecture and product docs                                   | Change required | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth.                                                                                                |
+| Root README and affected app/package READMEs/runbooks                     | Change required | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits.                                                                                                                          |
+| `AGENTS.md`, repo skills, instruction surfaces                            | N/A             | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction.                                                                                    |
+| Schemas, public types, service contracts, Layers, exports                 | Change required | Name effort/policy, branded correlation, and attempt-receipt schemas with Type/Encoded forms; reuse AtomicKeyValueStore and explicit live/memory Layers.                                                                          |
+| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts         | Change required | Exercise language service and existing policy scripts; update Turbo's build environment contract and proof scripts; reject internal Eve imports, generic KV mutation, and process-local joins. No boundary exception is expected. |
+| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required | Test low-default compatibility, high-target encoding, correlation transport, atomic state transitions, interruption/unknown cases, and live Preview proof. Browser evidence is N/A because this changes no visible browser UI.    |
+| Observability, rollout, migration, rollback artifacts                     | Change required | Add safe model/effort/correlation/phase/status evidence, receipt retention and recovery, Preview progression, and exact rollback procedure.                                                                                       |
+| SPEC index, task ledger, active execution plan                            | Change required | Keep the new implementation tasks and active plan current; prior terminal evidence is historical for the reopened correlation slice.                                                                                              |
 
 ## Risks and unresolved questions
 
@@ -533,6 +693,19 @@ or an Eve journey.
   the default logger). Implementation must choose the smallest existing
   Effect-owned observation point, prove it cannot leak sensitive data, and
   avoid a new telemetry abstraction unless a stable owner is demonstrated.
+- A public Eve attempt/provider seam may still be unavailable in the installed
+  version. The investigation must end in a bounded blocked receipt rather than
+  an internal harness import or a guessed provider header.
+- A durable receipt can prove one proxy admission and its recorded lifecycle,
+  but cannot remove the remote-provider crash window. The implementation must
+  preserve `unknown` and a recovery owner rather than silently retrying an
+  ambiguous upstream request.
+- A receipt at only the HTTP route would miss provider-owned 401 refresh
+  retries. The upstream-attempt observation must sit at the actual Codex
+  provider egress or explicitly narrow the claim to proxy admission.
+- `Effect.logInfo` is not a durable store. Log retention/queryability must be
+  recorded as a supporting operational claim, never substituted for the
+  atomic receipt.
 
 ## Acceptance criteria
 
@@ -560,24 +733,42 @@ or an Eve journey.
    subscription endpoint, and a protected Eve request reports exactly
    `bundjil-codex-proxy/gpt-5.6-terra`. No credentials, prompts, bodies,
    tokens, account ids, tool data, or chain-of-thought are retained.
-7. The exact Preview team's accessible Agent Runs metadata is read before and
-   after `startIndex=0` replay and records model, immutable deployment,
-   lifecycle, step/hook counts, and safe event predicates without payloads. A
-   per-session model/proxy-attempt count or framework-owned `$eve.*` tags are
-   required for the stronger no-second-upstream-call claim; if unavailable, the
-   task remains `blocked` and the receipt records the available metadata plus
-   that limitation. CLI admission traces, timing, process state, and unchanged
-   inventory are non-claims for that stronger predicate.
-8. Each implementation task records the ownership/call-graph,
-   implementation-quality, and verification-coverage lenses, including flat
-   Effect control flow, typed `.pipe(...)` error handling, schema ownership,
-   Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
-   boundary policy results.
-9. The implementation runs focused tests, Effect language-server diagnostics,
-   `bun run check:boundaries`, `bun run check:effect-setup`,
-   `bun run check:skills`, and `bun run verification`; all required docs,
-   runbooks, environment samples, proof artifacts, and rollout/rollback notes
-   are updated before acceptance.
+7. A supported public Eve/provider correlation seam is proven against the
+   installed version before it is used. The correlation contract has branded
+   schema-derived `Type` and `Encoded` forms, is decoded once at the provider
+   ingress, carries only an opaque safe value, and reaches the actual private
+   proxy request. Internal Eve harness imports, runtimeContext-as-header,
+   static headers, AsyncLocalStorage, process globals, and time-window joins
+   are rejected. If no supported seam exists, this criterion remains blocked.
+8. The proxy/provider boundary reuses `AtomicKeyValueStore` with a
+   schema-defined receipt and distinct logical key prefix. Atomic claim,
+   upstream-start, completion, failure, and unknown/interruption transitions
+   are tested with `Effect.Clock`, live Upstash, and memory Layers. Replaying a
+   completed logical key returns the durable result without another provider
+   request; an unknown key never silently retries. Provider-side 401 refresh
+   retries have distinct upstream-attempt ordinals.
+9. Native Effect structured logs use the same opaque correlation value and
+   safe lifecycle fields after durable transitions. Logs are explicitly
+   supporting evidence; the atomic receipt, not log presence or absence, is the
+   strict replay oracle. No sensitive data is retained.
+10. The exact Preview team's accessible Agent Runs metadata is read before and
+    after `startIndex=0` replay and records model, immutable deployment,
+    lifecycle, step/hook counts, safe event predicates, and the new receipt
+    state without payloads. CLI admission traces, timing, process state, and
+    unchanged inventory remain non-claims for the stronger predicate.
+11. Each implementation task records the ownership/call-graph,
+    implementation-quality, and verification-coverage lenses, including flat
+    Effect control flow, typed `.pipe(...)` error handling, schema ownership,
+    Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
+    boundary policy results.
+12. The implementation runs focused tests, Effect language-server diagnostics,
+    `bun run check:boundaries`, `bun run check:effect-setup`,
+    `bun run check:docs`, `bun run check:skills`, `bun run check:authority`,
+    `bun run check:controls`, `bun run check:verification`, and
+    `bun run verification`; all required docs, runbooks, environment samples,
+    proof artifacts, and rollout/rollback notes are updated before acceptance.
+    The final closeout task performs the mandatory terminal five-pass audit
+    after all correlation and receipt implementation work is complete.
 
 ## Implementation instruction block
 

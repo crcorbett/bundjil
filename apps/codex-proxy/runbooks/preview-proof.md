@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-codex-proxy-operator
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: Preview deployment, Vercel protection, proxy route/auth/mode, stored profile, model/reasoning, proof command, or output contract change
 ---
 
@@ -29,11 +29,13 @@ named Preview at `observedAt`; it is never Production proof.
   The bypass grants platform access only; it is not the proxy bearer.
 - Confirm the deployed Eve version is `0.29.5`, `EVE_TRACES_CONTENT=off`, and
   the exact Preview team exposes the accessible Vercel Agent Runs metadata
-  surface. Record whether framework-owned Workflow tags and a per-session
-  attempt count are actually present; do not assume another dashboard tier is
-  available. Do not configure a browser Session Trace, third-party trace
-  drain/exporter, broad propagation allowlist, or a request/header capture rule
-  for this proof.
+  surface. For the strict replay stage, also confirm the supported
+  Eve-to-provider correlation contract and the proxy-owned AtomicKeyValueStore
+  receipt prefix are deployed and readable without exposing values. Record
+  unavailable framework-owned Workflow tags as a limitation; do not assume
+  another dashboard tier is available. Do not configure a browser Session
+  Trace, third-party trace drain/exporter, broad propagation allowlist, or a
+  request/header capture rule for this proof.
 - Do not create a deployment, bypass, profile, or environment variable as part
   of this proof run.
 
@@ -113,27 +115,28 @@ payloads.
    deployment to create one bounded Eve session. Retain the command's request
    ID only in operator memory. Read the session once to completion/waiting,
    then replay that same stream with `startIndex=0`. Query the exact Preview
-   team's Agent Runs metadata immediately before and after replay. Record only
-   the one-hour run count, Terra-run count, selected run's model, immutable
-   deployment match, lifecycle status, event/step/hook counts, and safe event
-   booleans. Do not retain raw trace data, session/turn IDs, trace headers,
-   prompts, responses, tokens, tool values, reasoning, or screenshots
-   containing them.
+   team's Agent Runs metadata and the proxy-owned atomic receipt immediately
+   before and after replay. Record only the one-hour run count, Terra-run count,
+   selected run's model, immutable deployment match, lifecycle status,
+   event/step/hook counts, safe event booleans, opaque receipt phase, and
+   upstream-attempt ordinal. Do not retain raw trace data, session/turn/attempt
+   IDs, trace headers, prompts, responses, tokens, tool values, reasoning, or
+   screenshots containing them.
 
    The currently accessible Vercel Agent Runs surface does not expose the
-   framework-owned `$eve.*` Workflow tags or a per-session model/proxy-attempt
-   count. Treat identical inventory and lifecycle counts as supporting
-   metadata for Eve replay, not as an independent no-second-upstream-call
-   oracle. Keep the task `blocked` for that strict predicate until a supported
-   metadata or provider-owned counter is available. CLI admission traces,
-   timing, process-local state, static headers, and unchanged inventory are
-   not substitutes for a per-session attempt count.
+   framework-owned `$eve.*` Workflow tags. The strict no-second-upstream-call
+   oracle requires the supported Eve/provider correlation seam and the atomic
+   receipt, not a dashboard counter alone. Until both successor tasks are
+   deployed and read back, keep the task `blocked`. CLI admission traces,
+   timing, process-local state, static headers, log absence, and unchanged
+   inventory are not substitutes.
 
 ## Evidence and postcondition
 
 Retain source/deployment/config identity, sanitized Vercel readback, stored
 profile booleans, authority receipt, bounded receipt and detail digest,
-`observedAt`, true exit status, limitations, and non-claims in the matching
+`observedAt`, true exit status, correlation/receipt phase, limitations, and
+non-claims in the matching
 [`docs/verification`](../../../docs/verification/README.md) Preview packet.
 The packet must not be upgraded beyond the external readback it actually
 contains.

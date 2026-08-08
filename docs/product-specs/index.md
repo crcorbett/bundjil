@@ -24,9 +24,10 @@ context.
 ## Current
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  Preview is proven with a shared physical Upstash resource and separate
-  Preview profile, prefix, cipher, access, deployment, and proof boundaries.
-  Production remains out of scope.
+  Preview Terra/high, protected Eve session/replay, and shared physical Upstash
+  boundaries are proven up to the accessible metadata ceiling. A follow-on
+  correlation and atomic proxy-receipt slice is active; Production remains out
+  of scope.
 
 ## Implemented or superseded history
 

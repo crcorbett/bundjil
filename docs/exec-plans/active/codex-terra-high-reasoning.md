@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: task status, provider effort, Preview proof, authority, or rollback change
 spec: ../../product-specs/codex-terra-high-reasoning.md
 task_ledger: ../../product-specs/codex-terra-high-reasoning.tasks.json
@@ -24,42 +24,64 @@ The agent now targets Eve `0.29.5` with AI SDK `^7.0.38` and keeps
 `EVE_TRACES_CONTENT=off` as the Preview privacy requirement. The existing
 OpenTelemetry hooks remain restricted observability. The accessible replay
 metadata is the Vercel Agent Runs model/deployment/lifecycle/step/hook surface;
-the strict no-second-upstream-call oracle remains blocked because its
-per-session attempt counter is not exposed.
+the strict no-second-upstream-call oracle is reopened as a new implementation
+slice requiring both a supported Eve/provider correlation seam and a durable
+atomic proxy receipt.
 
 ## Current task
 
-Task `authorized-preview-subscription-proof` remains open only on the strict
-hosted per-session proxy correlation. Eve `0.29.5` is installed and the local
-agent Build Output/package checks pass after updating the AI SDK peer range. The
-short-lived project OIDC protected-call path proved the upgraded Preview info,
-session, and replay; Agent Runs metadata proved Terra, immutable deployment,
-run lifecycle, and stable step/hook counts before and after replay. The exact
-team does not expose `$eve.*` tags or a per-session model/proxy-attempt count,
-so the no-second-upstream-call claim stays blocked. Process-global, async-local,
-wrapper, static-header, time-window, and CLI-trace substitutes remain rejected.
-Production remains out of scope.
+Task `authorized-preview-subscription-proof` remains blocked at the lower
+metadata ceiling and now has three successor tasks: prove the public
+Eve/provider correlation seam, add the atomic proxy/provider attempt receipt,
+and rerun the protected Preview replay proof. Eve `0.29.5` is installed and
+the local agent Build Output/package checks pass after updating the AI SDK peer
+range. The short-lived project OIDC protected-call path proved the upgraded
+Preview info, session, and replay; Agent Runs metadata proved Terra, immutable
+deployment, run lifecycle, and stable step/hook counts before and after replay.
+Process-global, async-local, wrapper, static-header, time-window, internal
+harness, generic-KV, and CLI-trace substitutes remain rejected. Production
+remains out of scope.
+
+## Reopened correlation and receipt slice
+
+The implementation order is deliberately narrow:
+
+1. `eve-supported-provider-correlation` must prove a public Eve seam against
+   the installed package or produce a blocked receipt. `runtimeContext` span
+   metadata and internal `InstrumentationAttemptScope` are not sufficient.
+2. `proxy-atomic-attempt-receipt` reuses `AtomicKeyValueStore` and records the
+   actual provider stream lifecycle with `Effect.Clock`, explicit live/memory
+   Layers, and safe `Effect.logInfo` diagnostics. Generic KV `modify`, a
+   process counter, and a route-only completion mark are not acceptable.
+3. `correlated-preview-replay-proof-and-closeout` runs a new protected Preview
+   journey, reads the receipt before/after `startIndex=0` replay, and performs
+   the terminal five-pass audit only after both implementation tasks finish.
+
+The prior 2026-08-04 Preview packet and terminal audit remain valid lower-bound
+evidence for the Eve upgrade and hosted session/replay metadata. They do not
+close this reopened strict predicate and must not be rewritten as proof of a
+second-request absence.
 
 ## Evidence record
 
-| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Ownership and call graph | `@bundjil/codex` owns the Responses effort vocabulary, decoded policy, mapper, proof policy, and request encoding; `apps/codex-proxy` owns effort Config, live/local Layer injection, and safe health observation; `apps/agent` owns Eve `0.29.5` model/context selection, instrumentation, and the protected session entry point.         |
-| Implementation quality   | The upgrade keeps the existing Effect/schema/provider boundaries unchanged, aligns the AI SDK peer range, keeps `recordInputs`/`recordOutputs` disabled, and adds only the Turbo build-environment contract for `EVE_TRACES_CONTENT`. Packaging assertions now target stable ownership signals rather than minifier-specific bundle paths. |
-| Verification coverage    | Local agent build/package tests pass with the upgraded Eve line. The new Preview receipt proves Terra/1050000 info, protected session completion, identical replay event counts, and accessible Agent Runs model/deployment/lifecycle/step/hook metadata; the per-session model/proxy-attempt count remains unavailable.                   |
+| Lens                     | Current evidence                                                                                                                                                                                                                                                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership and call graph | `@bundjil/codex` owns Responses effort, correlation, provider-egress, and receipt contracts; `@bundjil/store` owns AtomicKeyValueStore; `apps/codex-proxy` owns ingress, receipt composition, and safe logs; `apps/agent` owns Eve `0.29.5` model/context selection, public correlation seam, instrumentation, and protected session entry. |
+| Implementation quality   | The upgrade keeps the existing Effect/schema/provider boundaries, and the reopened slice must add no internal Eve import, generic KV mutation, route-only counter, raw identifier, or helper/wrapper sprawl. It must use schema-derived contracts, explicit Layers, Effect Clock, and stream-finalization lifecycle observation.            |
+| Verification coverage    | The new Preview receipt proves Terra/1050000 info, protected session completion, identical replay event counts, and accessible Agent Runs metadata only as lower-bound evidence. The pending tasks must add correlation, atomic receipt transitions, provider-egress observation, and new protected replay proof.                           |
 
 ## Downstream-impact ledger
 
-| Surface                                       | Status          | Reason                                                                                                                                                                            |
-| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture/product docs                     | Change required | The SPEC/task state now records the installed-Eve API limit and forbids unsafe substitutes. Retain historical gpt-5.5 labels.                                                     |
-| Root, package, and app READMEs/runbooks       | Change required | Eve version, the Preview trace-content setting, and the Agent Runs proof route changed; app and deployment owners now carry the current pointer.                                  |
-| `AGENTS.md` and skills                        | Preserve        | Existing Effect/provider and helper-admission rules reject an unowned bridge or wrapper; no instruction conflict was found.                                                       |
-| Schemas, types, services, Layers, exports     | Preserve        | Eve remains a framework boundary; no new service, raw client, schema, or adapter was introduced by the version upgrade.                                                           |
-| Lint, diagnostics, boundary rules, CI/scripts | Change required | The Turbo build contract and version-aware packaging assertions changed; existing Effect and boundary controls remain applicable.                                                 |
-| Tests, fixtures, HTTP/provider evidence       | Change required | Packaging tests now match the current Eve bundle shape; hosted proof uses accessible Agent Runs metadata and records unavailable tag/attempt fields rather than CLI trace counts. |
-| Observability, rollout, migration, rollback   | Change required | `EVE_TRACES_CONTENT=off`, the accessible Agent Runs readback, the per-session counter limitation, and the old CLI-trace non-claim are explicit.                                   |
-| SPEC, task ledger, active-plan index          | Change required | These current owners record the investigation outcome and future admission predicate.                                                                                             |
+| Surface                                       | Status          | Reason                                                                                                                                                                                        |
+| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture/product docs                     | Change required | The SPEC/task state now records the installed-Eve API limit and forbids unsafe substitutes. Retain historical gpt-5.5 labels.                                                                 |
+| Root, package, and app READMEs/runbooks       | Change required | Eve version, the Preview trace-content setting, and the Agent Runs proof route changed; app and deployment owners now carry the current pointer.                                              |
+| `AGENTS.md` and skills                        | Preserve        | Existing Effect/provider and helper-admission rules reject an unowned bridge or wrapper; no instruction conflict was found.                                                                   |
+| Schemas, types, services, Layers, exports     | Change required | The reopened slice adds branded correlation/receipt schemas and reuses AtomicKeyValueStore with explicit live/memory Layers; no generic persistence service is permitted.                     |
+| Lint, diagnostics, boundary rules, CI/scripts | Change required | The Turbo build contract and version-aware packaging assertions changed; the reopened tasks must enforce public Eve imports, Effect Clock, boundary decoding, and no helper/KV/process joins. |
+| Tests, fixtures, HTTP/provider evidence       | Change required | Packaging tests match the current Eve bundle shape; new fixtures must prove actual provider correlation, atomic transitions, stream interruption, duplicate replay, and safe logs.            |
+| Observability, rollout, migration, rollback   | Change required | `EVE_TRACES_CONTENT=off`, Agent Runs lower-bound evidence, receipt retention/recovery, safe logs, unknown-state handling, and the old CLI-trace non-claim are explicit.                       |
+| SPEC, task ledger, active-plan index          | Change required | These current owners record the new task sequence and invalidate the prior terminal status for the reopened strict predicate.                                                                 |
 
 ## Preview receipts
 
@@ -138,13 +160,27 @@ counter.
   accepted for the strict no-second-upstream-call predicate because the exact
   Personal Agent Runs surface exposes no `$eve.*` Workflow tags or per-session
   model/proxy-attempt count.
-- A future improvement requires a supported Vercel/Eve metadata field or a
-  separately reviewed provider-owned observation seam. It must preserve the
-  current OIDC/protection boundary and prove an exact per-session attempt count;
-  it must not add a generic relay, static header, time-window join, raw trace
-  capture, or process-local bridge.
+- A future improvement now has the pending task sequence in the SPEC: public
+  Eve/provider correlation, atomic provider-boundary receipt, and protected
+  Preview replay proof. It must preserve the current OIDC/protection boundary
+  and use the existing AtomicKeyValueStore, not a generic relay, static header,
+  time-window join, raw trace capture, internal Eve import, or process-local
+  bridge.
+- The receipt must be attached to actual provider egress and stream finalization
+  so provider-owned 401 refresh retries and lazy SSE consumption are not hidden
+  by a route-level counter. Unknown crash state must remain fail-closed or use
+  an explicitly owned recovery procedure.
 - Production is excluded. Do not promote, rotate the accepted Preview profile,
   or change channel ingress as part of this correlation work.
+
+## 2026-08-05 SPEC revision and audit lifecycle
+
+This revision changes current implementation intent after the prior upgrade was
+accepted. The 2026-08-04 five-pass audit remains retained historical evidence
+for that earlier slice; it is not a terminal audit of the new correlation and
+receipt tasks. The final successor task must refresh the proof packet, rollback
+identity, docs-maintainer ledger, and all five lenses on the exact
+receipt-bearing Preview artifact before the strict predicate can close.
 
 ## 2026-08-04 terminal five-pass audit
 
