@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "kind": "local",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "none",
+    "target": "no external target"
+  },
+  "candidate": {
+    "repositoryCommit": "3fa94912b5984448a97c7be6dc97b3d69be7f4b7",
+    "sourceDigest": "c32ab8c69770c709ed09c70a2b5ce4507f86f92f763a621cf63bd341fc4dcb57",
+    "artifactDigest": "a4bdee87308e8eb170665719717da542c901cd0035688037b63ee0e436480f50"
+  },
+  "authority": {
+    "principal": "Bundjil repository maintainer",
+    "identitySource": "local installed Eve package and repository source",
+    "externalAccess": "none",
+    "approvalReceipt": null,
+    "rollbackOwner": "Bundjil repository maintainer"
+  },
+  "environment": {
+    "tier": "local",
+    "target": "installed Eve 0.29.5 public API inspection"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J03-proxy-health-auth-sse",
+      "status": "blocked",
+      "oracle": "No supported per-step correlation value reaches the model request."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "installed Eve public API and generated type inspection",
+    "outcome": "blocked",
+    "exitCode": 0,
+    "invariant": "Only public Eve data may identify a correlated proxy attempt.",
+    "target": "Bundjil repository commit 3fa94912b5984448a97c7be6dc97b3d69be7f4b7",
+    "recoveryHint": "Adopt only a future public Eve API with a stable per-step provider correlation value.",
+    "detailPath": "docs/evidence/verification/details/codex-terra-eve-correlation-blocked-2026-08-09.json",
+    "detailSha256": "6c682c88709b1942742fc1b4b495a96476bcf1b4ff6bce460226cca7f2e4b508",
+    "postcondition": "No speculative Eve-to-proxy bridge was added and no external system was called."
+  },
+  "externalReadback": {
+    "required": false,
+    "outcome": "not_required",
+    "receipt": "not required for the installed public API claim"
+  },
+  "postconditions": [
+    "The required public per-step correlation transport is unavailable in Eve 0.29.5.",
+    "The proxy receipt and Preview replay tasks were not started.",
+    "Production and all provider state remain unchanged."
+  ],
+  "limitations": [
+    "This local inspection does not establish hosted Eve behavior or provider availability.",
+    "The documented stream event id cannot be assumed available to the dynamic model resolver."
+  ],
+  "nonClaims": [
+    "No code, deployment, configuration, credential, request, response, or provider state changed.",
+    "No raw Eve identifiers, prompts, responses, headers, traces, or tokens are retained."
+  ],
+  "rollback": {
+    "identity": "No runtime change was made.",
+    "outcome": "not_needed",
+    "owner": "Bundjil repository maintainer"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/codex-terra-eve-correlation-blocked-2026-08-09.json",
+      "sha256": "6c682c88709b1942742fc1b4b495a96476bcf1b4ff6bce460226cca7f2e4b508",
+      "provenance": "installed Eve public documentation, generated types, and local source inspection"
+    }
+  ],
+  "observedAt": "2026-08-08T23:47:54Z"
+}

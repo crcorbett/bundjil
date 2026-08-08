@@ -173,7 +173,7 @@
     {
       "id": "eve-supported-provider-correlation",
       "title": "Prove and implement the supported Eve-to-provider correlation seam",
-      "status": "pending",
+      "status": "blocked",
       "dependsOn": ["terra-agent-build-and-proof-contract"],
       "description": "Find a supported public Eve seam that carries an opaque per-attempt or logical-step correlation value to the actual AI SDK provider request. Implement only the smallest schema-owned contract that can be joined at the private proxy; otherwise record a blocked result and do not import Eve internals or invent a transport header.",
       "implementationNotes": [
@@ -201,6 +201,11 @@
       "completionCriteria": [
         "A supported correlation seam is proven and implemented with a narrow canonical contract, or the task is explicitly blocked with a dated receipt and no speculative bridge.",
         "The existing lower-bound Agent Runs proof remains historical support and is not rewritten as strict replay proof."
+      ],
+      "blockedEvidence": [
+        "Eve 0.29.5 publicly allows a live LanguageModel from a step.started dynamic model resolver, but the resolver receives event: unknown and a context with session identity, channel metadata, and messages only.",
+        "The documented stable stream meta.id is minted after durable event emission. It is not a supported input to the dynamic model resolver that must choose the provider before the call.",
+        "Instrumentation runtimeContext is telemetry-only and does not provide a supported provider HTTP transport. See docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json."
       ],
       "commitAfterPassing": true
     },

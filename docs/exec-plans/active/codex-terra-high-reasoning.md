@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: active
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: task status, provider effort, Preview proof, authority, or rollback change
 spec: ../../product-specs/codex-terra-high-reasoning.md
 task_ledger: ../../product-specs/codex-terra-high-reasoning.tasks.json
@@ -31,31 +31,34 @@ atomic proxy receipt.
 ## Current task
 
 Task `authorized-preview-subscription-proof` remains blocked at the lower
-metadata ceiling and now has three successor tasks: prove the public
-Eve/provider correlation seam, add the atomic proxy/provider attempt receipt,
-and rerun the protected Preview replay proof. Eve `0.29.5` is installed and
-the local agent Build Output/package checks pass after updating the AI SDK peer
-range. The short-lived project OIDC protected-call path proved the upgraded
-Preview info, session, and replay; Agent Runs metadata proved Terra, immutable
-deployment, run lifecycle, and stable step/hook counts before and after replay.
-Process-global, async-local, wrapper, static-header, time-window, internal
-harness, generic-KV, and CLI-trace substitutes remain rejected. Production
-remains out of scope.
+metadata ceiling. Its first successor, `eve-supported-provider-correlation`,
+is now also blocked: installed Eve `0.29.5` has no public per-step value that a
+dynamic `LanguageModel` resolver can carry to the proxy. The dated local
+receipt records the exact limitation without a speculative bridge. The atomic
+receipt and correlated Preview replay tasks must not start. Eve `0.29.5` is
+installed and the local agent Build Output/package checks pass after updating
+the AI SDK peer range. The short-lived project OIDC protected-call path proved
+the upgraded Preview info, session, and replay; Agent Runs metadata proved
+Terra, immutable deployment, run lifecycle, and stable step/hook counts before
+and after replay. Process-global, async-local, wrapper, static-header,
+time-window, internal harness, generic-KV, and CLI-trace substitutes remain
+rejected. Production remains out of scope.
 
 ## Reopened correlation and receipt slice
 
 The implementation order is deliberately narrow:
 
-1. `eve-supported-provider-correlation` must prove a public Eve seam against
-   the installed package or produce a blocked receipt. `runtimeContext` span
-   metadata and internal `InstrumentationAttemptScope` are not sufficient.
-2. `proxy-atomic-attempt-receipt` reuses `AtomicKeyValueStore` and records the
-   actual provider stream lifecycle with `Effect.Clock`, explicit live/memory
-   Layers, and safe `Effect.logInfo` diagnostics. Generic KV `modify`, a
-   process counter, and a route-only completion mark are not acceptable.
-3. `correlated-preview-replay-proof-and-closeout` runs a new protected Preview
-   journey, reads the receipt before/after `startIndex=0` replay, and performs
-   the terminal five-pass audit only after both implementation tasks finish.
+1. `eve-supported-provider-correlation` is blocked by
+   [`codex-terra-eve-correlation-blocked-2026-08-09.json`](../../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
+   `runtimeContext`, the post-emission stream `meta.id`, and internal
+   `InstrumentationAttemptScope` are not a public pre-egress correlation seam.
+2. `proxy-atomic-attempt-receipt` remains pending and must not start without
+   the supported correlation value. It would otherwise reuse
+   `AtomicKeyValueStore` with `Effect.Clock`, explicit live/memory Layers, and
+   safe `Effect.logInfo` diagnostics.
+3. `correlated-preview-replay-proof-and-closeout` remains pending and must not
+   start. It requires both preceding tasks before it can read a receipt before
+   and after `startIndex=0` replay or run the terminal five-pass audit.
 
 The prior 2026-08-04 Preview packet and terminal audit remain valid lower-bound
 evidence for the Eve upgrade and hosted session/replay metadata. They do not
@@ -155,12 +158,11 @@ counter.
 
 ## Remaining external work
 
-- The upgraded Preview proof is complete up to the accessible metadata ceiling:
-  use the new packet as the current blocked receipt. Do not call the task
-  accepted for the strict no-second-upstream-call predicate because the exact
-  Personal Agent Runs surface exposes no `$eve.*` Workflow tags or per-session
-  model/proxy-attempt count.
-- A future improvement now has the pending task sequence in the SPEC: public
+- The upgraded Preview proof remains complete only up to the accessible
+  metadata ceiling. The new local receipt blocks the public correlation
+  prerequisite: the exact Personal Eve `0.29.5` API exposes no pre-egress
+  per-step identity. Do not call the strict predicate accepted.
+- A future upstream Eve API may reopen the task sequence: public
   Eve/provider correlation, atomic provider-boundary receipt, and protected
   Preview replay proof. It must preserve the current OIDC/protection boundary
   and use the existing AtomicKeyValueStore, not a generic relay, static header,

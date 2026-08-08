@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-architecture-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: agent wiring, provider selection, Channel runtime, Fiber, Scope, waitUntil, Eve Workflow lifecycle, generated Build Output, deployment boundary, or external readback change
 ---
 
@@ -65,6 +65,15 @@ are not durable replay evidence. Eve's internal attempt scope, runtime context
 as an HTTP header, process-local state, and generic KV read/modify/write are
 not supported architecture paths. The implementation and proof gates live in
 the [Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
+
+As of the installed Eve `0.29.5`, that correlation prerequisite is blocked.
+`defineDynamic` can select a live model at `step.started`, but the public
+resolver receives `event: unknown` and a session-level context, not a stable
+turn, step, or attempt identity. The documented stream `meta.id` exists only
+after durable emission and cannot be repurposed as a pre-egress resolver input.
+The [dated local receipt](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
+retains this limitation. Do not add a fallback bridge from message contents,
+telemetry, internal Eve source, or process state.
 
 ## Boundary invariants
 

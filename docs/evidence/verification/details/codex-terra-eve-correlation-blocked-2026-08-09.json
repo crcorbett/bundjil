@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "receipt": "codex-terra-eve-correlation-blocked",
+  "observedAt": "2026-08-08T23:47:54Z",
+  "candidate": {
+    "repositoryCommit": "3fa94912b5984448a97c7be6dc97b3d69be7f4b7",
+    "sourceDigest": "c32ab8c69770c709ed09c70a2b5ce4507f86f92f763a621cf63bd341fc4dcb57",
+    "eveVersion": "0.29.5"
+  },
+  "investigation": {
+    "publicDynamicModel": {
+      "stepStartedSupported": true,
+      "liveLanguageModelSupported": true,
+      "resolverEventType": "unknown",
+      "resolverContextProvides": [
+        "session identity",
+        "channel metadata",
+        "messages"
+      ],
+      "resolverContextOmits": [
+        "turn identity",
+        "step identity",
+        "attempt identity"
+      ]
+    },
+    "publicInstrumentation": {
+      "stepStartedMetadata": "telemetry runtimeContext only",
+      "providerTransportHeader": false
+    },
+    "publicStream": {
+      "stepStartedEventId": "stable after durable stream emission",
+      "usableByDynamicModelResolver": false
+    }
+  },
+  "outcome": {
+    "supportedPerAttemptOrLogicalStepCorrelation": false,
+    "providerHeaderPropagationProven": false,
+    "taskAcceptance": "blocked"
+  },
+  "limitations": [
+    "The public dynamic model resolver cannot receive a typed per-step or per-attempt identifier.",
+    "The stable public stream event id is produced after the resolver must select the live model.",
+    "Runtime context is telemetry metadata and is not a supported HTTP transport contract."
+  ],
+  "nonClaims": [
+    "No application code, proxy configuration, deployment, provider request, credential, or Production state changed.",
+    "No raw Eve session, turn, step, event, attempt, prompt, response, token, header, or trace value is retained.",
+    "This does not rule out a future public Eve API that provides the required correlation value."
+  ],
+  "recovery": {
+    "required": "A future Eve public API must provide a stable per-attempt or logical-step value to the actual LanguageModel request.",
+    "rejected": [
+      "internal Eve imports",
+      "runtimeContext as a transport header",
+      "static headers",
+      "message-derived identifiers",
+      "AsyncLocalStorage",
+      "process-global state",
+      "time-window joins"
+    ]
+  }
+}

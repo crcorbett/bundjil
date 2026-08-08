@@ -4,7 +4,7 @@ lifecycle: proposed
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-20
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: implementation, deployment, environment, or proof change
 ---
 
@@ -143,6 +143,18 @@ join, the atomic receipt proves proxy admission/lifecycle, and the actual
 provider-egress observation proves what was sent upstream. If only one layer is
 available, the receipt must state the narrower claim rather than infer the
 stronger one.
+
+### 2026-08-09 public-seam result
+
+The installed Eve `0.29.5` API does not satisfy the required correlation
+predicate. A dynamic model resolver may return a live `LanguageModel` at
+`step.started`, but its public resolver signature is `event: unknown` and its
+context provides session identity, channel metadata, and messages, not a typed
+turn, step, or attempt identity. Eve documents a stable `meta.id` only after a
+stream event is durably emitted; it is not a supported model-resolver input.
+`runtimeContext` remains telemetry-only. The task is therefore blocked in the
+dated [sanitized receipt](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
+Do not derive a substitute from message content or internal behavior.
 
 ## Ownership and canonical contracts
 
@@ -437,6 +449,11 @@ properties are proven. Do not send or retain raw Eve identifiers. If neither
 public seam exists, record the feature as blocked and do not substitute
 `runtimeContext`, a static header, `AsyncLocalStorage`, a process-global, or a
 time-window join.
+
+Eve `0.29.5` has now been inspected and neither seam is available: the dynamic
+resolver cannot receive a public per-step value, and instrumentation cannot
+transport one to the proxy. The proxy receipt and correlated Preview tasks stay
+unstarted until an upstream public API changes this predicate.
 
 ### Durable proxy-attempt receipt
 

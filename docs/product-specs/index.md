@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-09
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -25,9 +25,10 @@ context.
 
 - [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
   Preview Terra/high, protected Eve session/replay, and shared physical Upstash
-  boundaries are proven up to the accessible metadata ceiling. A follow-on
-  correlation and atomic proxy-receipt slice is active; Production remains out
-  of scope.
+  boundaries are proven up to the accessible metadata ceiling. The first
+  follow-on public-correlation task is blocked in Eve `0.29.5`, so the atomic
+  proxy-receipt and Preview closeout tasks remain unstarted; Production remains
+  out of scope.
 
 ## Implemented or superseded history
 

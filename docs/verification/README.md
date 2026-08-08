@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -211,6 +211,12 @@ operation nor asserts present provider state.
   tasks, so the packet remains blocked on the independent no-second-upstream-
   call predicate. It proves neither Production, channel delivery, public Eve
   access, nor general caller capability.
+- [`codex-terra-eve-correlation-blocked-2026-08-09.json`](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
+  records the local Eve `0.29.5` public-API stop: the step-scoped dynamic model
+  resolver has no supported per-step correlation value that can reach the
+  private proxy. No code, deployment, provider request, credential, or
+  Production state changed. The atomic receipt and correlated Preview replay
+  tasks remain unstarted.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 235,
-    "sortedPathSha256": "cc61cb63472b575bb14a630bef07f8faf99becc141ebbf35c664589114f1c1c2"
+    "pathCount": 237,
+    "sortedPathSha256": "1e74ad421d9df06cac0186134a663e5813add6b0a9fdd0e17ea2294891fe8f00"
   },
   "readmeInventory": {
     "pathCount": 23,
@@ -34,7 +34,7 @@
         "The 2026-08-04 Vercel Marketplace Upstash billing-blocked packet and its sanitized detail expand current accounting to 229 docs paths while preserving 23 README paths. They record a rejected free-plan request with no resource or billing relationship created, and do not establish a store, profile, provider request, deployment, Eve session, replay, or Production result.",
         "The 2026-08-04 shared-Upstash binding packet and its sanitized detail expand current accounting to 231 docs paths while preserving 23 README paths. They retain Cooper's approved reuse of the agent-bound physical store for proxy Preview and Production, with separate profile/prefix/cipher metadata required; the receipt proves only secret-safe Vercel variable metadata and no OAuth, deployment, proxy, Eve, replay, or Production runtime result.",
         "The 2026-08-04 successful Preview stored-profile and proxy proof detail expands current accounting to 232 docs paths while preserving 23 README paths. It proves only the named Preview encrypted profile and bounded Terra/high subscription SSE predicates; Eve session/replay and Production remain separate unproved claims.",
-        "The 2026-08-04 protected Preview Eve receipt expands current accounting to 233 docs paths while preserving 23 README paths. The upgraded Eve 0.29.5 Preview detail and blocked packet expand current accounting to 235 docs paths while preserving 23 README paths. They record Terra/1050000 info, session acceptance, identical durable replay event counts, and accessible Agent Runs model/deployment/lifecycle metadata without retaining payloads; per-session upstream-call correlation and all Production claims remain unproved."
+        "The 2026-08-04 protected Preview Eve receipt expands current accounting to 233 docs paths while preserving 23 README paths. The upgraded Eve 0.29.5 Preview detail and blocked packet expand current accounting to 235 docs paths while preserving 23 README paths. The 2026-08-09 public Eve correlation blocked packet and detail expand current accounting to 237 docs paths while preserving 23 README paths. They record Terra/1050000 info, session acceptance, identical durable replay event counts, and the unsupported public Eve correlation seam without retaining payloads; per-session upstream-call correlation and all Production claims remain unproved."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."
