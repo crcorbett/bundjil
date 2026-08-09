@@ -58,7 +58,10 @@ and retain tested rollback identities before alias or provider mutation.
    from both executable preflight admission and current Production metadata.
    The owner/test correction now fails closed, and the exact Personal project
    has a read-backed encrypted Production value of 15 seconds with single-key
-   removal as rollback; candidate creation remains gated on the full inventory.
+   removal as rollback. The full inventory also upgraded the existing proxy
+   namespace prefix from plain to encrypted metadata without changing its
+   bounded value. Candidate creation remains gated on a fresh pushed-source
+   inventory receipt.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all
    predecessors complete.
 
