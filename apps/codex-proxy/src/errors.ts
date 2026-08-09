@@ -5,6 +5,7 @@ import { CodexProxyDiagnosticMessage, CodexProxyErrorCode } from "./schemas.js";
 export const CodexProxySchemaBoundary = Schema.Literals([
   "CodexProxyRuntimeConfig",
   "CodexProxyMockStream",
+  "CodexProxyRequestContentLength",
   "OpenAICompatibleChatCompletionRequest",
   "OpenAICompatibleProxyInput",
 ]);

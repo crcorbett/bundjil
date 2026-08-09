@@ -34,6 +34,12 @@ export const CodexProxyDiagnosticMessage = Schema.NonEmptyString;
 export type CodexProxyDiagnosticMessage =
   typeof CodexProxyDiagnosticMessage.Type;
 
+export const CodexProxyRequestContentLength = Schema.BigIntFromString.check(
+  Schema.isGreaterThanOrEqualToBigInt(0n)
+);
+export type CodexProxyRequestContentLength =
+  typeof CodexProxyRequestContentLength.Type;
+
 export const CodexProxyRuntimeConfig = Schema.Struct({
   mode: CodexProxyMode,
   reasoningEffort: CodexResponsesReasoningEffort,

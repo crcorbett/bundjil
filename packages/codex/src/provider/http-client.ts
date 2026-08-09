@@ -1,10 +1,11 @@
-import { Context, Effect, Redacted, Schema } from "effect";
+import { Context, Effect, Redacted, Schema, Stream } from "effect";
 import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import { codexResponsesEndpointConfig } from "./config.js";
 import {
   CodexResponsesProofResult,
   CodexResponsesRequest,
+  CodexResponsesStreamMetadata,
 } from "./contracts.js";
 import type {
   CodexResponsesPostInput,
@@ -177,21 +178,31 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           });
         }
 
-        const body = yield* response.text.pipe(
+        const metadata = yield* Schema.decodeUnknownEffect(
+          CodexResponsesStreamMetadata
+        )({ status: response.status, contentType }).pipe(
           Effect.mapError(
             (cause) =>
               new CodexResponsesStreamError({
-                operation: "readResponseBody",
-                message: "Unable to read Codex Responses body.",
+                operation: "postResponsesStream",
+                message: "Unable to decode Codex Responses stream metadata.",
                 cause,
               })
           )
         );
 
         return {
-          status: response.status,
-          contentType,
-          body: Redacted.make(body),
+          ...metadata,
+          body: response.stream.pipe(
+            Stream.mapError(
+              (cause) =>
+                new CodexResponsesStreamError({
+                  operation: "readResponseBody",
+                  message: "Unable to read Codex Responses body.",
+                  cause,
+                })
+            )
+          ),
         };
       }
     ),

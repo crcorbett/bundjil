@@ -4,8 +4,12 @@ import {
   OpenAICompatibleProxyInput,
 } from "@bundjil/codex";
 import { Effect, Layer, Match, Redacted, Schema } from "effect";
-import type { HttpServerRequest } from "effect/unstable/http";
-import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
+import * as FileSystem from "effect/FileSystem";
+import {
+  HttpRouter,
+  HttpServerRequest,
+  HttpServerResponse,
+} from "effect/unstable/http";
 
 import { CodexProxyConfig, CodexProxyConfigLive } from "./env.js";
 import { CodexProxyRouteError } from "./errors.js";
@@ -19,11 +23,13 @@ import { CodexProxyReadiness } from "./readiness.service.js";
 import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
+  CodexProxyRequestContentLength,
 } from "./schemas.js";
 import type { CodexProxyErrorCode } from "./schemas.js";
 
 const healthJson = HttpServerResponse.schemaJson(CodexProxyHealthResponse);
 const errorJson = HttpServerResponse.schemaJson(CodexProxyErrorResponse);
+const codexProxyRequestBodyMaxBytes = FileSystem.Size(1024 * 1024);
 
 const errorResponse = (
   code: CodexProxyErrorCode,
@@ -70,8 +76,43 @@ const healthRoute = Effect.gen(function* healthRoute() {
 const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
   Effect.gen(function* chatCompletionsRoute() {
     const config = yield* CodexProxyConfig;
+    const declaredContentLength = request.headers["content-length"];
+
+    if (declaredContentLength !== undefined) {
+      const contentLength = yield* Schema.decodeUnknownEffect(
+        CodexProxyRequestContentLength
+      )(declaredContentLength).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexProxyRouteError({
+              boundary: "CodexProxyRequestContentLength",
+              cause,
+              code: "bad_request",
+              message: "Unable to decode Codex proxy request content length.",
+              responseMessage: "The request body could not be read.",
+              status: 400,
+            })
+        )
+      );
+
+      if (contentLength > codexProxyRequestBodyMaxBytes) {
+        return yield* new CodexProxyRouteError({
+          boundary: "CodexProxyRequestContentLength",
+          cause: "Request content length exceeded the configured byte limit.",
+          code: "bad_request",
+          message:
+            "Codex proxy request body exceeded the configured byte limit.",
+          responseMessage: "The request body could not be read.",
+          status: 400,
+        });
+      }
+    }
 
     const body = yield* request.text.pipe(
+      Effect.provideService(
+        HttpServerRequest.MaxBodySize,
+        codexProxyRequestBodyMaxBytes
+      ),
       Effect.mapError(
         (cause) =>
           new CodexProxyRouteError({
@@ -131,7 +172,7 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
     const proxy = yield* OpenAICompatibleProxy;
     const stream = yield* proxy.handleChatCompletions(proxyInput);
 
-    return HttpServerResponse.raw(stream.body, {
+    return HttpServerResponse.stream(stream.body, {
       contentType: stream.contentType,
       headers: {
         "cache-control": "no-cache, no-transform",

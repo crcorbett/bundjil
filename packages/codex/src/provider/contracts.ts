@@ -1,10 +1,12 @@
 import { Schema } from "effect";
+import type { Stream } from "effect";
 
 import {
   CodexOAuthAccessToken,
   CodexOAuthAccountId,
   CodexOAuthSubject,
 } from "../auth/credentials.js";
+import type { CodexResponsesStreamError } from "./errors.js";
 
 export const CodexResponsesModelId = Schema.NonEmptyString.pipe(
   Schema.brand("CodexResponsesModelId")
@@ -48,6 +50,13 @@ export type CodexResponsesFunctionArguments =
 export const CodexResponsesStreamContentType = Schema.String;
 export type CodexResponsesStreamContentType =
   typeof CodexResponsesStreamContentType.Type;
+
+export const CodexResponsesStreamMetadata = Schema.Struct({
+  status: Schema.Number.check(Schema.isFinite()),
+  contentType: CodexResponsesStreamContentType,
+});
+export type CodexResponsesStreamMetadata =
+  typeof CodexResponsesStreamMetadata.Type;
 
 export const CodexResponsesStreamEventKind = Schema.NonEmptyString.pipe(
   Schema.brand("CodexResponsesStreamEventKind")
@@ -192,17 +201,9 @@ export const CodexResponsesRequest = Schema.Struct({
 
 export type CodexResponsesRequest = typeof CodexResponsesRequest.Type;
 
-export const CodexResponsesStreamBody = Schema.RedactedFromValue(Schema.String);
-
-export type CodexResponsesStreamBody = typeof CodexResponsesStreamBody.Type;
-
-export const CodexResponsesStreamResult = Schema.Struct({
-  status: Schema.Number.check(Schema.isFinite()),
-  contentType: CodexResponsesStreamContentType,
-  body: CodexResponsesStreamBody,
-});
-
-export type CodexResponsesStreamResult = typeof CodexResponsesStreamResult.Type;
+export interface CodexResponsesStreamResult extends CodexResponsesStreamMetadata {
+  readonly body: Stream.Stream<Uint8Array, CodexResponsesStreamError>;
+}
 
 export const CodexResponsesStreamEvent = Schema.Struct({
   type: CodexResponsesStreamEventKind,
@@ -244,13 +245,10 @@ export const CodexResponsesFunctionArgumentsDeltaEvent = Schema.Struct({
 export type CodexResponsesFunctionArgumentsDeltaEvent =
   typeof CodexResponsesFunctionArgumentsDeltaEvent.Type;
 
-export const CodexResponsesStreamMapInput = Schema.Struct({
-  model: CodexResponsesModelId,
-  body: CodexResponsesStreamBody,
-});
-
-export type CodexResponsesStreamMapInput =
-  typeof CodexResponsesStreamMapInput.Type;
+export interface CodexResponsesStreamMapInput {
+  readonly model: CodexResponsesModelId;
+  readonly body: Stream.Stream<Uint8Array, CodexResponsesStreamError>;
+}
 
 export const CodexResponsesPostInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
@@ -394,17 +392,10 @@ export const OpenAICompatibleChatCompletionChunk = Schema.Struct({
 export type OpenAICompatibleChatCompletionChunk =
   typeof OpenAICompatibleChatCompletionChunk.Type;
 
-export const OpenAICompatibleChatCompletionStreamBody = Schema.String;
-export type OpenAICompatibleChatCompletionStreamBody =
-  typeof OpenAICompatibleChatCompletionStreamBody.Type;
-
-export const OpenAICompatibleChatCompletionStream = Schema.Struct({
-  contentType: Schema.Literal("text/event-stream"),
-  body: OpenAICompatibleChatCompletionStreamBody,
-});
-
-export type OpenAICompatibleChatCompletionStream =
-  typeof OpenAICompatibleChatCompletionStream.Type;
+export interface OpenAICompatibleChatCompletionStream {
+  readonly contentType: "text/event-stream";
+  readonly body: Stream.Stream<Uint8Array, CodexResponsesStreamError>;
+}
 
 export const CodexDirectProviderInput = Schema.Struct({
   subject: CodexOAuthSubject,

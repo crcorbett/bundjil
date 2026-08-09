@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: accepted task, source, verification, provider, deployment, rollback, or closeout state change
 spec: ../../product-specs/runtime-boundary-streaming-and-deployment-proof.md
 task_ledger: ../../product-specs/runtime-boundary-streaming-and-deployment-proof.tasks.json
@@ -45,8 +45,11 @@ and retain tested rollback identities before alias or provider mutation.
 2. `close-codex-and-agent-boundary-escapes` — completed. The raw transport
    service and generic production callback were retired, owner Schemas now
    back semantic Agent Config, and focused plus full verification passed.
-3. `stream-and-bound-codex-sse` — in progress.
-4. `enforce-staged-deployment-and-reconcile-docs` — pending.
+3. `stream-and-bound-codex-sse` — completed. The live provider path now
+   incrementally maps a bounded Effect byte stream through the proxy response;
+   deterministic tests prove early output, fragmentation, failure, size limits,
+   cancellation, and the current request ingress ceiling.
+4. `enforce-staged-deployment-and-reconcile-docs` — in progress.
 5. `integrate-and-prove-hosted-candidates` — pending.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all
    predecessors complete.

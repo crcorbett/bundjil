@@ -3,11 +3,13 @@ import {
   CodexResponsesStreamError,
   makeOpenAICompatibleProxy,
   OpenAICompatibleChatCompletionChunk,
-  OpenAICompatibleChatCompletionStream,
   OpenAICompatibleProxy,
 } from "@bundjil/codex";
-import type { CodexDirectProviderInputType } from "@bundjil/codex";
-import { Effect, Layer, Schema } from "effect";
+import type {
+  CodexDirectProviderInputType,
+  OpenAICompatibleChatCompletionStreamType,
+} from "@bundjil/codex";
+import { Effect, Layer, Schema, Stream } from "effect";
 
 import { CodexProxyReadyLive } from "./readiness.service.js";
 
@@ -55,21 +57,13 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
         )
       );
 
-      return yield* Schema.decodeUnknownEffect(
-        OpenAICompatibleChatCompletionStream
-      )({
-        body: `data: ${encodedChunk}\n\ndata: [DONE]\n\n`,
+      const stream: OpenAICompatibleChatCompletionStreamType = {
+        body: Stream.make(`data: ${encodedChunk}\n\ndata: [DONE]\n\n`).pipe(
+          Stream.encodeText
+        ),
         contentType: "text/event-stream",
-      }).pipe(
-        Effect.mapError(
-          (cause) =>
-            new CodexResponsesStreamError({
-              operation: "toOpenAICompatibleStream",
-              message: "Unable to decode mock OpenAI-compatible stream body.",
-              cause,
-            })
-        )
-      );
+      };
+      return stream;
     }),
   }
 );

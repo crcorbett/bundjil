@@ -91,7 +91,7 @@
     },
     {
       "id": "stream-and-bound-codex-sse",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Stream and bound Codex SSE incrementally",
       "dependsOn": ["close-codex-and-agent-boundary-escapes"],
       "description": "Carry upstream bytes through Effect Stream, incrementally decode/map bounded SSE lines, enforce the request limit, and return a streaming HTTP response with cancellation propagation.",
@@ -110,12 +110,18 @@
       "completionCriteria": [
         "No full upstream or rewritten response string exists on the live call graph and direct deterministic tests prove the named stream properties."
       ],
-      "evidence": [],
+      "evidence": [
+        "The live Codex call graph now carries the upstream body as an Effect byte stream from the private HttpClient response through incremental UTF-8/SSE decoding and OpenAI-compatible mapping to HttpServerResponse.stream; the proof-only postResponses operation remains the sole response.text consumer for its bounded byte/line receipt.",
+        "Codex tests directly proved a fragmented multi-byte UTF-8 delta, fragmented tool-call events and ordered state, an early mapped chunk before upstream release, downstream cancellation reaching the source finalizer, safe complete and residual 1 MiB line rejection, and upstream failure without a false completion marker. The Codex suite passed 12 files and 115 tests.",
+        "The proxy owns a separate 1 MiB materialised JSON ingress ceiling, with owner-Schema decoding for Content-Length plus MaxBodySize enforcement for observed bytes. Proxy tests proved both declared and observed overflow, and the real Web handler emitted an early chunk before source completion; all 3 files and 40 tests, typecheck, build, and smoke receipt healthStatus 200, streamStatus 200, streamLines 5 passed.",
+        "The direct Agent run rebuilt both Eve Node and Vercel outputs with the documented process-only synthetic Executor fixture and passed 15 files and 79 tests. Repository check, check:boundaries and git diff --check passed.",
+        "Full bun run verification passed on the receipt-bearing tree: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 107 tooling tests, type-aware lint, lint fixture, Knip, nine workspace typechecks and all fifteen Turbo test tasks. Codex and proxy were cache misses and passed 115 and 40 tests respectively. No provider, deployment, dispatch, delivery or replay claim is made by this slice."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "enforce-staged-deployment-and-reconcile-docs",
-      "status": "pending",
+      "status": "in_progress",
       "title": "Enforce staged deployment and reconcile durable owners",
       "dependsOn": ["stream-and-bound-codex-sse"],
       "description": "Disable Git-triggered Vercel deployments for both apps, add policy fixtures, correct lifecycle/proof routing, and update only the semantically owning architecture, README, runbook, authority, verification, SPEC/task, and plan surfaces.",
