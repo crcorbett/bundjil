@@ -53,7 +53,12 @@ and retain tested rollback identities before alias or provider mutation.
    configs and negative fixtures enforce manual-only deployment admission;
    architecture, README, runbook, lifecycle, verification, authority and
    automation owners now agree, and full verification passed.
-5. `integrate-and-prove-hosted-candidates` — in progress.
+5. `integrate-and-prove-hosted-candidates` — in progress. The pre-stage review
+   found that the runbook-required positive Channel handoff timeout was absent
+   from both executable preflight admission and current Production metadata.
+   The owner/test correction now fails closed, and the exact Personal project
+   has a read-backed encrypted Production value of 15 seconds with single-key
+   removal as rollback; candidate creation remains gated on the full inventory.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all
    predecessors complete.
 

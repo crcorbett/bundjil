@@ -481,6 +481,10 @@ const expectedAgentVariables = [
   [["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_ROUTING_IDENTITIES"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_ROUTING_SECRET"], ["sensitive"]],
+  [
+    ["BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"],
+    ["encrypted", "sensitive"],
+  ],
   [["BUNDJIL_CHANNEL_REPLAY_PREFIX"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"], ["encrypted"]],
   [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL"], ["encrypted"]],

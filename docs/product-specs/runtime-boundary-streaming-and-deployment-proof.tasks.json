@@ -168,7 +168,10 @@
       "completionCriteria": [
         "Every accepted hosted predicate has direct current evidence, all mutations are read back, and stable aliases plus rollback state are unambiguous."
       ],
-      "evidence": [],
+      "evidence": [
+        "Pre-stage reconciliation found and corrected one implementation defect before the terminal audit: deploy-promote.md already required the positive BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS Production binding, but executable preflight omitted it. The owner now admits only encrypted or sensitive metadata, and its negative fixture rejects a missing binding alongside the existing clean Channel and legacy-binding controls.",
+        "Fresh Personal-scope readback identified project prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and proved the Production timeout binding absent before the write. Under this task's explicit authority, one reversible non-sensitive Production binding was added with value 15000; immediate metadata readback reported target production and type encrypted, and an in-process equality probe returned present true and valid true without printing the value. Rollback is removal of only that binding followed by metadata readback."
+      ],
       "commitAfterPassing": false
     },
     {

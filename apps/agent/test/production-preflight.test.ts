@@ -18,6 +18,10 @@ const productionVariable = (name: string, type: "encrypted" | "sensitive") => ({
 const channelAgentVariables = [
   productionVariable("BUNDJIL_CHANNEL_ROUTING_IDENTITIES", "sensitive"),
   productionVariable("BUNDJIL_CHANNEL_ROUTING_SECRET", "sensitive"),
+  productionVariable(
+    "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS",
+    "encrypted"
+  ),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_PREFIX", "encrypted"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN", "encrypted"),
   productionVariable("BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL", "encrypted"),
@@ -529,7 +533,9 @@ describe("Production promotion preflight", () => {
             variables: [
               ...channelCandidateStaged.agent.variables.filter(
                 (variable) =>
-                  variable.name !== "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET"
+                  variable.name !== "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET" &&
+                  variable.name !==
+                    "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"
               ),
               productionVariable("BUNDJIL_SENDBLUE_API_KEY", "sensitive"),
               productionVariable("KV_REST_API_URL", "sensitive"),
@@ -543,6 +549,7 @@ describe("Production promotion preflight", () => {
         }).pipe(Effect.andThen(preflightProductionPromotion));
 
         assert.deepStrictEqual(evidence.rejected, [
+          "missing-production-variable:BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS",
           "missing-production-variable:BUNDJIL_CHANNEL_PHOTON_WEBHOOK_SECRET",
           "legacy-production-variable:BUNDJIL_SENDBLUE_API_KEY",
           "legacy-production-variable:KV_REST_API_URL",
