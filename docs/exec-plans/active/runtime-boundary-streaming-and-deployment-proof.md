@@ -60,8 +60,12 @@ and retain tested rollback identities before alias or provider mutation.
    has a read-backed encrypted Production value of 15 seconds with single-key
    removal as rollback. The full inventory also upgraded the existing proxy
    namespace prefix from plain to encrypted metadata without changing its
-   bounded value. Candidate creation remains gated on a fresh pushed-source
-   inventory receipt.
+   bounded value. A later current-state audit exposed a second false green:
+   the alias-family check discarded bindings with an invalid metadata type
+   before counting them, so two configured store aliases could pass as one.
+   The executable owner now counts names first and directly rejects that exact
+   mixed-type ambiguity. Hosted candidate proof and successor profile custody
+   remain in progress.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all
    predecessors complete.
 

@@ -713,6 +713,31 @@ describe("Production promotion preflight", () => {
           "ambiguous-production-variable:UPSTASH_REDIS_REST_URL|KV_REST_API_URL",
           "ambiguous-production-variable:UPSTASH_REDIS_REST_TOKEN|KV_REST_API_TOKEN",
         ]);
+
+        const ambiguousWrongType = yield* decode({
+          ...proxyProvisioned,
+          proxy: {
+            ...proxyProvisioned.proxy,
+            variables: [
+              ...proxyProvisioned.proxy.variables,
+              {
+                name: "UPSTASH_REDIS_REST_URL",
+                target: "production",
+                type: "encrypted",
+              },
+              {
+                name: "UPSTASH_REDIS_REST_TOKEN",
+                target: "production",
+                type: "encrypted",
+              },
+            ],
+          },
+        }).pipe(Effect.andThen(preflightProductionPromotion));
+
+        assert.deepStrictEqual(ambiguousWrongType.rejected, [
+          "ambiguous-production-variable:UPSTASH_REDIS_REST_URL|KV_REST_API_URL",
+          "ambiguous-production-variable:UPSTASH_REDIS_REST_TOKEN|KV_REST_API_TOKEN",
+        ]);
       })
   );
 

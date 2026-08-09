@@ -549,16 +549,19 @@ const missingVariableBindings = (
   expected: readonly ExpectedVariableBinding[]
 ) =>
   expected.flatMap(([names, allowedTypes]) => {
-    const matches = variables.filter(
-      (variable) =>
-        names.includes(variable.name) && allowedTypes.includes(variable.type)
+    const matches = variables.filter((variable) =>
+      names.includes(variable.name)
     );
-    if (matches.length === 0) {
+    const [match] = matches;
+    if (match === undefined) {
       return [`missing-production-variable:${names.join("|")}`];
     }
-    return matches.length === 1
+    if (matches.length > 1) {
+      return [`ambiguous-production-variable:${names.join("|")}`];
+    }
+    return allowedTypes.includes(match.type)
       ? []
-      : [`ambiguous-production-variable:${names.join("|")}`];
+      : [`missing-production-variable:${names.join("|")}`];
   });
 
 const legacyChannelBindings = (
