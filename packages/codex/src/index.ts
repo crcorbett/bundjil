@@ -244,11 +244,6 @@ export {
   loadCodexResponsesProofInputFromEnv,
 } from "./provider/config.js";
 export {
-  CodexResponsesFetch,
-  makeCodexResponsesFetch,
-} from "./provider/fetch.js";
-export type { CodexResponsesFetchShape } from "./provider/fetch.js";
-export {
   CodexResponsesProof,
   makeCodexResponsesProof,
   runCodexResponsesProof,
@@ -385,12 +380,9 @@ export {
   CodexResponsesReasoningEffort,
   CodexResponsesRequestPolicy,
   CodexResponsesRequest,
-  CodexResponsesStreamBody,
   CodexResponsesStreamContentType,
   CodexResponsesStreamEvent,
   CodexResponsesStreamEventKind,
-  CodexResponsesStreamMapInput,
-  CodexResponsesStreamResult,
   CodexResponsesTextContent,
   OpenAICompatibleChatCompletionChoice,
   OpenAICompatibleChatCompletionChunk,
@@ -398,7 +390,6 @@ export {
   OpenAICompatibleChatCompletionFinishReason,
   OpenAICompatibleChatCompletionId,
   OpenAICompatibleChatCompletionRequest,
-  OpenAICompatibleChatCompletionStream,
   OpenAICompatibleChatMessage,
   OpenAICompatibleChatRole,
   OpenAICompatibleProxyAuthorizationHeader,
@@ -523,7 +514,6 @@ export type {
   CodexResponsesRequestPolicy as CodexResponsesRequestPolicyType,
   CodexResponsesRequestPolicyEncoded,
   CodexResponsesRequest as CodexResponsesRequestType,
-  CodexResponsesStreamBody as CodexResponsesStreamBodyType,
   CodexResponsesStreamContentType as CodexResponsesStreamContentTypeType,
   CodexResponsesStreamEvent as CodexResponsesStreamEventType,
   CodexResponsesStreamEventKind as CodexResponsesStreamEventKindType,

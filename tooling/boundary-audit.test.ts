@@ -67,6 +67,14 @@ describe("boundary provenance audit", () => {
       "export const request = () => fetch('https://example.test');",
     ],
     [
+      "public-generic-fetch",
+      "export interface ProviderSettings { readonly fetch: (input: Request) => Promise<Response>; }",
+    ],
+    [
+      "public-http-transport",
+      'import type { HttpClientRequest, HttpClientResponse } from "effect/unstable/http"; export interface Provider { readonly send: (request: HttpClientRequest.HttpClientRequest) => Promise<HttpClientResponse.HttpClientResponse>; }',
+    ],
+    [
       "raw-response-text",
       "export const read = (response: Response) => response.text();",
     ],
@@ -90,6 +98,22 @@ describe("boundary provenance audit", () => {
         (diagnostic) => diagnostic.rule
       )
     ).toContain(rule);
+  });
+
+  it("accepts framework-owned Fetch request and response entrypoints", () => {
+    const { cwd, file } = fixture(
+      "export const handler = (request: Request): Promise<Response> => Promise.resolve(new Response(request.url));"
+    );
+    expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("does not reject a domain contract solely because its name resembles HTTP transport", () => {
+    const { cwd, file } = fixture(`
+      export declare const HttpClientResponse: { readonly Type: unique symbol };
+      export type HttpClientResponse = typeof HttpClientResponse.Type;
+      export interface Provider { readonly send: () => Promise<HttpClientResponse>; }
+    `);
+    expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
   });
 
   it("reports one semantic diagnostic for one nested raw signature slot", () => {

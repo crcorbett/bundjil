@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-verification-owner",
-  "lastReviewed": "2026-07-31",
+  "lastReviewed": "2026-08-10",
   "reviewTrigger": "critical journey, app command, runbook, environment, or authority change",
   "commands": [
     {
@@ -22,8 +22,8 @@
     },
     {
       "journeyId": "BND-J03-proxy-health-auth-sse",
-      "environment": "local mock mode",
-      "command": "bun run --filter @bundjil/codex-proxy smoke-test",
+      "environment": "local deterministic Layers and mock mode",
+      "command": "bun run --filter @bundjil/codex test && bun run --filter @bundjil/codex-proxy test && bun run --filter @bundjil/codex-proxy smoke-test",
       "claimScope": "proved",
       "procedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
       "externalReadback": "not required"

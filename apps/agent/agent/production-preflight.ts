@@ -481,6 +481,10 @@ const expectedAgentVariables = [
   [["BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_ROUTING_IDENTITIES"], ["sensitive"]],
   [["BUNDJIL_CHANNEL_ROUTING_SECRET"], ["sensitive"]],
+  [
+    ["BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"],
+    ["encrypted", "sensitive"],
+  ],
   [["BUNDJIL_CHANNEL_REPLAY_PREFIX"], ["encrypted", "sensitive"]],
   [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_TOKEN"], ["encrypted"]],
   [["BUNDJIL_CHANNEL_REPLAY_KV_REST_API_URL"], ["encrypted"]],
@@ -545,16 +549,19 @@ const missingVariableBindings = (
   expected: readonly ExpectedVariableBinding[]
 ) =>
   expected.flatMap(([names, allowedTypes]) => {
-    const matches = variables.filter(
-      (variable) =>
-        names.includes(variable.name) && allowedTypes.includes(variable.type)
+    const matches = variables.filter((variable) =>
+      names.includes(variable.name)
     );
-    if (matches.length === 0) {
+    const [match] = matches;
+    if (match === undefined) {
       return [`missing-production-variable:${names.join("|")}`];
     }
-    return matches.length === 1
+    if (matches.length > 1) {
+      return [`ambiguous-production-variable:${names.join("|")}`];
+    }
+    return allowedTypes.includes(match.type)
       ? []
-      : [`ambiguous-production-variable:${names.join("|")}`];
+      : [`missing-production-variable:${names.join("|")}`];
   });
 
 const legacyChannelBindings = (

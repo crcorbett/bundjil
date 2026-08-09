@@ -1,0 +1,215 @@
+{
+  "title": "Runtime Boundary Streaming And Deployment Proof Tasks",
+  "status": "completed",
+  "spec": "docs/product-specs/runtime-boundary-streaming-and-deployment-proof.md",
+  "principles": [
+    "Implement only accepted findings and keep Channel/Eve-native ownership intact.",
+    "Use owner-named Schema, Effect Config, services, Layers, safe tagged errors, flat Effects, and Effect Stream at provider boundaries.",
+    "Provider, deployment, dispatch, typing, delivery, and replay claims require separate direct evidence.",
+    "Never emit or retain secret values, phone numbers, message bodies, prompts, provider payloads, OAuth material, ciphertext, or chain-of-thought.",
+    "Run one terminal five-pass audit only after every predecessor task is complete."
+  ],
+  "globalVerification": [
+    "bun run check:boundaries",
+    "bun run check:effect-setup",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run --filter @bundjil/codex check-types",
+    "bun run --filter @bundjil/codex test",
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "bun run --filter @bundjil/agent check-types",
+    "bun run --filter @bundjil/agent test",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "riskLenses": [
+    "Effect contracts: Schema Type/Encoded provenance, branded identities, Config, named operations, safe tagged errors, flat Effects, Layers, streams, cancellation, and resource lifetime.",
+    "Ownership: complete call graphs, app/package boundaries, public exports, helper admission, dead paths, ChatSDK/Eve alignment, and no generic transport or callback capability.",
+    "Behavior and proof: clean builds, incremental/fragmented/oversize/failure streaming, replay and idempotency limits, hosted CI, deployment causality, provider readback, rollback, and secret-negative receipts."
+  ],
+  "tasks": [
+    {
+      "id": "repair-clean-agent-build-proof",
+      "status": "completed",
+      "title": "Repair the current Eve build-manifest oracle",
+      "dependsOn": [],
+      "description": "Point the Agent packaging assertion at the supported Eve 0.29.5 Build Output and prove it without generated-output or Turbo-cache false greens.",
+      "acceptance": [
+        "Generated Agent output is removed before the direct package test.",
+        "Both public channel routes and the exact external dependency manifest are asserted from current output.",
+        "Direct Agent tests pass and no runtime or provider state changes."
+      ],
+      "mandatoryVerification": [
+        "Remove apps/agent/.output and any obsolete apps/agent/.eve/compile output before building.",
+        "Run the direct Agent test task with the documented synthetic Executor build fixture and confirm both build modes execute.",
+        "Run git diff --check and record that no provider, deployment, or runtime claim is made."
+      ],
+      "completionCriteria": [
+        "The direct current-output oracle passes and the obsolete manifest path is absent from current production/test source."
+      ],
+      "evidence": [
+        "The generated apps/agent/.output directory was moved to recoverable temporary custody before the direct package run. Both Eve Node and Vercel builds executed from the current worktree and emitted the supported .output/.eve/compile manifest.",
+        "The direct @bundjil/agent test passed 15 files and 77 tests, including both channel routes and the exact @bundjil/photon, @grpc/grpc-js, nice-grpc and nice-grpc-common packaging contract.",
+        "Full bun run verification passed on the receipt-bearing tree: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 103 boundary/tooling tests, formatting/type-aware lint, lint fixture, Knip, nine workspace typechecks and all 15 Turbo test tasks. The Agent task was a cache miss and passed locally.",
+        "The documentation inventory was refreshed from 237 to 240 exact docs paths with digest 082ad42a4d0954e4fde8d9d784166b5d21659061372264f3b7487b3a88f6aa7a; the 23-path README digest was unchanged. No provider, deployment or runtime behavior was claimed."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "close-codex-and-agent-boundary-escapes",
+      "status": "completed",
+      "title": "Close raw Codex transport and Agent config callback escapes",
+      "dependsOn": ["repair-clean-agent-build-proof"],
+      "description": "Make CodexHttpClient own Effect HttpClient directly, retire CodexResponsesFetch, add boundary fixtures, and use owner Schemas for Agent Config without a production generic fetch dependency.",
+      "acceptance": [
+        "No Codex package-root raw request/response service or generic Agent fetch callback remains.",
+        "Tests use standard Layer or host-boundary substitution without changing production signatures.",
+        "Config absent/valid/invalid cases and boundary positive/negative fixtures pass."
+      ],
+      "mandatoryVerification": [
+        "Run Codex client/proof tests using an injected Effect HttpClient Layer and scan root exports for the retired service.",
+        "Run Agent model/config tests with a test-owned host fetch interception that is always restored.",
+        "Run boundary-audit positive and negative fixtures, check:boundaries, both package/app typechecks, and focused tests."
+      ],
+      "completionCriteria": [
+        "All production public signatures are domain-specific and every semantic config field is owner-Schema-backed."
+      ],
+      "evidence": [
+        "CodexHttpClient now consumes Effect HttpClient privately; the public CodexResponsesFetch service, root export, runtime Layer, testing mock and source module were retired. The proof script uses CodexResponsesProofLive, and proxy tests compose test-owned standard Effect HttpClient Layers beneath the domain client.",
+        "AgentCodexProxyBaseUrl and AgentModelContextWindowTokens now own their semantic boundaries and Config.schema reuses the exact struct fields. The production Agent model factory has no generic fetch dependency; its request/auth test temporarily intercepts the host fetch boundary and restores it with Effect.ensuring.",
+        "The provenance audit now rejects public Effect HttpClientRequest/HttpClientResponse transport types and exported generic fetch properties while accepting framework Fetch Request/Response entrypoints and owner contracts with similar names. The 107-test tooling suite and check:boundaries passed with no exception added.",
+        "Focused verification passed: Codex proof 5 tests, Agent model/config 6 tests, proxy handler 26 tests, Codex/Agent/proxy typechecks, Codex build, export/stale-seam scan and git diff --check. The proxy's first run exposed stale dist output; rebuilding @bundjil/codex made the current 26-test oracle pass.",
+        "Full bun run verification passed on the receipt-bearing tree with the documented process-only synthetic Executor URL/key fixture and no provider request: all policy gates, HGI-307, 107 tooling tests, type-aware lint, lint fixture, Knip, nine typechecks and all fifteen Turbo test tasks. Agent, Codex and proxy passed their current suites; Agent passed 79 tests, Codex 110 and proxy 37. No external provider or deployment state changed in this slice."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "stream-and-bound-codex-sse",
+      "status": "completed",
+      "title": "Stream and bound Codex SSE incrementally",
+      "dependsOn": ["close-codex-and-agent-boundary-escapes"],
+      "description": "Carry upstream bytes through Effect Stream, incrementally decode/map bounded SSE lines, enforce the request limit, and return a streaming HTTP response with cancellation propagation.",
+      "acceptance": [
+        "Fragmented text and tool-call events map in order without full-response buffering.",
+        "The first mapped chunk is observable before slow upstream completion.",
+        "Oversize request/line, upstream failure, and cancellation tests fail safely.",
+        "Codex, proxy, and Agent focused checks pass."
+      ],
+      "mandatoryVerification": [
+        "Prove fragmented UTF-8/SSE lines and tool-call state map in order and terminate with the correct finish reason and [DONE].",
+        "Use a gated slow upstream to prove a first output chunk before upstream completion, then separately prove downstream cancellation reaches the source.",
+        "Prove request and residual/complete line overflow fail with safe typed errors and no body leak.",
+        "Run Codex and proxy typechecks/tests/build/smoke plus Agent focused checks and repository boundary/Effect gates."
+      ],
+      "completionCriteria": [
+        "No full upstream or rewritten response string exists on the live call graph and direct deterministic tests prove the named stream properties."
+      ],
+      "evidence": [
+        "The live Codex call graph now carries the upstream body as an Effect byte stream from the private HttpClient response through incremental UTF-8/SSE decoding and OpenAI-compatible mapping to HttpServerResponse.stream; the proof-only postResponses operation remains the sole response.text consumer for its bounded byte/line receipt.",
+        "Codex tests directly proved a fragmented multi-byte UTF-8 delta, fragmented tool-call events and ordered state, an early mapped chunk before upstream release, downstream cancellation reaching the source finalizer, safe complete and residual 1 MiB line rejection, and upstream failure without a false completion marker. The Codex suite passed 12 files and 115 tests.",
+        "The proxy owns a separate 1 MiB materialised JSON ingress ceiling, with owner-Schema decoding for Content-Length plus MaxBodySize enforcement for observed bytes. Proxy tests proved both declared and observed overflow, and the real Web handler emitted an early chunk before source completion; all 3 files and 40 tests, typecheck, build, and smoke receipt healthStatus 200, streamStatus 200, streamLines 5 passed.",
+        "The direct Agent run rebuilt both Eve Node and Vercel outputs with the documented process-only synthetic Executor fixture and passed 15 files and 79 tests. Repository check, check:boundaries and git diff --check passed.",
+        "Full bun run verification passed on the receipt-bearing tree: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 107 tooling tests, type-aware lint, lint fixture, Knip, nine workspace typechecks and all fifteen Turbo test tasks. Codex and proxy were cache misses and passed 115 and 40 tests respectively. No provider, deployment, dispatch, delivery or replay claim is made by this slice."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "enforce-staged-deployment-and-reconcile-docs",
+      "status": "completed",
+      "title": "Enforce staged deployment and reconcile durable owners",
+      "dependsOn": ["stream-and-bound-codex-sse"],
+      "description": "Disable Git-triggered Vercel deployments for both apps, add policy fixtures, correct lifecycle/proof routing, and update only the semantically owning architecture, README, runbook, authority, verification, SPEC/task, and plan surfaces.",
+      "acceptance": [
+        "Both vercel.json files declare git.deploymentEnabled false and fixtures reject omission or true.",
+        "Codex proof routing and Alchemy lifecycle prose agree with canonical indexes.",
+        "The docs-maintainer impact ledger is reconciled and all documentation/authority/control gates pass."
+      ],
+      "mandatoryVerification": [
+        "Add config fixtures for both apps that fail when Git deployment is absent or enabled.",
+        "Add the cross-owner lifecycle negative fixture for a router that claims an active SPEC/plan absent from canonical indexes.",
+        "Invoke docs-maintainer across every ledger surface and run docs, skills, authority, controls, verification, boundary, and Effect setup checks."
+      ],
+      "completionCriteria": [
+        "Repository deployment policy, current docs, runbooks, registers, verification owners, and rollback instructions agree without historical receipt rewrites."
+      ],
+      "evidence": [
+        "Both app-owned vercel.json files now decode git.deploymentEnabled as the literal false. Agent and proxy packaging fixtures separately reject the field when absent or true while preserving their existing build, route and dependency contracts.",
+        "The deployment architecture, target deploy/promote and Alchemy runbooks, typed automation register, GitHub automation rationale, and both Vercel authority envelopes now agree that a Git push triggers CI only; immutable deployment creation and alias movement are separate manual foreground operations with before/after inventory and rollback gates.",
+        "The stale @bundjil/codex README claim that dated proof lacked a canonical owner was removed. BND-J03 now routes deterministic fragmentation, early-output, byte-limit, upstream-failure and cancellation evidence plus process smoke proof through docs/verification without upgrading it to hosted evidence.",
+        "The documentation policy regression now rejects a current task-backed SPEC or active plan omitted from either canonical index. The focused documentation test passed 11 tests; check:docs, check:skills, check:authority, check:controls, check:verification, check:effect-setup, check:boundaries, type-aware lint and git diff --check passed.",
+        "Full focused app suites rebuilt both Agent modes and passed Agent 15 files/80 tests and proxy 3 files/41 tests. Full bun run verification then passed on the exact receipt-bearing tree with 108 tooling tests, nine workspace typechecks and all fifteen Turbo test tasks. No Vercel, Photon, Sendblue, Executor, deployment, environment, credential, secret or message state changed in this repository-only slice."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "integrate-and-prove-hosted-candidates",
+      "status": "completed",
+      "title": "Push, stage, prove, promote, and read back hosted candidates",
+      "dependsOn": ["enforce-staged-deployment-and-reconcile-docs"],
+      "description": "Push the verified source without auto-deployment, stage exact proxy/Agent candidates, obtain claim-matched Preview and Production proof, perform bounded channel proof where targets are unambiguous, promote only accepted candidates, and retain sanitized rollback/readback evidence.",
+      "acceptance": [
+        "Hosted CI passes the exact pushed SHA and the push creates no automatic Vercel deployment.",
+        "Immutable proxy proof covers health, auth controls, incremental SSE first-byte/completion, source, and no-leak predicates.",
+        "Immutable Agent proof covers build/routes and accepted channel behavior; dispatch, typing, handset delivery, and strict replay are reported separately.",
+        "Stable aliases resolve to the accepted source and both prior READY rollback deployments remain recorded."
+      ],
+      "mandatoryVerification": [
+        "Re-read Personal-scope project/deployment/environment-name/provider inventories and exact rollback candidates before every write.",
+        "Push the exact verified source, wait for hosted CI, and compare pre/post Vercel deployment inventory to prove no Git-triggered deployment.",
+        "Stage immutable proxy and Agent candidates through target-owned runbooks, prove proxy health/auth/first-byte/completion and Agent build/routes, then run bounded live channels only for unambiguous provider targets.",
+        "Promote accepted candidates explicitly; read back source, aliases, status, provider state, and rollback IDs; retain sanitized packets and exact non-claims."
+      ],
+      "completionCriteria": [
+        "Every accepted hosted predicate has direct current evidence, all mutations are read back, and stable aliases plus rollback state are unambiguous."
+      ],
+      "evidence": [
+        "Pre-stage reconciliation found and corrected one implementation defect before the terminal audit: deploy-promote.md already required the positive BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS Production binding, but executable preflight omitted it. The owner now admits only encrypted or sensitive metadata, and its negative fixture rejects a missing binding alongside the existing clean Channel and legacy-binding controls.",
+        "Fresh Personal-scope readback identified project prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and proved the Production timeout binding absent before the write. Under this task's explicit authority, one reversible non-sensitive Production binding was added with value 15000; immediate metadata readback reported target production and type encrypted, and an in-process equality probe returned present true and valid true without printing the value. Rollback is removal of only that binding followed by metadata readback.",
+        "The complete preflight inventory then rejected the proxy's existing plain BUNDJIL_UPSTASH_REDIS_KEY_PREFIX against the canonical encrypted-or-sensitive policy. Fresh readback fixed the exact Personal proxy project and Production target; a process-only pipe preserved the non-empty bounded value while changing only its metadata type to encrypted. Immediate readback reported encrypted and opaque fingerprint 61b39331..., with inverse type conversion as rollback; no key, store credential, profile, ciphertext, provider resource or alias changed.",
+        "A later current-state audit found the proxy had both runtime store alias families, but preflight incorrectly discarded the invalid-type aliases before counting names and returned a false green. The earliest executable owner now counts configured alias names first, rejects more than one regardless of metadata type, and only then validates the sole binding type. A direct mixed-type regression and the complete 20-test preflight file pass; the hosted task remains reopened until Production is reduced to one proved family and fresh evidence is captured.",
+        "The exact correction tree passed full bun run verification with the documented process-only synthetic Executor fixture and no provider request: Effect setup, boundaries, docs, skills, authority, controls, verification policy, HGI-307, 108 tooling tests, type-aware lint, lint fixture, Knip, nine typechecks and all fifteen Turbo tasks; the changed Agent task rebuilt both modes and passed 15 files/80 tests. Earlier reruns correctly stopped on table formatting, strict indexed access, destructuring policy, and a missing synthetic build precondition before this complete receipt.",
+        "Hosted CI run 31321575702 passed exact source 6cc0936d502a7b5f0fa32994929fac7f396eb200, while pre/post-push Vercel inventories showed no Git-created deployment. Infrastructure Drift run 31321575704 stopped before source execution because its three repository secrets were unset and remains an external workflow-configuration limitation.",
+        "Personal-scope proxy deployment dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4 and Agent deployment dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA were manually staged at the exact source, passed immutable health/auth/stream and Eve session proof, and were explicitly promoted. Stable alias readback resolved to both READY deployments; prior READY rollback deployments dpl_5kbRiDzbGkdRYMcsSCJidZkJ3njB and dpl_ewqr5pW1RBZZz54j6auxKuYecu93 remain addressable with their recorded config fingerprints.",
+        "The successor Personal OAuth profile passed encrypted v2, subscription, refresh, expiry and marker-leak checks. Vercel retains the effective secret material; exact mode-0600 local key and bearer copies were removed after proof. The OAuth callback appeared once in internal Computer Use output, its tab was closed, and no callback material entered a repository file, diff, commit, retained receipt or final packet.",
+        "One exact Personal Sendblue iMessage journey produced a current API RECEIVED ingress and DELIVERED egress in the same conversation, with the matching reply independently visible on the handset. Fresh target admission then produced HTTP 200/SENT for one transient typing start and one stop. No phone identity or message body is retained. Photon CLI 2.0.0 reports an expired production session and the provider still exposes no candidate-specific replay oracle, so no Photon write occurred and current inventory, dispatch, typing, delivery and strict replay remain explicit non-blocking external limitations.",
+        "The accepted agent-accepted-rollback-ready preflight passed with empty rejections and detail digest 34cfe688ede2dc66bc7cf51754c7f1d2c3f3a73740d50a05ff07fd856dc28000. The channel-inventory stage was not rerun retrospectively because current Photon readback was unavailable. The dated runtime-boundary-streaming-production-accepted-2026-08-10.md packet records every provider/deployment mutation, incident, cleanup, rollback identity and non-claim."
+      ],
+      "commitAfterPassing": false
+    },
+    {
+      "id": "terminal-five-pass-audit",
+      "status": "completed",
+      "title": "Run the terminal five-pass audit and closeout",
+      "dependsOn": ["integrate-and-prove-hosted-candidates"],
+      "description": "Run the five required audit lenses once, fix every confirmed defect, rerun affected focused checks and full verification, then move the SPEC/plan/ledger to terminal lifecycle and commit/push the closeout evidence.",
+      "acceptance": [
+        "All five passes have explicit results newer than predecessor evidence.",
+        "No unresolved implementation defect remains and every limitation is external, disproven, or explicitly non-blocking.",
+        "bun run verification, hosted CI, git diff --check, docs reconciliation, exact origin/main readback, and final push integration pass."
+      ],
+      "mandatoryVerification": [
+        "Run the five lenses in the SPEC exactly once after all predecessor work and record each result; any correction reopens its owner and invalidates affected evidence.",
+        "Run every AGENTS.md gate, focused changed-package checks, bun run verification, git diff --check, hosted CI, and exact origin/main/source/deployment readback.",
+        "Invoke docs-maintainer for terminal lifecycle moves and prove the completed ledger, implemented SPEC, historical completed plan, indexes, runbooks, packets, rollback, and non-claims agree."
+      ],
+      "completionCriteria": [
+        "The terminal audit is newer than all implementation and live proof, every confirmed issue is fixed, and only explicit external/disproven non-blocking limitations remain."
+      ],
+      "evidence": [
+        "Pass 1 accepted the Effect contracts: owner-named Schemas and Config, branded identities, safe tagged errors, named services, explicit live/local/mock Layers and the lazy cancellation-aware byte stream remain at their owning boundaries. No raw host/provider DTO, unsafe cast, instanceof policy or unowned production callback was found.",
+        "Pass 2 accepted the call graph and topology: CodexResponsesFetch is absent, HttpClient stays inside the package-owned Codex client, public operations are domain-named, no new package or broad barrel exists, and helper/common/utils and dead-export scans found no admitted sprawl.",
+        "Pass 3 accepted behavior and failure paths. Focused Codex passed 12 files/115 tests, proxy 3 files/41 tests and Agent 15 files/80 tests after supplying the documented process-only synthetic Executor fixture; the first fixture-free Agent attempt stopped at its required configuration boundary and made no external request. Full verification passed after terminal documentation reconciliation.",
+        "Pass 4 found and fixed one documentation defect inside the audit: deploy-promote metadata commands still depended on app-local Vercel links despite the rollout's stale-link evidence. The canonical runbook now links the repository root to one exact project at a time, reads back project identity and uses --cwd . so the configured Root Directory is applied once. Documentation, skill, authority, control and verification gates then passed.",
+        "Pass 5 accepted provider/deployment/secret safety: stable aliases resolve to the exact READY current-source deployments, both prior rollback deployments remain READY, Sendblue ingress/egress/typing/handset observations stay separate, local credential copies are absent and leak scans found only explicit test sentinels. Photon live/replay and Infrastructure Drift remain explicit external non-claims.",
+        "The terminal receipt-bearing tree passed git diff --check and the complete AGENTS.md verification command with the synthetic Executor fixture. Hosted CI for deployed source 6cc0936d502a7b5f0fa32994929fac7f396eb200 remains green; final receipt integration receives its own GitHub readback after push. No unresolved implementation defect remains."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

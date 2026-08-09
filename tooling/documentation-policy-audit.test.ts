@@ -350,6 +350,36 @@ describe("HGI-302 documentation policy", () => {
     ).toBeTruthy();
   });
 
+  it("rejects current SPEC and plan routes omitted from canonical indexes", () => {
+    const files = baseFiles.map((file) => {
+      if (file.path === "docs/product-specs/index.md") {
+        return {
+          ...file,
+          content: `${metadata}\n\n# Specs\n\n- [Terminal](terminal.md)`,
+        };
+      }
+      return file.path === "docs/exec-plans/active/README.md"
+        ? { ...file, content: `${metadata}\n\n# Current plan index` }
+        : file;
+    });
+    const { findings } = run(snapshot(files));
+
+    expect(
+      findings.some(
+        (issue) =>
+          issue.code === "DOC-INDEX" &&
+          issue.target === "docs/product-specs/current.md"
+      )
+    ).toBeTruthy();
+    expect(
+      findings.some(
+        (issue) =>
+          issue.code === "DOC-INDEX" &&
+          issue.target === "docs/exec-plans/active/current.md"
+      )
+    ).toBeTruthy();
+  });
+
   it("rejects a completed-route plan with an in-progress ledger", () => {
     const files = baseFiles.map((file) =>
       file.path === "docs/product-specs/terminal.tasks.json"

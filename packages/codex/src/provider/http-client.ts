@@ -1,23 +1,23 @@
-import { Context, Effect, Redacted, Schema } from "effect";
-import { HttpClientRequest } from "effect/unstable/http";
+import { Context, Effect, Redacted, Schema, Stream } from "effect";
+import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import { codexResponsesEndpointConfig } from "./config.js";
 import {
   CodexResponsesProofResult,
   CodexResponsesRequest,
+  CodexResponsesStreamMetadata,
 } from "./contracts.js";
 import type {
   CodexResponsesPostInput,
   CodexResponsesProofResult as CodexResponsesProofResultType,
   CodexResponsesStreamResult,
 } from "./contracts.js";
-import type { CodexHttpNetworkError } from "./errors.js";
 import {
+  CodexHttpNetworkError,
   CodexHttpStatusError,
   CodexResponsesRequestError,
   CodexResponsesStreamError,
 } from "./errors.js";
-import { CodexResponsesFetch } from "./fetch.js";
 
 export type CodexHttpClientFailure =
   | CodexResponsesRequestError
@@ -40,7 +40,7 @@ export class CodexHttpClient extends Context.Service<
 >()("@bundjil/codex/CodexHttpClient") {}
 
 export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
-  const fetcher = yield* CodexResponsesFetch;
+  const client = yield* HttpClient.HttpClient;
   const endpoint = yield* codexResponsesEndpointConfig;
 
   return CodexHttpClient.of({
@@ -72,7 +72,16 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         HttpClientRequest.setHeaders(headers),
         HttpClientRequest.bodyText(encodedRequestBody, "application/json")
       );
-      const response = yield* fetcher.fetch(upstreamRequest);
+      const response = yield* client.execute(upstreamRequest).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexHttpNetworkError({
+              operation: "fetch",
+              message: "Unable to reach Codex Responses endpoint.",
+              cause,
+            })
+        )
+      );
       const contentType = response.headers["content-type"] ?? "";
 
       if (response.status < 200 || response.status >= 300) {
@@ -146,7 +155,16 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           HttpClientRequest.setHeaders(headers),
           HttpClientRequest.bodyText(encodedRequestBody, "application/json")
         );
-        const response = yield* fetcher.fetch(upstreamRequest);
+        const response = yield* client.execute(upstreamRequest).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexHttpNetworkError({
+                operation: "fetch",
+                message: "Unable to reach Codex Responses endpoint.",
+                cause,
+              })
+          )
+        );
         const contentType = response.headers["content-type"] ?? "";
 
         if (response.status < 200 || response.status >= 300) {
@@ -160,21 +178,31 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           });
         }
 
-        const body = yield* response.text.pipe(
+        const metadata = yield* Schema.decodeUnknownEffect(
+          CodexResponsesStreamMetadata
+        )({ status: response.status, contentType }).pipe(
           Effect.mapError(
             (cause) =>
               new CodexResponsesStreamError({
-                operation: "readResponseBody",
-                message: "Unable to read Codex Responses body.",
+                operation: "postResponsesStream",
+                message: "Unable to decode Codex Responses stream metadata.",
                 cause,
               })
           )
         );
 
         return {
-          status: response.status,
-          contentType,
-          body: Redacted.make(body),
+          ...metadata,
+          body: response.stream.pipe(
+            Stream.mapError(
+              (cause) =>
+                new CodexResponsesStreamError({
+                  operation: "readResponseBody",
+                  message: "Unable to read Codex Responses body.",
+                  cause,
+                })
+            )
+          ),
         };
       }
     ),

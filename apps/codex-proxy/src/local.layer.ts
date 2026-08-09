@@ -14,7 +14,6 @@ import {
   CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
-  CodexResponsesFetchLive,
   OpenAICompatibleProxyLive,
 } from "@bundjil/codex/runtime";
 import { CodexOAuthRefreshLockMemory } from "@bundjil/codex/testing";
@@ -83,7 +82,7 @@ export const makeCodexProxyOpenAICompatibleProxyLocal = (
   directory: CodexProxyLocalProfileStoreDirectory,
   policy: CodexResponsesRequestPolicy,
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv()),
-  responsesFetchLayer = CodexResponsesFetchLive
+  codexHttpClientLayer = CodexHttpClientLive
 ) =>
   Layer.merge(
     OpenAICompatibleProxyLive.pipe(
@@ -92,7 +91,7 @@ export const makeCodexProxyOpenAICompatibleProxyLocal = (
           Layer.provideMerge(
             Layer.merge(
               makeCodexProxyOAuthServiceLocal(directory, configProviderLayer),
-              CodexHttpClientLive.pipe(Layer.provide(responsesFetchLayer))
+              codexHttpClientLayer
             )
           )
         )

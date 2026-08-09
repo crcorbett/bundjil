@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
@@ -22,7 +22,12 @@ remains in force until a fresh target-owned readback is retained.
 - Record a clean source revision with `git status --short`, `git rev-parse
 HEAD`, and a readback of `origin/main`.
 - Authenticate the intended Vercel principal and record its identity source and
-  scope. Link each app directory only to its exact project.
+  scope. Verify the local link before every operation. Both Bundjil projects
+  already own an app Root Directory, so link the repository root to the exact
+  project for the current stage and deploy from that root; linking the app
+  directory would apply the Root Directory twice. Treat `.vercel` as disposable
+  local routing metadata, never provider truth, and remove any link-generated
+  local environment file before continuing.
 - Record an addressable approval for one stage, target, source SHA, operation,
   duration, and rollback. The snapshot literal `operationAuthority:
 "external-receipt-required"` is an explicit non-grant; attach the real
@@ -98,11 +103,15 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    ```bash
    vercel project inspect bundjil-codex-proxy --scope "$BUNDJIL_VERCEL_SCOPE"
    vercel project inspect bundjil-agent --scope "$BUNDJIL_VERCEL_SCOPE"
-   vercel env ls production --cwd apps/codex-proxy --scope "$BUNDJIL_VERCEL_SCOPE"
-   vercel env ls production --cwd apps/agent --scope "$BUNDJIL_VERCEL_SCOPE"
    vercel list bundjil-codex-proxy --environment production --scope "$BUNDJIL_VERCEL_SCOPE"
    vercel list bundjil-agent --environment production --scope "$BUNDJIL_VERCEL_SCOPE"
    ```
+
+   Then link the repository root to one exact project at a time, read back
+   `.vercel/project.json`, and run `vercel env ls production --cwd . --scope
+   "$BUNDJIL_VERCEL_SCOPE"`. Relink and repeat for the second project. Do not
+   reuse an app-local link or infer the project from the working-directory
+   name. Remove any link-generated local environment file before proceeding.
 
    Inspect each candidate with `vercel inspect "$DEPLOYMENT_URL" --scope
 "$BUNDJIL_VERCEL_SCOPE"`. Sanitize provider output into the snapshot; do not
@@ -170,11 +179,21 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 
 6. **Mutation gate:** stop before deploy, promote, alias/environment change, or
    rollback until the complete stage-specific authority envelope is attached.
-   When granted, operate one app and one stage only. Vercel's staged pattern is
-   `vercel deploy --prod --skip-domain --cwd <app> --scope
+   Confirm both app-owned `vercel.json` files still decode
+   `git.deploymentEnabled: false`; a Git push must trigger CI only and must not
+   be used as candidate creation or promotion. Compare the exact project
+   deployment inventories immediately before and after the pushed SHA and stop
+   if either project gained a Git-triggered deployment.
+   When granted, operate one app and one stage only. Link the repository root to
+   the exact project, read back `.vercel/project.json`, and confirm its project
+   ID matches the provider project. Because the provider applies the configured
+   app Root Directory, the staged pattern from that linked root is
+   `vercel deploy --prod --skip-domain --cwd . --scope
 "$BUNDJIL_VERCEL_SCOPE"`, followed only after acceptance by `vercel promote
-"$DEPLOYMENT_URL" --scope "$BUNDJIL_VERCEL_SCOPE"`. Do not use `--yes`,
-   inline secret flags, or an unreviewed prebuilt artifact.
+"$DEPLOYMENT_URL" --scope "$BUNDJIL_VERCEL_SCOPE"`. Stop if the CLI resolves a
+   doubled app path, an unrequested project, or any project other than the
+   read-backed target. Do not use `--yes` for deployment, inline secret flags,
+   or an unreviewed prebuilt artifact.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the
    immutable candidate URL. For the ordinary one-callback `Stable` topology,

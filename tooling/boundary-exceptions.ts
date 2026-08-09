@@ -28,6 +28,8 @@ export type BoundaryRule =
   | "config-primitive"
   | "direct-json"
   | "raw-fetch"
+  | "public-generic-fetch"
+  | "public-http-transport"
   | "raw-response-text"
   | "sync-schema-codec"
   | "unsafe-boundary-syntax";

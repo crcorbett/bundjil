@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-10
 review_trigger: Alchemy stack, remote state, Vercel or Photon provider boundary, adoption manifest, credential, drift, apply, rollback, or revocation change
 ---
 
@@ -442,10 +442,12 @@ identity, ambiguous key, unexpected plan action, or uncertain outcome after
 bounded observation. Retain Schema-valid mode-`0600` authority and receipt
 artifacts under ignored `tmp/proof/**`.
 
-Do not let Alchemy create, deploy, or promote Vercel Git deployments. Do not
-create or mutate Photon projects, dedicated lines, billing, users, webhooks,
-or platform settings unless the active SPEC task and authority envelope name
-that exact operation.
+Do not let Alchemy create, deploy, or promote Vercel deployments. Both app
+configs disable Git-triggered deployment; manual staging and promotion remain
+owned by the target deployment runbook. Do not create or mutate Photon
+projects, dedicated lines, billing, users, webhooks, or platform settings
+unless one current SPEC and sibling task ledger routed by the canonical
+indexes, plus the exact authority envelope, name that operation.
 
 ## Rollback, credential replacement, and revocation
 

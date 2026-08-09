@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-10
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -134,6 +134,10 @@ layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
 The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
 Vercel account. Do not link or deploy this app to Tilt Legal.
+Both this app and `apps/agent` own `git.deploymentEnabled: false` in their
+`vercel.json`. Git remains the source connection, but a push is never an
+admitted deployment trigger: only the target runbooks may stage an immutable
+candidate and explicitly move an alias after claim-matched proof.
 
 The proxy composes mock, deprecated local diagnostic, and refresh-capable
 hosted `live` modes for Production and retained Preview. It never owns a
@@ -288,11 +292,19 @@ message, deployment, or Production write authority.
   and service tags;
 - owns `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`, and
   KeyValueStore-backed live/memory layers;
-- owns `CodexHttpClient`, `CodexResponsesFetch`, and `CodexResponsesProof` for
-  the opt-in direct Codex Responses proof path;
+- owns `CodexHttpClient` and `CodexResponsesProof` for the opt-in direct Codex
+  Responses proof path; the named client keeps Effect HTTP request/response
+  primitives private and tests substitute the standard Effect HTTP client
+  Layer at that adapter boundary;
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;
+- carries the live Codex Responses body through one Effect byte stream from
+  the private HTTP client to the app response; `CodexStreamMapper` owns
+  incremental UTF-8/SSE decoding, ordered text/tool-call mapping, a 1 MiB
+  complete-or-residual line ceiling, late-stream failure, and cancellation,
+  while `apps/codex-proxy` alone owns the separately bounded 1 MiB materialised
+  JSON request ingress;
 - composes `@bundjil/store` for native and atomic persistence;
   it owns Codex logical keys, encrypted profile codecs, and refresh policy,
   not the Upstash client or provider adapter;

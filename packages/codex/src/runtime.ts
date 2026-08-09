@@ -40,10 +40,6 @@ import {
   makeCodexLegacyDirectProvider,
 } from "./provider/direct.js";
 import {
-  CodexResponsesFetch,
-  makeCodexResponsesFetch,
-} from "./provider/fetch.js";
-import {
   CodexHttpClient,
   makeCodexHttpClient,
 } from "./provider/http-client.js";
@@ -355,15 +351,10 @@ export const CodexOAuthMemoryKeyValueLive = CodexOAuthLive.pipe(
   Layer.provide(KeyValueStore.layerMemory)
 );
 
-export const CodexResponsesFetchLive = Layer.effect(
-  CodexResponsesFetch,
-  makeCodexResponsesFetch
-).pipe(Layer.provide(BunHttpClient.layer));
-
 export const CodexHttpClientLive = Layer.effect(
   CodexHttpClient,
   makeCodexHttpClient
-);
+).pipe(Layer.provide(BunHttpClient.layer));
 
 export const CodexResponsesProofLive = Layer.effect(
   CodexResponsesProof,
@@ -372,10 +363,6 @@ export const CodexResponsesProofLive = Layer.effect(
   Layer.provideMerge(
     Layer.merge(CodexHttpClientLive, CodexResponsesRequestPolicyLowLive)
   )
-);
-
-export const CodexResponsesProofFetchLive = CodexResponsesProofLive.pipe(
-  Layer.provide(CodexResponsesFetchLive)
 );
 
 export const makeCodexRequestMapperLive = (

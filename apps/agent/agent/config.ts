@@ -10,10 +10,7 @@ import {
   createAgentModel,
   defaultAgentModel,
 } from "./model-provider.js";
-import type {
-  AgentModelProviderDeps,
-  AgentModelProviderConfig,
-} from "./model-provider.js";
+import type { AgentModelProviderConfig } from "./model-provider.js";
 
 export class AgentModelProviderConfigError extends Schema.TaggedErrorClass<AgentModelProviderConfigError>()(
   "AgentModelProviderConfigError",
@@ -30,7 +27,10 @@ const agentModelProviderModeConfig = Config.schema(
   "BUNDJIL_AGENT_MODEL_PROVIDER"
 ).pipe(Config.withDefault("gateway"));
 
-const codexProxyBaseUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_BASE_URL");
+const codexProxyBaseUrlConfig = Config.schema(
+  AgentCodexProxyModelProviderConfig.fields.baseURL,
+  "BUNDJIL_CODEX_PROXY_BASE_URL"
+);
 
 const codexProxyInternalTokenConfig = Config.schema(
   AgentCodexProxyModelProviderConfig.fields.internalToken,
@@ -49,7 +49,7 @@ const codexProxyModelConfig = Config.option(
 );
 
 const codexProxyContextWindowTokensConfig = Config.schema(
-  Schema.Int.check(Schema.isGreaterThan(0)),
+  AgentCodexProxyModelProviderConfig.fields.modelContextWindowTokens,
   "BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS"
 ).pipe(Config.withDefault(200_000));
 
@@ -116,15 +116,14 @@ export type AgentConfig = Readonly<{
   modelProvider: AgentModelProviderConfig;
 }>;
 
-export const loadAgentConfig: (
-  deps?: AgentModelProviderDeps
-) => Effect.Effect<AgentConfig, AgentModelProviderConfigError> = Effect.fn(
-  "AgentConfig.load"
-)(function* (deps: AgentModelProviderDeps = {}) {
+export const loadAgentConfig: () => Effect.Effect<
+  AgentConfig,
+  AgentModelProviderConfigError
+> = Effect.fn("AgentConfig.load")(function* () {
   const modelProvider = yield* loadAgentModelProviderConfig;
 
   return {
-    model: createAgentModel(modelProvider, deps),
+    model: createAgentModel(modelProvider),
     ...(modelProvider.provider === "codex-proxy"
       ? { modelContextWindowTokens: modelProvider.modelContextWindowTokens }
       : {}),

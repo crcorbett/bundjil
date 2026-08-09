@@ -6,7 +6,7 @@ import { describe, it } from "vitest";
 
 const outputFile = new URL("../.output/server/index.mjs", import.meta.url);
 const compiledManifestFile = new URL(
-  "../.eve/compile/compiled-agent-manifest.json",
+  "../.output/.eve/compile/compiled-agent-manifest.json",
   import.meta.url
 );
 const tracedPackageFile = new URL(

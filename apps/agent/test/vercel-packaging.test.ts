@@ -26,6 +26,7 @@ const VercelConfig = Schema.Struct({
   buildCommand: Schema.Literal(
     "cd ../.. && bun run build --filter=@bundjil/agent"
   ),
+  git: Schema.Struct({ deploymentEnabled: Schema.Literal(false) }),
 });
 
 const TurboConfig = Schema.Struct({
@@ -164,6 +165,7 @@ describe("Vercel packaging", () => {
     expect(config.buildCommand).toBe(
       "cd ../.. && bun run build --filter=@bundjil/agent"
     );
+    expect(config.git.deploymentEnabled).toBeFalsy();
     expect(turbo.tasks["@bundjil/agent#build"].env).toContain(
       "BUNDJIL_CHANNEL_HANDOFF_TIMEOUT_MILLISECONDS"
     );
@@ -175,6 +177,22 @@ describe("Vercel packaging", () => {
       "function createEveVercelOptions(e){if(!e.enabled)return"
     );
     expect(vercelOptions).not.toContain("functions:");
+  });
+
+  it("rejects absent or enabled Git-triggered deployment policy", () => {
+    const decode = Schema.decodeUnknownResult(VercelConfig);
+
+    expect(
+      decode({
+        buildCommand: "cd ../.. && bun run build --filter=@bundjil/agent",
+      })._tag
+    ).toBe("Failure");
+    expect(
+      decode({
+        buildCommand: "cd ../.. && bun run build --filter=@bundjil/agent",
+        git: { deploymentEnabled: true },
+      })._tag
+    ).toBe("Failure");
   });
 
   it("decodes the generated route and function owners without inferring hosted state", async () => {

@@ -7,7 +7,10 @@ const appDirectory = new URL("..", import.meta.url);
 const ProxyManifest = Schema.Struct({
   dependencies: Schema.Record(Schema.String, Schema.String),
 });
-const VercelConfig = Schema.Struct({ buildCommand: Schema.String });
+const VercelConfig = Schema.Struct({
+  buildCommand: Schema.String,
+  git: Schema.Struct({ deploymentEnabled: Schema.Literal(false) }),
+});
 
 describe("Vercel packaging", () => {
   it("builds the transitive store workspace output without a direct dependency", async () => {
@@ -28,5 +31,18 @@ describe("Vercel packaging", () => {
       "bun run --filter @bundjil/codex build",
       "bun run --filter @bundjil/codex-proxy build",
     ]);
+    expect(vercelConfig.git.deploymentEnabled).toBeFalsy();
+  });
+
+  it("rejects absent or enabled Git-triggered deployment policy", () => {
+    const decode = Schema.decodeUnknownResult(VercelConfig);
+
+    expect(decode({ buildCommand: "fixture" })._tag).toBe("Failure");
+    expect(
+      decode({
+        buildCommand: "fixture",
+        git: { deploymentEnabled: true },
+      })._tag
+    ).toBe("Failure");
   });
 });

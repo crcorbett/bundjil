@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 237,
-    "sortedPathSha256": "0248c72733c2e394be0cf6bd80a1b5b2c40d56857c5796dff76963ae726d61e5"
+    "pathCount": 241,
+    "sortedPathSha256": "cf278208ab33b197988dc69be972cab13cdd00f863e404a69b570c7bd725ca25"
   },
   "readmeInventory": {
     "pathCount": 23,
@@ -34,7 +34,9 @@
         "The 2026-08-04 Vercel Marketplace Upstash billing-blocked packet and its sanitized detail expand current accounting to 229 docs paths while preserving 23 README paths. They record a rejected free-plan request with no resource or billing relationship created, and do not establish a store, profile, provider request, deployment, Eve session, replay, or Production result.",
         "The 2026-08-04 shared-Upstash binding packet and its sanitized detail expand current accounting to 231 docs paths while preserving 23 README paths. They retain Cooper's approved reuse of the agent-bound physical store for proxy Preview and Production, with separate profile/prefix/cipher metadata required; the receipt proves only secret-safe Vercel variable metadata and no OAuth, deployment, proxy, Eve, replay, or Production runtime result.",
         "The 2026-08-04 successful Preview stored-profile and proxy proof detail expands current accounting to 232 docs paths while preserving 23 README paths. It proves only the named Preview encrypted profile and bounded Terra/high subscription SSE predicates; Eve session/replay and Production remain separate unproved claims.",
-        "The 2026-08-04 protected Preview Eve receipt expands current accounting to 233 docs paths while preserving 23 README paths. The upgraded Eve 0.29.5 Preview detail and blocked packet expand current accounting to 235 docs paths while preserving 23 README paths. The 2026-08-09 public Eve correlation blocked packet and detail expand current accounting to 237 docs paths while preserving 23 README paths. The same-count 2026-08-09 Terra closeout moves the plan to completed history and records the public-Eve limit as a deferred future enhancement. It retains Terra/1050000 info, session acceptance, identical durable replay event counts, and the unsupported public Eve correlation seam without retaining payloads; strict per-session upstream-call correlation and all Production claims remain unproved."
+        "The 2026-08-04 protected Preview Eve receipt expands current accounting to 233 docs paths while preserving 23 README paths. The upgraded Eve 0.29.5 Preview detail and blocked packet expand current accounting to 235 docs paths while preserving 23 README paths. The 2026-08-09 public Eve correlation blocked packet and detail expand current accounting to 237 docs paths while preserving 23 README paths. The same-count 2026-08-09 Terra closeout moves the plan to completed history and records the public-Eve limit as a deferred future enhancement. It retains Terra/1050000 info, session acceptance, identical durable replay event counts, and the unsupported public Eve correlation seam without retaining payloads; strict per-session upstream-call correlation and all Production claims remain unproved.",
+        "The 2026-08-09 runtime-boundary improvement SPEC, sibling task ledger and active execution plan expand current accounting to 240 docs paths while preserving 23 README paths. The accepted intent and clean-build correction establish repository scope only; streaming, deployment, provider, delivery and replay claims remain gated by their later tasks.",
+        "The 2026-08-10 runtime-boundary closeout moves the same execution-plan path from active to completed ownership and adds one dated Production proof packet, expanding current accounting to 241 docs paths while preserving 23 README paths. It updates only current repository accounting; the packet owns its point-in-time hosted and Sendblue evidence plus explicit Photon and Infrastructure Drift non-claims."
       ],
       "limitations": [
         "Local documentation and evaluation evidence do not establish provider or Production state."

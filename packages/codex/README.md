@@ -44,9 +44,11 @@ target-owned procedures and are not general setup instructions.
   storage, and recovery procedures are owned by the Codex proxy
   [`runbooks/`](../../apps/codex-proxy/runbooks/README.md). This package owns
   their executable contracts, not provider authority or current state.
-- Dated provider responses, deployment observations, and journey proof have no
-  canonical repository owner yet; HGI-305 must create bounded verification
-  owners. External systems own current state.
+- Dated provider responses, deployment observations, and journey proof are
+  routed through
+  [`docs/verification/`](../../docs/verification/README.md). External systems
+  still own current state; a retained packet proves only its exact target and
+  observation window.
 
 Do not add provider actuality, dated proof, provisioning, secrets, operator
 sequences, rollback, or incident procedures here.

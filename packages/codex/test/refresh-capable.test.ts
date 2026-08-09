@@ -1,5 +1,13 @@
 import { assert, it } from "@effect/vitest";
-import { Deferred, Effect, Fiber, Layer, Redacted, Schema } from "effect";
+import {
+  Deferred,
+  Effect,
+  Fiber,
+  Layer,
+  Redacted,
+  Schema,
+  Stream,
+} from "effect";
 import { TestClock } from "effect/testing";
 
 import {
@@ -11,7 +19,6 @@ import {
   CodexOAuthRefreshPolicyService,
   CodexOAuthSubject,
   CodexOAuthTokenRefreshResult,
-  CodexResponsesStreamResult,
   CodexSubscriptionAuthError,
   CodexSubscriptionProfile,
   CodexAccessTokenImportProfile,
@@ -566,13 +573,13 @@ const makeProviderInput = (value: CodexOAuthSubjectType) =>
     },
   });
 
-const successfulStream = Schema.decodeUnknownEffect(CodexResponsesStreamResult)(
-  {
-    status: 200,
-    contentType: "text/event-stream",
-    body: 'data: {"type":"response.completed"}\n',
-  }
-);
+const successfulStream = {
+  status: 200,
+  contentType: "text/event-stream" as const,
+  body: Stream.make(
+    new TextEncoder().encode('data: {"type":"response.completed"}\n')
+  ),
+};
 
 it.effect("replays exactly once after a 401 and succeeds", () =>
   Effect.gen(function* testSingleReplay() {
@@ -580,7 +587,7 @@ it.effect("replays exactly once after a 401 and succeeds", () =>
     const profile = yield* makeProfile(value);
     const refreshResult = yield* makeRefreshResult(value);
     const input = yield* makeProviderInput(value);
-    const success = yield* successfulStream;
+    const success = successfulStream;
     let requests = 0;
     const provider = CodexDirectProviderLive.pipe(
       Layer.provide(CodexOAuthMemory([profile], { refreshResult })),

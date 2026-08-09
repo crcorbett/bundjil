@@ -1,20 +1,23 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
-import { HttpClientResponse } from "effect/unstable/http";
+import {
+  HttpClient,
+  HttpClientError,
+  HttpClientResponse,
+} from "effect/unstable/http";
 
 import {
-  CodexHttpNetworkError,
-  CodexResponsesFetch,
+  CodexHttpClient,
   CodexResponsesPostInput,
   CodexResponsesProofInput,
+  CodexResponsesProof,
+  CodexResponsesRequestPolicyLowLive,
   defaultCodexResponsesEndpoint,
+  makeCodexHttpClient,
+  makeCodexResponsesProof,
   postResponses,
   runCodexResponsesProof,
 } from "../src/index.js";
-import {
-  CodexHttpClientLive,
-  CodexResponsesProofLive,
-} from "../src/runtime.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString
@@ -38,6 +41,21 @@ const makeAccessToken = Schema.decodeUnknownEffect(CodexResponsesPostInput)({
   },
 });
 
+const codexHttpClientLayer = (client: HttpClient.HttpClient) =>
+  Layer.effect(CodexHttpClient, makeCodexHttpClient).pipe(
+    Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
+  );
+
+const codexResponsesProofLayer = (client: HttpClient.HttpClient) =>
+  Layer.effect(CodexResponsesProof, makeCodexResponsesProof).pipe(
+    Layer.provideMerge(
+      Layer.merge(
+        codexHttpClientLayer(client),
+        CodexResponsesRequestPolicyLowLive
+      )
+    )
+  );
+
 it.effect(
   "posts Codex Responses requests with bearer auth and safe result shape",
   () =>
@@ -45,23 +63,22 @@ it.effect(
       let capturedRequest:
         | Parameters<typeof HttpClientResponse.fromWeb>[0]
         | undefined;
-      const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: (request) =>
-          Effect.sync(() => {
-            capturedRequest = request;
+      const client = HttpClient.make((request) =>
+        Effect.sync(() => {
+          capturedRequest = request;
 
-            return HttpClientResponse.fromWeb(
-              request,
-              new Response("data: {}\n\n", {
-                headers: { "content-type": "text/event-stream" },
-                status: 200,
-              })
-            );
-          }),
-      });
+          return HttpClientResponse.fromWeb(
+            request,
+            new Response("data: {}\n\n", {
+              headers: { "content-type": "text/event-stream" },
+              status: 200,
+            })
+          );
+        })
+      );
       const input = yield* makeAccessToken;
       const result = yield* postResponses(input).pipe(
-        Effect.provide(CodexHttpClientLive.pipe(Layer.provide(fetchLayer)))
+        Effect.provide(codexHttpClientLayer(client))
       );
 
       assert.strictEqual(result.transport, "direct-codex-responses");
@@ -95,20 +112,19 @@ it.effect(
       let capturedRequest:
         | Parameters<typeof HttpClientResponse.fromWeb>[0]
         | undefined;
-      const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: (request) =>
-          Effect.sync(() => {
-            capturedRequest = request;
+      const client = HttpClient.make((request) =>
+        Effect.sync(() => {
+          capturedRequest = request;
 
-            return HttpClientResponse.fromWeb(
-              request,
-              new Response("data: {}\n\n", {
-                headers: { "content-type": "text/event-stream" },
-                status: 200,
-              })
-            );
-          }),
-      });
+          return HttpClientResponse.fromWeb(
+            request,
+            new Response("data: {}\n\n", {
+              headers: { "content-type": "text/event-stream" },
+              status: 200,
+            })
+          );
+        })
+      );
       const proofInput = yield* Schema.decodeUnknownEffect(
         CodexResponsesProofInput
       )({
@@ -118,7 +134,7 @@ it.effect(
         prompt: "Reply with OK.",
       });
       const result = yield* runCodexResponsesProof(proofInput).pipe(
-        Effect.provide(CodexResponsesProofLive.pipe(Layer.provide(fetchLayer)))
+        Effect.provide(codexResponsesProofLayer(client))
       );
 
       assert.strictEqual(result.usedAccountHeader, true);
@@ -138,22 +154,21 @@ it.effect(
   "maps unsuccessful Codex Responses statuses without reading response bodies",
   () =>
     Effect.gen(function* testStatusFailure() {
-      const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-        fetch: (request) =>
-          Effect.succeed(
-            HttpClientResponse.fromWeb(
-              request,
-              new Response("access-token-secret response body", {
-                headers: { "content-type": "application/json" },
-                status: 401,
-                statusText: "Unauthorized",
-              })
-            )
-          ),
-      });
+      const client = HttpClient.make((request) =>
+        Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            new Response("access-token-secret response body", {
+              headers: { "content-type": "application/json" },
+              status: 401,
+              statusText: "Unauthorized",
+            })
+          )
+        )
+      );
       const input = yield* makeAccessToken;
       const error = yield* postResponses(input).pipe(
-        Effect.provide(CodexHttpClientLive.pipe(Layer.provide(fetchLayer))),
+        Effect.provide(codexHttpClientLayer(client)),
         Effect.flip
       );
       const rendered = renderForLeakCheck(error);
@@ -166,19 +181,19 @@ it.effect(
 
 it.effect("maps fetch failures to safe network errors", () =>
   Effect.gen(function* testNetworkFailure() {
-    const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-      fetch: () =>
-        Effect.fail(
-          new CodexHttpNetworkError({
-            operation: "fetch",
-            message: "Unable to reach Codex Responses endpoint.",
+    const client = HttpClient.make((request) =>
+      Effect.fail(
+        new HttpClientError.HttpClientError({
+          reason: new HttpClientError.TransportError({
+            request,
             cause: "forced network failure",
-          })
-        ),
-    });
+          }),
+        })
+      )
+    );
     const input = yield* makeAccessToken;
     const error = yield* postResponses(input).pipe(
-      Effect.provide(CodexHttpClientLive.pipe(Layer.provide(fetchLayer))),
+      Effect.provide(codexHttpClientLayer(client)),
       Effect.flip
     );
 
@@ -193,24 +208,23 @@ it.effect("maps fetch failures to safe network errors", () =>
 it.effect("does not depend on OPENAI_API_KEY for subscription proof mode", () =>
   Effect.gen(function* testNoOpenAiApiKeyFallback() {
     let capturedAuthorization = "";
-    const fetchLayer = Layer.succeed(CodexResponsesFetch, {
-      fetch: (request) =>
-        Effect.sync(() => {
-          capturedAuthorization = request.headers["authorization"] ?? "";
+    const client = HttpClient.make((request) =>
+      Effect.sync(() => {
+        capturedAuthorization = request.headers["authorization"] ?? "";
 
-          return HttpClientResponse.fromWeb(
-            request,
-            new Response("data: {}\n\n", {
-              headers: { "content-type": "text/event-stream" },
-              status: 200,
-            })
-          );
-        }),
-    });
+        return HttpClientResponse.fromWeb(
+          request,
+          new Response("data: {}\n\n", {
+            headers: { "content-type": "text/event-stream" },
+            status: 200,
+          })
+        );
+      })
+    );
     const input = yield* makeAccessToken;
 
     yield* postResponses(input).pipe(
-      Effect.provide(CodexHttpClientLive.pipe(Layer.provide(fetchLayer)))
+      Effect.provide(codexHttpClientLayer(client))
     );
 
     assert.strictEqual(
