@@ -21,6 +21,13 @@ context.
   state/collection ownership, and four narrow existing-plugin lint rules;
   implementation awaits an active plan and explicit authority.
 
+## Current
+
+- [Runtime boundary, streaming, and deployment proof improvements](runtime-boundary-streaming-and-deployment-proof.md) —
+  accepted correction set for the Agent build oracle, Codex transport and
+  incremental SSE, Agent config boundaries, staged Vercel deployment,
+  documentation reconciliation, and claim-matched hosted proof.
+
 ## Implemented or superseded history
 
 The historical ledgers retain heterogeneous terminal provenance, including
