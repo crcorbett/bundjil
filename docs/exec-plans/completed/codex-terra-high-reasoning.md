@@ -1,10 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: active
+lifecycle: historical
 authority: canonical
 owner: bundjil-product-owner
+completed: 2026-08-09
 last_reviewed: 2026-08-09
-review_trigger: task status, provider effort, Preview proof, authority, or rollback change
+review_trigger: historical proof interpretation, model/reasoning policy, rollback, or future public Eve correlation API change
 spec: ../../product-specs/codex-terra-high-reasoning.md
 task_ledger: ../../product-specs/codex-terra-high-reasoning.tasks.json
 started: 2026-07-21
@@ -12,7 +13,70 @@ started: 2026-07-21
 
 # Codex Proxy GPT-5.6 Terra High Reasoning
 
-## Current trajectory
+## 2026-08-09 accepted closeout
+
+The GPT-5.6 Terra high-reasoning rollout is complete. `@bundjil/codex` owns
+the decoded effort policy; `apps/codex-proxy` decodes and injects high through
+its Config and Layer composition; `apps/agent` selects
+`bundjil-codex-proxy/gpt-5.6-terra` with context `1050000`. The retained
+Preview receipts establish live subscription SSE, protected Eve session
+completion, and `startIndex=0` durable-stream replay, without a Production
+operation.
+
+The independent claim that replay caused no second upstream request is not
+part of this accepted rollout. Eve `0.29.5` has no public pre-egress
+correlation identifier that reaches the provider request, so the correlation,
+atomic receipt, and correlated replay tasks are terminal as **Deferred**. The
+dated blocked receipt remains evidence of this limitation, not a defect in the
+Terra/high configuration. Resume only under a new SPEC after a future public
+Eve API provides that supported transport; do not add a proxy-only counter,
+private Eve import, static header, process state, or standalone receipt.
+
+### Terminal five-lens audit
+
+1. **Ownership and call graph.** The existing package, proxy, and agent
+   boundaries still own effort vocabulary, Config/Layer injection, and model
+   selection respectively. No new service, persistence path, provider wrapper,
+   or public API is needed for closeout.
+2. **Effect/config/schema/error boundary.** The rollout remains schema-owned:
+   closed effort literals, decoded Config, named request-policy service,
+   explicit live/test Layers, mapper encode at provider egress, and immediate
+   adapter decoding. No raw semantic strings, casts, generic option bag, or
+   helper/wrapper was introduced by closeout.
+3. **Async SSE and replay.** The retained protected Preview detail proves SSE
+   completion and identical durable replay event counts. It does not prove an
+   absence of a second upstream call, which is explicitly deferred rather than
+   inferred from Agent Runs metadata, logs, timing, or process state.
+4. **Privacy and evidence.** Existing packets retain only safe model,
+   deployment, status, event-count, and boolean observations. No prompt,
+   response, credential, token, trace payload, raw Eve identifier, or
+   reasoning content is added by this lifecycle slice.
+5. **Verification, docs, rollback, and deployment.** This closeout reconciles
+   the SPEC, ledger, architecture, Preview runbook, routers, plan lifecycle,
+   and documentation inventory. Full repository verification runs on this
+   lifecycle state. Rollback remains the target-owned prior Preview
+   gpt-5.5/200000/low configuration; no Vercel, provider, or Production action
+   occurs here.
+
+Audit result: passed with no reopened owner. `bun run verification` passed on
+this receipt-bearing lifecycle candidate with the process-local synthetic
+Executor configuration. This is repository proof only; it does not refresh
+the retained Preview observation or establish Production state.
+
+### Docs-maintainer impact ledger
+
+| Surface                                       | Decision        | Earliest owner and bounded result                                                                                                     |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and product docs                 | Change required | The Terra SPEC and Eve architecture now distinguish accepted rollout proof from the deferred strict replay enhancement.               |
+| READMEs, exports, generated references        | Preserve        | No public package, generated API, or README boundary changed.                                                                         |
+| Proxy runbooks, authority, controls           | Change required | The Preview runbook removes the unsupported strict oracle as a Terra/high prerequisite; authority and controls remain unchanged.      |
+| Schemas, services, Layers, config, and errors | Preserve        | The completed rollout's existing Effect boundaries remain the semantic owners; no uncorrelated receipt or wrapper was added.          |
+| Tests, lint, CI, and verification             | Preserve        | Existing deterministic checks cover the unchanged source; full verification passed.                                                   |
+| Proof and evidence                            | Change required | Existing dated Preview and correlation receipts remain immutable and are re-routed with their exact non-claims.                       |
+| Lifecycle, indexes, and archive               | Change required | The ledger is completed, future strict tasks are deferred with resume triggers, and this plan moves from active to completed history. |
+| Rollback and external state                   | Preserve        | The target-owned Preview rollback procedure is retained. No Vercel, provider, credential, or Production action occurred.              |
+
+## Historical trajectory
 
 The authorized Preview rollout uses the existing agent-bound Upstash resource
 only for physical storage. Preview and Production retain distinct subject,
@@ -20,22 +84,22 @@ profile, prefix, cipher, access, deployment, and proof boundaries. The
 encrypted Preview profile, live Terra/high subscription SSE, and protected Eve
 session/replay have been proven without a Production action.
 
-The agent now targets Eve `0.29.5` with AI SDK `^7.0.38` and keeps
+The agent targeted Eve `0.29.5` with AI SDK `^7.0.38` and kept
 `EVE_TRACES_CONTENT=off` as the Preview privacy requirement. The existing
 OpenTelemetry hooks remain restricted observability. The accessible replay
 metadata is the Vercel Agent Runs model/deployment/lifecycle/step/hook surface;
-the strict no-second-upstream-call oracle is reopened as a new implementation
-slice requiring both a supported Eve/provider correlation seam and a durable
-atomic proxy receipt.
+the strict no-second-upstream-call oracle was investigated as a separate
+enhancement requiring both a supported Eve/provider correlation seam and a
+durable atomic proxy receipt.
 
-## Current task
+## Historical blocked-task snapshot
 
-Task `authorized-preview-subscription-proof` remains blocked at the lower
-metadata ceiling. Its first successor, `eve-supported-provider-correlation`,
-is now also blocked: installed Eve `0.29.5` has no public per-step value that a
+Task `authorized-preview-subscription-proof` was initially held at the lower
+metadata ceiling. Its successor, `eve-supported-provider-correlation`, was
+blocked: installed Eve `0.29.5` has no public per-step value that a
 dynamic `LanguageModel` resolver can carry to the proxy. The dated local
 receipt records the exact limitation without a speculative bridge. The atomic
-receipt and correlated Preview replay tasks must not start. Eve `0.29.5` is
+receipt and correlated Preview replay tasks did not start. Eve `0.29.5` is
 installed and the local agent Build Output/package checks pass after updating
 the AI SDK peer range. The short-lived project OIDC protected-call path proved
 the upgraded Preview info, session, and replay; Agent Runs metadata proved
@@ -44,19 +108,19 @@ and after replay. Process-global, async-local, wrapper, static-header,
 time-window, internal harness, generic-KV, and CLI-trace substitutes remain
 rejected. Production remains out of scope.
 
-## Reopened correlation and receipt slice
+## Historical correlation and receipt slice
 
 The implementation order is deliberately narrow:
 
-1. `eve-supported-provider-correlation` is blocked by
+1. `eve-supported-provider-correlation` is deferred after the blocked
    [`codex-terra-eve-correlation-blocked-2026-08-09.json`](../../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
    `runtimeContext`, the post-emission stream `meta.id`, and internal
    `InstrumentationAttemptScope` are not a public pre-egress correlation seam.
-2. `proxy-atomic-attempt-receipt` remains pending and must not start without
+2. `proxy-atomic-attempt-receipt` is deferred and did not start without
    the supported correlation value. It would otherwise reuse
    `AtomicKeyValueStore` with `Effect.Clock`, explicit live/memory Layers, and
    safe `Effect.logInfo` diagnostics.
-3. `correlated-preview-replay-proof-and-closeout` remains pending and must not
+3. `correlated-preview-replay-proof-and-closeout` is deferred and did not
    start. It requires both preceding tasks before it can read a receipt before
    and after `startIndex=0` replay or run the terminal five-pass audit.
 
@@ -219,8 +283,8 @@ receipt-bearing Preview artifact before the strict predicate can close.
 
 Audit result: repository, deployment, protected Eve session/replay, and
 available Agent Runs metadata predicates pass; the strict independent
-no-second-upstream-call predicate remains blocked because its required
-per-session counter is unavailable.
+no-second-upstream-call predicate is deferred because its required supported
+public Eve-to-provider correlation transport is unavailable.
 
 ## Superseded 2026-08-04 terminal audit
 

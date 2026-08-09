@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-codex-proxy-operator
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: Preview deployment, Vercel protection, proxy route/auth/mode, stored profile, model/reasoning, proof command, or output contract change
 ---
 
@@ -29,10 +29,11 @@ named Preview at `observedAt`; it is never Production proof.
   The bypass grants platform access only; it is not the proxy bearer.
 - Confirm the deployed Eve version is `0.29.5`, `EVE_TRACES_CONTENT=off`, and
   the exact Preview team exposes the accessible Vercel Agent Runs metadata
-  surface. For the strict replay stage, also confirm the supported
-  Eve-to-provider correlation contract and the proxy-owned AtomicKeyValueStore
-  receipt prefix are deployed and readable without exposing values. Record
-  unavailable framework-owned Workflow tags as a limitation; do not assume
+  surface. Record unavailable framework-owned Workflow tags and the absent
+  per-request proxy correlation as limitations; neither prevents the bounded
+  Terra/high proof. A future strict replay stage requires a separately
+  authorized public Eve-to-provider correlation contract and matching atomic
+  receipt prefix. Do not assume
   another dashboard tier is available. Do not configure a browser Session
   Trace, third-party trace drain/exporter, broad propagation allowlist, or a
   request/header capture rule for this proof.
@@ -115,19 +116,18 @@ payloads.
    deployment to create one bounded Eve session. Retain the command's request
    ID only in operator memory. Read the session once to completion/waiting,
    then replay that same stream with `startIndex=0`. Query the exact Preview
-   team's Agent Runs metadata and the proxy-owned atomic receipt immediately
-   before and after replay. Record only the one-hour run count, Terra-run count,
-   selected run's model, immutable deployment match, lifecycle status,
-   event/step/hook counts, safe event booleans, opaque receipt phase, and
-   upstream-attempt ordinal. Do not retain raw trace data, session/turn/attempt
+   team's Agent Runs metadata before and after replay. Record only the one-hour
+   run count, Terra-run count, selected run's model, immutable deployment match,
+   lifecycle status, event/step/hook counts, and safe event booleans. Do not
+   retain raw trace data, session/turn/attempt
    IDs, trace headers, prompts, responses, tokens, tool values, reasoning, or
    screenshots containing them.
 
    The currently accessible Vercel Agent Runs surface does not expose the
-   framework-owned `$eve.*` Workflow tags. The strict no-second-upstream-call
-   oracle requires the supported Eve/provider correlation seam and the atomic
-   receipt, not a dashboard counter alone. Until both successor tasks are
-   deployed and read back, keep the task `blocked`. CLI admission traces,
+   framework-owned `$eve.*` Workflow tags. A future strict no-second-upstream-
+   call oracle requires the supported Eve/provider correlation seam and the
+   atomic receipt, not a dashboard counter alone. It is outside this bounded
+   Terra/high proof. CLI admission traces,
    timing, process-local state, static headers, log absence, and unchanged
    inventory are not substitutes.
 

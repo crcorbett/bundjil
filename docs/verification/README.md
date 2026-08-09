@@ -197,26 +197,24 @@ operation nor asserts present provider state.
   `startIndex=0` durable replay using Vercel's short-lived project OIDC token
   and CLI protection path. It retains event counts and status only; it does
   not claim Production, channel delivery, a public Eve route, general external
-  caller capability, or that replay made no second upstream call. The current
-  SPEC now records the accessible Eve `0.29.5` Agent Runs metadata and keeps
-  the separate no-second-upstream-call claim blocked until a supported
-  Eve/provider correlation seam and durable atomic proxy receipt are
-  implemented; the older CLI OpenTelemetry attempt remains negative evidence.
+  caller capability, or that replay made no second upstream call. The completed
+  Terra/high rollout accepts this as a deferred upstream-Eve-dependent
+  enhancement; the older CLI OpenTelemetry attempt remains negative evidence.
 - [`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
   records the Eve `0.29.5` protected Preview proof after the upgrade: exact
   Terra/1050000 info, session completion, identical `startIndex=0` replay
   event counts, and the accessible Agent Runs model/deployment/lifecycle
-  metadata. The current Vercel surface does not expose `$eve.*` Workflow tags,
-  and the repository has not yet completed the successor correlation/receipt
-  tasks, so the packet remains blocked on the independent no-second-upstream-
-  call predicate. It proves neither Production, channel delivery, public Eve
-  access, nor general caller capability.
+  metadata. The current Vercel surface does not expose `$eve.*` Workflow tags
+  or a per-session proxy attempt count. This remains an explicit non-claim;
+  strict replay absence is deferred rather than a dependency of the completed
+  Terra/high rollout. The packet proves neither Production, channel delivery,
+  public Eve access, nor general caller capability.
 - [`codex-terra-eve-correlation-blocked-2026-08-09.json`](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
   records the local Eve `0.29.5` public-API stop: the step-scoped dynamic model
   resolver has no supported per-step correlation value that can reach the
   private proxy. No code, deployment, provider request, credential, or
-  Production state changed. The atomic receipt and correlated Preview replay
-  tasks remain unstarted.
+  Production state changed. It is the resume trigger for a separately scoped
+  future strict replay enhancement, not an open rollout defect.
 - [`HEQ-preview-qualification-accepted-2026-07-25.json`](../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json)
   proves exact send acceptance before `202`, intended-session continuity,
   deployment-replacement durability, one bounded result, exact Sendblue

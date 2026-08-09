@@ -1,13 +1,13 @@
 {
   "title": "Codex Proxy GPT-5.6 Terra High Reasoning Tasks",
-  "status": "in_progress",
+  "status": "completed",
   "spec": "docs/product-specs/codex-terra-high-reasoning.md",
   "principles": [
     "Preview subscription-endpoint proof is required; direct public API, local Codex, mock, and repository-only results are insufficient.",
     "The Codex package owns the Responses effort vocabulary and decoded request policy; apps/codex-proxy owns the environment key and Layer injection; apps/agent owns Eve model selection.",
     "Keep the existing low behavior when the new proxy effort setting is absent, then make high an explicit coordinated Terra rollout setting.",
-    "Correlation and durable proxy evidence are both required for the strict replay claim; logs are supporting diagnostics only.",
-    "Reuse AtomicKeyValueStore with schema-defined transitions; do not use generic KV modify, internal Eve harness imports, static headers, process-local joins, or time-window counters.",
+    "Correlation and durable proxy evidence are required only for the separately deferred strict replay enhancement; logs are supporting diagnostics only.",
+    "Do not add AtomicKeyValueStore receipt machinery without the upstream-Eve correlation contract; generic KV modify, internal Eve harness imports, static headers, process-local joins, and time-window counters remain rejected.",
     "Never log, commit, retain, or display credentials, prompts, provider request or response bodies, account ids, tool values, reasoning text, or chain-of-thought."
   ],
   "globalVerification": [
@@ -130,8 +130,8 @@
     {
       "id": "authorized-preview-subscription-proof",
       "title": "Perform an authorized live Preview subscription-endpoint proof",
-      "status": "blocked",
-      "description": "The authorized Preview stage proves encrypted profile storage, live Terra/high subscription SSE, protected Eve identity, session completion, and startIndex=0 replay. The upgraded Agent Runs readback is accepted up to its metadata ceiling, but the strict replay claim remains blocked until the successor correlation and durable-receipt tasks prove a supported Eve-to-provider join and an atomic provider-boundary lifecycle record.",
+      "status": "completed",
+      "description": "The authorized Preview stage proved encrypted profile storage, live Terra/high subscription SSE, protected Eve identity, session completion, and startIndex=0 replay. The stricter no-second-upstream replay claim is explicitly outside this rollout and deferred to a future upstream-Eve-dependent enhancement.",
       "implementationNotes": [
         "The 2026-08-04 delegated task supplied scoped Preview mutation authority. Keep Production excluded and stop on any ambiguous target, shared store, cipher, bearer, or protection binding.",
         "Use the personal bundjil-codex-proxy and bundjil-agent projects only. Confirm Preview, not Production, and source build rather than --prebuilt.",
@@ -173,7 +173,7 @@
     {
       "id": "eve-supported-provider-correlation",
       "title": "Prove and implement the supported Eve-to-provider correlation seam",
-      "status": "blocked",
+      "status": "deferred",
       "dependsOn": ["terra-agent-build-and-proof-contract"],
       "description": "Find a supported public Eve seam that carries an opaque per-attempt or logical-step correlation value to the actual AI SDK provider request. Implement only the smallest schema-owned contract that can be joined at the private proxy; otherwise record a blocked result and do not import Eve internals or invent a transport header.",
       "implementationNotes": [
@@ -207,12 +207,14 @@
         "The documented stable stream meta.id is minted after durable event emission. It is not a supported input to the dynamic model resolver that must choose the provider before the call.",
         "Instrumentation runtimeContext is telemetry-only and does not provide a supported provider HTTP transport. See docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json."
       ],
+      "deferredReason": "Eve 0.29.5 exposes no supported public pre-egress correlation value that reaches the actual provider request. The Terra/high rollout does not require this stricter claim.",
+      "resumeTrigger": "A future public Eve API documents and the installed version proves a stable logical-step or attempt identifier delivered to the actual LanguageModel provider request.",
       "commitAfterPassing": true
     },
     {
       "id": "proxy-atomic-attempt-receipt",
       "title": "Add the atomic proxy attempt receipt at the provider lifecycle",
-      "status": "pending",
+      "status": "deferred",
       "dependsOn": ["eve-supported-provider-correlation"],
       "description": "Use the supported correlation value to add a small schema-defined, process-safe attempt receipt at the Bundjil proxy/provider boundary. Reuse AtomicKeyValueStore and the existing Upstash Layer, record the actual provider stream lifecycle, and keep Effect logs as supporting observations only.",
       "implementationNotes": [
@@ -244,12 +246,14 @@
         "The atomic receipt is the sole strict replay oracle, has no generic persistence abstraction or helper sprawl, and records the actual provider stream lifecycle.",
         "Logs are documented and tested as supporting diagnostics only; no acceptance path depends on their absence or completeness."
       ],
+      "deferredReason": "Without a supported Eve-to-provider correlation contract, an atomic proxy receipt cannot establish its stated logical-request meaning and would be speculative machinery.",
+      "resumeTrigger": "The deferred public Eve correlation task is newly proven and accepted under a separately authorized future SPEC.",
       "commitAfterPassing": true
     },
     {
       "id": "correlated-preview-replay-proof-and-closeout",
       "title": "Prove correlated Preview replay and close the strict evidence gap",
-      "status": "pending",
+      "status": "deferred",
       "dependsOn": [
         "eve-supported-provider-correlation",
         "proxy-atomic-attempt-receipt"
@@ -283,6 +287,8 @@
         "The new packet proves the combined correlation, atomic receipt, provider-egress, protected Eve, and Preview deployment predicates, or records a claim-matched blocked state.",
         "No Production operation occurs, and the prior accepted lower-bound proof remains historical rather than being overwritten."
       ],
+      "deferredReason": "The strict Preview replay oracle depends on both deferred predecessor contracts. Existing lower-bound Preview evidence remains accepted for the completed Terra/high rollout.",
+      "resumeTrigger": "A separately authorized future SPEC has completed both a supported public Eve correlation contract and its correlated durable proxy receipt.",
       "commitAfterPassing": true
     },
     {

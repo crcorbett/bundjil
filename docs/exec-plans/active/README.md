@@ -12,7 +12,7 @@ review_trigger: any active-plan admission, completion, or scope change
 Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
-- [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  public Eve correlation is blocked after the lower-bound Preview subscription
-  and Eve proof; atomic receipt and Preview closeout remain unstarted, and
-  Production remains excluded.
+There are currently no active execution plans. The completed
+[Codex proxy GPT-5.6 Terra high reasoning](../completed/codex-terra-high-reasoning.md)
+plan retains the bounded Preview proof and the deferred strict replay
+enhancement; it grants no provider or Production authority.

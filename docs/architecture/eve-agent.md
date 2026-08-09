@@ -57,23 +57,25 @@ observability for safe application spans, but it is not the acceptance oracle
 for a model-attempt count because a CLI admission trace does not necessarily
 follow Eve's queued worker.
 
-The strict replay target is intentionally two-part: a supported public
+The optional strict replay enhancement is intentionally two-part: a supported public
 Eve-to-provider correlation value must reach the private provider request, and
 the proxy/provider boundary must record the correlated lifecycle through the
 native `AtomicKeyValueStore` service. Native Effect logs support operations but
 are not durable replay evidence. Eve's internal attempt scope, runtime context
 as an HTTP header, process-local state, and generic KV read/modify/write are
-not supported architecture paths. The implementation and proof gates live in
-the [Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
+not supported architecture paths. This enhancement is not required for the
+completed Terra/high rollout; its future proof gate lives in the
+[Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
 
-As of the installed Eve `0.29.5`, that correlation prerequisite is blocked.
+As of the installed Eve `0.29.5`, that enhancement prerequisite is unavailable.
 `defineDynamic` can select a live model at `step.started`, but the public
 resolver receives `event: unknown` and a session-level context, not a stable
 turn, step, or attempt identity. The documented stream `meta.id` exists only
 after durable emission and cannot be repurposed as a pre-egress resolver input.
 The [dated local receipt](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
 retains this limitation. Do not add a fallback bridge from message contents,
-telemetry, internal Eve source, or process state.
+telemetry, internal Eve source, process state, proxy-only counters, or a
+standalone receipt that cannot meet the required correlation contract.
 
 ## Boundary invariants
 

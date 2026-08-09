@@ -1,11 +1,11 @@
 ---
 document_type: product-specification
-lifecycle: proposed
+lifecycle: implemented
 authority: canonical
 owner: bundjil-product-owner
 created: 2026-07-20
 last_reviewed: 2026-08-09
-review_trigger: implementation, deployment, environment, or proof change
+review_trigger: model/reasoning policy, bounded Preview proof, rollback, or future public Eve correlation API change
 ---
 
 # Codex Proxy GPT-5.6 Terra High Reasoning
@@ -56,6 +56,21 @@ OpenAI API, a local Codex client, a direct `proof:codex-responses` call, or a
 mock proxy. That proof establishes that the subscription endpoint accepted the
 Terra/high request at the actual deployed proxy boundary.
 
+### Accepted closeout boundary
+
+The Terra/high rollout is complete at its intended boundary: the package-owned
+reasoning policy, proxy Config and Layers, Eve model metadata, and bounded
+protected Preview subscription/Eve replay proof are implemented and verified.
+The dated Preview evidence proves live Terra/high subscription SSE, exact
+`bundjil-codex-proxy/gpt-5.6-terra` identity, context `1050000`, protected
+session completion, and durable-stream replay. It does **not** prove that a
+replay issued no second private-proxy or upstream request.
+
+That stricter claim is an accepted, deferred upstream-Eve enhancement, not a
+rollout dependency. The dated public-API receipt remains the durable
+non-claim. Do not add a speculative bridge, proxy-only counter, or standalone
+receipt machinery merely to make this historical rollout appear stronger.
+
 ## Current state and scope
 
 `packages/codex/src/provider/request-mapper.ts` currently builds every
@@ -89,7 +104,14 @@ at the private proxy or Codex subscription boundary. That claim must remain
 blocked until the correlation and durable-receipt requirements below are
 implemented and verified.
 
-## Correlation and attempt-evidence decision
+## Deferred strict replay enhancement
+
+The following design is retained only as a future enhancement. It does not
+block or reopen the completed Terra/high rollout. Resume only when a public
+Eve API supplies a stable logical-step or attempt identifier to the actual
+provider request, and then create a new SPEC/plan with new authority and
+proof. The required trigger and rejected substitutes are recorded in the
+sibling ledger and dated correlation receipt.
 
 Implement both controls. They answer different questions and neither is a
 complete substitute for the other:
@@ -683,16 +705,16 @@ or an Eve journey.
 
 ## Downstream impact ledger
 
-| Surface                                                                   | Status          | Reason                                                                                                                                                                                                                            |
-| ------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Canonical architecture and product docs                                   | Change required | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth.                                                                                                |
-| Root README and affected app/package READMEs/runbooks                     | Change required | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits.                                                                                                                          |
-| `AGENTS.md`, repo skills, instruction surfaces                            | N/A             | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction.                                                                                    |
-| Schemas, public types, service contracts, Layers, exports                 | Change required | Name effort/policy, branded correlation, and attempt-receipt schemas with Type/Encoded forms; reuse AtomicKeyValueStore and explicit live/memory Layers.                                                                          |
-| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts         | Change required | Exercise language service and existing policy scripts; update Turbo's build environment contract and proof scripts; reject internal Eve imports, generic KV mutation, and process-local joins. No boundary exception is expected. |
-| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required | Test low-default compatibility, high-target encoding, correlation transport, atomic state transitions, interruption/unknown cases, and live Preview proof. Browser evidence is N/A because this changes no visible browser UI.    |
-| Observability, rollout, migration, rollback artifacts                     | Change required | Add safe model/effort/correlation/phase/status evidence, receipt retention and recovery, Preview progression, and exact rollback procedure.                                                                                       |
-| SPEC index, task ledger, active execution plan                            | Change required | Keep the new implementation tasks and active plan current; prior terminal evidence is historical for the reopened correlation slice.                                                                                              |
+| Surface                                                                   | Status          | Reason                                                                                                                                                                                |
+| ------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canonical architecture and product docs                                   | Change required | Eve/proxy current configuration and evidence classes must describe Terra/high without rewriting historical proof as current truth.                                                    |
+| Root README and affected app/package READMEs/runbooks                     | Change required | Document model/effort variables, build allowlist, safe Preview verification, rollback, and proof limits.                                                                              |
+| `AGENTS.md`, repo skills, instruction surfaces                            | N/A             | Existing Effect/provider and PRD guidance already covers this slice; update only if implementation exposes a concrete conflicting instruction.                                        |
+| Schemas, public types, service contracts, Layers, exports                 | Change required | The completed rollout owns effort/policy schemas and explicit Layers. Correlation and receipt schemas are deferred until their public Eve prerequisite exists.                        |
+| Lint, Effect diagnostics, boundary audit, formatting, CI, scripts         | Change required | Exercise language service and existing policy scripts; retain the rejection of internal Eve imports, generic KV mutation, and process-local joins. No boundary exception is expected. |
+| Tests, fixtures, compatibility assertions, browser/HTTP/provider evidence | Change required | Test low-default compatibility, high-target encoding, and live Preview proof. Browser evidence is N/A because this changes no visible browser UI.                                     |
+| Observability, rollout, migration, rollback artifacts                     | Change required | Retain safe model/effort/status evidence, Preview proof, and exact rollback procedure. Strict replay observability remains a deferred future contract.                                |
+| SPEC index, task ledger, completed execution plan                         | Change required | Mark the rollout implemented/completed/historical and retain the future strict-replay trigger without fake active work.                                                               |
 
 ## Risks and unresolved questions
 
@@ -710,19 +732,9 @@ or an Eve journey.
   the default logger). Implementation must choose the smallest existing
   Effect-owned observation point, prove it cannot leak sensitive data, and
   avoid a new telemetry abstraction unless a stable owner is demonstrated.
-- A public Eve attempt/provider seam may still be unavailable in the installed
-  version. The investigation must end in a bounded blocked receipt rather than
-  an internal harness import or a guessed provider header.
-- A durable receipt can prove one proxy admission and its recorded lifecycle,
-  but cannot remove the remote-provider crash window. The implementation must
-  preserve `unknown` and a recovery owner rather than silently retrying an
-  ambiguous upstream request.
-- A receipt at only the HTTP route would miss provider-owned 401 refresh
-  retries. The upstream-attempt observation must sit at the actual Codex
-  provider egress or explicitly narrow the claim to proxy admission.
-- `Effect.logInfo` is not a durable store. Log retention/queryability must be
-  recorded as a supporting operational claim, never substituted for the
-  atomic receipt.
+- A public Eve attempt/provider seam is unavailable in the installed version.
+  The dated blocked receipt is an accepted non-claim and future resume trigger,
+  not a reason to infer a provider header or reopen this rollout.
 
 ## Acceptance criteria
 
@@ -750,42 +762,25 @@ or an Eve journey.
    subscription endpoint, and a protected Eve request reports exactly
    `bundjil-codex-proxy/gpt-5.6-terra`. No credentials, prompts, bodies,
    tokens, account ids, tool data, or chain-of-thought are retained.
-7. A supported public Eve/provider correlation seam is proven against the
-   installed version before it is used. The correlation contract has branded
-   schema-derived `Type` and `Encoded` forms, is decoded once at the provider
-   ingress, carries only an opaque safe value, and reaches the actual private
-   proxy request. Internal Eve harness imports, runtimeContext-as-header,
-   static headers, AsyncLocalStorage, process globals, and time-window joins
-   are rejected. If no supported seam exists, this criterion remains blocked.
-8. The proxy/provider boundary reuses `AtomicKeyValueStore` with a
-   schema-defined receipt and distinct logical key prefix. Atomic claim,
-   upstream-start, completion, failure, and unknown/interruption transitions
-   are tested with `Effect.Clock`, live Upstash, and memory Layers. Replaying a
-   completed logical key returns the durable result without another provider
-   request; an unknown key never silently retries. Provider-side 401 refresh
-   retries have distinct upstream-attempt ordinals.
-9. Native Effect structured logs use the same opaque correlation value and
-   safe lifecycle fields after durable transitions. Logs are explicitly
-   supporting evidence; the atomic receipt, not log presence or absence, is the
-   strict replay oracle. No sensitive data is retained.
-10. The exact Preview team's accessible Agent Runs metadata is read before and
-    after `startIndex=0` replay and records model, immutable deployment,
-    lifecycle, step/hook counts, safe event predicates, and the new receipt
-    state without payloads. CLI admission traces, timing, process state, and
-    unchanged inventory remain non-claims for the stronger predicate.
-11. Each implementation task records the ownership/call-graph,
-    implementation-quality, and verification-coverage lenses, including flat
-    Effect control flow, typed `.pipe(...)` error handling, schema ownership,
-    Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
-    boundary policy results.
-12. The implementation runs focused tests, Effect language-server diagnostics,
-    `bun run check:boundaries`, `bun run check:effect-setup`,
-    `bun run check:docs`, `bun run check:skills`, `bun run check:authority`,
-    `bun run check:controls`, `bun run check:verification`, and
-    `bun run verification`; all required docs, runbooks, environment samples,
-    proof artifacts, and rollout/rollback notes are updated before acceptance.
-    The final closeout task performs the mandatory terminal five-pass audit
-    after all correlation and receipt implementation work is complete.
+7. Strict no-second-upstream replay absence is explicitly excluded from this
+   rollout. It may be specified anew only when a public Eve API supplies a
+   stable pre-egress correlation value; internal Eve imports,
+   runtimeContext-as-header, static headers, AsyncLocalStorage, process
+   globals, time-window joins, proxy-only counters, and uncorrelated receipts
+   remain rejected.
+8. Each implementation task records the ownership/call-graph,
+   implementation-quality, and verification-coverage lenses, including flat
+   Effect control flow, typed `.pipe(...)` error handling, schema ownership,
+   Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
+   boundary policy results.
+9. The implementation runs focused tests, Effect language-server diagnostics,
+   `bun run check:boundaries`, `bun run check:effect-setup`,
+   `bun run check:docs`, `bun run check:skills`, `bun run check:authority`,
+   `bun run check:controls`, `bun run check:verification`, and
+   `bun run verification`; all required docs, runbooks, environment samples,
+   proof artifacts, and rollout/rollback notes are updated before acceptance.
+   The final closeout task performs the mandatory terminal five-pass audit on
+   the actual accepted rollout scope.
 
 ## Implementation instruction block
 

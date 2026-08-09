@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-09
 review_trigger: any execution-plan completion or archival change
 ---
 
@@ -20,6 +20,7 @@ authority for a new operation. Current work lives only under
 | Plan                                                                                                       | Provenance class                                                            |
 | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md)                    | Implemented hybrid infrastructure; five-pass audit accepted                 |
+| [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md)                                  | Implemented Terra/high rollout; strict replay absence deferred              |
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                      | Implemented storage rollout                                                 |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                          | Superseded local fallback                                                   |
 | [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                                        | Implemented provider composition                                            |

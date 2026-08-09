@@ -21,15 +21,6 @@ context.
   state/collection ownership, and four narrow existing-plugin lint rules;
   implementation awaits an active plan and explicit authority.
 
-## Current
-
-- [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md) —
-  Preview Terra/high, protected Eve session/replay, and shared physical Upstash
-  boundaries are proven up to the accessible metadata ceiling. The first
-  follow-on public-correlation task is blocked in Eve `0.29.5`, so the atomic
-  proxy-receipt and Preview closeout tasks remain unstarted; Production remains
-  out of scope.
-
 ## Implemented or superseded history
 
 The historical ledgers retain heterogeneous terminal provenance, including
@@ -42,6 +33,7 @@ is standing authority.
 | SPEC                                                                                                       | Lifecycle note                                                                                           |
 | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md)                    | Implemented hybrid infrastructure; five-pass audit accepted                                              |
+| [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md)                                  | Implemented Terra/high rollout; strict proxy replay absence deferred to a future public Eve API          |
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                      | Implemented history                                                                                      |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                          | Superseded fallback history                                                                              |
 | [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                                        | Implemented history                                                                                      |
