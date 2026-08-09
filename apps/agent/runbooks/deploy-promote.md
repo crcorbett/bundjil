@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
@@ -170,6 +170,11 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
 
 6. **Mutation gate:** stop before deploy, promote, alias/environment change, or
    rollback until the complete stage-specific authority envelope is attached.
+   Confirm both app-owned `vercel.json` files still decode
+   `git.deploymentEnabled: false`; a Git push must trigger CI only and must not
+   be used as candidate creation or promotion. Compare the exact project
+   deployment inventories immediately before and after the pushed SHA and stop
+   if either project gained a Git-triggered deployment.
    When granted, operate one app and one stage only. Vercel's staged pattern is
    `vercel deploy --prod --skip-domain --cwd <app> --scope
 "$BUNDJIL_VERCEL_SCOPE"`, followed only after acceptance by `vercel promote

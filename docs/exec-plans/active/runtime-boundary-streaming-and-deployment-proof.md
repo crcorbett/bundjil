@@ -49,8 +49,11 @@ and retain tested rollback identities before alias or provider mutation.
    incrementally maps a bounded Effect byte stream through the proxy response;
    deterministic tests prove early output, fragmentation, failure, size limits,
    cancellation, and the current request ingress ceiling.
-4. `enforce-staged-deployment-and-reconcile-docs` — in progress.
-5. `integrate-and-prove-hosted-candidates` — pending.
+4. `enforce-staged-deployment-and-reconcile-docs` — completed. Both app
+   configs and negative fixtures enforce manual-only deployment admission;
+   architecture, README, runbook, lifecycle, verification, authority and
+   automation owners now agree, and full verification passed.
+5. `integrate-and-prove-hosted-candidates` — in progress.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all
    predecessors complete.
 

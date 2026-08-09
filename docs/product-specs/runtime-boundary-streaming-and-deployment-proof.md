@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-effect-architecture-owner
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: Codex transport, SSE streaming, Agent model config, Eve build output, Vercel deployment policy, Channel provider, or proof lifecycle change
 task_ledger: runtime-boundary-streaming-and-deployment-proof.tasks.json
 ---
@@ -206,19 +206,19 @@ implementation. This establishes document readiness only, not behavior.
 
 ## Docs-maintainer impact ledger
 
-| Surface                                    | Decision                                              | Earliest owner and proof                                                                                                                      |
-| ------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Documentation router and lifecycle indexes | Change required                                       | Route this current SPEC/plan; later move both to implemented/historical only after terminal proof.                                            |
-| Architecture                               | Change required narrowly                              | Codex transport/stream ownership and deployment admission; preserve Channel/Eve composition.                                                  |
-| App/package READMEs                        | Change required narrowly                              | Remove stale Codex proof-owner claim; retain public boundary and command maps only.                                                           |
-| Runbooks                                   | Change required if commands or live sequencing differ | Deploy/promote and proxy proof runbooks own exact operations and rollback. Channel runbooks change only for proved inventory/proof semantics. |
-| Verification journeys and packets          | Change required                                       | Refresh exact Codex proxy streaming and dual-channel Production evidence without rewriting history.                                           |
-| Authority and automation registers         | Change required only for deployment trigger policy    | Record manual staging as desired behavior; preserve provider envelopes unless capability changes.                                             |
-| Skills and `AGENTS.md`                     | Preserve                                              | Existing skills and instructions already impose the selected boundaries.                                                                      |
-| Tests, lint, CI, and config                | Change required                                       | Clean manifest, raw signature/callback, streaming limits, lifecycle semantics, and Vercel Git policy oracles.                                 |
-| Package exports/topology                   | Change required narrowly                              | Retire raw Codex exports; no new package or broad barrel.                                                                                     |
-| Release/publication                        | N/A                                                   | No package release or publication.                                                                                                            |
-| Frontend/browser UI                        | N/A                                                   | No visible React surface changes.                                                                                                             |
+| Surface                                    | Decision                                           | Earliest owner and proof                                                                                                                                               |
+| ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Documentation router and lifecycle indexes | Change required                                    | This SPEC/plan are routed once in each canonical index; the new negative fixture rejects an omitted current SPEC or plan. Terminal movement remains gated on closeout. |
+| Architecture                               | Change required narrowly                           | `repo-structure.md` owns the delivered Codex stream and manual-only Vercel admission; Channel/Eve composition is preserved.                                            |
+| App/package READMEs                        | Change required narrowly                           | `packages/codex/README.md` now routes dated proof to the canonical verification owner; both app README boundary/command maps are preserved.                            |
+| Runbooks                                   | Change required                                    | Deploy/promote owns push-inventory comparison and manual staging; Alchemy explicitly excludes deployment. Proxy and Channel operation owners remain intact.            |
+| Verification journeys and packets          | Change required                                    | BND-J03 now owns deterministic incremental-stream proof plus smoke; exact hosted proxy and dual-channel packets remain in the hosted task.                             |
+| Authority and automation registers         | Change required only for deployment trigger policy | Both registers now state manual-only deploy/promote authority and reject Git push as a deployment signal; other provider envelopes are preserved.                      |
+| Skills and `AGENTS.md`                     | Preserve                                           | Existing skills and instructions already impose the selected boundaries; `check:skills` proves the mirror inventory unchanged.                                         |
+| Tests, lint, CI, and config                | Change required                                    | Clean manifest, raw signature/callback, streaming limits, lifecycle semantics, and both Vercel Git policy oracles are executable.                                      |
+| Package exports/topology                   | Change required narrowly                           | Raw Codex exports were retired; streaming stayed in the existing package/app owners with no new package or broad barrel.                                               |
+| Release/publication                        | N/A                                                | No package release or publication is accepted or performed.                                                                                                            |
+| Frontend/browser UI                        | N/A                                                | No visible React surface changes exist.                                                                                                                                |
 
 ## Rollback and evidence policy
 

@@ -61,13 +61,15 @@
   {
     "id": "BND-J03-proxy-health-auth-sse",
     "actorOrConsumer": "local Codex-compatible client",
-    "boundary": "Codex proxy health, bearer authentication, and mock SSE boundary",
-    "startingState": "local proxy mock mode with an ephemeral server and no hosted endpoint",
+    "boundary": "Codex proxy health, bearer authentication, bounded request, and incremental SSE boundary",
+    "startingState": "local proxy mock mode plus a deterministic test-owned streaming provider Layer, with no hosted endpoint",
     "inputs": ["health request", "authenticated mock completion request"],
     "stepsOrProcedureOwner": "apps/codex-proxy/runbooks/local-auth.md",
     "expectedBehavior": [
       "Health is reachable locally.",
-      "The proxy applies the documented authentication boundary and emits mock SSE only in mock mode."
+      "The proxy applies the documented authentication boundary and emits mock SSE only in mock mode.",
+      "A mapped SSE chunk reaches the real Web response before the gated source completes.",
+      "Oversize requests and lines fail safely, upstream failure does not emit completion, and downstream cancellation reaches the source."
     ],
     "expectedSideEffects": [
       "An ephemeral local server and mock response are created and then stopped."
@@ -76,10 +78,14 @@
       "No Codex network call occurs.",
       "No bearer value or request body is retained."
     ],
-    "oracle": "bun run --filter @bundjil/codex-proxy smoke-test exits successfully and writes only its bounded receipt.",
-    "environment": "local mock mode",
+    "oracle": "Codex and proxy tests prove fragmentation, early output, size limits, upstream failure and cancellation; the proxy smoke-test then exits successfully with a bounded health/status/line-count receipt.",
+    "environment": "local deterministic Layers and mock mode",
     "authority": "none",
-    "evidence": ["bun run --filter @bundjil/codex-proxy smoke-test"],
+    "evidence": [
+      "bun run --filter @bundjil/codex test",
+      "bun run --filter @bundjil/codex-proxy test",
+      "bun run --filter @bundjil/codex-proxy smoke-test"
+    ],
     "nonClaims": [
       "Local mock SSE does not prove hosted proxy authentication, Codex access, or Production SSE."
     ]

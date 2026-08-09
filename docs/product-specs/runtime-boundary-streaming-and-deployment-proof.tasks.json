@@ -121,7 +121,7 @@
     },
     {
       "id": "enforce-staged-deployment-and-reconcile-docs",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Enforce staged deployment and reconcile durable owners",
       "dependsOn": ["stream-and-bound-codex-sse"],
       "description": "Disable Git-triggered Vercel deployments for both apps, add policy fixtures, correct lifecycle/proof routing, and update only the semantically owning architecture, README, runbook, authority, verification, SPEC/task, and plan surfaces.",
@@ -138,12 +138,18 @@
       "completionCriteria": [
         "Repository deployment policy, current docs, runbooks, registers, verification owners, and rollback instructions agree without historical receipt rewrites."
       ],
-      "evidence": [],
+      "evidence": [
+        "Both app-owned vercel.json files now decode git.deploymentEnabled as the literal false. Agent and proxy packaging fixtures separately reject the field when absent or true while preserving their existing build, route and dependency contracts.",
+        "The deployment architecture, target deploy/promote and Alchemy runbooks, typed automation register, GitHub automation rationale, and both Vercel authority envelopes now agree that a Git push triggers CI only; immutable deployment creation and alias movement are separate manual foreground operations with before/after inventory and rollback gates.",
+        "The stale @bundjil/codex README claim that dated proof lacked a canonical owner was removed. BND-J03 now routes deterministic fragmentation, early-output, byte-limit, upstream-failure and cancellation evidence plus process smoke proof through docs/verification without upgrading it to hosted evidence.",
+        "The documentation policy regression now rejects a current task-backed SPEC or active plan omitted from either canonical index. The focused documentation test passed 11 tests; check:docs, check:skills, check:authority, check:controls, check:verification, check:effect-setup, check:boundaries, type-aware lint and git diff --check passed.",
+        "Full focused app suites rebuilt both Agent modes and passed Agent 15 files/80 tests and proxy 3 files/41 tests. Full bun run verification then passed on the exact receipt-bearing tree with 108 tooling tests, nine workspace typechecks and all fifteen Turbo test tasks. No Vercel, Photon, Sendblue, Executor, deployment, environment, credential, secret or message state changed in this repository-only slice."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "integrate-and-prove-hosted-candidates",
-      "status": "pending",
+      "status": "in_progress",
       "title": "Push, stage, prove, promote, and read back hosted candidates",
       "dependsOn": ["enforce-staged-deployment-and-reconcile-docs"],
       "description": "Push the verified source without auto-deployment, stage exact proxy/Agent candidates, obtain claim-matched Preview and Production proof, perform bounded channel proof where targets are unambiguous, promote only accepted candidates, and retain sanitized rollback/readback evidence.",

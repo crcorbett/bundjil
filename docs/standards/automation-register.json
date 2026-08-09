@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-31",
+  "lastReviewed": "2026-08-10",
   "reviewTrigger": "signal, state, authority, proof, cost, false-positive, convergence, stopping, escalation, rollback, or accepted-outcome change",
   "records": [
     {
@@ -194,16 +194,20 @@
     {
       "id": "vercel-deploy-promote",
       "fixturePaths": [
+        "apps/agent/vercel.json",
+        "apps/agent/test/vercel-packaging.test.ts",
         "apps/agent/test/production-preflight.test.ts",
+        "apps/codex-proxy/vercel.json",
+        "apps/codex-proxy/test/vercel-packaging.test.ts",
         "apps/codex-proxy/test/prove-preview.test.ts"
       ],
       "state": "foreground_only",
-      "signal": "One approved immutable candidate and exact target-owned deployment procedure.",
+      "signal": "One approved manual immutable candidate and exact target-owned deployment procedure; a Git push is not a deployment signal.",
       "stateOwner": "Vercel deployment/alias state externally; app runbooks and proof packets locally.",
       "durableState": "One candidate, target, previous alias, rollback identity, approval, and before/after readback.",
       "principal": "Authenticated deployment operator under target-specific authority.",
       "authorityOwner": "Agent/proxy deploy-promote runbooks and HGI-309.",
-      "operation": "Build, deploy, promote, prove, or roll back only the exact approved target.",
+      "operation": "Manually build, deploy, promote, prove, or roll back only the exact approved target; automatic Git deployment is disabled.",
       "resource": "Named Vercel project, immutable deployment, stable alias, and previous deployment.",
       "environment": "Approval-gated Preview or Production.",
       "duration": "One foreground procedure; no schedule or autonomous retry.",
@@ -220,13 +224,13 @@
         "synchronousHumanAttention": "Approval, observation, and incident attention.",
         "workerDuration": "Build/deploy/proof duration."
       },
-      "publication": "No scheduled deployment writer; each mutation requires separate approval and readback.",
+      "publication": "No Git-triggered or scheduled deployment writer; each manual mutation requires separate approval and readback.",
       "reviewTrigger": "Project, alias, config, entrypoint, runbook, proof, rollback, or authority change.",
       "retirement": "Retire a deployment path when the app/target no longer exists or a safer owned platform replaces it.",
       "externalReadback": "Not performed in HGI-306; deployment and alias state remain inconclusive.",
       "carryingCost": "Operator attention, platform duration/cost, proof, rollback readiness, and incident risk.",
       "selfFeedbackExcluded": true,
-      "nonClaim": "Runbooks, source, builds, and local preflight do not prove a Vercel deployment, alias, health, or Production state."
+      "nonClaim": "Configuration proves desired trigger policy only; it does not prove Vercel accepted the policy or that a push created no deployment. Runbooks, builds, and local preflight do not prove a Vercel deployment, alias, health, or Production state."
     },
     {
       "id": "sendblue-inbound",

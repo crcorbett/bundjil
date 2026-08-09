@@ -2,6 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "bun run --filter @bundjil/store build && bun run --filter @bundjil/codex build && bun run --filter @bundjil/codex-proxy build",
   "framework": null,
+  "git": {
+    "deploymentEnabled": false
+  },
   "installCommand": "bun install --frozen-lockfile",
   "functions": {
     "api/index.ts": {

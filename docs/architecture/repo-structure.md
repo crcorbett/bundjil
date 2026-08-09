@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-10
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -134,6 +134,10 @@ layers. It must not move app-owned env binding names, Vercel deployment
 metadata, local dev hosting, or route-specific HTTP behavior into the package.
 The linked Vercel project is `bundjil-codex-proxy` in Cooper's personal
 Vercel account. Do not link or deploy this app to Tilt Legal.
+Both this app and `apps/agent` own `git.deploymentEnabled: false` in their
+`vercel.json`. Git remains the source connection, but a push is never an
+admitted deployment trigger: only the target runbooks may stage an immutable
+candidate and explicitly move an alias after claim-matched proof.
 
 The proxy composes mock, deprecated local diagnostic, and refresh-capable
 hosted `live` modes for Production and retained Preview. It never owns a

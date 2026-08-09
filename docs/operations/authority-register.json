@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-31",
+  "lastReviewed": "2026-08-10",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -154,7 +154,7 @@
       "target": "vercel",
       "principal": "Authenticated Bundjil agent deployment operator",
       "identitySource": "Vercel CLI identity and team/project scope read immediately before the operation",
-      "operation": "One explicitly approved agent deploy, promote, alias, environment, rollback, or traffic operation",
+      "operation": "One explicitly approved manual agent deploy, promote, alias, environment, rollback, or traffic operation; never a Git-triggered deployment",
       "resource": "bundjil-agent project, immutable deployment, alias, environment, and configuration fingerprint",
       "environment": "Preview or Production named explicitly and never inferred from URL",
       "status": "disabled_pending_proof",
@@ -165,7 +165,7 @@
       "rollback": "Restore the recorded previous deployment or alias under separate approval and read back the target",
       "stopCondition": "Stop on identity, project, stage, source/config, protection, rollback, approval, or readback mismatch",
       "escalation": "Vercel project owner and Bundjil agent operator",
-      "nonClaim": "Repository source, tests, and historical deployments do not prove or authorize current Vercel state",
+      "nonClaim": "Repository source and tests prove desired manual-only admission, not provider acceptance; historical deployments do not prove or authorize current Vercel state",
       "readback": {
         "availability": "unavailable",
         "outcome": "inconclusive",
@@ -178,7 +178,7 @@
       "target": "vercel",
       "principal": "Authenticated Bundjil codex-proxy deployment operator",
       "identitySource": "Vercel CLI identity and team/project scope read immediately before the operation",
-      "operation": "One explicitly approved proxy deploy, promote, alias, environment, rollback, or traffic operation",
+      "operation": "One explicitly approved manual proxy deploy, promote, alias, environment, rollback, or traffic operation; never a Git-triggered deployment",
       "resource": "bundjil-codex-proxy project, immutable deployment, alias, environment, and configuration fingerprint",
       "environment": "Preview or Production named explicitly with independent subject/store/cipher/bearer identity",
       "status": "disabled_pending_proof",
@@ -189,7 +189,7 @@
       "rollback": "Restore the recorded previous deployment/alias without rolling back the newest fenced profile generation, then read back",
       "stopCondition": "Stop on identity, target, source/config, profile/store/cipher, protection, rollback, approval, or readback mismatch",
       "escalation": "Vercel project owner and Bundjil codex-proxy operator",
-      "nonClaim": "Local or Preview evidence does not prove Production; current proxy deployment and credential state are unknown",
+      "nonClaim": "Repository config proves desired manual-only admission, not provider acceptance; local or Preview evidence does not prove Production, and current proxy deployment and credential state require fresh readback",
       "readback": {
         "availability": "unavailable",
         "outcome": "inconclusive",

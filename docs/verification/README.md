@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -19,6 +19,10 @@ operation nor asserts present provider state.
 
 - [`critical-journeys.json`](critical-journeys.json) is the exact, small
   inventory. Each record conforms to the shared critical-journey contract.
+- Local proxy journey `BND-J03-proxy-health-auth-sse` binds direct Codex and
+  proxy fragmentation, early-emission, byte-limit, failure, and cancellation
+  tests to the process-level mock smoke receipt. This is local stream behavior,
+  not a hosted Codex, latency, Preview, or Production claim.
 - [`journey-command-map.json`](journey-command-map.json) maps those IDs to
   actual local commands or the target-owned runbook that must be followed.
 - [`proof-packet.schema.json`](proof-packet.schema.json) is the machine-readable

@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-10
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -154,9 +154,12 @@ proof, and HGI-306 admission evidence. Retained decision provenance is
 
 Vercel deployment/promotion, Sendblue outbound work, Executor reads/resumes,
 and AI Gateway/Eve turns remain foreground operations with exact target-owned
-runbooks, authority, proof, stopping, and recovery. The hosted Codex model
-proxy remains disabled pending proof. None is admitted as scheduled continuous
-automation, and unavailable external readback stays inconclusive.
+runbooks, authority, proof, stopping, and recovery. Both app-owned Vercel
+configs disable Git-triggered deployment; Git pushes admit CI only, while an
+immutable deployment and any alias movement require separate manual stages.
+The hosted Codex model proxy remains disabled pending proof. None is admitted
+as scheduled continuous automation, and unavailable external readback stays
+inconclusive.
 
 Sendblue inbound processing is the one admitted consequential runtime loop. Its
 signed ingress, durable replay/lease state, one-turn convergence, bounded proof,
