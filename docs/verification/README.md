@@ -23,6 +23,12 @@ operation nor asserts present provider state.
   proxy fragmentation, early-emission, byte-limit, failure, and cancellation
   tests to the process-level mock smoke receipt. This is local stream behavior,
   not a hosted Codex, latency, Preview, or Production claim.
+- [`runtime-boundary-streaming-production-accepted-2026-08-10.md`](runtime-boundary-streaming-production-accepted-2026-08-10.md)
+  binds exact source `6cc0936…` to manually staged and promoted proxy/Agent
+  deployments, incremental live SSE, Eve session completion, one independent
+  Sendblue iMessage round-trip, provider-accepted typing start/stop, rollback
+  identities, secret cleanup, and the separate Photon/Infrastructure Drift
+  non-claims. It is point-in-time evidence, not standing authority.
 - [`journey-command-map.json`](journey-command-map.json) maps those IDs to
   actual local commands or the target-owned runbook that must be followed.
 - [`proof-packet.schema.json`](proof-packet.schema.json) is the machine-readable

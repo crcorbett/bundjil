@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-repository-owner
 last_reviewed: 2026-08-10
@@ -9,7 +9,7 @@ spec: ../../product-specs/runtime-boundary-streaming-and-deployment-proof.md
 task_ledger: ../../product-specs/runtime-boundary-streaming-and-deployment-proof.tasks.json
 ---
 
-# Runtime boundary, streaming, and deployment proof execution plan
+# Runtime boundary, streaming, and deployment proof completed plan
 
 ## Execution rule
 
@@ -53,7 +53,7 @@ and retain tested rollback identities before alias or provider mutation.
    configs and negative fixtures enforce manual-only deployment admission;
    architecture, README, runbook, lifecycle, verification, authority and
    automation owners now agree, and full verification passed.
-5. `integrate-and-prove-hosted-candidates` — in progress. The pre-stage review
+5. `integrate-and-prove-hosted-candidates` — completed. The pre-stage review
    found that the runbook-required positive Channel handoff timeout was absent
    from both executable preflight admission and current Production metadata.
    The owner/test correction now fails closed, and the exact Personal project
@@ -64,10 +64,22 @@ and retain tested rollback identities before alias or provider mutation.
    the alias-family check discarded bindings with an invalid metadata type
    before counting them, so two configured store aliases could pass as one.
    The executable owner now counts names first and directly rejects that exact
-   mixed-type ambiguity. Hosted candidate proof and successor profile custody
-   remain in progress.
-6. `terminal-five-pass-audit` — pending and must run exactly once after all
-   predecessors complete.
+   mixed-type ambiguity. Exact source `6cc0936…` then passed hosted CI without
+   a Git-created Vercel deployment. Manually staged proxy and Agent candidates
+   passed immutable and stable health/auth/stream/session proof and were
+   explicitly promoted with both prior READY rollback deployments retained.
+   The Personal OAuth profile is encrypted and refresh-capable; temporary local
+   key/bearer copies were removed. One exact Sendblue iMessage journey joined
+   `RECEIVED` ingress to `DELIVERED` egress and handset reply, and separate
+   transient typing start/stop calls were provider-accepted. Photon CLI auth is
+   expired and the provider still exposes no candidate-specific replay oracle,
+   so no Photon write occurred and its live/replay claims remain explicit
+   non-blocking limitations in the dated proof packet.
+6. `terminal-five-pass-audit` — completed once after every predecessor. The
+   five passes accepted Effect contracts, topology, behavior, reconciled docs,
+   and provider/deployment safety. Pass four corrected the stale app-link/root
+   deployment command before the full repository gates; no unresolved
+   implementation defect remains.
 
 ## Docs-maintainer impact ledger
 
@@ -83,7 +95,7 @@ proves CI, no Git auto-deploy, immutable candidates, aliases, provider state,
 live behavior, rollback, and claim limits. Repository success is never used as
 provider proof.
 
-After the terminal audit and corrections, mark every task completed, change
-the SPEC lifecycle to `implemented`, move this plan to `completed` with
-`historical` lifecycle, update both indexes, rerun documentation and full
-verification, commit/push exact paths, and read back final Git integration.
+Every task is completed, the SPEC lifecycle is `implemented`, this historical
+plan is routed through the completed index, and the receipt-bearing tree owns
+the final documentation and verification evidence. The dated Production packet
+retains provider/deployment truth; this plan grants no standing authority.

@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: any execution-plan completion or archival change
 ---
 
@@ -33,6 +33,7 @@ authority for a new operation. Current work lives only under
 | [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md) | Preview accepted; combined Production inconclusive; terminal audit accepted |
 | [Channel providers and Production promotion](photon-channel-provider.md)                                   | Accepted dual-provider rollout; dated receipt owns truth                    |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                                        | Implemented migration                                                       |
+| [Runtime boundary, streaming, and deployment proof](runtime-boundary-streaming-and-deployment-proof.md)    | Implemented corrections; hosted proof and terminal five-pass audit accepted |
 | [Sendblue Eve channel](sendblue-eve-channel.md)                                                            | Implemented channel rollout history                                         |
 | [Sendblue typing indicators](sendblue-typing-indicators.md)                                                | Implemented feature rollout history                                         |
 | [Structural audit corrections](structural-audit-corrections.md)                                            | Accepted repository corrections; terminal five-pass audit passed            |

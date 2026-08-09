@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-effect-architecture-owner
@@ -14,14 +14,14 @@ task_ledger: runtime-boundary-streaming-and-deployment-proof.tasks.json
 
 ## Status and decision
 
-This SPEC is the current accepted improvement set derived from three completed
+This SPEC is the implemented improvement set derived from three completed
 analysis workstreams and fresh repository/provider readback. It authorises the
 repository, Vercel, Photon, Sendblue, credential-store, deployment, bounded
 test-message, rollback, and cleanup operations expressly required by its task
 ledger. It does not authorise unrelated resources, publication, package
 release, broad credential rotation, or destructive provider operations.
 
-The implementation will:
+The implementation delivered:
 
 1. repair the clean Agent build-manifest proof against Eve 0.29.5 output;
 2. keep Effect `HttpClient` private to the Codex package-owned client;
@@ -148,6 +148,27 @@ and strict replay are separate claims. Photon strict replay remains a safe
 residual control and explicit non-claim if the provider still has no supported
 candidate-specific oracle after the bounded readback.
 
+### Hosted acceptance outcome
+
+Exact source `6cc0936d502a7b5f0fa32994929fac7f396eb200` passed hosted CI,
+created no Git-triggered Vercel deployment, and was manually staged then
+promoted as READY Production proxy and Agent deployments. Immutable and stable
+proof separately covers proxy health/auth/incremental SSE, Agent Eve session
+completion, alias/source/config identity and prior READY rollback deployments.
+One exact Personal Sendblue iMessage journey proves `RECEIVED` ingress,
+`DELIVERED` egress, the matching handset reply and separate provider-accepted
+typing start/stop transitions. The dated
+[`runtime-boundary-streaming-production-accepted-2026-08-10.md`](../verification/runtime-boundary-streaming-production-accepted-2026-08-10.md)
+packet owns the sanitized receipts.
+
+Photon CLI authentication expired before final readback and the provider still
+offers no supported candidate-specific replay oracle. No Photon mutation or
+message occurred; current Photon inventory, dispatch, typing, delivery and
+strict replay remain explicit non-blocking external limitations. GitHub's
+Infrastructure Drift workflow also stopped before source execution because its
+three repository secrets are unset. Neither limit is promoted into a passing
+claim or treated as an implementation defect.
+
 ## Requirement-to-proof crosswalk
 
 | ID and accepted finding                                                                                                                  | Owning task                                                                                  | Direct observable and expected postcondition                                                                                                                                                                                                                               | False green rejected                                                                                                                 | Focused command/procedure and evidence owner                                                                                                  | Limitation or non-claim                                                                       |
@@ -208,11 +229,11 @@ implementation. This establishes document readiness only, not behavior.
 
 | Surface                                    | Decision                                           | Earliest owner and proof                                                                                                                                                                                                  |
 | ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Documentation router and lifecycle indexes | Change required                                    | This SPEC/plan are routed once in each canonical index; the new negative fixture rejects an omitted current SPEC or plan. Terminal movement remains gated on closeout.                                                    |
+| Documentation router and lifecycle indexes | Change required                                    | The implemented SPEC and completed plan are routed once in their historical indexes; the negative fixture rejects an omitted current SPEC or active plan while implementation is open.                                    |
 | Architecture                               | Change required narrowly                           | `repo-structure.md` owns the delivered Codex stream and manual-only Vercel admission; Channel/Eve composition is preserved.                                                                                               |
 | App/package READMEs                        | Change required narrowly                           | `packages/codex/README.md` now routes dated proof to the canonical verification owner; both app README boundary/command maps are preserved.                                                                               |
 | Runbooks                                   | Change required                                    | Deploy/promote owns push-inventory comparison and manual staging; Alchemy explicitly excludes deployment. Proxy and Channel operation owners remain intact.                                                               |
-| Verification journeys and packets          | Change required                                    | BND-J03 now owns deterministic incremental-stream proof plus smoke; exact hosted proxy and dual-channel packets remain in the hosted task.                                                                                |
+| Verification journeys and packets          | Change required                                    | BND-J03 owns deterministic incremental-stream proof plus smoke; the dated Production packet owns exact hosted proxy, Agent and Sendblue evidence plus Photon non-claims.                                                  |
 | Authority and automation registers         | Change required only for deployment trigger policy | Both registers now state manual-only deploy/promote authority and reject Git push as a deployment signal; other provider envelopes are preserved.                                                                         |
 | Skills and `AGENTS.md`                     | Preserve                                           | Existing skills and instructions already impose the selected boundaries; `check:skills` proves the mirror inventory unchanged.                                                                                            |
 | Tests, lint, CI, and config                | Change required                                    | Clean manifest, raw signature/callback, streaming limits, lifecycle semantics, both Vercel Git policy oracles, exact Production handoff-timeout admission, and name-first store-alias ambiguity rejection are executable. |
@@ -249,3 +270,26 @@ Run once after every implementation and live-proof task is complete:
 
 Any confirmed issue reopens its owning task and invalidates the affected
 receipt until focused proof and `bun run verification` pass again.
+
+## Terminal audit result
+
+The single terminal audit ran after every implementation and live-proof slice.
+Pass four found one documentation defect: the metadata-read step still relied
+on app-local Vercel links after the rollout had proved those links could be
+stale. The runbook now links the repository root to one exact provider project
+at a time, reads back its project ID and uses `--cwd .`, so the configured app
+Root Directory is applied exactly once. No runtime or provider mutation was
+required by that correction.
+
+| Pass                                   | Result                                                                                                                                                                                                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Effect contracts                       | Accepted. Owner Schemas, branded identities, Config, named services, safe tagged errors and explicit Layers remain on the changed boundaries; the live byte stream stays lazy and cancellation-aware.                                                         |
+| Call graph and topology                | Accepted. The raw transport service is absent, public operations remain domain-named, the existing package/app owners contain the change, and no helper/common/utils package or dead export was added.                                                        |
+| Behavior and failure paths             | Accepted. Direct Codex, proxy and Agent suites cover fragmentation, early output, oversize input/lines, cancellation, upstream failure, auth, packaging, preflight and failure paths; full repository verification passed after the documentation correction. |
+| Documentation consistency              | Accepted after the root-link correction. SPEC/tasks, completed plan, indexes, architecture, READMEs, runbook, authority/automation registers, verification router and dated packet agree.                                                                     |
+| Provider, deployment and secret safety | Accepted. Stable aliases resolve to the exact READY deployments, prior rollback deployments remain READY, Sendblue evidence classes are separate, local temp credentials are absent, and Photon plus Infrastructure Drift remain explicit non-claims.         |
+
+No unresolved implementation defect remains. The expired Photon session,
+unsupported strict replay oracle, unobserved handset typing indicator and
+unset Infrastructure Drift workflow secrets are external or evidence-bounded
+non-blocking limitations, not passing claims.
