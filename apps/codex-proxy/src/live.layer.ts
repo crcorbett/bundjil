@@ -14,7 +14,6 @@ import {
   CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
-  CodexResponsesFetchLive,
   CodexSubscriptionAuthProtocolConfigLive,
   CodexUpstashPersistenceLive,
   OpenAICompatibleProxyLive,
@@ -70,9 +69,7 @@ const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
   )
 );
 
-const CodexProxyHttpClientLive = CodexHttpClientLive.pipe(
-  Layer.provide(CodexResponsesFetchLive)
-);
+const CodexProxyHttpClientLive = CodexHttpClientLive;
 
 const makeCodexProxyDirectProviderLive = (
   policy: CodexResponsesRequestPolicy

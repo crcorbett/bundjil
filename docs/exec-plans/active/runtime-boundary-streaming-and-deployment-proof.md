@@ -42,8 +42,10 @@ and retain tested rollback identities before alias or provider mutation.
 1. `repair-clean-agent-build-proof` — completed. The recoverably clean direct
    Agent run executed both build modes and passed 77 tests; full repository
    verification then passed with an Agent cache miss.
-2. `close-codex-and-agent-boundary-escapes` — in progress.
-3. `stream-and-bound-codex-sse` — pending.
+2. `close-codex-and-agent-boundary-escapes` — completed. The raw transport
+   service and generic production callback were retired, owner Schemas now
+   back semantic Agent Config, and focused plus full verification passed.
+3. `stream-and-bound-codex-sse` — in progress.
 4. `enforce-staged-deployment-and-reconcile-docs` — pending.
 5. `integrate-and-prove-hosted-candidates` — pending.
 6. `terminal-five-pass-audit` — pending and must run exactly once after all

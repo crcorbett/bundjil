@@ -244,11 +244,6 @@ export {
   loadCodexResponsesProofInputFromEnv,
 } from "./provider/config.js";
 export {
-  CodexResponsesFetch,
-  makeCodexResponsesFetch,
-} from "./provider/fetch.js";
-export type { CodexResponsesFetchShape } from "./provider/fetch.js";
-export {
   CodexResponsesProof,
   makeCodexResponsesProof,
   runCodexResponsesProof,

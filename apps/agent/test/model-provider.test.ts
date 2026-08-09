@@ -1,18 +1,20 @@
 import { assert, it } from "@effect/vitest";
 import { generateText } from "ai";
 import { ConfigProvider, Effect, Schema } from "effect";
+import { vi } from "vitest";
 
 import {
   loadAgentConfig,
   loadAgentModelProviderConfig,
 } from "../agent/config.js";
 import {
+  AgentCodexProxyBaseUrl,
   AgentCodexProxyInternalToken,
+  AgentModelContextWindowTokens,
   AgentModelId,
   createAgentModel,
   defaultAgentModel,
 } from "../agent/model-provider.js";
-import type { AgentModelProviderDeps } from "../agent/model-provider.js";
 
 const OpenAICompatibleGenerateResponse = Schema.Struct({
   choices: Schema.Array(
@@ -51,6 +53,20 @@ it.effect("rejects an empty Codex proxy internal token", () =>
   )
 );
 
+it.effect("rejects an invalid Codex proxy URL boundary", () =>
+  Schema.decodeUnknownEffect(AgentCodexProxyBaseUrl)("not-a-url").pipe(
+    Effect.flip,
+    Effect.asVoid
+  )
+);
+
+it.effect("rejects a non-positive model context window", () =>
+  Schema.decodeUnknownEffect(AgentModelContextWindowTokens)(0).pipe(
+    Effect.flip,
+    Effect.asVoid
+  )
+);
+
 it.effect("selects the Gateway model string by default", () =>
   Effect.gen(function* testDefaultGatewayProvider() {
     const config = yield* loadAgentConfig().pipe(
@@ -70,7 +86,7 @@ it.effect("selects the Gateway model string by default", () =>
 );
 
 it.effect(
-  "builds a Codex proxy LanguageModel with private bearer auth and injected fetch",
+  "builds a Codex proxy LanguageModel with private bearer auth at the host fetch boundary",
   () =>
     Effect.gen(function* testCodexProxyProvider() {
       const config = yield* loadAgentModelProviderConfig.pipe(
@@ -153,8 +169,8 @@ it.effect(
         {
           preconnect: globalThis.fetch.preconnect,
         }
-      ) satisfies NonNullable<AgentModelProviderDeps["fetch"]>;
-      const model = createAgentModel(config, { fetch });
+      );
+      const model = createAgentModel(config);
 
       if (typeof model === "string") {
         throw new TypeError(
@@ -173,11 +189,15 @@ it.effect(
       assert.strictEqual(model.provider, "bundjil-codex-proxy.chat");
       assert.strictEqual(model.specificationVersion, "v4");
 
+      vi.stubGlobal("fetch", fetch);
       const result = yield* Effect.promise(() =>
-        generateText({
-          model,
-          prompt: "Say OK.",
-        })
+        generateText({ model, prompt: "Say OK." })
+      ).pipe(
+        Effect.ensuring(
+          Effect.sync(() => {
+            vi.unstubAllGlobals();
+          })
+        )
       );
       const [request] = requests;
 

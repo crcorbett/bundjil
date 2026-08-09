@@ -1,9 +1,5 @@
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { Context, Effect, Layer, Option, Redacted, Ref, Schema } from "effect";
-import type {
-  HttpClientRequest,
-  HttpClientResponse,
-} from "effect/unstable/http";
 
 import { CodexOAuthClient } from "../auth/client.js";
 import type { CodexOAuthTokenRefreshResult } from "../auth/credentials.js";
@@ -43,7 +39,6 @@ import type {
 } from "../provider/contracts.js";
 import { CodexDirectProvider } from "../provider/direct.js";
 import { CodexHttpNetworkError } from "../provider/errors.js";
-import { CodexResponsesFetch } from "../provider/fetch.js";
 import { CodexHttpClient } from "../provider/http-client.js";
 import {
   CodexOAuthProfileCipherLive,
@@ -62,19 +57,6 @@ export interface CodexOAuthClientMockOptions {
   readonly refreshResult?: CodexOAuthTokenRefreshResult;
   readonly refresh?: CodexOAuthClient["Service"]["refresh"];
 }
-
-export interface CodexResponsesFetchMockOptions {
-  readonly fetch: (
-    request: HttpClientRequest.HttpClientRequest
-  ) => Effect.Effect<HttpClientResponse.HttpClientResponse>;
-}
-
-export const CodexResponsesFetchMock = (
-  options: CodexResponsesFetchMockOptions
-) =>
-  Layer.succeed(CodexResponsesFetch, {
-    fetch: options.fetch,
-  });
 
 export interface CodexHttpClientMockOptions {
   readonly postResponses?: CodexResponsesProofResult;

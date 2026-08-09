@@ -1,6 +1,7 @@
 import {
   CodexAccessTokenImportProfile,
   CodexAuthTemporarilyUnavailable,
+  CodexHttpClient,
   CodexHttpStatusError,
   CodexOAuthOperationError,
   CodexOAuthProfileId,
@@ -14,26 +15,23 @@ import {
   CodexReauthenticationRequired,
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleProxy,
+  makeCodexHttpClient,
   putProfile,
 } from "@bundjil/codex";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
   makeCodexDirectProviderLive,
-  CodexHttpClientLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
   OpenAICompatibleProxyLive,
 } from "@bundjil/codex/runtime";
-import {
-  CodexOAuthMemory,
-  CodexResponsesFetchMock,
-} from "@bundjil/codex/testing";
+import { CodexOAuthMemory } from "@bundjil/codex/testing";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Layer, Redacted, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
-import { HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 import { describe, it as vitestIt } from "vitest";
 
 import { CodexProxyRouteError } from "../src/errors.js";
@@ -52,6 +50,11 @@ import {
   CodexProxyReadyLive,
   toCodexProxyVercelRequest,
 } from "../src/index.js";
+
+const codexHttpClientTestLayer = (client: HttpClient.HttpClient) =>
+  Layer.effect(CodexHttpClient, makeCodexHttpClient).pipe(
+    Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
+  );
 
 const encodeChatCompletionRequest = Schema.encodeUnknownSync(
   Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
@@ -185,27 +188,24 @@ const testWebHandler = Effect.gen(function* makeTestWebHandler() {
 const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
   Effect.gen(function* makeLiveProxyLayer() {
     const profile = yield* makeLiveProfile(expiresAtEpochMillis);
-    const httpClient = CodexHttpClientLive.pipe(
-      Layer.provide(
-        CodexResponsesFetchMock({
-          fetch: (request) =>
-            Effect.succeed(
-              HttpClientResponse.fromWeb(
-                request,
-                new Response(
-                  [
-                    'data: {"type":"response.output_text.delta","delta":"Live OK."}',
-                    'data: {"type":"response.completed"}',
-                    "",
-                  ].join("\n"),
-                  {
-                    headers: { "content-type": "text/event-stream" },
-                    status: 200,
-                  }
-                )
-              )
-            ),
-        })
+    const httpClient = codexHttpClientTestLayer(
+      HttpClient.make((request) =>
+        Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            new Response(
+              [
+                'data: {"type":"response.output_text.delta","delta":"Live OK."}',
+                'data: {"type":"response.completed"}',
+                "",
+              ].join("\n"),
+              {
+                headers: { "content-type": "text/event-stream" },
+                status: 200,
+              }
+            )
+          )
+        )
       )
     );
     const directProvider = makeCodexDirectProviderLive({
@@ -427,8 +427,8 @@ const withLocalTestHandler = <A>(
       localProfileStoreDirectory,
       { reasoningEffort: config.reasoningEffort },
       localCipherConfigProvider,
-      CodexResponsesFetchMock({
-        fetch: (request) =>
+      codexHttpClientTestLayer(
+        HttpClient.make((request) =>
           Effect.succeed(
             HttpClientResponse.fromWeb(
               request,
@@ -444,8 +444,9 @@ const withLocalTestHandler = <A>(
                 }
               )
             )
-          ),
-      })
+          )
+        )
+      )
     );
     const webHandler = makeCodexProxyWebHandler(
       makeCodexProxyAppLayer(
@@ -538,38 +539,33 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
         });
         const profile = yield* makeLiveProfile(Date.now() + 60_000);
         let captured: typeof CodexResponsesRequest.Type | undefined;
-        const httpClient = CodexHttpClientLive.pipe(
-          Layer.provide(
-            CodexResponsesFetchMock({
-              fetch: (request) =>
-                Effect.gen(function* captureEncodedProviderRequest() {
-                  if (request.body._tag !== "Uint8Array") {
-                    return yield* Effect.die(
-                      "Expected the Codex provider request to have an encoded JSON body."
-                    );
+        const httpClient = codexHttpClientTestLayer(
+          HttpClient.make((request) =>
+            Effect.gen(function* captureEncodedProviderRequest() {
+              if (request.body._tag !== "Uint8Array") {
+                return yield* Effect.die(
+                  "Expected the Codex provider request to have an encoded JSON body."
+                );
+              }
+
+              captured = yield* Schema.decodeUnknownEffect(
+                Schema.fromJsonString(CodexResponsesRequest)
+              )(new TextDecoder().decode(request.body.body)).pipe(Effect.orDie);
+
+              return HttpClientResponse.fromWeb(
+                request,
+                new Response(
+                  [
+                    'data: {"type":"response.output_text.delta","delta":"Live OK."}',
+                    'data: {"type":"response.completed"}',
+                    "",
+                  ].join("\n"),
+                  {
+                    headers: { "content-type": "text/event-stream" },
+                    status: 200,
                   }
-
-                  captured = yield* Schema.decodeUnknownEffect(
-                    Schema.fromJsonString(CodexResponsesRequest)
-                  )(new TextDecoder().decode(request.body.body)).pipe(
-                    Effect.orDie
-                  );
-
-                  return HttpClientResponse.fromWeb(
-                    request,
-                    new Response(
-                      [
-                        'data: {"type":"response.output_text.delta","delta":"Live OK."}',
-                        'data: {"type":"response.completed"}',
-                        "",
-                      ].join("\n"),
-                      {
-                        headers: { "content-type": "text/event-stream" },
-                        status: 200,
-                      }
-                    )
-                  );
-                }),
+                )
+              );
             })
           )
         );

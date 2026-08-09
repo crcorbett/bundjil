@@ -113,6 +113,44 @@ const isWithinPublicDeclaration = (node: ts.Node) => {
   return false;
 };
 
+const entityRootName = (name: ts.EntityName): string =>
+  ts.isIdentifier(name) ? name.text : entityRootName(name.left);
+
+const isEffectHttpTransportType = (node: ts.TypeNode) => {
+  if (
+    !ts.isTypeReferenceNode(node) ||
+    !["HttpClientRequest", "HttpClientResponse"].includes(
+      node.typeName.getText().split(".").at(-1) ?? ""
+    )
+  ) {
+    return false;
+  }
+  const rootName = entityRootName(node.typeName);
+
+  return node.getSourceFile().statements.some((statement) => {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      statement.moduleSpecifier.text !== "effect/unstable/http"
+    ) {
+      return false;
+    }
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings === undefined) {
+      return false;
+    }
+    if (ts.isNamespaceImport(bindings)) {
+      return bindings.name.text === rootName;
+    }
+    return bindings.elements.some((element) => element.name.text === rootName);
+  });
+};
+
+const isPublicGenericFetchProperty = (node: ts.PropertySignature) =>
+  node.type !== undefined &&
+  node.name.getText() === "fetch" &&
+  isPublicSignatureType(node.type);
+
 const dottedName = (expression: ts.Expression): string | undefined => {
   if (ts.isIdentifier(expression)) {
     return expression.text;
@@ -541,6 +579,24 @@ export const auditBoundaryProvenance = (
       continue;
     }
     const visit = (node: ts.Node): void => {
+      if (
+        ts.isTypeNode(node) &&
+        isPublicSignatureType(node) &&
+        isEffectHttpTransportType(node)
+      ) {
+        report(
+          node,
+          "public-http-transport",
+          "Public domain services cannot expose Effect HTTP request or response transport primitives."
+        );
+      }
+      if (ts.isPropertySignature(node) && isPublicGenericFetchProperty(node)) {
+        report(
+          node,
+          "public-generic-fetch",
+          "Public provider configuration cannot expose a generic fetch callback seam."
+        );
+      }
       if (
         ts.isTypeNode(node) &&
         isPublicSignatureType(node) &&

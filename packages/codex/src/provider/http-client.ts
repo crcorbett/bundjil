@@ -1,5 +1,5 @@
 import { Context, Effect, Redacted, Schema } from "effect";
-import { HttpClientRequest } from "effect/unstable/http";
+import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import { codexResponsesEndpointConfig } from "./config.js";
 import {
@@ -11,13 +11,12 @@ import type {
   CodexResponsesProofResult as CodexResponsesProofResultType,
   CodexResponsesStreamResult,
 } from "./contracts.js";
-import type { CodexHttpNetworkError } from "./errors.js";
 import {
+  CodexHttpNetworkError,
   CodexHttpStatusError,
   CodexResponsesRequestError,
   CodexResponsesStreamError,
 } from "./errors.js";
-import { CodexResponsesFetch } from "./fetch.js";
 
 export type CodexHttpClientFailure =
   | CodexResponsesRequestError
@@ -40,7 +39,7 @@ export class CodexHttpClient extends Context.Service<
 >()("@bundjil/codex/CodexHttpClient") {}
 
 export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
-  const fetcher = yield* CodexResponsesFetch;
+  const client = yield* HttpClient.HttpClient;
   const endpoint = yield* codexResponsesEndpointConfig;
 
   return CodexHttpClient.of({
@@ -72,7 +71,16 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         HttpClientRequest.setHeaders(headers),
         HttpClientRequest.bodyText(encodedRequestBody, "application/json")
       );
-      const response = yield* fetcher.fetch(upstreamRequest);
+      const response = yield* client.execute(upstreamRequest).pipe(
+        Effect.mapError(
+          (cause) =>
+            new CodexHttpNetworkError({
+              operation: "fetch",
+              message: "Unable to reach Codex Responses endpoint.",
+              cause,
+            })
+        )
+      );
       const contentType = response.headers["content-type"] ?? "";
 
       if (response.status < 200 || response.status >= 300) {
@@ -146,7 +154,16 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           HttpClientRequest.setHeaders(headers),
           HttpClientRequest.bodyText(encodedRequestBody, "application/json")
         );
-        const response = yield* fetcher.fetch(upstreamRequest);
+        const response = yield* client.execute(upstreamRequest).pipe(
+          Effect.mapError(
+            (cause) =>
+              new CodexHttpNetworkError({
+                operation: "fetch",
+                message: "Unable to reach Codex Responses endpoint.",
+                cause,
+              })
+          )
+        );
         const contentType = response.headers["content-type"] ?? "";
 
         if (response.status < 200 || response.status >= 300) {

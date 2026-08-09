@@ -288,8 +288,10 @@ message, deployment, or Production write authority.
   and service tags;
 - owns `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`, and
   KeyValueStore-backed live/memory layers;
-- owns `CodexHttpClient`, `CodexResponsesFetch`, and `CodexResponsesProof` for
-  the opt-in direct Codex Responses proof path;
+- owns `CodexHttpClient` and `CodexResponsesProof` for the opt-in direct Codex
+  Responses proof path; the named client keeps Effect HTTP request/response
+  primitives private and tests substitute the standard Effect HTTP client
+  Layer at that adapter boundary;
 - owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
   `OpenAICompatibleProxy` for the package-level private provider/proxy
   contract;

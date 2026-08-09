@@ -7,7 +7,7 @@ import {
   loadCodexResponsesProofInput,
   runCodexResponsesProof,
 } from "../src/index.js";
-import { CodexResponsesProofFetchLive } from "../src/runtime.js";
+import { CodexResponsesProofLive } from "../src/runtime.js";
 
 const program = Effect.gen(function* proveCodexResponses() {
   const input = yield* loadCodexResponsesProofInput;
@@ -16,7 +16,7 @@ const program = Effect.gen(function* proveCodexResponses() {
 }).pipe(
   Effect.provide(
     Layer.merge(
-      CodexResponsesProofFetchLive,
+      CodexResponsesProofLive,
       ConfigProvider.layer(ConfigProvider.fromEnv())
     )
   )

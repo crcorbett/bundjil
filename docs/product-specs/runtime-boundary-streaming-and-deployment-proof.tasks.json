@@ -63,7 +63,7 @@
     },
     {
       "id": "close-codex-and-agent-boundary-escapes",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Close raw Codex transport and Agent config callback escapes",
       "dependsOn": ["repair-clean-agent-build-proof"],
       "description": "Make CodexHttpClient own Effect HttpClient directly, retire CodexResponsesFetch, add boundary fixtures, and use owner Schemas for Agent Config without a production generic fetch dependency.",
@@ -80,12 +80,18 @@
       "completionCriteria": [
         "All production public signatures are domain-specific and every semantic config field is owner-Schema-backed."
       ],
-      "evidence": [],
+      "evidence": [
+        "CodexHttpClient now consumes Effect HttpClient privately; the public CodexResponsesFetch service, root export, runtime Layer, testing mock and source module were retired. The proof script uses CodexResponsesProofLive, and proxy tests compose test-owned standard Effect HttpClient Layers beneath the domain client.",
+        "AgentCodexProxyBaseUrl and AgentModelContextWindowTokens now own their semantic boundaries and Config.schema reuses the exact struct fields. The production Agent model factory has no generic fetch dependency; its request/auth test temporarily intercepts the host fetch boundary and restores it with Effect.ensuring.",
+        "The provenance audit now rejects public Effect HttpClientRequest/HttpClientResponse transport types and exported generic fetch properties while accepting framework Fetch Request/Response entrypoints and owner contracts with similar names. The 107-test tooling suite and check:boundaries passed with no exception added.",
+        "Focused verification passed: Codex proof 5 tests, Agent model/config 6 tests, proxy handler 26 tests, Codex/Agent/proxy typechecks, Codex build, export/stale-seam scan and git diff --check. The proxy's first run exposed stale dist output; rebuilding @bundjil/codex made the current 26-test oracle pass.",
+        "Full bun run verification passed on the receipt-bearing tree with the documented process-only synthetic Executor URL/key fixture and no provider request: all policy gates, HGI-307, 107 tooling tests, type-aware lint, lint fixture, Knip, nine typechecks and all fifteen Turbo test tasks. Agent, Codex and proxy passed their current suites; Agent passed 79 tests, Codex 110 and proxy 37. No external provider or deployment state changed in this slice."
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "stream-and-bound-codex-sse",
-      "status": "pending",
+      "status": "in_progress",
       "title": "Stream and bound Codex SSE incrementally",
       "dependsOn": ["close-codex-and-agent-boundary-escapes"],
       "description": "Carry upstream bytes through Effect Stream, incrementally decode/map bounded SSE lines, enforce the request limit, and return a streaming HTTP response with cancellation propagation.",
