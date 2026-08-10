@@ -70,6 +70,7 @@
         "limitationsAndNonClaims": "Repository proof does not establish GitHub secrets, hosted run or Vercel behaviour."
       },
       "docsImpact": "Update workflow, authority/control owners, runbooks, infrastructure README, testing architecture, verification journey and active plan in the same slice.",
+      "currentResult": "Passed after a 2026-08-10 live read-only Vercel review corrected one false fixture assumption: GET /v9/projects/:id binds targets.production through the already-decoded outer project id and does not repeat projectId inside the nested deployment. The current decoder now rejects a wrong outer project, binds that verified identity to the nested target, and a focused live-shape fixture passes. Hosted mutation remains separately gated.",
       "commitAfterPassing": true
     },
     {

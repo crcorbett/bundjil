@@ -96,18 +96,22 @@ const CliDeploymentOutput = Schema.Union([
   }),
 ]);
 
-const ProviderDeployment = Schema.Struct({
+const ProviderDeploymentTarget = Schema.Struct({
   id: VercelDeploymentId,
   url: Schema.NonEmptyString,
   readyState: Schema.Literal("READY"),
   target: Schema.Literal("production"),
-  projectId: VercelProjectId,
   meta: Schema.Struct({ gitCommitSha: VercelGitSha }),
+});
+
+const ProviderDeployment = Schema.Struct({
+  ...ProviderDeploymentTarget.fields,
+  projectId: VercelProjectId,
 });
 
 const ProviderProject = Schema.Struct({
   id: VercelProjectId,
-  targets: Schema.Struct({ production: ProviderDeployment }),
+  targets: Schema.Struct({ production: ProviderDeploymentTarget }),
 });
 
 const repositoryDirectory = fileURLToPath(
@@ -179,24 +183,42 @@ const selectProject = (
 
 const decodeProviderDeployment = (
   project: ProductionProject,
-  expectedProjectId: VercelProjectId,
-  provider: typeof ProviderDeployment.Type
+  projectId: VercelProjectId,
+  provider: typeof ProviderDeploymentTarget.Type
 ): Effect.Effect<ProductionDeployment, ProductionDeploymentError> =>
-  provider.projectId === expectedProjectId
-    ? Schema.decodeUnknownEffect(ProductionDeploymentSchema)({
-        project,
-        deploymentId: provider.id,
-        projectId: provider.projectId,
-        url: `https://${provider.url}`,
-        target: provider.target,
-        readyState: provider.readyState,
-        sourceSha: provider.meta.gitCommitSha,
-      }).pipe(
-        Effect.mapError(() =>
-          commandError("inspect", project, "invalidResponse")
-        )
-      )
-    : Effect.fail(commandError("inspect", project, "targetMismatch"));
+  Schema.decodeUnknownEffect(ProductionDeploymentSchema)({
+    project,
+    deploymentId: provider.id,
+    projectId,
+    url: `https://${provider.url}`,
+    target: provider.target,
+    readyState: provider.readyState,
+    sourceSha: provider.meta.gitCommitSha,
+  }).pipe(
+    Effect.mapError(() => commandError("inspect", project, "invalidResponse"))
+  );
+
+const decodeCurrentProductionProject = Effect.fn(
+  "ProductionDeploymentsLive.decodeCurrentProject"
+)(function* (
+  project: ProductionProject,
+  expectedProjectId: VercelProjectId,
+  output: string
+) {
+  const provider = yield* Schema.decodeUnknownEffect(
+    Schema.fromJsonString(ProviderProject)
+  )(output).pipe(
+    Effect.mapError(() => commandError("current", project, "invalidResponse"))
+  );
+  if (provider.id !== expectedProjectId) {
+    return yield* commandError("current", project, "targetMismatch");
+  }
+  return yield* decodeProviderDeployment(
+    project,
+    provider.id,
+    provider.targets.production
+  );
+});
 
 export const ProductionDeploymentsLive = Layer.effect(
   ProductionDeployments,
@@ -229,9 +251,12 @@ export const ProductionDeploymentsLive = Layer.effect(
           commandError("inspect", input.project, "invalidResponse")
         )
       );
+      if (provider.projectId !== selected.projectId) {
+        return yield* commandError("inspect", input.project, "targetMismatch");
+      }
       return yield* decodeProviderDeployment(
         input.project,
-        selected.projectId,
+        provider.projectId,
         provider
       );
     });
@@ -255,20 +280,10 @@ export const ProductionDeploymentsLive = Layer.effect(
         "current",
         project
       );
-      const provider = yield* Schema.decodeUnknownEffect(
-        Schema.fromJsonString(ProviderProject)
-      )(output).pipe(
-        Effect.mapError(() =>
-          commandError("current", project, "invalidResponse")
-        )
-      );
-      if (provider.id !== selected.projectId) {
-        return yield* commandError("current", project, "targetMismatch");
-      }
-      return yield* decodeProviderDeployment(
+      return yield* decodeCurrentProductionProject(
         project,
         selected.projectId,
-        provider.targets.production
+        output
       );
     });
 

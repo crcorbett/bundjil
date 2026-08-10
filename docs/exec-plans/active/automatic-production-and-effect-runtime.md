@@ -142,6 +142,24 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
   A subsequent local run without CI's synthetic Executor fixture stopped at
   agent build configuration and is not represented as a test failure or pass.
 
+### 2026-08-10 live Vercel boundary correction
+
+- A fresh read-only call to the exact Personal agent and proxy project endpoint
+  confirmed that `targets.production` carries deployment/source/readiness data
+  but omits `projectId`; the verified outer project owns that identity. The
+  original mock repeated `projectId` and would have let the hosted command fail
+  before staging despite repository tests passing.
+- The live decoder now validates the outer project against the configured
+  branded project ID, binds that ID to the nested target and preserves the
+  stricter deployment-inspection requirement that the deployment response
+  itself names the expected project. One focused live-shape regression fixture
+  covers the provider payload. No Vercel mutation, credential or alias action
+  occurred.
+- Documentation impact: task ledger and active evidence owner **Change
+  required**; SPEC, runbook, authority/control registers, package README,
+  architecture, public exports and rollback **Preserve** because the accepted
+  behavior and operating procedure did not change.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

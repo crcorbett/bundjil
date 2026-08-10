@@ -1,9 +1,11 @@
-import { Effect, Exit, Schema } from "effect";
-import { describe, expect, it } from "vitest";
+import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   makeProductionDeploymentsMemory,
   ProductionDeployment,
+  ProductionDeployments,
+  ProductionDeploymentsLive,
   ProductionDeploymentMemoryControl,
   runAutomaticProduction,
   VercelGitSha,
@@ -64,6 +66,66 @@ const runExitWithSnapshot = (failure: ProductionMemoryFailure) =>
   );
 
 describe("automatic Production deployment", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("decodes the current Vercel project target without an embedded projectId", async () => {
+    const spawn = vi.fn<
+      () => {
+        readonly exited: Promise<number>;
+        readonly stderr: ReadableStream<Uint8Array>;
+        readonly stdout: ReadableStream<Uint8Array>;
+      }
+    >(() => ({
+      exited: Promise.resolve(0),
+      stderr: new Blob([]).stream(),
+      stdout: new Blob([
+        JSON.stringify({
+          id: "prj_agent",
+          targets: {
+            production: {
+              id: "dpl_agent_previous",
+              meta: { gitCommitSha: previousSha },
+              readyState: "READY",
+              target: "production",
+              url: "bundjil-agent-previous.vercel.app",
+            },
+          },
+        }),
+      ]).stream(),
+    }));
+    vi.stubGlobal("Bun", { spawn });
+    const config = ConfigProvider.layer(
+      ConfigProvider.fromEnv({
+        env: {
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: "prj_agent",
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: "agent-token",
+          BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:
+            "https://bundjil-codex-proxy.vercel.app/health",
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: "prj_proxy",
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: "proxy-token",
+          BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: "team_personal",
+        },
+      })
+    );
+    const current = await Effect.runPromise(
+      Effect.gen(function* currentProductionTarget() {
+        const deployments = yield* ProductionDeployments;
+        return yield* deployments.current("agent");
+      }).pipe(
+        Effect.provide(ProductionDeploymentsLive.pipe(Layer.provide(config)))
+      )
+    );
+
+    expect(current.projectId).toBe("prj_agent");
+    expect(current.sourceSha).toBe(previousSha);
+    expect(spawn).toHaveBeenCalledWith(
+      expect.arrayContaining(["/v9/projects/prj_agent"]),
+      expect.anything()
+    );
+  });
+
   it("stages both exact-SHA candidates before ordered promotion", async () => {
     const result = await Effect.runPromise(run());
 
