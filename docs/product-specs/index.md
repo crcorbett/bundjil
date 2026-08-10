@@ -16,14 +16,16 @@ context.
 
 ## Proposed
 
-- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
-  reviewed implementation intent for deterministic Effect time, pragmatic
-  state/collection ownership, and four narrow existing-plugin lint rules;
-  implementation awaits an active plan and explicit authority.
+No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-No SPEC is currently in implementation.
+- [Automatic Production deployment and operational closeout](automatic-production-and-operational-closeout.md) —
+  exact-SHA post-CI Production automation, bounded credentials, rollback,
+  Terra High correction, Infrastructure Drift and live channel closeout.
+- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
+  being refreshed against merged source and the installed Effect/runtime epoch
+  before the four narrow lint and targeted runtime tasks begin.
 
 ## Implemented or superseded history
 

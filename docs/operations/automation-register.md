@@ -65,6 +65,30 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
+### Production deployment — admitted post-CI automation pending hosted proof
+
+- **Signal and target:** only a completed successful `CI` `workflow_run` for a
+  same-repository `push` to `main` may start the writer. The exact head SHA is
+  checked out and becomes the immutable candidate identity.
+- **Principal and operation:** the GitHub `Production` job has repository
+  `contents: read` plus exactly two Personal project-scoped Vercel tokens. The
+  repository-owned Effect command stages proxy and agent with domains skipped,
+  validates both candidates, re-reads main, promotes proxy then agent, and
+  verifies stable targets and health. Tilt, account-wide credentials and raw
+  workflow mutation commands are rejected.
+- **Duration and convergence:** one repository-wide queue never cancels an
+  in-flight writer and bounds each run to 30 minutes. Already-current and stale
+  candidates are explicit no-ops. A partial failure restores the exact prior
+  agent then proxy identities as applicable and verifies the restored targets.
+- **Evidence and non-claim:** source/CI/Production run, immutable candidates,
+  project/source/readiness, stable target, health and rollback identities are
+  separate receipt fields. Source and local fixtures do not prove GitHub
+  custody, hosted execution, Vercel mutation, model behaviour or channel proof.
+- **Stop, rollback, and escalation:** stop on any eligibility, target, SHA,
+  readiness, credential, output, alias, health, leak or timeout mismatch.
+  Restore exact prior deployments; control rollback disables the workflow and
+  revokes the two tokens without enabling Vercel Git deployment.
+
 ### Preview infrastructure drift — report-only automation
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
@@ -150,16 +174,14 @@ an explicit authority envelope, one-comment-per-head convergence, bounded
 proof, and HGI-306 admission evidence. Retained decision provenance is
 [`HGI-308-claude-review.decision.json`](../documentation-audit/HGI-308-claude-review.decision.json).
 
-### Deployment and provider operations — foreground or disabled
+### Other provider operations — foreground or disabled
 
-Vercel deployment/promotion, Sendblue outbound work, Executor reads/resumes,
-and AI Gateway/Eve turns remain foreground operations with exact target-owned
-runbooks, authority, proof, stopping, and recovery. Both app-owned Vercel
-configs disable Git-triggered deployment; Git pushes admit CI only, while an
-immutable deployment and any alias movement require separate manual stages.
-The hosted Codex model proxy remains disabled pending proof. None is admitted
-as scheduled continuous automation, and unavailable external readback stays
-inconclusive.
+Direct Vercel Git deployment remains disabled; the post-CI workflow above is
+the sole admitted automatic deployment/promotion writer. Sendblue outbound
+work, Executor reads/resumes and bounded AI Gateway/Eve proof turns remain
+foreground operations with exact target-owned runbooks, authority, proof,
+stopping and recovery. None is admitted as scheduled continuous automation,
+and unavailable external readback stays inconclusive.
 
 Sendblue inbound processing is the one admitted consequential runtime loop. Its
 signed ingress, durable replay/lease state, one-turn convergence, bounded proof,

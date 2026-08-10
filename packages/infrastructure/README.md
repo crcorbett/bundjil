@@ -48,7 +48,13 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-preview-webhook-binding`,
 `infrastructure:photon-production-webhook-register`,
 `infrastructure:photon-production-webhook-delete`, and
-`infrastructure:vercel-git-link-authority`.
+`infrastructure:vercel-git-link-authority`. `production:deploy` is the private
+post-CI Production entrypoint. It is owned by the exact-SHA `Production`
+workflow, uses two project-scoped Vercel credentials, stages both apps with
+domains skipped, validates immutable candidates, promotes only while the
+candidate is still `main`, verifies the stable targets and proxy health, and
+restores the exact prior deployments on an uncertain or partial failure. It is
+not an operator convenience command.
 
 ## Claim boundary
 
@@ -56,6 +62,9 @@ Package checks prove repository contracts only. They do not establish current
 provider state or authorize credentials, state migration, provider writes,
 deployment, promotion, messaging, billing, Preview, or Production operations.
 Current evidence belongs to task-scoped receipts and external readback.
+The automatic command's local tests prove orchestration and fail-closed
+behavior only; a successful hosted `Production` run plus Vercel readback is
+required to prove automatic deployment.
 
 Operational preconditions, authority, sequencing, evidence, rollback, stop,
 and escalation rules are owned by the

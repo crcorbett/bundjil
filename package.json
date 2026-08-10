@@ -77,6 +77,7 @@
     "infrastructure:preview-sync": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
     "infrastructure:preview-repair": "bun alchemy sync alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
     "infrastructure:preview-drift": "bun --env-file=.env.local --conditions=@bundjil/source run packages/infrastructure/scripts/preview-configuration-drift.ts",
+    "production:deploy": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/automatic-production.ts",
     "infrastructure:drift-report": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/report-drift.ts",
     "infrastructure:preview-rollback-plan": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --dry-run --yes",
     "infrastructure:preview-rollback": "BUNDJIL_PREVIEW_CONFIGURATION_PHASE=rollback bun alchemy deploy alchemy.preview.run.ts --stage preview --env-file .env.local --yes",
@@ -109,6 +110,7 @@
     "turbo": "^2.9.6",
     "typescript": "catalog:typescript",
     "ultracite": "7.6.1",
+    "vercel": "58.4.4",
     "vitest": "catalog:testing",
     "yaml": "^2.9.0"
   },

@@ -26,9 +26,10 @@ journey or supply provider readback.
   inventory.
 - Prove the exact independent Production subject, namespace, cipher, profile,
   lock/fence identity, and bearer without revealing values or raw profile data.
-- Confirm the accepted proxy deployment and its current/previous rollback
-  references in the five-stage
-  [agent deploy runbook](../../agent/runbooks/deploy-promote.md).
+- Confirm the successful exact-SHA CI and automatic `Production` runs, accepted
+  proxy deployment, stable alias, and current/previous rollback references in
+  the [agent deploy runbook](../../agent/runbooks/deploy-promote.md). Do not
+  substitute a READY candidate or manual promotion for automatic-path proof.
 - Record approval for each remote Production request and its expected side
   effects/cost. Production proof is not bundled into deployment authority.
 

@@ -8,6 +8,7 @@
         "stacks/**/*.ts",
         "tooling/codec-provenance.fixture.ts"
       ],
+      "ignoreDependencies": ["vercel"],
       "project": ["stacks/**/*.ts", "tooling/**/*.ts"]
     },
     "apps/agent": {

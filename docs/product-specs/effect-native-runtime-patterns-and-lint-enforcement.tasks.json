@@ -1,20 +1,22 @@
 {
   "title": "Effect-native runtime patterns and lint enforcement tasks",
   "spec": "docs/product-specs/effect-native-runtime-patterns-and-lint-enforcement.md",
-  "status": "proposed",
+  "status": "current",
   "draftBase": {
     "ref": "main",
-    "sha": "e92f8d2508dd927c09cb63eddb50c6ca09904b95",
-    "runtimeBranchRef": "origin/codex/eve-runtime-qualification",
-    "runtimeBranchSha": "238f0334a69b0d4b9cd1d449322c7f31195504be",
-    "researchDate": "2026-07-26"
+    "sha": "5c3c7db240a7abd9bb57ad560bdd8958af4ea701",
+    "runtimeState": "merged-current-main",
+    "siteComparisonRef": "origin/main",
+    "siteComparisonSha": "dd5d015879a82630127adfe044e4352deff72332",
+    "effectVersion": "4.0.0-beta.101",
+    "researchDate": "2026-08-10"
   },
   "authority": {
-    "implementation": "not-authorized",
-    "providerOperations": "not-authorized",
-    "deployment": "not-authorized",
-    "commitPushMerge": "not-authorized",
-    "activePlan": "absent-until-explicit-implementation-authority"
+    "implementation": "authorized-by-cooper-2026-08-10",
+    "providerOperations": "owned-by-automatic-production-and-operational-closeout-ledger",
+    "deployment": "owned-by-automatic-production-and-operational-closeout-ledger",
+    "commitPushMerge": "authorized-by-cooper-2026-08-10",
+    "activePlan": "docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md"
   },
   "principles": [
     "Decode unknown input once at ingress with the owning Effect Schema, pass Contract.Type, and encode Contract.Encoded only at egress.",
@@ -23,7 +25,7 @@
     "Extend Bundjil's existing Oxlint plugin, Effect language service, and boundary audit; do not add another lint runner or wrapper.",
     "Every lint rule requires one AST invariant, exact ownership, positive and negative unit plus installed-plugin fixtures, a false-positive matrix, migration, and safe autofix decision.",
     "Do not create pass-through services, generic collection transforms, DTO mirrors, manual readers, unsafe casts, or helper/common/utils sprawl.",
-    "Run one mandatory five-pass audit only after all future implementation tasks are complete."
+    "Run one mandatory five-pass audit only after both implementation ledgers are otherwise complete."
   ],
   "acceptedFindings": [
     {
@@ -74,7 +76,7 @@
     },
     {
       "id": "ENP-FND-006",
-      "decision": "Pin implementation decisions to lock-resolved Effect beta.74 and reopen research on dependency change.",
+      "decision": "Pin implementation decisions to lock-resolved Effect beta.101 and reopen research on dependency change.",
       "requirementIds": ["ENP-REQ-003", "ENP-REQ-004", "ENP-REQ-009"],
       "taskIds": [
         "refresh-integrated-inventory",
@@ -202,16 +204,16 @@
     },
     {
       "id": "ENP-REQ-008",
-      "requirement": "Sequence implementation after the actual eve-runtime-qualification integration state, refresh citations and findings, and preserve accepted branch proof.",
+      "requirement": "Use the exact merged Eve runtime source, refresh citations and findings, and preserve accepted historical proof without treating it as current provider evidence.",
       "taskIds": [
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets"
       ],
       "directObservable": "Implementation receipt names the exact final base SHA and resolves handoff timing, nested dispatch, observation Ref, and cardinality targets against merged source.",
-      "expectedPostcondition": "No stale line-based change is applied to the read-only branch.",
-      "falseGreenRejected": "Using origin branch name or old diff as current source truth.",
-      "focusedCommandOrProcedureOwner": "Git identity and read-only source/call-graph review",
+      "expectedPostcondition": "No stale line-based change is applied from the retired branch.",
+      "falseGreenRejected": "Using a retired branch name or old diff as current source truth.",
+      "focusedCommandOrProcedureOwner": "Git identity and merged source/call-graph review",
       "evidenceOwner": "Integration inventory receipt",
       "limitationsAndNonClaims": "Does not re-qualify hosted runtime behaviour."
     },
@@ -263,14 +265,14 @@
     },
     {
       "id": "ENP-REQ-012",
-      "requirement": "Run one mandatory five-pass implementation audit after every future implementation task is complete; findings reopen owners and invalidate stale evidence.",
+      "requirement": "Run one mandatory five-pass implementation audit after both task ledgers are otherwise complete; findings reopen owners and invalidate stale evidence.",
       "taskIds": ["terminal-five-pass-audit"],
       "directObservable": "One ordered five-pass receipt is newer than every dependency receipt.",
       "expectedPostcondition": "Architecture, Effect semantics, lint, proof, and docs/cleanup are jointly accepted.",
       "falseGreenRejected": "Per-task fixed ritual or a pre-implementation review.",
       "focusedCommandOrProcedureOwner": "Terminal audit task",
       "evidenceOwner": "Five-pass closeout receipt",
-      "limitationsAndNonClaims": "The audit grants no deployment or provider authority."
+      "limitationsAndNonClaims": "The audit records provider and deployment evidence but does not strengthen a missing live oracle."
     }
   ],
   "lintRules": [
@@ -369,11 +371,11 @@
     {
       "id": "refresh-integrated-inventory",
       "title": "Refresh the exact integrated inventory and freeze implementation decisions",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [],
-      "description": "After explicit implementation authority and after the Eve runtime branch integration state is known, rebase the investigation on the exact candidate, refresh all source findings, and freeze each lint/state/collection decision before code changes.",
+      "description": "Rebase the investigation on exact current main, installed Effect beta.101, current Site origin/main and merged Eve runtime source; freeze each lint/state/collection decision before code changes.",
       "implementationNotes": [
-        "Create an active execution plan; record exact Git identity and keep provider/runtime actuality separate.",
+        "Use the dedicated active execution plan; record exact Git identity and keep provider/runtime actuality separate.",
         "Re-run Bundjil, Site, and Effect-version inventories. Do not assume Site or upstream source is unchanged.",
         "Resolve the handoff nested generator, observation Ref, independent environment Refs, exact-cardinality fixture, and runtime execution targets against merged source.",
         "For every current lint finding record owner, failure mode, accepted migration or exact exception, false-positive class, and focused proof.",
@@ -392,7 +394,7 @@
       "completionCriteria": [
         "Every lint finding is migrate, exact exception, or rejected-rule evidence.",
         "Every proposed state/collection edit has domain evidence; cosmetic edits are removed.",
-        "No provider operation or runtime branch mutation occurs."
+        "Provider operations remain owned by the operational ledger; the retired runtime branch is not modified."
       ]
     },
     {
@@ -522,39 +524,42 @@
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
       "dependsOn": ["enable-rules-and-reconcile-docs"],
-      "description": "After every implementation task is complete, audit the final receipt-bearing candidate once; reopen every finding at its owner and rerun affected proof before repeating the terminal audit.",
+      "externalDependsOn": [
+        "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
+      ],
+      "description": "After both implementation ledgers are otherwise complete, audit the final receipt-bearing candidate once; reopen every finding at its owner and rerun affected proof before repeating the terminal audit.",
       "passes": [
         {
           "order": 1,
           "name": "architecture-boundaries",
-          "scope": "Architecture, package/service/Layer ownership, call graphs, Schema ingress/egress, provider adapters, branded identities, safe errors, Config, and live/mock Layers."
+          "scope": "Effect contracts, Schemas, branded boundaries, errors, Config, Layers, provider adapters and secret-negative ingress/egress."
         },
         {
           "order": 2,
-          "name": "effect-semantics",
-          "scope": "Effect flatness/laziness, Clock/TestClock, deadlines/retries, Ref family, cohesive state, Layer memoization/scope, collections, absence, concurrency, serialization, and observability."
+          "name": "call-graph-topology",
+          "scope": "Call graph, Effect flatness/laziness, runtime ownership, package/file ownership, exports, helper sprawl, dead paths, state/collection semantics and Layer lifetime."
         },
         {
           "order": 3,
-          "name": "lint-false-positives",
-          "scope": "AST invariants, imports/aliases, scopes, unit and installed-plugin fixtures, current findings, exceptions/staleness, false-positive matrix, migrations, and absence of unsafe autofix."
+          "name": "behaviour-and-gates",
+          "scope": "Behaviour, replay/idempotency, workflow eligibility, rollback/failure paths, Clock/TestClock, AST fixtures, tests, lint, typecheck and repository verification."
         },
         {
           "order": 4,
-          "name": "tests-proof",
-          "scope": "Focused adversarial tests, state/time/order/cardinality/runtime proofs, package gates, boundary/effect checks, terminal verification, exact Git identity, and limitations."
+          "name": "docs-and-proof-consistency",
+          "scope": "Docs, SPECs, task ledgers, plan, architecture, runbooks, authority/automation/control registers, proof packets, exact Git identity and limitations."
         },
         {
           "order": 5,
-          "name": "docs-skills-cleanup",
-          "scope": "Docs-impact ledger, architecture, testing rules, READMEs, AGENTS/skills only where justified, dead exceptions, unused helpers/wrappers, lifecycle/index/plan closeout, and non-goals."
+          "name": "provider-deployment-safety",
+          "scope": "Provider/deployment/secret safety, rollback, observability, immutable and stable readback, automatic exact-main evidence, live channel claims and explicit non-claims."
         }
       ],
       "implementationNotes": [
         "Do not run this terminal audit after each task.",
         "A finding reopens its owning task and invalidates affected downstream receipts.",
         "After corrections, rerun focused proof, terminal verification when affected, and one new ordered terminal audit.",
-        "Do not grant provider, deployment, release, commit, push, or merge authority through audit success."
+        "Use existing delegated authority only; audit success does not strengthen a missing provider or handset oracle."
       ],
       "proofContract": {
         "directObservable": "One ordered five-pass receipt is newer than all task and verification evidence and records zero unresolved findings.",
@@ -562,7 +567,7 @@
         "falseGreenRejected": "A fixed pass after each slice, a pre-implementation review, or stale evidence after a correction.",
         "focusedCommandOrProcedureOwner": "Active-plan terminal audit procedure",
         "evidenceOwner": "Five-pass closeout receipt",
-        "limitationsAndNonClaims": "Audit acceptance grants no external operation authority."
+        "limitationsAndNonClaims": "Audit acceptance preserves explicit provider, strict replay and handset non-claims."
       },
       "completionCriteria": [
         "All five ordered passes are recorded once after dependencies.",
@@ -589,11 +594,11 @@
     "git diff --check"
   ],
   "nonGoals": [
-    "No runtime or lint implementation in this drafting task.",
-    "No provider, deployment, credential, webhook, release, commit, push, or merge operation.",
+    "No cosmetic Effect API conversion or bulk migration.",
+    "No provider or deployment claim inferred from repository verification; live operations are owned by the operational ledger.",
     "No wholesale Site lint import.",
     "No universal conversion to Chunk, HashMap, HashSet, Option, Match, Atom, one Ref, or non-empty arrays.",
     "No helper/common/utils sprawl, pass-through services, generic collection transforms, DTO mirrors, manual object readers, unchecked casts, or unsafe autofixes.",
-    "No modification or hosted requalification of origin/codex/eve-runtime-qualification."
+    "No modification or hosted requalification of the retired Eve integration branch."
   ]
 }

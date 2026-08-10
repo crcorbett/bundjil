@@ -3,7 +3,7 @@ document_type: control-register
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-maintainer
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-10
 review_trigger: control finding, false positive, automation loop, boundary exception, accepted-outcome, carrying-cost, or retirement change
 ---
 
@@ -42,7 +42,7 @@ claim-matched evidence remain the behavioral oracle.
 
 ## Boundary exception decision
 
-HGI-306 measured 18 exact occurrence records. The representation is verbose,
+HGI-306 measured 19 exact occurrence records. The representation is verbose,
 especially for the private Upstash facade, but no smaller candidate has proved
 equivalent exact match, duplicate rejection, occurrence isolation, and stale
 detection against the real audit. The occurrence registry is therefore
@@ -57,16 +57,19 @@ stopping, escalation, rollback, accepted-outcome metrics, and a retirement
 condition. `foreground_only`, `disabled_pending_proof`, `retired`, and
 `report_only` are distinct states and grant no continuous-operation authority.
 
-The machine register distinguishes admitted read-only CI and the bounded
-Sendblue inbound runtime from disabled release and Codex-proxy paths,
-foreground interactive Claude/deployment/provider operations, retired automatic
-Claude review, report-only documentation freshness, and report-only Preview
-infrastructure drift. The latter wraps native Alchemy plan/sync observation,
-fails closed on blocking or inconclusive classifications, and has no repair
-edge. This register does not itself schedule a worker or enable an external
-capability. GitHub and providers remain authoritative for current settings,
-identities, runs, state, cost, and consequences; HGI-309 owns any separately
-approved authenticated readback.
+The machine register distinguishes admitted read-only CI, the exact-SHA
+post-CI Production writer and the bounded Sendblue inbound runtime from
+disabled release and Codex-proxy paths, foreground interactive
+Claude/provider operations, retired automatic Claude review, report-only
+documentation freshness, and report-only Preview infrastructure drift. The
+Production writer has one non-cancelling repository queue, two project-scoped
+credentials, immutable candidate and stable-target readback, and exact prior
+deployment rollback; direct Vercel Git deployment remains disabled. The drift
+worker wraps native Alchemy plan/sync observation, fails closed on blocking or
+inconclusive classifications, and has no repair edge. This register does not
+itself schedule a worker or prove an external capability. GitHub and providers
+remain authoritative for current settings, identities, runs, state, cost, and
+consequences; HGI-309 owns any separately approved authenticated readback.
 
 The infrastructure drift control is
 [`alchemy-infrastructure-drift.control.json`](alchemy-infrastructure-drift.control.json).

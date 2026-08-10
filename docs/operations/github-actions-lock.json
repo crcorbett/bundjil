@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-08-10",
   "reviewTrigger": "workflow action, upstream release, security advisory, pin, approved location, or update-owner change",
   "actions": [
     {
@@ -13,11 +13,12 @@
         ".github/workflows/ci.yml",
         ".github/workflows/claude.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
       "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "updatedAt": "2026-08-10"
     },
     {
       "action": "actions/setup-node",
@@ -27,11 +28,12 @@
       "approvedWorkflows": [
         ".github/workflows/ci.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
       "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "updatedAt": "2026-08-10"
     },
     {
       "action": "oven-sh/setup-bun",
@@ -41,11 +43,12 @@
       "approvedWorkflows": [
         ".github/workflows/ci.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
       "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "updatedAt": "2026-08-10"
     },
     {
       "action": "changesets/action",

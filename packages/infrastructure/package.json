@@ -41,6 +41,7 @@
     "photon:bind-preview-webhook": "bun --conditions=@bundjil/source run scripts/bind-photon-preview-webhook.ts",
     "inventory:live": "bun --conditions=@bundjil/source run scripts/inventory-live.ts",
     "preview:drift": "bun --conditions=@bundjil/source run scripts/preview-configuration-drift.ts",
+    "production:deploy": "bun --conditions=@bundjil/source run scripts/automatic-production.ts",
     "report:drift": "bun --conditions=@bundjil/source run scripts/report-drift.ts",
     "vercel:git-link-authority": "bun --conditions=@bundjil/source run scripts/validate-vercel-git-link-authority.ts",
     "test": "vitest run && bun --conditions=@bundjil/source test test-alchemy"

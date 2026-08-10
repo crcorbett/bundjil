@@ -1,11 +1,11 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-effect-architecture-owner
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-07-26
+last_reviewed: 2026-08-10
 review_trigger: Effect version, language-service diagnostic, Oxlint plugin, runtime-state ownership, timing, collection, or eve-runtime-qualification integration change
 task_ledger: effect-native-runtime-patterns-and-lint-enforcement.tasks.json
 ---
@@ -14,10 +14,14 @@ task_ledger: effect-native-runtime-patterns-and-lint-enforcement.tasks.json
 
 ## Status and decision
 
-This SPEC is implementation-ready proposed intent. It authorises no runtime or
-lint change, deployment, provider mutation, credential operation, release,
-commit, push, or merge. An active execution plan must be created before future
-implementation starts.
+This SPEC is current implementation intent under
+`docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md`.
+Cooper's
+2026-08-10 delegated authority covers the exact runtime, lint, documentation,
+commit, push and merge work in its sibling ledger. Provider and Production
+authority remains governed separately by
+`automatic-production-and-operational-closeout.md`; repository lint success is
+not provider or deployment proof.
 
 Bundjil will strengthen Effect-native code through targeted migrations and four
 narrow lint rules:
@@ -48,37 +52,39 @@ domain-visible decisions:
 - one cohesive state value is used only when fields share an invariant and must
   transition atomically.
 
-No future implementation task may rewrite clear working code merely to increase
+No implementation task may rewrite clear working code merely to increase
 the count of Effect APIs.
 
 ## Exact evidence epoch
 
-| Evidence                          | Exact identity                                                                                                            | Use and claim limit                                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Bundjil draft                     | clean detached `main`/`origin/main` at `e92f8d2508dd927c09cb63eddb50c6ca09904b95`                                         | Canonical repository evidence for this draft only.                                                                     |
-| Bundjil Effect dependency         | lock-resolved `effect@4.0.0-beta.74`; `package.json:30-35`                                                                | The beta.74 API controls implementation until a separate upgrade changes it.                                           |
-| Site read-only comparison         | `/Users/cooper/Projects/site`; local `main` `ed4306f1`, existing `origin/main` `a827c7deb90f40b14abe225c4e460fe5c2e560ba` | Rule/config source comparison only; the four remote commits beyond local `main` do not alter the inspected lint files. |
-| Eve runtime integration candidate | `origin/codex/eve-runtime-qualification` at `238f0334a69b0d4b9cd1d449322c7f31195504be`                                    | Read-only future integration evidence, not current `main` and not authority to modify that branch.                     |
-| Effect primary current source     | `Effect-TS/effect-smol` local clean `main` at `1caab3cc30f626efbf15e59d74f539a487e5c85c`                                  | API-drift discovery only where it differs from beta.74.                                                                |
-| Research date                     | 2026-07-26                                                                                                                | External or provider actuality was not read and is not claimed.                                                        |
+| Evidence                    | Exact identity                                                                                                                              | Use and claim limit                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Bundjil implementation base | clean `main`/`origin/main` at `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`; implementation branch `codex/automatic-production-effect-runtime` | Canonical source inventory and starting identity; final proof must name the ending candidate.    |
+| Bundjil Effect dependency   | manifest `^4.0.0-beta.100`; lock/install resolve `effect@4.0.0-beta.101` and `@effect/vitest@4.0.0-beta.101`                                | The installed beta.101 API controls implementation until a dependency change reopens review.     |
+| Site read-only comparison   | `/Users/cooper/Projects/site`; local `main` `4f98b6c` is behind; inspected `origin/main` `dd5d015879a82630127adfe044e4352deff72332`         | Rule/config source comparison only; Site policy and exceptions are not Bundjil policy.           |
+| Eve runtime integration     | runtime/handoff/channel work is merged into current Bundjil main                                                                            | Current merged source, not the retired integration branch, controls every finding and migration. |
+| Bundjil lint/runtime tools  | Oxlint `1.61.0`, Effect language service `0.86.6`, Eve `0.29.5`                                                                             | Installed behaviour and fixtures control; package ranges alone are not proof.                    |
+| Research date               | 2026-08-10                                                                                                                                  | Provider actuality and the operational ledger remain separate claims.                            |
 
 ## Research method and source priority
 
 The investigation:
 
 1. inspected Bundjil's current architecture, READMEs, lint configuration,
-   language-service configuration, custom checks, source, tests, and proposed
-   runtime branch;
+   language-service configuration, custom checks, source, tests and merged
+   runtime owners;
 2. inspected Site's actual rule implementations, config scopes, exceptions,
    unit tests, and installed-Oxlint fixtures read-only;
 3. queried Executor Personal DeepWiki against `Effect-TS/effect-smol` for
    discovery; and
-4. reconciled every API decision against Bundjil's installed beta.74 source and
-   current upstream Effect source.
+4. reconciled every API decision against Bundjil's installed beta.101 source;
+   and
+5. re-read the merged Eve channel/runtime call graph rather than the retired
+   integration branch.
 
-DeepWiki is supporting discovery only. The pinned dependency, installed source,
-and primary upstream source control. Current upstream APIs that beta.74 does not
-expose are unresolved upgrade questions, not implementation instructions.
+DeepWiki is supporting discovery only. The lock-resolved installed source
+controls. Current upstream or Site APIs that beta.101 does not expose are
+unresolved upgrade questions, not implementation instructions.
 
 Primary references:
 
@@ -126,25 +132,21 @@ Primary references:
 | Runtime execution                | `apps/agent/agent/channels/sendblue.ts:1-8`, `apps/agent/agent/channels/photon.ts:1-8`, app scripts, and package scripts                                                                                                                        | Named app/runtime/CLI boundaries are allowed. `apps/agent/agent/tools/workspace_status.ts` and `apps/agent/agent/connections/executor.ts` are explicit audit targets because they execute Effects inside adapter callbacks. |
 | Helper sprawl                    | no `helper`, `helpers`, `util`, `utils`, or `common` directories under current `apps`, `packages`, `tooling`, or `lint`                                                                                                                         | Preserve through review and ownership policy; there is no current debt baseline that justifies a name heuristic.                                                                                                            |
 
-### Read-only Eve runtime branch targets
+### Merged Eve runtime targets
 
-The branch is not current `main`. Future implementation must integrate only
-after the runtime branch lands or is rebased, and must re-inventory the merged
-source rather than applying line-based edits blindly.
-
-| Branch evidence at `238f0334`                              | Finding and future action                                                                                                                                                                                                                                              |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/agent/agent/lib/channel/handoff.ts:27-80`, `122-160` | A named service owns acceptance observations, uses a test-only `Ref` capture, and reads time through Effect Clock. Preserve its safe boundary and review whether observation storage should remain a test concern rather than a production reactive state abstraction. |
-| `apps/agent/agent/lib/channel/dispatch.ts:53-141`          | Provider Promise ingress is correctly wrapped and timed, but the nested yielded `Effect.gen` at lines 87-122 is a concrete flat-flow review target after integration; do not pre-judge it independently of the configured language-service result.                     |
-| `apps/agent/test/channel-handoff.test.ts:31-104`           | Two observation Refs represent two deliberately independent environment/secret owners; do not collapse them. The local `Set` at lines 96-102 is a small uniqueness assertion, not a runtime collection migration.                                                      |
-| `apps/agent/test/channel-continuity.test.ts:18-69`         | The fixture decodes ordinary arrays, then assumes exactly six messages and three acceptances. `Schema.NonEmptyArray` alone would not prove those cardinalities; a tuple/exact-length contract or explicit fixture construction is the relevant migration.              |
-| Branch commit and completed qualification docs             | This SPEC follows the branch; it does not edit, supersede, or reactivate its completed proof.                                                                                                                                                                          |
+| Current-main owner                                                                                                   | Decision                                                                                                                                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/agent/agent/lib/channel/handoff.ts`                                                                            | Preserve the named service, Effect Clock ownership and test observation seam; no reactive-state conversion is justified.                                                                                   |
+| `apps/agent/agent/lib/channel/dispatch.ts`                                                                           | Flatten the nested yielded `Effect.gen` because the current language-service contract rejects nested generator ownership; preserve acceptance timeout, rejection mapping and sequential handoff semantics. |
+| `apps/agent/test/channel-handoff.test.ts`                                                                            | Preserve independent environment/secret observation Refs and the local uniqueness assertion. No state or collection migration is justified.                                                                |
+| `apps/agent/test/channel-continuity.test.ts`                                                                         | Preserve decoded arrays unless focused proof demonstrates a cardinality defect; a non-empty contract would not prove an exact count.                                                                       |
+| `apps/agent/agent/tools/workspace_status.ts`, `apps/agent/agent/connections/executor.ts`, channel framework adapters | Register only exact framework callbacks that must return Promises or eager values. Keep application execution out of services and require tested disposal for any managed runtime.                         |
 
 ## Research findings
 
 ### Deterministic time
 
-Bundjil beta.74 exposes `Clock.currentTimeMillis`; sleeps, timeouts, schedules,
+Bundjil beta.101 exposes `Clock.currentTimeMillis`; sleeps, timeouts, schedules,
 and retries are Clock-driven. `TestClock` controls those semantics with
 `adjust`, `setTime`, and `withLive`. The correct test shape is:
 
@@ -181,7 +183,7 @@ contention, or failure domains.
 ### Layer-owned shared state
 
 A stateful service must be created by its owning Layer, not a module-global
-mutable value. In beta.74 Layers are lazy, scoped, and memoized by Layer
+mutable value. In beta.101 Layers are lazy, scoped, and memoized by Layer
 identity:
 
 - reusing the same Layer value shares one acquired service/state instance;
@@ -226,7 +228,7 @@ transformations; use `Match` for a material decoded literal/tagged union. Use
 ordinary `if` composition when it is the clearest local presentation or
 sequential control flow.
 
-There is no `Effect.onNone` export in Bundjil's beta.74. Its
+There is no `Effect.onNone` export in Bundjil's beta.101. Its
 `Effect.fromOption` always fails with `NoSuchElementError`. Current upstream
 beta source adds a customizable `onNone` callback to `Effect.fromOption`; that
 API must not enter implementation guidance until Bundjil's dependency is
@@ -245,7 +247,7 @@ upgraded and re-researched.
 | v4 context reference                            | Use `Context.Reference`/`References` for dynamically scoped, fiber-local defaults.                                                                | Use a state service for shared mutable state.                                                                                                                                                                      | Do not specify removed v3 `FiberRef` APIs.                                                                    |
 | Atom vs Ref family                              | Use Atom only in a separately approved reactive UI/server-state surface with registry/cache/subscriber ownership.                                 | Use the Ref family for backend process state.                                                                                                                                                                      | Atom is rejected for current backend/runtime work; no `@effect-atom` dependency.                              |
 | `Option` vs decoded optional field              | `Option` owns internal absence and collection lookup.                                                                                             | A Schema optional field owns encoded/decoded boundary representation.                                                                                                                                              | Do not wrap every optional field in another `Option` after decoding without a service-contract reason.        |
-| `Option.match` / `Effect.fromOption` vs `Match` | Use `Option.match` for value branching; beta.74 `Effect.fromOption` only when `NoSuchElementError` is intentionally translated at the owner.      | Use `Match` for decoded closed unions; use ordinary `if` for clear local sequential/presentation composition.                                                                                                      | No nonexistent `Effect.onNone`; no global `switch` ban.                                                       |
+| `Option.match` / `Effect.fromOption` vs `Match` | Use `Option.match` for value branching; beta.101 `Effect.fromOption` only when its error is intentionally translated at the owner.                | Use `Match` for decoded closed unions; use ordinary `if` for clear local sequential/presentation composition.                                                                                                      | No nonexistent `Effect.onNone`; no global `switch` ban.                                                       |
 | One state record vs several Refs                | Use one immutable record when fields share invariants, atomic transitions, snapshots, serialization, and lifetime.                                | Separate independently owned lifetimes, contention, failure, observation, or environments.                                                                                                                         | Syntax adjacency is not proof. Require a transition table demonstrating torn-state risk before consolidation. |
 
 ## Boundary and service implications
@@ -409,8 +411,8 @@ classifications are not hidden implementation work.
 | `ENP-FND-003` — Runtime execution ownership is documented but not locally linted            | Current `run*`/`ManagedRuntime` inventory and Site `effect-rules.js:1168-1248`                                                      | Add one import-aware Bundjil rule with exact runtime/CLI/test/framework owners; reject Site's duplicate second rule.       | `ENP-REQ-005`, `ENP-REQ-006`, `ENP-REQ-007` | `refresh-integrated-inventory`, `add-narrow-lint-rules-disabled`, `migrate-targeted-effect-patterns`      |
 | `ENP-FND-004` — State/collection syntax does not prove domain semantics                     | Store memory positive exemplar, Codex test Map, adjacent independent counter/observation Refs, and exact-cardinality branch fixture | Use transition/semantic decision records and focused proof; do not add adjacency/native-collection/index/helper-name lint. | `ENP-REQ-003`, `ENP-REQ-004`, `ENP-REQ-007` | `refresh-integrated-inventory`, `review-state-and-collection-targets`                                     |
 | `ENP-FND-005` — Site's strict plugin is not a portable Bundjil baseline                     | Site's 33 exported IDs at `effect-rules.js:1552-1594`, broad base scope at `oxlint.config.ts:15-65`, and many path exceptions       | Copy/adapt four rules, reuse installed-plugin fixture design, and classify every other rule explicitly.                    | `ENP-REQ-006`, `ENP-REQ-010`                | `refresh-integrated-inventory`, `add-narrow-lint-rules-disabled`                                          |
-| `ENP-FND-006` — Effect v4 beta APIs drift across pinned and current source                  | beta.74 `Effect.fromOption` vs current upstream custom `onNone`; v4 `Context.Reference`; unstable Atom                              | Pin implementation decisions to the lock-resolved API and reopen research on dependency changes.                           | `ENP-REQ-003`, `ENP-REQ-004`, `ENP-REQ-009` | `refresh-integrated-inventory`, `review-state-and-collection-targets`, `enable-rules-and-reconcile-docs`  |
-| `ENP-FND-007` — The runtime branch adds concrete targets but is not current source          | `origin/codex/eve-runtime-qualification@238f0334` handoff, dispatch, and tests cited above                                          | Sequence after integration, refresh the inventory, preserve independent state and completed hosted proof.                  | `ENP-REQ-008`, `ENP-REQ-010`                | `refresh-integrated-inventory`, `migrate-targeted-effect-patterns`, `review-state-and-collection-targets` |
+| `ENP-FND-006` — Effect v4 beta APIs drift                                                   | Installed beta.101, package ranges, current upstream and Site can differ                                                            | Pin implementation decisions to installed beta.101 and reopen research on dependency change.                               | `ENP-REQ-003`, `ENP-REQ-004`, `ENP-REQ-009` | `refresh-integrated-inventory`, `review-state-and-collection-targets`, `enable-rules-and-reconcile-docs`  |
+| `ENP-FND-007` — The Eve runtime is now merged                                               | Current-main handoff, dispatch, runtime adapters and tests cited above                                                              | Use merged source, preserve completed hosted proof, and migrate only current direct findings.                              | `ENP-REQ-008`, `ENP-REQ-010`                | `refresh-integrated-inventory`, `migrate-targeted-effect-patterns`, `review-state-and-collection-targets` |
 
 ## Requirements
 
@@ -457,18 +459,17 @@ autofix.
 
 ### `ENP-REQ-007` — targeted migrations
 
-Future implementation migrates only current findings mapped to a concrete
+Implementation migrates only current findings mapped to a concrete
 failure mode. It preserves clear exemplars, genuine host boundaries, provider
 wire behaviour, persistent bytes/keys/TTLs, error tags, service identities, and
 test intent.
 
-### `ENP-REQ-008` — runtime branch sequencing
+### `ENP-REQ-008` — integrated runtime sequencing
 
-The `origin/codex/eve-runtime-qualification@238f0334` candidate is read-only.
-Implementation begins after its actual integration state is known, refreshes
-all citations/findings, and reviews handoff timing, nested flow, observation
-Refs, exact-cardinality fixtures, and Layer sharing without changing its
-accepted hosted proof by assumption.
+Implementation uses the exact merged source, refreshes every citation/finding,
+and reviews handoff timing, nested flow, observation Refs, exact-cardinality
+fixtures and Layer sharing without changing completed hosted proof by
+assumption.
 
 ### `ENP-REQ-009` — documentation and skills
 
@@ -495,16 +496,17 @@ The final accepted candidate runs the repository's required
 
 ### `ENP-REQ-012` — one terminal five-pass audit
 
-After all future implementation tasks are complete, run one mandatory audit in
-this order:
+After all implementation and operational-ledger tasks are complete, run one
+mandatory audit in this order:
 
-1. architecture, ownership, call graphs, and boundary provenance;
-2. Effect semantics, time, state, collections, Layers, concurrency, and scope;
-3. lint AST invariants, fixtures, exception staleness, migration findings, and
-   false positives;
-4. focused tests, adversarial proof, package checks, and terminal verification;
-5. docs, skills, READMEs, dead exceptions, helper cleanup, and lifecycle
-   closeout.
+1. Effect contracts, Schemas, branded boundaries, errors, Config and Layers;
+2. call graph, package/file ownership, exports, helper sprawl and dead paths;
+3. behaviour, replay/idempotency, workflows, tests, lint, typecheck and failure
+   paths;
+4. docs, SPECs, task ledgers, runbooks, authority registers and proof
+   consistency; and
+5. provider/deployment/secret safety, rollback, observability, live evidence
+   and explicit non-claims.
 
 A finding reopens its owning task, invalidates stale evidence, and requires the
 affected focused proof plus a new terminal audit after correction. Do not run
@@ -514,24 +516,24 @@ this five-pass audit after each task.
 
 The sibling ledger is the full machine-readable owner.
 
-| Requirement   | Direct observable and expected postcondition                                                                      | False green rejected                                             | Focused procedure / evidence owner                                           | Limitation                                               |
-| ------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `ENP-REQ-001` | Boundary audit and focused adapter tests show one owning decode/encode and decoded service types.                 | Typecheck or lint alone.                                         | `bun run check:boundaries`; affected provider tests; boundary owner receipt. | Repository proof, not provider actuality.                |
-| `ENP-REQ-002` | TestClock attempt/time/deadline traces complete without live waiting; exact host exceptions remain bounded.       | Fast CI, fixed sleep, or a Date comparison that happens to pass. | Lint fixtures and affected Clock tests; test owner receipt.                  | One tested schedule and virtual clock.                   |
-| `ENP-REQ-003` | Transition tables and concurrency tests show atomic cohesive state and independent owners remain separate.        | Counting Refs or passing sequential tests.                       | State-owner focused tests; Layer/transition receipt.                         | In-process state is not durable.                         |
-| `ENP-REQ-004` | Each migrated collection records the semantic property and order/absence/cardinality proof.                       | Fewer native constructors.                                       | Package tests and migration decision receipt.                                | No universal performance claim.                          |
-| `ENP-REQ-005` | Language service and focused call-graph review show no nested runtime/Effect execution or wrapper-only operation. | Pretty pipelines or lower line count.                            | `check:effect-setup`, lint rule, affected service tests.                     | Readability retains reviewer judgment.                   |
-| `ENP-REQ-006` | Each rule's unit and installed-Oxlint fixtures reject/accept exact syntax and stale exceptions fail.              | Testing visitor objects only or linting current source only.     | `bun run test:lint`; lint fixture receipt.                                   | AST rules are intentionally not type/data-flow complete. |
-| `ENP-REQ-007` | Finding inventory maps every edit to a named failure and preserves recorded wire/state fixtures.                  | Bulk formatter or codemod success.                               | Targeted package tests and compatibility receipt.                            | Untouched code is not re-proved.                         |
-| `ENP-REQ-008` | Refreshed merged-base inventory names exact final SHA and resolves each branch target.                            | Applying old branch line numbers.                                | Git identity/read-only diff plus affected agent checks.                      | Does not re-qualify hosted runtime.                      |
-| `ENP-REQ-009` | Docs-maintainer ledger has Change required, Preserve, or evidenced N/A for every surface and policy checks pass.  | Updating only AGENTS or only a README.                           | `bun run check:docs`, `bun run check:skills`; docs receipt.                  | Docs checks prove consistency, not runtime.              |
-| `ENP-REQ-010` | Ledger contains complete proof fields for every requirement and rule.                                             | Broad verification alone.                                        | PRD review and task-ledger parse.                                            | Traceability is not behaviour.                           |
-| `ENP-REQ-011` | Focused commands and final `bun run verification` pass on one exact candidate.                                    | Old green output or partial workspace checks.                    | Verification owner terminal receipt.                                         | No external/provider claim.                              |
-| `ENP-REQ-012` | One ordered five-pass receipt is newer than all dependency evidence; findings reopen owners.                      | Per-task ritual or pre-implementation review.                    | Terminal audit task and closeout receipt.                                    | Audit grants no deployment authority.                    |
+| Requirement   | Direct observable and expected postcondition                                                                      | False green rejected                                             | Focused procedure / evidence owner                                           | Limitation                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `ENP-REQ-001` | Boundary audit and focused adapter tests show one owning decode/encode and decoded service types.                 | Typecheck or lint alone.                                         | `bun run check:boundaries`; affected provider tests; boundary owner receipt. | Repository proof, not provider actuality.                  |
+| `ENP-REQ-002` | TestClock attempt/time/deadline traces complete without live waiting; exact host exceptions remain bounded.       | Fast CI, fixed sleep, or a Date comparison that happens to pass. | Lint fixtures and affected Clock tests; test owner receipt.                  | One tested schedule and virtual clock.                     |
+| `ENP-REQ-003` | Transition tables and concurrency tests show atomic cohesive state and independent owners remain separate.        | Counting Refs or passing sequential tests.                       | State-owner focused tests; Layer/transition receipt.                         | In-process state is not durable.                           |
+| `ENP-REQ-004` | Each migrated collection records the semantic property and order/absence/cardinality proof.                       | Fewer native constructors.                                       | Package tests and migration decision receipt.                                | No universal performance claim.                            |
+| `ENP-REQ-005` | Language service and focused call-graph review show no nested runtime/Effect execution or wrapper-only operation. | Pretty pipelines or lower line count.                            | `check:effect-setup`, lint rule, affected service tests.                     | Readability retains reviewer judgment.                     |
+| `ENP-REQ-006` | Each rule's unit and installed-Oxlint fixtures reject/accept exact syntax and stale exceptions fail.              | Testing visitor objects only or linting current source only.     | `bun run test:lint`; lint fixture receipt.                                   | AST rules are intentionally not type/data-flow complete.   |
+| `ENP-REQ-007` | Finding inventory maps every edit to a named failure and preserves recorded wire/state fixtures.                  | Bulk formatter or codemod success.                               | Targeted package tests and compatibility receipt.                            | Untouched code is not re-proved.                           |
+| `ENP-REQ-008` | Refreshed merged-base inventory names exact final SHA and resolves each branch target.                            | Applying old branch line numbers.                                | Git identity/read-only diff plus affected agent checks.                      | Does not re-qualify hosted runtime.                        |
+| `ENP-REQ-009` | Docs-maintainer ledger has Change required, Preserve, or evidenced N/A for every surface and policy checks pass.  | Updating only AGENTS or only a README.                           | `bun run check:docs`, `bun run check:skills`; docs receipt.                  | Docs checks prove consistency, not runtime.                |
+| `ENP-REQ-010` | Ledger contains complete proof fields for every requirement and rule.                                             | Broad verification alone.                                        | PRD review and task-ledger parse.                                            | Traceability is not behaviour.                             |
+| `ENP-REQ-011` | Focused commands and final `bun run verification` pass on one exact candidate.                                    | Old green output or partial workspace checks.                    | Verification owner terminal receipt.                                         | No external/provider claim.                                |
+| `ENP-REQ-012` | One ordered five-pass receipt is newer than all dependency evidence; findings reopen owners.                      | Per-task ritual or pre-implementation review.                    | Terminal audit task and closeout receipt.                                    | Missing live or replay oracles remain explicit non-claims. |
 
 ## Phased implementation and sequencing
 
-The sibling ledger owns exact dependencies. The future sequence is:
+The sibling ledger owns exact dependencies. The implementation sequence is:
 
 1. refresh the inventory on the actual integrated base and freeze rule
    invariants, scopes, exceptions, and fixtures;
@@ -545,12 +547,13 @@ The sibling ledger owns exact dependencies. The future sequence is:
 6. run focused package proof and terminal repository verification; and
 7. run the one terminal five-pass implementation audit.
 
-There is no active plan in this draft. Implementation must create one only when
-Cooper authorises implementation.
+The active owner is
+`docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md`.
+Its terminal audit also depends on the operational closeout ledger.
 
 ## Focused verification commands
 
-During future implementation, use the smallest affected subset first:
+During implementation, use the smallest affected subset first:
 
 ```bash
 bun run check:effect-setup
@@ -570,25 +573,15 @@ The exact package commands are conditional on changed owners. Provider proof,
 deployments, credentials, webhooks, and hosted operations are outside this SPEC
 and cannot be inferred from these commands.
 
-For this documentation-only draft, the acceptance commands are:
-
-```bash
-bun run fix
-bun run check:docs
-bun run check:skills
-bun run check
-git diff --check
-```
-
-`bun run verification` is the mandatory future implementation terminal gate,
-not a requirement for widening this draft into runtime validation.
+`bun run verification` is the mandatory implementation terminal gate. It does
+not replace focused rule, migration, provider, deployment or channel proof.
 
 ## Docs-maintainer impact ledger
 
 | Surface                          | Decision                                  | Earliest owner, future action, proof, and non-claim                                                                                                                                                                                                                 |
 | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Canonical SPEC/tasks/index       | Change required now                       | This SPEC, sibling ledger, and `docs/product-specs/index.md` own proposed intent and lifecycle. `check:docs` proves routing only.                                                                                                                                   |
-| Documentation audit              | Change required now                       | `docs/documentation-audit/HGI-307-impact-ledger.json` records the two new docs paths, count, and sorted-path digest while preserving the original accepted epoch and validation as historical evidence. Future authoritative path changes refresh it again.         |
+| Canonical SPEC/tasks/index       | Change required                           | This SPEC, sibling ledger, and `docs/product-specs/index.md` own current intent and lifecycle. `check:docs` proves routing only.                                                                                                                                    |
+| Documentation audit              | Preserve                                  | Historical documentation-audit packets remain immutable; current policy is proved by `bun run check:docs`.                                                                                                                                                          |
 | Effect architecture              | Change required during implementation     | `docs/architecture/effect-patterns.md` must own accepted Clock/TestClock, state/ref, collection, Layer, absence, and lint policy after code exists.                                                                                                                 |
 | Testing/quality architecture     | Change required during implementation     | `docs/architecture/testing-and-quality.md` must own exact rule IDs, fixtures, exception staleness, finding migration, focused commands, and terminal gate.                                                                                                          |
 | Other architecture               | Preserve; conditional Change required     | `docs/architecture/README.md`, `docs/architecture/repo-structure.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient unless implementation proves a missing owner.                                             |
@@ -604,10 +597,10 @@ not a requirement for widening this draft into runtime validation.
 | Schemas/services/Layers          | Targeted Change required                  | Only named migration targets; preserve decoded boundary types, service identities, safe errors, wire values, state bytes, and explicit live/mock Layers.                                                                                                            |
 | Tests/fixtures                   | Change required                           | Deterministic time, AST positive/negative, integration, state concurrency, cardinality, order, and exception-staleness fixtures.                                                                                                                                    |
 | Verification/evidence/research   | Preserve now; conditional Change required | `docs/verification/README.md`, `docs/evidence/README.md`, and `docs/research/README.md` change only if a critical journey, retained proof owner, or supporting research route changes; lint fixtures remain code-owned.                                             |
-| Standards/operations/runbooks    | Evidenced N/A now                         | `docs/standards/controls.md`, `docs/operations/**`, and `apps/{agent,codex-proxy}/runbooks/**` own automation/operations, but this SPEC authorises no automation or operation. Reclassify only if implementation changes a runtime command or control.              |
-| Active/completed execution plans | Preserve now                              | `docs/exec-plans/active/README.md` and `docs/exec-plans/completed/README.md` remain unchanged; create an active plan only after implementation authority and close it only after the terminal audit.                                                                |
-| Runtime branch history/evidence  | Preserve                                  | Refresh against its integrated state; do not rewrite completed proof or infer hosted actuality.                                                                                                                                                                     |
-| Provider/runbooks/authority      | Evidenced N/A                             | This SPEC grants no provider operation and changes no target-owned operational procedure.                                                                                                                                                                           |
+| Standards/operations/runbooks    | Preserve                                  | Operational automation and provider changes are owned by the separate automatic-Production SPEC; do not duplicate them here.                                                                                                                                        |
+| Active/completed execution plans | Change required                           | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                                        |
+| Runtime branch history/evidence  | Preserve                                  | Use merged current source; do not rewrite completed proof or infer hosted actuality.                                                                                                                                                                                |
+| Provider/runbooks/authority      | Preserve                                  | The automatic-Production SPEC and plan own provider/runbook/authority changes. This SPEC changes no target-owned procedure.                                                                                                                                         |
 | Frontend/browser/accessibility   | Evidenced N/A                             | Atom is rejected for backend use and no visible React/browser surface changes.                                                                                                                                                                                      |
 | Release/version/publication      | Evidenced N/A                             | No tag, package release, publication, deployment, commit, push, or merge.                                                                                                                                                                                           |
 
@@ -630,11 +623,11 @@ not a requirement for widening this draft into runtime validation.
   hosted behaviour merely to satisfy style.
 - Do not use raw Promise/timers inside Effect services, but do preserve a named
   host callback boundary when the framework contract requires it.
-- Do not claim current upstream beta APIs exist in pinned beta.74.
-- Do not modify `origin/codex/eve-runtime-qualification` or rerun its hosted
-  qualification.
-- Do not deploy, mutate providers, commit, push, merge, release, or implement
-  runtime/lint changes in this drafting task.
+- Do not claim current upstream or Site APIs exist in installed beta.101.
+- Do not modify the retired Eve integration branch or rerun its hosted proof as
+  a substitute for current evidence.
+- Do not treat lint, typecheck, or repository verification as provider or
+  Production proof; those claims remain in the operational ledger.
 
 ## Rejected alternatives
 
@@ -646,34 +639,33 @@ not a requirement for widening this draft into runtime validation.
 | Use only documentation/review                         | Ambient time, async/await escape, bare `tryPromise`, and runtime execution have narrow durable AST invariants worth automating.                    |
 | Enable rules before migration                         | Creates a debt baseline or broad suppression pressure and makes current false positives part of policy.                                            |
 | Autofix first                                         | Clock, error, Layer, state, and boundary choices change semantics; no proposed transformation is provably safe.                                    |
-| Start on the runtime branch                           | Violates exact-main drafting and risks conflicting with active integration work.                                                                   |
+| Reopen the retired runtime branch                     | Violates exact-main implementation and risks diverging from merged ownership.                                                                      |
 
 ## Open questions and upgrade triggers
 
-1. Does the final integrated runtime branch still contain the nested dispatch
-   generator and exact-cardinality fixtures cited here?
-2. Which `Date.now` tests are genuinely Effect-clock-owned after an exact
+1. Which `Date.now` tests are genuinely Effect-clock-owned after an exact
    assertion/call-graph review, and which are fixed/live host fixtures?
-3. Can the runtime-execution rule use only import-aware AST and exact config
+2. Can the runtime-execution rule use only import-aware AST and exact config
    scopes, or does Bundjil need a small checked owner registry for framework
    callbacks?
-4. Does a real provider service acquire replaceable resource state that
+3. Does a real provider service acquire replaceable resource state that
    justifies `ScopedRef`, or is ordinary Layer scope sufficient?
-5. Does any current consumer require `SubscriptionRef.changes`, or should the
+4. Does any current consumer require `SubscriptionRef.changes`, or should the
    type remain absent?
-6. After a future Effect upgrade, did `Effect.fromOption` gain the current
-   upstream custom `onNone` form, did reactivity leave `unstable`, and did
+5. After a future Effect upgrade, did `Effect.fromOption` gain a custom
+   upstream `onNone` form, did reactivity leave `unstable`, and did
    Stream collection return types change?
-7. Do future repeated review findings justify a typed compiler audit for
+6. Do future repeated review findings justify a typed compiler audit for
    non-empty/index or Layer exports? This SPEC does not pre-authorise one.
 
-## Draft acceptance
+## Implementation acceptance
 
-This artifact is implementation-ready when:
+This refreshed artifact is implementation-ready when:
 
 - its sibling JSON parses and every requirement maps to tasks and proof;
 - product-spec index lifecycle agrees;
 - PRD review has no unresolved blocking finding;
 - docs-maintainer records every surface above;
 - documentation-only checks pass; and
-- the worktree contains no runtime/lint implementation or provider mutation.
+- the active plan records the exact integrated inventory and PRD review result
+  before runtime/lint implementation begins.

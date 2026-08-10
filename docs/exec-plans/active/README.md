@@ -12,4 +12,7 @@ review_trigger: any active-plan admission, completion, or scope change
 Only execution plans for work that is currently in progress belong here.
 Accepted and superseded plans live in [`../completed`](../completed/).
 
-No execution plan is currently active.
+- [Automatic Production and operational closeout](automatic-production-and-effect-runtime.md) —
+  active exact-main deployment and channel-proof plan.
+- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
+  dependent four-rule, migration and terminal-audit plan.

@@ -42,6 +42,44 @@
       "nonClaim": "Local parity and source desired state do not prove a hosted run, token, check, or accepted candidate."
     },
     {
+      "id": "github-production",
+      "fixturePaths": [
+        ".github/workflows/production.yml",
+        "packages/infrastructure/test/automatic-production.test.ts",
+        "tooling/authority-policy-audit.test.ts"
+      ],
+      "state": "admitted",
+      "signal": "Successful same-repository push CI workflow_run for the exact main head SHA.",
+      "stateOwner": "GitHub run/concurrency/environment externally; Vercel immutable deployments and stable targets externally; task ledger and bounded receipts locally.",
+      "durableState": "One serialized non-cancelling writer, exact accepted SHA, two current/candidate/rollback deployment identities and stable target readback.",
+      "principal": "Ephemeral GitHub Actions job using exactly two Personal project-scoped Vercel tokens from the Production environment.",
+      "authorityOwner": "docs/operations/authority-register.json#github-production and the automatic Production SPEC.",
+      "operation": "Stage proxy and agent with domains skipped, validate both, re-read main, promote proxy then agent, verify stable targets and health, and roll back exact moved targets on failure.",
+      "resource": "The exact two Bundjil Personal Vercel projects, immutable deployments, stable Production targets and prior rollback deployments.",
+      "environment": "GitHub Production and Personal Vercel Production; Tilt is rejected.",
+      "duration": "One run, at most 30 minutes; queued newer work waits and in-flight work is never cancelled.",
+      "convergence": "Already-current is no-op; superseded candidate is stale no-op; success is exact two-target stable readback; partial failure restores recorded prior targets.",
+      "proof": "Exact source/CI/Production run, candidates, projects, readiness, stable target, health and rollback identities with secret-negative receipt.",
+      "stopping": "Stop on ineligible event, missing/widened credential, target/SHA/readiness mismatch, stale main, malformed output, health failure, rollback failure, leak or timeout.",
+      "escalation": "Repository owner, security/automation maintainer and Personal Vercel project owner.",
+      "rollback": "Restore exact prior deployment identities with readback; control rollback disables the workflow/environment and revokes the two tokens without enabling Vercel Git deployment.",
+      "acceptedOutcome": "Every accepted main push converges automatically to exact-SHA Production or an explicit no-op/failure with no unverified alias movement.",
+      "metrics": {
+        "acceptedOutcome": "Exact accepted main SHAs with two stable target readbacks.",
+        "falsePositive": "Green runs disproved by immutable/stable/source/health readback.",
+        "feedbackLatency": "Successful CI completion to stable Production readback.",
+        "synchronousHumanAttention": "Incident and rollback attention only; no normal promotion step.",
+        "workerDuration": "Serialized build, deployment, promotion and proof duration."
+      },
+      "publication": "Automatic Production mutation is limited to the exact two projects after successful CI; no repository, release, provider-channel or message publication.",
+      "reviewTrigger": "Workflow, CI name, event, project, token scope, command, Vercel API/CLI, alias, health, rollback, timeout, proof or cost change.",
+      "retirement": "Retire if the two projects are removed or a smaller platform-native control proves post-verification exact-SHA promotion and rollback.",
+      "externalReadback": "Personal project and deployment metadata available; GitHub environment/tokens and first hosted automatic run remain pending until desired source is merged.",
+      "carryingCost": "Two Vercel builds per accepted main SHA, GitHub worker duration, credential rotation, proof retention and incident risk.",
+      "selfFeedbackExcluded": true,
+      "nonClaim": "Repository fixtures do not prove GitHub custody, hosted execution, Vercel mutation, stable alias, model behaviour, channel delivery, handset typing or strict replay."
+    },
+    {
       "id": "github-infrastructure-drift",
       "fixturePaths": [
         ".github/workflows/infrastructure-drift.yml",

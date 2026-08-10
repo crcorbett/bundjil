@@ -273,3 +273,34 @@ export {
   VercelProjects,
   type VercelProjectsShape,
 } from "./services.js";
+export { ProductionDeploymentError } from "./production.errors.js";
+export {
+  makeProductionDeploymentsMemory,
+  ProductionDeploymentMemoryControl,
+  type ProductionDeploymentMemoryInput,
+  type ProductionDeploymentMemorySnapshot,
+  ProductionMemoryFailure,
+} from "./production-memory.layer.js";
+export {
+  ProductionDeploymentConfigLive,
+  ProductionDeploymentConfigService,
+  ProductionDeploymentsLive,
+} from "./production.live.layer.js";
+export {
+  AutomaticProductionReceipt,
+  type AutomaticProductionReceipt as AutomaticProductionReceiptType,
+  AutomaticProductionReceiptJson,
+  AutomaticProductionStatus,
+  InspectProductionDeployment,
+  ProductionDeployment,
+  type ProductionDeployment as ProductionDeploymentType,
+  ProductionDeploymentUrl,
+  ProductionProject,
+  ProductionProxyHealth,
+  StageProductionDeployment,
+} from "./production.schemas.js";
+export {
+  ProductionDeployments,
+  type ProductionDeploymentsShape,
+} from "./production.service.js";
+export { runAutomaticProduction } from "./production.js";

@@ -1,0 +1,339 @@
+---
+document_type: product-spec
+lifecycle: current
+authority: canonical
+owner: bundjil-product-owner
+implementation_owner: bundjil-security-automation-maintainer
+verification_owner: bundjil-verification-owner
+last_reviewed: 2026-08-10
+review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
+task_ledger: automatic-production-and-operational-closeout.tasks.json
+---
+
+# Automatic Production deployment and operational closeout
+
+## Status and accepted outcome
+
+This SPEC is current implementation intent for one automatic, fail-closed
+Production path from accepted `main`, followed by the bounded operational proof
+needed to close the remaining Production control and channel gaps.
+
+An accepted push is a `push` event for `refs/heads/main` whose exact SHA has a
+successful `CI` workflow run. A successful pull-request check, local
+verification, a Vercel build, or a newer neighbouring main run is not that
+acceptance. The exact accepted SHA must be checked out, staged, read back, and
+either promoted automatically or left unpromoted with a bounded failure.
+
+The accepted outcome is:
+
+1. direct Vercel Git deployment remains disabled for both projects;
+2. a separate GitHub `workflow_run` job reacts only to a successful same-repo
+   main-push `CI` run, serializes without cancellation, and uses the protected
+   `Production` environment;
+3. the job stages the proxy and agent as Production candidates with domain
+   assignment skipped, validates both immutable deployments against the exact
+   accepted SHA and current target identities, then promotes them;
+4. a stale SHA, failed build, malformed provider response, wrong project,
+   alias mismatch, failed health/readback, or partial promotion fails closed;
+5. partial promotion invokes the exact recorded rollback identities and proves
+   the restored aliases before the job exits failed;
+6. the Production proxy uses `gpt-5.6-terra`, context window `1050000`, and
+   reasoning effort `high`, with stable health and Eve behaviour proved
+   separately;
+7. the Preview Infrastructure Drift environment has exactly the three required
+   secret artifacts and one genuine hosted read-only passing receipt; and
+8. one bounded existing-conversation Photon test and one bounded established
+   Sendblue test record provider acceptance, Eve completion, dispatch,
+   delivery, handset result, and typing visibility as separate claims.
+
+This SPEC does not convert a workflow success, deployment `READY`, provider
+acceptance, or historical conversation into a stronger live claim.
+
+## Evidence epoch
+
+| Evidence                      | Current identity                                                                                                                                                                                                 | Claim limit                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Bundjil source                | clean `codex/automatic-production-effect-runtime` at `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`, tracking the same `origin/main`                                                                                 | Draft and implementation base only.                                                        |
+| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                               | Historical acceptance of the starting SHA, not future deployment proof.                    |
+| GitHub controls               | Admin principal `crcorbett`; no current main protection; `Production` and `infrastructure-read-only-preview` environments have no protection rules; the drift environment has zero secrets                       | Point-in-time metadata readback only.                                                      |
+| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200` | Current metadata observation; no mutation authority or future state.                       |
+| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                            | Current metadata observation; no mutation authority or future state.                       |
+| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                            | Proves only the observed stable health payload; it is the mismatch this SPEC must correct. |
+| Vercel configuration metadata | required Production model/context variables are not both present on the agent target and Production reasoning effort is absent on the proxy target; retained variables are encrypted or sensitive                | Metadata only; values were not read or retained.                                           |
+| Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                     | Desired/source and provider-link observation only.                                         |
+
+`observedAt` timestamps and sanitized fingerprints belong in the active plan and
+dated proof packet. Secret values, message content, phone identities, OAuth
+artifacts, provider DTOs, raw logs, and protected URLs never enter repository
+evidence.
+
+## Decision and alternatives
+
+### Accepted: post-CI GitHub deployment and promotion
+
+Add `.github/workflows/production.yml` with `workflow_run` on completed `CI`.
+The job runs only when all of these are true:
+
+- repository is exactly `crcorbett/bundjil`;
+- the triggering workflow conclusion is `success`;
+- its event is `push`;
+- its head branch is `main`;
+- its head repository is the same repository; and
+- the checked-out commit equals the workflow-run head SHA.
+
+The workflow has root `contents: read`, a bounded timeout, one repository-wide
+Production concurrency group with `cancel-in-progress: false`, checkout
+credentials disabled, exact pinned actions, and the `Production` environment.
+It uses two separate Vercel project-scoped tokens so compromise of one cannot
+write the other project. Team and project identities are exact non-secret
+configuration, not inferred from a directory, alias, or CLI session.
+
+The repository-owned Effect command is the sole deployment adapter. It uses
+Schema-derived SHA, team, project, deployment, URL, alias, state, and bounded
+receipt contracts; `Config.schema` with redacted tokens; named service
+operations; immediate CLI/API output decoding; safe tagged errors; explicit
+live and memory Layers; flat sequential Effects; and one application-boundary
+runtime execution. Raw CLI output, token values, provider DTOs, Promises, and
+native errors remain private to its live Layer.
+
+### Rejected: direct Vercel Git auto-deploy
+
+Direct auto-deploy moves the Production alias as soon as Vercel accepts the Git
+event. It cannot prove Bundjil's repository verification completed first and
+recreates the previously observed unsafe ordering. Both app configs keep
+`git.deploymentEnabled: false`, Vercel Git remains disconnected, and tests plus
+provider readback must reject drift.
+
+### Rejected for this slice: merge queue as the deployment gate
+
+A merge queue can bind required checks to a synthetic merge-group SHA, but it
+adds queue policy, merge-group workflow coverage, and another external setting
+without removing the need to verify and deploy the resulting exact main SHA.
+The repository currently has no branch protection or queue. The accepted
+workflow protects the Production boundary for direct accepted pushes and
+merges alike. A minimal main ruleset requiring pull requests and the existing
+CI check may be installed as a repository control, but the Production job must
+remain correct if an authorised administrator creates a direct main push.
+
+### Rejected: promotion inside the CI verification job
+
+The current CI control is deliberately secret-free and cancellable. Giving the
+same job Production secrets would mix read-only candidate proof with a
+non-cancellable writer and make stale-run cancellation unsafe after a partial
+promotion. The separate workflow preserves independent identities and
+concurrency semantics.
+
+## Production call graphs
+
+```text
+main push SHA
+  -> GitHub CI workflow
+     -> build
+     -> bun run verification
+  -> successful workflow_run event for the same push SHA
+     -> Production environment
+     -> @bundjil/infrastructure automatic-production command
+        -> ProductionDeployment service
+        -> ProductionDeployment.layerLive
+           -> project-scoped Vercel CLI/API boundary
+           -> stage proxy --prod --skip-domain
+           -> stage agent --prod --skip-domain
+           -> decode immutable deployment readback
+           -> verify current refs/heads/main freshness
+           -> promote proxy, then agent
+           -> stable alias and health/readback
+           -> Schema-encoded bounded receipt
+        -> on partial promotion
+           -> rollback recorded prior deployment(s)
+           -> stable alias restoration readback
+           -> failed bounded receipt
+```
+
+```text
+Tests
+  -> automatic-production orchestration
+  -> ProductionDeployment.layerMemory
+  -> candidate-ready, stale-main, malformed-output, wrong-project,
+     partial-promotion, rollback-success, rollback-failure and no-op fixtures
+```
+
+```text
+Channel proof
+  -> target-owned Photon or Sendblue runbook
+  -> exact established Personal conversation selected without typing an address
+  -> stable Production agent webhook
+  -> replay/continuity -> Eve -> Terra/high proxy
+  -> provider typing/send result
+  -> provider delivery readback
+  -> direct handset observation where available
+```
+
+## Requirements and acceptance checks
+
+### Automatic deployment control
+
+- `production.yml` must not run from pull requests, forks, failed/cancelled CI,
+  another workflow, another branch, or another repository.
+- The writer must never cancel in flight. A newly queued run waits. Immediately
+  before promotion, it re-reads current `refs/heads/main`; a superseded
+  candidate remains unpromoted and exits as an explicit stale no-op.
+- Staging uses `--prod --skip-domain`; no stable alias moves until both
+  candidates are `READY`, Production-targeted, exact-project, and exact-SHA.
+- A rerun for the already-current exact SHA is idempotent and performs no
+  deployment or promotion.
+- Promotion is proxy first, agent second. Any post-proxy failure restores the
+  recorded prior proxy deployment; any post-agent failure restores the prior
+  agent then prior proxy. Restoration must be read back before failure is
+  reported.
+- Success requires both stable targets to read back the exact candidate IDs and
+  exact source SHA. Immutable readiness and stable alias resolution are
+  separate assertions.
+- The command emits only a bounded Schema-encoded receipt. It must not print
+  tokens, environment values, raw provider responses, protected URLs, message
+  content, request bodies, profiles, ciphertext, OAuth material, or raw errors.
+
+Focused acceptance:
+
+```bash
+bun run --filter @bundjil/infrastructure check-types
+bun run --filter @bundjil/infrastructure test
+bun run check:authority
+bun run check:controls
+bun run check:verification
+bun run check:docs
+bun run check:skills
+```
+
+Hosted acceptance requires the merged exact main SHA's CI run, Production run,
+two staged deployment IDs, both stable target readbacks, stable proxy health,
+protected Eve model behaviour, the rollback identities, and zero manual
+promotion.
+
+### Credential and environment custody
+
+- Create two Vercel tokens through the Personal account, each scoped to exactly
+  one project. Store them only as GitHub `Production` environment secrets.
+- GitHub receives only token ciphertext. Local creation material uses a
+  mode-`0600` temporary directory, is never printed, and is deleted after
+  secret metadata readback.
+- Record token IDs or sanitized fingerprints and revocation owners, never token
+  values. Rollback can revoke either token independently and disable the
+  workflow/environment without altering Vercel runtime variables.
+- Keep the Production environment free of unrelated secrets. Exact secret and
+  variable names must be asserted by the authority control.
+
+### Infrastructure Drift closure
+
+- Populate `infrastructure-read-only-preview` with exactly:
+  `BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON`,
+  `BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE`, and
+  `BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON`.
+- The authority artifact must validate against the fixed harness envelope and
+  drift authority policy. The manifest must be the current accepted Preview
+  adoption manifest. The dotenv artifact must contain only the read-only state,
+  Vercel, and Photon bindings needed by the report command.
+- Dispatch one `Infrastructure Drift` run for the exact source that owns the
+  workflow. Acceptance requires the hosted job to pass, its source SHA to
+  match, the receipt to report zero provider writes, and every required
+  provider read to be available. A missing secret, blocking desired change,
+  unknown secret revision, skipped read, or provider unavailability is not a
+  pass.
+
+### Terra High Production correction
+
+- Set agent Production `BUNDJIL_CODEX_PROXY_MODEL=gpt-5.6-terra` and
+  `BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=1050000` as encrypted semantic
+  configuration.
+- Set proxy Production
+  `BUNDJIL_CODEX_PROXY_REASONING_EFFORT=high` as encrypted semantic
+  configuration.
+- Redeploy only through the accepted automatic main path. No manual candidate
+  promotion may be used as substitute proof.
+- Stable proxy `/health` must report `mode: live` and
+  `reasoningEffort: high`. A bounded protected Eve journey must report Terra and
+  context `1050000`, complete one turn, and correlate one proxy completion.
+  Health, configuration, Eve completion, and provider/model behaviour remain
+  separate receipt claims.
+
+### Channel proof
+
+- Reauthenticate Photon only in the Personal scope, then take a fresh
+  inventory before any message. Stop on Tilt scope, session ambiguity,
+  conversation ambiguity, or an unproved established conversation.
+- Use Computer Use to select the established conversation by visible history;
+  never infer, retain, or type a phone number. Send one deliberately
+  long-response test and observe typing start/stop directly if the handset UI
+  exposes it.
+- Run one deliberately long Sendblue response in the established Bundjil
+  conversation and directly observe typing start and stop if possible.
+- For each provider record separately: inbound/provider acceptance, Eve
+  acceptance/completion, proxy completion, outbound dispatch, provider
+  acceptance, provider delivery state, handset message result, typing-start
+  acceptance, typing-stop acceptance, and handset-visible animation.
+- If Photon exposes no supported candidate-specific replay oracle after fresh
+  inventory, preserve the limitation and the existing atomic replay,
+  continuity, no-blind-retry, single-message and provider-readback controls.
+  Do not add a custom content/log/time-window oracle and do not block unrelated
+  accepted work.
+
+## Rollback and recovery
+
+The automatic job records the exact prior Production deployment for each
+project before staging. Runtime rollback restores agent first then proxy when
+both aliases moved; it restores only proxy when agent never moved. Every
+rollback must read back the stable alias, deployment readiness, project and
+source identity. Do not roll back the newest fenced Codex profile generation or
+provider state.
+
+Control rollback disables `.github/workflows/production.yml`, revokes both
+project-scoped tokens, and reads back the GitHub environment. It does not
+re-enable direct Vercel Git deployment. Infrastructure Drift rollback deletes
+the three environment secrets and disables the workflow/environment; provider
+rollback is not applicable because the report has zero writes.
+
+Channel messages cannot be unsent. On an uncertain send, stop; do not retry.
+Revoke a temporary OAuth/session grant after the proof window where the target
+owner supports it. Provider callbacks, credentials, replay state, and stable
+deployments remain unchanged unless a separately accepted rollback requires a
+specific mutation.
+
+## Evidence and non-claims
+
+The active plan records exact SHA, actor, authority, timestamps, run IDs,
+deployment and rollback IDs, sanitized secret/token metadata, environment and
+project identities, expected and observed postconditions, limitations,
+non-claims, and evidence paths. Dated accepted proof belongs under
+`docs/verification/**` or `docs/evidence/verification/**`; the SPEC and runbooks
+must not become provider-state snapshots.
+
+No repository check proves GitHub settings, secret availability, hosted
+execution, Vercel deployment, stable alias, model behaviour, provider delivery,
+handset display, typing animation, or strict replay. No provider response grants
+authority. A missing live oracle is recorded as inconclusive or a non-claim,
+never promoted to success.
+
+## Documentation impact ledger
+
+| Surface                                       | Decision                                                                 | Earliest owner and evidence                                                                                                                                                            |
+| --------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workflow desired state                        | Change required                                                          | New `.github/workflows/production.yml`; current CI remains secret-free.                                                                                                                |
+| Workflow/provider authority                   | Change required                                                          | `docs/operations/authority-register.json`, `docs/operations/automation-register.md`, `docs/standards/automation-register.json`, `docs/standards/controls.md`, authority/control tests. |
+| Vercel deployment boundary                    | Change required                                                          | `@bundjil/infrastructure` provider service, script, Schemas, errors, live/memory Layers, tests and package README command map.                                                         |
+| Direct Vercel Git settings                    | Preserve                                                                 | Both app `vercel.json` files retain `git.deploymentEnabled: false`; provider Git connection remains absent.                                                                            |
+| Agent/proxy runbooks                          | Change required                                                          | `apps/agent/runbooks/deploy-promote.md` becomes automatic-main operation and rollback owner; proxy Production proof and runbook indexes point to it.                                   |
+| App/package READMEs                           | Change required only for supported command or boundary changes           | Infrastructure README adds the automatic command; app READMEs preserve public boundary unless command routing changes.                                                                 |
+| Architecture/testing                          | Change required                                                          | `docs/architecture/testing-and-quality.md` separates CI acceptance, automatic staging/promotion and live proof; repo structure changes only if the actual topology requires it.        |
+| Verification journey/proof                    | Change required                                                          | `docs/verification/README.md`, journey command map, exact proof packet and dated receipt.                                                                                              |
+| SPEC/tasks/plan/indexes                       | Change required                                                          | This SPEC/tasks, refreshed Effect SPEC/tasks, one active plan, product and plan indexes.                                                                                               |
+| Runtime/provider Schemas and channel services | Preserve unless a direct confirmed defect is found                       | No custom replay oracle or channel wrapper is admitted by this SPEC.                                                                                                                   |
+| Skills, AGENTS, root README                   | Preserve unless implementation exposes a durable route not already owned | Existing routes and authority split already cover this change.                                                                                                                         |
+| Fixtures                                      | Change required                                                          | Create workflow/authority negative fixtures and Production deployment live/memory fixtures; update exact Vercel packaging fixtures; retain existing Channel and drift fixtures.        |
+| Rollout and rollback evidence                 | Change required                                                          | Active plan plus dated Production packet; failed/inconclusive attempts retained outside current routes.                                                                                |
+
+## Dependencies and sequencing
+
+The sibling task ledger is serial. Repository desired state, focused checks and
+full verification must pass before GitHub/Vercel mutations. The workflow and
+provider command must land on main before their automatic behaviour can be
+proved. The Effect-native runtime and lint SPEC follows this operational slice;
+the single terminal five-pass audit runs only after both ledgers are complete.

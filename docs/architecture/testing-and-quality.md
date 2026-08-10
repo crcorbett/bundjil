@@ -185,6 +185,12 @@ bun run --filter @bundjil/agent preflight:production
 - Codex proxy app change: run `@bundjil/codex-proxy` check-types, tests,
   build, and smoke-test. Hosted deployment proof belongs in the deployment task
   and must verify isolated Preview before Production changes.
+- Automatic Production control change: run the infrastructure package tests,
+  authority, controls, documentation and verification-contract checks, then
+  root verification. Repository CI accepts an exact `main` SHA; the distinct
+  non-cancelling `Production` workflow may deploy that SHA only after the
+  successful CI `workflow_run`. A green CI run is not a deployment, and a
+  READY immutable candidate is not stable-alias or runtime proof.
 - Codex documentation task: update root, architecture, app, package, SPEC, and
   task-ledger docs as needed. Documentation-only verification must include
   stale-claim scans and `git diff --check`; run broader checks only when the
