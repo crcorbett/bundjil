@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/oxlintrc.json",
+  "jsPlugins": ["../oxlint-plugin.ts"],
+  "rules": {
+    "bundjil/no-ambient-time-in-effect": "error",
+    "bundjil/no-async-await-in-effect-service": "error",
+    "bundjil/no-runtime-execution-outside-boundary": "error",
+    "bundjil/require-try-promise-catch": "error"
+  }
+}

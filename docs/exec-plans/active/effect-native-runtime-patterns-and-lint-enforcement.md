@@ -48,10 +48,16 @@ task, so neither plan can close independently.
 
 The sibling JSON is authoritative. `refresh-integrated-inventory` completed
 after current-source review, JSON traceability, documentation policy and skill
-policy passed on 2026-08-10. Later slices run
-serially: lint rules disabled with fixtures; targeted migrations; state and
-collection Preserve review; zero-debt enablement and docs reconciliation; then
-the one terminal audit after the operational ledger is also complete.
+policy passed on 2026-08-10. `add-narrow-lint-rules-disabled` completed on the
+same date: the local plugin now exposes exactly the four accepted rules, exact
+host/runtime exceptions are count-checked for staleness, and `bun run
+test:lint` passed seven direct and installed-Oxlint tests across two test files.
+The positive installed fixture exited zero; the negative fixture exited
+non-zero and exposed all four stable `bundjil/*` diagnostic IDs. The rules
+remain disabled against repository source, so this receipt does not claim
+production enforcement. Later slices run serially: targeted migrations; state
+and collection Preserve review; zero-debt enablement and docs reconciliation;
+then the one terminal audit after the operational ledger is also complete.
 
 ## Evidence and non-claims
 

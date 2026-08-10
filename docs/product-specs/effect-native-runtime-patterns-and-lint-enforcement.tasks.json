@@ -400,7 +400,7 @@
     {
       "id": "add-narrow-lint-rules-disabled",
       "title": "Add the four narrow lint rules and fixtures while disabled for production source",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["refresh-integrated-inventory"],
       "description": "Extend the existing Bundjil Oxlint JavaScript plugin with import-aware rules, focused visitor tests, installed-Oxlint fixtures, and exact exception staleness without changing runtime code or enabling a debt baseline.",
       "implementationNotes": [
