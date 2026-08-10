@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-10
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -51,9 +51,20 @@ required provenance and frontend-composition policy is present in instruction
 surfaces. `bun run verification` is the standard closeout gate. It runs those
 policy checks, Ultracite, focused repository lint-rule tests, dependency
 hygiene, workspace typechecks, and tests. `bun run check` enables
-`bundjil/tagged-error-name` for app and package TypeScript; the rule rejects
-any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
-literal tag do not agree.
+`bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
+`tryPromise`, and runtime-ownership rules for their approved app/package
+scopes. `bundjil/tagged-error-name` rejects any `Schema.TaggedErrorClass` whose
+class declaration, generic self-type, and literal tag do not agree. The four
+Effect rule IDs and semantic guidance are owned by
+[`effect-patterns.md`](effect-patterns.md).
+
+`bun run test:lint` executes direct RuleTester coverage and invokes the
+installed Oxlint binary against exact positive and negative fixtures. The
+negative fixture must exit non-zero and expose every stable `bundjil/*` rule
+ID; the positive fixture must exit zero. Exact host/framework exception
+fixtures also prove occurrence-count staleness. A clean repository lint alone
+is not sufficient rule proof, and a visitor-only test does not prove installed
+plugin behavior.
 
 `bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command

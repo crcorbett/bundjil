@@ -490,7 +490,7 @@
     {
       "id": "enable-rules-and-reconcile-docs",
       "title": "Enable zero-debt rules and reconcile durable documentation",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "add-narrow-lint-rules-disabled",
         "migrate-targeted-effect-patterns",

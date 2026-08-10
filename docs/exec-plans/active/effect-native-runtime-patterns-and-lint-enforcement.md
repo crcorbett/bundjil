@@ -90,6 +90,35 @@ Codex testing map, request transcript captures and framework runtime bridges
 therefore retain their current owners. No state, collection, Atom, Option,
 Match, helper or package-topology edit was admitted.
 
+## Enablement and documentation receipt
+
+`enable-rules-and-reconcile-docs` completed on 2026-08-10. The ambient-time,
+object-form `tryPromise`, and runtime-ownership rules run at error across all
+app/package TypeScript. Async/await confinement runs at error across package
+`src`, agent service code, and codex-proxy `src`. Five host/SDK/framework files
+have exact async/await occurrence records; the drift/process and runtime
+exceptions remain exact path/symbol/count records. No warning level, numeric
+debt, broad ignore, inline suppression, autofix, second runner, or plugin
+package was introduced.
+
+The lint suite now passes ten tests across two files: direct positive/negative
+syntax branches, installed Oxlint positive/negative exits, stable diagnostic
+IDs, TestClock, a package-resolved `@effect/vitest` fixture, and stale exact
+exceptions. The first terminal attempt correctly stopped when Knip identified
+the package fixture as unreferenced; the integration owner now imports and
+executes that fixture, after which Knip and lint passed.
+
+`docs/architecture/effect-patterns.md` is the earliest durable owner for
+Clock/TestClock, state/collection decisions, rule scopes, and exception
+staleness. `docs/architecture/testing-and-quality.md` owns the installed
+fixture and command contract. The SPEC impact ledger records every other
+surface as delivered, Preserve, or evidenced N/A. Docs, skills, authority,
+controls, verification contracts, HGI, boundary fixtures, Effect setup,
+type-aware lint, Knip, all nine workspace typechecks, and all workspace tests
+passed. The repository `bun run verification` pass used only the same public
+synthetic Executor values as CI; it establishes no hosted provider or
+deployment claim.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

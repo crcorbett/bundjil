@@ -141,6 +141,10 @@ describe("bundjil/no-async-await-in-effect-service", () => {
             "import { Effect as Fx } from 'effect'; Fx.tryPromise({ try: async () => await fetch('/'), catch: () => new Error() });",
             "import { Effect } from 'effect'; Effect.tryPromise({ catch: () => new Error(), try: () => new Promise(() => undefined) });",
             "const program = Effect.gen(function* () { return yield* service.read; });",
+            {
+              code: "const acquire = async () => { await one(); await two(); await three(); }; const resolve = async () => undefined;",
+              filename: "/repo/packages/photon/src/client.ts",
+            },
           ],
           invalid: [
             {
@@ -154,6 +158,11 @@ describe("bundjil/no-async-await-in-effect-service", () => {
             {
               code: "const value = new Promise(() => undefined);",
               errors: [{ messageId: "noPromise" }],
+            },
+            {
+              code: "const acquire = async () => { await one(); };",
+              filename: "/repo/packages/photon/src/client.ts",
+              errors: [{ messageId: "staleException" }],
             },
           ],
         }

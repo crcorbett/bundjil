@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-10
 review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
@@ -38,12 +38,18 @@ runtime config, or provider boundaries:
 - `Schema.TaggedErrorClass` or `Data.TaggedError` for expected failures.
 - `Context.Service` and `Layer` for dependency-injected operations.
 - `Config` and `ConfigProvider` for runtime config.
-- `Effect.tryPromise` for Promise or SDK calls.
+- Object-form `Effect.tryPromise({ try, catch })` for Promise or SDK calls,
+  with rejection mapped at the owning boundary.
+- `Clock.currentTimeMillis`, `Effect.sleep`, schedules, and timeouts for
+  runtime time so `TestClock` can control Effect-owned tests.
 - `Effect.fn` and `Effect.withSpan` for named operations that need readable
   traces.
 - `Match`, `Result`, and `Exit` for tagged branching and program outcomes.
-- Effect collection modules such as `Array`, `Chunk`, `HashMap`, `HashSet`,
-  and `Record` when transforming data in Effect-owned code.
+- Effect collection modules such as `Chunk`, `HashMap`, and `HashSet` when
+  persistent concatenation, Effect equality/hash, typed lookup absence, or
+  set algebra materially carries the domain. Ordinary immutable arrays,
+  records, and local native collections remain valid when those semantics do
+  not apply.
 
 Do not introduce Zod, local DTO mirrors, raw `unknown` readers, or hand-written
 success/error unions when an owning Effect Schema or tagged error can express
@@ -88,8 +94,9 @@ For every operation:
 2. Encode the outbound provider request with `Schema.encodeEffect` or the
    framework-native `HttpClient` Schema body API immediately before the call.
    Keep `typeof Contract.Encoded` inside the adapter.
-3. Wrap only the Promise call with `Effect.tryPromise` and map raw failure once
-   to an owner-named, safe `Schema.TaggedErrorClass` failure.
+3. Wrap only the Promise call with object-form
+   `Effect.tryPromise({ try, catch })` and map raw failure once to an
+   owner-named, safe `Schema.TaggedErrorClass` failure.
 4. Decode the complete provider response immediately with
    `Schema.decodeUnknownEffect`; use `Schema.decodeEffect` instead when the SDK
    statically returns the codec's `Encoded` type.
@@ -180,6 +187,24 @@ services return Effects and depend on service tags. Keep live Layer composition
 in `*.layer.ts` or the executable composition root rather than constructing it
 inside operations.
 
+Runtime time follows the same ownership rule. Read the current epoch through
+`Clock.currentTimeMillis`, then construct `Date` from that explicit value only
+at the formatting boundary. Tests of sleeps, retries, schedules, deadlines or
+timeouts fork the lazy Effect, use `TestClock.adjust` or `TestClock.setTime`,
+then join or inspect the Fiber. Fixed decoded epochs are appropriate for
+fixtures that merely need a valid future timestamp. Host `Date.now`, raw
+timers and `TestClock.withLive` are reserved for exact registered process or
+framework proofs; they are not a shortcut around deterministic test time.
+
+Choose state and collections by their observable semantics. Use one cohesive
+immutable Ref value only when fields share an invariant and must transition
+atomically. Keep independent Refs for independent observation or lifetime;
+use `SynchronizedRef` for serialized or effectful transitions,
+`SubscriptionRef` for a real subscriber stream, and `ScopedRef` for a
+replaceable resource. Use `Schema.NonEmptyArray` only for an at-least-one
+boundary, not as proof of exact cardinality. Atom is not a backend runtime
+state primitive.
+
 ## Helper Admission
 
 Helper sprawl is an architecture failure, not merely a style preference. Keep
@@ -230,9 +255,21 @@ namespace clearing as a coordination or recovery mechanism.
 ## Static Analysis
 
 `bun run check` runs the root Ultracite/Oxlint formatting and type-aware lint
-configuration. `bun run knip` enforces dead-code, export, file, and dependency
-hygiene. Package/app typechecks and the configured Effect language service are
-also required.
+configuration. In app/package TypeScript, the local plugin rejects ambient
+time, bare or catchless `Effect.tryPromise`, and runtime execution outside
+named edges. In package `src`, agent service code, and codex-proxy `src`, it
+also confines `async`, `await`, and `new Promise` to direct Effect Promise
+ingress callbacks. The stable rule IDs are
+`bundjil/no-ambient-time-in-effect`,
+`bundjil/no-async-await-in-effect-service`,
+`bundjil/require-try-promise-catch`, and
+`bundjil/no-runtime-execution-outside-boundary`. Exact process/framework
+exceptions live in the plugin as path, symbol, and occurrence-count records;
+removing or adding a matching occurrence fails lint as stale or unexplained.
+
+`bun run knip` enforces dead-code, export, file, and dependency hygiene.
+Package/app typechecks and the configured Effect language service are also
+required.
 
 Do not weaken the root lint config, add broad suppressions, introduce unsafe
 casts, or expand ignore patterns to land a change. A narrow suppression needs

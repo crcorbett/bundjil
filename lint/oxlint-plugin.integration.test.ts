@@ -2,6 +2,8 @@ import { spawnSync } from "node:child_process";
 
 import { describe, expect, it } from "vitest";
 
+import { deterministicEffectNativeVitestFixture } from "../packages/codex/test/fixtures/effect-native-vitest-positive.js";
+
 const runFixture = (fixture: string) => {
   const child = spawnSync(
     "bunx",
@@ -23,6 +25,23 @@ const runFixture = (fixture: string) => {
 describe("installed Bundjil Oxlint plugin", () => {
   it("accepts the exact positive fixture", () => {
     const result = runFixture("lint/fixtures/effect-native-positive.ts");
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain("bundjil(");
+  });
+
+  it("accepts the Effect TestClock fixture through installed Oxlint", () => {
+    const result = runFixture(
+      "lint/fixtures/effect-native-test-clock-positive.ts"
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain("bundjil(");
+  });
+
+  it("accepts the package-resolved @effect/vitest fixture", () => {
+    expect(deterministicEffectNativeVitestFixture).toBeDefined();
+    const result = runFixture(
+      "packages/codex/test/fixtures/effect-native-vitest-positive.ts"
+    );
     expect(result.exitCode).toBe(0);
     expect(result.output).not.toContain("bundjil(");
   });

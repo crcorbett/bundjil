@@ -227,6 +227,29 @@ export const ambientTimeExceptions = [
   },
 ] as const satisfies readonly ExactException[];
 
+export const asyncAwaitExceptions = [
+  {
+    pathSuffix: "packages/photon/src/client.ts",
+    expected: { async: 2, await: 3 },
+  },
+  {
+    pathSuffix: "apps/agent/agent/lib/channel/eve.ts",
+    expected: { async: 1, await: 1 },
+  },
+  {
+    pathSuffix: "apps/agent/agent/connections/executor.ts",
+    expected: { async: 1, await: 1 },
+  },
+  {
+    pathSuffix: "apps/codex-proxy/src/vercel.ts",
+    expected: { async: 3, await: 3 },
+  },
+  {
+    pathSuffix: "apps/codex-proxy/src/dev.ts",
+    expected: { await: 1 },
+  },
+] as const satisfies readonly ExactException[];
+
 export const runtimeExecutionExceptions = [
   {
     pathSuffix: "apps/agent/agent/channels/photon.ts",
@@ -482,12 +505,21 @@ export const noAmbientTimeInEffectRule = {
 export const noAsyncAwaitInEffectServiceRule = {
   create(context: RuleContext) {
     const tracker = createEffectTracker();
+    const exceptions = createExactExceptionTracker(
+      context,
+      asyncAwaitExceptions
+    );
+    const report = (node: AstNode, key: string, messageId: string) => {
+      if (!exceptions.accepts(key)) {
+        context.report({ messageId, node });
+      }
+    };
     const reportAsync = (node: AstNode) => {
       if (
         node.async === true &&
         !isAllowedPromiseBoundaryFunction(node, tracker)
       ) {
-        context.report({ messageId: "noAsync", node });
+        report(node, "async", "noAsync");
       }
     };
 
@@ -495,7 +527,7 @@ export const noAsyncAwaitInEffectServiceRule = {
       ArrowFunctionExpression: reportAsync,
       AwaitExpression(node: AstNode) {
         if (!isInsideAllowedPromiseBoundary(node, tracker)) {
-          context.report({ messageId: "noAwait", node });
+          report(node, "await", "noAwait");
         }
       },
       FunctionDeclaration: reportAsync,
@@ -509,8 +541,11 @@ export const noAsyncAwaitInEffectServiceRule = {
           node.callee.name === "Promise" &&
           !isInsideAllowedPromiseBoundary(node, tracker)
         ) {
-          context.report({ messageId: "noPromise", node: node.callee });
+          report(node.callee, "new Promise", "noPromise");
         }
+      },
+      "Program:exit"(node: AstNode) {
+        exceptions.verify(node);
       },
     };
   },
@@ -526,6 +561,8 @@ export const noAsyncAwaitInEffectServiceRule = {
         "Compose service work with Effect; await is allowed only inside the direct Promise ingress callback.",
       noPromise:
         "Use Effect.async, Effect.promise or object-form Effect.tryPromise at the owning adapter boundary.",
+      staleException:
+        "Async/await exception {{key}} is stale: expected {{expected}} occurrence(s), observed {{observed}}.",
     },
     type: "problem",
   },
