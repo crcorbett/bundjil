@@ -51,6 +51,8 @@ const encodeUnknownJson = Schema.encodeUnknownSync(
 const renderForLeakCheck = (value: unknown) =>
   `${String(value)} ${encodeUnknownJson(value)}`;
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+
 const streamBytes = (...parts: readonly (string | Uint8Array)[]) =>
   Stream.make(
     ...parts.map((part) =>
@@ -613,7 +615,10 @@ it.effect(
   () =>
     Effect.gen(function* testUpstreamStatusFailure() {
       const subject = yield* fixtureSubject;
-      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const profile = yield* makeProfile(
+        subject,
+        validProfileExpiryEpochMillis
+      );
       const request = yield* openAIRequest;
       const input = yield* Schema.decodeUnknownEffect(CodexDirectProviderInput)(
         {

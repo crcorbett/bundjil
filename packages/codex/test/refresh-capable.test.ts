@@ -39,6 +39,9 @@ import {
   CodexOAuthMemory,
 } from "../src/testing/index.js";
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+const fixtureUpdatedAtEpochMillis = 1_700_000_000_000;
+
 const subject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
   principal: {
@@ -69,7 +72,7 @@ const makeProfile = (
     accessToken: overrides.accessToken ?? "access-token-old-secret",
     refreshToken: overrides.refreshToken ?? "refresh-token-old-secret",
     expiresAtEpochMillis:
-      overrides.expiresAtEpochMillis ?? Date.now() + 3_600_000,
+      overrides.expiresAtEpochMillis ?? validProfileExpiryEpochMillis,
     accountId: overrides.accountId ?? "account-personal-secret",
     protocolScopeVersion: "codex-cli-rs-v1",
     scopes: ["openid", "offline_access"],
@@ -99,8 +102,8 @@ const makeRefreshResult = (
       ? {}
       : { accountId: overrides.accountId }),
     expiresAtEpochMillis:
-      overrides.expiresAtEpochMillis ?? Date.now() + 3_600_000,
-    updatedAtEpochMillis: Date.now(),
+      overrides.expiresAtEpochMillis ?? validProfileExpiryEpochMillis,
+    updatedAtEpochMillis: fixtureUpdatedAtEpochMillis,
   });
 
 it.effect(
@@ -463,7 +466,7 @@ it.effect("refuses legacy access-import profiles in refresh-capable mode", () =>
       profileKind: "access-token-import",
       subject: value,
       accessToken: "legacy-access-token-secret",
-      expiresAtEpochMillis: Date.now() + 60_000,
+      expiresAtEpochMillis: validProfileExpiryEpochMillis,
       scopes: [],
       createdAtEpochMillis: 1,
       updatedAtEpochMillis: 1,

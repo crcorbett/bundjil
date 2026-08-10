@@ -430,7 +430,7 @@
     {
       "id": "migrate-targeted-effect-patterns",
       "title": "Migrate deterministic timing, Promise ingress, and runtime execution targets",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["add-narrow-lint-rules-disabled"],
       "description": "Apply only inventory-approved migrations for Clock/TestClock, Promise boundaries, and runtime execution while preserving services, provider contracts, and runtime behaviour.",
       "implementationNotes": [
@@ -458,7 +458,7 @@
     {
       "id": "review-state-and-collection-targets",
       "title": "Review and migrate only evidence-backed state and collection targets",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns"

@@ -59,6 +59,8 @@ import {
   toCodexProxyVercelRequest,
 } from "../src/index.js";
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+
 const codexHttpClientTestLayer = (client: HttpClient.HttpClient) =>
   Layer.effect(CodexHttpClient, makeCodexHttpClient).pipe(
     Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
@@ -426,7 +428,7 @@ const withLocalTestHandler = <A>(
       CodexProxyLocalProfileStoreDirectory
     )(directory);
     const config = yield* localTestConfig(localProfileStoreDirectory);
-    const profile = yield* makeLocalProfile(Date.now() + 60_000);
+    const profile = yield* makeLocalProfile(validProfileExpiryEpochMillis);
 
     yield* putProfile(profile).pipe(
       Effect.provide(makeLocalEncryptedProfileStore(localProfileStoreDirectory))
@@ -545,7 +547,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             provider: "codex",
           },
         });
-        const profile = yield* makeLiveProfile(Date.now() + 60_000);
+        const profile = yield* makeLiveProfile(validProfileExpiryEpochMillis);
         let captured: typeof CodexResponsesRequest.Type | undefined;
         const httpClient = codexHttpClientTestLayer(
           HttpClient.make((request) =>
@@ -1055,7 +1057,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
   it.effect(
     "streams an imported access-only live profile through mocked fetch",
     () =>
-      withLiveTestHandler(Date.now() + 60_000, (handler) =>
+      withLiveTestHandler(validProfileExpiryEpochMillis, (handler) =>
         Effect.gen(function* testImportedLiveProfileStream() {
           const response = yield* Effect.promise(() =>
             handler(chatCompletionRequest("Bearer test-internal-token"))

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Inspectable, Layer, Schema } from "effect";
+import { TestClock } from "effect/testing";
 import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
@@ -27,6 +28,7 @@ const secondPhone = "+14155550299";
 const sourceFirstUserId = "10d6d04f-f9fa-4a7b-9c97-37c9c90ce91c";
 const sourceSecondUserId = "20d6d04f-f9fa-4a7b-9c97-37c9c90ce91c";
 const previewUserId = "30d6d04f-f9fa-4a7b-9c97-37c9c90ce91c";
+const inventoryObservationEpochMilliseconds = 1_753_401_600_000;
 
 const fingerprint = (value: string) =>
   PhotonIdentityFingerprint.make(
@@ -130,6 +132,7 @@ it.effect(
       });
 
       const selectedCandidateFingerprint = fingerprint(secondPhone);
+      yield* TestClock.setTime(inventoryObservationEpochMilliseconds);
       const receipt = yield* Effect.gen(function* () {
         const inventory = yield* PhotonCandidateInventory;
         return yield* inventory.captureCandidateInventory(
@@ -140,6 +143,7 @@ it.effect(
       }).pipe(Effect.provide(candidateRuntime(client)));
 
       assert.strictEqual(receipt.matching, true);
+      assert.strictEqual(receipt.observedAt, "2025-07-25T00:00:00.000Z");
       assert.strictEqual(
         receipt.firstManifestDigest,
         receipt.secondManifestDigest

@@ -59,6 +59,37 @@ production enforcement. Later slices run serially: targeted migrations; state
 and collection Preserve review; zero-debt enablement and docs reconciliation;
 then the one terminal audit after the operational ledger is also complete.
 
+## Targeted migration receipt
+
+`migrate-targeted-effect-patterns` completed on 2026-08-10. Photon candidate
+inventory now reads `Clock.currentTimeMillis`; its focused test fixes
+`TestClock`, asserts the exact encoded observation timestamp and retains the
+provider-read and fingerprint contracts. Effect-owned Codex and proxy profile
+fixtures use named fixed epochs instead of host time. The Eve dispatch owner is
+one flat `tryPromise`/decode/handoff Effect under the existing acceptance
+timeout, rejection mapping and timeout branch.
+
+The disabled production rules reported zero findings across 330 app/package
+files for ambient time, object-form `tryPromise` and runtime execution. The
+service-source async/await rule reported zero across 306 files. The only
+ambient-time findings left in source are the registered subprocess deadline
+proof and drift CLI process receipt; the only non-generic runtime owners are
+the exact registered Eve/framework adapters. Focused tests passed 117
+assertions, then complete owner tests and type checks passed: Photon 41, Codex
+115, codex-proxy 41 and agent 80. The agent build/test requires the same public
+synthetic Executor CI configuration as repository CI; an unconfigured first
+invocation stopped at `ExecutorConfigError: loadEndpoint`, and the configured
+rerun passed. `check:effect-setup` and `check:boundaries` passed.
+
+`review-state-and-collection-targets` also completed as a Preserve decision.
+No candidate demonstrated a torn shared invariant, replaceable resource,
+subscriber, Effect equality/hash requirement, exact non-empty cardinality, or
+measured persistent-concatenation need. The store's
+`SynchronizedRef<HashMap<...>>`, the channel observation Refs, decoded arrays,
+Codex testing map, request transcript captures and framework runtime bridges
+therefore retain their current owners. No state, collection, Atom, Option,
+Match, helper or package-topology edit was admitted.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { Config, Context, Effect, Layer, Schema } from "effect";
+import { Clock, Config, Context, Effect, Layer, Schema } from "effect";
 import { HttpClient } from "effect/unstable/http";
 
 /* oxlint-disable max-classes-per-file -- The owner service and its operation-specific safe error share one bounded contract file. */
@@ -378,12 +378,13 @@ export const layerPhotonCandidateInventoryLive = Layer.effect(
           });
         }
 
+        const observedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
         return PhotonCandidateInventoryReceipt.make({
           firstManifestDigest,
           manifest: first,
           matching: true,
           observedAt: PhotonCandidateInventoryObservedAt.make(
-            new Date().toISOString()
+            new Date(observedAtEpochMilliseconds).toISOString()
           ),
           secondManifestDigest,
           selectedCandidateFingerprint: input.selectedCandidateFingerprint,
