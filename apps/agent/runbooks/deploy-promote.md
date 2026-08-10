@@ -49,7 +49,7 @@ HEAD`, and a readback of `origin/main`.
 
 | Field               | Required value                                                                                                                                                          |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Identity            | Exact GitHub workload plus two Personal project-scoped Vercel credentials, or an authenticated emergency operator and approver                                          |
+| Identity            | Exact GitHub workload plus two separately revocable Personal-scope Vercel credentials in project-bound steps, or an authenticated emergency operator and approver       |
 | Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                              |
 | Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                         |
 | Environment         | Explicit Vercel Preview or Production target                                                                                                                            |

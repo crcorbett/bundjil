@@ -7,7 +7,7 @@
     "Deploy only an exact successful main CI SHA and never let Vercel Git move Production before repository verification.",
     "Stage both candidates without domains, decode provider output once, then promote with exact rollback identities.",
     "Keep CI verification secret-free and the non-cancellable Production writer in its own workflow and environment.",
-    "Use two project-scoped Vercel tokens, read before write, and retain only sanitized fingerprints and metadata.",
+    "Use two separately revocable Personal-scope Vercel tokens in exact project-bound steps, read before write, and retain only sanitized fingerprints and metadata; do not claim unavailable provider-enforced project scope.",
     "Keep repository, CI, deployment, alias, model, provider, delivery and handset claims separate.",
     "Do not invent a Photon replay oracle or retry an uncertain message."
   ],
@@ -52,7 +52,7 @@
       "title": "Implement the exact-SHA automatic Production workflow and Effect deployment boundary",
       "status": "completed",
       "dependsOn": ["freeze-production-control-inventory"],
-      "description": "Add the separate post-CI Production workflow, project-scoped Config contract, Schema-decoded Vercel CLI/API service, live/memory Layers, fail-closed orchestration, bounded receipt and complete negative fixture matrix.",
+      "description": "Add the separate post-CI Production workflow, project-bound Config contract, Schema-decoded Vercel CLI/API service, live/memory Layers, fail-closed orchestration, bounded receipt and complete negative fixture matrix.",
       "mandatoryVerification": [
         "The workflow accepts only same-repo successful main push CI workflow_run events, checks out the exact head SHA, uses contents read, Production environment, exact pins, checkout credentials false, a bounded timeout and non-cancelling Production concurrency.",
         "CI remains secret-free and cancellable; direct Vercel Git deployment remains disabled in both app configs and provider Git linkage remains absent.",
@@ -77,10 +77,10 @@
       "title": "Configure bounded GitHub and Vercel identities and close Infrastructure Drift",
       "status": "pending",
       "dependsOn": ["implement-automatic-production-control"],
-      "description": "After repository desired state is reviewed and pushed, create two Personal project-scoped Vercel tokens, bind only their ciphertext to the Production environment, install the minimal main ruleset, provision the three exact drift artifacts, dispatch one read-only drift run and retain sanitized readback.",
+      "description": "After repository desired state is reviewed and pushed, create two separately revocable Personal-scope Vercel tokens for the exact agent and proxy project steps, bind only their ciphertext to the Production environment, install the minimal main ruleset, provision the three exact drift artifacts, dispatch one read-only drift run and retain sanitized readback. Vercel does not currently enforce individual Personal-project token scope, so exact project configuration and decoded readback are mandatory residual controls.",
       "mandatoryVerification": [
         "Read GitHub and Personal Vercel identity immediately before every write and stop on Tilt or project ambiguity.",
-        "Create one Vercel token scoped only to the agent project and one scoped only to the proxy project; record token IDs/fingerprints and revocation owners without values.",
+        "Create one separately revocable Personal-scope Vercel token for the agent project step and one for the proxy project step; record token IDs/fingerprints, the unavailable provider-enforced project scope, and revocation owners without values.",
         "Production environment secret and variable inventories contain exactly the accepted deployment bindings and no unrelated credential.",
         "Main ruleset requires pull requests and the existing CI verification context without a human Production approval step; read back the exact ruleset and bypass actors.",
         "Drift authority, manifest and dotenv artifacts validate locally, are stored only as the three exact environment secrets, and temporary plaintext is removed.",
@@ -89,7 +89,7 @@
       ],
       "proofContract": {
         "directObservable": "GitHub environment/ruleset metadata, Vercel token metadata and a successful hosted drift receipt match the exact accepted source and targets.",
-        "expectedPostcondition": "Hosted automation has least-privilege credentials and the Preview drift loop is genuinely operable read-only.",
+        "expectedPostcondition": "Hosted automation uses the least scope Vercel currently exposes plus exact project-bound residual controls, and the Preview drift loop is genuinely operable read-only.",
         "falseGreenRejected": "Secret names in YAML, a local drift command, token creation, or a green unrelated run treated as current hosted proof.",
         "evidenceOwner": "Dated GitHub/Vercel/drift bounded receipt",
         "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
@@ -153,7 +153,7 @@
     "No direct Vercel Git auto-deploy or alias movement before main verification.",
     "No manual Production approval or promotion in the accepted automatic path.",
     "No merge-queue rollout in this slice.",
-    "No broad Vercel account token where project-scoped tokens work.",
+    "No broader Vercel team/account token where a narrower current provider scope works; Personal-project enforcement is unavailable and must not be claimed.",
     "No secret value, phone identity, message content, profile, token, ciphertext, protected URL or raw provider log in repository evidence.",
     "No custom Photon replay oracle, blind message retry, provider wrapper sprawl, or unrelated resource change."
   ]

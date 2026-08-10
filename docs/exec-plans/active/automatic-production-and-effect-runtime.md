@@ -37,25 +37,29 @@ invalidates affected evidence and the audit status.
 
 ## Current phase
 
-The Production inventory, SPEC review, exact-SHA workflow and Effect deployment
-boundary are complete and locally verified. Hosted GitHub/Vercel configuration
-is next. No external mutation has occurred under this plan yet.
+The Production workflow and Effect/lint implementation are complete and
+verified at branch SHA `928623a8f95131528d3eb850ec22c85826533f4a`. Hosted
+main/environment controls and the three Terra High metadata changes are read
+back. Credential custody, hosted drift, merge, automatic Production, Terra High
+runtime proof and Sendblue remain pending. One pre-deployment Photon probe is
+retained only as a bounded channel observation, not candidate-specific
+Production proof.
 
 ## Grounding receipt
 
-| Surface         | Observation                                                                                                                                                                              | Claim limit                                                                   |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| GitHub identity | `crcorbett`, admin of `crcorbett/bundjil`; workflow token scopes were read without retaining its value                                                                                   | Capability and metadata only.                                                 |
-| Main controls   | no branch protection/ruleset read back; `Production` has no reviewers; drift environment has zero secrets                                                                                | Point-in-time state, not accepted desired state.                              |
-| Vercel identity | `crcorbett`; Personal team `team_1LX7ZujbijowTv8J9k0aU7nD`; Tilt team exists and is rejected for this work                                                                               | Identity gate only.                                                           |
-| Agent target    | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`; Production `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA`, READY, source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                             | Metadata only.                                                                |
-| Proxy target    | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`; Production `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4`, READY, same source                                                                   | Metadata only.                                                                |
-| Agent rollback  | `dpl_ewqr5pW1RBZZz54j6auxKuYecu93`, READY, Production-targeted, project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, source `7ec2fd198d76e9809a2441fecd0faf3dba9197b1`                            | Fresh fallback identity only; it is not selected unless rollback is required. |
-| Proxy rollback  | `dpl_5UDNJzC3RJ3A3PCSYCeiUpJuxidC`, READY, Production-targeted, project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, source `924d9fb3d82f222c1a721606a499d94b99833f13`                            | Fresh fallback identity only; it is not selected unless rollback is required. |
-| Vercel Git      | both provider projects have no current Git repository connection; app configs disable Git deployment                                                                                     | Does not prove future absence.                                                |
-| Proxy health    | stable `200`, live, reasoning `low`                                                                                                                                                      | Directly proves the mismatch only.                                            |
-| Effect runtime  | manifest range `^4.0.0-beta.100`; lock/install resolve `effect@4.0.0-beta.101`, `@effect/vitest@beta.101`, platform packages beta.100, language service `0.86.6`; Eve `0.29.5`           | Installed APIs and lock are implementation authority.                         |
-| Site comparison | `/Users/cooper/Projects/site` local main `4f98b6c` is 117 commits behind `origin/main` `dd5d015879a82630127adfe044e4352deff72332`; current comparison uses files read from `origin/main` | Read-only rule-shape comparison only.                                         |
+| Surface         | Observation                                                                                                                                                                                                   | Claim limit                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| GitHub identity | `crcorbett`, admin of `crcorbett/bundjil`; workflow token scopes were read without retaining its value                                                                                                        | Capability and metadata only.                                                 |
+| Main controls   | active ruleset `20616946` requires pull request, strict `verify` and non-fast-forward with no bypass; `Production` is protected-branch-only with no reviewer/wait; both hosted environments have zero secrets | Current settings readback; no hosted deployment or drift claim.               |
+| Vercel identity | `crcorbett`; Personal team `team_1LX7ZujbijowTv8J9k0aU7nD`; Tilt team exists and is rejected for this work                                                                                                    | Identity gate only.                                                           |
+| Agent target    | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`; Production `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA`, READY, source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                  | Metadata only.                                                                |
+| Proxy target    | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`; Production `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4`, READY, same source                                                                                        | Metadata only.                                                                |
+| Agent rollback  | `dpl_ewqr5pW1RBZZz54j6auxKuYecu93`, READY, Production-targeted, project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, source `7ec2fd198d76e9809a2441fecd0faf3dba9197b1`                                                 | Fresh fallback identity only; it is not selected unless rollback is required. |
+| Proxy rollback  | `dpl_5UDNJzC3RJ3A3PCSYCeiUpJuxidC`, READY, Production-targeted, project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, source `924d9fb3d82f222c1a721606a499d94b99833f13`                                                 | Fresh fallback identity only; it is not selected unless rollback is required. |
+| Vercel Git      | both provider projects have no current Git repository connection; app configs disable Git deployment                                                                                                          | Does not prove future absence.                                                |
+| Proxy health    | stable `200`, live, reasoning `low`                                                                                                                                                                           | Directly proves the mismatch only.                                            |
+| Effect runtime  | manifest range `^4.0.0-beta.100`; lock/install resolve `effect@4.0.0-beta.101`, `@effect/vitest@beta.101`, platform packages beta.100, language service `0.86.6`; Eve `0.29.5`                                | Installed APIs and lock are implementation authority.                         |
+| Site comparison | `/Users/cooper/Projects/site` local main `4f98b6c` is 117 commits behind `origin/main` `dd5d015879a82630127adfe044e4352deff72332`; current comparison uses files read from `origin/main`                      | Read-only rule-shape comparison only.                                         |
 
 ## Documentation impact ledger
 
@@ -140,20 +144,60 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
 
 ## Commit and integration ledger
 
-No commit, push, pull request, merge, hosted run, provider mutation, secret
-mutation, OAuth grant, message, or deployment has occurred under this plan yet.
+- `b4c67b1` — automatic Production workflow, Effect deployment boundary and
+  reconciled owners.
+- `3a106e8` — four narrow Effect lint rules and fixtures.
+- `573ac6f` — deterministic Effect Clock/TestClock migrations and flat channel
+  dispatch flow.
+- `928623a` — installed-plugin lint integration and exact exception inventory.
+- Draft PR `#5` is pushed at exact head `928623a`; CI run `31345579991`
+  completed successfully. Infrastructure Drift run `31345579992` failed closed
+  because its three required secrets are absent; it is negative custody
+  evidence, not a drift result.
+- GitHub ruleset `20616946` is active with pull-request, strict `verify` and
+  non-fast-forward requirements and no bypass. The `Production` environment is
+  protected-branch-only with no reviewer or wait, and owns the four exact
+  non-secret deployment variables. Both hosted environments still have zero
+  secrets.
+- Personal Vercel Production metadata now owns agent model
+  `gpt-5.6-terra`, context `1050000` and proxy reasoning `high`. No deployment
+  or promotion has occurred, so stable proxy health remains `low`.
+- Photon OAuth was granted in a separate Safari session and the Personal, not
+  Tilt, profile was read back. The `bundjil` project reported shared iMessage
+  connected and one of three channel types connected. The established visible
+  Bundjil conversation was selected without entering or retaining a phone
+  number. The single bounded probe received a handset reply containing only
+  its requested boundary markers; the requested long body and visible typing
+  start/stop were not observed. This pre-deployment probe does not prove the
+  eventual automatic Production candidate, Eve completion, proxy completion,
+  dispatch internals, provider delivery status or strict replay.
+
+## Credential-boundary review correction
+
+The current Vercel provider documentation disproves the draft assumption that
+an access token for a Personal account can be provider-enforced to one project.
+The reviewed replacement keeps two separately revocable Personal-scope tokens,
+one in each project-bound workflow step, and requires exact configured project
+IDs plus decoded project/source/readiness readback before promotion. The lack
+of provider-enforced Personal-project scope is an explicit residual limitation,
+not a passed least-privilege claim. Credential creation remains action-time
+confirmation gated; no token or hosted secret has been created.
 
 ## PRD review receipt
 
-Accepted on 2026-08-10 before implementation. The review traced every
+Accepted on 2026-08-10 before implementation and re-reviewed after the current
+Vercel token surface disproved Personal-project token scoping. The review traced every
 Production task to a direct observable, expected postcondition, rejected false
 green, evidence owner, rollback and limitation. It compared direct Vercel Git,
 post-CI GitHub deployment and merge-queue gating; only the separate post-CI
 exact-main writer prevents pre-verification alias movement without adding a
 queue dependency. Negative workflow eligibility, two-candidate readiness,
 stale-main no-op, partial-promotion rollback, secret-negative output and stable
-alias readback are mandatory tests. Documentation policy and skill policy pass.
-No blocking or unclear requirement remains.
+alias readback are mandatory tests. Two separately revocable Personal-scope
+credentials plus exact project-bound readback are the least available control;
+provider-enforced project scope is a documented limitation. Documentation
+policy and skill policy pass. Credential creation and the missing drift custody
+remain external execution gates rather than unclear requirements.
 
 ## Terminal audit
 

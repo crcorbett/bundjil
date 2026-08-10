@@ -51,16 +51,16 @@ acceptance, or historical conversation into a stronger live claim.
 
 ## Evidence epoch
 
-| Evidence                      | Current identity                                                                                                                                                                                                 | Claim limit                                                                                |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Bundjil source                | clean `codex/automatic-production-effect-runtime` at `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`, tracking the same `origin/main`                                                                                 | Draft and implementation base only.                                                        |
-| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                               | Historical acceptance of the starting SHA, not future deployment proof.                    |
-| GitHub controls               | Admin principal `crcorbett`; no current main protection; `Production` and `infrastructure-read-only-preview` environments have no protection rules; the drift environment has zero secrets                       | Point-in-time metadata readback only.                                                      |
-| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200` | Current metadata observation; no mutation authority or future state.                       |
-| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                            | Current metadata observation; no mutation authority or future state.                       |
-| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                            | Proves only the observed stable health payload; it is the mismatch this SPEC must correct. |
-| Vercel configuration metadata | required Production model/context variables are not both present on the agent target and Production reasoning effort is absent on the proxy target; retained variables are encrypted or sensitive                | Metadata only; values were not read or retained.                                           |
-| Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                     | Desired/source and provider-link observation only.                                         |
+| Evidence                      | Current identity                                                                                                                                                                                                                                                                                       | Claim limit                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Bundjil source                | clean `codex/automatic-production-effect-runtime` at `928623a8f95131528d3eb850ec22c85826533f4a`; `origin/main` remains `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                      | Implemented candidate and starting-main identities only.                                          |
+| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                                                                                     | Historical acceptance of the starting SHA, not future deployment proof.                           |
+| GitHub controls               | Admin principal `crcorbett`; active ruleset `20616946` requires a pull request, strict `verify` status and non-fast-forward updates on the default branch with no bypass; `Production` permits protected branches with no human reviewer or wait; both hosted environments currently have zero secrets | Point-in-time metadata readback only; source and settings do not prove a future run.              |
+| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                       | Current metadata observation; no mutation authority or future state.                              |
+| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                  | Current metadata observation; no mutation authority or future state.                              |
+| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                  | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.        |
+| Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                 | Desired provider configuration only; live Terra High remains unproved until automatic deployment. |
+| Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                           | Desired/source and provider-link observation only.                                                |
 
 `observedAt` timestamps and sanitized fingerprints belong in the active plan and
 dated proof packet. Secret values, message content, phone identities, OAuth
@@ -84,9 +84,12 @@ The job runs only when all of these are true:
 The workflow has root `contents: read`, a bounded timeout, one repository-wide
 Production concurrency group with `cancel-in-progress: false`, checkout
 credentials disabled, exact pinned actions, and the `Production` environment.
-It uses two separate Vercel project-scoped tokens so compromise of one cannot
-write the other project. Team and project identities are exact non-secret
-configuration, not inferred from a directory, alias, or CLI session.
+It uses two separately revocable Personal-account Vercel tokens, one per
+project step. Vercel's current token surface does not enforce individual
+Personal-project scope, so exact team/project configuration, project-bound
+secret names, provider readback and fail-closed project/SHA checks constrain
+use inside the workflow. This is the least available provider scope, not a
+claim that either credential is provider-enforced to one project.
 
 The repository-owned Effect command is the sole deployment adapter. It uses
 Schema-derived SHA, team, project, deployment, URL, alias, state, and bounded
@@ -135,7 +138,7 @@ main push SHA
      -> @bundjil/infrastructure automatic-production command
         -> ProductionDeployment service
         -> ProductionDeployment.layerLive
-           -> project-scoped Vercel CLI/API boundary
+           -> project-bound Vercel CLI/API boundary
            -> stage proxy --prod --skip-domain
            -> stage agent --prod --skip-domain
            -> decode immutable deployment readback
@@ -211,8 +214,12 @@ promotion.
 
 ### Credential and environment custody
 
-- Create two Vercel tokens through the Personal account, each scoped to exactly
-  one project. Store them only as GitHub `Production` environment secrets.
+- Create two separately revocable Vercel tokens through the Personal account,
+  one for each exact project step. Store them only as the two project-named
+  GitHub `Production` environment secrets. Vercel currently scopes these
+  credentials to the Personal account rather than an individual project;
+  project IDs and decoded project/SHA readback provide the narrower workflow
+  boundary, and this provider limitation remains explicit.
 - GitHub receives only token ciphertext. Local creation material uses a
   mode-`0600` temporary directory, is never printed, and is deleted after
   secret metadata readback.
@@ -286,8 +293,8 @@ source identity. Do not roll back the newest fenced Codex profile generation or
 provider state.
 
 Control rollback disables `.github/workflows/production.yml`, revokes both
-project-scoped tokens, and reads back the GitHub environment. It does not
-re-enable direct Vercel Git deployment. Infrastructure Drift rollback deletes
+Personal-scope project-bound tokens, and reads back the GitHub environment. It
+does not re-enable direct Vercel Git deployment. Infrastructure Drift rollback deletes
 the three environment secrets and disables the workflow/environment; provider
 rollback is not applicable because the report has zero writes.
 

@@ -52,7 +52,7 @@
       "signal": "Successful same-repository push CI workflow_run for the exact main head SHA.",
       "stateOwner": "GitHub run/concurrency/environment externally; Vercel immutable deployments and stable targets externally; task ledger and bounded receipts locally.",
       "durableState": "One serialized non-cancelling writer, exact accepted SHA, two current/candidate/rollback deployment identities and stable target readback.",
-      "principal": "Ephemeral GitHub Actions job using exactly two Personal project-scoped Vercel tokens from the Production environment.",
+      "principal": "Ephemeral GitHub Actions job using exactly two separately revocable Personal-scope Vercel tokens from the Production environment in exact project-bound steps; Vercel does not enforce individual Personal-project token scope.",
       "authorityOwner": "docs/operations/authority-register.json#github-production and the automatic Production SPEC.",
       "operation": "Stage proxy and agent with domains skipped, validate both, re-read main, promote proxy then agent, verify stable targets and health, and roll back exact moved targets on failure.",
       "resource": "The exact two Bundjil Personal Vercel projects, immutable deployments, stable Production targets and prior rollback deployments.",
@@ -74,7 +74,7 @@
       "publication": "Automatic Production mutation is limited to the exact two projects after successful CI; no repository, release, provider-channel or message publication.",
       "reviewTrigger": "Workflow, CI name, event, project, token scope, command, Vercel API/CLI, alias, health, rollback, timeout, proof or cost change.",
       "retirement": "Retire if the two projects are removed or a smaller platform-native control proves post-verification exact-SHA promotion and rollback.",
-      "externalReadback": "Personal project and deployment metadata available; GitHub environment/tokens and first hosted automatic run remain pending until desired source is merged.",
+      "externalReadback": "Personal project/deployment metadata, active ruleset 20616946, protected-branch-only Production environment and four exact non-secret variables are available. Both required credentials and the first hosted automatic run remain pending.",
       "carryingCost": "Two Vercel builds per accepted main SHA, GitHub worker duration, credential rotation, proof retention and incident risk.",
       "selfFeedbackExcluded": true,
       "nonClaim": "Repository fixtures do not prove GitHub custody, hosted execution, Vercel mutation, stable alias, model behaviour, channel delivery, handset typing or strict replay."
@@ -113,7 +113,7 @@
       "publication": "GitHub run/check and fingerprint-only report disposition only; no issue, comment, provider, state, deployment or alert mutation.",
       "reviewTrigger": "Alchemy/provider contract, workflow, authority, secret, stage, state, classification, false positive, cost, missing run or alert-owner change.",
       "retirement": "Retire if accepted outcomes do not justify provider reads/cost or a smaller provider-owned control proves the same postcondition.",
-      "externalReadback": "Unavailable and inconclusive while the workflow remains only on the unmerged task branch; no GitHub environment, secret, schedule or hosted run is claimed.",
+      "externalReadback": "The environment is available with zero secrets. Pull-request run 31345579992 for branch SHA 928623a8f95131528d3eb850ec22c85826533f4a failed closed before provider reads because the three required custody artifacts are absent; no drift result is claimed.",
       "carryingCost": "One weekly read-only run, same-repository pull-request runs, hosted duration and human review attention.",
       "selfFeedbackExcluded": true,
       "nonClaim": "Source, local tests and a report file do not prove hosted execution, alert delivery, future no-drift, repair, deployment, promotion or Production state."

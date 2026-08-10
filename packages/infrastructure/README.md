@@ -50,7 +50,8 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-production-webhook-delete`, and
 `infrastructure:vercel-git-link-authority`. `production:deploy` is the private
 post-CI Production entrypoint. It is owned by the exact-SHA `Production`
-workflow, uses two project-scoped Vercel credentials, stages both apps with
+workflow, uses two separately revocable Personal-scope Vercel credentials in
+exact project-bound steps, stages both apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
 restores the exact prior deployments on an uncertain or partial failure. It is
