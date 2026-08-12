@@ -378,6 +378,11 @@ by this repository slice.
 - The final synthetic-Executor repository gate passes 135 boundary tests, 10
   lint fixtures, all 9 package typechecks and all 15 package test/build tasks
   from a cold Turbo cache.
+- Commit `b4ba89f5421e70fa28174aa3f1f8580e9a70f17a` was pushed as the exact
+  code candidate. Hosted CI run `31619302159`, check `94189799773`, passed the
+  repository `verify` job. Infrastructure Drift run `31619302124`, check
+  `94189799881`, failed before provider execution because both hosted custody
+  inputs were empty; this is negative custody evidence, not a drift result.
 - Documentation impact: Production orchestration, automatic Production SPEC,
   Effect architecture, Effect SPEC/task and both active plans **Change
   required**. Workflows, authority, provider commands, service/Layer identities,
