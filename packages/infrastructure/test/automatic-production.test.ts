@@ -227,6 +227,18 @@ describe("automatic Production deployment", () => {
     expect(result.snapshot.currentProxy.sourceSha).toBe(previousSha);
   });
 
+  it.each(["agent-promote-interrupt", "agent-promote-defect"] as const)(
+    "restores agent then proxy after an after-write %s",
+    async (failure) => {
+      const result = await Effect.runPromise(runExitWithSnapshot(failure));
+      expect(Exit.isFailure(result.exit)).toBeTruthy();
+      expect(result.snapshot.promotions).toStrictEqual(["proxy", "agent"]);
+      expect(result.snapshot.rollbacks).toStrictEqual(["agent", "proxy"]);
+      expect(result.snapshot.currentAgent.sourceSha).toBe(previousSha);
+      expect(result.snapshot.currentProxy.sourceSha).toBe(previousSha);
+    }
+  );
+
   it("restores agent then proxy when stable health fails", async () => {
     const result = await Effect.runPromise(runExitWithSnapshot("health"));
     expect(Exit.isFailure(result.exit)).toBeTruthy();

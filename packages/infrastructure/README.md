@@ -54,8 +54,9 @@ workflow, uses two separately revocable Personal-scope Vercel credentials in
 exact project-bound steps, stages both apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
-restores the exact prior deployments on an uncertain or partial failure. It is
-not an operator convenience command.
+restores the exact prior deployments on every non-success Effect exit after
+promotion starts, including interruption and defect paths. It is not an
+operator convenience command.
 
 ## Claim boundary
 

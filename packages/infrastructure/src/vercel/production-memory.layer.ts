@@ -18,6 +18,8 @@ export const ProductionMemoryFailure = Schema.Literals([
   "wrong-inspect",
   "proxy-promote",
   "agent-promote",
+  "agent-promote-defect",
+  "agent-promote-interrupt",
   "health",
   "health-rollback",
 ]);
@@ -126,7 +128,7 @@ export const makeProductionDeploymentsMemory = (
           if (config.failure === `${deployment.project}-promote`) {
             return yield* memoryError("promote", deployment.project);
           }
-          return yield* Ref.update(state, (snapshot) => ({
+          yield* Ref.update(state, (snapshot) => ({
             ...snapshot,
             currentProxy:
               deployment.project === "proxy"
@@ -138,6 +140,19 @@ export const makeProductionDeploymentsMemory = (
                 : snapshot.currentAgent,
             promotions: [...snapshot.promotions, deployment.project],
           }));
+          if (
+            deployment.project === "agent" &&
+            config.failure === "agent-promote-interrupt"
+          ) {
+            return yield* Effect.interrupt;
+          }
+          if (
+            deployment.project === "agent" &&
+            config.failure === "agent-promote-defect"
+          ) {
+            return yield* Effect.die("simulated after-write promotion defect");
+          }
+          return yield* Effect.void;
         }),
         rollback: Effect.fn("ProductionDeploymentsMemory.rollback")(function* (
           deployment: ProductionDeployment

@@ -35,8 +35,9 @@ The accepted outcome is:
    accepted SHA and current target identities, then promotes them;
 4. a stale SHA, failed build, malformed provider response, wrong project,
    alias mismatch, failed health/readback, or partial promotion fails closed;
-5. partial promotion invokes the exact recorded rollback identities and proves
-   the restored aliases before the job exits failed;
+5. any typed failure, interruption, or defect after promotion starts invokes
+   the exact recorded rollback identities and proves the restored aliases
+   before the job exits unsuccessfully;
 6. the Production proxy uses `gpt-5.6-terra`, context window `1050000`, and
    reasoning effort `high`, with stable health and Eve behaviour proved
    separately;
@@ -149,10 +150,10 @@ main push SHA
            -> promote proxy, then agent
            -> stable alias and health/readback
            -> Schema-encoded bounded receipt
-        -> on partial promotion
+        -> on any non-success Effect Exit after promotion starts
            -> rollback recorded prior deployment(s)
            -> stable alias restoration readback
-           -> failed bounded receipt
+           -> preserve the original unsuccessful exit unless rollback fails
 ```
 
 ```text
@@ -160,7 +161,8 @@ Tests
   -> automatic-production orchestration
   -> ProductionDeployment.layerMemory
   -> candidate-ready, stale-main, malformed-output, wrong-project,
-     partial-promotion, rollback-success, rollback-failure and no-op fixtures
+     partial-promotion, after-write interruption/defect, rollback-success,
+     rollback-failure and no-op fixtures
 ```
 
 ```text
@@ -187,10 +189,11 @@ Channel proof
   candidates are `READY`, Production-targeted, exact-project, and exact-SHA.
 - A rerun for the already-current exact SHA is idempotent and performs no
   deployment or promotion.
-- Promotion is proxy first, agent second. Any post-proxy failure restores the
-  recorded prior proxy deployment; any post-agent failure restores the prior
-  agent then prior proxy. Restoration must be read back before failure is
-  reported.
+- Promotion is proxy first, agent second. Any non-success Effect `Exit` after
+  proxy movement restores the recorded prior proxy deployment; any non-success
+  `Exit` after agent movement restores the prior agent then prior proxy. The
+  exit-aware rollback finalizer is uninterruptible and restoration must be
+  read back before the original failure, interruption, or defect is preserved.
 - Success requires both stable targets to read back the exact candidate IDs and
   exact source SHA. Immutable readiness and stable alias resolution are
   separate assertions.

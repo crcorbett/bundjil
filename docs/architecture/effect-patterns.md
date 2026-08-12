@@ -252,6 +252,14 @@ streams, or Workflow state. Logs and proof output contain only safe metadata;
 rollback restores the retained deployment or provider binding and never uses
 namespace clearing as a coordination or recovery mechanism.
 
+Compensation for an external state machine must observe the whole Effect
+`Exit`, not only the typed error channel. Use an exit-aware finalizer for any
+write sequence that must restore state after failure, interruption, or defect;
+the finalizer must read back the restored state, preserve the original
+unsuccessful exit when restoration succeeds, and surface a safe rollback error
+when restoration fails. Deterministic memory-Layer fixtures must cover an
+after-write interruption and defect, not only expected provider failures.
+
 ## Static Analysis
 
 `bun run check` runs the root Ultracite/Oxlint formatting and type-aware lint

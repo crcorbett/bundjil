@@ -112,7 +112,10 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
     });
 
     yield* promote.pipe(
-      Effect.catch((error) => {
+      Effect.onExit((promoteExit) => {
+        if (Exit.isSuccess(promoteExit)) {
+          return Effect.void;
+        }
         const rollback = Effect.gen(function* () {
           if (agentMoved) {
             yield* deployments.rollback(previousAgent);
@@ -142,7 +145,7 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
                     retry: "after-readback",
                   })
                 )
-              : Effect.fail(error)
+              : Effect.void
           )
         );
       })

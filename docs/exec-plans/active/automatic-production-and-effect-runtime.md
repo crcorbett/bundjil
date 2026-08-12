@@ -193,6 +193,31 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
   Production proof, rollback and provider state **Preserve**. Frontend and
   generated API references are **N/A** because the call graph has neither.
 
+### 2026-08-13 exit-aware rollback correction
+
+- The next strict Effect pass found that the ordered promotion state machine
+  compensated only through `Effect.catch`. That covered its typed
+  `ProductionDeploymentError` channel but not fiber interruption or defects,
+  so an after-write non-success exit could bypass the documented restoration.
+- The installed `effect@4.0.0-beta.101` `Effect.onExit` implementation was
+  inspected directly. Its finalizer observes every `Exit`, is uninterruptible
+  by default, and preserves the source exit unless the finalizer fails. The
+  promotion sequence now uses that primitive: successful exits do nothing;
+  every non-success exit restores and reads back agent then proxy as applicable;
+  successful restoration preserves the original exit; failed restoration
+  surfaces the existing safe rollback error.
+- The deterministic memory Layer now simulates an interruption and a defect
+  immediately after the agent write. Both fixtures prove the two writes were
+  observed, both rollback operations ran in reverse order, and both stable
+  identities returned to their recorded source SHA. Infrastructure typecheck,
+  83 Vitest tests and 21 Alchemy tests passed for the slice.
+- Documentation impact: the SPEC outcome/call graph, task verification/result,
+  Effect architecture, infrastructure README and this active evidence owner
+  **Change required**. Workflow eligibility, Config, public services, package
+  exports, provider commands, authority, secrets, runbooks, live proof and
+  rollback procedure **Preserve**. Frontend and generated API references are
+  **N/A** because this slice has neither.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
