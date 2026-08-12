@@ -62,7 +62,7 @@ acceptance, or historical conversation into a stronger live claim.
 | Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                  | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.        |
 | Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                 | Desired provider configuration only; live Terra High remains unproved until automatic deployment. |
 | Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                           | Desired/source and provider-link observation only.                                                |
-| GitHub action runtimes        | Hosted PR `#5` CI at `d84e2c2b4f40fa32614066cea2121e536b343d47` passed but reported that the pinned checkout/setup-node v4 actions still targeted deprecated Node 20. Public `v7.0.1`/`v7.0.0` refs and manifests resolve to exact Node-24 action revisions for the corrective candidate.              | The failing annotation and public ref/manifest facts only; the successor hosted run is required.  |
+| GitHub action runtimes        | Hosted PR `#5` CI run `31617632184` passed at exact source `5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc` with the reviewed checkout `v7.0.1` and setup-node `v7.0.0` commits; check `94184307855` returned zero annotations.                                                                              | Exact candidate action execution only; it does not prove later runs or upstream safety.           |
 
 `observedAt` timestamps and sanitized fingerprints belong in the active plan and
 dated proof packet. Secret values, message content, phone identities, OAuth
@@ -98,7 +98,8 @@ candidate replaces only `actions/checkout` and `actions/setup-node` with the
 reviewed Node-24 `v7.0.1` and `v7.0.0` commits after hosted CI surfaced the
 Node-20 action-runtime deprecation. Triggers, permissions, environments,
 credentials, operations and target gates remain unchanged; hosted execution
-must prove the replacement candidate.
+run `31617632184` proves the exact replacement candidate without the former
+Node-20 runtime annotation.
 
 The repository-owned Effect command is the sole deployment adapter. It uses
 Schema-derived SHA, team, project, deployment, URL, alias, state, and bounded

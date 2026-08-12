@@ -346,9 +346,14 @@ by this repository slice.
   workflow locations plus the action lock, authority policy and fixtures.
   Workflow triggers, permissions, credentials, environments, targets,
   operations, concurrency and timeouts are preserved.
-- Source/ref review is not hosted proof. The task remains in progress until
-  focused policy gates, full repository verification and the exact successor
-  hosted CI run pass without the Node-20 action-runtime annotation.
+- Local authority, controls, docs, skills, formatting and full repository
+  verification passed. Hosted CI run `31617632184` then passed at exact source
+  `5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc`; check `94184307855`
+  returned zero annotations, closing the Node-20 action-runtime finding.
+- Infrastructure Drift run `31617632131` used the replacement actions and then
+  failed closed at `Prepare bounded read-only custody` because the three hosted
+  artifacts remain absent. It performed no provider read or write and does not
+  close the separately pending drift-custody task.
 - Documentation impact: workflow pins, action lock, automation register,
   automatic Production SPEC/task and this plan **Change required**. Provider
   settings, credentials, deployments, aliases, runbooks, authority envelopes,

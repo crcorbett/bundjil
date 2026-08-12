@@ -76,7 +76,7 @@
     {
       "id": "refresh-node24-action-runtimes",
       "title": "Refresh admitted GitHub actions to Node 24 runtimes",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["implement-automatic-production-control"],
       "description": "Replace the deprecated Node-20-based checkout and setup-node pins with exact reviewed Node-24 action revisions after hosted CI reports the runtime deprecation.",
       "mandatoryVerification": [
@@ -93,6 +93,7 @@
         "limitationsAndNonClaims": "Public refs and manifests do not prove upstream safety, hosted execution or provider configuration."
       },
       "docsImpact": "Update the action lock, automation register, SPEC/task ledger and active plan; preserve provider/runbook claims.",
+      "currentResult": "Public refs resolved checkout v7.0.1 to 3d3c42e5aac5ba805825da76410c181273ba90b1 and setup-node v7.0.0 to 820762786026740c76f36085b0efc47a31fe5020; both reviewed manifests declare node24. Local authority, controls, docs, skills, formatting and full verification passed. Hosted CI run 31617632184 passed for exact source 5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc and check 94184307855 returned zero annotations. Infrastructure Drift run 31617632131 used the new actions successfully, then failed closed at the separately pending empty-custody gate; no provider read or write occurred.",
       "commitAfterPassing": true
     },
     {
