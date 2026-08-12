@@ -226,10 +226,11 @@ boundary, not as proof of exact cardinality. Atom is not a backend runtime
 state primitive.
 
 An Effect traversal callback returns its immutable observation; it does not
-mutate outer counters or collections that a later Effect relies on. Derive
+mutate outer counters or collections that the caller later relies on. Derive
 counts and `HashSet`/`HashMap` domain invariants after the traversal. Local
-mutable loops remain valid for a synchronous parser, byte copy, pagination
-cursor, or host-owned callback when no Effect crosses the mutation.
+mutable state remains valid inside one synchronous parser, byte copy,
+single-fiber sequential pagination loop, or host-owned callback when it is not
+captured across traversal callbacks, concurrent work, or a later finalizer.
 
 Control state that is written before one Effect and observed by a later
 finalizer is runtime state, even when it is scoped to one operation. Keep

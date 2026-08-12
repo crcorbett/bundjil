@@ -676,8 +676,9 @@ managed-binding observation. The caller derives an immutable Effect `HashSet`
 for projects and keys and checks exact cardinality plus subset semantics after
 the traversal. A duplicate-key fixture preserves distinct logical and physical
 identities so it reaches this validator rather than failing the earlier
-manifest Schema. Local parser, byte-copy, pagination and host-callback mutation
-remain unchanged because they do not carry state across Effects.
+manifest Schema. Local parser, byte-copy, single-fiber sequential pagination
+and host-callback mutation remain unchanged because their state is not captured
+across traversal callbacks, concurrent work, or a later finalizer.
 
 ## Focused verification commands
 
