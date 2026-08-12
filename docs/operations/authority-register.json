@@ -49,7 +49,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "Personal project and current/rollback deployment metadata, active default-branch ruleset 20616946, protected-branch-only Production environment and four exact non-secret variables were read on 2026-08-10. Both required Production secrets and the automatic hosted run remain pending."
+        "evidence": "GitHub readback on 2026-08-13 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment and the four exact non-secret variables. Both required project-specific Vercel secrets are absent, so no automatic hosted Production run is accepted; prior Personal Vercel project and deployment metadata remains dated evidence only."
       }
     },
     {
@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "The infrastructure-read-only-preview environment was read with zero secrets. Pull-request run 31345579992 for exact branch SHA 928623a8f95131528d3eb850ec22c85826533f4a failed closed in custody preparation because all three required secret artifacts are absent; no provider drift result is claimed."
+        "evidence": "GitHub readback on 2026-08-13 confirms the infrastructure-read-only-preview environment has zero secrets. Pull-request run 31623150154, check 94202739358, for exact branch SHA e982c88e4fddd504747cc566142ccdfa061421a2 failed closed in custody preparation because all three required artifacts are absent; no provider read or drift result is claimed."
       }
     },
     {

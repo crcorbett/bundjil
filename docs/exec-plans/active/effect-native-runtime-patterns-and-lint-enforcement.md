@@ -429,8 +429,8 @@ verification` gate passes with all nine package typechecks and all fifteen
 - Commit `6ae246fcd86b135fa61612796f4cda420cddfae3` was pushed as the exact
   code candidate. Hosted CI run `31622701592`, check `94201242410`, passed.
   Infrastructure Drift run `31622701671`, check `94201242811`, failed before
-  provider execution because both hosted custody inputs were empty; this is
-  negative custody evidence, not a drift result.
+  provider execution because all three hosted custody artifacts were empty;
+  this is negative custody evidence, not a drift result.
 - Installed `effect@4.0.0-beta.101` remains runtime authority; local comparison
   revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the matching
   immutable HashSet operations.
@@ -439,6 +439,18 @@ verification` gate passes with all nine package typechecks and all fifteen
   architecture, public exports, provider operations, runbooks, authority,
   controls and hosted evidence **Preserve**. READMEs, frontend, browser,
   accessibility, generated references, release and publication are **N/A**.
+- A fresh read-only GitHub reconciliation on 2026-08-13 confirms exact pushed
+  head `e982c88e4fddd504747cc566142ccdfa061421a2` has green CI run
+  `31623150122`, check `94202739127`. Infrastructure Drift run `31623150154`,
+  check `94202739358`, failed closed before provider reads because the exact
+  environment has zero secrets. The Production environment still has its four
+  exact non-secret variables and active ruleset `20616946`, but lacks both
+  project-specific Vercel secrets. This is current custody evidence only, not a
+  drift, deployment, Production, model, channel, or terminal-audit result.
+  Documentation impact: authority/control external readback and both active
+  plans **Change required**; Effect source/architecture, task status, provider
+  state, runbooks, READMEs, frontend, release and publication **Preserve** or
+  **N/A**.
 
 ## Evidence and non-claims
 

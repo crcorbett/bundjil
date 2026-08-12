@@ -430,8 +430,8 @@ by this repository slice.
 - Commit `6ae246fcd86b135fa61612796f4cda420cddfae3` was pushed as the exact
   code candidate. Hosted CI run `31622701592`, check `94201242410`, passed.
   Infrastructure Drift run `31622701671`, check `94201242811`, failed before
-  provider execution because both hosted custody inputs were empty; this is
-  negative custody evidence, not a drift result.
+  provider execution because all three hosted custody artifacts were empty;
+  this is negative custody evidence, not a drift result.
 - Installed `effect@4.0.0-beta.101` and local comparison revision
   `1caab3cc30f626efbf15e59d74f539a487e5c85c` expose the used HashSet APIs.
 - Documentation impact: production collection owners, Effect SPEC/task,
@@ -439,6 +439,17 @@ by this repository slice.
   workflow semantics, provider state, runbooks, authority, controls and hosted
   evidence **Preserve**. READMEs, frontend, browser, accessibility, generated
   references, release and publication are **N/A**.
+- A fresh read-only GitHub reconciliation on 2026-08-13 confirms branch head
+  `e982c88e4fddd504747cc566142ccdfa061421a2` is exactly pushed. CI run
+  `31623150122`, check `94202739127`, passed; Infrastructure Drift run
+  `31623150154`, check `94202739358`, failed closed before provider reads
+  because `infrastructure-read-only-preview` still has zero secrets. The
+  `Production` environment retains its four exact non-secret variables and
+  active ruleset `20616946`, but both project-specific Vercel secrets remain
+  absent. No provider read, drift result, deployment, or Production proof is
+  claimed. Documentation impact: authority/control external readback and this
+  plan **Change required**; source contracts, task status, provider state,
+  runbooks, READMEs, frontend, release and publication **Preserve** or **N/A**.
 
 ## Commit and integration ledger
 
