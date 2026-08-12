@@ -26,6 +26,8 @@ export type BoundaryRule =
   | "codec-provenance"
   | "raw-outbound-write"
   | "config-primitive"
+  | "direct-environment-access"
+  | "direct-platform-process"
   | "direct-json"
   | "raw-fetch"
   | "public-generic-fetch"
@@ -40,30 +42,6 @@ export type BoundaryRule =
  * makes the entry stale and fails check:boundaries.
  */
 export const boundaryExceptions = [
-  {
-    file: "packages/infrastructure/src/vercel/production.live.layer.ts",
-    symbol: "runCommand",
-    occurrence: "call#1",
-    owner: "@bundjil/infrastructure",
-    boundaryKind: "cli",
-    canonicalContract: "CommandOutput",
-    admittedSyntax: "Bun child-process stdout stream text reader",
-    reason:
-      "The private Vercel CLI adapter drains stdout then immediately decodes the CommandOutput transport before an operation-specific provider codec.",
-    rule: "raw-response-text",
-  },
-  {
-    file: "packages/infrastructure/src/vercel/production.live.layer.ts",
-    symbol: "runCommand",
-    occurrence: "call#2",
-    owner: "@bundjil/infrastructure",
-    boundaryKind: "cli",
-    canonicalContract: "CommandOutput",
-    admittedSyntax: "Bun child-process stderr stream text reader",
-    reason:
-      "The private Vercel CLI adapter drains stderr to prevent process blockage and discards it before safe error translation.",
-    rule: "raw-response-text",
-  },
   {
     file: "packages/sendblue/src/live.layer.ts",
     symbol: "body",

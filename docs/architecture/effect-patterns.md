@@ -461,6 +461,12 @@ Rules:
 - Keep server-only secrets out of browser bundles and committed files.
 - Use owner-named redacted Schemas for credentials.
 - Do not read `process.env` directly in package logic.
+- The boundary provenance gate rejects direct `process.env`,
+  `globalThis.process.env`, `Bun.env`, and `import.meta.env` access throughout
+  owned app and package production source. Add no broad host exception: acquire
+  semantic values with `Config.schema`, and let an application root provide a
+  platform Layer when a live service needs filesystem, process, or network
+  capabilities.
 - App bootstrap can read app-owned config, but provider packages should decode
   their own required config at their boundary.
 - If multiple files need the same package config, expose a config module or
@@ -476,6 +482,13 @@ Live and mock layers should be explicit:
   on hidden globals.
 - Provider SDK clients must be wrapped behind services before domain logic uses
   them.
+- Child processes are scoped platform resources. A live Layer captures the
+  installed Effect `ChildProcessSpawner`, models argv and environment overrides
+  explicitly, consumes bounded output through `Stream`, and maps platform
+  failure once. The Bun/CLI root provides `BunServices.layer`; package logic
+  must not own `Bun.spawn`, raw Promise orchestration, or ambient environment
+  copying. `check:boundaries` rejects direct Bun process spawning and direct
+  ambient environment reads in owned source.
 
 For app tools, it is acceptable to provide a live layer directly at the tool
 edge while the app is small:

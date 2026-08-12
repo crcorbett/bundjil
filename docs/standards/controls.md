@@ -3,7 +3,7 @@ document_type: control-register
 lifecycle: current
 authority: canonical
 owner: bundjil-harness-maintainer
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: control finding, false positive, automation loop, boundary exception, accepted-outcome, carrying-cost, or retirement change
 ---
 
@@ -42,11 +42,13 @@ claim-matched evidence remain the behavioral oracle.
 
 ## Boundary exception decision
 
-HGI-306 measured 19 exact occurrence records. The representation is verbose,
+HGI-306 currently measures 17 exact occurrence records. The representation is verbose,
 especially for the private Upstash facade, but no smaller candidate has proved
 equivalent exact match, duplicate rejection, occurrence isolation, and stale
-detection against the real audit. The occurrence registry is therefore
-retained. Line count is not a success criterion. The dated decision is
+detection against the real audit. Two former Production CLI response-reader
+exceptions were retired after that adapter moved to Effect's scoped process
+service. The remaining occurrence registry is retained. Line count is not a
+success criterion. The dated decision is
 [`HGI-306-boundary-exceptions.decision.json`](../documentation-audit/HGI-306-boundary-exceptions.decision.json).
 
 ## Automation states

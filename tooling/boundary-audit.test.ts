@@ -63,6 +63,30 @@ describe("boundary provenance audit", () => {
     ],
     ["config-primitive", "export const token = Config.redacted('TOKEN');"],
     [
+      "direct-environment-access",
+      "export const token = process.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = globalThis.process.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = Bun.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = import.meta.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-platform-process",
+      "export const run = () => Bun.spawn(['vercel', 'deploy']);",
+    ],
+    [
+      "direct-platform-process",
+      "export const run = () => Bun.spawnSync(['vercel', 'deploy']);",
+    ],
+    [
       "raw-fetch",
       "export const request = () => fetch('https://example.test');",
     ],

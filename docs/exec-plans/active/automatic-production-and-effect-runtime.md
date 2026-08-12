@@ -160,6 +160,39 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
   architecture, public exports and rollback **Preserve** because the accepted
   behavior and operating procedure did not change.
 
+### 2026-08-13 strict Effect process-boundary correction
+
+- A fresh audit found that the Production live Layer still used `Bun.spawn`,
+  raw Promise orchestration and ambient `process.env` copying even though its
+  public service and provider codecs were otherwise closed. This finding was
+  possible because the boundary audit enforced Config primitives and raw
+  response readers, but not direct host-environment acquisition.
+- The exact installed authority is `effect@4.0.0-beta.101` plus
+  `@effect/platform-bun@4.0.0-beta.100` and
+  `@effect/platform-node-shared@4.0.0-beta.101` from the frozen lockfile. The
+  installed `ChildProcess`/`ChildProcessSpawner` sources were used for the API
+  shape. The local Effect reference clone was also inspected at
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c`; its files differ from the
+  installed package, so it is comparison evidence only and the installed
+  beta.101 source controls.
+- The Layer now captures the scoped Effect process service, extends the host
+  environment only inside the platform implementation, exposes only the
+  redacted token override at process creation, consumes stdout through
+  `Stream`, ignores stderr without buffering it, and preserves the existing
+  typed command/output failure boundary. `automatic-production.ts` is the
+  application root and supplies `BunServices.layer`.
+- A controlled `ChildProcessSpawner` Layer replaces the global Bun stub in the
+  live-shape test. The boundary audit now rejects direct
+  `Bun.spawn`/`Bun.spawnSync` process ownership plus `process.env`,
+  `globalThis.process.env`, `Bun.env`, and `import.meta.env`; six negative
+  fixtures prevent regression. The two obsolete raw-response exceptions were
+  retired, reducing the exact retained registry from 19 to 17.
+- Documentation impact: Effect architecture, boundary tooling/fixtures,
+  HGI-306 decision/control owners, this task result and active plan **Change
+  required**. Workflow behavior, runbooks, package exports/README, authority,
+  Production proof, rollback and provider state **Preserve**. Frontend and
+  generated API references are **N/A** because the call graph has neither.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

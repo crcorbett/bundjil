@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "decision": "retain-occurrence-registry",
-  "measuredAt": "2026-08-10T10:08:00+10:00",
-  "exceptionCount": 19,
+  "measuredAt": "2026-08-13T00:25:00+10:00",
+  "exceptionCount": 17,
   "preservedProperties": [
     "exact match",
     "duplicate rejection",
     "occurrence isolation",
     "stale detection"
   ],
-  "measuredCost": "19 exact rows: 14 private Upstash facade occurrences and five framework, HTTP, or CLI adapter occurrences. The two new CLI rows separately own stdout decode and discarded stderr drain. Repetition is visible but local, reviewable, and covered by the real audit.",
+  "measuredCost": "17 exact rows: 14 private Upstash facade occurrences and three framework or HTTP adapter occurrences. The Production CLI no longer needs two raw-response exceptions because its scoped Effect ChildProcess boundary consumes stdout as a Stream and ignores stderr at process configuration. Repetition is visible but local, reviewable, and covered by the real audit.",
   "rationale": "No semantic or generated replacement was supplied that reduces carrying cost while preserving all four properties against current source. The existing representation remains the safer and earlier durable owner; line-count reduction is not an accepted outcome.",
   "nonClaims": [
     "Retention does not prove that the registry has no maintenance cost or can never be replaced.",

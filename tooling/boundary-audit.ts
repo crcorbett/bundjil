@@ -412,6 +412,12 @@ const isRawResponseRead = (
   );
 };
 
+const isDirectEnvironmentAccess = (node: ts.PropertyAccessExpression) =>
+  node.name.text === "env" &&
+  ["process", "globalThis.process", "Bun", "import.meta"].includes(
+    node.expression.getText()
+  );
+
 const namedCallRules: readonly Readonly<{
   names: readonly string[];
   rule: BoundaryRule;
@@ -438,6 +444,12 @@ const namedCallRules: readonly Readonly<{
     rule: "config-primitive",
     message:
       "Semantic configuration must use Config.schema with its owner-named Schema.",
+  },
+  {
+    names: ["Bun.spawn", "Bun.spawnSync"],
+    rule: "direct-platform-process",
+    message:
+      "Owned source must execute child processes through an Effect platform service supplied by the application root.",
   },
   {
     names: ["fetch"],
@@ -612,6 +624,16 @@ export const auditBoundaryProvenance = (
       }
       if (ts.isCallExpression(node)) {
         inspectCallExpression(checker, node, report);
+      }
+      if (
+        ts.isPropertyAccessExpression(node) &&
+        isDirectEnvironmentAccess(node)
+      ) {
+        report(
+          node,
+          "direct-environment-access",
+          "Owned source must acquire host configuration through Effect Config rather than reading an ambient environment object."
+        );
       }
       if (
         (ts.isAsExpression(node) ||

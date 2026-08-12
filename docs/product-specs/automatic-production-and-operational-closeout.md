@@ -95,9 +95,11 @@ The repository-owned Effect command is the sole deployment adapter. It uses
 Schema-derived SHA, team, project, deployment, URL, alias, state, and bounded
 receipt contracts; `Config.schema` with redacted tokens; named service
 operations; immediate CLI/API output decoding; safe tagged errors; explicit
-live and memory Layers; flat sequential Effects; and one application-boundary
-runtime execution. Raw CLI output, token values, provider DTOs, Promises, and
-native errors remain private to its live Layer.
+live and memory Layers; a scoped Effect `ChildProcessSpawner`; flat sequential
+Effects; and one Bun application-boundary runtime execution. The application
+root supplies `BunServices.layer`. Raw CLI output, token values, provider DTOs,
+platform failures, and process handles remain private to the live Layer; raw
+Promises and ambient environment reads are not part of the package boundary.
 
 ### Rejected: direct Vercel Git auto-deploy
 
@@ -138,6 +140,7 @@ main push SHA
      -> @bundjil/infrastructure automatic-production command
         -> ProductionDeployment service
         -> ProductionDeployment.layerLive
+           -> scoped Effect ChildProcessSpawner
            -> project-bound Vercel CLI/API boundary
            -> stage proxy --prod --skip-domain
            -> stage agent --prod --skip-domain

@@ -1,5 +1,15 @@
-import { ConfigProvider, Effect, Exit, Layer, Schema } from "effect";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  ConfigProvider,
+  Effect,
+  Exit,
+  Layer,
+  Schema,
+  Sink,
+  Stream,
+} from "effect";
+import { ChildProcessSpawner } from "effect/unstable/process";
+import type { ChildProcess } from "effect/unstable/process";
+import { describe, expect, it } from "vitest";
 
 import {
   makeProductionDeploymentsMemory,
@@ -66,36 +76,44 @@ const runExitWithSnapshot = (failure: ProductionMemoryFailure) =>
   );
 
 describe("automatic Production deployment", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("decodes the current Vercel project target without an embedded projectId", async () => {
-    const spawn = vi.fn<
-      () => {
-        readonly exited: Promise<number>;
-        readonly stderr: ReadableStream<Uint8Array>;
-        readonly stdout: ReadableStream<Uint8Array>;
-      }
-    >(() => ({
-      exited: Promise.resolve(0),
-      stderr: new Blob([]).stream(),
-      stdout: new Blob([
-        JSON.stringify({
-          id: "prj_agent",
-          targets: {
-            production: {
-              id: "dpl_agent_previous",
-              meta: { gitCommitSha: previousSha },
-              readyState: "READY",
-              target: "production",
-              url: "bundjil-agent-previous.vercel.app",
-            },
+    const commands: ChildProcess.Command[] = [];
+    const stdout = new TextEncoder().encode(
+      Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+        id: "prj_agent",
+        targets: {
+          production: {
+            id: "dpl_agent_previous",
+            meta: { gitCommitSha: previousSha },
+            readyState: "READY",
+            target: "production",
+            url: "bundjil-agent-previous.vercel.app",
           },
-        }),
-      ]).stream(),
-    }));
-    vi.stubGlobal("Bun", { spawn });
+        },
+      })
+    );
+    const spawner = ChildProcessSpawner.make((command) => {
+      commands.push(command);
+      return Effect.succeed(
+        ChildProcessSpawner.makeHandle({
+          pid: ChildProcessSpawner.ProcessId(1),
+          exitCode: Effect.succeed(ChildProcessSpawner.ExitCode(0)),
+          isRunning: Effect.succeed(false),
+          kill: () => Effect.void,
+          stdin: Sink.drain,
+          stdout: Stream.fromIterable([stdout]),
+          stderr: Stream.empty,
+          all: Stream.fromIterable([stdout]),
+          getInputFd: () => Sink.drain,
+          getOutputFd: () => Stream.empty,
+          unref: Effect.succeed(Effect.void),
+        })
+      );
+    });
+    const processLayer = Layer.succeed(
+      ChildProcessSpawner.ChildProcessSpawner,
+      spawner
+    );
     const config = ConfigProvider.layer(
       ConfigProvider.fromEnv({
         env: {
@@ -114,16 +132,30 @@ describe("automatic Production deployment", () => {
         const deployments = yield* ProductionDeployments;
         return yield* deployments.current("agent");
       }).pipe(
-        Effect.provide(ProductionDeploymentsLive.pipe(Layer.provide(config)))
+        Effect.provide(
+          ProductionDeploymentsLive.pipe(
+            Layer.provide(config),
+            Layer.provide(processLayer)
+          )
+        )
       )
     );
 
     expect(current.projectId).toBe("prj_agent");
     expect(current.sourceSha).toBe(previousSha);
-    expect(spawn).toHaveBeenCalledWith(
-      expect.arrayContaining(["/v9/projects/prj_agent"]),
-      expect.anything()
+    const [command] = commands;
+    expect(command?._tag).toBe("StandardCommand");
+    if (command?._tag !== "StandardCommand") {
+      throw new Error("expected one standard Vercel command");
+    }
+    expect([command.command, ...command.args]).toStrictEqual(
+      expect.arrayContaining(["/v9/projects/prj_agent"])
     );
+    expect(command.options).toMatchObject({
+      env: { VERCEL_TOKEN: "agent-token" },
+      extendEnv: true,
+      stderr: "ignore",
+    });
   });
 
   it("stages both exact-SHA candidates before ordered promotion", async () => {

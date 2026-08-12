@@ -1,6 +1,15 @@
 import { fileURLToPath } from "node:url";
 
-import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  Config,
+  Context,
+  Effect,
+  Layer,
+  Redacted,
+  Schema,
+  Stream,
+} from "effect";
+import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 import { ProductionDeploymentError } from "./production.errors.js";
 import type {
@@ -130,41 +139,6 @@ const commandError = (
     retry: "after-readback",
   });
 
-const runCommand = (
-  command: readonly string[],
-  token: ProductionVercelToken | null,
-  operation: ProductionDeploymentError["operation"],
-  project: ProductionProject | null
-) =>
-  Effect.tryPromise({
-    try: async () => {
-      const processHandle = Bun.spawn([...command], {
-        cwd: repositoryDirectory,
-        env:
-          token === null
-            ? process.env
-            : { ...process.env, VERCEL_TOKEN: Redacted.value(token) },
-        stdout: "pipe",
-        stderr: "pipe",
-      });
-      const [stdout, , exitCode] = await Promise.all([
-        new Response(processHandle.stdout).text(),
-        new Response(processHandle.stderr).text(),
-        processHandle.exited,
-      ]);
-      return { exitCode, stdout };
-    },
-    catch: () => commandError(operation, project),
-  }).pipe(
-    Effect.flatMap(Schema.decodeUnknownEffect(CommandOutput)),
-    Effect.mapError(() => commandError(operation, project)),
-    Effect.flatMap((output) =>
-      output.exitCode === 0
-        ? Effect.succeed(output.stdout)
-        : Effect.fail(commandError(operation, project))
-    )
-  );
-
 const selectProject = (
   config: ProductionDeploymentConfig,
   project: ProductionProject
@@ -224,6 +198,49 @@ export const ProductionDeploymentsLive = Layer.effect(
   ProductionDeployments,
   Effect.gen(function* makeProductionDeployments() {
     const config = yield* ProductionDeploymentConfigService;
+    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+
+    const runCommand = (
+      [executable, ...args]: readonly string[],
+      token: ProductionVercelToken | null,
+      operation: ProductionDeploymentError["operation"],
+      project: ProductionProject | null
+    ) =>
+      executable === undefined
+        ? Effect.fail(commandError(operation, project))
+        : Effect.scoped(
+            Effect.gen(function* runProductionCommand() {
+              const handle = yield* spawner.spawn(
+                ChildProcess.make(executable, args, {
+                  cwd: repositoryDirectory,
+                  env:
+                    token === null
+                      ? undefined
+                      : { VERCEL_TOKEN: Redacted.value(token) },
+                  extendEnv: true,
+                  stdin: "ignore",
+                  stdout: "pipe",
+                  stderr: "ignore",
+                })
+              );
+              const [stdout, exitCode] = yield* Effect.all(
+                [
+                  Stream.mkString(Stream.decodeText(handle.stdout)),
+                  handle.exitCode,
+                ],
+                { concurrency: "unbounded" }
+              );
+              return { exitCode, stdout };
+            })
+          ).pipe(
+            Effect.flatMap(Schema.decodeUnknownEffect(CommandOutput)),
+            Effect.mapError(() => commandError(operation, project)),
+            Effect.flatMap((output) =>
+              output.exitCode === 0
+                ? Effect.succeed(output.stdout)
+                : Effect.fail(commandError(operation, project))
+            )
+          );
 
     const inspect = Effect.fn("ProductionDeploymentsLive.inspect")(function* (
       input: InspectProductionDeployment
