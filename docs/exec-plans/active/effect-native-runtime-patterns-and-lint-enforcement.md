@@ -349,6 +349,34 @@ verification` gate passes with all nine package typechecks and all fifteen
   and provider state **Preserve**. READMEs, frontend, browser, accessibility,
   generated references, release, and publication are **N/A**.
 
+## 2026-08-13 Production rollback Ref correction
+
+- The next state audit found two closure-mutated booleans written before Vercel
+  promotion Effects and read later by the `onExit` compensation finalizer.
+- Proxy and agent eligibility share one operation lifetime, one rollback
+  invariant and one finalizer snapshot. `runAutomaticProduction` now owns one
+  immutable `Ref` record, updates each field before its potentially
+  outcome-uncertain promotion, and reads one snapshot before restoring agent
+  then proxy.
+- Installed `effect@4.0.0-beta.101` is runtime authority; local comparison
+  revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes matching
+  `Ref.make`, `Ref.update` and `Ref.get` APIs for comparison only.
+- Focused infrastructure typecheck and all 84 Vitest plus 34 Alchemy tests pass,
+  including proxy-only rollback, reverse restoration, after-write interruption,
+  defect and rollback-failure fixtures. No provider operation ran.
+- The final synthetic-Executor repository gate passes 135 boundary tests, 10
+  lint fixtures, all 9 package typechecks and all 15 package test/build tasks
+  from a cold Turbo cache.
+- No lint rule is added: the SPEC already rejects syntax-only mutable-state
+  bans because local parsing algorithms are legitimate and cross-Effect
+  ownership requires call-graph evidence.
+- Documentation impact: Production orchestration, Effect architecture,
+  automatic Production SPEC, Effect SPEC/task and both active plans **Change
+  required**. Public services, Layers, Schemas, receipts, workflow authority,
+  provider calls, runbooks, hosted evidence and provider state **Preserve**.
+  READMEs, frontend, browser, accessibility, generated references, release and
+  publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

@@ -1,4 +1,4 @@
-import { Effect, Exit } from "effect";
+import { Effect, Exit, Ref } from "effect";
 
 import { ProductionDeploymentError } from "./production.errors.js";
 import type {
@@ -91,17 +91,25 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
       } satisfies AutomaticProductionReceipt;
     }
 
-    let proxyMoved = false;
-    let agentMoved = false;
+    const rollbackEligibility = yield* Ref.make<{
+      readonly agent: boolean;
+      readonly proxy: boolean;
+    }>({ agent: false, proxy: false });
     const promote = Effect.gen(function* () {
-      proxyMoved = true;
+      yield* Ref.update(rollbackEligibility, (current) => ({
+        ...current,
+        proxy: true,
+      }));
       yield* deployments.promote(candidateProxy);
       yield* validateCandidate(
         yield* deployments.current("proxy"),
         candidateProxy,
         sourceSha
       );
-      agentMoved = true;
+      yield* Ref.update(rollbackEligibility, (current) => ({
+        ...current,
+        agent: true,
+      }));
       yield* deployments.promote(candidateAgent);
       yield* validateCandidate(
         yield* deployments.current("agent"),
@@ -117,7 +125,8 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
           return Effect.void;
         }
         const rollback = Effect.gen(function* () {
-          if (agentMoved) {
+          const eligible = yield* Ref.get(rollbackEligibility);
+          if (eligible.agent) {
             yield* deployments.rollback(previousAgent);
             yield* validateCandidate(
               yield* deployments.current("agent"),
@@ -125,7 +134,7 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
               previousAgent.sourceSha
             );
           }
-          if (proxyMoved) {
+          if (eligible.proxy) {
             yield* deployments.rollback(previousProxy);
             yield* validateCandidate(
               yield* deployments.current("proxy"),

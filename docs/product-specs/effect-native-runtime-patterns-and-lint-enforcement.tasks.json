@@ -726,10 +726,37 @@
       ]
     },
     {
+      "id": "own-production-rollback-state",
+      "title": "Own Production rollback eligibility with Effect Ref",
+      "status": "completed",
+      "dependsOn": ["close-ambient-random-identities"],
+      "description": "Replace closure-mutated Production promotion flags crossing provider Effects and the exit finalizer with one cohesive Effect Ref snapshot while preserving conservative rollback eligibility and reverse restoration order.",
+      "implementationNotes": [
+        "Create one operation-local Ref because proxy and agent eligibility share one rollback snapshot, lifetime and finalizer invariant.",
+        "Set each field before its possibly outcome-uncertain promotion call, preserving the existing conservative rollback behavior for interruption, defects and typed failures.",
+        "Read one immutable snapshot inside the uninterruptible onExit finalizer and restore agent before proxy exactly as before.",
+        "Do not add a service, Layer, helper, Schema, public export or broad mutable-state lint rule; the state is ephemeral, internal and already covered by deterministic failure fixtures."
+      ],
+      "proofContract": {
+        "directObservable": "Production orchestration contains no closure-mutated rollback flags; deterministic fixtures still prove proxy-only, agent-then-proxy, interruption, defect and rollback-failure behavior.",
+        "expectedPostcondition": "Rollback eligibility is Effect-owned cohesive state observed once by the finalizer without changing provider operations or receipts.",
+        "falseGreenRejected": "Renaming the mutable variables, splitting them into adjacent Refs, setting eligibility after the uncertain write, weakening rollback assertions, or adding a generic state helper.",
+        "focusedCommandOrProcedureOwner": "Automatic Production operation and deterministic infrastructure tests, Effect setup, docs and root verification owners",
+        "evidenceOwner": "Production rollback Ref correction receipt",
+        "limitationsAndNonClaims": "Repository fixtures do not deploy, promote, roll back or prove hosted Vercel behavior."
+      },
+      "completionCriteria": [
+        "One cohesive Ref owns both rollback-eligibility fields for one operation execution.",
+        "Eligibility is recorded before each promotion and read once inside the finalizer.",
+        "Existing typed failure, interruption, defect, reverse-order rollback and rollback-failure tests pass unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-ambient-random-identities"],
+      "dependsOn": ["own-production-rollback-state"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

@@ -157,6 +157,7 @@ main push SHA
            -> decode immutable deployment readback
            -> verify current refs/heads/main freshness
            -> promote proxy, then agent
+           -> cohesive Ref marks rollback eligibility before each promotion
            -> stable alias and health/readback
            -> Schema-encoded bounded receipt
         -> on any non-success Effect Exit after promotion starts
@@ -198,11 +199,13 @@ Channel proof
   candidates are `READY`, Production-targeted, exact-project, and exact-SHA.
 - A rerun for the already-current exact SHA is idempotent and performs no
   deployment or promotion.
-- Promotion is proxy first, agent second. Any non-success Effect `Exit` after
-  proxy movement restores the recorded prior proxy deployment; any non-success
-  `Exit` after agent movement restores the prior agent then prior proxy. The
-  exit-aware rollback finalizer is uninterruptible and restoration must be
-  read back before the original failure, interruption, or defect is preserved.
+- Promotion is proxy first, agent second. One cohesive operation-local `Ref`
+  records proxy and agent rollback eligibility immediately before each
+  potentially outcome-uncertain provider call. Any later non-success Effect
+  `Exit` restores the eligible recorded prior deployment, agent then proxy when
+  both are eligible. The exit-aware rollback finalizer is uninterruptible,
+  reads one eligibility snapshot, and verifies restoration before preserving
+  the original failure, interruption, or defect.
 - Success requires both stable targets to read back the exact candidate IDs and
   exact source SHA. Immutable readiness and stable alias resolution are
   separate assertions.
@@ -302,10 +305,12 @@ promotion.
 
 The automatic job records the exact prior Production deployment for each
 project before staging. Runtime rollback restores agent first then proxy when
-both aliases moved; it restores only proxy when agent never moved. Every
-rollback must read back the stable alias, deployment readiness, project and
-source identity. Do not roll back the newest fenced Codex profile generation or
-provider state.
+both promotion attempts became rollback-eligible; it restores only proxy when
+the agent attempt never became eligible. Eligibility is conservative because
+it is recorded before a provider call whose write outcome could become
+uncertain. Every rollback must read back the stable alias, deployment
+readiness, project and source identity. Do not roll back the newest fenced
+Codex profile generation or provider state.
 
 Control rollback disables `.github/workflows/production.yml`, revokes both
 Personal-scope project-bound tokens, and reads back the GitHub environment. It

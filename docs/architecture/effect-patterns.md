@@ -225,6 +225,14 @@ replaceable resource. Use `Schema.NonEmptyArray` only for an at-least-one
 boundary, not as proof of exact cardinality. Atom is not a backend runtime
 state primitive.
 
+Control state that is written before one Effect and observed by a later
+finalizer is runtime state, even when it is scoped to one operation. Keep
+fields that share one compensation invariant in a single immutable `Ref`
+value, update eligibility before an outcome-uncertain external write, and read
+one snapshot in the finalizer. Do not carry compensation policy across Effects
+with closure-mutated booleans or split one rollback snapshot into adjacent
+Refs.
+
 ## Helper Admission
 
 Helper sprawl is an architecture failure, not merely a style preference. Keep

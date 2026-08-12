@@ -361,6 +361,30 @@ by this repository slice.
   behavior, frontend, browser, accessibility, generated references, release
   and publication are **N/A**.
 
+### 2026-08-13 Production rollback Ref correction
+
+- The continuing strict Effect audit found proxy and agent rollback eligibility
+  stored in closure-mutated booleans across provider Effects and the exit
+  finalizer.
+- `runAutomaticProduction` now stores both fields in one operation-local
+  immutable `Ref` because they share one compensation invariant, lifetime and
+  finalizer snapshot. Eligibility remains conservatively recorded before each
+  potentially outcome-uncertain promotion, and rollback remains agent then
+  proxy.
+- Installed `effect@4.0.0-beta.101` and comparison revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` expose the used `Ref`
+  operations. Focused infrastructure typecheck and all 84 Vitest plus 34
+  Alchemy tests pass without a provider call.
+- The final synthetic-Executor repository gate passes 135 boundary tests, 10
+  lint fixtures, all 9 package typechecks and all 15 package test/build tasks
+  from a cold Turbo cache.
+- Documentation impact: Production orchestration, automatic Production SPEC,
+  Effect architecture, Effect SPEC/task and both active plans **Change
+  required**. Workflows, authority, provider commands, service/Layer identities,
+  receipts, runbooks, hosted evidence and provider state **Preserve**. READMEs,
+  frontend, browser, accessibility, generated references, release and
+  publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
