@@ -635,6 +635,19 @@ rejects `Promise.all` and `Promise.race` in owned production source with no
 exception; direct fixtures raise the boundary suite to 131 tests. A rejected
 Web Crypto import proves the exact encoded safe error and no raw-cause leak.
 
+The redaction pass then found 29 reveals nested inside Effectful Schema
+decoders across Codex proxy config, OAuth/session/profile construction,
+refresh-lock persistence, cipher-key conversion, proof config, and the
+infrastructure migration leak scanner. Internal composition now passes decoded
+`Redacted` values to the owning Schema `.makeEffect` constructor so Type-side
+validation remains in the typed Effect channel. Actual representation changes use the owning
+Schema encoder immediately before the crypto or persistence boundary, and the
+leak scanner validates the existing redacted value directly. The boundary
+audit rejects every reveal nested inside `Schema.decodeEffect` or
+`Schema.decodeUnknownEffect` while accepting an immediate outbound-header
+reveal; direct fixtures raise the suite to 133 tests without an exception or
+behavioral contract change.
+
 ## Focused verification commands
 
 During implementation, use the smallest affected subset first:
@@ -670,16 +683,16 @@ not replace focused rule, migration, provider, deployment or channel proof.
 | Testing/quality architecture     | Change required; delivered          | `docs/architecture/testing-and-quality.md` owns exact rule IDs, installed fixtures, exception staleness, focused commands, and terminal gate.                                                                                                              |
 | Other architecture               | Preserve                            | `docs/architecture/README.md`, `docs/architecture/repo-structure.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient; implementation introduced no route, topology, Eve contract, or frontend change. |
 | Root README / docs index         | Preserve                            | `README.md` and `docs/README.md` already route the unchanged public commands and owners; the decision matrix remains in its semantic owner.                                                                                                                |
-| App READMEs                      | Preserve                            | `apps/agent/README.md` and `apps/codex-proxy/README.md` retain the same public boundaries and commands.                                                                                                                                                    |
+| App READMEs                      | Preserve                            | `apps/agent/README.md` and `apps/codex-proxy/README.md` retain the same public boundaries and commands; internal redaction composition does not add setup or operations.                                                                                   |
 | Package READMEs                  | Targeted Change required; delivered | The Sendblue README records private Web Crypto Promise ingress and Effect-owned concurrency; other package purpose, export paths, and commands remain unchanged.                                                                                           |
 | AGENTS.md                        | Preserve                            | `AGENTS.md` already requires flat Effect flow, Schema boundaries, no helper sprawl, provider wrapper review, and docs maintenance.                                                                                                                         |
 | `prd-writer`                     | Preserve                            | `.agents/skills/prd-writer/SKILL.md` already requires Effect call graphs, proof, and impact ledgers; this one implementation does not establish repeated skill failure.                                                                                    |
 | `prd-review` / `prd-implementer` | Preserve                            | The current skills already require implementation-ready contracts, serial slices, focused proof, docs reconciliation, and terminal audit.                                                                                                                  |
 | `effect-client-wrapper`          | Preserve                            | The skill already owns named services, typed provider boundaries, Config, errors, Layers, Promise confinement, and resource lifetime; no new provider-state abstraction was introduced.                                                                    |
 | Lint plugin/config/tests         | Change required; delivered          | The existing plugin now owns four stable rules, direct and installed fixtures, exact count-checked exceptions and approved zero-debt scopes; no second runner, plugin package, autofix or broad ignore was added.                                          |
-| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings hidden in local or imported shared error fields; the exact exception registry remains unchanged.               |
-| Schemas/services/Layers          | Targeted Change required; delivered | Exported errors are Schema-backed and cause-free; migration counts are branded; five shared diagnostic families use owner-named bounded Schemas; service/Layer identities remain unchanged.                                                                |
-| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; boundary fixtures cover raw Promise coordination, causes, exported Data errors, and same-file or cross-file aliased field objects; the migration error round-trips its exact encoded contract.                 |
+| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, redacted Schema round-trips, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings hidden in shared error fields; the exception registry remains unchanged.          |
+| Schemas/services/Layers          | Targeted Change required; delivered | Exported errors are Schema-backed and cause-free; migration counts are branded; shared diagnostics are bounded; Codex and migration composition retain decoded redacted values; service/Layer identities remain unchanged.                                 |
+| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; boundary fixtures cover raw Promise coordination, redacted decoder round-trips, causes, exported Data errors, and same-file or cross-file aliased field objects; the migration error round-trips exactly.      |
 | Verification/evidence/research   | Preserve                            | No critical journey, retained proof owner, or research route changed; repository lint and runtime evidence remains in the active plan and code-owned fixtures.                                                                                             |
 | Standards/operations/runbooks    | Preserve                            | Operational automation and provider changes are owned by the separate automatic-Production SPEC; do not duplicate them here.                                                                                                                               |
 | Active/completed execution plans | Change required                     | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                               |

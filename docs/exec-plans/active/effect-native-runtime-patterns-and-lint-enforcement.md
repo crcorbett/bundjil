@@ -276,7 +276,7 @@ deployment claim.
   boundary suite to 131 tests without an exception; a Web Crypto rejection
   fixture proves the exact safe encoded error without the private cause.
 - Focused Sendblue typecheck and 10 tests pass. The complete `bun run
-  verification` gate passes with all nine package typechecks and all fifteen
+verification` gate passes with all nine package typechecks and all fifteen
   test/build tasks green; the changed Sendblue and agent tasks executed while
   unaffected tasks replayed from the shared Turbo cache. The final owned-source
   scan is empty for `Promise.all` and `Promise.race`.
@@ -285,6 +285,40 @@ deployment claim.
   Public package exports, Channel contract, provider payload Schemas, app
   routing, webhooks, operations, authority, controls, live evidence and
   provider state **Preserve**. Frontend, browser, accessibility, generated API
+  references, release and publication are **N/A**.
+
+## 2026-08-13 redaction-provenance correction
+
+- A fresh `Redacted.value` call-graph audit found 29 reveal sites nested inside
+  Effectful Schema decoding across proxy config, OAuth/session/profile
+  construction, refresh-lock persistence, cipher-key conversion, proof config,
+  and the infrastructure migration leak scanner.
+- Internal composition now passes decoded `Redacted` values through the owning
+  Schema `.makeEffect` constructor. The cipher and refresh-lock adapters use
+  their owning Schema encoders before
+  representation-changing crypto/persistence boundaries, and the migration
+  leak scanner validates existing redacted values directly. The public
+  `makeCodexProxyConfig` encoded-input decoder and actual HTTP, SDK, process,
+  browser, crypto, persistence, or framework reveals remain unchanged.
+- `redacted-schema-roundtrip` rejects a reveal nested inside
+  `Schema.decodeEffect` or `Schema.decodeUnknownEffect`. A negative round-trip
+  fixture and positive outbound-header fixture raise boundary proof to 133
+  tests without an exception.
+- Installed `effect@4.0.0-beta.101` remains runtime authority and the local
+  Effect comparison remains revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+- Focused proof passes: 115 Codex tests, 41 proxy tests, 84 infrastructure
+  Vitest tests plus 21 Alchemy tests, affected package typechecks,
+  `check:boundaries`, `check:docs`, `check:skills`, and `git diff --check`.
+- The final synthetic-Executor `bun run verification` candidate passes 133
+  boundary tests, 10 lint fixtures, all 9 package typechecks, and all 15
+  package test/build tasks with zero cache hits.
+- Documentation impact: Codex proxy/config, OAuth/profile/storage,
+  infrastructure migration script, Effect architecture, Effect SPEC/task, this
+  plan, and boundary tooling/fixtures **Change required**.
+  Public config API, app README, services, Layer identities, stored ciphertext,
+  provider calls, operations, authority, controls, hosted evidence and provider
+  state **Preserve**. Frontend, browser, accessibility, generated API
   references, release and publication are **N/A**.
 
 ## Evidence and non-claims

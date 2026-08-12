@@ -428,7 +428,7 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
             {
               _tag: "Set",
               key,
-              value: Redacted.value(lease.owner),
+              value: encodedOwner,
               ttl: lease.expiresAtEpochMillis - nowEpochMillis,
             },
           ],
@@ -488,12 +488,23 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
               })
           )
         );
+        const encodedOwner = yield* Schema.encodeEffect(
+          CodexOAuthRefreshLockOwner
+        )(lease.owner).pipe(
+          Effect.mapError(
+            () =>
+              new CodexOAuthRefreshLockError({
+                operation: "release",
+                reason: "release",
+                subjectHash: lease.subjectHash,
+                message: "Unable to encode the Codex OAuth refresh-lock owner.",
+              })
+          )
+        );
         const transaction = yield* Schema.decodeUnknownEffect(
           AtomicKeyValueStoreTransaction
         )({
-          conditions: [
-            { _tag: "Equals", key, value: Redacted.value(lease.owner) },
-          ],
+          conditions: [{ _tag: "Equals", key, value: encodedOwner }],
           mutations: [{ _tag: "Remove", key }],
         }).pipe(
           Effect.mapError(

@@ -466,6 +466,25 @@ const isRawResponseRead = (
   );
 };
 
+const isRedactedSchemaRoundTrip = (node: ts.CallExpression) => {
+  if (dottedName(node.expression) !== "Redacted.value") {
+    return false;
+  }
+  let current: ts.Node | undefined = node.parent;
+  while (current !== undefined && !ts.isSourceFile(current)) {
+    if (
+      ts.isCallExpression(current) &&
+      ["Schema.decodeEffect", "Schema.decodeUnknownEffect"].includes(
+        rootCallName(current) ?? ""
+      )
+    ) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
+};
+
 const isDirectEnvironmentAccess = (node: ts.PropertyAccessExpression) =>
   node.name.text === "env" &&
   ["process", "globalThis.process", "Bun", "import.meta"].includes(
@@ -610,6 +629,13 @@ const inspectCallExpression = (
       node,
       "raw-response-text",
       "Raw response text or JSON must be decoded by the canonical boundary codec before domain use."
+    );
+  }
+  if (isRedactedSchemaRoundTrip(node)) {
+    report(
+      node,
+      "redacted-schema-roundtrip",
+      "Already-decoded Redacted values must not be revealed merely to pass through another Schema decoder. Compose the decoded contract directly."
     );
   }
   const codecSideName = codecMisuse(checker, node);

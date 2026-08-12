@@ -11,7 +11,6 @@ import {
   FileSystem,
   Layer,
   Match,
-  Redacted,
   Schema,
 } from "effect";
 
@@ -183,10 +182,7 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
       photonCredentials.projectSecret,
       vercelAccessToken,
     ],
-    (value) =>
-      Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(
-        Redacted.make(Redacted.value(value))
-      )
+    (value) => Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(value)
   );
   const backupStore = makePreviewStateBackupStoreLive(
     backupPath,

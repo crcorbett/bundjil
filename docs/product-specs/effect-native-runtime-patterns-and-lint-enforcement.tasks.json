@@ -671,10 +671,38 @@
       ]
     },
     {
+      "id": "close-redacted-schema-roundtrip",
+      "title": "Close redacted Schema round-trips",
+      "status": "completed",
+      "dependsOn": ["close-raw-promise-coordination"],
+      "description": "Correct every repository finding where already-decoded Redacted values were revealed inside another Effectful Schema decoder, including Codex config, OAuth/profile, crypto/persistence composition, and infrastructure leak scanning.",
+      "implementationNotes": [
+        "Compose config, session, token, profile, and proof contracts from already-decoded values with the owning Schema makeEffect constructor; preserve makeCodexProxyConfig as the public encoded-input decoder.",
+        "Use the owning Schema encoder before representation-changing cipher-key and refresh-lock persistence boundaries; validate the migration scanner's existing redacted values directly.",
+        "Remove only unnecessary reveals nested in Effectful decoding; preserve immediate reveals at HTTP headers, provider SDK construction, process invocation, browser callbacks, cryptographic calls, persistence clients, and framework token callbacks.",
+        "Reject a Redacted.value call nested inside Schema.decodeEffect or Schema.decodeUnknownEffect through the existing boundary audit.",
+        "Add direct negative round-trip and positive outbound-header fixtures with no exception, helper, service, Layer identity, or config behavior change."
+      ],
+      "proofContract": {
+        "directObservable": "All 29 detected nested reveal sites are removed; a negative fixture rejects Schema re-decoding and a positive fixture accepts an immediate header reveal; 133 boundary tests, affected package typechecks/tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Decoded secrets remain Redacted through internal composition and become plaintext only at an actual external boundary.",
+        "falseGreenRejected": "Moving the reveal into a helper, banning all Redacted.value calls, changing public encoded-input decoding, weakening secret Schemas, relying on grep alone, or treating config tests as hosted secret proof.",
+        "focusedCommandOrProcedureOwner": "Codex proxy, OAuth/profile/storage, infrastructure migration, boundary provenance fixtures, affected package tests, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Redaction-provenance correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not read a hosted secret, rotate key material, decrypt a hosted profile, invoke Codex, or establish deployment behavior."
+      },
+      "completionCriteria": [
+        "Internal config, OAuth/session/profile, proof, storage, crypto, and migration composition retains decoded Redacted values without decoder round-trips.",
+        "Immediate external-boundary reveals remain allowed and unchanged.",
+        "Negative and positive provenance fixtures pass with no exception.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-raw-promise-coordination"],
+      "dependsOn": ["close-redacted-schema-roundtrip"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

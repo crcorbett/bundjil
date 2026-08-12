@@ -15,7 +15,6 @@ import {
   Effect,
   Layer,
   Option,
-  Redacted,
   Schema,
 } from "effect";
 
@@ -161,18 +160,27 @@ export const loadCodexProxyConfig = Effect.gen(
       provider: "codex",
     });
 
-    const config = yield* decodeCodexProxyRuntimeConfig({
+    const config = yield* CodexProxyRuntimeConfig.makeEffect({
       mode,
       reasoningEffort,
-      internalToken: Redacted.value(internalToken),
+      internalToken,
       subject,
-      ...(Option.isNone(accountId)
-        ? {}
-        : { accountId: Redacted.value(accountId.value) }),
+      ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
       ...(Option.isNone(localProfileStoreDirectory)
         ? {}
         : { localProfileStoreDirectory: localProfileStoreDirectory.value }),
-    });
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new CodexProxyRouteError({
+            boundary: "CodexProxyRuntimeConfig",
+            code: "bad_request",
+            message: "Unable to compose Codex proxy runtime config.",
+            responseMessage: "The Codex proxy config is invalid.",
+            status: 400,
+          })
+      )
+    );
 
     if (
       config.mode === "local" &&

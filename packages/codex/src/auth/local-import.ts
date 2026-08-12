@@ -1,4 +1,4 @@
-import { Clock, Context, Effect, Layer, Redacted, Schema } from "effect";
+import { Clock, Context, Effect, Layer, Schema } from "effect";
 
 import { CodexAccessTokenImportProfile } from "../profiles/contracts.js";
 import { CodexProfileStore } from "../profiles/store.js";
@@ -48,13 +48,11 @@ export const makeCodexLocalProfileImportService = Effect.gen(
             });
           }
 
-          const profile = yield* Schema.decodeUnknownEffect(
-            CodexAccessTokenImportProfile
-          )({
+          const profile = yield* CodexAccessTokenImportProfile.makeEffect({
             profileVersion: 2,
             profileKind: "access-token-import",
             subject: config.subject,
-            accessToken: Redacted.value(cache.tokens.access_token),
+            accessToken: cache.tokens.access_token,
             expiresAtEpochMillis,
             scopes: [],
             createdAtEpochMillis: nowEpochMillis,

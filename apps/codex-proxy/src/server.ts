@@ -3,7 +3,7 @@ import {
   OpenAICompatibleProxy,
   OpenAICompatibleProxyInput,
 } from "@bundjil/codex";
-import { Effect, Layer, Match, Redacted, Schema } from "effect";
+import { Effect, Layer, Match, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import {
   HttpRouter,
@@ -137,9 +137,7 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
           })
       )
     );
-    const proxyInput = yield* Schema.decodeUnknownEffect(
-      OpenAICompatibleProxyInput
-    )({
+    const proxyInput = yield* OpenAICompatibleProxyInput.makeEffect({
       ...(request.headers["authorization"] === undefined
         ? {}
         : { authorization: request.headers["authorization"] }),
@@ -150,7 +148,7 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         request: completion,
         subject: config.subject,
       },
-      internalToken: Redacted.value(config.internalToken),
+      internalToken: config.internalToken,
     }).pipe(
       Effect.mapError(
         () =>

@@ -1,12 +1,4 @@
-import {
-  Clock,
-  Context,
-  Effect,
-  Equal,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Clock, Context, Effect, Equal, Option } from "effect";
 
 import { generateCodexOAuthCredentialRevision } from "../profiles/cipher.js";
 import { CodexOAuthProfileCommit } from "../profiles/commit.js";
@@ -90,9 +82,9 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   const credentialFromProfile = Effect.fn(
     "CodexOAuthService.credentialFromProfile"
   )(function* (profile: CodexSubscriptionProfileType) {
-    return yield* Schema.decodeUnknownEffect(CodexOAuthCredential)({
-      accessToken: Redacted.value(profile.accessToken),
-      accountId: Redacted.value(profile.accountId),
+    return yield* CodexOAuthCredential.makeEffect({
+      accessToken: profile.accessToken,
+      accountId: profile.accountId,
       credentialRevision: profile.credentialRevision,
     }).pipe(
       Effect.mapError(
@@ -129,13 +121,11 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   )(function* (profile: CodexSubscriptionProfileType) {
     const nowEpochMillis = yield* Clock.currentTimeMillis;
     const credentialRevision = yield* generateCodexOAuthCredentialRevision();
-    const markedProfile = yield* Schema.decodeUnknownEffect(
-      CodexSubscriptionProfile
-    )({
+    const markedProfile = yield* CodexSubscriptionProfile.makeEffect({
       ...profile,
-      accessToken: Redacted.value(profile.accessToken),
-      refreshToken: Redacted.value(profile.refreshToken),
-      accountId: Redacted.value(profile.accountId),
+      accessToken: profile.accessToken,
+      refreshToken: profile.refreshToken,
+      accountId: profile.accountId,
       credentialRevision,
       requiresReauthentication: true,
       updatedAtEpochMillis: nowEpochMillis,
@@ -324,16 +314,11 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
 
           const credentialRevision =
             yield* generateCodexOAuthCredentialRevision();
-          const refreshedProfile = yield* Schema.decodeUnknownEffect(
-            CodexSubscriptionProfile
-          )({
+          const refreshedProfile = yield* CodexSubscriptionProfile.makeEffect({
             ...profile,
-            accessToken: Redacted.value(refreshResult.accessToken),
-            refreshToken:
-              refreshResult.refreshToken === undefined
-                ? Redacted.value(profile.refreshToken)
-                : Redacted.value(refreshResult.refreshToken),
-            accountId: Redacted.value(profile.accountId),
+            accessToken: refreshResult.accessToken,
+            refreshToken: refreshResult.refreshToken ?? profile.refreshToken,
+            accountId: profile.accountId,
             expiresAtEpochMillis: refreshResult.expiresAtEpochMillis,
             updatedAtEpochMillis: refreshResult.updatedAtEpochMillis,
             lastRefreshedAtEpochMillis: refreshResult.updatedAtEpochMillis,

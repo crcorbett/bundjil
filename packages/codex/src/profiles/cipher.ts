@@ -1,10 +1,11 @@
-import { Context, Effect, Redacted, Schema } from "effect";
+import { Context, Effect, Schema } from "effect";
 
 import { CodexOAuthCredentialRevision } from "../auth/credentials.js";
 import { CodexOAuthProfileCipherConfigService } from "./cipher-config.js";
 import {
   CodexOAuthProfile,
   CodexOAuthProfileCipherKeyId,
+  CodexOAuthProfileCipherKeyMaterial,
   EncryptedCodexOAuthProfileV2,
   LegacyCodexOAuthProfileV1,
 } from "./contracts.js";
@@ -67,9 +68,21 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
   crypto: Crypto = globalThis.crypto
 ) {
   const config = yield* CodexOAuthProfileCipherConfigService;
+  const encodedKeyMaterial = yield* Schema.encodeEffect(
+    CodexOAuthProfileCipherKeyMaterial
+  )(config.keyMaterial).pipe(
+    Effect.mapError(
+      () =>
+        new CodexOAuthProfileCipherError({
+          operation: "loadKey",
+          keyId: config.keyId,
+          message: "Codex OAuth profile encryption key material is invalid.",
+        })
+    )
+  );
   const keyMaterial = yield* Schema.decodeUnknownEffect(
     Schema.Uint8ArrayFromBase64
-  )(Redacted.value(config.keyMaterial)).pipe(
+  )(encodedKeyMaterial).pipe(
     Effect.mapError(
       () =>
         new CodexOAuthProfileCipherError({

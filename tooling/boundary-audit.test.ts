@@ -67,6 +67,10 @@ describe("boundary provenance audit", () => {
       "export const fastest = () => Promise.race([fetch('/a'), fetch('/b')]);",
     ],
     [
+      "redacted-schema-roundtrip",
+      "const Config = Schema.Struct({ token: Schema.RedactedFromValue(Schema.NonEmptyString) }); export const config = Schema.decodeUnknownEffect(Config)({ token: Redacted.value(token) });",
+    ],
+    [
       "sync-schema-codec",
       "export const decode = () => Schema.decodeSync(Value);",
     ],
@@ -153,6 +157,17 @@ describe("boundary provenance audit", () => {
     const { cwd, file } = fixture(
       "export const handler = (request: Request): Promise<Response> => Promise.resolve(new Response(request.url));"
     );
+    expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("accepts revealing a redacted value at an outbound header boundary", () => {
+    const { cwd, file } = fixture(`
+      export const request = HttpClientRequest.setHeader(
+        HttpClientRequest.get("https://example.test"),
+        "authorization",
+        Redacted.value(token)
+      );
+    `);
     expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
   });
 

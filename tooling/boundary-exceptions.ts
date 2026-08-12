@@ -32,6 +32,7 @@ export type BoundaryRule =
   | "direct-environment-access"
   | "direct-platform-process"
   | "raw-promise-coordination"
+  | "redacted-schema-roundtrip"
   | "direct-json"
   | "raw-fetch"
   | "public-generic-fetch"

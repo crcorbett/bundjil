@@ -1,4 +1,4 @@
-import { Clock, Effect, Layer, Redacted, Schema } from "effect";
+import { Clock, Effect, Layer } from "effect";
 
 import {
   CodexOAuthClient,
@@ -44,15 +44,13 @@ export const makeCodexOAuthRefreshClient = Effect.gen(
             : yield* decodeCodexAccountMetadata(response.id_token);
         const updatedAtEpochMillis = yield* Clock.currentTimeMillis;
 
-        return yield* Schema.decodeUnknownEffect(CodexOAuthTokenRefreshResult)({
+        return yield* CodexOAuthTokenRefreshResult.makeEffect({
           subject: input.subject,
-          accessToken: Redacted.value(response.access_token),
+          accessToken: response.access_token,
           ...(response.refresh_token === undefined
             ? {}
-            : { refreshToken: Redacted.value(response.refresh_token) }),
-          ...(account === undefined
-            ? {}
-            : { accountId: Redacted.value(account.accountId) }),
+            : { refreshToken: response.refresh_token }),
+          ...(account === undefined ? {} : { accountId: account.accountId }),
           expiresAtEpochMillis: expiry.expiresAtEpochMillis,
           updatedAtEpochMillis,
         }).pipe(

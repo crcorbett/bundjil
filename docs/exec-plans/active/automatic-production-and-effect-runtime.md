@@ -310,6 +310,19 @@ linear. Boundary proof now rejects `Promise.all` and `Promise.race` and passes
 Crypto ingress. This source correction changes no Channel
 contract, webhook, provider state, hosted evidence, or deployment dependency.
 
+The following redaction pass removed 29 internal plaintext round-trips across
+Codex proxy config, OAuth/session/profile composition, refresh-lock storage,
+cipher-key conversion, proof config, and the infrastructure migration leak
+scanner. Decoded values stay `Redacted` through internal composition; explicit
+Schema encoding owns the two representation-changing crypto/persistence
+boundaries. Boundary proof rejects reveals nested in Effectful Schema decoding
+while accepting immediate outbound-boundary reveals, for 133 tests with no
+exception. Public encoded config decoding, ciphertext, hosted secrets,
+provider behavior, and deployment dependencies are unchanged.
+The final synthetic-Executor repository gate passes 133 boundary tests, 10 lint
+fixtures, all 9 package typechecks, and all 15 package test/build tasks. This is
+repository proof only; it does not establish hosted secret or provider state.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

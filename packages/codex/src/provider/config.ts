@@ -1,11 +1,4 @@
-import {
-  Config,
-  ConfigProvider,
-  Effect,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Config, ConfigProvider, Effect, Option } from "effect";
 
 import {
   CodexOAuthAccessToken,
@@ -22,7 +15,7 @@ import { CodexResponsesRequestError } from "./errors.js";
 export const defaultCodexResponsesEndpoint =
   "https://chatgpt.com/backend-api/codex/responses";
 
-export const defaultCodexResponsesModel = "gpt-5.5";
+export const defaultCodexResponsesModel = CodexResponsesModelId.make("gpt-5.5");
 
 const proofAccessTokenConfig = Config.schema(
   CodexOAuthAccessToken,
@@ -55,8 +48,8 @@ export const loadCodexResponsesProofInput = Effect.gen(
     const model = yield* proofModelConfig;
     const prompt = yield* proofPromptConfig;
 
-    return yield* Schema.decodeUnknownEffect(CodexResponsesProofInput)({
-      accessToken: Redacted.value(rawAccessToken),
+    return yield* CodexResponsesProofInput.makeEffect({
+      accessToken: rawAccessToken,
       ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
       model,
       prompt,

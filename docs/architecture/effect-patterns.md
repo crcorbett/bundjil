@@ -112,6 +112,17 @@ Tests use a scoped `ConfigProvider` when proving configuration and a
 deterministic mock/memory Layer for service behavior. Every provider service
 exports explicit live and mock/memory Layers.
 
+Compose dynamic already-decoded redacted config with the owning Schema's
+`.makeEffect` constructor so Type-side validation stays in the typed error
+channel; reserve `.make` for trusted static construction. Do not call
+`Redacted.value` merely to feed the
+plaintext into `Schema.decodeEffect` or `Schema.decodeUnknownEffect` and create
+another redacted wrapper. `redacted-schema-roundtrip` enforces this while
+preserving immediate boundary reveals. When an external representation really
+must change, encode the owning redacted Schema at that exact egress before
+decoding the target wire/crypto representation; do not reveal and re-wrap it as
+an internal shortcut.
+
 Alchemy custom providers follow the same boundary. `Resource` props and
 attributes are canonical decoded Schema types; `Provider.succeed` delegates
 named `read`/`diff`/`reconcile`/`delete`/`list` operations to injected services
