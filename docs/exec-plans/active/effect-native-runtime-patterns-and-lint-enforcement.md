@@ -452,6 +452,36 @@ verification` gate passes with all nine package typechecks and all fifteen
   state, runbooks, READMEs, frontend, release and publication **Preserve** or
   **N/A**.
 
+## 2026-08-13 policy receipt Clock correction
+
+- A fresh residual audit found seven ambient receipt timestamps across six
+  Effect-owned policy CLIs. Their pure policy functions already accepted an
+  explicit timestamp, but each executable owner supplied zero-argument
+  `new Date()` and `tooling/**` was outside the ambient-time lint scope.
+- Each successful CLI now reads one epoch through installed
+  `Clock.currentTimeMillis` and formats `Date` only from that explicit value.
+  Verification fallback generation owns a separate linear Effect-clock path
+  because the primary program did not complete. No timestamp helper, service,
+  Layer, public export or receipt Schema was added.
+- `oxlint.config.ts` enables only the existing
+  `bundjil/no-ambient-time-in-effect` rule for owned tooling. Async, runtime,
+  `tryPromise` and tagged-error rule scopes are unchanged.
+- Installed `effect@4.0.0-beta.101` is the execution authority; its packaged
+  `effect/src/Clock.ts` exports `Clock.currentTimeMillis`. The retained primary
+  reference revision is
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c`, cited by the SPEC's v4 Clock
+  source links. Effect setup, tooling typecheck, all six policy commands and
+  all 11 installed/unit lint fixtures pass.
+- The forced synthetic-Executor `bun run verification` candidate passes with
+  zero Turbo cache hits: 135 boundary tests, 11 lint fixtures, all 9 package
+  typechecks and all 15 package build/test tasks, including 85 infrastructure
+  Vitest tests and 21 Alchemy/Bun tests. No Executor or provider request ran.
+- Documentation impact: policy CLI timestamp owners, root lint scope, Effect
+  architecture, SPEC/task ledger and both active plans **Change required**.
+  Receipt contracts, app/package runtime behavior, provider state, workflows,
+  runbooks, READMEs and public exports **Preserve**. Frontend, browser,
+  accessibility, release, deployment and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

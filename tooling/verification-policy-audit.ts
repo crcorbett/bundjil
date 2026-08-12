@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { Console, Effect, Option, Schema } from "effect";
+import { Clock, Console, Effect, Option, Schema } from "effect";
 
 import {
   auditVerification,
@@ -199,11 +199,12 @@ const program = Effect.gen(function* () {
       )
     )
   );
+  const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
   const report = auditVerification(
     { commandMap, detailArtifacts, journeys, packets, repositoryPaths },
     {
       detailPath,
-      generatedAt: new Date().toISOString(),
+      generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
       maxFindings: maximumConsoleFindings,
     }
   );
@@ -261,29 +262,30 @@ const program = Effect.gen(function* () {
 try {
   await Effect.runPromise(program);
 } catch {
-  const fallback: VerificationPolicyReport = {
-    detailPath,
-    findings: [],
-    generatedAt: new Date().toISOString(),
-    ok: false,
-    omittedFindings: 0,
-    schemaVersion: 1,
-    shownFindings: 0,
-  };
   await Effect.runPromise(
-    Schema.encodeEffect(VerificationPolicyReportJson)(fallback).pipe(
-      Effect.flatMap((encoded) =>
-        Effect.tryPromise({
-          try: async () => {
-            const path = resolve(repositoryRoot, detailPath);
-            await mkdir(dirname(path), { recursive: true });
-            await Bun.write(path, `${encoded}\n`);
-          },
-          catch: () => null,
-        })
-      ),
-      Effect.catch(() => Effect.void)
-    )
+    Effect.gen(function* () {
+      const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
+      const fallback: VerificationPolicyReport = {
+        detailPath,
+        findings: [],
+        generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
+        ok: false,
+        omittedFindings: 0,
+        schemaVersion: 1,
+        shownFindings: 0,
+      };
+      const encoded = yield* Schema.encodeEffect(VerificationPolicyReportJson)(
+        fallback
+      );
+      yield* Effect.tryPromise({
+        try: async () => {
+          const path = resolve(repositoryRoot, detailPath);
+          await mkdir(dirname(path), { recursive: true });
+          await Bun.write(path, `${encoded}\n`);
+        },
+        catch: () => null,
+      });
+    }).pipe(Effect.catch(() => Effect.void))
   );
   console.error(
     "check:verification failed; inspect tmp/verification-policy-report.json"

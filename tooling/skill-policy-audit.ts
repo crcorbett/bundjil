@@ -2,7 +2,7 @@ import { lstatSync } from "node:fs";
 import { lstat, mkdir, readlink, stat } from "node:fs/promises";
 import { dirname, posix, resolve } from "node:path";
 
-import { Console, Effect, Schema } from "effect";
+import { Clock, Console, Effect, Schema } from "effect";
 
 import {
   auditSkills,
@@ -132,11 +132,12 @@ const program = Effect.gen(function* () {
     inspectLink,
     { concurrency: 16 }
   );
+  const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
   const report = auditSkills(
     { files, links, repositoryPaths },
     {
       detailPath,
-      generatedAt: new Date().toISOString(),
+      generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
       maxFindings: maximumConsoleFindings,
     }
   );

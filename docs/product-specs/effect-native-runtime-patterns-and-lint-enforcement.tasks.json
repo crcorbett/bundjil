@@ -131,7 +131,8 @@
       "taskIds": [
         "add-narrow-lint-rules-disabled",
         "migrate-targeted-effect-patterns",
-        "enable-rules-and-reconcile-docs"
+        "enable-rules-and-reconcile-docs",
+        "own-policy-receipt-time"
       ],
       "directObservable": "Deterministic attempt, timestamp, timeout, and retry traces complete under TestClock; exact host exceptions remain registered.",
       "expectedPostcondition": "Effect-owned test outcomes are independent of host wall time.",
@@ -191,7 +192,8 @@
       "taskIds": [
         "refresh-integrated-inventory",
         "add-narrow-lint-rules-disabled",
-        "enable-rules-and-reconcile-docs"
+        "enable-rules-and-reconcile-docs",
+        "own-policy-receipt-time"
       ],
       "directObservable": "Each rule rejects exact negative fixtures, accepts exact positive/exception fixtures, and stale exceptions fail.",
       "expectedPostcondition": "Rules are durable and actionable without a debt baseline.",
@@ -206,6 +208,7 @@
       "taskIds": [
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets",
+        "own-policy-receipt-time",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Finding inventory links each source edit to focused behavioural or compatibility proof.",
@@ -236,6 +239,7 @@
       "taskIds": [
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
+        "own-policy-receipt-time",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Docs ledger, source, rule IDs, commands, and skills agree and policy audits pass.",
@@ -270,6 +274,7 @@
       "taskIds": [
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
+        "own-policy-receipt-time",
         "terminal-five-pass-audit"
       ],
       "directObservable": "One exact candidate has fresh focused and terminal command receipts.",
@@ -807,10 +812,37 @@
       ]
     },
     {
+      "id": "own-policy-receipt-time",
+      "title": "Own policy receipt timestamps with Effect Clock",
+      "status": "completed",
+      "dependsOn": ["align-domain-membership-hashsets"],
+      "description": "Replace ambient host timestamps in Effect-owned policy audit CLIs with one Clock.currentTimeMillis observation per executed receipt path and extend the existing ambient-time lint rule to owned tooling.",
+      "implementationNotes": [
+        "Read the epoch inside each existing linear Effect program and construct Date only from that explicit value at the receipt-formatting boundary.",
+        "Keep verification-policy fallback generation in its own Effect-clock path because the primary program did not complete.",
+        "Enable only the existing ambient-time rule for tooling; do not widen async, runtime-root, tryPromise or tagged-error rules without a separate finding inventory.",
+        "Do not add a shared timestamp helper, service, Layer, public export, custom Clock, provider operation or receipt-contract change."
+      ],
+      "proofContract": {
+        "directObservable": "All seven Effect-owned policy receipt timestamp sites use Clock.currentTimeMillis, no zero-argument Date remains in tooling, and root lint applies the ambient-time rule to tooling TypeScript.",
+        "expectedPostcondition": "Policy receipt time is Effect-owned and future tooling ambient-time regressions fail the normal lint gate without changing encoded receipt contracts.",
+        "falseGreenRejected": "Moving new Date into a helper, replacing it with Date.now, changing only current source without a lint scope, or enabling unrelated rules across tooling.",
+        "focusedCommandOrProcedureOwner": "Effect setup, root lint, lint fixtures, six policy audit commands, tooling typecheck, docs policy and root verification",
+        "evidenceOwner": "Policy receipt Clock correction receipt",
+        "limitationsAndNonClaims": "A live Clock at CLI execution remains nondeterministic wall time; this proves dependency ownership and test-injectable semantics, not timestamp accuracy or hosted execution."
+      },
+      "completionCriteria": [
+        "Policy audit success and fallback paths obtain their timestamps from the active Effect Clock.",
+        "The existing ambient-time rule covers tooling without unrelated rule expansion.",
+        "All policy audit commands, lint fixtures, tooling typecheck, docs checks and full verification pass.",
+        "Canonical architecture, SPEC/task ledger and both active plans record the bounded change and non-claims."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["align-domain-membership-hashsets"],
+      "dependsOn": ["own-policy-receipt-time"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

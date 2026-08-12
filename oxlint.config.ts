@@ -27,6 +27,12 @@ export default defineConfig({
       },
     },
     {
+      files: ["tooling/**/*.ts"],
+      rules: {
+        "bundjil/no-ambient-time-in-effect": "error",
+      },
+    },
+    {
       files: [
         "apps/agent/agent/**/*.ts",
         "apps/agent/agent/**/*.tsx",

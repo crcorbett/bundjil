@@ -2,7 +2,7 @@ import { lstatSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { Console, Effect, Schema } from "effect";
+import { Clock, Console, Effect, Schema } from "effect";
 import { parse as parseYamlDocument } from "yaml";
 
 import {
@@ -174,6 +174,7 @@ const program = Effect.gen(function* () {
       ),
     { concurrency: 4 }
   );
+  const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
   const report = auditAuthority(
     {
       automationRegister,
@@ -184,7 +185,7 @@ const program = Effect.gen(function* () {
     },
     {
       detailPath,
-      generatedAt: new Date().toISOString(),
+      generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
       maxFindings: maximumConsoleFindings,
     }
   );

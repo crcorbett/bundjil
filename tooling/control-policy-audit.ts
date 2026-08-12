@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { Console, Effect, Schema } from "effect";
+import { Clock, Console, Effect, Schema } from "effect";
 
 import { boundaryExceptions } from "./boundary-exceptions.js";
 import {
@@ -153,6 +153,7 @@ const program = Effect.gen(function* () {
       { concurrency: 4 }
     )
   );
+  const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
   const report = auditControlPolicy(
     {
       automationRegister,
@@ -165,7 +166,10 @@ const program = Effect.gen(function* () {
       repositoryPaths,
       sourceDigests,
     },
-    { detailPath, generatedAt: new Date().toISOString() }
+    {
+      detailPath,
+      generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
+    }
   );
   const encoded = yield* Schema.encodeEffect(ControlPolicyReportJson)(
     report

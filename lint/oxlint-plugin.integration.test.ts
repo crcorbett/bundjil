@@ -1,4 +1,6 @@
 import { spawnSync } from "node:child_process";
+import { rmSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
@@ -56,6 +58,25 @@ describe("installed Bundjil Oxlint plugin", () => {
       "bundjil(require-try-promise-catch)",
     ]) {
       expect(result.output).toContain(rule);
+    }
+  });
+
+  it("applies ambient-time enforcement to owned tooling", () => {
+    const probe = "tooling/.ambient-time-lint-probe.ts";
+    writeFileSync(resolve(probe), "new Date();\n");
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-ambient-time-in-effect)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
     }
   });
 });

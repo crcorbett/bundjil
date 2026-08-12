@@ -451,6 +451,30 @@ by this repository slice.
   plan **Change required**; source contracts, task status, provider state,
   runbooks, READMEs, frontend, release and publication **Preserve** or **N/A**.
 
+## 2026-08-13 policy receipt Clock correction
+
+- Six Effect-owned policy CLIs now derive all seven executed receipt
+  timestamps from `Clock.currentTimeMillis`, including the verification
+  fallback path. Date formatting remains inline at each receipt boundary;
+  encoded receipt contracts and runtime/provider behavior are unchanged.
+- The existing ambient-time lint rule now covers owned `tooling/**` TypeScript
+  through a dedicated override. No unrelated lint rule or exception scope was
+  widened.
+- Installed `effect@4.0.0-beta.101` and its packaged `effect/src/Clock.ts` are
+  the exact API authority for this correction; the SPEC retains primary v4
+  comparison revision `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+  Effect setup, tooling typecheck, all six policy commands and all 11 lint
+  fixtures pass.
+- The forced synthetic-Executor `bun run verification` candidate passes with
+  zero Turbo cache hits: 135 boundary tests, all 9 package typechecks and all
+  15 package build/test tasks, including 85 infrastructure Vitest tests and 21
+  Alchemy/Bun tests. No Executor or provider request ran.
+- Documentation impact: policy CLI timestamp owners, lint scope, Effect
+  architecture, SPEC/task ledger and both active plans **Change required**.
+  Production workflow semantics, provider state, authority envelopes,
+  runbooks, READMEs and public exports **Preserve**. Frontend, browser,
+  accessibility, deployment, release and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

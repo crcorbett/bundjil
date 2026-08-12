@@ -300,9 +300,11 @@ after-write interruption and defect, not only expected provider failures.
 `bun run check` runs the root Ultracite/Oxlint formatting and type-aware lint
 configuration. In app/package TypeScript, the local plugin rejects ambient
 time, bare or catchless `Effect.tryPromise`, and runtime execution outside
-named edges. In package `src`, agent service code, and codex-proxy `src`, it
-also confines `async`, `await`, and `new Promise` to direct Effect Promise
-ingress callbacks. The stable rule IDs are
+named edges. It also rejects ambient host time in owned `tooling/**`
+TypeScript, including policy receipt generation. In package `src`, agent
+service code, and codex-proxy `src`, it confines `async`, `await`, and
+`new Promise` to direct Effect Promise ingress callbacks. The stable rule IDs
+are
 `bundjil/no-ambient-time-in-effect`,
 `bundjil/no-async-await-in-effect-service`,
 `bundjil/require-try-promise-catch`, and
