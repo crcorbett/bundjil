@@ -288,6 +288,31 @@ const rootCallName = (node: ts.CallExpression) => {
   return dottedName(expression);
 };
 
+const isOperatorRawCause = (node: ts.PropertySignature) => {
+  if (
+    node.type?.kind !== ts.SyntaxKind.UnknownKeyword ||
+    !node.getSourceFile().fileName.includes(`${sep}scripts${sep}`)
+  ) {
+    return false;
+  }
+  let current: ts.Node | undefined = node.parent;
+  while (current !== undefined && !ts.isSourceFile(current)) {
+    if (ts.isClassDeclaration(current)) {
+      return (
+        current.heritageClauses?.some((clause) =>
+          clause.types.some(
+            (type) =>
+              ts.isCallExpression(type.expression) &&
+              rootCallName(type.expression) === "Data.TaggedError"
+          )
+        ) === true
+      );
+    }
+    current = current.parent;
+  }
+  return false;
+};
+
 const codecSide = (
   checker: ts.TypeChecker,
   codec: ts.Expression,
@@ -631,6 +656,13 @@ export const auditBoundaryProvenance = (
           node,
           "public-generic-fetch",
           "Public provider configuration cannot expose a generic fetch callback seam."
+        );
+      }
+      if (ts.isPropertySignature(node) && isOperatorRawCause(node)) {
+        report(
+          node,
+          "operator-raw-cause",
+          "Operator errors cannot retain arbitrary unknown values. Classify the failure with bounded secret-negative fields before it reaches an operator receipt."
         );
       }
       if (

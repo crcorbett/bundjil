@@ -564,10 +564,36 @@
       ]
     },
     {
+      "id": "close-operator-error-cause-boundary",
+      "title": "Close operator error-retention channels",
+      "status": "completed",
+      "dependsOn": ["close-public-error-cause-boundary"],
+      "description": "Correct the iterative observability finding where the hosted staged-refresh proof retained an arbitrary HTTP rejection in a private tagged error even though its renderer currently emitted only a bounded blocked receipt.",
+      "implementationNotes": [
+        "Remove the unknown cause from HostedProofRequestError while preserving its typed failure tag and bounded success/blocked output contract.",
+        "Add operator-raw-cause to the existing boundary audit; reject arbitrary unknown fields only on Data.TaggedError classes under app/package scripts directories.",
+        "Accept bounded operator classifications and preserve private adapter causes outside scripts only where they are immediately collapsed into safe public errors.",
+        "Add direct negative and positive fixtures without an exception or another checker."
+      ],
+      "proofContract": {
+        "directObservable": "The staged-refresh proof retains no raw rejection; the boundary audit rejects an unknown operator-error field and accepts bounded operator plus private-adapter cases; 126 boundary tests, check:boundaries, Codex typecheck, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Operator receipt safety follows from the error contract rather than a later renderer branch, and future script-local raw-cause retention fails the existing repository gate.",
+        "falseGreenRejected": "Leaving the cause private but retained, checking only a field named cause, banning immediate private adapter translation, changing only the renderer, or adding a broad exception.",
+        "focusedCommandOrProcedureOwner": "Boundary provenance, Codex operator script, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Operator error-retention correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not execute the hosted staged-refresh request, establish provider behavior, or remove a private cause that is immediately translated inside an adapter."
+      },
+      "completionCriteria": [
+        "No app/package operator script Data.TaggedError retains an arbitrary unknown field.",
+        "The provenance rule has direct rejection and acceptance fixtures with no exception.",
+        "Canonical Effect guidance, task ledger, active plans, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-public-error-cause-boundary"],
+      "dependsOn": ["close-operator-error-cause-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

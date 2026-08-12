@@ -1,6 +1,6 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -8,10 +8,11 @@ import { auditBoundaryProvenance } from "./boundary-audit.js";
 import type { BoundaryException } from "./boundary-exceptions.js";
 
 const directories: string[] = [];
-const fixture = (source: string) => {
+const fixture = (source: string, relativePath = "fixture.ts") => {
   const cwd = mkdtempSync(join(tmpdir(), "bundjil-boundary-audit-"));
   directories.push(cwd);
-  const file = join(cwd, "fixture.ts");
+  const file = join(cwd, relativePath);
+  mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, source);
   return { cwd, file };
 };
@@ -141,6 +142,48 @@ describe("boundary provenance audit", () => {
       "export const handler = (request: Request): Promise<Response> => Promise.resolve(new Response(request.url));"
     );
     expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("rejects arbitrary unknown fields retained by operator errors", () => {
+    const { cwd, file } = fixture(
+      `
+        import { Data } from "effect";
+        class ProofFailure extends Data.TaggedError("ProofFailure")<{
+          readonly providerFailure: unknown;
+        }> {}
+      `,
+      "packages/example/scripts/prove.ts"
+    );
+    expect(
+      auditBoundaryProvenance({ cwd, files: [file] }).map(
+        (diagnostic) => diagnostic.rule
+      )
+    ).toContain("operator-raw-cause");
+  });
+
+  it("accepts a bounded operator error and private adapter cause", () => {
+    const operator = fixture(
+      `
+        import { Data } from "effect";
+        class ProofFailure extends Data.TaggedError("ProofFailure")<{
+          readonly classification: "request_failed";
+        }> {}
+      `,
+      "packages/example/scripts/prove.ts"
+    );
+    expect(
+      auditBoundaryProvenance({ cwd: operator.cwd, files: [operator.file] })
+    ).toStrictEqual([]);
+
+    const adapter = fixture(`
+      import { Data } from "effect";
+      class ProviderFailure extends Data.TaggedError("ProviderFailure")<{
+        readonly cause: unknown;
+      }> {}
+    `);
+    expect(
+      auditBoundaryProvenance({ cwd: adapter.cwd, files: [adapter.file] })
+    ).toStrictEqual([]);
   });
 
   it("does not reject a domain contract solely because its name resembles HTTP transport", () => {

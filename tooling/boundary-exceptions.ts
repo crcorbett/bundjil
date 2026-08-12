@@ -22,6 +22,7 @@ export type BoundaryException = Readonly<{
 
 export type BoundaryRule =
   | "boundary-raw-primitive"
+  | "operator-raw-cause"
   | "public-raw-cause"
   | "inline-string-schema"
   | "codec-provenance"

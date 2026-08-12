@@ -84,7 +84,7 @@ const HostedStagedRefreshProofBlocked = Schema.Struct({
 
 class HostedProofRequestError extends Data.TaggedError(
   "HostedProofRequestError"
-)<{ readonly cause: unknown }> {}
+) {}
 
 const program = Effect.gen(function* proveHostedStagedRefresh() {
   const input = yield* CodexSubscriptionLoginConfigService;
@@ -139,9 +139,7 @@ const program = Effect.gen(function* proveHostedStagedRefresh() {
   );
   const responses = yield* Effect.all(
     [client.execute(request), client.execute(request)].map((response) =>
-      response.pipe(
-        Effect.mapError((cause) => new HostedProofRequestError({ cause }))
-      )
+      response.pipe(Effect.mapError(() => new HostedProofRequestError()))
     ),
     { concurrency: "unbounded" }
   );

@@ -267,6 +267,17 @@ operations, runbooks, authority/control envelopes, live proof and provider
 state **Preserve**. Frontend, browser, accessibility, generated API references,
 release and publication are **N/A**.
 
+The next non-terminal pass closed the same invariant for operator commands.
+The hosted staged-refresh proof no longer retains an arbitrary HTTP rejection
+inside its tagged error, and the existing provenance audit now rejects unknown
+fields on script-local `Data.TaggedError` classes through
+`operator-raw-cause`. Bounded classifications and immediate private adapter
+translation remain admitted. Boundary proof passes 126 tests with no new
+exception, and the complete repository verification gate passes with the
+public synthetic Executor CI configuration. This is repository proof only and
+does not satisfy the missing hosted staged-refresh, automatic-main, channel, or
+handset dependencies.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
@@ -279,13 +290,14 @@ release and publication are **N/A**.
 - `b323acb` — Effect platform process ownership and environment confinement.
 - `d907985` — exit-aware rollback for interruption and defects.
 - `33b4c4d` — Effect Clock/DateTime drift receipts.
-- The closed error-channel correction and this pre-terminal audit are carried
-  by the commit containing this receipt; exact branch/remote identity is read
-  back after push rather than self-embedded.
-- Draft PR `#5` is pushed at exact head `928623a`; CI run `31345579991`
-  completed successfully. Infrastructure Drift run `31345579992` failed closed
-  because its three required secrets are absent; it is negative custody
-  evidence, not a drift result.
+- `c1b27b6` — closed public error channels and typed adoption failure.
+- The operator error-retention correction is carried by the commit containing
+  this receipt; exact branch/remote identity is read back after push rather
+  than self-embedded.
+- Draft PR `#5` is the branch integration owner. Its current exact head and
+  checks must be read back from GitHub; prior `verify` runs succeeded while
+  `preview-report` failed closed because required hosted drift custody is
+  absent. That failure is negative custody evidence, not a drift result.
 - GitHub ruleset `20616946` is active with pull-request, strict `verify` and
   non-fast-forward requirements and no bypass. The `Production` environment is
   protected-branch-only with no reviewer or wait, and owns the four exact

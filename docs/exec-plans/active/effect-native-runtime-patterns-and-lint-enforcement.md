@@ -172,6 +172,31 @@ deployment claim.
   Frontend, browser, accessibility, generated API references, release, and
   publication are **N/A**.
 
+## 2026-08-13 operator error-retention correction
+
+- A follow-up observability pass found that the hosted staged-refresh proof
+  retained an Effect HTTP rejection as `unknown` in a private tagged error.
+  The renderer already collapsed every failure to the bounded blocked receipt,
+  but leak safety depended on that final branch rather than the error contract.
+- The proof error now carries only its tag. The existing boundary provenance
+  audit owns a narrow `operator-raw-cause` rule: script-local
+  `Data.TaggedError` fields cannot be arbitrary `unknown` values. Bounded
+  classifications remain accepted, and private adapter errors outside operator
+  scripts may retain a rejection only for immediate safe translation.
+- The rule has a direct negative fixture plus positive bounded-script and
+  private-adapter cases. The boundary suite passes 126 tests, `check:boundaries`
+  passes with no new exception, and Codex typecheck passes. The complete
+  `bun run verification` gate also passes with the public synthetic Executor CI
+  configuration: Effect setup, documentation/skill/authority/control/
+  verification policy, HGI-307, formatting, lint, Knip, nine typechecks, and
+  all fifteen Turbo test tasks are green.
+- Documentation impact: Effect architecture, Effect SPEC/task, this active
+  plan, staged-refresh proof, and boundary tooling/fixtures **Change required**.
+  App/package READMEs, exports, runtime services/Layers, public errors,
+  provider requests, persistence data, runbooks, authority, controls, live
+  evidence and provider state **Preserve**. Frontend, browser, accessibility,
+  generated API references, release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

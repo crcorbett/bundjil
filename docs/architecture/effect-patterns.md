@@ -445,6 +445,13 @@ Rules:
   `Schema.Defect` cause field. The `public-raw-cause` boundary rule enforces
   this for every field in an exported structure, including optional or renamed
   causes.
+- Operator scripts must classify failures before retaining them in a tagged
+  error. A script-local `Data.TaggedError` may carry a bounded classification,
+  operation, status, or digest, but not an arbitrary `unknown` value. The
+  `operator-raw-cause` boundary rule enforces this across app and package
+  `scripts/` directories. A private adapter may retain an SDK rejection only
+  for immediate safe error translation; it must not log, encode, return, or
+  place that value in an operator receipt.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
 - Translate provider/framework errors at the app boundary. Packages should not
