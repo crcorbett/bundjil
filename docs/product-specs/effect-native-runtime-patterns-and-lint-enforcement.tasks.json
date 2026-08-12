@@ -93,6 +93,18 @@
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets"
       ]
+    },
+    {
+      "id": "ENP-FND-008",
+      "decision": "Close typed error channels by removing arbitrary defect causes from exported tagged-error Schemas, enforcing the diagnostic boundary, and replacing a validated-but-impossible adoption-manifest defect with its owning typed failure.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-007",
+        "ENP-REQ-009",
+        "ENP-REQ-010",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-public-error-cause-boundary"]
     }
   ],
   "requirements": [
@@ -103,6 +115,7 @@
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns",
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Boundary audit and affected adapter tests show decoded service inputs and encoded outward values.",
@@ -222,6 +235,7 @@
       "requirement": "Update earliest durable docs and skills only where final implementation proves a change; record Change required, Preserve, or evidenced N/A across the impact ledger.",
       "taskIds": [
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Docs ledger, source, rule IDs, commands, and skills agree and policy audits pass.",
@@ -240,6 +254,7 @@
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets",
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Every requirement and rule has observable, postcondition, false green, procedure owner, evidence owner, and limitation.",
@@ -254,6 +269,7 @@
       "requirement": "Run focused slice proof and terminal bun run verification plus git diff --check on the final candidate.",
       "taskIds": [
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
         "terminal-five-pass-audit"
       ],
       "directObservable": "One exact candidate has fresh focused and terminal command receipts.",
@@ -520,10 +536,38 @@
       ]
     },
     {
+      "id": "close-public-error-cause-boundary",
+      "title": "Close exported and declared error channels",
+      "status": "completed",
+      "dependsOn": ["enable-rules-and-reconcile-docs"],
+      "description": "Correct iterative audit findings where exported Eve, Codex, and proxy tagged errors encoded arbitrary Schema.Defect causes and one adoption-manifest branch escaped its declared typed failure channel through Effect.die.",
+      "implementationNotes": [
+        "Use the installed effect@4.0.0-beta.101 Schema.Defect implementation as authority: its encoded side is arbitrary JSON and can retain Error message and cause data.",
+        "Remove the cause field from twelve exported error Schemas and all constructors while preserving tags, operations, boundaries, safe messages, statuses, subject hashes, profile IDs, and refresh-lock timing diagnostics.",
+        "Keep the Upstash SDK rejection cause only in its private adapter error and collapse it to the existing safe public KeyValueStore errors.",
+        "Add the public-raw-cause provenance rule with direct required, optional, and renamed-field Schema.Defect negative fixtures; do not add exceptions or another checker.",
+        "Replace the unreachable Effect.die after Photon cardinality validation with the same capability-owned AdoptionManifestBuildError so later control-flow changes cannot escape the declared channel."
+      ],
+      "proofContract": {
+        "directObservable": "The production-source Schema.Defect scan is empty; the boundary audit rejects required, optional, and renamed exported defect fields; encoded error fixtures omit arbitrary causes; the adoption scope has no production Effect.die; Eve 7, Codex 115, proxy 41, boundary 124, and infrastructure owner tests pass.",
+        "expectedPostcondition": "Public typed failures cannot serialize raw provider or host causes, declared operation failures remain typed, and future raw-defect regressions fail the existing repository gate.",
+        "falseGreenRejected": "Changing only log rendering, making cause optional, retaining Schema.Defect under another exported field, preserving an impossible die after validation, or passing typecheck without encoded-contract fixtures.",
+        "focusedCommandOrProcedureOwner": "Eve, Codex, codex-proxy, boundary provenance, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Public error-cause boundary correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not establish provider behavior or remove private causes before their safe public mapping."
+      },
+      "completionCriteria": [
+        "No exported production tagged-error Schema contains Schema.Defect.",
+        "The provenance rule has direct required, optional, and renamed-field negative fixtures and no exception.",
+        "Adoption manifest provider-scope validation fails through AdoptionManifestBuildError rather than a defect.",
+        "Canonical Effect guidance, task ledger, active plan, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["enable-rules-and-reconcile-docs"],
+      "dependsOn": ["close-public-error-cause-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

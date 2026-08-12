@@ -72,7 +72,6 @@ export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
             new CodexHttpNetworkError({
               operation: "postResponses",
               message: "CodexHttpClientMock.postResponses is not seeded.",
-              cause: "missing mock postResponses result",
             })
           )
         : Effect.succeed(options.postResponses),
@@ -85,7 +84,6 @@ export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
           new CodexHttpNetworkError({
             operation: "postResponsesStream",
             message: "CodexHttpClientMock.postResponsesStream is not seeded.",
-            cause: "missing mock postResponsesStream result",
           })
         );
       }
@@ -124,7 +122,6 @@ export const CodexOAuthClientMock = (
             new CodexProfileStorageError({
               operation: "seedProfiles",
               message: "Mock completeLogin requires a seeded login profile.",
-              cause: "missing mock profile",
             })
           )
         : Effect.succeed(options.loginProfile),
@@ -137,7 +134,6 @@ export const CodexOAuthClientMock = (
           new CodexProfileStorageError({
             operation: "seedProfiles",
             message: "Mock refresh requires a seeded refresh result.",
-            cause: "missing mock refresh result",
           })
         );
       }
@@ -154,11 +150,10 @@ class CodexOAuthMemoryProfiles extends Context.Service<
 const encodeSeedProfile = (profile: CodexOAuthProfileType) =>
   Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProfileSchemaError({
           boundary: "CodexOAuthProfile",
           message: "Unable to encode seeded Codex OAuth profile.",
-          cause,
         })
     )
   );
@@ -213,11 +208,10 @@ const CodexProfileStoreMemoryLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
         yield* Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode Codex OAuth profile.",
-                cause,
               })
           )
         );
@@ -274,11 +268,10 @@ export const CodexOAuthProfileCommitMemory = Layer.effect(
         );
         yield* Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode committed Codex OAuth profile.",
-                cause,
               })
           )
         );

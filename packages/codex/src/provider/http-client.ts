@@ -51,11 +51,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         Schema.fromJsonString(CodexResponsesRequest)
       )(input.request).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexResponsesRequestError({
               boundary: "CodexResponsesRequest",
               message: "Unable to encode Codex Responses request.",
-              cause,
             })
         )
       );
@@ -74,11 +73,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
       );
       const response = yield* client.execute(upstreamRequest).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexHttpNetworkError({
               operation: "fetch",
               message: "Unable to reach Codex Responses endpoint.",
-              cause,
             })
         )
       );
@@ -96,11 +94,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
 
       const body = yield* response.text.pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexResponsesStreamError({
               operation: "readResponseBody",
               message: "Unable to read Codex Responses body.",
-              cause,
             })
         )
       );
@@ -119,11 +116,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         usedAccountHeader: input.accountId !== undefined,
       }).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexResponsesRequestError({
               boundary: "CodexResponsesProofResult",
               message: "Unable to decode sanitized Codex Responses result.",
-              cause,
             })
         )
       );
@@ -134,11 +130,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           Schema.fromJsonString(CodexResponsesRequest)
         )(input.request).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexResponsesRequestError({
                 boundary: "CodexResponsesRequest",
                 message: "Unable to encode Codex Responses request.",
-                cause,
               })
           )
         );
@@ -157,11 +152,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
         );
         const response = yield* client.execute(upstreamRequest).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexHttpNetworkError({
                 operation: "fetch",
                 message: "Unable to reach Codex Responses endpoint.",
-                cause,
               })
           )
         );
@@ -182,11 +176,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           CodexResponsesStreamMetadata
         )({ status: response.status, contentType }).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexResponsesStreamError({
                 operation: "postResponsesStream",
                 message: "Unable to decode Codex Responses stream metadata.",
-                cause,
               })
           )
         );
@@ -195,11 +188,10 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
           ...metadata,
           body: response.stream.pipe(
             Stream.mapError(
-              (cause) =>
+              () =>
                 new CodexResponsesStreamError({
                   operation: "readResponseBody",
                   message: "Unable to read Codex Responses body.",
-                  cause,
                 })
             )
           ),

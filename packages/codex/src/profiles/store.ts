@@ -45,11 +45,10 @@ export const putProfile = (profile: CodexOAuthProfileType) =>
 
     yield* Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProfileSchemaError({
             boundary: "CodexOAuthProfile",
             message: "Unable to encode Codex OAuth profile.",
-            cause,
           })
       )
     );
@@ -59,17 +58,15 @@ export const putProfile = (profile: CodexOAuthProfileType) =>
         operation: "putLegacyProfile",
         message:
           "CodexProfileStore.putProfile is reserved for legacy import and bootstrap profiles only.",
-        cause: "subscription profiles must use CodexOAuthProfileCommit",
       });
     }
 
     yield* Schema.encodeEffect(CodexAccessTokenImportProfile)(profile).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProfileSchemaError({
             boundary: "CodexAccessTokenImportProfile",
             message: "Unable to encode the legacy Codex OAuth profile.",
-            cause,
           })
       )
     );

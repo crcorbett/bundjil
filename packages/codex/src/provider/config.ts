@@ -62,11 +62,10 @@ export const loadCodexResponsesProofInput = Effect.gen(
       prompt,
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexResponsesRequestError({
             boundary: "CodexResponsesProofInput",
             message: "Unable to decode Codex Responses proof config.",
-            cause,
           })
       )
     );

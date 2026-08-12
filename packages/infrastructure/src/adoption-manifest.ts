@@ -677,7 +677,12 @@ export const adoptionManifestProviderScopes = Effect.fn(
   }
   const [photonProject] = photonProjects;
   if (photonProject === undefined) {
-    return yield* Effect.die("Photon project cardinality check failed.");
+    return yield* new AdoptionManifestBuildError({
+      reason: "candidateMismatch",
+      message: AdoptionManifestBuildMessage.make(
+        "The adoption manifest must contain exactly one Photon project."
+      ),
+    });
   }
   const vercel = yield* Schema.decodeUnknownEffect(VercelInventoryScope)({
     projects: vercelProjects.map((resource) => ({

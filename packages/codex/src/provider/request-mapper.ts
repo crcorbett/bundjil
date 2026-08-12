@@ -111,11 +111,10 @@ export const makeCodexRequestMapper = Effect.gen(
             ...(toolChoice === undefined ? {} : { tool_choice: toolChoice }),
           }).pipe(
             Effect.mapError(
-              (cause) =>
+              () =>
                 new CodexResponsesRequestError({
                   boundary: "CodexResponsesRequest",
                   message: "Unable to map OpenAI-compatible request to Codex.",
-                  cause,
                 })
             )
           );

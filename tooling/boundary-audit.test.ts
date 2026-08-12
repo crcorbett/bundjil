@@ -112,6 +112,18 @@ describe("boundary provenance audit", () => {
       "export const Account = Schema.Struct({ id: Schema.String });",
     ],
     [
+      "public-raw-cause",
+      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.Defect() }) {}",
+    ],
+    [
+      "public-raw-cause",
+      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.optional(Schema.Defect()) }) {}",
+    ],
+    [
+      "public-raw-cause",
+      "export const ProviderFailure = Schema.Struct({ details: Schema.Defect() });",
+    ],
+    [
       "raw-outbound-write",
       "export const send = () => HttpClientRequest.bodyText('raw');",
     ],

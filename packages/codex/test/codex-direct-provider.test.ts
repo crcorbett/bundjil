@@ -515,7 +515,6 @@ it.effect(
       const upstreamError = new CodexResponsesStreamError({
         operation: "readResponseBody",
         message: "Unable to read Codex Responses body.",
-        cause: "Synthetic transport failure.",
       });
       const source = streamBytes(
         'data: {"type":"response.output_text.delta","delta":"Before failure"}\n\n'
@@ -632,7 +631,6 @@ it.effect(
             new CodexHttpNetworkError({
               operation: "postResponses",
               message: "postResponses is not used by direct provider test.",
-              cause: "unexpected test operation",
             })
           ),
         postResponsesStream: () =>

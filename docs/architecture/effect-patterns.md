@@ -421,7 +421,6 @@ export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchem
   {
     boundary: WorkspaceSchemaBoundary,
     message: Schema.NonEmptyString,
-    cause: Schema.Defect,
   }
 ) {}
 ```
@@ -441,6 +440,11 @@ Rules:
 - Do not export speculative errors. A public tagged error needs a real
   constructor or consumer in the owning capability; otherwise remove it until
   a concrete failure boundary exists.
+- Keep arbitrary host and provider causes inside the owning adapter. Exported
+  error Schemas must expose only bounded owner-named diagnostics; never add a
+  `Schema.Defect` cause field. The `public-raw-cause` boundary rule enforces
+  this for every field in an exported structure, including optional or renamed
+  causes.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
 - Translate provider/framework errors at the app boundary. Packages should not

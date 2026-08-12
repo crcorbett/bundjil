@@ -66,15 +66,13 @@ const profileCommitError = (
   operation: CodexOAuthProfileCommitOperation,
   profile: CodexSubscriptionProfile,
   subjectHash: CodexOAuthSubjectHash,
-  message: string,
-  cause: unknown
+  message: string
 ) =>
   new CodexOAuthProfileCommitError({
     operation,
     profileId: profile.subject.profileId,
     subjectHash,
     message,
-    cause,
   });
 
 const transactProfileCommit = (
@@ -96,13 +94,12 @@ const transactProfileCommit = (
     const encodedProfile = yield* Schema.encodeEffect(
       encryptedCodexOAuthProfileV2Json
     )(encryptedProfile).pipe(
-      Effect.mapError((cause) =>
+      Effect.mapError(() =>
         profileCommitError(
           operation,
           profile,
           subjectHash,
-          "Unable to encode the encrypted Codex OAuth profile commit payload.",
-          cause
+          "Unable to encode the encrypted Codex OAuth profile commit payload."
         )
       )
     );
@@ -175,26 +172,24 @@ const transactProfileCommit = (
         },
       ],
     }).pipe(
-      Effect.mapError((cause) =>
+      Effect.mapError(() =>
         profileCommitError(
           operation,
           profile,
           subjectHash,
-          "Unable to construct the fenced Codex OAuth profile commit.",
-          cause
+          "Unable to construct the fenced Codex OAuth profile commit."
         )
       )
     );
     const outcome = yield* atomic
       .transact(transaction)
       .pipe(
-        Effect.mapError((cause) =>
+        Effect.mapError(() =>
           profileCommitError(
             operation,
             profile,
             subjectHash,
-            "Unable to apply the fenced Codex OAuth profile commit.",
-            cause
+            "Unable to apply the fenced Codex OAuth profile commit."
           )
         )
       );
@@ -264,14 +259,13 @@ export const CodexOAuthProfileCommitAtomicLive = Layer.effect(
           const encodedProfile = yield* keyValueStore
             .get(profileKey)
             .pipe(
-              Effect.catchTag("KeyValueStoreError", (cause) =>
+              Effect.catchTag("KeyValueStoreError", () =>
                 Effect.fail(
                   profileCommitError(
                     "replaceLegacy",
                     input.profile,
                     subjectHash,
-                    "Unable to read the encrypted legacy profile fence.",
-                    cause
+                    "Unable to read the encrypted legacy profile fence."
                   )
                 )
               )
@@ -282,13 +276,12 @@ export const CodexOAuthProfileCommitAtomicLive = Layer.effect(
           const encryptedProfile = yield* Schema.decodeUnknownEffect(
             encryptedCodexOAuthProfileJson
           )(encodedProfile).pipe(
-            Effect.mapError((cause) =>
+            Effect.mapError(() =>
               profileCommitError(
                 "replaceLegacy",
                 input.profile,
                 subjectHash,
-                "Unable to decode the encrypted legacy profile fence.",
-                cause
+                "Unable to decode the encrypted legacy profile fence."
               )
             )
           );
@@ -304,13 +297,12 @@ export const CodexOAuthProfileCommitAtomicLive = Layer.effect(
               input.expectedLegacyProfile
             ),
           ]).pipe(
-            Effect.mapError((cause) =>
+            Effect.mapError(() =>
               profileCommitError(
                 "replaceLegacy",
                 input.profile,
                 subjectHash,
-                "Unable to compare the legacy profile fence.",
-                cause
+                "Unable to compare the legacy profile fence."
               )
             )
           );
@@ -366,24 +358,22 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
           input.subject
         ).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 message: "Unable to derive the Codex OAuth refresh-lock key.",
-                cause,
               })
           )
         );
         const owner = yield* Effect.try({
           try: () => Redacted.make(globalThis.crypto.randomUUID()),
-          catch: (cause) =>
+          catch: () =>
             new CodexOAuthRefreshLockError({
               operation: "acquire",
               reason: "acquisition",
               subjectHash,
               message: "Unable to create a Codex OAuth refresh-lock owner.",
-              cause,
             }),
         });
         const nowEpochMillis = yield* Clock.currentTimeMillis;
@@ -391,13 +381,12 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
           CodexOAuthRefreshLockOwner
         )(owner).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 subjectHash,
                 message: "Unable to encode a Codex OAuth refresh-lock owner.",
-                cause,
               })
           )
         );
@@ -410,26 +399,24 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
           expiresAtEpochMillis: nowEpochMillis + input.ttlMillis,
         }).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 subjectHash,
                 message:
                   "Unable to construct a Codex OAuth refresh-lock lease.",
-                cause,
               })
           )
         );
         const key = yield* codexOAuthRefreshLockStorageKey(input.subject).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 subjectHash,
                 message: "Unable to derive the Codex OAuth refresh-lock key.",
-                cause,
               })
           )
         );
@@ -447,26 +434,24 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
           ],
         }).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 subjectHash,
                 message:
                   "Unable to construct the Codex OAuth refresh-lock transaction.",
-                cause,
               })
           )
         );
         const outcome = yield* atomic.transact(transaction).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "acquire",
                 reason: "acquisition",
                 subjectHash,
                 message: "Unable to acquire the Codex OAuth refresh lock.",
-                cause,
               })
           )
         );
@@ -494,13 +479,12 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
         }
         const key = yield* codexOAuthRefreshLockStorageKey(lease.subject).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "release",
                 reason: "release",
                 subjectHash: lease.subjectHash,
                 message: "Unable to derive the Codex OAuth refresh-lock key.",
-                cause,
               })
           )
         );
@@ -513,26 +497,24 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
           mutations: [{ _tag: "Remove", key }],
         }).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "release",
                 reason: "release",
                 subjectHash: lease.subjectHash,
                 message:
                   "Unable to construct the Codex OAuth refresh-lock release transaction.",
-                cause,
               })
           )
         );
         const outcome = yield* atomic.transact(transaction).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexOAuthRefreshLockError({
                 operation: "release",
                 reason: "release",
                 subjectHash: lease.subjectHash,
                 message: "Unable to release the Codex OAuth refresh lock.",
-                cause,
               })
           )
         );

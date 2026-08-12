@@ -36,11 +36,10 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
         object: "chat.completion.chunk",
       }).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexResponsesStreamError({
               operation: "toOpenAICompatibleStream",
               message: "Unable to decode mock OpenAI-compatible stream chunk.",
-              cause,
             })
         )
       );
@@ -48,11 +47,10 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
         Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
       )(chunk).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexResponsesStreamError({
               operation: "toOpenAICompatibleStream",
               message: "Unable to encode mock OpenAI-compatible stream chunk.",
-              cause,
             })
         )
       );

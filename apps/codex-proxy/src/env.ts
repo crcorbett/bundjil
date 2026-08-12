@@ -93,10 +93,9 @@ const portConfig = Config.port("PORT").pipe(Config.withDefault(8787));
 const decodeCodexOAuthSubject = (input: unknown) =>
   CodexOAuthSubject.pipe(Schema.decodeUnknownEffect)(input).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProxyRouteError({
           boundary: "CodexProxyRuntimeConfig",
-          cause,
           code: "bad_request",
           message: "Unable to decode Codex proxy OAuth subject config.",
           responseMessage: "The Codex proxy config is invalid.",
@@ -108,10 +107,9 @@ const decodeCodexOAuthSubject = (input: unknown) =>
 const decodeCodexProxyDevServerConfig = (input: unknown) =>
   CodexProxyDevServerConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProxyRouteError({
           boundary: "CodexProxyRuntimeConfig",
-          cause,
           code: "bad_request",
           message: "Unable to decode Codex proxy dev server config.",
           responseMessage: "The Codex proxy config is invalid.",
@@ -123,10 +121,9 @@ const decodeCodexProxyDevServerConfig = (input: unknown) =>
 const decodeCodexProxyRuntimeConfig = (input: unknown) =>
   CodexProxyRuntimeConfig.pipe(Schema.decodeUnknownEffect)(input).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProxyRouteError({
           boundary: "CodexProxyRuntimeConfig",
-          cause,
           code: "bad_request",
           message: "Unable to decode Codex proxy runtime config.",
           responseMessage: "The Codex proxy config is invalid.",

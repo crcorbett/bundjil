@@ -218,6 +218,55 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
   rollback procedure **Preserve**. Frontend and generated API references are
   **N/A** because this slice has neither.
 
+### 2026-08-13 strict Effect pre-terminal audit
+
+This is an iterative repository audit, not the mandatory terminal audit. The
+terminal task remains pending until hosted control, automatic exact-main, and
+channel-proof dependencies are complete.
+
+1. **Architecture and boundaries:** the pass found and corrected twelve
+   exported Eve, Codex, and proxy error Schemas whose `Schema.Defect` fields
+   could encode arbitrary causes. It also replaced one validated-but-impossible
+   adoption-manifest `Effect.die` with `AdoptionManifestBuildError`. The
+   existing provenance audit now rejects required, optional, or renamed
+   exported `Schema.Defect` fields through `public-raw-cause`; 124 boundary
+   tests pass and the exception registry remains at 17 exact external or
+   framework occurrences.
+2. **Call graph and topology:** package export, cross-import, runtime-root,
+   async/Promise, environment/process, generated-output, deep-import, dead
+   export, and helper-directory scans found no additional actionable defect.
+   Large Photon/Vercel provider files remain capability-cohesive owners rather
+   than generic helpers. Channel `ManagedRuntime` instances remain exact Eve
+   framework adapters with test disposal; no authored hosted teardown hook was
+   found, so inventing a service wrapper or speculative lifecycle is rejected.
+3. **Behavior and gates:** focused proof passed Eve 7, Codex 115,
+   codex-proxy 41, infrastructure 83 Vitest plus 21 Alchemy, and boundary 124
+   tests. The complete repository gate passed with the public synthetic
+   Executor CI fixture: HGI-307 12 scenarios/9 impact areas, 10 lint tests,
+   Knip, nine typechecks, and all fifteen Turbo test tasks. Deliberate memory
+   Layer defects remain only as rollback and missing-fixture test instruments.
+4. **Documentation and proof:** the Effect architecture, SPEC/task ledger and
+   active plans now agree on closed error channels, exact Effect beta.101
+   authority, focused evidence, preserved surfaces, and external non-claims.
+   Docs, skills, authority, controls, verification policy, formatting, task
+   JSON parse, and `git diff --check` pass.
+5. **Provider, deployment, and secret safety:** no provider, deployment,
+   credential, webhook, alias, environment, or production mutation occurred.
+   The branch diff contains no credential material. Draft PR `#5` remains
+   blocked from acceptance: CI `verify` passed at prior head `33b4c4d`, while
+   Infrastructure Drift `preview-report` failed closed before source execution
+   because required hosted custody is absent. Repository proof does not
+   establish Production, automatic-main, Photon replay, typing, or handset
+   behavior.
+
+Documentation impact: this parent plan, the Effect SPEC/task/plan, Effect
+architecture, public error contracts/constructors, adoption cardinality branch,
+encoded error fixtures, and boundary tooling **Change required**. App/package
+READMEs, exports, services, Layers, provider requests, persistent keys/bytes,
+operations, runbooks, authority/control envelopes, live proof and provider
+state **Preserve**. Frontend, browser, accessibility, generated API references,
+release and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
@@ -226,6 +275,13 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
 - `573ac6f` — deterministic Effect Clock/TestClock migrations and flat channel
   dispatch flow.
 - `928623a` — installed-plugin lint integration and exact exception inventory.
+- `d4c1888` — decoded live Vercel Production target ownership.
+- `b323acb` — Effect platform process ownership and environment confinement.
+- `d907985` — exit-aware rollback for interruption and defects.
+- `33b4c4d` — Effect Clock/DateTime drift receipts.
+- The closed error-channel correction and this pre-terminal audit are carried
+  by the commit containing this receipt; exact branch/remote identity is read
+  back after push rather than self-embedded.
 - Draft PR `#5` is pushed at exact head `928623a`; CI run `31345579991`
   completed successfully. Infrastructure Drift run `31345579992` failed closed
   because its three required secrets are absent; it is negative custody

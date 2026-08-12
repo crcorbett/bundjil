@@ -36,20 +36,18 @@ export const codexOAuthProfileSubjectHash = (subject: CodexOAuthSubject) =>
         byte.toString(16).padStart(2, "0")
       ).join("");
     },
-    catch: (cause) =>
+    catch: () =>
       new CodexProfileStorageError({
         operation: "deriveProfileStorageKey",
         message: "Unable to derive Codex OAuth profile storage key.",
-        cause,
       }),
   }).pipe(
     Effect.flatMap(Schema.decodeUnknownEffect(CodexOAuthSubjectHash)),
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProfileStorageError({
           operation: "deriveProfileStorageKey",
           message: "Unable to derive Codex OAuth profile storage key.",
-          cause,
         })
     )
   );
@@ -63,11 +61,10 @@ export const codexOAuthProfileStorageKey = Effect.fn(
     `${codexOAuthProfileStoragePrefix}/${subjectHash}`
   ).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProfileStorageError({
           operation: "deriveProfileStorageKey",
           message: "Unable to derive Codex OAuth profile storage key.",
-          cause,
         })
     )
   );
@@ -82,11 +79,10 @@ export const codexOAuthRefreshLockStorageKey = Effect.fn(
     `${codexOAuthRefreshLockStoragePrefix}/${subjectHash}`
   ).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProfileStorageError({
           operation: "deriveProfileStorageKey",
           message: "Unable to derive Codex OAuth profile storage key.",
-          cause,
         })
     )
   );
@@ -101,11 +97,10 @@ export const codexOAuthProfileRevisionStorageKey = Effect.fn(
     `${codexOAuthProfileRevisionStoragePrefix}/${subjectHash}`
   ).pipe(
     Effect.mapError(
-      (cause) =>
+      () =>
         new CodexProfileStorageError({
           operation: "deriveProfileStorageKey",
           message: "Unable to derive Codex OAuth profile storage key.",
-          cause,
         })
     )
   );

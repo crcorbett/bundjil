@@ -66,13 +66,12 @@ export const makeCodexStoredProfileProof = Effect.gen(
         const key = yield* codexOAuthProfileStorageKey(subject);
         const encodedEnvelope = yield* keyValueStore.get(key).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message:
                   "Unable to read the encrypted Codex OAuth profile proof.",
-                cause,
               })
           )
         );
@@ -94,12 +93,11 @@ export const makeCodexStoredProfileProof = Effect.gen(
           encryptedProfileJson
         )(encodedEnvelope).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message:
                   "Unable to decode the encrypted profile proof envelope.",
-                cause,
               })
           )
         );

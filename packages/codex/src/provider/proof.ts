@@ -50,11 +50,10 @@ export const makeCodexResponsesProof = Effect.gen(
           reasoning: { effort: requestPolicy.policy.reasoningEffort },
         }).pipe(
           Effect.mapError(
-            (cause) =>
+            () =>
               new CodexResponsesRequestError({
                 boundary: "CodexResponsesRequest",
                 message: "Unable to build Codex Responses proof request.",
-                cause,
               })
           )
         );

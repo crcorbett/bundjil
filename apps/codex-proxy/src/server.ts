@@ -83,10 +83,9 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         CodexProxyRequestContentLength
       )(declaredContentLength).pipe(
         Effect.mapError(
-          (cause) =>
+          () =>
             new CodexProxyRouteError({
               boundary: "CodexProxyRequestContentLength",
-              cause,
               code: "bad_request",
               message: "Unable to decode Codex proxy request content length.",
               responseMessage: "The request body could not be read.",
@@ -98,7 +97,6 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
       if (contentLength > codexProxyRequestBodyMaxBytes) {
         return yield* new CodexProxyRouteError({
           boundary: "CodexProxyRequestContentLength",
-          cause: "Request content length exceeded the configured byte limit.",
           code: "bad_request",
           message:
             "Codex proxy request body exceeded the configured byte limit.",
@@ -114,9 +112,8 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         codexProxyRequestBodyMaxBytes
       ),
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProxyRouteError({
-            cause,
             code: "bad_request",
             message: "Unable to read Codex proxy request body.",
             responseMessage: "The request body could not be read.",
@@ -128,10 +125,9 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
       Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
     )(body).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProxyRouteError({
             boundary: "OpenAICompatibleChatCompletionRequest",
-            cause,
             code: "bad_request",
             message:
               "Unable to decode OpenAI-compatible chat completion request.",
@@ -157,10 +153,9 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
       internalToken: Redacted.value(config.internalToken),
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProxyRouteError({
             boundary: "OpenAICompatibleProxyInput",
-            cause,
             code: "bad_request",
             message: "Unable to decode Codex proxy request envelope.",
             responseMessage:

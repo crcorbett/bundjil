@@ -103,22 +103,20 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
         const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
         const profile = yield* schemaStore.get(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -140,22 +138,20 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
 
         yield* schemaStore.set(key, profile).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -167,13 +163,12 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         yield* schemaStore.remove(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "removeProfile",
                 key,
                 message: "Unable to remove Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -185,13 +180,12 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         return yield* schemaStore.has(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -218,22 +212,20 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
         const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
         const encryptedProfile = yield* encryptedProfileStore.get(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read encrypted Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -266,22 +258,20 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const encryptedProfile = yield* cipher.encrypt(profile);
 
         yield* encryptedProfileStore.set(key, encryptedProfile).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store encrypted Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -292,13 +282,12 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
           const key = yield* codexOAuthProfileStorageKey(subject);
 
           yield* encryptedProfileStore.remove(key).pipe(
-            Effect.catchTag("KeyValueStoreError", (cause) =>
+            Effect.catchTag("KeyValueStoreError", () =>
               Effect.fail(
                 new CodexProfileStorageError({
                   operation: "removeProfile",
                   key,
                   message: "Unable to remove encrypted Codex OAuth profile.",
-                  cause,
                 })
               )
             )
@@ -311,13 +300,12 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         return yield* encryptedProfileStore.has(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )

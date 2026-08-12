@@ -61,11 +61,10 @@ const initialMapperState: MapperState = {
   nextFunctionCallIndex: 0,
 };
 
-const streamError = (message: string, cause: unknown) =>
+const streamError = (message: string) =>
   new CodexResponsesStreamError({
     operation: "toOpenAICompatibleStream",
     message,
-    cause,
   });
 
 const decodeLine = (parts: readonly Uint8Array[], byteLength: number) =>
@@ -83,8 +82,7 @@ const decodeLine = (parts: readonly Uint8Array[], byteLength: number) =>
         bytes.subarray(0, contentLength)
       );
     },
-    catch: (cause) =>
-      streamError("Unable to decode a Codex Responses SSE line.", cause),
+    catch: () => streamError("Unable to decode a Codex Responses SSE line."),
   });
 
 const boundedSseLines = (
@@ -109,8 +107,7 @@ const boundedSseLines = (
             const completeLineBytes = byteLength + segment.byteLength;
             if (completeLineBytes > codexResponsesSseLineMaxBytes) {
               return yield* streamError(
-                "Codex Responses SSE line exceeded the configured byte limit.",
-                "SSE line byte limit exceeded."
+                "Codex Responses SSE line exceeded the configured byte limit."
               );
             }
             lines.push(
@@ -126,8 +123,7 @@ const boundedSseLines = (
             byteLength += residual.byteLength;
             if (byteLength > codexResponsesSseLineMaxBytes) {
               return yield* streamError(
-                "Codex Responses SSE line exceeded the configured byte limit.",
-                "SSE residual byte limit exceeded."
+                "Codex Responses SSE line exceeded the configured byte limit."
               );
             }
             parts = [...parts, residual];
@@ -154,8 +150,8 @@ const decodeCodexStreamLine = (line: string) => {
     Schema.fromJsonString(CodexResponsesStreamEvent)
   )(data).pipe(
     Effect.map(Option.some),
-    Effect.mapError((cause) =>
-      streamError("Unable to decode Codex Responses stream event.", cause)
+    Effect.mapError(() =>
+      streamError("Unable to decode Codex Responses stream event.")
     )
   );
 };
@@ -165,8 +161,8 @@ const encodeChunk = (chunk: OpenAICompatibleChatCompletionChunkType) =>
     Schema.fromJsonString(OpenAICompatibleChatCompletionChunk)
   )(chunk).pipe(
     Effect.map((encoded) => `data: ${encoded}\n\n`),
-    Effect.mapError((cause) =>
-      streamError("Unable to encode OpenAI-compatible stream chunk.", cause)
+    Effect.mapError(() =>
+      streamError("Unable to encode OpenAI-compatible stream chunk.")
     )
   );
 
@@ -217,11 +213,8 @@ const mapEvent = (
           const item = yield* Schema.decodeUnknownEffect(
             CodexResponsesOutputItemDiscriminator
           )(event.item).pipe(
-            Effect.mapError((cause) =>
-              streamError(
-                "Unable to decode Codex Responses output item.",
-                cause
-              )
+            Effect.mapError(() =>
+              streamError("Unable to decode Codex Responses output item.")
             )
           );
 
@@ -232,11 +225,8 @@ const mapEvent = (
           const functionCall = yield* Schema.decodeUnknownEffect(
             CodexResponsesFunctionCallAddedEvent
           )(event).pipe(
-            Effect.mapError((cause) =>
-              streamError(
-                "Unable to decode Codex function-call output item.",
-                cause
-              )
+            Effect.mapError(() =>
+              streamError("Unable to decode Codex function-call output item.")
             )
           );
           const current = yield* Ref.get(state);
@@ -275,11 +265,8 @@ const mapEvent = (
           const functionArguments = yield* Schema.decodeUnknownEffect(
             CodexResponsesFunctionArgumentsDeltaEvent
           )(event).pipe(
-            Effect.mapError((cause) =>
-              streamError(
-                "Unable to decode Codex function-call arguments.",
-                cause
-              )
+            Effect.mapError(() =>
+              streamError("Unable to decode Codex function-call arguments.")
             )
           );
           const current = yield* Ref.get(state);
@@ -290,8 +277,7 @@ const mapEvent = (
 
           if (Option.isNone(functionCallIndex)) {
             return yield* streamError(
-              "Codex function-call arguments arrived before their output item.",
-              "Missing function-call output index."
+              "Codex function-call arguments arrived before their output item."
             );
           }
 
@@ -321,11 +307,8 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
     const completionId = yield* Schema.decodeUnknownEffect(
       OpenAICompatibleChatCompletionId
     )("bundjil-codex").pipe(
-      Effect.mapError((cause) =>
-        streamError(
-          "Unable to construct OpenAI-compatible completion ID.",
-          cause
-        )
+      Effect.mapError(() =>
+        streamError("Unable to construct OpenAI-compatible completion ID.")
       )
     );
     const state = yield* Ref.make(initialMapperState);

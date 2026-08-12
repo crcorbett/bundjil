@@ -338,7 +338,6 @@ const selectedFailureMappings = [
     error: new CodexOAuthOperationError({
       operation: "startLogin",
       message: "Internal OAuth operation detail.",
-      cause: { defect: "fixture" },
     }),
     status: 502,
     body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
@@ -358,7 +357,6 @@ const selectedFailureMappings = [
     error: new CodexProfileSchemaError({
       boundary: "CodexOAuthProfile",
       message: "Internal profile schema detail.",
-      cause: { defect: "fixture" },
     }),
     status: 502,
     body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
@@ -376,7 +374,6 @@ const selectedFailureMappings = [
       operation: "getProfile",
       key: "private-profile-key",
       message: "Internal profile storage detail.",
-      cause: { defect: "fixture" },
     }),
     status: 503,
     body: '{"error":{"code":"codex_auth_temporarily_unavailable","message":"Codex authorization is temporarily unavailable."}}',

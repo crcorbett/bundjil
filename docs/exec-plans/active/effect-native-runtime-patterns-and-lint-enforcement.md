@@ -136,6 +136,42 @@ deployment claim.
   controls, provider behavior and live evidence **Preserve**. Frontend and
   generated API references are **N/A** because this slice has neither.
 
+## 2026-08-13 closed error-channel correction
+
+- The next architecture pass inspected installed `effect@4.0.0-beta.101`
+  `Schema.Defect` and confirmed that its encoded side is arbitrary JSON which
+  may retain `Error` messages and nested causes. Twelve exported Eve, Codex,
+  and proxy tagged errors therefore contradicted the durable ban on public raw
+  causes.
+- Those public cause fields and constructor inputs were removed while tags,
+  operation/boundary discriminants, bounded messages, status, subject/profile
+  identity and refresh-lock timing diagnostics were preserved. The private
+  Upstash SDK error remains internal and maps to the existing safe public
+  persistence error.
+- The same pass removed an `Effect.die` after exact Photon project cardinality
+  validation. The branch now returns the capability-owned
+  `AdoptionManifestBuildError`, so future control-flow changes cannot escape
+  the operation's declared failure channel.
+- The existing boundary provenance audit now rejects required, optional, or
+  renamed `Schema.Defect` fields in exported Schema structures through
+  `public-raw-cause`; three direct negative fixtures require no exception.
+  Focused proof passed Eve 7, Codex 115, codex-proxy 41, and boundary 124 tests.
+  The first direct proxy run exposed stale built Codex output; rebuilding that
+  dependency made all 41 proxy tests pass.
+- The complete repository gate then passed with the public synthetic Executor
+  CI fixture: Effect setup, boundaries, docs, skills, authority, controls,
+  verification policy, HGI-307, 124 boundary tests, Ultracite, 10 lint tests,
+  Knip, nine typechecks, and all fifteen Turbo test tasks. Infrastructure
+  retained 83 Vitest and 21 Alchemy tests.
+- Documentation impact: Effect architecture, Effect SPEC/task, this active
+  plan, public error Schemas/constructors, adoption cardinality branch,
+  encoded error tests, and boundary tooling/fixtures **Change required**.
+  App/package READMEs, exports, service identities, Layers, provider requests,
+  persistence keys/bytes, operations, runbooks, authority, controls, live proof,
+  and provider state **Preserve**.
+  Frontend, browser, accessibility, generated API references, release, and
+  publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

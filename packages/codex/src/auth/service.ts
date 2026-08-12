@@ -96,11 +96,10 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
       credentialRevision: profile.credentialRevision,
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexOAuthOperationError({
             operation: "refresh",
             message: "Unable to construct the atomic Codex OAuth credential.",
-            cause,
           })
       )
     );
@@ -142,11 +141,10 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
       updatedAtEpochMillis: nowEpochMillis,
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexOAuthOperationError({
             operation: "refresh",
             message: "Unable to construct the Codex reauthentication marker.",
-            cause,
           })
       )
     );
@@ -343,12 +341,11 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
             requiresReauthentication: false,
           }).pipe(
             Effect.mapError(
-              (cause) =>
+              () =>
                 new CodexOAuthOperationError({
                   operation: "refresh",
                   message:
                     "Unable to construct the refreshed Codex subscription profile.",
-                  cause,
                 })
             )
           );

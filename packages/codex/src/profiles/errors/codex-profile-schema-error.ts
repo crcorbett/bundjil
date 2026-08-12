@@ -10,6 +10,5 @@ export class CodexProfileSchemaError extends Schema.TaggedErrorClass<CodexProfil
   {
     boundary: CodexProfileSchemaBoundary,
     message: CodexProfileErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

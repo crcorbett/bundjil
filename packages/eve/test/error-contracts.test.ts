@@ -9,13 +9,11 @@ describe("workspace schema error contract", () => {
       _tag: "WorkspaceSchemaError",
       boundary: "WorkspaceStatusSuccess",
       message: "Unable to encode workspace status success.",
-      cause: { defect: "fixture" },
     } as const;
     const encoded = Schema.encodeUnknownSync(WorkspaceSchemaError)(
       new WorkspaceSchemaError({
         boundary: "WorkspaceStatusSuccess",
         message: "Unable to encode workspace status success.",
-        cause: { defect: "fixture" },
       })
     );
 

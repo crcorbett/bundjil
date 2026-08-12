@@ -266,6 +266,20 @@ const isInlineStringSchema = (node: ts.Expression) => {
   return name === "Schema.String" || name === "Schema.NonEmptyString";
 };
 
+const isRawCauseSchema = (node: ts.Expression): boolean => {
+  if (ts.isCallExpression(node)) {
+    const name = dottedName(node.expression);
+    if (name === "Schema.Defect") {
+      return true;
+    }
+    if (name === "Schema.optional") {
+      const [inner] = node.arguments;
+      return inner !== undefined && isRawCauseSchema(inner);
+    }
+  }
+  return false;
+};
+
 const rootCallName = (node: ts.CallExpression) => {
   let { expression } = node;
   while (ts.isCallExpression(expression)) {
@@ -483,6 +497,16 @@ const inspectInlineSchema = (
     return;
   }
   for (const property of fields.properties) {
+    if (
+      ts.isPropertyAssignment(property) &&
+      isRawCauseSchema(property.initializer)
+    ) {
+      report(
+        property,
+        "public-raw-cause",
+        "Exported Schema structures cannot expose arbitrary defect values. Keep raw causes private and publish only bounded owner-named diagnostics."
+      );
+    }
     if (
       ts.isPropertyAssignment(property) &&
       isInlineStringSchema(property.initializer)

@@ -27,11 +27,10 @@ export const WorkspaceOperationsLive = Layer.effect(
         Effect.gen(function* getWorkspaceStatus() {
           const workspace = yield* makeWorkspaceSummary().pipe(
             Effect.mapError(
-              (cause) =>
+              () =>
                 new WorkspaceSchemaError({
                   boundary: "WorkspaceSummary",
                   message: "Unable to decode workspace summary.",
-                  cause,
                 })
             )
           );
@@ -42,11 +41,10 @@ export const WorkspaceOperationsLive = Layer.effect(
             agentSummary: `Question: ${input.question}. Workspace ${workspace.name} exposes ${workspace.packages.length} packages: ${workspace.packages.join(", ")}.`,
           }).pipe(
             Effect.mapError(
-              (cause) =>
+              () =>
                 new WorkspaceSchemaError({
                   boundary: "WorkspaceStatusSuccess",
                   message: "Unable to encode workspace status success.",
-                  cause,
                 })
             )
           );
