@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
 task_ledger: automatic-production-and-operational-closeout.tasks.json
 ---
@@ -54,7 +54,7 @@ acceptance, or historical conversation into a stronger live claim.
 
 | Evidence                      | Current identity                                                                                                                                                                                                                                                                                       | Claim limit                                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Bundjil source                | clean `codex/automatic-production-effect-runtime` at `928623a8f95131528d3eb850ec22c85826533f4a`; `origin/main` remains `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                      | Implemented candidate and starting-main identities only.                                          |
+| Bundjil source                | Draft PR `#5` owns branch `codex/automatic-production-effect-runtime`; its exact current head must be read from GitHub at action time. `origin/main` remains the historical starting identity `5c3c7db240a7abd9bb57ad560bdd8958af4ea701` until merge readback proves otherwise.                        | Candidate routing and starting-main identity only; this prose is not a current-head assertion.    |
 | Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                                                                                     | Historical acceptance of the starting SHA, not future deployment proof.                           |
 | GitHub controls               | Admin principal `crcorbett`; active ruleset `20616946` requires a pull request, strict `verify` status and non-fast-forward updates on the default branch with no bypass; `Production` permits protected branches with no human reviewer or wait; both hosted environments currently have zero secrets | Point-in-time metadata readback only; source and settings do not prove a future run.              |
 | Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                       | Current metadata observation; no mutation authority or future state.                              |
@@ -62,6 +62,7 @@ acceptance, or historical conversation into a stronger live claim.
 | Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                  | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.        |
 | Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                 | Desired provider configuration only; live Terra High remains unproved until automatic deployment. |
 | Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                           | Desired/source and provider-link observation only.                                                |
+| GitHub action runtimes        | Hosted PR `#5` CI at `d84e2c2b4f40fa32614066cea2121e536b343d47` passed but reported that the pinned checkout/setup-node v4 actions still targeted deprecated Node 20. Public `v7.0.1`/`v7.0.0` refs and manifests resolve to exact Node-24 action revisions for the corrective candidate.              | The failing annotation and public ref/manifest facts only; the successor hosted run is required.  |
 
 `observedAt` timestamps and sanitized fingerprints belong in the active plan and
 dated proof packet. Secret values, message content, phone identities, OAuth
@@ -91,6 +92,13 @@ Personal-project scope, so exact team/project configuration, project-bound
 secret names, provider readback and fail-closed project/SHA checks constrain
 use inside the workflow. This is the least available provider scope, not a
 claim that either credential is provider-enforced to one project.
+
+All workflow actions remain exact-commit pinned and lock-owned. The corrective
+candidate replaces only `actions/checkout` and `actions/setup-node` with the
+reviewed Node-24 `v7.0.1` and `v7.0.0` commits after hosted CI surfaced the
+Node-20 action-runtime deprecation. Triggers, permissions, environments,
+credentials, operations and target gates remain unchanged; hosted execution
+must prove the replacement candidate.
 
 The repository-owned Effect command is the sole deployment adapter. It uses
 Schema-derived SHA, team, project, deployment, URL, alias, state, and bounded

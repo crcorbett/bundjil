@@ -331,6 +331,31 @@ regression without an exception. Web Crypto remains unchanged for PKCE and
 AES-GCM cryptographic entropy; stored formats and hosted state are not proved
 by this repository slice.
 
+### 2026-08-13 GitHub action runtime correction
+
+- Hosted CI for exact candidate
+  `d84e2c2b4f40fa32614066cea2121e536b343d47` passed repository verification
+  but emitted a deprecation annotation because the pinned checkout and
+  setup-node v4 actions still target Node 20.
+- Public upstream tag readback resolves `actions/checkout@v7.0.1` to
+  `3d3c42e5aac5ba805825da76410c181273ba90b1` and
+  `actions/setup-node@v7.0.0` to
+  `820762786026740c76f36085b0efc47a31fe5020`; each reviewed `action.yml`
+  declares `node24`.
+- The corrective candidate changes only those exact pins in their admitted
+  workflow locations plus the action lock, authority policy and fixtures.
+  Workflow triggers, permissions, credentials, environments, targets,
+  operations, concurrency and timeouts are preserved.
+- Source/ref review is not hosted proof. The task remains in progress until
+  focused policy gates, full repository verification and the exact successor
+  hosted CI run pass without the Node-20 action-runtime annotation.
+- Documentation impact: workflow pins, action lock, automation register,
+  automatic Production SPEC/task and this plan **Change required**. Provider
+  settings, credentials, deployments, aliases, runbooks, authority envelopes,
+  controls and live evidence **Preserve**. Effect service boundaries, channel
+  behavior, frontend, browser, accessibility, generated references, release
+  and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

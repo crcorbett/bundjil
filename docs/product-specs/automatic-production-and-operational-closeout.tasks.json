@@ -74,10 +74,32 @@
       "commitAfterPassing": true
     },
     {
+      "id": "refresh-node24-action-runtimes",
+      "title": "Refresh admitted GitHub actions to Node 24 runtimes",
+      "status": "in_progress",
+      "dependsOn": ["implement-automatic-production-control"],
+      "description": "Replace the deprecated Node-20-based checkout and setup-node pins with exact reviewed Node-24 action revisions after hosted CI reports the runtime deprecation.",
+      "mandatoryVerification": [
+        "Resolve the exact public v7.0.1 checkout and v7.0.0 setup-node tag commits and inspect each upstream action.yml runtime declaration.",
+        "Update only the admitted workflow locations, action lock, policy pins and fixtures; preserve triggers, permissions, identities, operations and provider custody.",
+        "Reject stale v4 pins and comments across current workflow and policy owners.",
+        "Run authority, controls, docs, skills, formatting, full repository verification and one hosted CI run for the exact pushed candidate."
+      ],
+      "proofContract": {
+        "directObservable": "All admitted workflow uses resolve through the action lock to the reviewed Node-24 commits, local policy gates pass, and hosted CI no longer emits the Node-20 action-runtime annotation.",
+        "expectedPostcondition": "Bundjil's admitted GitHub actions execute on their declared Node 24 runtimes without changing workflow authority.",
+        "falseGreenRejected": "Changing comments only, using floating v7 tags, updating the lock without workflows, local success without hosted execution, or treating a public tag as action-safety proof.",
+        "evidenceOwner": "Action lock, authority tests, active-plan slice receipt and exact hosted CI run",
+        "limitationsAndNonClaims": "Public refs and manifests do not prove upstream safety, hosted execution or provider configuration."
+      },
+      "docsImpact": "Update the action lock, automation register, SPEC/task ledger and active plan; preserve provider/runbook claims.",
+      "commitAfterPassing": true
+    },
+    {
       "id": "configure-hosted-controls-and-drift",
       "title": "Configure bounded GitHub and Vercel identities and close Infrastructure Drift",
       "status": "pending",
-      "dependsOn": ["implement-automatic-production-control"],
+      "dependsOn": ["refresh-node24-action-runtimes"],
       "description": "After repository desired state is reviewed and pushed, create two separately revocable Personal-scope Vercel tokens for the exact agent and proxy project steps, bind only their ciphertext to the Production environment, install the minimal main ruleset, provision the three exact drift artifacts, dispatch one read-only drift run and retain sanitized readback. Vercel does not currently enforce individual Personal-project token scope, so exact project configuration and decoded readback are mandatory residual controls.",
       "mandatoryVerification": [
         "Read GitHub and Personal Vercel identity immediately before every write and stop on Tilt or project ambiguity.",

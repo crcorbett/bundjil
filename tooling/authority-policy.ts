@@ -288,8 +288,8 @@ const requiredAuthorityRecordById = new Map<
 >(requiredAuthorityRecords.map((record) => [record.id, record] as const));
 
 const requiredPins = {
-  "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
-  "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+  "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+  "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
   "anthropics/claude-code-action": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
   "changesets/action": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
   "oven-sh/setup-bun": "0c5077e51419868618aeaa5fe8019c62421857d6",

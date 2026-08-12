@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -213,6 +213,13 @@ Unknown, floating, short, mismatched, or unregistered actions fail closed.
 Rollback restores the prior lock and workflow pins together. Compromise or
 upstream deletion stops the affected workflow and escalates to the repository
 owner; it does not justify substituting an unreviewed fork or tag.
+
+The 2026-08-13 action-runtime review moved the admitted workflows from the
+Node-20-based checkout/setup-node v4 pins to exact `actions/checkout@v7.0.1`
+and `actions/setup-node@v7.0.0` commits. Both reviewed upstream `action.yml`
+files declare `node24`. The public tag and manifest readback proves only the
+resolved source and declared action runtime; the next hosted run remains the
+execution proof.
 
 ## External settings and HGI-309
 
