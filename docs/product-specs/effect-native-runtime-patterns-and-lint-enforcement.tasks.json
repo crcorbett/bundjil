@@ -644,10 +644,37 @@
       ]
     },
     {
+      "id": "close-raw-promise-coordination",
+      "title": "Close raw Promise coordination",
+      "status": "completed",
+      "dependsOn": ["close-shared-error-field-provenance"],
+      "description": "Correct the iterative concurrency finding where the Sendblue Web Crypto verifier coordinated independent Promise operations with Promise.all inside its live adapter.",
+      "implementationNotes": [
+        "Keep verifyWebhookSecret as the private named adapter operation; do not introduce a service, generic crypto wrapper, utility module, or public export.",
+        "Wrap each Web Crypto Promise with object-form Effect.tryPromise and map rejection immediately to the existing closed ChannelWebhookAuthenticationError.",
+        "Use Effect.all with explicit concurrency only for independent key imports; keep signing and verification linear and preserve constant-time authentication behavior.",
+        "Reject Promise.all and Promise.race in owned production app/package source through the existing boundary audit with direct fixtures and no exception."
+      ],
+      "proofContract": {
+        "directObservable": "The production scan contains no Promise.all or Promise.race; direct fixtures reject both forms; a rejected Web Crypto import encodes only the safe authentication error; 131 boundary tests, Sendblue typecheck and 10 tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Provider Promise ingress remains private while concurrency, interruption, and typed failure composition are owned by Effect.",
+        "falseGreenRejected": "Moving Promise.all into another helper, wrapping the whole async block in one tryPromise, serializing independent imports without reason, changing authentication semantics, adding a broad lint exception, or relying on search without a regression fixture.",
+        "focusedCommandOrProcedureOwner": "Sendblue live Layer and tests, boundary provenance fixture, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Sendblue Effect concurrency correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not invoke Sendblue, mutate a webhook, prove hosted authentication, or establish message delivery."
+      },
+      "completionCriteria": [
+        "No owned production app/package source uses Promise.all or Promise.race.",
+        "Sendblue Web Crypto rejections remain a closed authentication error and raw causes remain private.",
+        "The provenance fixture rejects the prior bypass and the exception registry is unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-shared-error-field-provenance"],
+      "dependsOn": ["close-raw-promise-coordination"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

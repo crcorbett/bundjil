@@ -41,49 +41,67 @@ const sendMessageUrl = "https://api.sendblue.com/api/send-message";
 const presenceUrl = "https://api.sendblue.com/api/send-typing-indicator";
 const textEncoder = new TextEncoder();
 
-const verifyWebhookSecret = (provided: string, expected: Redacted.Redacted) =>
-  Effect.tryPromise({
-    try: async () => {
-      const algorithm = { name: "HMAC", hash: "SHA-256" };
-      const [providedKey, expectedKey] = await Promise.all([
-        globalThis.crypto.subtle.importKey(
-          "raw",
-          textEncoder.encode(provided),
-          algorithm,
-          false,
-          ["sign"]
-        ),
-        globalThis.crypto.subtle.importKey(
-          "raw",
-          textEncoder.encode(Redacted.value(expected)),
-          algorithm,
-          false,
-          ["verify"]
-        ),
-      ]);
-      const comparisonPayload = textEncoder.encode(
-        "@bundjil/sendblue/webhook-secret-v1"
-      );
-      const providedSignature = await globalThis.crypto.subtle.sign(
-        algorithm,
-        providedKey,
-        comparisonPayload
-      );
-      return globalThis.crypto.subtle.verify(
-        algorithm,
-        expectedKey,
-        providedSignature,
-        comparisonPayload
-      );
-    },
-    catch: () =>
+const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
+  function* (provided: string, expected: Redacted.Redacted) {
+    const authenticationError = () =>
       new ChannelWebhookAuthenticationError({
         provider: "sendblue",
         operation: "decodeWebhook",
         reason: "authentication",
         retry: "never",
-      }),
-  });
+      });
+    const algorithm = { name: "HMAC", hash: "SHA-256" };
+    const [providedKey, expectedKey] = yield* Effect.all(
+      [
+        Effect.tryPromise({
+          try: () =>
+            globalThis.crypto.subtle.importKey(
+              "raw",
+              textEncoder.encode(provided),
+              algorithm,
+              false,
+              ["sign"]
+            ),
+          catch: authenticationError,
+        }),
+        Effect.tryPromise({
+          try: () =>
+            globalThis.crypto.subtle.importKey(
+              "raw",
+              textEncoder.encode(Redacted.value(expected)),
+              algorithm,
+              false,
+              ["verify"]
+            ),
+          catch: authenticationError,
+        }),
+      ],
+      { concurrency: "unbounded" }
+    );
+    const comparisonPayload = textEncoder.encode(
+      "@bundjil/sendblue/webhook-secret-v1"
+    );
+    const providedSignature = yield* Effect.tryPromise({
+      try: () =>
+        globalThis.crypto.subtle.sign(
+          algorithm,
+          providedKey,
+          comparisonPayload
+        ),
+      catch: authenticationError,
+    });
+    return yield* Effect.tryPromise({
+      try: () =>
+        globalThis.crypto.subtle.verify(
+          algorithm,
+          expectedKey,
+          providedSignature,
+          comparisonPayload
+        ),
+      catch: authenticationError,
+    });
+  }
+);
 
 export const layerLive = (config: SendblueConfig) =>
   Layer.effect(

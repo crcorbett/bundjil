@@ -59,6 +59,14 @@ describe("boundary provenance audit", () => {
     ],
     ["direct-json", "export const decode = () => JSON.parse('{}');"],
     [
+      "raw-promise-coordination",
+      "export const load = () => Promise.all([fetch('/a'), fetch('/b')]);",
+    ],
+    [
+      "raw-promise-coordination",
+      "export const fastest = () => Promise.race([fetch('/a'), fetch('/b')]);",
+    ],
+    [
       "sync-schema-codec",
       "export const decode = () => Schema.decodeSync(Value);",
     ],

@@ -483,6 +483,12 @@ const namedCallRules: readonly Readonly<{
     message: "Direct JSON APIs bypass the canonical Schema codec.",
   },
   {
+    names: ["Promise.all", "Promise.race"],
+    rule: "raw-promise-coordination",
+    message:
+      "Owned production concurrency must use Effect.all, Effect.race, or another Effect concurrency primitive.",
+  },
+  {
     names: [
       "Schema.decodeSync",
       "Schema.decodeUnknownSync",

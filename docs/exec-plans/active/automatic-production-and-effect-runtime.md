@@ -301,6 +301,15 @@ verification gate also passes from a cold Turbo cache with the public synthetic
 Executor CI configuration. No provider operation ran and no hosted dependency
 is satisfied by this source correction.
 
+The next concurrency pass removed the sole production `Promise.all` from the
+private Sendblue Web Crypto verifier. Provider Promise ingress is translated
+individually to the existing closed authentication error, independent key
+imports use explicit `Effect.all` concurrency, and signing/verification remain
+linear. Boundary proof now rejects `Promise.all` and `Promise.race` and passes
+131 tests with no exception; Sendblue passes 10 tests including rejected Web
+Crypto ingress. This source correction changes no Channel
+contract, webhook, provider state, hosted evidence, or deployment dependency.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

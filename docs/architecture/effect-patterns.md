@@ -40,6 +40,9 @@ runtime config, or provider boundaries:
 - `Config` and `ConfigProvider` for runtime config.
 - Object-form `Effect.tryPromise({ try, catch })` for Promise or SDK calls,
   with rejection mapped at the owning boundary.
+- `Effect.all`, `Effect.race`, fibers, and other Effect primitives for owned
+  concurrency. Raw `Promise.all` and `Promise.race` are forbidden in production
+  app/package source even inside a `tryPromise` callback.
 - `Clock.currentTimeMillis`, `Effect.sleep`, schedules, and timeouts for
   runtime time so `TestClock` can control Effect-owned tests.
 - `Effect.fn` and `Effect.withSpan` for named operations that need readable
@@ -278,6 +281,11 @@ removing or adding a matching occurrence fails lint as stale or unexplained.
 `bun run knip` enforces dead-code, export, file, and dependency hygiene.
 Package/app typechecks and the configured Effect language service are also
 required.
+
+`bun run check:boundaries` also rejects raw Promise coordination in owned
+production source. A framework callback may return one Promise at its exact
+host edge, but parallelism, racing, interruption, and failure composition stay
+inside the application-owned Effect runtime.
 
 Do not weaken the root lint config, add broad suppressions, introduce unsafe
 casts, or expand ignore patterns to land a change. A narrow suppression needs

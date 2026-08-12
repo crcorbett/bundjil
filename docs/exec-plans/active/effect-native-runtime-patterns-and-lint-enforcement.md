@@ -259,6 +259,34 @@ deployment claim.
   alias target and adding the cross-file fixture closes that exact gap without
   changing the accepted runtime surface.
 
+## 2026-08-13 Sendblue Effect concurrency correction
+
+- A fresh production-source concurrency scan found the sole `Promise.all` in
+  the private Sendblue Web Crypto verifier. Although the whole block mapped
+  rejection through `Effect.tryPromise`, Promise scheduling and interruption
+  remained outside Effect ownership.
+- Installed `effect@4.0.0-beta.101` is authoritative for `Effect.all` and its
+  explicit concurrency option. The local Effect comparison remains revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` and is comparison evidence only.
+- The verifier now wraps each provider Promise independently, uses concurrent
+  Effect key imports, then signs and verifies linearly. The existing closed
+  authentication error receives every rejection and no raw cause is retained.
+- `raw-promise-coordination` rejects `Promise.all` and `Promise.race` across
+  owned production app/package source. Direct negative fixtures raise the
+  boundary suite to 131 tests without an exception; a Web Crypto rejection
+  fixture proves the exact safe encoded error without the private cause.
+- Focused Sendblue typecheck and 10 tests pass. The complete `bun run
+  verification` gate passes with all nine package typechecks and all fifteen
+  test/build tasks green; the changed Sendblue and agent tasks executed while
+  unaffected tasks replayed from the shared Turbo cache. The final owned-source
+  scan is empty for `Promise.all` and `Promise.race`.
+- Documentation impact: Sendblue live Layer/README, Effect architecture,
+  Effect SPEC/task, this plan, and boundary tooling/fixture **Change required**.
+  Public package exports, Channel contract, provider payload Schemas, app
+  routing, webhooks, operations, authority, controls, live evidence and
+  provider state **Preserve**. Frontend, browser, accessibility, generated API
+  references, release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove
