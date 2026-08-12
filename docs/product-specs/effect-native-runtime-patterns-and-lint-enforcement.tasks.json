@@ -590,10 +590,37 @@
       ]
     },
     {
+      "id": "close-exported-schema-error-boundary",
+      "title": "Close exported Schema-error contracts",
+      "status": "completed",
+      "dependsOn": ["close-operator-error-cause-boundary"],
+      "description": "Correct the iterative public-contract finding where PreviewStateMigrationError was the sole exported production Data.TaggedError and therefore lacked an explicit encodable Schema contract.",
+      "implementationNotes": [
+        "Use installed effect@4.0.0-beta.101 Schema.TaggedErrorClass as the authoritative schema-validated yieldable error API; record the comparison clone revision separately.",
+        "Migrate PreviewStateMigrationError without changing its tag, reason, message, constructors, service failure union, state behavior, or rollback paths.",
+        "Model observed and expected counts with the owner-branded non-negative PreviewStateMigrationCount Schema and export it through the existing infrastructure root.",
+        "Add an Effectful encoded round-trip fixture plus public-data-tagged-error enforcement in the existing boundary audit; preserve private Data.TaggedError classes and add no exception."
+      ],
+      "proofContract": {
+        "directObservable": "The production scan has no exported Data.TaggedError; the migration error encodes and decodes its exact safe contract; the boundary audit rejects the regression; infrastructure typecheck, 84 Vitest tests, 21 Alchemy tests, 127 boundary tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Every exported yieldable typed error has a Schema-owned encoded contract and future plain Data.TaggedError exports fail the existing repository gate.",
+        "falseGreenRejected": "Changing only the class import, leaving raw semantic counts, omitting encoded proof, banning private adapter errors, adding a second checker, or inferring state/provider behavior from unit tests.",
+        "focusedCommandOrProcedureOwner": "Infrastructure error Schema/export/test, boundary provenance, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Exported Schema-error correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not execute migration, mutate provider state, prove hosted behavior, or change durable state bytes."
+      },
+      "completionCriteria": [
+        "No exported production class extends Data.TaggedError.",
+        "The migration error and semantic counts are Schema-owned and round-trip through Effectful codecs.",
+        "The provenance rule has a direct negative fixture and no exception.",
+        "Canonical docs, task ledger, active plans, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-operator-error-cause-boundary"],
+      "dependsOn": ["close-exported-schema-error-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

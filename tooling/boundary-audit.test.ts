@@ -125,6 +125,10 @@ describe("boundary provenance audit", () => {
       "export const ProviderFailure = Schema.Struct({ details: Schema.Defect() });",
     ],
     [
+      "public-data-tagged-error",
+      "export class ProviderFailure extends Data.TaggedError('ProviderFailure')<{ readonly reason: 'failed' }> {}",
+    ],
+    [
       "raw-outbound-write",
       "export const send = () => HttpClientRequest.bodyText('raw');",
     ],

@@ -288,6 +288,15 @@ const rootCallName = (node: ts.CallExpression) => {
   return dottedName(expression);
 };
 
+const isDataTaggedErrorClass = (node: ts.ClassDeclaration) =>
+  node.heritageClauses?.some((clause) =>
+    clause.types.some(
+      (type) =>
+        ts.isCallExpression(type.expression) &&
+        rootCallName(type.expression) === "Data.TaggedError"
+    )
+  ) === true;
+
 const isOperatorRawCause = (node: ts.PropertySignature) => {
   if (
     node.type?.kind !== ts.SyntaxKind.UnknownKeyword ||
@@ -298,19 +307,25 @@ const isOperatorRawCause = (node: ts.PropertySignature) => {
   let current: ts.Node | undefined = node.parent;
   while (current !== undefined && !ts.isSourceFile(current)) {
     if (ts.isClassDeclaration(current)) {
-      return (
-        current.heritageClauses?.some((clause) =>
-          clause.types.some(
-            (type) =>
-              ts.isCallExpression(type.expression) &&
-              rootCallName(type.expression) === "Data.TaggedError"
-          )
-        ) === true
-      );
+      return isDataTaggedErrorClass(current);
     }
     current = current.parent;
   }
   return false;
+};
+
+const inspectClassDeclaration = (
+  node: ts.ClassDeclaration,
+  report: ReportDiagnostic
+) => {
+  if (!hasExportModifier(node) || !isDataTaggedErrorClass(node)) {
+    return;
+  }
+  report(
+    node,
+    "public-data-tagged-error",
+    "Exported typed errors must use Schema.TaggedErrorClass so their public encoded contract is explicit and testable."
+  );
 };
 
 const codecSide = (
@@ -657,6 +672,9 @@ export const auditBoundaryProvenance = (
           "public-generic-fetch",
           "Public provider configuration cannot expose a generic fetch callback seam."
         );
+      }
+      if (ts.isClassDeclaration(node)) {
+        inspectClassDeclaration(node, report);
       }
       if (ts.isPropertySignature(node) && isOperatorRawCause(node)) {
         report(

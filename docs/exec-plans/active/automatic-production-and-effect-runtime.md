@@ -278,6 +278,18 @@ public synthetic Executor CI configuration. This is repository proof only and
 does not satisfy the missing hosted staged-refresh, automatic-main, channel, or
 handset dependencies.
 
+The following public-contract pass migrated the sole exported production
+`Data.TaggedError`, `PreviewStateMigrationError`, to
+`Schema.TaggedErrorClass`, branded its optional non-negative counts, and added
+an Effectful encoded-contract fixture. The existing boundary audit now rejects
+future exported `Data.TaggedError` declarations through
+`public-data-tagged-error`; boundary proof passes 127 tests with no exception.
+Infrastructure typecheck, 84 Vitest tests and 21 Alchemy tests pass. No state
+migration or provider command ran. The complete repository verification gate
+also passes from a cold Turbo cache with the public synthetic Executor CI
+configuration; this repository correction does not satisfy any hosted or
+channel dependency.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

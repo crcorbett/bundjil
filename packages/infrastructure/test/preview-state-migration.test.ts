@@ -11,6 +11,9 @@ import {
   makePreviewStateBackupStoreMemory,
   makePreviewStateMigrationLayer,
   PreviewStateMigration,
+  PreviewStateMigrationCount,
+  PreviewStateMigrationError,
+  PreviewStateMigrationErrorMessage,
   PreviewStateMigrationPolicy,
   PreviewStateForbiddenValue,
   PreviewStateResourceFingerprint,
@@ -119,6 +122,35 @@ const seedState = (stage: "preview" | "prod" = "preview") =>
   });
 
 describe("Preview state migration", () => {
+  it("encodes and decodes its bounded public error contract", async () => {
+    const error = new PreviewStateMigrationError({
+      reason: "currentCountMismatch",
+      message: PreviewStateMigrationErrorMessage.make(
+        "Preview state resource count did not match the exact migration policy."
+      ),
+      observedCount: PreviewStateMigrationCount.make(4),
+      expectedCount: PreviewStateMigrationCount.make(5),
+    });
+    const encoded = await Effect.runPromise(
+      Schema.encodeEffect(PreviewStateMigrationError)(error)
+    );
+    const decoded = await Effect.runPromise(
+      Schema.decodeUnknownEffect(PreviewStateMigrationError)(encoded)
+    );
+
+    expect(encoded).toStrictEqual({
+      _tag: "PreviewStateMigrationError",
+      reason: "currentCountMismatch",
+      message:
+        "Preview state resource count did not match the exact migration policy.",
+      observedCount: 4,
+      expectedCount: 5,
+    });
+    expect(decoded._tag).toBe("PreviewStateMigrationError");
+    expect(decoded.observedCount).toBe(4);
+    expect(decoded.expectedCount).toBe(5);
+  });
+
   it("keeps forbidden credential sentinels redacted at the leak-scan boundary", async () => {
     const accepted = await Effect.runPromise(
       Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(

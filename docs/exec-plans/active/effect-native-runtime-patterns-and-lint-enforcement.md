@@ -197,6 +197,34 @@ deployment claim.
   evidence and provider state **Preserve**. Frontend, browser, accessibility,
   generated API references, release and publication are **N/A**.
 
+## 2026-08-13 exported Schema-error correction
+
+- The next public-contract pass found one exported production
+  `Data.TaggedError`: `PreviewStateMigrationError`. Installed
+  `effect@4.0.0-beta.101` documents `Schema.TaggedErrorClass` as the
+  schema-validated, yieldable tagged-error owner. The local comparison clone
+  remained at `1caab3cc30f626efbf15e59d74f539a487e5c85c`; installed beta.101
+  source was authoritative where the APIs differ.
+- The migration error now uses `Schema.TaggedErrorClass`. Its optional observed
+  and expected counts use the new branded, non-negative
+  `PreviewStateMigrationCount` codec, exported from the existing infrastructure
+  root. A direct Effectful encode/decode fixture preserves the exact safe shape.
+- The existing provenance audit adds `public-data-tagged-error`; it rejects an
+  exported `Data.TaggedError` while preserving private adapter and operator
+  errors. Boundary proof passes 127 tests with no new exception.
+- Focused proof passes infrastructure typecheck, 84 Vitest tests, 21 Alchemy
+  tests, Effect setup and boundary checks. The complete `bun run verification`
+  gate also passes from a cold Turbo cache with the public synthetic Executor
+  CI configuration: all nine typechecks and fifteen test/build tasks are green.
+  No provider or state migration command ran.
+- Documentation impact: Effect architecture, Effect SPEC/task, this plan,
+  infrastructure Schema/error/root export, direct contract test, and boundary
+  tooling/fixture **Change required**. The infrastructure README, root/docs
+  indexes, other architecture, services/Layers, state bytes, provider commands,
+  runbooks, authority, controls, live evidence and provider state **Preserve**.
+  Frontend, browser, accessibility, generated API references, release and
+  publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

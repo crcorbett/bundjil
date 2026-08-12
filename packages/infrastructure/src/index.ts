@@ -161,6 +161,8 @@ export {
   PreviewStateInstanceId,
   type PreviewStateInstanceIdEncoded,
   PreviewStateMigration,
+  PreviewStateMigrationCount,
+  type PreviewStateMigrationCountEncoded,
   PreviewStateMigrationError,
   PreviewStateMigrationFailureReason,
   type PreviewStateMigrationFailureReasonEncoded,

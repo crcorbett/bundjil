@@ -430,6 +430,11 @@ Rules:
 - An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.
+- Every exported yieldable typed error must use `Schema.TaggedErrorClass`, not
+  `Data.TaggedError`, so its encoded contract can be checked and round-tripped.
+  The `public-data-tagged-error` boundary rule owns this invariant. Private
+  adapter and operator-only errors may use `Data.TaggedError` when they do not
+  cross a public or durable boundary.
 - Rename an exported tagged error as one atomic encoded-contract migration:
   update the declaration, self-type, literal tag, constructors, failure
   unions, `catchTag`/`catchTags` consumers, guards, Schema encode/decode tests,

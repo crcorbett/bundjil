@@ -5,7 +5,6 @@ import { dirname, isAbsolute } from "node:path";
 import { State } from "alchemy/State";
 import {
   Context,
-  Data,
   Effect,
   FileSystem,
   Layer,
@@ -87,6 +86,14 @@ export type PreviewStateMigrationErrorMessage =
   typeof PreviewStateMigrationErrorMessage.Type;
 export type PreviewStateMigrationErrorMessageEncoded =
   typeof PreviewStateMigrationErrorMessage.Encoded;
+
+export const PreviewStateMigrationCount = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThanOrEqualTo(0)),
+  Schema.brand("@bundjil/infrastructure/state/PreviewStateMigrationCount")
+);
+export type PreviewStateMigrationCount = typeof PreviewStateMigrationCount.Type;
+export type PreviewStateMigrationCountEncoded =
+  typeof PreviewStateMigrationCount.Encoded;
 
 export const PreviewStateMigrationFailureReason = Schema.Literals([
   "stateListFailed",
@@ -200,14 +207,15 @@ export type PreviewStateMigrationPolicy =
 export type PreviewStateMigrationPolicyEncoded =
   typeof PreviewStateMigrationPolicy.Encoded;
 
-export class PreviewStateMigrationError extends Data.TaggedError(
-  "PreviewStateMigrationError"
-)<{
-  readonly reason: PreviewStateMigrationFailureReason;
-  readonly message: PreviewStateMigrationErrorMessage;
-  readonly observedCount?: number;
-  readonly expectedCount?: number;
-}> {}
+export class PreviewStateMigrationError extends Schema.TaggedErrorClass<PreviewStateMigrationError>()(
+  "PreviewStateMigrationError",
+  {
+    reason: PreviewStateMigrationFailureReason,
+    message: PreviewStateMigrationErrorMessage,
+    observedCount: Schema.optional(PreviewStateMigrationCount),
+    expectedCount: Schema.optional(PreviewStateMigrationCount),
+  }
+) {}
 
 const migrationError = (
   reason: PreviewStateMigrationFailureReason,
@@ -220,7 +228,12 @@ const migrationError = (
   new PreviewStateMigrationError({
     reason,
     message: PreviewStateMigrationErrorMessage.make(message),
-    ...counts,
+    ...(counts === undefined
+      ? {}
+      : {
+          observedCount: PreviewStateMigrationCount.make(counts.observedCount),
+          expectedCount: PreviewStateMigrationCount.make(counts.expectedCount),
+        }),
   });
 
 export class PreviewStateBackupStore extends Context.Service<
