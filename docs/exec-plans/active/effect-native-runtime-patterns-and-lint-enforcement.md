@@ -34,9 +34,9 @@ task, so neither plan can close independently.
 
 1. Add exactly the four lint rules in the SPEC with unit and installed-plugin
    fixtures, exact scopes/exceptions, staleness proof and no autofix.
-2. Migrate Effect-clock-owned Codex/proxy test fixtures and Photon candidate
-   observation time. Preserve drift CLI and subprocess live timing as exact
-   process-boundary exceptions.
+2. Migrate Effect-clock-owned Codex/proxy test fixtures, Photon candidate
+   observation time and Effect-owned drift receipts. Preserve only direct
+   subprocess live timing as an exact host-boundary exception.
 3. Preserve existing object-form `Effect.tryPromise` production calls; the
    rule protects this zero-debt state.
 4. Flatten the nested channel dispatch generator. Keep runtime execution only
@@ -69,12 +69,13 @@ fixtures use named fixed epochs instead of host time. The Eve dispatch owner is
 one flat `tryPromise`/decode/handoff Effect under the existing acceptance
 timeout, rejection mapping and timeout branch.
 
-The disabled production rules reported zero findings across 330 app/package
-files for ambient time, object-form `tryPromise` and runtime execution. The
-service-source async/await rule reported zero across 306 files. The only
-ambient-time findings left in source are the registered subprocess deadline
-proof and drift CLI process receipt; the only non-generic runtime owners are
-the exact registered Eve/framework adapters. Focused tests passed 117
+The disabled production rules reported zero unexplained findings across 330
+app/package files for ambient time, object-form `tryPromise` and runtime
+execution. The service-source async/await rule reported zero across 306 files.
+The registered subprocess deadline proof was retained as the sole ambient-time
+exception; the drift CLI process receipt was subsequently migrated to the
+Effect Clock during the 2026-08-13 audit. The only non-generic runtime owners
+are the exact registered Eve/framework adapters. Focused tests passed 117
 assertions, then complete owner tests and type checks passed: Photon 41, Codex
 115, codex-proxy 41 and agent 80. The agent build/test requires the same public
 synthetic Executor CI configuration as repository CI; an unconfigured first
@@ -96,8 +97,8 @@ Match, helper or package-topology edit was admitted.
 object-form `tryPromise`, and runtime-ownership rules run at error across all
 app/package TypeScript. Async/await confinement runs at error across package
 `src`, agent service code, and codex-proxy `src`. Five host/SDK/framework files
-have exact async/await occurrence records; the drift/process and runtime
-exceptions remain exact path/symbol/count records. No warning level, numeric
+have exact async/await occurrence records; the remaining host-time and runtime
+exceptions retain exact path/symbol/count records. No warning level, numeric
 debt, broad ignore, inline suppression, autofix, second runner, or plugin
 package was introduced.
 
@@ -118,6 +119,22 @@ type-aware lint, Knip, all nine workspace typechecks, and all workspace tests
 passed. The repository `bun run verification` pass used only the same public
 synthetic Executor values as CI; it establishes no hosted provider or
 deployment claim.
+
+## 2026-08-13 ambient-time exception retirement
+
+- The iterative strict Effect audit reclassified the infrastructure drift
+  timestamp and duration as application semantics rather than host-process
+  proof. Installed `effect@4.0.0-beta.101` `DateTime.now`, `formatIso` and
+  `toEpochMillis` were inspected and used directly; both measurements now flow
+  through the injected Effect `Clock`.
+- The exact drift-script exception and its positive lint fixture were removed.
+  The remaining ambient-time exception is the codex-proxy host response-time
+  proof, whose live deadline and timer are the direct subject of that test.
+- Documentation impact: this active plan, the Effect SPEC/task migration
+  guidance, lint registry/fixture and drift command **Change required**.
+  Architecture, public contracts, package exports/READMEs, runbooks, authority,
+  controls, provider behavior and live evidence **Preserve**. Frontend and
+  generated API references are **N/A** because this slice has neither.
 
 ## Evidence and non-claims
 

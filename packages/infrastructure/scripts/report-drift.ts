@@ -15,6 +15,7 @@ import {
   Config,
   ConfigProvider,
   Console,
+  DateTime,
   Effect,
   FileSystem,
   Layer,
@@ -543,7 +544,7 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
 });
 
 const program = Effect.gen(function* () {
-  const startedAt = Date.now();
+  const startedAt = yield* DateTime.now;
   const stage = yield* stageConfig;
   if (stage !== "preview") {
     return yield* Effect.fail("production-target-rejected");
@@ -566,13 +567,15 @@ const program = Effect.gen(function* () {
     Effect.catch(() => Effect.succeed(unavailableNativeResult(stage)))
   );
   const { observations } = native;
+  const observedAt = yield* DateTime.now;
   const report = yield* buildInfrastructureDriftReport(
     InfrastructureDriftReportInput.make({
       authorityFingerprint,
       desiredPlan: native.desiredPlan,
       observations,
-      observedAt: new Date().toISOString(),
-      runDurationMilliseconds: Date.now() - startedAt,
+      observedAt: DateTime.formatIso(observedAt),
+      runDurationMilliseconds:
+        DateTime.toEpochMillis(observedAt) - DateTime.toEpochMillis(startedAt),
       sourceSha,
       stage,
     })

@@ -434,7 +434,7 @@
       "dependsOn": ["add-narrow-lint-rules-disabled"],
       "description": "Apply only inventory-approved migrations for Clock/TestClock, Promise boundaries, and runtime execution while preserving services, provider contracts, and runtime behaviour.",
       "implementationNotes": [
-        "Replace Effect-owned Date.now fixtures with fixed decoded epochs or Clock/TestClock-driven values; preserve exact live host/process tests.",
+        "Replace Effect-owned Date.now fixtures and semantic command timestamps/durations with fixed decoded epochs or Clock/DateTime/TestClock-driven values; preserve only exact tests whose direct subject is live host/process timing.",
         "Use fork-adjust-or-setTime-join for sleeping, timeout, retry, and Schedule assertions and verify attempt/timestamp traces.",
         "Move async/await and Promise ingress to named live/framework adapters and use Effect.tryPromise object form with safe tagged errors.",
         "Return Effects from service/package logic; retain ManagedRuntime/run* only at named app, CLI, test, or registered framework owners with disposal proof.",

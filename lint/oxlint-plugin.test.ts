@@ -89,10 +89,6 @@ describe("bundjil/no-ambient-time-in-effect", () => {
               code: "Date.now(); Date.now(); setTimeout(() => undefined, 1);",
               filename: "/repo/apps/codex-proxy/test/prove-preview.test.ts",
             },
-            {
-              code: "Date.now(); Date.now(); new Date();",
-              filename: "/repo/packages/infrastructure/scripts/report-drift.ts",
-            },
           ],
           invalid: [
             { code: "Date.now();", errors: [{ messageId: "noDateNow" }] },

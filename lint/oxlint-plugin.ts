@@ -221,10 +221,6 @@ export const ambientTimeExceptions = [
     pathSuffix: "apps/codex-proxy/test/prove-preview.test.ts",
     expected: { "Date.now": 2, setTimeout: 1 },
   },
-  {
-    pathSuffix: "packages/infrastructure/scripts/report-drift.ts",
-    expected: { "Date.now": 2, "new Date()": 1 },
-  },
 ] as const satisfies readonly ExactException[];
 
 export const asyncAwaitExceptions = [
