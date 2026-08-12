@@ -519,6 +519,29 @@ type ReportDiagnostic = (
   message: string
 ) => void;
 
+const resolveSchemaFields = (
+  checker: ts.TypeChecker,
+  expression: ts.Expression
+): ts.ObjectLiteralExpression | undefined => {
+  if (ts.isObjectLiteralExpression(expression)) {
+    return expression;
+  }
+  if (!ts.isIdentifier(expression)) {
+    return undefined;
+  }
+  const symbol = checker.getSymbolAtLocation(expression);
+  const target =
+    symbol?.flags === ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(symbol)
+      : symbol;
+  const initializer = target?.declarations?.find(
+    ts.isVariableDeclaration
+  )?.initializer;
+  return initializer !== undefined && ts.isObjectLiteralExpression(initializer)
+    ? initializer
+    : undefined;
+};
+
 const inspectInlineSchema = (
   checker: ts.TypeChecker,
   node: ts.CallExpression,
@@ -537,15 +560,8 @@ const inspectInlineSchema = (
   if (fieldsExpression === undefined) {
     return;
   }
-  let fields: ts.Expression | undefined;
-  if (ts.isObjectLiteralExpression(fieldsExpression)) {
-    fields = fieldsExpression;
-  } else if (ts.isIdentifier(fieldsExpression)) {
-    fields = checker
-      .getSymbolAtLocation(fieldsExpression)
-      ?.declarations?.find(ts.isVariableDeclaration)?.initializer;
-  }
-  if (fields === undefined || !ts.isObjectLiteralExpression(fields)) {
+  const fields = resolveSchemaFields(checker, fieldsExpression);
+  if (fields === undefined) {
     return;
   }
   for (const property of fields.properties) {

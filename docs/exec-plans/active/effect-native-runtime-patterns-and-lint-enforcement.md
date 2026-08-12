@@ -227,8 +227,8 @@ deployment claim.
 
 ## 2026-08-13 shared error-field provenance correction
 
-- The next boundary pass found five public error families whose same-file
-  shared field objects contained `Schema.NonEmptyString`. This bypassed the
+- The next boundary pass found five public error families whose shared field
+  objects contained `Schema.NonEmptyString`. This bypassed the
   existing `inline-string-schema` check even though direct inline fields were
   rejected.
 - Synthetic infrastructure, Vercel read, Vercel Preview configuration, Vercel
@@ -237,10 +237,11 @@ deployment claim.
   ordinary strings because they are not identities or routing/persistence
   values; adding nominal brands and about 150 static constructor conversions
   was rejected as ceremony without a distinct domain invariant.
-- `inline-string-schema` now resolves a same-file identifier argument to its
-  object-literal declaration before inspection. Its direct negative fixture
-  raises boundary proof to 128 tests without an exception. Installed
-  `effect@4.0.0-beta.101` remains authoritative; no new Effect API was assumed.
+- `inline-string-schema` now resolves local and imported identifier arguments
+  to their object-literal declarations before inspection. Direct same-file and
+  cross-file negative fixtures raise boundary proof to 129 tests without an
+  exception. Installed `effect@4.0.0-beta.101` remains authoritative; no new
+  Effect API was assumed.
 - Focused proof passes infrastructure typecheck, 84 Vitest and 21 Alchemy
   tests, Photon typecheck and 41 tests, boundary checks, formatting, and Effect
   language-service diagnostics. The complete `bun run verification` gate also
@@ -253,6 +254,10 @@ deployment claim.
   operations, runbooks, authority, controls, live evidence and provider state
   **Preserve**. Frontend, browser, accessibility, generated API references,
   release and publication are **N/A**.
+- The first shared-field correction receipt was reopened after a fresh audit
+  found that imported alias symbols still bypassed the same rule. Resolving the
+  alias target and adding the cross-file fixture closes that exact gap without
+  changing the accepted runtime surface.
 
 ## Evidence and non-claims
 

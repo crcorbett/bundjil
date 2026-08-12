@@ -292,14 +292,14 @@ channel dependency.
 
 The next provenance pass closed a shared-field bypass in
 `inline-string-schema`: five public infrastructure/Photon error families now
-use owner-named bounded diagnostic Schemas, and aliased same-file field objects
-are inspected. Boundary proof passes 128 tests; infrastructure 84 Vitest plus
-21 Alchemy and Photon 41 tests pass. Diagnostic messages remain ordinary
-bounded strings rather than nominal identities, and provider wire/opaque state
-fields remain adapter-owned. The complete repository verification gate also
-passes from a cold Turbo cache with the public synthetic Executor CI
-configuration. No provider operation ran and no hosted dependency is satisfied
-by this source correction.
+use owner-named bounded diagnostic Schemas, and local or imported aliased field
+objects are inspected. Boundary proof passes 129 tests; infrastructure 84
+Vitest plus 21 Alchemy and Photon 41 tests pass. Diagnostic messages remain
+ordinary bounded strings rather than nominal identities, and provider
+wire/opaque state fields remain adapter-owned. The complete repository
+verification gate also passes from a cold Turbo cache with the public synthetic
+Executor CI configuration. No provider operation ran and no hosted dependency
+is satisfied by this source correction.
 
 ## Commit and integration ledger
 
