@@ -390,6 +390,27 @@ by this repository slice.
   frontend, browser, accessibility, generated references, release and
   publication are **N/A**.
 
+### 2026-08-13 stable adoption collection correction
+
+- Stable-adoption validation no longer mutates an outer count and native sets
+  across `Effect.forEach` callbacks. Each callback returns an immutable
+  managed-binding observation or void, and the caller derives Effect
+  `HashSet`s for the exact four-key, one-project invariant.
+- A duplicate-key fixture retains distinct logical and physical identities so
+  the stable-adoption validator itself rejects the false green. Focused
+  infrastructure typecheck and all five adoption tests pass.
+- The cold synthetic-Executor `bun run verification` candidate passes all 85
+  infrastructure Vitest tests, 21 Alchemy/Bun tests, 135 boundary tests, 10
+  lint fixtures, all 9 package typechecks and all 15 package test/build tasks.
+- Installed `effect@4.0.0-beta.101` and local comparison revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` expose the used immutable
+  `HashSet` operations. No provider operation ran.
+- Documentation impact: stable-adoption validation/test, Effect architecture,
+  Effect SPEC/task and both active plans **Change required**. Production
+  workflow behavior, provider state, authority, runbooks and hosted evidence
+  **Preserve**. READMEs, frontend, browser, accessibility, generated
+  references, release and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

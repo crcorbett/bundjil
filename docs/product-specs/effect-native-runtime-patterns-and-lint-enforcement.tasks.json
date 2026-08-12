@@ -753,10 +753,37 @@
       ]
     },
     {
+      "id": "close-stable-adoption-collection-state",
+      "title": "Close stable-adoption traversal mutation",
+      "status": "completed",
+      "dependsOn": ["own-production-rollback-state"],
+      "description": "Replace outer counter and native-set mutation across stable-adoption Effect traversal callbacks with returned immutable observations and Effect HashSet domain checks.",
+      "implementationNotes": [
+        "Return void for observed-only resources and one immutable project/key observation for each fully validated managed binding.",
+        "Derive project and key HashSets after Effect.forEach, then enforce exact observation count, one project, four unique keys and expected-key subset semantics.",
+        "Add a duplicate-key fixture that preserves distinct logical and physical identities so it reaches the stable-adoption invariant rather than failing the earlier manifest Schema.",
+        "Do not add Ref, a service, Layer, helper, public export, broad mutable-state lint rule, or cosmetic conversion of synchronous parser, pagination, byte-copy or host-callback loops."
+      ],
+      "proofContract": {
+        "directObservable": "Stable-adoption validation has no outer mutation across Effect.forEach; a valid four-binding manifest succeeds and a four-observation duplicate-key manifest fails.",
+        "expectedPostcondition": "Managed-binding exactness is derived from immutable callback results with Effect HashSet semantics after traversal.",
+        "falseGreenRejected": "Moving mutation into a helper, using Ref for derived values, duplicating a whole resource so the manifest Schema fails first, converting every native collection, or weakening exact-key checks.",
+        "focusedCommandOrProcedureOwner": "Stable-adoption command, adoption-manifest test, infrastructure typecheck, Effect setup, docs and root verification owners",
+        "evidenceOwner": "Stable adoption collection correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not generate or apply a live adoption manifest, read provider state, mutate Vercel or Photon, or establish hosted deployment behavior."
+      },
+      "completionCriteria": [
+        "Effect traversal callbacks return immutable observations and do not mutate outer validation state.",
+        "Effect HashSet owns exact project/key set semantics after traversal.",
+        "Valid and duplicate-key focused fixtures pass with unchanged manifest Schema and public API.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["own-production-rollback-state"],
+      "dependsOn": ["close-stable-adoption-collection-state"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

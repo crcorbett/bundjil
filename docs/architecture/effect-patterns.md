@@ -225,6 +225,12 @@ replaceable resource. Use `Schema.NonEmptyArray` only for an at-least-one
 boundary, not as proof of exact cardinality. Atom is not a backend runtime
 state primitive.
 
+An Effect traversal callback returns its immutable observation; it does not
+mutate outer counters or collections that a later Effect relies on. Derive
+counts and `HashSet`/`HashMap` domain invariants after the traversal. Local
+mutable loops remain valid for a synchronous parser, byte copy, pagination
+cursor, or host-owned callback when no Effect crosses the mutation.
+
 Control state that is written before one Effect and observed by a later
 finalizer is runtime state, even when it is scoped to one operation. Keep
 fields that share one compensation invariant in a single immutable `Ref`

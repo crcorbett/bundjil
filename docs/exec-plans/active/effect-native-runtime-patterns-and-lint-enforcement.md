@@ -382,6 +382,29 @@ verification` gate passes with all nine package typechecks and all fifteen
   READMEs, frontend, browser, accessibility, generated references, release and
   publication are **N/A**.
 
+## 2026-08-13 stable adoption collection correction
+
+- The fresh exception review found a count and two native sets mutated inside
+  `Effect.forEach` callbacks, then read as one exact stable-manifest invariant.
+- Each callback now returns an immutable managed-binding observation or void.
+  The caller derives project and key `HashSet`s and checks four observations,
+  one project, four unique keys and the complete expected-key subset.
+- The duplicate-key regression keeps logical and physical identities distinct,
+  proving the final stable-adoption check rather than the earlier manifest
+  uniqueness Schema. Focused infrastructure typecheck and all five adoption
+  tests pass.
+- The cold synthetic-Executor `bun run verification` candidate passes all 85
+  infrastructure Vitest tests, 21 Alchemy/Bun tests, 135 boundary tests, 10
+  lint fixtures, all 9 package typechecks and all 15 package test/build tasks.
+- Installed `effect@4.0.0-beta.101` remains runtime authority; local comparison
+  revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the matching
+  immutable `HashSet.fromIterable`, `size` and `isSubset` APIs.
+- Documentation impact: stable-adoption validation/test, Effect architecture,
+  Effect SPEC/task, and both active plans **Change required**. Manifest Schema,
+  public exports, provider writes, authority, runbooks and hosted evidence
+  **Preserve**. Frontend, browser, accessibility, generated references,
+  release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

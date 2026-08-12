@@ -669,6 +669,16 @@ continue to prove proxy-only, reverse-order, interruption, defect and
 rollback-failure behavior. No broad mutable-state lint rule is admitted because
 syntax alone cannot distinguish local algorithms from cross-Effect state.
 
+The subsequent stable-adoption pass found a count and two native sets mutated
+inside `Effect.forEach` callbacks, then consumed as one exact manifest
+invariant. Each callback now returns either no observation or one immutable
+managed-binding observation. The caller derives an immutable Effect `HashSet`
+for projects and keys and checks exact cardinality plus subset semantics after
+the traversal. A duplicate-key fixture preserves distinct logical and physical
+identities so it reaches this validator rather than failing the earlier
+manifest Schema. Local parser, byte-copy, pagination and host-callback mutation
+remain unchanged because they do not carry state across Effects.
+
 ## Focused verification commands
 
 During implementation, use the smallest affected subset first:
