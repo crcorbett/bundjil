@@ -402,6 +402,11 @@ by this repository slice.
 - The cold synthetic-Executor `bun run verification` candidate passes all 85
   infrastructure Vitest tests, 21 Alchemy/Bun tests, 135 boundary tests, 10
   lint fixtures, all 9 package typechecks and all 15 package test/build tasks.
+- Commit `a2381b2c1853cccfff0d6ecea0ecf56f21b94939` was pushed as the exact
+  code candidate. Hosted CI run `31620966395`, check `94195410763`, passed.
+  Infrastructure Drift run `31620966302`, check `94195410419`, failed before
+  provider execution because both hosted custody inputs were empty; this is
+  negative custody evidence, not a drift result.
 - Installed `effect@4.0.0-beta.101` and local comparison revision
   `1caab3cc30f626efbf15e59d74f539a487e5c85c` expose the used immutable
   `HashSet` operations. No provider operation ran.
