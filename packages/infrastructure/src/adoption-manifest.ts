@@ -4,7 +4,7 @@ import {
   PhotonUserId,
   PhotonWebhookId,
 } from "@bundjil/photon/management";
-import { Effect, Match, Schema } from "effect";
+import { Effect, HashSet, Match, Schema } from "effect";
 /* oxlint-disable unicorn/no-array-method-this-argument -- Effect.forEach is a data-first Effect combinator, not Array.prototype.forEach. */
 
 import type { InfrastructureInventoryArtifact } from "./inventory.js";
@@ -293,7 +293,7 @@ export type AdoptionBindingProfileEncoded =
   typeof AdoptionBindingProfile.Encoded;
 
 const logicalId = Schema.decodeUnknownEffect(AlchemyLogicalResourceId);
-const managedPhotonKeys = new Set([
+const managedPhotonKeys = HashSet.fromIterable([
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
   "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
@@ -369,7 +369,7 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
         Effect.gen(function* buildVercelEnvironmentManifestResource() {
           const valueOwnership =
             bindingProfile !== "observedOnly" &&
-            managedPhotonKeys.has(environmentVariable.key)
+            HashSet.has(managedPhotonKeys, environmentVariable.key)
               ? {
                   _tag: "Managed" as const,
                   reference: SecretReference.make({

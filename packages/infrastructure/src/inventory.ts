@@ -31,7 +31,7 @@ import type {
   PhotonWebhooksReadError,
 } from "@bundjil/photon/management";
 import type { Effect as EffectType } from "effect";
-import { Context, Effect, Layer, Match, Schema } from "effect";
+import { Context, Effect, HashSet, Layer, Match, Schema } from "effect";
 
 import { InfrastructureStage } from "./schemas.js";
 import type {
@@ -280,7 +280,8 @@ export const InfrastructureInventoryLive = Layer.effect(
         })
       );
       if (
-        new Set(target.vercelProjectIds).size !== target.vercelProjectIds.length
+        HashSet.size(HashSet.fromIterable(target.vercelProjectIds)) !==
+        target.vercelProjectIds.length
       ) {
         return yield* new InfrastructureInventoryReadError({
           reason: "projectAmbiguous",

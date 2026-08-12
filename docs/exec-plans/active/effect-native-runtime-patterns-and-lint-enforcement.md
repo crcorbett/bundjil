@@ -410,6 +410,31 @@ verification` gate passes with all nine package typechecks and all fifteen
   **Preserve**. Frontend, browser, accessibility, generated references,
   release and publication are **N/A**.
 
+## 2026-08-13 domain membership HashSet correction
+
+- A fresh production native-collection audit found seven immutable membership
+  or uniqueness sites omitted from the earlier decision inventory: managed
+  Photon keys, authorized Vercel projects, source/Preview candidate identities,
+  desired migration resources, stale resources and backup resources.
+- These sites now use installed Effect `HashSet.fromIterable`, `size` and
+  `has`. The ordered manifest Schema retains its incremental native `Set` for
+  first-duplicate issue paths; the Codex test-memory `Map` remains a fixture
+  backend isolated behind `Ref`.
+- Infrastructure and Photon typechecks pass, with 15 focused infrastructure
+  tests and 3 candidate-inventory tests proving duplicate, membership,
+  selection, migration and restore behavior.
+- The cold synthetic-Executor `bun run verification` candidate passes 135
+  boundary tests, 10 lint fixtures, all 9 package typechecks, all 15 package
+  test/build tasks, 85 infrastructure tests and 41 Photon tests.
+- Installed `effect@4.0.0-beta.101` remains runtime authority; local comparison
+  revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the matching
+  immutable HashSet operations.
+- Documentation impact: production collection owners, Effect SPEC/task,
+  decision inventory, and both active plans **Change required**. Durable Effect
+  architecture, public exports, provider operations, runbooks, authority,
+  controls and hosted evidence **Preserve**. READMEs, frontend, browser,
+  accessibility, generated references, release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

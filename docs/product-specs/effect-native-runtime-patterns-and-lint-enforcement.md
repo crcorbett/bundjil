@@ -132,6 +132,8 @@ Primary references:
 | Adjacent request transcript refs | `packages/codex/test/subscription-login.test.ts:445-466`                                                                                                                                                                                        | Review whether body and content type form one atomic transcript record; no syntax-only lint decision.                                                                                                                       |
 | Runtime execution                | `apps/agent/agent/channels/sendblue.ts:1-8`, `apps/agent/agent/channels/photon.ts:1-8`, app scripts, and package scripts                                                                                                                        | Named app/runtime/CLI boundaries are allowed. `apps/agent/agent/tools/workspace_status.ts` and `apps/agent/agent/connections/executor.ts` are explicit audit targets because they execute Effects inside adapter callbacks. |
 | Helper sprawl                    | no `helper`, `helpers`, `util`, `utils`, or `common` directories under current `apps`, `packages`, `tooling`, or `lint`                                                                                                                         | Preserve through review and ownership policy; there is no current debt baseline that justifies a name heuristic.                                                                                                            |
+| Production domain membership     | `packages/infrastructure/src/adoption-manifest.ts`, `inventory.ts`, `state/preview-state-migration.ts`, and `packages/photon/src/candidate-inventory.ts`                                                                                        | Implemented: immutable `HashSet` owns seven managed-key, authorized-project, candidate-identity, desired-resource, stale-resource, and backup-resource membership/uniqueness operations.                                    |
+| Ordered diagnostic/test backend  | `packages/infrastructure/src/adoption-manifest.ts` logical-ID Schema check; `packages/codex/src/testing/index.ts`                                                                                                                               | Preserve native collections: the Schema check incrementally owns first-duplicate index paths; the test `Map` is a mutable fixture backend already isolated behind `Ref`.                                                    |
 
 ### Merged Eve runtime targets
 
@@ -679,6 +681,15 @@ identities so it reaches this validator rather than failing the earlier
 manifest Schema. Local parser, byte-copy, single-fiber sequential pagination
 and host-callback mutation remain unchanged because their state is not captured
 across traversal callbacks, concurrent work, or a later finalizer.
+
+The next domain-collection pass corrected an omission in the original decision
+inventory. Seven production sets perform immutable membership or uniqueness
+algebra over managed Photon keys, authorized Vercel projects, Photon candidate
+identities, desired/stale migration resources, and backup resources. They now
+use installed Effect `HashSet.fromIterable`, `size`, and `has`. The ordered
+manifest Schema's incremental native set remains because it associates the
+first duplicate with an exact issue path; the Codex test-memory map remains a
+fixture backend isolated behind `Ref`. No native-collection lint ban is added.
 
 ## Focused verification commands
 

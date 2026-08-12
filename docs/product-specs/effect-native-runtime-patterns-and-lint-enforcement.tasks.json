@@ -780,10 +780,37 @@
       ]
     },
     {
+      "id": "align-domain-membership-hashsets",
+      "title": "Align immutable domain membership with Effect HashSet",
+      "status": "completed",
+      "dependsOn": ["close-stable-adoption-collection-state"],
+      "description": "Close the state/collection decision-inventory gap by using Effect HashSet for production membership and uniqueness algebra while retaining native collections with ordered-diagnostic or fixture-backend ownership.",
+      "implementationNotes": [
+        "Use HashSet for managed Photon key membership, authorized Vercel project uniqueness, source/Preview Photon candidate uniqueness, desired migration membership, stale-resource membership, and backup-resource membership.",
+        "Preserve the adoption-manifest Schema's incremental native Set because it binds the first duplicate to an exact resource index and issue path.",
+        "Preserve the Codex test-memory Map because it is a mutable fixture backend isolated behind Ref and relies on ordinary string-key Map behavior.",
+        "Do not add a native collection lint ban, collection helper, service, Layer, public export, or unrelated conversion."
+      ],
+      "proofContract": {
+        "directObservable": "The seven identified production membership/uniqueness sites use Effect HashSet; the ordered Schema diagnostic and Ref-owned test backend remain native with explicit reasons.",
+        "expectedPostcondition": "Immutable domain set algebra uses Effect equality/hash semantics without obscuring ordered diagnostics or fixture backend behavior.",
+        "falseGreenRejected": "Converting every Set/Map, adding a constructor ban, changing diagnostic ordering, wrapping HashSet calls in helpers, or relying on a source search without focused behavior tests.",
+        "focusedCommandOrProcedureOwner": "Infrastructure and Photon typechecks; adoption, inventory, migration, and candidate-inventory tests; Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Domain membership HashSet correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not compare collection performance, invoke providers, mutate infrastructure, run a migration, or establish hosted behavior."
+      },
+      "completionCriteria": [
+        "Seven bounded production domain-set sites use installed Effect HashSet APIs.",
+        "Ordered diagnostic and test-backend native collections are explicitly preserved.",
+        "Focused typechecks and behavior fixtures pass without public API or provider behavior change.",
+        "Canonical SPEC/tasks, decision inventory, active plans, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-stable-adoption-collection-state"],
+      "dependsOn": ["align-domain-membership-hashsets"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

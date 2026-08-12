@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { Clock, Config, Context, Effect, Layer, Schema } from "effect";
+import { Clock, Config, Context, Effect, HashSet, Layer, Schema } from "effect";
 import { HttpClient } from "effect/unstable/http";
 
 /* oxlint-disable max-classes-per-file -- The owner service and its operation-specific safe error share one bounded contract file. */
@@ -229,10 +229,12 @@ export const layerPhotonCandidateInventoryLive = Layer.effect(
           const sourceUsers = yield* sourceManagement.listSharedUsers();
           const previewUsers = yield* previewManagement.listSharedUsers();
           if (
-            new Set(sourceUsers.map((user) => user.phoneNumber)).size !==
-              sourceUsers.length ||
-            new Set(previewUsers.map((user) => user.phoneNumber)).size !==
-              previewUsers.length
+            HashSet.size(
+              HashSet.fromIterable(sourceUsers.map((user) => user.phoneNumber))
+            ) !== sourceUsers.length ||
+            HashSet.size(
+              HashSet.fromIterable(previewUsers.map((user) => user.phoneNumber))
+            ) !== previewUsers.length
           ) {
             return yield* new PhotonCandidateInventoryError({
               operation: "captureCandidateInventory",

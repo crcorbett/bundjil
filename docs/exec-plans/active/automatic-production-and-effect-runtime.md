@@ -416,6 +416,25 @@ by this repository slice.
   **Preserve**. READMEs, frontend, browser, accessibility, generated
   references, release and publication are **N/A**.
 
+### 2026-08-13 domain membership HashSet correction
+
+- Seven production membership/uniqueness sites across infrastructure and Photon
+  now use immutable Effect `HashSet`; ordered Schema diagnostics and the
+  Ref-owned Codex test backend retain native collections for explicit reasons.
+- Infrastructure and Photon typechecks pass, with 15 focused infrastructure
+  tests and 3 candidate-inventory tests covering duplicate, selection,
+  migration and restore behavior. No provider operation ran.
+- The cold synthetic-Executor `bun run verification` candidate passes 135
+  boundary tests, 10 lint fixtures, all 9 package typechecks, all 15 package
+  test/build tasks, 85 infrastructure tests and 41 Photon tests.
+- Installed `effect@4.0.0-beta.101` and local comparison revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` expose the used HashSet APIs.
+- Documentation impact: production collection owners, Effect SPEC/task,
+  decision inventory and both active plans **Change required**. Production
+  workflow semantics, provider state, runbooks, authority, controls and hosted
+  evidence **Preserve**. READMEs, frontend, browser, accessibility, generated
+  references, release and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
