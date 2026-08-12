@@ -520,6 +520,7 @@ type ReportDiagnostic = (
 ) => void;
 
 const inspectInlineSchema = (
+  checker: ts.TypeChecker,
   node: ts.CallExpression,
   report: ReportDiagnostic
 ) => {
@@ -532,7 +533,18 @@ const inspectInlineSchema = (
   ) {
     return;
   }
-  const fields = node.arguments.at(-1);
+  const fieldsExpression = node.arguments.at(-1);
+  if (fieldsExpression === undefined) {
+    return;
+  }
+  let fields: ts.Expression | undefined;
+  if (ts.isObjectLiteralExpression(fieldsExpression)) {
+    fields = fieldsExpression;
+  } else if (ts.isIdentifier(fieldsExpression)) {
+    fields = checker
+      .getSymbolAtLocation(fieldsExpression)
+      ?.declarations?.find(ts.isVariableDeclaration)?.initializer;
+  }
   if (fields === undefined || !ts.isObjectLiteralExpression(fields)) {
     return;
   }
@@ -594,7 +606,7 @@ const inspectCallExpression = (
       "Outbound HTTP or persistence values must come from Schema.encodeEffect or a framework Schema body API."
     );
   }
-  inspectInlineSchema(node, report);
+  inspectInlineSchema(checker, node, report);
 };
 
 /** Runs the narrow provenance audit without loading application runtime code. */

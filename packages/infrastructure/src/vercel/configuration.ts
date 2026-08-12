@@ -58,12 +58,16 @@ export const VercelPreviewConfigurationFailureReason = Schema.Literals([
 export type VercelPreviewConfigurationFailureReason =
   typeof VercelPreviewConfigurationFailureReason.Type;
 
+const VercelPreviewConfigurationErrorMessage = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isMaxLength(300))
+);
+
 const VercelPreviewConfigurationErrorFields = {
   operation: VercelPreviewConfigurationOperation,
   reason: VercelPreviewConfigurationFailureReason,
   retry: InfrastructureRetryClass,
   certainty: InfrastructureOutcomeCertainty,
-  message: Schema.NonEmptyString,
+  message: VercelPreviewConfigurationErrorMessage,
 };
 
 export class VercelPreviewConfigurationReadError extends Schema.TaggedErrorClass<VercelPreviewConfigurationReadError>()(

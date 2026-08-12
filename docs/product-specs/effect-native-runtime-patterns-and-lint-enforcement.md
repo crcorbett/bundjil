@@ -610,6 +610,22 @@ operator errors. One negative fixture raises the boundary suite to 127 tests
 without an exception. This changes no migration state byte, provider command,
 service operation, Layer, rollback path, or runbook.
 
+The following field-provenance pass found that five public error families could
+bypass `inline-string-schema` by passing a shared object containing
+`Schema.NonEmptyString` to `Schema.TaggedErrorClass`. Synthetic infrastructure,
+Vercel read, Vercel Preview configuration, Vercel stable-environment, and Photon
+management errors now each use one owner-named diagnostic-message Schema bounded
+to 300 characters. These messages remain ordinary encoded strings: they are
+human-safe diagnostics, not identities used for routing, equality, lookup, or
+persistence, so nominal branding and roughly 150 mechanical `.make` calls would
+add ceremony without a semantic distinction.
+
+The existing boundary audit now resolves same-file identifier arguments to
+their object-literal declaration before checking fields. A direct shared-object
+fixture raises the boundary suite to 128 tests. Focused infrastructure and
+Photon suites preserve all behavior, and no provider wire Schema or opaque
+state field was reclassified as a domain value.
+
 ## Focused verification commands
 
 During implementation, use the smallest affected subset first:
@@ -641,7 +657,7 @@ not replace focused rule, migration, provider, deployment or channel proof.
 | -------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Canonical SPEC/tasks/index       | Change required; delivered          | This SPEC, sibling ledger, and `docs/product-specs/index.md` own current intent and lifecycle. `check:docs` proves routing only.                                                                                                                           |
 | Documentation audit              | Preserve                            | Historical documentation-audit packets remain immutable; current policy is proved by `bun run check:docs`.                                                                                                                                                 |
-| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, state/ref, collection, Layer, absence, lint-scope, exact-exception, and closed public-error policy.                                                                                  |
+| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, state/ref, collection, Layer, absence, lint scope, exact exceptions, public errors, shared field objects, and identity-versus-diagnostic branding.                                   |
 | Testing/quality architecture     | Change required; delivered          | `docs/architecture/testing-and-quality.md` owns exact rule IDs, installed fixtures, exception staleness, focused commands, and terminal gate.                                                                                                              |
 | Other architecture               | Preserve                            | `docs/architecture/README.md`, `docs/architecture/repo-structure.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient; implementation introduced no route, topology, Eve contract, or frontend change. |
 | Root README / docs index         | Preserve                            | `README.md` and `docs/README.md` already route the unchanged public commands and owners; the decision matrix remains in its semantic owner.                                                                                                                |
@@ -652,9 +668,9 @@ not replace focused rule, migration, provider, deployment or channel proof.
 | `prd-review` / `prd-implementer` | Preserve                            | The current skills already require implementation-ready contracts, serial slices, focused proof, docs reconciliation, and terminal audit.                                                                                                                  |
 | `effect-client-wrapper`          | Preserve                            | The skill already owns named services, typed provider boundaries, Config, errors, Layers, Promise confinement, and resource lifetime; no new provider-state abstraction was introduced.                                                                    |
 | Lint plugin/config/tests         | Change required; delivered          | The existing plugin now owns four stable rules, direct and installed fixtures, exact count-checked exceptions and approved zero-debt scopes; no second runner, plugin package, autofix or broad ignore was added.                                          |
-| Boundary/effect checks           | Change required; delivered          | The audit rejects exported raw defects, script-local unknown error fields, and exported `Data.TaggedError` declarations through three narrow rules; the exact exception registry remains unchanged.                                                        |
-| Schemas/services/Layers          | Targeted Change required; delivered | Exported errors no longer carry arbitrary causes; the state-migration error is Schema-backed with branded counts; adoption cardinality stays typed; service/Layer identities remain unchanged.                                                             |
-| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; public/operational cause fixtures and the exported-Data fixture enforce the boundary; the migration error round-trips its exact encoded contract.                                                              |
+| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings hidden in same-file shared error fields; the exact exception registry remains unchanged.                                                 |
+| Schemas/services/Layers          | Targeted Change required; delivered | Exported errors are Schema-backed and cause-free; migration counts are branded; five shared diagnostic families use owner-named bounded Schemas; service/Layer identities remain unchanged.                                                                |
+| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; boundary fixtures cover causes, exported Data errors, and aliased field objects; the migration error round-trips its exact encoded contract.                                                                   |
 | Verification/evidence/research   | Preserve                            | No critical journey, retained proof owner, or research route changed; repository lint and runtime evidence remains in the active plan and code-owned fixtures.                                                                                             |
 | Standards/operations/runbooks    | Preserve                            | Operational automation and provider changes are owned by the separate automatic-Production SPEC; do not duplicate them here.                                                                                                                               |
 | Active/completed execution plans | Change required                     | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                               |

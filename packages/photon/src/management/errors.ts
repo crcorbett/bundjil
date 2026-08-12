@@ -8,11 +8,15 @@ import {
   PhotonManagementRetry,
 } from "./schemas.js";
 
+const PhotonManagementReadErrorMessage = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isMaxLength(300))
+);
+
 const PhotonManagementReadErrorFields = {
   operation: PhotonManagementReadOperation,
   reason: PhotonManagementReadFailureReason,
   retry: PhotonManagementRetry,
-  message: Schema.NonEmptyString,
+  message: PhotonManagementReadErrorMessage,
 };
 
 export class PhotonProjectsReadError extends Schema.TaggedErrorClass<PhotonProjectsReadError>()(

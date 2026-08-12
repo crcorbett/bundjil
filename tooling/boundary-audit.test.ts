@@ -224,6 +224,21 @@ describe("boundary provenance audit", () => {
     ).toContain("inline-string-schema");
   });
 
+  it("rejects an inline string hidden in a shared tagged-error field object", () => {
+    const { cwd, file } = fixture(`
+      const ProviderErrorFields = { message: Schema.NonEmptyString };
+      export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+        "ProviderError",
+        ProviderErrorFields
+      ) {}
+    `);
+    expect(
+      auditBoundaryProvenance({ cwd, files: [file] }).map(
+        (diagnostic) => diagnostic.rule
+      )
+    ).toContain("inline-string-schema");
+  });
+
   it("rejects a raw outbound variable and accepts an encoded variable", () => {
     const raw = fixture(`
       const body: string = "raw";

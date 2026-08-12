@@ -450,6 +450,14 @@ Rules:
   `Schema.Defect` cause field. The `public-raw-cause` boundary rule enforces
   this for every field in an exported structure, including optional or renamed
   causes.
+- Owner-named fields remain mandatory when a tagged error reuses a shared field
+  object. Do not hide `Schema.String` or `Schema.NonEmptyString` in an aliased
+  object passed to `Schema.TaggedErrorClass`; define one bounded Schema named
+  for that error family. `inline-string-schema` resolves same-file field-object
+  identifiers as well as inline object literals. Brand identities and values
+  used for routing, equality, lookup, or persistence. A bounded diagnostic
+  message does not need a nominal brand merely to force `.make` at every static
+  constructor.
 - Operator scripts must classify failures before retaining them in a tagged
   error. A script-local `Data.TaggedError` may carry a bounded classification,
   operation, status, or digest, but not an arbitrary `unknown` value. The

@@ -225,6 +225,35 @@ deployment claim.
   Frontend, browser, accessibility, generated API references, release and
   publication are **N/A**.
 
+## 2026-08-13 shared error-field provenance correction
+
+- The next boundary pass found five public error families whose same-file
+  shared field objects contained `Schema.NonEmptyString`. This bypassed the
+  existing `inline-string-schema` check even though direct inline fields were
+  rejected.
+- Synthetic infrastructure, Vercel read, Vercel Preview configuration, Vercel
+  stable-environment, and Photon management errors now use one owner-named,
+  300-character diagnostic Schema per family. Diagnostic messages remain
+  ordinary strings because they are not identities or routing/persistence
+  values; adding nominal brands and about 150 static constructor conversions
+  was rejected as ceremony without a distinct domain invariant.
+- `inline-string-schema` now resolves a same-file identifier argument to its
+  object-literal declaration before inspection. Its direct negative fixture
+  raises boundary proof to 128 tests without an exception. Installed
+  `effect@4.0.0-beta.101` remains authoritative; no new Effect API was assumed.
+- Focused proof passes infrastructure typecheck, 84 Vitest and 21 Alchemy
+  tests, Photon typecheck and 41 tests, boundary checks, formatting, and Effect
+  language-service diagnostics. The complete `bun run verification` gate also
+  passes from a cold Turbo cache with the public synthetic Executor CI
+  configuration: all nine typechecks and fifteen test/build tasks are green.
+  No provider operation ran.
+- Documentation impact: Effect architecture, Effect SPEC/task, this plan, five
+  error-field owners, and boundary tooling/fixture **Change required**.
+  Package READMEs/exports, services/Layers, provider wire Schemas, opaque state,
+  operations, runbooks, authority, controls, live evidence and provider state
+  **Preserve**. Frontend, browser, accessibility, generated API references,
+  release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

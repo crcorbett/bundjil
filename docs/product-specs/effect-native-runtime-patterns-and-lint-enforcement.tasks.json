@@ -617,10 +617,37 @@
       ]
     },
     {
+      "id": "close-shared-error-field-provenance",
+      "title": "Close shared error-field provenance",
+      "status": "completed",
+      "dependsOn": ["close-exported-schema-error-boundary"],
+      "description": "Correct the iterative boundary finding where five public tagged-error families hid inline primitive message Schemas in shared field objects that the existing inline-string-schema rule did not resolve.",
+      "implementationNotes": [
+        "Resolve same-file identifier arguments passed to exported Schema.TaggedErrorClass declarations and inspect the owning object-literal fields with the existing inline-string-schema rule.",
+        "Replace each accepted inline diagnostic with one owner-named non-empty message Schema bounded to 300 characters for synthetic infrastructure, Vercel read, Vercel Preview configuration, Vercel stable-environment, and Photon management errors.",
+        "Brand identities and semantic values used for routing, equality, lookup, or persistence; preserve bounded diagnostics as ordinary strings rather than adding roughly 150 ceremonial static constructor conversions.",
+        "Keep provider wire and opaque state fields private and separately decoded; add one direct regression fixture and no exception or second checker."
+      ],
+      "proofContract": {
+        "directObservable": "The boundary audit rejects a primitive string hidden in a shared tagged-error field object; the production audit is empty; 128 boundary tests, infrastructure typecheck plus 84 Vitest and 21 Alchemy tests, Photon typecheck plus 41 tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Public error-family diagnostics have explicit bounded owners and future shared-object bypasses fail the existing repository gate.",
+        "falseGreenRejected": "Checking only inline call literals, branding arbitrary prose without a semantic identity, changing provider wire Schemas, adding helper constructors, adding a broad exception, or passing typecheck without the AST fixture.",
+        "focusedCommandOrProcedureOwner": "Error-family field Schemas, boundary provenance fixture, infrastructure/Photon tests, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Shared error-field provenance correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not validate provider wire payloads, execute provider operations, or establish hosted behavior."
+      },
+      "completionCriteria": [
+        "No exported tagged error reaches an inline primitive string through a same-file shared field object.",
+        "Each affected diagnostic family has one owner-named bounded Schema without a generic helper.",
+        "The provenance fixture rejects the prior bypass and the exception registry is unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-exported-schema-error-boundary"],
+      "dependsOn": ["close-shared-error-field-provenance"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

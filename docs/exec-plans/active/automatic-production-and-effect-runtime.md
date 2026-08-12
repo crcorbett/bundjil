@@ -290,6 +290,17 @@ also passes from a cold Turbo cache with the public synthetic Executor CI
 configuration; this repository correction does not satisfy any hosted or
 channel dependency.
 
+The next provenance pass closed a shared-field bypass in
+`inline-string-schema`: five public infrastructure/Photon error families now
+use owner-named bounded diagnostic Schemas, and aliased same-file field objects
+are inspected. Boundary proof passes 128 tests; infrastructure 84 Vitest plus
+21 Alchemy and Photon 41 tests pass. Diagnostic messages remain ordinary
+bounded strings rather than nominal identities, and provider wire/opaque state
+fields remain adapter-owned. The complete repository verification gate also
+passes from a cold Turbo cache with the public synthetic Executor CI
+configuration. No provider operation ran and no hosted dependency is satisfied
+by this source correction.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and
