@@ -210,6 +210,12 @@ fixtures that merely need a valid future timestamp. Host `Date.now`, raw
 timers and `TestClock.withLive` are reserved for exact registered process or
 framework proofs; they are not a shortcut around deterministic test time.
 
+Non-cryptographic runtime identities follow the same rule. Generate them from
+fiber-local `Random` and prove reproducibility with `Random.withSeed`; do not
+call ambient `Math.random` or `globalThis.crypto.randomUUID`. Keep Web Crypto
+entropy only at explicit cryptographic boundaries such as PKCE material and
+AES-GCM IVs, where cryptographic security is the observable requirement.
+
 Choose state and collections by their observable semantics. Use one cohesive
 immutable Ref value only when fields share an invariant and must transition
 atomically. Keep independent Refs for independent observation or lifetime;

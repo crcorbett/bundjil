@@ -485,6 +485,11 @@ const isRedactedSchemaRoundTrip = (node: ts.CallExpression) => {
   return false;
 };
 
+const isAmbientRandomIdentity = (node: ts.CallExpression) =>
+  ["Math.random", "globalThis.crypto.randomUUID"].includes(
+    dottedName(node.expression) ?? ""
+  );
+
 const isDirectEnvironmentAccess = (node: ts.PropertyAccessExpression) =>
   node.name.text === "env" &&
   ["process", "globalThis.process", "Bun", "import.meta"].includes(
@@ -636,6 +641,13 @@ const inspectCallExpression = (
       node,
       "redacted-schema-roundtrip",
       "Already-decoded Redacted values must not be revealed merely to pass through another Schema decoder. Compose the decoded contract directly."
+    );
+  }
+  if (isAmbientRandomIdentity(node)) {
+    report(
+      node,
+      "ambient-random-identity",
+      "Non-cryptographic runtime identities must use Effect Random so tests can provide deterministic seeds. Keep Web Crypto only at explicit cryptographic boundaries."
     );
   }
   const codecSideName = codecMisuse(checker, node);

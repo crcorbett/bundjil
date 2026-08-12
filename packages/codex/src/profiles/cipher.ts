@@ -1,4 +1,4 @@
-import { Context, Effect, Schema } from "effect";
+import { Context, Effect, Random, Schema } from "effect";
 
 import { CodexOAuthCredentialRevision } from "../auth/credentials.js";
 import { CodexOAuthProfileCipherConfigService } from "./cipher-config.js";
@@ -308,6 +308,10 @@ export const decryptCodexOAuthProfile = (
 export const generateCodexOAuthCredentialRevision = Effect.fn(
   "CodexOAuthCredentialRevision.generate"
 )(function* generateCodexOAuthCredentialRevisionOperation() {
+  const [revisionHigh, revisionLow] = yield* Effect.all([
+    Random.nextInt,
+    Random.nextInt,
+  ]);
   const generatedKeyId = yield* Schema.decodeUnknownEffect(
     CodexOAuthProfileCipherKeyId
   )("generated").pipe(
@@ -321,7 +325,7 @@ export const generateCodexOAuthCredentialRevision = Effect.fn(
   );
 
   return yield* Schema.decodeUnknownEffect(CodexOAuthCredentialRevision)(
-    globalThis.crypto.randomUUID()
+    `${revisionHigh.toString(36)}-${revisionLow.toString(36)}`
   ).pipe(
     Effect.mapError(
       () =>

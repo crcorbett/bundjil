@@ -699,10 +699,37 @@
       ]
     },
     {
+      "id": "close-ambient-random-identities",
+      "title": "Close ambient random identity generation",
+      "status": "completed",
+      "dependsOn": ["close-redacted-schema-roundtrip"],
+      "description": "Replace ambient global UUID generation for Codex credential revisions and refresh-lock owners with deterministic, fiber-local Effect Random while preserving explicit Web Crypto boundaries.",
+      "implementationNotes": [
+        "Generate each non-cryptographic identity from two Random.nextInt values inside its existing named operation; keep owner-specific Schema decoding and Redacted storage.",
+        "Preserve Web Crypto getRandomValues for PKCE material and AES-GCM IVs because those are explicit cryptographic boundaries.",
+        "Reject Math.random and globalThis.crypto.randomUUID in owned production source through the existing boundary audit.",
+        "Add two negative provenance fixtures and one Random.withSeed test proving reproducible sequences and distinct sequential revisions without a helper, service, Layer, exception, or public API change."
+      ],
+      "proofContract": {
+        "directObservable": "Owned production source has no ambient UUID or Math.random identity generation; 135 boundary tests and 116 Codex tests pass, including deterministic seeded replay with distinct sequential revisions.",
+        "expectedPostcondition": "Non-cryptographic identity generation is fiber-local and testable while cryptographic entropy remains at explicit Web Crypto boundaries.",
+        "falseGreenRejected": "Wrapping randomUUID, using fixed production IDs, replacing cryptographic entropy with a weak generator, asserting only non-empty values, or introducing a generic random helper/service.",
+        "focusedCommandOrProcedureOwner": "Codex credential revision and refresh-lock operations, persistence test, boundary fixtures, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Effect Random identity correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not estimate provider collision rates, inspect hosted lock values, exercise OAuth, alter ciphertext, or establish deployment behavior."
+      },
+      "completionCriteria": [
+        "Credential revision and refresh-lock owner generation use Effect Random and retain Schema-owned representations.",
+        "PKCE and AES-GCM continue using Web Crypto at their existing boundaries.",
+        "Negative ambient-random fixtures and deterministic seeded proof pass with no exception.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-redacted-schema-roundtrip"],
+      "dependsOn": ["close-ambient-random-identities"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

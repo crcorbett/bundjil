@@ -33,6 +33,7 @@ export type BoundaryRule =
   | "direct-platform-process"
   | "raw-promise-coordination"
   | "redacted-schema-roundtrip"
+  | "ambient-random-identity"
   | "direct-json"
   | "raw-fetch"
   | "public-generic-fetch"

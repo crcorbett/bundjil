@@ -321,6 +321,34 @@ verification` gate passes with all nine package typechecks and all fifteen
   state **Preserve**. Frontend, browser, accessibility, generated API
   references, release and publication are **N/A**.
 
+## 2026-08-13 Effect Random identity correction
+
+- The next source audit found two non-cryptographic identities generated with
+  ambient `globalThis.crypto.randomUUID`: Codex credential revisions and
+  refresh-lock owners.
+- Both operations now draw two safe integers from installed Effect
+  `Random.nextInt`, preserve their owner-specific Schema and redaction
+  boundaries, and require no helper, service, Layer, callback, or public export.
+  PKCE state/verifier entropy and AES-GCM IV generation remain at explicit Web
+  Crypto boundaries.
+- `ambient-random-identity` rejects direct global UUID generation and
+  `Math.random`. Two negative fixtures raise boundary proof to 135 tests with
+  no exception. A seeded test proves the same revision sequence replays while
+  sequential values remain distinct; all 116 Codex tests pass.
+- Installed `effect@4.0.0-beta.101` remains runtime authority; local comparison
+  revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the same
+  fiber-local Random API for comparison only.
+- The final synthetic-Executor `bun run verification` candidate passes all 9
+  package typechecks and all 15 package test/build tasks; Codex and proxy are
+  cache misses in the affected graph. Policy, lint, Knip, formatting, and docs
+  gates also pass.
+- Documentation impact: Codex identity generation, deterministic test,
+  boundary tooling/fixtures, Effect architecture, SPEC/task, and both active
+  plans **Change required**. Public exports, stored key/value formats, TTLs,
+  crypto boundaries, provider behavior, authority, controls, hosted evidence,
+  and provider state **Preserve**. READMEs, frontend, browser, accessibility,
+  generated references, release, and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

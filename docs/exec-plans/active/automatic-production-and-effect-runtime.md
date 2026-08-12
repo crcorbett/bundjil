@@ -323,6 +323,14 @@ The final synthetic-Executor repository gate passes 133 boundary tests, 10 lint
 fixtures, all 9 package typechecks, and all 15 package test/build tasks. This is
 repository proof only; it does not establish hosted secret or provider state.
 
+The subsequent Random pass replaces ambient UUID generation for Codex
+credential revisions and refresh-lock owners with fiber-local Effect Random.
+Seeded proof is deterministic, sequential identities remain distinct, all 116
+Codex tests pass, and 135 boundary tests reject global UUID/`Math.random`
+regression without an exception. Web Crypto remains unchanged for PKCE and
+AES-GCM cryptographic entropy; stored formats and hosted state are not proved
+by this repository slice.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

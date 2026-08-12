@@ -71,6 +71,11 @@ describe("boundary provenance audit", () => {
       "const Config = Schema.Struct({ token: Schema.RedactedFromValue(Schema.NonEmptyString) }); export const config = Schema.decodeUnknownEffect(Config)({ token: Redacted.value(token) });",
     ],
     [
+      "ambient-random-identity",
+      "export const id = () => globalThis.crypto.randomUUID();",
+    ],
+    ["ambient-random-identity", "export const id = () => Math.random();"],
+    [
       "sync-schema-codec",
       "export const decode = () => Schema.decodeSync(Value);",
     ],

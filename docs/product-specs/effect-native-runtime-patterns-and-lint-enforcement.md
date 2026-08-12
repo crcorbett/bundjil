@@ -648,6 +648,16 @@ audit rejects every reveal nested inside `Schema.decodeEffect` or
 reveal; direct fixtures raise the suite to 133 tests without an exception or
 behavioral contract change.
 
+The following randomness pass found two non-cryptographic identity generators
+using ambient `globalThis.crypto.randomUUID`: Codex credential revisions and
+refresh-lock owners. Both now draw two safe integers from Effect's fiber-local
+`Random` service, retain owner-specific Schema validation/redaction, and can be
+replayed with `Random.withSeed` in tests. PKCE material and AES-GCM IVs continue
+to use Web Crypto because they are cryptographic boundaries, not test identity
+generation. `ambient-random-identity` rejects `Math.random` and direct global
+UUID generation; two negative fixtures raise boundary proof to 135 tests
+without an exception.
+
 ## Focused verification commands
 
 During implementation, use the smallest affected subset first:
@@ -679,7 +689,7 @@ not replace focused rule, migration, provider, deployment or channel proof.
 | -------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Canonical SPEC/tasks/index       | Change required; delivered          | This SPEC, sibling ledger, and `docs/product-specs/index.md` own current intent and lifecycle. `check:docs` proves routing only.                                                                                                                           |
 | Documentation audit              | Preserve                            | Historical documentation-audit packets remain immutable; current policy is proved by `bun run check:docs`.                                                                                                                                                 |
-| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, state/ref, collection, Layer, absence, lint scope, exact exceptions, public errors, shared field objects, and identity-versus-diagnostic branding.                                   |
+| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, Random, state/ref, collection, Layer, absence, lint scope, exact exceptions, public errors, shared field objects, and identity-versus-diagnostic branding.                           |
 | Testing/quality architecture     | Change required; delivered          | `docs/architecture/testing-and-quality.md` owns exact rule IDs, installed fixtures, exception staleness, focused commands, and terminal gate.                                                                                                              |
 | Other architecture               | Preserve                            | `docs/architecture/README.md`, `docs/architecture/repo-structure.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient; implementation introduced no route, topology, Eve contract, or frontend change. |
 | Root README / docs index         | Preserve                            | `README.md` and `docs/README.md` already route the unchanged public commands and owners; the decision matrix remains in its semantic owner.                                                                                                                |
@@ -690,9 +700,9 @@ not replace focused rule, migration, provider, deployment or channel proof.
 | `prd-review` / `prd-implementer` | Preserve                            | The current skills already require implementation-ready contracts, serial slices, focused proof, docs reconciliation, and terminal audit.                                                                                                                  |
 | `effect-client-wrapper`          | Preserve                            | The skill already owns named services, typed provider boundaries, Config, errors, Layers, Promise confinement, and resource lifetime; no new provider-state abstraction was introduced.                                                                    |
 | Lint plugin/config/tests         | Change required; delivered          | The existing plugin now owns four stable rules, direct and installed fixtures, exact count-checked exceptions and approved zero-debt scopes; no second runner, plugin package, autofix or broad ignore was added.                                          |
-| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, redacted Schema round-trips, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings hidden in shared error fields; the exception registry remains unchanged.          |
+| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, redacted Schema round-trips, ambient random identities, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings in shared error fields; exceptions remain unchanged.   |
 | Schemas/services/Layers          | Targeted Change required; delivered | Exported errors are Schema-backed and cause-free; migration counts are branded; shared diagnostics are bounded; Codex and migration composition retain decoded redacted values; service/Layer identities remain unchanged.                                 |
-| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; boundary fixtures cover raw Promise coordination, redacted decoder round-trips, causes, exported Data errors, and same-file or cross-file aliased field objects; the migration error round-trips exactly.      |
+| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; boundary fixtures cover Promise coordination, redacted decoder round-trips, ambient random identities, causes, exported Data errors, and aliased field objects; seeded Random proves deterministic identity.   |
 | Verification/evidence/research   | Preserve                            | No critical journey, retained proof owner, or research route changed; repository lint and runtime evidence remains in the active plan and code-owned fixtures.                                                                                             |
 | Standards/operations/runbooks    | Preserve                            | Operational automation and provider changes are owned by the separate automatic-Production SPEC; do not duplicate them here.                                                                                                                               |
 | Active/completed execution plans | Change required                     | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                               |

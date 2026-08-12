@@ -2,7 +2,7 @@ import {
   AtomicKeyValueStore,
   AtomicKeyValueStoreTransaction,
 } from "@bundjil/store";
-import { Clock, Effect, Layer, Match, Option, Redacted, Schema } from "effect";
+import { Clock, Effect, Layer, Match, Option, Random, Schema } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import type { CodexOAuthSubjectHash } from "../auth/credentials.js";
@@ -366,16 +366,23 @@ export const CodexOAuthRefreshLockAtomicLive = Layer.effect(
               })
           )
         );
-        const owner = yield* Effect.try({
-          try: () => Redacted.make(globalThis.crypto.randomUUID()),
-          catch: () =>
-            new CodexOAuthRefreshLockError({
-              operation: "acquire",
-              reason: "acquisition",
-              subjectHash,
-              message: "Unable to create a Codex OAuth refresh-lock owner.",
-            }),
-        });
+        const [ownerHigh, ownerLow] = yield* Effect.all([
+          Random.nextInt,
+          Random.nextInt,
+        ]);
+        const owner = yield* Schema.decodeUnknownEffect(
+          CodexOAuthRefreshLockOwner
+        )(`${ownerHigh.toString(36)}-${ownerLow.toString(36)}`).pipe(
+          Effect.mapError(
+            () =>
+              new CodexOAuthRefreshLockError({
+                operation: "acquire",
+                reason: "acquisition",
+                subjectHash,
+                message: "Unable to create a Codex OAuth refresh-lock owner.",
+              })
+          )
+        );
         const nowEpochMillis = yield* Clock.currentTimeMillis;
         const encodedOwner = yield* Schema.encodeEffect(
           CodexOAuthRefreshLockOwner
