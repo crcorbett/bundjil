@@ -426,6 +426,11 @@ verification` gate passes with all nine package typechecks and all fifteen
 - The cold synthetic-Executor `bun run verification` candidate passes 135
   boundary tests, 10 lint fixtures, all 9 package typechecks, all 15 package
   test/build tasks, 85 infrastructure tests and 41 Photon tests.
+- Commit `6ae246fcd86b135fa61612796f4cda420cddfae3` was pushed as the exact
+  code candidate. Hosted CI run `31622701592`, check `94201242410`, passed.
+  Infrastructure Drift run `31622701671`, check `94201242811`, failed before
+  provider execution because both hosted custody inputs were empty; this is
+  negative custody evidence, not a drift result.
 - Installed `effect@4.0.0-beta.101` remains runtime authority; local comparison
   revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the matching
   immutable HashSet operations.
