@@ -907,9 +907,9 @@
         "result": "passed",
         "sourceInventory": "Zero direct primitive Effect fail/failSync/mapError constructions remain in the admitted app service and package source scope; operator scripts remain explicitly outside this completed task.",
         "focused": "Effect language service, 12 lint tests, both root- and package-working-directory authority-loader fixtures, infrastructure typecheck/build and documentation policy passed.",
-      "repository": "The corrected synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks, all 15 build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests.",
-      "hosted": "Commit 751609d3dfd5926131d6541d0b4fce06bc2669c3 is pushed to the draft PR branch. GitHub CI run 31660327906 passed for that exact SHA. Infrastructure Drift run 31660327986 failed closed in Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
-      "correction": "The first full run exposed a test-only working-directory dependency and missing synthetic Executor environment. The fixture now uses package.json, which exists in both supported test working directories; the rerun used the same public synthetic values as CI.",
+        "repository": "The corrected synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks, all 15 build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests.",
+        "hosted": "Commit 751609d3dfd5926131d6541d0b4fce06bc2669c3 is pushed to the draft PR branch. GitHub CI run 31660327906 passed for that exact SHA. Infrastructure Drift run 31660327986 failed closed in Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
+        "correction": "The first full run exposed a test-only working-directory dependency and missing synthetic Executor environment. The fixture now uses package.json, which exists in both supported test working directories; the rerun used the same public synthetic values as CI.",
         "nonClaims": "No provider request, infrastructure mutation, deployment, credential operation, channel send or hosted proof occurred."
       },
       "completionCriteria": [
@@ -923,7 +923,7 @@
     {
       "id": "close-operator-command-error-channels",
       "title": "Close operator command error channels",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["close-public-authority-loader-error-channels"],
       "description": "Migrate the inventoried infrastructure operator commands from primitive fail/mapError values to owner-local typed errors while preserving exact process-exit, receipt, rollback and provider non-claim semantics, then extend primitive-failure lint scope to the migrated scripts.",
       "implementationNotes": [
@@ -940,6 +940,15 @@
         "focusedCommandOrProcedureOwner": "Infrastructure command tests and dry fixtures, lint scope/fixtures, package typecheck/build, Effect setup, docs and root verification",
         "evidenceOwner": "Operator command failure correction receipt",
         "limitationsAndNonClaims": "Repository proof will not establish provider access, state convergence, deployment, messaging, or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "sourceInventory": "Every infrastructure operator script now uses an owner-local Schema tagged error for direct fail/mapError construction. Root no-primitive-effect-failure lint covers the complete scripts directory, and an installed-Oxlint probe proves the scope.",
+        "behavior": "Eight real Bun entrypoints were exercised through deterministic configuration, path, mode, file-contract, or target failures before provider transport. Existing nonzero exits and bounded blocked/invalid/reason output remained intact.",
+        "focused": "Infrastructure package typecheck, Effect language service, type-aware lint, 13 lint tests, 89 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests passed.",
+        "repository": "The exact final candidate passed bun run verification with public synthetic Executor configuration and zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "corrections": "Effect diagnostics replaced redundant Effect.fail wrappers with direct yielding of Schema tagged errors. The subprocess harness was corrected to launch Bun rather than Vitest's Node executable, supplied only synthetic eager R2 Layer configuration, removed one formatter-obsoleted import, and raised only its integration-test budget to 60 seconds for parallel Turbo load.",
+        "nonClaims": "No fixture executed a provider request, mutated infrastructure, changed authority or credentials, deployed, sent a channel message, or proved hosted or Production behavior."
       },
       "completionCriteria": [
         "Every inventoried command uses an owner-local typed failure vocabulary and retains existing outward behavior.",

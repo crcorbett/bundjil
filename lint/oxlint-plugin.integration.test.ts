@@ -80,4 +80,27 @@ describe("installed Bundjil Oxlint plugin", () => {
       rmSync(resolve(probe), { force: true });
     }
   });
+
+  it("applies primitive-failure enforcement to infrastructure scripts", () => {
+    const probe =
+      "packages/infrastructure/scripts/.primitive-failure-lint-probe.ts";
+    writeFileSync(
+      resolve(probe),
+      'import { Effect } from "effect";\nEffect.fail("primitive");\n'
+    );
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-primitive-effect-failure)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
+    }
+  });
 });

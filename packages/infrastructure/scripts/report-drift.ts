@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { dirname } from "node:path";
+/* oxlint-disable max-classes-per-file -- Native Alchemy failures and operator command failures are distinct local boundaries. */
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- The pinned Alchemy Stack and Sync APIs expose upstream any/unknown channels.
 /** @effect-diagnostics anyUnknownInErrorContext:off, missingEffectContext:off */
 
@@ -108,6 +109,16 @@ const InfrastructureDriftNativePhase = Schema.Literals([
 class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
   { phase: InfrastructureDriftNativePhase }
+) {}
+const InfrastructureDriftCommandFailureReason = Schema.Literals([
+  "authorityFileInvalid",
+  "authorityInvalid",
+  "productionTargetRejected",
+  "receiptIncompatible",
+]);
+class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<InfrastructureDriftCommandError>()(
+  "InfrastructureDriftCommandError",
+  { reason: InfrastructureDriftCommandFailureReason }
 ) {}
 
 const resourceKindFromNativeType = (resourceType: string) =>
@@ -229,7 +240,9 @@ const readAuthority = Effect.fn("InfrastructureDriftAuthority.read")(function* (
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(path);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-    return yield* Effect.fail("authority-file-invalid");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "authorityFileInvalid",
+    });
   }
   const text = yield* fileSystem.readFileString(path);
   const decoded = yield* Schema.decodeUnknownEffect(
@@ -244,7 +257,9 @@ const readAuthority = Effect.fn("InfrastructureDriftAuthority.read")(function* (
     strict: false,
   }).compile(driftAuthorityPolicy);
   if (!validateEnvelope(decoded) || !validatePolicy(decoded)) {
-    return yield* Effect.fail("authority-invalid");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "authorityInvalid",
+    });
   }
   return InfrastructureDriftResourceFingerprint.make(sha256(text));
 });
@@ -522,7 +537,9 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
     validateFormats: false,
   }).compile(boundedReceiptSchema);
   if (!validateReceipt(receiptEncoded)) {
-    return yield* Effect.fail("receipt-incompatible");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "receiptIncompatible",
+    });
   }
   const fileSystem = yield* FileSystem.FileSystem;
   yield* fileSystem.makeDirectory(dirname(reportPath), {
@@ -552,7 +569,9 @@ const program = Effect.gen(function* () {
   const startedAt = yield* DateTime.now;
   const stage = yield* stageConfig;
   if (stage !== "preview") {
-    return yield* Effect.fail("production-target-rejected");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "productionTargetRejected",
+    });
   }
   const authorityPath = yield* authorityPathConfig;
   const reportPath = yield* reportPathConfig;

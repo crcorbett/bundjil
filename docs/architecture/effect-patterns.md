@@ -478,9 +478,10 @@ Rules:
   an owner-named tagged error so callers can match a closed vocabulary and the
   boundary can be Schema encoded. `bundjil/no-primitive-effect-failure`
   rejects direct primitive `Effect.fail`, `Effect.failSync`, and
-  `Effect.mapError` constructions in the approved production-source scope.
-  Operator scripts are migrated and admitted separately because their
-  process-exit and receipt contracts are different owners.
+  `Effect.mapError` constructions in approved production source and
+  infrastructure operator scripts. A CLI may collapse its owner-tagged error
+  to a stable exit code or bounded receipt reason only in the final renderer;
+  the Effect program itself must retain the typed error.
 - An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.

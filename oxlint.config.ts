@@ -52,6 +52,17 @@ export default defineConfig({
         "bundjil/no-primitive-effect-failure": "error",
       },
     },
+    {
+      files: [
+        "packages/infrastructure/scripts/**/*.ts",
+        "packages/infrastructure/scripts/**/*.tsx",
+        "packages/infrastructure/scripts/**/*.mts",
+        "packages/infrastructure/scripts/**/*.cts",
+      ],
+      rules: {
+        "bundjil/no-primitive-effect-failure": "error",
+      },
+    },
   ],
   rules: {
     "eslint/func-names": "off",

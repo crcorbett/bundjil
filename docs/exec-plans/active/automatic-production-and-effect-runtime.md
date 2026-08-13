@@ -514,8 +514,10 @@ reasons, and the Vercel subpath exports its complete contract. A fifth
 Effect-native lint rule rejects direct primitive failures in production
 service/package source with unit and installed-plugin proof. Existing Alchemy
 composition and provider behavior are unchanged. Operator scripts remain a
-separate pending owner-specific migration; no provider operation, credential,
-deployment, channel send, or external-state claim occurred.
+separate pending owner-specific migration at this task boundary; the later
+operator command correction below resolves that inventory. No provider
+operation, credential, deployment, channel send, or external-state claim
+occurred.
 
 The corrected synthetic-Executor `bun run verification` candidate passes with
 zero Turbo cache hits: 136 boundary tests, 12 lint tests, all 9 package
@@ -536,6 +538,25 @@ architecture, infrastructure README, Effect SPEC/task and both active plans
 runbooks, critical journeys, provider state, credentials and rollback
 identities **Preserve**. Frontend, browser, accessibility, release and
 publication are **N/A**.
+
+## Operator command failure correction
+
+The follow-on Effect slice replaced primitive failure values in all eight
+infrastructure operator entrypoints with owner-local Schema tagged errors. The
+final process adapters preserve their existing blocked/invalid output and exit
+codes. Root lint now enforces the entire scripts directory, and deterministic
+subprocess fixtures stop every command before provider transport. The exact
+candidate passed repository verification with zero Turbo cache hits: 136
+boundary tests, 13 lint tests, all 9 typechecks, all 15 package build/test
+tasks, 89 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests. No
+provider read/write, credential operation, authority change, deployment or
+channel send occurred.
+
+Documentation impact: infrastructure command source/tests, lint scope, Effect
+and testing architecture, infrastructure README, Effect SPEC/task ledger and
+both active plans **Change required**. Production workflow/provider state,
+runbooks, critical journeys, app behavior and external proof **Preserve**.
+Frontend, browser, accessibility, release and publication are **N/A**.
 
 ## Commit and integration ledger
 

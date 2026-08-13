@@ -104,6 +104,10 @@ const AdoptionProofBlockedReason = Schema.Literals([
   "remote-state-resource-missing",
   "unclassified",
 ]);
+class AdoptionProofError extends Schema.TaggedErrorClass<AdoptionProofError>()(
+  "AdoptionProofError",
+  { reason: AdoptionProofBlockedReason }
+) {}
 
 const PersistedStateResourceIdentity = Schema.Struct({
   logicalId: AlchemyLogicalResourceId,
@@ -126,7 +130,7 @@ const readFixedContractArtifact = Effect.fn(
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(path);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 2n * 1024n * 1024n) {
-    return yield* Effect.fail("proof-input-invalid");
+    return yield* new AdoptionProofError({ reason: "proof-input-invalid" });
   }
   return yield* fileSystem.readFileString(path);
 });
@@ -148,22 +152,30 @@ const runAdoptionStateProof = Effect.gen(
       manifestPath: manifestPathConfig,
       receiptPath: receiptPathConfig,
       stage: stageConfig,
-    }).pipe(Effect.mapError(() => "configuration-invalid" as const));
+    }).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "configuration-invalid" })
+      )
+    );
     if (
       authorityPath === manifestPath ||
       authorityPath === receiptPath ||
       manifestPath === receiptPath
     ) {
-      return yield* Effect.fail("proof-path-conflict");
+      return yield* new AdoptionProofError({ reason: "proof-path-conflict" });
     }
 
     const authorityText = yield* readFixedContractArtifact(authorityPath).pipe(
-      Effect.mapError(() => "authority-input-invalid" as const)
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "authority-input-invalid" })
+      )
     );
     const authority = yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(Schema.Unknown)
     )(authorityText).pipe(
-      Effect.mapError(() => "authority-input-invalid" as const)
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "authority-input-invalid" })
+      )
     );
     const validateAuthority = new Ajv2020({
       allErrors: true,
@@ -185,18 +197,26 @@ const runAdoptionStateProof = Effect.gen(
           validateFormats: false,
         }).compile(productionStableEnvironmentAuthorityPolicy)(authority))
     ) {
-      return yield* Effect.fail("authority-invalid");
+      return yield* new AdoptionProofError({ reason: "authority-invalid" });
     }
 
     const manifestText = yield* readFixedContractArtifact(manifestPath).pipe(
-      Effect.mapError(() => "manifest-invalid" as const)
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "manifest-invalid" })
+      )
     );
     const manifest = yield* Schema.decodeUnknownEffect(AdoptionManifestJson)(
       manifestText,
       { onExcessProperty: "error" }
-    ).pipe(Effect.mapError(() => "manifest-invalid" as const));
+    ).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "manifest-invalid" })
+      )
+    );
     if (manifest.stage !== stage) {
-      return yield* Effect.fail("manifest-stage-mismatch");
+      return yield* new AdoptionProofError({
+        reason: "manifest-stage-mismatch",
+      });
     }
     const managedManifestResources = manifest.resources.filter(
       (resource) =>
@@ -210,28 +230,48 @@ const runAdoptionStateProof = Effect.gen(
         bindingProfile === "productionPhotonManaged") &&
         managedManifestResources.length !== 4)
     ) {
-      return yield* Effect.fail("binding-profile-mismatch");
+      return yield* new AdoptionProofError({
+        reason: "binding-profile-mismatch",
+      });
     }
 
     const resolveState = yield* State;
     const state = yield* resolveState.pipe(
-      Effect.mapError(() => "remote-state-read-failed" as const)
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+      )
     );
     const version = yield* state
       .getVersion()
-      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+        )
+      );
     const stacks = yield* state
       .listStacks()
-      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+        )
+      );
     const stages = yield* state
       .listStages("BundjilInfrastructure")
-      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+        )
+      );
     const fqns = yield* state
       .list({
         stack: "BundjilInfrastructure",
         stage,
       })
-      .pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+        )
+      );
     const resources = yield* Effect.forEach(fqns, (fqn) =>
       state
         .get({
@@ -242,18 +282,28 @@ const runAdoptionStateProof = Effect.gen(
         .pipe(
           Effect.flatMap((resource) =>
             resource === undefined
-              ? Effect.fail("remote-state-resource-missing")
+              ? new AdoptionProofError({
+                  reason: "remote-state-resource-missing",
+                })
               : Effect.succeed(resource)
           )
         )
-    ).pipe(Effect.mapError(() => "remote-state-read-failed" as const));
+    ).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "remote-state-read-failed" })
+      )
+    );
     const decodedResourceIdentities = yield* Effect.forEach(
       resources,
       (resource) =>
         Schema.decodeUnknownEffect(PersistedStateResourceIdentity)(resource, {
           onExcessProperty: "ignore",
         })
-    ).pipe(Effect.mapError(() => "remote-state-shape-invalid" as const));
+    ).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "remote-state-shape-invalid" })
+      )
+    );
     const persistedLogicalIds = decodedResourceIdentities.map(
       (resource) => resource.logicalId
     );
@@ -272,16 +322,24 @@ const runAdoptionStateProof = Effect.gen(
       (resource) => resource.status === "updated"
     );
     const stateConfig = yield* loadAlchemyR2StateConfig.pipe(
-      Effect.mapError(() => "credential-custody-invalid" as const)
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "credential-custody-invalid" })
+      )
     );
     const photonCredentials = yield* loadInfrastructurePhotonCredentials(
       stage
-    ).pipe(Effect.mapError(() => "credential-custody-invalid" as const));
+    ).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "credential-custody-invalid" })
+      )
+    );
     const credentials = [
       stateConfig.accessKeyId,
       stateConfig.secretAccessKey,
       yield* vercelAccessTokenConfig.pipe(
-        Effect.mapError(() => "credential-custody-invalid" as const)
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "credential-custody-invalid" })
+        )
       ),
       photonCredentials.projectSecret,
     ];
@@ -303,7 +361,12 @@ const runAdoptionStateProof = Effect.gen(
               { onExcessProperty: "ignore" }
             )
           ).pipe(
-            Effect.mapError(() => "managed-state-attributes-invalid" as const)
+            Effect.mapError(
+              () =>
+                new AdoptionProofError({
+                  reason: "managed-state-attributes-invalid",
+                })
+            )
           )
         : [];
     const managedStateMatches =
@@ -339,7 +402,9 @@ const runAdoptionStateProof = Effect.gen(
       managedStateMatches &&
       credentialLeakCount === 0;
     if (!exactState) {
-      return yield* Effect.fail("remote-state-proof-failed");
+      return yield* new AdoptionProofError({
+        reason: "remote-state-proof-failed",
+      });
     }
 
     const observedAt = new Date(
@@ -421,17 +486,25 @@ const runAdoptionStateProof = Effect.gen(
     });
     const receiptText = yield* Schema.encodeEffect(
       InfrastructureBoundedReceiptJson
-    )(receipt).pipe(Effect.mapError(() => "receipt-write-failed" as const));
+    )(receipt).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "receipt-write-failed" })
+      )
+    );
     const receiptEncoded = yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(Schema.Unknown)
-    )(receiptText).pipe(Effect.mapError(() => "receipt-write-failed" as const));
+    )(receiptText).pipe(
+      Effect.mapError(
+        () => new AdoptionProofError({ reason: "receipt-write-failed" })
+      )
+    );
     const validateReceipt = new Ajv2020({
       allErrors: true,
       strict: false,
       validateFormats: false,
     }).compile(boundedReceiptSchema);
     if (!validateReceipt(receiptEncoded)) {
-      return yield* Effect.fail("receipt-incompatible");
+      return yield* new AdoptionProofError({ reason: "receipt-incompatible" });
     }
 
     const fileSystem = yield* FileSystem.FileSystem;
@@ -440,15 +513,27 @@ const runAdoptionStateProof = Effect.gen(
         recursive: true,
         mode: 0o700,
       })
-      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "receipt-write-failed" })
+        )
+      );
     yield* fileSystem
       .writeFileString(receiptPath, receiptText, {
         mode: 0o600,
       })
-      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "receipt-write-failed" })
+        )
+      );
     yield* fileSystem
       .chmod(receiptPath, 0o600)
-      .pipe(Effect.mapError(() => "receipt-write-failed" as const));
+      .pipe(
+        Effect.mapError(
+          () => new AdoptionProofError({ reason: "receipt-write-failed" })
+        )
+      );
     return Match.value(bindingProfile).pipe(
       Match.when("observedOnly", () => ({
         status: "passed" as const,
@@ -488,8 +573,8 @@ const main = runAdoptionStateProof.pipe(
   Effect.catch((error) =>
     Console.error({
       status: "blocked" as const,
-      reason: Schema.is(AdoptionProofBlockedReason)(error)
-        ? error
+      reason: Schema.is(AdoptionProofError)(error)
+        ? error.reason
         : AdoptionProofBlockedReason.make("unclassified"),
     }).pipe(
       Effect.andThen(

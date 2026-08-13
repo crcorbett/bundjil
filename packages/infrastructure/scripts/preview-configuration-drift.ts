@@ -1,6 +1,6 @@
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
-import { Console, Effect, Layer } from "effect";
+import { Console, Effect, Layer, Schema } from "effect";
 
 import {
   layerVercelPreviewConfigurationLive,
@@ -9,6 +9,15 @@ import {
   SetVercelPreviewFeedback,
   VercelPreviewConfiguration,
 } from "../src/vercel/index.js";
+
+const PreviewConfigurationDriftFailureReason = Schema.Literals([
+  "preconditionFailed",
+  "readbackFailed",
+]);
+class PreviewConfigurationDriftError extends Schema.TaggedErrorClass<PreviewConfigurationDriftError>()(
+  "PreviewConfigurationDriftError",
+  { reason: PreviewConfigurationDriftFailureReason }
+) {}
 
 const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
   Effect.flatMap((input) =>
@@ -26,9 +35,9 @@ const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
         before.attributes.enabled !== true ||
         before.attributes.productionEnabled !== null
       ) {
-        return yield* Effect.fail(
-          "preview-configuration-drift-precondition-failed"
-        );
+        return yield* new PreviewConfigurationDriftError({
+          reason: "preconditionFailed",
+        });
       }
       const mutation = yield* configuration.setPreviewFeedback(
         SetVercelPreviewFeedback.make({
@@ -51,9 +60,9 @@ const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
         after.attributes.enabled !== false ||
         after.attributes.productionEnabled !== null
       ) {
-        return yield* Effect.fail(
-          "preview-configuration-drift-readback-failed"
-        );
+        return yield* new PreviewConfigurationDriftError({
+          reason: "readbackFailed",
+        });
       }
       return yield* Console.log({
         operation: "direct-preview-feedback-drift",

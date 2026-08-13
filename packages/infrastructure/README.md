@@ -22,6 +22,13 @@ receipts, and retained custom Resources.
 Raw provider clients, wire DTOs, credentials, secret values, and unchecked
 provider failures are not public exports.
 
+Infrastructure operator programs keep owner-local Schema tagged errors until
+their final process adapter. That adapter alone may render the stable bounded
+status/reason and set the documented exit code. Root lint rejects primitive
+`Effect.fail`, `Effect.failSync`, and `Effect.mapError` values across every
+script in `scripts/`; subprocess fixtures exercise deterministic stops before
+provider transport composition.
+
 ## Supported commands
 
 Run package checks from the repository root:

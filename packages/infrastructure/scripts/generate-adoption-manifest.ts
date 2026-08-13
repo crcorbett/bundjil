@@ -37,6 +37,14 @@ const AdoptionArtifactPath = Schema.String.pipe(
   ),
   Schema.brand("@bundjil/infrastructure/AdoptionArtifactPath")
 );
+const AdoptionManifestCommandFailureReason = Schema.Literals([
+  "adoptionPathConflictsWithInventory",
+  "inventoryArtifactInvalid",
+]);
+class AdoptionManifestCommandError extends Schema.TaggedErrorClass<AdoptionManifestCommandError>()(
+  "AdoptionManifestCommandError",
+  { reason: AdoptionManifestCommandFailureReason }
+) {}
 
 const inventoryPathConfig = Config.schema(
   AdoptionArtifactPath,
@@ -57,7 +65,9 @@ const generateAdoptionManifest = Effect.gen(
     const adoptionPath = yield* adoptionPathConfig;
     const bindingProfile = yield* bindingProfileConfig;
     if (inventoryPath === adoptionPath) {
-      return yield* Effect.fail("adoption-path-conflicts-with-inventory");
+      return yield* new AdoptionManifestCommandError({
+        reason: "adoptionPathConflictsWithInventory",
+      });
     }
     const fileSystem = yield* FileSystem.FileSystem;
     const inventoryMetadata = yield* fileSystem.stat(inventoryPath);
@@ -65,7 +75,9 @@ const generateAdoptionManifest = Effect.gen(
       inventoryMetadata.mode % 0o1000 !== 0o600 ||
       inventoryMetadata.size > 2n * 1024n * 1024n
     ) {
-      return yield* Effect.fail("inventory-artifact-invalid");
+      return yield* new AdoptionManifestCommandError({
+        reason: "inventoryArtifactInvalid",
+      });
     }
     const inventoryText = yield* fileSystem.readFileString(inventoryPath);
     const inventory = yield* Schema.decodeUnknownEffect(

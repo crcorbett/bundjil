@@ -532,8 +532,8 @@ verification` gate passes with all nine package typechecks and all fifteen
   `Effect.fail`, `Effect.failSync`, and `Effect.mapError` construction across
   app service/package source. Unit and installed-Oxlint negative fixtures prove
   namespace, direct-import, alias, static-template and `as const` forms. The
-  separately inventoried operator scripts remain outside this scope until the
-  next owner-specific migration task.
+  separately inventoried operator scripts remained outside this task's scope;
+  the later operator command correction below resolves that inventory.
 - Installed `effect@4.0.0-beta.101` is the API authority; retained v4 comparison
   revision is `1caab3cc30f626efbf15e59d74f539a487e5c85c`. Focused lint,
   authority-loader tests, infrastructure typecheck/build and Effect language
@@ -557,6 +557,42 @@ verification` gate passes with all nine package typechecks and all fifteen
   provider behavior, runbooks, authority/control records, critical journeys,
   credentials and external state **Preserve**. Frontend, browser,
   accessibility, release, deployment and publication are **N/A**.
+
+## 2026-08-13 operator command failure correction
+
+- Adoption manifest generation/proof, inventory, state migration, drift
+  reporting, Preview configuration drift, Photon Preview webhook binding and
+  Vercel Git-link authority validation now construct only owner-local
+  `Schema.TaggedErrorClass` failures. Final CLI adapters retain their existing
+  bounded status/reason and exit classifications.
+- `bundjil/no-primitive-effect-failure` now covers the complete infrastructure
+  scripts directory. The installed-Oxlint fixture creates an exact script probe
+  and proves the root configuration rejects it; no generic error module,
+  helper bucket, script suppression or autofix was added.
+- Subprocess fixtures launch all eight real Bun entrypoints and force
+  deterministic configuration, mode, path, file-contract or target stops
+  before provider transport. The proof harness supplies public synthetic R2
+  values because Layer acquisition reads configuration before the adoption
+  proof foreground guard; no remote state operation runs.
+- Installed `effect@4.0.0-beta.101` is the execution authority. Its Effect
+  language service required yieldable Schema tagged errors to be yielded
+  directly instead of redundantly wrapped in `Effect.fail`. Retained v4
+  comparison revision is
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+- Focused infrastructure proof passes with 89 Vitest tests and 21 Alchemy/Bun
+  lifecycle tests; lint passes 13 tests. The final synthetic-Executor
+  `bun run verification` candidate passes with zero Turbo cache hits: 136
+  boundary tests, all 9 typechecks and all 15 package build/test tasks.
+- Corrections during verification were confined to the harness: use Bun rather
+  than Vitest's Node executable, satisfy eager Layer configuration with public
+  sentinels, remove one formatter-obsoleted import, and allow 60 seconds only
+  for the multi-process fixture under parallel Turbo load.
+- Documentation impact: command source/tests, lint scope/installed fixture,
+  Effect/testing architecture, infrastructure README, SPEC/task ledger and
+  both active plans **Change required**. Provider state, credentials, authority,
+  runbooks, critical journeys, app runtime, deployments and channels
+  **Preserve**. Frontend, browser, accessibility, release and publication are
+  **N/A**.
 
 ## Evidence and non-claims
 
