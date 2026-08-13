@@ -638,6 +638,11 @@ verification` gate passes with all nine package typechecks and all fifteen
   with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
   typechecks and all 15 package build/test tasks. The Codex Preview subprocess
   suite passes all 10 tests under its explicit integration budget.
+- Commit `b9cd2afcfa8b96b63013f0d23b8aaa746852bc78` is pushed to the draft PR
+  branch. Hosted CI run `31664722119` passed that exact SHA. Infrastructure
+  Drift run `31664722113` failed closed at bounded custody because all three
+  hosted values were empty; provider reporting was skipped. This is negative
+  custody evidence, not a drift or provider result.
 
 ## Evidence and non-claims
 

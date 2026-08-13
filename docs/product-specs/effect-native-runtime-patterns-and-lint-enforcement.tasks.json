@@ -986,6 +986,7 @@
         "lint": "bundjil/no-layer-or-die-in-service passes direct namespace/alias fixtures and installed-Oxlint proof; the root scope covers owned app/package source and all infrastructure scripts without a broad suppression or autofix.",
         "focused": "Infrastructure typecheck, Effect language service, 14 lint tests, 89 infrastructure Vitest tests, 21 canonical Alchemy/Bun lifecycle tests and the 10-test Codex Preview subprocess suite pass.",
         "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Commit b9cd2afcfa8b96b63013f0d23b8aaa746852bc78 is pushed to the draft PR branch, and GitHub CI run 31664722119 passed that exact SHA. Infrastructure Drift run 31664722113 failed closed at Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
         "corrections": "Cold verification under concurrent workspace load exposed harness ceilings only. The eight-entrypoint command fixture now permits 120 seconds and the Codex Preview subprocess-proof suite 15 seconds; product timeout, retry, interruption and Effect Clock behavior are unchanged.",
         "nonClaims": "No provider request, state read/write, infrastructure mutation, authority or credential change, deployment, hosted drift, channel send or Production proof occurred."
       },

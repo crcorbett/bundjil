@@ -590,6 +590,12 @@ The final public-synthetic-Executor `bun run verification` candidate passes
 with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
 typechecks and all 15 package build/test tasks. No provider operation ran.
 
+Commit `b9cd2afcfa8b96b63013f0d23b8aaa746852bc78` is pushed to the draft PR
+branch, and hosted CI run `31664722119` passed that exact SHA. Infrastructure
+Drift run `31664722113` failed closed at `Prepare bounded read-only custody`
+because its three hosted values were empty; provider reporting was skipped.
+That run establishes absent hosted custody only, not drift or provider state.
+
 Documentation impact: R2 Layer/Alchemy root composition, three operator
 commands, command/lint tests, Effect/testing architecture, infrastructure
 README, Effect SPEC/task and both active plans **Change required**. Provider
