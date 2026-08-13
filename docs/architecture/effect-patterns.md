@@ -52,7 +52,9 @@ runtime config, or provider boundaries:
   persistent concatenation, Effect equality/hash, typed lookup absence, or
   set algebra materially carries the domain. Ordinary immutable arrays,
   records, and local native collections remain valid when those semantics do
-  not apply.
+  not apply. A native `Map`, `Set`, `WeakMap`, or `WeakSet` constructor in owned
+  app/package source requires an exact occurrence-checked lint exception that
+  names its local algorithm, ordered diagnostic, host, or test-backend owner.
 
 Do not introduce Zod, local DTO mirrors, raw `unknown` readers, or hand-written
 success/error unions when an owning Effect Schema or tagged error can express
@@ -246,6 +248,9 @@ counts and `HashSet`/`HashMap` domain invariants after the traversal. Local
 mutable state remains valid inside one synchronous parser, byte copy,
 single-fiber sequential pagination loop, or host-owned callback when it is not
 captured across traversal callbacks, concurrent work, or a later finalizer.
+`bundjil/no-unregistered-native-collection` makes that review fail closed for
+owned app/package source; its exceptions are exact by file, constructor, and
+occurrence count, and stale exceptions fail lint.
 
 Control state that is written before one Effect and observed by a later
 finalizer is runtime state, even when it is scoped to one operation. Keep

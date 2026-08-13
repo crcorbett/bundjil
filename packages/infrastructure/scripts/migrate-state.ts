@@ -9,6 +9,7 @@ import {
   Console,
   Effect,
   FileSystem,
+  HashSet,
   Layer,
   Match,
   Schema,
@@ -142,7 +143,14 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
   const candidate = yield* candidateConfig;
   const stage = yield* stageConfig;
   if (
-    new Set([authorityPath, manifestPath, backupPath, receiptPath]).size !== 4
+    HashSet.size(
+      HashSet.fromIterable([
+        authorityPath,
+        manifestPath,
+        backupPath,
+        receiptPath,
+      ])
+    ) !== 4
   ) {
     return yield* new StateMigrationCommandError({
       reason: "migration-path-conflict",

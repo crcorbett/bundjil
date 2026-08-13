@@ -140,6 +140,11 @@ Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
 code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
 RPC, SSR, command, config, or service boundary.
 
+In owned app/package source, a native Map/Set/WeakMap/WeakSet constructor must
+either be replaced where Effect collection semantics carry the domain or have
+an exact occurrence-checked lint exception naming its local algorithm, ordered
+diagnostic, host, or test-backend owner.
+
 Reuse canonical schemas, types, service contracts, errors, and branded
 identifiers from the owning package. Do not define standalone DTO mirrors or
 duplicate fields such as id: string, slug: string, status, or post metadata
@@ -219,6 +224,8 @@ Before accepting a task, audit for:
 - Effect primitives where they fit: `Data`, `Schema`, `Array`, `Chunk`,
   `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`,
   `Record`, `Result`, `Exit`, Bun/Platform `Command`, and `ManagedRuntime`
+- no unregistered native collection constructor in owned app/package source;
+  every retained occurrence has a current exact owner and count
 - no `Object.values`, `Object.entries`, `switch`, unsafe casts, local DTO
   mirrors, or stringly branching when an Effect/schema-owned approach fits
 - no trivial wrappers/helpers; every new helper is either reused, names a real

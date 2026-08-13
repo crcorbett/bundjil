@@ -332,6 +332,17 @@ export const asyncAwaitExceptions = [
   },
 ] as const satisfies readonly ExactException[];
 
+export const nativeCollectionExceptions = [
+  {
+    pathSuffix: "packages/infrastructure/src/adoption-manifest.ts",
+    expected: { Set: 1 },
+  },
+  {
+    pathSuffix: "packages/codex/src/testing/index.ts",
+    expected: { Map: 4 },
+  },
+] as const satisfies readonly ExactException[];
+
 export const runtimeExecutionExceptions = [
   {
     pathSuffix: "apps/agent/agent/channels/photon.ts",
@@ -755,6 +766,50 @@ export const noLayerOrDieInServiceRule = {
   },
 };
 
+const nativeCollectionNames = new Set(["Map", "Set", "WeakMap", "WeakSet"]);
+
+export const noUnregisteredNativeCollectionRule = {
+  create(context: RuleContext) {
+    const exceptions = createExactExceptionTracker(
+      context,
+      nativeCollectionExceptions
+    );
+    return {
+      NewExpression(node: AstNode) {
+        const name =
+          node.callee?.type === "Identifier" ? node.callee.name : undefined;
+        if (
+          name !== undefined &&
+          nativeCollectionNames.has(name) &&
+          !exceptions.accepts(name)
+        ) {
+          context.report({
+            data: { collection: name },
+            messageId: "noUnregisteredNativeCollection",
+            node: node.callee ?? node,
+          });
+        }
+      },
+      "Program:exit"(node: AstNode) {
+        exceptions.verify(node);
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Require owned native collection constructors to have an exact reviewed exception.",
+    },
+    messages: {
+      noUnregisteredNativeCollection:
+        "Use an Effect collection for domain state/algebra, or register this {{collection}} constructor as an exact local algorithm, ordered diagnostic, host boundary, or test-backend exception.",
+      staleException:
+        "Native-collection exception {{key}} is stale: expected {{expected}} occurrence(s), observed {{observed}}.",
+    },
+    type: "problem",
+  },
+};
+
 const runtimeMethodNames = new Set([
   "Effect.runFork",
   "Effect.runPromise",
@@ -855,6 +910,7 @@ export default {
     "no-primitive-effect-failure": noPrimitiveEffectFailureRule,
     "no-runtime-execution-outside-boundary":
       noRuntimeExecutionOutsideBoundaryRule,
+    "no-unregistered-native-collection": noUnregisteredNativeCollectionRule,
     "require-try-promise-catch": requireTryPromiseCatchRule,
     "tagged-error-name": taggedErrorNameRule,
   },

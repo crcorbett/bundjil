@@ -175,6 +175,11 @@ Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
 code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
 RPC, SSR, command, config, or service boundary.
 
+For owned app/package source, specify whether each native
+Map/Set/WeakMap/WeakSet constructor becomes an Effect collection or retains an
+exact occurrence-checked exception naming its local algorithm, ordered
+diagnostic, host, or test-backend owner.
+
 Reuse canonical schemas, types, service contracts, errors, and branded
 identifiers from the owning package. Do not define standalone DTO mirrors or
 duplicate fields such as id: string, slug: string, status, or post metadata

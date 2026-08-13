@@ -7,6 +7,7 @@ import {
   noLayerOrDieInServiceRule,
   noPrimitiveEffectFailureRule,
   noRuntimeExecutionOutsideBoundaryRule,
+  noUnregisteredNativeCollectionRule,
   requireTryPromiseCatchRule,
   taggedErrorNameRule,
 } from "./oxlint-plugin.js";
@@ -272,6 +273,55 @@ describe("bundjil/no-layer-or-die-in-service", () => {
             {
               code: "import * as Layers from 'effect/Layer'; Layers.orDie(layer);",
               errors: [{ messageId: "noLayerOrDie" }],
+            },
+          ],
+        }
+      );
+    }).not.toThrow();
+  });
+});
+
+describe("bundjil/no-unregistered-native-collection", () => {
+  it("requires exact reviewed ownership for native collection constructors", () => {
+    expect(() => {
+      makeRuleTester().run(
+        "no-unregistered-native-collection",
+        noUnregisteredNativeCollectionRule,
+        {
+          valid: [
+            "const values = HashSet.fromIterable(['value']);",
+            {
+              code: "const seen = new Set<string>();",
+              filename:
+                "/repo/packages/infrastructure/src/adoption-manifest.ts",
+            },
+            {
+              code: "new Map(); new Map(); new Map(); new Map();",
+              filename: "/repo/packages/codex/src/testing/index.ts",
+            },
+          ],
+          invalid: [
+            {
+              code: "const values = new Set<string>();",
+              errors: [{ messageId: "noUnregisteredNativeCollection" }],
+            },
+            {
+              code: "const values = new WeakMap<object, string>();",
+              errors: [{ messageId: "noUnregisteredNativeCollection" }],
+            },
+            {
+              code: "const values = new Set<string>(); new Set<string>();",
+              filename:
+                "/repo/packages/infrastructure/src/adoption-manifest.ts",
+              errors: [
+                { messageId: "staleException" },
+                { messageId: "noUnregisteredNativeCollection" },
+              ],
+            },
+            {
+              code: "new Map(); new Map(); new Map();",
+              filename: "/repo/packages/codex/src/testing/index.ts",
+              errors: [{ messageId: "staleException" }],
             },
           ],
         }

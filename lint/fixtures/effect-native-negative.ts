@@ -13,3 +13,5 @@ Effect.runPromise(Effect.void);
 Effect.fail("primitive-failure");
 
 Layer.orDie(Layer.empty);
+
+export const nativeCollection = new Set(["domain-value"]);

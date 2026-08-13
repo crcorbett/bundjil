@@ -741,6 +741,43 @@ verification` gate passes with all nine package typechecks and all fifteen
   terminal audit remains pending behind hosted drift, automatic Production and
   channel proof.
 
+## 2026-08-13 native collection recurrence correction
+
+- A fresh owned-source constructor scan found an eighth production domain-set
+  owner omitted by two earlier decision inventories: the state-migration
+  command used a native `Set` to require four distinct branded artifact paths.
+  It now uses installed `HashSet.fromIterable` and `HashSet.size`; the existing
+  real-command fixture still proves `migration-path-conflict` before file or
+  provider access.
+- The repeated omission changed the control decision. Review alone no longer
+  owns native constructors in app/package runtime and script source.
+  `bundjil/no-unregistered-native-collection` rejects direct `Map`, `Set`,
+  `WeakMap`, and `WeakSet` construction unless an exact file/name/count
+  exception documents a local algorithm, ordered diagnostic, host boundary, or
+  fixture backend. One ordered adoption-manifest `Set` and four Ref-owned Codex
+  test-backend `Map` constructors are the complete registered corpus.
+- Direct RuleTester cases prove unregistered, over-count, and stale-count
+  failure. The installed negative fixture proves the stable rule ID, and an
+  owned infrastructure-script probe proves root configuration scope. A fresh
+  production scan contains only the five registered occurrences.
+- Installed `effect@4.0.0-beta.101` remains execution authority. The local v4
+  comparison revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` exposes the
+  matching immutable `HashSet.fromIterable` and `size` APIs.
+- Focused proof passes: 16 lint tests, infrastructure typecheck, 92
+  infrastructure Vitest tests, 21 Alchemy/Bun lifecycle tests, and current docs
+  and skill policy checks. No provider transport or external mutation ran.
+- The cold synthetic-Executor `bun run verification` candidate passes with
+  zero Turbo cache hits: 136 boundary tests, 16 lint tests, all nine package
+  typechecks, and all 15 package build/test tasks.
+- Documentation impact: migration command, lint plugin/config/fixtures, Effect
+  and testing architecture, Effect SPEC/task/plan, and PRD skills **Change
+  required**. Automatic Production plan, public exports, app/package READMEs,
+  provider behavior, authority/control/runbooks, critical journeys,
+  credentials, deployments and channels **Preserve**. Frontend, browser,
+  accessibility, generated references, release and publication are **N/A**.
+  This correction refreshes the completed collection task but does not satisfy
+  or run the dependency-gated terminal audit.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

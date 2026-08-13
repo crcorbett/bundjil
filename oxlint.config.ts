@@ -34,6 +34,33 @@ export default defineConfig({
     },
     {
       files: [
+        "apps/*/agent/**/*.ts",
+        "apps/*/agent/**/*.tsx",
+        "apps/*/agent/**/*.mts",
+        "apps/*/agent/**/*.cts",
+        "apps/*/src/**/*.ts",
+        "apps/*/src/**/*.tsx",
+        "apps/*/src/**/*.mts",
+        "apps/*/src/**/*.cts",
+        "apps/*/scripts/**/*.ts",
+        "apps/*/scripts/**/*.tsx",
+        "apps/*/scripts/**/*.mts",
+        "apps/*/scripts/**/*.cts",
+        "packages/*/src/**/*.ts",
+        "packages/*/src/**/*.tsx",
+        "packages/*/src/**/*.mts",
+        "packages/*/src/**/*.cts",
+        "packages/*/scripts/**/*.ts",
+        "packages/*/scripts/**/*.tsx",
+        "packages/*/scripts/**/*.mts",
+        "packages/*/scripts/**/*.cts",
+      ],
+      rules: {
+        "bundjil/no-unregistered-native-collection": "error",
+      },
+    },
+    {
+      files: [
         "apps/agent/agent/**/*.ts",
         "apps/agent/agent/**/*.tsx",
         "apps/agent/agent/**/*.mts",

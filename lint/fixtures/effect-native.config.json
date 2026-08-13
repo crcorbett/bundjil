@@ -7,6 +7,7 @@
     "bundjil/no-layer-or-die-in-service": "error",
     "bundjil/no-primitive-effect-failure": "error",
     "bundjil/no-runtime-execution-outside-boundary": "error",
+    "bundjil/no-unregistered-native-collection": "error",
     "bundjil/require-try-promise-catch": "error"
   }
 }

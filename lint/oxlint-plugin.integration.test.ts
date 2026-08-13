@@ -57,6 +57,7 @@ describe("installed Bundjil Oxlint plugin", () => {
       "bundjil(no-layer-or-die-in-service)",
       "bundjil(no-primitive-effect-failure)",
       "bundjil(no-runtime-execution-outside-boundary)",
+      "bundjil(no-unregistered-native-collection)",
       "bundjil(require-try-promise-catch)",
     ]) {
       expect(result.output).toContain(rule);
@@ -99,6 +100,26 @@ describe("installed Bundjil Oxlint plugin", () => {
       expect(child.status).not.toBe(0);
       expect(`${child.stdout}\n${child.stderr}`).toContain(
         "bundjil(no-primitive-effect-failure)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
+    }
+  });
+
+  it("applies native-collection review to owned package scripts", () => {
+    const probe =
+      "packages/infrastructure/scripts/.native-collection-lint-probe.ts";
+    writeFileSync(resolve(probe), 'const values = new Set(["value"]);\n');
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-unregistered-native-collection)"
       );
     } finally {
       rmSync(resolve(probe), { force: true });

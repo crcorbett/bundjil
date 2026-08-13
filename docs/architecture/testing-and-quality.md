@@ -53,13 +53,14 @@ policy checks, Ultracite, focused repository lint-rule tests, dependency
 hygiene, workspace typechecks, and tests. `bun run check` enables
 `bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
 `tryPromise`, primitive-failure, Layer-defect, and runtime-ownership rules for
-their approved app/package and infrastructure-script scopes.
+their approved app/package and infrastructure-script scopes, plus exact
+native-collection review for owned runtime and script source.
 `bundjil/no-layer-or-die-in-service` rejects import-aware `Layer.orDie` outside
 an exact framework host edge. `bundjil/tagged-error-name`
 rejects any `Schema.TaggedErrorClass` whose
 class declaration, generic self-type, and literal tag do not agree. The four
-original Effect rule IDs plus the later primitive-failure correction and their
-semantic guidance are owned by
+original Effect rule IDs plus the later primitive-failure and
+native-collection corrections and their semantic guidance are owned by
 [`effect-patterns.md`](effect-patterns.md).
 
 `bun run test:lint` executes direct RuleTester coverage and invokes the
@@ -69,6 +70,12 @@ ID; the positive fixture must exit zero. Exact host/framework exception
 fixtures also prove occurrence-count staleness. A clean repository lint alone
 is not sufficient rule proof, and a visitor-only test does not prove installed
 plugin behavior.
+
+`bundjil/no-unregistered-native-collection` rejects direct `new Map`, `Set`,
+`WeakMap`, and `WeakSet` in owned app/package source unless the exact file,
+constructor, and occurrence count is registered. Registration is not a waiver
+for domain state: it documents a proved local algorithm, ordered diagnostic,
+host boundary, or fixture backend and fails when the occurrence count drifts.
 
 Infrastructure command-boundary fixtures launch the real Bun entrypoints with
 only synthetic configuration and deterministic pre-provider failures. They
