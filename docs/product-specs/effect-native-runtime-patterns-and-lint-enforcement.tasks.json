@@ -1024,6 +1024,7 @@
         "oracle": "The real missing-authority Bun entrypoint exits 1 with exactly the bounded blocked classification and rejects the raw authority tag, ConfigError, stack marker and repository-absolute path without provider transport.",
         "focused": "Infrastructure typecheck, Effect language service, boundary audit, focused formatting/lint and the two-test real operator-command subprocess suite pass.",
         "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine typechecks, 89 infrastructure Vitest tests, 21 Alchemy/Bun lifecycle tests and all 15 package build/test tasks.",
+        "hosted": "Commit ffc1889c603bf228df389501e1c23fc45a2c5142 is pushed to the draft PR branch, and GitHub CI run 31666250197 passed that exact SHA. Infrastructure Drift run 31666250211 failed closed at Prepare bounded read-only custody because all three hosted values were empty; its provider-report step was skipped.",
         "corrections": "The first repository gate rejected a synchronous Schema fallback encoder. The process edge now uses Schema.encodeEffect; only its statically valid blocked literal converts an impossible encoding failure to a defect after command failure has already been collapsed.",
         "nonClaims": "No Vercel request, Preview read/write, provider mutation, authority or credential change, deployment, channel send, hosted proof or Production behavior occurred."
       },

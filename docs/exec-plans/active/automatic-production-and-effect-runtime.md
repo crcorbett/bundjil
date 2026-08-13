@@ -622,6 +622,12 @@ use `Schema.encodeEffect`. The final public-synthetic-Executor
 boundary tests, 14 lint tests, all nine typechecks, 89 infrastructure Vitest
 tests, 21 Alchemy/Bun lifecycle tests and all 15 package build/test tasks.
 
+Commit `ffc1889c603bf228df389501e1c23fc45a2c5142` is pushed to the draft PR
+branch, and hosted CI run `31666250197` passed that exact SHA. Infrastructure
+Drift run `31666250211` failed closed at `Prepare bounded read-only custody`
+because its three hosted values were empty; provider reporting was skipped.
+That run establishes absent hosted custody only, not drift or provider state.
+
 Documentation impact: Preview drift
 script/test, Effect/testing architecture, infrastructure README, Effect
 SPEC/task and both active plans **Change required**. Provider state,
