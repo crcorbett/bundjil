@@ -653,6 +653,14 @@ typecheck and all 89 Vitest plus 21 Alchemy lifecycle tests pass. This proves a
 repository process contract only, not hosted eligibility, deployment,
 rollback, Vercel state, or Production behavior.
 
+The cold public-synthetic-Executor `bun run verification` candidate passed
+with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
+typechecks, and all 15 package build/test tasks. Commit
+`f48946ab6036aab633152b6bf5a6521167a6b21e` is pushed, and hosted CI run
+`31667205683` passed that exact SHA. Infrastructure Drift run `31667205678`
+failed closed at its three empty custody values and skipped provider reporting;
+it proves no drift or provider result.
+
 Documentation impact: Production script/fixture, Effect/testing architecture,
 infrastructure README, both SPEC/task owners, and both active plans **Change
 required**. Workflow authority, transition semantics, rollback, provider

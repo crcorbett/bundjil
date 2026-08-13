@@ -1038,7 +1038,7 @@
     {
       "id": "close-automatic-production-command-boundary",
       "title": "Close automatic Production command output boundary",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["close-preview-drift-command-boundary"],
       "description": "Correct the post-task finding that the private exact-SHA Production workflow command delegated expected Config and deployment failure to BunRuntime.runMain and could expose raw Effect diagnostics.",
       "implementationNotes": [
@@ -1054,6 +1054,16 @@
         "focusedCommandOrProcedureOwner": "Automatic Production real-entrypoint fixture, orchestration suite, infrastructure typecheck/tests, Effect setup, docs and root verification",
         "evidenceOwner": "Automatic Production command output correction receipt",
         "limitationsAndNonClaims": "Repository proof invokes no Vercel transport and does not prove workflow eligibility, deployment, rollback, hosted execution, provider state or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The private Production command preserves the existing exact-SHA deployment operation, live Layer, exit-aware rollback finalizer and AutomaticProductionReceiptJson success contract. It no longer delegates command failure to BunRuntime.runMain.",
+        "boundary": "Source Config decodes before deployment Layer provision. One final Effect.exit captures Layer acquisition, orchestration, rollback and health failure, and Effectful success receipt encoding; the process adapter emits only the existing success receipt or one Schema-encoded blocked result and owns exit code 1.",
+        "oracle": "The real Bun entrypoint with absent source SHA exits 1 with exactly {\"status\":\"blocked\"} and rejects ProductionDeploymentError, ConfigError, stack markers and the repository path before Layer acquisition or provider transport.",
+        "focused": "Infrastructure typecheck, Effect language-service diagnostics, boundary audit, docs/skills/authority/controls/verification policies, 14 lint tests, 89 infrastructure Vitest tests and 21 Alchemy lifecycle tests pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Commit f48946ab6036aab633152b6bf5a6521167a6b21e is pushed to the draft PR branch and GitHub CI run 31667205683 passed that exact SHA. Infrastructure Drift run 31667205678 failed closed at empty bounded custody and skipped provider reporting.",
+        "nonClaims": "No Vercel request, provider read/write, deployment, rollback, authority or credential mutation, channel send, hosted Production workflow or Production behavior was exercised."
       },
       "completionCriteria": [
         "The existing success receipt is preserved and every expected command failure collapses to the Schema-owned blocked result.",

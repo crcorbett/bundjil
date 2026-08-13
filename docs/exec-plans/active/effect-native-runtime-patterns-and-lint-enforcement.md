@@ -697,6 +697,13 @@ verification` gate passes with all nine package typechecks and all fifteen
   path. It stops before Layer acquisition and provider transport. The focused
   infrastructure typecheck and complete 89-Vitest/21-Alchemy package test
   suites pass.
+- The cold public-synthetic-Executor `bun run verification` candidate passed
+  with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
+  typechecks, and all 15 package build/test tasks. Commit
+  `f48946ab6036aab633152b6bf5a6521167a6b21e` is pushed, and hosted CI run
+  `31667205683` passed that exact SHA. Infrastructure Drift run `31667205678`
+  failed closed at its three empty custody values and skipped provider
+  reporting; it proves no drift or provider result.
 - Documentation impact: Production script/fixture, Effect/testing
   architecture, infrastructure README, both SPEC/task owners, and both active
   plans **Change required**. Workflow authority, service topology, deployment
