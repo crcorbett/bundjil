@@ -115,10 +115,8 @@ export const decodeCodexAccountMetadata = Effect.fn(
     )
   );
 
-  return yield* Schema.decodeUnknownEffect(CodexOAuthAccountMetadata)({
-    accountId: Redacted.value(
-      claims["https://api.openai.com/auth"].chatgpt_account_id
-    ),
+  return yield* CodexOAuthAccountMetadata.makeEffect({
+    accountId: claims["https://api.openai.com/auth"].chatgpt_account_id,
   }).pipe(
     Effect.mapError(
       () =>

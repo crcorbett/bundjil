@@ -10,6 +10,5 @@ export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchem
   {
     boundary: WorkspaceSchemaBoundary,
     message: WorkspaceSchemaErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

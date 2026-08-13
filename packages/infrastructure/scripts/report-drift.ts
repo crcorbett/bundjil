@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { dirname } from "node:path";
+/* oxlint-disable max-classes-per-file -- Native Alchemy failures and operator command failures are distinct local boundaries. */
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- The pinned Alchemy Stack and Sync APIs expose upstream any/unknown channels.
 /** @effect-diagnostics anyUnknownInErrorContext:off, missingEffectContext:off */
 
@@ -15,6 +16,7 @@ import {
   Config,
   ConfigProvider,
   Console,
+  DateTime,
   Effect,
   FileSystem,
   Layer,
@@ -26,7 +28,7 @@ import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
-import { makeStableInfrastructureStack } from "../../../alchemy.stable.run.js";
+import { makeStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import {
   buildInfrastructureDriftReceipt,
@@ -38,6 +40,7 @@ import {
   InfrastructureDriftReportInput,
   InfrastructureDriftReportJson,
   InfrastructureDriftResourceFingerprint,
+  InfrastructureDriftRunIdentity,
   InfrastructureDriftSourceSha,
   InfrastructureStage,
   layerAlchemyR2State,
@@ -106,6 +109,16 @@ const InfrastructureDriftNativePhase = Schema.Literals([
 class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
   { phase: InfrastructureDriftNativePhase }
+) {}
+const InfrastructureDriftCommandFailureReason = Schema.Literals([
+  "authorityFileInvalid",
+  "authorityInvalid",
+  "productionTargetRejected",
+  "receiptIncompatible",
+]);
+class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<InfrastructureDriftCommandError>()(
+  "InfrastructureDriftCommandError",
+  { reason: InfrastructureDriftCommandFailureReason }
 ) {}
 
 const resourceKindFromNativeType = (resourceType: string) =>
@@ -177,6 +190,10 @@ const sourceShaConfig = Config.schema(
   InfrastructureDriftSourceSha,
   "BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA"
 );
+const runIdentityConfig = Config.schema(
+  InfrastructureDriftRunIdentity,
+  "BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY"
+);
 const acceptUnownedConfig = Config.schema(
   Schema.Boolean,
   "BUNDJIL_INFRASTRUCTURE_DRIFT_ACCEPT_UNOWNED"
@@ -223,7 +240,9 @@ const readAuthority = Effect.fn("InfrastructureDriftAuthority.read")(function* (
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(path);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-    return yield* Effect.fail("authority-file-invalid");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "authorityFileInvalid",
+    });
   }
   const text = yield* fileSystem.readFileString(path);
   const decoded = yield* Schema.decodeUnknownEffect(
@@ -238,7 +257,9 @@ const readAuthority = Effect.fn("InfrastructureDriftAuthority.read")(function* (
     strict: false,
   }).compile(driftAuthorityPolicy);
   if (!validateEnvelope(decoded) || !validatePolicy(decoded)) {
-    return yield* Effect.fail("authority-invalid");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "authorityInvalid",
+    });
   }
   return InfrastructureDriftResourceFingerprint.make(sha256(text));
 });
@@ -359,7 +380,7 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
   stage: typeof InfrastructureStage.Type
 ) {
   return yield* AlchemyStack.evalStack(
-    makeStableInfrastructureStack(manifest),
+    makeStableInfrastructureDriftStack(manifest),
     (stack) =>
       Effect.gen(function* () {
         const desiredPlan = yield* AlchemyPlan.make(stack).pipe(
@@ -516,7 +537,9 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
     validateFormats: false,
   }).compile(boundedReceiptSchema);
   if (!validateReceipt(receiptEncoded)) {
-    return yield* Effect.fail("receipt-incompatible");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "receiptIncompatible",
+    });
   }
   const fileSystem = yield* FileSystem.FileSystem;
   yield* fileSystem.makeDirectory(dirname(reportPath), {
@@ -543,15 +566,18 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
 });
 
 const program = Effect.gen(function* () {
-  const startedAt = Date.now();
+  const startedAt = yield* DateTime.now;
   const stage = yield* stageConfig;
   if (stage !== "preview") {
-    return yield* Effect.fail("production-target-rejected");
+    return yield* new InfrastructureDriftCommandError({
+      reason: "productionTargetRejected",
+    });
   }
   const authorityPath = yield* authorityPathConfig;
   const reportPath = yield* reportPathConfig;
   const receiptPath = yield* receiptPathConfig;
   const sourceSha = yield* sourceShaConfig;
+  const runIdentity = yield* runIdentityConfig;
   const acceptUnowned = yield* acceptUnownedConfig;
   const authorityFingerprint = yield* readAuthority(authorityPath);
   const command = yield* loadAdoptionCommand;
@@ -566,13 +592,17 @@ const program = Effect.gen(function* () {
     Effect.catch(() => Effect.succeed(unavailableNativeResult(stage)))
   );
   const { observations } = native;
+  const observedAt = yield* DateTime.now;
   const report = yield* buildInfrastructureDriftReport(
     InfrastructureDriftReportInput.make({
       authorityFingerprint,
       desiredPlan: native.desiredPlan,
+      manifestDigest: command.manifest.digest,
       observations,
-      observedAt: new Date().toISOString(),
-      runDurationMilliseconds: Date.now() - startedAt,
+      observedAt: DateTime.formatIso(observedAt),
+      runDurationMilliseconds:
+        DateTime.toEpochMillis(observedAt) - DateTime.toEpochMillis(startedAt),
+      runIdentity,
       sourceSha,
       stage,
     })
@@ -592,7 +622,18 @@ const program = Effect.gen(function* () {
   return summary;
 });
 
+const runtime = Layer.mergeAll(
+  PlatformServices,
+  FetchHttpClient.layer,
+  Layer.provideMerge(AlchemyContextLive, PlatformServices),
+  Layer.succeed(ArtifactStore, createArtifactStore()),
+  selectCli(),
+  layerAlchemyR2State,
+  ConfigProvider.layer(ConfigProvider.fromEnv())
+);
+
 const main = program.pipe(
+  Effect.provide(runtime),
   Effect.flatMap(Console.log),
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
   Effect.catch(() =>
@@ -605,17 +646,6 @@ const main = program.pipe(
           process.exitCode = 2;
         })
       )
-    )
-  ),
-  Effect.provide(
-    Layer.mergeAll(
-      PlatformServices,
-      FetchHttpClient.layer,
-      Layer.provideMerge(AlchemyContextLive, PlatformServices),
-      Layer.succeed(ArtifactStore, createArtifactStore()),
-      selectCli(),
-      layerAlchemyR2State,
-      ConfigProvider.layer(ConfigProvider.fromEnv())
     )
   )
 );

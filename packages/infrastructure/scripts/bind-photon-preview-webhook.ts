@@ -82,6 +82,16 @@ const PhotonPreviewWebhookBindingSuccess = Schema.Struct({
 const PhotonPreviewWebhookBindingBlocked = Schema.Struct({
   status: Schema.Literal("blocked"),
 });
+const PhotonPreviewWebhookBindingFailureReason = Schema.Literals([
+  "bindingAlreadyPresent",
+  "bindingFileInvalid",
+  "bindingFileRetained",
+  "bindingReadbackInvalid",
+]);
+class PhotonPreviewWebhookBindingError extends Schema.TaggedErrorClass<PhotonPreviewWebhookBindingError>()(
+  "PhotonPreviewWebhookBindingError",
+  { reason: PhotonPreviewWebhookBindingFailureReason }
+) {}
 
 const bindingPathConfig = Config.schema(
   PhotonWebhookBindingPath,
@@ -146,7 +156,9 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(bindingPath);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 16n * 1024n) {
-    return yield* Effect.fail("binding-file-invalid");
+    return yield* new PhotonPreviewWebhookBindingError({
+      reason: "bindingFileInvalid",
+    });
   }
   const binding = yield* fileSystem
     .readFileString(bindingPath)
@@ -172,7 +184,9 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
     Option.isSome(recoveryMode) &&
     isExactPreviewBindingMetadata(existingBindings);
   if (!isInitialBinding && !isAuthorizedExistingBindingWrite) {
-    return yield* Effect.fail("binding-already-present");
+    return yield* new PhotonPreviewWebhookBindingError({
+      reason: "bindingAlreadyPresent",
+    });
   }
 
   const sink = yield* PhotonWebhookBindingSink;
@@ -197,7 +211,9 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
   );
   const exactBindings = exactPhotonBindings(observed.environmentVariables);
   if (!isExactPreviewBindingMetadata(exactBindings)) {
-    return yield* Effect.fail("binding-readback-invalid");
+    return yield* new PhotonPreviewWebhookBindingError({
+      reason: "bindingReadbackInvalid",
+    });
   }
 
   if (isAuthorizedExistingBindingWrite) {
@@ -216,7 +232,9 @@ const command = Effect.gen(function* bindPhotonPreviewWebhook() {
 
   yield* fileSystem.remove(bindingPath);
   if (yield* fileSystem.exists(bindingPath)) {
-    return yield* Effect.fail("binding-file-retained");
+    return yield* new PhotonPreviewWebhookBindingError({
+      reason: "bindingFileRetained",
+    });
   }
   return PhotonPreviewWebhookBindingReceipt.make({
     environmentBindingCount: 4,

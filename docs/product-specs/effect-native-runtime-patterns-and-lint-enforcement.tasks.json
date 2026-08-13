@@ -1,20 +1,22 @@
 {
   "title": "Effect-native runtime patterns and lint enforcement tasks",
   "spec": "docs/product-specs/effect-native-runtime-patterns-and-lint-enforcement.md",
-  "status": "proposed",
+  "status": "implemented",
   "draftBase": {
     "ref": "main",
-    "sha": "e92f8d2508dd927c09cb63eddb50c6ca09904b95",
-    "runtimeBranchRef": "origin/codex/eve-runtime-qualification",
-    "runtimeBranchSha": "238f0334a69b0d4b9cd1d449322c7f31195504be",
-    "researchDate": "2026-07-26"
+    "sha": "5c3c7db240a7abd9bb57ad560bdd8958af4ea701",
+    "runtimeState": "merged-current-main",
+    "siteComparisonRef": "origin/main",
+    "siteComparisonSha": "dd5d015879a82630127adfe044e4352deff72332",
+    "effectVersion": "4.0.0-beta.101",
+    "researchDate": "2026-08-10"
   },
   "authority": {
-    "implementation": "not-authorized",
-    "providerOperations": "not-authorized",
-    "deployment": "not-authorized",
-    "commitPushMerge": "not-authorized",
-    "activePlan": "absent-until-explicit-implementation-authority"
+    "implementation": "authorized-by-cooper-2026-08-10",
+    "providerOperations": "owned-by-automatic-production-and-operational-closeout-ledger",
+    "deployment": "owned-by-automatic-production-and-operational-closeout-ledger",
+    "commitPushMerge": "authorized-by-cooper-2026-08-10",
+    "completedPlan": "docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md"
   },
   "principles": [
     "Decode unknown input once at ingress with the owning Effect Schema, pass Contract.Type, and encode Contract.Encoded only at egress.",
@@ -23,7 +25,7 @@
     "Extend Bundjil's existing Oxlint plugin, Effect language service, and boundary audit; do not add another lint runner or wrapper.",
     "Every lint rule requires one AST invariant, exact ownership, positive and negative unit plus installed-plugin fixtures, a false-positive matrix, migration, and safe autofix decision.",
     "Do not create pass-through services, generic collection transforms, DTO mirrors, manual readers, unsafe casts, or helper/common/utils sprawl.",
-    "Run one mandatory five-pass audit only after all future implementation tasks are complete."
+    "Run one mandatory five-pass audit only after both implementation ledgers are otherwise complete."
   ],
   "acceptedFindings": [
     {
@@ -74,7 +76,7 @@
     },
     {
       "id": "ENP-FND-006",
-      "decision": "Pin implementation decisions to lock-resolved Effect beta.74 and reopen research on dependency change.",
+      "decision": "Pin implementation decisions to lock-resolved Effect beta.101 and reopen research on dependency change.",
       "requirementIds": ["ENP-REQ-003", "ENP-REQ-004", "ENP-REQ-009"],
       "taskIds": [
         "refresh-integrated-inventory",
@@ -91,6 +93,377 @@
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets"
       ]
+    },
+    {
+      "id": "ENP-FND-008",
+      "decision": "Close typed error channels by removing arbitrary defect causes from exported tagged-error Schemas, enforcing the diagnostic boundary, and replacing a validated-but-impossible adoption-manifest defect with its owning typed failure.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-007",
+        "ENP-REQ-009",
+        "ENP-REQ-010",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-public-error-cause-boundary"]
+    },
+    {
+      "id": "ENP-FND-009",
+      "decision": "Correct report-only infrastructure drift identity provenance by separating static authority-policy custody from dynamic branded GitHub run identity and carrying the decoded manifest digest through the report and receipt.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-009",
+        "ENP-REQ-010",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["bind-drift-receipt-execution-identity"]
+    },
+    {
+      "id": "ENP-FND-010",
+      "decision": "Make reusable exported Effect operation trace ownership explicit: named Effect.fn for semantic work, Effect.fnUntraced only for justified leaves or delegates, and one import-aware rule rejecting direct exported Effect.gen functions.",
+      "requirementIds": [
+        "ENP-REQ-005",
+        "ENP-REQ-006",
+        "ENP-REQ-007",
+        "ENP-REQ-009",
+        "ENP-REQ-010",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-exported-effect-generator-ownership"]
+    },
+    {
+      "id": "ENP-FND-011",
+      "decision": "Treat provider rejection objects as hostile property containers: inspect only non-accessor own values through a non-throwing boundary before constructing closed diagnostics.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-photon-sdk-diagnostic-boundary"]
+    },
+    {
+      "id": "ENP-FND-012",
+      "decision": "Use one bounded SSE framing owner for proof and streaming, require a framed response.completed before emitting clean completion, match the exact media type, and hide private transport dependencies with Layer.provide.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-013",
+      "decision": "Bound complete SSE events as well as lines, fold proof events into constant-size state, name the receipt count as events, and remove the remaining request-mapper root/runtime exports.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-014",
+      "decision": "Count every SSE field toward the complete-event byte ceiling, accept LF, CRLF and CR framing, and constrain observed Photon transport status to the closed 100-599 range or unknown.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-photon-sdk-diagnostic-boundary",
+        "close-codex-provider-boundary-contracts"
+      ]
+    },
+    {
+      "id": "ENP-FND-015",
+      "decision": "Decode terminal Responses events through a closed Schema union and one Match-owned sequence state machine that rejects failure, incomplete, error, duplicate terminal and post-terminal events.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-016",
+      "decision": "Keep raw provider Content-Type and status text inside the HTTP adapter; successful metadata emits the closed text/event-stream literal and public errors retain only bounded status and fixed messages.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-017",
+      "decision": "Measure the complete SSE event ceiling from exact consumed wire bytes, including LF, CRLF or CR delimiters and the terminating blank line.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-018",
+      "decision": "Use persistent Effect Chunk accumulators plus explicit 4096 line-fragment and event-field ceilings to prevent sub-byte-limit quadratic copying.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-019",
+      "decision": "Retain a pending carriage-return state across empty transport chunks so split CRLF framing remains one delimiter.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-020",
+      "decision": "Own HTTP status, byte/event counts, sequence numbers and output indexes with bounded integer Schemas rather than finite Number.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-021",
+      "decision": "Inspect every supported Codex package subpath with one path-specific raw-transport export denylist oracle.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-022",
+      "decision": "Pin the credential-bearing Codex Responses client to the one owned HTTPS endpoint literal; configuration cannot redirect bearer credentials to another origin or path.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-023",
+      "decision": "Constrain access-token and account-ID values to bounded visible-ASCII headers and map defensive Headers construction failures to one fixed secret-negative tagged error before any request executes.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-024",
+      "decision": "Own arbitrary protocol JSON with an opaque Effect Schema declaration whose depth-limited validator cannot recurse beyond 32 containers; use it for tool parameters and SSE JSON before event selection.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-025",
+      "decision": "Decode every recognized Responses event into one shared closed tagged union before proof or live mapping consumes it, so malformed recognized payloads fail identically.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-026",
+      "decision": "Advance one exact zero-based expected sequence number for every JSON event and reject duplicate, regressing or skipped values before proof success or clean mapped completion.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-027",
+      "decision": "Remove the unused package-private postResponsesStream convenience accessor while retaining the named service operation used by runtime composition.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-010", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-028",
+      "decision": "Read Photon SDK success fields through the same hostile own-data-property boundary as failures, then decode a newly constructed application-owned object.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-photon-sdk-diagnostic-boundary"]
+    },
+    {
+      "id": "ENP-FND-029",
+      "decision": "Require Codex function parameters to be a non-null, non-array object before accepting the bounded JSON predicate; boolean, number and string roots are invalid.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-030",
+      "decision": "Accept only dense arrays and enumerable own data properties in bounded Codex JSON so Schema encoding cannot omit or synthesize accepted values.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-031",
+      "decision": "Brand Codex access-token and account-ID values separately before redaction so TypeScript cannot interchange two valid secret domains.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-032",
+      "decision": "Own UTF-8 BOM state once per SSE stream and treat a colonless data field as empty data; later BOMs and empty events cannot disappear before a clean completion.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-033",
+      "decision": "Capture the expected proxy token in the service Layer, remove it from operation input, decode and redact the presented authorization at HTTP ingress, bound both values, and compare over one fixed-width loop.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-034",
+      "decision": "Reject a repeated Codex function-call output_index before replacing mapper state or emitting a second tool-call identity.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-004", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-035",
+      "decision": "Canonical JSON decoding and encoding must produce detached, deeply frozen, bounded ordinary data so caller mutation and stateful objects cannot change a previously decoded value.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-003", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-036",
+      "decision": "Load positive header timeout, stream idle timeout, cumulative body byte, and SSE event budgets through Effect Config; enforce time with Effect timeout operators and interruption-safe streams.",
+      "requirementIds": [
+        "ENP-REQ-002",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-037",
+      "decision": "Decode the public proxy request with exact excess-property rejection and accept only omitted or literal-true stream mode because the route always returns SSE.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-038",
+      "decision": "Inline Bundjil workspace packages in app Vitest SSR resolution so source-condition tests cannot silently execute stale ignored dist output.",
+      "requirementIds": ["ENP-REQ-007", "ENP-REQ-009", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-039",
+      "decision": "Keep recursive canonical JSON implementation unions private, derive the public protocol values from opaque branded Effect Schemas, and remove the SSE accumulator assertion so accepted values cannot regain a structurally forgeable or unchecked public type surface.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-040",
+      "decision": "Require the canonical JSON declaration type side to accept only recursively frozen canonical containers so Schema guards, constructors and nested type-side validation cannot brand caller-owned mutable values without running the detaching transformation.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-003", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-041",
+      "decision": "Make negative nested-boundary fixtures satisfy every earlier contract with valid decoded values, exercise the named constructor, and assert the exact request.tools[0].parameters issue path so failure cannot occur before the intended field is reached.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-042",
+      "decision": "Close implementation-task lifecycle before beginning the terminal audit: the product index, task statuses, completion evidence and active plan must agree on the exact 25 completed implementation tasks.",
+      "requirementIds": ["ENP-REQ-009", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-043",
+      "decision": "A 401 recovery oracle must capture old and refreshed authorization, consume the lazy returned stream, and assert mapped terminal completion plus [DONE]; request count alone cannot prove credential recovery or a valid response.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-044",
+      "decision": "Deep freezing is not canonical-JSON ownership: a frozen Proxy can retain provider-controlled enumeration behavior. Require package-private identity provenance for every transformed container, reject unowned frozen containers at type-side guards and constructors, and prove decoding detaches a hostile Proxy into stable encodable data.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-003",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-045",
+      "decision": "Proxy availability fallback may recover typed Layer acquisition errors only. Replace catchCause with Layer.catch so defects and interruption retain their Cause, and prove live/local defects plus local interruption remain terminal failures while existing typed configuration fallback remains available.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-046",
+      "decision": "An upstream body pull is progress only when it emits at least one byte. Filter zero-length chunks before the Effect stream idle timeout so periodic empty chunks cannot keep the request alive without consuming byte, event or framing budgets; prove timeout and finalization with TestClock.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-047",
+      "decision": "Prove rather than assume rejected-response lifetime: both proof and streaming acquisition must close their HttpClient.withScope request immediately for non-2xx and rejected media, leave Response.bodyUsed false, and keep rejected body bytes out of typed errors. The existing scoped implementation satisfies the contract; a four-case abort-signal matrix owns recurrence.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-048",
+      "decision": "Bound accepted-but-unclaimed response ownership without moving upstream status/auth errors behind HTTP response headers: start one Effect-clock ownership watchdog after validated headers, close the response scope at the configured idle deadline unless body subscription claims it, and signal the watchdog from every scope-close path. Prove an unconsumed accepted stream aborts without reading bytes under TestClock.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-049",
+      "decision": "Start the unclaimed-body ownership watchdog only after status, media type and metadata validation. Header acquisition remains governed solely by its independent header timeout even when the configured stream-idle duration is shorter; prove delayed valid headers survive the idle duration, then body subscription claims and closes normally.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-050",
+      "decision": "Treat Deferred.succeed's boolean result as the exactly-once response-body ownership decision. Only the winning subscriber may expose the upstream stream; a subscriber arriving after expiry or after another subscriber must fail with the fixed typed stream error before touching the one-shot body.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-051",
+      "decision": "Keep lifecycle claims truthful until terminal closeout: an active plan and pending audit cannot be described as completed or accepted history. Restore current/pending wording before the restarted audit, then move plans, ledgers and indexes to implemented history only with the final receipt.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-052",
+      "decision": "Refresh lifecycle-owner review metadata in the same atomic transition that changes SPEC, task, plan or index state. A completed-history move cannot retain a pre-transition last_reviewed value when its declared review trigger includes that move.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-053",
+      "decision": "Keep current status summaries and sequence-owner wording consistent with the canonical task and plan lifecycle. A pending terminal audit cannot be called accepted, and an active plan cannot be called completed, even when an explicitly labelled invalidated receipt preserves that earlier history.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
     }
   ],
   "requirements": [
@@ -101,6 +474,8 @@
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns",
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
+        "bind-drift-receipt-execution-identity",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Boundary audit and affected adapter tests show decoded service inputs and encoded outward values.",
@@ -116,7 +491,8 @@
       "taskIds": [
         "add-narrow-lint-rules-disabled",
         "migrate-targeted-effect-patterns",
-        "enable-rules-and-reconcile-docs"
+        "enable-rules-and-reconcile-docs",
+        "own-policy-receipt-time"
       ],
       "directObservable": "Deterministic attempt, timestamp, timeout, and retry traces complete under TestClock; exact host exceptions remain registered.",
       "expectedPostcondition": "Effect-owned test outcomes are independent of host wall time.",
@@ -161,6 +537,7 @@
         "add-narrow-lint-rules-disabled",
         "migrate-targeted-effect-patterns",
         "enable-rules-and-reconcile-docs",
+        "close-exported-effect-generator-ownership",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Language-service and lint findings are zero and focused call-graph review shows runtime execution only at named boundaries.",
@@ -172,11 +549,13 @@
     },
     {
       "id": "ENP-REQ-006",
-      "requirement": "Implement four narrow Bundjil Oxlint rules with AST invariants, scopes, positive/negative unit and installed-plugin fixtures, current-finding classification, false-positive matrices, migration, exact stale exceptions, and no unsafe autofix.",
+      "requirement": "Implement the original four narrow Bundjil Oxlint rules plus evidence-backed corrections with AST invariants, scopes, positive/negative unit and installed-plugin fixtures, current-finding classification, false-positive matrices, migration, exact stale exceptions where needed, and no unsafe autofix.",
       "taskIds": [
         "refresh-integrated-inventory",
         "add-narrow-lint-rules-disabled",
-        "enable-rules-and-reconcile-docs"
+        "enable-rules-and-reconcile-docs",
+        "own-policy-receipt-time",
+        "close-exported-effect-generator-ownership"
       ],
       "directObservable": "Each rule rejects exact negative fixtures, accepts exact positive/exception fixtures, and stale exceptions fail.",
       "expectedPostcondition": "Rules are durable and actionable without a debt baseline.",
@@ -191,6 +570,8 @@
       "taskIds": [
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets",
+        "own-policy-receipt-time",
+        "close-exported-effect-generator-ownership",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Finding inventory links each source edit to focused behavioural or compatibility proof.",
@@ -202,16 +583,16 @@
     },
     {
       "id": "ENP-REQ-008",
-      "requirement": "Sequence implementation after the actual eve-runtime-qualification integration state, refresh citations and findings, and preserve accepted branch proof.",
+      "requirement": "Use the exact merged Eve runtime source, refresh citations and findings, and preserve accepted historical proof without treating it as current provider evidence.",
       "taskIds": [
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets"
       ],
       "directObservable": "Implementation receipt names the exact final base SHA and resolves handoff timing, nested dispatch, observation Ref, and cardinality targets against merged source.",
-      "expectedPostcondition": "No stale line-based change is applied to the read-only branch.",
-      "falseGreenRejected": "Using origin branch name or old diff as current source truth.",
-      "focusedCommandOrProcedureOwner": "Git identity and read-only source/call-graph review",
+      "expectedPostcondition": "No stale line-based change is applied from the retired branch.",
+      "falseGreenRejected": "Using a retired branch name or old diff as current source truth.",
+      "focusedCommandOrProcedureOwner": "Git identity and merged source/call-graph review",
       "evidenceOwner": "Integration inventory receipt",
       "limitationsAndNonClaims": "Does not re-qualify hosted runtime behaviour."
     },
@@ -220,6 +601,10 @@
       "requirement": "Update earliest durable docs and skills only where final implementation proves a change; record Change required, Preserve, or evidenced N/A across the impact ledger.",
       "taskIds": [
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
+        "own-policy-receipt-time",
+        "bind-drift-receipt-execution-identity",
+        "close-exported-effect-generator-ownership",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Docs ledger, source, rule IDs, commands, and skills agree and policy audits pass.",
@@ -238,6 +623,9 @@
         "migrate-targeted-effect-patterns",
         "review-state-and-collection-targets",
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
+        "bind-drift-receipt-execution-identity",
+        "close-exported-effect-generator-ownership",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Every requirement and rule has observable, postcondition, false green, procedure owner, evidence owner, and limitation.",
@@ -252,6 +640,10 @@
       "requirement": "Run focused slice proof and terminal bun run verification plus git diff --check on the final candidate.",
       "taskIds": [
         "enable-rules-and-reconcile-docs",
+        "close-public-error-cause-boundary",
+        "own-policy-receipt-time",
+        "bind-drift-receipt-execution-identity",
+        "close-exported-effect-generator-ownership",
         "terminal-five-pass-audit"
       ],
       "directObservable": "One exact candidate has fresh focused and terminal command receipts.",
@@ -263,14 +655,14 @@
     },
     {
       "id": "ENP-REQ-012",
-      "requirement": "Run one mandatory five-pass implementation audit after every future implementation task is complete; findings reopen owners and invalidate stale evidence.",
+      "requirement": "Run one mandatory five-pass implementation audit after both task ledgers are otherwise complete; findings reopen owners and invalidate stale evidence.",
       "taskIds": ["terminal-five-pass-audit"],
       "directObservable": "One ordered five-pass receipt is newer than every dependency receipt.",
       "expectedPostcondition": "Architecture, Effect semantics, lint, proof, and docs/cleanup are jointly accepted.",
       "falseGreenRejected": "Per-task fixed ritual or a pre-implementation review.",
       "focusedCommandOrProcedureOwner": "Terminal audit task",
       "evidenceOwner": "Five-pass closeout receipt",
-      "limitationsAndNonClaims": "The audit grants no deployment or provider authority."
+      "limitationsAndNonClaims": "The audit records provider and deployment evidence but does not strengthen a missing live oracle."
     }
   ],
   "lintRules": [
@@ -369,11 +761,11 @@
     {
       "id": "refresh-integrated-inventory",
       "title": "Refresh the exact integrated inventory and freeze implementation decisions",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [],
-      "description": "After explicit implementation authority and after the Eve runtime branch integration state is known, rebase the investigation on the exact candidate, refresh all source findings, and freeze each lint/state/collection decision before code changes.",
+      "description": "Rebase the investigation on exact current main, installed Effect beta.101, current Site origin/main and merged Eve runtime source; freeze each lint/state/collection decision before code changes.",
       "implementationNotes": [
-        "Create an active execution plan; record exact Git identity and keep provider/runtime actuality separate.",
+        "Use the dedicated active execution plan; record exact Git identity and keep provider/runtime actuality separate.",
         "Re-run Bundjil, Site, and Effect-version inventories. Do not assume Site or upstream source is unchanged.",
         "Resolve the handoff nested generator, observation Ref, independent environment Refs, exact-cardinality fixture, and runtime execution targets against merged source.",
         "For every current lint finding record owner, failure mode, accepted migration or exact exception, false-positive class, and focused proof.",
@@ -392,13 +784,13 @@
       "completionCriteria": [
         "Every lint finding is migrate, exact exception, or rejected-rule evidence.",
         "Every proposed state/collection edit has domain evidence; cosmetic edits are removed.",
-        "No provider operation or runtime branch mutation occurs."
+        "Provider operations remain owned by the operational ledger; the retired runtime branch is not modified."
       ]
     },
     {
       "id": "add-narrow-lint-rules-disabled",
       "title": "Add the four narrow lint rules and fixtures while disabled for production source",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["refresh-integrated-inventory"],
       "description": "Extend the existing Bundjil Oxlint JavaScript plugin with import-aware rules, focused visitor tests, installed-Oxlint fixtures, and exact exception staleness without changing runtime code or enabling a debt baseline.",
       "implementationNotes": [
@@ -428,11 +820,11 @@
     {
       "id": "migrate-targeted-effect-patterns",
       "title": "Migrate deterministic timing, Promise ingress, and runtime execution targets",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["add-narrow-lint-rules-disabled"],
       "description": "Apply only inventory-approved migrations for Clock/TestClock, Promise boundaries, and runtime execution while preserving services, provider contracts, and runtime behaviour.",
       "implementationNotes": [
-        "Replace Effect-owned Date.now fixtures with fixed decoded epochs or Clock/TestClock-driven values; preserve exact live host/process tests.",
+        "Replace Effect-owned Date.now fixtures and semantic command timestamps/durations with fixed decoded epochs or Clock/DateTime/TestClock-driven values; preserve only exact tests whose direct subject is live host/process timing.",
         "Use fork-adjust-or-setTime-join for sleeping, timeout, retry, and Schedule assertions and verify attempt/timestamp traces.",
         "Move async/await and Promise ingress to named live/framework adapters and use Effect.tryPromise object form with safe tagged errors.",
         "Return Effects from service/package logic; retain ManagedRuntime/run* only at named app, CLI, test, or registered framework owners with disposal proof.",
@@ -456,7 +848,7 @@
     {
       "id": "review-state-and-collection-targets",
       "title": "Review and migrate only evidence-backed state and collection targets",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "refresh-integrated-inventory",
         "migrate-targeted-effect-patterns"
@@ -488,7 +880,7 @@
     {
       "id": "enable-rules-and-reconcile-docs",
       "title": "Enable zero-debt rules and reconcile durable documentation",
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [
         "add-narrow-lint-rules-disabled",
         "migrate-targeted-effect-patterns",
@@ -518,43 +910,790 @@
       ]
     },
     {
+      "id": "close-public-error-cause-boundary",
+      "title": "Close exported and declared error channels",
+      "status": "completed",
+      "dependsOn": ["enable-rules-and-reconcile-docs"],
+      "description": "Correct iterative audit findings where exported Eve, Codex, and proxy tagged errors encoded arbitrary Schema.Defect causes and one adoption-manifest branch escaped its declared typed failure channel through Effect.die.",
+      "implementationNotes": [
+        "Use the installed effect@4.0.0-beta.101 Schema.Defect implementation as authority: its encoded side is arbitrary JSON and can retain Error message and cause data.",
+        "Remove the cause field from twelve exported error Schemas and all constructors while preserving tags, operations, boundaries, safe messages, statuses, subject hashes, profile IDs, and refresh-lock timing diagnostics.",
+        "Keep the Upstash SDK rejection cause only in its private adapter error and collapse it to the existing safe public KeyValueStore errors.",
+        "Add the public-raw-cause provenance rule with direct required, optional, and renamed-field Schema.Defect negative fixtures; do not add exceptions or another checker.",
+        "Replace the unreachable Effect.die after Photon cardinality validation with the same capability-owned AdoptionManifestBuildError so later control-flow changes cannot escape the declared channel."
+      ],
+      "proofContract": {
+        "directObservable": "The production-source Schema.Defect scan is empty; the boundary audit rejects required, optional, and renamed exported defect fields; encoded error fixtures omit arbitrary causes; the adoption scope has no production Effect.die; Eve 7, Codex 115, proxy 41, boundary 124, and infrastructure owner tests pass.",
+        "expectedPostcondition": "Public typed failures cannot serialize raw provider or host causes, declared operation failures remain typed, and future raw-defect regressions fail the existing repository gate.",
+        "falseGreenRejected": "Changing only log rendering, making cause optional, retaining Schema.Defect under another exported field, preserving an impossible die after validation, or passing typecheck without encoded-contract fixtures.",
+        "focusedCommandOrProcedureOwner": "Eve, Codex, codex-proxy, boundary provenance, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Public error-cause boundary correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not establish provider behavior or remove private causes before their safe public mapping."
+      },
+      "completionCriteria": [
+        "No exported production tagged-error Schema contains Schema.Defect.",
+        "The provenance rule has direct required, optional, and renamed-field negative fixtures and no exception.",
+        "Adoption manifest provider-scope validation fails through AdoptionManifestBuildError rather than a defect.",
+        "Canonical Effect guidance, task ledger, active plan, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-operator-error-cause-boundary",
+      "title": "Close operator error-retention channels",
+      "status": "completed",
+      "dependsOn": ["close-public-error-cause-boundary"],
+      "description": "Correct the iterative observability finding where the hosted staged-refresh proof retained an arbitrary HTTP rejection in a private tagged error even though its renderer currently emitted only a bounded blocked receipt.",
+      "implementationNotes": [
+        "Remove the unknown cause from HostedProofRequestError while preserving its typed failure tag and bounded success/blocked output contract.",
+        "Add operator-raw-cause to the existing boundary audit; reject arbitrary unknown fields only on Data.TaggedError classes under app/package scripts directories.",
+        "Accept bounded operator classifications and preserve private adapter causes outside scripts only where they are immediately collapsed into safe public errors.",
+        "Add direct negative and positive fixtures without an exception or another checker."
+      ],
+      "proofContract": {
+        "directObservable": "The staged-refresh proof retains no raw rejection; the boundary audit rejects an unknown operator-error field and accepts bounded operator plus private-adapter cases; 126 boundary tests, check:boundaries, Codex typecheck, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Operator receipt safety follows from the error contract rather than a later renderer branch, and future script-local raw-cause retention fails the existing repository gate.",
+        "falseGreenRejected": "Leaving the cause private but retained, checking only a field named cause, banning immediate private adapter translation, changing only the renderer, or adding a broad exception.",
+        "focusedCommandOrProcedureOwner": "Boundary provenance, Codex operator script, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Operator error-retention correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not execute the hosted staged-refresh request, establish provider behavior, or remove a private cause that is immediately translated inside an adapter."
+      },
+      "completionCriteria": [
+        "No app/package operator script Data.TaggedError retains an arbitrary unknown field.",
+        "The provenance rule has direct rejection and acceptance fixtures with no exception.",
+        "Canonical Effect guidance, task ledger, active plans, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-exported-schema-error-boundary",
+      "title": "Close exported Schema-error contracts",
+      "status": "completed",
+      "dependsOn": ["close-operator-error-cause-boundary"],
+      "description": "Correct the iterative public-contract finding where PreviewStateMigrationError was the sole exported production Data.TaggedError and therefore lacked an explicit encodable Schema contract.",
+      "implementationNotes": [
+        "Use installed effect@4.0.0-beta.101 Schema.TaggedErrorClass as the authoritative schema-validated yieldable error API; record the comparison clone revision separately.",
+        "Migrate PreviewStateMigrationError without changing its tag, reason, message, constructors, service failure union, state behavior, or rollback paths.",
+        "Model observed and expected counts with the owner-branded non-negative PreviewStateMigrationCount Schema and export it through the existing infrastructure root.",
+        "Add an Effectful encoded round-trip fixture plus public-data-tagged-error enforcement in the existing boundary audit; preserve private Data.TaggedError classes and add no exception."
+      ],
+      "proofContract": {
+        "directObservable": "The production scan has no exported Data.TaggedError; the migration error encodes and decodes its exact safe contract; the boundary audit rejects the regression; infrastructure typecheck, 84 Vitest tests, 21 Alchemy tests, 127 boundary tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Every exported yieldable typed error has a Schema-owned encoded contract and future plain Data.TaggedError exports fail the existing repository gate.",
+        "falseGreenRejected": "Changing only the class import, leaving raw semantic counts, omitting encoded proof, banning private adapter errors, adding a second checker, or inferring state/provider behavior from unit tests.",
+        "focusedCommandOrProcedureOwner": "Infrastructure error Schema/export/test, boundary provenance, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Exported Schema-error correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not execute migration, mutate provider state, prove hosted behavior, or change durable state bytes."
+      },
+      "completionCriteria": [
+        "No exported production class extends Data.TaggedError.",
+        "The migration error and semantic counts are Schema-owned and round-trip through Effectful codecs.",
+        "The provenance rule has a direct negative fixture and no exception.",
+        "Canonical docs, task ledger, active plans, focused tests, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-shared-error-field-provenance",
+      "title": "Close shared error-field provenance",
+      "status": "completed",
+      "dependsOn": ["close-exported-schema-error-boundary"],
+      "description": "Correct the iterative boundary finding where five public tagged-error families hid inline primitive message Schemas in shared field objects that the existing inline-string-schema rule did not resolve.",
+      "implementationNotes": [
+        "Resolve local and imported identifier arguments passed to exported Schema.TaggedErrorClass declarations and inspect the owning object-literal fields with the existing inline-string-schema rule.",
+        "Replace each accepted inline diagnostic with one owner-named non-empty message Schema bounded to 300 characters for synthetic infrastructure, Vercel read, Vercel Preview configuration, Vercel stable-environment, and Photon management errors.",
+        "Brand identities and semantic values used for routing, equality, lookup, or persistence; preserve bounded diagnostics as ordinary strings rather than adding roughly 150 ceremonial static constructor conversions.",
+        "Keep provider wire and opaque state fields private and separately decoded; add direct same-file and cross-file regression fixtures and no exception or second checker."
+      ],
+      "proofContract": {
+        "directObservable": "The boundary audit rejects a primitive string hidden in a local or imported shared tagged-error field object; the production audit is empty; 129 boundary tests, infrastructure typecheck plus 84 Vitest and 21 Alchemy tests, Photon typecheck plus 41 tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Public error-family diagnostics have explicit bounded owners and future shared-object bypasses fail the existing repository gate.",
+        "falseGreenRejected": "Checking only inline call literals, branding arbitrary prose without a semantic identity, changing provider wire Schemas, adding helper constructors, adding a broad exception, or passing typecheck without the AST fixture.",
+        "focusedCommandOrProcedureOwner": "Error-family field Schemas, boundary provenance fixture, infrastructure/Photon tests, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Shared error-field provenance correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not validate provider wire payloads, execute provider operations, or establish hosted behavior."
+      },
+      "completionCriteria": [
+        "No exported tagged error reaches an inline primitive string through a local or imported shared field object.",
+        "Each affected diagnostic family has one owner-named bounded Schema without a generic helper.",
+        "The same-file and cross-file provenance fixtures reject the prior bypasses and the exception registry is unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-raw-promise-coordination",
+      "title": "Close raw Promise coordination",
+      "status": "completed",
+      "dependsOn": ["close-shared-error-field-provenance"],
+      "description": "Correct the iterative concurrency finding where the Sendblue Web Crypto verifier coordinated independent Promise operations with Promise.all inside its live adapter.",
+      "implementationNotes": [
+        "Keep verifyWebhookSecret as the private named adapter operation; do not introduce a service, generic crypto wrapper, utility module, or public export.",
+        "Wrap each Web Crypto Promise with object-form Effect.tryPromise and map rejection immediately to the existing closed ChannelWebhookAuthenticationError.",
+        "Use Effect.all with explicit concurrency only for independent key imports; keep signing and verification linear and preserve constant-time authentication behavior.",
+        "Reject Promise.all and Promise.race in owned production app/package source through the existing boundary audit with direct fixtures and no exception."
+      ],
+      "proofContract": {
+        "directObservable": "The production scan contains no Promise.all or Promise.race; direct fixtures reject both forms; a rejected Web Crypto import encodes only the safe authentication error; 131 boundary tests, Sendblue typecheck and 10 tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Provider Promise ingress remains private while concurrency, interruption, and typed failure composition are owned by Effect.",
+        "falseGreenRejected": "Moving Promise.all into another helper, wrapping the whole async block in one tryPromise, serializing independent imports without reason, changing authentication semantics, adding a broad lint exception, or relying on search without a regression fixture.",
+        "focusedCommandOrProcedureOwner": "Sendblue live Layer and tests, boundary provenance fixture, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Sendblue Effect concurrency correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not invoke Sendblue, mutate a webhook, prove hosted authentication, or establish message delivery."
+      },
+      "completionCriteria": [
+        "No owned production app/package source uses Promise.all or Promise.race.",
+        "Sendblue Web Crypto rejections remain a closed authentication error and raw causes remain private.",
+        "The provenance fixture rejects the prior bypass and the exception registry is unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-redacted-schema-roundtrip",
+      "title": "Close redacted Schema round-trips",
+      "status": "completed",
+      "dependsOn": ["close-raw-promise-coordination"],
+      "description": "Correct every repository finding where already-decoded Redacted values were revealed inside another Effectful Schema decoder, including Codex config, OAuth/profile, crypto/persistence composition, and infrastructure leak scanning.",
+      "implementationNotes": [
+        "Compose config, session, token, profile, and proof contracts from already-decoded values with the owning Schema makeEffect constructor; preserve makeCodexProxyConfig as the public encoded-input decoder.",
+        "Use the owning Schema encoder before representation-changing cipher-key and refresh-lock persistence boundaries; validate the migration scanner's existing redacted values directly.",
+        "Remove only unnecessary reveals nested in Effectful decoding; preserve immediate reveals at HTTP headers, provider SDK construction, process invocation, browser callbacks, cryptographic calls, persistence clients, and framework token callbacks.",
+        "Reject a Redacted.value call nested inside Schema.decodeEffect or Schema.decodeUnknownEffect through the existing boundary audit.",
+        "Add direct negative round-trip and positive outbound-header fixtures with no exception, helper, service, Layer identity, or config behavior change."
+      ],
+      "proofContract": {
+        "directObservable": "All 29 detected nested reveal sites are removed; a negative fixture rejects Schema re-decoding and a positive fixture accepts an immediate header reveal; 133 boundary tests, affected package typechecks/tests, check:boundaries, and the complete bun run verification gate pass.",
+        "expectedPostcondition": "Decoded secrets remain Redacted through internal composition and become plaintext only at an actual external boundary.",
+        "falseGreenRejected": "Moving the reveal into a helper, banning all Redacted.value calls, changing public encoded-input decoding, weakening secret Schemas, relying on grep alone, or treating config tests as hosted secret proof.",
+        "focusedCommandOrProcedureOwner": "Codex proxy, OAuth/profile/storage, infrastructure migration, boundary provenance fixtures, affected package tests, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Redaction-provenance correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not read a hosted secret, rotate key material, decrypt a hosted profile, invoke Codex, or establish deployment behavior."
+      },
+      "completionCriteria": [
+        "Internal config, OAuth/session/profile, proof, storage, crypto, and migration composition retains decoded Redacted values without decoder round-trips.",
+        "Immediate external-boundary reveals remain allowed and unchanged.",
+        "Negative and positive provenance fixtures pass with no exception.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-ambient-random-identities",
+      "title": "Close ambient random identity generation",
+      "status": "completed",
+      "dependsOn": ["close-redacted-schema-roundtrip"],
+      "description": "Replace ambient global UUID generation for Codex credential revisions and refresh-lock owners with deterministic, fiber-local Effect Random while preserving explicit Web Crypto boundaries.",
+      "implementationNotes": [
+        "Generate each non-cryptographic identity from two Random.nextInt values inside its existing named operation; keep owner-specific Schema decoding and Redacted storage.",
+        "Preserve Web Crypto getRandomValues for PKCE material and AES-GCM IVs because those are explicit cryptographic boundaries.",
+        "Reject Math.random and globalThis.crypto.randomUUID in owned production source through the existing boundary audit.",
+        "Add two negative provenance fixtures and one Random.withSeed test proving reproducible sequences and distinct sequential revisions without a helper, service, Layer, exception, or public API change."
+      ],
+      "proofContract": {
+        "directObservable": "Owned production source has no ambient UUID or Math.random identity generation; 135 boundary tests and 116 Codex tests pass, including deterministic seeded replay with distinct sequential revisions.",
+        "expectedPostcondition": "Non-cryptographic identity generation is fiber-local and testable while cryptographic entropy remains at explicit Web Crypto boundaries.",
+        "falseGreenRejected": "Wrapping randomUUID, using fixed production IDs, replacing cryptographic entropy with a weak generator, asserting only non-empty values, or introducing a generic random helper/service.",
+        "focusedCommandOrProcedureOwner": "Codex credential revision and refresh-lock operations, persistence test, boundary fixtures, Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Effect Random identity correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not estimate provider collision rates, inspect hosted lock values, exercise OAuth, alter ciphertext, or establish deployment behavior."
+      },
+      "completionCriteria": [
+        "Credential revision and refresh-lock owner generation use Effect Random and retain Schema-owned representations.",
+        "PKCE and AES-GCM continue using Web Crypto at their existing boundaries.",
+        "Negative ambient-random fixtures and deterministic seeded proof pass with no exception.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification, and git diff --check agree."
+      ]
+    },
+    {
+      "id": "own-production-rollback-state",
+      "title": "Own Production rollback eligibility with Effect Ref",
+      "status": "completed",
+      "dependsOn": ["close-ambient-random-identities"],
+      "description": "Replace closure-mutated Production promotion flags crossing provider Effects and the exit finalizer with one cohesive Effect Ref snapshot while preserving conservative rollback eligibility and reverse restoration order.",
+      "implementationNotes": [
+        "Create one operation-local Ref because proxy and agent eligibility share one rollback snapshot, lifetime and finalizer invariant.",
+        "Set each field before its possibly outcome-uncertain promotion call, preserving the existing conservative rollback behavior for interruption, defects and typed failures.",
+        "Read one immutable snapshot inside the uninterruptible onExit finalizer and restore agent before proxy exactly as before.",
+        "Do not add a service, Layer, helper, Schema, public export or broad mutable-state lint rule; the state is ephemeral, internal and already covered by deterministic failure fixtures."
+      ],
+      "proofContract": {
+        "directObservable": "Production orchestration contains no closure-mutated rollback flags; deterministic fixtures still prove proxy-only, agent-then-proxy, interruption, defect and rollback-failure behavior.",
+        "expectedPostcondition": "Rollback eligibility is Effect-owned cohesive state observed once by the finalizer without changing provider operations or receipts.",
+        "falseGreenRejected": "Renaming the mutable variables, splitting them into adjacent Refs, setting eligibility after the uncertain write, weakening rollback assertions, or adding a generic state helper.",
+        "focusedCommandOrProcedureOwner": "Automatic Production operation and deterministic infrastructure tests, Effect setup, docs and root verification owners",
+        "evidenceOwner": "Production rollback Ref correction receipt",
+        "limitationsAndNonClaims": "Repository fixtures do not deploy, promote, roll back or prove hosted Vercel behavior."
+      },
+      "completionCriteria": [
+        "One cohesive Ref owns both rollback-eligibility fields for one operation execution.",
+        "Eligibility is recorded before each promotion and read once inside the finalizer.",
+        "Existing typed failure, interruption, defect, reverse-order rollback and rollback-failure tests pass unchanged.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification and git diff --check agree."
+      ]
+    },
+    {
+      "id": "close-stable-adoption-collection-state",
+      "title": "Close stable-adoption traversal mutation",
+      "status": "completed",
+      "dependsOn": ["own-production-rollback-state"],
+      "description": "Replace outer counter and native-set mutation across stable-adoption Effect traversal callbacks with returned immutable observations and Effect HashSet domain checks.",
+      "implementationNotes": [
+        "Return void for observed-only resources and one immutable project/key observation for each fully validated managed binding.",
+        "Derive project and key HashSets after Effect.forEach, then enforce exact observation count, one project, four unique keys and expected-key subset semantics.",
+        "Add a duplicate-key fixture that preserves distinct logical and physical identities so it reaches the stable-adoption invariant rather than failing the earlier manifest Schema.",
+        "Do not add Ref, a service, Layer, helper, public export, broad mutable-state lint rule, or cosmetic conversion of synchronous parser, pagination, byte-copy or host-callback loops."
+      ],
+      "proofContract": {
+        "directObservable": "Stable-adoption validation has no outer mutation across Effect.forEach; a valid four-binding manifest succeeds and a four-observation duplicate-key manifest fails.",
+        "expectedPostcondition": "Managed-binding exactness is derived from immutable callback results with Effect HashSet semantics after traversal.",
+        "falseGreenRejected": "Moving mutation into a helper, using Ref for derived values, duplicating a whole resource so the manifest Schema fails first, converting every native collection, or weakening exact-key checks.",
+        "focusedCommandOrProcedureOwner": "Stable-adoption command, adoption-manifest test, infrastructure typecheck, Effect setup, docs and root verification owners",
+        "evidenceOwner": "Stable adoption collection correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not generate or apply a live adoption manifest, read provider state, mutate Vercel or Photon, or establish hosted deployment behavior."
+      },
+      "completionCriteria": [
+        "Effect traversal callbacks return immutable observations and do not mutate outer validation state.",
+        "Effect HashSet owns exact project/key set semantics after traversal.",
+        "Valid and duplicate-key focused fixtures pass with unchanged manifest Schema and public API.",
+        "Canonical docs, task ledger, active plans, focused checks, bun run verification and git diff --check agree."
+      ]
+    },
+    {
+      "id": "align-domain-membership-hashsets",
+      "title": "Align immutable domain membership with Effect HashSet",
+      "status": "completed",
+      "dependsOn": ["close-stable-adoption-collection-state"],
+      "description": "Close the state/collection decision-inventory gap by using Effect HashSet for production membership and uniqueness algebra while retaining native collections with ordered-diagnostic or fixture-backend ownership.",
+      "implementationNotes": [
+        "Use HashSet for managed Photon key membership, authorized Vercel project uniqueness, source/Preview Photon candidate uniqueness, state-migration path cardinality, desired migration membership, stale-resource membership, and backup-resource membership.",
+        "Preserve the adoption-manifest Schema's incremental native Set because it binds the first duplicate to an exact resource index and issue path.",
+        "Preserve the Codex test-memory Map because it is a mutable fixture backend isolated behind Ref and relies on ordinary string-key Map behavior.",
+        "After the second independently discovered omitted domain Set, add a narrow no-unregistered-native-collection review gate for owned app/package runtime and script source, with exact occurrence-count exceptions only for the ordered manifest diagnostic and Ref-owned test backend.",
+        "Do not add a collection helper, service, Layer, public export, array-method rule, or unrelated conversion."
+      ],
+      "proofContract": {
+        "directObservable": "The eight identified production membership/uniqueness sites use Effect HashSet; the ordered Schema diagnostic and Ref-owned test backend remain native with exact stale-checked reasons, and an unregistered constructor fails installed Oxlint.",
+        "expectedPostcondition": "Immutable domain set algebra uses Effect equality/hash semantics without obscuring ordered diagnostics or fixture backend behavior.",
+        "falseGreenRejected": "Converting every Set/Map, allowing a new constructor without review, changing diagnostic ordering, wrapping HashSet calls in helpers, accepting visitor-only tests, or relying on a source search without focused behavior tests.",
+        "focusedCommandOrProcedureOwner": "Infrastructure and Photon typechecks; adoption, inventory, migration, and candidate-inventory tests; Effect setup, docs, and root verification owners",
+        "evidenceOwner": "Domain membership HashSet correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not compare collection performance, invoke providers, mutate infrastructure, run a migration, or establish hosted behavior."
+      },
+      "completionCriteria": [
+        "Eight bounded production domain-set sites use installed Effect HashSet APIs.",
+        "Ordered diagnostic and test-backend native collections are explicitly preserved by exact occurrence-count exceptions.",
+        "Direct RuleTester, installed negative fixture, owned-script probe, and whole-source lint prove no-unregistered-native-collection enforcement.",
+        "Focused typechecks and behavior fixtures pass without public API or provider behavior change.",
+        "Canonical SPEC/tasks, decision inventory, active plans, bun run verification, and git diff --check agree."
+      ],
+      "currentResult": "A fresh 2026-08-13 audit found state-migration path cardinality was the eighth production native-set owner omitted by two earlier inventories. The command now uses installed Effect HashSet.fromIterable and size while its existing migration-path-conflict subprocess fixture preserves behavior. The second recurrence admits bundjil/no-unregistered-native-collection as a fail-closed owned-source review gate. Exact exceptions preserve one ordered-diagnostic Set and four Ref-owned test-backend Maps; direct, stale-count, installed negative, and real owned-script probes prevent silent expansion."
+    },
+    {
+      "id": "own-policy-receipt-time",
+      "title": "Own policy receipt timestamps with Effect Clock",
+      "status": "completed",
+      "dependsOn": ["align-domain-membership-hashsets"],
+      "description": "Replace ambient host timestamps in Effect-owned policy audit CLIs with one Clock.currentTimeMillis observation per executed receipt path and extend the existing ambient-time lint rule to owned tooling.",
+      "implementationNotes": [
+        "Read the epoch inside each existing linear Effect program and construct Date only from that explicit value at the receipt-formatting boundary.",
+        "Keep verification-policy fallback generation in its own Effect-clock path because the primary program did not complete.",
+        "Enable only the existing ambient-time rule for tooling; do not widen async, runtime-root, tryPromise or tagged-error rules without a separate finding inventory.",
+        "Do not add a shared timestamp helper, service, Layer, public export, custom Clock, provider operation or receipt-contract change."
+      ],
+      "proofContract": {
+        "directObservable": "All seven Effect-owned policy receipt timestamp sites use Clock.currentTimeMillis, no zero-argument Date remains in tooling, and root lint applies the ambient-time rule to tooling TypeScript.",
+        "expectedPostcondition": "Policy receipt time is Effect-owned and future tooling ambient-time regressions fail the normal lint gate without changing encoded receipt contracts.",
+        "falseGreenRejected": "Moving new Date into a helper, replacing it with Date.now, changing only current source without a lint scope, or enabling unrelated rules across tooling.",
+        "focusedCommandOrProcedureOwner": "Effect setup, root lint, lint fixtures, six policy audit commands, tooling typecheck, docs policy and root verification",
+        "evidenceOwner": "Policy receipt Clock correction receipt",
+        "limitationsAndNonClaims": "A live Clock at CLI execution remains nondeterministic wall time; this proves dependency ownership and test-injectable semantics, not timestamp accuracy or hosted execution."
+      },
+      "completionCriteria": [
+        "Policy audit success and fallback paths obtain their timestamps from the active Effect Clock.",
+        "The existing ambient-time rule covers tooling without unrelated rule expansion.",
+        "All policy audit commands, lint fixtures, tooling typecheck, docs checks and full verification pass.",
+        "Canonical architecture, SPEC/task ledger and both active plans record the bounded change and non-claims."
+      ]
+    },
+    {
+      "id": "bind-drift-receipt-execution-identity",
+      "title": "Bind drift receipts to dynamic execution identity",
+      "status": "completed",
+      "dependsOn": ["own-policy-receipt-time"],
+      "description": "Correct the drift proof boundary so a static protected-environment authority policy cannot be mistaken for one-run identity; decode and retain the exact GitHub repository/run/attempt identity, source SHA, and adoption-manifest digest in every report and receipt.",
+      "implementationNotes": [
+        "Add one branded exact-repository GitHub run identity and obtain it through Effect Config at the report command boundary.",
+        "Carry the already-decoded adoption manifest digest from the validated command rather than rereading or recasting the artifact.",
+        "Keep the authority JSON as a fingerprinted static policy envelope and preserve its three-secret custody surface.",
+        "Enforce the dynamic workflow binding through the existing authority policy audit and an independent negative fixture.",
+        "Do not add a service, Layer, helper, alternate drift engine, provider write, credential, or hosted-success claim."
+      ],
+      "proofContract": {
+        "directObservable": "The Schema-encoded drift report and bounded receipt contain the branded crcorbett/bundjil run/attempt identity, exact source SHA, static authority fingerprint, and decoded manifest digest; the authority audit rejects a workflow without dynamic identity binding.",
+        "expectedPostcondition": "Repository proof distinguishes static policy custody from dynamic execution provenance and cannot attribute a report to source SHA alone.",
+        "falseGreenRejected": "Calling the reusable authority secret one-run, relying only on the GitHub check page, adding an unvalidated string, or recording a manifest path without its decoded digest.",
+        "focusedCommandOrProcedureOwner": "Infrastructure drift Schema/tests, workflow authority policy fixture, infrastructure typecheck, docs/authority/control checks and root verification",
+        "evidenceOwner": "Drift execution-identity correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not install the three hosted artifacts, run provider reads, prove current GitHub execution, or authorize repair, deployment, or Production."
+      },
+      "completionCriteria": [
+        "Installed Effect v4 Schema and Config own the branded dynamic identity boundary.",
+        "Report and bounded receipt retain run identity, source SHA, authority fingerprint and manifest digest.",
+        "Workflow policy and focused negative fixture prevent removal of the dynamic identity binding.",
+        "Canonical architecture, testing, automation, authority, runbook, SPEC/tasks and both active plans agree.",
+        "Focused checks, full repository verification and git diff --check pass without provider execution."
+      ]
+    },
+    {
+      "id": "close-public-authority-loader-error-channels",
+      "title": "Close public Vercel authority loader error channels",
+      "status": "completed",
+      "dependsOn": ["bind-drift-receipt-execution-identity"],
+      "description": "Replace raw Config, filesystem, parser, Schema and primitive-string failures in the two exported Vercel authority loaders with owner-named Schema tagged errors, then prevent direct primitive failures from returning to production source.",
+      "implementationNotes": [
+        "Define one owner-local failure-reason Schema and Schema.TaggedErrorClass beside each authority loader; export complete Type/Encoded contracts through the Vercel subpath.",
+        "Translate raw boundary failures once inside each owner while preserving existing Alchemy and Preview-drift composition.",
+        "Add one import-aware Oxlint rule for direct primitive fail, failSync and mapError construction in approved app service/package source, with unit and installed-plugin proof.",
+        "Keep operator scripts outside the initial rule scope until their process-exit and receipt semantics migrate through the next task.",
+        "Do not add a shared generic error module, service, Layer, helper bucket, provider operation, credential, deployment or hosted claim."
+      ],
+      "proofContract": {
+        "directObservable": "Both exported loaders expose only their owner Schema tagged error; fixtures decode configurationInvalid, authorityUnreadable and authorityInvalid; installed Oxlint rejects namespace/direct/aliased primitive failure forms.",
+        "expectedPostcondition": "Public source error channels are closed and future direct primitive failure construction in the admitted source scope fails the normal lint gate.",
+        "falseGreenRejected": "Changing only literal strings, wrapping them in a shared generic error, relying on typecheck alone, enabling scripts before migration, or testing only the rule visitor without installed Oxlint.",
+        "focusedCommandOrProcedureOwner": "Vercel authority-loader fixtures, lint RuleTester and installed plugin fixtures, infrastructure typecheck/build, Effect setup, docs and repository verification",
+        "evidenceOwner": "Public authority failure correction receipt in the active Effect plan",
+        "limitationsAndNonClaims": "Repository tests do not execute Alchemy, read providers, mutate infrastructure, deploy, or prove hosted behavior. Operator command scripts remain a separately admitted migration."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "sourceInventory": "Zero direct primitive Effect fail/failSync/mapError constructions remain in the admitted app service and package source scope; operator scripts remain explicitly outside this completed task.",
+        "focused": "Effect language service, 12 lint tests, both root- and package-working-directory authority-loader fixtures, infrastructure typecheck/build and documentation policy passed.",
+        "repository": "The corrected synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks, all 15 build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests.",
+        "hosted": "Commit 751609d3dfd5926131d6541d0b4fce06bc2669c3 is pushed to the draft PR branch. GitHub CI run 31660327906 passed for that exact SHA. Infrastructure Drift run 31660327986 failed closed in Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
+        "correction": "The first full run exposed a test-only working-directory dependency and missing synthetic Executor environment. The fixture now uses package.json, which exists in both supported test working directories; the rerun used the same public synthetic values as CI.",
+        "nonClaims": "No provider request, infrastructure mutation, deployment, credential operation, channel send or hosted proof occurred."
+      },
+      "completionCriteria": [
+        "Each loader has one closed owner-tagged failure type and all raw causes remain private.",
+        "All three bounded reasons are behaviorally decoded through each error Schema.",
+        "The production-source lint scope and installed fixture reject direct primitive failures without a broad suppression or autofix.",
+        "Canonical architecture, testing, infrastructure README, SPEC/tasks and both active plans agree.",
+        "Focused checks, full repository verification and git diff --check pass without provider execution."
+      ]
+    },
+    {
+      "id": "close-operator-command-error-channels",
+      "title": "Close operator command error channels",
+      "status": "completed",
+      "dependsOn": ["close-public-authority-loader-error-channels"],
+      "description": "Migrate the inventoried infrastructure operator commands from primitive fail/mapError values to owner-local typed errors while preserving exact process-exit, receipt, rollback and provider non-claim semantics, then extend primitive-failure lint scope to the migrated scripts.",
+      "implementationNotes": [
+        "Classify report-drift, adoption-manifest generation/proof, inventory, state migration, Preview configuration drift, Photon Preview webhook binding and Vercel Git-link authority failures by their existing command owner.",
+        "Reuse an existing command error only when ownership and fields already match; otherwise colocate an owner-local Schema/Data tagged error rather than creating common/errors or helper abstractions.",
+        "Keep one-use error translation inline and preserve flat sequential Effects, existing encoded receipts, exact exit behavior and secret-negative diagnostics.",
+        "Extend no-primitive-effect-failure to scripts only after the complete inventory is zero and direct plus installed fixtures prove the scope.",
+        "Do not execute providers, mutate infrastructure, change authority, or infer hosted success from command tests."
+      ],
+      "proofContract": {
+        "directObservable": "The complete infrastructure script inventory has zero direct primitive Effect failure/mapError values, command behavior fixtures pass, and root lint applies the rule to the migrated script scope.",
+        "expectedPostcondition": "Operator error channels are owner-typed and matchable without changing process, receipt, provider or rollback semantics.",
+        "falseGreenRejected": "A source-only search without behavior tests, one generic command error, string constants hidden behind identifiers, broad script suppression, or changed exit status/receipt encoding.",
+        "focusedCommandOrProcedureOwner": "Infrastructure command tests and dry fixtures, lint scope/fixtures, package typecheck/build, Effect setup, docs and root verification",
+        "evidenceOwner": "Operator command failure correction receipt",
+        "limitationsAndNonClaims": "Repository proof will not establish provider access, state convergence, deployment, messaging, or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "sourceInventory": "Every infrastructure operator script now uses an owner-local Schema tagged error for direct fail/mapError construction. Root no-primitive-effect-failure lint covers the complete scripts directory, and an installed-Oxlint probe proves the scope.",
+        "behavior": "Eight real Bun entrypoints were exercised through deterministic configuration, path, mode, file-contract, or target failures before provider transport. Existing nonzero exits and bounded blocked/invalid/reason output remained intact.",
+        "focused": "Infrastructure package typecheck, Effect language service, type-aware lint, 13 lint tests, 89 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests passed.",
+        "repository": "The exact final candidate passed bun run verification with public synthetic Executor configuration and zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Commit f9f3efbb8c768305000c548c25f3db3b8c5da191 is pushed to the draft PR branch, and GitHub CI run 31661928382 passed that exact SHA. Infrastructure Drift run 31661928490 failed closed at bounded custody because its three hosted values were empty; provider reporting was skipped.",
+        "corrections": "Effect diagnostics replaced redundant Effect.fail wrappers with direct yielding of Schema tagged errors. The subprocess harness was corrected to launch Bun rather than Vitest's Node executable, supplied only synthetic eager R2 Layer configuration, removed one formatter-obsoleted import, and raised only its integration-test budget to 60 seconds for parallel Turbo load.",
+        "nonClaims": "No fixture executed a provider request, mutated infrastructure, changed authority or credentials, deployed, sent a channel message, or proved hosted or Production behavior."
+      },
+      "completionCriteria": [
+        "Every inventoried command uses an owner-local typed failure vocabulary and retains existing outward behavior.",
+        "No generic helper/error sprawl, raw cause retention or secret-bearing diagnostic is introduced.",
+        "The lint scope covers migrated scripts with a zero finding inventory and installed proof.",
+        "Canonical docs/tasks/plans and focused plus full verification pass."
+      ]
+    },
+    {
+      "id": "close-operator-layer-acquisition-boundary",
+      "title": "Close operator Layer acquisition boundary",
+      "status": "completed",
+      "dependsOn": ["close-operator-command-error-channels"],
+      "description": "Correct the post-task finding that fallible R2 Layer acquisition was converted to a defect and installed outside final command renderers, then enforce the reusable-Layer invariant without weakening Alchemy's exact host contract.",
+      "implementationNotes": [
+        "Keep the reusable R2 state Layer fallible and provide complete operator runtimes inside their final catch or Effect.exit boundary.",
+        "Map acquisition failures only to the command owner's existing bounded vocabulary; retain no raw ConfigError, Cause, credential or provider payload.",
+        "Keep Layer.orDie only in the three exact root Alchemy composition files because Alchemy 2.0.0-beta.64 requires Layer<State, never, StackServices>; document that host constraint beside each use.",
+        "Add one import-aware no-layer-or-die-in-service lint rule with direct and installed fixtures rather than a wrapper or broad suppression.",
+        "Exercise the real command entrypoints with absent R2 configuration and preserve provider-free proof. Test harness budgets may reflect process startup under parallel Turbo load but must not change product timing semantics."
+      ],
+      "proofContract": {
+        "directObservable": "Missing R2 configuration produces only the existing bounded adoption/drift classifications, reusable source and scripts contain no Layer.orDie, and the installed lint fixture exposes the stable rule ID.",
+        "expectedPostcondition": "Layer construction failure remains typed through reusable composition and reaches the same final renderer as foreground command failure.",
+        "falseGreenRejected": "Foreground-only command fixtures supplied synthetic Layer credentials, a clean source search ignored defect conversion, or an isolated run hid fixed process-test timeout pressure.",
+        "focusedCommandOrProcedureOwner": "Real infrastructure command subprocess fixtures, lint unit/installed fixtures, infrastructure and Codex proxy tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Operator Layer acquisition correction receipt",
+        "limitationsAndNonClaims": "Repository proof establishes no provider access, state read, deployment, hosted drift, credential, messaging or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The reusable R2 state Layer retains typed Config failure. Adoption proof, drift report and inventory provide complete runtimes inside their final error/exit boundary. Only the three exact Alchemy root composition files retain documented Layer.orDie calls required by Alchemy's infallible state-Layer type.",
+        "behavior": "Real Bun entrypoint probes with absent R2 configuration emit only configuration-invalid or drift-report-boundary-failed, never raw ConfigError. All eight infrastructure commands retain nonzero bounded foreground behavior without provider transport.",
+        "lint": "bundjil/no-layer-or-die-in-service passes direct namespace/alias fixtures and installed-Oxlint proof; the root scope covers owned app/package source and all infrastructure scripts without a broad suppression or autofix.",
+        "focused": "Infrastructure typecheck, Effect language service, 14 lint tests, 89 infrastructure Vitest tests, 21 canonical Alchemy/Bun lifecycle tests and the 10-test Codex Preview subprocess suite pass.",
+        "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Commit b9cd2afcfa8b96b63013f0d23b8aaa746852bc78 is pushed to the draft PR branch, and GitHub CI run 31664722119 passed that exact SHA. Infrastructure Drift run 31664722113 failed closed at Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
+        "corrections": "Cold verification under concurrent workspace load exposed harness ceilings only. The eight-entrypoint command fixture now permits 120 seconds and the Codex Preview subprocess-proof suite 15 seconds; product timeout, retry, interruption and Effect Clock behavior are unchanged.",
+        "nonClaims": "No provider request, state read/write, infrastructure mutation, authority or credential change, deployment, hosted drift, channel send or Production proof occurred."
+      },
+      "completionCriteria": [
+        "Reusable R2 state composition preserves its typed Config error and exact Alchemy roots alone retain documented defect conversion.",
+        "Adoption, drift and inventory runtimes are inside their final error or exit boundary.",
+        "Real missing-configuration probes remain bounded and secret-negative without provider transport.",
+        "Direct and installed lint proof, focused checks, full repository verification and git diff --check pass."
+      ]
+    },
+    {
+      "id": "close-preview-drift-command-boundary",
+      "title": "Close Preview drift command output boundary",
+      "status": "completed",
+      "dependsOn": ["close-operator-layer-acquisition-boundary"],
+      "description": "Correct the post-task finding that the mutating Preview configuration drift command delegated expected failures to BunRuntime.runMain and emitted raw Effect errors with absolute source paths.",
+      "implementationNotes": [
+        "Preserve the existing precondition, one-write and readback semantics; change only the final process output boundary.",
+        "Return one small Schema-owned success receipt from the operation and encode it only at the final adapter.",
+        "Use Effect.exit around the fully provided command so authority, Config, Layer, provider and receipt-encoding failures collapse to one secret-negative blocked result and exit code 1.",
+        "Do not add a helper, service, shared receipt module, raw Cause renderer, provider call, authority change or deployment."
+      ],
+      "proofContract": {
+        "directObservable": "The real command with missing Preview authority emits exactly one bounded blocked JSON result and no stack trace, absolute path, raw tagged error or ConfigError.",
+        "expectedPostcondition": "Every infrastructure operator entrypoint now owns a bounded final process adapter while the Preview drift operation retains its existing mutation and readback sequence.",
+        "falseGreenRejected": "A nonzero-only subprocess assertion, BunRuntime default logging, a foreground-only catch, or a synthetic unit path that does not execute the real entrypoint.",
+        "focusedCommandOrProcedureOwner": "Preview drift real-entrypoint fixture, infrastructure typecheck/tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Preview drift command output correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not invoke Vercel, mutate Preview configuration, validate provider output, deploy or establish hosted behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The Preview drift operation preserves its precondition, one mutation and readback sequence, returns one small Schema-owned completion receipt, and no longer delegates expected failure to BunRuntime.runMain.",
+        "boundary": "One final Effect.exit captures the fully provided command and Effectful Schema receipt encoding. The process adapter emits only Schema-encoded completed or blocked JSON and owns exit code 1.",
+        "oracle": "The real missing-authority Bun entrypoint exits 1 with exactly the bounded blocked classification and rejects the raw authority tag, ConfigError, stack marker and repository-absolute path without provider transport.",
+        "focused": "Infrastructure typecheck, Effect language service, boundary audit, focused formatting/lint and the two-test real operator-command subprocess suite pass.",
+        "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine typechecks, 89 infrastructure Vitest tests, 21 Alchemy/Bun lifecycle tests and all 15 package build/test tasks.",
+        "hosted": "Commit ffc1889c603bf228df389501e1c23fc45a2c5142 is pushed to the draft PR branch, and GitHub CI run 31666250197 passed that exact SHA. Infrastructure Drift run 31666250211 failed closed at Prepare bounded read-only custody because all three hosted values were empty; its provider-report step was skipped.",
+        "corrections": "The first repository gate rejected a synchronous Schema fallback encoder. The process edge now uses Schema.encodeEffect; only its statically valid blocked literal converts an impossible encoding failure to a defect after command failure has already been collapsed.",
+        "nonClaims": "No Vercel request, Preview read/write, provider mutation, authority or credential change, deployment, channel send, hosted proof or Production behavior occurred."
+      },
+      "completionCriteria": [
+        "The fully provided command and receipt encoding are captured by one final Effect.exit boundary.",
+        "Success and blocked output are Schema encoded and secret-negative.",
+        "The real missing-authority entrypoint oracle rejects raw runtime diagnostics.",
+        "Focused checks, full verification and git diff --check pass."
+      ]
+    },
+    {
+      "id": "close-automatic-production-command-boundary",
+      "title": "Close automatic Production command output boundary",
+      "status": "completed",
+      "dependsOn": ["close-preview-drift-command-boundary"],
+      "description": "Correct the post-task finding that the private exact-SHA Production workflow command delegated expected Config and deployment failure to BunRuntime.runMain and could expose raw Effect diagnostics.",
+      "implementationNotes": [
+        "Preserve the automatic Production state machine, ordered rollback finalizer, successful AutomaticProductionReceiptJson contract and workflow authority.",
+        "Decode source Config before providing the deployment Layer, then capture Config, Layer acquisition, orchestration, rollback/health failure and success-receipt encoding in one final Effect.exit.",
+        "Schema-encode one fixed blocked process result and own exit code 1 without rendering a Cause or exposing provider, credential, path or stack details.",
+        "Do not add a generic renderer, helper package, shared receipt, provider operation, authority change, deployment or workflow mutation."
+      ],
+      "proofContract": {
+        "directObservable": "The real command with absent source SHA exits 1 with exactly one Schema-owned blocked JSON result and no ConfigError, raw deployment tag, stack marker or repository path.",
+        "expectedPostcondition": "The private Production workflow command has the same bounded final process boundary as mutating operator commands while preserving successful receipts and deployment semantics.",
+        "falseGreenRejected": "A service-only orchestration test, nonzero-only CLI assertion, default BunRuntime reporter, or synthetic function path that does not execute the real entrypoint.",
+        "focusedCommandOrProcedureOwner": "Automatic Production real-entrypoint fixture, orchestration suite, infrastructure typecheck/tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Automatic Production command output correction receipt",
+        "limitationsAndNonClaims": "Repository proof invokes no Vercel transport and does not prove workflow eligibility, deployment, rollback, hosted execution, provider state or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The private Production command preserves the existing exact-SHA deployment operation, live Layer, exit-aware rollback finalizer and AutomaticProductionReceiptJson success contract. It no longer delegates command failure to BunRuntime.runMain.",
+        "boundary": "Source Config decodes before deployment Layer provision. One final Effect.exit captures Layer acquisition, orchestration, rollback and health failure, and Effectful success receipt encoding; the process adapter emits only the existing success receipt or one Schema-encoded blocked result and owns exit code 1.",
+        "oracle": "The real Bun entrypoint with absent source SHA exits 1 with exactly {\"status\":\"blocked\"} and rejects ProductionDeploymentError, ConfigError, stack markers and the repository path before Layer acquisition or provider transport.",
+        "focused": "Infrastructure typecheck, Effect language-service diagnostics, boundary audit, docs/skills/authority/controls/verification policies, 14 lint tests, 89 infrastructure Vitest tests and 21 Alchemy lifecycle tests pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Commit f48946ab6036aab633152b6bf5a6521167a6b21e is pushed to the draft PR branch and GitHub CI run 31667205683 passed that exact SHA. Infrastructure Drift run 31667205678 failed closed at empty bounded custody and skipped provider reporting.",
+        "nonClaims": "No Vercel request, provider read/write, deployment, rollback, authority or credential mutation, channel send, hosted Production workflow or Production behavior was exercised."
+      },
+      "completionCriteria": [
+        "The existing success receipt is preserved and every expected command failure collapses to the Schema-owned blocked result.",
+        "The real absent-source entrypoint oracle rejects raw runtime diagnostics before Layer acquisition or provider transport.",
+        "Focused checks, full verification, hosted CI and git diff checks pass."
+      ]
+    },
+    {
+      "id": "close-exported-effect-generator-ownership",
+      "title": "Close exported Effect operation trace ownership",
+      "status": "completed",
+      "dependsOn": ["close-automatic-production-command-boundary"],
+      "description": "Correct the iterative audit finding that exported reusable functions directly constructed Effect.gen without explicitly declaring semantic versus delegated trace ownership.",
+      "implementationNotes": [
+        "Classify every current exported direct Effect.gen function against installed effect@4.0.0-beta.101 and reviewed v4 source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "Use named Effect.fn for semantic boundary or orchestration work; use Effect.fnUntraced only for an existing leaf or public accessor whose called service operation already owns the trace.",
+        "Preserve export names, result contracts, service requirements, errors, Layers, provider calls, wire behavior and current consumers; close any newly visible raw public argument with its existing owner Schema rather than a cast or new wrapper.",
+        "Add one import-aware Oxlint rule with direct and installed positive/negative fixtures, no autofix, no exception registry and no broad scope exclusion.",
+        "Reconcile Effect/testing architecture, SPEC/tasks/active plan and repo-owned PRD/provider-wrapper skills in the same slice."
+      ],
+      "proofContract": {
+        "directObservable": "The owned source scan has no exported arrow or function declaration that directly returns import-aware Effect.gen, and installed Oxlint emits bundjil(no-exported-effect-gen-function) for the exact negative fixture.",
+        "expectedPostcondition": "Every existing reusable exported Effect operation explicitly owns a semantic trace or deliberately delegates without duplicating the called service span.",
+        "falseGreenRejected": "Renaming the generator body, adding withSpan after a direct exported Effect.gen, visitor-only tests, or converting every delegate to a duplicate named span.",
+        "focusedCommandOrProcedureOwner": "Lint RuleTester and installed fixtures, codex/eve/photon typechecks and tests, Effect setup, docs/skills checks and root verification",
+        "evidenceOwner": "Exported Effect operation ownership correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not establish trace export to a hosted collector, provider behavior, deployment, message delivery or Production state."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "All 31 exported direct Effect.gen functions were classified against installed effect@4.0.0-beta.101 and reviewed v4 source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c. Four semantic operations use named Effect.fn; existing service delegates use named generator bodies inside Effect.fnUntraced.",
+        "boundary": "The migration preserves export names, result/error/service/Layer contracts and provider calls. The explicit workspace helper signature exposed one raw string and now reuses BundjilWorkspaceName with an Effectful default decode.",
+        "oracle": "Direct RuleTester and installed Oxlint fixtures prove bundjil/no-exported-effect-gen-function for namespace, alias, direct import, immediate pipe and import-order cases while accepting top-level/local generators, Effect.fn, Effect.fnUntraced and unrelated identifiers.",
+        "focused": "Effect setup, zero-finding boundary audit, docs and 16-mirror skill policy, root type-aware lint, 17 lint tests, Codex/Eve/Photon typechecks, 116 Codex tests, 7 Eve tests and 41 Photon tests pass.",
+        "repository": "The cold public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: all policy gates, 136 boundary tests, Knip, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Implementation commit 93fc40a96970d5fcc7fd1263df266412eaafd56a is pushed and GitHub CI run 31677398344 passed that exact SHA in 3m47s. Same-source Infrastructure Drift run 31677398387 failed at protected custody and skipped provider reporting.",
+        "nonClaims": "No live Vercel credential, provider request, drift report, deployment, model call, channel send, trace export, handset behavior or Production state was exercised or proved."
+      },
+      "completionCriteria": [
+        "All current findings are classified and migrated without public-contract or provider-wire changes.",
+        "The import-aware rule accepts top-level/local generators and Effect.fn/fnUntraced while rejecting exported direct Effect.gen functions, including immediate pipe composition.",
+        "Focused checks, docs/skills audits, full verification and git diff checks pass."
+      ]
+    },
+    {
+      "id": "close-photon-sdk-diagnostic-boundary",
+      "title": "Close Photon SDK diagnostic string boundary",
+      "status": "completed",
+      "dependsOn": ["close-exported-effect-generator-ownership"],
+      "description": "Correct terminal audit pass 1 finding ENP-AUDIT-001 and rerun findings ENP-FND-011, ENP-FND-014 and ENP-FND-028: provider-controlled SDK strings entered telemetry, hostile failure or success property accessors could escape before typed error translation, and arbitrary safe integers could enter the transport-status diagnostic.",
+      "implementationNotes": [
+        "Remove provider-controlled string values from PhotonSdkObservedFailure and structured logs instead of expanding a regex or guessing a provider allowlist.",
+        "Retain only closed operation/phase and bounded boolean/numeric-or-unknown observations that carry current recovery value.",
+        "Decode transport status through the owner range of 100 through 599; every other provider number collapses to unknown.",
+        "Inspect only own data properties through Option.liftThrowable; accessor, proxy and descriptor failures collapse to unknown rather than escaping the typed boundary.",
+        "Read successful provider message identity through the same hostile-property boundary and decode a newly constructed application-owned result before returning it.",
+        "Add a direct Logger fixture with credential-like SDK fields and prove no sentinel reaches the encoded diagnostic.",
+        "Preserve channel error mapping, retry policy, SDK lifecycle, provider calls, public exports and wire behavior."
+      ],
+      "proofContract": {
+        "directObservable": "Controlled SDK failures containing credential-like name/code values, hostile failure or success accessors and an out-of-range numeric code either emit Schema-decodable Photon diagnostics or return the existing safe Channel error with no provider-controlled string, sentinel or arbitrary status number.",
+        "expectedPostcondition": "Photon telemetry is closed, low-cardinality and secret-negative without weakening typed channel failures.",
+        "falseGreenRejected": "A token-shaped regex, truncation, failure-only hostile-property coverage, a safe public Channel error without success-result coverage, or a test that does not inspect the structured log payload.",
+        "focusedCommandOrProcedureOwner": "Photon transport Logger fixture, package typecheck/tests, boundary/docs checks and root verification",
+        "evidenceOwner": "Terminal pass 1 Photon diagnostic correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not exercise the live Spectrum SDK, provider telemetry ingestion, delivery or Production."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "Photon diagnostics retain only closed operation/phase, bounded HTTP-status-or-unknown and boolean-or-unknown observations; hostile own-property access on failures and successful send results is contained before typed translation.",
+        "oracle": "The encoded Logger fixture rejects provider-controlled strings and credential sentinels, while hostile getter/proxy, invalid status and successful-result fixtures prove the same adapter boundary.",
+        "focused": "Photon typecheck/build and all 45 Photon tests pass on the exact candidate; boundary and lint suites pass with 136 and 17 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, Knip, nine package typechecks and 15 workspace build/test tasks.",
+        "nonClaims": "No live Spectrum SDK request, provider telemetry ingestion, message delivery, handset behavior, deployment or Production state was exercised or proved."
+      },
+      "completionCriteria": [
+        "Provider-controlled SDK strings, throwing failure or success accessors and out-of-range numeric statuses cannot enter or bypass Photon structured telemetry or typed result translation.",
+        "Focused Photon checks and repository boundary/docs gates pass.",
+        "Terminal audit pass 1 is rerun after correction."
+      ]
+    },
+    {
+      "id": "close-codex-provider-boundary-contracts",
+      "title": "Close Codex provider boundary contracts",
+      "status": "completed",
+      "dependsOn": ["close-photon-sdk-diagnostic-boundary"],
+      "description": "Correct terminal audit pass 1 Codex findings ENP-FND-012 through ENP-FND-032: close tool, destination, credential identity, canonical recursive JSON, export, Layer, header, numeric, SSE resource and terminal-sequence boundaries so proof/live streams cannot manufacture or leak a clean completion.",
+      "implementationNotes": [
+        "Use one opaque Effect Schema declaration with a bounded recursive predicate for arbitrary protocol JSON and an object-root tool-parameters contract; reject scalar roots, sparse arrays, non-enumerable/accessor/symbol properties and nested containers beyond the 32-container ceiling without a stack defect, while preserving the existing 1 MiB HTTP ingress ceiling as the independent wire-size owner.",
+        "Pin the credential-bearing HTTP client to the exact owned https://chatgpt.com/backend-api/codex/responses literal; malformed, HTTP, loopback and foreign endpoints fail Config parsing before request construction.",
+        "Constrain credential header values to non-empty visible ASCII with a 16,384-character ceiling, brand access-token and account-ID values separately before redaction, and wrap Headers construction in Effect.try with a fixed CodexResponsesRequestError so defensive failures cannot disclose a secret or reach the network.",
+        "Keep CodexHttpClient and raw Stream<Uint8Array> private to package provider/runtime composition. Expose only CodexDirectProvider and CodexResponsesProof domain services from supported public paths; testing substitution belongs under the explicit testing export.",
+        "Compose private dependencies with Layer.provide rather than Layer.provideMerge and inspect built public/test Layer contexts for absence of raw services.",
+        "Use one bounded package-private SSE line/event framing owner for proof and live streaming. Require an exactly matched SSE media type and a framed decoded response.completed before returning proof or emitting finish_reason and [DONE].",
+        "Bound both each decoded line and the joined multi-line event at 1 MiB; fold proof events into constant-size count/completion state and name the public receipt field receivedStreamEvents.",
+        "Count data, comments and every other nonblank SSE field toward the complete-event ceiling, accept LF, CRLF and CR line endings, strip a UTF-8 BOM only at stream start, and treat colonless data as an empty data field without weakening termination checks.",
+        "Preserve exact consumed delimiter bytes and the terminating blank line in event accounting; retain pending CR state across empty chunks.",
+        "Use Effect Chunk for persistent line/data accumulation and cap line fragments plus event fields at 4096 with deterministic limit-plus-one errors.",
+        "Decode terminal and recognized data events into one shared closed tagged union, then use one Match-owned sequence state to require exact zero-based progression and reject malformed, failed, duplicate, regressing, skipped and post-terminal input before proof or live completion.",
+        "Normalize successful Content-Type to the closed text/event-stream literal and keep raw provider headers/status text out of public results and tagged errors.",
+        "Use owner-named bounded integer Schemas for HTTP status, counts, sequence numbers and output indexes.",
+        "Inspect root, runtime, local, testing and filesystem-store namespaces with the same private-transport denylist.",
+        "Keep CodexRequestMapper constructors, accessors and Layers package-private together with the HTTP and stream mapper services; remove unused private convenience accessors rather than preserving wrapper surface.",
+        "Reject malformed JSON, misleading media types, unterminated lines/events and clean upstream termination before completion with the existing safe error vocabulary.",
+        "Preserve live OAuth recovery, streaming behavior, cancellation, public proxy contract, request mapping and application runtime ownership.",
+        "Capture the stable expected proxy token in the OpenAICompatibleProxy implementation Layer; operation input carries only the decoded presented authorization and completion request.",
+        "Decode bounded authorization into Redacted at HTTP ingress and compare it with the Layer-owned expected value over one fixed-width loop; a forged request field cannot choose the expected token.",
+        "Canonicalize recursive JSON in both Schema directions into detached deeply frozen ordinary arrays/objects; do not retain caller-owned mutable objects, accessors or proxies.",
+        "Reject duplicate function-call output indexes before mapper-state mutation or output emission.",
+        "Load positive header-timeout, stream-idle-timeout, cumulative-body-byte and SSE-event limits through Config.schema; enforce time with Effect timeout operators and preserve interruption/finalization.",
+        "Decode public chat-completion bodies with onExcessProperty error and accept only omitted or literal-true stream because the route is SSE-only.",
+        "Configure app Vitest SSR to inline workspace packages under the @bundjil/source condition so ignored dist output cannot satisfy focused tests.",
+        "Keep recursive canonical JSON implementation unions private, expose only opaque Schema-derived branded protocol values, and remove unchecked assertions from SSE accumulation.",
+        "Require the declaration type side to accept only recursively frozen canonical containers; mutable and shallow-frozen values must fail guards and nested type-side construction.",
+        "Construct the nested request regression from valid decoded sibling fields, exercise both Schema.toType validation and CodexResponsesPostInput.makeEffect, and assert the exact request.tools[0].parameters issue path.",
+        "For 401 recovery, capture both authorization headers, prove the retry uses the refreshed token, consume the lazy mapped body, and require finish_reason stop plus the [DONE] terminator.",
+        "Treat deep freezing as necessary but insufficient for canonical ownership: register every transformed array/object in one package-private identity-provenance WeakSet, require provenance recursively on the declaration type side, and reject unowned frozen Proxies before nested construction.",
+        "Recover unavailable proxy composition with Layer.catch over typed acquisition errors only; never downgrade defects or interruption into ordinary readiness state.",
+        "Define body-stream progress as a non-empty byte chunk by filtering empty chunks before the per-pull idle timeout; preserve TestClock control and upstream finalization.",
+        "Keep proof requests scoped through completion and streaming requests in a dedicated scope transferred to the returned body; prove every non-2xx or rejected-media acquisition failure aborts its request immediately without consuming rejected body bytes.",
+        "After accepted stream status, media type and metadata validation, use one bounded Effect-clock ownership watchdog: body subscription claims the response scope and existing per-pull/finalizer ownership takes over; otherwise the configured stream-idle deadline closes the scope. Header acquisition remains governed only by its independent header timeout. Signal watchdog completion from the scope finalizer so normal completion, failure and cancellation leave no detached work.",
+        "Inspect the boolean returned by Deferred.succeed when a body subscriber claims ownership. Expose the one-shot upstream stream only to the winning subscriber; late and duplicate subscribers fail through one fixed CodexResponsesStreamError before reading the body."
+      ],
+      "proofContract": {
+        "directObservable": "Config fixtures reject every unowned credential destination; type/schema fixtures distinguish access tokens from account IDs and reject unsafe headers, scalar/non-JSON/non-object/non-canonical/over-depth tool parameters and impossible numbers; malformed credential ingress is typed and secret-negative; every supported export and built Layer context exposes no raw service; proof/live fixtures reject over-depth JSON, malformed recognized events, failed terminals, duplicate/regressing/skipped sequence numbers, later BOMs, colonless empty data, post-terminal events, unterminated/truncated streams, exact-wire overflow and fragment/field limit-plus-one while accepting a stream-start BOM and valid LF, CRLF and CR framing including empty split chunks.",
+        "expectedPostcondition": "Every public Codex provider boundary carries owned decoded domain values and the proof name matches its semantic oracle.",
+        "falseGreenRejected": "A configurable credential destination, two Redacted<string> aliases, Redacted inspection without hostile-header construction, generic recursive Schema.Json traversal, an array-only non-object fixture, sparse/non-enumerable JSON accepted before lossy encoding, proof-only event validation, sequence-number presence without progression, per-line BOM stripping, ignored colonless data, HTTP ingress JSON parsing alone, removing only one barrel symbol, provideMerge-hidden type inference, substring media matching, raw successful metadata, completion-anywhere booleans, re-encoded line lengths, aggregate bytes without cardinality ceilings, synthetic newline insertion, finite Number, an unused private wrapper, or a mock bypassing a supported export/Layer surface.",
+        "focusedCommandOrProcedureOwner": "Codex contract/proof/direct-provider tests, proxy tests, export scan, typechecks, boundaries/docs and root verification",
+        "evidenceOwner": "Terminal pass 1 Codex provider correction receipt",
+        "limitationsAndNonClaims": "Controlled transport proves package semantics only; it does not prove current Codex subscription acceptance or hosted provider behavior."
+      },
+      "invalidatedCompletionEvidence": {
+        "invalidatedBy": "ENP-FND-043",
+        "result": "passed",
+        "source": "Codex ingress, canonical JSON, endpoint, credential, Layer, HTTP/SSE resource, event-order and proxy-authorization boundaries are closed through owner Schemas and private adapters against Effect 4.0.0-beta.101.",
+        "oracle": "Schema guard/constructor, export/Context, exact endpoint/header, deterministic timeout/finalizer, byte/event/cardinality, SSE framing/sequence, duplicate index, strict HTTP ingress and stale-dist source-resolution fixtures cover the accepted findings.",
+        "focused": "Codex typecheck/build and all 151 Codex tests pass; Codex proxy typecheck/build and all 42 proxy tests pass; boundary and lint suites pass with 136 and 17 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, Knip, nine package typechecks and 15 workspace build/test tasks.",
+        "nonClaims": "No Codex subscription endpoint, hosted proxy, current OAuth credential, model response, deployment or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd043": {
+        "invalidatedBy": "ENP-FND-044",
+        "result": "passed",
+        "correction": "ENP-FND-043 now proves 401 recovery with old and refreshed authorization values plus complete consumption of the lazy mapped terminal stream.",
+        "focused": "Codex typecheck and all 17 refresh-capable tests pass; the complete Codex suite passes 151 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, 136 boundary tests, 17 lint tests, Knip, nine package typechecks and all 15 workspace build/test tasks; proxy and agent suites passed 42 and 80 tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd044": {
+        "invalidatedBy": ["ENP-FND-045", "ENP-FND-046"],
+        "result": "passed",
+        "correction": "ENP-FND-044 now rejects frozen caller-owned proxies at guards and nested constructors while ordinary decoding detaches them into package-owned deeply frozen data with stable repeated encoding.",
+        "focused": "Codex typecheck and all 30 Responses proof tests pass; lint-plugin tests pass all 17 fixtures and the exact native-collection exception admits one WeakSet only.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 151 Codex, 42 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd046": {
+        "invalidatedBy": "ENP-FND-047",
+        "result": "passed",
+        "corrections": [
+          "ENP-FND-045 preserves defects and interruption across live/local availability composition while recovering only typed Layer acquisition failures.",
+          "ENP-FND-046 treats only non-empty upstream body chunks as idle-timeout progress and proves timeout plus finalization under TestClock."
+        ],
+        "focused": "Codex and proxy typechecks pass; all 31 Responses proof tests and all 31 proxy-handler tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 152 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd047": {
+        "invalidatedBy": "ENP-FND-048",
+        "result": "passed",
+        "correction": "ENP-FND-047 proves immediate request-scope cancellation and unread rejected bodies for proof/streaming non-2xx and rejected-media paths without changing the already-scoped implementation.",
+        "focused": "Codex typecheck and all 32 Responses proof tests pass; docs, skills, boundaries and lint checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 153 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd048": {
+        "invalidatedBy": "ENP-FND-049",
+        "result": "passed",
+        "correction": "ENP-FND-048 bounds accepted-but-unclaimed response ownership at the configured stream-idle deadline while body subscription transfers ownership to existing per-pull and finalizer semantics.",
+        "focused": "Codex typecheck and all 33 Responses proof tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 154 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd049": {
+        "invalidatedBy": "ENP-FND-050",
+        "result": "passed",
+        "correction": "ENP-FND-049 starts accepted-stream ownership expiry only after status/media/metadata validation, keeping header and body ownership deadlines independent.",
+        "focused": "Codex typecheck and all 34 Responses proof tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 155 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "correction": "ENP-FND-050 makes Deferred.succeed's boolean the exactly-once body-ownership decision, exposing the upstream stream only to the winning subscriber and returning a fixed typed failure for expired or duplicate claims.",
+        "focused": "Codex typecheck and all 35 Responses proof tests pass; Ultracite, Effect setup, boundaries, docs, skills, authority, controls, verification policy and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "completionCriteria": [
+        "Tool parameters are an opaque, canonical, depth-bounded JSON object contract on both ingress and provider request sides; scalar roots and values that encode differently are rejected, and SSE JSON uses the same bounded owner before event selection.",
+        "The credential-bearing endpoint is the exact owned HTTPS literal and unsafe credential header values fail before network execution without entering the typed error.",
+        "Raw HTTP/SSE/request-mapper transport has no supported package export or exported Layer output and app tests substitute only through an explicit testing owner.",
+        "Line and complete-event ceilings reject individually valid lines whose aggregate event exceeds 1 MiB; proof retains only a constant-size summary and reports an accurate event count.",
+        "Ignored SSE fields count toward the event ceiling; legal LF, CRLF and CR delimiters preserve exact event framing; only a stream-start BOM is stripped; and colonless data becomes an empty event field.",
+        "Exact wire-byte just-below/at/above fixtures pass or fail correctly for LF, CRLF and CR; empty chunks cannot split CRLF.",
+        "Fragment and field limit-plus-one fixtures fail deterministically without timing assertions or quadratic accumulation.",
+        "Failed, incomplete, error, malformed recognized data, duplicate/regressing/skipped sequence, duplicate completion and every post-terminal event fail before finish_reason or DONE in both proof and live paths.",
+        "Raw provider headers/status text cannot enter results, errors, logs or host responses; successful content type is the closed literal.",
+        "All supported package subpaths enforce the private transport denylist and numeric Schemas reject fractional, negative and out-of-range values.",
+        "Proof and live streaming require a framed decoded completed event and all focused/full checks pass.",
+        "Terminal audit pass 1 is rerun after correction.",
+        "A caller cannot select both presented and expected proxy credentials; malformed or incorrect authorization fails through the fixed secret-negative error.",
+        "Decoded protocol JSON is detached and deeply frozen; source mutation cannot alter subsequent encoding.",
+        "Header, idle-body, body-byte and event limit tests use TestClock or deterministic Effect streams and assert interruption/finalizer behavior.",
+        "Duplicate output indexes, stream false, and unsupported request fields fail before a clean mapped/provider response.",
+        "Focused app tests resolve current workspace source independently of stale ignored package builds.",
+        "Public protocol JSON types remain opaque Schema-derived brands, and SSE accumulation uses checked inference without an assertion.",
+        "Schema guards and type-side constructors reject mutable or shallow-frozen protocol JSON while decoded values remain deeply frozen and encodable.",
+        "The nested request oracle uses valid decoded sibling fields and fails through both the type-side Schema and named makeEffect constructor at the exact request.tools[0].parameters issue path.",
+        "The 401 recovery oracle proves old-token rejection, refreshed-token replay and complete consumption of a valid terminal mapped stream.",
+        "Frozen but unowned containers, including a Proxy with unstable own-key ordering, fail Schema guards and nested constructors; decoding detaches them into package-owned deeply frozen data whose encoding remains stable.",
+        "Live/local Layer defects and interruption remain in the terminal Cause; only typed acquisition failure selects unavailable readiness.",
+        "Periodic empty upstream chunks do not reset body idleness and the timed-out stream finalizes deterministically under TestClock.",
+        "Proof and streaming acquisition close the scoped request immediately for rejected status/media, do not consume Response bodies, and do not expose rejected body sentinels.",
+        "An accepted response whose body is never subscribed closes at the configured idle deadline without consuming bytes; body subscription transfers ownership to existing stream timeout/finalizer semantics.",
+        "A valid response delayed beyond stream-idle duration but within header timeout is not aborted before headers; after accepted metadata, body subscription claims ownership and normal drain closes the request.",
+        "Exactly one subscriber can claim an accepted response body; a subscriber after ownership expiry or after a successful first drain receives the fixed typed ownership error before the one-shot body is touched."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
-      "status": "pending",
-      "dependsOn": ["enable-rules-and-reconcile-docs"],
-      "description": "After every implementation task is complete, audit the final receipt-bearing candidate once; reopen every finding at its owner and rerun affected proof before repeating the terminal audit.",
+      "status": "completed",
+      "dependsOn": ["close-codex-provider-boundary-contracts"],
+      "externalDependsOn": [
+        "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
+      ],
+      "description": "After both implementation ledgers are otherwise complete, audit the final receipt-bearing candidate once; reopen every finding at its owner and rerun affected proof before repeating the terminal audit.",
       "passes": [
         {
           "order": 1,
           "name": "architecture-boundaries",
-          "scope": "Architecture, package/service/Layer ownership, call graphs, Schema ingress/egress, provider adapters, branded identities, safe errors, Config, and live/mock Layers."
+          "scope": "Effect contracts, Schemas, branded boundaries, errors, Config, Layers, provider adapters and secret-negative ingress/egress."
         },
         {
           "order": 2,
-          "name": "effect-semantics",
-          "scope": "Effect flatness/laziness, Clock/TestClock, deadlines/retries, Ref family, cohesive state, Layer memoization/scope, collections, absence, concurrency, serialization, and observability."
+          "name": "call-graph-topology",
+          "scope": "Call graph, Effect flatness/laziness, runtime ownership, package/file ownership, exports, helper sprawl, dead paths, state/collection semantics and Layer lifetime."
         },
         {
           "order": 3,
-          "name": "lint-false-positives",
-          "scope": "AST invariants, imports/aliases, scopes, unit and installed-plugin fixtures, current findings, exceptions/staleness, false-positive matrix, migrations, and absence of unsafe autofix."
+          "name": "behaviour-and-gates",
+          "scope": "Behaviour, replay/idempotency, workflow eligibility, rollback/failure paths, Clock/TestClock, AST fixtures, tests, lint, typecheck and repository verification."
         },
         {
           "order": 4,
-          "name": "tests-proof",
-          "scope": "Focused adversarial tests, state/time/order/cardinality/runtime proofs, package gates, boundary/effect checks, terminal verification, exact Git identity, and limitations."
+          "name": "docs-and-proof-consistency",
+          "scope": "Docs, SPECs, task ledgers, plan, architecture, runbooks, authority/automation/control registers, proof packets, exact Git identity and limitations."
         },
         {
           "order": 5,
-          "name": "docs-skills-cleanup",
-          "scope": "Docs-impact ledger, architecture, testing rules, READMEs, AGENTS/skills only where justified, dead exceptions, unused helpers/wrappers, lifecycle/index/plan closeout, and non-goals."
+          "name": "provider-deployment-safety",
+          "scope": "Provider/deployment/secret safety, rollback, observability, immutable and stable readback, automatic exact-main evidence, live channel claims and explicit non-claims."
         }
       ],
       "implementationNotes": [
         "Do not run this terminal audit after each task.",
         "A finding reopens its owning task and invalidates affected downstream receipts.",
         "After corrections, rerun focused proof, terminal verification when affected, and one new ordered terminal audit.",
-        "Do not grant provider, deployment, release, commit, push, or merge authority through audit success."
+        "Use existing delegated authority only; audit success does not strengthen a missing provider or handset oracle.",
+        "ENP-FND-051 restored truthful active and pending lifecycle wording before the restarted sequence; completed-history routing is written only with the final receipt.",
+        "ENP-FND-052 requires every lifecycle owner's last_reviewed metadata to advance atomically with the final state transition; the terminal sequence restarts after correction.",
+        "ENP-FND-053 requires every current status summary and sequence-owner statement to agree with the pending terminal task and active plan; historical accepted wording remains only inside an explicitly invalidated receipt."
       ],
       "proofContract": {
         "directObservable": "One ordered five-pass receipt is newer than all task and verification evidence and records zero unresolved findings.",
@@ -562,7 +1701,54 @@
         "falseGreenRejected": "A fixed pass after each slice, a pre-implementation review, or stale evidence after a correction.",
         "focusedCommandOrProcedureOwner": "Active-plan terminal audit procedure",
         "evidenceOwner": "Five-pass closeout receipt",
-        "limitationsAndNonClaims": "Audit acceptance grants no external operation authority."
+        "limitationsAndNonClaims": "Audit acceptance preserves explicit provider, strict replay and handset non-claims."
+      },
+      "invalidatedCompletionEvidence": {
+        "invalidatedBy": "ENP-FND-043",
+        "result": "passed",
+        "implementationCandidateDigestSha256": "6d3a58a0279260efca39cccf732e0780d5973351aaf986e507e4e64dfa2cb529",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: zero findings after ENP-FND-042 lifecycle correction.",
+          "PASS 2 call-graph-topology: zero findings; Knip, private-export Context oracle and deep-import scan passed.",
+          "PASS 3 behaviour-and-gates: zero findings; the post-correction full verification passed.",
+          "PASS 4 docs-and-proof-consistency: zero findings; 25 implementation tasks, two ledgers, indexes, deferred external dependency and proof ceilings agreed.",
+          "PASS 5 provider-deployment-safety: zero findings; secret-negative diff and personal-only identity stop preserved zero provider/deployment/channel mutations."
+        ],
+        "repository": "Post-correction public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 151 Codex, 45 Photon, 42 proxy and 80 agent tests.",
+        "nonClaims": "No Vercel token, GitHub secret, provider write, deployment, Codex subscription request, model call, channel send, handset behavior, strict replay oracle or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd051": {
+        "invalidatedBy": "ENP-FND-052",
+        "result": "passed",
+        "implementationCandidateDigestSha256": "cc4af0e45956c31cfc4ea07aa5d7768e3230105d9137bd8c6ca7e7832916723f",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: clean after ENP-FND-050; fresh reviewer 019ffb63-c861-79c1-be7c-d30b689d31d0 inspected Codex, proxy and Photon boundaries and focused tests passed.",
+          "PASS 2 call-graph-topology: clean; fresh reviewer 019ffb77-27ec-73d3-b3d8-8b7f4e4a1994 inspected private exports, Layer composition, source topology and one-shot stream ownership.",
+          "PASS 3 behaviour-and-gates: clean; direct observables cover credential replay, lazy stream consumption, typed Layer fallback, TestClock timeout ordering, response cancellation, unclaimed expiry and exactly-once body claims.",
+          "PASS 4 docs-and-proof-consistency: ENP-FND-051 corrected premature lifecycle claims; the restarted pass found 25 completed implementation tasks, one terminal deferred external ledger, truthful lifecycle routing and bounded evidence.",
+          "PASS 5 provider-deployment-safety: clean; secret-negative diff and the personal-only Vercel identity stop preserve zero Vercel token, GitHub secret, deployment, provider or channel mutations."
+        ],
+        "repository": "The post-ENP-FND-051 public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "lifecycle": "Both SPECs and ledgers move to implemented history; both active plans move atomically to completed history with this receipt.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, Vercel token, GitHub secret, hosted proxy, provider write, deployment, model response, channel send, handset behavior, strict candidate-specific replay oracle or Production state was exercised or proved."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "acceptedOn": "2026-08-14",
+        "implementationCandidateDigestSha256": "2ea0939ed75d15c33a60cb0c4d71ad92ee9ca47d10fce3d2865684e55b5ccd9e",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: clean; ENP-FND-053 changed documentation only, and the unchanged executable candidate retained its verified Schema, Config, service, Layer, transport, redaction and resource boundaries.",
+          "PASS 2 call-graph-topology: clean; the correction changed no executable path, export, package placement, helper, state owner or Layer lifetime, while Knip and repository boundary checks remained green.",
+          "PASS 3 behaviour-and-gates: clean; fresh full verification passed policy gates, deterministic boundary and lint fixtures, typechecks, builds and all workspace tests.",
+          "PASS 4 docs-and-proof-consistency: clean after ENP-FND-053; current summaries, task status, active routing, review dates, 248-document and 23-README inventories, invalidated history, deferred hosted work and claim ceilings agreed.",
+          "PASS 5 provider-deployment-safety: clean; the audited correction was documentation-only and secret-negative, with no workflow, credential, provider, deployment or channel mutation."
+        ],
+        "repository": "The post-ENP-FND-053 public-synthetic-Executor bun run verification passed every policy gate, HGI-307, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "lifecycle": "Both SPECs and ledgers move to implemented history; both active plans move atomically to completed history with this receipt and refreshed inventory routing.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, personal Vercel token, GitHub secret, hosted proxy, provider write, deployment, model response, channel send, handset behavior, strict candidate-specific replay oracle or Production state was exercised or proved."
       },
       "completionCriteria": [
         "All five ordered passes are recorded once after dependencies.",
@@ -589,11 +1775,11 @@
     "git diff --check"
   ],
   "nonGoals": [
-    "No runtime or lint implementation in this drafting task.",
-    "No provider, deployment, credential, webhook, release, commit, push, or merge operation.",
+    "No cosmetic Effect API conversion or bulk migration.",
+    "No provider or deployment claim inferred from repository verification; live operations are owned by the operational ledger.",
     "No wholesale Site lint import.",
     "No universal conversion to Chunk, HashMap, HashSet, Option, Match, Atom, one Ref, or non-empty arrays.",
     "No helper/common/utils sprawl, pass-through services, generic collection transforms, DTO mirrors, manual object readers, unchecked casts, or unsafe autofixes.",
-    "No modification or hosted requalification of origin/codex/eve-runtime-qualification."
+    "No modification or hosted requalification of the retired Eve integration branch."
   ]
 }

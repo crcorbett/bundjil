@@ -10,6 +10,5 @@ export class CodexOAuthOperationError extends Schema.TaggedErrorClass<CodexOAuth
   {
     operation: CodexOAuthClientOperation,
     message: CodexAuthErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

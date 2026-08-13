@@ -1,12 +1,4 @@
-import {
-  Clock,
-  Context,
-  Effect,
-  Equal,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Clock, Context, Effect, Equal, Option } from "effect";
 
 import { generateCodexOAuthCredentialRevision } from "../profiles/cipher.js";
 import { CodexOAuthProfileCommit } from "../profiles/commit.js";
@@ -90,17 +82,16 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   const credentialFromProfile = Effect.fn(
     "CodexOAuthService.credentialFromProfile"
   )(function* (profile: CodexSubscriptionProfileType) {
-    return yield* Schema.decodeUnknownEffect(CodexOAuthCredential)({
-      accessToken: Redacted.value(profile.accessToken),
-      accountId: Redacted.value(profile.accountId),
+    return yield* CodexOAuthCredential.makeEffect({
+      accessToken: profile.accessToken,
+      accountId: profile.accountId,
       credentialRevision: profile.credentialRevision,
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexOAuthOperationError({
             operation: "refresh",
             message: "Unable to construct the atomic Codex OAuth credential.",
-            cause,
           })
       )
     );
@@ -130,23 +121,20 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   )(function* (profile: CodexSubscriptionProfileType) {
     const nowEpochMillis = yield* Clock.currentTimeMillis;
     const credentialRevision = yield* generateCodexOAuthCredentialRevision();
-    const markedProfile = yield* Schema.decodeUnknownEffect(
-      CodexSubscriptionProfile
-    )({
+    const markedProfile = yield* CodexSubscriptionProfile.makeEffect({
       ...profile,
-      accessToken: Redacted.value(profile.accessToken),
-      refreshToken: Redacted.value(profile.refreshToken),
-      accountId: Redacted.value(profile.accountId),
+      accessToken: profile.accessToken,
+      refreshToken: profile.refreshToken,
+      accountId: profile.accountId,
       credentialRevision,
       requiresReauthentication: true,
       updatedAtEpochMillis: nowEpochMillis,
     }).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexOAuthOperationError({
             operation: "refresh",
             message: "Unable to construct the Codex reauthentication marker.",
-            cause,
           })
       )
     );
@@ -326,16 +314,11 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
 
           const credentialRevision =
             yield* generateCodexOAuthCredentialRevision();
-          const refreshedProfile = yield* Schema.decodeUnknownEffect(
-            CodexSubscriptionProfile
-          )({
+          const refreshedProfile = yield* CodexSubscriptionProfile.makeEffect({
             ...profile,
-            accessToken: Redacted.value(refreshResult.accessToken),
-            refreshToken:
-              refreshResult.refreshToken === undefined
-                ? Redacted.value(profile.refreshToken)
-                : Redacted.value(refreshResult.refreshToken),
-            accountId: Redacted.value(profile.accountId),
+            accessToken: refreshResult.accessToken,
+            refreshToken: refreshResult.refreshToken ?? profile.refreshToken,
+            accountId: profile.accountId,
             expiresAtEpochMillis: refreshResult.expiresAtEpochMillis,
             updatedAtEpochMillis: refreshResult.updatedAtEpochMillis,
             lastRefreshedAtEpochMillis: refreshResult.updatedAtEpochMillis,
@@ -343,12 +326,11 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
             requiresReauthentication: false,
           }).pipe(
             Effect.mapError(
-              (cause) =>
+              () =>
                 new CodexOAuthOperationError({
                   operation: "refresh",
                   message:
                     "Unable to construct the refreshed Codex subscription profile.",
-                  cause,
                 })
             )
           );
@@ -477,46 +459,53 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   });
 }).pipe(Effect.withSpan("CodexOAuthServiceLive"));
 
-export const startLogin = (input: CodexOAuthLoginStart) =>
-  Effect.gen(function* startLoginOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.startLogin(input);
-  });
+export const startLogin = Effect.fnUntraced(function* startLoginOperation(
+  input: CodexOAuthLoginStart
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.startLogin(input);
+});
 
-export const completeLogin = (input: CodexOAuthLoginCallback) =>
-  Effect.gen(function* completeLoginOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.completeLogin(input);
-  });
+export const completeLogin = Effect.fnUntraced(function* completeLoginOperation(
+  input: CodexOAuthLoginCallback
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.completeLogin(input);
+});
 
-export const getValidToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getValidTokenOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.getValidToken(subject);
-  });
+export const getValidToken = Effect.fnUntraced(function* getValidTokenOperation(
+  subject: CodexOAuthSubject
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.getValidToken(subject);
+});
 
-export const getValidCredential = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getValidCredentialOperation() {
+export const getValidCredential = Effect.fnUntraced(
+  function* getValidCredentialOperation(subject: CodexOAuthSubject) {
     const service = yield* CodexOAuthService;
     return yield* service.getValidCredential(subject);
-  });
+  }
+);
 
-export const refreshAccessToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* refreshAccessTokenOperation() {
+export const refreshAccessToken = Effect.fnUntraced(
+  function* refreshAccessTokenOperation(subject: CodexOAuthSubject) {
     const service = yield* CodexOAuthService;
     return yield* service.refreshAccessToken(subject);
-  });
+  }
+);
 
-export const recoverAfterUnauthorized = (
-  input: CodexOAuthRecoverAfterUnauthorizedInput
-) =>
-  Effect.gen(function* recoverAfterUnauthorizedOperation() {
+export const recoverAfterUnauthorized = Effect.fnUntraced(
+  function* recoverAfterUnauthorizedOperation(
+    input: CodexOAuthRecoverAfterUnauthorizedInput
+  ) {
     const service = yield* CodexOAuthService;
     return yield* service.recoverAfterUnauthorized(input);
-  });
+  }
+);
 
-export const revokeToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* revokeTokenOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.revokeToken(subject);
-  });
+export const revokeToken = Effect.fnUntraced(function* revokeTokenOperation(
+  subject: CodexOAuthSubject
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.revokeToken(subject);
+});

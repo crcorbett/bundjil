@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: Alchemy stack, remote state, Vercel or Photon provider boundary, adoption manifest, credential, drift, apply, rollback, or revocation change
 ---
 
@@ -62,6 +62,16 @@ only by owning `Config.schema` boundaries:
 - `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.
+
+The broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` remains an explicit inventory,
+adoption, and authorized configuration-command credential. The report-only
+hosted drift command does not use it. That command requires
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`: one JSON array of
+unique exact project-ID/token bindings, decoded through Effect Schema with
+each token redacted. Each binding must use a dedicated project-scoped token,
+must read its assigned project, and must be denied by the sibling project
+before the dotenv artifact enters GitHub custody. A team-wide or account-wide
+token is not a fallback.
 
 Preview inventory, adoption, and state proof use the distinct
 `BUNDJIL_PHOTON_PREVIEW_PROJECT_ID` and
@@ -384,20 +394,31 @@ The report-only path wraps the same stable stack, stage-owned R2 state, native
 desired plan, and native Alchemy `sync --dry-run`. It does not own repair.
 Before every run:
 
-1. Bind the exact source SHA and the receipt-bearing post-apply Preview
-   manifest plus its decoded digest to a one-run authority envelope that
-   validates against both the fixed harness contract and
-   `packages/infrastructure/schemas/drift-report-authority.schema.json`.
+1. Validate the static read-only policy envelope against both the fixed harness
+   contract and
+   `packages/infrastructure/schemas/drift-report-authority.schema.json`. It is
+   protected environment custody and is fingerprinted by each run; it is not a
+   one-run identity. Bind execution dynamically to the exact checked-out source
+   SHA and branded GitHub repository/run/attempt identity. Carry those values
+   plus the receipt-bearing post-apply Preview manifest's decoded digest through
+   the Schema-encoded report and bounded receipt.
    A filename containing `current` is convenience custody only and is not an
    evidence owner: stop if it differs from the last accepted post-apply
    manifest or receipt.
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
-2. Provide the authority, manifest, provider/state environment file, output
-   report, and bounded-receipt paths only through mode-`0600` custody. Never
-   put credentials in workflow YAML, tracked files, command arguments, stdout,
-   report fields, or receipts.
+2. Provide the static authority policy, manifest, provider/state environment
+   file, output report, and bounded-receipt paths only through mode-`0600`
+   custody. The environment file must contain the exact-project Vercel
+   credential JSON described above, never the broad inventory token. The
+   project provider observes each manifest project by exact ID and cannot call
+   the team-wide project-list operation under this Layer. Never put credentials
+   in workflow YAML, tracked files, command arguments, stdout, report fields,
+   or receipts. Vercel access tokens are not method-level read-only
+   credentials; project scope, dedicated revocation, the read-only command
+   graph, `contents: read`, and zero-write receipt are the compensating
+   controls.
 3. Run `bun run infrastructure:drift-report`. The command validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits

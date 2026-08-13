@@ -22,10 +22,18 @@ export type BoundaryException = Readonly<{
 
 export type BoundaryRule =
   | "boundary-raw-primitive"
+  | "operator-raw-cause"
+  | "public-data-tagged-error"
+  | "public-raw-cause"
   | "inline-string-schema"
   | "codec-provenance"
   | "raw-outbound-write"
   | "config-primitive"
+  | "direct-environment-access"
+  | "direct-platform-process"
+  | "raw-promise-coordination"
+  | "redacted-schema-roundtrip"
+  | "ambient-random-identity"
   | "direct-json"
   | "raw-fetch"
   | "public-generic-fetch"

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-harness-maintainer",
-  "lastReviewed": "2026-07-24",
+  "lastReviewed": "2026-08-13",
   "reviewTrigger": "control finding, false positive, fixture drift, owner change, command change, or accepted-outcome regression",
   "controls": [
     {
@@ -51,7 +51,7 @@
       "admissionEvidence": "Positive and negative fixtures cover exact admission, occurrence isolation, duplicates, stale entries, codecs, Config, JSON, HTTP, persistence, and assertions.",
       "falsePositiveCost": "An exact diagnostic blocks one occurrence; resolution requires an owner-named contract or a justified exact exception.",
       "repairCost": "Usually local to the adapter; repeated exceptions are retained until a proven equivalent representation exists.",
-      "carryingCost": "Maintain compiler-API matching and 18 exact occurrence records.",
+      "carryingCost": "Maintain compiler-API matching and 17 exact occurrence records.",
       "reviewTrigger": "Boundary syntax, TypeScript AST, exception, provider SDK, or source-condition change.",
       "retirement": "Replace only with equal exact-match, duplicate, occurrence-isolation, and stale-detection evidence.",
       "rollback": "Restore the last exact registry and audit together; never widen to file- or symbol-only admission.",

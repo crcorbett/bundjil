@@ -7,6 +7,7 @@ export const CodexProxySchemaBoundary = Schema.Literals([
   "CodexProxyMockStream",
   "CodexProxyRequestContentLength",
   "OpenAICompatibleChatCompletionRequest",
+  "OpenAICompatibleProxyAuthorizationHeader",
   "OpenAICompatibleProxyInput",
 ]);
 
@@ -20,6 +21,5 @@ export class CodexProxyRouteError extends Schema.TaggedErrorClass<CodexProxyRout
     message: CodexProxyDiagnosticMessage,
     responseMessage: CodexProxyDiagnosticMessage,
     status: Schema.Number.check(Schema.isFinite()),
-    cause: Schema.optional(Schema.Defect()),
   }
 ) {}

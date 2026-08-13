@@ -1,3 +1,4 @@
+/* oxlint-disable promise/prefer-await-to-callbacks -- Effect callbacks preserve the typed error channel without Promise escape. */
 import { isAbsolute } from "node:path";
 
 import { Ajv2020 } from "ajv/dist/2020.js";
@@ -57,6 +58,21 @@ export type VercelPreviewConfigurationInput =
 export type VercelPreviewConfigurationInputEncoded =
   typeof VercelPreviewConfigurationInput.Encoded;
 
+export const VercelPreviewConfigurationAuthorityFailureReason = Schema.Literals(
+  ["configurationInvalid", "authorityUnreadable", "authorityInvalid"]
+);
+export type VercelPreviewConfigurationAuthorityFailureReason =
+  typeof VercelPreviewConfigurationAuthorityFailureReason.Type;
+export type VercelPreviewConfigurationAuthorityFailureReasonEncoded =
+  typeof VercelPreviewConfigurationAuthorityFailureReason.Encoded;
+
+export class VercelPreviewConfigurationAuthorityError extends Schema.TaggedErrorClass<VercelPreviewConfigurationAuthorityError>()(
+  "VercelPreviewConfigurationAuthorityError",
+  { reason: VercelPreviewConfigurationAuthorityFailureReason }
+) {}
+export type VercelPreviewConfigurationAuthorityErrorEncoded =
+  typeof VercelPreviewConfigurationAuthorityError.Encoded;
+
 const phaseConfig = Config.schema(
   VercelPreviewConfigurationPhase,
   "BUNDJIL_PREVIEW_CONFIGURATION_PHASE"
@@ -94,14 +110,37 @@ const validateAuthority = Effect.fn(
   "VercelPreviewConfigurationAuthority.validate"
 )(function* (path: VercelPreviewConfigurationAuthorityPath) {
   const fileSystem = yield* FileSystem.FileSystem;
-  const metadata = yield* fileSystem.stat(path);
+  const metadata = yield* fileSystem.stat(path).pipe(
+    Effect.mapError(
+      () =>
+        new VercelPreviewConfigurationAuthorityError({
+          reason: "authorityUnreadable",
+        })
+    )
+  );
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-    return yield* Effect.fail("preview-configuration-authority-invalid");
+    return yield* new VercelPreviewConfigurationAuthorityError({
+      reason: "authorityInvalid",
+    });
   }
-  const text = yield* fileSystem.readFileString(path);
+  const text = yield* fileSystem.readFileString(path).pipe(
+    Effect.mapError(
+      () =>
+        new VercelPreviewConfigurationAuthorityError({
+          reason: "authorityUnreadable",
+        })
+    )
+  );
   const authority = yield* Schema.decodeUnknownEffect(
     Schema.fromJsonString(Schema.Unknown)
-  )(text);
+  )(text).pipe(
+    Effect.mapError(
+      () =>
+        new VercelPreviewConfigurationAuthorityError({
+          reason: "authorityInvalid",
+        })
+    )
+  );
   const options = {
     allErrors: true,
     strict: false,
@@ -113,7 +152,9 @@ const validateAuthority = Effect.fn(
       authority
     )
   ) {
-    return yield* Effect.fail("preview-configuration-authority-invalid");
+    return yield* new VercelPreviewConfigurationAuthorityError({
+      reason: "authorityInvalid",
+    });
   }
   return path;
 });
@@ -143,4 +184,13 @@ export const loadVercelPreviewConfigurationInput = Effect.gen(
       destructivePolicy,
     });
   }
-).pipe(Effect.withSpan("VercelPreviewConfigurationInput.load"));
+).pipe(
+  Effect.mapError((error) =>
+    Schema.is(VercelPreviewConfigurationAuthorityError)(error)
+      ? error
+      : new VercelPreviewConfigurationAuthorityError({
+          reason: "configurationInvalid",
+        })
+  ),
+  Effect.withSpan("VercelPreviewConfigurationInput.load")
+);

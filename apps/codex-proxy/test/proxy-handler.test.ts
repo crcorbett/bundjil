@@ -1,7 +1,6 @@
 import {
   CodexAccessTokenImportProfile,
   CodexAuthTemporarilyUnavailable,
-  CodexHttpClient,
   CodexHttpStatusError,
   CodexOAuthOperationError,
   CodexOAuthProfileId,
@@ -15,24 +14,27 @@ import {
   CodexReauthenticationRequired,
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleProxy,
-  makeCodexHttpClient,
   putProfile,
 } from "@bundjil/codex";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
-  makeCodexDirectProviderLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexProfileStoreEncryptedKeyValueLive,
-  OpenAICompatibleProxyLive,
+  makeOpenAICompatibleProxyLive,
 } from "@bundjil/codex/runtime";
-import { CodexOAuthMemory } from "@bundjil/codex/testing";
+import {
+  CodexOAuthMemory,
+  makeCodexDirectProviderHttpClientTestLayer,
+  makeCodexLegacyDirectProviderHttpClientTestLayer,
+} from "@bundjil/codex/testing";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, it } from "@effect/vitest";
 import {
   ConfigProvider,
   Deferred,
   Effect,
+  Exit,
   Layer,
   Redacted,
   Schema,
@@ -59,13 +61,13 @@ import {
   toCodexProxyVercelRequest,
 } from "../src/index.js";
 
-const codexHttpClientTestLayer = (client: HttpClient.HttpClient) =>
-  Layer.effect(CodexHttpClient, makeCodexHttpClient).pipe(
-    Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
-  );
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
 
 const encodeChatCompletionRequest = Schema.encodeUnknownSync(
   Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+);
+const encodeUnknownJson = Schema.encodeUnknownSync(
+  Schema.UnknownFromJsonString
 );
 
 const testConfig = makeCodexProxyConfig({
@@ -195,16 +197,20 @@ const testWebHandler = Effect.gen(function* makeTestWebHandler() {
 
 const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
   Effect.gen(function* makeLiveProxyLayer() {
+    const config = yield* liveTestConfig;
     const profile = yield* makeLiveProfile(expiresAtEpochMillis);
-    const httpClient = codexHttpClientTestLayer(
+    const directProvider = makeCodexDirectProviderHttpClientTestLayer(
+      { reasoningEffort: "low" },
       HttpClient.make((request) =>
         Effect.succeed(
           HttpClientResponse.fromWeb(
             request,
             new Response(
               [
-                'data: {"type":"response.output_text.delta","delta":"Live OK."}',
-                'data: {"type":"response.completed"}',
+                'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Live OK."}',
+                "",
+                'data: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}',
+                "",
                 "",
               ].join("\n"),
               {
@@ -215,15 +221,12 @@ const makeLiveProxyLayer = (expiresAtEpochMillis: number) =>
           )
         )
       )
-    );
-    const directProvider = makeCodexDirectProviderLive({
-      reasoningEffort: "low",
-    }).pipe(
-      Layer.provideMerge(Layer.merge(CodexOAuthMemory([profile]), httpClient))
-    );
+    ).pipe(Layer.provideMerge(CodexOAuthMemory([profile])));
 
     return Layer.merge(
-      OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider)),
+      makeOpenAICompatibleProxyLive(config.internalToken).pipe(
+        Layer.provide(directProvider)
+      ),
       CodexProxyReadyLive
     );
   });
@@ -336,7 +339,6 @@ const selectedFailureMappings = [
     error: new CodexOAuthOperationError({
       operation: "startLogin",
       message: "Internal OAuth operation detail.",
-      cause: { defect: "fixture" },
     }),
     status: 502,
     body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
@@ -356,7 +358,6 @@ const selectedFailureMappings = [
     error: new CodexProfileSchemaError({
       boundary: "CodexOAuthProfile",
       message: "Internal profile schema detail.",
-      cause: { defect: "fixture" },
     }),
     status: 502,
     body: '{"error":{"code":"codex_reauthentication_required","message":"Codex authorization requires a new trusted-local login."}}',
@@ -374,7 +375,6 @@ const selectedFailureMappings = [
       operation: "getProfile",
       key: "private-profile-key",
       message: "Internal profile storage detail.",
-      cause: { defect: "fixture" },
     }),
     status: 503,
     body: '{"error":{"code":"codex_auth_temporarily_unavailable","message":"Codex authorization is temporarily unavailable."}}',
@@ -426,7 +426,7 @@ const withLocalTestHandler = <A>(
       CodexProxyLocalProfileStoreDirectory
     )(directory);
     const config = yield* localTestConfig(localProfileStoreDirectory);
-    const profile = yield* makeLocalProfile(Date.now() + 60_000);
+    const profile = yield* makeLocalProfile(validProfileExpiryEpochMillis);
 
     yield* putProfile(profile).pipe(
       Effect.provide(makeLocalEncryptedProfileStore(localProfileStoreDirectory))
@@ -434,16 +434,20 @@ const withLocalTestHandler = <A>(
     const localProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal(
       localProfileStoreDirectory,
       { reasoningEffort: config.reasoningEffort },
+      config.internalToken,
       localCipherConfigProvider,
-      codexHttpClientTestLayer(
+      makeCodexLegacyDirectProviderHttpClientTestLayer(
+        { reasoningEffort: config.reasoningEffort },
         HttpClient.make((request) =>
           Effect.succeed(
             HttpClientResponse.fromWeb(
               request,
               new Response(
                 [
-                  'data: {"type":"response.output_text.delta","delta":"Local OK."}',
-                  'data: {"type":"response.completed"}',
+                  'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Local OK."}',
+                  "",
+                  'data: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}',
+                  "",
                   "",
                 ].join("\n"),
                 {
@@ -545,9 +549,10 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             provider: "codex",
           },
         });
-        const profile = yield* makeLiveProfile(Date.now() + 60_000);
+        const profile = yield* makeLiveProfile(validProfileExpiryEpochMillis);
         let captured: typeof CodexResponsesRequest.Type | undefined;
-        const httpClient = codexHttpClientTestLayer(
+        const directProvider = makeCodexDirectProviderHttpClientTestLayer(
+          { reasoningEffort: config.reasoningEffort },
           HttpClient.make((request) =>
             Effect.gen(function* captureEncodedProviderRequest() {
               if (request.body._tag !== "Uint8Array") {
@@ -564,8 +569,10 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
                 request,
                 new Response(
                   [
-                    'data: {"type":"response.output_text.delta","delta":"Live OK."}',
-                    'data: {"type":"response.completed"}',
+                    'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Live OK."}',
+                    "",
+                    'data: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}',
+                    "",
                     "",
                   ].join("\n"),
                   {
@@ -576,16 +583,11 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
               );
             })
           )
-        );
-        const directProvider = makeCodexDirectProviderLive({
-          reasoningEffort: config.reasoningEffort,
-        }).pipe(
-          Layer.provideMerge(
-            Layer.merge(CodexOAuthMemory([profile]), httpClient)
-          )
-        );
+        ).pipe(Layer.provideMerge(CodexOAuthMemory([profile])));
         const proxyLayer = Layer.merge(
-          OpenAICompatibleProxyLive.pipe(Layer.provide(directProvider)),
+          makeOpenAICompatibleProxyLive(config.internalToken).pipe(
+            Layer.provide(directProvider)
+          ),
           CodexProxyReadyLive
         );
         const webHandler = makeCodexProxyWebHandler(
@@ -799,6 +801,47 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
     )
   );
 
+  it.effect("rejects unsupported and non-streaming request fields", () =>
+    withTestHandler((handler) =>
+      Effect.gen(function* testStrictChatCompletionIngress() {
+        for (const body of [
+          {
+            messages: [{ content: "Say OK.", role: "user" }],
+            model: "gpt-5.5",
+            stream: false,
+          },
+          {
+            messages: [{ content: "Say OK.", role: "user" }],
+            model: "gpt-5.5",
+            stream: true,
+            temperature: 0,
+          },
+        ]) {
+          const response = yield* Effect.promise(() =>
+            handler(
+              new Request("https://bundjil.local/v1/chat/completions", {
+                body: encodeUnknownJson(body),
+                headers: {
+                  authorization: "Bearer test-internal-token",
+                  "content-type": "application/json",
+                },
+                method: "POST",
+              })
+            )
+          );
+          const responseBody = yield* Effect.promise(() => response.text());
+          const payload = yield* Schema.decodeUnknownEffect(
+            Schema.fromJsonString(CodexProxyErrorResponse)
+          )(responseBody).pipe(Effect.orDie);
+
+          assert.strictEqual(response.status, 400);
+          assert.strictEqual(payload.error.code, "bad_request");
+          assert.notInclude(responseBody, "temperature");
+        }
+      })
+    )
+  );
+
   it.effect("rejects a request body larger than one MiB", () =>
     withTestHandler((handler) =>
       Effect.gen(function* testRequestBodyLimit() {
@@ -990,6 +1033,47 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
       })
   );
 
+  it.effect(
+    "preserves defects and interruption while recovering typed Layer failures",
+    () =>
+      Effect.gen(function* testProxyLayerCauseBoundaries() {
+        const liveConfig = yield* liveTestConfig;
+        const directory = yield* Schema.decodeUnknownEffect(
+          CodexProxyLocalProfileStoreDirectory
+        )("/tmp/bundjil-codex-proxy-layer-cause-boundary");
+        const localConfig = yield* localTestConfig(directory);
+        const liveDefect = yield* Layer.build(
+          CodexProxyOpenAICompatibleProxyLiveOrUnavailable.pipe(
+            Layer.provide(
+              CodexProxyConfigLayer(liveConfig).pipe(
+                Layer.tap(() => Effect.die("live-layer-defect-sentinel"))
+              )
+            )
+          )
+        ).pipe(Effect.scoped, Effect.exit);
+        const localDefect = yield* Layer.build(
+          makeCodexProxyOpenAICompatibleProxyLocal(
+            directory,
+            { reasoningEffort: localConfig.reasoningEffort },
+            localConfig.internalToken,
+            ConfigProvider.layer(Effect.die("local-layer-defect-sentinel"))
+          )
+        ).pipe(Effect.provide(BunServices.layer), Effect.scoped, Effect.exit);
+        const localInterruption = yield* Layer.build(
+          makeCodexProxyOpenAICompatibleProxyLocal(
+            directory,
+            { reasoningEffort: localConfig.reasoningEffort },
+            localConfig.internalToken,
+            ConfigProvider.layer(Effect.interrupt)
+          )
+        ).pipe(Effect.provide(BunServices.layer), Effect.scoped, Effect.exit);
+
+        assert.isTrue(Exit.hasDies(liveDefect));
+        assert.isTrue(Exit.hasDies(localDefect));
+        assert.isTrue(Exit.hasInterrupts(localInterruption));
+      })
+  );
+
   it.effect.each(selectedFailureMappings)(
     "maps $error._tag to its byte-stable public response",
     (fixture) =>
@@ -1013,8 +1097,6 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
       new CodexHttpStatusError({
         operation: "postResponsesStream",
         status: 500,
-        statusText: "Provider detail secret",
-        contentType: "application/json",
         message: "Sanitized package failure.",
       }),
       (handler) =>
@@ -1055,7 +1137,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
   it.effect(
     "streams an imported access-only live profile through mocked fetch",
     () =>
-      withLiveTestHandler(Date.now() + 60_000, (handler) =>
+      withLiveTestHandler(validProfileExpiryEpochMillis, (handler) =>
         Effect.gen(function* testImportedLiveProfileStream() {
           const response = yield* Effect.promise(() =>
             handler(chatCompletionRequest("Bearer test-internal-token"))

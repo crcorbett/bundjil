@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { Console, Effect, Schema } from "effect";
+import { Clock, Console, Effect, Schema } from "effect";
 
 import {
   auditHarnessEvaluation,
@@ -191,12 +191,13 @@ const program = Effect.gen(function* () {
       repositoryPaths,
     })
   );
+  const generatedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
   const report = {
     checkedImpactAreas: impactLedger.impactAreas.length,
     checkedScenarios: epoch.scenarios.length,
     detailPath,
     findings,
-    generatedAt: new Date().toISOString(),
+    generatedAt: new Date(generatedAtEpochMilliseconds).toISOString(),
     ok: findings.length === 0,
     schemaVersion: 1 as const,
   };

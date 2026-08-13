@@ -5,9 +5,9 @@ import { dirname, isAbsolute } from "node:path";
 import { State } from "alchemy/State";
 import {
   Context,
-  Data,
   Effect,
   FileSystem,
+  HashSet,
   Layer,
   Match,
   Redacted,
@@ -87,6 +87,14 @@ export type PreviewStateMigrationErrorMessage =
   typeof PreviewStateMigrationErrorMessage.Type;
 export type PreviewStateMigrationErrorMessageEncoded =
   typeof PreviewStateMigrationErrorMessage.Encoded;
+
+export const PreviewStateMigrationCount = Schema.Int.pipe(
+  Schema.check(Schema.isGreaterThanOrEqualTo(0)),
+  Schema.brand("@bundjil/infrastructure/state/PreviewStateMigrationCount")
+);
+export type PreviewStateMigrationCount = typeof PreviewStateMigrationCount.Type;
+export type PreviewStateMigrationCountEncoded =
+  typeof PreviewStateMigrationCount.Encoded;
 
 export const PreviewStateMigrationFailureReason = Schema.Literals([
   "stateListFailed",
@@ -200,14 +208,15 @@ export type PreviewStateMigrationPolicy =
 export type PreviewStateMigrationPolicyEncoded =
   typeof PreviewStateMigrationPolicy.Encoded;
 
-export class PreviewStateMigrationError extends Data.TaggedError(
-  "PreviewStateMigrationError"
-)<{
-  readonly reason: PreviewStateMigrationFailureReason;
-  readonly message: PreviewStateMigrationErrorMessage;
-  readonly observedCount?: number;
-  readonly expectedCount?: number;
-}> {}
+export class PreviewStateMigrationError extends Schema.TaggedErrorClass<PreviewStateMigrationError>()(
+  "PreviewStateMigrationError",
+  {
+    reason: PreviewStateMigrationFailureReason,
+    message: PreviewStateMigrationErrorMessage,
+    observedCount: Schema.optional(PreviewStateMigrationCount),
+    expectedCount: Schema.optional(PreviewStateMigrationCount),
+  }
+) {}
 
 const migrationError = (
   reason: PreviewStateMigrationFailureReason,
@@ -220,7 +229,12 @@ const migrationError = (
   new PreviewStateMigrationError({
     reason,
     message: PreviewStateMigrationErrorMessage.make(message),
-    ...counts,
+    ...(counts === undefined
+      ? {}
+      : {
+          observedCount: PreviewStateMigrationCount.make(counts.observedCount),
+          expectedCount: PreviewStateMigrationCount.make(counts.expectedCount),
+        }),
   });
 
 export class PreviewStateBackupStore extends Context.Service<
@@ -401,11 +415,11 @@ export const makePreviewStateMigrationLayer = (
         manifest: AdoptionManifest,
         resources: readonly PreviewStateBackupResource[]
       ) {
-        const desired = new Set<string>(
+        const desired = HashSet.fromIterable(
           manifest.resources.map((resource) => resource.logicalId)
         );
         const stale = resources.filter(
-          (resource) => !desired.has(resource.logicalId)
+          (resource) => !HashSet.has(desired, resource.logicalId)
         );
         const staleFingerprints = stale
           .map((resource) => fingerprint(resource.fqn))
@@ -526,11 +540,11 @@ export const makePreviewStateMigrationLayer = (
           );
         }
         const prepared = yield* prepareResources(manifest, backup.resources);
-        const staleFqns = new Set(
+        const staleFqns = HashSet.fromIterable(
           prepared.stale.map((resource) => resource.fqn)
         );
         const expectedRetained = prepared.resources.filter(
-          (resource) => !staleFqns.has(resource.fqn)
+          (resource) => !HashSet.has(staleFqns, resource.fqn)
         );
         const currentEncoded = yield* Schema.encodeEffect(
           Schema.fromJsonString(Schema.Array(PreviewStateBackupResource))
@@ -627,11 +641,13 @@ export const makePreviewStateMigrationLayer = (
         restore: Effect.gen(function* restorePreviewState() {
           const backup = yield* backupStore.load;
           const current = yield* readResources();
-          const backupFqns = new Set(
+          const backupFqns = HashSet.fromIterable(
             backup.resources.map((resource) => resource.fqn)
           );
           yield* Effect.forEach(
-            current.filter((resource) => !backupFqns.has(resource.fqn)),
+            current.filter(
+              (resource) => !HashSet.has(backupFqns, resource.fqn)
+            ),
             (resource) =>
               state
                 .delete({

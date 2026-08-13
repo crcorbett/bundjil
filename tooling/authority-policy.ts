@@ -145,6 +145,7 @@ const requiredWorkflowPaths = [
   ".github/workflows/ci.yml",
   ".github/workflows/claude.yml",
   ".github/workflows/infrastructure-drift.yml",
+  ".github/workflows/production.yml",
   ".github/workflows/release.yml",
 ] as const;
 
@@ -157,6 +158,12 @@ const requiredAuthorityRecords = [
   },
   {
     id: "github-infrastructure-drift",
+    status: "bounded",
+    surface: "workflow",
+    target: "github-actions",
+  },
+  {
+    id: "github-production",
     status: "bounded",
     surface: "workflow",
     target: "github-actions",
@@ -281,8 +288,8 @@ const requiredAuthorityRecordById = new Map<
 >(requiredAuthorityRecords.map((record) => [record.id, record] as const));
 
 const requiredPins = {
-  "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
-  "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+  "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+  "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
   "anthropics/claude-code-action": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
   "changesets/action": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
   "oven-sh/setup-bun": "0c5077e51419868618aeaa5fe8019c62421857d6",
@@ -295,6 +302,7 @@ const approvedWorkflowsByAction: Readonly<Record<string, readonly string[]>> = {
   "actions/setup-node": [
     ".github/workflows/ci.yml",
     ".github/workflows/infrastructure-drift.yml",
+    ".github/workflows/production.yml",
     ".github/workflows/release.yml",
   ],
   "anthropics/claude-code-action": [".github/workflows/claude.yml"],
@@ -302,6 +310,7 @@ const approvedWorkflowsByAction: Readonly<Record<string, readonly string[]>> = {
   "oven-sh/setup-bun": [
     ".github/workflows/ci.yml",
     ".github/workflows/infrastructure-drift.yml",
+    ".github/workflows/production.yml",
     ".github/workflows/release.yml",
   ],
 };
@@ -353,9 +362,9 @@ const inventoryFindings = (
         "AUTH-WORKFLOW-INVENTORY",
         "GitHub workflow inventory is exact and excludes autonomous review loops",
         ".github/workflows/**",
-        "Keep only ci.yml, claude.yml, infrastructure-drift.yml, and release.yml; retire auto-review workflows",
+        "Keep only ci.yml, claude.yml, infrastructure-drift.yml, production.yml, and release.yml; retire auto-review workflows",
         `Missing: ${missing.join(", ") || "none"}; unexpected: ${unexpected.join(", ") || "none"}`,
-        "Exactly the four approved workflow paths remain"
+        "Exactly the five approved workflow paths remain"
       )
     );
   }
@@ -704,6 +713,22 @@ const infrastructureDriftFindings = (
     );
   }
   if (
+    !/BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:\s*github-actions:\$\{\{\s*github\.repository\s*\}\}:\$\{\{\s*github\.run_id\s*\}\}:\$\{\{\s*github\.run_attempt\s*\}\}/.test(
+      workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-RUN-IDENTITY",
+        "Infrastructure drift binds receipts to the exact GitHub repository, run, and attempt",
+        workflow.path,
+        "Restore the branded run identity from github.repository, github.run_id, and github.run_attempt",
+        "The dynamic GitHub run identity is absent or incomplete",
+        "Each report and receipt names its exact hosted execution identity"
+      )
+    );
+  }
+  if (
     !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
       workflow.content
     ) ||
@@ -719,6 +744,141 @@ const infrastructureDriftFindings = (
         "Keep only infrastructure:drift-report and remove apply, repair, rollback, Photon, Production, and OIDC paths",
         "The exact report command is absent or a prohibited mutation surface appears",
         "The worker can plan, observe, classify, and report but cannot apply"
+      )
+    );
+  }
+  return issues;
+};
+
+// oxlint-disable-next-line complexity -- The Production workflow policy checks every independent eligibility, custody, and rollback authority property in one auditable pass.
+const productionFindings = (
+  workflow: AuthorityWorkflow
+): readonly AuthorityFinding[] => {
+  const permissions = readMapping(workflow.document, "permissions");
+  const concurrency = readMapping(workflow.document, "concurrency");
+  const trigger = readMapping(workflow.document, "on");
+  const workflowRun = readMapping(trigger, "workflow_run");
+  const workflows = workflowRun?.["workflows"];
+  const types = workflowRun?.["types"];
+  const { content } = workflow;
+  const secretReferences = [...content.matchAll(/secrets\.([A-Z0-9_]+)/g)].map(
+    (match) => match[1]
+  );
+  const expectedSecrets = [
+    "BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN",
+    "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN",
+  ];
+  const issues: AuthorityFinding[] = [];
+  if (!exactPermissions(permissions, { contents: "read" })) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-PERMISSIONS",
+        "Production has contents-read GitHub authority only",
+        workflow.path,
+        "Set root permissions to exactly contents: read",
+        "Production permissions are widened, missing, or not exact",
+        "The writer can read source but cannot mutate repository state"
+      )
+    );
+  }
+  if (
+    concurrency?.["cancel-in-progress"] !== false ||
+    concurrency["group"] !== "production-crcorbett-bundjil"
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-CONCURRENCY",
+        "Production is globally serialized and never cancelled in flight",
+        workflow.path,
+        "Use the exact Production concurrency group with cancel-in-progress false",
+        "Production concurrency or cancellation policy drifted",
+        "A new main candidate waits for the current writer"
+      )
+    );
+  }
+  if (
+    !Array.isArray(workflows) ||
+    workflows.length !== 1 ||
+    workflows[0] !== "CI" ||
+    !Array.isArray(types) ||
+    types.length !== 1 ||
+    types[0] !== "completed"
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-TRIGGER",
+        "Production reacts only to completed CI workflow runs",
+        workflow.path,
+        "Restore workflow_run workflows [CI] and types [completed]",
+        "The Production signal set drifted",
+        "Only completed CI runs can reach eligibility gates"
+      )
+    );
+  }
+  const requiredGates = [
+    /github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/,
+    /github\.event\.workflow_run\.conclusion\s*==\s*['"]success['"]/,
+    /github\.event\.workflow_run\.event\s*==\s*['"]push['"]/,
+    /github\.event\.workflow_run\.head_branch\s*==\s*['"]main['"]/,
+    /github\.event\.workflow_run\.head_repository\.full_name\s*==\s*['"]crcorbett\/bundjil['"]/,
+  ];
+  if (requiredGates.some((gate) => !gate.test(content))) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-TARGET",
+        "Production requires successful same-repository main-push CI",
+        workflow.path,
+        "Restore every exact repository, conclusion, event, branch, and head-repository gate",
+        "One or more exact eligibility gates are absent",
+        "Pull requests, forks, failures, other branches and other workflows cannot deploy"
+      )
+    );
+  }
+  if (
+    !/environment:\s*Production/.test(content) ||
+    !/ref:\s*\$\{\{\s*github\.event\.workflow_run\.head_sha\s*\}\}/.test(
+      content
+    ) ||
+    !/persist-credentials:\s*false/.test(content)
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-ENVIRONMENT",
+        "Production uses its exact environment and accepted SHA checkout",
+        workflow.path,
+        "Restore Production environment, exact head SHA checkout and disabled checkout credentials",
+        "Environment or checkout identity gate drifted",
+        "Only the accepted SHA reaches the bounded writer identity"
+      )
+    );
+  }
+  if (
+    secretReferences.length !== expectedSecrets.length ||
+    expectedSecrets.some((secret) => !secretReferences.includes(secret))
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-CUSTODY",
+        "Production resolves exactly two project-scoped Vercel tokens",
+        workflow.path,
+        "Reference only the agent and proxy project-scoped token secrets",
+        `Observed secret references: ${secretReferences.join(", ") || "none"}`,
+        "No account-wide or unrelated secret reaches the writer"
+      )
+    );
+  }
+  if (
+    !/run:\s*bun run production:deploy/.test(content) ||
+    /run:[^\n]*(?:vercel\s+(?:deploy|promote|rollback)|--token)/i.test(content)
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-BOUNDARY",
+        "Production mutations use only the repository-owned Effect command",
+        workflow.path,
+        "Invoke only bun run production:deploy and keep raw Vercel/token commands out of YAML",
+        "The owned command is absent or a raw mutation/token path appears",
+        "Schema, Config, rollback and receipt policy remain in one tested boundary"
       )
     );
   }
@@ -958,6 +1118,9 @@ const workflowFindings = (
     }
     case ".github/workflows/infrastructure-drift.yml": {
       return [...common, ...infrastructureDriftFindings(workflow)];
+    }
+    case ".github/workflows/production.yml": {
+      return [...common, ...productionFindings(workflow)];
     }
     case ".github/workflows/release.yml": {
       return [...common, ...releaseFindings(workflow)];

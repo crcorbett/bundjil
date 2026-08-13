@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/oxlintrc.json",
+  "jsPlugins": ["../oxlint-plugin.ts"],
+  "rules": {
+    "bundjil/no-ambient-time-in-effect": "error",
+    "bundjil/no-async-await-in-effect-service": "error",
+    "bundjil/no-exported-effect-gen-function": "error",
+    "bundjil/no-layer-or-die-in-service": "error",
+    "bundjil/no-primitive-effect-failure": "error",
+    "bundjil/no-runtime-execution-outside-boundary": "error",
+    "bundjil/no-unregistered-native-collection": "error",
+    "bundjil/require-try-promise-catch": "error"
+  }
+}

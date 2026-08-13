@@ -5,6 +5,7 @@ import {
   ConfigProvider,
   Effect,
   Layer,
+  Random,
   Redacted,
   Result,
   Schema,
@@ -21,6 +22,7 @@ import {
   CodexOAuthRefreshLockTtlMillis,
   CodexOAuthSubject,
   CodexSubscriptionProfile,
+  generateCodexOAuthCredentialRevision,
   getProfile,
   putProfile,
 } from "../src/index.js";
@@ -48,6 +50,20 @@ const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   installationId: "agent-dev",
   profileId: "default",
 });
+
+it.effect("generates deterministic distinct credential revisions", () =>
+  Effect.gen(function* testCredentialRevisionRandomness() {
+    const generatePair = Effect.all([
+      generateCodexOAuthCredentialRevision(),
+      generateCodexOAuthCredentialRevision(),
+    ]);
+    const first = yield* generatePair.pipe(Random.withSeed("revision-seed"));
+    const replay = yield* generatePair.pipe(Random.withSeed("revision-seed"));
+
+    assert.deepStrictEqual(first, replay);
+    assert.notStrictEqual(first[0], first[1]);
+  })
+);
 
 const makeLegacyProfile = (subject: CodexOAuthSubjectType) =>
   Schema.decodeUnknownEffect(CodexAccessTokenImportProfile)({

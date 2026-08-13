@@ -10,8 +10,8 @@ import type {
 } from "./authority-policy.js";
 
 const pins = {
-  "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
-  "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+  "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+  "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
   "anthropics/claude-code-action": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
   "changesets/action": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
   "oven-sh/setup-bun": "0c5077e51419868618aeaa5fe8019c62421857d6",
@@ -40,7 +40,7 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@${pins["actions/checkout"]} # v4
+      - uses: actions/checkout@${pins["actions/checkout"]} # v7.0.1
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
 `
@@ -69,6 +69,7 @@ jobs:
     environment: infrastructure-read-only-preview
     env:
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:\${{ github.repository }}:\${{ github.run_id }}:\${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
       DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
@@ -80,6 +81,39 @@ jobs:
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
       - run: bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report
+`
+  );
+
+const production = () =>
+  workflow(
+    ".github/workflows/production.yml",
+    `name: Production
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: production-crcorbett-bundjil
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.repository == 'crcorbett/bundjil' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == 'crcorbett/bundjil'
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    environment: Production
+    env:
+      BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
+      BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@${pins["actions/checkout"]}
+        with:
+          persist-credentials: false
+          ref: \${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@${pins["actions/setup-node"]}
+      - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
+      - run: bun run production:deploy
 `
   );
 
@@ -150,6 +184,12 @@ const authorityRows = [
   },
   {
     id: "github-infrastructure-drift",
+    status: "bounded",
+    surface: "workflow",
+    target: "github-actions",
+  },
+  {
+    id: "github-production",
     status: "bounded",
     surface: "workflow",
     target: "github-actions",
@@ -317,6 +357,7 @@ const actionRows = [
       ".github/workflows/ci.yml",
       ".github/workflows/claude.yml",
       ".github/workflows/infrastructure-drift.yml",
+      ".github/workflows/production.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["actions/checkout"],
@@ -326,6 +367,7 @@ const actionRows = [
     approvedWorkflows: [
       ".github/workflows/ci.yml",
       ".github/workflows/infrastructure-drift.yml",
+      ".github/workflows/production.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["actions/setup-node"],
@@ -335,6 +377,7 @@ const actionRows = [
     approvedWorkflows: [
       ".github/workflows/ci.yml",
       ".github/workflows/infrastructure-drift.yml",
+      ".github/workflows/production.yml",
       ".github/workflows/release.yml",
     ],
     pin: pins["oven-sh/setup-bun"],
@@ -377,9 +420,10 @@ const snapshot = (): AuthoritySnapshot => ({
     ".github/workflows/ci.yml",
     ".github/workflows/claude.yml",
     ".github/workflows/infrastructure-drift.yml",
+    ".github/workflows/production.yml",
     ".github/workflows/release.yml",
   ],
-  workflows: [ci(), claude(), infrastructureDrift(), release()],
+  workflows: [ci(), claude(), infrastructureDrift(), production(), release()],
 });
 
 const run = (input = snapshot()) =>
@@ -522,6 +566,15 @@ describe("HGI-304 authority policy", () => {
         "{{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_EXTRA }}\n",
     ],
     [
+      "dynamic run identity removed",
+      "AUTH-DRIFT-RUN-IDENTITY",
+      (content: string) =>
+        content.replace(
+          /^\s*BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:.*$/m,
+          ""
+        ),
+    ],
+    [
       "report command changed to apply",
       "AUTH-DRIFT-MUTATION",
       (content: string) =>
@@ -536,6 +589,67 @@ describe("HGI-304 authority policy", () => {
       const broken = withWorkflow(
         snapshot(),
         ".github/workflows/infrastructure-drift.yml",
+        mutate
+      );
+      const codes = new Set(run(broken).findings.map((issue) => issue.code));
+      expect(codes).toContain(expectedCode);
+    }
+  );
+
+  it.each([
+    [
+      "widened repository permission",
+      "AUTH-PRODUCTION-PERMISSIONS",
+      (content: string) => content.replace("contents: read", "contents: write"),
+    ],
+    [
+      "in-flight cancellation enabled",
+      "AUTH-PRODUCTION-CONCURRENCY",
+      (content: string) =>
+        content.replace(
+          "cancel-in-progress: false",
+          "cancel-in-progress: true"
+        ),
+    ],
+    [
+      "CI success trigger replaced",
+      "AUTH-PRODUCTION-TRIGGER",
+      (content: string) => content.replace("workflow_run:", "push:"),
+    ],
+    [
+      "same-repository gate changed",
+      "AUTH-PRODUCTION-TARGET",
+      (content: string) =>
+        content.replace("crcorbett/bundjil", "other/repository"),
+    ],
+    [
+      "protected environment changed",
+      "AUTH-PRODUCTION-ENVIRONMENT",
+      (content: string) =>
+        content.replace("environment: Production", "environment: Preview"),
+    ],
+    [
+      "extra credential added",
+      "AUTH-PRODUCTION-CUSTODY",
+      (content: string) =>
+        [
+          content,
+          "\n# $",
+          "{{ secrets.BUNDJIL_PRODUCTION_EXTRA_TOKEN }}\n",
+        ].join(""),
+    ],
+    [
+      "owned command changed",
+      "AUTH-PRODUCTION-BOUNDARY",
+      (content: string) =>
+        content.replace("bun run production:deploy", "vercel --prod"),
+    ],
+  ])(
+    "rejects Production property independently: %s",
+    (_name, expectedCode, mutate) => {
+      const broken = withWorkflow(
+        snapshot(),
+        ".github/workflows/production.yml",
         mutate
       );
       const codes = new Set(run(broken).findings.map((issue) => issue.code));

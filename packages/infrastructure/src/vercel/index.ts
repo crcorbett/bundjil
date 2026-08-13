@@ -1,5 +1,9 @@
 export {
   loadVercelStableEnvironmentAuthority,
+  VercelStableEnvironmentAuthorityError,
+  type VercelStableEnvironmentAuthorityErrorEncoded,
+  VercelStableEnvironmentAuthorityFailureReason,
+  type VercelStableEnvironmentAuthorityFailureReasonEncoded,
   VercelStableEnvironmentAuthorityPath,
   type VercelStableEnvironmentAuthorityPathEncoded,
 } from "./stable-environment-authority.js";
@@ -62,6 +66,10 @@ export {
 } from "./configuration-providers.js";
 export {
   loadVercelPreviewConfigurationInput,
+  VercelPreviewConfigurationAuthorityError,
+  type VercelPreviewConfigurationAuthorityErrorEncoded,
+  VercelPreviewConfigurationAuthorityFailureReason,
+  type VercelPreviewConfigurationAuthorityFailureReasonEncoded,
   VercelPreviewConfigurationAuthorityPath,
   type VercelPreviewConfigurationAuthorityPathEncoded,
   VercelPreviewConfigurationInput,
@@ -112,6 +120,7 @@ export {
   VercelStableEnvironmentWriteError,
 } from "./stable-environment.js";
 export {
+  VercelCredentialError,
   VercelDeploymentsReadError,
   VercelDomainsReadError,
   VercelEnvironmentVariablesReadError,
@@ -119,11 +128,9 @@ export {
   VercelProjectsReadError,
 } from "./errors.js";
 export {
-  VercelAccessToken,
-  type VercelAccessTokenEncoded,
-  VercelCredentials,
   VercelCredentialsLive,
   VercelLive,
+  VercelProjectCredentialsLive,
 } from "./live.layer.js";
 export {
   emptyVercelInventory,
@@ -174,6 +181,12 @@ export {
   type ObserveVercelProjectDomainEncoded,
   VercelCanonicalDomain,
   type VercelCanonicalDomainEncoded,
+  VercelAccessToken,
+  type VercelAccessTokenEncoded,
+  VercelCredentialFailureReason,
+  type VercelCredentialFailureReasonEncoded,
+  VercelCredentialScope,
+  type VercelCredentialScopeEncoded,
   VercelDeploymentId,
   type VercelDeploymentIdEncoded,
   VercelDeploymentObservation,
@@ -262,6 +275,8 @@ export {
   type VercelTeamIdEncoded,
 } from "./schemas.js";
 export {
+  VercelCredentials,
+  type VercelCredentialsShape,
   VercelDeployments,
   type VercelDeploymentsShape,
   VercelDomains,
@@ -273,3 +288,34 @@ export {
   VercelProjects,
   type VercelProjectsShape,
 } from "./services.js";
+export { ProductionDeploymentError } from "./production.errors.js";
+export {
+  makeProductionDeploymentsMemory,
+  ProductionDeploymentMemoryControl,
+  type ProductionDeploymentMemoryInput,
+  type ProductionDeploymentMemorySnapshot,
+  ProductionMemoryFailure,
+} from "./production-memory.layer.js";
+export {
+  ProductionDeploymentConfigLive,
+  ProductionDeploymentConfigService,
+  ProductionDeploymentsLive,
+} from "./production.live.layer.js";
+export {
+  AutomaticProductionReceipt,
+  type AutomaticProductionReceipt as AutomaticProductionReceiptType,
+  AutomaticProductionReceiptJson,
+  AutomaticProductionStatus,
+  InspectProductionDeployment,
+  ProductionDeployment,
+  type ProductionDeployment as ProductionDeploymentType,
+  ProductionDeploymentUrl,
+  ProductionProject,
+  ProductionProxyHealth,
+  StageProductionDeployment,
+} from "./production.schemas.js";
+export {
+  ProductionDeployments,
+  type ProductionDeploymentsShape,
+} from "./production.service.js";
+export { runAutomaticProduction } from "./production.js";

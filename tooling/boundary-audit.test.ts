@@ -1,6 +1,6 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -8,10 +8,11 @@ import { auditBoundaryProvenance } from "./boundary-audit.js";
 import type { BoundaryException } from "./boundary-exceptions.js";
 
 const directories: string[] = [];
-const fixture = (source: string) => {
+const fixture = (source: string, relativePath = "fixture.ts") => {
   const cwd = mkdtempSync(join(tmpdir(), "bundjil-boundary-audit-"));
   directories.push(cwd);
-  const file = join(cwd, "fixture.ts");
+  const file = join(cwd, relativePath);
+  mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, source);
   return { cwd, file };
 };
@@ -58,10 +59,51 @@ describe("boundary provenance audit", () => {
     ],
     ["direct-json", "export const decode = () => JSON.parse('{}');"],
     [
+      "raw-promise-coordination",
+      "export const load = () => Promise.all([fetch('/a'), fetch('/b')]);",
+    ],
+    [
+      "raw-promise-coordination",
+      "export const fastest = () => Promise.race([fetch('/a'), fetch('/b')]);",
+    ],
+    [
+      "redacted-schema-roundtrip",
+      "const Config = Schema.Struct({ token: Schema.RedactedFromValue(Schema.NonEmptyString) }); export const config = Schema.decodeUnknownEffect(Config)({ token: Redacted.value(token) });",
+    ],
+    [
+      "ambient-random-identity",
+      "export const id = () => globalThis.crypto.randomUUID();",
+    ],
+    ["ambient-random-identity", "export const id = () => Math.random();"],
+    [
       "sync-schema-codec",
       "export const decode = () => Schema.decodeSync(Value);",
     ],
     ["config-primitive", "export const token = Config.redacted('TOKEN');"],
+    [
+      "direct-environment-access",
+      "export const token = process.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = globalThis.process.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = Bun.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-environment-access",
+      "export const token = import.meta.env.PROVIDER_TOKEN;",
+    ],
+    [
+      "direct-platform-process",
+      "export const run = () => Bun.spawn(['vercel', 'deploy']);",
+    ],
+    [
+      "direct-platform-process",
+      "export const run = () => Bun.spawnSync(['vercel', 'deploy']);",
+    ],
     [
       "raw-fetch",
       "export const request = () => fetch('https://example.test');",
@@ -88,6 +130,22 @@ describe("boundary provenance audit", () => {
       "export const Account = Schema.Struct({ id: Schema.String });",
     ],
     [
+      "public-raw-cause",
+      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.Defect() }) {}",
+    ],
+    [
+      "public-raw-cause",
+      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.optional(Schema.Defect()) }) {}",
+    ],
+    [
+      "public-raw-cause",
+      "export const ProviderFailure = Schema.Struct({ details: Schema.Defect() });",
+    ],
+    [
+      "public-data-tagged-error",
+      "export class ProviderFailure extends Data.TaggedError('ProviderFailure')<{ readonly reason: 'failed' }> {}",
+    ],
+    [
       "raw-outbound-write",
       "export const send = () => HttpClientRequest.bodyText('raw');",
     ],
@@ -105,6 +163,59 @@ describe("boundary provenance audit", () => {
       "export const handler = (request: Request): Promise<Response> => Promise.resolve(new Response(request.url));"
     );
     expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("accepts revealing a redacted value at an outbound header boundary", () => {
+    const { cwd, file } = fixture(`
+      export const request = HttpClientRequest.setHeader(
+        HttpClientRequest.get("https://example.test"),
+        "authorization",
+        Redacted.value(token)
+      );
+    `);
+    expect(auditBoundaryProvenance({ cwd, files: [file] })).toStrictEqual([]);
+  });
+
+  it("rejects arbitrary unknown fields retained by operator errors", () => {
+    const { cwd, file } = fixture(
+      `
+        import { Data } from "effect";
+        class ProofFailure extends Data.TaggedError("ProofFailure")<{
+          readonly providerFailure: unknown;
+        }> {}
+      `,
+      "packages/example/scripts/prove.ts"
+    );
+    expect(
+      auditBoundaryProvenance({ cwd, files: [file] }).map(
+        (diagnostic) => diagnostic.rule
+      )
+    ).toContain("operator-raw-cause");
+  });
+
+  it("accepts a bounded operator error and private adapter cause", () => {
+    const operator = fixture(
+      `
+        import { Data } from "effect";
+        class ProofFailure extends Data.TaggedError("ProofFailure")<{
+          readonly classification: "request_failed";
+        }> {}
+      `,
+      "packages/example/scripts/prove.ts"
+    );
+    expect(
+      auditBoundaryProvenance({ cwd: operator.cwd, files: [operator.file] })
+    ).toStrictEqual([]);
+
+    const adapter = fixture(`
+      import { Data } from "effect";
+      class ProviderFailure extends Data.TaggedError("ProviderFailure")<{
+        readonly cause: unknown;
+      }> {}
+    `);
+    expect(
+      auditBoundaryProvenance({ cwd: adapter.cwd, files: [adapter.file] })
+    ).toStrictEqual([]);
   });
 
   it("does not reject a domain contract solely because its name resembles HTTP transport", () => {
@@ -134,6 +245,43 @@ describe("boundary provenance audit", () => {
     ],
   ])("rejects inline string fields in exported Schema.%s", (_name, source) => {
     const { cwd, file } = fixture(source);
+    expect(
+      auditBoundaryProvenance({ cwd, files: [file] }).map(
+        (diagnostic) => diagnostic.rule
+      )
+    ).toContain("inline-string-schema");
+  });
+
+  it("rejects an inline string hidden in a shared tagged-error field object", () => {
+    const { cwd, file } = fixture(`
+      const ProviderErrorFields = { message: Schema.NonEmptyString };
+      export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+        "ProviderError",
+        ProviderErrorFields
+      ) {}
+    `);
+    expect(
+      auditBoundaryProvenance({ cwd, files: [file] }).map(
+        (diagnostic) => diagnostic.rule
+      )
+    ).toContain("inline-string-schema");
+  });
+
+  it("rejects an inline string hidden in an imported tagged-error field object", () => {
+    const { cwd, file } = fixture(
+      `
+        import { ProviderErrorFields } from "./fields.js";
+        export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+          "ProviderError",
+          ProviderErrorFields
+        ) {}
+      `,
+      "packages/example/error.ts"
+    );
+    writeFileSync(
+      join(cwd, "packages/example/fields.ts"),
+      "export const ProviderErrorFields = { message: Schema.NonEmptyString };"
+    );
     expect(
       auditBoundaryProvenance({ cwd, files: [file] }).map(
         (diagnostic) => diagnostic.rule

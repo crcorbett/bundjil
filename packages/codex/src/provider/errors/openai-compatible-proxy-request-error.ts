@@ -10,6 +10,5 @@ export class OpenAICompatibleProxyRequestError extends Schema.TaggedErrorClass<O
   {
     operation: OpenAICompatibleProxyOperation,
     message: CodexProviderErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

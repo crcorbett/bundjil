@@ -11,11 +11,16 @@ review_trigger: Vercel project, deployment, environment, domain, protection, var
 
 ## Scope and non-claims
 
-Use this runbook for the sequential Vercel rollout of the Codex proxy, agent,
-and clean Sendblue plus Photon Channel routes. The repository command validates a sanitized
-snapshot; it does not fetch Vercel state, deploy, promote, roll back, grant
-authority, or establish Production. The deferred Eve live-state decision
-remains in force until a fresh target-owned readback is retained.
+Use this runbook for the coordinated Vercel rollout of the Codex proxy, agent,
+and clean Sendblue plus Photon Channel routes. Accepted pushes to `main` deploy
+automatically only after the matching repository `CI` run succeeds. The
+`Production` workflow stages both immutable candidates with domains skipped,
+validates target and source identity, re-reads `main`, promotes proxy then
+agent, verifies stable targets and proxy health, and restores the exact prior
+deployments on an uncertain or partial failure. Direct Vercel Git deployment
+remains disabled. Repository source and local tests do not establish GitHub
+custody, hosted execution, Vercel state, live runtime behavior, or Channel
+proof.
 
 ## Preconditions
 
@@ -42,15 +47,15 @@ HEAD`, and a readback of `origin/main`.
 
 ## Authority envelope
 
-| Field               | Required value                                                                                                     |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Identity            | Authenticated Vercel principal, team/scope, and human approver                                                     |
-| Operation           | One read, staged deploy, promote, rollback, environment/alias change, or exact Channel provider activation         |
-| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                    |
-| Environment         | Explicit Vercel Preview or Production target                                                                       |
-| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                   |
-| Approval            | Addressable receipt matching operation, project, environment, source SHA, and deployment                           |
-| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim |
+| Field               | Required value                                                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Identity            | Exact GitHub workload plus two separately revocable exact-project Vercel credentials proved by assigned-project access and sibling-project denial, or an authenticated emergency operator and approver |
+| Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                                                             |
+| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                                                        |
+| Environment         | Explicit Vercel Preview or Production target                                                                                                                                                           |
+| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                                                                                                       |
+| Approval            | Admitted automatic envelope for an eligible successful CI run, or an addressable emergency receipt matching operation, project, environment, source SHA, and deployment                                |
+| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim                                                                                     |
 
 ## Inputs and secret handling
 
@@ -177,23 +182,24 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    the newly pushed SHA while preserving the distinct stable-alias rollback
    deployment.
 
-6. **Mutation gate:** stop before deploy, promote, alias/environment change, or
-   rollback until the complete stage-specific authority envelope is attached.
-   Confirm both app-owned `vercel.json` files still decode
-   `git.deploymentEnabled: false`; a Git push must trigger CI only and must not
-   be used as candidate creation or promotion. Compare the exact project
-   deployment inventories immediately before and after the pushed SHA and stop
-   if either project gained a Git-triggered deployment.
-   When granted, operate one app and one stage only. Link the repository root to
-   the exact project, read back `.vercel/project.json`, and confirm its project
-   ID matches the provider project. Because the provider applies the configured
-   app Root Directory, the staged pattern from that linked root is
-   `vercel deploy --prod --skip-domain --cwd . --scope
-"$BUNDJIL_VERCEL_SCOPE"`, followed only after acceptance by `vercel promote
-"$DEPLOYMENT_URL" --scope "$BUNDJIL_VERCEL_SCOPE"`. Stop if the CLI resolves a
-   doubled app path, an unrequested project, or any project other than the
-   read-backed target. Do not use `--yes` for deployment, inline secret flags,
-   or an unreviewed prebuilt artifact.
+6. **Automatic mutation gate:** confirm both app-owned `vercel.json` files
+   still decode `git.deploymentEnabled: false`; direct Vercel Git automation
+   must create no deployment. An eligible successful same-repository `CI`
+   `workflow_run` for a `push` to `main` starts the distinct `Production`
+   workflow. It checks out the event's exact head SHA without persisted Git
+   credentials and invokes only `bun run production:deploy` in the protected
+   `Production` environment. The command uses exactly two project-scoped
+   tokens and fixed Personal team/project IDs. It reads current proxy and
+   agent targets, stages both candidates using `vercel deploy --prod
+--skip-domain`, validates each immutable project/SHA/READY identity, and
+   re-reads `origin/main` before any promote. A stale candidate is an explicit
+   no-op. It promotes proxy then agent, validates each stable target and probes
+   proxy health. Any uncertain or partial failure restores the exact prior
+   agent then proxy identities as applicable and verifies both. An
+   already-current SHA is an idempotent no-op. The repository-wide queue never
+   cancels an in-flight writer. Stop on any eligibility, credential, project,
+   source, readiness, alias, health, timeout, output, or rollback mismatch.
+   Do not run `production:deploy` interactively as a routine alternative.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the
    immutable candidate URL. For the ordinary one-callback `Stable` topology,
@@ -260,9 +266,11 @@ retain raw provider output containing secrets or payloads.
 
 ## Rollback and revocation
 
-Rollback requires a fresh readback proving the current deployment/config still
-matches the accepted `current` reference and the previous reference is
-distinct. Under separate authority, use `vercel rollback
+The automatic command performs immediate failure rollback from its captured
+pre-mutation identities. A later or operator-initiated rollback requires a
+fresh readback proving the current deployment/config still matches the
+accepted `current` reference and the previous reference is distinct. Under
+separate emergency authority, use `vercel rollback
 "$PREVIOUS_DEPLOYMENT" --scope "$BUNDJIL_VERCEL_SCOPE"`, then re-read project,
 deployment, alias, variable metadata, and app proof. Coordinate proxy and agent
 configuration; preserve the newest fenced OAuth profile generation. Before

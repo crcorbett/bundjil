@@ -144,11 +144,11 @@ const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
         }).pipe(Effect.provideContext(context))
       );
     })
-  ).pipe(Layer.provide(dependencies), Layer.orDie);
+  ).pipe(Layer.provide(dependencies));
 };
 
 export const layerAlchemyR2State = Layer.unwrap(
   loadAlchemyR2StateConfig.pipe(Effect.map(layerForAlchemyR2StateConfig))
-).pipe(Layer.orDie);
+);
 
 export const layerAlchemyR2StateMemory = inMemoryState();

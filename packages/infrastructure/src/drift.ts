@@ -6,6 +6,7 @@ import {
   InfrastructureReceiptStatus,
 } from "./receipt.js";
 import {
+  AdoptionManifestDigest,
   InfrastructureOutcomeCertainty,
   InfrastructureOwnershipState,
   InfrastructureResourceKind,
@@ -53,6 +54,19 @@ export type InfrastructureDriftSourceSha =
   typeof InfrastructureDriftSourceSha.Type;
 export type InfrastructureDriftSourceShaEncoded =
   typeof InfrastructureDriftSourceSha.Encoded;
+
+export const InfrastructureDriftRunIdentity = Schema.String.pipe(
+  Schema.check(
+    Schema.isPattern(
+      /^github-actions:crcorbett\/bundjil:[1-9][0-9]*:[1-9][0-9]*$/
+    )
+  ),
+  Schema.brand("@bundjil/infrastructure/InfrastructureDriftRunIdentity")
+);
+export type InfrastructureDriftRunIdentity =
+  typeof InfrastructureDriftRunIdentity.Type;
+export type InfrastructureDriftRunIdentityEncoded =
+  typeof InfrastructureDriftRunIdentity.Encoded;
 
 export const InfrastructureDriftAction = Schema.Literals([
   "unchanged",
@@ -224,6 +238,7 @@ export type InfrastructureDriftDesiredPlanEncoded =
 
 export const InfrastructureDriftReportInput = Schema.Struct({
   authorityFingerprint: InfrastructureDriftResourceFingerprint,
+  manifestDigest: AdoptionManifestDigest,
   observedAt: Schema.String.pipe(
     Schema.check(
       Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/)
@@ -234,6 +249,7 @@ export const InfrastructureDriftReportInput = Schema.Struct({
     Schema.check(Schema.isMinLength(1))
   ),
   runDurationMilliseconds: NonNegativeInt,
+  runIdentity: InfrastructureDriftRunIdentity,
   sourceSha: InfrastructureDriftSourceSha,
   stage: InfrastructureStage,
 });
@@ -266,11 +282,13 @@ export const InfrastructureDriftReport = Schema.Struct({
   }),
   desiredPlan: InfrastructureDriftDesiredPlan,
   findings: Schema.Array(InfrastructureDriftFinding),
+  manifestDigest: AdoptionManifestDigest,
   nonClaims: Schema.Array(Schema.NonEmptyString).pipe(
     Schema.check(Schema.isMinLength(1))
   ),
   observedAt: InfrastructureDriftReportInput.fields.observedAt,
   runDurationMilliseconds: NonNegativeInt,
+  runIdentity: InfrastructureDriftRunIdentity,
   schemaVersion: Schema.Literal(1),
   sourceSha: InfrastructureDriftSourceSha,
   stage: InfrastructureStage,
@@ -435,6 +453,7 @@ export const buildInfrastructureDriftReport = Effect.fn(
     authorityFingerprint: input.authorityFingerprint,
     counts,
     findings,
+    manifestDigest: input.manifestDigest,
     desiredPlan: input.desiredPlan,
     nonClaims: [
       "A report-only run does not authorize repair, apply, deployment, promotion, credential change, provider mutation, or Production access.",
@@ -443,6 +462,7 @@ export const buildInfrastructureDriftReport = Effect.fn(
     ],
     observedAt: input.observedAt,
     runDurationMilliseconds: input.runDurationMilliseconds,
+    runIdentity: input.runIdentity,
     schemaVersion: 1,
     sourceSha: input.sourceSha,
     stage: input.stage,
@@ -470,7 +490,7 @@ export const buildInfrastructureDriftReceipt = Effect.fn(
   );
   return yield* Effect.succeed(
     InfrastructureBoundedReceipt.make({
-      actor: report.sourceSha,
+      actor: report.runIdentity,
       authorityReceipt: input.authorityReceipt,
       candidateIdentity: report.sourceSha,
       claim:
@@ -485,6 +505,7 @@ export const buildInfrastructureDriftReceipt = Effect.fn(
       nonClaims: report.nonClaims,
       observations: [
         `status:${report.status}`,
+        `manifest-digest:${report.manifestDigest}`,
         `accepted:${report.counts.accepted}`,
         `report:${report.counts.report}`,
         `blocking:${report.counts.blocking}`,

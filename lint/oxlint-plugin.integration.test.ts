@@ -1,0 +1,129 @@
+import { spawnSync } from "node:child_process";
+import { rmSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+import { describe, expect, it } from "vitest";
+
+import { deterministicEffectNativeVitestFixture } from "../packages/codex/test/fixtures/effect-native-vitest-positive.js";
+
+const runFixture = (fixture: string) => {
+  const child = spawnSync(
+    "bunx",
+    [
+      "--bun",
+      "oxlint",
+      "--config",
+      "lint/fixtures/effect-native.config.json",
+      fixture,
+    ],
+    { encoding: "utf-8" }
+  );
+  return {
+    exitCode: child.status,
+    output: `${child.stdout}\n${child.stderr}`,
+  };
+};
+
+describe("installed Bundjil Oxlint plugin", () => {
+  it("accepts the exact positive fixture", () => {
+    const result = runFixture("lint/fixtures/effect-native-positive.ts");
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain("bundjil(");
+  });
+
+  it("accepts the Effect TestClock fixture through installed Oxlint", () => {
+    const result = runFixture(
+      "lint/fixtures/effect-native-test-clock-positive.ts"
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain("bundjil(");
+  });
+
+  it("accepts the package-resolved @effect/vitest fixture", () => {
+    expect(deterministicEffectNativeVitestFixture).toBeDefined();
+    const result = runFixture(
+      "packages/codex/test/fixtures/effect-native-vitest-positive.ts"
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain("bundjil(");
+  });
+
+  it("rejects every exact negative rule fixture by stable ID", () => {
+    const result = runFixture("lint/fixtures/effect-native-negative.ts");
+    expect(result.exitCode).not.toBe(0);
+    for (const rule of [
+      "bundjil(no-ambient-time-in-effect)",
+      "bundjil(no-async-await-in-effect-service)",
+      "bundjil(no-exported-effect-gen-function)",
+      "bundjil(no-layer-or-die-in-service)",
+      "bundjil(no-primitive-effect-failure)",
+      "bundjil(no-runtime-execution-outside-boundary)",
+      "bundjil(no-unregistered-native-collection)",
+      "bundjil(require-try-promise-catch)",
+    ]) {
+      expect(result.output).toContain(rule);
+    }
+  });
+
+  it("applies ambient-time enforcement to owned tooling", () => {
+    const probe = "tooling/.ambient-time-lint-probe.ts";
+    writeFileSync(resolve(probe), "new Date();\n");
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-ambient-time-in-effect)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
+    }
+  });
+
+  it("applies primitive-failure enforcement to infrastructure scripts", () => {
+    const probe =
+      "packages/infrastructure/scripts/.primitive-failure-lint-probe.ts";
+    writeFileSync(
+      resolve(probe),
+      'import { Effect } from "effect";\nEffect.fail("primitive");\n'
+    );
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-primitive-effect-failure)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
+    }
+  });
+
+  it("applies native-collection review to owned package scripts", () => {
+    const probe =
+      "packages/infrastructure/scripts/.native-collection-lint-probe.ts";
+    writeFileSync(resolve(probe), 'const values = new Set(["value"]);\n');
+
+    try {
+      const child = spawnSync(
+        "bunx",
+        ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
+        { encoding: "utf-8" }
+      );
+      expect(child.status).not.toBe(0);
+      expect(`${child.stdout}\n${child.stderr}`).toContain(
+        "bundjil(no-unregistered-native-collection)"
+      );
+    } finally {
+      rmSync(resolve(probe), { force: true });
+    }
+  });
+});

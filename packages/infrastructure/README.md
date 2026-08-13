@@ -12,12 +12,34 @@ receipts, and retained custom Resources.
   provider capabilities.
 - `@bundjil/infrastructure/testing` — decoded deterministic test fixtures.
 - `@bundjil/infrastructure/vercel` — Vercel-owned Schemas, identities,
-  services, safe errors, and explicit read/write-capability Layers.
+  services, safe errors, and explicit read/write-capability Layers. Preview
+  configuration and stable-environment authority loaders expose only their
+  owner-named authority error and bounded reason Schema; raw Config,
+  filesystem, parser, and primitive-string failures remain private.
 - `@bundjil/infrastructure/photon` — retained Photon observation Resources and
   the separately composed Preview webhook-binding capability.
 
 Raw provider clients, wire DTOs, credentials, secret values, and unchecked
 provider failures are not public exports.
+
+Infrastructure operator programs keep owner-local Schema tagged errors until
+their final process adapter. That adapter alone may render the stable bounded
+status/reason and set the documented exit code. Root lint rejects primitive
+`Effect.fail`, `Effect.failSync`, and `Effect.mapError` values across every
+script in `scripts/`. Reusable live Layers retain typed construction failures;
+commands provide their runtime inside the final catch/exit boundary, and root
+lint rejects `Layer.orDie` in package source and infrastructure scripts.
+Subprocess fixtures exercise deterministic foreground stops and missing Layer
+configuration without provider transport or raw Cause output. Mutating
+commands capture authority, configuration, runtime acquisition, foreground
+work, readback, and Schema receipt encoding in that boundary; expected failure
+must not fall through to a runtime stack reporter. The private automatic
+Production entrypoint follows the same process contract: it keeps the existing
+Schema-encoded deployment receipt on success and emits only
+`{"status":"blocked"}` with exit code `1` after any Config, Layer, deployment,
+rollback, health, or encoding failure. That bounded result is not a deployment
+or rollback diagnosis; GitHub logs and Vercel readback remain the operational
+evidence owners.
 
 ## Supported commands
 
@@ -48,7 +70,25 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-preview-webhook-binding`,
 `infrastructure:photon-production-webhook-register`,
 `infrastructure:photon-production-webhook-delete`, and
-`infrastructure:vercel-git-link-authority`.
+`infrastructure:vercel-git-link-authority`. `production:deploy` is the private
+post-CI Production entrypoint. It is owned by the exact-SHA `Production`
+workflow, uses two separately revocable exact-project Vercel credentials
+selected under the Personal account and proved by assigned-project access plus
+sibling-project denial, stages both apps with
+domains skipped, validates immutable candidates, promotes only while the
+candidate is still `main`, verifies the stable targets and proxy health, and
+restores the exact prior deployments on every non-success Effect exit after
+promotion starts, including interruption and defect paths. It is not an
+operator convenience command.
+
+`infrastructure:drift-report` uses a distinct project-routed credential Layer.
+Its environment file supplies
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
+non-empty array of unique project-ID/token bindings. The Vercel adapter selects
+a redacted token only after receiving a decoded branded project ID, and the
+Alchemy project provider observes exactly the manifest projects rather than
+listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
+limited to the separate inventory/adoption/operator paths.
 
 ## Claim boundary
 
@@ -56,6 +96,9 @@ Package checks prove repository contracts only. They do not establish current
 provider state or authorize credentials, state migration, provider writes,
 deployment, promotion, messaging, billing, Preview, or Production operations.
 Current evidence belongs to task-scoped receipts and external readback.
+The automatic command's local tests prove orchestration and fail-closed
+behavior only; a successful hosted `Production` run plus Vercel readback is
+required to prove automatic deployment.
 
 Operational preconditions, authority, sequencing, evidence, rollback, stop,
 and escalation rules are owned by the

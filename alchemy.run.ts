@@ -9,7 +9,7 @@ import {
   loadAdoptionCommand,
 } from "@bundjil/infrastructure";
 import * as Alchemy from "alchemy";
-import { Config, Effect, Schema } from "effect";
+import { Config, Effect, Layer, Schema } from "effect";
 
 import { BundjilInfrastructureStack } from "./stacks/bundjil.js";
 
@@ -39,7 +39,9 @@ export default loadAdoptionCommand.pipe(
               "BundjilInfrastructure",
               {
                 providers: layerLiveReadOnlyAdoptionProviders(scopes),
-                state: layerAlchemyR2State,
+                // Alchemy.Stack requires an infallible state Layer; retain the
+                // defect conversion only at this framework-owned host edge.
+                state: layerAlchemyR2State.pipe(Layer.orDie),
               },
               BundjilInfrastructureStack(manifest)
             )

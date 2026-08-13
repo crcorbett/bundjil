@@ -9,9 +9,9 @@ import {
   Console,
   Effect,
   FileSystem,
+  HashSet,
   Layer,
   Match,
-  Redacted,
   Schema,
 } from "effect";
 
@@ -76,11 +76,14 @@ const StateMigrationBlockedReason = Schema.Union([
 const StateMigrationDiagnosticCount = Schema.Int.pipe(
   Schema.check(Schema.isGreaterThanOrEqualTo(0))
 );
-const StateMigrationFailure = Schema.Struct({
-  reason: StateMigrationBlockedReason,
-  observedCount: Schema.optional(StateMigrationDiagnosticCount),
-  expectedCount: Schema.optional(StateMigrationDiagnosticCount),
-});
+class StateMigrationCommandError extends Schema.TaggedErrorClass<StateMigrationCommandError>()(
+  "StateMigrationCommandError",
+  {
+    reason: StateMigrationBlockedReason,
+    observedCount: Schema.optional(StateMigrationDiagnosticCount),
+    expectedCount: Schema.optional(StateMigrationDiagnosticCount),
+  }
+) {}
 
 const authorityPathConfig = Config.schema(
   StateMigrationPath,
@@ -124,7 +127,9 @@ const readMode600 = Effect.fn("StateMigration.readMode600")(function* (
   const fileSystem = yield* FileSystem.FileSystem;
   const metadata = yield* fileSystem.stat(path);
   if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 2n * 1024n * 1024n) {
-    return yield* Effect.fail("migration-input-invalid");
+    return yield* new StateMigrationCommandError({
+      reason: "migration-input-invalid",
+    });
   }
   return yield* fileSystem.readFileString(path);
 });
@@ -138,9 +143,18 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
   const candidate = yield* candidateConfig;
   const stage = yield* stageConfig;
   if (
-    new Set([authorityPath, manifestPath, backupPath, receiptPath]).size !== 4
+    HashSet.size(
+      HashSet.fromIterable([
+        authorityPath,
+        manifestPath,
+        backupPath,
+        receiptPath,
+      ])
+    ) !== 4
   ) {
-    return yield* Effect.fail("migration-path-conflict");
+    return yield* new StateMigrationCommandError({
+      reason: "migration-path-conflict",
+    });
   }
 
   const authorityText = yield* readMode600(authorityPath);
@@ -161,7 +175,9 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
     !ajv.compile(authorityEnvelopeSchema)(authority) ||
     !ajv.compile(migrationAuthorityPolicy)(authority)
   ) {
-    return yield* Effect.fail("migration-authority-invalid");
+    return yield* new StateMigrationCommandError({
+      reason: "migration-authority-invalid",
+    });
   }
 
   const manifestText = yield* readMode600(manifestPath);
@@ -170,7 +186,9 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
     { onExcessProperty: "error" }
   );
   if (manifest.stage !== stage) {
-    return yield* Effect.fail("migration-manifest-stage-mismatch");
+    return yield* new StateMigrationCommandError({
+      reason: "migration-manifest-stage-mismatch",
+    });
   }
 
   const stateConfig = yield* loadAlchemyR2StateConfig;
@@ -183,10 +201,7 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
       photonCredentials.projectSecret,
       vercelAccessToken,
     ],
-    (value) =>
-      Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(
-        Redacted.make(Redacted.value(value))
-      )
+    (value) => Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(value)
   );
   const backupStore = makePreviewStateBackupStoreLive(
     backupPath,
@@ -206,16 +221,17 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
     Match.when("apply", () => migration.retire(manifest)),
     Match.when("restore", () => migration.restore),
     Match.exhaustive,
-    Effect.mapError((error) =>
-      StateMigrationFailure.make({
-        reason: error.reason,
-        ...(error.observedCount === undefined
-          ? {}
-          : { observedCount: error.observedCount }),
-        ...(error.expectedCount === undefined
-          ? {}
-          : { expectedCount: error.expectedCount }),
-      })
+    Effect.mapError(
+      (error) =>
+        new StateMigrationCommandError({
+          reason: error.reason,
+          ...(error.observedCount === undefined
+            ? {}
+            : { observedCount: error.observedCount }),
+          ...(error.expectedCount === undefined
+            ? {}
+            : { expectedCount: error.expectedCount }),
+        })
     )
   );
 
@@ -301,7 +317,9 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
       validateFormats: false,
     }).compile(boundedReceiptSchema)(receiptUnknown)
   ) {
-    return yield* Effect.fail("migration-receipt-incompatible");
+    return yield* new StateMigrationCommandError({
+      reason: "migration-receipt-incompatible",
+    });
   }
   yield* fileSystem.makeDirectory(dirname(receiptPath), {
     recursive: true,
@@ -340,7 +358,7 @@ const main = runStateMigration.pipe(
   ),
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
   Effect.catch((error) =>
-    Schema.decodeUnknownEffect(StateMigrationFailure)(error).pipe(
+    Schema.decodeUnknownEffect(StateMigrationCommandError)(error).pipe(
       Effect.map((failure) => ({
         status: "blocked" as const,
         reason: failure.reason,

@@ -64,6 +64,17 @@ const InventoryArtifactPath = Schema.String.pipe(
   ),
   Schema.brand("@bundjil/infrastructure/InventoryArtifactPath")
 );
+const InfrastructureInventoryCommandFailureReason = Schema.Literals([
+  "artifactPathConflict",
+  "authorityFileInvalid",
+  "authorityInvalid",
+  "inventoryModeRequired",
+  "receiptIncompatible",
+]);
+class InfrastructureInventoryCommandError extends Schema.TaggedErrorClass<InfrastructureInventoryCommandError>()(
+  "InfrastructureInventoryCommandError",
+  { reason: InfrastructureInventoryCommandFailureReason }
+) {}
 
 const authorityPathConfig = Config.schema(
   InventoryArtifactPath,
@@ -101,7 +112,9 @@ const readAndValidateAuthority = Effect.fn("InventoryAuthority.validate")(
     const fileSystem = yield* FileSystem.FileSystem;
     const metadata = yield* fileSystem.stat(authorityPath);
     if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-      return yield* Effect.fail("authority-file-invalid");
+      return yield* new InfrastructureInventoryCommandError({
+        reason: "authorityFileInvalid",
+      });
     }
     const authorityText = yield* fileSystem.readFileString(authorityPath);
     const authority = yield* Schema.decodeUnknownEffect(
@@ -116,7 +129,9 @@ const readAndValidateAuthority = Effect.fn("InventoryAuthority.validate")(
       strict: false,
     }).compile(readOnlyInventoryAuthorityPolicy);
     if (!validate(authority) || !validateTaskPolicy(authority)) {
-      return yield* Effect.fail("authority-invalid");
+      return yield* new InfrastructureInventoryCommandError({
+        reason: "authorityInvalid",
+      });
     }
     return authorityPath;
   }
@@ -126,7 +141,9 @@ const runInventory = Effect.gen(
   function* runAuthorizedInfrastructureInventory() {
     const input = yield* loadInfrastructureCommandConfig;
     if (input.mode !== "inventory") {
-      return yield* Effect.fail("inventory-mode-required");
+      return yield* new InfrastructureInventoryCommandError({
+        reason: "inventoryModeRequired",
+      });
     }
     const authorityPath = yield* authorityPathConfig;
     yield* readAndValidateAuthority(authorityPath);
@@ -137,7 +154,9 @@ const runInventory = Effect.gen(
       receiptPath === authorityPath ||
       receiptPath === artifactPath
     ) {
-      return yield* Effect.fail("artifact-path-conflicts-with-authority");
+      return yield* new InfrastructureInventoryCommandError({
+        reason: "artifactPathConflict",
+      });
     }
     const teamId = yield* teamIdConfig;
     const projectIds = yield* projectIdsConfig;
@@ -239,7 +258,9 @@ const runInventory = Effect.gen(
       validateFormats: false,
     }).compile(boundedReceiptSchema);
     if (!validateReceipt(receiptEncoded)) {
-      return yield* Effect.fail("receipt-incompatible");
+      return yield* new InfrastructureInventoryCommandError({
+        reason: "receiptIncompatible",
+      });
     }
     const fileSystem = yield* FileSystem.FileSystem;
     yield* fileSystem.makeDirectory(dirname(artifactPath), {
@@ -285,7 +306,14 @@ const inventoryLayer = InfrastructureInventoryLive.pipe(
   Layer.provide(providerLayers)
 );
 
-const main = Effect.exit(runInventory).pipe(
+const runtime = Layer.mergeAll(
+  BunFileSystem.layer,
+  ConfigProvider.layer(ConfigProvider.fromEnv()),
+  providerLayers,
+  inventoryLayer
+);
+
+const main = Effect.exit(runInventory.pipe(Effect.provide(runtime))).pipe(
   Effect.flatMap((exit) =>
     Exit.isSuccess(exit)
       ? Console.log(exit.value)
@@ -296,14 +324,6 @@ const main = Effect.exit(runInventory).pipe(
             })
           )
         )
-  ),
-  Effect.provide(
-    Layer.mergeAll(
-      BunFileSystem.layer,
-      ConfigProvider.layer(ConfigProvider.fromEnv()),
-      providerLayers,
-      inventoryLayer
-    )
   )
 );
 

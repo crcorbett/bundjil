@@ -122,13 +122,17 @@ export const VercelStableEnvironmentProviderFailure = Schema.Struct({
 export type VercelStableEnvironmentProviderFailure =
   typeof VercelStableEnvironmentProviderFailure.Type;
 
+const VercelStableEnvironmentErrorMessage = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isMaxLength(300))
+);
+
 const VercelStableEnvironmentErrorFields = {
   operation: VercelStableEnvironmentOperation,
   reason: VercelStableEnvironmentFailureReason,
   retry: InfrastructureRetryClass,
   certainty: InfrastructureOutcomeCertainty,
   providerFailure: Schema.optional(VercelStableEnvironmentProviderFailure),
-  message: Schema.NonEmptyString,
+  message: VercelStableEnvironmentErrorMessage,
 };
 
 export class VercelStableEnvironmentReadError extends Schema.TaggedErrorClass<VercelStableEnvironmentReadError>()(

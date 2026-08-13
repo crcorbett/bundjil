@@ -56,6 +56,9 @@ const encodeUnknownJson = Schema.encodeUnknownSync(
 const renderForLeakCheck = (value: unknown) =>
   `${String(value)} ${encodeUnknownJson(value)}`;
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+const fixtureUpdatedAtEpochMillis = 1_700_000_000_000;
+
 const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
   principal: {
@@ -184,7 +187,7 @@ it.effect("decodes and encodes profiles with redacted runtime tokens", () =>
     const subject = yield* fixtureSubject;
     const profile = yield* makeSubscriptionProfile(
       subject,
-      Date.now() + 60_000
+      validProfileExpiryEpochMillis
     );
     const encoded = yield* Schema.encodeEffect(CodexSubscriptionProfile)(
       profile
@@ -237,7 +240,10 @@ it.effect(
   () =>
     Effect.gen(function* testProfileStoreRoundTrip() {
       const subject = yield* fixtureSubject;
-      const profile = yield* makeImportProfile(subject, Date.now() + 60_000);
+      const profile = yield* makeImportProfile(
+        subject,
+        validProfileExpiryEpochMillis
+      );
 
       yield* putProfile(profile);
       assert.strictEqual(yield* hasProfile(subject), true);
@@ -258,7 +264,10 @@ it.effect(
   () =>
     Effect.gen(function* testEncryptedProfileStoreRoundTrip() {
       const subject = yield* fixtureSubject;
-      const profile = yield* makeImportProfile(subject, Date.now() + 60_000);
+      const profile = yield* makeImportProfile(
+        subject,
+        validProfileExpiryEpochMillis
+      );
       const cipherConfig = yield* makeCipherConfig();
       const keyValueStoreLayer = KeyValueStore.layerMemory;
       const encryptedStoreLayer = CodexProfileStoreEncryptedKeyValueLive.pipe(
@@ -345,7 +354,7 @@ it.effect(
       const expiredProfile = yield* makeImportProfile(subject, -1);
       const refreshedProfile = yield* makeImportProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
       const input = yield* makeRefreshLockInput(subject);
       const refreshStarted = yield* Deferred.make<null>();
@@ -397,7 +406,7 @@ it.effect("uses memory layer seeding for profile reads", () =>
     const subject = yield* fixtureSubject;
     const profile = yield* makeSubscriptionProfile(
       subject,
-      Date.now() + 60_000
+      validProfileExpiryEpochMillis
     );
     const stored = yield* getProfile(subject).pipe(
       Effect.provide(CodexProfileStoreMemory([profile]))
@@ -435,7 +444,7 @@ it.effect(
       const subject = yield* fixtureSubject;
       const profile = yield* makeSubscriptionProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
 
       yield* Effect.gen(function* revokeAndReadBack() {
@@ -458,8 +467,8 @@ it.effect("refreshes an access token through the mock client", () =>
       subject,
       accessToken: "fresh-access-token-secret",
       refreshToken: "fresh-refresh-token-secret",
-      expiresAtEpochMillis: Date.now() + 60_000,
-      updatedAtEpochMillis: Date.now(),
+      expiresAtEpochMillis: validProfileExpiryEpochMillis,
+      updatedAtEpochMillis: fixtureUpdatedAtEpochMillis,
     });
 
     const accessToken = yield* refreshAccessToken(subject).pipe(
@@ -502,7 +511,7 @@ it.effect(
       const subject = yield* fixtureSubject;
       const profile = yield* makeSubscriptionProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
       const config = yield* makeCipherConfig();
       const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
@@ -543,7 +552,7 @@ it.effect("fails decryption with a different encryption key", () =>
     const subject = yield* fixtureSubject;
     const profile = yield* makeSubscriptionProfile(
       subject,
-      Date.now() + 60_000
+      validProfileExpiryEpochMillis
     );
     const encryptingConfig = yield* makeCipherConfig();
     const decryptingConfig = yield* makeCipherConfig(
@@ -572,7 +581,7 @@ it.effect(
       const subject = yield* fixtureSubject;
       const profile = yield* makeSubscriptionProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
       const encryptingConfig = yield* makeCipherConfig();
       const decryptingConfig = yield* makeCipherConfig("test-key-v2");
@@ -597,7 +606,7 @@ it.effect(
       const subject = yield* fixtureSubject;
       const profile = yield* makeSubscriptionProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
       const config = yield* makeCipherConfig();
       const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
@@ -626,7 +635,7 @@ it.effect("rejects unsupported encrypted profile versions", () =>
     const subject = yield* fixtureSubject;
     const profile = yield* makeSubscriptionProfile(
       subject,
-      Date.now() + 60_000
+      validProfileExpiryEpochMillis
     );
     const config = yield* makeCipherConfig();
     const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
@@ -668,7 +677,7 @@ it.effect(
       const subject = yield* fixtureSubject;
       const profile = yield* makeSubscriptionProfile(
         subject,
-        Date.now() + 60_000
+        validProfileExpiryEpochMillis
       );
       const encryptedProfile = yield* encryptCodexOAuthProfile(profile).pipe(
         Effect.provide(

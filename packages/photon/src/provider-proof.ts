@@ -99,12 +99,12 @@ export const loadPhotonEnvironmentWebhookProviderConfig =
     )
   );
 
-export const provePhotonProvider = (
-  projectId: PhotonProjectIdType,
-  projectSecret: PhotonProjectSecretType,
-  proofWebhookUrl: URL
-) =>
-  Effect.gen(function* provePhotonProvider() {
+export const provePhotonProvider = Effect.fn("PhotonProviderProof.prove")(
+  function* provePhotonProvider(
+    projectId: PhotonProjectIdType,
+    projectSecret: PhotonProjectSecretType,
+    proofWebhookUrl: URL
+  ) {
     const management = yield* PhotonManagement;
     const lifecycle = yield* PhotonLifecycleProbe;
     const discovered = yield* management.listWebhooks();
@@ -211,4 +211,5 @@ export const provePhotonProvider = (
       webhookDeleted: true,
       webhookListedAfterCreate: attempt.value.webhookListedAfterCreate,
     });
-  });
+  }
+);

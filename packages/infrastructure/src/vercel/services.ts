@@ -4,6 +4,7 @@ import type { Effect } from "effect";
 import { Context } from "effect";
 
 import type {
+  VercelCredentialError,
   VercelDeploymentsReadError,
   VercelDomainsReadError,
   VercelEnvironmentVariablesReadError,
@@ -33,7 +34,20 @@ import type {
   VercelProjectDomainObservation,
   VercelProjectDiscovery,
   VercelProjectObservation,
+  VercelAccessToken,
+  VercelCredentialScope,
 } from "./schemas.js";
+
+export interface VercelCredentialsShape {
+  readonly accessToken: (
+    scope: VercelCredentialScope
+  ) => Effect.Effect<VercelAccessToken, VercelCredentialError>;
+}
+
+export class VercelCredentials extends Context.Service<
+  VercelCredentials,
+  VercelCredentialsShape
+>()("@bundjil/infrastructure/vercel/VercelCredentials") {}
 
 export interface VercelProjectsShape {
   readonly discoverProject: (

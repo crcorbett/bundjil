@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -65,23 +65,76 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
+### Production deployment — admitted post-CI automation, hosted proof deferred
+
+The source control is admitted, but its hosted proof is deferred for this
+implementation epoch. Fresh Executor Personal readback on 2026-08-13 found the
+sole Vercel connection authenticated as the explicitly excluded
+`cooper.corbett@tilt.legal` account, so no project token or partial GitHub
+custody was created. The bounded stop is retained in
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+
+- **Signal and target:** only a completed successful `CI` `workflow_run` for a
+  same-repository `push` to `main` may start the writer. The exact head SHA is
+  checked out and becomes the immutable candidate identity.
+- **Principal and operation:** the GitHub `Production` job has repository
+  `contents: read` plus exactly two separately revocable Vercel tokens selected
+  under the Personal account, one for each exact Bundjil project. Before
+  custody, each token must read its assigned project and receive a denied result
+  for the sibling project. Exact project configuration and decoded project/SHA
+  readback remain independent controls. The
+  repository-owned Effect command stages proxy and agent with domains skipped,
+  validates both candidates, re-reads main, promotes proxy then agent, and
+  verifies stable targets and health. Tilt, account-wide credentials and raw
+  workflow mutation commands are rejected.
+- **Duration and convergence:** one repository-wide queue never cancels an
+  in-flight writer and bounds each run to 30 minutes. Already-current and stale
+  candidates are explicit no-ops. A partial failure restores the exact prior
+  agent then proxy identities as applicable and verifies the restored targets.
+- **Evidence and non-claim:** source/CI/Production run, immutable candidates,
+  project/source/readiness, stable target, health and rollback identities are
+  separate receipt fields. Source and local fixtures do not prove GitHub
+  custody, hosted execution, Vercel mutation, model behaviour or channel proof.
+- **Stop, rollback, and escalation:** stop on any eligibility, target, SHA,
+  readiness, credential, output, alias, health, leak or timeout mismatch.
+  Restore exact prior deployments; control rollback disables the workflow and
+  revokes the two tokens without enabling Vercel Git deployment.
+
 ### Preview infrastructure drift — report-only automation
+
+The report-only source remains admitted, while hosted execution is deferred at
+the same identity gate. Exact-head run `31677769897` failed closed before
+provider reporting because the three custody artifacts were absent; it proves
+missing custody only, not drift. Resume requires a separate admitted personal
+Vercel principal and the complete credential/artifact package.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.
 - **Principal and authority:** `contents: read` plus one protected
   `infrastructure-read-only-preview` environment. Its three secret artifacts
-  contain the fixed authority, provider/state environment, and accepted
-  manifest. The job has no OIDC, apply, reconcile, repair, deployment,
-  promotion, Production, Photon mutation, billing, or write-token authority.
+  contain the static fixed policy envelope, provider/state environment, and
+  accepted manifest. The environment artifact holds a distinct Schema-decoded
+  set of unique project-ID/token bindings, one dedicated project-scoped Vercel
+  token per manifest project; the Layer rejects Team scope and Production or
+  broad inventory credentials are not reused. Vercel personal tokens are not
+  method-level read-only, so project scope, sibling denial, independent
+  revocation, the read-only call graph and zero-write receipt are mandatory
+  controls. The policy envelope is fingerprinted custody, not a dynamic run
+  identity. The workflow derives a branded exact
+  repository/run/attempt identity and checked-out source SHA from GitHub, and
+  the command carries those values plus the decoded manifest digest through
+  its report and receipt. The job has no OIDC, apply, reconcile, repair,
+  deployment, promotion, Production, Photon mutation, billing, or admitted
+  provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
   native `sync --dry-run` remain distinct sources. Blocking drift fails;
   unavailable, ambiguous, skipped, or unknown-secret observations are
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
-  fixed-contract bounded receipt. Source review and a local run prove neither
+  fixed-contract bounded receipt bound to the repository/run/attempt, source
+  SHA, static authority fingerprint, and manifest digest. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the
@@ -150,16 +203,14 @@ an explicit authority envelope, one-comment-per-head convergence, bounded
 proof, and HGI-306 admission evidence. Retained decision provenance is
 [`HGI-308-claude-review.decision.json`](../documentation-audit/HGI-308-claude-review.decision.json).
 
-### Deployment and provider operations — foreground or disabled
+### Other provider operations — foreground or disabled
 
-Vercel deployment/promotion, Sendblue outbound work, Executor reads/resumes,
-and AI Gateway/Eve turns remain foreground operations with exact target-owned
-runbooks, authority, proof, stopping, and recovery. Both app-owned Vercel
-configs disable Git-triggered deployment; Git pushes admit CI only, while an
-immutable deployment and any alias movement require separate manual stages.
-The hosted Codex model proxy remains disabled pending proof. None is admitted
-as scheduled continuous automation, and unavailable external readback stays
-inconclusive.
+Direct Vercel Git deployment remains disabled; the post-CI workflow above is
+the sole admitted automatic deployment/promotion writer. Sendblue outbound
+work, Executor reads/resumes and bounded AI Gateway/Eve proof turns remain
+foreground operations with exact target-owned runbooks, authority, proof,
+stopping and recovery. None is admitted as scheduled continuous automation,
+and unavailable external readback stays inconclusive.
 
 Sendblue inbound processing is the one admitted consequential runtime loop. Its
 signed ingress, durable replay/lease state, one-turn convergence, bounded proof,
@@ -188,6 +239,13 @@ Unknown, floating, short, mismatched, or unregistered actions fail closed.
 Rollback restores the prior lock and workflow pins together. Compromise or
 upstream deletion stops the affected workflow and escalates to the repository
 owner; it does not justify substituting an unreviewed fork or tag.
+
+The 2026-08-13 action-runtime review moved the admitted workflows from the
+Node-20-based checkout/setup-node v4 pins to exact `actions/checkout@v7.0.1`
+and `actions/setup-node@v7.0.0` commits. Both reviewed upstream `action.yml`
+files declare `node24`. The public tag and manifest readback proves only the
+resolved source and declared action runtime; the next hosted run remains the
+execution proof.
 
 ## External settings and HGI-309
 

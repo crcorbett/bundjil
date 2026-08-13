@@ -17,6 +17,7 @@ import {
   HttpClientRequest,
   HttpClientResponse,
 } from "effect/unstable/http";
+import { vi } from "vitest";
 
 import { layerLive } from "../src/live.layer.js";
 import {
@@ -176,6 +177,59 @@ it.effect("rejects invalid authentication before an invalid body", () =>
       true
     );
   })
+);
+
+it.effect(
+  "maps a Web Crypto rejection to the closed authentication error",
+  () =>
+    Effect.acquireUseRelease(
+      Effect.sync(() =>
+        vi
+          .spyOn(globalThis.crypto.subtle, "importKey")
+          .mockRejectedValueOnce(new Error("private crypto failure"))
+      ),
+      () =>
+        Effect.gen(function* testCryptoRejection() {
+          const fixture = yield* fixtures;
+          const error = yield* Effect.gen(function* decodeRejectedCrypto() {
+            const transport = yield* ChannelTransport;
+            return yield* transport.decodeWebhook(
+              new Request("https://example.invalid/sendblue", {
+                method: "POST",
+                headers: { "sb-signing-secret": "test-webhook-secret" },
+                body: fixture.encodedWebhook,
+              })
+            );
+          }).pipe(
+            Effect.provide(layer(unusedClient, fixture.config)),
+            Effect.flip
+          );
+
+          assert.strictEqual(
+            Schema.is(ChannelWebhookAuthenticationError)(error),
+            true
+          );
+          const authenticationError = yield* Schema.decodeUnknownEffect(
+            ChannelWebhookAuthenticationError
+          )(error).pipe(Effect.orDie);
+          assert.deepStrictEqual(
+            yield* Schema.encodeEffect(ChannelWebhookAuthenticationError)(
+              authenticationError
+            ),
+            {
+              _tag: "ChannelWebhookAuthenticationError",
+              provider: "sendblue",
+              operation: "decodeWebhook",
+              reason: "authentication",
+              retry: "never",
+            }
+          );
+        }),
+      (spy) =>
+        Effect.sync(() => {
+          spy.mockRestore();
+        })
+    )
 );
 
 it.effect("enforces body limits and authenticated payload shape", () =>

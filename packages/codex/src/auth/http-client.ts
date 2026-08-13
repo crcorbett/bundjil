@@ -165,10 +165,10 @@ export const makeCodexOAuthHttpClient = Effect.gen(
         );
       }),
       refresh: Effect.fn("CodexOAuthHttpClient.refresh")(function* (input) {
-        const body = yield* Schema.decodeUnknownEffect(RefreshRequest)({
+        const body = yield* RefreshRequest.makeEffect({
           client_id: protocol.config.clientId,
           grant_type: "refresh_token",
-          refresh_token: Redacted.value(input.refreshToken),
+          refresh_token: input.refreshToken,
         }).pipe(Effect.mapError(() => mapResponseFailure("refreshToken")));
         const request = yield* HttpClientRequest.post(
           protocol.config.tokenEndpoint

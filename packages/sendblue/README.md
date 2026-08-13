@@ -11,6 +11,11 @@ common Channel error vocabulary. It exposes no raw client, provider DTO,
 callback, Promise, environment reader, account-management operation, or
 delivery claim.
 
+Web Crypto Promise ingress is confined to the private live adapter. Independent
+key imports use explicit Effect concurrency; signing and verification remain a
+named linear Effect, and every rejection maps to the closed Channel
+authentication error without retaining the raw cause.
+
 `layerLive(config)` consumes an already decoded `SendblueConfig` and requires
 an Effect `HttpClient` Layer. `layerMemory(config)` delegates to the canonical
 deterministic Channel memory Layer. The app owns environment variable names

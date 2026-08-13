@@ -7,7 +7,6 @@ import {
   Exit,
   Layer,
   Option,
-  Redacted,
   Schema,
 } from "effect";
 
@@ -82,15 +81,13 @@ const program = Effect.gen(function* stageNearExpiryProfile() {
 
   const now = yield* Clock.currentTimeMillis;
   const credentialRevision = yield* generateCodexOAuthCredentialRevision();
-  const stagedProfile = yield* Schema.decodeUnknownEffect(
-    CodexSubscriptionProfile
-  )({
+  const stagedProfile = yield* CodexSubscriptionProfile.makeEffect({
     ...profile,
-    accessToken: Redacted.value(profile.accessToken),
-    accountId: Redacted.value(profile.accountId),
+    accessToken: profile.accessToken,
+    accountId: profile.accountId,
     credentialRevision,
     expiresAtEpochMillis: now - 1,
-    refreshToken: Redacted.value(profile.refreshToken),
+    refreshToken: profile.refreshToken,
     updatedAtEpochMillis: now,
   });
 

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "kind": "approval_gated",
+  "status": "blocked",
+  "outcome": "blocked",
+  "lifecycle": { "state": "blocked" },
+  "externalConsequence": {
+    "outcome": "not_attempted",
+    "target": "Personal-only Vercel credential custody for automatic Production and report-only Preview drift"
+  },
+  "candidate": {
+    "repositoryCommit": "763199f07b6f2f0569442546e6ea7ef695c49a74",
+    "sourceDigest": "7641cffb0ed02759884ea9d3297a52e08d96ba7a91b296618409545f1834f52e",
+    "artifactDigest": "f5b27295b7952363658f7d05973dbc8f79102ea1f27234278fbe379c5d7e5981"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Explicit 2026-08-13 approval constrained to a genuinely personal Vercel account and excluding cooper.corbett@tilt.legal and Tilt Legal",
+    "externalAccess": "mutation",
+    "approvalReceipt": "Current Codex task instruction to create required tokens under the personal-only constraint",
+    "rollbackOwner": "Bundjil personal Vercel and GitHub operator"
+  },
+  "environment": {
+    "tier": "external",
+    "target": "Bundjil Personal Vercel projects and GitHub Production/infrastructure-read-only-preview environments"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "status": "blocked",
+      "oracle": "The sole Executor Personal Vercel connection authenticated as the explicitly excluded account, so credential creation stopped before mutation and the hosted report remained unattempted."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Executor Personal connections.list, Vercel getAuthUser, and Vercel getTeams readback",
+    "outcome": "blocked",
+    "exitCode": 0,
+    "invariant": "Every Vercel credential must be created by an admitted personal principal; a personal team label cannot override an excluded authenticated account.",
+    "target": "Four isolated exact-project Vercel credentials and their complete GitHub custody package",
+    "recoveryHint": "Connect Executor Personal to a separate personal Vercel user with access to both Bundjil projects, then repeat identity, assigned-project access, and sibling-denial proof before custody.",
+    "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+    "detailSha256": "602aa8cba05126c48b6b8c2137edd502261b0c21ee7ae376018245977bfeb9bb",
+    "postcondition": "No Vercel credential or GitHub custody artifact was created and no hosted provider operation began."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Executor Personal returned one Vercel connection whose authenticated user ID and canonical email failed the explicit personal-only identity condition."
+  },
+  "postconditions": [
+    "The excluded Vercel account and every Tilt Legal team or resource remain unused for credential creation.",
+    "The personal Cloudflare R2 credential remains separately active and unchanged in personal 1Password custody.",
+    "Hosted drift, automatic Production, Terra High stable behavior, and dependent channel proofs remain unproved."
+  ],
+  "limitations": [
+    "This readback observes the single connection currently exposed by Executor Personal; it cannot create or infer a separate Vercel identity.",
+    "No project-token scope or sibling-denial behavior could be tested because token creation was not admitted."
+  ],
+  "nonClaims": [
+    "No GitHub secret, ruleset, Vercel token, deployment, alias, environment value, provider route, or message was created or changed.",
+    "No token value, secret, protected URL, provider payload, message content, phone identity, prompt, response, OAuth material, or chain-of-thought is retained."
+  ],
+  "rollback": {
+    "identity": "No Vercel or GitHub mutation occurred; retain repository SHA 763199f07b6f2f0569442546e6ea7ef695c49a74 and existing provider state.",
+    "outcome": "ready",
+    "owner": "Bundjil personal Vercel and GitHub operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+      "sha256": "602aa8cba05126c48b6b8c2137edd502261b0c21ee7ae376018245977bfeb9bb",
+      "provenance": "Authenticated read-only Executor Personal Vercel connection, user, and team metadata"
+    }
+  ],
+  "observedAt": "2026-08-13T07:36:39Z"
+}

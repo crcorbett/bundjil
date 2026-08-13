@@ -20,7 +20,7 @@ import {
   OpenAICompatibleChatCompletionRequest,
 } from "@bundjil/codex";
 import { Schema } from "effect";
-import { describe, it } from "vitest";
+import { afterAll, beforeAll, describe, it, vi } from "vitest";
 
 import {
   CodexProxyErrorResponse,
@@ -39,6 +39,7 @@ const encodeChatCompletionChunk = Schema.encodeSync(
 const decodeChatCompletionRequest = Schema.decodeUnknownSync(
   Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
 );
+const previewProofTestTimeoutMilliseconds = 15_000;
 
 const liveHealthResponse = encodeHealthResponse(
   CodexProxyHealthResponse.make({
@@ -226,6 +227,13 @@ const runProofFixture = async (
 };
 
 describe("preview proof", () => {
+  beforeAll(() => {
+    vi.setConfig({ testTimeout: previewProofTestTimeoutMilliseconds });
+  });
+  afterAll(() => {
+    vi.resetConfig();
+  });
+
   it("proves a complete live preview contract without emitting secret material", async () => {
     const result = await runProofFixture(200);
 

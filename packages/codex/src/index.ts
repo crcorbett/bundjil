@@ -143,16 +143,6 @@ export {
 } from "./profiles/commit.js";
 export type { CodexOAuthProfileCommitShape } from "./profiles/commit.js";
 export {
-  CodexHttpClient,
-  makeCodexHttpClient,
-  postResponses,
-  postResponsesStream,
-} from "./provider/http-client.js";
-export type {
-  CodexHttpClientFailure,
-  CodexHttpClientShape,
-} from "./provider/http-client.js";
-export {
   CodexDirectProvider,
   makeCodexLegacyDirectProvider,
   makeCodexDirectProvider,
@@ -225,12 +215,6 @@ export {
 } from "./profiles/store.js";
 export type { CodexProfileStoreShape } from "./profiles/store.js";
 export {
-  CodexRequestMapper,
-  makeCodexRequestMapper,
-  toCodexResponses,
-} from "./provider/request-mapper.js";
-export type { CodexRequestMapperShape } from "./provider/request-mapper.js";
-export {
   CodexResponsesRequestPolicyLowLive,
   CodexResponsesRequestPolicyService,
   defaultCodexResponsesRequestPolicy,
@@ -252,12 +236,6 @@ export type {
   CodexResponsesProofFailure,
   CodexResponsesProofShape,
 } from "./provider/proof.js";
-export {
-  CodexStreamMapper,
-  makeCodexStreamMapper,
-  toOpenAICompatibleStream,
-} from "./provider/stream-mapper.js";
-export type { CodexStreamMapperShape } from "./provider/stream-mapper.js";
 export {
   handleChatCompletions,
   makeOpenAICompatibleProxy,
@@ -364,6 +342,7 @@ export {
   CodexDirectProviderInput,
   CodexResponsesEndpoint,
   CodexResponsesContent,
+  CodexFunctionParameters,
   CodexResponsesFunctionArguments,
   CodexResponsesFunctionCallId,
   CodexResponsesFunctionName,
@@ -373,7 +352,6 @@ export {
   CodexResponsesNonEmptyContent,
   CodexResponsesOutputItemId,
   CodexResponsesOutputTextContent,
-  CodexResponsesPostInput,
   CodexResponsesProofInput,
   CodexResponsesProofResult,
   CodexResponsesReasoning,
@@ -381,8 +359,6 @@ export {
   CodexResponsesRequestPolicy,
   CodexResponsesRequest,
   CodexResponsesStreamContentType,
-  CodexResponsesStreamEvent,
-  CodexResponsesStreamEventKind,
   CodexResponsesTextContent,
   OpenAICompatibleChatCompletionChoice,
   OpenAICompatibleChatCompletionChunk,
@@ -496,6 +472,7 @@ export type {
   CodexDirectProviderInput as CodexDirectProviderInputType,
   CodexResponsesEndpoint as CodexResponsesEndpointType,
   CodexResponsesContent as CodexResponsesContentType,
+  CodexFunctionParameters as CodexFunctionParametersType,
   CodexResponsesFunctionArguments as CodexResponsesFunctionArgumentsType,
   CodexResponsesFunctionCallId as CodexResponsesFunctionCallIdType,
   CodexResponsesFunctionName as CodexResponsesFunctionNameType,
@@ -505,7 +482,6 @@ export type {
   CodexResponsesNonEmptyContent as CodexResponsesNonEmptyContentType,
   CodexResponsesOutputItemId as CodexResponsesOutputItemIdType,
   CodexResponsesOutputTextContent as CodexResponsesOutputTextContentType,
-  CodexResponsesPostInput as CodexResponsesPostInputType,
   CodexResponsesProofInput as CodexResponsesProofInputType,
   CodexResponsesProofResult as CodexResponsesProofResultType,
   CodexResponsesReasoning as CodexResponsesReasoningType,
@@ -515,10 +491,6 @@ export type {
   CodexResponsesRequestPolicyEncoded,
   CodexResponsesRequest as CodexResponsesRequestType,
   CodexResponsesStreamContentType as CodexResponsesStreamContentTypeType,
-  CodexResponsesStreamEvent as CodexResponsesStreamEventType,
-  CodexResponsesStreamEventKind as CodexResponsesStreamEventKindType,
-  CodexResponsesStreamMapInput as CodexResponsesStreamMapInputType,
-  CodexResponsesStreamResult as CodexResponsesStreamResultType,
   CodexResponsesTextContent as CodexResponsesTextContentType,
   OpenAICompatibleChatCompletionChoice as OpenAICompatibleChatCompletionChoiceType,
   OpenAICompatibleChatCompletionChunk as OpenAICompatibleChatCompletionChunkType,

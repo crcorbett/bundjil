@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { Config, Context, Effect, Layer, Schema } from "effect";
+import { Clock, Config, Context, Effect, HashSet, Layer, Schema } from "effect";
 import { HttpClient } from "effect/unstable/http";
 
 /* oxlint-disable max-classes-per-file -- The owner service and its operation-specific safe error share one bounded contract file. */
@@ -229,10 +229,12 @@ export const layerPhotonCandidateInventoryLive = Layer.effect(
           const sourceUsers = yield* sourceManagement.listSharedUsers();
           const previewUsers = yield* previewManagement.listSharedUsers();
           if (
-            new Set(sourceUsers.map((user) => user.phoneNumber)).size !==
-              sourceUsers.length ||
-            new Set(previewUsers.map((user) => user.phoneNumber)).size !==
-              previewUsers.length
+            HashSet.size(
+              HashSet.fromIterable(sourceUsers.map((user) => user.phoneNumber))
+            ) !== sourceUsers.length ||
+            HashSet.size(
+              HashSet.fromIterable(previewUsers.map((user) => user.phoneNumber))
+            ) !== previewUsers.length
           ) {
             return yield* new PhotonCandidateInventoryError({
               operation: "captureCandidateInventory",
@@ -378,12 +380,13 @@ export const layerPhotonCandidateInventoryLive = Layer.effect(
           });
         }
 
+        const observedAtEpochMilliseconds = yield* Clock.currentTimeMillis;
         return PhotonCandidateInventoryReceipt.make({
           firstManifestDigest,
           manifest: first,
           matching: true,
           observedAt: PhotonCandidateInventoryObservedAt.make(
-            new Date().toISOString()
+            new Date(observedAtEpochMilliseconds).toISOString()
           ),
           secondManifestDigest,
           selectedCandidateFingerprint: input.selectedCandidateFingerprint,

@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-13
 review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
@@ -38,18 +38,47 @@ runtime config, or provider boundaries:
 - `Schema.TaggedErrorClass` or `Data.TaggedError` for expected failures.
 - `Context.Service` and `Layer` for dependency-injected operations.
 - `Config` and `ConfigProvider` for runtime config.
-- `Effect.tryPromise` for Promise or SDK calls.
-- `Effect.fn` and `Effect.withSpan` for named operations that need readable
-  traces.
+- Object-form `Effect.tryPromise({ try, catch })` for Promise or SDK calls,
+  with rejection mapped at the owning boundary.
+- `Effect.all`, `Effect.race`, fibers, and other Effect primitives for owned
+  concurrency. Raw `Promise.all` and `Promise.race` are forbidden in production
+  app/package source even inside a `tryPromise` callback.
+- `Clock.currentTimeMillis`, `Effect.sleep`, schedules, and timeouts for
+  runtime time so `TestClock` can control Effect-owned tests.
+- `Effect.fn("Owner.operation")` for reusable semantic operations that own a
+  readable trace. Use `Effect.fnUntraced` only for a small leaf or public
+  service accessor whose invoked service operation already owns the trace.
+  Direct exported functions that construct `Effect.gen` are forbidden;
+  top-level Effect programs and local one-use generators remain valid.
 - `Match`, `Result`, and `Exit` for tagged branching and program outcomes.
-- Effect collection modules such as `Array`, `Chunk`, `HashMap`, `HashSet`,
-  and `Record` when transforming data in Effect-owned code.
+- Effect collection modules such as `Chunk`, `HashMap`, and `HashSet` when
+  persistent concatenation, Effect equality/hash, typed lookup absence, or
+  set algebra materially carries the domain. Ordinary immutable arrays,
+  records, and local native collections remain valid when those semantics do
+  not apply. A native `Map`, `Set`, `WeakMap`, or `WeakSet` constructor in owned
+  app/package source requires an exact occurrence-checked lint exception that
+  names its local algorithm, ordered diagnostic, host, test-backend, or
+  unforgeable identity-provenance owner. Weak identity is appropriate when a
+  Schema must distinguish containers it created from frozen proxies or other
+  caller-owned lookalikes; Effect collections do not provide that identity
+  capability.
 
 Do not introduce Zod, local DTO mirrors, raw `unknown` readers, or hand-written
 success/error unions when an owning Effect Schema or tagged error can express
 the contract.
 
 ## Service Shape
+
+An exported operation must make trace ownership visible at its declaration.
+Use a named `Effect.fn` when the operation performs policy, validation,
+orchestration, or other work whose failures need their own span. Use
+`Effect.fnUntraced` when a stable public accessor only acquires a service and
+delegates to an already named service operation; give its generator a useful
+function name for diagnostics. Do not add a pass-through accessor merely to
+rename a service method: it needs an existing public-package consumer or
+another concrete API-boundary reason. This distinction follows installed
+`effect@4.0.0-beta.101`; the reviewed v4 source revision is
+`1caab3cc30f626efbf15e59d74f539a487e5c85c`.
 
 Use this file layout when a package grows past one or two operations:
 
@@ -88,8 +117,9 @@ For every operation:
 2. Encode the outbound provider request with `Schema.encodeEffect` or the
    framework-native `HttpClient` Schema body API immediately before the call.
    Keep `typeof Contract.Encoded` inside the adapter.
-3. Wrap only the Promise call with `Effect.tryPromise` and map raw failure once
-   to an owner-named, safe `Schema.TaggedErrorClass` failure.
+3. Wrap only the Promise call with object-form
+   `Effect.tryPromise({ try, catch })` and map raw failure once to an
+   owner-named, safe `Schema.TaggedErrorClass` failure.
 4. Decode the complete provider response immediately with
    `Schema.decodeUnknownEffect`; use `Schema.decodeEffect` instead when the SDK
    statically returns the codec's `Encoded` type.
@@ -101,6 +131,83 @@ and are revealed only at immediate SDK construction or header assignment.
 Tests use a scoped `ConfigProvider` when proving configuration and a
 deterministic mock/memory Layer for service behavior. Every provider service
 exports explicit live and mock/memory Layers.
+
+An availability fallback may recover the Layer's expected typed acquisition
+errors with `Layer.catch` or a narrower tagged recovery. It must not use
+`Layer.catchCause` to turn defects or interruption into an ordinary unavailable
+state. Tests must prove both the admitted typed fallback and preservation of a
+defect/interruption Cause when availability affects host readiness.
+
+Stable credentials, clients, and policy belong in the service implementation
+or its Layer. Operation input carries only request-specific decoded facts. In
+particular, an authorization operation must not accept both the presented
+credential and the expected credential: decode and redact the presented value
+at ingress, capture the bounded expected value in the Layer, and use a
+fixed-work comparison appropriate to the admitted representation. Errors and
+observability remain secret-negative.
+
+An opaque protocol-JSON Schema must not return caller-owned arrays, objects,
+accessors, or proxies merely because a predicate accepted them. Canonicalize
+both Schema directions into detached ordinary data, bound recursion and
+cardinality, and freeze the decoded value when later mutation would violate the
+domain contract. Its declaration/type-side guard must accept only the deeply
+frozen containers created by that transform; freezing and structural equality
+alone are not ownership because a frozen `Proxy` can retain caller-controlled
+behavior. Where the type side must prove provenance, register transformed
+containers in one package-private weak-identity owner and require that identity
+recursively. Otherwise `Schema.is`, `.makeEffect`, or a nested type-side
+constructor can brand the caller's source without running the detaching
+transformation. Stateful provider indexes and identities must reject a
+duplicate before updating `Ref`/`HashMap` state or emitting output.
+
+Streaming adapters own explicit positive budgets for response headers,
+per-pull body idleness, cumulative bytes, decoded events, and existing
+line/event framing. A pull counts as progress only when it emits a non-empty
+protocol chunk; filter empty transport chunks before the idle timeout so a
+provider cannot keep work alive without consuming another budget. Load
+semantic limits through `Config.schema`; implement time with Effect timeout
+operators so `TestClock` can drive it, and preserve stream
+interruption/finalization. Scope each HTTP response from acquisition through
+consumption. Close rejected status/media responses immediately without reading
+their bodies; for an accepted streaming response, transfer the dedicated scope
+to the returned body and close it on completion, failure, cancellation, or
+interruption. If accepted headers must be acquired before returning the stream
+so typed status/auth errors remain available before host headers, bound the
+ownership gap with one Effect-clock watchdog started only after accepted
+status, media type and metadata: body subscription claims the scope, while the
+configured idle deadline closes an unclaimed scope. Header acquisition remains
+governed only by its independent header timeout. Use an
+Effect `Deferred` completed by the scope finalizer so every earlier close also
+terminates the bounded detached fiber. Treat `Deferred.succeed`'s boolean result
+as the exactly-once claim decision: only the winning subscriber may expose the
+one-shot upstream stream, while an expired or duplicate subscriber fails with
+the fixed typed boundary error before reading it. Assert request abort, unread
+rejected bytes, accepted-but-unclaimed expiry, late subscription, and duplicate
+subscription directly. A public
+SSE-only request Schema accepts only
+the supported fields and omitted or literal-true stream mode; use exact excess
+property rejection at HTTP ingress instead of silently stripping drift.
+
+When one provider service needs credentials selected by an already-decoded
+resource identity, expose a named semantic lookup over a Schema-owned tagged
+scope and return a closed safe error. Decode the complete credential set once
+inside the live operation, store it in Effect `HashMap` when keyed lookup is
+the domain operation, and fail on duplicate, unavailable, or unadmitted scope.
+Do not expose a raw Config effect as the service, accept primitive project IDs,
+or select credentials from their encoded wire representation. Keep broader
+inventory credentials and exact-resource automation credentials in distinct
+Layers when their authority differs.
+
+Compose dynamic already-decoded redacted config with the owning Schema's
+`.makeEffect` constructor so Type-side validation stays in the typed error
+channel; reserve `.make` for trusted static construction. Do not call
+`Redacted.value` merely to feed the
+plaintext into `Schema.decodeEffect` or `Schema.decodeUnknownEffect` and create
+another redacted wrapper. `redacted-schema-roundtrip` enforces this while
+preserving immediate boundary reveals. When an external representation really
+must change, encode the owning redacted Schema at that exact egress before
+decoding the target wire/crypto representation; do not reveal and re-wrap it as
+an internal shortcut.
 
 Alchemy custom providers follow the same boundary. `Resource` props and
 attributes are canonical decoded Schema types; `Provider.succeed` delegates
@@ -118,7 +225,12 @@ and sync result once, fingerprints physical identities before persistence,
 classifies each observation through `Match`, and encodes only its owned report
 and bounded receipt at the file boundary. Native fields that do not expose
 attempts or duration stay explicitly `NotExposed`; missing observation data is
-not invented.
+not invented. The protected environment supplies a static, fingerprinted
+read-only policy artifact; it is not misrepresented as one-run identity. Each
+execution separately decodes a branded GitHub repository/run/attempt identity,
+the checked-out source SHA, and the already-decoded adoption-manifest digest,
+then carries all three through the report and receipt. A source-only actor or
+an unbound manifest is not accepted as hosted execution evidence.
 
 The Vercel read/import boundary applies this per operation: encode one
 owner-qualified request immediately before team/project/query assignment,
@@ -180,6 +292,48 @@ services return Effects and depend on service tags. Keep live Layer composition
 in `*.layer.ts` or the executable composition root rather than constructing it
 inside operations.
 
+Runtime time follows the same ownership rule. Read the current epoch through
+`Clock.currentTimeMillis`, then construct `Date` from that explicit value only
+at the formatting boundary. Tests of sleeps, retries, schedules, deadlines or
+timeouts fork the lazy Effect, use `TestClock.adjust` or `TestClock.setTime`,
+then join or inspect the Fiber. Fixed decoded epochs are appropriate for
+fixtures that merely need a valid future timestamp. Host `Date.now`, raw
+timers and `TestClock.withLive` are reserved for exact registered process or
+framework proofs; they are not a shortcut around deterministic test time.
+
+Non-cryptographic runtime identities follow the same rule. Generate them from
+fiber-local `Random` and prove reproducibility with `Random.withSeed`; do not
+call ambient `Math.random` or `globalThis.crypto.randomUUID`. Keep Web Crypto
+entropy only at explicit cryptographic boundaries such as PKCE material and
+AES-GCM IVs, where cryptographic security is the observable requirement.
+
+Choose state and collections by their observable semantics. Use one cohesive
+immutable Ref value only when fields share an invariant and must transition
+atomically. Keep independent Refs for independent observation or lifetime;
+use `SynchronizedRef` for serialized or effectful transitions,
+`SubscriptionRef` for a real subscriber stream, and `ScopedRef` for a
+replaceable resource. Use `Schema.NonEmptyArray` only for an at-least-one
+boundary, not as proof of exact cardinality. Atom is not a backend runtime
+state primitive.
+
+An Effect traversal callback returns its immutable observation; it does not
+mutate outer counters or collections that the caller later relies on. Derive
+counts and `HashSet`/`HashMap` domain invariants after the traversal. Local
+mutable state remains valid inside one synchronous parser, byte copy,
+single-fiber sequential pagination loop, or host-owned callback when it is not
+captured across traversal callbacks, concurrent work, or a later finalizer.
+`bundjil/no-unregistered-native-collection` makes that review fail closed for
+owned app/package source; its exceptions are exact by file, constructor, and
+occurrence count, and stale exceptions fail lint.
+
+Control state that is written before one Effect and observed by a later
+finalizer is runtime state, even when it is scoped to one operation. Keep
+fields that share one compensation invariant in a single immutable `Ref`
+value, update eligibility before an outcome-uncertain external write, and read
+one snapshot in the finalizer. Do not carry compensation policy across Effects
+with closure-mutated booleans or split one rollback snapshot into adjacent
+Refs.
+
 ## Helper Admission
 
 Helper sprawl is an architecture failure, not merely a style preference. Keep
@@ -227,12 +381,40 @@ streams, or Workflow state. Logs and proof output contain only safe metadata;
 rollback restores the retained deployment or provider binding and never uses
 namespace clearing as a coordination or recovery mechanism.
 
+Compensation for an external state machine must observe the whole Effect
+`Exit`, not only the typed error channel. Use an exit-aware finalizer for any
+write sequence that must restore state after failure, interruption, or defect;
+the finalizer must read back the restored state, preserve the original
+unsuccessful exit when restoration succeeds, and surface a safe rollback error
+when restoration fails. Deterministic memory-Layer fixtures must cover an
+after-write interruption and defect, not only expected provider failures.
+
 ## Static Analysis
 
 `bun run check` runs the root Ultracite/Oxlint formatting and type-aware lint
-configuration. `bun run knip` enforces dead-code, export, file, and dependency
-hygiene. Package/app typechecks and the configured Effect language service are
-also required.
+configuration. In app/package TypeScript, the local plugin rejects ambient
+time, bare or catchless `Effect.tryPromise`, and runtime execution outside
+named edges. It also rejects ambient host time in owned `tooling/**`
+TypeScript, including policy receipt generation. In package `src`, agent
+service code, and codex-proxy `src`, it confines `async`, `await`, and
+`new Promise` to direct Effect Promise ingress callbacks. The stable rule IDs
+are
+`bundjil/no-ambient-time-in-effect`,
+`bundjil/no-async-await-in-effect-service`,
+`bundjil/no-exported-effect-gen-function`,
+`bundjil/require-try-promise-catch`, and
+`bundjil/no-runtime-execution-outside-boundary`. Exact process/framework
+exceptions live in the plugin as path, symbol, and occurrence-count records;
+removing or adding a matching occurrence fails lint as stale or unexplained.
+
+`bun run knip` enforces dead-code, export, file, and dependency hygiene.
+Package/app typechecks and the configured Effect language service are also
+required.
+
+`bun run check:boundaries` also rejects raw Promise coordination in owned
+production source. A framework callback may return one Promise at its exact
+host edge, but parallelism, racing, interruption, and failure composition stay
+inside the application-owned Effect runtime.
 
 Do not weaken the root lint config, add broad suppressions, introduce unsafe
 casts, or expand ignore patterns to land a change. A narrow suppression needs
@@ -275,8 +457,9 @@ use the category that matches its semantics:
   operations use a named `Schema.Literal` or `Schema.Literals` contract. Use
   `Match` over the decoded discriminant for material control flow.
 - **Secrets** use owner-named `Schema.Redacted` or
-  `Schema.RedactedFromValue` contracts. Do not reveal a secret merely to add a
-  brand.
+  `Schema.RedactedFromValue` contracts. When independently valid secret domains
+  cross one boundary, brand the checked source Schema before wrapping it in
+  redaction; never reveal an already-redacted secret merely to add a brand.
 - **Content** such as prompts, messages, instructions, descriptions, and tool
   output uses an owner-named checked text Schema. Brand content only when two
   independently valid content domains cross the same call boundary and mixing
@@ -287,6 +470,22 @@ use the category that matches its semantics:
   operation that decoded their enclosing boundary.
 - **Diagnostics** such as safe tagged-error messages remain checked strings.
   They are not identifiers and must not require unsafe brand construction.
+
+Closed diagnostics also constrain primitive domains. A provider-observed HTTP
+status is an owner Schema limited to 100 through 599, or the literal
+`unknown`; an arbitrary safe integer is not a low-cardinality observation.
+Raw provider header values remain inside their adapter and are never copied to
+public results or safe tagged errors. After validation, outward metadata uses a
+closed application-owned literal. Counts, sequence numbers and indexes use
+owner-named non-negative integer Schemas rather than finite `number`.
+
+When a protocol has ordered semantics, decode terminal and recognized data
+events through one shared closed tagged union and advance one
+application-owned state with `Match`. Proof and live mapping must consume that
+same validated union. A boolean recording that completion appeared somewhere
+is not a completion oracle: failures, malformed recognized events, duplicate,
+regressing or skipped sequence numbers, duplicate terminals, done markers and
+post-terminal events must be rejected in order.
 
 Decode the complete canonical request, event, config, or persisted record once
 at the incoming boundary and encode it at the outgoing boundary. Do not add
@@ -326,6 +525,28 @@ diagnostic, use Effect's JSON schema rather than raw serialization:
 ```ts
 const body = yield * Schema.encodeEffect(Schema.UnknownFromJsonString)(value);
 ```
+
+`Schema.Unknown` is not a domain contract for provider-owned JSON fields.
+Neither is unbounded recursive `Schema.Json` sufficient when an adversarial
+payload can exhaust the JavaScript stack before entering the typed failure
+channel. When a protocol deliberately accepts arbitrary JSON, define one
+opaque owner Schema with an explicit maximum depth and a validator whose own
+recursion cannot exceed that bound. Bundjil's Codex protocol admits at most 32
+nested containers and uses the same owner for object-root function-tool
+parameters and SSE JSON before concrete event selection. Accepted arbitrary
+JSON must also be stable under its outward encoder: arrays are dense and
+objects expose only enumerable own data properties. Arrays at the tool root,
+sparse arrays, accessors, symbols, non-enumerable properties, non-plain objects,
+functions, non-finite numbers and over-depth values fail at the owning boundary.
+
+A credential-bearing endpoint is not ordinary configurable text. Its Config
+Schema must be the exact owned HTTPS literal or a reviewed closed allowlist;
+never attach a bearer credential to a caller-selected origin or path. Secret
+header values use redacted, length-bounded, header-safe Schemas. Construct
+platform `Headers` inside `Effect.try` even after decoding, translate failure
+to one fixed tagged error, and prove the request client was not invoked. Two
+valid credential domains that share header syntax still use distinct brands
+inside their redacted Schemas so TypeScript cannot interchange them.
 
 Tests, smoke scripts, provider request bodies, SSE chunks, proof output, and
 leak checks all follow this rule. If a framework hands you an already encoded
@@ -376,16 +597,35 @@ export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchem
   {
     boundary: WorkspaceSchemaBoundary,
     message: Schema.NonEmptyString,
-    cause: Schema.Defect,
   }
 ) {}
 ```
 
 Rules:
 
+- Production service/source Effects must not fail with primitive values. Use
+  an owner-named tagged error so callers can match a closed vocabulary and the
+  boundary can be Schema encoded. `bundjil/no-primitive-effect-failure`
+  rejects direct primitive `Effect.fail`, `Effect.failSync`, and
+  `Effect.mapError` constructions in approved production source and
+  infrastructure operator scripts. A CLI may collapse its owner-tagged error
+  to a stable exit code or bounded receipt reason only in the final renderer;
+  the Effect program itself must retain the typed error.
+- Fallible live Layers retain their typed construction errors. Provide the
+  complete runtime before the final command `Effect.exit` or catch so Config
+  and acquisition failures reach the same bounded renderer as foreground
+  failures. `bundjil/no-layer-or-die-in-service` rejects `Layer.orDie` in owned
+  service/package source and infrastructure scripts. A defect conversion is
+  allowed only at an exact host-framework edge whose API requires an
+  infallible Layer, with that constraint documented beside the composition.
 - An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.
+- Every exported yieldable typed error must use `Schema.TaggedErrorClass`, not
+  `Data.TaggedError`, so its encoded contract can be checked and round-tripped.
+  The `public-data-tagged-error` boundary rule owns this invariant. Private
+  adapter and operator-only errors may use `Data.TaggedError` when they do not
+  cross a public or durable boundary.
 - Rename an exported tagged error as one atomic encoded-contract migration:
   update the declaration, self-type, literal tag, constructors, failure
   unions, `catchTag`/`catchTags` consumers, guards, Schema encode/decode tests,
@@ -396,8 +636,37 @@ Rules:
 - Do not export speculative errors. A public tagged error needs a real
   constructor or consumer in the owning capability; otherwise remove it until
   a concrete failure boundary exists.
+- Keep arbitrary host and provider causes inside the owning adapter. Exported
+  error Schemas must expose only bounded owner-named diagnostics; never add a
+  `Schema.Defect` cause field. The `public-raw-cause` boundary rule enforces
+  this for every field in an exported structure, including optional or renamed
+  causes.
+- Owner-named fields remain mandatory when a tagged error reuses a shared field
+  object. Do not hide `Schema.String` or `Schema.NonEmptyString` in an aliased
+  object passed to `Schema.TaggedErrorClass`; define one bounded Schema named
+  for that error family. `inline-string-schema` resolves local and imported
+  field-object identifiers as well as inline object literals. Brand identities
+  and values used for routing, equality, lookup, or persistence. A bounded
+  diagnostic message does not need a nominal brand merely to force `.make` at
+  every static constructor.
+- Operator scripts must classify failures before retaining them in a tagged
+  error. A script-local `Data.TaggedError` may carry a bounded classification,
+  operation, status, or digest, but not an arbitrary `unknown` value. The
+  `operator-raw-cause` boundary rule enforces this across app and package
+  `scripts/` directories. A private adapter may retain an SDK rejection only
+  for immediate safe error translation; it must not log, encode, return, or
+  place that value in an operator receipt.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
+- Provider-controlled names, codes and messages are not safe telemetry merely
+  because they pass a lexical filter. Keep them private to immediate error
+  translation; structured logs expose only closed operation/phase values and
+  bounded numeric, boolean, enum or explicitly unknown observations required
+  for recovery.
+- Treat provider rejection objects as hostile. Property getters and Proxies can
+  throw before typed error translation; inspect only non-accessor own data
+  properties through a non-throwing owner boundary and collapse failed or
+  accessor-backed observations to the closed `unknown` case.
 - Translate provider/framework errors at the app boundary. Packages should not
   leak Eve, Sendblue, Cloudflare, Notion, or Vercel-specific exceptions unless
   that package explicitly owns the provider wrapper.
@@ -424,6 +693,12 @@ Rules:
 - Keep server-only secrets out of browser bundles and committed files.
 - Use owner-named redacted Schemas for credentials.
 - Do not read `process.env` directly in package logic.
+- The boundary provenance gate rejects direct `process.env`,
+  `globalThis.process.env`, `Bun.env`, and `import.meta.env` access throughout
+  owned app and package production source. Add no broad host exception: acquire
+  semantic values with `Config.schema`, and let an application root provide a
+  platform Layer when a live service needs filesystem, process, or network
+  capabilities.
 - App bootstrap can read app-owned config, but provider packages should decode
   their own required config at their boundary.
 - If multiple files need the same package config, expose a config module or
@@ -437,8 +712,29 @@ Live and mock layers should be explicit:
 - `Memory` or `Mock` layers provide deterministic behavior for tests.
 - Test helpers should compose layers at the test boundary rather than relying
   on hidden globals.
+- `Layer.provide` hides implementation dependencies and retains only the target
+  Layer's output; `Layer.provideMerge` deliberately retains both outputs. Use
+  the former when a public domain Layer must not expose its private transport,
+  mapper, credential, or persistence services, and inspect the built Context in
+  a direct test when that absence is part of the contract.
 - Provider SDK clients must be wrapped behind services before domain logic uses
   them.
+- Keep `Layer.orDie` out of reusable live Layers. A CLI provides its runtime
+  inside its final error/exit boundary; otherwise Layer acquisition can bypass
+  the command's typed failure vocabulary and leak a raw runtime Cause.
+- A mutating operator or workflow CLI must also capture authority, Config, Layer,
+  foreground operation, readback, and receipt encoding in that final
+  `Effect.exit` boundary. Do not pass expected failure directly to
+  `BunRuntime.runMain`: its default reporter can expose error tags, source
+  paths, and stack frames. Schema-encode one bounded success or blocked result
+  at the process edge and keep the underlying typed errors private.
+- Child processes are scoped platform resources. A live Layer captures the
+  installed Effect `ChildProcessSpawner`, models argv and environment overrides
+  explicitly, consumes bounded output through `Stream`, and maps platform
+  failure once. The Bun/CLI root provides `BunServices.layer`; package logic
+  must not own `Bun.spawn`, raw Promise orchestration, or ambient environment
+  copying. `check:boundaries` rejects direct Bun process spawning and direct
+  ambient environment reads in owned source.
 
 For app tools, it is acceptable to provide a live layer directly at the tool
 edge while the app is small:

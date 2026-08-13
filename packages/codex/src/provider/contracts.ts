@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Effect, Option, Schema, SchemaGetter, SchemaIssue } from "effect";
 import type { Stream } from "effect";
 
 import {
@@ -6,6 +6,7 @@ import {
   CodexOAuthAccountId,
   CodexOAuthSubject,
 } from "../auth/credentials.js";
+import { CodexHttpStatus } from "./error-contracts.js";
 import type { CodexResponsesStreamError } from "./errors.js";
 
 export const CodexResponsesModelId = Schema.NonEmptyString.pipe(
@@ -14,8 +15,8 @@ export const CodexResponsesModelId = Schema.NonEmptyString.pipe(
 
 export type CodexResponsesModelId = typeof CodexResponsesModelId.Type;
 
-export const CodexResponsesEndpoint = Schema.NonEmptyString.pipe(
-  Schema.brand("CodexResponsesEndpoint")
+export const CodexResponsesEndpoint = Schema.Literal(
+  "https://chatgpt.com/backend-api/codex/responses"
 );
 
 export type CodexResponsesEndpoint = typeof CodexResponsesEndpoint.Type;
@@ -47,12 +48,13 @@ export const CodexResponsesFunctionArguments = Schema.String;
 export type CodexResponsesFunctionArguments =
   typeof CodexResponsesFunctionArguments.Type;
 
-export const CodexResponsesStreamContentType = Schema.String;
+export const CodexResponsesStreamContentType =
+  Schema.Literal("text/event-stream");
 export type CodexResponsesStreamContentType =
   typeof CodexResponsesStreamContentType.Type;
 
 export const CodexResponsesStreamMetadata = Schema.Struct({
-  status: Schema.Number.check(Schema.isFinite()),
+  status: CodexHttpStatus,
   contentType: CodexResponsesStreamContentType,
 });
 export type CodexResponsesStreamMetadata =
@@ -63,6 +65,22 @@ export const CodexResponsesStreamEventKind = Schema.NonEmptyString.pipe(
 );
 export type CodexResponsesStreamEventKind =
   typeof CodexResponsesStreamEventKind.Type;
+
+export const CodexResponsesCount = Schema.Int.check(
+  Schema.isGreaterThanOrEqualTo(0)
+);
+export type CodexResponsesCount = typeof CodexResponsesCount.Type;
+
+export const CodexResponsesOutputIndex = Schema.Int.check(
+  Schema.isGreaterThanOrEqualTo(0)
+);
+export type CodexResponsesOutputIndex = typeof CodexResponsesOutputIndex.Type;
+
+export const CodexResponsesSequenceNumber = Schema.Int.check(
+  Schema.isGreaterThanOrEqualTo(0)
+);
+export type CodexResponsesSequenceNumber =
+  typeof CodexResponsesSequenceNumber.Type;
 
 export const CodexResponsesRecognizedStreamEventType = Schema.Literals([
   "response.output_text.delta",
@@ -140,11 +158,263 @@ export const CodexResponsesInput = Schema.Union([
 
 export type CodexResponsesInput = typeof CodexResponsesInput.Type;
 
+type CanonicalCodexJsonArray = readonly CanonicalCodexJsonValue[];
+
+interface CanonicalCodexJsonObject {
+  readonly [key: string]: CanonicalCodexJsonValue;
+}
+
+type CanonicalCodexJsonValue =
+  | null
+  | boolean
+  | number
+  | string
+  | CanonicalCodexJsonArray
+  | CanonicalCodexJsonObject;
+
+const maximumCodexJsonDepth = 32;
+const ownedCanonicalCodexJsonContainers = new WeakSet<object>();
+
+function canonicalizeCodexJsonArray(
+  input: readonly unknown[],
+  depth: number,
+  canonicalize: (
+    input: unknown,
+    depth: number
+  ) => CanonicalCodexJsonValue | undefined
+): CanonicalCodexJsonArray | undefined {
+  const lengthDescriptor = Object.getOwnPropertyDescriptor(input, "length");
+  if (
+    lengthDescriptor === undefined ||
+    !Object.hasOwn(lengthDescriptor, "value") ||
+    typeof lengthDescriptor.value !== "number" ||
+    !Number.isSafeInteger(lengthDescriptor.value) ||
+    lengthDescriptor.value < 0 ||
+    Reflect.ownKeys(input).length !== lengthDescriptor.value + 1
+  ) {
+    return undefined;
+  }
+  const output: CanonicalCodexJsonValue[] = [];
+  for (let index = 0; index < lengthDescriptor.value; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(input, String(index));
+    if (
+      descriptor === undefined ||
+      !descriptor.enumerable ||
+      !Object.hasOwn(descriptor, "value")
+    ) {
+      return undefined;
+    }
+    const value = canonicalize(descriptor.value, depth + 1);
+    if (value === undefined) {
+      return undefined;
+    }
+    output.push(value);
+  }
+  const frozen = Object.freeze(output);
+  ownedCanonicalCodexJsonContainers.add(frozen);
+  return frozen;
+}
+
+function canonicalizeCodexJsonObject(
+  input: object,
+  depth: number,
+  canonicalize: (
+    input: unknown,
+    depth: number
+  ) => CanonicalCodexJsonValue | undefined
+): CanonicalCodexJsonObject | undefined {
+  const prototype = Reflect.getPrototypeOf(input);
+  if (prototype !== Object.prototype && prototype !== null) {
+    return undefined;
+  }
+
+  const output: Record<string, CanonicalCodexJsonValue> = {};
+  for (const key of Reflect.ownKeys(input)) {
+    if (typeof key !== "string") {
+      return undefined;
+    }
+    const descriptor = Object.getOwnPropertyDescriptor(input, key);
+    if (
+      descriptor === undefined ||
+      !descriptor.enumerable ||
+      !Object.hasOwn(descriptor, "value")
+    ) {
+      return undefined;
+    }
+    const value = canonicalize(descriptor.value, depth + 1);
+    if (value === undefined) {
+      return undefined;
+    }
+    Object.defineProperty(output, key, {
+      configurable: false,
+      enumerable: true,
+      value,
+      writable: false,
+    });
+  }
+  const frozen = Object.freeze(output);
+  ownedCanonicalCodexJsonContainers.add(frozen);
+  return frozen;
+}
+
+function canonicalizeCodexJsonValueAtDepth(
+  input: unknown,
+  depth: number
+): CanonicalCodexJsonValue | undefined {
+  if (
+    input === null ||
+    typeof input === "boolean" ||
+    typeof input === "string"
+  ) {
+    return input;
+  }
+  if (typeof input === "number") {
+    return Number.isFinite(input) ? input : undefined;
+  }
+  if (typeof input !== "object" || depth >= maximumCodexJsonDepth) {
+    return undefined;
+  }
+  return Array.isArray(input)
+    ? canonicalizeCodexJsonArray(
+        input,
+        depth,
+        canonicalizeCodexJsonValueAtDepth
+      )
+    : canonicalizeCodexJsonObject(
+        input,
+        depth,
+        canonicalizeCodexJsonValueAtDepth
+      );
+}
+
+const canonicalizeCodexJsonValue = Option.liftThrowable((input: unknown) =>
+  canonicalizeCodexJsonValueAtDepth(input, 0)
+);
+
+const canonicalCodexJsonIssue = (input: unknown) =>
+  new SchemaIssue.InvalidValue(Option.some(input), {
+    message: "Expected canonical bounded JSON",
+  });
+
+const decodeCanonicalCodexJson = (input: unknown) =>
+  Option.match(canonicalizeCodexJsonValue(input), {
+    onNone: () => Effect.fail(canonicalCodexJsonIssue(input)),
+    onSome: (value) =>
+      value === undefined
+        ? Effect.fail(canonicalCodexJsonIssue(input))
+        : Effect.succeed(value),
+  });
+
+function isOwnedCanonicalCodexJsonValueAtDepth(
+  input: unknown,
+  depth: number
+): boolean {
+  if (
+    input === null ||
+    typeof input === "boolean" ||
+    typeof input === "string"
+  ) {
+    return true;
+  }
+  if (typeof input === "number") {
+    return Number.isFinite(input);
+  }
+  if (
+    typeof input !== "object" ||
+    depth >= maximumCodexJsonDepth ||
+    !Object.isFrozen(input) ||
+    !ownedCanonicalCodexJsonContainers.has(input)
+  ) {
+    return false;
+  }
+  const isArray = Array.isArray(input);
+  if (
+    Reflect.getPrototypeOf(input) !==
+    (isArray ? Array.prototype : Object.prototype)
+  ) {
+    return false;
+  }
+  const canonical = canonicalizeCodexJsonValueAtDepth(input, depth);
+  if (canonical === undefined) {
+    return false;
+  }
+  const keys = isArray
+    ? Array.from({ length: input.length }, (_, index) => String(index))
+    : Reflect.ownKeys(input);
+  return keys.every((key) => {
+    const descriptor = Object.getOwnPropertyDescriptor(input, key);
+    return (
+      descriptor !== undefined &&
+      Object.hasOwn(descriptor, "value") &&
+      isOwnedCanonicalCodexJsonValueAtDepth(descriptor.value, depth + 1)
+    );
+  });
+}
+
+const isOwnedCanonicalCodexJsonValue = Option.liftThrowable((input: unknown) =>
+  isOwnedCanonicalCodexJsonValueAtDepth(input, 0)
+);
+
+const CodexJsonValueDeclaration = Schema.declare<unknown>(
+  (input): input is unknown =>
+    Option.match(isOwnedCanonicalCodexJsonValue(input), {
+      onNone: () => false,
+      onSome: (isOwned) => isOwned,
+    }),
+  { identifier: "CodexJsonValue" }
+);
+
+export const CodexJsonValue = Schema.Unknown.pipe(
+  Schema.decodeTo(CodexJsonValueDeclaration, {
+    decode: SchemaGetter.transformOrFail(decodeCanonicalCodexJson),
+    encode: SchemaGetter.transformOrFail(decodeCanonicalCodexJson),
+  }),
+  Schema.brand("CodexJsonValue")
+);
+
+export type CodexJsonValue = typeof CodexJsonValue.Type;
+
+const isCodexJsonObject = (input: unknown): input is CanonicalCodexJsonObject =>
+  typeof input === "object" && input !== null && !Array.isArray(input);
+
+const decodeCodexFunctionParameters = (input: unknown) =>
+  Effect.gen(function* decodeCanonicalCodexFunctionParameters() {
+    const value = yield* decodeCanonicalCodexJson(input);
+    if (isCodexJsonObject(value)) {
+      return value;
+    }
+    return yield* Effect.fail(
+      new SchemaIssue.InvalidValue(Option.some(input), {
+        message: "Expected a canonical bounded JSON object",
+      })
+    );
+  });
+
+const CodexFunctionParametersDeclaration = Schema.declare<unknown>(
+  (input): input is unknown =>
+    isCodexJsonObject(input) &&
+    Option.match(isOwnedCanonicalCodexJsonValue(input), {
+      onNone: () => false,
+      onSome: (isOwned) => isOwned,
+    }),
+  { identifier: "CodexFunctionParameters" }
+);
+
+export const CodexFunctionParameters = Schema.Unknown.pipe(
+  Schema.decodeTo(CodexFunctionParametersDeclaration, {
+    decode: SchemaGetter.transformOrFail(decodeCodexFunctionParameters),
+    encode: SchemaGetter.transformOrFail(decodeCodexFunctionParameters),
+  }),
+  Schema.brand("CodexFunctionParameters")
+);
+
+export type CodexFunctionParameters = typeof CodexFunctionParameters.Type;
+
 export const CodexResponsesFunctionTool = Schema.Struct({
   type: Schema.Literal("function"),
   name: CodexResponsesFunctionName,
   description: Schema.optional(CodexResponsesContent),
-  parameters: Schema.Unknown,
+  parameters: CodexFunctionParameters,
   strict: Schema.optional(Schema.Boolean),
 });
 
@@ -203,16 +473,45 @@ export type CodexResponsesRequest = typeof CodexResponsesRequest.Type;
 
 export interface CodexResponsesStreamResult extends CodexResponsesStreamMetadata {
   readonly body: Stream.Stream<Uint8Array, CodexResponsesStreamError>;
+  readonly transportPolicy: CodexResponsesTransportPolicy;
 }
 
-export const CodexResponsesStreamEvent = Schema.Struct({
+export const CodexResponsesStreamEventDiscriminator = Schema.Struct({
   type: CodexResponsesStreamEventKind,
-  delta: Schema.optional(CodexResponsesContent),
-  output_index: Schema.optional(Schema.Number.check(Schema.isFinite())),
-  item: Schema.optional(Schema.Unknown),
+  sequence_number: CodexResponsesSequenceNumber,
 });
 
-export type CodexResponsesStreamEvent = typeof CodexResponsesStreamEvent.Type;
+export type CodexResponsesStreamEventDiscriminator =
+  typeof CodexResponsesStreamEventDiscriminator.Type;
+
+const CodexResponsesTerminalEventFields = {
+  sequence_number: CodexResponsesSequenceNumber,
+};
+
+export const CodexResponsesCompletedEvent = Schema.Struct({
+  type: Schema.Literal("response.completed"),
+  ...CodexResponsesTerminalEventFields,
+  response: Schema.Struct({ status: Schema.Literal("completed") }),
+});
+export type CodexResponsesCompletedEvent =
+  typeof CodexResponsesCompletedEvent.Type;
+
+export const CodexResponsesFailedEvent = Schema.Struct({
+  type: Schema.Literal("response.failed"),
+  ...CodexResponsesTerminalEventFields,
+  response: Schema.Struct({ status: Schema.Literal("failed") }),
+});
+
+export const CodexResponsesIncompleteEvent = Schema.Struct({
+  type: Schema.Literal("response.incomplete"),
+  ...CodexResponsesTerminalEventFields,
+  response: Schema.Struct({ status: Schema.Literal("incomplete") }),
+});
+
+export const CodexResponsesErrorEvent = Schema.Struct({
+  type: Schema.Literal("error"),
+  ...CodexResponsesTerminalEventFields,
+});
 
 export const CodexResponsesOutputItemKind = Schema.NonEmptyString.pipe(
   Schema.brand("CodexResponsesOutputItemKind")
@@ -227,9 +526,16 @@ export const CodexResponsesOutputItemDiscriminator = Schema.Struct({
 export type CodexResponsesOutputItemDiscriminator =
   typeof CodexResponsesOutputItemDiscriminator.Type;
 
+export const CodexResponsesOutputItemAddedDiscriminatorEvent = Schema.Struct({
+  type: Schema.Literal("response.output_item.added"),
+  sequence_number: CodexResponsesSequenceNumber,
+  item: CodexResponsesOutputItemDiscriminator,
+});
+
 export const CodexResponsesFunctionCallAddedEvent = Schema.Struct({
   type: Schema.Literal("response.output_item.added"),
-  output_index: Schema.Number.check(Schema.isFinite()),
+  sequence_number: CodexResponsesSequenceNumber,
+  output_index: CodexResponsesOutputIndex,
   item: CodexResponsesFunctionCallOutputItem,
 });
 
@@ -238,23 +544,35 @@ export type CodexResponsesFunctionCallAddedEvent =
 
 export const CodexResponsesFunctionArgumentsDeltaEvent = Schema.Struct({
   type: Schema.Literal("response.function_call_arguments.delta"),
-  output_index: Schema.Number.check(Schema.isFinite()),
+  sequence_number: CodexResponsesSequenceNumber,
+  output_index: CodexResponsesOutputIndex,
   delta: CodexResponsesFunctionArguments,
 });
 
 export type CodexResponsesFunctionArgumentsDeltaEvent =
   typeof CodexResponsesFunctionArgumentsDeltaEvent.Type;
 
+export const CodexResponsesOutputTextDeltaEvent = Schema.Struct({
+  type: Schema.Literal("response.output_text.delta"),
+  sequence_number: CodexResponsesSequenceNumber,
+  output_index: CodexResponsesOutputIndex,
+  delta: CodexResponsesContent,
+});
+
+export type CodexResponsesOutputTextDeltaEvent =
+  typeof CodexResponsesOutputTextDeltaEvent.Type;
+
 export interface CodexResponsesStreamMapInput {
   readonly model: CodexResponsesModelId;
   readonly body: Stream.Stream<Uint8Array, CodexResponsesStreamError>;
+  readonly transportPolicy: CodexResponsesTransportPolicy;
 }
 
 export const CodexResponsesPostInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   accountId: Schema.optional(CodexOAuthAccountId),
   request: CodexResponsesRequest,
-});
+}).pipe(Schema.redact);
 
 export type CodexResponsesPostInput = typeof CodexResponsesPostInput.Type;
 
@@ -308,7 +626,7 @@ export const OpenAICompatibleFunctionTool = Schema.Struct({
   function: Schema.Struct({
     name: CodexResponsesFunctionName,
     description: Schema.optional(CodexResponsesContent),
-    parameters: Schema.Unknown,
+    parameters: CodexFunctionParameters,
     strict: Schema.optional(Schema.Boolean),
   }),
 });
@@ -329,7 +647,7 @@ export type OpenAICompatibleToolChoice = typeof OpenAICompatibleToolChoice.Type;
 export const OpenAICompatibleChatCompletionRequest = Schema.Struct({
   model: CodexResponsesModelId,
   messages: Schema.Array(OpenAICompatibleChatMessage),
-  stream: Schema.optional(Schema.Boolean),
+  stream: Schema.optional(Schema.Literal(true)),
   tools: Schema.optional(Schema.Array(OpenAICompatibleFunctionTool)),
   tool_choice: Schema.optional(OpenAICompatibleToolChoice),
 });
@@ -342,7 +660,7 @@ export const OpenAICompatibleChatCompletionDelta = Schema.Struct({
   tool_calls: Schema.optional(
     Schema.Array(
       Schema.Struct({
-        index: Schema.Number.check(Schema.isFinite()),
+        index: CodexResponsesOutputIndex,
         id: Schema.optional(CodexResponsesFunctionCallId),
         type: Schema.optional(Schema.Literal("function")),
         function: Schema.Struct({
@@ -365,7 +683,7 @@ export type OpenAICompatibleChatCompletionFinishReason =
   typeof OpenAICompatibleChatCompletionFinishReason.Type;
 
 export const OpenAICompatibleChatCompletionChoice = Schema.Struct({
-  index: Schema.Number.check(Schema.isFinite()),
+  index: CodexResponsesOutputIndex,
   delta: OpenAICompatibleChatCompletionDelta,
   finish_reason: Schema.optional(
     Schema.NullOr(OpenAICompatibleChatCompletionFinishReason)
@@ -384,7 +702,7 @@ export type OpenAICompatibleChatCompletionId =
 export const OpenAICompatibleChatCompletionChunk = Schema.Struct({
   id: OpenAICompatibleChatCompletionId,
   object: Schema.Literal("chat.completion.chunk"),
-  created: Schema.Number.check(Schema.isFinite()),
+  created: CodexResponsesCount,
   model: CodexResponsesModelId,
   choices: Schema.Array(OpenAICompatibleChatCompletionChoice),
 });
@@ -405,24 +723,50 @@ export const CodexDirectProviderInput = Schema.Struct({
 
 export type CodexDirectProviderInput = typeof CodexDirectProviderInput.Type;
 
+const OpenAICompatibleProxyHeaderSecret = Schema.NonEmptyString.check(
+  Schema.isMaxLength(16_384),
+  Schema.isPattern(/^[\u0021-\u007E]+$/)
+);
+
 export const OpenAICompatibleProxyInternalToken = Schema.RedactedFromValue(
-  Schema.NonEmptyString
+  OpenAICompatibleProxyHeaderSecret.pipe(
+    Schema.brand("OpenAICompatibleProxyInternalToken")
+  )
 );
 
 export type OpenAICompatibleProxyInternalToken =
   typeof OpenAICompatibleProxyInternalToken.Type;
 
-export const OpenAICompatibleProxyAuthorizationHeader = Schema.String;
+export const OpenAICompatibleProxyAuthorizationHeader =
+  Schema.RedactedFromValue(
+    Schema.NonEmptyString.check(
+      Schema.isMaxLength(16_391),
+      Schema.isPattern(/^[\u0020-\u007E]+$/)
+    ).pipe(Schema.brand("OpenAICompatibleProxyAuthorizationHeader"))
+  );
 export type OpenAICompatibleProxyAuthorizationHeader =
   typeof OpenAICompatibleProxyAuthorizationHeader.Type;
 
 export const OpenAICompatibleProxyInput = Schema.Struct({
   authorization: Schema.optional(OpenAICompatibleProxyAuthorizationHeader),
-  internalToken: OpenAICompatibleProxyInternalToken,
   completion: CodexDirectProviderInput,
 });
 
 export type OpenAICompatibleProxyInput = typeof OpenAICompatibleProxyInput.Type;
+
+const CodexResponsesTransportLimit = Schema.Int.check(
+  Schema.isGreaterThanOrEqualTo(1)
+);
+
+export const CodexResponsesTransportPolicy = Schema.Struct({
+  headerTimeoutMillis: CodexResponsesTransportLimit,
+  streamIdleTimeoutMillis: CodexResponsesTransportLimit,
+  maximumBodyBytes: CodexResponsesTransportLimit,
+  maximumEvents: CodexResponsesTransportLimit,
+});
+
+export type CodexResponsesTransportPolicy =
+  typeof CodexResponsesTransportPolicy.Type;
 
 export const UpstashRedisRestUrl = Schema.URL;
 
@@ -453,17 +797,17 @@ export const CodexResponsesProofInput = Schema.Struct({
   accountId: Schema.optional(CodexOAuthAccountId),
   model: CodexResponsesModelId,
   prompt: CodexResponsesNonEmptyContent,
-});
+}).pipe(Schema.redact);
 
 export type CodexResponsesProofInput = typeof CodexResponsesProofInput.Type;
 
 export const CodexResponsesProofResult = Schema.Struct({
   transport: Schema.Literal("direct-codex-responses"),
   endpoint: CodexResponsesEndpoint,
-  status: Schema.Number.check(Schema.isFinite()),
+  status: CodexHttpStatus,
   contentType: CodexResponsesStreamContentType,
-  receivedBodyBytes: Schema.Number.check(Schema.isFinite()),
-  receivedStreamLines: Schema.Number.check(Schema.isFinite()),
+  receivedBodyBytes: CodexResponsesCount,
+  receivedStreamEvents: CodexResponsesCount,
   usedAccountHeader: Schema.Boolean,
 });
 

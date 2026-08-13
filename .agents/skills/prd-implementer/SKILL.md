@@ -102,8 +102,11 @@ the canonical task ledger, acceptance evidence, or proof receipts.
   `docs/architecture/frontend-composition.md`: use schema-owned URL and route
   identity contracts, keep the app router as the URL writer, and keep app route
   APIs out of reusable packages.
-- Prefer flat, linear `Effect.gen` programs for primary operations. Put typed
-  error handling in the `.pipe(...)` after `Effect.gen` with `catchTag`,
+- Prefer flat, linear Effects for primary operations. Reusable semantic
+  operations use `Effect.fn("Owner.operation")`; a justified leaf or service
+  delegate may use `Effect.fnUntraced` when the called operation already owns
+  the trace. Do not export a function that directly constructs `Effect.gen`.
+  Put typed error handling in the outer `.pipe(...)` with `catchTag`,
   `catchTags`, or `mapError`; avoid burying domain decisions in nested helper
   chains.
 - Avoid wrapper/helper sprawl. A helper must be reused, name a real boundary or
@@ -139,6 +142,11 @@ HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
 Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
 code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
 RPC, SSR, command, config, or service boundary.
+
+In owned app/package source, a native Map/Set/WeakMap/WeakSet constructor must
+either be replaced where Effect collection semantics carry the domain or have
+an exact occurrence-checked lint exception naming its local algorithm, ordered
+diagnostic, host, or test-backend owner.
 
 Reuse canonical schemas, types, service contracts, errors, and branded
 identifiers from the owning package. Do not define standalone DTO mirrors or
@@ -214,11 +222,15 @@ Before accepting a task, audit for:
 - no helper sprawl
 - canonical type/schema/id/error reuse
 - strict Effect service/layer patterns
-- flat linear `Effect.gen` control flow for primary operations with tagged
-  errors handled in the following `.pipe(...)`
+- flat linear primary Effect control flow with explicit `Effect.fn` versus
+  `Effect.fnUntraced` trace ownership, no exported function directly
+  constructing `Effect.gen`, and tagged errors handled in the outer
+  `.pipe(...)`
 - Effect primitives where they fit: `Data`, `Schema`, `Array`, `Chunk`,
   `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`,
   `Record`, `Result`, `Exit`, Bun/Platform `Command`, and `ManagedRuntime`
+- no unregistered native collection constructor in owned app/package source;
+  every retained occurrence has a current exact owner and count
 - no `Object.values`, `Object.entries`, `switch`, unsafe casts, local DTO
   mirrors, or stringly branching when an Effect/schema-owned approach fits
 - no trivial wrappers/helpers; every new helper is either reused, names a real

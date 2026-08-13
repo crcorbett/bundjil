@@ -16,6 +16,7 @@ import {
   InfrastructureDriftReportInput,
   InfrastructureDriftReportJson,
   InfrastructureDriftResourceFingerprint,
+  InfrastructureDriftRunIdentity,
   InfrastructureDriftSourceSha,
 } from "../src/drift.js";
 import type {
@@ -31,8 +32,13 @@ import {
   InfrastructureArtifactDigest,
   InfrastructureBoundedReceiptJson,
 } from "../src/receipt.js";
+import { AdoptionManifestDigest } from "../src/schemas.js";
 
 const fingerprint = InfrastructureDriftResourceFingerprint.make("a".repeat(64));
+const manifestDigest = AdoptionManifestDigest.make("c".repeat(64));
+const runIdentity = InfrastructureDriftRunIdentity.make(
+  "github-actions:crcorbett/bundjil:31625215217:1"
+);
 const sourceSha = InfrastructureDriftSourceSha.make("b".repeat(40));
 
 const observation = ({
@@ -88,9 +94,11 @@ const reportFor = (observations: readonly InfrastructureDriftObservation[]) =>
           replace: 0,
           update: 0,
         },
+        manifestDigest,
         observedAt: "2026-07-31T01:00:00.000Z",
         observations,
         runDurationMilliseconds: 42,
+        runIdentity,
         sourceSha,
         stage: "preview",
       })
@@ -284,11 +292,13 @@ describe("infrastructure drift report", () => {
         InfrastructureDriftReportInput.make({
           authorityFingerprint: fingerprint,
           desiredPlan: { _tag: "NotExposed" },
+          manifestDigest,
           observedAt: "2026-07-31T01:00:00.000Z",
           observations: [
             observation({ action: "unavailable", readback: "unavailable" }),
           ],
           runDurationMilliseconds: 42,
+          runIdentity,
           sourceSha,
           stage: "preview",
         })
@@ -353,6 +363,8 @@ describe("infrastructure drift report", () => {
     }).compile(boundedReceiptSchema);
     expect(validate(decoded)).toBeTruthy();
     expect(encoded).toContain("BND-J14-preview-infrastructure-drift-report");
+    expect(encoded).toContain(String(manifestDigest));
+    expect(encoded).toContain(String(runIdentity));
     expect(encoded).toContain("provider-writes:0");
     expect(encoded).not.toContain("raw-provider-payload");
     expect(encoded).not.toContain("secret-value");
@@ -370,6 +382,14 @@ describe("infrastructure drift report", () => {
     ).rejects.toBeDefined();
     await expect(
       Effect.runPromise(
+        Schema.decodeUnknownEffect(InfrastructureDriftReport)({
+          ...valid,
+          runIdentity: "github-actions:another/repository:31625215217:1",
+        })
+      )
+    ).rejects.toBeDefined();
+    await expect(
+      Effect.runPromise(
         Schema.decodeUnknownEffect(InfrastructureDriftReportInput)({
           authorityFingerprint: fingerprint,
           desiredPlan: {
@@ -380,9 +400,11 @@ describe("infrastructure drift report", () => {
             replace: 0,
             update: 0,
           },
+          manifestDigest,
           observedAt: "2026-07-31T01:00:00.000Z",
           observations: [],
           runDurationMilliseconds: 1,
+          runIdentity,
           sourceSha,
           stage: "preview",
         })

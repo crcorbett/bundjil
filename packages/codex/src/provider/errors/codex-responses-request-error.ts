@@ -10,6 +10,5 @@ export class CodexResponsesRequestError extends Schema.TaggedErrorClass<CodexRes
   {
     boundary: CodexResponsesSchemaBoundary,
     message: CodexProviderErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

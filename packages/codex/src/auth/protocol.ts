@@ -9,6 +9,7 @@ import type {
   CodexOAuthAuthorizationMaterial as CodexOAuthAuthorizationMaterialType,
   CodexSubscriptionAuthProtocolConfig as CodexSubscriptionAuthProtocolConfigType,
 } from "./contracts.js";
+import { CodexOAuthAuthorizationUrl } from "./credentials.js";
 import type { CodexOAuthRedirectUri } from "./credentials.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 
@@ -153,12 +154,24 @@ export const buildCodexOAuthAuthorizationSession = Effect.fn(
   authorizationUrl.searchParams.set("codex_cli_simplified_flow", "true");
   authorizationUrl.searchParams.set("state", Redacted.value(material.state));
   authorizationUrl.searchParams.set("originator", protocol.config.originator);
+  const redactedAuthorizationUrl = yield* Schema.decodeEffect(
+    CodexOAuthAuthorizationUrl
+  )(authorizationUrl.toString()).pipe(
+    Effect.mapError(
+      () =>
+        new CodexSubscriptionAuthError({
+          operation: "createAuthorizationSession",
+          reason: "cryptoFailure",
+          message: "Unable to protect the OAuth authorization URL.",
+        })
+    )
+  );
 
-  return yield* Schema.decodeUnknownEffect(CodexOAuthAuthorizationSession)({
-    state: Redacted.value(material.state),
-    codeVerifier: Redacted.value(material.codeVerifier),
+  return yield* CodexOAuthAuthorizationSession.makeEffect({
+    state: material.state,
+    codeVerifier: material.codeVerifier,
     codeChallenge: material.codeChallenge,
-    authorizationUrl: authorizationUrl.toString(),
+    authorizationUrl: redactedAuthorizationUrl,
     redirectUri,
   }).pipe(
     Effect.mapError(

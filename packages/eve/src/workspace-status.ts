@@ -26,16 +26,20 @@ export const WorkspaceSummary = Schema.Struct({
   packages: Schema.Array(BundjilPackageName),
 });
 export type WorkspaceSummary = typeof WorkspaceSummary.Type;
-export const makeWorkspaceSummary = (
-  name = "bundjil"
-): Effect.Effect<WorkspaceSummary, Schema.SchemaError> =>
-  Effect.gen(function* makeWorkspaceSummary() {
+export const makeWorkspaceSummary = Effect.fn("WorkspaceSummary.make")(
+  function* makeWorkspaceSummary(
+    name?: BundjilWorkspaceName
+  ): Effect.fn.Return<WorkspaceSummary, Schema.SchemaError> {
+    const workspaceName =
+      name ??
+      (yield* Schema.decodeUnknownEffect(BundjilWorkspaceName)("bundjil"));
     const packages = yield* Schema.decodeUnknownEffect(
       Schema.Array(BundjilDefaultWorkspacePackage)
     )(defaultWorkspacePackages);
 
     return yield* Schema.decodeUnknownEffect(WorkspaceSummary)({
-      name,
+      name: workspaceName,
       packages,
     });
-  });
+  }
+);

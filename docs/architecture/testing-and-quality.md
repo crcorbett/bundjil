@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-10
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -51,9 +51,54 @@ required provenance and frontend-composition policy is present in instruction
 surfaces. `bun run verification` is the standard closeout gate. It runs those
 policy checks, Ultracite, focused repository lint-rule tests, dependency
 hygiene, workspace typechecks, and tests. `bun run check` enables
-`bundjil/tagged-error-name` for app and package TypeScript; the rule rejects
-any `Schema.TaggedErrorClass` whose class declaration, generic self-type, and
-literal tag do not agree.
+`bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
+`tryPromise`, exported reusable-generator ownership, primitive-failure,
+Layer-defect, and runtime-ownership rules for their approved app/package and
+infrastructure-script scopes, plus exact native-collection review for owned
+runtime and script source.
+`bundjil/no-layer-or-die-in-service` rejects import-aware `Layer.orDie` outside
+an exact framework host edge. `bundjil/tagged-error-name`
+rejects any `Schema.TaggedErrorClass` whose
+class declaration, generic self-type, and literal tag do not agree. The four
+original Effect rule IDs plus the later primitive-failure and
+native-collection corrections and their semantic guidance are owned by
+[`effect-patterns.md`](effect-patterns.md).
+
+`bundjil/no-exported-effect-gen-function` rejects an exported arrow or function
+declaration that directly returns import-aware `Effect.gen`, including an
+immediate `.pipe(...)`. Use named `Effect.fn` for an operation that owns a
+semantic trace and `Effect.fnUntraced` for a small leaf or service delegate
+whose called operation already owns that trace. The rule deliberately accepts
+top-level Effect values, local one-use generators, and unrelated identifiers.
+
+`bun run test:lint` executes direct RuleTester coverage and invokes the
+installed Oxlint binary against exact positive and negative fixtures. The
+negative fixture must exit non-zero and expose every stable `bundjil/*` rule
+ID; the positive fixture must exit zero. Exact host/framework exception
+fixtures also prove occurrence-count staleness. A clean repository lint alone
+is not sufficient rule proof, and a visitor-only test does not prove installed
+plugin behavior.
+
+`bundjil/no-unregistered-native-collection` rejects direct `new Map`, `Set`,
+`WeakMap`, and `WeakSet` in owned app/package source unless the exact file,
+constructor, and occurrence count is registered. Registration is not a waiver
+for domain state: it documents a proved local algorithm, ordered diagnostic,
+host boundary, or fixture backend and fails when the occurrence count drifts.
+
+Infrastructure command-boundary fixtures launch the real Bun entrypoints with
+only synthetic configuration and deterministic pre-provider failures. They
+must prove nonzero exit and the existing bounded output classification without
+reading or mutating provider state. They separately exercise foreground guards
+with synthetic Layer configuration and absent or invalid Layer configuration;
+neither path may expose a raw `ConfigError`, Cause, credential, or provider
+payload. Satisfying configuration is not evidence that a provider transport
+ran. Every command case must assert its bounded outward classification rather
+than only a nonzero exit. Mutating-command negative fixtures must additionally
+reject raw tagged-error names, stack frames, and repository-absolute paths.
+This includes private workflow entrypoints: an absent exact Production source
+SHA must stop before deployment service acquisition and emit only the
+Schema-owned blocked process result, while the orchestration suite separately
+owns transition and rollback semantics.
 
 `bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command
@@ -84,6 +129,19 @@ GitHub CI therefore checks out full repository history before running
 verification; a shallow checkout cannot supply the intentionally historical
 skill object and must not be treated as an evaluator failure or bypassed by
 weakening the epoch identity.
+
+App Vitest configurations that exercise workspace packages must select the
+`@bundjil/source` export condition and inline `@bundjil/*` for SSR resolution.
+The source condition alone is insufficient when Vitest externalises the
+package: it can execute stale ignored `dist` output and produce a false green
+or false failure. Focused app tests must remain valid without depending on a
+prior workspace-package build.
+
+Provider stream limits require direct deterministic oracles: use `TestClock`
+for Effect-owned header and idle timeouts, an Effect `Stream` finalizer for
+interruption proof, and exact limit-plus-one fixtures for cumulative bytes,
+event cardinality, framing, and state indexes. A broad successful stream test
+does not prove timeout, cleanup, duplicate rejection, or bounded memory.
 The command reads repository evidence only, writes bounded detail to
 `tmp/harness-evaluation-report.json`, and grants no provider or mutation
 authority. Epoch identity and metric interpretation are owned by
@@ -147,6 +205,8 @@ bun run --filter @bundjil/agent preflight:production
   credential preflight remains inconclusive.
 - Report-only infrastructure drift changes additionally test the fixed
   Preview-only authority and control records; native-plan/source separation;
+  branded repository/run/attempt identity and decoded manifest-digest receipt
+  binding;
   normalization, unowned, missing, in-place, destructive, unavailable,
   ambiguous, unknown-secret, skipped-read, and deployment classifications;
   bounded receipt encoding; Production/apply rejection; and secret/raw-ID leak
@@ -185,6 +245,12 @@ bun run --filter @bundjil/agent preflight:production
 - Codex proxy app change: run `@bundjil/codex-proxy` check-types, tests,
   build, and smoke-test. Hosted deployment proof belongs in the deployment task
   and must verify isolated Preview before Production changes.
+- Automatic Production control change: run the infrastructure package tests,
+  authority, controls, documentation and verification-contract checks, then
+  root verification. Repository CI accepts an exact `main` SHA; the distinct
+  non-cancelling `Production` workflow may deploy that SHA only after the
+  successful CI `workflow_run`. A green CI run is not a deployment, and a
+  READY immutable candidate is not stable-alias or runtime proof.
 - Codex documentation task: update root, architecture, app, package, SPEC, and
   task-ledger docs as needed. Documentation-only verification must include
   stale-claim scans and `git diff --check`; run broader checks only when the
@@ -225,6 +291,18 @@ substitution requirements must assert the semantic result from every relevant
 composition root. A shared Service tag, for example, is proved independent
 only when each provider runtime resolves and exercises the expected
 provider-backed service, not merely when both runtimes build.
+
+A negative boundary fixture must satisfy every earlier field and composition
+precondition with valid decoded values, invoke the actual named constructor or
+operation under review, and assert the intended failure owner. A fixture that
+can fail first on an unrelated credential, sibling field, setup Layer, or host
+adapter is a false green even when the aggregate result is failure.
+
+A stream-returning operation is not proved by acquiring its lazy stream or by
+counting transport attempts. The fixture consumes the stream to its claimed
+terminal state and asserts consequential values on every attempt, such as old
+versus refreshed authorization. For an OpenAI-compatible recovery path, that
+includes the mapped terminal finish and `[DONE]`, not merely a second request.
 
 Policy requirements need deterministic policy evidence, not only terminal
 error classification. Retry and reconciliation fixtures must distinguish
@@ -453,6 +531,51 @@ Every durable feature should leave behind:
 - app README updates for commands, env vars, routes, and local proof;
 - a SPEC and task ledger for new apps, channels, providers, or package
   boundaries.
+
+Provider package tests must exercise the supported export surface as well as
+internal behavior. Keep a negative export oracle when a raw transport service
+or byte stream must remain package-private; inspect every supported subpath,
+not only the root barrel. A direct proof test must reject a
+plausible successful transport response that lacks the semantic completion
+event; status, content type, byte count and line count are insufficient proof.
+Secret-negative telemetry tests capture the structured logger payload and
+decode it through its owning Schema rather than inspecting only the public
+error returned to a caller. Provider SDK fixtures exercise hostile own-property
+access on both failure diagnostics and successful result fields; failure-only
+coverage does not prove the adapter boundary.
+
+SSE boundary fixtures must distinguish line, event and whole-stream bounds. A
+multi-line event with individually valid lines must still fail when their
+complete wire representation exceeds the event ceiling, including bytes in
+comments, ignored fields, exact delimiter width and the terminating blank line.
+Positive fixtures cover LF, CRLF and CR line endings, including empty transport
+chunks between CR and LF. Deterministic limit-plus-one fixtures own fragment and
+field cardinality ceilings; do not use timing as an allocation oracle. Proof
+aggregation retains only bounded summary state rather than collecting the
+provider-controlled stream.
+Receipt fields name the measured unit exactly (`events`, not `lines`).
+The first stream line may begin with one UTF-8 BOM; a BOM on any later line is
+data and must not be silently stripped. A colonless `data` field contributes an
+empty data value and therefore cannot disappear before terminal validation.
+
+Streaming success is an ordered state-machine claim. Direct proof and mapped
+stream fixtures consume the same recognized-event union and reject failed,
+incomplete and error terminals, malformed recognized payloads, duplicate,
+regressing or skipped sequence numbers, malformed or duplicate completion,
+every event after completion, premature or duplicate done markers, and
+end-before-completion. They also assert that no rejected sequence emits
+`finish_reason` or `[DONE]`. Endpoint fixtures reject HTTP, loopback and foreign
+credential destinations. Header-sentinel fixtures prove malformed secrets fail
+before network execution and raw provider Content-Type/status text do not enter
+encoded results, errors, logs or host responses. Exact depth and
+limit-plus-one fixtures prove arbitrary protocol JSON fails through Schema
+rather than a stack defect. Numeric Schema fixtures reject fractional HTTP
+statuses, negative or fractional counts, sequence numbers and output indexes.
+Function-parameter fixtures reject scalar and array roots. Arbitrary JSON
+fixtures reject sparse arrays, non-enumerable or accessor properties, symbols,
+non-plain objects and over-depth values so an accepted value cannot change
+during encoding. Compile-time type oracles prove independently valid redacted
+credential domains are not assignable to each other.
 
 Every SPEC and implementation review must also maintain a downstream-impact
 ledger. Mark docs, affected READMEs/runbooks, agent instructions and skills,

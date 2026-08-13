@@ -1,10 +1,11 @@
-import { Context, Effect, Redacted, Schema } from "effect";
+import { Context, Effect, Random, Schema } from "effect";
 
 import { CodexOAuthCredentialRevision } from "../auth/credentials.js";
 import { CodexOAuthProfileCipherConfigService } from "./cipher-config.js";
 import {
   CodexOAuthProfile,
   CodexOAuthProfileCipherKeyId,
+  CodexOAuthProfileCipherKeyMaterial,
   EncryptedCodexOAuthProfileV2,
   LegacyCodexOAuthProfileV1,
 } from "./contracts.js";
@@ -67,9 +68,21 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
   crypto: Crypto = globalThis.crypto
 ) {
   const config = yield* CodexOAuthProfileCipherConfigService;
+  const encodedKeyMaterial = yield* Schema.encodeEffect(
+    CodexOAuthProfileCipherKeyMaterial
+  )(config.keyMaterial).pipe(
+    Effect.mapError(
+      () =>
+        new CodexOAuthProfileCipherError({
+          operation: "loadKey",
+          keyId: config.keyId,
+          message: "Codex OAuth profile encryption key material is invalid.",
+        })
+    )
+  );
   const keyMaterial = yield* Schema.decodeUnknownEffect(
     Schema.Uint8ArrayFromBase64
-  )(Redacted.value(config.keyMaterial)).pipe(
+  )(encodedKeyMaterial).pipe(
     Effect.mapError(
       () =>
         new CodexOAuthProfileCipherError({
@@ -276,25 +289,31 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
   });
 });
 
-export const encryptCodexOAuthProfile = (profile: CodexOAuthProfileType) =>
-  Effect.gen(function* encryptCodexOAuthProfileOperation() {
+export const encryptCodexOAuthProfile = Effect.fnUntraced(
+  function* encryptCodexOAuthProfileOperation(profile: CodexOAuthProfileType) {
     const cipher = yield* CodexOAuthProfileCipher;
 
     return yield* cipher.encrypt(profile);
-  });
+  }
+);
 
-export const decryptCodexOAuthProfile = (
-  encryptedProfile: EncryptedCodexOAuthProfile
-) =>
-  Effect.gen(function* decryptCodexOAuthProfileOperation() {
+export const decryptCodexOAuthProfile = Effect.fnUntraced(
+  function* decryptCodexOAuthProfileOperation(
+    encryptedProfile: EncryptedCodexOAuthProfile
+  ) {
     const cipher = yield* CodexOAuthProfileCipher;
 
     return yield* cipher.decrypt(encryptedProfile);
-  });
+  }
+);
 
 export const generateCodexOAuthCredentialRevision = Effect.fn(
   "CodexOAuthCredentialRevision.generate"
 )(function* generateCodexOAuthCredentialRevisionOperation() {
+  const [revisionHigh, revisionLow] = yield* Effect.all([
+    Random.nextInt,
+    Random.nextInt,
+  ]);
   const generatedKeyId = yield* Schema.decodeUnknownEffect(
     CodexOAuthProfileCipherKeyId
   )("generated").pipe(
@@ -308,7 +327,7 @@ export const generateCodexOAuthCredentialRevision = Effect.fn(
   );
 
   return yield* Schema.decodeUnknownEffect(CodexOAuthCredentialRevision)(
-    globalThis.crypto.randomUUID()
+    `${revisionHigh.toString(36)}-${revisionLow.toString(36)}`
   ).pipe(
     Effect.mapError(
       () =>

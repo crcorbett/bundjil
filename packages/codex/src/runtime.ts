@@ -103,22 +103,20 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
         const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
         const profile = yield* schemaStore.get(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -140,22 +138,20 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(profile.subject);
 
         yield* schemaStore.set(key, profile).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -167,13 +163,12 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         yield* schemaStore.remove(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "removeProfile",
                 key,
                 message: "Unable to remove Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -185,13 +180,12 @@ export const CodexProfileStoreKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         return yield* schemaStore.has(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -218,22 +212,20 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
         const subjectHash = yield* codexOAuthProfileSubjectHash(subject);
         const encryptedProfile = yield* encryptedProfileStore.get(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "getProfile",
                 key,
                 message: "Unable to read encrypted Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to decode encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -266,22 +258,20 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const encryptedProfile = yield* cipher.encrypt(profile);
 
         yield* encryptedProfileStore.set(key, encryptedProfile).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "putProfile",
                 key,
                 message: "Unable to store encrypted Codex OAuth profile.",
-                cause,
               })
             )
           ),
-          Effect.catchTag("SchemaError", (cause) =>
+          Effect.catchTag("SchemaError", () =>
             Effect.fail(
               new CodexProfileSchemaError({
                 boundary: "CodexOAuthProfile",
                 message: "Unable to encode encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -292,13 +282,12 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
           const key = yield* codexOAuthProfileStorageKey(subject);
 
           yield* encryptedProfileStore.remove(key).pipe(
-            Effect.catchTag("KeyValueStoreError", (cause) =>
+            Effect.catchTag("KeyValueStoreError", () =>
               Effect.fail(
                 new CodexProfileStorageError({
                   operation: "removeProfile",
                   key,
                   message: "Unable to remove encrypted Codex OAuth profile.",
-                  cause,
                 })
               )
             )
@@ -311,13 +300,12 @@ export const CodexProfileStoreEncryptedKeyValueLive = Layer.effect(
         const key = yield* codexOAuthProfileStorageKey(subject);
 
         return yield* encryptedProfileStore.has(key).pipe(
-          Effect.catchTag("KeyValueStoreError", (cause) =>
+          Effect.catchTag("KeyValueStoreError", () =>
             Effect.fail(
               new CodexProfileStorageError({
                 operation: "hasProfile",
                 key,
                 message: "Unable to check encrypted Codex OAuth profile.",
-                cause,
               })
             )
           )
@@ -351,7 +339,7 @@ export const CodexOAuthMemoryKeyValueLive = CodexOAuthLive.pipe(
   Layer.provide(KeyValueStore.layerMemory)
 );
 
-export const CodexHttpClientLive = Layer.effect(
+const CodexHttpClientLive = Layer.effect(
   CodexHttpClient,
   makeCodexHttpClient
 ).pipe(Layer.provide(BunHttpClient.layer));
@@ -360,23 +348,17 @@ export const CodexResponsesProofLive = Layer.effect(
   CodexResponsesProof,
   makeCodexResponsesProof
 ).pipe(
-  Layer.provideMerge(
+  Layer.provide(
     Layer.merge(CodexHttpClientLive, CodexResponsesRequestPolicyLowLive)
   )
 );
 
-export const makeCodexRequestMapperLive = (
-  policy: CodexResponsesRequestPolicy
-) =>
+const makeCodexRequestMapperLive = (policy: CodexResponsesRequestPolicy) =>
   Layer.effect(CodexRequestMapper, makeCodexRequestMapper).pipe(
     Layer.provide(makeCodexResponsesRequestPolicyLayer(policy))
   );
 
-export const CodexRequestMapperLive = makeCodexRequestMapperLive({
-  ...defaultCodexResponsesRequestPolicy,
-});
-
-export const CodexStreamMapperLive = Layer.succeed(
+const CodexStreamMapperLive = Layer.succeed(
   CodexStreamMapper,
   makeCodexStreamMapper
 );
@@ -385,8 +367,12 @@ export const makeCodexDirectProviderLive = (
   policy: CodexResponsesRequestPolicy
 ) =>
   Layer.effect(CodexDirectProvider, makeCodexDirectProvider).pipe(
-    Layer.provideMerge(
-      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    Layer.provide(
+      Layer.mergeAll(
+        makeCodexRequestMapperLive(policy),
+        CodexStreamMapperLive,
+        CodexHttpClientLive
+      )
     )
   );
 
@@ -398,8 +384,12 @@ export const makeCodexLegacyDirectProviderLive = (
   policy: CodexResponsesRequestPolicy
 ) =>
   Layer.effect(CodexDirectProvider, makeCodexLegacyDirectProvider).pipe(
-    Layer.provideMerge(
-      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    Layer.provide(
+      Layer.mergeAll(
+        makeCodexRequestMapperLive(policy),
+        CodexStreamMapperLive,
+        CodexHttpClientLive
+      )
     )
   );
 
@@ -407,7 +397,7 @@ export const CodexLegacyDirectProviderLive = makeCodexLegacyDirectProviderLive(
   defaultCodexResponsesRequestPolicy
 );
 
-export const OpenAICompatibleProxyLive = Layer.effect(
-  OpenAICompatibleProxy,
-  makeOpenAICompatibleProxy
-);
+export const makeOpenAICompatibleProxyLive = (
+  internalToken: Parameters<typeof makeOpenAICompatibleProxy>[0]
+) =>
+  Layer.effect(OpenAICompatibleProxy, makeOpenAICompatibleProxy(internalToken));

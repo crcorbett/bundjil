@@ -1,6 +1,6 @@
 /* oxlint-disable unicorn/no-array-method-this-argument -- Effect.forEach is a data-first Effect combinator, not Array.prototype.forEach. */
 
-import { Config, Effect, Match, Schema } from "effect";
+import { Config, Effect, HashSet, Match, Schema } from "effect";
 
 import type { AdoptionCommand } from "./adoption-command.js";
 import { SecretReferenceId } from "./secret-reference.js";
@@ -11,7 +11,7 @@ import {
   VercelProductionPhotonSecretOwner,
 } from "./vercel/stable-environment.js";
 
-const expectedManagedKeys = new Set<string>([
+const expectedManagedKeys = HashSet.fromIterable<string>([
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
   "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET",
   "BUNDJIL_CHANNEL_PHOTON_WEBHOOK_ID",
@@ -48,10 +48,7 @@ export const validateStableAdoptionCommand = Effect.fn(
   const environmentResources = manifest.resources.filter(
     (resource) => resource.resourceKind === "vercelEnvironmentVariable"
   );
-  let managedCount = 0;
-  const managedProjects = new Set<string>();
-  const managedKeys = new Set<string>();
-  yield* Effect.forEach(environmentResources, (resource) =>
+  const observations = yield* Effect.forEach(environmentResources, (resource) =>
     Match.value(resource.desired.valueOwnership).pipe(
       Match.tag("Absent", () =>
         failConfiguration(
@@ -61,9 +58,6 @@ export const validateStableAdoptionCommand = Effect.fn(
       Match.tag("ObservedUnknown", () => Effect.void),
       Match.tag("Managed", (ownership) =>
         Effect.gen(function* validateManagedResource() {
-          managedCount += 1;
-          managedProjects.add(resource.physicalId.projectId);
-          managedKeys.add(resource.desired.key);
           if (
             resource.desired.type !== "sensitive" ||
             resource.desired.targets.length !== 1 ||
@@ -95,17 +89,29 @@ export const validateStableAdoptionCommand = Effect.fn(
               "A managed Preview Photon reference does not match its exact environment identity."
             );
           }
-          return yield* Effect.void;
+          return {
+            key: resource.desired.key,
+            projectId: resource.physicalId.projectId,
+          } as const;
         })
       ),
       Match.exhaustive
     )
   );
+  const managed = observations.filter(
+    (observation) => observation !== undefined
+  );
+  const managedProjects = HashSet.fromIterable(
+    managed.map((observation) => observation.projectId)
+  );
+  const managedKeys = HashSet.fromIterable(
+    managed.map((observation) => observation.key)
+  );
   if (
-    managedCount !== expectedManagedKeys.size ||
-    managedProjects.size !== 1 ||
-    managedKeys.size !== expectedManagedKeys.size ||
-    [...expectedManagedKeys].some((key) => !managedKeys.has(key))
+    managed.length !== HashSet.size(expectedManagedKeys) ||
+    HashSet.size(managedProjects) !== 1 ||
+    HashSet.size(managedKeys) !== HashSet.size(expectedManagedKeys) ||
+    !HashSet.isSubset(expectedManagedKeys, managedKeys)
   ) {
     return yield* failConfiguration(
       "The stable manifest must manage exactly the four stage-owned Photon bindings in one Vercel project."

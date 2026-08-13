@@ -10,6 +10,5 @@ export class CodexResponsesStreamError extends Schema.TaggedErrorClass<CodexResp
   {
     operation: CodexResponsesStreamOperation,
     message: CodexProviderErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

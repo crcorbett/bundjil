@@ -33,6 +33,8 @@ const encodeUnknownJson = Schema.encodeUnknownSync(
 const renderForLeakCheck = (value: unknown) =>
   `${String(value)} ${encodeUnknownJson(value)}`;
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+
 class TestCryptoError extends Data.TaggedError("TestCryptoError")<{
   readonly cause: unknown;
 }> {}
@@ -629,7 +631,7 @@ it.effect(
         accessToken: "observer-fresh-access-token-secret",
         refreshToken: "observer-fresh-refresh-token-secret",
         accountId: "acct-observer-secret",
-        expiresAtEpochMillis: Date.now() + 60_000,
+        expiresAtEpochMillis: validProfileExpiryEpochMillis,
         updatedAtEpochMillis: 1_700_000_020_000,
       });
       const layer = CodexOAuthMemory([profile], { refreshResult });

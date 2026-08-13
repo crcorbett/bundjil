@@ -184,6 +184,27 @@ export const VercelReadOperation = Schema.Literals([
 export type VercelReadOperation = typeof VercelReadOperation.Type;
 export type VercelReadOperationEncoded = typeof VercelReadOperation.Encoded;
 
+export const VercelCredentialScope = Schema.Union([
+  Schema.TaggedStruct("Team", { teamId: VercelTeamId }),
+  Schema.TaggedStruct("Project", { projectId: VercelProjectId }),
+]);
+export type VercelCredentialScope = typeof VercelCredentialScope.Type;
+export type VercelCredentialScopeEncoded = typeof VercelCredentialScope.Encoded;
+
+export const VercelCredentialFailureReason = Schema.Literals([
+  "configurationUnavailable",
+  "projectScopeUnavailable",
+  "teamScopeUnavailable",
+]);
+export type VercelCredentialFailureReason =
+  typeof VercelCredentialFailureReason.Type;
+export type VercelCredentialFailureReasonEncoded =
+  typeof VercelCredentialFailureReason.Encoded;
+
+export const VercelAccessToken = Schema.Redacted(Schema.NonEmptyString);
+export type VercelAccessToken = typeof VercelAccessToken.Type;
+export type VercelAccessTokenEncoded = typeof VercelAccessToken.Encoded;
+
 export const VercelReadFailureReason = Schema.Literals([
   "notFound",
   "ambiguous",

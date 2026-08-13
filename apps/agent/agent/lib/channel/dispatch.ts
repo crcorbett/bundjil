@@ -84,33 +84,31 @@ export const layerEve = (send: SendFn<typeof ChannelAdapterState.Encoded>) =>
                 () => new EveChannelDispatchError({ reason: "rejected" })
               )
             );
-            const accepted = yield* Effect.gen(
-              function* sendChannelInboundToEve() {
-                const session = yield* Effect.tryPromise({
-                  try: () =>
-                    send(input.message.text, {
-                      auth: {
-                        attributes: {
-                          channel: input.message.conversation.provider,
-                        },
-                        authenticator: input.message.conversation.provider,
-                        principalId: input.principalId,
-                        principalType: "user",
-                      },
-                      continuationToken: input.continuationToken,
-                      state,
-                    }),
-                  catch: () =>
-                    new EveChannelDispatchError({
-                      reason: "acceptance-uncertain",
-                    }),
-                });
-                const sessionId = yield* Schema.decodeUnknownEffect(
-                  EveSessionId
-                )(session.id);
-                return yield* handoff.sendAccepted(attempt, sessionId);
-              }
-            ).pipe(
+            const accepted = yield* Effect.tryPromise({
+              try: () =>
+                send(input.message.text, {
+                  auth: {
+                    attributes: {
+                      channel: input.message.conversation.provider,
+                    },
+                    authenticator: input.message.conversation.provider,
+                    principalId: input.principalId,
+                    principalType: "user",
+                  },
+                  continuationToken: input.continuationToken,
+                  state,
+                }),
+              catch: () =>
+                new EveChannelDispatchError({
+                  reason: "acceptance-uncertain",
+                }),
+            }).pipe(
+              Effect.flatMap((session) =>
+                Schema.decodeUnknownEffect(EveSessionId)(session.id)
+              ),
+              Effect.flatMap((sessionId) =>
+                handoff.sendAccepted(attempt, sessionId)
+              ),
               Effect.tapError(() => handoff.sendRejected(attempt, "uncertain")),
               Effect.mapError(
                 () =>

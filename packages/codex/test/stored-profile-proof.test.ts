@@ -20,6 +20,8 @@ import {
 } from "../src/runtime.js";
 import { CodexOAuthProfileCipherTest } from "../src/testing/index.js";
 
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+
 const fixtureSubject = Schema.decodeUnknownSync(CodexOAuthSubject)({
   provider: "codex",
   principal: {
@@ -42,7 +44,7 @@ const fixtureCipherConfig = Schema.decodeUnknownSync(
 
 const makeSubscriptionProfile = (
   subject: CodexOAuthSubjectType,
-  expiresAtEpochMillis = Date.now() + 60_000
+  expiresAtEpochMillis = validProfileExpiryEpochMillis
 ) =>
   Schema.decodeUnknownEffect(CodexSubscriptionProfile)({
     profileVersion: 2,

@@ -1,37 +1,39 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-07-21",
+  "lastReviewed": "2026-08-13",
   "reviewTrigger": "workflow action, upstream release, security advisory, pin, approved location, or update-owner change",
   "actions": [
     {
       "action": "actions/checkout",
-      "ref": "refs/tags/v4",
-      "tag": "v4",
-      "pin": "11d5960a326750d5838078e36cf38b85af677262",
+      "ref": "refs/tags/v7.0.1",
+      "tag": "v7.0.1",
+      "pin": "3d3c42e5aac5ba805825da76410c181273ba90b1",
       "approvedWorkflows": [
         ".github/workflows/ci.yml",
         ".github/workflows/claude.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
-      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "provenance": "Public upstream Git ref refs/tags/v7.0.1 resolved with git ls-remote on 2026-08-13; the reviewed action.yml declares node24. This proves ref identity and declared runtime only, not action safety or hosted execution.",
+      "updatedAt": "2026-08-13"
     },
     {
       "action": "actions/setup-node",
-      "ref": "refs/tags/v4",
-      "tag": "v4",
-      "pin": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+      "ref": "refs/tags/v7.0.0",
+      "tag": "v7.0.0",
+      "pin": "820762786026740c76f36085b0efc47a31fe5020",
       "approvedWorkflows": [
         ".github/workflows/ci.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
-      "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "provenance": "Public upstream Git ref refs/tags/v7.0.0 resolved with git ls-remote on 2026-08-13; the reviewed action.yml declares node24. This proves ref identity and declared runtime only, not action safety or hosted execution.",
+      "updatedAt": "2026-08-13"
     },
     {
       "action": "oven-sh/setup-bun",
@@ -41,11 +43,12 @@
       "approvedWorkflows": [
         ".github/workflows/ci.yml",
         ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml",
         ".github/workflows/release.yml"
       ],
       "updateOwner": "bundjil-security-automation-maintainer",
       "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety or hosted execution.",
-      "updatedAt": "2026-07-21"
+      "updatedAt": "2026-08-10"
     },
     {
       "action": "changesets/action",

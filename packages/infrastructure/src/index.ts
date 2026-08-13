@@ -36,7 +36,10 @@ export {
   type AdoptionCommandEncoded,
   loadAdoptionCommand,
 } from "./adoption-command.js";
-export { layerLiveStableAdoptionProviders } from "./stable-adoption-live.layer.js";
+export {
+  layerLiveStableAdoptionDriftProviders,
+  layerLiveStableAdoptionProviders,
+} from "./stable-adoption-live.layer.js";
 export { validateStableAdoptionCommand } from "./stable-adoption-command.js";
 export {
   loadInfrastructureCommandConfig,
@@ -110,6 +113,8 @@ export {
   type InfrastructureDriftResourceFingerprintEncoded,
   InfrastructureDriftResourceKind,
   type InfrastructureDriftResourceKindEncoded,
+  InfrastructureDriftRunIdentity,
+  type InfrastructureDriftRunIdentityEncoded,
   InfrastructureDriftSecretRevision,
   type InfrastructureDriftSecretRevisionEncoded,
   InfrastructureDriftSourceSha,
@@ -161,6 +166,8 @@ export {
   PreviewStateInstanceId,
   type PreviewStateInstanceIdEncoded,
   PreviewStateMigration,
+  PreviewStateMigrationCount,
+  type PreviewStateMigrationCountEncoded,
   PreviewStateMigrationError,
   PreviewStateMigrationFailureReason,
   type PreviewStateMigrationFailureReasonEncoded,

@@ -298,6 +298,51 @@ it.effect(
     })
 );
 
+it.effect("rejects a duplicated stable Photon binding", () =>
+  Effect.gen(function* testDuplicatedStablePhotonBinding() {
+    const inventory = yield* decodeInventoryFixture;
+    const manifest = yield* buildAdoptionManifest(
+      inventory,
+      "previewPhotonManaged"
+    );
+    const input = yield* Schema.decodeUnknownEffect(InfrastructureCommandInput)(
+      {
+        stack: "BundjilInfrastructure",
+        stage: "preview",
+        mode: "plan",
+        manifestPath: "tmp/proof/preview-manifest.json",
+        manifestDigest: manifest.digest,
+      }
+    );
+    const encoded = yield* Schema.encodeEffect(AdoptionManifest)(manifest);
+    const duplicateResources = encoded.resources.map((resource) => {
+      if (
+        resource.resourceKind !== "vercelEnvironmentVariable" ||
+        resource.desired.valueOwnership._tag !== "Managed" ||
+        resource.desired.key !== "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+      ) {
+        return resource;
+      }
+      return {
+        ...resource,
+        desired: {
+          ...resource.desired,
+          key: "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+        },
+      };
+    });
+    const duplicateManifest = yield* decodeAdoptionManifestUnknown({
+      ...encoded,
+      resources: duplicateResources,
+    });
+    const result = yield* validateStableAdoptionCommand({
+      input,
+      manifest: duplicateManifest,
+    }).pipe(Effect.exit);
+    assert.strictEqual(Exit.isFailure(result), true);
+  })
+);
+
 it.effect(
   "rejects stage, physical identity, digest, logical rename, retain, and secret false greens",
   () =>

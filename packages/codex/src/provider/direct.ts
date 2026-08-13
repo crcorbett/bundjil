@@ -94,6 +94,7 @@ export const makeCodexDirectProvider = Effect.gen(
         return yield* streamMapper.toOpenAICompatibleStream({
           model: input.request.model,
           body: response.body,
+          transportPolicy: response.transportPolicy,
         });
       }),
     });
@@ -124,15 +125,17 @@ export const makeCodexLegacyDirectProvider = Effect.gen(
         return yield* streamMapper.toOpenAICompatibleStream({
           model: input.request.model,
           body: response.body,
+          transportPolicy: response.transportPolicy,
         });
       }),
     });
   }
 ).pipe(Effect.withSpan("CodexLegacyDirectProviderLive"));
 
-export const streamChatCompletion = (input: CodexDirectProviderInput) =>
-  Effect.gen(function* streamChatCompletionOperation() {
+export const streamChatCompletion = Effect.fnUntraced(
+  function* streamChatCompletionOperation(input: CodexDirectProviderInput) {
     const provider = yield* CodexDirectProvider;
 
     return yield* provider.streamChatCompletion(input);
-  });
+  }
+);

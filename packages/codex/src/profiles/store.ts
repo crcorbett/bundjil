@@ -32,24 +32,24 @@ export class CodexProfileStore extends Context.Service<
   CodexProfileStoreShape
 >()("@bundjil/codex/CodexProfileStore") {}
 
-export const getProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const getProfile = Effect.fnUntraced(function* getProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.getProfile(subject);
-  });
+  return yield* store.getProfile(subject);
+});
 
-export const putProfile = (profile: CodexOAuthProfileType) =>
-  Effect.gen(function* putProfileOperation() {
+export const putProfile = Effect.fn("CodexProfileStore.putProfileBoundary")(
+  function* putProfileOperation(profile: CodexOAuthProfileType) {
     const store = yield* CodexProfileStore;
 
     yield* Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProfileSchemaError({
             boundary: "CodexOAuthProfile",
             message: "Unable to encode Codex OAuth profile.",
-            cause,
           })
       )
     );
@@ -59,34 +59,35 @@ export const putProfile = (profile: CodexOAuthProfileType) =>
         operation: "putLegacyProfile",
         message:
           "CodexProfileStore.putProfile is reserved for legacy import and bootstrap profiles only.",
-        cause: "subscription profiles must use CodexOAuthProfileCommit",
       });
     }
 
     yield* Schema.encodeEffect(CodexAccessTokenImportProfile)(profile).pipe(
       Effect.mapError(
-        (cause) =>
+        () =>
           new CodexProfileSchemaError({
             boundary: "CodexAccessTokenImportProfile",
             message: "Unable to encode the legacy Codex OAuth profile.",
-            cause,
           })
       )
     );
 
     return yield* store.putProfile(profile);
-  });
+  }
+);
 
-export const removeProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* removeProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const removeProfile = Effect.fnUntraced(function* removeProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.removeProfile(subject);
-  });
+  return yield* store.removeProfile(subject);
+});
 
-export const hasProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* hasProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const hasProfile = Effect.fnUntraced(function* hasProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.hasProfile(subject);
-  });
+  return yield* store.hasProfile(subject);
+});

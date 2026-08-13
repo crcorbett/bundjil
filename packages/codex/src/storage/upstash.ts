@@ -54,11 +54,10 @@ export const loadUpstashRedisConfig = Effect.gen(
   }
 ).pipe(
   Effect.mapError(
-    (cause) =>
+    () =>
       new UpstashKeyValueStoreConfigError({
         boundary: "UpstashRedisConfig",
         message: "Unable to load Upstash Redis KeyValueStore config.",
-        cause,
       })
   ),
   Effect.withSpan("loadUpstashRedisConfig")
@@ -75,11 +74,10 @@ export const CodexUpstashPersistenceLive = Layer.unwrap(
     ),
     Effect.map(UpstashPersistenceLive),
     Effect.mapError(
-      (cause) =>
+      () =>
         new UpstashKeyValueStoreConfigError({
           boundary: "UpstashRedisConfig",
           message: "Unable to load Upstash Redis KeyValueStore config.",
-          cause,
         })
     )
   )

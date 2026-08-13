@@ -5,14 +5,7 @@ import {
   CodexOAuthProfileCipherConfigService,
 } from "@bundjil/codex";
 import { CodexOAuthProfileCipherConfigLive } from "@bundjil/codex/runtime";
-import {
-  Config,
-  ConfigProvider,
-  Effect,
-  Layer,
-  Redacted,
-  Schema,
-} from "effect";
+import { Config, ConfigProvider, Effect, Layer, Schema } from "effect";
 
 const proofModeConfig = Config.schema(
   Schema.Boolean,
@@ -42,12 +35,10 @@ const makeCodexProxyProfileCipherConfigLayer = (
 
       const keyMaterial = yield* proofCipherKeyConfig;
       const keyId = yield* proofCipherKeyIdConfig;
-      const config = yield* Schema.decodeUnknownEffect(
-        CodexOAuthProfileCipherConfig
-      )({
+      const config = yield* CodexOAuthProfileCipherConfig.makeEffect({
         algorithm: "AES-GCM",
         keyId,
-        keyMaterial: Redacted.value(keyMaterial),
+        keyMaterial,
       });
 
       return Layer.succeed(

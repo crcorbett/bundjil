@@ -2,14 +2,27 @@
 
 import { Schema } from "effect";
 
-import { VercelReadFailureReason, VercelReadOperation } from "./schemas.js";
+import {
+  VercelCredentialFailureReason,
+  VercelReadFailureReason,
+  VercelReadOperation,
+} from "./schemas.js";
+
+const VercelReadErrorMessage = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isMaxLength(300))
+);
 
 const VercelReadErrorFields = {
   operation: VercelReadOperation,
   reason: VercelReadFailureReason,
   retry: Schema.Literals(["never", "backoff"]),
-  message: Schema.NonEmptyString,
+  message: VercelReadErrorMessage,
 };
+
+export class VercelCredentialError extends Schema.TaggedErrorClass<VercelCredentialError>()(
+  "VercelCredentialError",
+  { reason: VercelCredentialFailureReason }
+) {}
 
 export class VercelProjectsReadError extends Schema.TaggedErrorClass<VercelProjectsReadError>()(
   "VercelProjectsReadError",

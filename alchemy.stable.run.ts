@@ -5,6 +5,7 @@
 import {
   adoptionManifestProviderScopes,
   layerAlchemyR2State,
+  layerLiveStableAdoptionDriftProviders,
   layerLiveStableAdoptionProviders,
   loadAdoptionCommand,
   validateStableAdoptionCommand,
@@ -12,7 +13,7 @@ import {
 import type { AdoptionManifest } from "@bundjil/infrastructure";
 import { loadVercelStableEnvironmentAuthority } from "@bundjil/infrastructure/vercel";
 import * as Alchemy from "alchemy";
-import { Config, Effect, Schema } from "effect";
+import { Config, Effect, Layer, Schema } from "effect";
 
 import { BundjilInfrastructureStack } from "./stacks/bundjil.js";
 
@@ -21,25 +22,46 @@ const failConfiguration = (message: string) =>
     Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
   );
 
+const makeStableInfrastructureStackWith = Effect.fn(
+  "StableInfrastructureStack.makeWith"
+)(
+  (
+    manifest: AdoptionManifest,
+    providersFor: typeof layerLiveStableAdoptionProviders
+  ) =>
+    adoptionManifestProviderScopes(manifest).pipe(
+      Effect.catch(() =>
+        failConfiguration(
+          "The stable manifest does not define the exact provider scopes."
+        )
+      ),
+      Effect.flatMap((scopes) =>
+        Alchemy.Stack(
+          "BundjilInfrastructure",
+          {
+            providers: providersFor(scopes),
+            // Alchemy.Stack requires an infallible state Layer; retain the defect
+            // conversion only at this framework-owned host edge.
+            state: layerAlchemyR2State.pipe(Layer.orDie),
+          },
+          BundjilInfrastructureStack(manifest)
+        )
+      )
+    )
+);
+
 export const makeStableInfrastructureStack = Effect.fn(
   "StableInfrastructureStack.make"
 )((manifest: AdoptionManifest) =>
-  adoptionManifestProviderScopes(manifest).pipe(
-    Effect.catch(() =>
-      failConfiguration(
-        "The stable manifest does not define the exact provider scopes."
-      )
-    ),
-    Effect.flatMap((scopes) =>
-      Alchemy.Stack(
-        "BundjilInfrastructure",
-        {
-          providers: layerLiveStableAdoptionProviders(scopes),
-          state: layerAlchemyR2State,
-        },
-        BundjilInfrastructureStack(manifest)
-      )
-    )
+  makeStableInfrastructureStackWith(manifest, layerLiveStableAdoptionProviders)
+);
+
+export const makeStableInfrastructureDriftStack = Effect.fn(
+  "StableInfrastructureDriftStack.make"
+)((manifest: AdoptionManifest) =>
+  makeStableInfrastructureStackWith(
+    manifest,
+    layerLiveStableAdoptionDriftProviders
   )
 );
 

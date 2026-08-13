@@ -8,13 +8,12 @@ import {
   Schema,
   Stream,
 } from "effect";
+import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
   CodexSubscriptionProfile,
   CodexDirectProviderInput,
-  CodexHttpClient,
-  CodexHttpNetworkError,
-  CodexHttpStatusError,
+  CodexFunctionParameters,
   CodexOAuthSubject,
   CodexResponsesRequest,
   CodexResponsesRequestPolicy,
@@ -22,11 +21,10 @@ import {
   OpenAICompatibleChatCompletionChunk,
   OpenAICompatibleChatCompletionDelta,
   OpenAICompatibleChatCompletionRequest,
+  OpenAICompatibleProxyInternalToken,
   OpenAICompatibleProxyInput,
   handleChatCompletions,
   streamChatCompletion,
-  toCodexResponses,
-  toOpenAICompatibleStream,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
 import {
@@ -34,14 +32,20 @@ import {
   OpenAICompatibleProxy,
 } from "../src/provider/openai-compatible-proxy.js";
 import {
-  CodexDirectProviderLive,
-  CodexRequestMapperLive,
-  CodexStreamMapperLive,
-  makeCodexRequestMapperLive,
-} from "../src/runtime.js";
+  CodexRequestMapper,
+  makeCodexRequestMapper,
+  toCodexResponses,
+} from "../src/provider/request-mapper.js";
+import { makeCodexResponsesRequestPolicyLayer } from "../src/provider/request-policy.js";
+import {
+  CodexStreamMapper,
+  makeCodexStreamMapper,
+  toOpenAICompatibleStream as toOpenAICompatibleStreamWithPolicy,
+} from "../src/provider/stream-mapper.js";
 import {
   CodexDirectProviderMock,
   CodexOAuthMemory,
+  makeCodexDirectProviderHttpClientTestLayer,
 } from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
@@ -50,6 +54,44 @@ const encodeUnknownJson = Schema.encodeUnknownSync(
 
 const renderForLeakCheck = (value: unknown) =>
   `${String(value)} ${encodeUnknownJson(value)}`;
+
+const validProfileExpiryEpochMillis = 4_102_444_800_000;
+const completedStreamEvent =
+  '{"type":"response.completed","sequence_number":0,"response":{"status":"completed"}}';
+const failedStreamEvent =
+  '{"type":"response.failed","sequence_number":0,"response":{"status":"failed"}}';
+
+const CodexStreamMapperTest = Layer.succeed(
+  CodexStreamMapper,
+  makeCodexStreamMapper
+);
+
+const makeCodexRequestMapperTest = (policy: CodexResponsesRequestPolicy) =>
+  Layer.effect(CodexRequestMapper, makeCodexRequestMapper).pipe(
+    Layer.provide(makeCodexResponsesRequestPolicyLayer(policy))
+  );
+
+const CodexRequestMapperTest = makeCodexRequestMapperTest({
+  reasoningEffort: "low",
+});
+
+const testTransportPolicy = {
+  headerTimeoutMillis: 30_000,
+  streamIdleTimeoutMillis: 30_000,
+  maximumBodyBytes: 32 * 1024 * 1024,
+  maximumEvents: 100_000,
+};
+
+const toOpenAICompatibleStream = (
+  input: Omit<
+    Parameters<typeof toOpenAICompatibleStreamWithPolicy>[0],
+    "transportPolicy"
+  >
+) =>
+  toOpenAICompatibleStreamWithPolicy({
+    ...input,
+    transportPolicy: testTransportPolicy,
+  });
 
 const streamBytes = (...parts: readonly (string | Uint8Array)[]) =>
   Stream.make(
@@ -129,16 +171,40 @@ it.effect("decodes OpenAI-compatible chat completion requests", () =>
   })
 );
 
+it.effect("rejects non-object and non-JSON function-tool parameters", () =>
+  Effect.gen(function* testFunctionToolParameterBoundary() {
+    const decode = (parameters: unknown) =>
+      Schema.decodeUnknownEffect(OpenAICompatibleChatCompletionRequest)({
+        model: "gpt-5.5",
+        messages: [{ role: "user", content: "Use the tool." }],
+        tools: [
+          {
+            type: "function",
+            function: { name: "connection_search", parameters },
+          },
+        ],
+      });
+
+    yield* decode(["not", "an", "object"]).pipe(Effect.flip);
+    yield* decode(true).pipe(Effect.flip);
+    yield* decode(42).pipe(Effect.flip);
+    yield* decode("not-an-object").pipe(Effect.flip);
+    yield* decode({
+      type: "object",
+      unsupported: () => "credential-like-sentinel",
+    }).pipe(Effect.flip);
+  })
+);
+
 it.effect("maps OpenAI-compatible requests into Codex Responses payloads", () =>
   Effect.gen(function* testCodexRequestMapping() {
     const request = yield* openAIRequest;
     const codexRequest = yield* toCodexResponses(request).pipe(
-      Effect.provide(CodexRequestMapperLive)
+      Effect.provide(CodexRequestMapperTest)
     );
     const encoded = yield* Schema.encodeEffect(CodexResponsesRequest)(
       codexRequest
     );
-
     assert.strictEqual(encoded.model, "gpt-5.5");
     assert.strictEqual(encoded.store, false);
     assert.strictEqual(encoded.stream, true);
@@ -169,7 +235,7 @@ it.effect("maps the decoded high reasoning policy into Terra requests", () =>
       CodexResponsesRequestPolicy
     )({ reasoningEffort: "high" });
     const codexRequest = yield* toCodexResponses(request).pipe(
-      Effect.provide(makeCodexRequestMapperLive(policy))
+      Effect.provide(makeCodexRequestMapperTest(policy))
     );
     const encoded = yield* Schema.encodeEffect(CodexResponsesRequest)(
       codexRequest
@@ -231,22 +297,25 @@ it.effect("maps tool definitions and tool history into Codex Responses", () =>
       },
     });
     const codexRequest = yield* toCodexResponses(request).pipe(
-      Effect.provide(CodexRequestMapperLive)
+      Effect.provide(CodexRequestMapperTest)
     );
     const encoded = yield* Schema.encodeEffect(CodexResponsesRequest)(
       codexRequest
     );
+    const expectedParameters = yield* Schema.decodeUnknownEffect(
+      CodexFunctionParameters
+    )({
+      type: "object",
+      properties: { query: { type: "string" } },
+      required: ["query"],
+    });
 
     assert.deepStrictEqual(encoded.tools, [
       {
         type: "function",
         name: "connection_search",
         description: "Search configured connections.",
-        parameters: {
-          type: "object",
-          properties: { query: { type: "string" } },
-          required: ["query"],
-        },
+        parameters: expectedParameters,
         strict: true,
       },
     ]);
@@ -285,9 +354,12 @@ it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
     const request = yield* openAIRequest;
     const encodedInput = new TextEncoder().encode(
       [
-        'data: {"type":"response.output_text.delta","delta":"Hel 🦅"}',
-        'data: {"type":"response.output_text.delta","delta":"lo"}',
-        'data: {"type":"response.completed"}',
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Hel 🦅"}',
+        "",
+        'data: {"type":"response.output_text.delta","sequence_number":1,"output_index":0,"delta":"lo"}',
+        "",
+        'data: {"type":"response.completed","sequence_number":2,"response":{"status":"completed"}}',
+        "",
         "",
       ].join("\n")
     );
@@ -300,7 +372,7 @@ it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
       ),
     };
     const stream = yield* toOpenAICompatibleStream(input).pipe(
-      Effect.provide(CodexStreamMapperLive)
+      Effect.provide(CodexStreamMapperTest)
     );
     const body = yield* collectStreamText(stream.body);
 
@@ -331,18 +403,122 @@ it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
   })
 );
 
+it.effect("fails when the upstream stream ends before completion", () =>
+  Effect.gen(function* testIncompleteStreamFailure() {
+    const request = yield* openAIRequest;
+    const output = yield* toOpenAICompatibleStream({
+      model: request.model,
+      body: streamBytes(
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Partial"}\n\n'
+      ),
+    }).pipe(Effect.provide(CodexStreamMapperTest));
+    const error = yield* output.body.pipe(Stream.runDrain, Effect.flip);
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(error.operation, "toOpenAICompatibleStream");
+  })
+);
+
+it.effect(
+  "rejects malformed recognized events and invalid sequence progression",
+  () =>
+    Effect.gen(function* testRecognizedEventSequenceParity() {
+      const request = yield* openAIRequest;
+      const cases = [
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0}\n\ndata: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}\n\n',
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"first"}\n\ndata: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"duplicate"}\n\n',
+        'data: {"type":"response.output_text.delta","sequence_number":1,"output_index":0,"delta":"skipped"}\n\n',
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"first"}\n\ndata: {"type":"response.output_text.delta","sequence_number":2,"output_index":0,"delta":"skipped"}\n\n',
+        'data\n\ndata: {"type":"response.completed","sequence_number":0,"response":{"status":"completed"}}\n\n',
+        'data: {"type":"response.created","sequence_number":0}\n\n\uFEFFdata: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}\n\n',
+      ];
+
+      for (const body of cases) {
+        const output = yield* toOpenAICompatibleStream({
+          model: request.model,
+          body: streamBytes(body),
+        }).pipe(Effect.provide(CodexStreamMapperTest));
+        let received = "";
+        const error = yield* output.body.pipe(
+          Stream.decodeText(),
+          Stream.runForEach((part) =>
+            Effect.sync(() => {
+              received += part;
+            })
+          ),
+          Effect.flip
+        );
+
+        assert.strictEqual(error._tag, "CodexResponsesStreamError");
+        assert.notInclude(received, "data: [DONE]");
+      }
+    })
+);
+
+it.effect("preserves CRLF framing across empty transport chunks", () =>
+  Effect.gen(function* testSplitCarriageReturnLineFeed() {
+    const request = yield* openAIRequest;
+    const output = yield* toOpenAICompatibleStream({
+      model: request.model,
+      body: streamBytes(
+        `data: ${completedStreamEvent}\r`,
+        new Uint8Array(),
+        "\n\r",
+        new Uint8Array(),
+        "\n"
+      ),
+    }).pipe(Effect.provide(CodexStreamMapperTest));
+    const body = yield* collectStreamText(output.body);
+
+    assert.include(body, '"finish_reason":"stop"');
+    assert.include(body, "data: [DONE]");
+  })
+);
+
+it.effect("fails closed for invalid terminal event sequences", () =>
+  Effect.gen(function* testInvalidTerminalSequences() {
+    const request = yield* openAIRequest;
+    const cases = [
+      `data: ${failedStreamEvent}\n\ndata: ${completedStreamEvent}\n\n`,
+      `data: ${completedStreamEvent}\n\ndata: {"type":"response.output_text.delta","sequence_number":1,"output_index":0,"delta":"late"}\n\n`,
+      `data: ${completedStreamEvent}\n\ndata: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}\n\n`,
+      'data: {"type":"response.completed","sequence_number":0}\n\n',
+    ];
+
+    for (const upstreamBody of cases) {
+      const output = yield* toOpenAICompatibleStream({
+        model: request.model,
+        body: streamBytes(upstreamBody),
+      }).pipe(Effect.provide(CodexStreamMapperTest));
+      let received = "";
+      const error = yield* output.body.pipe(
+        Stream.decodeText(),
+        Stream.runForEach((part) =>
+          Effect.sync(() => {
+            received += part;
+          })
+        ),
+        Effect.flip
+      );
+
+      assert.strictEqual(error._tag, "CodexResponsesStreamError");
+      assert.notInclude(received, "data: [DONE]");
+    }
+  })
+);
+
 it.effect("maps Codex function calls to OpenAI-compatible tool chunks", () =>
   Effect.gen(function* testFunctionCallStreamMapping() {
     const request = yield* openAIRequest;
     const fragments = [
-      'data: {"type":"response.output_item.added","output_index":1,',
+      'data: {"type":"response.output_item.added","sequence_number":0,"output_index":1,',
       '"item":{"type":"function_call","id":"fc_executor","call_id":"call_executor",',
-      '"name":"connection_search","arguments":""}}\n',
-      'data: {"type":"response.function_call_arguments.delta","output_index":1,',
-      '"delta":"{\\"query\\":\\"Executor"}\n',
-      'data: {"type":"response.function_call_arguments.delta","output_index":1,',
-      '"delta":" skills\\"}"}\n',
-      'data: {"type":"response.completed"}\n',
+      '"name":"connection_search","arguments":""}}\n\n',
+      'data: {"type":"response.function_call_arguments.delta","sequence_number":1,"output_index":1,',
+      '"delta":"{\\"query\\":\\"Executor"}\n\n',
+      'data: {"type":"response.function_call_arguments.delta","sequence_number":2,"output_index":1,',
+      '"delta":" skills\\"}"}\n\n',
+      'data: {"type":"response.completed","sequence_number":3,"response":{"status":"completed"}}\n\n',
       "",
     ];
     const input = {
@@ -350,7 +526,7 @@ it.effect("maps Codex function calls to OpenAI-compatible tool chunks", () =>
       body: streamBytes(...fragments),
     };
     const stream = yield* toOpenAICompatibleStream(input).pipe(
-      Effect.provide(CodexStreamMapperLive)
+      Effect.provide(CodexStreamMapperTest)
     );
     const body = yield* collectStreamText(stream.body);
     const chunks = yield* Effect.forEach(
@@ -399,14 +575,14 @@ it.effect("emits a mapped chunk before the upstream stream completes", () =>
     const releaseUpstream = yield* Deferred.make<null>();
     const firstMappedChunk = yield* Deferred.make<null>();
     const source = streamBytes(
-      'data: {"type":"response.output_text.delta","delta":"Early"}\n\n'
+      'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Early"}\n\n'
     ).pipe(
       Stream.concat(
         Stream.fromEffect(
           Deferred.await(releaseUpstream).pipe(
             Effect.as(
               new TextEncoder().encode(
-                'data: {"type":"response.completed"}\n\n'
+                'data: {"type":"response.completed","sequence_number":1,"response":{"status":"completed"}}\n\n'
               )
             )
           )
@@ -416,7 +592,7 @@ it.effect("emits a mapped chunk before the upstream stream completes", () =>
     const output = yield* toOpenAICompatibleStream({
       model: request.model,
       body: source,
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     let received = "";
     const fiber = yield* Effect.forkChild(
       output.body.pipe(
@@ -447,7 +623,7 @@ it.effect("propagates downstream cancellation to the upstream stream", () =>
     const firstMappedChunk = yield* Deferred.make<null>();
     const upstreamFinalized = yield* Deferred.make<null>();
     const source = streamBytes(
-      'data: {"type":"response.output_text.delta","delta":"Cancel"}\n\n'
+      'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Cancel"}\n\n'
     ).pipe(
       Stream.concat(Stream.fromEffect(Effect.never)),
       Stream.ensuring(Deferred.succeed(upstreamFinalized, null))
@@ -455,7 +631,7 @@ it.effect("propagates downstream cancellation to the upstream stream", () =>
     const output = yield* toOpenAICompatibleStream({
       model: request.model,
       body: source,
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     const fiber = yield* Effect.forkChild(
       output.body.pipe(
         Stream.runForEach(() => Deferred.succeed(firstMappedChunk, null))
@@ -475,7 +651,7 @@ it.effect("rejects an oversized residual SSE line without retaining it", () =>
     const output = yield* toOpenAICompatibleStream({
       model: request.model,
       body: streamBytes(secretLine),
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     const error = yield* output.body.pipe(Stream.runDrain, Effect.flip);
     const rendered = renderForLeakCheck(error);
 
@@ -494,13 +670,34 @@ it.effect("rejects an oversized complete SSE line", () =>
     const output = yield* toOpenAICompatibleStream({
       model: request.model,
       body: streamBytes(`data: ${"x".repeat(1024 * 1024)}\n`),
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     const error = yield* output.body.pipe(Stream.runDrain, Effect.flip);
 
     assert.strictEqual(error._tag, "CodexResponsesStreamError");
     assert.strictEqual(
       error.message,
       "Codex Responses SSE line exceeded the configured byte limit."
+    );
+  })
+);
+
+it.effect("rejects SSE line fragment limit plus one", () =>
+  Effect.gen(function* testLineFragmentLimit() {
+    const request = yield* openAIRequest;
+    const fragments = globalThis.Array.from(
+      { length: 4097 },
+      () => new Uint8Array([120])
+    );
+    const output = yield* toOpenAICompatibleStream({
+      model: request.model,
+      body: streamBytes(...fragments),
+    }).pipe(Effect.provide(CodexStreamMapperTest));
+    const error = yield* output.body.pipe(Stream.runDrain, Effect.flip);
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(
+      error.message,
+      "Codex Responses SSE line exceeded the configured fragment limit."
     );
   })
 );
@@ -513,15 +710,14 @@ it.effect(
       const upstreamError = new CodexResponsesStreamError({
         operation: "readResponseBody",
         message: "Unable to read Codex Responses body.",
-        cause: "Synthetic transport failure.",
       });
       const source = streamBytes(
-        'data: {"type":"response.output_text.delta","delta":"Before failure"}\n\n'
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"Before failure"}\n\n'
       ).pipe(Stream.concat(Stream.fail(upstreamError)));
       const output = yield* toOpenAICompatibleStream({
         model: request.model,
         body: source,
-      }).pipe(Effect.provide(CodexStreamMapperLive));
+      }).pipe(Effect.provide(CodexStreamMapperTest));
       let received = "";
       const error = yield* output.body.pipe(
         Stream.decodeText(),
@@ -545,9 +741,9 @@ it.effect("fails closed on malformed Codex function-call events", () =>
     const stream = yield* toOpenAICompatibleStream({
       model: request.model,
       body: streamBytes(
-        'data: {"type":"response.output_item.added","output_index":0,"item":{"type":"function_call","id":"fc_executor","name":"connection_search","arguments":""}}\n\n'
+        'data: {"type":"response.output_item.added","sequence_number":0,"output_index":0,"item":{"type":"function_call","id":"fc_executor","name":"connection_search","arguments":""}}\n\n'
       ),
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     const error = yield* stream.body.pipe(Stream.runDrain, Effect.flip);
 
     assert.strictEqual(error._tag, "CodexResponsesStreamError");
@@ -564,9 +760,9 @@ it.effect("fails closed on orphaned Codex function-call arguments", () =>
     const stream = yield* toOpenAICompatibleStream({
       model: request.model,
       body: streamBytes(
-        'data: {"type":"response.function_call_arguments.delta","output_index":3,"delta":"{}"}\n\n'
+        'data: {"type":"response.function_call_arguments.delta","sequence_number":0,"output_index":3,"delta":"{}"}\n\n'
       ),
-    }).pipe(Effect.provide(CodexStreamMapperLive));
+    }).pipe(Effect.provide(CodexStreamMapperTest));
     const error = yield* stream.body.pipe(Stream.runDrain, Effect.flip);
 
     assert.strictEqual(error._tag, "CodexResponsesStreamError");
@@ -577,15 +773,59 @@ it.effect("fails closed on orphaned Codex function-call arguments", () =>
   })
 );
 
+it.effect("rejects duplicate Codex function-call output indexes", () =>
+  Effect.gen(function* testDuplicateFunctionCallOutputIndex() {
+    const request = yield* openAIRequest;
+    const first =
+      '{"type":"response.output_item.added","sequence_number":0,"output_index":2,"item":{"type":"function_call","id":"fc_one","call_id":"call_one","name":"first_tool","arguments":""}}';
+    const duplicate =
+      '{"type":"response.output_item.added","sequence_number":1,"output_index":2,"item":{"type":"function_call","id":"fc_two","call_id":"call_two","name":"second_tool","arguments":""}}';
+    const stream = yield* toOpenAICompatibleStream({
+      model: request.model,
+      body: streamBytes(`data: ${first}\n\ndata: ${duplicate}\n\n`),
+    }).pipe(Effect.provide(CodexStreamMapperTest));
+    const error = yield* stream.body.pipe(Stream.runDrain, Effect.flip);
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(
+      error.message,
+      "Codex function-call output index was added more than once."
+    );
+  })
+);
+
+it.effect("rejects Codex streams above the mapped event budget", () =>
+  Effect.gen(function* testMappedEventLimit() {
+    const request = yield* openAIRequest;
+    const output = yield* toOpenAICompatibleStreamWithPolicy({
+      model: request.model,
+      body: streamBytes(
+        'data: {"type":"response.output_text.delta","sequence_number":0,"output_index":0,"delta":"one"}\n\n' +
+          `data: ${completedStreamEvent}\n\n`
+      ),
+      transportPolicy: { ...testTransportPolicy, maximumEvents: 1 },
+    }).pipe(Effect.provide(CodexStreamMapperTest));
+    const error = yield* output.body.pipe(Stream.runDrain, Effect.flip);
+
+    assert.strictEqual(error._tag, "CodexResponsesStreamError");
+    assert.strictEqual(
+      error.message,
+      "Codex Responses SSE stream exceeded the configured event limit."
+    );
+  })
+);
+
 it.effect("rejects private proxy calls with invalid internal auth", () =>
   Effect.gen(function* testProxyAuthFailure() {
     const subject = yield* fixtureSubject;
     const request = yield* openAIRequest;
     const stream = streamFixture("data: [DONE]\n\n");
+    const internalToken = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleProxyInternalToken
+    )("correct-internal-token");
     const input = yield* Schema.decodeUnknownEffect(OpenAICompatibleProxyInput)(
       {
         authorization: "Bearer wrong-token",
-        internalToken: "correct-internal-token",
         completion: {
           subject,
           request,
@@ -594,9 +834,10 @@ it.effect("rejects private proxy calls with invalid internal auth", () =>
     );
     const proxyLayer = Layer.effect(
       OpenAICompatibleProxy,
-      makeOpenAICompatibleProxy
+      makeOpenAICompatibleProxy(internalToken)
     ).pipe(Layer.provide(CodexDirectProviderMock({ stream })));
-    const error = yield* handleChatCompletions(input).pipe(
+    const forgedInput = { ...input, internalToken };
+    const error = yield* handleChatCompletions(forgedInput).pipe(
       Effect.provide(proxyLayer),
       Effect.flip
     );
@@ -613,7 +854,10 @@ it.effect(
   () =>
     Effect.gen(function* testUpstreamStatusFailure() {
       const subject = yield* fixtureSubject;
-      const profile = yield* makeProfile(subject, Date.now() + 60_000);
+      const profile = yield* makeProfile(
+        subject,
+        validProfileExpiryEpochMillis
+      );
       const request = yield* openAIRequest;
       const input = yield* Schema.decodeUnknownEffect(CodexDirectProviderInput)(
         {
@@ -621,34 +865,23 @@ it.effect(
           request,
         }
       );
-      const httpClientLayer = Layer.succeed(CodexHttpClient, {
-        postResponses: () =>
-          Effect.fail(
-            new CodexHttpNetworkError({
-              operation: "postResponses",
-              message: "postResponses is not used by direct provider test.",
-              cause: "unexpected test operation",
-            })
-          ),
-        postResponsesStream: () =>
-          Effect.fail(
-            new CodexHttpStatusError({
-              operation: "postResponsesStream",
-              status: 403,
-              statusText: "Forbidden",
-              contentType: "application/json",
-              message:
-                "Codex Responses endpoint returned an unsuccessful status.",
-            })
-          ),
-      });
-      const error = yield* streamChatCompletion(input).pipe(
-        Effect.provide(
-          CodexDirectProviderLive.pipe(
-            Layer.provide(CodexOAuthMemory([profile])),
-            Layer.provide(httpClientLayer)
+      const directProviderLayer = makeCodexDirectProviderHttpClientTestLayer(
+        { reasoningEffort: "low" },
+        HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response("private provider body", {
+                headers: { "content-type": "application/json" },
+                status: 403,
+                statusText: "Forbidden",
+              })
+            )
           )
-        ),
+        )
+      ).pipe(Layer.provideMerge(CodexOAuthMemory([profile])));
+      const error = yield* streamChatCompletion(input).pipe(
+        Effect.provide(directProviderLayer),
         Effect.flip
       );
       const rendered = renderForLeakCheck(error);
@@ -664,12 +897,14 @@ it.effect("does not depend on OPENAI_API_KEY for proxy subscription mode", () =>
     const subject = yield* fixtureSubject;
     const request = yield* openAIRequest;
     const stream = streamFixture("data: [DONE]\n\n");
+    const internalToken = yield* Schema.decodeUnknownEffect(
+      OpenAICompatibleProxyInternalToken
+    )("correct-internal-token");
     const input = yield* Schema.decodeUnknownEffect(OpenAICompatibleProxyInput)(
       {
         authorization: `Bearer ${Redacted.value(
           Redacted.make("correct-internal-token")
         )}`,
-        internalToken: "correct-internal-token",
         completion: {
           subject,
           request,
@@ -678,7 +913,7 @@ it.effect("does not depend on OPENAI_API_KEY for proxy subscription mode", () =>
     );
     const proxyLayer = Layer.effect(
       OpenAICompatibleProxy,
-      makeOpenAICompatibleProxy
+      makeOpenAICompatibleProxy(internalToken)
     ).pipe(Layer.provide(CodexDirectProviderMock({ stream })));
     const output = yield* handleChatCompletions(input).pipe(
       Effect.provide(proxyLayer)

@@ -1,6 +1,5 @@
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
-import * as BunRuntime from "@effect/platform-bun/BunRuntime";
-import { Console, Effect, Layer } from "effect";
+import { Console, Effect, Exit, Layer, Schema } from "effect";
 
 import {
   layerVercelPreviewConfigurationLive,
@@ -9,6 +8,35 @@ import {
   SetVercelPreviewFeedback,
   VercelPreviewConfiguration,
 } from "../src/vercel/index.js";
+
+declare const process: {
+  exitCode: number | undefined;
+};
+
+const PreviewConfigurationDriftFailureReason = Schema.Literals([
+  "preconditionFailed",
+  "readbackFailed",
+]);
+class PreviewConfigurationDriftError extends Schema.TaggedErrorClass<PreviewConfigurationDriftError>()(
+  "PreviewConfigurationDriftError",
+  { reason: PreviewConfigurationDriftFailureReason }
+) {}
+
+const PreviewConfigurationDriftCompleted = Schema.Struct({
+  operation: Schema.Literal("direct-preview-feedback-drift"),
+  status: Schema.Literal("completed"),
+  beforeEnabled: Schema.Literal(true),
+  afterEnabled: Schema.Literal(false),
+});
+const PreviewConfigurationDriftBlocked = Schema.Struct({
+  status: Schema.Literal("blocked"),
+});
+const encodeCompleted = Schema.encodeEffect(
+  Schema.fromJsonString(PreviewConfigurationDriftCompleted)
+);
+const encodeBlocked = Schema.encodeEffect(
+  Schema.fromJsonString(PreviewConfigurationDriftBlocked)
+);
 
 const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
   Effect.flatMap((input) =>
@@ -26,11 +54,11 @@ const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
         before.attributes.enabled !== true ||
         before.attributes.productionEnabled !== null
       ) {
-        return yield* Effect.fail(
-          "preview-configuration-drift-precondition-failed"
-        );
+        return yield* new PreviewConfigurationDriftError({
+          reason: "preconditionFailed",
+        });
       }
-      const mutation = yield* configuration.setPreviewFeedback(
+      yield* configuration.setPreviewFeedback(
         SetVercelPreviewFeedback.make({
           stage: "preview",
           teamId: input.teamId,
@@ -51,21 +79,42 @@ const runPreviewConfigurationDrift = loadVercelPreviewConfigurationInput.pipe(
         after.attributes.enabled !== false ||
         after.attributes.productionEnabled !== null
       ) {
-        return yield* Effect.fail(
-          "preview-configuration-drift-readback-failed"
-        );
+        return yield* new PreviewConfigurationDriftError({
+          reason: "readbackFailed",
+        });
       }
-      return yield* Console.log({
+      return PreviewConfigurationDriftCompleted.make({
         operation: "direct-preview-feedback-drift",
-        before: before.attributes,
-        mutation,
-        after: after.attributes,
+        status: "completed",
+        beforeEnabled: true,
+        afterEnabled: false,
       });
     })
-  ),
-  Effect.provide(
-    Layer.merge(layerVercelPreviewConfigurationLive, BunFileSystem.layer)
   )
 );
 
-BunRuntime.runMain(runPreviewConfigurationDrift);
+const runtime = Layer.merge(
+  layerVercelPreviewConfigurationLive,
+  BunFileSystem.layer
+);
+
+const main = Effect.gen(function* renderPreviewConfigurationDrift() {
+  const exit = yield* Effect.exit(
+    runPreviewConfigurationDrift.pipe(
+      Effect.flatMap(encodeCompleted),
+      Effect.provide(runtime)
+    )
+  );
+  if (Exit.isSuccess(exit)) {
+    return yield* Console.log(exit.value);
+  }
+  const blockedOutput = yield* encodeBlocked(
+    PreviewConfigurationDriftBlocked.make({ status: "blocked" })
+  ).pipe(Effect.orDie);
+  yield* Console.error(blockedOutput);
+  return yield* Effect.sync(() => {
+    process.exitCode = 1;
+  });
+});
+
+await Effect.runPromise(main);

@@ -1,0 +1,199 @@
+{
+  "title": "Automatic Production deployment and operational closeout tasks",
+  "spec": "automatic-production-and-operational-closeout.md",
+  "status": "implemented",
+  "authority": "Cooper's 2026-08-10 delegated authority covers the exact repository, GitHub, Personal Vercel, secret, deployment, rollback, Photon, Sendblue, OAuth and Computer Use operations in this ledger; it does not permit Tilt scope, secret disclosure, unrelated resources, destructive out-of-scope work, or blind retry.",
+  "principles": [
+    "Deploy only an exact successful main CI SHA and never let Vercel Git move Production before repository verification.",
+    "Stage both candidates without domains, decode provider output once, then promote with exact rollback identities.",
+    "Keep CI verification secret-free and the non-cancellable Production writer in its own workflow and environment.",
+    "Use two separately revocable exact-project Vercel tokens selected under the Personal account, prove assigned-project access and sibling-project denial before custody, and retain only sanitized fingerprints and metadata.",
+    "Keep repository, CI, deployment, alias, model, provider, delivery and handset claims separate.",
+    "Do not invent a Photon replay oracle or retry an uncertain message."
+  ],
+  "globalVerification": [
+    "bun run check:effect-setup",
+    "bun run check:boundaries",
+    "bun run check:docs",
+    "bun run check:skills",
+    "bun run check:authority",
+    "bun run check:controls",
+    "bun run check:verification",
+    "bun run verification",
+    "jq empty docs/product-specs/automatic-production-and-operational-closeout.tasks.json",
+    "git diff --check"
+  ],
+  "tasks": [
+    {
+      "id": "freeze-production-control-inventory",
+      "title": "Freeze current GitHub, Vercel, configuration and rollback identities",
+      "status": "completed",
+      "dependsOn": [],
+      "description": "Record the exact starting SHA, current main/CI, GitHub environments and protection, Personal Vercel projects, Git linkage, Production deployments/aliases, encrypted variable metadata, stable health mismatch, and existing rollback identities before any write.",
+      "mandatoryVerification": [
+        "Confirm the worktree is clean and based on exact origin/main 5c3c7db240a7abd9bb57ad560bdd8958af4ea701.",
+        "Confirm GitHub repository crcorbett/bundjil, successful main CI run 31341341435, zero drift-environment secrets and no current main protection.",
+        "Confirm Personal team team_1LX7ZujbijowTv8J9k0aU7nD and exact project IDs; explicitly reject Tilt scope.",
+        "Confirm current Production deployment IDs, source SHAs, aliases, readiness and prior rollback candidates without reading secret values.",
+        "Confirm stable proxy health reports live/low and keep that mismatch distinct from variable metadata."
+      ],
+      "proofContract": {
+        "directObservable": "One sanitized active-plan inventory names exact current repository, workflow, environment, project, deployment, alias, configuration-metadata and rollback identities.",
+        "expectedPostcondition": "Every later mutation has an exact before-state and stop condition.",
+        "falseGreenRejected": "Historical receipt, local config, project name, stable URL or successful CLI authentication treated as current target proof.",
+        "evidenceOwner": "docs/exec-plans/completed/automatic-production-and-effect-runtime.md",
+        "limitationsAndNonClaims": "Readback authorizes no write and proves no future state."
+      },
+      "docsImpact": "Update this ledger, SPEC evidence epoch and active plan only; provider actuality remains dated evidence.",
+      "commitAfterPassing": false
+    },
+    {
+      "id": "implement-automatic-production-control",
+      "title": "Implement the exact-SHA automatic Production workflow and Effect deployment boundary",
+      "status": "completed",
+      "dependsOn": ["freeze-production-control-inventory"],
+      "description": "Add the separate post-CI Production workflow, project-bound Config contract, Schema-decoded Vercel CLI/API service, live/memory Layers, fail-closed orchestration, bounded receipt and complete negative fixture matrix.",
+      "mandatoryVerification": [
+        "The workflow accepts only same-repo successful main push CI workflow_run events, checks out the exact head SHA, uses contents read, Production environment, exact pins, checkout credentials false, a bounded timeout and non-cancelling Production concurrency.",
+        "CI remains secret-free and cancellable; direct Vercel Git deployment remains disabled in both app configs and provider Git linkage remains absent.",
+        "The service exposes named stage, inspect, promote, rollback and probe operations over branded Schema types, Config.schema redacted tokens, safe tagged errors and explicit live/memory Layers.",
+        "The live Layer captures the scoped Effect ChildProcessSpawner supplied by the Bun application root, keeps raw CLI/API output, token and platform/provider errors private, encodes outward inputs and immediately decodes provider results, and contains no raw Promise or ambient environment access.",
+        "Tests directly cover ineligible events, already-current no-op, stale-main no-op, both candidates ready, one build failure, malformed output, wrong project/SHA, proxy promotion failure, agent promotion failure, after-write interruption and defect exits, rollback success, rollback failure, alias mismatch and leak-negative receipts.",
+        "No helper/common/utils package, generic client callback, raw client, unsafe cast, primitive public identity, unchecked output or broad export is introduced.",
+        "Focused infrastructure tests, authority/control/verification/docs/skills checks and bun run verification pass."
+      ],
+      "proofContract": {
+        "directObservable": "Fixtures prove no alias movement before both exact-SHA candidates pass, and prove exact restoration after every partial-promotion failure.",
+        "expectedPostcondition": "Repository desired state admits one automatic fail-closed Production path and rejects the former unsafe ordering.",
+        "falseGreenRejected": "Workflow YAML existence, a successful build, a current source match on only one project, or a mocked happy path without rollback assertions.",
+        "evidenceOwner": "Automatic deployment tests and active-plan slice receipt",
+        "limitationsAndNonClaims": "Repository proof does not establish GitHub secrets, hosted run or Vercel behaviour."
+      },
+      "docsImpact": "Update workflow, authority/control owners, runbooks, infrastructure README, testing architecture, verification journey and active plan in the same slice.",
+      "currentResult": "Passed after four audit corrections. A 2026-08-10 live read-only Vercel review corrected one false fixture assumption: GET /v9/projects/:id binds targets.production through the already-decoded outer project id and does not repeat projectId inside the nested deployment. The current decoder rejects a wrong outer project and binds that verified identity to the nested target. A 2026-08-13 strict Effect audit replaced Bun.spawn, raw Promise orchestration, ambient process.env copying, and two response-reader exceptions with the installed beta.101 scoped ChildProcessSpawner and Stream boundary; the application command supplies BunServices.layer, while a controlled spawner Layer proves live payload decoding without a real process. Direct Bun process spawning and ambient environment access are boundary-audit failures. The same audit then replaced typed-error-only compensation with an uninterruptible Effect.onExit rollback finalizer, and deterministic after-write interruption and defect fixtures prove agent-then-proxy restoration. A later real missing-source command probe found the private CLI still delegated failure to BunRuntime.runMain; one final Effect.exit now preserves the existing success receipt and emits only a Schema-owned blocked result for Config, Layer, orchestration, rollback, health, or encoding failure. Hosted mutation remains separately gated.",
+      "commitAfterPassing": true
+    },
+    {
+      "id": "refresh-node24-action-runtimes",
+      "title": "Refresh admitted GitHub actions to Node 24 runtimes",
+      "status": "completed",
+      "dependsOn": ["implement-automatic-production-control"],
+      "description": "Replace the deprecated Node-20-based checkout and setup-node pins with exact reviewed Node-24 action revisions after hosted CI reports the runtime deprecation.",
+      "mandatoryVerification": [
+        "Resolve the exact public v7.0.1 checkout and v7.0.0 setup-node tag commits and inspect each upstream action.yml runtime declaration.",
+        "Update only the admitted workflow locations, action lock, policy pins and fixtures; preserve triggers, permissions, identities, operations and provider custody.",
+        "Reject stale v4 pins and comments across current workflow and policy owners.",
+        "Run authority, controls, docs, skills, formatting, full repository verification and one hosted CI run for the exact pushed candidate."
+      ],
+      "proofContract": {
+        "directObservable": "All admitted workflow uses resolve through the action lock to the reviewed Node-24 commits, local policy gates pass, and hosted CI no longer emits the Node-20 action-runtime annotation.",
+        "expectedPostcondition": "Bundjil's admitted GitHub actions execute on their declared Node 24 runtimes without changing workflow authority.",
+        "falseGreenRejected": "Changing comments only, using floating v7 tags, updating the lock without workflows, local success without hosted execution, or treating a public tag as action-safety proof.",
+        "evidenceOwner": "Action lock, authority tests, active-plan slice receipt and exact hosted CI run",
+        "limitationsAndNonClaims": "Public refs and manifests do not prove upstream safety, hosted execution or provider configuration."
+      },
+      "docsImpact": "Update the action lock, automation register, SPEC/task ledger and active plan; preserve provider/runbook claims.",
+      "currentResult": "Public refs resolved checkout v7.0.1 to 3d3c42e5aac5ba805825da76410c181273ba90b1 and setup-node v7.0.0 to 820762786026740c76f36085b0efc47a31fe5020; both reviewed manifests declare node24. Local authority, controls, docs, skills, formatting and full verification passed. Hosted CI run 31617632184 passed for exact source 5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc and check 94184307855 returned zero annotations. Infrastructure Drift run 31617632131 used the new actions successfully, then failed closed at the separately pending empty-custody gate; no provider read or write occurred.",
+      "commitAfterPassing": true
+    },
+    {
+      "id": "configure-hosted-controls-and-drift",
+      "title": "Configure bounded GitHub and Vercel identities and close Infrastructure Drift",
+      "status": "deferred",
+      "dependsOn": ["refresh-node24-action-runtimes"],
+      "description": "After repository desired state is reviewed and pushed, create two separately revocable Production tokens through the Personal-account dashboard, scope one to the exact agent project and one to the exact proxy project, prove assigned-project access plus sibling-project denial, and bind only their ciphertext to the Production environment. Create a separately revocable exact-project pair for the report-only drift environment, encode those bindings only inside its bounded dotenv artifact, install the minimal main ruleset, provision the three exact drift artifacts, dispatch one read-only drift run and retain sanitized readback. Exact project configuration and decoded project/source readback remain mandatory independent controls.",
+      "mandatoryVerification": [
+        "Read GitHub and Personal Vercel identity immediately before every write and stop on Tilt or project ambiguity.",
+        "Create one separately revocable Vercel token scoped to bundjil-agent and one scoped to bundjil-codex-proxy; before GitHub custody, prove each token reads only its assigned project and receives a denied result for the sibling project, then record token IDs/fingerprints, expiry and revocation owners without values.",
+        "Create a distinct drift-only exact-project token for each manifest Vercel project, repeat the assigned-project and sibling-denial tests, and never reuse a Production deployment token or the broad inventory/adoption token.",
+        "Production environment secret and variable inventories contain exactly the accepted deployment bindings and no unrelated credential.",
+        "Main ruleset requires pull requests and the existing CI verification context without a human Production approval step; read back the exact ruleset and bypass actors.",
+        "Static drift authority policy, manifest and dotenv artifacts validate locally, are stored only as the three exact environment secrets, and temporary plaintext is removed. The dotenv artifact contains a Schema-decoded non-empty unique BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON binding set; team-wide credential resolution and project listing fail closed in the drift Layer.",
+        "A hosted Infrastructure Drift run Schema-decodes the branded repository/run/attempt identity and carries it, the exact owning SHA, static authority fingerprint and decoded manifest digest through its report and bounded receipt.",
+        "That hosted run succeeds with providerWrites zero, available reads and a no-op or accepted-normalization disposition.",
+        "A failed, unavailable, skipped, unknown-secret or blocking run remains failed/inconclusive and is not rewritten as passing."
+      ],
+      "proofContract": {
+        "directObservable": "GitHub environment/ruleset metadata, Production and drift-only exact-project Vercel token metadata, assigned/sibling access tests, and a successful hosted drift receipt match the branded repository/run/attempt identity, exact accepted source, static authority fingerprint, decoded manifest digest and targets.",
+        "expectedPostcondition": "Production automation uses two provider-selected exact-project deployment credentials, while Preview drift uses a distinct project-routed credential set plus independent decoded target controls and a read-only call graph.",
+        "falseGreenRejected": "Secret names in YAML, a local drift command, token creation, or a green unrelated run treated as current hosted proof.",
+        "evidenceOwner": "Dated GitHub/Vercel/drift bounded receipt",
+        "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
+      },
+      "docsImpact": "Refresh authority/control externalReadback fields, active plan and dated drift evidence; do not copy mutable GitHub settings into README prose.",
+      "currentResult": "Deferred with a blocked external disposition on 2026-08-13. Cooper explicitly approved credential creation only through a genuinely personal Vercel account and excluded cooper.corbett@tilt.legal and Tilt Legal. A fresh Executor Personal readback found exactly one Vercel connection, personalvercelapi, authenticated as user nBzSPdkIxazY1om0rrNZ9cFg with canonical email cooper.corbett@tilt.legal. The personal team label does not override that excluded principal, so token creation stopped before mutation. The separately approved personal Cloudflare account f9f94270a4a5af8af7010d891020922d retains active exact-bucket token 8033ee98f001f2aeeb4512750f4d8f36 through 2026-11-11T06:11:42Z in personal Bundjil 1Password custody. No Vercel token, GitHub secret, ruleset, hosted drift report, deployment, or channel operation was created or changed. Resume only after Executor Personal exposes a separate admitted Vercel user with access to both exact Bundjil projects.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+        "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "correct-terra-high-and-prove-automatic-main",
+      "title": "Apply Terra High configuration and prove automatic exact-main Production",
+      "status": "deferred",
+      "dependsOn": ["configure-hosted-controls-and-drift"],
+      "description": "Set the three required semantic Production values in their owning Personal projects, merge an exact verified candidate, let the new main workflow stage and promote without a human step, and prove immutable/stable/rollback and model behaviour.",
+      "mandatoryVerification": [
+        "Metadata-only readback precedes each environment update; model/context are encrypted on agent and reasoning effort is encrypted on proxy.",
+        "The successful main CI run and Production workflow run share the exact merged main SHA.",
+        "Both staged deployments are Production-targeted, READY, correct-project and exact-SHA before any stable alias movement.",
+        "Both stable aliases resolve to the accepted deployments and source SHA after automatic promotion; previous deployments remain READY rollback identities.",
+        "Stable proxy health returns 200, live and high; absent/invalid proxy auth remains 401 without leaks.",
+        "Protected Eve info and one bounded completed turn prove Terra and context 1050000 separately from stable health, with one correlated proxy completion and no raw content retained.",
+        "No manual vercel promote or dashboard promotion occurs in the accepted path."
+      ],
+      "proofContract": {
+        "directObservable": "Exact merged main SHA -> successful CI -> successful Production run -> two immutable deployments -> two stable aliases -> high health and Terra/context Eve result.",
+        "expectedPostcondition": "Current main is automatically and verifiably Production with Terra High.",
+        "falseGreenRejected": "READY without alias, alias without SHA, high Preview, low stable health, manual promotion, or Eve metadata without a completed turn.",
+        "evidenceOwner": "Dated automatic Production acceptance packet",
+        "limitationsAndNonClaims": "One bounded turn does not prove all future model responses, latency or strict replay absence."
+      },
+      "docsImpact": "Update accepted Production proof, runbook readback, active plan and lifecycle owners; provider state remains dated evidence.",
+      "currentResult": "Deferred without execution because the required complete Production credential custody is unavailable under the personal-only identity condition. Repository workflow and Effect deployment behavior remain implemented and locally/CI verified, but no accepted main SHA was automatically deployed or promoted by this control. Stable Terra High, immutable/stable deployment identity, rollback, and protected Eve behavior remain unproved.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "close-channel-proof-gaps",
+      "title": "Run bounded Personal Photon and Sendblue long-response proofs",
+      "status": "deferred",
+      "dependsOn": ["correct-terra-high-and-prove-automatic-main"],
+      "description": "Reauthenticate Photon in Personal scope, inventory it, then use the established conversations for one bounded Photon and one bounded Sendblue long-response test with direct handset observation where available.",
+      "mandatoryVerification": [
+        "Photon Personal identity, project, user, webhook and established-conversation gates pass before a send; no number is inferred, retained or typed.",
+        "Computer Use selects only the established visible conversation and sends exactly one bounded prompt per provider.",
+        "Provider acceptance, Eve completion, proxy completion, outbound dispatch, provider delivery and handset message result are recorded separately.",
+        "Typing start and stop provider acceptance are recorded separately from direct handset-visible typing start and stop.",
+        "An uncertain send is not retried and message content/identity is not retained.",
+        "Photon strict candidate-specific replay is either proved by a supported oracle or retained as a non-blocking limitation with existing residual controls; no custom oracle is added.",
+        "Docs-maintainer ledger and affected proof owners are reconciled; local/full gates are rerun only where repository state changed."
+      ],
+      "proofContract": {
+        "directObservable": "Two bounded claim-separated receipts bind the exact Production deployment and established conversations to provider and handset observations.",
+        "expectedPostcondition": "Remaining live channel claims are either directly proved or explicitly retained as non-claims.",
+        "falseGreenRejected": "Provider 2xx as handset delivery, typing API success as visible animation, neighbouring message, historical receipt or time-window correlation as strict replay proof.",
+        "evidenceOwner": "Dated dual-channel Production closeout packet",
+        "limitationsAndNonClaims": "Photon strict replay and any unobservable handset animation remain explicit limitations, not implementation defects."
+      },
+      "docsImpact": "Update verification packet/index, active plan, task status and exact runbook evidence pointers; preserve provider procedures in app runbooks.",
+      "currentResult": "Deferred without a new send because the exact automatic Production candidate required by this task was not produced. Prior dated Photon and Sendblue Production receipts remain historical point-in-time evidence only. No message was sent, no uncertain operation was retried, and candidate-specific Photon replay plus any unobserved handset typing remain explicit non-claims.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
+      "commitAfterPassing": true
+    }
+  ],
+  "terminalAuditOwner": "effect-native-runtime-patterns-and-lint-enforcement.tasks.json#terminal-five-pass-audit",
+  "nonGoals": [
+    "No direct Vercel Git auto-deploy or alias movement before main verification.",
+    "No manual Production approval or promotion in the accepted automatic path.",
+    "No merge-queue rollout in this slice.",
+    "No all-project, broader Vercel team/account token, or fallback when exact Personal-project selection or cross-project denial cannot be proved.",
+    "No secret value, phone identity, message content, profile, token, ciphertext, protected URL or raw provider log in repository evidence.",
+    "No custom Photon replay oracle, blind message retry, provider wrapper sprawl, or unrelated resource change."
+  ]
+}

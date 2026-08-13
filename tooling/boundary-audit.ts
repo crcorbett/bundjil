@@ -266,12 +266,66 @@ const isInlineStringSchema = (node: ts.Expression) => {
   return name === "Schema.String" || name === "Schema.NonEmptyString";
 };
 
+const isRawCauseSchema = (node: ts.Expression): boolean => {
+  if (ts.isCallExpression(node)) {
+    const name = dottedName(node.expression);
+    if (name === "Schema.Defect") {
+      return true;
+    }
+    if (name === "Schema.optional") {
+      const [inner] = node.arguments;
+      return inner !== undefined && isRawCauseSchema(inner);
+    }
+  }
+  return false;
+};
+
 const rootCallName = (node: ts.CallExpression) => {
   let { expression } = node;
   while (ts.isCallExpression(expression)) {
     ({ expression } = expression);
   }
   return dottedName(expression);
+};
+
+const isDataTaggedErrorClass = (node: ts.ClassDeclaration) =>
+  node.heritageClauses?.some((clause) =>
+    clause.types.some(
+      (type) =>
+        ts.isCallExpression(type.expression) &&
+        rootCallName(type.expression) === "Data.TaggedError"
+    )
+  ) === true;
+
+const isOperatorRawCause = (node: ts.PropertySignature) => {
+  if (
+    node.type?.kind !== ts.SyntaxKind.UnknownKeyword ||
+    !node.getSourceFile().fileName.includes(`${sep}scripts${sep}`)
+  ) {
+    return false;
+  }
+  let current: ts.Node | undefined = node.parent;
+  while (current !== undefined && !ts.isSourceFile(current)) {
+    if (ts.isClassDeclaration(current)) {
+      return isDataTaggedErrorClass(current);
+    }
+    current = current.parent;
+  }
+  return false;
+};
+
+const inspectClassDeclaration = (
+  node: ts.ClassDeclaration,
+  report: ReportDiagnostic
+) => {
+  if (!hasExportModifier(node) || !isDataTaggedErrorClass(node)) {
+    return;
+  }
+  report(
+    node,
+    "public-data-tagged-error",
+    "Exported typed errors must use Schema.TaggedErrorClass so their public encoded contract is explicit and testable."
+  );
 };
 
 const codecSide = (
@@ -412,6 +466,36 @@ const isRawResponseRead = (
   );
 };
 
+const isRedactedSchemaRoundTrip = (node: ts.CallExpression) => {
+  if (dottedName(node.expression) !== "Redacted.value") {
+    return false;
+  }
+  let current: ts.Node | undefined = node.parent;
+  while (current !== undefined && !ts.isSourceFile(current)) {
+    if (
+      ts.isCallExpression(current) &&
+      ["Schema.decodeEffect", "Schema.decodeUnknownEffect"].includes(
+        rootCallName(current) ?? ""
+      )
+    ) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
+};
+
+const isAmbientRandomIdentity = (node: ts.CallExpression) =>
+  ["Math.random", "globalThis.crypto.randomUUID"].includes(
+    dottedName(node.expression) ?? ""
+  );
+
+const isDirectEnvironmentAccess = (node: ts.PropertyAccessExpression) =>
+  node.name.text === "env" &&
+  ["process", "globalThis.process", "Bun", "import.meta"].includes(
+    node.expression.getText()
+  );
+
 const namedCallRules: readonly Readonly<{
   names: readonly string[];
   rule: BoundaryRule;
@@ -421,6 +505,12 @@ const namedCallRules: readonly Readonly<{
     names: ["JSON.parse", "JSON.stringify"],
     rule: "direct-json",
     message: "Direct JSON APIs bypass the canonical Schema codec.",
+  },
+  {
+    names: ["Promise.all", "Promise.race"],
+    rule: "raw-promise-coordination",
+    message:
+      "Owned production concurrency must use Effect.all, Effect.race, or another Effect concurrency primitive.",
   },
   {
     names: [
@@ -440,6 +530,12 @@ const namedCallRules: readonly Readonly<{
       "Semantic configuration must use Config.schema with its owner-named Schema.",
   },
   {
+    names: ["Bun.spawn", "Bun.spawnSync"],
+    rule: "direct-platform-process",
+    message:
+      "Owned source must execute child processes through an Effect platform service supplied by the application root.",
+  },
+  {
     names: ["fetch"],
     rule: "raw-fetch",
     message:
@@ -453,7 +549,31 @@ type ReportDiagnostic = (
   message: string
 ) => void;
 
+const resolveSchemaFields = (
+  checker: ts.TypeChecker,
+  expression: ts.Expression
+): ts.ObjectLiteralExpression | undefined => {
+  if (ts.isObjectLiteralExpression(expression)) {
+    return expression;
+  }
+  if (!ts.isIdentifier(expression)) {
+    return undefined;
+  }
+  const symbol = checker.getSymbolAtLocation(expression);
+  const target =
+    symbol?.flags === ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(symbol)
+      : symbol;
+  const initializer = target?.declarations?.find(
+    ts.isVariableDeclaration
+  )?.initializer;
+  return initializer !== undefined && ts.isObjectLiteralExpression(initializer)
+    ? initializer
+    : undefined;
+};
+
 const inspectInlineSchema = (
+  checker: ts.TypeChecker,
   node: ts.CallExpression,
   report: ReportDiagnostic
 ) => {
@@ -466,11 +586,25 @@ const inspectInlineSchema = (
   ) {
     return;
   }
-  const fields = node.arguments.at(-1);
-  if (fields === undefined || !ts.isObjectLiteralExpression(fields)) {
+  const fieldsExpression = node.arguments.at(-1);
+  if (fieldsExpression === undefined) {
+    return;
+  }
+  const fields = resolveSchemaFields(checker, fieldsExpression);
+  if (fields === undefined) {
     return;
   }
   for (const property of fields.properties) {
+    if (
+      ts.isPropertyAssignment(property) &&
+      isRawCauseSchema(property.initializer)
+    ) {
+      report(
+        property,
+        "public-raw-cause",
+        "Exported Schema structures cannot expose arbitrary defect values. Keep raw causes private and publish only bounded owner-named diagnostics."
+      );
+    }
     if (
       ts.isPropertyAssignment(property) &&
       isInlineStringSchema(property.initializer)
@@ -502,6 +636,20 @@ const inspectCallExpression = (
       "Raw response text or JSON must be decoded by the canonical boundary codec before domain use."
     );
   }
+  if (isRedactedSchemaRoundTrip(node)) {
+    report(
+      node,
+      "redacted-schema-roundtrip",
+      "Already-decoded Redacted values must not be revealed merely to pass through another Schema decoder. Compose the decoded contract directly."
+    );
+  }
+  if (isAmbientRandomIdentity(node)) {
+    report(
+      node,
+      "ambient-random-identity",
+      "Non-cryptographic runtime identities must use Effect Random so tests can provide deterministic seeds. Keep Web Crypto only at explicit cryptographic boundaries."
+    );
+  }
   const codecSideName = codecMisuse(checker, node);
   if (codecSideName !== null) {
     report(
@@ -518,7 +666,7 @@ const inspectCallExpression = (
       "Outbound HTTP or persistence values must come from Schema.encodeEffect or a framework Schema body API."
     );
   }
-  inspectInlineSchema(node, report);
+  inspectInlineSchema(checker, node, report);
 };
 
 /** Runs the narrow provenance audit without loading application runtime code. */
@@ -597,6 +745,16 @@ export const auditBoundaryProvenance = (
           "Public provider configuration cannot expose a generic fetch callback seam."
         );
       }
+      if (ts.isClassDeclaration(node)) {
+        inspectClassDeclaration(node, report);
+      }
+      if (ts.isPropertySignature(node) && isOperatorRawCause(node)) {
+        report(
+          node,
+          "operator-raw-cause",
+          "Operator errors cannot retain arbitrary unknown values. Classify the failure with bounded secret-negative fields before it reaches an operator receipt."
+        );
+      }
       if (
         ts.isTypeNode(node) &&
         isPublicSignatureType(node) &&
@@ -612,6 +770,16 @@ export const auditBoundaryProvenance = (
       }
       if (ts.isCallExpression(node)) {
         inspectCallExpression(checker, node, report);
+      }
+      if (
+        ts.isPropertyAccessExpression(node) &&
+        isDirectEnvironmentAccess(node)
+      ) {
+        report(
+          node,
+          "direct-environment-access",
+          "Owned source must acquire host configuration through Effect Config rather than reading an ambient environment object."
+        );
       }
       if (
         (ts.isAsExpression(node) ||

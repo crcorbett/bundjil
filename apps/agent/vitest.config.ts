@@ -4,6 +4,9 @@ export default defineConfig({
   resolve: {
     conditions: ["@bundjil/source"],
   },
+  ssr: {
+    noExternal: [/^@bundjil\//],
+  },
   test: {
     exclude: ["**/node_modules/**", "**/dist/**"],
     globals: false,

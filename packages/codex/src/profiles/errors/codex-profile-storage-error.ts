@@ -12,6 +12,5 @@ export class CodexProfileStorageError extends Schema.TaggedErrorClass<CodexProfi
     operation: CodexProfileStorageOperation,
     key: Schema.optional(CodexProfileErrorKey),
     message: CodexProfileErrorMessage,
-    cause: Schema.Defect(),
   }
 ) {}

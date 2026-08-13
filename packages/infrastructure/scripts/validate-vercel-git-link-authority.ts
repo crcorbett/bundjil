@@ -34,6 +34,14 @@ const VercelGitLinkAuthorityPath = Schema.String.pipe(
   ),
   Schema.brand("@bundjil/infrastructure/VercelGitLinkAuthorityPath")
 );
+const VercelGitLinkAuthorityCommandFailureReason = Schema.Literals([
+  "fileContractInvalid",
+  "policyInvalid",
+]);
+class VercelGitLinkAuthorityCommandError extends Schema.TaggedErrorClass<VercelGitLinkAuthorityCommandError>()(
+  "VercelGitLinkAuthorityCommandError",
+  { reason: VercelGitLinkAuthorityCommandFailureReason }
+) {}
 
 const authorityPathConfig = Config.schema(
   VercelGitLinkAuthorityPath,
@@ -50,7 +58,9 @@ const validateVercelGitLinkAuthority = Effect.gen(
     const fileSystem = yield* FileSystem.FileSystem;
     const metadata = yield* fileSystem.stat(authorityPath);
     if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-      return yield* Effect.fail("vercel-git-link-authority-invalid");
+      return yield* new VercelGitLinkAuthorityCommandError({
+        reason: "fileContractInvalid",
+      });
     }
     const authorityText = yield* fileSystem.readFileString(authorityPath);
     const authority = yield* Schema.decodeUnknownEffect(
@@ -65,7 +75,9 @@ const validateVercelGitLinkAuthority = Effect.gen(
       !new Ajv2020(options).compile(authorityEnvelopeSchema)(authority) ||
       !new Ajv2020(options).compile(vercelGitLinkAuthorityPolicy)(authority)
     ) {
-      return yield* Effect.fail("vercel-git-link-authority-invalid");
+      return yield* new VercelGitLinkAuthorityCommandError({
+        reason: "policyInvalid",
+      });
     }
     return yield* Console.log('{"status":"valid"}');
   }

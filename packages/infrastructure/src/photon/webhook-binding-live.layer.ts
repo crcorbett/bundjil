@@ -13,15 +13,13 @@ import {
   SecretReferenceId,
   SecretRevision,
 } from "../secret-reference.js";
-import type { VercelAccessToken } from "../vercel/live.layer.js";
-import {
-  VercelCredentials,
-  VercelCredentialsLive,
-} from "../vercel/live.layer.js";
+import { VercelCredentialsLive } from "../vercel/live.layer.js";
+import type { VercelAccessToken } from "../vercel/schemas.js";
 import {
   VercelEnvironmentVariableId,
   VercelEnvironmentVariableKey,
 } from "../vercel/schemas.js";
+import { VercelCredentials } from "../vercel/services.js";
 import {
   PhotonWebhookBindingSink,
   PhotonWebhookBindingWrite,
@@ -196,15 +194,20 @@ export const PhotonWebhookBindingSinkLive = Layer.effect(
           )
         )
       );
-      const token = yield* credentials.pipe(
-        Effect.mapError(() =>
-          knownFailure(
-            "persistPreviewWebhookBinding",
-            "requestFailed",
-            "Vercel binding credentials are unavailable."
+      const token = yield* credentials
+        .accessToken({
+          _tag: "Project",
+          projectId: input.vercelProjectId,
+        })
+        .pipe(
+          Effect.mapError(() =>
+            knownFailure(
+              "persistPreviewWebhookBinding",
+              "requestFailed",
+              "Vercel binding credentials are unavailable."
+            )
           )
-        )
-      );
+        );
       const request = yield* HttpClientRequest.post(
         vercelUrl(`/v10/projects/${encoded.vercelProjectId}/env`)
       ).pipe(

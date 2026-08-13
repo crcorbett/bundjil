@@ -38,16 +38,17 @@ export const CodexOAuthObserverNoop = Layer.succeed(
   })
 );
 
-export const recordCodexOAuthObserverEvent = (
+export const recordCodexOAuthObserverEvent = Effect.fn(
+  "CodexOAuthObserver.recordBoundary"
+)(function* recordCodexOAuthObserverEventOperation(
   event: CodexOAuthObserverEventType
-) =>
-  Effect.gen(function* recordCodexOAuthObserverEventOperation() {
-    const observer = yield* CodexOAuthObserver;
+) {
+  const observer = yield* CodexOAuthObserver;
 
-    yield* Schema.encodeEffect(CodexOAuthObserverEvent)(event);
+  yield* Schema.encodeEffect(CodexOAuthObserverEvent)(event);
 
-    return yield* observer.record(event);
-  });
+  return yield* observer.record(event);
+});
 
 export const getCodexOAuthObserverSnapshot = Effect.gen(
   function* getCodexOAuthObserverSnapshotOperation() {

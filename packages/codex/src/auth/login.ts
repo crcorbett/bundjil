@@ -1,12 +1,4 @@
-import {
-  Clock,
-  Context,
-  Effect,
-  Layer,
-  Option,
-  Redacted,
-  Schema,
-} from "effect";
+import { Clock, Context, Effect, Layer, Option, Schema } from "effect";
 
 import { generateCodexOAuthCredentialRevision } from "../profiles/cipher.js";
 import { CodexOAuthProfileCommit } from "../profiles/commit.js";
@@ -19,6 +11,7 @@ import type {
   CodexSubscriptionLoginInput,
   CodexSubscriptionLoginResult as CodexSubscriptionLoginResultType,
 } from "./contracts.js";
+import { CodexOAuthScope } from "./credentials.js";
 import type { CodexSubscriptionAuthFailure } from "./errors.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 import { CodexOAuthHttpClient } from "./http-client.js";
@@ -102,20 +95,32 @@ export const makeCodexSubscriptionLogin = Effect.gen(
           }
 
           const account = yield* decodeCodexAccountMetadata(tokens.id_token);
+          const scopes = yield* Effect.all(
+            protocol.config.scopes.map((scope) =>
+              Schema.decodeEffect(CodexOAuthScope)(scope)
+            )
+          ).pipe(
+            Effect.mapError(
+              () =>
+                new CodexSubscriptionAuthError({
+                  operation: "completeLogin",
+                  reason: "tokenMetadataInvalid",
+                  message: "Unable to construct the Codex OAuth scope set.",
+                })
+            )
+          );
           const credentialRevision =
             yield* generateCodexOAuthCredentialRevision();
-          const profile = yield* Schema.decodeUnknownEffect(
-            CodexSubscriptionProfile
-          )({
+          const profile = yield* CodexSubscriptionProfile.makeEffect({
             profileVersion: 2,
             profileKind: "subscription",
             subject: input.subject,
-            accessToken: Redacted.value(tokens.access_token),
-            refreshToken: Redacted.value(tokens.refresh_token),
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
             expiresAtEpochMillis: expiry.expiresAtEpochMillis,
-            accountId: Redacted.value(account.accountId),
+            accountId: account.accountId,
             protocolScopeVersion: protocol.config.protocolScopeVersion,
-            scopes: [...protocol.config.scopes],
+            scopes,
             createdAtEpochMillis: Option.isSome(existingProfile)
               ? existingProfile.value.createdAtEpochMillis
               : now,
@@ -178,9 +183,12 @@ export const CodexSubscriptionLoginLive = Layer.effect(
   makeCodexSubscriptionLogin
 );
 
-export const runCodexSubscriptionLogin = (input: CodexSubscriptionLoginInput) =>
-  Effect.gen(function* runCodexSubscriptionLoginOperation() {
+export const runCodexSubscriptionLogin = Effect.fnUntraced(
+  function* runCodexSubscriptionLoginOperation(
+    input: CodexSubscriptionLoginInput
+  ) {
     const login = yield* CodexSubscriptionLogin;
 
     return yield* login.run(input);
-  });
+  }
+);

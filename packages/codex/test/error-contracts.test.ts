@@ -63,14 +63,12 @@ const selectedErrorFixtures = [
       _tag: "CodexOAuthOperationError",
       operation: "startLogin",
       message: "Unable to construct Codex credentials.",
-      cause: { defect: "fixture" },
     },
     encode: () =>
       Schema.encodeUnknownSync(CodexOAuthOperationError)(
         new CodexOAuthOperationError({
           operation: "startLogin",
           message: "Unable to construct Codex credentials.",
-          cause: { defect: "fixture" },
         })
       ),
     decode: (input: unknown) =>
@@ -105,14 +103,12 @@ const selectedErrorFixtures = [
       _tag: "CodexProfileSchemaError",
       boundary: "CodexOAuthProfile",
       message: "Unable to decode Codex profile.",
-      cause: { defect: "fixture" },
     },
     encode: () =>
       Schema.encodeUnknownSync(CodexProfileSchemaError)(
         new CodexProfileSchemaError({
           boundary: "CodexOAuthProfile",
           message: "Unable to decode Codex profile.",
-          cause: { defect: "fixture" },
         })
       ),
     decode: (input: unknown) =>
@@ -127,7 +123,6 @@ const selectedErrorFixtures = [
       operation: "getProfile",
       key: "profile-key",
       message: "Unable to read Codex profile.",
-      cause: { defect: "fixture" },
     },
     encode: () =>
       Schema.encodeUnknownSync(CodexProfileStorageError)(
@@ -135,7 +130,6 @@ const selectedErrorFixtures = [
           operation: "getProfile",
           key: "profile-key",
           message: "Unable to read Codex profile.",
-          cause: { defect: "fixture" },
         })
       ),
     decode: (input: unknown) =>
