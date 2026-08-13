@@ -289,21 +289,23 @@ export const makeCodexOAuthProfileCipher = Effect.fn(
   });
 });
 
-export const encryptCodexOAuthProfile = (profile: CodexOAuthProfileType) =>
-  Effect.gen(function* encryptCodexOAuthProfileOperation() {
+export const encryptCodexOAuthProfile = Effect.fnUntraced(
+  function* encryptCodexOAuthProfileOperation(profile: CodexOAuthProfileType) {
     const cipher = yield* CodexOAuthProfileCipher;
 
     return yield* cipher.encrypt(profile);
-  });
+  }
+);
 
-export const decryptCodexOAuthProfile = (
-  encryptedProfile: EncryptedCodexOAuthProfile
-) =>
-  Effect.gen(function* decryptCodexOAuthProfileOperation() {
+export const decryptCodexOAuthProfile = Effect.fnUntraced(
+  function* decryptCodexOAuthProfileOperation(
+    encryptedProfile: EncryptedCodexOAuthProfile
+  ) {
     const cipher = yield* CodexOAuthProfileCipher;
 
     return yield* cipher.decrypt(encryptedProfile);
-  });
+  }
+);
 
 export const generateCodexOAuthCredentialRevision = Effect.fn(
   "CodexOAuthCredentialRevision.generate"

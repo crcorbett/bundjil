@@ -124,11 +124,12 @@ export const makeCodexRequestMapper = Effect.gen(
   }
 );
 
-export const toCodexResponses = (
-  input: OpenAICompatibleChatCompletionRequest
-) =>
-  Effect.gen(function* toCodexResponsesOperation() {
+export const toCodexResponses = Effect.fnUntraced(
+  function* toCodexResponsesOperation(
+    input: OpenAICompatibleChatCompletionRequest
+  ) {
     const mapper = yield* CodexRequestMapper;
 
     return yield* mapper.toCodexResponses(input);
-  });
+  }
+);

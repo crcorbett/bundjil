@@ -51,9 +51,10 @@ export const makeOpenAICompatibleProxy = Effect.gen(
   }
 ).pipe(Effect.withSpan("OpenAICompatibleProxyLive"));
 
-export const handleChatCompletions = (input: OpenAICompatibleProxyInput) =>
-  Effect.gen(function* handleChatCompletionsOperation() {
+export const handleChatCompletions = Effect.fnUntraced(
+  function* handleChatCompletionsOperation(input: OpenAICompatibleProxyInput) {
     const proxy = yield* OpenAICompatibleProxy;
 
     return yield* proxy.handleChatCompletions(input);
-  });
+  }
+);

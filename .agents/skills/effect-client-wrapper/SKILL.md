@@ -40,9 +40,12 @@ genuinely owns that provider boundary.
 - Wrap Promise calls with `Effect.tryPromise` at the live boundary. Map raw
   failures once to safe `Schema.TaggedErrorClass` failures. Branch on decoded
   literals or tagged unions with `Match` or Effect tagged-error operators.
-- Keep each primary operation as one flat, sequential `Effect.fn` or
-  `Effect.gen` program. Put expected error translation, retry, logging, and
-  spans in its outer pipeline.
+- Keep each primary operation as one flat, sequential Effect. Reusable
+  semantic operations use `Effect.fn("Owner.operation")`; use
+  `Effect.fnUntraced` only for a small leaf/delegate whose invoked operation
+  already owns the trace. Do not export a function that directly constructs
+  `Effect.gen`. Put expected error translation, retry, logging, and spans in
+  the outer pipeline.
 - Keep one-off encoding, decoding, and error mapping inline. Add a helper only
   for multiple real call sites, a genuine boundary owner, or a non-trivial
   independently tested policy.

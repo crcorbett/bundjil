@@ -132,15 +132,16 @@ export const makeCodexStoredProfileProof = Effect.gen(
   }
 );
 
-export const proveCodexStoredProfile = (
-  subject: CodexOAuthSubject
-): Effect.Effect<
-  CodexStoredProfileProofResultType,
-  CodexProfileStoreFailure,
-  CodexStoredProfileProof
-> =>
-  Effect.gen(function* proveCodexStoredProfileOperation() {
+export const proveCodexStoredProfile = Effect.fnUntraced(
+  function* proveCodexStoredProfileOperation(
+    subject: CodexOAuthSubject
+  ): Effect.fn.Return<
+    CodexStoredProfileProofResultType,
+    CodexProfileStoreFailure,
+    CodexStoredProfileProof
+  > {
     const proof = yield* CodexStoredProfileProof;
 
     return yield* proof.prove(subject);
-  });
+  }
+);

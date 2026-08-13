@@ -3,6 +3,7 @@ import { Effect, Schema } from "effect";
 
 import {
   BundjilDefaultWorkspacePackage,
+  BundjilWorkspaceName,
   EveAssistantStepFinishReason,
   EveMessageCompletedEventType,
   EveMessageCompletedEventTypeValue,
@@ -30,7 +31,9 @@ it.effect("creates the default workspace summary", () =>
 
 it.effect("allows a custom workspace name", () =>
   Effect.gen(function* testCustomName() {
-    const summary = yield* makeWorkspaceSummary("example");
+    const name =
+      yield* Schema.decodeUnknownEffect(BundjilWorkspaceName)("example");
+    const summary = yield* makeWorkspaceSummary(name);
 
     assert.strictEqual(summary.name, "example");
   })

@@ -778,6 +778,43 @@ verification` gate passes with all nine package typechecks and all fifteen
   This correction refreshes the completed collection task but does not satisfy
   or run the dependency-gated terminal audit.
 
+## 2026-08-13 exported Effect operation ownership correction
+
+- A fresh AST inventory found 31 exported app/package functions whose body
+  directly constructed `Effect.gen`. Existing named generator bodies did not
+  declare whether the public operation owned a semantic trace or delegated to
+  an already named service operation.
+- Installed `effect@4.0.0-beta.101` is authoritative. Its `Effect.fn` owns a
+  stack-frame/named span while `Effect.fnUntraced` reuses the generator body
+  without adding either; reviewed v4 source revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` confirms those semantics.
+- Semantic boundary/orchestration operations now use named `Effect.fn`.
+  Existing stable public service accessors use named generator bodies inside
+  `Effect.fnUntraced` where the invoked service already owns the trace. The
+  explicit workspace helper signature exposed a raw public name string; it now
+  accepts the existing `BundjilWorkspaceName` brand and decodes its default.
+  Export names, result contracts, service requirements, errors, Layers,
+  provider calls and wire behavior remain unchanged; no accessor or helper was
+  added.
+- `bundjil/no-exported-effect-gen-function` rejects import-aware exported arrow
+  and function declarations that directly return `Effect.gen`, including an
+  immediate `.pipe(...)`. It accepts top-level Effect values, local one-use
+  generators, `Effect.fn`, `Effect.fnUntraced`, and unrelated identifiers.
+- Direct and installed lint fixtures pass. Codex, Eve, and Photon typechecks
+  pass; 17 lint tests, 116 Codex tests, 7 Eve tests, and 41 Photon tests pass.
+  The cold public-synthetic-Executor `bun run verification` candidate passes
+  with zero Turbo cache hits: all policy gates, 136 boundary tests, 17 lint
+  tests, Knip, all nine typechecks and all 15 package build/test tasks.
+  Exact-head hosted CI remains to be recorded before this correction task
+  closes.
+- Documentation impact: affected package source, lint plugin/config/fixtures,
+  Effect/testing architecture, Effect SPEC/task/plan, and PRD/provider-wrapper
+  skills **Change required**. Public exports, app/package READMEs, provider
+  behavior, automatic Production plan, authority/control/runbooks, critical
+  journeys, credentials, deployments and channels **Preserve**. Frontend,
+  browser, accessibility, generated references, release and publication are
+  **N/A**. The dependency-gated terminal audit remains pending.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

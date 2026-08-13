@@ -346,9 +346,12 @@ export const makeCodexStreamMapper = CodexStreamMapper.of({
   }),
 });
 
-export const toOpenAICompatibleStream = (input: CodexResponsesStreamMapInput) =>
-  Effect.gen(function* toOpenAICompatibleStreamOperation() {
+export const toOpenAICompatibleStream = Effect.fnUntraced(
+  function* toOpenAICompatibleStreamOperation(
+    input: CodexResponsesStreamMapInput
+  ) {
     const mapper = yield* CodexStreamMapper;
 
     return yield* mapper.toOpenAICompatibleStream(input);
-  });
+  }
+);

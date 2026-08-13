@@ -52,49 +52,52 @@ export const CodexOAuthProfileCommitUnsupported = Layer.succeed(
   })
 );
 
-export const commitInitialCodexSubscriptionProfile = (
-  profile: CodexSubscriptionProfile
-) =>
-  Effect.gen(function* commitInitialCodexSubscriptionProfileOperation() {
+export const commitInitialCodexSubscriptionProfile = Effect.fnUntraced(
+  function* commitInitialCodexSubscriptionProfileOperation(
+    profile: CodexSubscriptionProfile
+  ) {
     const commit = yield* CodexOAuthProfileCommit;
 
     return yield* commit.initialWrite(profile);
-  });
+  }
+);
 
-export const commitRefreshedCodexSubscriptionProfile = (
-  input: CodexOAuthProfileCommitRefreshInput
-) =>
-  Effect.gen(function* commitRefreshedCodexSubscriptionProfileOperation() {
+export const commitRefreshedCodexSubscriptionProfile = Effect.fnUntraced(
+  function* commitRefreshedCodexSubscriptionProfileOperation(
+    input: CodexOAuthProfileCommitRefreshInput
+  ) {
     const commit = yield* CodexOAuthProfileCommit;
 
     return yield* commit.refresh(input);
-  });
+  }
+);
 
-export const replaceCodexSubscriptionProfile = (
-  input: CodexOAuthProfileCommitReplacementInput
-) =>
-  Effect.gen(function* replaceCodexSubscriptionProfileOperation() {
+export const replaceCodexSubscriptionProfile = Effect.fnUntraced(
+  function* replaceCodexSubscriptionProfileOperation(
+    input: CodexOAuthProfileCommitReplacementInput
+  ) {
     const commit = yield* CodexOAuthProfileCommit;
 
     return yield* commit.replace(input);
-  });
+  }
+);
 
-export const replaceLegacyCodexOAuthProfile = (
-  input: CodexOAuthProfileCommitLegacyReplacementInput
-) =>
-  Effect.gen(function* replaceLegacyCodexOAuthProfileOperation() {
+export const replaceLegacyCodexOAuthProfile = Effect.fnUntraced(
+  function* replaceLegacyCodexOAuthProfileOperation(
+    input: CodexOAuthProfileCommitLegacyReplacementInput
+  ) {
     const commit = yield* CodexOAuthProfileCommit;
 
     return yield* commit.replaceLegacy(input);
-  });
+  }
+);
 
-export const markCodexSubscriptionReauthenticationRequired = (
-  input: CodexOAuthProfileCommitReauthenticationInput
-) =>
-  Effect.gen(
-    function* markCodexSubscriptionReauthenticationRequiredOperation() {
-      const commit = yield* CodexOAuthProfileCommit;
+export const markCodexSubscriptionReauthenticationRequired = Effect.fnUntraced(
+  function* markCodexSubscriptionReauthenticationRequiredOperation(
+    input: CodexOAuthProfileCommitReauthenticationInput
+  ) {
+    const commit = yield* CodexOAuthProfileCommit;
 
-      return yield* commit.markReauthenticationRequired(input);
-    }
-  );
+    return yield* commit.markReauthenticationRequired(input);
+  }
+);

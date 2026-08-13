@@ -45,8 +45,11 @@ runtime config, or provider boundaries:
   app/package source even inside a `tryPromise` callback.
 - `Clock.currentTimeMillis`, `Effect.sleep`, schedules, and timeouts for
   runtime time so `TestClock` can control Effect-owned tests.
-- `Effect.fn` and `Effect.withSpan` for named operations that need readable
-  traces.
+- `Effect.fn("Owner.operation")` for reusable semantic operations that own a
+  readable trace. Use `Effect.fnUntraced` only for a small leaf or public
+  service accessor whose invoked service operation already owns the trace.
+  Direct exported functions that construct `Effect.gen` are forbidden;
+  top-level Effect programs and local one-use generators remain valid.
 - `Match`, `Result`, and `Exit` for tagged branching and program outcomes.
 - Effect collection modules such as `Chunk`, `HashMap`, and `HashSet` when
   persistent concatenation, Effect equality/hash, typed lookup absence, or
@@ -61,6 +64,17 @@ success/error unions when an owning Effect Schema or tagged error can express
 the contract.
 
 ## Service Shape
+
+An exported operation must make trace ownership visible at its declaration.
+Use a named `Effect.fn` when the operation performs policy, validation,
+orchestration, or other work whose failures need their own span. Use
+`Effect.fnUntraced` when a stable public accessor only acquires a service and
+delegates to an already named service operation; give its generator a useful
+function name for diagnostics. Do not add a pass-through accessor merely to
+rename a service method: it needs an existing public-package consumer or
+another concrete API-boundary reason. This distinction follows installed
+`effect@4.0.0-beta.101`; the reviewed v4 source revision is
+`1caab3cc30f626efbf15e59d74f539a487e5c85c`.
 
 Use this file layout when a package grows past one or two operations:
 
@@ -327,6 +341,7 @@ service code, and codex-proxy `src`, it confines `async`, `await`, and
 are
 `bundjil/no-ambient-time-in-effect`,
 `bundjil/no-async-await-in-effect-service`,
+`bundjil/no-exported-effect-gen-function`,
 `bundjil/require-try-promise-catch`, and
 `bundjil/no-runtime-execution-outside-boundary`. Exact process/framework
 exceptions live in the plugin as path, symbol, and occurrence-count records;

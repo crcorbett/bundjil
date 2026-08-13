@@ -70,9 +70,10 @@ export const makeCodexResponsesProof = Effect.gen(
   }
 ).pipe(Effect.withSpan("CodexResponsesProofLive"));
 
-export const runCodexResponsesProof = (input: CodexResponsesProofInput) =>
-  Effect.gen(function* runCodexResponsesProofOperation() {
+export const runCodexResponsesProof = Effect.fnUntraced(
+  function* runCodexResponsesProofOperation(input: CodexResponsesProofInput) {
     const proof = yield* CodexResponsesProof;
 
     return yield* proof.run(input);
-  });
+  }
+);

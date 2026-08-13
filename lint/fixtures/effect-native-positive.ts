@@ -12,3 +12,9 @@ export const positiveProgram = Effect.gen(function* positiveFixture() {
   });
   return response.status;
 });
+
+export const positiveOperation = Effect.fnUntraced(
+  function* positiveOperation() {
+    return yield* positiveProgram;
+  }
+);

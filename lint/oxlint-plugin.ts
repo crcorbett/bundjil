@@ -5,10 +5,13 @@ interface AstNode {
   readonly body?: AstNode | readonly AstNode[];
   readonly callee?: AstNode;
   readonly computed?: boolean;
+  readonly declaration?: AstNode | null;
+  readonly declarations?: readonly AstNode[];
   readonly expressions?: readonly AstNode[];
   readonly expression?: AstNode;
   readonly id?: AstNode | null;
   readonly imported?: AstNode;
+  readonly init?: AstNode | null;
   readonly key?: AstNode;
   readonly local?: AstNode;
   readonly name?: string;
@@ -157,6 +160,35 @@ const returnsPrimitiveExpression = (node: AstNode | undefined): boolean => {
       (statement) =>
         statement.type === "ReturnStatement" &&
         isPrimitiveExpression(statement.argument)
+    )
+  );
+};
+
+const returnsEffectGen = (
+  node: AstNode | undefined,
+  tracker: ReturnType<typeof createEffectTracker>
+): boolean => {
+  const expression = unwrapExpression(node);
+  if (expression?.type === "CallExpression") {
+    if (tracker.referenceName(expression.callee) === "Effect.gen") {
+      return true;
+    }
+    if (
+      expression.callee?.type === "MemberExpression" &&
+      propertyName(expression.callee.property) === "pipe"
+    ) {
+      return returnsEffectGen(expression.callee.object, tracker);
+    }
+  }
+  if (expression?.type !== "BlockStatement") {
+    return false;
+  }
+  return (
+    isAstNodeArray(expression.body) &&
+    expression.body.some(
+      (statement) =>
+        statement.type === "ReturnStatement" &&
+        returnsEffectGen(statement.argument, tracker)
     )
   );
 };
@@ -810,6 +842,70 @@ export const noUnregisteredNativeCollectionRule = {
   },
 };
 
+export const noExportedEffectGenFunctionRule = {
+  create(context: RuleContext) {
+    const tracker = createEffectTracker();
+    return {
+      Program(node: AstNode) {
+        if (isAstNodeArray(node.body)) {
+          for (const statement of node.body) {
+            if (statement.type === "ImportDeclaration") {
+              tracker.importDeclaration(statement);
+            }
+          }
+        }
+      },
+      ExportNamedDeclaration(node: AstNode) {
+        const { declaration } = node;
+        if (declaration?.type === "VariableDeclaration") {
+          for (const declarator of declaration.declarations ?? []) {
+            const initializer = unwrapExpression(declarator.init ?? undefined);
+            if (
+              initializer?.type === "ArrowFunctionExpression" &&
+              returnsEffectGen(
+                isAstNodeArray(initializer.body) ? undefined : initializer.body,
+                tracker
+              )
+            ) {
+              context.report({
+                messageId: "useEffectFn",
+                node: initializer,
+              });
+            }
+          }
+          return;
+        }
+        if (
+          declaration?.type === "FunctionDeclaration" &&
+          returnsEffectGen(
+            isAstNodeArray(declaration.body) ? undefined : declaration.body,
+            tracker
+          )
+        ) {
+          context.report({
+            messageId: "useEffectFn",
+            node: declaration,
+          });
+        }
+      },
+      ImportDeclaration(node: AstNode) {
+        tracker.importDeclaration(node);
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Require exported reusable Effect generators to declare trace ownership with Effect.fn or Effect.fnUntraced.",
+    },
+    messages: {
+      useEffectFn:
+        "Define exported reusable Effect operations with Effect.fn when they own a semantic trace, or Effect.fnUntraced when a called service already owns that trace.",
+    },
+    type: "problem",
+  },
+};
+
 const runtimeMethodNames = new Set([
   "Effect.runFork",
   "Effect.runPromise",
@@ -906,6 +1002,7 @@ export default {
   rules: {
     "no-ambient-time-in-effect": noAmbientTimeInEffectRule,
     "no-async-await-in-effect-service": noAsyncAwaitInEffectServiceRule,
+    "no-exported-effect-gen-function": noExportedEffectGenFunctionRule,
     "no-layer-or-die-in-service": noLayerOrDieInServiceRule,
     "no-primitive-effect-failure": noPrimitiveEffectFailureRule,
     "no-runtime-execution-outside-boundary":

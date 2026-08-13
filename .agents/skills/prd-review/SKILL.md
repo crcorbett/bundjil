@@ -46,9 +46,12 @@ Always:
    and operational artifacts `Change required`, `Preserve`, or `N/A` with
    exact paths and evidence;
 7. require `Context.Service`, explicit Layers, boundary-only codecs, flat
-   sequential Effects, deterministic test Layers, route/feature-owned data and workflows,
-   presentation-leaf rendering/accessibility/local UI state, and no helper
-   sprawl where applicable;
+   sequential Effects, named `Effect.fn` semantic trace owners,
+   `Effect.fnUntraced` only for justified leaves/delegates, no exported
+   function that directly constructs `Effect.gen`, deterministic test Layers,
+   route/feature-owned data and workflows, presentation-leaf
+   rendering/accessibility/local UI state, and no helper sprawl where
+   applicable;
 8. make rewriting any stale `effect-client-wrapper` an acceptance task,
    including generic SDK callbacks, raw identifiers/client access, primitive
    config, runtime class policy, and unchecked provider output;

@@ -32,15 +32,16 @@ export class CodexProfileStore extends Context.Service<
   CodexProfileStoreShape
 >()("@bundjil/codex/CodexProfileStore") {}
 
-export const getProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const getProfile = Effect.fnUntraced(function* getProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.getProfile(subject);
-  });
+  return yield* store.getProfile(subject);
+});
 
-export const putProfile = (profile: CodexOAuthProfileType) =>
-  Effect.gen(function* putProfileOperation() {
+export const putProfile = Effect.fn("CodexProfileStore.putProfileBoundary")(
+  function* putProfileOperation(profile: CodexOAuthProfileType) {
     const store = yield* CodexProfileStore;
 
     yield* Schema.encodeEffect(CodexOAuthProfile)(profile).pipe(
@@ -72,18 +73,21 @@ export const putProfile = (profile: CodexOAuthProfileType) =>
     );
 
     return yield* store.putProfile(profile);
-  });
+  }
+);
 
-export const removeProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* removeProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const removeProfile = Effect.fnUntraced(function* removeProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.removeProfile(subject);
-  });
+  return yield* store.removeProfile(subject);
+});
 
-export const hasProfile = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* hasProfileOperation() {
-    const store = yield* CodexProfileStore;
+export const hasProfile = Effect.fnUntraced(function* hasProfileOperation(
+  subject: CodexOAuthSubject
+) {
+  const store = yield* CodexProfileStore;
 
-    return yield* store.hasProfile(subject);
-  });
+  return yield* store.hasProfile(subject);
+});

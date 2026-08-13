@@ -62,9 +62,10 @@ export const WorkspaceOperationsMemory = (
     )((_input: WorkspaceStatusInput) => Effect.succeed(workspaceStatus)),
   });
 
-export const getWorkspaceStatus = (input: WorkspaceStatusInput) =>
-  Effect.gen(function* getWorkspaceStatus() {
+export const getWorkspaceStatus = Effect.fnUntraced(
+  function* getWorkspaceStatus(input: WorkspaceStatusInput) {
     const operations = yield* WorkspaceOperations;
 
     return yield* operations.getWorkspaceStatus(input);
-  });
+  }
+);

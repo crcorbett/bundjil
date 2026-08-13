@@ -48,8 +48,12 @@ Read in this order:
   verification gates over package-by-package TODO lists.
 - Link to architecture docs instead of restating service, API, frontend, or workflow guidance.
 - For Effect TS work, specs and task lists must require flat, meaningful
-  `Effect.gen` control flow for primary operations, tagged errors handled in
-  `.pipe(...)`, canonical Effect Schema-derived types, and an audit against
+  Effect control flow for primary operations, `Effect.fn("Owner.operation")`
+  for reusable semantic operations that own a trace, and
+  `Effect.fnUntraced` only for a justified leaf/delegate whose called service
+  owns the trace. Direct exported functions that construct `Effect.gen` are
+  forbidden. Require tagged errors handled in `.pipe(...)`, canonical Effect
+  Schema-derived types, and an audit against
   `docs/architecture/effect-patterns.md` plus
   `docs/architecture/repo-structure.md`.
 - Specs that touch runtime, service, RPC, schema, config, command, or package
@@ -251,7 +255,9 @@ relevant.
 For Effect TS tasks, every task's `mandatoryVerification` or
 `completionCriteria` must explicitly check:
 
-- flat meaningful `Effect.gen` programs for primary operations;
+- flat meaningful primary Effects with explicit `Effect.fn` versus
+  `Effect.fnUntraced` trace ownership and no exported function that directly
+  constructs `Effect.gen`;
 - typed error handling in `.pipe(...)` with `catchTag`, `catchTags`, or
   `mapError`;
 - canonical `Effect.Schema` contracts and schema-derived types from owning

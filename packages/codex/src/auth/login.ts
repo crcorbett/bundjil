@@ -183,9 +183,12 @@ export const CodexSubscriptionLoginLive = Layer.effect(
   makeCodexSubscriptionLogin
 );
 
-export const runCodexSubscriptionLogin = (input: CodexSubscriptionLoginInput) =>
-  Effect.gen(function* runCodexSubscriptionLoginOperation() {
+export const runCodexSubscriptionLogin = Effect.fnUntraced(
+  function* runCodexSubscriptionLoginOperation(
+    input: CodexSubscriptionLoginInput
+  ) {
     const login = yield* CodexSubscriptionLogin;
 
     return yield* login.run(input);
-  });
+  }
+);

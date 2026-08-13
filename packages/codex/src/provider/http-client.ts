@@ -201,16 +201,18 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
   });
 }).pipe(Effect.withSpan("CodexHttpClientLive"));
 
-export const postResponses = (input: CodexResponsesPostInput) =>
-  Effect.gen(function* postResponsesOperation() {
-    const client = yield* CodexHttpClient;
+export const postResponses = Effect.fnUntraced(function* postResponsesOperation(
+  input: CodexResponsesPostInput
+) {
+  const client = yield* CodexHttpClient;
 
-    return yield* client.postResponses(input);
-  });
+  return yield* client.postResponses(input);
+});
 
-export const postResponsesStream = (input: CodexResponsesPostInput) =>
-  Effect.gen(function* postResponsesStreamOperation() {
+export const postResponsesStream = Effect.fnUntraced(
+  function* postResponsesStreamOperation(input: CodexResponsesPostInput) {
     const client = yield* CodexHttpClient;
 
     return yield* client.postResponsesStream(input);
-  });
+  }
+);

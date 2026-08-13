@@ -130,9 +130,10 @@ export const makeCodexLegacyDirectProvider = Effect.gen(
   }
 ).pipe(Effect.withSpan("CodexLegacyDirectProviderLive"));
 
-export const streamChatCompletion = (input: CodexDirectProviderInput) =>
-  Effect.gen(function* streamChatCompletionOperation() {
+export const streamChatCompletion = Effect.fnUntraced(
+  function* streamChatCompletionOperation(input: CodexDirectProviderInput) {
     const provider = yield* CodexDirectProvider;
 
     return yield* provider.streamChatCompletion(input);
-  });
+  }
+);

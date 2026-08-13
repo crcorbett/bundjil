@@ -56,6 +56,7 @@ export default defineConfig({
         "packages/*/scripts/**/*.cts",
       ],
       rules: {
+        "bundjil/no-exported-effect-gen-function": "error",
         "bundjil/no-unregistered-native-collection": "error",
       },
     },

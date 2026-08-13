@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   noAmbientTimeInEffectRule,
   noAsyncAwaitInEffectServiceRule,
+  noExportedEffectGenFunctionRule,
   noLayerOrDieInServiceRule,
   noPrimitiveEffectFailureRule,
   noRuntimeExecutionOutsideBoundaryRule,
@@ -322,6 +323,44 @@ describe("bundjil/no-unregistered-native-collection", () => {
               code: "new Map(); new Map(); new Map();",
               filename: "/repo/packages/codex/src/testing/index.ts",
               errors: [{ messageId: "staleException" }],
+            },
+          ],
+        }
+      );
+    }).not.toThrow();
+  });
+});
+
+describe("bundjil/no-exported-effect-gen-function", () => {
+  it("requires explicit trace ownership for exported reusable generators", () => {
+    expect(() => {
+      makeRuleTester().run(
+        "no-exported-effect-gen-function",
+        noExportedEffectGenFunctionRule,
+        {
+          valid: [
+            "import { Effect } from 'effect'; export const program = Effect.gen(function* () { return 1; });",
+            "import { Effect } from 'effect'; const local = () => Effect.gen(function* () { return 1; });",
+            "import { Effect } from 'effect'; export const traced = Effect.fn('Owner.operation')(function* () { return 1; });",
+            "import { Effect } from 'effect'; export const delegated = Effect.fnUntraced(function* () { return 1; });",
+            "const Effect = { gen: (body: unknown) => body }; export const unrelated = () => Effect.gen(() => 1);",
+          ],
+          invalid: [
+            {
+              code: "import { Effect } from 'effect'; export const operation = () => Effect.gen(function* () { return 1; });",
+              errors: [{ messageId: "useEffectFn" }],
+            },
+            {
+              code: "import { Effect as Fx } from 'effect'; export function operation() { return Fx.gen(function* () { return 1; }).pipe(Fx.withSpan('operation')); }",
+              errors: [{ messageId: "useEffectFn" }],
+            },
+            {
+              code: "import { gen as effectGen } from 'effect/Effect'; export const operation = () => { return effectGen(function* () { return 1; }); };",
+              errors: [{ messageId: "useEffectFn" }],
+            },
+            {
+              code: "export const operation = () => Effect.gen(function* () { return 1; }); import { Effect } from 'effect';",
+              errors: [{ messageId: "useEffectFn" }],
             },
           ],
         }

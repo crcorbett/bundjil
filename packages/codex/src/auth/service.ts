@@ -459,46 +459,53 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
   });
 }).pipe(Effect.withSpan("CodexOAuthServiceLive"));
 
-export const startLogin = (input: CodexOAuthLoginStart) =>
-  Effect.gen(function* startLoginOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.startLogin(input);
-  });
+export const startLogin = Effect.fnUntraced(function* startLoginOperation(
+  input: CodexOAuthLoginStart
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.startLogin(input);
+});
 
-export const completeLogin = (input: CodexOAuthLoginCallback) =>
-  Effect.gen(function* completeLoginOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.completeLogin(input);
-  });
+export const completeLogin = Effect.fnUntraced(function* completeLoginOperation(
+  input: CodexOAuthLoginCallback
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.completeLogin(input);
+});
 
-export const getValidToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getValidTokenOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.getValidToken(subject);
-  });
+export const getValidToken = Effect.fnUntraced(function* getValidTokenOperation(
+  subject: CodexOAuthSubject
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.getValidToken(subject);
+});
 
-export const getValidCredential = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* getValidCredentialOperation() {
+export const getValidCredential = Effect.fnUntraced(
+  function* getValidCredentialOperation(subject: CodexOAuthSubject) {
     const service = yield* CodexOAuthService;
     return yield* service.getValidCredential(subject);
-  });
+  }
+);
 
-export const refreshAccessToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* refreshAccessTokenOperation() {
+export const refreshAccessToken = Effect.fnUntraced(
+  function* refreshAccessTokenOperation(subject: CodexOAuthSubject) {
     const service = yield* CodexOAuthService;
     return yield* service.refreshAccessToken(subject);
-  });
+  }
+);
 
-export const recoverAfterUnauthorized = (
-  input: CodexOAuthRecoverAfterUnauthorizedInput
-) =>
-  Effect.gen(function* recoverAfterUnauthorizedOperation() {
+export const recoverAfterUnauthorized = Effect.fnUntraced(
+  function* recoverAfterUnauthorizedOperation(
+    input: CodexOAuthRecoverAfterUnauthorizedInput
+  ) {
     const service = yield* CodexOAuthService;
     return yield* service.recoverAfterUnauthorized(input);
-  });
+  }
+);
 
-export const revokeToken = (subject: CodexOAuthSubject) =>
-  Effect.gen(function* revokeTokenOperation() {
-    const service = yield* CodexOAuthService;
-    return yield* service.revokeToken(subject);
-  });
+export const revokeToken = Effect.fnUntraced(function* revokeTokenOperation(
+  subject: CodexOAuthSubject
+) {
+  const service = yield* CodexOAuthService;
+  return yield* service.revokeToken(subject);
+});
