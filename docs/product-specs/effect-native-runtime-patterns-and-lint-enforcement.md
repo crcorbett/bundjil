@@ -784,6 +784,27 @@ prove the success branch, provider mutation, Preview state, deployment, or
 hosted behavior. No helper, service, shared receipt module, provider operation,
 authority change, or runtime wrapper was added.
 
+### Automatic Production command output correction
+
+The next consequential-entrypoint probe removed
+`BUNDJIL_PRODUCTION_SOURCE_SHA` and reproduced the same default reporter leak
+from the private post-CI Production command: raw `ConfigError`, absolute
+worktree paths, and stack frames. Its deployment state machine, ordered
+rollback finalizer, and successful `AutomaticProductionReceiptJson` contract
+remain unchanged. One final `Effect.exit` now captures source Config,
+deployment Layer acquisition, orchestration, rollback/health failure, and
+success-receipt encoding. The process adapter emits either the existing
+Schema-encoded success receipt or one fixed Schema-encoded blocked result and
+owns exit code `1`.
+
+The real missing-source fixture requires exactly `{"status":"blocked"}` and
+rejects the raw deployment tag, `ConfigError`, stack markers, and repository
+path. Because the source Config is decoded before the live deployment Layer is
+provided, this negative oracle performs no Vercel transport. It does not prove
+the success branch, rollback, hosted workflow, deployment, or provider state.
+No generic command renderer, helper package, service, provider operation,
+authority change, or wrapper was added.
+
 ## Docs-maintainer impact ledger
 
 | Surface                          | Decision                            | Earliest owner, future action, proof, and non-claim                                                                                                                                                                                                                                                     |

@@ -7,7 +7,10 @@ import { describe, expect, it } from "vitest";
 const packageRoot = dirname(import.meta.dirname);
 const commandFixtureTimeoutMilliseconds = 120_000;
 
-const runCommand = (script: string, environment: Record<string, string>) => {
+const runCommand = (
+  script: string,
+  environment: Record<string, string | undefined>
+) => {
   const child = spawnSync(
     "bun",
     ["--conditions=@bundjil/source", "run", `scripts/${script}`],
@@ -109,6 +112,18 @@ describe("infrastructure operator command boundaries", () => {
       expect(previewConfiguration.output).not.toContain("ConfigError");
       expect(previewConfiguration.output).not.toContain(packageRoot);
       expect(previewConfiguration.output).not.toContain("at <anonymous>");
+
+      const automaticProduction = runCommand("automatic-production.ts", {
+        BUNDJIL_PRODUCTION_SOURCE_SHA: undefined,
+      });
+      expect(automaticProduction.exitCode).not.toBe(0);
+      expect(automaticProduction.output.trim()).toBe('{"status":"blocked"}');
+      expect(automaticProduction.output).not.toContain(
+        "ProductionDeploymentError"
+      );
+      expect(automaticProduction.output).not.toContain("ConfigError");
+      expect(automaticProduction.output).not.toContain(packageRoot);
+      expect(automaticProduction.output).not.toContain("at <anonymous>");
     },
     commandFixtureTimeoutMilliseconds
   );

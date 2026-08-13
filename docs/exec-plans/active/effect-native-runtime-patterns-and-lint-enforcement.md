@@ -680,6 +680,30 @@ verification` gate passes with all nine package typechecks and all fifteen
   hosted values were empty; provider reporting was skipped. This is negative
   custody evidence, not a drift or provider result.
 
+## 2026-08-13 automatic Production command output correction
+
+- A fresh consequential-entrypoint probe removed
+  `BUNDJIL_PRODUCTION_SOURCE_SHA` and reproduced raw `ConfigError`, worktree
+  paths, and stack frames from the private Production CLI's default
+  `BunRuntime.runMain` reporter.
+- The deployment state machine, `Effect.onExit` rollback finalizer, workflow
+  authority, and successful `AutomaticProductionReceiptJson` contract are
+  unchanged. Source Config remains first; the live deployment Layer is
+  provided only after it decodes. One final `Effect.exit` now captures the
+  complete command and success encoder, then renders only the existing success
+  receipt or a Schema-owned blocked result with exit code `1`.
+- The real missing-source fixture requires exactly `{"status":"blocked"}` and
+  rejects the raw deployment tag, `ConfigError`, stack marker, and repository
+  path. It stops before Layer acquisition and provider transport. The focused
+  infrastructure typecheck and complete 89-Vitest/21-Alchemy package test
+  suites pass.
+- Documentation impact: Production script/fixture, Effect/testing
+  architecture, infrastructure README, both SPEC/task owners, and both active
+  plans **Change required**. Workflow authority, service topology, deployment
+  transitions, rollback, provider state, credentials, runbooks, journeys, and
+  channels **Preserve**. Frontend, browser, accessibility, release, and
+  publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

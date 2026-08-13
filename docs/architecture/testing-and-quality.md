@@ -80,6 +80,10 @@ payload. Satisfying configuration is not evidence that a provider transport
 ran. Every command case must assert its bounded outward classification rather
 than only a nonzero exit. Mutating-command negative fixtures must additionally
 reject raw tagged-error names, stack frames, and repository-absolute paths.
+This includes private workflow entrypoints: an absent exact Production source
+SHA must stop before deployment service acquisition and emit only the
+Schema-owned blocked process result, while the orchestration suite separately
+owns transition and rollback semantics.
 
 `bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command

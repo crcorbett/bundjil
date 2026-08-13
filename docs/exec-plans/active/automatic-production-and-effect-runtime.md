@@ -635,6 +635,30 @@ credentials, authority, runbooks, journeys, deployments and channels
 **Preserve**. Frontend, browser, accessibility, release and publication are
 **N/A**.
 
+## Automatic Production command output correction
+
+A fresh no-authority probe found that the private exact-SHA Production
+entrypoint still delegated expected Config failure to `BunRuntime.runMain`,
+which emitted raw `ConfigError`, absolute worktree paths, and stack frames. The
+deployment service, transition order, exit-aware rollback, workflow trigger,
+and successful receipt remain unchanged. Source Config is decoded before the
+live Layer is supplied; one final `Effect.exit` now captures the complete
+command and Schema success encoder, then emits only the existing success
+receipt or a Schema-owned blocked result with exit code `1`.
+
+The real absent-source entrypoint fixture requires exactly
+`{"status":"blocked"}` and rejects the raw deployment tag, `ConfigError`, stack
+markers, and repository path before provider transport. Focused infrastructure
+typecheck and all 89 Vitest plus 21 Alchemy lifecycle tests pass. This proves a
+repository process contract only, not hosted eligibility, deployment,
+rollback, Vercel state, or Production behavior.
+
+Documentation impact: Production script/fixture, Effect/testing architecture,
+infrastructure README, both SPEC/task owners, and both active plans **Change
+required**. Workflow authority, transition semantics, rollback, provider
+state, credentials, runbooks, journeys, and channels **Preserve**. Frontend,
+browser, accessibility, release, and publication are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

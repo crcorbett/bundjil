@@ -1036,10 +1036,36 @@
       ]
     },
     {
+      "id": "close-automatic-production-command-boundary",
+      "title": "Close automatic Production command output boundary",
+      "status": "in_progress",
+      "dependsOn": ["close-preview-drift-command-boundary"],
+      "description": "Correct the post-task finding that the private exact-SHA Production workflow command delegated expected Config and deployment failure to BunRuntime.runMain and could expose raw Effect diagnostics.",
+      "implementationNotes": [
+        "Preserve the automatic Production state machine, ordered rollback finalizer, successful AutomaticProductionReceiptJson contract and workflow authority.",
+        "Decode source Config before providing the deployment Layer, then capture Config, Layer acquisition, orchestration, rollback/health failure and success-receipt encoding in one final Effect.exit.",
+        "Schema-encode one fixed blocked process result and own exit code 1 without rendering a Cause or exposing provider, credential, path or stack details.",
+        "Do not add a generic renderer, helper package, shared receipt, provider operation, authority change, deployment or workflow mutation."
+      ],
+      "proofContract": {
+        "directObservable": "The real command with absent source SHA exits 1 with exactly one Schema-owned blocked JSON result and no ConfigError, raw deployment tag, stack marker or repository path.",
+        "expectedPostcondition": "The private Production workflow command has the same bounded final process boundary as mutating operator commands while preserving successful receipts and deployment semantics.",
+        "falseGreenRejected": "A service-only orchestration test, nonzero-only CLI assertion, default BunRuntime reporter, or synthetic function path that does not execute the real entrypoint.",
+        "focusedCommandOrProcedureOwner": "Automatic Production real-entrypoint fixture, orchestration suite, infrastructure typecheck/tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Automatic Production command output correction receipt",
+        "limitationsAndNonClaims": "Repository proof invokes no Vercel transport and does not prove workflow eligibility, deployment, rollback, hosted execution, provider state or Production behavior."
+      },
+      "completionCriteria": [
+        "The existing success receipt is preserved and every expected command failure collapses to the Schema-owned blocked result.",
+        "The real absent-source entrypoint oracle rejects raw runtime diagnostics before Layer acquisition or provider transport.",
+        "Focused checks, full verification, hosted CI and git diff checks pass."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-preview-drift-command-boundary"],
+      "dependsOn": ["close-automatic-production-command-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

@@ -579,7 +579,7 @@ Live and mock layers should be explicit:
 - Keep `Layer.orDie` out of reusable live Layers. A CLI provides its runtime
   inside its final error/exit boundary; otherwise Layer acquisition can bypass
   the command's typed failure vocabulary and leak a raw runtime Cause.
-- A mutating operator CLI must also capture authority, Config, Layer,
+- A mutating operator or workflow CLI must also capture authority, Config, Layer,
   foreground operation, readback, and receipt encoding in that final
   `Effect.exit` boundary. Do not pass expected failure directly to
   `BunRuntime.runMain`: its default reporter can expose error tags, source
