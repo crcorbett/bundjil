@@ -713,6 +713,22 @@ const infrastructureDriftFindings = (
     );
   }
   if (
+    !/BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:\s*github-actions:\$\{\{\s*github\.repository\s*\}\}:\$\{\{\s*github\.run_id\s*\}\}:\$\{\{\s*github\.run_attempt\s*\}\}/.test(
+      workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-RUN-IDENTITY",
+        "Infrastructure drift binds receipts to the exact GitHub repository, run, and attempt",
+        workflow.path,
+        "Restore the branded run identity from github.repository, github.run_id, and github.run_attempt",
+        "The dynamic GitHub run identity is absent or incomplete",
+        "Each report and receipt names its exact hosted execution identity"
+      )
+    );
+  }
+  if (
     !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
       workflow.content
     ) ||

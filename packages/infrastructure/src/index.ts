@@ -110,6 +110,8 @@ export {
   type InfrastructureDriftResourceFingerprintEncoded,
   InfrastructureDriftResourceKind,
   type InfrastructureDriftResourceKindEncoded,
+  InfrastructureDriftRunIdentity,
+  type InfrastructureDriftRunIdentityEncoded,
   InfrastructureDriftSecretRevision,
   type InfrastructureDriftSecretRevisionEncoded,
   InfrastructureDriftSourceSha,

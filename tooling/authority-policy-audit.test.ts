@@ -69,6 +69,7 @@ jobs:
     environment: infrastructure-read-only-preview
     env:
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:\${{ github.repository }}:\${{ github.run_id }}:\${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
       DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
@@ -563,6 +564,15 @@ describe("HGI-304 authority policy", () => {
       (content: string) =>
         `${content}\n# $` +
         "{{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_EXTRA }}\n",
+    ],
+    [
+      "dynamic run identity removed",
+      "AUTH-DRIFT-RUN-IDENTITY",
+      (content: string) =>
+        content.replace(
+          /^\s*BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:.*$/m,
+          ""
+        ),
     ],
     [
       "report command changed to apply",

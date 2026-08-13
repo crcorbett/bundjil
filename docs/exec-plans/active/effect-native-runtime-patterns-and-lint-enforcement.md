@@ -482,6 +482,37 @@ verification` gate passes with all nine package typechecks and all fifteen
   runbooks, READMEs and public exports **Preserve**. Frontend, browser,
   accessibility, release, deployment and publication are **N/A**.
 
+## 2026-08-13 drift execution identity correction
+
+- A fresh proof-boundary audit found that the reusable protected-environment
+  authority JSON was described as one-run identity although the report retained
+  only its fingerprint and source SHA. The report did not retain GitHub
+  repository/run/attempt identity or the decoded adoption-manifest digest.
+- `InfrastructureDriftRunIdentity` now brands the exact
+  `github-actions:crcorbett/bundjil:<run-id>:<attempt>` boundary. The workflow
+  supplies it from trusted GitHub context, `Config.schema` decodes it, and the
+  report/receipt retain it with source SHA, static authority fingerprint, and
+  the already-decoded manifest digest.
+- The workflow authority policy and an independent negative fixture reject
+  removal of this dynamic binding. The three-secret custody surface, native
+  Alchemy drift engine, provider access, and mutation authority are unchanged.
+- Focused proof passes: infrastructure typecheck/build, 20 drift tests, 21
+  authority-policy tests, all 85 infrastructure Vitest tests, and all 21
+  Alchemy/Bun tests. Effect setup, boundaries, docs, skills, authority,
+  controls, verification policy, formatting and type-aware lint also pass.
+- A forced synthetic-Executor `bun run verification` passes with zero Turbo
+  cache hits: 136 boundary tests, 11 lint fixtures, all 9 package typechecks,
+  and all 15 package build/test tasks. No Executor or provider request ran.
+- Installed `effect@4.0.0-beta.101` `Schema`/`Config` and Alchemy
+  `2.0.0-beta.64` are the implementation authorities; retained Effect v4
+  comparison revision is `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+- Documentation impact: drift Schema/export, workflow, authority policy/test,
+  Effect/testing architecture, automation/authority owners, Alchemy runbook,
+  both SPEC/task ledgers and both active plans **Change required**. Provider
+  state, credentials, secret values, deployment, channel behavior and hosted
+  success **Preserve** or remain explicit non-claims. App/package public setup,
+  frontend, browser, accessibility, release and publication are **N/A**.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

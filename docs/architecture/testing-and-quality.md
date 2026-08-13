@@ -158,6 +158,8 @@ bun run --filter @bundjil/agent preflight:production
   credential preflight remains inconclusive.
 - Report-only infrastructure drift changes additionally test the fixed
   Preview-only authority and control records; native-plan/source separation;
+  branded repository/run/attempt identity and decoded manifest-digest receipt
+  binding;
   normalization, unowned, missing, in-place, destructive, unavailable,
   ambiguous, unknown-secret, skipped-read, and deployment classifications;
   bounded receipt encoding; Production/apply rejection; and secret/raw-ID leak

@@ -107,12 +107,13 @@
         "Create one separately revocable Personal-scope Vercel token for the agent project step and one for the proxy project step; record token IDs/fingerprints, the unavailable provider-enforced project scope, and revocation owners without values.",
         "Production environment secret and variable inventories contain exactly the accepted deployment bindings and no unrelated credential.",
         "Main ruleset requires pull requests and the existing CI verification context without a human Production approval step; read back the exact ruleset and bypass actors.",
-        "Drift authority, manifest and dotenv artifacts validate locally, are stored only as the three exact environment secrets, and temporary plaintext is removed.",
-        "A hosted Infrastructure Drift run for the exact owning SHA succeeds with providerWrites zero, available reads and a no-op or accepted-normalization disposition.",
+        "Static drift authority policy, manifest and dotenv artifacts validate locally, are stored only as the three exact environment secrets, and temporary plaintext is removed.",
+        "A hosted Infrastructure Drift run Schema-decodes the branded repository/run/attempt identity and carries it, the exact owning SHA, static authority fingerprint and decoded manifest digest through its report and bounded receipt.",
+        "That hosted run succeeds with providerWrites zero, available reads and a no-op or accepted-normalization disposition.",
         "A failed, unavailable, skipped, unknown-secret or blocking run remains failed/inconclusive and is not rewritten as passing."
       ],
       "proofContract": {
-        "directObservable": "GitHub environment/ruleset metadata, Vercel token metadata and a successful hosted drift receipt match the exact accepted source and targets.",
+        "directObservable": "GitHub environment/ruleset metadata, Vercel token metadata and a successful hosted drift receipt match the branded repository/run/attempt identity, exact accepted source, static authority fingerprint, decoded manifest digest and targets.",
         "expectedPostcondition": "Hosted automation uses the least scope Vercel currently exposes plus exact project-bound residual controls, and the Preview drift loop is genuinely operable read-only.",
         "falseGreenRejected": "Secret names in YAML, a local drift command, token creation, or a green unrelated run treated as current hosted proof.",
         "evidenceOwner": "Dated GitHub/Vercel/drift bounded receipt",

@@ -254,9 +254,14 @@ promotion.
   `BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE`, and
   `BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON`.
 - The authority artifact must validate against the fixed harness envelope and
-  drift authority policy. The manifest must be the current accepted Preview
-  adoption manifest. The dotenv artifact must contain only the read-only state,
-  Vercel, and Photon bindings needed by the report command.
+  drift authority policy. It is static protected-environment policy custody,
+  not a one-run identity. The workflow must derive and Schema-decode the exact
+  GitHub repository/run/attempt identity and source SHA for every execution.
+  The manifest must be the current accepted Preview adoption manifest. The
+  command must carry its decoded digest, the dynamic run identity, and the
+  source SHA through the report and bounded receipt. The dotenv artifact must
+  contain only the read-only state, Vercel, and Photon bindings needed by the
+  report command.
 - Dispatch one `Infrastructure Drift` run for the exact source that owns the
   workflow. Acceptance requires the hosted job to pass, its source SHA to
   match, the receipt to report zero provider writes, and every required

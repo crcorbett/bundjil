@@ -99,8 +99,12 @@ automation fallback.
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.
 - **Principal and authority:** `contents: read` plus one protected
   `infrastructure-read-only-preview` environment. Its three secret artifacts
-  contain the fixed authority, provider/state environment, and accepted
-  manifest. The job has no OIDC, apply, reconcile, repair, deployment,
+  contain the static fixed policy envelope, provider/state environment, and
+  accepted manifest. The policy envelope is fingerprinted custody, not a
+  dynamic run identity. The workflow derives a branded exact
+  repository/run/attempt identity and checked-out source SHA from GitHub, and
+  the command carries those values plus the decoded manifest digest through
+  its report and receipt. The job has no OIDC, apply, reconcile, repair, deployment,
   promotion, Production, Photon mutation, billing, or write-token authority.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
@@ -108,7 +112,8 @@ automation fallback.
   unavailable, ambiguous, skipped, or unknown-secret observations are
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
-  fixed-contract bounded receipt. Source review and a local run prove neither
+  fixed-contract bounded receipt bound to the repository/run/attempt, source
+  SHA, static authority fingerprint, and manifest digest. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the

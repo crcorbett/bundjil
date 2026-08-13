@@ -384,17 +384,21 @@ The report-only path wraps the same stable stack, stage-owned R2 state, native
 desired plan, and native Alchemy `sync --dry-run`. It does not own repair.
 Before every run:
 
-1. Bind the exact source SHA and the receipt-bearing post-apply Preview
-   manifest plus its decoded digest to a one-run authority envelope that
-   validates against both the fixed harness contract and
-   `packages/infrastructure/schemas/drift-report-authority.schema.json`.
+1. Validate the static read-only policy envelope against both the fixed harness
+   contract and
+   `packages/infrastructure/schemas/drift-report-authority.schema.json`. It is
+   protected environment custody and is fingerprinted by each run; it is not a
+   one-run identity. Bind execution dynamically to the exact checked-out source
+   SHA and branded GitHub repository/run/attempt identity. Carry those values
+   plus the receipt-bearing post-apply Preview manifest's decoded digest through
+   the Schema-encoded report and bounded receipt.
    A filename containing `current` is convenience custody only and is not an
    evidence owner: stop if it differs from the last accepted post-apply
    manifest or receipt.
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
-2. Provide the authority, manifest, provider/state environment file, output
+2. Provide the static authority policy, manifest, provider/state environment file, output
    report, and bounded-receipt paths only through mode-`0600` custody. Never
    put credentials in workflow YAML, tracked files, command arguments, stdout,
    report fields, or receipts.

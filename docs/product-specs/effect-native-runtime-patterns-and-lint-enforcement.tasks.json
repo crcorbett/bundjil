@@ -105,6 +105,17 @@
         "ENP-REQ-011"
       ],
       "taskIds": ["close-public-error-cause-boundary"]
+    },
+    {
+      "id": "ENP-FND-009",
+      "decision": "Correct report-only infrastructure drift identity provenance by separating static authority-policy custody from dynamic branded GitHub run identity and carrying the decoded manifest digest through the report and receipt.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-009",
+        "ENP-REQ-010",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["bind-drift-receipt-execution-identity"]
     }
   ],
   "requirements": [
@@ -116,6 +127,7 @@
         "migrate-targeted-effect-patterns",
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
+        "bind-drift-receipt-execution-identity",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Boundary audit and affected adapter tests show decoded service inputs and encoded outward values.",
@@ -240,6 +252,7 @@
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
         "own-policy-receipt-time",
+        "bind-drift-receipt-execution-identity",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Docs ledger, source, rule IDs, commands, and skills agree and policy audits pass.",
@@ -259,6 +272,7 @@
         "review-state-and-collection-targets",
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
+        "bind-drift-receipt-execution-identity",
         "terminal-five-pass-audit"
       ],
       "directObservable": "Every requirement and rule has observable, postcondition, false green, procedure owner, evidence owner, and limitation.",
@@ -275,6 +289,7 @@
         "enable-rules-and-reconcile-docs",
         "close-public-error-cause-boundary",
         "own-policy-receipt-time",
+        "bind-drift-receipt-execution-identity",
         "terminal-five-pass-audit"
       ],
       "directObservable": "One exact candidate has fresh focused and terminal command receipts.",
@@ -839,10 +854,39 @@
       ]
     },
     {
+      "id": "bind-drift-receipt-execution-identity",
+      "title": "Bind drift receipts to dynamic execution identity",
+      "status": "completed",
+      "dependsOn": ["own-policy-receipt-time"],
+      "description": "Correct the drift proof boundary so a static protected-environment authority policy cannot be mistaken for one-run identity; decode and retain the exact GitHub repository/run/attempt identity, source SHA, and adoption-manifest digest in every report and receipt.",
+      "implementationNotes": [
+        "Add one branded exact-repository GitHub run identity and obtain it through Effect Config at the report command boundary.",
+        "Carry the already-decoded adoption manifest digest from the validated command rather than rereading or recasting the artifact.",
+        "Keep the authority JSON as a fingerprinted static policy envelope and preserve its three-secret custody surface.",
+        "Enforce the dynamic workflow binding through the existing authority policy audit and an independent negative fixture.",
+        "Do not add a service, Layer, helper, alternate drift engine, provider write, credential, or hosted-success claim."
+      ],
+      "proofContract": {
+        "directObservable": "The Schema-encoded drift report and bounded receipt contain the branded crcorbett/bundjil run/attempt identity, exact source SHA, static authority fingerprint, and decoded manifest digest; the authority audit rejects a workflow without dynamic identity binding.",
+        "expectedPostcondition": "Repository proof distinguishes static policy custody from dynamic execution provenance and cannot attribute a report to source SHA alone.",
+        "falseGreenRejected": "Calling the reusable authority secret one-run, relying only on the GitHub check page, adding an unvalidated string, or recording a manifest path without its decoded digest.",
+        "focusedCommandOrProcedureOwner": "Infrastructure drift Schema/tests, workflow authority policy fixture, infrastructure typecheck, docs/authority/control checks and root verification",
+        "evidenceOwner": "Drift execution-identity correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not install the three hosted artifacts, run provider reads, prove current GitHub execution, or authorize repair, deployment, or Production."
+      },
+      "completionCriteria": [
+        "Installed Effect v4 Schema and Config own the branded dynamic identity boundary.",
+        "Report and bounded receipt retain run identity, source SHA, authority fingerprint and manifest digest.",
+        "Workflow policy and focused negative fixture prevent removal of the dynamic identity binding.",
+        "Canonical architecture, testing, automation, authority, runbook, SPEC/tasks and both active plans agree.",
+        "Focused checks, full repository verification and git diff --check pass without provider execution."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["own-policy-receipt-time"],
+      "dependsOn": ["bind-drift-receipt-execution-identity"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

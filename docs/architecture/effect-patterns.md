@@ -139,7 +139,12 @@ and sync result once, fingerprints physical identities before persistence,
 classifies each observation through `Match`, and encodes only its owned report
 and bounded receipt at the file boundary. Native fields that do not expose
 attempts or duration stay explicitly `NotExposed`; missing observation data is
-not invented.
+not invented. The protected environment supplies a static, fingerprinted
+read-only policy artifact; it is not misrepresented as one-run identity. Each
+execution separately decodes a branded GitHub repository/run/attempt identity,
+the checked-out source SHA, and the already-decoded adoption-manifest digest,
+then carries all three through the report and receipt. A source-only actor or
+an unbound manifest is not accepted as hosted execution evidence.
 
 The Vercel read/import boundary applies this per operation: encode one
 owner-qualified request immediately before team/project/query assignment,

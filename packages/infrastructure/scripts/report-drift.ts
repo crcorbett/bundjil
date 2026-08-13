@@ -39,6 +39,7 @@ import {
   InfrastructureDriftReportInput,
   InfrastructureDriftReportJson,
   InfrastructureDriftResourceFingerprint,
+  InfrastructureDriftRunIdentity,
   InfrastructureDriftSourceSha,
   InfrastructureStage,
   layerAlchemyR2State,
@@ -177,6 +178,10 @@ const receiptPathConfig = Config.schema(
 const sourceShaConfig = Config.schema(
   InfrastructureDriftSourceSha,
   "BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA"
+);
+const runIdentityConfig = Config.schema(
+  InfrastructureDriftRunIdentity,
+  "BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY"
 );
 const acceptUnownedConfig = Config.schema(
   Schema.Boolean,
@@ -553,6 +558,7 @@ const program = Effect.gen(function* () {
   const reportPath = yield* reportPathConfig;
   const receiptPath = yield* receiptPathConfig;
   const sourceSha = yield* sourceShaConfig;
+  const runIdentity = yield* runIdentityConfig;
   const acceptUnowned = yield* acceptUnownedConfig;
   const authorityFingerprint = yield* readAuthority(authorityPath);
   const command = yield* loadAdoptionCommand;
@@ -572,10 +578,12 @@ const program = Effect.gen(function* () {
     InfrastructureDriftReportInput.make({
       authorityFingerprint,
       desiredPlan: native.desiredPlan,
+      manifestDigest: command.manifest.digest,
       observations,
       observedAt: DateTime.formatIso(observedAt),
       runDurationMilliseconds:
         DateTime.toEpochMillis(observedAt) - DateTime.toEpochMillis(startedAt),
+      runIdentity,
       sourceSha,
       stage,
     })

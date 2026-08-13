@@ -475,6 +475,34 @@ by this repository slice.
   runbooks, READMEs and public exports **Preserve**. Frontend, browser,
   accessibility, deployment, release and publication are **N/A**.
 
+## 2026-08-13 drift execution identity correction
+
+- A repository audit found an identity-provenance false green in the pending
+  drift closure: the static protected-environment authority JSON was described
+  as one-run identity, while reports retained neither GitHub run/attempt nor the
+  decoded adoption-manifest digest.
+- The report boundary now Schema-decodes a branded exact
+  `crcorbett/bundjil` GitHub run/attempt identity and carries it, exact source
+  SHA, static authority fingerprint and validated manifest digest through the
+  specialized report and bounded receipt. The authority policy audit rejects a
+  workflow that omits this binding.
+- Focused infrastructure and authority tests pass, and the forced
+  synthetic-Executor `bun run verification` candidate passes with zero Turbo
+  cache hits: 136 boundary tests, 11 lint fixtures, all 9 package typechecks,
+  all 15 package build/test tasks, 85 infrastructure Vitest tests, and 21
+  Alchemy/Bun tests.
+- The three hosted drift artifacts and two Production Vercel tokens remain
+  absent. No provider request, secret installation, deployment, channel send or
+  hosted proof ran in this repository correction.
+- Installed `effect@4.0.0-beta.101` `Schema`/`Config`, retained v4 comparison
+  revision `1caab3cc30f626efbf15e59d74f539a487e5c85c`, and Alchemy
+  `2.0.0-beta.64` are the exact API references.
+- Documentation impact: drift workflow/Schema/export, authority fixture,
+  Effect/testing architecture, automation/authority registers, Alchemy
+  runbook, both SPEC/task ledgers and both active plans **Change required**.
+  Current external custody, provider state, Production, channels, READMEs,
+  frontend, release and publication **Preserve** or are **N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

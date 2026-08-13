@@ -25,6 +25,7 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_PATH: tmp/proof/infrastructure-drift.authority.json
       BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH: tmp/proof/infrastructure-drift.receipt.json
       BUNDJIL_INFRASTRUCTURE_DRIFT_REPORT_PATH: tmp/proof/infrastructure-drift.report.json
+      BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:${{ github.repository }}:${{ github.run_id }}:${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
       BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
