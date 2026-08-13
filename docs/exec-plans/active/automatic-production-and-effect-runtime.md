@@ -524,6 +524,12 @@ typechecks, all 15 package build/test tasks, 87 infrastructure Vitest tests and
 test-fixture working-directory assumption; it did not reveal a runtime or
 provider behavior change.
 
+Commit `751609d3dfd5926131d6541d0b4fce06bc2669c3` is pushed to the draft PR
+branch, and hosted CI run `31660327906` passed that exact SHA. Infrastructure
+Drift run `31660327986` failed closed at bounded read-only custody because its
+three required hosted values were empty; the provider-report step was skipped.
+That run is evidence of absent hosted custody only, not drift or provider state.
+
 Documentation impact: code/export/tests, lint control, Effect/testing
 architecture, infrastructure README, Effect SPEC/task and both active plans
 **Change required**. Production workflow, authority/control registers,

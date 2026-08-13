@@ -544,7 +544,13 @@ verification` gate passes with all nine package typechecks and all fifteen
 - The corrected `bun run verification` candidate passes with zero Turbo cache
   hits: 136 boundary tests, 12 lint tests, all 9 package typechecks, all 15
   package build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun
-  lifecycle tests. Hosted CI identity is recorded only after push.
+  lifecycle tests.
+- Commit `751609d3dfd5926131d6541d0b4fce06bc2669c3` is pushed to the draft PR
+  branch. Hosted CI run `31660327906` passed that exact SHA. Infrastructure
+  Drift run `31660327986` failed closed while preparing bounded read-only
+  custody because `DRIFT_AUTHORITY_JSON`, `DRIFT_ENV_FILE` and
+  `DRIFT_MANIFEST_JSON` were empty; the provider-report step was skipped. This
+  is negative hosted-custody evidence, not a drift or provider result.
 - Documentation impact: authority source/export/tests, lint plugin/config/
   fixtures, Effect/testing architecture, infrastructure README, Effect
   SPEC/task and both active plans **Change required**. Alchemy topology,

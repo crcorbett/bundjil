@@ -907,8 +907,9 @@
         "result": "passed",
         "sourceInventory": "Zero direct primitive Effect fail/failSync/mapError constructions remain in the admitted app service and package source scope; operator scripts remain explicitly outside this completed task.",
         "focused": "Effect language service, 12 lint tests, both root- and package-working-directory authority-loader fixtures, infrastructure typecheck/build and documentation policy passed.",
-        "repository": "The corrected synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks, all 15 build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests.",
-        "correction": "The first full run exposed a test-only working-directory dependency and missing synthetic Executor environment. The fixture now uses package.json, which exists in both supported test working directories; the rerun used the same public synthetic values as CI.",
+      "repository": "The corrected synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks, all 15 build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests.",
+      "hosted": "Commit 751609d3dfd5926131d6541d0b4fce06bc2669c3 is pushed to the draft PR branch. GitHub CI run 31660327906 passed for that exact SHA. Infrastructure Drift run 31660327986 failed closed in Prepare bounded read-only custody because DRIFT_AUTHORITY_JSON, DRIFT_ENV_FILE and DRIFT_MANIFEST_JSON were empty; its provider-report step was skipped.",
+      "correction": "The first full run exposed a test-only working-directory dependency and missing synthetic Executor environment. The fixture now uses package.json, which exists in both supported test working directories; the rerun used the same public synthetic values as CI.",
         "nonClaims": "No provider request, infrastructure mutation, deployment, credential operation, channel send or hosted proof occurred."
       },
       "completionCriteria": [
