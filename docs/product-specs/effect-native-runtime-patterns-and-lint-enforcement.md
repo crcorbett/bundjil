@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-effect-architecture-owner
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-14
 review_trigger: Effect version, language-service diagnostic, Oxlint plugin, runtime-state ownership, timing, collection, or eve-runtime-qualification integration change
 task_ledger: effect-native-runtime-patterns-and-lint-enforcement.tasks.json
 ---
@@ -14,7 +14,7 @@ task_ledger: effect-native-runtime-patterns-and-lint-enforcement.tasks.json
 
 ## Status and decision
 
-This SPEC is implemented history under
+The implementation and terminal audit are complete under
 `docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md`.
 Cooper's
 2026-08-10 delegated authority covers the exact runtime, lint, documentation,
@@ -565,7 +565,8 @@ The sibling ledger owns exact dependencies. The implementation sequence is:
 
 The completed owner is
 `docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md`.
-Its accepted terminal audit depended on the operational closeout ledger.
+Its accepted terminal audit depends on the operational closeout ledger's
+explicit terminal dispositions.
 
 ## Closed error-channel correction
 
@@ -1094,6 +1095,20 @@ headers by two seconds, proves no premature abort, then drains the claimed body
 and observes normal request closure. The never-subscribed expiry fixture remains
 in place. The ordered audit restarts from pass 1 after full verification.
 
+The later docs-and-proof pass found `ENP-FND-052`: the completed-history move
+updated lifecycle state without advancing `last_reviewed` in owners whose
+declared triggers included that exact transition. The prior terminal receipt
+is invalidated, both SPECs and plans return to current routing, and review
+metadata advances to 2026-08-14 before the ordered sequence restarts from pass
+
+1. No runtime, provider, credential, deployment or channel behavior changes.
+
+The restarted docs-and-proof pass then found `ENP-FND-053`: current summaries
+still called the terminal audit accepted and its sibling plan completed while
+the canonical task remained pending and both plans were active. Those current
+claims now match the ledger; accepted wording remains only in the explicitly
+invalidated receipt below. The ordered sequence restarts from pass 1.
+
 The restarted pass 1 then found that the subscriber discarded the boolean
 returned by `Deferred.succeed`. After watchdog expiry, or after one successful
 subscription, a later subscriber could therefore continue to the same one-shot
@@ -1111,7 +1126,7 @@ domain services, OAuth recovery, request/stream mapping, cancellation, channel
 error mapping, provider calls and wire behavior. It does not prove live Photon,
 Codex subscription, hosted proxy, deployment, channel delivery or Production
 behavior. The complete five-pass audit restarts after this correction and its
-focused evidence are accepted.
+focused evidence was accepted.
 
 ## Docs-maintainer impact ledger
 

@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: historical
 authority: canonical
 owner: bundjil-implementation-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-14
 review_trigger: task status, scope, source SHA, workflow, provider, secret, deployment, channel, Effect inventory, lint, proof, rollback, or verification change
 spec: ../../product-specs/automatic-production-and-operational-closeout.md
 ---
@@ -41,8 +41,8 @@ The Production workflow and Effect/lint implementation are complete. Hosted
 credential custody, drift, automatic Production, Terra High runtime proof and
 channel proof ended with explicit `deferred` dispositions at the personal-only
 Vercel identity gate. The retained Photon probe is only a bounded historical
-observation, not candidate-specific Production proof. The accepted terminal
-audit is owned by the sibling completed Effect plan.
+observation, not candidate-specific Production proof. The terminal audit is
+accepted in the sibling completed Effect plan.
 
 ## Grounding receipt
 
@@ -912,7 +912,13 @@ may now run, but cannot strengthen any deferred external claim.
 
 ## Terminal audit
 
-Accepted on 2026-08-14 after `ENP-FND-051` corrected premature completed-
+The 2026-08-14 receipt below was invalidated by `ENP-FND-052`: the completed
+transition retained stale `last_reviewed` metadata in lifecycle owners whose
+declared triggers included that exact move. Both plans and SPECs are current
+again while the ordered terminal audit restarts from pass 1. No source,
+provider, credential, deployment or channel behavior changed.
+
+The invalidated audit had been accepted after `ENP-FND-051` corrected premature completed-
 history and accepted-audit wording. Every implementation task completed and
 every external task received an honest terminal deferred disposition before
 the restarted ordered audit ran. Its final receipt is owned by the sibling
@@ -924,3 +930,14 @@ Effect task ledger and covers:
 4. docs, SPEC, task, runbook, authority, control and proof consistency; and
 5. provider/deployment/secret safety, rollback, observability, live evidence
    and explicit non-claims.
+
+The restarted docs-and-proof pass found `ENP-FND-053`: the current final-outcome
+summary still called the terminal audit accepted and the sibling Effect plan
+completed. The summary now agrees with the pending task and active plan;
+accepted wording remains only in the explicitly invalidated history above. The
+ordered audit restarts from pass 1.
+
+The post-correction five-pass sequence is accepted. The final receipt is owned
+by the sibling completed Effect task ledger. It proves repository source,
+documentation and verification consistency only; every hosted/provider/channel
+non-claim above remains unchanged.

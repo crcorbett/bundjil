@@ -452,6 +452,18 @@
       "decision": "Keep lifecycle claims truthful until terminal closeout: an active plan and pending audit cannot be described as completed or accepted history. Restore current/pending wording before the restarted audit, then move plans, ledgers and indexes to implemented history only with the final receipt.",
       "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
       "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-052",
+      "decision": "Refresh lifecycle-owner review metadata in the same atomic transition that changes SPEC, task, plan or index state. A completed-history move cannot retain a pre-transition last_reviewed value when its declared review trigger includes that move.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-053",
+      "decision": "Keep current status summaries and sequence-owner wording consistent with the canonical task and plan lifecycle. A pending terminal audit cannot be called accepted, and an active plan cannot be called completed, even when an explicitly labelled invalidated receipt preserves that earlier history.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
     }
   ],
   "requirements": [
@@ -1679,7 +1691,9 @@
         "A finding reopens its owning task and invalidates affected downstream receipts.",
         "After corrections, rerun focused proof, terminal verification when affected, and one new ordered terminal audit.",
         "Use existing delegated authority only; audit success does not strengthen a missing provider or handset oracle.",
-        "ENP-FND-051 restored truthful active and pending lifecycle wording before the restarted sequence; completed-history routing is written only with the final receipt."
+        "ENP-FND-051 restored truthful active and pending lifecycle wording before the restarted sequence; completed-history routing is written only with the final receipt.",
+        "ENP-FND-052 requires every lifecycle owner's last_reviewed metadata to advance atomically with the final state transition; the terminal sequence restarts after correction.",
+        "ENP-FND-053 requires every current status summary and sequence-owner statement to agree with the pending terminal task and active plan; historical accepted wording remains only inside an explicitly invalidated receipt."
       ],
       "proofContract": {
         "directObservable": "One ordered five-pass receipt is newer than all task and verification evidence and records zero unresolved findings.",
@@ -1704,7 +1718,8 @@
         "repository": "Post-correction public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 151 Codex, 45 Photon, 42 proxy and 80 agent tests.",
         "nonClaims": "No Vercel token, GitHub secret, provider write, deployment, Codex subscription request, model call, channel send, handset behavior, strict replay oracle or Production state was exercised or proved."
       },
-      "completionEvidence": {
+      "invalidatedCompletionEvidenceAfterFnd051": {
+        "invalidatedBy": "ENP-FND-052",
         "result": "passed",
         "implementationCandidateDigestSha256": "cc4af0e45956c31cfc4ea07aa5d7768e3230105d9137bd8c6ca7e7832916723f",
         "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
@@ -1718,6 +1733,22 @@
         "repository": "The post-ENP-FND-051 public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
         "lifecycle": "Both SPECs and ledgers move to implemented history; both active plans move atomically to completed history with this receipt.",
         "nonClaims": "No current OAuth credential, Codex subscription endpoint, Vercel token, GitHub secret, hosted proxy, provider write, deployment, model response, channel send, handset behavior, strict candidate-specific replay oracle or Production state was exercised or proved."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "acceptedOn": "2026-08-14",
+        "implementationCandidateDigestSha256": "2ea0939ed75d15c33a60cb0c4d71ad92ee9ca47d10fce3d2865684e55b5ccd9e",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: clean; ENP-FND-053 changed documentation only, and the unchanged executable candidate retained its verified Schema, Config, service, Layer, transport, redaction and resource boundaries.",
+          "PASS 2 call-graph-topology: clean; the correction changed no executable path, export, package placement, helper, state owner or Layer lifetime, while Knip and repository boundary checks remained green.",
+          "PASS 3 behaviour-and-gates: clean; fresh full verification passed policy gates, deterministic boundary and lint fixtures, typechecks, builds and all workspace tests.",
+          "PASS 4 docs-and-proof-consistency: clean after ENP-FND-053; current summaries, task status, active routing, review dates, 248-document and 23-README inventories, invalidated history, deferred hosted work and claim ceilings agreed.",
+          "PASS 5 provider-deployment-safety: clean; the audited correction was documentation-only and secret-negative, with no workflow, credential, provider, deployment or channel mutation."
+        ],
+        "repository": "The post-ENP-FND-053 public-synthetic-Executor bun run verification passed every policy gate, HGI-307, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "lifecycle": "Both SPECs and ledgers move to implemented history; both active plans move atomically to completed history with this receipt and refreshed inventory routing.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, personal Vercel token, GitHub secret, hosted proxy, provider write, deployment, model response, channel send, handset behavior, strict candidate-specific replay oracle or Production state was exercised or proved."
       },
       "completionCriteria": [
         "All five ordered passes are recorded once after dependencies.",

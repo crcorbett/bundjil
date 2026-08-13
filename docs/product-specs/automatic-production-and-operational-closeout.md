@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-14
 review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
 task_ledger: automatic-production-and-operational-closeout.tasks.json
 ---
@@ -14,10 +14,10 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 
 ## Status and accepted outcome
 
-This SPEC is implemented repository history for one automatic, fail-closed
-Production path from accepted `main`. Hosted credential, deployment and channel
-proof tasks ended with explicit deferred dispositions at the personal-only
-Vercel identity gate; they are not current provider claims or active work.
+Repository implementation and the shared terminal audit are complete. Hosted
+credential, deployment and channel proof tasks retain explicit deferred
+dispositions at the personal-only Vercel identity gate; they are not current
+provider claims or active provider work.
 
 An accepted push is a `push` event for `refs/heads/main` whose exact SHA has a
 successful `CI` workflow run. A successful pull-request check, local

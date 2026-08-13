@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-14
 review_trigger: any execution-plan completion or archival change
 ---
 

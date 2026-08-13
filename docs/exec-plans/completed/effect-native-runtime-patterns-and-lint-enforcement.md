@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: historical
 authority: canonical
 owner: bundjil-effect-architecture-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-14
 review_trigger: Effect version, source inventory, lint rule, fixture, exception, migration, task status, verification, or terminal-audit change
 spec: ../../product-specs/effect-native-runtime-patterns-and-lint-enforcement.md
 ---
@@ -1091,6 +1091,13 @@ false lifecycle claim is restored to current/pending wording before the
 restarted sequence. Completed-history routing will be written only with the
 final receipt.
 
+The later restarted docs-and-proof pass found `ENP-FND-053`: current status
+summaries still called the terminal audit accepted and its sibling plan
+completed while the canonical task remained pending and both plans were
+active. Those current claims now agree with the ledger. Accepted wording is
+retained only inside the explicitly invalidated receipt, and the ordered audit
+restarts from pass 1.
+
 Documentation impact: Photon/Codex source and tests, Codex package exports,
 Codex/proxy READMEs, app Vitest configuration, Effect/repository/testing
 architecture, this SPEC/task/plan and the terminal receipt **Change required**.
@@ -1107,9 +1114,15 @@ GitHub settings, deployment, provider behaviour, delivery, handset typing or
 strict replay. Corrections reopen the owning task and invalidate downstream
 receipts.
 
-## Final terminal audit receipt
+## Invalidated terminal audit receipt
 
-Accepted on 2026-08-14 for pre-receipt implementation candidate digest
+This receipt was invalidated by `ENP-FND-052` after the completed transition
+retained pre-transition `last_reviewed` metadata in its lifecycle owners. Both
+plans and SPECs are current again while the ordered audit restarts from pass 1.
+The correction changes lifecycle metadata and routing only; source, provider,
+credential, deployment and channel behavior are unchanged.
+
+The audit had been accepted on 2026-08-14 for pre-receipt implementation candidate digest
 `cc4af0e45956c31cfc4ea07aa5d7768e3230105d9137bd8c6ca7e7832916723f`.
 Installed `effect@4.0.0-beta.101` and immutable reviewed source revision
 `1caab3cc30f626efbf15e59d74f539a487e5c85c` were the only Effect API
@@ -1128,6 +1141,29 @@ This proves repository behavior only. No current OAuth credential, Codex
 subscription endpoint, Vercel token, GitHub secret, hosted proxy, provider
 write, deployment, model response, channel send, handset behavior, strict
 candidate-specific replay oracle or Production state was exercised or proved.
+
+## Final terminal audit receipt
+
+Accepted on 2026-08-14 for pre-receipt implementation candidate digest
+`2ea0939ed75d15c33a60cb0c4d71ad92ee9ca47d10fce3d2865684e55b5ccd9e`.
+Installed `effect@4.0.0-beta.101` and immutable reviewed source revision
+`1caab3cc30f626efbf15e59d74f539a487e5c85c` were the only Effect API
+authorities.
+
+The restarted ordered sequence is clean across architecture boundaries;
+call-graph topology; behaviour and gates; docs and proof consistency; and
+provider/deployment safety. `ENP-FND-053` aligned every current status summary
+with the pending terminal task before the restart. The post-correction
+public-synthetic-Executor `bun run verification` passed every policy gate,
+HGI-307, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks
+and all 15 workspace build/test tasks. Focused suites passed 156 Codex, 43
+proxy, 80 agent and 45 Photon tests.
+
+This proves repository behavior only. No current OAuth credential, Codex
+subscription endpoint, personal Vercel token, GitHub secret, hosted proxy,
+provider write, deployment, model response, channel send, handset behavior,
+strict candidate-specific replay oracle or Production state was exercised or
+proved.
 
 ## PRD review receipt
 
