@@ -583,6 +583,11 @@ verification` gate passes with all nine package typechecks and all fifteen
   lifecycle tests; lint passes 13 tests. The final synthetic-Executor
   `bun run verification` candidate passes with zero Turbo cache hits: 136
   boundary tests, all 9 typechecks and all 15 package build/test tasks.
+- Commit `f9f3efbb8c768305000c548c25f3db3b8c5da191` is pushed to the draft PR
+  branch. Hosted CI run `31661928382` passed that exact SHA. Infrastructure
+  Drift run `31661928490` failed closed at bounded custody because its three
+  hosted values were empty; provider reporting was skipped. This is negative
+  custody evidence, not a drift or provider result.
 - Corrections during verification were confined to the harness: use Bun rather
   than Vitest's Node executable, satisfy eager Layer configuration with public
   sentinels, remove one formatter-obsoleted import, and allow 60 seconds only

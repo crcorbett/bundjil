@@ -552,6 +552,12 @@ tasks, 89 infrastructure Vitest tests and 21 Alchemy/Bun lifecycle tests. No
 provider read/write, credential operation, authority change, deployment or
 channel send occurred.
 
+Commit `f9f3efbb8c768305000c548c25f3db3b8c5da191` is pushed to the draft PR
+branch, and hosted CI run `31661928382` passed that exact SHA. Infrastructure
+Drift run `31661928490` failed closed before provider reporting because its
+three hosted custody values were empty. This does not establish drift or
+provider state.
+
 Documentation impact: infrastructure command source/tests, lint scope, Effect
 and testing architecture, infrastructure README, Effect SPEC/task ledger and
 both active plans **Change required**. Production workflow/provider state,
