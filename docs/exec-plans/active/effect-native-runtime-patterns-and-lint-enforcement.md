@@ -805,8 +805,11 @@ verification` gate passes with all nine package typechecks and all fifteen
   The cold public-synthetic-Executor `bun run verification` candidate passes
   with zero Turbo cache hits: all policy gates, 136 boundary tests, 17 lint
   tests, Knip, all nine typechecks and all 15 package build/test tasks.
-  Exact-head hosted CI remains to be recorded before this correction task
-  closes.
+  Implementation commit
+  `93fc40a96970d5fcc7fd1263df266412eaafd56a` is pushed, and GitHub CI run
+  `31677398344` passed that exact SHA in 3m47s. Same-source Infrastructure
+  Drift run `31677398387` failed at protected custody and skipped provider
+  reporting; it proves no provider or drift result.
 - Documentation impact: affected package source, lint plugin/config/fixtures,
   Effect/testing architecture, Effect SPEC/task/plan, and PRD/provider-wrapper
   skills **Change required**. Public exports, app/package READMEs, provider

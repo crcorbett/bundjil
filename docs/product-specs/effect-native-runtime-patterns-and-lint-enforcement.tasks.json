@@ -1096,7 +1096,7 @@
     {
       "id": "close-exported-effect-generator-ownership",
       "title": "Close exported Effect operation trace ownership",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["close-automatic-production-command-boundary"],
       "description": "Correct the iterative audit finding that exported reusable functions directly constructed Effect.gen without explicitly declaring semantic versus delegated trace ownership.",
       "implementationNotes": [
@@ -1113,6 +1113,16 @@
         "focusedCommandOrProcedureOwner": "Lint RuleTester and installed fixtures, codex/eve/photon typechecks and tests, Effect setup, docs/skills checks and root verification",
         "evidenceOwner": "Exported Effect operation ownership correction receipt",
         "limitationsAndNonClaims": "Repository proof does not establish trace export to a hosted collector, provider behavior, deployment, message delivery or Production state."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "All 31 exported direct Effect.gen functions were classified against installed effect@4.0.0-beta.101 and reviewed v4 source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c. Four semantic operations use named Effect.fn; existing service delegates use named generator bodies inside Effect.fnUntraced.",
+        "boundary": "The migration preserves export names, result/error/service/Layer contracts and provider calls. The explicit workspace helper signature exposed one raw string and now reuses BundjilWorkspaceName with an Effectful default decode.",
+        "oracle": "Direct RuleTester and installed Oxlint fixtures prove bundjil/no-exported-effect-gen-function for namespace, alias, direct import, immediate pipe and import-order cases while accepting top-level/local generators, Effect.fn, Effect.fnUntraced and unrelated identifiers.",
+        "focused": "Effect setup, zero-finding boundary audit, docs and 16-mirror skill policy, root type-aware lint, 17 lint tests, Codex/Eve/Photon typechecks, 116 Codex tests, 7 Eve tests and 41 Photon tests pass.",
+        "repository": "The cold public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: all policy gates, 136 boundary tests, Knip, all nine typechecks and all 15 package build/test tasks.",
+        "hosted": "Implementation commit 93fc40a96970d5fcc7fd1263df266412eaafd56a is pushed and GitHub CI run 31677398344 passed that exact SHA in 3m47s. Same-source Infrastructure Drift run 31677398387 failed at protected custody and skipped provider reporting.",
+        "nonClaims": "No live Vercel credential, provider request, drift report, deployment, model call, channel send, trace export, handset behavior or Production state was exercised or proved."
       },
       "completionCriteria": [
         "All current findings are classified and migrated without public-contract or provider-wire changes.",
