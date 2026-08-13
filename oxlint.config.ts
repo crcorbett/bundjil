@@ -49,6 +49,7 @@ export default defineConfig({
       ],
       rules: {
         "bundjil/no-async-await-in-effect-service": "error",
+        "bundjil/no-primitive-effect-failure": "error",
       },
     },
   ],

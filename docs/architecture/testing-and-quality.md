@@ -52,10 +52,11 @@ surfaces. `bun run verification` is the standard closeout gate. It runs those
 policy checks, Ultracite, focused repository lint-rule tests, dependency
 hygiene, workspace typechecks, and tests. `bun run check` enables
 `bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
-`tryPromise`, and runtime-ownership rules for their approved app/package
+`tryPromise`, primitive-failure, and runtime-ownership rules for their approved app/package
 scopes. `bundjil/tagged-error-name` rejects any `Schema.TaggedErrorClass` whose
 class declaration, generic self-type, and literal tag do not agree. The four
-Effect rule IDs and semantic guidance are owned by
+original Effect rule IDs plus the later primitive-failure correction and their
+semantic guidance are owned by
 [`effect-patterns.md`](effect-patterns.md).
 
 `bun run test:lint` executes direct RuleTester coverage and invokes the

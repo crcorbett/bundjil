@@ -12,8 +12,9 @@ spec: ../../product-specs/effect-native-runtime-patterns-and-lint-enforcement.md
 
 ## Objective and dependency
 
-Implement the refreshed four-rule Effect-native runtime and lint ledger against
-exact current main, then participate in the single terminal five-pass audit.
+Implement the refreshed four-rule Effect-native runtime baseline and
+dependency-ordered iterative corrections against exact current main, then
+participate in the single terminal five-pass audit.
 Implementation follows the operational closeout tasks owned by
 [`automatic-production-and-effect-runtime.md`](automatic-production-and-effect-runtime.md).
 The Effect terminal-audit task also depends on the operational channel-proof
@@ -32,8 +33,10 @@ task, so neither plan can close independently.
 
 ## Frozen implementation decisions
 
-1. Add exactly the four lint rules in the SPEC with unit and installed-plugin
-   fixtures, exact scopes/exceptions, staleness proof and no autofix.
+1. Add the original four lint rules in the SPEC with unit and installed-plugin
+   fixtures, exact scopes/exceptions, staleness proof and no autofix; admit a
+   later rule only when an iterative finding has a complete migration and
+   recurrence proof.
 2. Migrate Effect-clock-owned Codex/proxy test fixtures, Photon candidate
    observation time and Effect-owned drift receipts. Preserve only direct
    subprocess live timing as an exact host-boundary exception.
@@ -512,6 +515,42 @@ verification` gate passes with all nine package typechecks and all fifteen
   state, credentials, secret values, deployment, channel behavior and hosted
   success **Preserve** or remain explicit non-claims. App/package public setup,
   frontend, browser, accessibility, release and publication are **N/A**.
+
+## 2026-08-13 public authority failure correction
+
+- The continuing source audit found two exported Vercel authority loaders
+  leaking raw Config, filesystem, parser, Schema and primitive-string failures.
+  Both now expose one owner-named `Schema.TaggedErrorClass` with the bounded
+  reasons `configurationInvalid`, `authorityUnreadable`, and
+  `authorityInvalid`; complete Type/Encoded contracts are exported from the
+  Vercel subpath.
+- Direct fixtures prove every reason decodes through its owner error Schema.
+  Existing Alchemy entrypoints and Preview drift composition are unchanged;
+  no service, Layer, generic error module, helper bucket, provider operation or
+  deployment was added.
+- `bundjil/no-primitive-effect-failure` now rejects literal primitive
+  `Effect.fail`, `Effect.failSync`, and `Effect.mapError` construction across
+  app service/package source. Unit and installed-Oxlint negative fixtures prove
+  namespace, direct-import, alias, static-template and `as const` forms. The
+  separately inventoried operator scripts remain outside this scope until the
+  next owner-specific migration task.
+- Installed `effect@4.0.0-beta.101` is the API authority; retained v4 comparison
+  revision is `1caab3cc30f626efbf15e59d74f539a487e5c85c`. Focused lint,
+  authority-loader tests, infrastructure typecheck/build and Effect language
+  service pass. The first full run exposed a test-only current-directory
+  dependency and absent synthetic Executor environment; the fixture now uses
+  `package.json`, which exists under both root and package test execution, and
+  the corrected run used the same public synthetic values as CI.
+- The corrected `bun run verification` candidate passes with zero Turbo cache
+  hits: 136 boundary tests, 12 lint tests, all 9 package typechecks, all 15
+  package build/test tasks, 87 infrastructure Vitest tests and 21 Alchemy/Bun
+  lifecycle tests. Hosted CI identity is recorded only after push.
+- Documentation impact: authority source/export/tests, lint plugin/config/
+  fixtures, Effect/testing architecture, infrastructure README, Effect
+  SPEC/task and both active plans **Change required**. Alchemy topology,
+  provider behavior, runbooks, authority/control records, critical journeys,
+  credentials and external state **Preserve**. Frontend, browser,
+  accessibility, release, deployment and publication are **N/A**.
 
 ## Evidence and non-claims
 

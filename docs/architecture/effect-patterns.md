@@ -474,6 +474,13 @@ export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchem
 
 Rules:
 
+- Production service/source Effects must not fail with primitive values. Use
+  an owner-named tagged error so callers can match a closed vocabulary and the
+  boundary can be Schema encoded. `bundjil/no-primitive-effect-failure`
+  rejects direct primitive `Effect.fail`, `Effect.failSync`, and
+  `Effect.mapError` constructions in the approved production-source scope.
+  Operator scripts are migrated and admitted separately because their
+  process-exit and receipt contracts are different owners.
 - An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.

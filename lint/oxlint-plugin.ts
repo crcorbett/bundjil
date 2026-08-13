@@ -1,8 +1,11 @@
 interface AstNode {
+  readonly argument?: AstNode;
   readonly arguments?: readonly AstNode[];
   readonly async?: boolean;
+  readonly body?: AstNode | readonly AstNode[];
   readonly callee?: AstNode;
   readonly computed?: boolean;
+  readonly expressions?: readonly AstNode[];
   readonly expression?: AstNode;
   readonly id?: AstNode | null;
   readonly imported?: AstNode;
@@ -10,6 +13,7 @@ interface AstNode {
   readonly local?: AstNode;
   readonly name?: string;
   readonly object?: AstNode;
+  readonly operator?: string;
   readonly parent?: AstNode | null;
   readonly params?: readonly AstNode[];
   readonly property?: AstNode;
@@ -85,6 +89,77 @@ const isFunctionNode = (node: AstNode | undefined) =>
   node?.type === "ArrowFunctionExpression" ||
   node?.type === "FunctionDeclaration" ||
   node?.type === "FunctionExpression";
+
+const unwrapExpression = (node: AstNode | undefined): AstNode | undefined => {
+  let current = node;
+  while (
+    current !== undefined &&
+    (current.type === "ChainExpression" ||
+      current.type === "ParenthesizedExpression" ||
+      current.type === "TSAsExpression" ||
+      current.type === "TSNonNullExpression" ||
+      current.type === "TSTypeAssertion")
+  ) {
+    current = current.expression;
+  }
+  return current;
+};
+
+const isPrimitiveExpression = (node: AstNode | undefined): boolean => {
+  const expression = unwrapExpression(node);
+  if (expression?.type === "Literal") {
+    return (
+      expression.value === null ||
+      typeof expression.value === "string" ||
+      typeof expression.value === "number" ||
+      typeof expression.value === "boolean" ||
+      typeof expression.value === "bigint"
+    );
+  }
+  if (expression?.type === "TemplateLiteral") {
+    return true;
+  }
+  if (expression?.type === "Identifier" && expression.name === "undefined") {
+    return true;
+  }
+  return (
+    expression?.type === "UnaryExpression" &&
+    expression.operator !== "delete" &&
+    (expression.operator === "!" ||
+      expression.operator === "void" ||
+      isPrimitiveExpression(expression.argument))
+  );
+};
+
+const isAstNodeArray = (
+  value: AstNode | readonly AstNode[] | undefined
+): value is readonly AstNode[] => Array.isArray(value);
+
+const returnsPrimitiveExpression = (node: AstNode | undefined): boolean => {
+  const callback = unwrapExpression(node);
+  if (
+    callback?.type !== "ArrowFunctionExpression" &&
+    callback?.type !== "FunctionExpression"
+  ) {
+    return false;
+  }
+  const { body } = callback;
+  if (isAstNodeArray(body)) {
+    return false;
+  }
+  if (body?.type !== "BlockStatement") {
+    return isPrimitiveExpression(body);
+  }
+  const statements = body.body;
+  return (
+    isAstNodeArray(statements) &&
+    statements.some(
+      (statement) =>
+        statement.type === "ReturnStatement" &&
+        isPrimitiveExpression(statement.argument)
+    )
+  );
+};
 
 const createEffectTracker = () => {
   const namespaces = new Map<string, "Effect" | "ManagedRuntime">();
@@ -602,6 +677,43 @@ export const requireTryPromiseCatchRule = {
   },
 };
 
+export const noPrimitiveEffectFailureRule = {
+  create(context: RuleContext) {
+    const tracker = createEffectTracker();
+    return {
+      CallExpression(node: AstNode) {
+        const method = tracker.referenceName(node.callee);
+        const argument = node.arguments?.[0];
+        if (
+          (method === "Effect.fail" && isPrimitiveExpression(argument)) ||
+          (method === "Effect.failSync" &&
+            returnsPrimitiveExpression(argument)) ||
+          (method === "Effect.mapError" && returnsPrimitiveExpression(argument))
+        ) {
+          context.report({
+            messageId: "noPrimitiveFailure",
+            node: node.callee ?? node,
+          });
+        }
+      },
+      ImportDeclaration(node: AstNode) {
+        tracker.importDeclaration(node);
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Require owner-named typed failures instead of primitive Effect error values.",
+    },
+    messages: {
+      noPrimitiveFailure:
+        "Fail with an owner-named tagged error; primitive Effect error values cannot form a closed, matchable boundary.",
+    },
+    type: "problem",
+  },
+};
+
 const runtimeMethodNames = new Set([
   "Effect.runFork",
   "Effect.runPromise",
@@ -698,6 +810,7 @@ export default {
   rules: {
     "no-ambient-time-in-effect": noAmbientTimeInEffectRule,
     "no-async-await-in-effect-service": noAsyncAwaitInEffectServiceRule,
+    "no-primitive-effect-failure": noPrimitiveEffectFailureRule,
     "no-runtime-execution-outside-boundary":
       noRuntimeExecutionOutsideBoundaryRule,
     "require-try-promise-catch": requireTryPromiseCatchRule,

@@ -9,3 +9,5 @@ export const bareAttempt = Effect.tryPromise(() =>
 );
 
 Effect.runPromise(Effect.void);
+
+Effect.fail("primitive-failure");

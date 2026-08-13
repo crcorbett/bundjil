@@ -54,6 +54,7 @@ describe("installed Bundjil Oxlint plugin", () => {
     for (const rule of [
       "bundjil(no-ambient-time-in-effect)",
       "bundjil(no-async-await-in-effect-service)",
+      "bundjil(no-primitive-effect-failure)",
       "bundjil(no-runtime-execution-outside-boundary)",
       "bundjil(require-try-promise-catch)",
     ]) {

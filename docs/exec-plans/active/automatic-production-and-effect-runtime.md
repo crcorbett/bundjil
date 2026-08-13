@@ -96,7 +96,9 @@ proof, fixtures, SPEC/tasks, this plan and lifecycle as `Change required`,
 - Installed runtime authority is Effect and `@effect/vitest` beta.101, Oxlint
   `1.61.0`, Effect language service `0.86.6` and Eve `0.29.5`; Site comparison
   is read-only `origin/main@dd5d015`.
-- Accepted rule set remains exactly four. Ambient time has two runtime owners:
+- The accepted baseline contains exactly four rules. Later iterative findings
+  require their own migration and recurrence proof before extending it.
+  Ambient time has two runtime owners:
   Photon candidate inventory migrates to Effect Clock, while the drift CLI's
   elapsed wall-time receipt remains an exact process-boundary exception.
   Effect-clock-owned Codex/proxy tests migrate to fixed/TestClock epochs;
@@ -502,6 +504,32 @@ by this repository slice.
   runbook, both SPEC/task ledgers and both active plans **Change required**.
   Current external custody, provider state, Production, channels, READMEs,
   frontend, release and publication **Preserve** or are **N/A**.
+
+## Public authority failure correction
+
+The iterative Effect audit closed raw Config, filesystem, parser, Schema, and
+primitive-string failures from the two public Vercel authority loaders. Each
+loader now exposes one owner-named Schema tagged error with three bounded
+reasons, and the Vercel subpath exports its complete contract. A fifth
+Effect-native lint rule rejects direct primitive failures in production
+service/package source with unit and installed-plugin proof. Existing Alchemy
+composition and provider behavior are unchanged. Operator scripts remain a
+separate pending owner-specific migration; no provider operation, credential,
+deployment, channel send, or external-state claim occurred.
+
+The corrected synthetic-Executor `bun run verification` candidate passes with
+zero Turbo cache hits: 136 boundary tests, 12 lint tests, all 9 package
+typechecks, all 15 package build/test tasks, 87 infrastructure Vitest tests and
+21 Alchemy/Bun lifecycle tests. The first attempt exposed and corrected only a
+test-fixture working-directory assumption; it did not reveal a runtime or
+provider behavior change.
+
+Documentation impact: code/export/tests, lint control, Effect/testing
+architecture, infrastructure README, Effect SPEC/task and both active plans
+**Change required**. Production workflow, authority/control registers,
+runbooks, critical journeys, provider state, credentials and rollback
+identities **Preserve**. Frontend, browser, accessibility, release and
+publication are **N/A**.
 
 ## Commit and integration ledger
 

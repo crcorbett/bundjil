@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   noAmbientTimeInEffectRule,
   noAsyncAwaitInEffectServiceRule,
+  noPrimitiveEffectFailureRule,
   noRuntimeExecutionOutsideBoundaryRule,
   requireTryPromiseCatchRule,
   taggedErrorNameRule,
@@ -187,6 +188,58 @@ describe("bundjil/require-try-promise-catch", () => {
             {
               code: "import { tryPromise as attempt } from 'effect/Effect'; attempt({ try: () => fetch('/') });",
               errors: [{ messageId: "requireCatch" }],
+            },
+          ],
+        }
+      );
+    }).not.toThrow();
+  });
+});
+
+describe("bundjil/no-primitive-effect-failure", () => {
+  it("requires owner-named values in Effect failure channels", () => {
+    expect(() => {
+      makeRuleTester().run(
+        "no-primitive-effect-failure",
+        noPrimitiveEffectFailureRule,
+        {
+          valid: [
+            "import { Effect } from 'effect'; Effect.fail(new ExampleError());",
+            "import { fail as reject } from 'effect/Effect'; reject(new ExampleError());",
+            "import { Effect } from 'effect'; Effect.mapError(() => new ExampleError());",
+            "const fail = (value: unknown) => value; fail('unrelated');",
+          ],
+          invalid: [
+            {
+              code: "import { Effect } from 'effect'; Effect.fail('invalid');",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code: "import { fail as reject } from 'effect/Effect'; reject(42);",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code: "import { Effect as Fx } from 'effect'; Fx.failSync(() => `invalid`);",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code:
+                "import { Effect } from 'effect'; Effect.fail(`invalid-" +
+                "$" +
+                "{reason}`);",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code: "import { Effect } from 'effect'; Effect.fail(undefined);",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code: "import { mapError as classify } from 'effect/Effect'; classify(() => ('invalid' as const));",
+              errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+            {
+              code: "import { Effect } from 'effect'; Effect.mapError(function () { return false; });",
+              errors: [{ messageId: "noPrimitiveFailure" }],
             },
           ],
         }

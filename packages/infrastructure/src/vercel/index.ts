@@ -1,5 +1,9 @@
 export {
   loadVercelStableEnvironmentAuthority,
+  VercelStableEnvironmentAuthorityError,
+  type VercelStableEnvironmentAuthorityErrorEncoded,
+  VercelStableEnvironmentAuthorityFailureReason,
+  type VercelStableEnvironmentAuthorityFailureReasonEncoded,
   VercelStableEnvironmentAuthorityPath,
   type VercelStableEnvironmentAuthorityPathEncoded,
 } from "./stable-environment-authority.js";
@@ -62,6 +66,10 @@ export {
 } from "./configuration-providers.js";
 export {
   loadVercelPreviewConfigurationInput,
+  VercelPreviewConfigurationAuthorityError,
+  type VercelPreviewConfigurationAuthorityErrorEncoded,
+  VercelPreviewConfigurationAuthorityFailureReason,
+  type VercelPreviewConfigurationAuthorityFailureReasonEncoded,
   VercelPreviewConfigurationAuthorityPath,
   type VercelPreviewConfigurationAuthorityPathEncoded,
   VercelPreviewConfigurationInput,

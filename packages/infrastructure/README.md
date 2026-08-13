@@ -12,7 +12,10 @@ receipts, and retained custom Resources.
   provider capabilities.
 - `@bundjil/infrastructure/testing` — decoded deterministic test fixtures.
 - `@bundjil/infrastructure/vercel` — Vercel-owned Schemas, identities,
-  services, safe errors, and explicit read/write-capability Layers.
+  services, safe errors, and explicit read/write-capability Layers. Preview
+  configuration and stable-environment authority loaders expose only their
+  owner-named authority error and bounded reason Schema; raw Config,
+  filesystem, parser, and primitive-string failures remain private.
 - `@bundjil/infrastructure/photon` — retained Photon observation Resources and
   the separately composed Preview webhook-binding capability.
 

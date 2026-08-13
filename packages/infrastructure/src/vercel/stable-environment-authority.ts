@@ -1,3 +1,4 @@
+/* oxlint-disable promise/prefer-await-to-callbacks -- Effect callbacks preserve the typed error channel without Promise escape. */
 import { isAbsolute } from "node:path";
 
 import { Ajv2020 } from "ajv/dist/2020.js";
@@ -29,6 +30,23 @@ export type VercelStableEnvironmentAuthorityPath =
 export type VercelStableEnvironmentAuthorityPathEncoded =
   typeof VercelStableEnvironmentAuthorityPath.Encoded;
 
+export const VercelStableEnvironmentAuthorityFailureReason = Schema.Literals([
+  "configurationInvalid",
+  "authorityUnreadable",
+  "authorityInvalid",
+]);
+export type VercelStableEnvironmentAuthorityFailureReason =
+  typeof VercelStableEnvironmentAuthorityFailureReason.Type;
+export type VercelStableEnvironmentAuthorityFailureReasonEncoded =
+  typeof VercelStableEnvironmentAuthorityFailureReason.Encoded;
+
+export class VercelStableEnvironmentAuthorityError extends Schema.TaggedErrorClass<VercelStableEnvironmentAuthorityError>()(
+  "VercelStableEnvironmentAuthorityError",
+  { reason: VercelStableEnvironmentAuthorityFailureReason }
+) {}
+export type VercelStableEnvironmentAuthorityErrorEncoded =
+  typeof VercelStableEnvironmentAuthorityError.Encoded;
+
 const authorityPathConfig = Config.schema(
   VercelStableEnvironmentAuthorityPath,
   "BUNDJIL_STABLE_ENVIRONMENT_AUTHORITY_PATH"
@@ -43,14 +61,37 @@ export const loadVercelStableEnvironmentAuthority = Effect.gen(
     const path = yield* authorityPathConfig;
     const stage = yield* stageConfig;
     const fileSystem = yield* FileSystem.FileSystem;
-    const metadata = yield* fileSystem.stat(path);
+    const metadata = yield* fileSystem.stat(path).pipe(
+      Effect.mapError(
+        () =>
+          new VercelStableEnvironmentAuthorityError({
+            reason: "authorityUnreadable",
+          })
+      )
+    );
     if (metadata.mode % 0o1000 !== 0o600 || metadata.size > 64n * 1024n) {
-      return yield* Effect.fail("stable-environment-authority-invalid");
+      return yield* new VercelStableEnvironmentAuthorityError({
+        reason: "authorityInvalid",
+      });
     }
-    const text = yield* fileSystem.readFileString(path);
+    const text = yield* fileSystem.readFileString(path).pipe(
+      Effect.mapError(
+        () =>
+          new VercelStableEnvironmentAuthorityError({
+            reason: "authorityUnreadable",
+          })
+      )
+    );
     const authority = yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(Schema.Unknown)
-    )(text);
+    )(text).pipe(
+      Effect.mapError(
+        () =>
+          new VercelStableEnvironmentAuthorityError({
+            reason: "authorityInvalid",
+          })
+      )
+    );
     const options = {
       allErrors: true,
       strict: false,
@@ -66,8 +107,19 @@ export const loadVercelStableEnvironmentAuthority = Effect.gen(
         )
       )(authority)
     ) {
-      return yield* Effect.fail("stable-environment-authority-invalid");
+      return yield* new VercelStableEnvironmentAuthorityError({
+        reason: "authorityInvalid",
+      });
     }
     return path;
   }
-).pipe(Effect.withSpan("VercelStableEnvironmentAuthority.load"));
+).pipe(
+  Effect.mapError((error) =>
+    Schema.is(VercelStableEnvironmentAuthorityError)(error)
+      ? error
+      : new VercelStableEnvironmentAuthorityError({
+          reason: "configurationInvalid",
+        })
+  ),
+  Effect.withSpan("VercelStableEnvironmentAuthority.load")
+);
