@@ -729,6 +729,11 @@ verification` gate passes with all nine package typechecks and all fifteen
   passes with the documented synthetic Executor fixture; that is repository
   contract evidence only, not live provider proof. No external mutation
   occurred.
+- GitHub CI run `31670943481` passed for implementation commit
+  `cf58ef5822baa8426363745b40e7c6aa873f04aa`. Same-source drift run
+  `31670943452` failed before report execution because all three protected
+  custody artifacts were empty; this is the expected external gate, not hosted
+  drift proof.
 - Documentation impact: Vercel contracts/Layers/exports, drift composition,
   active SPEC/tasks/plans, runbook, README and authority/control owners
   **Change required**. Other provider/runtime/channel/package behavior

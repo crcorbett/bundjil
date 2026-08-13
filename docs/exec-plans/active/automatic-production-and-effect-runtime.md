@@ -787,6 +787,14 @@ completed successfully. The fixture proves repository integration contracts;
 it is not a live Personal Executor, Vercel, Photon, R2, deployment, or channel
 proof.
 
+GitHub CI run `31670943481` independently passed build and verification for
+implementation commit `cf58ef5822baa8426363745b40e7c6aa873f04aa`. The
+same-source Infrastructure Drift run `31670943452` failed closed in `Prepare
+bounded read-only custody`: all three protected inputs were empty and the
+report step was skipped. This confirms the documented missing-custody gate; it
+does not prove project-token enforcement, provider reads, drift classification,
+or Preview state.
+
 Documentation impact: Vercel Schema/error/service/Layer exports, stable stack,
 drift entrypoint, Alchemy runbook, infrastructure README, active SPEC/tasks,
 authority/control/automation registers and both active plans **Change
