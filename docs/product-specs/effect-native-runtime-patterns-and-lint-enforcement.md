@@ -766,6 +766,24 @@ real-entrypoint missing-configuration fixtures now prevent the original false
 green. No provider transport, state read, mutation, credential change,
 deployment, or channel operation is part of this proof.
 
+### Preview drift command output correction
+
+A subsequent real-entrypoint probe found that the Preview configuration drift
+command was the only infrastructure operator command whose negative fixture
+asserted merely a nonzero exit. Missing authority flowed into
+`BunRuntime.runMain`, whose installed Effect v4 reporter printed the tagged
+authority error, absolute source paths, and stack frames. The operation now
+returns a small Schema-owned completion receipt, while one final `Effect.exit`
+captures authority, Config, Layer, provider operation, readback, and receipt
+encoding. The process adapter Schema-encodes either that receipt or one fixed
+blocked result and owns exit code 1.
+
+The real missing-authority fixture now rejects the raw error tag,
+`ConfigError`, stack markers, and repository path. It does not invoke Vercel or
+prove the success branch, provider mutation, Preview state, deployment, or
+hosted behavior. No helper, service, shared receipt module, provider operation,
+authority change, or runtime wrapper was added.
+
 ## Docs-maintainer impact ledger
 
 | Surface                          | Decision                            | Earliest owner, future action, proof, and non-claim                                                                                                                                                                                                                                                     |

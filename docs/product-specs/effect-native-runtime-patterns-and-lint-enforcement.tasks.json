@@ -998,10 +998,47 @@
       ]
     },
     {
+      "id": "close-preview-drift-command-boundary",
+      "title": "Close Preview drift command output boundary",
+      "status": "completed",
+      "dependsOn": ["close-operator-layer-acquisition-boundary"],
+      "description": "Correct the post-task finding that the mutating Preview configuration drift command delegated expected failures to BunRuntime.runMain and emitted raw Effect errors with absolute source paths.",
+      "implementationNotes": [
+        "Preserve the existing precondition, one-write and readback semantics; change only the final process output boundary.",
+        "Return one small Schema-owned success receipt from the operation and encode it only at the final adapter.",
+        "Use Effect.exit around the fully provided command so authority, Config, Layer, provider and receipt-encoding failures collapse to one secret-negative blocked result and exit code 1.",
+        "Do not add a helper, service, shared receipt module, raw Cause renderer, provider call, authority change or deployment."
+      ],
+      "proofContract": {
+        "directObservable": "The real command with missing Preview authority emits exactly one bounded blocked JSON result and no stack trace, absolute path, raw tagged error or ConfigError.",
+        "expectedPostcondition": "Every infrastructure operator entrypoint now owns a bounded final process adapter while the Preview drift operation retains its existing mutation and readback sequence.",
+        "falseGreenRejected": "A nonzero-only subprocess assertion, BunRuntime default logging, a foreground-only catch, or a synthetic unit path that does not execute the real entrypoint.",
+        "focusedCommandOrProcedureOwner": "Preview drift real-entrypoint fixture, infrastructure typecheck/tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Preview drift command output correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not invoke Vercel, mutate Preview configuration, validate provider output, deploy or establish hosted behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The Preview drift operation preserves its precondition, one mutation and readback sequence, returns one small Schema-owned completion receipt, and no longer delegates expected failure to BunRuntime.runMain.",
+        "boundary": "One final Effect.exit captures the fully provided command and Effectful Schema receipt encoding. The process adapter emits only Schema-encoded completed or blocked JSON and owns exit code 1.",
+        "oracle": "The real missing-authority Bun entrypoint exits 1 with exactly the bounded blocked classification and rejects the raw authority tag, ConfigError, stack marker and repository-absolute path without provider transport.",
+        "focused": "Infrastructure typecheck, Effect language service, boundary audit, focused formatting/lint and the two-test real operator-command subprocess suite pass.",
+        "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine typechecks, 89 infrastructure Vitest tests, 21 Alchemy/Bun lifecycle tests and all 15 package build/test tasks.",
+        "corrections": "The first repository gate rejected a synchronous Schema fallback encoder. The process edge now uses Schema.encodeEffect; only its statically valid blocked literal converts an impossible encoding failure to a defect after command failure has already been collapsed.",
+        "nonClaims": "No Vercel request, Preview read/write, provider mutation, authority or credential change, deployment, channel send, hosted proof or Production behavior occurred."
+      },
+      "completionCriteria": [
+        "The fully provided command and receipt encoding are captured by one final Effect.exit boundary.",
+        "Success and blocked output are Schema encoded and secret-negative.",
+        "The real missing-authority entrypoint oracle rejects raw runtime diagnostics.",
+        "Focused checks, full verification and git diff --check pass."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-operator-layer-acquisition-boundary"],
+      "dependsOn": ["close-preview-drift-command-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

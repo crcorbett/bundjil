@@ -603,6 +603,32 @@ state, credentials, authority, runbooks, journeys, deployments and channels
 **Preserve**. Frontend, browser, accessibility, release and publication are
 **N/A**.
 
+## Preview drift command output correction
+
+The final command-boundary review found one weakened oracle: the Preview
+configuration drift fixture asserted only nonzero exit. Missing authority
+therefore reached `BunRuntime.runMain` and printed the raw tagged error,
+absolute source paths and stack frames. The command's precondition, one-write
+and readback behavior are unchanged. Its fully provided operation and
+Schema-owned receipt encoding now run inside one final `Effect.exit`; the
+process edge emits only a Schema-encoded completed or blocked result.
+
+The real missing-authority fixture requires the blocked result and rejects the
+raw error tag, `ConfigError`, stack markers and repository path. It performs no
+provider request or mutation. The first root boundary gate rejected a
+synchronous Schema fallback encoder, so both completion and blocked output now
+use `Schema.encodeEffect`. The final public-synthetic-Executor
+`bun run verification` candidate passes with zero Turbo cache hits: 136
+boundary tests, 14 lint tests, all nine typechecks, 89 infrastructure Vitest
+tests, 21 Alchemy/Bun lifecycle tests and all 15 package build/test tasks.
+
+Documentation impact: Preview drift
+script/test, Effect/testing architecture, infrastructure README, Effect
+SPEC/task and both active plans **Change required**. Provider state,
+credentials, authority, runbooks, journeys, deployments and channels
+**Preserve**. Frontend, browser, accessibility, release and publication are
+**N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

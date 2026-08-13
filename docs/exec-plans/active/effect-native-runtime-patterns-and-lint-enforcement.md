@@ -644,6 +644,37 @@ verification` gate passes with all nine package typechecks and all fifteen
   hosted values were empty; provider reporting was skipped. This is negative
   custody evidence, not a drift or provider result.
 
+## 2026-08-13 Preview drift command output correction
+
+- The final infrastructure command fixture previously accepted any nonzero
+  Preview drift exit. A direct missing-authority probe therefore exposed a raw
+  Effect reporter trace containing the authority error tag, absolute source
+  paths and stack frames without failing repository verification.
+- The command keeps its existing precondition, single mutation, and readback
+  sequence. Its operation now returns a small Schema-owned completion receipt;
+  one final `Effect.exit` captures the fully provided command and receipt
+  encoding, then emits only Schema-encoded completed or blocked JSON.
+- The real-entrypoint fixture requires `{"status":"blocked"}` and rejects the
+  raw tag, `ConfigError`, stack markers and repository path. It runs without
+  provider transport.
+- The first root boundary gate rejected a synchronous Schema fallback encoder;
+  both completion and blocked process results now use `Schema.encodeEffect`.
+  Focused typecheck, Effect diagnostics, boundary audit and the two-test real
+  subprocess suite pass.
+- Installed `effect@4.0.0-beta.101` remains the execution authority; its
+  `BunRuntime.runMain` source documents default error reporting, while the
+  retained v4 comparison revision remains
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+- Documentation impact: Preview drift script/test, Effect/testing architecture,
+  infrastructure README, SPEC/task ledger and both active plans **Change
+  required**. Provider state, credentials, authority, runbooks, journeys,
+  deployments and channels **Preserve**. Frontend, browser, accessibility,
+  release and publication are **N/A**.
+- The final public-synthetic-Executor `bun run verification` candidate passes
+  with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
+  typechecks, 89 infrastructure Vitest tests, 21 Alchemy/Bun lifecycle tests
+  and all 15 package build/test tasks.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

@@ -30,7 +30,10 @@ script in `scripts/`. Reusable live Layers retain typed construction failures;
 commands provide their runtime inside the final catch/exit boundary, and root
 lint rejects `Layer.orDie` in package source and infrastructure scripts.
 Subprocess fixtures exercise deterministic foreground stops and missing Layer
-configuration without provider transport or raw Cause output.
+configuration without provider transport or raw Cause output. Mutating
+commands capture authority, configuration, runtime acquisition, foreground
+work, readback, and Schema receipt encoding in that boundary; expected failure
+must not fall through to a runtime stack reporter.
 
 ## Supported commands
 

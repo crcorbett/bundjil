@@ -579,6 +579,12 @@ Live and mock layers should be explicit:
 - Keep `Layer.orDie` out of reusable live Layers. A CLI provides its runtime
   inside its final error/exit boundary; otherwise Layer acquisition can bypass
   the command's typed failure vocabulary and leak a raw runtime Cause.
+- A mutating operator CLI must also capture authority, Config, Layer,
+  foreground operation, readback, and receipt encoding in that final
+  `Effect.exit` boundary. Do not pass expected failure directly to
+  `BunRuntime.runMain`: its default reporter can expose error tags, source
+  paths, and stack frames. Schema-encode one bounded success or blocked result
+  at the process edge and keep the underlying typed errors private.
 - Child processes are scoped platform resources. A live Layer captures the
   installed Effect `ChildProcessSpawner`, models argv and environment overrides
   explicitly, consumes bounded output through `Stream`, and maps platform

@@ -102,6 +102,13 @@ describe("infrastructure operator command boundaries", () => {
         }
       );
       expect(previewConfiguration.exitCode).not.toBe(0);
+      expect(previewConfiguration.output.trim()).toBe('{"status":"blocked"}');
+      expect(previewConfiguration.output).not.toContain(
+        "VercelPreviewConfigurationAuthorityError"
+      );
+      expect(previewConfiguration.output).not.toContain("ConfigError");
+      expect(previewConfiguration.output).not.toContain(packageRoot);
+      expect(previewConfiguration.output).not.toContain("at <anonymous>");
     },
     commandFixtureTimeoutMilliseconds
   );

@@ -77,7 +77,9 @@ reading or mutating provider state. They separately exercise foreground guards
 with synthetic Layer configuration and absent or invalid Layer configuration;
 neither path may expose a raw `ConfigError`, Cause, credential, or provider
 payload. Satisfying configuration is not evidence that a provider transport
-ran.
+ran. Every command case must assert its bounded outward classification rather
+than only a nonzero exit. Mutating-command negative fixtures must additionally
+reject raw tagged-error names, stack frames, and repository-absolute paths.
 
 `bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command
