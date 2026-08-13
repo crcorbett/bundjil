@@ -306,7 +306,14 @@ const inventoryLayer = InfrastructureInventoryLive.pipe(
   Layer.provide(providerLayers)
 );
 
-const main = Effect.exit(runInventory).pipe(
+const runtime = Layer.mergeAll(
+  BunFileSystem.layer,
+  ConfigProvider.layer(ConfigProvider.fromEnv()),
+  providerLayers,
+  inventoryLayer
+);
+
+const main = Effect.exit(runInventory.pipe(Effect.provide(runtime))).pipe(
   Effect.flatMap((exit) =>
     Exit.isSuccess(exit)
       ? Console.log(exit.value)
@@ -317,14 +324,6 @@ const main = Effect.exit(runInventory).pipe(
             })
           )
         )
-  ),
-  Effect.provide(
-    Layer.mergeAll(
-      BunFileSystem.layer,
-      ConfigProvider.layer(ConfigProvider.fromEnv()),
-      providerLayers,
-      inventoryLayer
-    )
   )
 );
 

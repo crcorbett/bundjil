@@ -7,7 +7,7 @@ import {
   loadVercelPreviewConfigurationInput,
 } from "@bundjil/infrastructure/vercel";
 import * as Alchemy from "alchemy";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 
 import { BundjilPreviewVercelConfigurationStack } from "./stacks/preview-vercel-configuration.js";
 
@@ -34,7 +34,9 @@ export default loadVercelPreviewConfigurationInput.pipe(
       "BundjilPreviewConfigurationSpike",
       {
         providers,
-        state: layerAlchemyR2State,
+        // Alchemy.Stack requires an infallible state Layer; retain the defect
+        // conversion only at this framework-owned host edge.
+        state: layerAlchemyR2State.pipe(Layer.orDie),
       },
       BundjilPreviewVercelConfigurationStack(input)
     );

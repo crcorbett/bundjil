@@ -482,6 +482,13 @@ Rules:
   infrastructure operator scripts. A CLI may collapse its owner-tagged error
   to a stable exit code or bounded receipt reason only in the final renderer;
   the Effect program itself must retain the typed error.
+- Fallible live Layers retain their typed construction errors. Provide the
+  complete runtime before the final command `Effect.exit` or catch so Config
+  and acquisition failures reach the same bounded renderer as foreground
+  failures. `bundjil/no-layer-or-die-in-service` rejects `Layer.orDie` in owned
+  service/package source and infrastructure scripts. A defect conversion is
+  allowed only at an exact host-framework edge whose API requires an
+  infallible Layer, with that constraint documented beside the composition.
 - An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.
@@ -569,6 +576,9 @@ Live and mock layers should be explicit:
   on hidden globals.
 - Provider SDK clients must be wrapped behind services before domain logic uses
   them.
+- Keep `Layer.orDie` out of reusable live Layers. A CLI provides its runtime
+  inside its final error/exit boundary; otherwise Layer acquisition can bypass
+  the command's typed failure vocabulary and leak a raw runtime Cause.
 - Child processes are scoped platform resources. A live Layer captures the
   installed Effect `ChildProcessSpawner`, models argv and environment overrides
   explicitly, consumes bounded output through `Stream`, and maps platform

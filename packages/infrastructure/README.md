@@ -26,8 +26,11 @@ Infrastructure operator programs keep owner-local Schema tagged errors until
 their final process adapter. That adapter alone may render the stable bounded
 status/reason and set the documented exit code. Root lint rejects primitive
 `Effect.fail`, `Effect.failSync`, and `Effect.mapError` values across every
-script in `scripts/`; subprocess fixtures exercise deterministic stops before
-provider transport composition.
+script in `scripts/`. Reusable live Layers retain typed construction failures;
+commands provide their runtime inside the final catch/exit boundary, and root
+lint rejects `Layer.orDie` in package source and infrastructure scripts.
+Subprocess fixtures exercise deterministic foreground stops and missing Layer
+configuration without provider transport or raw Cause output.
 
 ## Supported commands
 

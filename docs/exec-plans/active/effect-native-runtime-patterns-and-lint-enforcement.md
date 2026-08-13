@@ -599,6 +599,46 @@ verification` gate passes with all nine package typechecks and all fifteen
   **Preserve**. Frontend, browser, accessibility, release and publication are
   **N/A**.
 
+## 2026-08-13 operator Layer acquisition correction
+
+- A fresh direct command probe removed the synthetic R2 credentials from the
+  prior foreground fixture and reproduced raw `ConfigError` output. The R2
+  live Layer had converted its typed Config failure to a defect with
+  `Layer.orDie`, and adoption/drift command composition installed that Layer
+  outside the final renderer's error boundary.
+- The reusable R2 Layer now retains its typed error. Adoption proof, drift
+  report and inventory compose complete runtimes inside their final catch or
+  `Effect.exit`; missing R2 configuration now emits only the existing bounded
+  `configuration-invalid` or `drift-report-boundary-failed` classification.
+- Alchemy `2.0.0-beta.64` requires its root state input to be
+  `Layer<State, never, StackServices>`. Therefore only the three exact root
+  Alchemy composition files retain documented `Layer.orDie` calls. No shared
+  wrapper or generic runtime helper was introduced.
+- New `bundjil/no-layer-or-die-in-service` unit and installed-Oxlint fixtures
+  protect package/app source and infrastructure scripts. Focused checks pass:
+  14 lint tests, infrastructure typecheck, Effect language service, 89
+  infrastructure Vitest tests and 21 canonical Alchemy/Bun lifecycle tests.
+- Cold verification under concurrent workspace load exposed only integration
+  harness budgets: the eight-entrypoint infrastructure fixture completed in 77
+  seconds after its old 60-second ceiling, and three-subprocess Codex Preview
+  proof cases crossed Vitest's default five seconds. Their explicit harness
+  ceilings are now 120 and 15 seconds respectively; product timeout, retry,
+  interruption and TestClock semantics are unchanged.
+- Installed `effect@4.0.0-beta.101` is the execution authority; its `provide`
+  signature preserves `Layer.Error` in the Effect channel and its `orDie`
+  implementation converts that error to a defect. The retained v4 comparison
+  revision remains `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+- Documentation impact: R2 Layer and exact Alchemy roots, three commands,
+  command/lint tests, lint config, Effect/testing architecture,
+  infrastructure README, SPEC/tasks and both active plans **Change required**.
+  Provider state, credentials, authority, runbooks, critical journeys,
+  deployments and channels **Preserve**. Frontend, browser, accessibility,
+  release and publication are **N/A**.
+- The final public-synthetic-Executor `bun run verification` candidate passes
+  with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
+  typechecks and all 15 package build/test tasks. The Codex Preview subprocess
+  suite passes all 10 tests under its explicit integration budget.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove

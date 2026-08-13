@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 
 Date.now();
 
@@ -11,3 +11,5 @@ export const bareAttempt = Effect.tryPromise(() =>
 Effect.runPromise(Effect.void);
 
 Effect.fail("primitive-failure");
+
+Layer.orDie(Layer.empty);

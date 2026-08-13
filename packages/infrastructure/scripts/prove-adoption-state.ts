@@ -567,7 +567,20 @@ const runAdoptionStateProof = Effect.gen(
   }
 );
 
+const runtime = Layer.mergeAll(
+  layerAlchemyR2State,
+  BunFileSystem.layer,
+  ConfigProvider.layer(ConfigProvider.fromEnv())
+);
+
 const main = runAdoptionStateProof.pipe(
+  Effect.provide(runtime),
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-callbacks -- Effect.mapError translates the Effect error channel, not a Promise callback. */
+  Effect.mapError((error) =>
+    Schema.is(AdoptionProofError)(error)
+      ? error
+      : new AdoptionProofError({ reason: "configuration-invalid" })
+  ),
   Effect.flatMap(Console.log),
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
   Effect.catch((error) =>
@@ -582,13 +595,6 @@ const main = runAdoptionStateProof.pipe(
           process.exitCode = 1;
         })
       )
-    )
-  ),
-  Effect.provide(
-    Layer.mergeAll(
-      layerAlchemyR2State,
-      BunFileSystem.layer,
-      ConfigProvider.layer(ConfigProvider.fromEnv())
     )
   )
 );

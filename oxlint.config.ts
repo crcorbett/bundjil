@@ -49,6 +49,7 @@ export default defineConfig({
       ],
       rules: {
         "bundjil/no-async-await-in-effect-service": "error",
+        "bundjil/no-layer-or-die-in-service": "error",
         "bundjil/no-primitive-effect-failure": "error",
       },
     },
@@ -60,6 +61,7 @@ export default defineConfig({
         "packages/infrastructure/scripts/**/*.cts",
       ],
       rules: {
+        "bundjil/no-layer-or-die-in-service": "error",
         "bundjil/no-primitive-effect-failure": "error",
       },
     },

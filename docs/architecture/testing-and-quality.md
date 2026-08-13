@@ -52,8 +52,10 @@ surfaces. `bun run verification` is the standard closeout gate. It runs those
 policy checks, Ultracite, focused repository lint-rule tests, dependency
 hygiene, workspace typechecks, and tests. `bun run check` enables
 `bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
-`tryPromise`, primitive-failure, and runtime-ownership rules for their approved
-app/package and infrastructure-script scopes. `bundjil/tagged-error-name`
+`tryPromise`, primitive-failure, Layer-defect, and runtime-ownership rules for
+their approved app/package and infrastructure-script scopes.
+`bundjil/no-layer-or-die-in-service` rejects import-aware `Layer.orDie` outside
+an exact framework host edge. `bundjil/tagged-error-name`
 rejects any `Schema.TaggedErrorClass` whose
 class declaration, generic self-type, and literal tag do not agree. The four
 original Effect rule IDs plus the later primitive-failure correction and their
@@ -71,9 +73,11 @@ plugin behavior.
 Infrastructure command-boundary fixtures launch the real Bun entrypoints with
 only synthetic configuration and deterministic pre-provider failures. They
 must prove nonzero exit and the existing bounded output classification without
-reading or mutating provider state. Layer acquisition may require synthetic
-configuration before a foreground guard; satisfying that configuration is not
-evidence that a provider transport ran.
+reading or mutating provider state. They separately exercise foreground guards
+with synthetic Layer configuration and absent or invalid Layer configuration;
+neither path may expose a raw `ConfigError`, Cause, credential, or provider
+payload. Satisfying configuration is not evidence that a provider transport
+ran.
 
 `bun run check:verification` validates all current critical-journey records, their
 real command/runbook mappings, every proof-packet template, bounded command

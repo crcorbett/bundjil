@@ -959,10 +959,48 @@
       ]
     },
     {
+      "id": "close-operator-layer-acquisition-boundary",
+      "title": "Close operator Layer acquisition boundary",
+      "status": "completed",
+      "dependsOn": ["close-operator-command-error-channels"],
+      "description": "Correct the post-task finding that fallible R2 Layer acquisition was converted to a defect and installed outside final command renderers, then enforce the reusable-Layer invariant without weakening Alchemy's exact host contract.",
+      "implementationNotes": [
+        "Keep the reusable R2 state Layer fallible and provide complete operator runtimes inside their final catch or Effect.exit boundary.",
+        "Map acquisition failures only to the command owner's existing bounded vocabulary; retain no raw ConfigError, Cause, credential or provider payload.",
+        "Keep Layer.orDie only in the three exact root Alchemy composition files because Alchemy 2.0.0-beta.64 requires Layer<State, never, StackServices>; document that host constraint beside each use.",
+        "Add one import-aware no-layer-or-die-in-service lint rule with direct and installed fixtures rather than a wrapper or broad suppression.",
+        "Exercise the real command entrypoints with absent R2 configuration and preserve provider-free proof. Test harness budgets may reflect process startup under parallel Turbo load but must not change product timing semantics."
+      ],
+      "proofContract": {
+        "directObservable": "Missing R2 configuration produces only the existing bounded adoption/drift classifications, reusable source and scripts contain no Layer.orDie, and the installed lint fixture exposes the stable rule ID.",
+        "expectedPostcondition": "Layer construction failure remains typed through reusable composition and reaches the same final renderer as foreground command failure.",
+        "falseGreenRejected": "Foreground-only command fixtures supplied synthetic Layer credentials, a clean source search ignored defect conversion, or an isolated run hid fixed process-test timeout pressure.",
+        "focusedCommandOrProcedureOwner": "Real infrastructure command subprocess fixtures, lint unit/installed fixtures, infrastructure and Codex proxy tests, Effect setup, docs and root verification",
+        "evidenceOwner": "Operator Layer acquisition correction receipt",
+        "limitationsAndNonClaims": "Repository proof establishes no provider access, state read, deployment, hosted drift, credential, messaging or Production behavior."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "The reusable R2 state Layer retains typed Config failure. Adoption proof, drift report and inventory provide complete runtimes inside their final error/exit boundary. Only the three exact Alchemy root composition files retain documented Layer.orDie calls required by Alchemy's infallible state-Layer type.",
+        "behavior": "Real Bun entrypoint probes with absent R2 configuration emit only configuration-invalid or drift-report-boundary-failed, never raw ConfigError. All eight infrastructure commands retain nonzero bounded foreground behavior without provider transport.",
+        "lint": "bundjil/no-layer-or-die-in-service passes direct namespace/alias fixtures and installed-Oxlint proof; the root scope covers owned app/package source and all infrastructure scripts without a broad suppression or autofix.",
+        "focused": "Infrastructure typecheck, Effect language service, 14 lint tests, 89 infrastructure Vitest tests, 21 canonical Alchemy/Bun lifecycle tests and the 10-test Codex Preview subprocess suite pass.",
+        "repository": "The final public-synthetic-Executor bun run verification candidate passed with zero Turbo cache hits: 136 boundary tests, all nine typechecks and all 15 package build/test tasks.",
+        "corrections": "Cold verification under concurrent workspace load exposed harness ceilings only. The eight-entrypoint command fixture now permits 120 seconds and the Codex Preview subprocess-proof suite 15 seconds; product timeout, retry, interruption and Effect Clock behavior are unchanged.",
+        "nonClaims": "No provider request, state read/write, infrastructure mutation, authority or credential change, deployment, hosted drift, channel send or Production proof occurred."
+      },
+      "completionCriteria": [
+        "Reusable R2 state composition preserves its typed Config error and exact Alchemy roots alone retain documented defect conversion.",
+        "Adoption, drift and inventory runtimes are inside their final error or exit boundary.",
+        "Real missing-configuration probes remain bounded and secret-negative without provider transport.",
+        "Direct and installed lint proof, focused checks, full repository verification and git diff --check pass."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
       "status": "pending",
-      "dependsOn": ["close-operator-command-error-channels"],
+      "dependsOn": ["close-operator-layer-acquisition-boundary"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],

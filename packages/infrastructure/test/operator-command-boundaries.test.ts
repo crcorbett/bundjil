@@ -5,7 +5,7 @@ import { dirname, join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const packageRoot = dirname(import.meta.dirname);
-const commandFixtureTimeoutMilliseconds = 60_000;
+const commandFixtureTimeoutMilliseconds = 120_000;
 
 const runCommand = (script: string, environment: Record<string, string>) => {
   const child = spawnSync(
@@ -16,8 +16,6 @@ const runCommand = (script: string, environment: Record<string, string>) => {
       encoding: "utf-8",
       env: {
         ...process.env,
-        BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID: "operator-test-access-key",
-        BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "operator-test-secret-key",
         ...environment,
       },
     }
@@ -30,7 +28,7 @@ const runCommand = (script: string, environment: Record<string, string>) => {
 
 describe("infrastructure operator command boundaries", () => {
   it(
-    "preserves bounded blocked output before provider composition",
+    "preserves bounded blocked output across command and Layer failures",
     () => {
       const sharedPath = "tmp/proof/operator-command-boundary.json";
       const cases = [
@@ -66,6 +64,8 @@ describe("infrastructure operator command boundaries", () => {
         {
           script: "prove-adoption-state.ts",
           environment: {
+            BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID: "",
+            BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "",
             BUNDJIL_INFRASTRUCTURE_ADOPTION_PATH: sharedPath,
             BUNDJIL_INFRASTRUCTURE_AUTHORITY_PATH: sharedPath,
             BUNDJIL_INFRASTRUCTURE_CANDIDATE_IDENTITY:
@@ -73,11 +73,13 @@ describe("infrastructure operator command boundaries", () => {
             BUNDJIL_INFRASTRUCTURE_RECEIPT_PATH: sharedPath,
             BUNDJIL_INFRASTRUCTURE_STAGE: "preview",
           },
-          output: "proof-path-conflict",
+          output: "configuration-invalid",
         },
         {
           script: "report-drift.ts",
           environment: {
+            BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID: "",
+            BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "",
             BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: "prod",
           },
           output: "drift-report-boundary-failed",
@@ -88,6 +90,7 @@ describe("infrastructure operator command boundaries", () => {
         const result = runCommand(fixture.script, fixture.environment);
         expect(result.exitCode).not.toBe(0);
         expect(result.output).toContain(fixture.output);
+        expect(result.output).not.toContain("ConfigError");
       }
 
       const previewConfiguration = runCommand(

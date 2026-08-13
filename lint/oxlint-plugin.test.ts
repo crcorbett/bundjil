@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   noAmbientTimeInEffectRule,
   noAsyncAwaitInEffectServiceRule,
+  noLayerOrDieInServiceRule,
   noPrimitiveEffectFailureRule,
   noRuntimeExecutionOutsideBoundaryRule,
   requireTryPromiseCatchRule,
@@ -240,6 +241,37 @@ describe("bundjil/no-primitive-effect-failure", () => {
             {
               code: "import { Effect } from 'effect'; Effect.mapError(function () { return false; });",
               errors: [{ messageId: "noPrimitiveFailure" }],
+            },
+          ],
+        }
+      );
+    }).not.toThrow();
+  });
+});
+
+describe("bundjil/no-layer-or-die-in-service", () => {
+  it("preserves typed Layer construction failures", () => {
+    expect(() => {
+      makeRuleTester().run(
+        "no-layer-or-die-in-service",
+        noLayerOrDieInServiceRule,
+        {
+          valid: [
+            "import { Layer } from 'effect'; Layer.catch(layer, () => fallback);",
+            "const orDie = (value: unknown) => value; orDie(layer);",
+          ],
+          invalid: [
+            {
+              code: "import { Layer } from 'effect'; Layer.orDie(layer);",
+              errors: [{ messageId: "noLayerOrDie" }],
+            },
+            {
+              code: "import { orDie as terminate } from 'effect/Layer'; terminate(layer);",
+              errors: [{ messageId: "noLayerOrDie" }],
+            },
+            {
+              code: "import * as Layers from 'effect/Layer'; Layers.orDie(layer);",
+              errors: [{ messageId: "noLayerOrDie" }],
             },
           ],
         }

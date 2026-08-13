@@ -162,7 +162,7 @@ const returnsPrimitiveExpression = (node: AstNode | undefined): boolean => {
 };
 
 const createEffectTracker = () => {
-  const namespaces = new Map<string, "Effect" | "ManagedRuntime">();
+  const namespaces = new Map<string, "Effect" | "Layer" | "ManagedRuntime">();
   const methods = new Map<string, string>();
 
   return {
@@ -175,7 +175,11 @@ const createEffectTracker = () => {
         }
         if (source === "effect") {
           const imported = importedName(specifier);
-          if (imported === "Effect" || imported === "ManagedRuntime") {
+          if (
+            imported === "Effect" ||
+            imported === "Layer" ||
+            imported === "ManagedRuntime"
+          ) {
             namespaces.set(local, imported);
           }
         } else if (source === "effect/Effect") {
@@ -184,6 +188,13 @@ const createEffectTracker = () => {
             namespaces.set(local, "Effect");
           } else if (imported !== undefined) {
             methods.set(local, `Effect.${imported}`);
+          }
+        } else if (source === "effect/Layer") {
+          const imported = importedName(specifier);
+          if (specifier.type === "ImportNamespaceSpecifier") {
+            namespaces.set(local, "Layer");
+          } else if (imported !== undefined) {
+            methods.set(local, `Layer.${imported}`);
           }
         } else if (source === "effect/ManagedRuntime") {
           const imported = importedName(specifier);
@@ -714,6 +725,36 @@ export const noPrimitiveEffectFailureRule = {
   },
 };
 
+export const noLayerOrDieInServiceRule = {
+  create(context: RuleContext) {
+    const tracker = createEffectTracker();
+    return {
+      CallExpression(node: AstNode) {
+        if (tracker.referenceName(node.callee) === "Layer.orDie") {
+          context.report({
+            messageId: "noLayerOrDie",
+            node: node.callee ?? node,
+          });
+        }
+      },
+      ImportDeclaration(node: AstNode) {
+        tracker.importDeclaration(node);
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Keep fallible Layer acquisition in the typed error channel outside exact host-framework constraints.",
+    },
+    messages: {
+      noLayerOrDie:
+        "Preserve the Layer's typed construction error; Layer.orDie is allowed only at an exact host boundary whose framework contract requires an infallible Layer.",
+    },
+    type: "problem",
+  },
+};
+
 const runtimeMethodNames = new Set([
   "Effect.runFork",
   "Effect.runPromise",
@@ -810,6 +851,7 @@ export default {
   rules: {
     "no-ambient-time-in-effect": noAmbientTimeInEffectRule,
     "no-async-await-in-effect-service": noAsyncAwaitInEffectServiceRule,
+    "no-layer-or-die-in-service": noLayerOrDieInServiceRule,
     "no-primitive-effect-failure": noPrimitiveEffectFailureRule,
     "no-runtime-execution-outside-boundary":
       noRuntimeExecutionOutsideBoundaryRule,

@@ -564,6 +564,39 @@ both active plans **Change required**. Production workflow/provider state,
 runbooks, critical journeys, app behavior and external proof **Preserve**.
 Frontend, browser, accessibility, release and publication are **N/A**.
 
+## Operator Layer acquisition correction
+
+A fresh missing-configuration probe disproved the prior command fixture's
+implicit assumption that supplying synthetic R2 credentials was enough to
+prove the final error boundary. The reusable R2 state Layer used
+`Layer.orDie`, so Config failure became a defect and bypassed the adoption and
+drift renderers. The Layer now retains its typed error, and adoption, drift and
+inventory provide their complete runtimes inside the final catch or
+`Effect.exit` boundary. Missing configuration emits only existing bounded
+classifications.
+
+Alchemy `2.0.0-beta.64` requires an infallible state Layer, so the only retained
+`Layer.orDie` calls are documented in the three exact root Alchemy composition
+files. New import-aware lint and real-entrypoint fixtures prevent defect
+conversion in reusable package/app source and infrastructure scripts. Focused
+proof passes with 14 lint tests, infrastructure typecheck, Effect language
+service, 89 infrastructure Vitest tests and 23 Alchemy/Bun lifecycle tests. No
+provider request, state operation, mutation, deployment or channel send ran.
+Cold verification under concurrent workspace load also corrected only test
+harness ceilings: 120 seconds for the eight real infrastructure entrypoints and
+15 seconds for the Codex Preview subprocess-proof suite. No product timeout,
+retry, interruption or Effect Clock behavior changed.
+The final public-synthetic-Executor `bun run verification` candidate passes
+with zero Turbo cache hits: 136 boundary tests, 14 lint tests, all nine
+typechecks and all 15 package build/test tasks. No provider operation ran.
+
+Documentation impact: R2 Layer/Alchemy root composition, three operator
+commands, command/lint tests, Effect/testing architecture, infrastructure
+README, Effect SPEC/task and both active plans **Change required**. Provider
+state, credentials, authority, runbooks, journeys, deployments and channels
+**Preserve**. Frontend, browser, accessibility, release and publication are
+**N/A**.
+
 ## Commit and integration ledger
 
 - `b4c67b1` — automatic Production workflow, Effect deployment boundary and

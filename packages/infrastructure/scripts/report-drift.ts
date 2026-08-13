@@ -622,7 +622,18 @@ const program = Effect.gen(function* () {
   return summary;
 });
 
+const runtime = Layer.mergeAll(
+  PlatformServices,
+  FetchHttpClient.layer,
+  Layer.provideMerge(AlchemyContextLive, PlatformServices),
+  Layer.succeed(ArtifactStore, createArtifactStore()),
+  selectCli(),
+  layerAlchemyR2State,
+  ConfigProvider.layer(ConfigProvider.fromEnv())
+);
+
 const main = program.pipe(
+  Effect.provide(runtime),
   Effect.flatMap(Console.log),
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
   Effect.catch(() =>
@@ -635,17 +646,6 @@ const main = program.pipe(
           process.exitCode = 2;
         })
       )
-    )
-  ),
-  Effect.provide(
-    Layer.mergeAll(
-      PlatformServices,
-      FetchHttpClient.layer,
-      Layer.provideMerge(AlchemyContextLive, PlatformServices),
-      Layer.succeed(ArtifactStore, createArtifactStore()),
-      selectCli(),
-      layerAlchemyR2State,
-      ConfigProvider.layer(ConfigProvider.fromEnv())
     )
   )
 );
