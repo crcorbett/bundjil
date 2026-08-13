@@ -1,5 +1,13 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Exit, Inspectable, Layer, Redacted, Schema } from "effect";
+import {
+  ConfigProvider,
+  Effect,
+  Exit,
+  Inspectable,
+  Layer,
+  Redacted,
+  Schema,
+} from "effect";
 import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
@@ -22,6 +30,8 @@ import {
   VercelLive,
   VercelMarketplaceBindings,
   VercelMemoryControl,
+  VercelProjectCredentialsLive,
+  VercelProjectId,
   VercelProjects,
   VercelReadOnlyInventory,
   VercelTeamId,
@@ -277,11 +287,153 @@ const liveLayer = (client: HttpClient.HttpClient) =>
         Layer.succeed(HttpClient.HttpClient, client),
         Layer.succeed(
           VercelCredentials,
-          Effect.succeed(Redacted.make("vercel-token-sentinel"))
+          VercelCredentials.of({
+            accessToken: () =>
+              Effect.succeed(Redacted.make("vercel-token-sentinel")),
+          })
         )
       )
     )
   );
+
+it.effect(
+  "routes project-scoped credentials by branded project ID and rejects team-wide access",
+  () => {
+    const config = ConfigProvider.fromUnknown({
+      BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
+        '[{"projectId":"prj-agent","accessToken":"agent-token-sentinel"},{"projectId":"prj-proxy","accessToken":"proxy-token-sentinel"}]',
+    });
+    return Effect.gen(function* testProjectScopedCredentials() {
+      const credentials = yield* VercelCredentials;
+      const agentToken = yield* credentials.accessToken({
+        _tag: "Project",
+        projectId: VercelProjectId.make("prj-agent"),
+      });
+      const proxyToken = yield* credentials.accessToken({
+        _tag: "Project",
+        projectId: VercelProjectId.make("prj-proxy"),
+      });
+      const unknownProject = yield* credentials
+        .accessToken({
+          _tag: "Project",
+          projectId: VercelProjectId.make("prj-unknown"),
+        })
+        .pipe(Effect.exit);
+      const teamScope = yield* credentials
+        .accessToken({
+          _tag: "Team",
+          teamId: VercelTeamId.make("team-preview"),
+        })
+        .pipe(Effect.exit);
+
+      assert.strictEqual(Redacted.value(agentToken), "agent-token-sentinel");
+      assert.strictEqual(Redacted.value(proxyToken), "proxy-token-sentinel");
+      assert.strictEqual(Exit.isFailure(unknownProject), true);
+      assert.strictEqual(Exit.isFailure(teamScope), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown([unknownProject, teamScope]).includes(
+          "token-sentinel"
+        ),
+        false
+      );
+    }).pipe(
+      Effect.provide(VercelProjectCredentialsLive),
+      Effect.provideService(ConfigProvider.ConfigProvider, config)
+    );
+  }
+);
+
+it.effect(
+  "rejects duplicate project credential bindings without leaking",
+  () => {
+    const config = ConfigProvider.fromUnknown({
+      BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
+        '[{"projectId":"prj-agent","accessToken":"first-token-sentinel"},{"projectId":"prj-agent","accessToken":"second-token-sentinel"}]',
+    });
+    return Effect.gen(function* testDuplicateProjectCredentials() {
+      const credentials = yield* VercelCredentials;
+      const result = yield* credentials
+        .accessToken({
+          _tag: "Project",
+          projectId: VercelProjectId.make("prj-agent"),
+        })
+        .pipe(Effect.exit);
+      assert.strictEqual(Exit.isFailure(result), true);
+      assert.strictEqual(
+        Inspectable.toStringUnknown(result).includes("token-sentinel"),
+        false
+      );
+    }).pipe(
+      Effect.provide(VercelProjectCredentialsLive),
+      Effect.provideService(ConfigProvider.ConfigProvider, config)
+    );
+  }
+);
+
+it.effect(
+  "selects the matching project token at the Vercel HTTP boundary",
+  () => {
+    const config = ConfigProvider.fromUnknown({
+      BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
+        '[{"projectId":"prj-agent","accessToken":"agent-token-sentinel"},{"projectId":"prj-proxy","accessToken":"proxy-token-sentinel"}]',
+    });
+    const client = HttpClient.make((request) =>
+      Effect.sync(() => {
+        const projectId = new URL(request.url).pathname.split("/").at(-1);
+        assert.strictEqual(
+          request.headers["authorization"],
+          projectId === "prj-agent"
+            ? "Bearer agent-token-sentinel"
+            : "Bearer proxy-token-sentinel"
+        );
+        return HttpClientResponse.fromWeb(
+          request,
+          Response.json(
+            {
+              id: projectId,
+              name:
+                projectId === "prj-agent" ? "bundjil-agent" : "bundjil-proxy",
+              framework: null,
+              rootDirectory:
+                projectId === "prj-agent" ? "apps/agent" : "apps/codex-proxy",
+            },
+            { status: 200 }
+          )
+        );
+      })
+    );
+    const projectLayer = VercelLive.pipe(
+      Layer.provide(
+        Layer.merge(
+          Layer.succeed(HttpClient.HttpClient, client),
+          VercelProjectCredentialsLive
+        )
+      )
+    );
+    return Effect.gen(function* testProjectCredentialHttpRouting() {
+      const projects = yield* VercelProjects;
+      const agent = yield* projects.observeProject(
+        ObserveVercelProject.make({
+          stage: "preview",
+          teamId: VercelTeamId.make("team-preview"),
+          projectId: VercelProjectId.make("prj-agent"),
+        })
+      );
+      const proxy = yield* projects.observeProject(
+        ObserveVercelProject.make({
+          stage: "preview",
+          teamId: VercelTeamId.make("team-preview"),
+          projectId: VercelProjectId.make("prj-proxy"),
+        })
+      );
+      assert.strictEqual(agent._tag, "Found");
+      assert.strictEqual(proxy._tag, "Found");
+    }).pipe(
+      Effect.provide(projectLayer),
+      Effect.provideService(ConfigProvider.ConfigProvider, config)
+    );
+  }
+);
 
 it.effect(
   "decodes full live envelopes, paginates projects, and keeps env values absent",

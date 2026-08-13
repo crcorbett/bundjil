@@ -120,6 +120,7 @@ export {
   VercelStableEnvironmentWriteError,
 } from "./stable-environment.js";
 export {
+  VercelCredentialError,
   VercelDeploymentsReadError,
   VercelDomainsReadError,
   VercelEnvironmentVariablesReadError,
@@ -127,11 +128,9 @@ export {
   VercelProjectsReadError,
 } from "./errors.js";
 export {
-  VercelAccessToken,
-  type VercelAccessTokenEncoded,
-  VercelCredentials,
   VercelCredentialsLive,
   VercelLive,
+  VercelProjectCredentialsLive,
 } from "./live.layer.js";
 export {
   emptyVercelInventory,
@@ -182,6 +181,12 @@ export {
   type ObserveVercelProjectDomainEncoded,
   VercelCanonicalDomain,
   type VercelCanonicalDomainEncoded,
+  VercelAccessToken,
+  type VercelAccessTokenEncoded,
+  VercelCredentialFailureReason,
+  type VercelCredentialFailureReasonEncoded,
+  VercelCredentialScope,
+  type VercelCredentialScopeEncoded,
   VercelDeploymentId,
   type VercelDeploymentIdEncoded,
   VercelDeploymentObservation,
@@ -270,6 +275,8 @@ export {
   type VercelTeamIdEncoded,
 } from "./schemas.js";
 export {
+  VercelCredentials,
+  type VercelCredentialsShape,
   VercelDeployments,
   type VercelDeploymentsShape,
   VercelDomains,

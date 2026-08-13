@@ -1,16 +1,16 @@
-import type { Effect as EffectType } from "effect";
 import {
   Array,
   Config,
   Context,
   Effect,
+  HashMap,
   Layer,
+  Match,
   Option,
   Redacted,
   Schedule,
   Schema,
 } from "effect";
-import type { ConfigError } from "effect/Config";
 import {
   HttpClient,
   HttpClientRequest,
@@ -18,6 +18,7 @@ import {
 } from "effect/unstable/http";
 
 import {
+  VercelCredentialError,
   VercelDeploymentsReadError,
   VercelDomainsReadError,
   VercelEnvironmentVariablesReadError,
@@ -67,6 +68,7 @@ import {
   VercelProjectId,
   VercelProjectName,
   VercelProjectObservation,
+  VercelAccessToken,
   ListVercelDeployments,
   ListVercelEnvironmentVariables,
   ListVercelMarketplaceBindings,
@@ -74,6 +76,7 @@ import {
   ListVercelProjects,
 } from "./schemas.js";
 import {
+  VercelCredentials,
   VercelDeployments,
   VercelDomains,
   VercelEnvironmentVariables,
@@ -81,23 +84,93 @@ import {
   VercelProjects,
 } from "./services.js";
 
-export const VercelAccessToken = Schema.Redacted(Schema.NonEmptyString);
-export type VercelAccessToken = typeof VercelAccessToken.Type;
-export type VercelAccessTokenEncoded = typeof VercelAccessToken.Encoded;
+const VercelProjectCredentialBinding = Schema.Struct({
+  projectId: VercelProjectId,
+  accessToken: Schema.RedactedFromValue(Schema.NonEmptyString),
+});
+const VercelProjectCredentialBindings = Schema.NonEmptyArray(
+  VercelProjectCredentialBinding
+).pipe(
+  Schema.check(
+    Schema.makeFilter((bindings) =>
+      Array.dedupeWith(
+        bindings,
+        (left, right) => left.projectId === right.projectId
+      ).length === bindings.length
+        ? undefined
+        : "Vercel project credential bindings must use unique project IDs."
+    )
+  )
+);
+const VercelProjectCredentialBindingsJson = Schema.fromJsonString(
+  VercelProjectCredentialBindings
+);
 
 const vercelAccessTokenConfig = Config.schema(
   VercelAccessToken,
   "VERCEL_INFRASTRUCTURE_ACCESS_TOKEN"
 );
-
-export class VercelCredentials extends Context.Service<
-  VercelCredentials,
-  EffectType.Effect<VercelAccessToken, ConfigError>
->()("@bundjil/infrastructure/vercel/VercelCredentials") {}
+const vercelProjectCredentialBindingsConfig = Config.schema(
+  VercelProjectCredentialBindingsJson,
+  "BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON"
+);
 
 export const VercelCredentialsLive = Layer.succeed(
   VercelCredentials,
-  vercelAccessTokenConfig
+  VercelCredentials.of({
+    accessToken: Effect.fn("VercelCredentialsLive.accessToken")(() =>
+      vercelAccessTokenConfig.pipe(
+        Effect.mapError(
+          () =>
+            new VercelCredentialError({
+              reason: "configurationUnavailable",
+            })
+        )
+      )
+    ),
+  })
+);
+
+export const VercelProjectCredentialsLive = Layer.succeed(
+  VercelCredentials,
+  VercelCredentials.of({
+    accessToken: Effect.fn("VercelProjectCredentialsLive.accessToken")(
+      function* (scope) {
+        const bindings = yield* vercelProjectCredentialBindingsConfig.pipe(
+          Effect.mapError(
+            () =>
+              new VercelCredentialError({
+                reason: "configurationUnavailable",
+              })
+          )
+        );
+        const credentialsByProject = HashMap.fromIterable(
+          bindings.map((binding) => [binding.projectId, binding.accessToken])
+        );
+        return yield* Match.value(scope).pipe(
+          Match.tag("Team", () =>
+            Effect.fail(
+              new VercelCredentialError({
+                reason: "teamScopeUnavailable",
+              })
+            )
+          ),
+          Match.tag("Project", ({ projectId }) =>
+            Option.match(HashMap.get(credentialsByProject, projectId), {
+              onNone: () =>
+                Effect.fail(
+                  new VercelCredentialError({
+                    reason: "projectScopeUnavailable",
+                  })
+                ),
+              onSome: (accessToken) => Effect.succeed(accessToken),
+            })
+          ),
+          Match.exhaustive
+        );
+      }
+    ),
+  })
 );
 
 const VercelResponseHeaders = Schema.Struct({
@@ -316,17 +389,19 @@ export const VercelLive = Layer.effectContext(
               })
           )
         );
-        const token = yield* credentials.pipe(
-          Effect.mapError(
-            () =>
-              new VercelProjectsReadError({
-                operation: "listProjects",
-                reason: "requestFailed",
-                retry: "never",
-                message: "Vercel read credentials are unavailable.",
-              })
-          )
-        );
+        const token = yield* credentials
+          .accessToken({ _tag: "Team", teamId: input.teamId })
+          .pipe(
+            Effect.mapError(
+              () =>
+                new VercelProjectsReadError({
+                  operation: "listProjects",
+                  reason: "requestFailed",
+                  retry: "never",
+                  message: "Vercel read credentials are unavailable.",
+                })
+            )
+          );
         const projects: VercelProjectAttributes[] = [];
         let cursor: string | undefined;
         do {
@@ -411,17 +486,19 @@ export const VercelLive = Layer.effectContext(
               })
           )
         );
-        const token = yield* credentials.pipe(
-          Effect.mapError(
-            () =>
-              new VercelProjectsReadError({
-                operation: "observeProject",
-                reason: "requestFailed",
-                retry: "never",
-                message: "Vercel read credentials are unavailable.",
-              })
-          )
-        );
+        const token = yield* credentials
+          .accessToken({ _tag: "Project", projectId: input.projectId })
+          .pipe(
+            Effect.mapError(
+              () =>
+                new VercelProjectsReadError({
+                  operation: "observeProject",
+                  reason: "requestFailed",
+                  retry: "never",
+                  message: "Vercel read credentials are unavailable.",
+                })
+            )
+          );
         const response = yield* client
           .execute(
             withVercelAuthorization(
@@ -526,17 +603,19 @@ export const VercelLive = Layer.effectContext(
             })
         )
       );
-      const token = yield* credentials.pipe(
-        Effect.mapError(
-          () =>
-            new VercelDomainsReadError({
-              operation: "listDomains",
-              reason: "requestFailed",
-              retry: "never",
-              message: "Vercel read credentials are unavailable.",
-            })
-        )
-      );
+      const token = yield* credentials
+        .accessToken({ _tag: "Project", projectId: input.projectId })
+        .pipe(
+          Effect.mapError(
+            () =>
+              new VercelDomainsReadError({
+                operation: "listDomains",
+                reason: "requestFailed",
+                retry: "never",
+                message: "Vercel read credentials are unavailable.",
+              })
+          )
+        );
       const domains: VercelProjectDomainAttributes[] = [];
       let cursor: string | undefined;
       do {
@@ -638,17 +717,19 @@ export const VercelLive = Layer.effectContext(
             })
         )
       );
-      const token = yield* credentials.pipe(
-        Effect.mapError(
-          () =>
-            new VercelEnvironmentVariablesReadError({
-              operation: "listEnvironmentVariables",
-              reason: "requestFailed",
-              retry: "never",
-              message: "Vercel read credentials are unavailable.",
-            })
-        )
-      );
+      const token = yield* credentials
+        .accessToken({ _tag: "Project", projectId: input.projectId })
+        .pipe(
+          Effect.mapError(
+            () =>
+              new VercelEnvironmentVariablesReadError({
+                operation: "listEnvironmentVariables",
+                reason: "requestFailed",
+                retry: "never",
+                message: "Vercel read credentials are unavailable.",
+              })
+          )
+        );
       const environmentVariables: VercelEnvironmentVariableAttributes[] = [];
       let cursor: string | undefined;
       do {
@@ -771,17 +852,19 @@ export const VercelLive = Layer.effectContext(
             })
         )
       );
-      const token = yield* credentials.pipe(
-        Effect.mapError(
-          () =>
-            new VercelMarketplaceBindingsReadError({
-              operation: "listMarketplaceBindings",
-              reason: "requestFailed",
-              retry: "never",
-              message: "Vercel read credentials are unavailable.",
-            })
-        )
-      );
+      const token = yield* credentials
+        .accessToken({ _tag: "Project", projectId: input.projectId })
+        .pipe(
+          Effect.mapError(
+            () =>
+              new VercelMarketplaceBindingsReadError({
+                operation: "listMarketplaceBindings",
+                reason: "requestFailed",
+                retry: "never",
+                message: "Vercel read credentials are unavailable.",
+              })
+          )
+        );
       const contentHints: (typeof VercelMarketplaceContentHint.Type)[] = [];
       let cursor: string | undefined;
       do {
@@ -963,17 +1046,19 @@ export const VercelLive = Layer.effectContext(
               })
           )
         );
-        const token = yield* credentials.pipe(
-          Effect.mapError(
-            () =>
-              new VercelDeploymentsReadError({
-                operation: "listDeployments",
-                reason: "requestFailed",
-                retry: "never",
-                message: "Vercel read credentials are unavailable.",
-              })
-          )
-        );
+        const token = yield* credentials
+          .accessToken({ _tag: "Project", projectId: input.projectId })
+          .pipe(
+            Effect.mapError(
+              () =>
+                new VercelDeploymentsReadError({
+                  operation: "listDeployments",
+                  reason: "requestFailed",
+                  retry: "never",
+                  message: "Vercel read credentials are unavailable.",
+                })
+            )
+          );
         const deployments: VercelDeploymentObservationAttributes[] = [];
         let cursor: string | undefined;
         do {

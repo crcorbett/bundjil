@@ -48,7 +48,10 @@ const layerPreviewConfigurationLive = (client: HttpClient.HttpClient) => {
     Layer.succeed(HttpClient.HttpClient, client),
     Layer.succeed(
       VercelCredentials,
-      Effect.succeed(Redacted.make("vercel-token-sentinel"))
+      VercelCredentials.of({
+        accessToken: () =>
+          Effect.succeed(Redacted.make("vercel-token-sentinel")),
+      })
     )
   );
   const reads = VercelLive.pipe(Layer.provide(transport));

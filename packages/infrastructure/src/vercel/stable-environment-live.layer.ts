@@ -12,8 +12,7 @@ import {
 } from "effect/unstable/http";
 
 import { SecretReferenceId } from "../secret-reference.js";
-import type { VercelAccessToken } from "./live.layer.js";
-import { VercelCredentials } from "./live.layer.js";
+import type { VercelAccessToken } from "./schemas.js";
 import {
   VercelEnvironmentVariableAttributes,
   VercelEnvironmentVariableId,
@@ -21,6 +20,7 @@ import {
   VercelEnvironmentVariableType,
   VercelEnvironmentVariableUpdatedAt,
 } from "./schemas.js";
+import { VercelCredentials } from "./services.js";
 import {
   UpdateVercelStableEnvironmentVariable,
   VercelPreviewPhotonBindingValues,
@@ -293,15 +293,17 @@ export const VercelStableEnvironmentBindingsLive = Layer.effect(
           )
         )
       );
-      const token = yield* credentials.pipe(
-        Effect.mapError(() =>
-          writeFailure(
-            "updateStableEnvironmentVariable",
-            "requestFailed",
-            "Vercel stable environment credentials are unavailable."
+      const token = yield* credentials
+        .accessToken({ _tag: "Project", projectId: input.projectId })
+        .pipe(
+          Effect.mapError(() =>
+            writeFailure(
+              "updateStableEnvironmentVariable",
+              "requestFailed",
+              "Vercel stable environment credentials are unavailable."
+            )
           )
-        )
-      );
+        );
       const request = yield* HttpClientRequest.patch(
         stableEnvironmentUrl(
           `/v9/projects/${encoded.projectId}/env/${encoded.environmentVariableId}`

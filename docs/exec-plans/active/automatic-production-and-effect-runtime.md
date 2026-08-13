@@ -756,6 +756,48 @@ Focused documentation, authority, control and verification policy checks pass
 for this correction. They prove repository owner consistency only, not token
 creation, project enforcement, GitHub custody or hosted execution.
 
+## Preview drift exact-project credential correction
+
+A subsequent call-graph audit found that the report-only drift stack still
+constructed `VercelLive` around one `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`, and
+the Alchemy project provider called the team-wide project-list operation. That
+made the new exact-project custody policy true for Production but false for
+Preview drift.
+
+The Vercel credential boundary now exposes one named `accessToken` operation
+over a Schema-owned tagged Team/Project scope and a closed
+`VercelCredentialError`. The ordinary inventory/adoption Layer retains the
+explicit broad token. The drift Layer instead decodes
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON` as a non-empty array of
+unique branded project IDs and redacted tokens, indexes it with Effect
+`HashMap`, rejects Team scope, and selects only the token matching the decoded
+project input. The Alchemy project provider observes every exact manifest
+project instead of listing a team. The drift and ordinary stacks share their
+provider composition without exposing a raw client or callback service.
+
+Installed `effect@4.0.0-beta.101` is the implementation authority; the local
+v4 comparison clone remains `1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+Focused typecheck, type-aware Ultracite, nine Vercel contract tests, all 92
+infrastructure Vitest tests, and all 21 Alchemy lifecycle tests pass. No
+provider, credential, GitHub setting, deployment, or message mutation occurred.
+Root `bun run verification` also passes with the documented synthetic Executor
+fixture: all policy audits, 136 boundary tests, type-aware lint, dead-code
+analysis, nine package typechecks, both Eve builds, and all package tests
+completed successfully. The fixture proves repository integration contracts;
+it is not a live Personal Executor, Vercel, Photon, R2, deployment, or channel
+proof.
+
+Documentation impact: Vercel Schema/error/service/Layer exports, stable stack,
+drift entrypoint, Alchemy runbook, infrastructure README, active SPEC/tasks,
+authority/control/automation registers and both active plans **Change
+required**. Workflow trigger/permissions, R2 and Photon boundaries, Production
+deployment state machine, package commands, rollback, channel behaviour and
+dated provider state **Preserve**. Frontend, browser, accessibility, release,
+publication, generated API references and repo-local skills are **N/A** after
+their owners and call graph were inspected. Hosted control closure remains
+pending until distinct drift tokens and all three secret artifacts exist and a
+hosted report succeeds; repository tests do not prove those facts.
+
 ## Terminal audit
 
 Pending. It runs once after both task ledgers are otherwise complete and covers:

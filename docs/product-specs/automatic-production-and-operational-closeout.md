@@ -266,8 +266,18 @@ promotion.
   The manifest must be the current accepted Preview adoption manifest. The
   command must carry its decoded digest, the dynamic run identity, and the
   source SHA through the report and bounded receipt. The dotenv artifact must
-  contain only the read-only state, Vercel, and Photon bindings needed by the
-  report command.
+  contain only the state, Photon, and Vercel bindings needed by the report
+  command. Vercel custody is a Schema-decoded non-empty array of unique exact
+  project-ID/token bindings under
+  `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`; each dedicated
+  project-scoped token must pass assigned-project access and sibling-project
+  denial before custody. The drift Layer rejects team scope and the Alchemy
+  project provider observes manifest project IDs directly rather than listing
+  all team projects. Do not reuse either Production deployment token or the
+  broad inventory/adoption token. Vercel does not expose a method-level
+  read-only personal token here, so exact project scope, independent
+  revocation, the read-only call graph, and the zero-write receipt are all
+  required controls.
 - Dispatch one `Infrastructure Drift` run for the exact source that owns the
   workflow. Acceptance requires the hosted job to pass, its source SHA to
   match, the receipt to report zero provider writes, and every required

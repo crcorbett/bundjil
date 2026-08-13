@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
@@ -111,6 +111,16 @@ and are revealed only at immediate SDK construction or header assignment.
 Tests use a scoped `ConfigProvider` when proving configuration and a
 deterministic mock/memory Layer for service behavior. Every provider service
 exports explicit live and mock/memory Layers.
+
+When one provider service needs credentials selected by an already-decoded
+resource identity, expose a named semantic lookup over a Schema-owned tagged
+scope and return a closed safe error. Decode the complete credential set once
+inside the live operation, store it in Effect `HashMap` when keyed lookup is
+the domain operation, and fail on duplicate, unavailable, or unadmitted scope.
+Do not expose a raw Config effect as the service, accept primitive project IDs,
+or select credentials from their encoded wire representation. Keep broader
+inventory credentials and exact-resource automation credentials in distinct
+Layers when their authority differs.
 
 Compose dynamic already-decoded redacted config with the owning Schema's
 `.makeEffect` constructor so Type-side validation stays in the typed error

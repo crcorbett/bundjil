@@ -4,7 +4,7 @@ lifecycle: implemented
 authority: supporting
 owner: bundjil-product-owner
 created: 2026-07-24
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-13
 review_trigger: Alchemy version or provider support, Vercel or Photon API, deployment topology, storage binding, secret custody, authority, rollout, rollback, or proof-contract change
 ---
 
@@ -20,6 +20,14 @@ ordered pass evidence, corrections, exact proof boundaries, rollback chain and
 Git identity. This history is not standing authority for another provider
 read, write, deployment, message, credential, billing or Production
 operation.
+
+The current operational successor is
+`automatic-production-and-operational-closeout.md`. Its 2026-08-13 correction
+replaces the historical report command's single broad Vercel token with a
+distinct Schema-decoded set of dedicated exact-project credentials and exact
+manifest-project observation. The historical accepted receipts below remain
+evidence for their source revision; they are not evidence that current hosted
+credential custody exists.
 
 ## Decision and intended outcome
 

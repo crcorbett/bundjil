@@ -81,6 +81,15 @@ restores the exact prior deployments on every non-success Effect exit after
 promotion starts, including interruption and defect paths. It is not an
 operator convenience command.
 
+`infrastructure:drift-report` uses a distinct project-routed credential Layer.
+Its environment file supplies
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
+non-empty array of unique project-ID/token bindings. The Vercel adapter selects
+a redacted token only after receiving a decoded branded project ID, and the
+Alchemy project provider observes exactly the manifest projects rather than
+listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
+limited to the separate inventory/adoption/operator paths.
+
 ## Claim boundary
 
 Package checks prove repository contracts only. They do not establish current

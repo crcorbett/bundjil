@@ -28,7 +28,7 @@ import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
-import { makeStableInfrastructureStack } from "../../../alchemy.stable.run.js";
+import { makeStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import {
   buildInfrastructureDriftReceipt,
@@ -380,7 +380,7 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
   stage: typeof InfrastructureStage.Type
 ) {
   return yield* AlchemyStack.evalStack(
-    makeStableInfrastructureStack(manifest),
+    makeStableInfrastructureDriftStack(manifest),
     (stack) =>
       Effect.gen(function* () {
         const desiredPlan = yield* AlchemyPlan.make(stack).pipe(

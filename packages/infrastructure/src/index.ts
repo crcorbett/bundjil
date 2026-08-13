@@ -36,7 +36,10 @@ export {
   type AdoptionCommandEncoded,
   loadAdoptionCommand,
 } from "./adoption-command.js";
-export { layerLiveStableAdoptionProviders } from "./stable-adoption-live.layer.js";
+export {
+  layerLiveStableAdoptionDriftProviders,
+  layerLiveStableAdoptionProviders,
+} from "./stable-adoption-live.layer.js";
 export { validateStableAdoptionCommand } from "./stable-adoption-command.js";
 export {
   loadInfrastructureCommandConfig,

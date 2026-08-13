@@ -12,6 +12,7 @@ import {
   ObserveVercelPreviewFeedback,
   SetVercelPreviewFeedback,
   VercelPreviewConfiguration,
+  VercelPreviewConfigurationOperation,
   VercelPreviewConfigurationReadError,
   VercelPreviewConfigurationWriteError,
   VercelPreviewEnvironmentMetadataAttributes,
@@ -22,10 +23,8 @@ import {
 import type {
   DeleteVercelPreviewEnvironmentMetadata,
   ObserveVercelPreviewEnvironmentMetadata,
-  VercelPreviewConfigurationOperation,
 } from "./configuration.js";
-import type { VercelAccessToken } from "./live.layer.js";
-import { VercelCredentials } from "./live.layer.js";
+import type { VercelAccessToken } from "./schemas.js";
 import {
   ListVercelEnvironmentVariables,
   VercelEnvironmentVariableId,
@@ -33,7 +32,7 @@ import {
   VercelEnvironmentVariableType,
   VercelProjectId,
 } from "./schemas.js";
-import { VercelEnvironmentVariables } from "./services.js";
+import { VercelCredentials, VercelEnvironmentVariables } from "./services.js";
 
 const VercelConfigurationResponseHeaders = Schema.Struct({
   "x-ratelimit-remaining": Schema.optional(Schema.String),
@@ -81,6 +80,11 @@ const VercelCreatePreviewEnvironmentRequest = Schema.Struct({
   value: Schema.NonEmptyString,
   type: Schema.Literal("plain"),
   target: Schema.Tuple([Schema.Literal("preview")]),
+});
+
+const VercelPreviewConfigurationTokenInput = Schema.Struct({
+  operation: VercelPreviewConfigurationOperation,
+  projectId: VercelProjectId,
 });
 
 const VercelProviderCreatedEnvironment = Schema.Struct({
@@ -213,15 +217,17 @@ export const VercelPreviewConfigurationLive = Layer.effect(
     const environmentVariables = yield* VercelEnvironmentVariables;
 
     const tokenFor = Effect.fn("VercelPreviewConfigurationLive.tokenFor")(
-      (operation: VercelPreviewConfigurationOperation) =>
-        credentials.pipe(
-          Effect.mapError(() =>
-            writeFailure(
-              operation,
-              "Vercel Preview configuration credentials are unavailable."
+      (input: typeof VercelPreviewConfigurationTokenInput.Type) =>
+        credentials
+          .accessToken({ _tag: "Project", projectId: input.projectId })
+          .pipe(
+            Effect.mapError(() =>
+              writeFailure(
+                input.operation,
+                "Vercel Preview configuration credentials are unavailable."
+              )
             )
           )
-        )
     );
 
     const observePreviewFeedback = Effect.fn(
@@ -241,7 +247,10 @@ export const VercelPreviewConfigurationLive = Layer.effect(
             })
         )
       );
-      const token = yield* tokenFor("observePreviewFeedback").pipe(
+      const token = yield* tokenFor({
+        operation: "observePreviewFeedback",
+        projectId: input.projectId,
+      }).pipe(
         Effect.mapError(
           (failure) =>
             new VercelPreviewConfigurationReadError({
@@ -333,7 +342,10 @@ export const VercelPreviewConfigurationLive = Layer.effect(
           )
         )
       );
-      const token = yield* tokenFor("setPreviewFeedback");
+      const token = yield* tokenFor({
+        operation: "setPreviewFeedback",
+        projectId: input.projectId,
+      });
       const request = yield* HttpClientRequest.patch(
         vercelConfigurationUrl(`/v9/projects/${encoded.projectId}`)
       ).pipe(
@@ -489,7 +501,10 @@ export const VercelPreviewConfigurationLive = Layer.effect(
           )
         )
       );
-      const token = yield* tokenFor("createPreviewEnvironmentMetadata");
+      const token = yield* tokenFor({
+        operation: "createPreviewEnvironmentMetadata",
+        projectId: input.projectId,
+      });
       const request = yield* HttpClientRequest.post(
         vercelConfigurationUrl(`/v10/projects/${encoded.projectId}/env`)
       ).pipe(
@@ -580,7 +595,10 @@ export const VercelPreviewConfigurationLive = Layer.effect(
             "Preview environment deletion requires the exact approval receipt.",
         });
       }
-      const token = yield* tokenFor("deletePreviewEnvironmentMetadata");
+      const token = yield* tokenFor({
+        operation: "deletePreviewEnvironmentMetadata",
+        projectId: input.attributes.projectId,
+      });
       const encoded = yield* Schema.encodeEffect(
         VercelPreviewEnvironmentMetadataAttributes
       )(input.attributes).pipe(

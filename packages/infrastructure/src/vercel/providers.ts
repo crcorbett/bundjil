@@ -33,7 +33,6 @@ import {
   ListVercelEnvironmentVariables,
   ListVercelMarketplaceBindings,
   ListVercelProjectDomains,
-  ListVercelProjects,
   ObserveVercelDeployment,
   ObserveVercelEnvironmentVariable,
   ObserveVercelMarketplaceBinding,
@@ -238,18 +237,13 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
       ),
       list: Effect.fn("VercelProjectProvider.list")(function* () {
         const projects = yield* VercelProjects;
-        const pages = yield* Effect.forEach(scope.projects, (projectScope) =>
-          projects.listProjects(
-            ListVercelProjects.make({
-              stage: projectScope.stage,
-              teamId: projectScope.teamId,
-            })
-          )
-        );
-        return Array.dedupeWith(
-          Array.flatMap(pages, (page) => page.projects),
-          (left, right) =>
-            left.teamId === right.teamId && left.projectId === right.projectId
+        return yield* Effect.forEach(
+          scope.projects,
+          (projectScope) =>
+            projects
+              .observeProject(ObserveVercelProject.make(projectScope))
+              .pipe(Effect.flatMap(requireFoundProject)),
+          { concurrency: 1 }
         );
       }),
       stables: ["teamId", "projectId"],

@@ -101,12 +101,19 @@ automation fallback.
 - **Principal and authority:** `contents: read` plus one protected
   `infrastructure-read-only-preview` environment. Its three secret artifacts
   contain the static fixed policy envelope, provider/state environment, and
-  accepted manifest. The policy envelope is fingerprinted custody, not a
-  dynamic run identity. The workflow derives a branded exact
+  accepted manifest. The environment artifact holds a distinct Schema-decoded
+  set of unique project-ID/token bindings, one dedicated project-scoped Vercel
+  token per manifest project; the Layer rejects Team scope and Production or
+  broad inventory credentials are not reused. Vercel personal tokens are not
+  method-level read-only, so project scope, sibling denial, independent
+  revocation, the read-only call graph and zero-write receipt are mandatory
+  controls. The policy envelope is fingerprinted custody, not a dynamic run
+  identity. The workflow derives a branded exact
   repository/run/attempt identity and checked-out source SHA from GitHub, and
   the command carries those values plus the decoded manifest digest through
-  its report and receipt. The job has no OIDC, apply, reconcile, repair, deployment,
-  promotion, Production, Photon mutation, billing, or write-token authority.
+  its report and receipt. The job has no OIDC, apply, reconcile, repair,
+  deployment, promotion, Production, Photon mutation, billing, or admitted
+  provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
   native `sync --dry-run` remain distinct sources. Blocking drift fails;

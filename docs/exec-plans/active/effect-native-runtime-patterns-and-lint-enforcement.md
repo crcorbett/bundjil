@@ -711,6 +711,31 @@ verification` gate passes with all nine package typechecks and all fifteen
   channels **Preserve**. Frontend, browser, accessibility, release, and
   publication are **N/A**.
 
+## 2026-08-13 Preview drift project-routed credential correction
+
+- A fresh service/call-graph pass found one broad Vercel Config effect exposed
+  as the credential service and one team-list call inside the report-only
+  Alchemy project provider. Production's exact-project custody did not cover
+  that separate drift runtime.
+- The boundary is now a named service operation over Schema-owned branded
+  Team/Project scopes with a closed safe error. Ordinary inventory/adoption
+  retains its explicit broad-token Layer; drift uses a distinct Config/Schema
+  Layer containing unique project-ID/redacted-token bindings, Effect `HashMap`
+  lookup, fail-closed Team scope, and exact-project observation.
+- Installed `effect@4.0.0-beta.101` controls; local comparison revision
+  `1caab3cc30f626efbf15e59d74f539a487e5c85c` remains non-authoritative.
+  Focused typecheck, type-aware lint, nine Vercel contract tests, 92 Vitest
+  tests and 21 Alchemy lifecycle tests pass. Root `bun run verification` also
+  passes with the documented synthetic Executor fixture; that is repository
+  contract evidence only, not live provider proof. No external mutation
+  occurred.
+- Documentation impact: Vercel contracts/Layers/exports, drift composition,
+  active SPEC/tasks/plans, runbook, README and authority/control owners
+  **Change required**. Other provider/runtime/channel/package behavior
+  **Preserve**. Frontend, generated references and skills are **N/A**. The
+  terminal audit remains pending behind hosted drift, automatic Production and
+  channel proof.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove
