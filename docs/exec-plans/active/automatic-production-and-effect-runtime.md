@@ -806,6 +806,75 @@ their owners and call graph were inspected. Hosted control closure remains
 pending until distinct drift tokens and all three secret artifacts exist and a
 hosted report succeeds; repository tests do not prove those facts.
 
+## 2026-08-13 fresh pre-terminal audit
+
+This fresh pass reviewed the exact pushed PR head
+`d7a189d714950d19d8730576d66bac95a4d094f2`. It remains a pre-terminal audit:
+the terminal task cannot run until automatic Production and channel closeout
+are complete.
+
+- The status and forbidden-pattern scans found no new code defect. Module-load
+  `Effect.runSync` and tool-edge `Effect.runPromise` remain narrow Eve adapter
+  constraints already owned by the app; provider live Layers remain explicit
+  package composition surfaces. No speculative service or helper was added.
+- `check:effect-setup`, `check:boundaries`, `check:docs`, `check:skills`, and the
+  type-aware `check` command pass. The Effect language service reports no
+  diagnostic, boundary exceptions remain exact and stale-entry checked, and
+  formatting reports no warning or error.
+- The product index was stale: it described four Effect tasks as not yet begun
+  even though 22 of 23 tasks are complete. The index now states the measured
+  ledger status and preserves the external dependency on automatic Production
+  and channel closeout.
+- GitHub CI run `31671302093` passed the exact audited head. Infrastructure
+  Drift run `31671302134` failed closed before source execution because all
+  three protected custody values were empty; its report step was skipped. This
+  is missing-custody evidence only, not a provider or no-drift result.
+
+Documentation impact: the canonical product index and this current evidence
+owner **Change required**. Code, Config, Schemas, errors, services, Layers,
+package exports, tests, lint rules, workflows, authority, controls, runbooks,
+provider state, credentials, deployments, channels and proof packets
+**Preserve**. READMEs, repo-local skills, frontend, browser, accessibility,
+generated references, release and publication are **N/A** because their owners
+and call graphs are unchanged. `configure-hosted-controls-and-drift` remains
+pending and no acceptance or terminal-audit status advances.
+
+## 2026-08-13 personal drift-state credential
+
+Cooper explicitly approved the required token creation. Read-before-write
+confirmed personal Cloudflare account
+`f9f94270a4a5af8af7010d891020922d` and exact bucket
+`bundjil-alchemy-state`. Active account token
+`8033ee98f001f2aeeb4512750f4d8f36` is scoped only to Workers R2 Storage
+Bucket Item Write for that bucket and expires at `2026-11-11T06:11:42Z`.
+Its derived S3 Access Key ID and Secret Access Key are held only by personal
+Bundjil 1Password item `dylpugrxetztdr76qruqtxonie`. One direct S3 list under
+`bundjil/v1` succeeded; the bounded result exposed one visible object and a
+truncated continuation, not object contents. The one-use RSA handoff and all
+temporary ciphertext, private-key and plaintext files were removed.
+
+Two malformed Cloudflare create requests failed before mutation. A later
+token was created but immediately revoked when 1Password Connect rejected the
+item write. The final token above is the only active credential from this
+operation. No existing state token was rolled or revoked.
+
+Vercel mutation stopped before token creation. Both the Executor connection
+named Personal and a Chrome sign-in explicitly selected through
+`coopercorbett@gmail.com` resolved to Vercel user
+`nBzSPdkIxazY1om0rrNZ9cFg`, whose canonical account email is
+`cooper.corbett@tilt.legal`; the latter then required 2FA. That identity does
+not satisfy Cooper's explicit Personal-only condition, so no Vercel token,
+Production secret, drift artifact, deployment or promotion was created.
+
+Documentation impact: active SPEC/task/plan, authority register and automation
+external readback **Change required**. Cloudflare account/bucket and 1Password
+custody changed as recorded; existing provider resources, R2 state contents,
+Vercel, GitHub secrets/settings, Photon, deployments, channels, workflows,
+code, tests and runbooks **Preserve**. READMEs, package exports, skills, lint,
+frontend, browser journeys, generated references, release and publication are
+**N/A**. `configure-hosted-controls-and-drift` remains pending because its four
+Vercel tokens, three GitHub artifacts and hosted report do not exist.
+
 ## Terminal audit
 
 Pending. It runs once after both task ledgers are otherwise complete and covers:

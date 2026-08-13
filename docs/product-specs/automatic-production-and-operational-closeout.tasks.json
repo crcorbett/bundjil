@@ -121,6 +121,7 @@
         "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
       },
       "docsImpact": "Refresh authority/control externalReadback fields, active plan and dated drift evidence; do not copy mutable GitHub settings into README prose.",
+      "currentResult": "On 2026-08-13 Cooper explicitly approved the required credential creation. Personal Cloudflare account f9f94270a4a5af8af7010d891020922d now owns active 90-day token 8033ee98f001f2aeeb4512750f4d8f36 through 2026-11-11T06:11:42Z, scoped only to Object Read & Write for bucket bundjil-alchemy-state. Its derived S3 credentials are held in personal Bundjil 1Password item dylpugrxetztdr76qruqtxonie; a direct S3 list under bundjil/v1 succeeded and temporary encrypted-handoff files were removed. One intermediate token was revoked after 1Password Connect rejected custody, and two invalid create requests made no token. Vercel creation stopped before mutation: the Executor connection and the Chrome session selected through coopercorbett@gmail.com both resolved to Vercel user nBzSPdkIxazY1om0rrNZ9cFg whose canonical email is cooper.corbett@tilt.legal. This does not satisfy the explicit Personal-only identity condition. No Vercel token or GitHub secret was created; all three drift artifacts, hosted drift execution, automatic Production, and channel proof remain pending.",
       "commitAfterPassing": true
     },
     {

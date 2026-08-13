@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -24,8 +24,9 @@ No SPEC is currently proposed without an active implementation plan.
   exact-SHA post-CI Production automation, bounded credentials, rollback,
   Terra High correction, Infrastructure Drift and live channel closeout.
 - [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
-  being refreshed against merged source and the installed Effect/runtime epoch
-  before the four narrow lint and targeted runtime tasks begin.
+  all 22 implementation tasks are complete against installed Effect
+  `4.0.0-beta.101`; its single terminal five-pass audit remains dependency-gated
+  by automatic Production and live channel closeout.
 
 ## Implemented or superseded history
 
