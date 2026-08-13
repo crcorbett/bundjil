@@ -65,7 +65,14 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
-### Production deployment — admitted post-CI automation pending hosted proof
+### Production deployment — admitted post-CI automation, hosted proof deferred
+
+The source control is admitted, but its hosted proof is deferred for this
+implementation epoch. Fresh Executor Personal readback on 2026-08-13 found the
+sole Vercel connection authenticated as the explicitly excluded
+`cooper.corbett@tilt.legal` account, so no project token or partial GitHub
+custody was created. The bounded stop is retained in
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -94,6 +101,12 @@ automation fallback.
   revokes the two tokens without enabling Vercel Git deployment.
 
 ### Preview infrastructure drift — report-only automation
+
+The report-only source remains admitted, while hosted execution is deferred at
+the same identity gate. Exact-head run `31677769897` failed closed before
+provider reporting because the three custody artifacts were absent; it proves
+missing custody only, not drift. Resume requires a separate admitted personal
+Vercel principal and the complete credential/artifact package.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

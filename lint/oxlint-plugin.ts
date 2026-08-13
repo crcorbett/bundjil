@@ -366,6 +366,10 @@ export const asyncAwaitExceptions = [
 
 export const nativeCollectionExceptions = [
   {
+    pathSuffix: "packages/codex/src/provider/contracts.ts",
+    expected: { WeakSet: 1 },
+  },
+  {
     pathSuffix: "packages/infrastructure/src/adoption-manifest.ts",
     expected: { Set: 1 },
   },

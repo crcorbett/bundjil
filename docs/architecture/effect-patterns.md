@@ -57,7 +57,11 @@ runtime config, or provider boundaries:
   records, and local native collections remain valid when those semantics do
   not apply. A native `Map`, `Set`, `WeakMap`, or `WeakSet` constructor in owned
   app/package source requires an exact occurrence-checked lint exception that
-  names its local algorithm, ordered diagnostic, host, or test-backend owner.
+  names its local algorithm, ordered diagnostic, host, test-backend, or
+  unforgeable identity-provenance owner. Weak identity is appropriate when a
+  Schema must distinguish containers it created from frozen proxies or other
+  caller-owned lookalikes; Effect collections do not provide that identity
+  capability.
 
 Do not introduce Zod, local DTO mirrors, raw `unknown` readers, or hand-written
 success/error unions when an owning Effect Schema or tagged error can express
@@ -127,6 +131,62 @@ and are revealed only at immediate SDK construction or header assignment.
 Tests use a scoped `ConfigProvider` when proving configuration and a
 deterministic mock/memory Layer for service behavior. Every provider service
 exports explicit live and mock/memory Layers.
+
+An availability fallback may recover the Layer's expected typed acquisition
+errors with `Layer.catch` or a narrower tagged recovery. It must not use
+`Layer.catchCause` to turn defects or interruption into an ordinary unavailable
+state. Tests must prove both the admitted typed fallback and preservation of a
+defect/interruption Cause when availability affects host readiness.
+
+Stable credentials, clients, and policy belong in the service implementation
+or its Layer. Operation input carries only request-specific decoded facts. In
+particular, an authorization operation must not accept both the presented
+credential and the expected credential: decode and redact the presented value
+at ingress, capture the bounded expected value in the Layer, and use a
+fixed-work comparison appropriate to the admitted representation. Errors and
+observability remain secret-negative.
+
+An opaque protocol-JSON Schema must not return caller-owned arrays, objects,
+accessors, or proxies merely because a predicate accepted them. Canonicalize
+both Schema directions into detached ordinary data, bound recursion and
+cardinality, and freeze the decoded value when later mutation would violate the
+domain contract. Its declaration/type-side guard must accept only the deeply
+frozen containers created by that transform; freezing and structural equality
+alone are not ownership because a frozen `Proxy` can retain caller-controlled
+behavior. Where the type side must prove provenance, register transformed
+containers in one package-private weak-identity owner and require that identity
+recursively. Otherwise `Schema.is`, `.makeEffect`, or a nested type-side
+constructor can brand the caller's source without running the detaching
+transformation. Stateful provider indexes and identities must reject a
+duplicate before updating `Ref`/`HashMap` state or emitting output.
+
+Streaming adapters own explicit positive budgets for response headers,
+per-pull body idleness, cumulative bytes, decoded events, and existing
+line/event framing. A pull counts as progress only when it emits a non-empty
+protocol chunk; filter empty transport chunks before the idle timeout so a
+provider cannot keep work alive without consuming another budget. Load
+semantic limits through `Config.schema`; implement time with Effect timeout
+operators so `TestClock` can drive it, and preserve stream
+interruption/finalization. Scope each HTTP response from acquisition through
+consumption. Close rejected status/media responses immediately without reading
+their bodies; for an accepted streaming response, transfer the dedicated scope
+to the returned body and close it on completion, failure, cancellation, or
+interruption. If accepted headers must be acquired before returning the stream
+so typed status/auth errors remain available before host headers, bound the
+ownership gap with one Effect-clock watchdog started only after accepted
+status, media type and metadata: body subscription claims the scope, while the
+configured idle deadline closes an unclaimed scope. Header acquisition remains
+governed only by its independent header timeout. Use an
+Effect `Deferred` completed by the scope finalizer so every earlier close also
+terminates the bounded detached fiber. Treat `Deferred.succeed`'s boolean result
+as the exactly-once claim decision: only the winning subscriber may expose the
+one-shot upstream stream, while an expired or duplicate subscriber fails with
+the fixed typed boundary error before reading it. Assert request abort, unread
+rejected bytes, accepted-but-unclaimed expiry, late subscription, and duplicate
+subscription directly. A public
+SSE-only request Schema accepts only
+the supported fields and omitted or literal-true stream mode; use exact excess
+property rejection at HTTP ingress instead of silently stripping drift.
 
 When one provider service needs credentials selected by an already-decoded
 resource identity, expose a named semantic lookup over a Schema-owned tagged
@@ -397,8 +457,9 @@ use the category that matches its semantics:
   operations use a named `Schema.Literal` or `Schema.Literals` contract. Use
   `Match` over the decoded discriminant for material control flow.
 - **Secrets** use owner-named `Schema.Redacted` or
-  `Schema.RedactedFromValue` contracts. Do not reveal a secret merely to add a
-  brand.
+  `Schema.RedactedFromValue` contracts. When independently valid secret domains
+  cross one boundary, brand the checked source Schema before wrapping it in
+  redaction; never reveal an already-redacted secret merely to add a brand.
 - **Content** such as prompts, messages, instructions, descriptions, and tool
   output uses an owner-named checked text Schema. Brand content only when two
   independently valid content domains cross the same call boundary and mixing
@@ -409,6 +470,22 @@ use the category that matches its semantics:
   operation that decoded their enclosing boundary.
 - **Diagnostics** such as safe tagged-error messages remain checked strings.
   They are not identifiers and must not require unsafe brand construction.
+
+Closed diagnostics also constrain primitive domains. A provider-observed HTTP
+status is an owner Schema limited to 100 through 599, or the literal
+`unknown`; an arbitrary safe integer is not a low-cardinality observation.
+Raw provider header values remain inside their adapter and are never copied to
+public results or safe tagged errors. After validation, outward metadata uses a
+closed application-owned literal. Counts, sequence numbers and indexes use
+owner-named non-negative integer Schemas rather than finite `number`.
+
+When a protocol has ordered semantics, decode terminal and recognized data
+events through one shared closed tagged union and advance one
+application-owned state with `Match`. Proof and live mapping must consume that
+same validated union. A boolean recording that completion appeared somewhere
+is not a completion oracle: failures, malformed recognized events, duplicate,
+regressing or skipped sequence numbers, duplicate terminals, done markers and
+post-terminal events must be rejected in order.
 
 Decode the complete canonical request, event, config, or persisted record once
 at the incoming boundary and encode it at the outgoing boundary. Do not add
@@ -448,6 +525,28 @@ diagnostic, use Effect's JSON schema rather than raw serialization:
 ```ts
 const body = yield * Schema.encodeEffect(Schema.UnknownFromJsonString)(value);
 ```
+
+`Schema.Unknown` is not a domain contract for provider-owned JSON fields.
+Neither is unbounded recursive `Schema.Json` sufficient when an adversarial
+payload can exhaust the JavaScript stack before entering the typed failure
+channel. When a protocol deliberately accepts arbitrary JSON, define one
+opaque owner Schema with an explicit maximum depth and a validator whose own
+recursion cannot exceed that bound. Bundjil's Codex protocol admits at most 32
+nested containers and uses the same owner for object-root function-tool
+parameters and SSE JSON before concrete event selection. Accepted arbitrary
+JSON must also be stable under its outward encoder: arrays are dense and
+objects expose only enumerable own data properties. Arrays at the tool root,
+sparse arrays, accessors, symbols, non-enumerable properties, non-plain objects,
+functions, non-finite numbers and over-depth values fail at the owning boundary.
+
+A credential-bearing endpoint is not ordinary configurable text. Its Config
+Schema must be the exact owned HTTPS literal or a reviewed closed allowlist;
+never attach a bearer credential to a caller-selected origin or path. Secret
+header values use redacted, length-bounded, header-safe Schemas. Construct
+platform `Headers` inside `Effect.try` even after decoding, translate failure
+to one fixed tagged error, and prove the request client was not invoked. Two
+valid credential domains that share header syntax still use distinct brands
+inside their redacted Schemas so TypeScript cannot interchange them.
 
 Tests, smoke scripts, provider request bodies, SSE chunks, proof output, and
 leak checks all follow this rule. If a framework hands you an already encoded
@@ -559,6 +658,15 @@ Rules:
   place that value in an operator receipt.
 - Preserve useful provider context, but never include secrets, private message
   contents, raw documents, or long unredacted payloads in error fields.
+- Provider-controlled names, codes and messages are not safe telemetry merely
+  because they pass a lexical filter. Keep them private to immediate error
+  translation; structured logs expose only closed operation/phase values and
+  bounded numeric, boolean, enum or explicitly unknown observations required
+  for recovery.
+- Treat provider rejection objects as hostile. Property getters and Proxies can
+  throw before typed error translation; inspect only non-accessor own data
+  properties through a non-throwing owner boundary and collapse failed or
+  accessor-backed observations to the closed `unknown` case.
 - Translate provider/framework errors at the app boundary. Packages should not
   leak Eve, Sendblue, Cloudflare, Notion, or Vercel-specific exceptions unless
   that package explicitly owns the provider wrapper.
@@ -604,6 +712,11 @@ Live and mock layers should be explicit:
 - `Memory` or `Mock` layers provide deterministic behavior for tests.
 - Test helpers should compose layers at the test boundary rather than relying
   on hidden globals.
+- `Layer.provide` hides implementation dependencies and retains only the target
+  Layer's output; `Layer.provideMerge` deliberately retains both outputs. Use
+  the former when a public domain Layer must not expose its private transport,
+  mapper, credential, or persistence services, and inspect the built Context in
+  a direct test when that absence is part of the contract.
 - Provider SDK clients must be wrapped behind services before domain logic uses
   them.
 - Keep `Layer.orDie` out of reusable live Layers. A CLI provides its runtime

@@ -11,9 +11,15 @@ It does not own browser OAuth, a public gateway, Eve model selection, or shared
 provider contracts.
 
 `GET /health` reports the app health contract. `POST /v1/chat/completions`
-requires the app-owned internal bearer. The app's `mock`, `local`, and `live`
+requires the app-owned internal bearer. The expected token is captured by the
+selected proxy Layer; the route decodes only the bounded presented
+authorization. Request bodies reject unsupported fields and accept only
+omitted or literal-true `stream` because the route always returns SSE. The
+app's `mock`, `local`, and `live`
 modes are decoded from app configuration; code and Schemas own their exact
-behavior and error contracts.
+behavior and error contracts. Live/local availability composition recovers only
+typed Layer acquisition failures; defects and interruption remain terminal
+causes rather than being reported as ordinary unavailability.
 
 ## Public commands
 

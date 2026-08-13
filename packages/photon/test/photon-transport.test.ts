@@ -34,6 +34,7 @@ import {
   PhotonWebhookPlatform,
   PhotonWebhookPayload,
 } from "../src/schemas.js";
+import { PhotonSdkObservedFailure } from "../src/sdk-observed-failure.js";
 import { layerTransport } from "../src/transport.layer.js";
 import {
   classifyPhotonWebhookPlatform,
@@ -132,6 +133,13 @@ const boundaryLogger = (messages: globalThis.Array<unknown>) =>
   Logger.make(({ message }) => {
     messages.push(message);
   });
+
+const PhotonSdkFailureLogs = Schema.Array(
+  Schema.Tuple([
+    Schema.Literal("PhotonSdkOperationFailure"),
+    PhotonSdkObservedFailure,
+  ])
+);
 
 const successClient = PhotonClient.of({
   sendMessage: () => Effect.succeed({ id: "provider-message-1" }),
@@ -857,6 +865,195 @@ it.effect(
       assert.strictEqual(acquisitions, 1);
       assert.notInclude(String(error), "private acquisition detail");
     })
+);
+
+it.effect("contains hostile SDK success accessors", () =>
+  Effect.gen(function* testHostileSdkSuccessAccessor() {
+    const fixture = yield* fixtures;
+    const getterSentinel = "provider-success-secret";
+    const result = {
+      get id(): never {
+        throw new Error(getterSentinel);
+      },
+    };
+    const factory: PhotonSdkFactory = {
+      acquire: async () => ({
+        resolveDirectSpace: async () => ({
+          sendMessage: async () => result,
+          setPresence: async () => {},
+        }),
+        stop: async () => {},
+      }),
+    };
+    const client = yield* PhotonClient.pipe(
+      Effect.provide(layerClient(fixture.config, factory))
+    );
+    const outcome = yield* client
+      .sendMessage(fixture.conversation.participantId, fixture.text)
+      .pipe(Effect.result);
+    const encoded = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)(
+      outcome
+    );
+
+    assert.isTrue(Result.isFailure(outcome));
+    if (Result.isFailure(outcome)) {
+      assert.isTrue(Schema.is(ChannelProviderRejectedError)(outcome.failure));
+    }
+    assert.notInclude(String(outcome), getterSentinel);
+    assert.notInclude(encoded, getterSentinel);
+  })
+);
+
+it.effect(
+  "records SDK failures without provider-controlled diagnostic strings",
+  () =>
+    Effect.gen(function* testPhotonSdkFailureDiagnostics() {
+      const fixture = yield* fixtures;
+      const messages: globalThis.Array<unknown> = [];
+      const nameSentinel = "credential-name-sentinel";
+      const codeSentinel = "credential-code-sentinel";
+      const sdkFailure = Object.assign(new Error("SDK failure sentinel"), {
+        name: nameSentinel,
+        code: codeSentinel,
+        retryable: true,
+        cause: { code: 503 },
+      });
+      const clientLayer = layerClient(fixture.config, {
+        acquire: async () => {
+          throw sdkFailure;
+        },
+      });
+      const result = yield* Effect.gen(function* sendPhotonMessage() {
+        const client = yield* PhotonClient;
+        return yield* client.sendMessage(
+          fixture.conversation.participantId,
+          fixture.text
+        );
+      }).pipe(
+        Effect.provide(
+          Layer.mergeAll(clientLayer, Logger.layer([boundaryLogger(messages)]))
+        ),
+        Effect.result
+      );
+
+      assert.strictEqual(Result.isFailure(result), true);
+      const diagnostics =
+        yield* Schema.decodeUnknownEffect(PhotonSdkFailureLogs)(messages);
+      assert.deepStrictEqual(diagnostics, [
+        [
+          "PhotonSdkOperationFailure",
+          new PhotonSdkObservedFailure({
+            operation: "sendMessage",
+            phase: "acquire",
+            transportStatus: 503,
+            retryable: true,
+          }),
+        ],
+      ]);
+      const encodedDiagnostics = yield* Schema.encodeEffect(
+        Schema.fromJsonString(PhotonSdkFailureLogs)
+      )(diagnostics);
+      assert.strictEqual(encodedDiagnostics.includes(nameSentinel), false);
+      assert.strictEqual(encodedDiagnostics.includes(codeSentinel), false);
+    })
+);
+
+it.effect("contains hostile SDK diagnostic accessors", () =>
+  Effect.gen(function* testHostileSdkDiagnosticAccessors() {
+    const fixture = yield* fixtures;
+    const messages: globalThis.Array<unknown> = [];
+    const getterSentinel = "provider-getter-secret";
+    const sdkFailure = new Error("SDK failure sentinel");
+    Object.defineProperties(sdkFailure, {
+      cause: {
+        get: () => {
+          throw new Error(getterSentinel);
+        },
+      },
+      retryable: {
+        get: () => {
+          throw new Error(getterSentinel);
+        },
+      },
+    });
+    const clientLayer = layerClient(fixture.config, {
+      acquire: async () => {
+        throw sdkFailure;
+      },
+    });
+    const result = yield* Effect.gen(function* sendPhotonMessage() {
+      const client = yield* PhotonClient;
+      return yield* client.sendMessage(
+        fixture.conversation.participantId,
+        fixture.text
+      );
+    }).pipe(
+      Effect.provide(
+        Layer.mergeAll(clientLayer, Logger.layer([boundaryLogger(messages)]))
+      ),
+      Effect.result
+    );
+
+    assert.strictEqual(Result.isFailure(result), true);
+    const diagnostics =
+      yield* Schema.decodeUnknownEffect(PhotonSdkFailureLogs)(messages);
+    assert.deepStrictEqual(diagnostics, [
+      [
+        "PhotonSdkOperationFailure",
+        new PhotonSdkObservedFailure({
+          operation: "sendMessage",
+          phase: "acquire",
+          transportStatus: "unknown",
+          retryable: "unknown",
+        }),
+      ],
+    ]);
+    const encoded = yield* Schema.encodeEffect(
+      Schema.fromJsonString(PhotonSdkFailureLogs)
+    )(diagnostics);
+    assert.strictEqual(encoded.includes(getterSentinel), false);
+  })
+);
+
+it.effect("collapses out-of-range SDK transport statuses", () =>
+  Effect.gen(function* testOutOfRangeSdkTransportStatus() {
+    const fixture = yield* fixtures;
+    const messages: globalThis.Array<unknown> = [];
+    const clientLayer = layerClient(fixture.config, {
+      acquire: async () => {
+        throw Object.assign(new Error("SDK failure sentinel"), {
+          cause: { code: 8_675_309 },
+        });
+      },
+    });
+    const result = yield* Effect.gen(function* sendPhotonMessage() {
+      const client = yield* PhotonClient;
+      return yield* client.sendMessage(
+        fixture.conversation.participantId,
+        fixture.text
+      );
+    }).pipe(
+      Effect.provide(
+        Layer.mergeAll(clientLayer, Logger.layer([boundaryLogger(messages)]))
+      ),
+      Effect.result
+    );
+
+    assert.strictEqual(Result.isFailure(result), true);
+    const diagnostics =
+      yield* Schema.decodeUnknownEffect(PhotonSdkFailureLogs)(messages);
+    assert.deepStrictEqual(diagnostics, [
+      [
+        "PhotonSdkOperationFailure",
+        new PhotonSdkObservedFailure({
+          operation: "sendMessage",
+          phase: "acquire",
+          transportStatus: "unknown",
+          retryable: "unknown",
+        }),
+      ],
+    ]);
+  })
 );
 
 it.effect("verifies webhooks without acquiring the outbound SDK", () =>

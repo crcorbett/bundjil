@@ -82,8 +82,13 @@ export const CodexOAuthSubject = Schema.Struct({
 
 export type CodexOAuthSubject = typeof CodexOAuthSubject.Type;
 
+const CodexOAuthHeaderValue = Schema.NonEmptyString.check(
+  Schema.isMaxLength(16_384),
+  Schema.isPattern(/^[\u0021-\u007E]+$/)
+);
+
 export const CodexOAuthAccessToken = Schema.RedactedFromValue(
-  Schema.NonEmptyString
+  CodexOAuthHeaderValue.pipe(Schema.brand("CodexOAuthAccessToken"))
 );
 
 export type CodexOAuthAccessToken = typeof CodexOAuthAccessToken.Type;
@@ -119,7 +124,7 @@ export const CodexOAuthIdToken = Schema.RedactedFromValue(
 export type CodexOAuthIdToken = typeof CodexOAuthIdToken.Type;
 
 export const CodexOAuthAccountId = Schema.RedactedFromValue(
-  Schema.NonEmptyString
+  CodexOAuthHeaderValue.pipe(Schema.brand("CodexOAuthAccountId"))
 );
 
 export type CodexOAuthAccountId = typeof CodexOAuthAccountId.Type;

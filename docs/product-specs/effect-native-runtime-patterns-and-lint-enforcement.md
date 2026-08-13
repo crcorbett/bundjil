@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-effect-architecture-owner
@@ -14,8 +14,8 @@ task_ledger: effect-native-runtime-patterns-and-lint-enforcement.tasks.json
 
 ## Status and decision
 
-This SPEC is current implementation intent under
-`docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md`.
+This SPEC is implemented history under
+`docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md`.
 Cooper's
 2026-08-10 delegated authority covers the exact runtime, lint, documentation,
 commit, push and merge work in its sibling ledger. Provider and Production
@@ -563,9 +563,9 @@ The sibling ledger owns exact dependencies. The implementation sequence is:
 7. run focused package proof and terminal repository verification; and
 8. run the one terminal five-pass implementation audit.
 
-The active owner is
-`docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md`.
-Its terminal audit also depends on the operational closeout ledger.
+The completed owner is
+`docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md`.
+Its accepted terminal audit depended on the operational closeout ledger.
 
 ## Closed error-channel correction
 
@@ -846,33 +846,300 @@ RuleTester and installed positive/negative fixtures own the rule. No autofix,
 helper, wrapper service, exception registry, provider operation, credential,
 deployment, or hosted claim was added.
 
+## Terminal audit pass 1 boundary correction
+
+The first ordered architecture-boundaries pass found four defects after the
+earlier implementation checks: Photon logged provider-controlled SDK name/code
+strings after only lexical filtering; Codex function-tool parameters used
+`Schema.Unknown`; the supported package root exported the raw HTTP and byte
+stream mapper services; and the direct Responses proof accepted any successful
+body by transport counts. These survived because the previous checks observed
+safe public errors, TypeScript assignability, transport-type signatures and
+successful HTTP fixtures without directly asserting the structured logger
+payload, recursive JSON contract, root export denylist, or semantic
+`response.completed` event.
+
+The correction removes all provider-controlled Photon strings from the
+Schema-owned diagnostic and retains only closed operation/phase plus bounded
+status/retry observations. Codex now owns object-root recursive JSON tool
+parameters through an Effect Schema; raw HTTP and stream mapper
+services remain private to package runtime composition; explicit `/testing`
+Layers inject only the standard Effect HTTP client into refresh-capable or
+legacy provider compositions. The direct proof decodes SSE data events through
+the owning stream-event Schema and succeeds only after `response.completed`.
+Negative fixtures now inspect encoded Photon logs, reject non-JSON and
+non-object tool parameters, deny the raw root exports, and reject non-SSE or
+incomplete successful responses.
+
+The fresh pass-1 rerun then found four deeper false greens. Photon diagnostic
+extraction used `Reflect.get`, so a hostile getter could throw before the safe
+error existed. Codex live streaming appended `finish_reason` and `[DONE]`
+without observing `response.completed`; proof parsing accepted an unterminated
+completed line and a media-type parameter containing `text/event-stream`; and
+`Layer.provideMerge` retained the private HTTP/mapper services in exported
+Layer contexts even after their barrel exports were removed.
+
+The root correction treats provider failures as hostile property containers:
+only non-accessor own data properties are inspected through
+`Option.liftThrowable`, with every descriptor/accessor failure collapsing to
+the closed `unknown` observation. Codex proof and live streaming now share one
+bounded package-private SSE line/event framer. It rejects unterminated lines or
+events, matches the exact media type, decodes framed data through the owning
+Schema, and requires `response.completed` before proof success or clean
+OpenAI-compatible completion. Proof counts the incrementally consumed bytes in
+an Effect `Ref` rather than materialising an unbounded response body. Private
+HTTP/request/stream dependencies use
+`Layer.provide`; a built-context test proves they are absent from exported live
+and test Layers. New direct fixtures use throwing provider getters, misleading
+media types, malformed and unterminated SSE, clean upstream termination before
+completion, and built Layer context inspection.
+
+The next pass-1 rerun found that separately bounded `data:` lines could still
+form an unbounded multi-line event, proof retained all decoded events with
+`runCollect`, the receipt named its event count `receivedStreamLines`, and the
+request mapper remained reachable from root/runtime exports. The framer now
+bounds both individual lines and the joined event at 1 MiB. Proof uses
+`Stream.runFold` to retain only `{ count, completed }`, and its Schema field is
+`receivedStreamEvents`. A valid multi-line JSON event proves one-event
+counting; two sub-limit lines above the aggregate ceiling fail. The remaining
+request-mapper service, constructor, accessor and Layer exports are removed and
+added to the root denylist oracle.
+
+The following pass-1 rerun found that comment and ignored-field bytes did not
+contribute to the aggregate SSE event ceiling, legal CR-only framing was not
+owned by a direct oracle, and Photon accepted any safe integer as a transport
+status. The framer now counts every nonblank wire line toward its 1 MiB event
+budget while preserving LF, CRLF and CR framing. Photon owns the closed
+100-through-599 transport-status Schema and collapses every other numeric value
+to `unknown`. Direct fixtures cover CR-only completion, aggregate ignored-field
+overflow and out-of-range provider numbers. Pass 1 restarts from this candidate.
+
+The next pass-1 rerun reproduced seven further false greens. A failed event
+followed by completion became a clean stream; raw provider Content-Type escaped
+into public receipts/errors; re-encoded line lengths undercounted CRLF wire
+bytes; repeated array spreads admitted quadratic work below the byte ceiling;
+an empty chunk split CRLF; finite-number Schemas admitted impossible statuses,
+counts and indexes; and the export denylist inspected only the root barrel.
+
+The correction introduces one package-private Schema and `Match` terminal-event
+state owner shared by proof and live mapping. It rejects failed, incomplete,
+error, malformed, duplicate and post-terminal input before clean finish or
+`[DONE]`. Successful metadata emits only the closed `text/event-stream`
+literal, while public HTTP errors retain bounded status and fixed application
+messages. The SSE framer preserves exact delimiter and blank-line bytes across
+empty chunks, uses persistent Effect `Chunk` accumulation, and enforces 4,096
+line-fragment and event-field ceilings. HTTP status, counts, sequence numbers
+and output indexes are bounded integers. Direct tests own terminal ordering,
+header sentinels, exact LF/CRLF/CR byte thresholds, fragment/field limit-plus-one,
+impossible numbers and every supported package subpath. Pass 1 restarts from
+this candidate.
+
+The latest pass-1 rerun found six related boundary failures plus one cold-gate
+surface finding. Config could redirect the bearer credential to any non-empty
+endpoint; malformed redacted token/account values could defect during platform
+header construction; generic recursive JSON could overflow the JavaScript
+stack; proof accepted malformed recognized events that live mapping rejected;
+sequence numbers were decoded but not advanced; and Knip found an unused
+private stream convenience accessor.
+
+The corrected owner pins the credential-bearing endpoint to the exact ChatGPT
+Responses HTTPS literal, constrains header values to bounded visible ASCII and
+wraps platform `Headers` construction in a fixed secret-negative
+`Effect.try`. One opaque depth-bounded Schema now validates arbitrary protocol
+JSON for both object-root tool parameters and SSE input before event selection.
+Proof and live mapping consume the same closed recognized-event union and one
+`Match` state machine that requires exact zero-based sequence progression. The
+unused accessor is removed. Config, network-negative header, exact-depth,
+malformed-recognized-event and duplicate/regressing/skipped-sequence fixtures
+own each recurrence path. Pass 1 restarts from this candidate.
+
+The subsequent pass-1 rerun found five remaining boundary false greens. Photon
+read a successful SDK result's `id` directly, so a hostile getter could still
+escape the typed adapter. Codex function parameters reused the bounded JSON
+predicate without preserving their object-root invariant; sparse arrays and
+non-enumerable object fields could pass validation and then encode to a
+different value; access tokens and account IDs were both assignable as
+`Redacted<string>`; and a fresh decoder per SSE line stripped a BOM outside the
+stream start while colonless `data` fields disappeared.
+
+The corrected candidate reads Photon success identity through the same hostile
+own-data-property boundary as failures and decodes a new application-owned
+result. Codex function parameters explicitly require a non-null, non-array
+object. Its opaque JSON contract accepts only dense arrays and enumerable own
+data properties, so accepted values have stable outward encoding. Access-token
+and account-ID strings have distinct brands before redaction. SSE framing owns
+one first-line flag, strips a BOM only at stream start, and treats colonless
+`data` as an empty data field. Direct fixtures cover the hostile success getter,
+scalar parameter roots, sparse/non-enumerable JSON, credential
+non-assignability, a valid first-line BOM, a later BOM, and colonless data. Pass
+1 restarts from this candidate.
+
+The next pass-1 rerun found five remaining boundary defects and one test
+resolution false green. Expected proxy authorization was request-controlled
+alongside presented authorization; a duplicate function-call output index
+overwrote mapper state; accepted protocol JSON retained caller-owned mutable
+references; the Responses transport had no header, idle-body, cumulative-body
+or event budgets; and the SSE-only route accepted `stream: false` and silently
+stripped unsupported fields. App Vitest could also externalise a workspace
+package and execute stale ignored build output despite its source condition.
+
+The accepted correction captures the expected token in the service Layer,
+decodes the bounded presented authorization into `Redacted` at ingress, and
+uses one fixed-width comparison loop. Duplicate output indexes fail before
+state mutation. The canonical JSON Schema uses installed beta.101
+`Schema.decodeTo` and fallible `SchemaGetter` transformations in both
+directions, yielding detached deeply frozen bounded data. Positive transport
+budgets come from `Config.schema`; Effect timeout and Stream operators own
+headers, per-pull idleness, cumulative bytes, event cardinality, interruption
+and finalisation. Exact HTTP decoding rejects excess properties and accepts
+only omitted or literal-true stream mode. App Vitest inlines workspace packages
+under the source export condition. Forged-token, duplicate-index,
+source-mutation, deterministic timeout/finalizer, resource-limit, strict
+ingress and source-resolution fixtures own the recurrence paths. Pass 1
+restarts from this candidate.
+
+The subsequent full boundary gate found one remaining type-surface false green:
+the recursive canonical JSON unions were exported even though runtime values
+were opaque, and the SSE accumulator used an assertion to recover its tuple
+type. The implementation unions are now private, the public protocol value
+types are derived only from opaque branded Effect Schemas, and the accumulator
+uses checked Effect inference. The public-export fixture and boundary gate own
+the recurrence path. Pass 1 restarts from this candidate.
+
+The fresh terminal pass 1 then found that the declaration predicate validated
+by creating and discarding a canonical copy. Effect type-side guards and
+constructors could therefore brand the original mutable object without running
+the detaching transformation. The declaration now accepts only recursively
+frozen canonical containers, while decode and encode continue to produce new
+deeply frozen ordinary data. Direct guard, shallow-freeze, type-side constructor
+and nested request fixtures own the alternate entry path. The ordered terminal
+audit restarts from pass 1.
+
+The next fresh pass 1 found an oracle false green rather than another runtime
+bypass: the nested request fixture used a plain access-token string and could
+fail before reaching mutable tool parameters. The accepted correction reuses
+valid decoded sibling fields and exercises both the type-side Schema and
+`CodexResponsesPostInput.makeEffect`, asserting the exact
+`request.tools[0].parameters` issue path. Negative boundary fixtures must
+satisfy all earlier field and composition preconditions and prove the intended
+failure owner. The ordered terminal audit restarts from pass 1.
+
+The following fresh pass 1 found that deep freezing still did not establish
+canonical ownership. A frozen `Proxy` can satisfy structural and freeze checks
+while retaining caller-controlled own-key behavior. `ENP-FND-044` therefore
+adds package-private weak-identity provenance to every transformed container;
+the declaration type side requires that provenance recursively, while ordinary
+decode still detaches a hostile proxy into stable deeply frozen data. The exact
+one-constructor lint exception and its stale-count fixture own the native
+`WeakSet`; guard, nested-constructor, detachment and repeated-encoding fixtures
+own the boundary recurrence path. The ordered terminal audit restarts from
+pass 1.
+
+The first ordered audit attempt then exposed a lifecycle false green: the
+product index retained the earlier 23-task count and the two accepted boundary
+tasks remained `in_progress` after their completion evidence had passed. The
+ledger now closes all 25 implementation tasks before the terminal task begins.
+`ENP-FND-042` makes exact task-count and status agreement part of the terminal
+proof; the ordered five-pass audit restarts after this documentation correction.
+
+A later behavior pass found another lazy-stream oracle false green. The 401
+recovery fixture counted two requests but did not identify the credential used
+by either request and did not consume the returned mapped body. The corrected
+fixture proves old-token rejection, refreshed-token replay, terminal
+`finish_reason: stop`, and `[DONE]`. Request count alone is not credential or
+stream-completion evidence. The earlier five-pass receipt is invalidated and
+the ordered terminal audit restarts from pass 1.
+
+The next restarted pass 1 found two resource/cause false greens. Live and local
+proxy availability used `Layer.catchCause`, which could downgrade defects or
+interruption into ordinary unavailability. They now use installed beta.101
+`Layer.catch`, recovering typed acquisition failures only; deterministic live
+and local defect plus interruption fixtures own the recurrence path. The same
+pass found that periodic zero-length upstream chunks reset a per-pull idle
+timeout without consuming byte, event or framing budgets. The bounded body
+stream now filters empty chunks before the timeout, so only non-empty protocol
+bytes count as progress; a `TestClock` fixture proves timeout and upstream
+finalization. `ENP-FND-045` and `ENP-FND-046` reopen the Codex task and restart
+the ordered audit from pass 1.
+
+The following pass 1 identified a response-finalization proof gap. The
+implementation already scopes proof requests through completion and transfers a
+dedicated scope to accepted streaming bodies, but early status/media fixtures
+proved only that body text did not leak. `ENP-FND-047` adds a four-case matrix
+over proof/streaming and non-2xx/rejected-media paths. Each case observes the
+`HttpClient.withScope` abort signal immediately, requires `Response.bodyUsed`
+to remain false, and keeps a rejected-body sentinel out of the typed result.
+The focused Codex suite passes 32 proof tests. The ordered audit restarts from
+pass 1 after full verification.
+
+The next pass 1 found the remaining ownership gap: accepted headers created a
+dedicated response scope before return, but cleanup was attached only to body
+subscription. A caller that discarded the successful result could therefore
+leave transport open indefinitely. Fully lazy acquisition was rejected because
+it would move upstream 401/media failures behind already-sent proxy headers.
+`ENP-FND-048` instead adds one bounded Effect-clock ownership watchdog after
+header validation. Body subscription claims the scope and the existing
+per-pull/finalizer path takes over; otherwise the configured idle deadline
+closes it. A scope-finalizer `Deferred` terminates the detached watchdog on
+every earlier close. `TestClock` proves an accepted discarded stream aborts at
+the deadline without reading its body. The ordered audit restarts from pass 1
+after full verification.
+
+The next pass 1 found that the first ownership watchdog started before header
+acquisition, allowing a short stream-idle setting to abort a still-valid longer
+header wait. `ENP-FND-049` moves watchdog startup until after accepted status,
+media type and metadata validation. A `TestClock` regression configures a
+five-second header deadline and one-second stream-idle deadline, delays valid
+headers by two seconds, proves no premature abort, then drains the claimed body
+and observes normal request closure. The never-subscribed expiry fixture remains
+in place. The ordered audit restarts from pass 1 after full verification.
+
+The restarted pass 1 then found that the subscriber discarded the boolean
+returned by `Deferred.succeed`. After watchdog expiry, or after one successful
+subscription, a later subscriber could therefore continue to the same one-shot
+upstream body instead of failing at the ownership boundary. `ENP-FND-050`
+branches on that claim result: only the winner receives the bounded stream;
+expired and duplicate claims return one fixed `CodexResponsesStreamError`
+before reading the response. Deterministic fixtures prove both negative paths,
+including unread body state after expiry. The ordered audit restarts from pass
+1 after full verification.
+
+Installed `effect@4.0.0-beta.101` remains execution authority; reviewed v4
+source revision `1caab3cc30f626efbf15e59d74f539a487e5c85c` provides the
+Schema declaration, Redacted, Config, Match and Layer APIs used here. This correction preserves public
+domain services, OAuth recovery, request/stream mapping, cancellation, channel
+error mapping, provider calls and wire behavior. It does not prove live Photon,
+Codex subscription, hosted proxy, deployment, channel delivery or Production
+behavior. The complete five-pass audit restarts after this correction and its
+focused evidence are accepted.
+
 ## Docs-maintainer impact ledger
 
-| Surface                          | Decision                            | Earliest owner, future action, proof, and non-claim                                                                                                                                                                                                                                    |
-| -------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Canonical SPEC/tasks/index       | Change required; delivered          | This SPEC, sibling ledger, and `docs/product-specs/index.md` own current intent and lifecycle. `check:docs` proves routing only.                                                                                                                                                       |
-| Documentation audit              | Preserve                            | Historical documentation-audit packets remain immutable; current policy is proved by `bun run check:docs`.                                                                                                                                                                             |
-| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, Random, state/ref, collection, Layer, absence, lint scope, exact exceptions, public errors, shared field objects, identity-versus-diagnostic branding, and dynamic drift execution provenance.                   |
-| Testing/quality architecture     | Change required; delivered          | `docs/architecture/testing-and-quality.md` owns exact rule IDs, installed fixtures, exception staleness, focused commands, drift run/digest binding proof, and terminal gate.                                                                                                          |
-| Other architecture               | Preserve                            | `docs/architecture/README.md`, `docs/architecture/repo-structure.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient; implementation introduced no route, topology, Eve contract, or frontend change.                             |
-| Root README / docs index         | Preserve                            | `README.md` and `docs/README.md` already route the unchanged public commands and owners; the decision matrix remains in its semantic owner.                                                                                                                                            |
-| App READMEs                      | Preserve                            | `apps/agent/README.md` and `apps/codex-proxy/README.md` retain the same public boundaries and commands; internal redaction composition does not add setup or operations.                                                                                                               |
-| Package READMEs                  | Targeted Change required; delivered | The Sendblue README records private Web Crypto Promise ingress and Effect-owned concurrency; the infrastructure README records the two closed authority-loader errors; other package purpose, export paths, and commands remain unchanged.                                             |
-| AGENTS.md                        | Preserve                            | `AGENTS.md` already requires flat Effect flow, Schema boundaries, no helper sprawl, provider wrapper review, and docs maintenance.                                                                                                                                                     |
-| `prd-writer`                     | Change required; delivered          | The skill now requires explicit `Effect.fn` versus `Effect.fnUntraced` trace ownership and rejects exported functions that directly construct `Effect.gen`.                                                                                                                            |
-| `prd-review` / `prd-implementer` | Change required; delivered          | Both skills now audit the same exported-operation invariant while preserving flat sequential flow, focused proof, docs reconciliation, and the single terminal audit.                                                                                                                  |
-| `effect-client-wrapper`          | Change required; delivered          | The skill now distinguishes semantic `Effect.fn` trace owners from untraced delegates while retaining named services, typed provider boundaries, Config, errors, Layers, Promise confinement, and resource lifetime.                                                                   |
-| Lint plugin/config/tests         | Change required; delivered          | The existing plugin now also owns exported reusable-generator trace ownership with direct and installed fixtures; the approved zero-debt scopes add no second runner, plugin package, autofix, broad ignore, or exception.                                                             |
-| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, redacted Schema round-trips, ambient random identities, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings in shared error fields; exceptions remain unchanged.                               |
-| Schemas/services/Layers          | Targeted Change required; delivered | Existing exported operations now declare semantic traced versus untraced delegate ownership; the workspace helper reuses its existing branded name Schema instead of raw string, while exports, result contracts, errors, service identities and Layers remain unchanged.              |
-| Tests/fixtures                   | Change required; delivered          | Encoded error fixtures prove closed shapes; lint fixtures cover Layer defect conversion; real command subprocesses prove both foreground and missing-Layer configuration failures remain bounded and secret-negative; seeded Random and Production transition fixtures remain focused. |
-| Verification/evidence/research   | Preserve                            | No critical journey, retained proof owner, or research route changed; repository lint and runtime evidence remains in the active plan and code-owned fixtures.                                                                                                                         |
-| Standards/operations/runbooks    | Targeted Change required; delivered | Workflow, authority/control registers, Alchemy runbook, and automatic-Production SPEC distinguish static policy custody from dynamic run/source/manifest provenance. No provider procedure or authority scope changed.                                                                 |
-| Active/completed execution plans | Change required                     | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                                                           |
-| Runtime branch history/evidence  | Preserve                            | Use merged current source; do not rewrite completed proof or infer hosted actuality.                                                                                                                                                                                                   |
-| Provider state and hosted proof  | Preserve                            | The automatic-Production SPEC and plan retain the external custody and hosted proof gates. This correction changes repository provenance contracts only.                                                                                                                               |
-| Frontend/browser/accessibility   | Evidenced N/A                       | Atom is rejected for backend use and no visible React/browser surface changes.                                                                                                                                                                                                         |
-| Release/version/publication      | Evidenced N/A                       | No package version, tag, release, or publication; combined branch commit/push/merge and Production proof remain owned by the parent execution plan.                                                                                                                                    |
+| Surface                          | Decision                            | Earliest owner, future action, proof, and non-claim                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canonical SPEC/tasks/index       | Change required; delivered          | This SPEC, sibling ledger, and `docs/product-specs/index.md` own current intent and lifecycle. `check:docs` proves routing only.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Documentation audit              | Preserve                            | Historical documentation-audit packets remain immutable; current policy is proved by `bun run check:docs`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Effect architecture              | Change required; delivered          | `docs/architecture/effect-patterns.md` owns accepted Clock/TestClock, Random, state/ref, collection, Layer, absence, lint scope, exact exceptions, public errors, shared field objects, identity-versus-diagnostic branding, recursive JSON protocol fields, closed provider telemetry, and dynamic drift execution provenance.                                                                                                                                                                                                                                                              |
+| Testing/quality architecture     | Change required; delivered          | `docs/architecture/testing-and-quality.md` owns exact rule IDs, installed fixtures, exception staleness, focused commands, drift run/digest binding proof, and terminal gate.                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Other architecture               | Targeted Change required; delivered | `docs/architecture/repo-structure.md` owns the Codex private transport/public domain-service split; `docs/architecture/README.md`, `docs/architecture/eve-agent.md`, and `docs/architecture/frontend-composition.md` remain sufficient because no route, Eve contract, or frontend changed.                                                                                                                                                                                                                                                                                                  |
+| Root README / docs index         | Preserve                            | `README.md` and `docs/README.md` already route the unchanged public commands and owners; the decision matrix remains in its semantic owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| App READMEs                      | Targeted Change required; delivered | `apps/codex-proxy/README.md` records the Layer-owned credential and exact SSE-only ingress contract; `apps/agent/README.md` remains unchanged because model/channel behavior did not change.                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Package READMEs                  | Targeted Change required; delivered | The Codex README records private raw transport, explicit test injection, canonical JSON ownership and Config-owned resource limits; prior Sendblue/infrastructure guidance remains current. Photon public exports and commands are unchanged, so its README is preserved.                                                                                                                                                                                                                                                                                                                    |
+| AGENTS.md                        | Preserve                            | `AGENTS.md` already requires flat Effect flow, Schema boundaries, no helper sprawl, provider wrapper review, and docs maintenance.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `prd-writer`                     | Change required; delivered          | The skill now requires explicit `Effect.fn` versus `Effect.fnUntraced` trace ownership and rejects exported functions that directly construct `Effect.gen`.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `prd-review` / `prd-implementer` | Change required; delivered          | Both skills now audit the same exported-operation invariant while preserving flat sequential flow, focused proof, docs reconciliation, and the single terminal audit.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `effect-client-wrapper`          | Change required; delivered          | The skill now distinguishes semantic `Effect.fn` trace owners from untraced delegates while retaining named services, typed provider boundaries, Config, errors, Layers, Promise confinement, and resource lifetime.                                                                                                                                                                                                                                                                                                                                                                         |
+| Lint plugin/config/tests         | Change required; delivered          | The existing plugin now also owns exported reusable-generator trace ownership with direct and installed fixtures; the approved zero-debt scopes add no second runner, plugin package, autofix, broad ignore, or exception.                                                                                                                                                                                                                                                                                                                                                                   |
+| Boundary/effect checks           | Change required; delivered          | The audit rejects raw defects, raw Promise coordination, redacted Schema round-trips, ambient random identities, operator unknown fields, exported `Data.TaggedError`, and inline primitive strings in shared error fields; exceptions remain unchanged.                                                                                                                                                                                                                                                                                                                                     |
+| Schemas/services/Layers          | Targeted Change required; delivered | Existing trace ownership remains; Photon failures and successful message identity cross one hostile-property boundary, Codex function parameters and SSE use one canonical depth-bounded JSON Schema, credential domains remain distinct before redaction, recognized events share one sequence owner, and raw transport Layers remain behind runtime/testing composition.                                                                                                                                                                                                                   |
+| Tests/fixtures                   | Change required; delivered          | Encoded Photon logger and hostile-success capture; endpoint/header/depth/canonical-JSON ownership including frozen-proxy rejection and stable detachment/encoding; typed Layer fallback with defect/interruption preservation; non-empty body-progress timeout/finalization; credential-type/sequence/BOM rejection; forged-token, duplicate-index, transport-budget, strict-ingress and source-resolution oracles; all-subpath export denial; and semantic SSE completion fixtures own the pass-1 recurrence paths. Existing command, lint, Random, and transition fixtures remain focused. |
+| Verification/evidence/research   | Preserve                            | No critical journey, retained proof owner, or research route changed; repository lint and runtime evidence remains in the active plan and code-owned fixtures.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Standards/operations/runbooks    | Targeted Change required; delivered | Workflow, authority/control registers, Alchemy runbook, and automatic-Production SPEC distinguish static policy custody from dynamic run/source/manifest provenance. No provider procedure or authority scope changed.                                                                                                                                                                                                                                                                                                                                                                       |
+| Active/completed execution plans | Change required                     | The dedicated active plan owns this ledger and closes only after the combined terminal audit; the active/completed indexes follow lifecycle.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Runtime branch history/evidence  | Preserve                            | Use merged current source; do not rewrite completed proof or infer hosted actuality.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Provider state and hosted proof  | Preserve                            | The automatic-Production SPEC and plan retain the external custody and hosted proof gates. This correction changes repository provenance contracts only.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Frontend/browser/accessibility   | Evidenced N/A                       | Atom is rejected for backend use and no visible React/browser surface changes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Release/version/publication      | Evidenced N/A                       | No package version, tag, release, or publication; combined branch commit/push/merge and Production proof remain owned by the parent execution plan.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## Non-goals
 

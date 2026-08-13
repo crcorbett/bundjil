@@ -9,11 +9,12 @@ import {
   Stream,
 } from "effect";
 import { TestClock } from "effect/testing";
+import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
   CodexDirectProviderInput,
-  CodexHttpStatusError,
   CodexOAuthClient,
+  CodexOAuthAccessToken,
   CodexOAuthCredentialRevision,
   CodexOAuthRefreshLockTtlMillis,
   CodexOAuthRefreshPolicyService,
@@ -29,18 +30,16 @@ import {
   streamChatCompletion,
 } from "../src/index.js";
 import type { CodexOAuthSubjectType } from "../src/index.js";
+import { CodexOAuthRefreshClientLive } from "../src/runtime.js";
 import {
-  CodexDirectProviderLive,
-  CodexOAuthRefreshClientLive,
-} from "../src/runtime.js";
-import {
-  CodexHttpClientMock,
   CodexOAuthHttpClientMock,
   CodexOAuthMemory,
+  makeCodexDirectProviderHttpClientTestLayer,
 } from "../src/testing/index.js";
 
 const validProfileExpiryEpochMillis = 4_102_444_800_000;
 const fixtureUpdatedAtEpochMillis = 1_700_000_000_000;
+const accessTokenFixture = Schema.decodeUnknownSync(CodexOAuthAccessToken);
 
 const subject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   provider: "codex",
@@ -550,7 +549,7 @@ it.effect("rejects omitted and malformed refreshed access tokens", () =>
       Layer.provide(
         CodexOAuthHttpClientMock({
           refresh: () =>
-            Effect.succeed({ access_token: Redacted.make("not-a-jwt") }),
+            Effect.succeed({ access_token: accessTokenFixture("not-a-jwt") }),
         })
       )
     );
@@ -576,46 +575,57 @@ const makeProviderInput = (value: CodexOAuthSubjectType) =>
     },
   });
 
-const successfulStream = {
-  status: 200,
-  contentType: "text/event-stream" as const,
-  body: Stream.make(
-    new TextEncoder().encode('data: {"type":"response.completed"}\n')
-  ),
-};
-
 it.effect("replays exactly once after a 401 and succeeds", () =>
   Effect.gen(function* testSingleReplay() {
     const value = yield* subject;
     const profile = yield* makeProfile(value);
     const refreshResult = yield* makeRefreshResult(value);
     const input = yield* makeProviderInput(value);
-    const success = successfulStream;
     let requests = 0;
-    const provider = CodexDirectProviderLive.pipe(
-      Layer.provide(CodexOAuthMemory([profile], { refreshResult })),
-      Layer.provide(
-        CodexHttpClientMock({
-          postResponsesStreamEffect: () => {
-            requests += 1;
-            return requests === 1
-              ? Effect.fail(
-                  new CodexHttpStatusError({
-                    operation: "postResponsesStream",
-                    status: 401,
-                    statusText: "Unauthorized",
-                    contentType: "application/json",
-                    message: "Sanitized provider rejection.",
-                  })
+    const authorizations: string[] = [];
+    const provider = makeCodexDirectProviderHttpClientTestLayer(
+      { reasoningEffort: "low" },
+      HttpClient.make((request) => {
+        requests += 1;
+        authorizations.push(request.headers["authorization"] ?? "");
+        return Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            requests === 1
+              ? new Response("private rejection body", {
+                  headers: { "content-type": "application/json" },
+                  status: 401,
+                })
+              : new Response(
+                  'data: {"type":"response.completed","sequence_number":0,"response":{"status":"completed"}}\n\n',
+                  {
+                    headers: { "content-type": "text/event-stream" },
+                    status: 200,
+                  }
                 )
-              : Effect.succeed(success);
-          },
-        })
+          )
+        );
+      })
+    ).pipe(Layer.provideMerge(CodexOAuthMemory([profile], { refreshResult })));
+
+    const output = yield* streamChatCompletion(input).pipe(
+      Effect.provide(provider)
+    );
+    const body = yield* output.body.pipe(
+      Stream.decodeText(),
+      Stream.runFold(
+        () => "",
+        (received, part) => received + part
       )
     );
 
-    yield* streamChatCompletion(input).pipe(Effect.provide(provider));
     assert.strictEqual(requests, 2);
+    assert.deepStrictEqual(authorizations, [
+      "Bearer access-token-old-secret",
+      "Bearer access-token-new-secret",
+    ]);
+    assert.include(body, '"finish_reason":"stop"');
+    assert.include(body, "data: [DONE]");
   })
 );
 
@@ -626,25 +636,21 @@ it.effect("stops after the second 401", () =>
     const refreshResult = yield* makeRefreshResult(value);
     const input = yield* makeProviderInput(value);
     let requests = 0;
-    const provider = CodexDirectProviderLive.pipe(
-      Layer.provide(CodexOAuthMemory([profile], { refreshResult })),
-      Layer.provide(
-        CodexHttpClientMock({
-          postResponsesStreamEffect: () => {
-            requests += 1;
-            return Effect.fail(
-              new CodexHttpStatusError({
-                operation: "postResponsesStream",
-                status: 401,
-                statusText: "Unauthorized",
-                contentType: "application/json",
-                message: "Sanitized provider rejection.",
-              })
-            );
-          },
-        })
-      )
-    );
+    const provider = makeCodexDirectProviderHttpClientTestLayer(
+      { reasoningEffort: "low" },
+      HttpClient.make((request) => {
+        requests += 1;
+        return Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            new Response("private rejection body", {
+              headers: { "content-type": "application/json" },
+              status: 401,
+            })
+          )
+        );
+      })
+    ).pipe(Layer.provideMerge(CodexOAuthMemory([profile], { refreshResult })));
     const error = yield* streamChatCompletion(input).pipe(
       Effect.provide(provider),
       Effect.flip
@@ -661,25 +667,21 @@ it.effect("does not replay unrelated upstream failures", () =>
     const profile = yield* makeProfile(value);
     const input = yield* makeProviderInput(value);
     let requests = 0;
-    const provider = CodexDirectProviderLive.pipe(
-      Layer.provide(CodexOAuthMemory([profile])),
-      Layer.provide(
-        CodexHttpClientMock({
-          postResponsesStreamEffect: () => {
-            requests += 1;
-            return Effect.fail(
-              new CodexHttpStatusError({
-                operation: "postResponsesStream",
-                status: 500,
-                statusText: "Unavailable",
-                contentType: "application/json",
-                message: "Sanitized provider failure.",
-              })
-            );
-          },
-        })
-      )
-    );
+    const provider = makeCodexDirectProviderHttpClientTestLayer(
+      { reasoningEffort: "low" },
+      HttpClient.make((request) => {
+        requests += 1;
+        return Effect.succeed(
+          HttpClientResponse.fromWeb(
+            request,
+            new Response("private failure body", {
+              headers: { "content-type": "application/json" },
+              status: 500,
+            })
+          )
+        );
+      })
+    ).pipe(Layer.provideMerge(CodexOAuthMemory([profile])));
     const error = yield* streamChatCompletion(input).pipe(
       Effect.provide(provider),
       Effect.flip

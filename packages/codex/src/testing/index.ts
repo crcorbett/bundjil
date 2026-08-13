@@ -1,5 +1,6 @@
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { Context, Effect, Layer, Option, Redacted, Ref, Schema } from "effect";
+import { HttpClient } from "effect/unstable/http";
 
 import { CodexOAuthClient } from "../auth/client.js";
 import type { CodexOAuthTokenRefreshResult } from "../auth/credentials.js";
@@ -33,13 +34,27 @@ import { CodexOAuthObserver } from "../profiles/observer.js";
 import { defaultCodexOAuthRefreshLockTtlMillis } from "../profiles/refresh-lock.js";
 import { CodexProfileStore } from "../profiles/store.js";
 import type {
-  CodexResponsesProofResult,
-  CodexResponsesStreamResult,
+  CodexResponsesRequestPolicy,
   OpenAICompatibleChatCompletionStream,
 } from "../provider/contracts.js";
-import { CodexDirectProvider } from "../provider/direct.js";
-import { CodexHttpNetworkError } from "../provider/errors.js";
-import { CodexHttpClient } from "../provider/http-client.js";
+import {
+  CodexDirectProvider,
+  makeCodexDirectProvider,
+  makeCodexLegacyDirectProvider,
+} from "../provider/direct.js";
+import {
+  CodexHttpClient,
+  makeCodexHttpClient,
+} from "../provider/http-client.js";
+import {
+  CodexRequestMapper,
+  makeCodexRequestMapper,
+} from "../provider/request-mapper.js";
+import { makeCodexResponsesRequestPolicyLayer } from "../provider/request-policy.js";
+import {
+  CodexStreamMapper,
+  makeCodexStreamMapper,
+} from "../provider/stream-mapper.js";
 import {
   CodexOAuthProfileCipherLive,
   CodexOAuthServiceLive,
@@ -58,38 +73,35 @@ export interface CodexOAuthClientMockOptions {
   readonly refresh?: CodexOAuthClient["Service"]["refresh"];
 }
 
-export interface CodexHttpClientMockOptions {
-  readonly postResponses?: CodexResponsesProofResult;
-  readonly postResponsesStream?: CodexResponsesStreamResult;
-  readonly postResponsesStreamEffect?: CodexHttpClient["Service"]["postResponsesStream"];
-}
+const makeCodexHttpClientTestDependencies = (
+  policy: CodexResponsesRequestPolicy,
+  client: HttpClient.HttpClient
+) =>
+  Layer.mergeAll(
+    Layer.effect(CodexRequestMapper, makeCodexRequestMapper).pipe(
+      Layer.provide(makeCodexResponsesRequestPolicyLayer(policy))
+    ),
+    Layer.succeed(CodexStreamMapper, makeCodexStreamMapper),
+    Layer.effect(CodexHttpClient, makeCodexHttpClient).pipe(
+      Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
+    )
+  );
 
-export const CodexHttpClientMock = (options: CodexHttpClientMockOptions = {}) =>
-  Layer.succeed(CodexHttpClient, {
-    postResponses: () =>
-      options.postResponses === undefined
-        ? Effect.fail(
-            new CodexHttpNetworkError({
-              operation: "postResponses",
-              message: "CodexHttpClientMock.postResponses is not seeded.",
-            })
-          )
-        : Effect.succeed(options.postResponses),
-    postResponsesStream: (input) => {
-      if (options.postResponsesStreamEffect !== undefined) {
-        return options.postResponsesStreamEffect(input);
-      }
-      if (options.postResponsesStream === undefined) {
-        return Effect.fail(
-          new CodexHttpNetworkError({
-            operation: "postResponsesStream",
-            message: "CodexHttpClientMock.postResponsesStream is not seeded.",
-          })
-        );
-      }
-      return Effect.succeed(options.postResponsesStream);
-    },
-  });
+export const makeCodexDirectProviderHttpClientTestLayer = (
+  policy: CodexResponsesRequestPolicy,
+  client: HttpClient.HttpClient
+) =>
+  Layer.effect(CodexDirectProvider, makeCodexDirectProvider).pipe(
+    Layer.provide(makeCodexHttpClientTestDependencies(policy, client))
+  );
+
+export const makeCodexLegacyDirectProviderHttpClientTestLayer = (
+  policy: CodexResponsesRequestPolicy,
+  client: HttpClient.HttpClient
+) =>
+  Layer.effect(CodexDirectProvider, makeCodexLegacyDirectProvider).pipe(
+    Layer.provide(makeCodexHttpClientTestDependencies(policy, client))
+  );
 
 export interface CodexDirectProviderMockOptions {
   readonly stream: OpenAICompatibleChatCompletionStream;

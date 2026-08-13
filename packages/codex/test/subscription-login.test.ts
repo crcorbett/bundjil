@@ -18,6 +18,8 @@ import {
 
 import { CodexOAuthProviderErrorCode } from "../src/auth/contracts.js";
 import {
+  CodexOAuthAccessToken,
+  CodexOAuthAccountId,
   CodexOAuthCallbackRequestMethod,
   CodexOAuthCallbackRequestUrl,
   CodexOAuthRedirectUri,
@@ -74,6 +76,8 @@ const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
   installationId: "agent-dev",
   profileId: "default",
 });
+
+const accessTokenFixture = Schema.decodeUnknownSync(CodexOAuthAccessToken);
 
 it.effect(
   "constructs platform browser commands without spawning a process",
@@ -215,7 +219,7 @@ const makeLoginLayer = (
           options.exchangeAuthorizationCode ??
           (() =>
             Effect.succeed({
-              access_token: Redacted.make(tokens.accessToken),
+              access_token: accessTokenFixture(tokens.accessToken),
               id_token: Redacted.make(tokens.idToken),
               refresh_token: Redacted.make("refresh-token-secret"),
             })),
@@ -408,7 +412,7 @@ it.effect("decodes JWT expiry and canonical account metadata", () =>
   Effect.gen(function* testJwtMetadata() {
     const tokens = yield* makeTokens;
     const expiry = yield* decodeCodexAccessTokenExpiry(
-      Redacted.make(tokens.accessToken)
+      accessTokenFixture(tokens.accessToken)
     );
     const account = yield* decodeCodexAccountMetadata(
       Redacted.make(tokens.idToken)
@@ -418,7 +422,7 @@ it.effect("decodes JWT expiry and canonical account metadata", () =>
     assert.strictEqual(Redacted.value(account.accountId), "account-personal");
 
     const malformed = yield* decodeCodexAccessTokenExpiry(
-      Redacted.make("not-a-jwt")
+      accessTokenFixture("not-a-jwt")
     ).pipe(Effect.flip);
     assert.strictEqual(malformed.reason, "tokenMetadataInvalid");
     const malformedIdToken = yield* decodeCodexAccountMetadata(
@@ -432,12 +436,12 @@ it.effect("rejects cross-account refresh metadata", () =>
   Effect.gen(function* testCrossAccount() {
     const expected = yield* Schema.decodeUnknownEffect(
       Schema.Struct({
-        accountId: Schema.RedactedFromValue(Schema.NonEmptyString),
+        accountId: CodexOAuthAccountId,
       })
     )({ accountId: "account-a" });
     const received = yield* Schema.decodeUnknownEffect(
       Schema.Struct({
-        accountId: Schema.RedactedFromValue(Schema.NonEmptyString),
+        accountId: CodexOAuthAccountId,
       })
     )({ accountId: "account-b" });
     const error = yield* ensureCodexRefreshAccount(
@@ -633,7 +637,7 @@ it.effect("rejects an already expired exchanged access token", () =>
     const layer = yield* makeLoginLayer({
       exchangeAuthorizationCode: () =>
         Effect.succeed({
-          access_token: Redacted.make(expiredAccessToken),
+          access_token: accessTokenFixture(expiredAccessToken),
           id_token: Redacted.make(idToken),
           refresh_token: Redacted.make("refresh-token-secret"),
         }),

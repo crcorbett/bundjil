@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-implementation-owner
 last_reviewed: 2026-08-10
@@ -8,7 +8,7 @@ review_trigger: task status, scope, source SHA, workflow, provider, secret, depl
 spec: ../../product-specs/automatic-production-and-operational-closeout.md
 ---
 
-# Automatic Production and Effect-native runtime execution plan
+# Automatic Production and Effect-native runtime completed plan
 
 ## Objective and trajectory
 
@@ -35,15 +35,14 @@ invalidates affected evidence and the audit status.
   overwritten.
 - Starting main CI: run `31341341435`, successful for the exact starting SHA.
 
-## Current phase
+## Final outcome
 
-The Production workflow and Effect/lint implementation are complete and
-verified at branch SHA `928623a8f95131528d3eb850ec22c85826533f4a`. Hosted
-main/environment controls and the three Terra High metadata changes are read
-back. Credential custody, hosted drift, merge, automatic Production, Terra High
-runtime proof and Sendblue remain pending. One pre-deployment Photon probe is
-retained only as a bounded channel observation, not candidate-specific
-Production proof.
+The Production workflow and Effect/lint implementation are complete. Hosted
+credential custody, drift, automatic Production, Terra High runtime proof and
+channel proof ended with explicit `deferred` dispositions at the personal-only
+Vercel identity gate. The retained Photon probe is only a bounded historical
+observation, not candidate-specific Production proof. The accepted terminal
+audit is owned by the sibling completed Effect plan.
 
 ## Grounding receipt
 
@@ -872,12 +871,52 @@ custody changed as recorded; existing provider resources, R2 state contents,
 Vercel, GitHub secrets/settings, Photon, deployments, channels, workflows,
 code, tests and runbooks **Preserve**. READMEs, package exports, skills, lint,
 frontend, browser journeys, generated references, release and publication are
-**N/A**. `configure-hosted-controls-and-drift` remains pending because its four
-Vercel tokens, three GitHub artifacts and hosted report do not exist.
+**N/A**. The later terminal disposition below supersedes the pending status for
+this implementation epoch without claiming the absent hosted results.
+
+## 2026-08-13 personal Vercel identity terminal disposition
+
+A final read-before-write check through Executor Personal listed exactly one
+Vercel connection, `personalvercelapi`. Its authenticated user was
+`nBzSPdkIxazY1om0rrNZ9cFg` with canonical email
+`cooper.corbett@tilt.legal`; its only visible team was the Personal-named team.
+Cooper's authority explicitly excludes that account and every Tilt Legal
+resource, so the team label could not widen the admitted principal. No Vercel
+token, GitHub secret, ruleset, deployment, alias, environment value, provider
+route or message was created or changed.
+
+The fixed blocked packet is
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+It binds exact repository candidate `763199f07b6f2f0569442546e6ea7ef695c49a74`,
+the two workflow digests, external identity readback, unchanged postconditions,
+resume trigger, rollback and non-claims. The separate personal Cloudflare R2
+credential remains active and unchanged in personal 1Password custody.
+
+`configure-hosted-controls-and-drift`,
+`correct-terra-high-and-prove-automatic-main`, and
+`close-channel-proof-gaps` now have terminal `deferred` dispositions for this
+epoch. Repository desired state, implementation and exact-head CI remain
+proved. Hosted drift, automatic Production, Terra High stable behavior,
+immutable/stable deployment identity, channel delivery, handset typing and
+candidate-specific replay remain unproved. A successor resumes only after a
+separate admitted personal Vercel user is connected and must repeat all
+credential-scope, custody and hosted proof gates.
+
+Documentation impact: blocked proof detail/packet, automatic Production
+SPEC/tasks, active plan, verification router and authority/automation external
+readbacks **Change required**. Workflow/code, Effect contracts, tests, lint,
+runbooks, app/package READMEs, provider resources, existing credentials,
+deployments and channels **Preserve**. Frontend, browser, accessibility,
+generated references, release and publication are **N/A**. The terminal audit
+may now run, but cannot strengthen any deferred external claim.
 
 ## Terminal audit
 
-Pending. It runs once after both task ledgers are otherwise complete and covers:
+Accepted on 2026-08-14 after `ENP-FND-051` corrected premature completed-
+history and accepted-audit wording. Every implementation task completed and
+every external task received an honest terminal deferred disposition before
+the restarted ordered audit ran. Its final receipt is owned by the sibling
+Effect task ledger and covers:
 
 1. Effect contracts, Schemas, branded boundaries, errors, Config and Layers;
 2. call graph, topology, exports, helper sprawl and dead paths;

@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-repository-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: workspace, package, export, import, TypeScript, lint, test, or source-condition change
 ---
 
@@ -292,17 +292,27 @@ message, deployment, or Production write authority.
   and service tags;
 - owns `CodexProfileStore`, `CodexOAuthService`, `CodexOAuthClient`, and
   KeyValueStore-backed live/memory layers;
-- owns `CodexHttpClient` and `CodexResponsesProof` for the opt-in direct Codex
-  Responses proof path; the named client keeps Effect HTTP request/response
-  primitives private and tests substitute the standard Effect HTTP client
-  Layer at that adapter boundary;
-- owns `CodexRequestMapper`, `CodexStreamMapper`, `CodexDirectProvider`, and
-  `OpenAICompatibleProxy` for the package-level private provider/proxy
-  contract;
+- owns `CodexResponsesProof` for the opt-in direct Codex Responses proof path;
+  the proof incrementally consumes the provider byte stream and accepts only a
+  bounded, framed, decoded SSE sequence containing `response.completed`, not a
+  successful status, content type, byte count, or line count alone;
+- owns package-private `CodexHttpClient`, `CodexRequestMapper`, and
+  `CodexStreamMapper` adapters plus public domain-level `CodexDirectProvider`
+  and `OpenAICompatibleProxy` contracts. Raw Effect HTTP services and
+  `Stream<Uint8Array>` values are not supported package exports; tests inject a
+  standard Effect HTTP client through the explicit `/testing` owner. A single
+  denylist oracle inspects root, `/runtime`, `/local`, `/testing`, and
+  `/filesystem-store` namespaces;
 - carries the live Codex Responses body through one Effect byte stream from
   the private HTTP client to the app response; `CodexStreamMapper` owns
   incremental UTF-8/SSE decoding, ordered text/tool-call mapping, a 1 MiB
-  complete-or-residual line ceiling, late-stream failure, and cancellation,
+  complete-or-residual line ceiling, 4,096-fragment line ceiling, 1 MiB exact
+  wire-byte event ceiling and 4,096-field event ceiling. Framing preserves LF,
+  CRLF and CR delimiters across empty chunks and accounts for data, comments,
+  ignored fields and the terminating blank line. One package-private terminal
+  event state machine requires a Schema-decoded `response.completed` and
+  rejects failure, incomplete, error, duplicate and post-terminal events before
+  clean finish/`[DONE]`; the mapper also owns late-stream failure and cancellation,
   while `apps/codex-proxy` alone owns the separately bounded 1 MiB materialised
   JSON request ingress;
 - composes `@bundjil/store` for native and atomic persistence;

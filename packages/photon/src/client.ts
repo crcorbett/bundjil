@@ -10,7 +10,7 @@ import type {
 } from "@bundjil/channel";
 import { Spectrum } from "@spectrum-ts/core";
 import { imessage } from "@spectrum-ts/imessage";
-import { Context, Effect, Layer, Redacted, Schema } from "effect";
+import { Context, Effect, Layer, Option, Redacted, Schema } from "effect";
 
 import { PhotonLifecycleError } from "./errors.js";
 import { PhotonSdkSendResult } from "./schemas.js";
@@ -64,17 +64,24 @@ export interface PhotonSdkFactory {
   readonly acquire: (config: PhotonConfig) => Promise<PhotonSdkResource>;
 }
 
-const safeSdkToken = (value: unknown) =>
-  typeof value === "string" && /^[A-Za-z][A-Za-z0-9_.-]{0,63}$/u.test(value)
-    ? value
-    : "unknown";
-
 const sdkProperty = (value: unknown, key: PropertyKey): unknown => {
   if (typeof value !== "object" || value === null) {
     return null;
   }
-  const property: unknown = Reflect.get(value, key);
-  return property;
+  const descriptor = Option.liftThrowable(Object.getOwnPropertyDescriptor)(
+    value,
+    key
+  );
+  return Option.match(descriptor, {
+    onNone: () => null,
+    onSome: (property) => {
+      if (property === undefined || !("value" in property)) {
+        return null;
+      }
+      const propertyValue: unknown = property.value;
+      return propertyValue;
+    },
+  });
 };
 
 const makeSdkObservedFailure = (
@@ -88,11 +95,11 @@ const makeSdkObservedFailure = (
   return new PhotonSdkObservedFailure({
     operation,
     phase,
-    errorName: safeSdkToken(sdkProperty(failure, "name")),
-    providerCode: safeSdkToken(sdkProperty(failure, "code")),
     transportStatus:
       typeof transportStatus === "number" &&
-      Number.isSafeInteger(transportStatus)
+      Number.isSafeInteger(transportStatus) &&
+      transportStatus >= 100 &&
+      transportStatus <= 599
         ? transportStatus
         : "unknown",
     retryable: typeof retryable === "boolean" ? retryable : "unknown",
@@ -100,15 +107,7 @@ const makeSdkObservedFailure = (
 };
 
 const observeSdkFailure = (failure: PhotonSdkObservedFailure) =>
-  Effect.logError("PhotonSdkOperationFailure", {
-    provider: "photon",
-    operation: failure.operation,
-    phase: failure.phase,
-    errorName: failure.errorName,
-    providerCode: failure.providerCode,
-    transportStatus: failure.transportStatus,
-    retryable: failure.retryable,
-  });
+  Effect.logError("PhotonSdkOperationFailure", failure);
 
 const observeSdkSuccess = (
   operation: PhotonSdkOperation,
@@ -270,9 +269,9 @@ export const layerClient = (config: PhotonConfig, factory: PhotonSdkFactory) =>
                     })
                 )
               );
-              return yield* Schema.decodeUnknownEffect(PhotonSdkSendResult)(
-                result
-              ).pipe(
+              return yield* Schema.decodeUnknownEffect(PhotonSdkSendResult)({
+                id: sdkProperty(result, "id"),
+              }).pipe(
                 Effect.mapError(
                   () =>
                     new ChannelProviderRejectedError({

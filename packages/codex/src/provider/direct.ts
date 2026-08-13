@@ -94,6 +94,7 @@ export const makeCodexDirectProvider = Effect.gen(
         return yield* streamMapper.toOpenAICompatibleStream({
           model: input.request.model,
           body: response.body,
+          transportPolicy: response.transportPolicy,
         });
       }),
     });
@@ -124,6 +125,7 @@ export const makeCodexLegacyDirectProvider = Effect.gen(
         return yield* streamMapper.toOpenAICompatibleStream({
           model: input.request.model,
           body: response.body,
+          transportPolicy: response.transportPolicy,
         });
       }),
     });

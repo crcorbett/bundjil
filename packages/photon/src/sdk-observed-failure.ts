@@ -16,17 +16,20 @@ export const PhotonSdkPhase = Schema.Literals([
 ]);
 export type PhotonSdkPhase = typeof PhotonSdkPhase.Type;
 
-export const PhotonSdkErrorName = Schema.String;
-export const PhotonSdkProviderCode = Schema.String;
+export const PhotonSdkTransportStatus = Schema.Int.check(
+  Schema.isBetween({ minimum: 100, maximum: 599 })
+);
+export type PhotonSdkTransportStatus = typeof PhotonSdkTransportStatus.Type;
 
 export class PhotonSdkObservedFailure extends Schema.TaggedErrorClass<PhotonSdkObservedFailure>()(
   "PhotonSdkObservedFailure",
   {
     operation: PhotonSdkOperation,
     phase: PhotonSdkPhase,
-    errorName: PhotonSdkErrorName,
-    providerCode: PhotonSdkProviderCode,
-    transportStatus: Schema.Union([Schema.Int, Schema.Literal("unknown")]),
+    transportStatus: Schema.Union([
+      PhotonSdkTransportStatus,
+      Schema.Literal("unknown"),
+    ]),
     retryable: Schema.Union([Schema.Boolean, Schema.Literal("unknown")]),
   }
 ) {}

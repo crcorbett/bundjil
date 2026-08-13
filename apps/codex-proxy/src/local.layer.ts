@@ -7,14 +7,13 @@ import type { CodexResponsesRequestPolicy } from "@bundjil/codex";
 import { CodexFileSystemKeyValueStoreLive } from "@bundjil/codex/filesystem-store";
 import {
   makeCodexLegacyDirectProviderLive,
-  CodexHttpClientLive,
   CodexOAuthClientLive,
   CodexOAuthProfileCipherConfigLive,
   CodexOAuthProfileCipherLive,
   CodexOAuthRefreshPolicyLive,
   CodexOAuthServiceLive,
   CodexProfileStoreEncryptedKeyValueLive,
-  OpenAICompatibleProxyLive,
+  makeOpenAICompatibleProxyLive,
 } from "@bundjil/codex/runtime";
 import { CodexOAuthRefreshLockMemory } from "@bundjil/codex/testing";
 import { ConfigProvider, Effect, Layer } from "effect";
@@ -81,23 +80,24 @@ const makeCodexProxyOAuthServiceLocal = (
 export const makeCodexProxyOpenAICompatibleProxyLocal = (
   directory: CodexProxyLocalProfileStoreDirectory,
   policy: CodexResponsesRequestPolicy,
+  internalToken: Parameters<typeof makeOpenAICompatibleProxyLive>[0],
   configProviderLayer = ConfigProvider.layer(ConfigProvider.fromEnv()),
-  codexHttpClientLayer = CodexHttpClientLive
+  codexDirectProviderLayer: ReturnType<
+    typeof makeCodexLegacyDirectProviderLive
+  > = makeCodexLegacyDirectProviderLive(policy)
 ) =>
   Layer.merge(
-    OpenAICompatibleProxyLive.pipe(
+    makeOpenAICompatibleProxyLive(internalToken).pipe(
       Layer.provide(
-        makeCodexLegacyDirectProviderLive(policy).pipe(
+        codexDirectProviderLayer.pipe(
           Layer.provideMerge(
-            Layer.merge(
-              makeCodexProxyOAuthServiceLocal(directory, configProviderLayer),
-              codexHttpClientLayer
-            )
+            makeCodexProxyOAuthServiceLocal(directory, configProviderLayer)
           )
         )
       )
     ),
     CodexProxyReadyLive
   ).pipe(
-    Layer.catchCause(() => CodexProxyOpenAICompatibleProxyLocalUnavailableLive)
+    /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then -- Layer.catch recovers the typed Effect Layer error channel, not a Promise callback. */
+    Layer.catch(() => CodexProxyOpenAICompatibleProxyLocalUnavailableLive)
   );

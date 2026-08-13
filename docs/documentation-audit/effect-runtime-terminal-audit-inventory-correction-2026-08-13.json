@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "taskId": "effect-native-runtime-terminal-audit",
+  "status": "passed",
+  "observedAt": "2026-08-13T09:18:33Z",
+  "trigger": "The personal-Vercel identity stop adds one detail and one packet while this dated correction accounts for the terminal-audit candidate.",
+  "docsInventory": {
+    "pathCount": 248,
+    "sortedPathSha256": "e3a42966e447e241dd4e1c20742bc2b516a7bb1bb2888661d529b21b6097ab5e"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+    "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The new paths record a bounded external identity stop and current path accounting without changing the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and validation remain bound to their recorded candidate. This correction updates only the executable current path inventory.",
+    "nonClaim": "This correction does not prove a personal Vercel credential, hosted drift, deployment, model call, channel delivery, handset behavior or Production state."
+  },
+  "checks": [
+    {
+      "command": "bun run verification",
+      "status": "failed_before_correction",
+      "result": "The candidate passed the preceding policy gates and then HARNESS-DOCS-INVENTORY rejected the stale 245-path inventory."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The focused evaluator confirmed the corrected 248-path docs and unchanged 23-path README inventories across twelve scenarios and nine impact areas."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "The terminal five-pass audit and cold repository verification remain downstream."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No provider read or write, credential creation, deployment, message, billing or Production operation occurred."
+  ]
+}

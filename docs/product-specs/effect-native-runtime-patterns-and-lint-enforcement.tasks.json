@@ -1,7 +1,7 @@
 {
   "title": "Effect-native runtime patterns and lint enforcement tasks",
   "spec": "docs/product-specs/effect-native-runtime-patterns-and-lint-enforcement.md",
-  "status": "current",
+  "status": "implemented",
   "draftBase": {
     "ref": "main",
     "sha": "5c3c7db240a7abd9bb57ad560bdd8958af4ea701",
@@ -16,7 +16,7 @@
     "providerOperations": "owned-by-automatic-production-and-operational-closeout-ledger",
     "deployment": "owned-by-automatic-production-and-operational-closeout-ledger",
     "commitPushMerge": "authorized-by-cooper-2026-08-10",
-    "activePlan": "docs/exec-plans/active/effect-native-runtime-patterns-and-lint-enforcement.md"
+    "completedPlan": "docs/exec-plans/completed/effect-native-runtime-patterns-and-lint-enforcement.md"
   },
   "principles": [
     "Decode unknown input once at ingress with the owning Effect Schema, pass Contract.Type, and encode Contract.Encoded only at egress.",
@@ -129,6 +129,329 @@
         "ENP-REQ-011"
       ],
       "taskIds": ["close-exported-effect-generator-ownership"]
+    },
+    {
+      "id": "ENP-FND-011",
+      "decision": "Treat provider rejection objects as hostile property containers: inspect only non-accessor own values through a non-throwing boundary before constructing closed diagnostics.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-photon-sdk-diagnostic-boundary"]
+    },
+    {
+      "id": "ENP-FND-012",
+      "decision": "Use one bounded SSE framing owner for proof and streaming, require a framed response.completed before emitting clean completion, match the exact media type, and hide private transport dependencies with Layer.provide.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-013",
+      "decision": "Bound complete SSE events as well as lines, fold proof events into constant-size state, name the receipt count as events, and remove the remaining request-mapper root/runtime exports.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-014",
+      "decision": "Count every SSE field toward the complete-event byte ceiling, accept LF, CRLF and CR framing, and constrain observed Photon transport status to the closed 100-599 range or unknown.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-photon-sdk-diagnostic-boundary",
+        "close-codex-provider-boundary-contracts"
+      ]
+    },
+    {
+      "id": "ENP-FND-015",
+      "decision": "Decode terminal Responses events through a closed Schema union and one Match-owned sequence state machine that rejects failure, incomplete, error, duplicate terminal and post-terminal events.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-016",
+      "decision": "Keep raw provider Content-Type and status text inside the HTTP adapter; successful metadata emits the closed text/event-stream literal and public errors retain only bounded status and fixed messages.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-017",
+      "decision": "Measure the complete SSE event ceiling from exact consumed wire bytes, including LF, CRLF or CR delimiters and the terminating blank line.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-018",
+      "decision": "Use persistent Effect Chunk accumulators plus explicit 4096 line-fragment and event-field ceilings to prevent sub-byte-limit quadratic copying.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-019",
+      "decision": "Retain a pending carriage-return state across empty transport chunks so split CRLF framing remains one delimiter.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-020",
+      "decision": "Own HTTP status, byte/event counts, sequence numbers and output indexes with bounded integer Schemas rather than finite Number.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-021",
+      "decision": "Inspect every supported Codex package subpath with one path-specific raw-transport export denylist oracle.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-022",
+      "decision": "Pin the credential-bearing Codex Responses client to the one owned HTTPS endpoint literal; configuration cannot redirect bearer credentials to another origin or path.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-023",
+      "decision": "Constrain access-token and account-ID values to bounded visible-ASCII headers and map defensive Headers construction failures to one fixed secret-negative tagged error before any request executes.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-024",
+      "decision": "Own arbitrary protocol JSON with an opaque Effect Schema declaration whose depth-limited validator cannot recurse beyond 32 containers; use it for tool parameters and SSE JSON before event selection.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-025",
+      "decision": "Decode every recognized Responses event into one shared closed tagged union before proof or live mapping consumes it, so malformed recognized payloads fail identically.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-026",
+      "decision": "Advance one exact zero-based expected sequence number for every JSON event and reject duplicate, regressing or skipped values before proof success or clean mapped completion.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-027",
+      "decision": "Remove the unused package-private postResponsesStream convenience accessor while retaining the named service operation used by runtime composition.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-010", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-028",
+      "decision": "Read Photon SDK success fields through the same hostile own-data-property boundary as failures, then decode a newly constructed application-owned object.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-photon-sdk-diagnostic-boundary"]
+    },
+    {
+      "id": "ENP-FND-029",
+      "decision": "Require Codex function parameters to be a non-null, non-array object before accepting the bounded JSON predicate; boolean, number and string roots are invalid.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-030",
+      "decision": "Accept only dense arrays and enumerable own data properties in bounded Codex JSON so Schema encoding cannot omit or synthesize accepted values.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-031",
+      "decision": "Brand Codex access-token and account-ID values separately before redaction so TypeScript cannot interchange two valid secret domains.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-032",
+      "decision": "Own UTF-8 BOM state once per SSE stream and treat a colonless data field as empty data; later BOMs and empty events cannot disappear before a clean completion.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-033",
+      "decision": "Capture the expected proxy token in the service Layer, remove it from operation input, decode and redact the presented authorization at HTTP ingress, bound both values, and compare over one fixed-width loop.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-034",
+      "decision": "Reject a repeated Codex function-call output_index before replacing mapper state or emitting a second tool-call identity.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-004", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-035",
+      "decision": "Canonical JSON decoding and encoding must produce detached, deeply frozen, bounded ordinary data so caller mutation and stateful objects cannot change a previously decoded value.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-003", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-036",
+      "decision": "Load positive header timeout, stream idle timeout, cumulative body byte, and SSE event budgets through Effect Config; enforce time with Effect timeout operators and interruption-safe streams.",
+      "requirementIds": [
+        "ENP-REQ-002",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-037",
+      "decision": "Decode the public proxy request with exact excess-property rejection and accept only omitted or literal-true stream mode because the route always returns SSE.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-005", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-038",
+      "decision": "Inline Bundjil workspace packages in app Vitest SSR resolution so source-condition tests cannot silently execute stale ignored dist output.",
+      "requirementIds": ["ENP-REQ-007", "ENP-REQ-009", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-039",
+      "decision": "Keep recursive canonical JSON implementation unions private, derive the public protocol values from opaque branded Effect Schemas, and remove the SSE accumulator assertion so accepted values cannot regain a structurally forgeable or unchecked public type surface.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-040",
+      "decision": "Require the canonical JSON declaration type side to accept only recursively frozen canonical containers so Schema guards, constructors and nested type-side validation cannot brand caller-owned mutable values without running the detaching transformation.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-003", "ENP-REQ-007"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-041",
+      "decision": "Make negative nested-boundary fixtures satisfy every earlier contract with valid decoded values, exercise the named constructor, and assert the exact request.tools[0].parameters issue path so failure cannot occur before the intended field is reached.",
+      "requirementIds": ["ENP-REQ-001", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": ["close-codex-provider-boundary-contracts"]
+    },
+    {
+      "id": "ENP-FND-042",
+      "decision": "Close implementation-task lifecycle before beginning the terminal audit: the product index, task statuses, completion evidence and active plan must agree on the exact 25 completed implementation tasks.",
+      "requirementIds": ["ENP-REQ-009", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
+    },
+    {
+      "id": "ENP-FND-043",
+      "decision": "A 401 recovery oracle must capture old and refreshed authorization, consume the lazy returned stream, and assert mapped terminal completion plus [DONE]; request count alone cannot prove credential recovery or a valid response.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-044",
+      "decision": "Deep freezing is not canonical-JSON ownership: a frozen Proxy can retain provider-controlled enumeration behavior. Require package-private identity provenance for every transformed container, reject unowned frozen containers at type-side guards and constructors, and prove decoding detaches a hostile Proxy into stable encodable data.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-003",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-045",
+      "decision": "Proxy availability fallback may recover typed Layer acquisition errors only. Replace catchCause with Layer.catch so defects and interruption retain their Cause, and prove live/local defects plus local interruption remain terminal failures while existing typed configuration fallback remains available.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-046",
+      "decision": "An upstream body pull is progress only when it emits at least one byte. Filter zero-length chunks before the Effect stream idle timeout so periodic empty chunks cannot keep the request alive without consuming byte, event or framing budgets; prove timeout and finalization with TestClock.",
+      "requirementIds": ["ENP-REQ-005", "ENP-REQ-007", "ENP-REQ-011"],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-047",
+      "decision": "Prove rather than assume rejected-response lifetime: both proof and streaming acquisition must close their HttpClient.withScope request immediately for non-2xx and rejected media, leave Response.bodyUsed false, and keep rejected body bytes out of typed errors. The existing scoped implementation satisfies the contract; a four-case abort-signal matrix owns recurrence.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-048",
+      "decision": "Bound accepted-but-unclaimed response ownership without moving upstream status/auth errors behind HTTP response headers: start one Effect-clock ownership watchdog after validated headers, close the response scope at the configured idle deadline unless body subscription claims it, and signal the watchdog from every scope-close path. Prove an unconsumed accepted stream aborts without reading bytes under TestClock.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-049",
+      "decision": "Start the unclaimed-body ownership watchdog only after status, media type and metadata validation. Header acquisition remains governed solely by its independent header timeout even when the configured stream-idle duration is shorter; prove delayed valid headers survive the idle duration, then body subscription claims and closes normally.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-050",
+      "decision": "Treat Deferred.succeed's boolean result as the exactly-once response-body ownership decision. Only the winning subscriber may expose the upstream stream; a subscriber arriving after expiry or after another subscriber must fail with the fixed typed stream error before touching the one-shot body.",
+      "requirementIds": [
+        "ENP-REQ-001",
+        "ENP-REQ-005",
+        "ENP-REQ-007",
+        "ENP-REQ-011"
+      ],
+      "taskIds": [
+        "close-codex-provider-boundary-contracts",
+        "terminal-five-pass-audit"
+      ]
+    },
+    {
+      "id": "ENP-FND-051",
+      "decision": "Keep lifecycle claims truthful until terminal closeout: an active plan and pending audit cannot be described as completed or accepted history. Restore current/pending wording before the restarted audit, then move plans, ledgers and indexes to implemented history only with the final receipt.",
+      "requirementIds": ["ENP-REQ-010", "ENP-REQ-012"],
+      "taskIds": ["terminal-five-pass-audit"]
     }
   ],
   "requirements": [
@@ -1131,10 +1454,195 @@
       ]
     },
     {
+      "id": "close-photon-sdk-diagnostic-boundary",
+      "title": "Close Photon SDK diagnostic string boundary",
+      "status": "completed",
+      "dependsOn": ["close-exported-effect-generator-ownership"],
+      "description": "Correct terminal audit pass 1 finding ENP-AUDIT-001 and rerun findings ENP-FND-011, ENP-FND-014 and ENP-FND-028: provider-controlled SDK strings entered telemetry, hostile failure or success property accessors could escape before typed error translation, and arbitrary safe integers could enter the transport-status diagnostic.",
+      "implementationNotes": [
+        "Remove provider-controlled string values from PhotonSdkObservedFailure and structured logs instead of expanding a regex or guessing a provider allowlist.",
+        "Retain only closed operation/phase and bounded boolean/numeric-or-unknown observations that carry current recovery value.",
+        "Decode transport status through the owner range of 100 through 599; every other provider number collapses to unknown.",
+        "Inspect only own data properties through Option.liftThrowable; accessor, proxy and descriptor failures collapse to unknown rather than escaping the typed boundary.",
+        "Read successful provider message identity through the same hostile-property boundary and decode a newly constructed application-owned result before returning it.",
+        "Add a direct Logger fixture with credential-like SDK fields and prove no sentinel reaches the encoded diagnostic.",
+        "Preserve channel error mapping, retry policy, SDK lifecycle, provider calls, public exports and wire behavior."
+      ],
+      "proofContract": {
+        "directObservable": "Controlled SDK failures containing credential-like name/code values, hostile failure or success accessors and an out-of-range numeric code either emit Schema-decodable Photon diagnostics or return the existing safe Channel error with no provider-controlled string, sentinel or arbitrary status number.",
+        "expectedPostcondition": "Photon telemetry is closed, low-cardinality and secret-negative without weakening typed channel failures.",
+        "falseGreenRejected": "A token-shaped regex, truncation, failure-only hostile-property coverage, a safe public Channel error without success-result coverage, or a test that does not inspect the structured log payload.",
+        "focusedCommandOrProcedureOwner": "Photon transport Logger fixture, package typecheck/tests, boundary/docs checks and root verification",
+        "evidenceOwner": "Terminal pass 1 Photon diagnostic correction receipt",
+        "limitationsAndNonClaims": "Repository proof does not exercise the live Spectrum SDK, provider telemetry ingestion, delivery or Production."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "source": "Photon diagnostics retain only closed operation/phase, bounded HTTP-status-or-unknown and boolean-or-unknown observations; hostile own-property access on failures and successful send results is contained before typed translation.",
+        "oracle": "The encoded Logger fixture rejects provider-controlled strings and credential sentinels, while hostile getter/proxy, invalid status and successful-result fixtures prove the same adapter boundary.",
+        "focused": "Photon typecheck/build and all 45 Photon tests pass on the exact candidate; boundary and lint suites pass with 136 and 17 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, Knip, nine package typechecks and 15 workspace build/test tasks.",
+        "nonClaims": "No live Spectrum SDK request, provider telemetry ingestion, message delivery, handset behavior, deployment or Production state was exercised or proved."
+      },
+      "completionCriteria": [
+        "Provider-controlled SDK strings, throwing failure or success accessors and out-of-range numeric statuses cannot enter or bypass Photon structured telemetry or typed result translation.",
+        "Focused Photon checks and repository boundary/docs gates pass.",
+        "Terminal audit pass 1 is rerun after correction."
+      ]
+    },
+    {
+      "id": "close-codex-provider-boundary-contracts",
+      "title": "Close Codex provider boundary contracts",
+      "status": "completed",
+      "dependsOn": ["close-photon-sdk-diagnostic-boundary"],
+      "description": "Correct terminal audit pass 1 Codex findings ENP-FND-012 through ENP-FND-032: close tool, destination, credential identity, canonical recursive JSON, export, Layer, header, numeric, SSE resource and terminal-sequence boundaries so proof/live streams cannot manufacture or leak a clean completion.",
+      "implementationNotes": [
+        "Use one opaque Effect Schema declaration with a bounded recursive predicate for arbitrary protocol JSON and an object-root tool-parameters contract; reject scalar roots, sparse arrays, non-enumerable/accessor/symbol properties and nested containers beyond the 32-container ceiling without a stack defect, while preserving the existing 1 MiB HTTP ingress ceiling as the independent wire-size owner.",
+        "Pin the credential-bearing HTTP client to the exact owned https://chatgpt.com/backend-api/codex/responses literal; malformed, HTTP, loopback and foreign endpoints fail Config parsing before request construction.",
+        "Constrain credential header values to non-empty visible ASCII with a 16,384-character ceiling, brand access-token and account-ID values separately before redaction, and wrap Headers construction in Effect.try with a fixed CodexResponsesRequestError so defensive failures cannot disclose a secret or reach the network.",
+        "Keep CodexHttpClient and raw Stream<Uint8Array> private to package provider/runtime composition. Expose only CodexDirectProvider and CodexResponsesProof domain services from supported public paths; testing substitution belongs under the explicit testing export.",
+        "Compose private dependencies with Layer.provide rather than Layer.provideMerge and inspect built public/test Layer contexts for absence of raw services.",
+        "Use one bounded package-private SSE line/event framing owner for proof and live streaming. Require an exactly matched SSE media type and a framed decoded response.completed before returning proof or emitting finish_reason and [DONE].",
+        "Bound both each decoded line and the joined multi-line event at 1 MiB; fold proof events into constant-size count/completion state and name the public receipt field receivedStreamEvents.",
+        "Count data, comments and every other nonblank SSE field toward the complete-event ceiling, accept LF, CRLF and CR line endings, strip a UTF-8 BOM only at stream start, and treat colonless data as an empty data field without weakening termination checks.",
+        "Preserve exact consumed delimiter bytes and the terminating blank line in event accounting; retain pending CR state across empty chunks.",
+        "Use Effect Chunk for persistent line/data accumulation and cap line fragments plus event fields at 4096 with deterministic limit-plus-one errors.",
+        "Decode terminal and recognized data events into one shared closed tagged union, then use one Match-owned sequence state to require exact zero-based progression and reject malformed, failed, duplicate, regressing, skipped and post-terminal input before proof or live completion.",
+        "Normalize successful Content-Type to the closed text/event-stream literal and keep raw provider headers/status text out of public results and tagged errors.",
+        "Use owner-named bounded integer Schemas for HTTP status, counts, sequence numbers and output indexes.",
+        "Inspect root, runtime, local, testing and filesystem-store namespaces with the same private-transport denylist.",
+        "Keep CodexRequestMapper constructors, accessors and Layers package-private together with the HTTP and stream mapper services; remove unused private convenience accessors rather than preserving wrapper surface.",
+        "Reject malformed JSON, misleading media types, unterminated lines/events and clean upstream termination before completion with the existing safe error vocabulary.",
+        "Preserve live OAuth recovery, streaming behavior, cancellation, public proxy contract, request mapping and application runtime ownership.",
+        "Capture the stable expected proxy token in the OpenAICompatibleProxy implementation Layer; operation input carries only the decoded presented authorization and completion request.",
+        "Decode bounded authorization into Redacted at HTTP ingress and compare it with the Layer-owned expected value over one fixed-width loop; a forged request field cannot choose the expected token.",
+        "Canonicalize recursive JSON in both Schema directions into detached deeply frozen ordinary arrays/objects; do not retain caller-owned mutable objects, accessors or proxies.",
+        "Reject duplicate function-call output indexes before mapper-state mutation or output emission.",
+        "Load positive header-timeout, stream-idle-timeout, cumulative-body-byte and SSE-event limits through Config.schema; enforce time with Effect timeout operators and preserve interruption/finalization.",
+        "Decode public chat-completion bodies with onExcessProperty error and accept only omitted or literal-true stream because the route is SSE-only.",
+        "Configure app Vitest SSR to inline workspace packages under the @bundjil/source condition so ignored dist output cannot satisfy focused tests.",
+        "Keep recursive canonical JSON implementation unions private, expose only opaque Schema-derived branded protocol values, and remove unchecked assertions from SSE accumulation.",
+        "Require the declaration type side to accept only recursively frozen canonical containers; mutable and shallow-frozen values must fail guards and nested type-side construction.",
+        "Construct the nested request regression from valid decoded sibling fields, exercise both Schema.toType validation and CodexResponsesPostInput.makeEffect, and assert the exact request.tools[0].parameters issue path.",
+        "For 401 recovery, capture both authorization headers, prove the retry uses the refreshed token, consume the lazy mapped body, and require finish_reason stop plus the [DONE] terminator.",
+        "Treat deep freezing as necessary but insufficient for canonical ownership: register every transformed array/object in one package-private identity-provenance WeakSet, require provenance recursively on the declaration type side, and reject unowned frozen Proxies before nested construction.",
+        "Recover unavailable proxy composition with Layer.catch over typed acquisition errors only; never downgrade defects or interruption into ordinary readiness state.",
+        "Define body-stream progress as a non-empty byte chunk by filtering empty chunks before the per-pull idle timeout; preserve TestClock control and upstream finalization.",
+        "Keep proof requests scoped through completion and streaming requests in a dedicated scope transferred to the returned body; prove every non-2xx or rejected-media acquisition failure aborts its request immediately without consuming rejected body bytes.",
+        "After accepted stream status, media type and metadata validation, use one bounded Effect-clock ownership watchdog: body subscription claims the response scope and existing per-pull/finalizer ownership takes over; otherwise the configured stream-idle deadline closes the scope. Header acquisition remains governed only by its independent header timeout. Signal watchdog completion from the scope finalizer so normal completion, failure and cancellation leave no detached work.",
+        "Inspect the boolean returned by Deferred.succeed when a body subscriber claims ownership. Expose the one-shot upstream stream only to the winning subscriber; late and duplicate subscribers fail through one fixed CodexResponsesStreamError before reading the body."
+      ],
+      "proofContract": {
+        "directObservable": "Config fixtures reject every unowned credential destination; type/schema fixtures distinguish access tokens from account IDs and reject unsafe headers, scalar/non-JSON/non-object/non-canonical/over-depth tool parameters and impossible numbers; malformed credential ingress is typed and secret-negative; every supported export and built Layer context exposes no raw service; proof/live fixtures reject over-depth JSON, malformed recognized events, failed terminals, duplicate/regressing/skipped sequence numbers, later BOMs, colonless empty data, post-terminal events, unterminated/truncated streams, exact-wire overflow and fragment/field limit-plus-one while accepting a stream-start BOM and valid LF, CRLF and CR framing including empty split chunks.",
+        "expectedPostcondition": "Every public Codex provider boundary carries owned decoded domain values and the proof name matches its semantic oracle.",
+        "falseGreenRejected": "A configurable credential destination, two Redacted<string> aliases, Redacted inspection without hostile-header construction, generic recursive Schema.Json traversal, an array-only non-object fixture, sparse/non-enumerable JSON accepted before lossy encoding, proof-only event validation, sequence-number presence without progression, per-line BOM stripping, ignored colonless data, HTTP ingress JSON parsing alone, removing only one barrel symbol, provideMerge-hidden type inference, substring media matching, raw successful metadata, completion-anywhere booleans, re-encoded line lengths, aggregate bytes without cardinality ceilings, synthetic newline insertion, finite Number, an unused private wrapper, or a mock bypassing a supported export/Layer surface.",
+        "focusedCommandOrProcedureOwner": "Codex contract/proof/direct-provider tests, proxy tests, export scan, typechecks, boundaries/docs and root verification",
+        "evidenceOwner": "Terminal pass 1 Codex provider correction receipt",
+        "limitationsAndNonClaims": "Controlled transport proves package semantics only; it does not prove current Codex subscription acceptance or hosted provider behavior."
+      },
+      "invalidatedCompletionEvidence": {
+        "invalidatedBy": "ENP-FND-043",
+        "result": "passed",
+        "source": "Codex ingress, canonical JSON, endpoint, credential, Layer, HTTP/SSE resource, event-order and proxy-authorization boundaries are closed through owner Schemas and private adapters against Effect 4.0.0-beta.101.",
+        "oracle": "Schema guard/constructor, export/Context, exact endpoint/header, deterministic timeout/finalizer, byte/event/cardinality, SSE framing/sequence, duplicate index, strict HTTP ingress and stale-dist source-resolution fixtures cover the accepted findings.",
+        "focused": "Codex typecheck/build and all 151 Codex tests pass; Codex proxy typecheck/build and all 42 proxy tests pass; boundary and lint suites pass with 136 and 17 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, Knip, nine package typechecks and 15 workspace build/test tasks.",
+        "nonClaims": "No Codex subscription endpoint, hosted proxy, current OAuth credential, model response, deployment or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd043": {
+        "invalidatedBy": "ENP-FND-044",
+        "result": "passed",
+        "correction": "ENP-FND-043 now proves 401 recovery with old and refreshed authorization values plus complete consumption of the lazy mapped terminal stream.",
+        "focused": "Codex typecheck and all 17 refresh-capable tests pass; the complete Codex suite passes 151 tests.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed all policy gates, 136 boundary tests, 17 lint tests, Knip, nine package typechecks and all 15 workspace build/test tasks; proxy and agent suites passed 42 and 80 tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd044": {
+        "invalidatedBy": ["ENP-FND-045", "ENP-FND-046"],
+        "result": "passed",
+        "correction": "ENP-FND-044 now rejects frozen caller-owned proxies at guards and nested constructors while ordinary decoding detaches them into package-owned deeply frozen data with stable repeated encoding.",
+        "focused": "Codex typecheck and all 30 Responses proof tests pass; lint-plugin tests pass all 17 fixtures and the exact native-collection exception admits one WeakSet only.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 151 Codex, 42 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd046": {
+        "invalidatedBy": "ENP-FND-047",
+        "result": "passed",
+        "corrections": [
+          "ENP-FND-045 preserves defects and interruption across live/local availability composition while recovering only typed Layer acquisition failures.",
+          "ENP-FND-046 treats only non-empty upstream body chunks as idle-timeout progress and proves timeout plus finalization under TestClock."
+        ],
+        "focused": "Codex and proxy typechecks pass; all 31 Responses proof tests and all 31 proxy-handler tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 152 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd047": {
+        "invalidatedBy": "ENP-FND-048",
+        "result": "passed",
+        "correction": "ENP-FND-047 proves immediate request-scope cancellation and unread rejected bodies for proof/streaming non-2xx and rejected-media paths without changing the already-scoped implementation.",
+        "focused": "Codex typecheck and all 32 Responses proof tests pass; docs, skills, boundaries and lint checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 153 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd048": {
+        "invalidatedBy": "ENP-FND-049",
+        "result": "passed",
+        "correction": "ENP-FND-048 bounds accepted-but-unclaimed response ownership at the configured stream-idle deadline while body subscription transfers ownership to existing per-pull and finalizer semantics.",
+        "focused": "Codex typecheck and all 33 Responses proof tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 154 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "invalidatedCompletionEvidenceAfterFnd049": {
+        "invalidatedBy": "ENP-FND-050",
+        "result": "passed",
+        "correction": "ENP-FND-049 starts accepted-stream ownership expiry only after status/media/metadata validation, keeping header and body ownership deadlines independent.",
+        "focused": "Codex typecheck and all 34 Responses proof tests pass; docs, skills, boundaries, lint and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 155 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "correction": "ENP-FND-050 makes Deferred.succeed's boolean the exactly-once body-ownership decision, exposing the upstream stream only to the winning subscriber and returning a fixed typed failure for expired or duplicate claims.",
+        "focused": "Codex typecheck and all 35 Responses proof tests pass; Ultracite, Effect setup, boundaries, docs, skills, authority, controls, verification policy and diff checks pass.",
+        "repository": "The public-synthetic-Executor bun run verification candidate passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, hosted proxy, model response, provider write, deployment, channel send, handset behavior or Production state was exercised or proved."
+      },
+      "completionCriteria": [
+        "Tool parameters are an opaque, canonical, depth-bounded JSON object contract on both ingress and provider request sides; scalar roots and values that encode differently are rejected, and SSE JSON uses the same bounded owner before event selection.",
+        "The credential-bearing endpoint is the exact owned HTTPS literal and unsafe credential header values fail before network execution without entering the typed error.",
+        "Raw HTTP/SSE/request-mapper transport has no supported package export or exported Layer output and app tests substitute only through an explicit testing owner.",
+        "Line and complete-event ceilings reject individually valid lines whose aggregate event exceeds 1 MiB; proof retains only a constant-size summary and reports an accurate event count.",
+        "Ignored SSE fields count toward the event ceiling; legal LF, CRLF and CR delimiters preserve exact event framing; only a stream-start BOM is stripped; and colonless data becomes an empty event field.",
+        "Exact wire-byte just-below/at/above fixtures pass or fail correctly for LF, CRLF and CR; empty chunks cannot split CRLF.",
+        "Fragment and field limit-plus-one fixtures fail deterministically without timing assertions or quadratic accumulation.",
+        "Failed, incomplete, error, malformed recognized data, duplicate/regressing/skipped sequence, duplicate completion and every post-terminal event fail before finish_reason or DONE in both proof and live paths.",
+        "Raw provider headers/status text cannot enter results, errors, logs or host responses; successful content type is the closed literal.",
+        "All supported package subpaths enforce the private transport denylist and numeric Schemas reject fractional, negative and out-of-range values.",
+        "Proof and live streaming require a framed decoded completed event and all focused/full checks pass.",
+        "Terminal audit pass 1 is rerun after correction.",
+        "A caller cannot select both presented and expected proxy credentials; malformed or incorrect authorization fails through the fixed secret-negative error.",
+        "Decoded protocol JSON is detached and deeply frozen; source mutation cannot alter subsequent encoding.",
+        "Header, idle-body, body-byte and event limit tests use TestClock or deterministic Effect streams and assert interruption/finalizer behavior.",
+        "Duplicate output indexes, stream false, and unsupported request fields fail before a clean mapped/provider response.",
+        "Focused app tests resolve current workspace source independently of stale ignored package builds.",
+        "Public protocol JSON types remain opaque Schema-derived brands, and SSE accumulation uses checked inference without an assertion.",
+        "Schema guards and type-side constructors reject mutable or shallow-frozen protocol JSON while decoded values remain deeply frozen and encodable.",
+        "The nested request oracle uses valid decoded sibling fields and fails through both the type-side Schema and named makeEffect constructor at the exact request.tools[0].parameters issue path.",
+        "The 401 recovery oracle proves old-token rejection, refreshed-token replay and complete consumption of a valid terminal mapped stream.",
+        "Frozen but unowned containers, including a Proxy with unstable own-key ordering, fail Schema guards and nested constructors; decoding detaches them into package-owned deeply frozen data whose encoding remains stable.",
+        "Live/local Layer defects and interruption remain in the terminal Cause; only typed acquisition failure selects unavailable readiness.",
+        "Periodic empty upstream chunks do not reset body idleness and the timed-out stream finalizes deterministically under TestClock.",
+        "Proof and streaming acquisition close the scoped request immediately for rejected status/media, do not consume Response bodies, and do not expose rejected body sentinels.",
+        "An accepted response whose body is never subscribed closes at the configured idle deadline without consuming bytes; body subscription transfers ownership to existing stream timeout/finalizer semantics.",
+        "A valid response delayed beyond stream-idle duration but within header timeout is not aborted before headers; after accepted metadata, body subscription claims ownership and normal drain closes the request.",
+        "Exactly one subscriber can claim an accepted response body; a subscriber after ownership expiry or after a successful first drain receives the fixed typed ownership error before the one-shot body is touched."
+      ]
+    },
+    {
       "id": "terminal-five-pass-audit",
       "title": "Run one terminal five-pass implementation audit and closeout",
-      "status": "pending",
-      "dependsOn": ["close-exported-effect-generator-ownership"],
+      "status": "completed",
+      "dependsOn": ["close-codex-provider-boundary-contracts"],
       "externalDependsOn": [
         "automatic-production-and-operational-closeout.tasks.json#close-channel-proof-gaps"
       ],
@@ -1170,7 +1678,8 @@
         "Do not run this terminal audit after each task.",
         "A finding reopens its owning task and invalidates affected downstream receipts.",
         "After corrections, rerun focused proof, terminal verification when affected, and one new ordered terminal audit.",
-        "Use existing delegated authority only; audit success does not strengthen a missing provider or handset oracle."
+        "Use existing delegated authority only; audit success does not strengthen a missing provider or handset oracle.",
+        "ENP-FND-051 restored truthful active and pending lifecycle wording before the restarted sequence; completed-history routing is written only with the final receipt."
       ],
       "proofContract": {
         "directObservable": "One ordered five-pass receipt is newer than all task and verification evidence and records zero unresolved findings.",
@@ -1179,6 +1688,36 @@
         "focusedCommandOrProcedureOwner": "Active-plan terminal audit procedure",
         "evidenceOwner": "Five-pass closeout receipt",
         "limitationsAndNonClaims": "Audit acceptance preserves explicit provider, strict replay and handset non-claims."
+      },
+      "invalidatedCompletionEvidence": {
+        "invalidatedBy": "ENP-FND-043",
+        "result": "passed",
+        "implementationCandidateDigestSha256": "6d3a58a0279260efca39cccf732e0780d5973351aaf986e507e4e64dfa2cb529",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: zero findings after ENP-FND-042 lifecycle correction.",
+          "PASS 2 call-graph-topology: zero findings; Knip, private-export Context oracle and deep-import scan passed.",
+          "PASS 3 behaviour-and-gates: zero findings; the post-correction full verification passed.",
+          "PASS 4 docs-and-proof-consistency: zero findings; 25 implementation tasks, two ledgers, indexes, deferred external dependency and proof ceilings agreed.",
+          "PASS 5 provider-deployment-safety: zero findings; secret-negative diff and personal-only identity stop preserved zero provider/deployment/channel mutations."
+        ],
+        "repository": "Post-correction public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 151 Codex, 45 Photon, 42 proxy and 80 agent tests.",
+        "nonClaims": "No Vercel token, GitHub secret, provider write, deployment, Codex subscription request, model call, channel send, handset behavior, strict replay oracle or Production state was exercised or proved."
+      },
+      "completionEvidence": {
+        "result": "passed",
+        "implementationCandidateDigestSha256": "cc4af0e45956c31cfc4ea07aa5d7768e3230105d9137bd8c6ca7e7832916723f",
+        "effect": "Installed effect@4.0.0-beta.101 with immutable reviewed source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.",
+        "passes": [
+          "PASS 1 architecture-boundaries: clean after ENP-FND-050; fresh reviewer 019ffb63-c861-79c1-be7c-d30b689d31d0 inspected Codex, proxy and Photon boundaries and focused tests passed.",
+          "PASS 2 call-graph-topology: clean; fresh reviewer 019ffb77-27ec-73d3-b3d8-8b7f4e4a1994 inspected private exports, Layer composition, source topology and one-shot stream ownership.",
+          "PASS 3 behaviour-and-gates: clean; direct observables cover credential replay, lazy stream consumption, typed Layer fallback, TestClock timeout ordering, response cancellation, unclaimed expiry and exactly-once body claims.",
+          "PASS 4 docs-and-proof-consistency: ENP-FND-051 corrected premature lifecycle claims; the restarted pass found 25 completed implementation tasks, one terminal deferred external ledger, truthful lifecycle routing and bounded evidence.",
+          "PASS 5 provider-deployment-safety: clean; secret-negative diff and the personal-only Vercel identity stop preserve zero Vercel token, GitHub secret, deployment, provider or channel mutations."
+        ],
+        "repository": "The post-ENP-FND-051 public-synthetic-Executor bun run verification passed every policy gate, 136 boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15 workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.",
+        "lifecycle": "Both SPECs and ledgers move to implemented history; both active plans move atomically to completed history with this receipt.",
+        "nonClaims": "No current OAuth credential, Codex subscription endpoint, Vercel token, GitHub secret, hosted proxy, provider write, deployment, model response, channel send, handset behavior, strict candidate-specific replay oracle or Production state was exercised or proved."
       },
       "completionCriteria": [
         "All five ordered passes are recorded once after dependencies.",

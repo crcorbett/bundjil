@@ -300,6 +300,10 @@ describe("bundjil/no-unregistered-native-collection", () => {
               code: "new Map(); new Map(); new Map(); new Map();",
               filename: "/repo/packages/codex/src/testing/index.ts",
             },
+            {
+              code: "const owned = new WeakSet<object>();",
+              filename: "/repo/packages/codex/src/provider/contracts.ts",
+            },
           ],
           invalid: [
             {
@@ -323,6 +327,14 @@ describe("bundjil/no-unregistered-native-collection", () => {
               code: "new Map(); new Map(); new Map();",
               filename: "/repo/packages/codex/src/testing/index.ts",
               errors: [{ messageId: "staleException" }],
+            },
+            {
+              code: "const one = new WeakSet<object>(); const two = new WeakSet<object>();",
+              filename: "/repo/packages/codex/src/provider/contracts.ts",
+              errors: [
+                { messageId: "staleException" },
+                { messageId: "noUnregisteredNativeCollection" },
+              ],
             },
           ],
         }

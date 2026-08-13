@@ -31,8 +31,12 @@ operation nor asserts present provider state.
   non-claims. It is point-in-time evidence, not standing authority.
 - The current automatic Production closeout is owned by
   [`../product-specs/automatic-production-and-operational-closeout.md`](../product-specs/automatic-production-and-operational-closeout.md)
-  and its active plan. Until a dated packet records the matching successful CI
-  and `Production` runs, exact immutable candidates, stable targets, health,
+  and its active plan. Its
+  [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
+  packet records the personal-only identity stop before Vercel token or GitHub
+  custody mutation. The hosted tasks are deferred for that implementation
+  epoch. Until a successor packet records matching successful CI and
+  `Production` runs, exact immutable candidates, stable targets, health,
   rollback identities and live journey results, repository source proves only
   the control contract—not hosted automatic deployment or channel behavior.
 - [`journey-command-map.json`](journey-command-map.json) maps those IDs to

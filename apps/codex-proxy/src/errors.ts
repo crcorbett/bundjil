@@ -7,6 +7,7 @@ export const CodexProxySchemaBoundary = Schema.Literals([
   "CodexProxyMockStream",
   "CodexProxyRequestContentLength",
   "OpenAICompatibleChatCompletionRequest",
+  "OpenAICompatibleProxyAuthorizationHeader",
   "OpenAICompatibleProxyInput",
 ]);
 

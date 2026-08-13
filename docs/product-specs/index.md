@@ -20,13 +20,7 @@ No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-- [Automatic Production deployment and operational closeout](automatic-production-and-operational-closeout.md) —
-  exact-SHA post-CI Production automation, bounded credentials, rollback,
-  Terra High correction, Infrastructure Drift and live channel closeout.
-- [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md) —
-  all 22 implementation tasks are complete against installed Effect
-  `4.0.0-beta.101`; its single terminal five-pass audit remains dependency-gated
-  by automatic Production and live channel closeout.
+No SPEC currently has an active implementation plan.
 
 ## Implemented or superseded history
 
@@ -40,11 +34,13 @@ is standing authority.
 | SPEC                                                                                                                 | Lifecycle note                                                                                           |
 | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md)                              | Implemented hybrid infrastructure; five-pass audit accepted                                              |
+| [Automatic Production deployment and operational closeout](automatic-production-and-operational-closeout.md)         | Repository controls implemented; hosted/provider tasks deferred; five-pass audit accepted                |
 | [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md)                                            | Implemented Terra/high rollout; strict proxy replay absence deferred to a future public Eve API          |
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                                | Implemented history                                                                                      |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                                    | Superseded fallback history                                                                              |
 | [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                                                  | Implemented history                                                                                      |
 | [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md)                                  | Implemented history                                                                                      |
+| [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md)        | Implemented runtime/lint corrections; five-pass audit accepted                                           |
 | [Effect persistence](effect-persistence.md)                                                                          | Implemented history; current package names/exports own present state                                     |
 | [Effect Schema string contracts](effect-schema-string-contracts.md)                                                  | Implemented history                                                                                      |
 | [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)                                    | Implemented runtime/supervision history; five-pass audit accepted                                        |

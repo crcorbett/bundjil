@@ -28,6 +28,7 @@ Implementation-audit feedback promotion:
 Alchemy infrastructure lifecycle accounting:
 
 - [`alchemy-drift-control-inventory-correction-2026-07-31.json`](alchemy-drift-control-inventory-correction-2026-07-31.json)
+- [`effect-runtime-terminal-audit-inventory-correction-2026-08-13.json`](effect-runtime-terminal-audit-inventory-correction-2026-08-13.json)
 - [`alchemy-main-integration-inventory-correction-2026-08-01.json`](alchemy-main-integration-inventory-correction-2026-08-01.json)
 - [`alchemy-terminal-closeout-inventory-correction-2026-07-31.json`](alchemy-terminal-closeout-inventory-correction-2026-07-31.json)
 
@@ -165,6 +166,12 @@ path-accounting correction, producing the exact 199-path docs and 23-path
 README inventories. It updates only current repository accounting; it proves
 no hosted GitHub run, external setting, provider state, drift, repair, or alert
 delivery and does not requalify the historical HGI-307 epoch.
+
+The 2026-08-13 Effect terminal-audit candidate adds two personal-Vercel
+identity-stop evidence paths and this dated path-accounting correction. It
+updates only the current inventory; the external tasks remain deferred and no
+provider, deployment, model, message, delivery or Production behavior is
+established.
 
 The 2026-08-01 source integration combines the completed Alchemy branch with
 current ChannelHandoff and hosted Eve ownership. Its dated correction owns the

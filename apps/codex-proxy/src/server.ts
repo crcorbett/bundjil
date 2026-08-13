@@ -1,6 +1,7 @@
 import {
   OpenAICompatibleChatCompletionRequest,
   OpenAICompatibleProxy,
+  OpenAICompatibleProxyAuthorizationHeader,
   OpenAICompatibleProxyInput,
 } from "@bundjil/codex";
 import { Effect, Layer, Match, Schema } from "effect";
@@ -18,7 +19,7 @@ import {
   CodexProxyOpenAICompatibleProxyLocalUnavailableLive,
   makeCodexProxyOpenAICompatibleProxyLocal,
 } from "./local.layer.js";
-import { CodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
+import { makeCodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
 import { CodexProxyReadiness } from "./readiness.service.js";
 import {
   CodexProxyErrorResponse,
@@ -122,7 +123,8 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
       )
     );
     const completion = yield* Schema.decodeUnknownEffect(
-      Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
+      Schema.fromJsonString(OpenAICompatibleChatCompletionRequest),
+      { onExcessProperty: "error" }
     )(body).pipe(
       Effect.mapError(
         () =>
@@ -137,10 +139,26 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
           })
       )
     );
+    const authorization =
+      request.headers["authorization"] === undefined
+        ? undefined
+        : yield* Schema.decodeUnknownEffect(
+            OpenAICompatibleProxyAuthorizationHeader
+          )(request.headers["authorization"]).pipe(
+            Effect.mapError(
+              () =>
+                new CodexProxyRouteError({
+                  boundary: "OpenAICompatibleProxyAuthorizationHeader",
+                  code: "bad_request",
+                  message: "Unable to decode Codex proxy authorization.",
+                  responseMessage:
+                    "The request does not match the Codex proxy contract.",
+                  status: 400,
+                })
+            )
+          );
     const proxyInput = yield* OpenAICompatibleProxyInput.makeEffect({
-      ...(request.headers["authorization"] === undefined
-        ? {}
-        : { authorization: request.headers["authorization"] }),
+      ...(authorization === undefined ? {} : { authorization }),
       completion: {
         ...(config.accountId === undefined
           ? {}
@@ -148,7 +166,6 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         request: completion,
         subject: config.subject,
       },
-      internalToken: config.internalToken,
     }).pipe(
       Effect.mapError(
         () =>
@@ -228,15 +245,21 @@ const makeCodexProxyModeLayer = (
       const config = yield* CodexProxyConfig;
 
       return Match.value(config.mode).pipe(
-        Match.when("mock", () => CodexProxyOpenAICompatibleProxyMockLive),
+        Match.when("mock", () =>
+          makeCodexProxyOpenAICompatibleProxyMockLive(config.internalToken)
+        ),
         Match.when("local", () => {
           if (config.localProfileStoreDirectory === undefined) {
             return CodexProxyOpenAICompatibleProxyLocalUnavailableLive;
           }
 
-          return makeLocalProxyLayer(config.localProfileStoreDirectory, {
-            reasoningEffort: config.reasoningEffort,
-          });
+          return makeLocalProxyLayer(
+            config.localProfileStoreDirectory,
+            {
+              reasoningEffort: config.reasoningEffort,
+            },
+            config.internalToken
+          );
         }),
         Match.when("live", () => liveProxyLayer),
         Match.exhaustive

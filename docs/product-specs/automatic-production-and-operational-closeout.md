@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
@@ -14,9 +14,10 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 
 ## Status and accepted outcome
 
-This SPEC is current implementation intent for one automatic, fail-closed
-Production path from accepted `main`, followed by the bounded operational proof
-needed to close the remaining Production control and channel gaps.
+This SPEC is implemented repository history for one automatic, fail-closed
+Production path from accepted `main`. Hosted credential, deployment and channel
+proof tasks ended with explicit deferred dispositions at the personal-only
+Vercel identity gate; they are not current provider claims or active work.
 
 An accepted push is a `push` event for `refs/heads/main` whose exact SHA has a
 successful `CI` workflow run. A successful pull-request check, local
@@ -361,6 +362,34 @@ handset display, typing animation, or strict replay. No provider response grants
 authority. A missing live oracle is recorded as inconclusive or a non-claim,
 never promoted to success.
 
+## 2026-08-13 terminal external disposition
+
+Repository implementation is complete, but the three serial hosted tasks are
+deferred rather than accepted. Cooper authorized credential creation only
+through a genuinely personal Vercel account and explicitly excluded
+`cooper.corbett@tilt.legal` and Tilt Legal. The fresh pre-mutation Executor
+Personal readback found one Vercel connection, `personalvercelapi`, authenticated
+as the excluded account. Its personal team label does not change the
+authenticated principal, so no Vercel credential or partial GitHub custody was
+created.
+
+The blocked packet at
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
+owns the attempted work, readback, unchanged postconditions, resume trigger,
+rollback and non-claims. `configure-hosted-controls-and-drift`,
+`correct-terra-high-and-prove-automatic-main`, and
+`close-channel-proof-gaps` are terminally deferred for this implementation
+epoch. This disposition unblocks the repository terminal audit; it does not
+convert any absent hosted result into acceptance.
+
+Resume the operational chain only after Executor Personal exposes a separate
+Vercel user whose authenticated identity satisfies the personal-only condition
+and can access both exact Bundjil projects. A successor epoch must repeat
+identity readback, create four separately revocable exact-project credentials,
+prove assigned-project access and sibling denial, install the complete custody
+package, and gather new hosted evidence. Existing repository checks and the
+personal Cloudflare credential are not substitutes.
+
 ## Documentation impact ledger
 
 | Surface                                       | Decision                                                                 | Earliest owner and evidence                                                                                                                                                            |
@@ -384,5 +413,7 @@ never promoted to success.
 The sibling task ledger is serial. Repository desired state, focused checks and
 full verification must pass before GitHub/Vercel mutations. The workflow and
 provider command must land on main before their automatic behaviour can be
-proved. The Effect-native runtime and lint SPEC follows this operational slice;
-the single terminal five-pass audit runs only after both ledgers are complete.
+proved. For this epoch the three hosted tasks have an honest deferred
+disposition at the personal-identity gate, so the Effect-native runtime and lint
+SPEC may run the one terminal five-pass audit. A future successor reopens the
+hosted chain and must not reuse this terminal audit as provider proof.

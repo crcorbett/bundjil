@@ -66,10 +66,13 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
   }
 );
 
-export const CodexProxyOpenAICompatibleProxyMockLive = Layer.effect(
-  OpenAICompatibleProxy,
-  makeOpenAICompatibleProxy
-).pipe(
-  Layer.provide(CodexProxyMockDirectProviderLive),
-  Layer.merge(CodexProxyReadyLive)
-);
+export const makeCodexProxyOpenAICompatibleProxyMockLive = (
+  internalToken: Parameters<typeof makeOpenAICompatibleProxy>[0]
+) =>
+  Layer.effect(
+    OpenAICompatibleProxy,
+    makeOpenAICompatibleProxy(internalToken)
+  ).pipe(
+    Layer.provide(CodexProxyMockDirectProviderLive),
+    Layer.merge(CodexProxyReadyLive)
+  );

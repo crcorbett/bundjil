@@ -5,7 +5,6 @@ import {
 } from "@bundjil/codex";
 import {
   makeCodexDirectProviderLive,
-  CodexHttpClientLive,
   CodexOAuthHttpClientLive,
   CodexOAuthProfileCipherLive,
   CodexOAuthProfileCommitAtomicLive,
@@ -16,7 +15,7 @@ import {
   CodexProfileStoreEncryptedKeyValueLive,
   CodexSubscriptionAuthProtocolConfigLive,
   CodexUpstashPersistenceLive,
-  OpenAICompatibleProxyLive,
+  makeOpenAICompatibleProxyLive,
 } from "@bundjil/codex/runtime";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer } from "effect";
@@ -69,15 +68,11 @@ const CodexProxyOAuthServiceLive = CodexOAuthServiceLive.pipe(
   )
 );
 
-const CodexProxyHttpClientLive = CodexHttpClientLive;
-
 const makeCodexProxyDirectProviderLive = (
   policy: CodexResponsesRequestPolicy
 ) =>
   makeCodexDirectProviderLive(policy).pipe(
-    Layer.provideMerge(
-      Layer.merge(CodexProxyOAuthServiceLive, CodexProxyHttpClientLive)
-    )
+    Layer.provideMerge(CodexProxyOAuthServiceLive)
   );
 
 export const CodexProxyOpenAICompatibleProxyLive = Layer.unwrap(
@@ -85,7 +80,7 @@ export const CodexProxyOpenAICompatibleProxyLive = Layer.unwrap(
     const config = yield* CodexProxyConfig;
 
     return Layer.merge(
-      OpenAICompatibleProxyLive.pipe(
+      makeOpenAICompatibleProxyLive(config.internalToken).pipe(
         Layer.provide(
           makeCodexProxyDirectProviderLive({
             reasoningEffort: config.reasoningEffort,
@@ -113,5 +108,6 @@ export const CodexProxyOpenAICompatibleProxyUnavailableLive = Layer.succeed(
 
 export const CodexProxyOpenAICompatibleProxyLiveOrUnavailable =
   CodexProxyOpenAICompatibleProxyLive.pipe(
-    Layer.catchCause(() => CodexProxyOpenAICompatibleProxyUnavailableLive)
+    /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then -- Layer.catch recovers the typed Effect Layer error channel, not a Promise callback. */
+    Layer.catch(() => CodexProxyOpenAICompatibleProxyUnavailableLive)
   );

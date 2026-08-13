@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-effect-architecture-owner
 last_reviewed: 2026-08-10
@@ -8,7 +8,7 @@ review_trigger: Effect version, source inventory, lint rule, fixture, exception,
 spec: ../../product-specs/effect-native-runtime-patterns-and-lint-enforcement.md
 ---
 
-# Effect-native runtime patterns and lint enforcement plan
+# Effect-native runtime patterns and lint enforcement completed plan
 
 ## Objective and dependency
 
@@ -818,12 +818,316 @@ verification` gate passes with all nine package typechecks and all fifteen
   browser, accessibility, generated references, release and publication are
   **N/A**. The dependency-gated terminal audit remains pending.
 
+## 2026-08-13 external dependency disposition
+
+The automatic Production ledger now gives its three serial hosted tasks an
+honest terminal `deferred` disposition. Fresh Executor Personal identity
+readback found its sole Vercel connection authenticated as the account Cooper
+explicitly excluded, so token creation stopped before mutation. The bounded
+packet is
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+
+This satisfies the terminal-audit dependency as a non-accepted terminal state,
+not as hosted proof. The audit must preserve explicit non-claims for hosted
+drift, automatic Production, Terra High stable behavior, channel delivery,
+handset typing and candidate-specific replay. A future operational successor
+reopens those provider tasks and cannot reuse this audit as evidence of their
+external behavior.
+
+Documentation impact: external task disposition, proof packet/detail,
+automatic and Effect plans, SPEC/task owners, verification router and
+authority/automation readback **Change required**. Effect source, lint, tests,
+skills, package exports, READMEs, runbooks and provider state **Preserve**.
+Frontend, browser, accessibility, generated references, release and
+publication are **N/A**. The terminal five-pass audit is now ready.
+
+## Terminal pass 1 boundary correction
+
+The first architecture-boundaries pass found four false greens: Photon SDK
+name/code strings remained provider-controlled telemetry after lexical
+filtering; Codex tool parameters used `Schema.Unknown`; package-root exports
+exposed raw HTTP/SSE services; and the direct Responses proof accepted
+transport success without a semantic completion event. The earlier checks did
+not inspect the encoded logger payload, recursive JSON value space, supported
+root export denylist, or a plausible successful-but-incomplete provider body.
+
+The correction removes those Photon strings, gives Codex tool parameters an
+object-root recursive Effect Schema contract, keeps HTTP and stream mapper
+services private to runtime composition, and exposes standard Effect HTTP test
+substitution only through explicit refresh-capable and legacy `/testing`
+Layers. The direct proof decodes SSE data events and requires
+`response.completed`. Direct negative fixtures now own each recurrence path.
+Public domain services, OAuth recovery, cancellation, proxy/channel behavior,
+provider calls and wire contracts are preserved.
+
+The fresh pass-1 rerun found that the first correction still trusted throwing
+Photon property getters, treated Codex SSE lines as complete events, emitted a
+clean live completion without `response.completed`, used substring media-type
+matching, and retained private transport services through
+`Layer.provideMerge`. The corrected owners now inspect only non-accessor own
+provider values through `Option.liftThrowable`; share one bounded line/event
+framer across proof and live streaming; require exact SSE media type and a
+framed decoded completion event; consume proof bytes incrementally without an
+unbounded materialised body; and use `Layer.provide` so built exported contexts
+contain only their domain service. Hostile-getter, misleading-media,
+malformed/unterminated/truncated-stream and built-context fixtures own these
+recurrence paths. The terminal pass restarts again from the corrected
+candidate.
+
+The next rerun found an aggregate-event memory gap, proof-wide event
+collection, an inaccurate `receivedStreamLines` receipt name, and remaining
+request-mapper root/runtime exports. The shared framer now enforces the same
+1 MiB ceiling over the complete joined event, proof folds decoded events into
+constant-size completion/count state, the receipt reports
+`receivedStreamEvents`, and all mapper construction/access paths remain
+package-private. Direct valid/oversized multi-line and export-deny fixtures own
+the recurrence proof. Pass 1 restarts from this candidate.
+
+The following rerun found that ignored/comment SSE fields could bypass the
+aggregate event budget, CR-only framing lacked a direct oracle, and Photon
+transport diagnostics admitted arbitrary safe integers. The shared framer now
+budgets every nonblank wire line and accepts LF, CRLF and CR delimiters. Photon
+decodes observed status only inside 100 through 599 and otherwise records
+`unknown`. Direct CR-only, ignored-field overflow and out-of-range status
+fixtures own the recurrence paths. Pass 1 restarts from this candidate.
+
+The subsequent pass-1 rerun found five remaining false greens: Photon trusted a
+successful SDK result getter; scalar roots could satisfy the Codex function
+parameter declaration; sparse arrays and non-enumerable object properties
+could encode differently after acceptance; access-token and account-ID
+redactions had the same TypeScript type; and per-line SSE decoding stripped a
+BOM beyond stream start while colonless `data` disappeared. The corrected
+candidate reads success identity through the hostile own-data-property
+boundary, restores the function-parameter object root, admits only dense and
+enumerable canonical JSON, brands credential domains before redaction, and
+owns first-line BOM plus colonless-data semantics in the shared framer. Direct
+fixtures own every recurrence path. Pass 1 restarts from this candidate.
+
+The next pass-1 rerun reproduced seven additional false greens: failed then
+completed streams succeeded; raw Content-Type escaped; CRLF bytes were
+undercounted; array-spread accumulators admitted quadratic work; an empty chunk
+split CRLF; finite-number Schemas admitted impossible values; and only the root
+export barrel was inspected. The corrected candidate shares one package-private
+Schema/`Match` terminal sequence owner across proof and live mapping, emits only
+closed successful metadata and safe HTTP errors, preserves exact SSE wire bytes
+with Effect `Chunk`, caps fragments and fields at 4,096, retains CR state across
+empty chunks, uses bounded integer Schemas and inspects all five supported
+subpaths. Direct terminal-order, sentinel, exact-byte, limit-plus-one, numeric
+and export fixtures own every recurrence path. Pass 1 restarts from this
+candidate.
+
+The latest pass-1 rerun found that the credential destination accepted any
+non-empty string, malformed redacted values could defect and disclose through
+platform header construction, generic recursive JSON could overflow the stack,
+proof and live paths validated recognized events differently, and decoded
+sequence numbers were not enforced. Cold verification also found one unused
+private stream accessor. The corrected candidate pins the credential endpoint
+to one owned HTTPS literal; constrains header values and maps defensive
+construction through a fixed secret-negative `Effect.try`; validates tool and
+SSE JSON through one opaque 32-container Schema; decodes recognized events once
+for both consumers; and requires exact zero-based sequence progression through
+the shared `Match` state machine. The unused accessor is removed. Direct
+endpoint, network-negative header, depth-bound, malformed-event and sequence
+fixtures own the recurrence paths. Pass 1 restarts from this candidate.
+
+The next independent pass-1 rerun found five remaining boundary defects and
+one proof-harness false green. The proxy operation accepted both presented
+authorization and its expected internal token as request data; duplicate
+function-call output indexes replaced mapper state; opaque JSON validation
+retained caller-owned mutable references; Responses transport had no header,
+idle-body, cumulative-body or event budgets; and the SSE-only HTTP route
+silently stripped unsupported fields while accepting `stream: false`. App
+Vitest also externalised workspace packages and could execute stale ignored
+`dist` output despite the source export condition.
+
+The corrected candidate captures the expected token in the service Layer,
+decodes and redacts only the presented authorization at HTTP ingress, bounds
+both values, and compares them over one fixed-width loop. The mapper rejects a
+duplicate output index before state mutation. The beta.101-native
+`Schema.decodeTo`/`SchemaGetter.transformOrFail` codec now canonicalises both
+directions into detached, deeply frozen, bounded ordinary JSON. Positive
+transport budgets load through `Config.schema`; Effect timeout operators own
+header and per-pull idle time, while streams enforce cumulative bytes and SSE
+event cardinality with interruption-safe finalisation. The route rejects excess
+properties and accepts only omitted or literal-true stream mode. App Vitest
+inlines `@bundjil/*` packages under the source condition. Direct forged-token,
+duplicate-index, source-mutation, TestClock timeout/finalizer, limit and strict
+ingress fixtures own each recurrence path. Pass 1 restarts from this candidate.
+
+The following complete boundary gate found that exported recursive JSON unions
+still exposed a structurally forgeable type surface and that the SSE
+accumulator recovered its tuple through an assertion. Those recursive unions
+are now implementation-private, public protocol values come only from opaque
+branded Effect Schema types, and the accumulator uses checked Effect inference.
+The package public-export fixture and repository boundary gate own the
+recurrence path. Pass 1 restarts from this candidate.
+
+The fresh terminal pass 1 found one additional constructor path: the
+declaration predicate canonicalised only to decide validity, then accepted the
+original object. Effect type-side guards and constructors could therefore
+brand caller-owned mutable state without running the detaching transformation.
+The declaration now accepts only recursively frozen canonical containers;
+decode and encode still produce new deeply frozen ordinary data. Mutable,
+shallow-frozen, guard, type-side constructor and nested request fixtures own the
+recurrence path. The ordered terminal audit restarts from pass 1.
+
+The following fresh pass 1 confirmed the implementation guard but found that
+the nested request fixture supplied a plain access-token string. Its aggregate
+failure could therefore occur at the credential boundary before mutable tool
+parameters were inspected. The corrected oracle reuses valid decoded sibling
+fields, proves rejection through both the type-side Schema and
+`CodexResponsesPostInput.makeEffect`, and asserts the exact
+`request.tools[0].parameters` issue path. Testing architecture now requires
+negative fixtures to satisfy every earlier boundary precondition and assert the
+intended failure owner. Pass 1 restarts from this candidate.
+
+The first ordered audit attempt reached pass 4 and found a lifecycle mismatch,
+not a code defect: the product index still counted 23 implementation tasks and
+the Photon/Codex boundary tasks remained `in_progress` despite accepted focused
+and repository evidence. `ENP-FND-042` closes both tasks with bounded
+completion evidence and records the exact current count of 25 implementation
+tasks. Because the terminal audit requires every implementation dependency to
+be complete in the canonical ledger before pass 1, the earlier pass results are
+discarded and the full ordered sequence restarts from this corrected candidate.
+
+## Invalidated terminal five-pass receipt
+
+The 2026-08-13 receipt for pre-closeout implementation candidate digest
+`6d3a58a0279260efca39cccf732e0780d5973351aaf986e507e4e64dfa2cb529`
+is retained only as invalidated history. A later pass-3 review found
+`ENP-FND-043`, so its zero-finding sequence is not terminal evidence.
+Installed `effect@4.0.0-beta.101` and immutable reviewed source revision
+`1caab3cc30f626efbf15e59d74f539a487e5c85c` were the only Effect API
+authorities. The restarted ordered sequence reported zero findings in all five
+passes: architecture boundaries; call-graph topology; behaviour and gates;
+docs and proof consistency; and provider/deployment safety.
+
+The post-correction public-synthetic-Executor `bun run verification` passed all
+policy gates, 136 boundary tests, 17 lint tests, Knip, all nine package
+typechecks and all 15 workspace build/test tasks. Focused suites passed 151
+Codex, 45 Photon, 42 proxy and 80 agent tests. This proves repository behavior
+only. No provider write, deployment, live model call, channel send, handset
+behavior, strict replay oracle or Production state was exercised or proved.
+
+`ENP-FND-043` found that the 401 recovery fixture counted two requests without
+proving which credential each request used and without consuming the lazy
+returned stream. The corrected fixture captures old and refreshed
+authorization, proves the replay uses the refreshed token, consumes the mapped
+body, and requires both terminal `finish_reason: stop` and `[DONE]`. Focused
+typecheck and all 17 refresh-capable tests pass. The Codex boundary task is
+reopened until complete verification passes, and the ordered audit restarts
+from pass 1.
+
+The restarted pass 1 then found that deep freezing alone did not prove
+canonical JSON ownership: a frozen `Proxy` could pass the type-side structural
+checks while preserving caller-controlled own-key behavior. `ENP-FND-044`
+registers each transformed container in one package-private weak-identity owner
+and requires that provenance recursively at guards and constructors. The
+focused oracle rejects the unowned frozen proxy, proves nested construction
+fails at tool parameters, then proves ordinary decoding detaches it into stable
+deeply frozen data whose encoding is unchanged when the proxy behavior changes.
+An exact occurrence-checked lint exception owns the sole `WeakSet`. The Codex
+boundary task remains open until full verification passes, and the ordered
+audit restarts from pass 1.
+
+That restarted pass 1 found two additional bounded defects. `ENP-FND-045`
+replaces live/local `Layer.catchCause` availability recovery with
+`Layer.catch`, preserving defects and interruption while retaining typed
+configuration fallback. Live/local defect and local interruption exits now own
+that boundary. `ENP-FND-046` defines body progress as a non-empty byte chunk:
+empty chunks are filtered before the idle timeout, and a `TestClock` oracle
+proves periodic zero-byte transport still times out and finalizes upstream.
+Focused proxy and Codex tests pass. The Codex boundary task remains open until
+full verification passes, and the ordered audit restarts from pass 1.
+
+The following pass 1 found one proof gap rather than a source lifetime defect.
+Proof requests were already scoped through complete consumption, and streaming
+requests already transferred a dedicated scope to the returned body, but early
+status/media tests did not observe request cancellation. `ENP-FND-047` adds a
+four-case proof/streaming matrix for non-2xx and rejected media. It requires the
+Effect HTTP request abort signal immediately, leaves `Response.bodyUsed` false,
+and excludes the rejected-body sentinel from typed results. The Codex boundary
+task remains open until full verification passes, and the ordered audit
+restarts from pass 1.
+
+The next pass 1 found that accepted stream acquisition could still outlive a
+caller that never subscribed to the returned body. `ENP-FND-048` preserves
+pre-header 401/media error mapping and adds a bounded ownership handoff instead
+of moving request acquisition behind the stream. One Effect-clock watchdog
+closes an unclaimed response scope at the configured idle deadline; body
+subscription claims it and existing per-pull/finalizer ownership takes over.
+The scope finalizer completes a `Deferred` so every normal or failure close also
+terminates the detached watchdog. A `TestClock` fixture proves an accepted
+discarded stream aborts without consuming body bytes. The Codex boundary task
+remains open until full verification, and the ordered audit restarts from
+pass 1.
+
+The next pass 1 found that the initial ownership watchdog started before
+headers, so a shorter stream-idle configuration could preempt the independent
+header timeout. `ENP-FND-049` starts it only after accepted status, media type
+and metadata. A `TestClock` fixture delays valid headers past the idle duration
+but within the header deadline, proves the request remains alive, then drains a
+claimed body and observes normal closure. The Codex boundary task remains open
+until full verification, and the ordered audit restarts from pass 1.
+
+The restarted pass 1 then found that the body subscriber ignored the boolean
+returned by `Deferred.succeed`. A claim after watchdog expiry or after an
+earlier subscriber could still proceed to the one-shot upstream body.
+`ENP-FND-050` makes that boolean the exactly-once ownership decision: the
+winning subscriber receives the bounded stream and every expired or duplicate
+claim fails through the fixed typed stream error before touching the body.
+`TestClock` proves the expired path leaves `Response.bodyUsed` false, and a
+second-subscription fixture proves one completed drain cannot be repeated. The
+public-synthetic-Executor full verification passed every policy gate, 136
+boundary tests, 17 lint tests, Knip, all nine package typechecks and all 15
+workspace build/test tasks; focused suites passed 156 Codex, 43 proxy, 80 agent
+and 45 Photon tests. The Codex boundary task is reclosed and the ordered audit
+restarts from pass 1.
+
+The following docs-and-proof pass found `ENP-FND-051`: both SPECs and the
+automatic-production plan described completed history and an accepted audit
+while their plans were still active and the terminal task was pending. That
+false lifecycle claim is restored to current/pending wording before the
+restarted sequence. Completed-history routing will be written only with the
+final receipt.
+
+Documentation impact: Photon/Codex source and tests, Codex package exports,
+Codex/proxy READMEs, app Vitest configuration, Effect/repository/testing
+architecture, this SPEC/task/plan and the terminal receipt **Change required**.
+Other app routes, Photon README, runbooks,
+authority/automation/control records, critical journeys, credentials,
+deployments and provider state **Preserve**. Frontend, browser, accessibility,
+release and publication are **N/A**. Repository checks cannot prove live
+Photon, Codex subscription, hosted proxy, delivery or Production behavior.
+
 ## Evidence and non-claims
 
 Repository tests and lint prove only source contracts. They do not prove
 GitHub settings, deployment, provider behaviour, delivery, handset typing or
 strict replay. Corrections reopen the owning task and invalidate downstream
 receipts.
+
+## Final terminal audit receipt
+
+Accepted on 2026-08-14 for pre-receipt implementation candidate digest
+`cc4af0e45956c31cfc4ea07aa5d7768e3230105d9137bd8c6ca7e7832916723f`.
+Installed `effect@4.0.0-beta.101` and immutable reviewed source revision
+`1caab3cc30f626efbf15e59d74f539a487e5c85c` were the only Effect API
+authorities.
+
+The restarted ordered sequence is clean across architecture boundaries;
+call-graph topology; behaviour and gates; docs and proof consistency; and
+provider/deployment safety. `ENP-FND-051` restored truthful pending lifecycle
+before the restart; this receipt and the atomic plan/index move now establish
+implemented history. The post-correction public-synthetic-Executor `bun run
+verification` passed every policy gate, 136 boundary tests, 17 lint tests,
+Knip, all nine package typechecks and all 15 workspace build/test tasks.
+Focused suites passed 156 Codex, 43 proxy, 80 agent and 45 Photon tests.
+
+This proves repository behavior only. No current OAuth credential, Codex
+subscription endpoint, Vercel token, GitHub secret, hosted proxy, provider
+write, deployment, model response, channel send, handset behavior, strict
+candidate-specific replay oracle or Production state was exercised or proved.
 
 ## PRD review receipt
 

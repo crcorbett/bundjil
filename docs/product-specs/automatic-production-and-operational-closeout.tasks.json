@@ -1,7 +1,7 @@
 {
   "title": "Automatic Production deployment and operational closeout tasks",
   "spec": "automatic-production-and-operational-closeout.md",
-  "status": "current",
+  "status": "implemented",
   "authority": "Cooper's 2026-08-10 delegated authority covers the exact repository, GitHub, Personal Vercel, secret, deployment, rollback, Photon, Sendblue, OAuth and Computer Use operations in this ledger; it does not permit Tilt scope, secret disclosure, unrelated resources, destructive out-of-scope work, or blind retry.",
   "principles": [
     "Deploy only an exact successful main CI SHA and never let Vercel Git move Production before repository verification.",
@@ -41,7 +41,7 @@
         "directObservable": "One sanitized active-plan inventory names exact current repository, workflow, environment, project, deployment, alias, configuration-metadata and rollback identities.",
         "expectedPostcondition": "Every later mutation has an exact before-state and stop condition.",
         "falseGreenRejected": "Historical receipt, local config, project name, stable URL or successful CLI authentication treated as current target proof.",
-        "evidenceOwner": "docs/exec-plans/active/automatic-production-and-effect-runtime.md",
+        "evidenceOwner": "docs/exec-plans/completed/automatic-production-and-effect-runtime.md",
         "limitationsAndNonClaims": "Readback authorizes no write and proves no future state."
       },
       "docsImpact": "Update this ledger, SPEC evidence epoch and active plan only; provider actuality remains dated evidence.",
@@ -99,7 +99,7 @@
     {
       "id": "configure-hosted-controls-and-drift",
       "title": "Configure bounded GitHub and Vercel identities and close Infrastructure Drift",
-      "status": "pending",
+      "status": "deferred",
       "dependsOn": ["refresh-node24-action-runtimes"],
       "description": "After repository desired state is reviewed and pushed, create two separately revocable Production tokens through the Personal-account dashboard, scope one to the exact agent project and one to the exact proxy project, prove assigned-project access plus sibling-project denial, and bind only their ciphertext to the Production environment. Create a separately revocable exact-project pair for the report-only drift environment, encode those bindings only inside its bounded dotenv artifact, install the minimal main ruleset, provision the three exact drift artifacts, dispatch one read-only drift run and retain sanitized readback. Exact project configuration and decoded project/source readback remain mandatory independent controls.",
       "mandatoryVerification": [
@@ -121,13 +121,17 @@
         "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
       },
       "docsImpact": "Refresh authority/control externalReadback fields, active plan and dated drift evidence; do not copy mutable GitHub settings into README prose.",
-      "currentResult": "On 2026-08-13 Cooper explicitly approved the required credential creation. Personal Cloudflare account f9f94270a4a5af8af7010d891020922d now owns active 90-day token 8033ee98f001f2aeeb4512750f4d8f36 through 2026-11-11T06:11:42Z, scoped only to Object Read & Write for bucket bundjil-alchemy-state. Its derived S3 credentials are held in personal Bundjil 1Password item dylpugrxetztdr76qruqtxonie; a direct S3 list under bundjil/v1 succeeded and temporary encrypted-handoff files were removed. One intermediate token was revoked after 1Password Connect rejected custody, and two invalid create requests made no token. Vercel creation stopped before mutation: the Executor connection and the Chrome session selected through coopercorbett@gmail.com both resolved to Vercel user nBzSPdkIxazY1om0rrNZ9cFg whose canonical email is cooper.corbett@tilt.legal. This does not satisfy the explicit Personal-only identity condition. No Vercel token or GitHub secret was created; all three drift artifacts, hosted drift execution, automatic Production, and channel proof remain pending.",
+      "currentResult": "Deferred with a blocked external disposition on 2026-08-13. Cooper explicitly approved credential creation only through a genuinely personal Vercel account and excluded cooper.corbett@tilt.legal and Tilt Legal. A fresh Executor Personal readback found exactly one Vercel connection, personalvercelapi, authenticated as user nBzSPdkIxazY1om0rrNZ9cFg with canonical email cooper.corbett@tilt.legal. The personal team label does not override that excluded principal, so token creation stopped before mutation. The separately approved personal Cloudflare account f9f94270a4a5af8af7010d891020922d retains active exact-bucket token 8033ee98f001f2aeeb4512750f4d8f36 through 2026-11-11T06:11:42Z in personal Bundjil 1Password custody. No Vercel token, GitHub secret, ruleset, hosted drift report, deployment, or channel operation was created or changed. Resume only after Executor Personal exposes a separate admitted Vercel user with access to both exact Bundjil projects.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+        "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "correct-terra-high-and-prove-automatic-main",
       "title": "Apply Terra High configuration and prove automatic exact-main Production",
-      "status": "pending",
+      "status": "deferred",
       "dependsOn": ["configure-hosted-controls-and-drift"],
       "description": "Set the three required semantic Production values in their owning Personal projects, merge an exact verified candidate, let the new main workflow stage and promote without a human step, and prove immutable/stable/rollback and model behaviour.",
       "mandatoryVerification": [
@@ -147,12 +151,16 @@
         "limitationsAndNonClaims": "One bounded turn does not prove all future model responses, latency or strict replay absence."
       },
       "docsImpact": "Update accepted Production proof, runbook readback, active plan and lifecycle owners; provider state remains dated evidence.",
+      "currentResult": "Deferred without execution because the required complete Production credential custody is unavailable under the personal-only identity condition. Repository workflow and Effect deployment behavior remain implemented and locally/CI verified, but no accepted main SHA was automatically deployed or promoted by this control. Stable Terra High, immutable/stable deployment identity, rollback, and protected Eve behavior remain unproved.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
       "commitAfterPassing": true
     },
     {
       "id": "close-channel-proof-gaps",
       "title": "Run bounded Personal Photon and Sendblue long-response proofs",
-      "status": "pending",
+      "status": "deferred",
       "dependsOn": ["correct-terra-high-and-prove-automatic-main"],
       "description": "Reauthenticate Photon in Personal scope, inventory it, then use the established conversations for one bounded Photon and one bounded Sendblue long-response test with direct handset observation where available.",
       "mandatoryVerification": [
@@ -172,6 +180,10 @@
         "limitationsAndNonClaims": "Photon strict replay and any unobservable handset animation remain explicit limitations, not implementation defects."
       },
       "docsImpact": "Update verification packet/index, active plan, task status and exact runbook evidence pointers; preserve provider procedures in app runbooks.",
+      "currentResult": "Deferred without a new send because the exact automatic Production candidate required by this task was not produced. Prior dated Photon and Sendblue Production receipts remain historical point-in-time evidence only. No message was sent, no uncertain operation was retried, and candidate-specific Photon replay plus any unobserved handset typing remain explicit non-claims.",
+      "blockedEvidence": [
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+      ],
       "commitAfterPassing": true
     }
   ],

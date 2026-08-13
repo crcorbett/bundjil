@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "receipt": "automatic-production-personal-vercel-identity-blocked",
+  "observedAt": "2026-08-13T07:36:39Z",
+  "candidate": {
+    "repositoryCommit": "763199f07b6f2f0569442546e6ea7ef695c49a74",
+    "pullRequest": 5,
+    "productionWorkflowSha256": "7641cffb0ed02759884ea9d3297a52e08d96ba7a91b296618409545f1834f52e",
+    "driftWorkflowSha256": "f5b27295b7952363658f7d05973dbc8f79102ea1f27234278fbe379c5d7e5981"
+  },
+  "authority": {
+    "scope": "Create the four separately revocable exact-project Vercel credentials required by the accepted automatic Production and report-only Preview drift controls, install only the complete bounded GitHub custody package, and run the admitted hosted proofs.",
+    "access": "mutation",
+    "approval": "Cooper explicitly approved credential creation on 2026-08-13 subject to a personal-only identity condition.",
+    "excludedIdentity": "Any Vercel account whose authenticated principal is cooper.corbett@tilt.legal, and every Tilt Legal team or resource."
+  },
+  "attemptedWork": [
+    "Listed Executor Personal connections and selected its sole vercel_api connection, personalvercelapi.",
+    "Read the authenticated Vercel user and team memberships immediately before any credential mutation.",
+    "Compared the authenticated principal with the explicit personal-only authority condition and stopped before token creation."
+  ],
+  "identityReadback": {
+    "executorOrganisation": "Personal",
+    "connection": "personalvercelapi",
+    "authenticatedUserId": "nBzSPdkIxazY1om0rrNZ9cFg",
+    "authenticatedEmail": "cooper.corbett@tilt.legal",
+    "authenticatedUsername": "crcorbett",
+    "visibleTeamId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+    "visibleTeamName": "Cooper Corbett's projects",
+    "visibleTeamRole": "OWNER",
+    "personalOnlyConditionSatisfied": false
+  },
+  "lastSuccessfulStep": "The separately approved personal Cloudflare R2 credential remains active, exact-bucket scoped, verified, and held in personal 1Password custody; it was not changed during this Vercel identity check.",
+  "blockedPredicates": [
+    "Executor Personal exposes no second Vercel connection authenticated as a genuinely personal user.",
+    "The sole authenticated principal is explicitly excluded even though its visible team has a personal name.",
+    "The required assigned-project access and sibling-project denial proof cannot begin without creating credentials through an admitted principal."
+  ],
+  "postconditions": [
+    "No Vercel token, GitHub environment secret, ruleset, deployment, alias, environment variable, provider route, or message was created or changed.",
+    "The infrastructure-read-only-preview environment remains without its complete three-artifact custody package.",
+    "Automatic Production, Terra High stable deployment, and the dependent Photon and Sendblue proofs remain unattempted in this candidate."
+  ],
+  "resumeTrigger": "Connect Executor Personal to a separate Vercel user whose authenticated email is personal and which can access both exact Bundjil projects without using the excluded account or a Tilt Legal team. Re-run identity readback before creating the four isolated project credentials.",
+  "nonClaims": [
+    "A personal team name does not prove a personal authenticated account.",
+    "This packet does not prove hosted infrastructure drift, automatic Production deployment, Terra High stable behavior, channel delivery, handset typing, or candidate-specific replay.",
+    "No access-token value, secret, protected URL, provider payload, message content, phone identity, profile, prompt, response, or OAuth material is retained."
+  ],
+  "rollback": "No Vercel or GitHub mutation occurred. Retain the existing repository branch, personal Cloudflare credential, and prior provider state; resume only after a new admitted identity readback."
+}

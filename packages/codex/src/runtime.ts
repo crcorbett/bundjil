@@ -339,7 +339,7 @@ export const CodexOAuthMemoryKeyValueLive = CodexOAuthLive.pipe(
   Layer.provide(KeyValueStore.layerMemory)
 );
 
-export const CodexHttpClientLive = Layer.effect(
+const CodexHttpClientLive = Layer.effect(
   CodexHttpClient,
   makeCodexHttpClient
 ).pipe(Layer.provide(BunHttpClient.layer));
@@ -348,23 +348,17 @@ export const CodexResponsesProofLive = Layer.effect(
   CodexResponsesProof,
   makeCodexResponsesProof
 ).pipe(
-  Layer.provideMerge(
+  Layer.provide(
     Layer.merge(CodexHttpClientLive, CodexResponsesRequestPolicyLowLive)
   )
 );
 
-export const makeCodexRequestMapperLive = (
-  policy: CodexResponsesRequestPolicy
-) =>
+const makeCodexRequestMapperLive = (policy: CodexResponsesRequestPolicy) =>
   Layer.effect(CodexRequestMapper, makeCodexRequestMapper).pipe(
     Layer.provide(makeCodexResponsesRequestPolicyLayer(policy))
   );
 
-export const CodexRequestMapperLive = makeCodexRequestMapperLive({
-  ...defaultCodexResponsesRequestPolicy,
-});
-
-export const CodexStreamMapperLive = Layer.succeed(
+const CodexStreamMapperLive = Layer.succeed(
   CodexStreamMapper,
   makeCodexStreamMapper
 );
@@ -373,8 +367,12 @@ export const makeCodexDirectProviderLive = (
   policy: CodexResponsesRequestPolicy
 ) =>
   Layer.effect(CodexDirectProvider, makeCodexDirectProvider).pipe(
-    Layer.provideMerge(
-      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    Layer.provide(
+      Layer.mergeAll(
+        makeCodexRequestMapperLive(policy),
+        CodexStreamMapperLive,
+        CodexHttpClientLive
+      )
     )
   );
 
@@ -386,8 +384,12 @@ export const makeCodexLegacyDirectProviderLive = (
   policy: CodexResponsesRequestPolicy
 ) =>
   Layer.effect(CodexDirectProvider, makeCodexLegacyDirectProvider).pipe(
-    Layer.provideMerge(
-      Layer.merge(makeCodexRequestMapperLive(policy), CodexStreamMapperLive)
+    Layer.provide(
+      Layer.mergeAll(
+        makeCodexRequestMapperLive(policy),
+        CodexStreamMapperLive,
+        CodexHttpClientLive
+      )
     )
   );
 
@@ -395,7 +397,7 @@ export const CodexLegacyDirectProviderLive = makeCodexLegacyDirectProviderLive(
   defaultCodexResponsesRequestPolicy
 );
 
-export const OpenAICompatibleProxyLive = Layer.effect(
-  OpenAICompatibleProxy,
-  makeOpenAICompatibleProxy
-);
+export const makeOpenAICompatibleProxyLive = (
+  internalToken: Parameters<typeof makeOpenAICompatibleProxy>[0]
+) =>
+  Layer.effect(OpenAICompatibleProxy, makeOpenAICompatibleProxy(internalToken));

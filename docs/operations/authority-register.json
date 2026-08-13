@@ -49,7 +49,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment and the four exact non-secret variables. Both required project-specific Vercel secrets are absent, so no automatic hosted Production run is accepted; prior Personal Vercel project and deployment metadata remains dated evidence only."
+        "evidence": "GitHub readback on 2026-08-13 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment and the four exact non-secret variables. Both required project-specific Vercel secrets are absent. Fresh Executor Personal readback found its sole Vercel connection authenticated as the explicitly excluded cooper.corbett@tilt.legal account, so credential creation stopped before mutation and automatic Production is deferred for this epoch. See docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json."
       }
     },
     {
@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms the infrastructure-read-only-preview environment has zero secrets. Pull-request run 31671302134 for exact branch SHA d7a189d714950d19d8730576d66bac95a4d094f2 failed closed in custody preparation because all three required artifacts are absent. Personal Cloudflare token 8033ee98f001f2aeeb4512750f4d8f36 is separately active through 2026-11-11T06:11:42Z with exact bundjil-alchemy-state Object Read & Write scope, personal 1Password custody and one successful S3 prefix read; no Vercel drift credential, GitHub artifact, hosted provider report or drift result is claimed."
+        "evidence": "GitHub readback on 2026-08-13 confirms the infrastructure-read-only-preview environment has zero secrets. Pull-request run 31677769897 for exact branch SHA 763199f07b6f2f0569442546e6ea7ef695c49a74 failed closed in custody preparation and skipped provider reporting. Personal Cloudflare token 8033ee98f001f2aeeb4512750f4d8f36 remains exact-bucket scoped in personal 1Password custody. Fresh Executor Personal readback found its sole Vercel connection authenticated as the explicitly excluded cooper.corbett@tilt.legal account, so no Vercel drift credential or GitHub artifact was created and hosted drift is deferred for this epoch. See docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json."
       }
     },
     {
