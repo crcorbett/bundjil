@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-08-10",
+  "lastReviewed": "2026-08-13",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -32,13 +32,13 @@
       "id": "github-production",
       "surface": "workflow",
       "target": "github-actions",
-      "principal": "Ephemeral GitHub Actions Production job with two separately revocable Personal-scope Vercel tokens in exact project-bound steps",
-      "identitySource": "Successful same-repository main-push CI workflow_run, exact accepted head SHA, Production environment, separate agent/proxy credentials and decoded project/SHA readback; Vercel does not enforce individual Personal-project token scope",
+      "principal": "Ephemeral GitHub Actions Production job with two separately revocable exact-project Vercel tokens selected under the Personal account",
+      "identitySource": "Successful same-repository main-push CI workflow_run, exact accepted head SHA, Production environment, separate agent/proxy credentials, pre-custody assigned-project access and sibling-project denial, and decoded project/SHA readback",
       "operation": "Stage both exact-SHA Production candidates without domains, validate immutable project/source/readiness, promote proxy then agent, verify stable targets and health, and restore exact previous deployments on partial failure",
       "resource": "Personal Vercel projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB, their immutable deployments and stable Production targets",
       "environment": "GitHub Production environment and Personal Vercel Production only; Tilt scope is rejected",
       "status": "bounded",
-      "durationRevocation": "One globally serialized run, maximum 30 minutes, never cancelled in flight; revoke either Personal-scope project-bound token, disable the workflow/environment, or revert source under separate settings authority",
+      "durationRevocation": "One globally serialized run, maximum 30 minutes, never cancelled in flight; revoke either exact-project token, disable the workflow/environment, or revert source under separate settings authority",
       "approvalBoundary": "Cooper's accepted automatic-Production SPEC authorizes only verified exact-main candidates through the repository-owned Effect command; workflow/provider output cannot widen targets, credentials or operations",
       "approvalReceipt": "Exact main SHA, successful CI and Production run IDs, two immutable candidate IDs, prior rollback IDs, stable target readback and sanitized token metadata",
       "auditEvidence": "Workflow eligibility, repository tests, provider project/source/readiness, stable target identity, health, rollback and secret-negative bounded receipt",

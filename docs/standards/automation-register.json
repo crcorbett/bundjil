@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-08-10",
+  "lastReviewed": "2026-08-13",
   "reviewTrigger": "signal, state, authority, proof, cost, false-positive, convergence, stopping, escalation, rollback, or accepted-outcome change",
   "records": [
     {
@@ -52,7 +52,7 @@
       "signal": "Successful same-repository push CI workflow_run for the exact main head SHA.",
       "stateOwner": "GitHub run/concurrency/environment externally; Vercel immutable deployments and stable targets externally; task ledger and bounded receipts locally.",
       "durableState": "One serialized non-cancelling writer, exact accepted SHA, two current/candidate/rollback deployment identities and stable target readback.",
-      "principal": "Ephemeral GitHub Actions job using exactly two separately revocable Personal-scope Vercel tokens from the Production environment in exact project-bound steps; Vercel does not enforce individual Personal-project token scope.",
+      "principal": "Ephemeral GitHub Actions job using exactly two separately revocable Vercel tokens from the Production environment, one selected for bundjil-agent and one for bundjil-codex-proxy under the Personal account; assigned-project access and sibling-project denial are required before custody.",
       "authorityOwner": "docs/operations/authority-register.json#github-production and the automatic Production SPEC.",
       "operation": "Stage proxy and agent with domains skipped, validate both, re-read main, promote proxy then agent, verify stable targets and health, and roll back exact moved targets on failure.",
       "resource": "The exact two Bundjil Personal Vercel projects, immutable deployments, stable Production targets and prior rollback deployments.",

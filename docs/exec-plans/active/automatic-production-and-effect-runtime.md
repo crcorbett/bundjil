@@ -705,32 +705,56 @@ browser, accessibility, release, and publication are **N/A**.
   eventual automatic Production candidate, Eve completion, proxy completion,
   dispatch internals, provider delivery status or strict replay.
 
-## Credential-boundary review correction
+## Credential-boundary review corrections
 
-The current Vercel provider documentation disproves the draft assumption that
-an access token for a Personal account can be provider-enforced to one project.
-The reviewed replacement keeps two separately revocable Personal-scope tokens,
-one in each project-bound workflow step, and requires exact configured project
-IDs plus decoded project/source/readiness readback before promotion. The lack
-of provider-enforced Personal-project scope is an explicit residual limitation,
-not a passed least-privilege claim. Credential creation remains action-time
-confirmation gated; no token or hosted secret has been created.
+The first 2026-08-13 API attempt disproved token-on-token credential creation:
+both Personal-account and team-qualified `POST /v3/user/tokens` calls returned
+`403`, and rollback readback confirmed that neither GitHub Production secret
+was created. That failure leaked no token and performed no Vercel write.
+
+A later authenticated dashboard preflight corrected the earlier scope
+assumption. Beneath `Cooper Corbett's projects`, the current Vercel token form
+exposes individual `bundjil-agent` and `bundjil-codex-proxy` selectors. The
+official access-token guide documents selectable scope, expiry and one-time
+display but does not state the project-level enforcement contract. The task now
+requires two 90-day exact-project credentials plus a positive assigned-project
+read and denied sibling-project read before GitHub custody. An all-project or
+account-wide fallback is rejected. The agent form is prepared with the exact
+project and 90-day expiry, but the action-time credential-creation confirmation
+has not been received; no token or hosted secret has been created.
 
 ## PRD review receipt
 
 Accepted on 2026-08-10 before implementation and re-reviewed after the current
-Vercel token surface disproved Personal-project token scoping. The review traced every
+Vercel dashboard exposed exact Personal-project token selection. The review traced every
 Production task to a direct observable, expected postcondition, rejected false
 green, evidence owner, rollback and limitation. It compared direct Vercel Git,
 post-CI GitHub deployment and merge-queue gating; only the separate post-CI
 exact-main writer prevents pre-verification alias movement without adding a
 queue dependency. Negative workflow eligibility, two-candidate readiness,
 stale-main no-op, partial-promotion rollback, secret-negative output and stable
-alias readback are mandatory tests. Two separately revocable Personal-scope
-credentials plus exact project-bound readback are the least available control;
-provider-enforced project scope is a documented limitation. Documentation
-policy and skill policy pass. Credential creation and the missing drift custody
-remain external execution gates rather than unclear requirements.
+alias readback are mandatory tests. Two separately revocable exact-project
+credentials require both positive assigned-project access and sibling-project
+denial before custody; exact decoded project/source checks remain independent
+runtime controls. Documentation policy and skill policy pass. Credential
+creation and the missing drift custody remain external execution gates rather
+than unclear requirements.
+
+### Exact-project credential correction impact
+
+| Surface                                                            | Decision            | Evidence and postcondition                                                                                                                                                                                                   |
+| ------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current SPEC, task and execution plan                              | **Change required** | Replace the disproved account-scope assumption with exact project selection, assigned-project access, sibling-project denial and no broad fallback. Keep the hosted task pending until both credentials and readbacks exist. |
+| Authority and automation registers                                 | **Change required** | The workflow principal is two separately revocable exact-project credentials; runtime project/SHA decoding remains an independent control. External readback still records both GitHub secrets absent.                       |
+| Agent deployment runbook and infrastructure README                 | **Change required** | Route the operator and package boundary to the same positive/negative scope proof without copying token values or dashboard steps.                                                                                           |
+| Workflow, Effect command, Config, Schema, errors, Layers and tests | **Preserve**        | Separate secret names and exact decoded project/source checks already enforce the runtime boundary; this provider-custody correction changes no executable call graph.                                                       |
+| Dated proof and verification                                       | **Change required** | The eventual receipt must record token metadata, 90-day expiry, assigned-project success, sibling-project denial and GitHub secret-name readback without values. The dashboard selector alone remains preflight evidence.    |
+| Skills, lint, package exports, frontend and browser journeys       | **N/A**             | No skill policy, TypeScript, export, visible application UI or browser journey changed. Computer Use is only the external credential-creation adapter and remains action-time confirmation gated.                            |
+| Lifecycle and terminal audit                                       | **Preserve**        | `configure-hosted-controls-and-drift` remains pending; no acceptance, Production, drift or terminal-audit claim advances.                                                                                                    |
+
+Focused documentation, authority, control and verification policy checks pass
+for this correction. They prove repository owner consistency only, not token
+creation, project enforcement, GitHub custody or hosted execution.
 
 ## Terminal audit
 

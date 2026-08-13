@@ -86,12 +86,17 @@ The job runs only when all of these are true:
 The workflow has root `contents: read`, a bounded timeout, one repository-wide
 Production concurrency group with `cancel-in-progress: false`, checkout
 credentials disabled, exact pinned actions, and the `Production` environment.
-It uses two separately revocable Personal-account Vercel tokens, one per
-project step. Vercel's current token surface does not enforce individual
-Personal-project scope, so exact team/project configuration, project-bound
-secret names, provider readback and fail-closed project/SHA checks constrain
-use inside the workflow. This is the least available provider scope, not a
-claim that either credential is provider-enforced to one project.
+It uses two separately revocable Vercel tokens, each scoped in the Personal
+account to exactly one Bundjil project. The current dashboard exposes an exact
+project selector beneath the Personal-account scope; Vercel's
+[access-token guide](https://vercel.com/kb/guide/how-do-i-use-a-vercel-api-access-token)
+documents scope selection and one-time token display but does not document the
+project-level enforcement semantics. Therefore the accepted proof requires
+both a successful read of the assigned project and a denied read of the sibling
+Bundjil project before either credential enters GitHub. The workflow retains
+exact team/project configuration, project-bound secret names, decoded provider
+readback and fail-closed project/SHA checks as independent controls. An
+account-wide or all-project token is not an accepted fallback.
 
 All workflow actions remain exact-commit pinned and lock-owned. The corrective
 candidate replaces only `actions/checkout` and `actions/setup-node` with the
@@ -233,11 +238,12 @@ promotion.
 ### Credential and environment custody
 
 - Create two separately revocable Vercel tokens through the Personal account,
-  one for each exact project step. Store them only as the two project-named
-  GitHub `Production` environment secrets. Vercel currently scopes these
-  credentials to the Personal account rather than an individual project;
-  project IDs and decoded project/SHA readback provide the narrower workflow
-  boundary, and this provider limitation remains explicit.
+  one scoped to `bundjil-agent` and one scoped to `bundjil-codex-proxy`. Store
+  them only as the two project-named GitHub `Production` environment secrets.
+  Before storage, prove each token can read its assigned project and cannot
+  read the sibling project. Stop if the dashboard no longer offers the exact
+  selector or either negative test succeeds; do not widen to all Personal
+  projects or account scope.
 - GitHub receives only token ciphertext. Local creation material uses a
   mode-`0600` temporary directory, is never printed, and is deleted after
   secret metadata readback.
@@ -318,7 +324,7 @@ readiness, project and source identity. Do not roll back the newest fenced
 Codex profile generation or provider state.
 
 Control rollback disables `.github/workflows/production.yml`, revokes both
-Personal-scope project-bound tokens, and reads back the GitHub environment. It
+exact-project tokens, and reads back the GitHub environment. It
 does not re-enable direct Vercel Git deployment. Infrastructure Drift rollback deletes
 the three environment secrets and disables the workflow/environment; provider
 rollback is not applicable because the report has zero writes.

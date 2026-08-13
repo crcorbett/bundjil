@@ -71,10 +71,11 @@ automation fallback.
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Personal-scope Vercel
-  tokens, one per exact project-bound step. Vercel does not currently enforce
-  individual Personal-project scope; exact project configuration and decoded
-  project/SHA readback are mandatory residual controls. The
+  `contents: read` plus exactly two separately revocable Vercel tokens selected
+  under the Personal account, one for each exact Bundjil project. Before
+  custody, each token must read its assigned project and receive a denied result
+  for the sibling project. Exact project configuration and decoded project/SHA
+  readback remain independent controls. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then agent, and
   verifies stable targets and health. Tilt, account-wide credentials and raw

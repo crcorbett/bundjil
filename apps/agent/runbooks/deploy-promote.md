@@ -47,15 +47,15 @@ HEAD`, and a readback of `origin/main`.
 
 ## Authority envelope
 
-| Field               | Required value                                                                                                                                                          |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Identity            | Exact GitHub workload plus two separately revocable Personal-scope Vercel credentials in project-bound steps, or an authenticated emergency operator and approver       |
-| Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                              |
-| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                         |
-| Environment         | Explicit Vercel Preview or Production target                                                                                                                            |
-| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                                                                        |
-| Approval            | Admitted automatic envelope for an eligible successful CI run, or an addressable emergency receipt matching operation, project, environment, source SHA, and deployment |
-| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim                                                      |
+| Field               | Required value                                                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Identity            | Exact GitHub workload plus two separately revocable exact-project Vercel credentials proved by assigned-project access and sibling-project denial, or an authenticated emergency operator and approver |
+| Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                                                             |
+| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                                                        |
+| Environment         | Explicit Vercel Preview or Production target                                                                                                                                                           |
+| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                                                                                                       |
+| Approval            | Admitted automatic envelope for an eligible successful CI run, or an addressable emergency receipt matching operation, project, environment, source SHA, and deployment                                |
+| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim                                                                                     |
 
 ## Inputs and secret handling
 
