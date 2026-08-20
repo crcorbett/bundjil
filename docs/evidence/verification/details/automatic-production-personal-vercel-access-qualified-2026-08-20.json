@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-08-19T23:48:36Z",
+  "source": "tools.vercel_api.user.personalvercelapi",
+  "operations": ["teams.getTeams", "projects.getProjects"],
+  "result": "personal_access_qualified",
+  "teamReadback": {
+    "count": 1,
+    "team": {
+      "id": "team_1LX7ZujbijowTv8J9k0aU7nD",
+      "slug": "cooper-corbetts-projects",
+      "name": "Cooper Corbett's projects",
+      "membershipRole": "OWNER",
+      "limited": false
+    }
+  },
+  "projectReadback": {
+    "visibleProjectCount": 11,
+    "exactBundjilProjects": [
+      {
+        "id": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "name": "bundjil-agent",
+        "accountId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+        "rootDirectory": "apps/agent"
+      },
+      {
+        "id": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "name": "bundjil-codex-proxy",
+        "accountId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+        "rootDirectory": "apps/codex-proxy"
+      }
+    ]
+  },
+  "classification": {
+    "acceptedBoundary": "The connection exposes one Personal Vercel team owned by Cooper and the exact two Bundjil projects.",
+    "supersededConclusion": "The account's primary contact email is not evidence that the connection exposes a Tilt Legal Vercel team or resources.",
+    "nextControl": "Repeat exact team, owner-role and project-ID readback before token creation or GitHub custody mutation."
+  },
+  "limitations": [
+    "This is point-in-time read-only access evidence; it does not prove future membership or project ownership.",
+    "This does not prove a token exists, its expiry or scope, GitHub custody, hosted workflow execution, deployment, promotion or model behaviour.",
+    "Standard Vercel management tokens remain user- or team-scoped; exact project routing is a Bundjil control rather than provider-enforced project token isolation."
+  ],
+  "nonClaims": [
+    "No Vercel token, GitHub secret, project, deployment, alias, environment value or provider setting was created or changed.",
+    "No token value, secret, environment value, deployment URL or unrelated project metadata is retained."
+  ]
+}

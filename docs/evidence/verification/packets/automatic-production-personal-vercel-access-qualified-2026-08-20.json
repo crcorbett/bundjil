@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "approval_gated",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": { "state": "accepted" },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "Read-only qualification of the Personal Vercel team and exact Bundjil project access"
+  },
+  "candidate": {
+    "repositoryCommit": "c154d725372617c699538629712569518ee18099",
+    "sourceDigest": "b518601a5f929376153eb5af2c46d94f7213624dbb48de766bca4a5bcec41a4e",
+    "artifactDigest": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Authenticated Executor Personal connection tools.vercel_api.user.personalvercelapi",
+    "externalAccess": "mutation",
+    "approvalReceipt": "Cooper's instructions to qualify the Personal Vercel connection by team/project readback and continue the bounded credential and deployment work",
+    "rollbackOwner": "Bundjil personal Vercel operator"
+  },
+  "environment": {
+    "tier": "external",
+    "target": "Personal Vercel team team_1LX7ZujbijowTv8J9k0aU7nD and exact Bundjil agent/proxy projects"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "status": "inconclusive",
+      "oracle": "The Vercel identity precondition now passes, but drift credentials, GitHub custody and the hosted report were not created or run."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Executor Personal Vercel teams.getTeams and projects.getProjects with sanitized result projection",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "Classify Vercel resource scope from accessible teams, membership and exact projects rather than the account's primary contact email.",
+    "target": "One Personal team with OWNER membership and exact bundjil-agent/bundjil-codex-proxy project ownership",
+    "recoveryHint": "Repeat exact team, role and project-ID readback immediately before any token or GitHub custody mutation.",
+    "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
+    "detailSha256": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159",
+    "postcondition": "The former email-based identity blocker is cleared without creating or changing any provider resource."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "getTeams returned only team_1LX7ZujbijowTv8J9k0aU7nD with OWNER membership; getProjects returned both exact Bundjil projects under that team."
+  },
+  "postconditions": [
+    "tools.vercel_api.user.personalvercelapi is admitted for a successor Personal Vercel credential task while the same exact team/project readback remains true.",
+    "The 2026-08-13 packet remains valid no-mutation evidence but no longer blocks on its email-based account classification.",
+    "Token custody, GitHub secrets, hosted drift, automatic Production, Terra High stable behaviour and dependent channel proofs remain outstanding."
+  ],
+  "limitations": [
+    "This readback is point-in-time evidence and must be repeated before mutation.",
+    "Standard Vercel management tokens are user- or team-scoped; this packet does not prove project-level token isolation.",
+    "No hosted workflow, deployment, promotion, rollback, model or channel behaviour was exercised."
+  ],
+  "nonClaims": [
+    "No Vercel token, GitHub secret, project, deployment, alias, environment value, workflow, provider setting or message was created or changed.",
+    "No token value, secret, environment value, deployment URL, unrelated project name or provider payload is retained."
+  ],
+  "rollback": {
+    "identity": "No external mutation occurred; retain existing Vercel and GitHub state.",
+    "outcome": "not_needed",
+    "owner": "Bundjil personal Vercel and GitHub operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
+      "sha256": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159",
+      "provenance": "Authenticated read-only Executor Personal Vercel team and project metadata with secret-negative projection"
+    }
+  ],
+  "observedAt": "2026-08-19T23:48:36Z"
+}

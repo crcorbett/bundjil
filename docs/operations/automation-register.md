@@ -68,25 +68,30 @@ automation fallback.
 ### Production deployment — admitted post-CI automation, hosted proof deferred
 
 The source control is admitted, but its hosted proof is deferred for this
-implementation epoch. Fresh Executor Personal readback on 2026-08-13 found the
-sole Vercel connection authenticated as the explicitly excluded
-`cooper.corbett@tilt.legal` account, so no project token or partial GitHub
-custody was created. The bounded stop is retained in
+implementation epoch. The 2026-08-13 stop occurred before any token or partial
+GitHub custody was created and is retained in
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+Its identity classification is superseded by the 2026-08-20 read-only
+`getTeams`/`getProjects` result: the connection exposes only Personal team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, with owner membership and both exact Bundjil
+projects. The primary contact email does not define Vercel resource scope.
+The accepted read-only correction packet is
+[`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Vercel tokens selected
-  under the Personal account, one for each exact Bundjil project. Before
-  custody, each token must read its assigned project and receive a denied result
-  for the sibling project. Exact project configuration and decoded project/SHA
-  readback remain independent controls. The
+  `contents: read` plus exactly two separately revocable Vercel tokens scoped to
+  the admitted Personal team, one bound to each exact Bundjil project. Before
+  custody, each binding must read back the expected team and project. Exact
+  project configuration and decoded project/SHA readback remain independent
+  controls; sibling denial is not asserted. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then agent, and
-  verifies stable targets and health. Tilt, account-wide credentials and raw
-  workflow mutation commands are rejected.
+  verifies stable targets and health. Unexpected teams, account-wide or
+  user-scoped credentials, team-wide project listing, and raw workflow mutation
+  commands are rejected.
 - **Duration and convergence:** one repository-wide queue never cancels an
   in-flight writer and bounds each run to 30 minutes. Already-current and stale
   candidates are explicit no-ops. A partial failure restores the exact prior
@@ -102,11 +107,12 @@ custody was created. The bounded stop is retained in
 
 ### Preview infrastructure drift — report-only automation
 
-The report-only source remains admitted, while hosted execution is deferred at
-the same identity gate. Exact-head run `31677769897` failed closed before
+The report-only source remains admitted, while hosted execution is deferred
+until its credential package is installed. Exact-head run `31677769897` failed closed before
 provider reporting because the three custody artifacts were absent; it proves
-missing custody only, not drift. Resume requires a separate admitted personal
-Vercel principal and the complete credential/artifact package.
+missing custody only, not drift. The 2026-08-20 Personal team/project readback
+clears the former identity gate; resume still requires the complete
+credential/artifact package.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
@@ -115,12 +121,14 @@ Vercel principal and the complete credential/artifact package.
   `infrastructure-read-only-preview` environment. Its three secret artifacts
   contain the static fixed policy envelope, provider/state environment, and
   accepted manifest. The environment artifact holds a distinct Schema-decoded
-  set of unique project-ID/token bindings, one dedicated project-scoped Vercel
-  token per manifest project; the Layer rejects Team scope and Production or
-  broad inventory credentials are not reused. Vercel personal tokens are not
-  method-level read-only, so project scope, sibling denial, independent
-  revocation, the read-only call graph and zero-write receipt are mandatory
-  controls. The policy envelope is fingerprinted custody, not a dynamic run
+  set of unique project-ID/token bindings, one separately revocable Vercel
+  token scoped to the admitted Personal team per manifest project; the Layer
+  rejects team-wide project resolution and Production or broad inventory
+  credentials are not reused. The binding is exact request routing, not a
+  project-scoped Vercel token claim. Vercel personal tokens are not
+  method-level read-only, so exact routing, independent revocation, the
+  read-only call graph and zero-write receipt are mandatory controls; sibling
+  denial is not asserted. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
   repository/run/attempt identity and checked-out source SHA from GitHub, and
   the command carries those values plus the decoded manifest digest through

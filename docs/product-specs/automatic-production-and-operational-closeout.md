@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-20
 review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
 task_ledger: automatic-production-and-operational-closeout.tasks.json
 ---
@@ -16,8 +16,44 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 
 Repository implementation and the shared terminal audit are complete. Hosted
 credential, deployment and channel proof tasks retain explicit deferred
-dispositions at the personal-only Vercel identity gate; they are not current
-provider claims or active provider work.
+dispositions from the original implementation epoch; they are not current
+provider claims. The former Vercel identity blocker is cleared by the
+2026-08-20 team/project readback below, but no token custody, hosted deployment,
+or channel proof has yet been completed under that correction.
+
+### Vercel credential boundary correction (2026-08-20)
+
+Neither the saved Executor connection label nor the Vercel account's primary
+contact email is enough to classify provider scope. A read-only
+`getTeams`/`getProjects` readback through
+`tools.vercel_api.user.personalvercelapi` returned exactly one accessible team:
+`team_1LX7ZujbijowTv8J9k0aU7nD` (`cooper-corbetts-projects`, `Cooper Corbett's
+projects`), with the authenticated user as `OWNER`. The same team owns exact
+projects `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN` (`bundjil-agent`) and
+`prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB` (`bundjil-codex-proxy`). No second Vercel
+team was returned. This connection therefore satisfies the Personal Vercel
+access boundary even though `cooper.corbett@tilt.legal` is the account's
+primary contact address. Fresh team/project readback, not email-domain
+classification, is the pre-mutation identity control.
+The dated read-only receipt is
+[`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
+
+Standard Vercel access tokens are user- or team-scoped; the token creation
+contract does not provide a project scope. See Vercel's
+[access-token guide](https://vercel.com/kb/guide/how-do-i-use-a-vercel-api-access-token),
+[REST API documentation](https://vercel.com/docs/rest-api), and
+[Vercel Connect guide](https://vercel.com/kb/guide/vercel-connect). Vercel
+Connect project/environment scopes are for third-party connector runtime
+tokens, not Vercel management API tokens. The accepted design therefore uses
+separately revocable tokens scoped to the admitted Personal Vercel team, with
+one secret binding per exact
+Bundjil project. Every command must decode the branded project ID, select its
+matching token binding, and read back the returned team and project IDs before
+custody or mutation. A sibling-project denial is not a required proof and must
+not be claimed: a team-scoped token may be able to read another project in the
+same team. Account-wide or unscoped custody remains rejected. If credential-
+level sibling isolation is required later, it needs separate Vercel teams or a
+provider credential type that explicitly supports project scope.
 
 An accepted push is a `push` event for `refs/heads/main` whose exact SHA has a
 successful `CI` workflow run. A successful pull-request check, local
@@ -88,17 +124,16 @@ The job runs only when all of these are true:
 The workflow has root `contents: read`, a bounded timeout, one repository-wide
 Production concurrency group with `cancel-in-progress: false`, checkout
 credentials disabled, exact pinned actions, and the `Production` environment.
-It uses two separately revocable Vercel tokens, each scoped in the Personal
-account to exactly one Bundjil project. The current dashboard exposes an exact
-project selector beneath the Personal-account scope; Vercel's
-[access-token guide](https://vercel.com/kb/guide/how-do-i-use-a-vercel-api-access-token)
-documents scope selection and one-time token display but does not document the
-project-level enforcement semantics. Therefore the accepted proof requires
-both a successful read of the assigned project and a denied read of the sibling
-Bundjil project before either credential enters GitHub. The workflow retains
-exact team/project configuration, project-bound secret names, decoded provider
-readback and fail-closed project/SHA checks as independent controls. An
-account-wide or all-project token is not an accepted fallback.
+It uses two separately revocable Vercel tokens scoped to the admitted Personal
+Vercel team. One secret binding is selected for the exact agent project and one
+for the exact proxy project. Before either credential enters GitHub, read back
+the authenticated team and the exact assigned project through the Vercel API,
+and verify the binding, secret name, project ID and team ID agree. The workflow
+retains exact team/project configuration, project-bound secret names, decoded
+provider readback and fail-closed project/SHA checks as independent controls.
+Do not require or claim sibling-project denial: standard team-scoped Vercel
+tokens do not provide that isolation. An account-wide or unscoped token is not
+an accepted fallback.
 
 All workflow actions remain exact-commit pinned and lock-owned. The corrective
 candidate replaces only `actions/checkout` and `actions/setup-node` with the
@@ -239,13 +274,13 @@ promotion.
 
 ### Credential and environment custody
 
-- Create two separately revocable Vercel tokens through the Personal account,
-  one scoped to `bundjil-agent` and one scoped to `bundjil-codex-proxy`. Store
-  them only as the two project-named GitHub `Production` environment secrets.
-  Before storage, prove each token can read its assigned project and cannot
-  read the sibling project. Stop if the dashboard no longer offers the exact
-  selector or either negative test succeeds; do not widen to all Personal
-  projects or account scope.
+- Create two separately revocable Vercel tokens scoped to admitted Personal
+  team `team_1LX7ZujbijowTv8J9k0aU7nD`, bind one to `bundjil-agent` and one to
+  `bundjil-codex-proxy`, and store them only as the two project-named GitHub
+  `Production` environment secrets. Before storage, prove each binding reads
+  back the expected team and exact project. Do not require sibling-project
+  denial, because standard Vercel tokens do not provide project scope; prevent
+  broad use through exact project routing and no team-wide project listing.
 - GitHub receives only token ciphertext. Local creation material uses a
   mode-`0600` temporary directory, is never printed, and is deleted after
   secret metadata readback.
@@ -271,15 +306,17 @@ promotion.
   contain only the state, Photon, and Vercel bindings needed by the report
   command. Vercel custody is a Schema-decoded non-empty array of unique exact
   project-ID/token bindings under
-  `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`; each dedicated
-  project-scoped token must pass assigned-project access and sibling-project
-  denial before custody. The drift Layer rejects team scope and the Alchemy
-  project provider observes manifest project IDs directly rather than listing
-  all team projects. Do not reuse either Production deployment token or the
-  broad inventory/adoption token. Vercel does not expose a method-level
-  read-only personal token here, so exact project scope, independent
-  revocation, the read-only call graph, and the zero-write receipt are all
-  required controls.
+  `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`; each token must be
+  scoped to the admitted Personal Vercel team, separately revocable, and bound
+  to one exact manifest project ID. Before custody, read back the expected
+  team and project for every binding. The drift Layer rejects team-wide
+  project resolution and the Alchemy project provider observes manifest
+  project IDs directly rather than listing all team projects. Do not reuse
+  either Production deployment token or the broad inventory/adoption token.
+  Vercel does not expose a method-level read-only personal token here, so exact
+  project routing, independent revocation, the read-only call graph, and the
+  zero-write receipt are the compensating controls. Sibling denial is neither
+  required nor asserted.
 - Dispatch one `Infrastructure Drift` run for the exact source that owns the
   workflow. Acceptance requires the hosted job to pass, its source SHA to
   match, the receipt to report zero provider writes, and every required
@@ -336,7 +373,7 @@ readiness, project and source identity. Do not roll back the newest fenced
 Codex profile generation or provider state.
 
 Control rollback disables `.github/workflows/production.yml`, revokes both
-exact-project tokens, and reads back the GitHub environment. It
+team-scoped Vercel tokens, and reads back the GitHub environment. It
 does not re-enable direct Vercel Git deployment. Infrastructure Drift rollback deletes
 the three environment secrets and disables the workflow/environment; provider
 rollback is not applicable because the report has zero writes.
@@ -362,33 +399,34 @@ handset display, typing animation, or strict replay. No provider response grants
 authority. A missing live oracle is recorded as inconclusive or a non-claim,
 never promoted to success.
 
-## 2026-08-13 terminal external disposition
+## 2026-08-13 disposition and 2026-08-20 correction
 
 Repository implementation is complete, but the three serial hosted tasks are
-deferred rather than accepted. Cooper authorized credential creation only
-through a genuinely personal Vercel account and explicitly excluded
-`cooper.corbett@tilt.legal` and Tilt Legal. The fresh pre-mutation Executor
-Personal readback found one Vercel connection, `personalvercelapi`, authenticated
-as the excluded account. Its personal team label does not change the
-authenticated principal, so no Vercel credential or partial GitHub custody was
-created.
+deferred rather than accepted. On 2026-08-13, work stopped before mutation
+because the connection's primary contact email was treated as proof of Tilt
+scope. That was too strict: an email address identifies a user contact, not the
+Vercel teams and projects available to the connection.
 
 The blocked packet at
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
-owns the attempted work, readback, unchanged postconditions, resume trigger,
-rollback and non-claims. `configure-hosted-controls-and-drift`,
+still owns the attempted work, unchanged postconditions, rollback and
+non-claims for that date. Its identity-classification conclusion is superseded
+by the 2026-08-20 readback, which returned only Personal team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, authenticated owner access, and the exact two
+Bundjil projects. `configure-hosted-controls-and-drift`,
 `correct-terra-high-and-prove-automatic-main`, and
 `close-channel-proof-gaps` are terminally deferred for this implementation
 epoch. This disposition unblocks the repository terminal audit; it does not
 convert any absent hosted result into acceptance.
 
-Resume the operational chain only after Executor Personal exposes a separate
-Vercel user whose authenticated identity satisfies the personal-only condition
-and can access both exact Bundjil projects. A successor epoch must repeat
-identity readback, create four separately revocable exact-project credentials,
-prove assigned-project access and sibling denial, install the complete custody
-package, and gather new hosted evidence. Existing repository checks and the
-personal Cloudflare credential are not substitutes.
+The operational chain may resume through
+`tools.vercel_api.user.personalvercelapi` after a fresh readback confirms the
+same sole team, owner role, and exact Bundjil project IDs. A successor epoch
+must create four separately revocable team-scoped credentials, bind each to one
+exact project route, prove the expected team/project readback, install the
+complete custody package, and gather new hosted evidence. It must not claim
+sibling denial. Existing repository checks and the personal Cloudflare
+credential are not substitutes.
 
 ## Documentation impact ledger
 
@@ -413,7 +451,6 @@ personal Cloudflare credential are not substitutes.
 The sibling task ledger is serial. Repository desired state, focused checks and
 full verification must pass before GitHub/Vercel mutations. The workflow and
 provider command must land on main before their automatic behaviour can be
-proved. For this epoch the three hosted tasks have an honest deferred
-disposition at the personal-identity gate, so the Effect-native runtime and lint
-SPEC may run the one terminal five-pass audit. A future successor reopens the
-hosted chain and must not reuse this terminal audit as provider proof.
+proved. The three hosted tasks retain their original deferred disposition, but
+the 2026-08-20 readback clears the former identity gate for a successor epoch.
+That successor must not reuse the earlier terminal audit as provider proof.

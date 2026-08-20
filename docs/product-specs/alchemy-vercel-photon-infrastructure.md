@@ -24,8 +24,8 @@ operation.
 The current operational successor is
 `automatic-production-and-operational-closeout.md`. Its 2026-08-13 correction
 replaces the historical report command's single broad Vercel token with a
-distinct Schema-decoded set of dedicated exact-project credentials and exact
-manifest-project observation. The historical accepted receipts below remain
+distinct Schema-decoded set of team-scoped credentials bound to exact project
+routes and exact manifest-project observation. The historical accepted receipts below remain
 evidence for their source revision; they are not evidence that current hosted
 credential custody exists.
 

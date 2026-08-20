@@ -34,8 +34,12 @@ operation nor asserts present provider state.
   and its active plan. Its
   [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
   packet records the personal-only identity stop before Vercel token or GitHub
-  custody mutation. The hosted tasks are deferred for that implementation
-  epoch. Until a successor packet records matching successful CI and
+  custody mutation. Its email-based identity conclusion is superseded by
+  [`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json),
+  which proves the Executor connection exposes only Cooper's Personal Vercel
+  team with owner access and both exact Bundjil projects. It does not create a
+  token or prove hosted execution. The hosted tasks remain deferred until a
+  successor packet records matching successful CI and
   `Production` runs, exact immutable candidates, stable targets, health,
   rollback identities and live journey results, repository source proves only
   the control contract—not hosted automatic deployment or channel behavior.

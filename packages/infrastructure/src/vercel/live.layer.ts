@@ -84,6 +84,8 @@ import {
   VercelProjects,
 } from "./services.js";
 
+// Vercel issues the token at team scope; this binding limits which exact
+// project route the report-only Layer may request with it.
 const VercelProjectCredentialBinding = Schema.Struct({
   projectId: VercelProjectId,
   accessToken: Schema.RedactedFromValue(Schema.NonEmptyString),

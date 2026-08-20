@@ -68,10 +68,12 @@ adoption, and authorized configuration-command credential. The report-only
 hosted drift command does not use it. That command requires
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`: one JSON array of
 unique exact project-ID/token bindings, decoded through Effect Schema with
-each token redacted. Each binding must use a dedicated project-scoped token,
-must read its assigned project, and must be denied by the sibling project
-before the dotenv artifact enters GitHub custody. A team-wide or account-wide
-token is not a fallback.
+each token redacted. Each binding must use a separately revocable token scoped
+to the admitted Personal Vercel team, must read back its expected team and
+assigned project, and must be bound to that exact project ID before the dotenv
+artifact enters GitHub custody. The binding is request routing, not
+project-level Vercel token isolation. A team-wide project-list operation or
+account-wide/unscoped token is not a fallback.
 
 Preview inventory, adoption, and state proof use the distinct
 `BUNDJIL_PHOTON_PREVIEW_PROJECT_ID` and
@@ -410,15 +412,16 @@ Before every run:
    operations.
 2. Provide the static authority policy, manifest, provider/state environment
    file, output report, and bounded-receipt paths only through mode-`0600`
-   custody. The environment file must contain the exact-project Vercel
-   credential JSON described above, never the broad inventory token. The
+   custody. The environment file must contain the exact project-routed,
+   team-scoped Vercel credential JSON described above, never the broad
+   inventory token. The
    project provider observes each manifest project by exact ID and cannot call
    the team-wide project-list operation under this Layer. Never put credentials
    in workflow YAML, tracked files, command arguments, stdout, report fields,
    or receipts. Vercel access tokens are not method-level read-only
-   credentials; project scope, dedicated revocation, the read-only command
-   graph, `contents: read`, and zero-write receipt are the compensating
-   controls.
+   credentials; exact project routing, dedicated revocation, the read-only
+   command graph, `contents: read`, and zero-write receipt are the compensating
+   controls. Sibling denial is not asserted.
 3. Run `bun run infrastructure:drift-report`. The command validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits

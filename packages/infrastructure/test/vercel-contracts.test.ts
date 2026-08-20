@@ -297,13 +297,13 @@ const liveLayer = (client: HttpClient.HttpClient) =>
   );
 
 it.effect(
-  "routes project-scoped credentials by branded project ID and rejects team-wide access",
+  "routes team-scoped token bindings by branded project ID and rejects team-wide project enumeration",
   () => {
     const config = ConfigProvider.fromUnknown({
       BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
         '[{"projectId":"prj-agent","accessToken":"agent-token-sentinel"},{"projectId":"prj-proxy","accessToken":"proxy-token-sentinel"}]',
     });
-    return Effect.gen(function* testProjectScopedCredentials() {
+    return Effect.gen(function* testProjectRoutedCredentials() {
       const credentials = yield* VercelCredentials;
       const agentToken = yield* credentials.accessToken({
         _tag: "Project",
@@ -319,7 +319,7 @@ it.effect(
           projectId: VercelProjectId.make("prj-unknown"),
         })
         .pipe(Effect.exit);
-      const teamScope = yield* credentials
+      const teamEnumeration = yield* credentials
         .accessToken({
           _tag: "Team",
           teamId: VercelTeamId.make("team-preview"),
@@ -329,9 +329,9 @@ it.effect(
       assert.strictEqual(Redacted.value(agentToken), "agent-token-sentinel");
       assert.strictEqual(Redacted.value(proxyToken), "proxy-token-sentinel");
       assert.strictEqual(Exit.isFailure(unknownProject), true);
-      assert.strictEqual(Exit.isFailure(teamScope), true);
+      assert.strictEqual(Exit.isFailure(teamEnumeration), true);
       assert.strictEqual(
-        Inspectable.toStringUnknown([unknownProject, teamScope]).includes(
+        Inspectable.toStringUnknown([unknownProject, teamEnumeration]).includes(
           "token-sentinel"
         ),
         false

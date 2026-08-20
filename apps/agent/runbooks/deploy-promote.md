@@ -47,15 +47,15 @@ HEAD`, and a readback of `origin/main`.
 
 ## Authority envelope
 
-| Field               | Required value                                                                                                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Identity            | Exact GitHub workload plus two separately revocable exact-project Vercel credentials proved by assigned-project access and sibling-project denial, or an authenticated emergency operator and approver |
-| Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                                                             |
-| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                                                        |
-| Environment         | Explicit Vercel Preview or Production target                                                                                                                                                           |
-| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                                                                                                       |
-| Approval            | Admitted automatic envelope for an eligible successful CI run, or an addressable emergency receipt matching operation, project, environment, source SHA, and deployment                                |
-| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim                                                                                     |
+| Field               | Required value                                                                                                                                                                                                                         |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity            | Exact GitHub workload plus two separately revocable Vercel credentials scoped to the admitted Personal team, each routed to one exact project and proved by team/project readback, or an authenticated emergency operator and approver |
+| Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                                                                                             |
+| Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                                                                                        |
+| Environment         | Explicit Vercel Preview or Production target                                                                                                                                                                                           |
+| Duration/revocation | One stage; expiry and provider/session revocation owner recorded                                                                                                                                                                       |
+| Approval            | Admitted automatic envelope for an eligible successful CI run, or an addressable emergency receipt matching operation, project, environment, source SHA, and deployment                                                                |
+| Receipt             | Sanitized metadata snapshot, preflight JSON, immutable IDs, `observedAt`, postcondition, limitation, and non-claim                                                                                                                     |
 
 ## Inputs and secret handling
 
@@ -188,8 +188,8 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    `workflow_run` for a `push` to `main` starts the distinct `Production`
    workflow. It checks out the event's exact head SHA without persisted Git
    credentials and invokes only `bun run production:deploy` in the protected
-   `Production` environment. The command uses exactly two project-scoped
-   tokens and fixed Personal team/project IDs. It reads current proxy and
+   `Production` environment. The command uses exactly two team-scoped tokens,
+   fixed Personal team/project IDs, and separate project bindings. It reads current proxy and
    agent targets, stages both candidates using `vercel deploy --prod
 --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
