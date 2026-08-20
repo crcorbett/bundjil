@@ -11,7 +11,7 @@
   "candidate": {
     "repositoryCommit": "c154d725372617c699538629712569518ee18099",
     "sourceDigest": "b518601a5f929376153eb5af2c46d94f7213624dbb48de766bca4a5bcec41a4e",
-    "artifactDigest": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159"
+    "artifactDigest": "2ffd33b682b875882ffd55ad9ba85e6cd10eef3413cc3ae13e94c6464b8dfcf7"
   },
   "authority": {
     "principal": "Cooper, personal Bundjil owner",
@@ -39,26 +39,27 @@
     "target": "One Personal team with OWNER membership and exact bundjil-agent/bundjil-codex-proxy project ownership",
     "recoveryHint": "Repeat exact team, role and project-ID readback immediately before any token or GitHub custody mutation.",
     "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
-    "detailSha256": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159",
+    "detailSha256": "2ffd33b682b875882ffd55ad9ba85e6cd10eef3413cc3ae13e94c6464b8dfcf7",
     "postcondition": "The former email-based identity blocker is cleared without creating or changing any provider resource."
   },
   "externalReadback": {
     "required": true,
     "outcome": "available",
-    "receipt": "getTeams returned only team_1LX7ZujbijowTv8J9k0aU7nD with OWNER membership; getProjects returned both exact Bundjil projects under that team."
+    "receipt": "API readback found the sole Personal team and both exact Bundjil projects. Dashboard readback at 2026-08-20T00:33:03Z showed both exact project choices under Cooper Corbett's projects."
   },
   "postconditions": [
     "tools.vercel_api.user.personalvercelapi is admitted for a successor Personal Vercel credential task while the same exact team/project readback remains true.",
     "The 2026-08-13 packet remains valid no-mutation evidence but no longer blocks on its email-based account classification.",
+    "The successor dashboard observation corrects the former no-project-scope conclusion, but no token was created and no assigned-project or sibling-denial result exists.",
     "Token custody, GitHub secrets, hosted drift, automatic Production, Terra High stable behaviour and dependent channel proofs remain outstanding."
   ],
   "limitations": [
     "This readback is point-in-time evidence and must be repeated before mutation.",
-    "Standard Vercel management tokens are user- or team-scoped; this packet does not prove project-level token isolation.",
+    "The REST catalog showed user/team scope; the successor dashboard showed project scope, but no token or provider-enforced isolation was proved.",
     "No hosted workflow, deployment, promotion, rollback, model or channel behaviour was exercised."
   ],
   "nonClaims": [
-    "No Vercel token, GitHub secret, project, deployment, alias, environment value, workflow, provider setting or message was created or changed.",
+    "No Vercel token, GitHub secret, project, deployment, alias, environment value, workflow, provider setting or message was created or changed by the qualification or its successor dashboard observation.",
     "No token value, secret, environment value, deployment URL, unrelated project name or provider payload is retained."
   ],
   "rollback": {
@@ -69,7 +70,7 @@
   "evidence": [
     {
       "path": "docs/evidence/verification/details/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
-      "sha256": "b881d37d68caec8f8486e66271faf00855d53627499f631c3b2a0171e3ed6159",
+      "sha256": "2ffd33b682b875882ffd55ad9ba85e6cd10eef3413cc3ae13e94c6464b8dfcf7",
       "provenance": "Authenticated read-only Executor Personal Vercel team and project metadata with secret-negative projection"
     }
   ],

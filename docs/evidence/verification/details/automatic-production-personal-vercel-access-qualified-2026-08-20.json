@@ -34,12 +34,34 @@
   "classification": {
     "acceptedBoundary": "The connection exposes one Personal Vercel team owned by Cooper and the exact two Bundjil projects.",
     "supersededConclusion": "The account's primary contact email is not evidence that the connection exposes a Tilt Legal Vercel team or resources.",
-    "nextControl": "Repeat exact team, owner-role and project-ID readback before token creation or GitHub custody mutation."
+    "nextControl": "Repeat exact team, owner-role and project-ID readback, then create and test the exact project-scoped tokens before 1Password or GitHub custody mutation."
+  },
+  "successorScopeCorrection": {
+    "observedAt": "2026-08-20T00:33:03Z",
+    "source": "Authenticated Vercel dashboard account settings/tokens",
+    "selectedScope": "Cooper Corbett's projects",
+    "projectChoicesObserved": [
+      {
+        "id": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "name": "bundjil-agent"
+      },
+      {
+        "id": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "name": "bundjil-codex-proxy"
+      }
+    ],
+    "result": "project_scope_available_in_dashboard",
+    "status": "read_only_observation",
+    "supersedes": "The earlier REST-catalog interpretation that the ordinary Vercel token flow had no project scope.",
+    "limitations": [
+      "The dashboard observation created no token and did not read back an assigned project or sibling denial.",
+      "It proves no 1Password item, GitHub secret, deployment, drift run or provider state."
+    ]
   },
   "limitations": [
     "This is point-in-time read-only access evidence; it does not prove future membership or project ownership.",
     "This does not prove a token exists, its expiry or scope, GitHub custody, hosted workflow execution, deployment, promotion or model behaviour.",
-    "Standard Vercel management tokens remain user- or team-scoped; exact project routing is a Bundjil control rather than provider-enforced project token isolation."
+    "The REST token-creation catalog read during the original qualification exposed user/team scope only; the successor dashboard observation shows project scope is available in that UI, but provider token creation and assigned/sibling access tests remain outstanding."
   ],
   "nonClaims": [
     "No Vercel token, GitHub secret, project, deployment, alias, environment value or provider setting was created or changed.",

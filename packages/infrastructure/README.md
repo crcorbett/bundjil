@@ -72,21 +72,21 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-production-webhook-delete`, and
 `infrastructure:vercel-git-link-authority`. `production:deploy` is the private
 post-CI Production entrypoint. It is owned by the exact-SHA `Production`
-workflow, uses two separately revocable Vercel credentials scoped to the
-admitted Personal team and selected by exact project binding, proves the
-expected team/project readback, and stages both apps with
+workflow, uses two separately revocable Vercel credentials project-scoped to
+the exact Personal projects and selected by exact project binding, proves the
+assigned-project read and sibling-project denial before custody, and stages both apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
 restores the exact prior deployments on every non-success Effect exit after
 promotion starts, including interruption and defect paths. It is not an
 operator convenience command.
 
-`infrastructure:drift-report` uses a distinct project-routed credential Layer.
+`infrastructure:drift-report` uses a distinct project-scoped credential Layer.
 Its environment file supplies
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
-non-empty array of unique project-ID/token bindings. Each token is scoped to
-the admitted Personal Vercel team; the binding is request routing, not a claim
-that Vercel issued a project-scoped token. The Vercel adapter selects a
+non-empty array of unique project-ID/token bindings. Each token is issued for
+one exact Personal Vercel project and must pass the assigned-project read and
+sibling-project denial checks before custody. The Vercel adapter selects a
 redacted token only after receiving a decoded branded project ID, and the
 Alchemy project provider observes exactly the manifest projects rather than
 listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains

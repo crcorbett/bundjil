@@ -412,16 +412,16 @@ Before every run:
    operations.
 2. Provide the static authority policy, manifest, provider/state environment
    file, output report, and bounded-receipt paths only through mode-`0600`
-   custody. The environment file must contain the exact project-routed,
-   team-scoped Vercel credential JSON described above, never the broad
+   custody. The environment file must contain the exact project-scoped,
+   sibling-denial-verified Vercel credential JSON described above, never the broad
    inventory token. The
    project provider observes each manifest project by exact ID and cannot call
    the team-wide project-list operation under this Layer. Never put credentials
    in workflow YAML, tracked files, command arguments, stdout, report fields,
    or receipts. Vercel access tokens are not method-level read-only
-   credentials; exact project routing, dedicated revocation, the read-only
-   command graph, `contents: read`, and zero-write receipt are the compensating
-   controls. Sibling denial is not asserted.
+   credentials; exact project scope, sibling-denial readback, dedicated
+   revocation, the read-only command graph, `contents: read`, and zero-write
+   receipt are the controls.
 3. Run `bun run infrastructure:drift-report`. The command validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits

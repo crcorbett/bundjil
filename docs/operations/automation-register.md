@@ -82,11 +82,13 @@ The accepted read-only correction packet is
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Vercel tokens scoped to
-  the admitted Personal team, one bound to each exact Bundjil project. Before
+  `contents: read` plus exactly two separately revocable Vercel tokens
+  project-scoped to the exact Personal projects, one bound to each exact
+  Bundjil project. Before
   custody, each binding must read back the expected team and project. Exact
   project configuration and decoded project/SHA readback remain independent
-  controls; sibling denial is not asserted. The
+  controls; each token must be project-scoped and pass sibling denial before
+  custody. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then agent, and
   verifies stable targets and health. Unexpected teams, account-wide or
@@ -122,13 +124,14 @@ credential/artifact package.
   contain the static fixed policy envelope, provider/state environment, and
   accepted manifest. The environment artifact holds a distinct Schema-decoded
   set of unique project-ID/token bindings, one separately revocable Vercel
-  token scoped to the admitted Personal team per manifest project; the Layer
+  project-scoped token per manifest project; the Layer
   rejects team-wide project resolution and Production or broad inventory
-  credentials are not reused. The binding is exact request routing, not a
-  project-scoped Vercel token claim. Vercel personal tokens are not
-  method-level read-only, so exact routing, independent revocation, the
-  read-only call graph and zero-write receipt are mandatory controls; sibling
-  denial is not asserted. The policy envelope is fingerprinted custody, not a dynamic run
+  credentials are not reused. The provider token scope and decoded project
+  binding must agree; request routing is not a substitute for that scope.
+  Vercel personal tokens are not
+  method-level read-only, so exact project scope, sibling denial, independent
+  revocation, the read-only call graph and zero-write receipt are mandatory
+  controls. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
   repository/run/attempt identity and checked-out source SHA from GitHub, and
   the command carries those values plus the decoded manifest digest through

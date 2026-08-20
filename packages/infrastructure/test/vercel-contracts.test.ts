@@ -238,7 +238,7 @@ it.effect(
     })
 );
 
-it.effect("fails ambiguous project discovery and isolates team scope", () =>
+it.effect("fails ambiguous project discovery and isolates project scope", () =>
   Effect.gen(function* testVercelMemoryAmbiguityAndTeamScope() {
     const duplicated = yield* Schema.decodeUnknownEffect(
       VercelReadOnlyInventory
@@ -297,7 +297,7 @@ const liveLayer = (client: HttpClient.HttpClient) =>
   );
 
 it.effect(
-  "routes team-scoped token bindings by branded project ID and rejects team-wide project enumeration",
+  "routes project-scoped token bindings by branded project ID and rejects team-wide project enumeration",
   () => {
     const config = ConfigProvider.fromUnknown({
       BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
