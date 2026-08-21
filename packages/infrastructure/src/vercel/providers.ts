@@ -5,7 +5,7 @@ import { Unowned } from "alchemy/AdoptPolicy";
 import { isResolved } from "alchemy/Diff";
 import * as Provider from "alchemy/Provider";
 import { Resource as makeResource } from "alchemy/Resource";
-import { Array, Effect, Layer, Match, Schedule, Schema } from "effect";
+import { Array, Console, Effect, Layer, Match, Schedule, Schema } from "effect";
 
 import {
   VercelDeploymentsReadError,
@@ -732,9 +732,29 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
         return yield* Match.value(observation).pipe(
           Match.tag("Missing", () => Effect.succeed(missingVercelResource)),
           Match.tag("Found", ({ attributes }) =>
-            Effect.succeed(
-              output === undefined ? Unowned(attributes) : attributes
-            )
+            Effect.gen(function* diagnoseDeploymentObservation() {
+              if (output === undefined) {
+                return Unowned(attributes);
+              }
+              const changedFields = {
+                aliases: !sameTargets(output.aliases, attributes.aliases),
+                deploymentId: output.deploymentId !== attributes.deploymentId,
+                gitSha: output.gitSha !== attributes.gitSha,
+                ownership: output.ownership !== attributes.ownership,
+                projectId: output.projectId !== attributes.projectId,
+                stage: output.stage !== attributes.stage,
+                status: output.status !== attributes.status,
+                target: output.target !== attributes.target,
+                teamId: output.teamId !== attributes.teamId,
+              };
+              if (Object.values(changedFields).some(Boolean)) {
+                yield* Console.info({
+                  changedFields,
+                  diagnostic: "vercelDeploymentObservationDrift",
+                });
+              }
+              return attributes;
+            })
           ),
           Match.exhaustive
         );

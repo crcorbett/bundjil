@@ -201,6 +201,9 @@ excludes custom targets from Bundjil Preview and Production observations.
   disposition and count plus the bounded receipt; it does not print resource
   fingerprints or provider values. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
+  A provider adapter may additionally log only a closed boolean map naming
+  changed fields for read-only Photon project and Vercel deployment
+  observations. It emits no old/current values or resource identity.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the
   run. Disable the workflow or revoke its read-only environment under separate
