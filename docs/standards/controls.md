@@ -92,6 +92,9 @@ size boundary, so the workflow may only expand the in-memory transport into a
 mode-`0600` file and then let the report command Schema-decode the original
 manifest. A direct copy, changed pipeline, or transport treated as a new
 manifest authority fails the control.
+The same audit requires the exact accepted manifest digest as non-secret
+workflow configuration. Materialised file custody without that binding fails
+before provider reads.
 
 ## Report-only freshness
 

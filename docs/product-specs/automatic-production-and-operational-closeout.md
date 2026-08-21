@@ -38,7 +38,11 @@ gzip/base64 transport only after Schema encoding, materialises the same JSON
 inside the runner, and Schema-decodes it again before any provider read. The
 7,516-byte transport was installed at `2026-08-21T04:07:06Z` after its
 in-memory round trip retained the 87,930-byte manifest's stage, digest and all
-155 resources.
+155 resources. Pull-request run `32445924126` proved the materialisation but
+stopped at `manifestArtifactInvalid` because the workflow omitted the exact
+accepted digest required by command configuration. The successor binds digest
+`307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60`; the
+authority audit rejects an absent or changed binding.
 Automatic deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
@@ -507,6 +511,11 @@ authority audit rejects a missing or altered materialisation pipeline.
 The 7,516-byte transport was installed at `2026-08-21T04:07:06Z` only after
 an in-memory round trip retained the 87,930-byte manifest's stage, digest and
 all 155 resources. Secret readback remains names and timestamps only.
+Pull-request run `32445924126` then proved transport materialisation and
+stopped safely at `manifestArtifactInvalid` because the workflow did not bind
+the accepted digest required by `loadAdoptionCommand`. The successor adds the
+exact digest as non-secret source configuration and an authority fixture that
+rejects omission or change.
 
 ## Documentation impact ledger
 

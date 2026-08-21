@@ -71,6 +71,7 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
       BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:\${{ github.repository }}:\${{ github.run_id }}:\${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST: 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60
       DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
       BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
@@ -582,6 +583,15 @@ describe("HGI-304 authority policy", () => {
         content.replace(
           /^\s*BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:.*$/m,
           ""
+        ),
+    ],
+    [
+      "accepted manifest digest changed",
+      "AUTH-DRIFT-MANIFEST",
+      (content: string) =>
+        content.replace(
+          "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+          "0".repeat(64)
         ),
     ],
     [

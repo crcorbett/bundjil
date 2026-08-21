@@ -151,6 +151,11 @@ hosted receipt is still required. The 7,516-byte transport was installed at
 `2026-08-21T04:07:06Z` after an in-memory round trip retained the 87,930-byte
 manifest's stage, digest and all 155 resources; GitHub readback exposed only
 the secret name and update time.
+Pull-request run `32445924126` proved the transport materialisation but stopped
+at `manifestArtifactInvalid` because the workflow omitted the accepted digest
+required by command configuration. The successor binds the exact digest as
+non-secret source configuration and the authority audit rejects omission or
+change.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

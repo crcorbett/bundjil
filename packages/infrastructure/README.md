@@ -96,7 +96,8 @@ The accepted Preview manifest is Schema-encoded first, then held in the exact
 GitHub manifest secret as an in-memory gzip/base64 transport because the raw
 155-resource JSON exceeds GitHub's secret-size boundary. The hosted workflow
 materialises the original JSON into mode-`0600` custody before this command
-Schema-decodes it; the transport is never a second manifest authority.
+Schema-decodes it and compares it with the exact configured accepted digest;
+the transport is never a second manifest authority.
 
 ## Claim boundary
 

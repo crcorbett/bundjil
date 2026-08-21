@@ -33,6 +33,11 @@ rejected the raw 155-resource manifest with HTTP 422 because it is larger than
 an environment secret. The next source admits an exact in-memory gzip/base64
 transport, materialises the same Schema-encoded manifest inside the runner,
 and keeps report-time Schema validation as the acceptance boundary.
+Pull-request run `32445924126` proved that materialisation step but stopped at
+`manifestArtifactInvalid`: the workflow had not supplied the exact accepted
+digest required by the command config. The next source binds digest
+`307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60`, and
+the authority audit rejects an absent or changed value.
 
 ## Exact scope
 
@@ -76,6 +81,9 @@ and keeps report-time Schema validation as the acceptance boundary.
 - [x] Install the accepted manifest's admitted gzip/base64 transport as the
       remaining corrected drift secret at `2026-08-21T04:07:06Z`; its in-memory
       round trip retained stage, digest and all 155 resources.
+- [x] Reject run `32445924126` at `manifestArtifactInvalid` after it proved
+      transport materialisation, then bind the exact accepted digest in source
+      and add an independent negative authority fixture.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`

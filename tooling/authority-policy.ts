@@ -729,6 +729,22 @@ const infrastructureDriftFindings = (
     );
   }
   if (
+    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60/.test(
+      workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-MANIFEST",
+        "Infrastructure drift binds the materialised manifest to the exact accepted digest",
+        workflow.path,
+        "Restore the exact accepted Preview manifest digest",
+        "The accepted manifest digest is absent or changed",
+        "The report command decodes one manifest whose digest matches the accepted Preview state"
+      )
+    );
+  }
+  if (
     !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report/.test(
       workflow.content
     ) ||

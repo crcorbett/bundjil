@@ -407,6 +407,10 @@ Before every run:
    A filename containing `current` is convenience custody only and is not an
    evidence owner: stop if it differs from the last accepted post-apply
    manifest or receipt.
+   The hosted workflow must set
+   `BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST` to the exact accepted digest owned
+   by that manifest. File custody without the configured digest is an invalid
+   command boundary, not provider drift.
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
