@@ -550,8 +550,18 @@ it.effect(
                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                     },
                   },
+                  {
+                    uid: "deployment-custom-staging",
+                    projectId: "prj-agent",
+                    target: "staging",
+                    readyState: "READY",
+                    meta: {
+                      githubCommitSha:
+                        "cccccccccccccccccccccccccccccccccccccccc",
+                    },
+                  },
                 ],
-                pagination: { count: 1, next: 123, prev: 124 },
+                pagination: { count: 2, next: 123, prev: 124 },
               };
             }
             return {

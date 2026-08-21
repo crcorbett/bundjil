@@ -156,6 +156,13 @@ at `manifestArtifactInvalid` because the workflow omitted the accepted digest
 required by command configuration. The successor binds the exact digest as
 non-secret source configuration and the authority audit rejects omission or
 change.
+CI run `32446250097` passed on exact SHA
+`01978dc818adacb75d54042a34c7bf422c571745`. Pull-request drift run
+`32446250037` then produced a Schema-valid inconclusive receipt with zero
+provider writes. The exact-project deployment endpoint returned HTTP 200 for
+both credentials; the private decoder rejected Vercel's custom `staging`
+target. The successor admits non-empty provider target names at ingress and
+excludes custom targets from Bundjil Preview and Production observations.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

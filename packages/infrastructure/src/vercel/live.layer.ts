@@ -44,7 +44,6 @@ import {
   VercelDeploymentObservation,
   VercelDeploymentObservationAttributes,
   VercelDeploymentStatus,
-  VercelDeploymentTarget,
   VercelEnvironmentTarget,
   VercelEnvironmentVariableAttributes,
   VercelEnvironmentVariableId,
@@ -325,6 +324,10 @@ const VercelMarketplaceStorageStoresEnvelope = Schema.Union([
   VercelFailureEnvelope,
 ]);
 
+// Vercel can return project-owned custom targets such as "staging". Decode
+// that provider field here, then project only Bundjil's admitted stages below.
+const VercelProviderDeploymentTarget = Schema.NullOr(Schema.NonEmptyString);
+
 const VercelDeploymentsSuccessEnvelope = Schema.Struct({
   status: Schema.Literal(200),
   headers: VercelResponseHeaders,
@@ -333,7 +336,7 @@ const VercelDeploymentsSuccessEnvelope = Schema.Struct({
       Schema.Struct({
         uid: VercelDeploymentId,
         projectId: VercelProjectId,
-        target: Schema.NullOr(VercelDeploymentTarget),
+        target: VercelProviderDeploymentTarget,
         readyState: VercelDeploymentStatus,
         alias: Schema.optional(Schema.Array(VercelCanonicalDomain)),
         meta: Schema.Struct({
@@ -1102,12 +1105,19 @@ export const VercelLive = Layer.effectContext(
           }
           deployments.push(
             ...response.body.deployments.flatMap((deployment) => {
-              const target = deployment.target ?? "preview";
+              const target = Match.value(deployment.target).pipe(
+                Match.when("production", () => "production" as const),
+                Match.when("preview", () => "preview" as const),
+                Match.when(null, () => "preview" as const),
+                Match.orElse(() => "custom" as const)
+              );
               const belongsToStage =
-                input.stage === "prod"
+                target !== "custom" &&
+                (input.stage === "prod"
                   ? target === "production"
-                  : target === "preview";
-              return belongsToStage &&
+                  : target === "preview");
+              return target !== "custom" &&
+                belongsToStage &&
                 deployment.meta.githubCommitSha !== undefined
                 ? [
                     VercelDeploymentObservationAttributes.make({

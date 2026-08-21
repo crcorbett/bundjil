@@ -38,6 +38,16 @@ Pull-request run `32445924126` proved that materialisation step but stopped at
 digest required by the command config. The next source binds digest
 `307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60`, and
 the authority audit rejects an absent or changed value.
+CI run `32446250097` passed on exact SHA
+`01978dc818adacb75d54042a34c7bf422c571745`. Drift run `32446250037`
+materialised the exact manifest, reached provider reads, produced a valid
+inconclusive receipt, and recorded `provider-writes:0`. Its native read stopped
+because Vercel returned the custom deployment target `staging`, while the
+private response Schema admitted only Preview and Production. Direct
+secret-negative readback returned HTTP 200 for both exact project credentials.
+The successor decoder accepts non-empty provider targets at ingress, then
+keeps only exact Preview, Production, or legacy `null` Preview observations;
+custom targets remain excluded rather than being misclassified.
 
 ## Exact scope
 
@@ -84,6 +94,9 @@ the authority audit rejects an absent or changed value.
 - [x] Reject run `32445924126` at `manifestArtifactInvalid` after it proved
       transport materialisation, then bind the exact accepted digest in source
       and add an independent negative authority fixture.
+- [x] Retain run `32446250037` as a valid inconclusive zero-write receipt,
+      isolate its failure to Vercel custom deployment target decoding, and add
+      a fixture proving `staging` is decoded but excluded from Bundjil stages.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -109,17 +122,17 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                        |
-| ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                      |
-| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                    |
-| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.              |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.         |
-| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback. |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.     |
-| Provider adapters and values       | Change required | R2 config and client initialisation now have separate typed errors; provider values are preserved.    |
-| Package README                     | Change required | Record the GitHub-only compressed manifest transport and report-time Schema decode.                   |
-| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                          |
+| Surface                            | Decision        | Owner/readback                                                                                                                         |
+| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                       |
+| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                                                     |
+| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.                                               |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                          |
+| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback.                                  |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.                                      |
+| Provider adapters and values       | Change required | The Vercel response decoder accepts custom target names but projects only admitted Bundjil stages; credential values remain concealed. |
+| Package README                     | Change required | Record the GitHub-only compressed manifest transport and report-time Schema decode.                                                    |
+| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                           |
 
 ## Verification status
 

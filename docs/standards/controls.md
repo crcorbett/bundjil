@@ -95,6 +95,9 @@ manifest authority fails the control.
 The same audit requires the exact accepted manifest digest as non-secret
 workflow configuration. Materialised file custody without that binding fails
 before provider reads.
+The Vercel deployment response boundary decodes non-empty custom target names
+but emits observations only for exact Preview, Production, or legacy `null`
+Preview targets. A custom target such as `staging` is excluded, not renamed.
 
 ## Report-only freshness
 

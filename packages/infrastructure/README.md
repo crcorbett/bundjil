@@ -98,6 +98,10 @@ GitHub manifest secret as an in-memory gzip/base64 transport because the raw
 materialises the original JSON into mode-`0600` custody before this command
 Schema-decodes it and compares it with the exact configured accepted digest;
 the transport is never a second manifest authority.
+Vercel deployment responses may also contain named custom targets. The live
+adapter decodes those provider values but admits only `preview`, `production`,
+or the provider's legacy `null` Preview target into Bundjil observations;
+custom targets such as `staging` are ignored and are never relabelled Preview.
 
 ## Claim boundary
 

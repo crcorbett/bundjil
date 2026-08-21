@@ -452,6 +452,10 @@ Before every run:
    result remain `NotExposed`; if native execution fails before returning a
    plan, the plan itself remains `NotExposed` and the bounded result is
    inconclusive rather than fabricated zero counts.
+   Vercel may return named custom deployment targets such as `staging`.
+   Decode the non-empty provider target at ingress, then admit only exact
+   `preview`, `production`, or the provider's legacy `null` Preview target.
+   Ignore custom targets; never relabel one as Preview or Production.
    Vercel sensitive environment values are write-only at this boundary. A
    desired plan may prove their persisted desired references are unchanged,
    and native sync may prove their metadata is unchanged, but neither proves

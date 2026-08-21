@@ -43,6 +43,16 @@ stopped at `manifestArtifactInvalid` because the workflow omitted the exact
 accepted digest required by command configuration. The successor binds digest
 `307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60`; the
 authority audit rejects an absent or changed binding.
+CI run `32446250097` then passed on exact SHA
+`01978dc818adacb75d54042a34c7bf422c571745`. Drift run `32446250037`
+reached live provider reads and emitted a Schema-valid inconclusive receipt
+with `provider-writes:0`. Its native read failed because Vercel returned the
+custom deployment target `staging` and the private transport Schema admitted
+only Preview and Production. Both exact project credentials returned HTTP 200
+for the same deployment endpoint in secret-negative follow-up. The successor
+decodes non-empty provider target names but projects only exact Preview,
+Production, or legacy `null` Preview values into Bundjil observations; custom
+targets stay excluded.
 Automatic deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
@@ -516,6 +526,14 @@ stopped safely at `manifestArtifactInvalid` because the workflow did not bind
 the accepted digest required by `loadAdoptionCommand`. The successor adds the
 exact digest as non-secret source configuration and an authority fixture that
 rejects omission or change.
+CI run `32446250097` passed on the exact digest-binding SHA. Drift run
+`32446250037` produced the first valid hosted receipt after custody, with an
+inconclusive native read and zero provider writes. Secret-negative follow-up
+isolated the cause to Vercel's valid custom deployment target `staging`, not
+credential denial: both exact project tokens returned HTTP 200. The provider
+transport now decodes arbitrary non-empty target names and explicitly excludes
+custom targets from the closed Bundjil Preview/Production model. A fixture
+proves `staging` is ignored rather than rejected or relabelled.
 
 ## Documentation impact ledger
 
