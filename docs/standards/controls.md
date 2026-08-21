@@ -81,10 +81,10 @@ retirement, and disconfirming evidence against the fixed control-record
 contract. The authority audit requires Bun's executable `run --env-file`
 argument order and a non-empty receipt readback, so help text with exit zero
 cannot count as a drift run. Before receipt creation, the report command emits
-only a fixed secret-safe failure phase, including a distinct R2 state
-configuration phase, never an underlying value or provider payload. A workflow
-file, green command, run count, or local fixture cannot promote it beyond
-`report_only`.
+only a fixed secret-safe failure phase, including distinct R2 state
+configuration and state-client initialisation phases, never an underlying
+value or provider payload. A workflow file, green command, run count, or local
+fixture cannot promote it beyond `report_only`.
 
 ## Report-only freshness
 

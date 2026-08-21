@@ -131,8 +131,12 @@ corrected command but failed before writing a receipt. The next source maps
 every pre-receipt error to a fixed secret-safe phase so follow-up can target the
 failed boundary without printing values or provider payloads. Diagnostic run
 `32442223436` on `707aad58ceedeff1662f46d949326d5821449de0` reported
-`runtimeInitializationFailed`; its successor separates R2 state configuration
-from the remaining runtime initialisation boundary.
+`runtimeInitializationFailed`. After the eight-line custody artifact passed its
+R2, Preview Photon and exact-project Vercel Config Schemas and replaced only
+the GitHub environment secret, run `32443491605` still reported
+`stateConfigurationInvalid`. That source also mapped state-client
+initialisation to the config label; its successor gives those typed boundaries
+separate fixed outcomes.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

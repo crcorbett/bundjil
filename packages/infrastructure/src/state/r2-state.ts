@@ -53,6 +53,15 @@ export const AlchemyR2StateConfig = Schema.Struct({
 export type AlchemyR2StateConfig = typeof AlchemyR2StateConfig.Type;
 export type AlchemyR2StateConfigEncoded = typeof AlchemyR2StateConfig.Encoded;
 
+export const AlchemyR2StateFailureReason = Schema.Literals([
+  "configurationInvalid",
+  "initializationFailed",
+]);
+export class AlchemyR2StateError extends Schema.TaggedErrorClass<AlchemyR2StateError>()(
+  "AlchemyR2StateError",
+  { reason: AlchemyR2StateFailureReason }
+) {}
+
 const accountIdConfig = Config.schema(
   AlchemyR2AccountId,
   "BUNDJIL_ALCHEMY_STATE_ACCOUNT_ID"
@@ -144,11 +153,25 @@ const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
         }).pipe(Effect.provideContext(context))
       );
     })
-  ).pipe(Layer.provide(dependencies));
+  ).pipe(
+    Layer.provide(dependencies),
+    /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Layer.catch recovers the typed provider Layer error channel, not a Promise callback. */
+    Layer.catch(() =>
+      Layer.effect(
+        State,
+        new AlchemyR2StateError({ reason: "initializationFailed" })
+      )
+    )
+  );
 };
 
 export const layerAlchemyR2State = Layer.unwrap(
-  loadAlchemyR2StateConfig.pipe(Effect.map(layerForAlchemyR2StateConfig))
+  loadAlchemyR2StateConfig.pipe(
+    Effect.mapError(
+      () => new AlchemyR2StateError({ reason: "configurationInvalid" })
+    ),
+    Effect.map(layerForAlchemyR2StateConfig)
+  )
 );
 
 export const layerAlchemyR2StateMemory = inMemoryState();

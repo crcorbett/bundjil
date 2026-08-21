@@ -132,6 +132,8 @@ export {
   SyntheticProviderCredentialsLive,
 } from "./live.layer.js";
 export {
+  AlchemyR2StateError,
+  AlchemyR2StateFailureReason,
   AlchemyR2AccessKeyId,
   type AlchemyR2AccessKeyIdEncoded,
   AlchemyR2AccountId,

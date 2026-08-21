@@ -129,6 +129,7 @@ const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
   "receiptPersistenceFailed",
   "runtimeInitializationFailed",
   "stateConfigurationInvalid",
+  "stateInitializationFailed",
 ]);
 class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
   "InfrastructureDriftBoundaryError",
@@ -701,11 +702,21 @@ const program = Effect.gen(function* () {
 
 const driftStateLayer = layerAlchemyR2State.pipe(
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Layer.catch recovers the typed Layer error channel, not a Promise callback. */
-  Layer.catch(() =>
+  Layer.catch(({ reason }) =>
     Layer.effect(
       State,
       new InfrastructureDriftBoundaryError({
-        reason: "stateConfigurationInvalid",
+        reason: Match.value(reason).pipe(
+          Match.when(
+            "configurationInvalid",
+            () => "stateConfigurationInvalid" as const
+          ),
+          Match.when(
+            "initializationFailed",
+            () => "stateInitializationFailed" as const
+          ),
+          Match.exhaustive
+        ),
       })
     )
   )

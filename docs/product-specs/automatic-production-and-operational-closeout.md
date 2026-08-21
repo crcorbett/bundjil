@@ -25,8 +25,11 @@ readback. Corrected pull-request run `32441621932` then executed the report but
 failed before a receipt existed. The report boundary now emits only a fixed,
 secret-safe failure stage before receipt creation so the next run is diagnostic
 without disclosing values. Diagnostic run `32442223436` narrowed the stop to
-runtime initialisation; the successor separates R2 state configuration from
-the remaining runtime. Automatic deployment and channel proof remain unproved.
+runtime initialisation. The rebuilt eight-line custody artifact then passed its
+R2, Preview Photon and exact-project Vercel Config Schemas, but run
+`32443491605` exposed that the R2 config label also covered state-client
+initialisation. The successor separates those typed outcomes. Automatic
+deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
 
