@@ -163,6 +163,16 @@ provider writes. The exact-project deployment endpoint returned HTTP 200 for
 both credentials; the private decoder rejected Vercel's custom `staging`
 target. The successor admits non-empty provider target names at ingress and
 excludes custom targets from Bundjil Preview and Production observations.
+Runs `32452367518` and `32453467578` then completed live provider reads with
+zero writes. The latter retained one report-only Photon metadata change, 37
+blocking deployment observations and 44 inconclusive write-only rows on exact
+SHA `e3deed1d307748ee629c684874d21c3c8f33b015`; CI run `32453467606`
+passed that SHA. Secret-negative exact-state comparison proved 58 saved
+deployment observations still match every typed field and 37 accepted
+historical identities are no longer returned. No returned deployment changed.
+The successor reports that historical API limit without repair authority and
+accepts write-only baseline continuity only under the three-way manifest,
+native-result and provider-revision rule below.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
@@ -191,8 +201,11 @@ excludes custom targets from Bundjil Preview and Production observations.
   provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
-  native `sync --dry-run` remain distinct sources. Blocking drift fails;
-  unavailable, ambiguous, skipped, or unknown-secret observations are
+  native `sync --dry-run` remain distinct sources. Blocking drift fails.
+  Unavailable, ambiguous and skipped reads remain inconclusive. An unknown
+  write-only secret baseline is accepted only when the accepted manifest,
+  unchanged native result and present unchanged provider revision metadata all
+  agree; this does not prove the value. Every other unknown revision remains
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
@@ -202,9 +215,10 @@ excludes custom targets from Bundjil Preview and Production observations.
   fingerprints or provider values. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
   Read-only Photon project metadata changes remain visible as non-repair
-  reports. Equivalent Vercel deployment observations retain their persisted
-  representation so legacy-only saved fields do not create false drift; all
-  current typed fields still have to match.
+  reports. Returned Vercel deployment observations must match all current typed
+  fields. Accepted historical deployment identities absent from Vercel's
+  current list are reported as unavailable history, not drift, no-op, deletion,
+  retention, or repair authority.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the
   run. Disable the workflow or revoke its read-only environment under separate

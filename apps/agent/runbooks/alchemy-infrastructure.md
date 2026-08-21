@@ -462,12 +462,12 @@ Before every run:
    Decode the non-empty provider target at ingress, then admit only exact
    `preview`, `production`, or the provider's legacy `null` Preview target.
    Ignore custom targets; never relabel one as Preview or Production.
-   Vercel sensitive environment values are write-only at this boundary. A
-   desired plan may prove their persisted desired references are unchanged,
-   and native sync may prove their metadata is unchanged, but neither proves
-   the remote value or revision; classify those rows `unknownSecretRevision`
-   and keep the overall report inconclusive unless a separately accepted
-   custody/readback contract proves the value.
+   Vercel sensitive environment values are write-only at this boundary. A row
+   with an `ObservedUnknown` accepted manifest baseline may classify
+   `unknownSecretRevision` as accepted only when native sync returns
+   `unchanged` and present provider revision metadata matches the persisted
+   observation. This proves metadata continuity, not the remote value. Missing
+   revision metadata or any changed row remains inconclusive.
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
    Before a receipt exists, a rejected boundary emits only its safe phase:
@@ -478,9 +478,11 @@ Before every run:
    name and closed typed reason, never its message, request, response, URL,
    headers, provider payload, credential, or other underlying value. None is
    repair authority. A read-only Photon project metadata change is a report,
-   not repair authority. An equivalent Vercel deployment observation retains
-   its persisted representation so legacy-only state fields do not create
-   false drift; every current typed deployment field must still match.
+   not repair authority. A returned Vercel deployment must match every current
+   typed field. An accepted historical deployment that is no longer returned
+   by Vercel's current project list is
+   `historicalDeploymentUnavailable`/`report`: it is not drift repair
+   authority, a no-op claim, or proof that the deployment still exists.
    Missing or stale runs, signed-ingress/replay/send/typing failures,
    Photon inventory/billing failures, and report failures are operator signals;
    Photon exposes no alert-policy or persistent delivery-log management API,

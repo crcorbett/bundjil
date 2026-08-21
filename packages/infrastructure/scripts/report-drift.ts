@@ -56,6 +56,7 @@ import type {
 } from "../src/index.js";
 import { InfrastructureOwnershipState } from "../src/schemas.js";
 import { SecretOwnership } from "../src/secret-reference.js";
+import { VercelEnvironmentVariableUpdatedAt } from "../src/vercel/index.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -99,6 +100,7 @@ const NativeDesiredPlan = Schema.Struct({
 });
 const DriftAttributeProjection = Schema.Struct({
   ownership: Schema.optional(InfrastructureOwnershipState),
+  providerUpdatedAt: Schema.optional(VercelEnvironmentVariableUpdatedAt),
   valueOwnership: Schema.optional(SecretOwnership),
 });
 const InfrastructureDriftNativePhase = Schema.Literals([
@@ -358,6 +360,13 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
             resource.attr
           );
     const ownership = projection?.ownership ?? "Unknown";
+    const acceptedWriteOnlyBaseline =
+      resource.action === "unchanged" &&
+      resourceKind === "vercelEnvironmentVariable" &&
+      projection?.providerUpdatedAt !== undefined &&
+      projection.valueOwnership?._tag === "ObservedUnknown" &&
+      manifestResource?.resourceKind === "vercelEnvironmentVariable" &&
+      manifestResource.desired.valueOwnership._tag === "ObservedUnknown";
     const secretRevision = Match.value({
       resourceKind,
       valueOwnership: projection?.valueOwnership,
@@ -376,7 +385,9 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
       action: resource.action,
       attempts: { _tag: "NotExposed" },
       baselineDisposition:
-        ownership === "Unowned" && acceptUnowned ? "accepted" : "rejected",
+        (ownership === "Unowned" && acceptUnowned) || acceptedWriteOnlyBaseline
+          ? "accepted"
+          : "rejected",
       certainty: { _tag: "Known" },
       diffClass: Match.value(resource.action).pipe(
         Match.when("drifted", () => "update" as const),

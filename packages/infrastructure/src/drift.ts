@@ -189,6 +189,7 @@ export const InfrastructureDriftCategory = Schema.Literals([
   "unavailableOrAmbiguousReadback",
   "unknownSecretRevision",
   "skippedProviderRead",
+  "historicalDeploymentUnavailable",
   "deploymentDrift",
   "readOnlyObservationChange",
   "desiredStatePlanChange",
@@ -341,6 +342,11 @@ const categoryFor = (observation: InfrastructureDriftObservation) =>
     ),
     Match.when(
       ({ action, resourceKind }) =>
+        resourceKind === "vercelDeploymentObservation" && action === "missing",
+      () => InfrastructureDriftCategory.make("historicalDeploymentUnavailable")
+    ),
+    Match.when(
+      ({ action, resourceKind }) =>
         resourceKind === "vercelDeploymentObservation" &&
         action !== "unchanged",
       () => InfrastructureDriftCategory.make("deploymentDrift")
@@ -388,10 +394,19 @@ const dispositionFor = (
     Match.when("readOnlyObservationChange", () =>
       InfrastructureDriftDisposition.make("report")
     ),
+    Match.when("historicalDeploymentUnavailable", () =>
+      InfrastructureDriftDisposition.make("report")
+    ),
+    Match.when("unknownSecretRevision", () =>
+      InfrastructureDriftDisposition.make(
+        observation.baselineDisposition === "accepted"
+          ? "accepted"
+          : "inconclusive"
+      )
+    ),
     Match.when(
       (value) =>
         value === "unavailableOrAmbiguousReadback" ||
-        value === "unknownSecretRevision" ||
         value === "skippedProviderRead",
       () => InfrastructureDriftDisposition.make("inconclusive")
     ),

@@ -68,16 +68,21 @@ the old team list is denied and absent from Vercel's current OpenAPI catalogue.
 The correction now uses only those project attachment hints, retains the
 accepted manifest database ID after the observable tuple matches, and records
 that the external database ID is not freshly observed.
-Exact-source run `32452367518` then completed every provider read and wrote a
+Exact-source run `32452367518` completed every provider read and wrote a
 Schema-valid zero-write receipt on `d073aa33895880abf17ba8c842d3259967571549`.
-It rejected one changed Photon project observation, 37 Vercel deployment
-observations and 44 unknown write-only Vercel secret revisions. The temporary
-closed boolean diagnostic proved that only Photon `profileConfigured` changed;
-every typed Vercel deployment field matched. The 37 deployment findings are
-therefore legacy-only saved-state shape churn, not an identity or live-field
-change. The successor retains an equivalent persisted deployment observation,
-reports the real read-only Photon metadata change without repair authority, and
-keeps all 44 unknown secret revisions inconclusive.
+Run `32453467578` on `e3deed1d307748ee629c684874d21c3c8f33b015`
+then proved the Photon change is report-only but retained 37 blocking Vercel
+deployment findings and 44 inconclusive write-only rows. CI run `32453467606`
+passed on that exact SHA. A secret-negative read-only comparison of the exact
+R2 state and the two exact project APIs then found 95 saved deployment
+observations: 58 are still returned and match every typed field, while 37 are
+no longer returned by Vercel's current deployment list. None of the returned
+records changed. The successor therefore reports unavailable historical
+deployment observations without repair authority or a retention claim. An
+unchanged write-only row is accepted only when its provider revision metadata
+is present and the accepted manifest explicitly records the same
+`ObservedUnknown` baseline; the secret value itself remains an explicit
+non-claim. Every other unknown revision remains inconclusive.
 
 ## Exact scope
 
@@ -135,9 +140,13 @@ keeps all 44 unknown secret revisions inconclusive.
       `32449836785` as an exact-SHA zero-write receipt that exposed the denied
       account-wide Marketplace list.
 - [x] Retain run `32452367518` as an exact-SHA zero-write failed receipt, prove
-      the one Photon metadata field and all typed Vercel deployment fields
-      without values, and replace the temporary field diagnostic with typed
-      legacy-shape normalisation plus a non-repair Photon report.
+      the one Photon metadata field without values, and replace the temporary
+      field diagnostic with typed comparison plus a non-repair Photon report.
+- [x] Retain run `32453467578`, prove 58 returned historical deployments match
+      and 37 accepted historical identities are absent from the current Vercel
+      list, then classify that absence as a report rather than repairable
+      drift. Accept an unknown write-only baseline only with unchanged present
+      provider revision metadata and the matching accepted manifest baseline.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -163,24 +172,25 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                                                                                    |
-| ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                                  |
-| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                                         |
-| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                                   |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                                     |
-| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, require receipt readback, and group non-accepted findings without values or fingerprints. |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage and classifies read-only Photon project metadata change as report-only.                  |
-| Provider adapters and values       | Change required | Vercel reads exact-project Marketplace hints and retains equivalent deployment state across legacy-only shape differences; values stay concealed.                 |
-| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                            |
-| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                                      |
+| Surface                            | Decision        | Owner/readback                                                                                                                                                                                    |
+| ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                                                                  |
+| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                                                                         |
+| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                                                                   |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                                                                     |
+| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, require receipt readback, and group non-accepted findings without values or fingerprints.                                 |
+| Effect command code and tests      | Change required | The report boundary classifies unavailable historical deployments as reports and accepts write-only baseline continuity only from present unchanged revision metadata plus the accepted manifest. |
+| Provider adapters and values       | Preserve        | Exact-project Vercel reads and provider values are unchanged; the correction is report classification only and values stay concealed.                                                             |
+| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                                                            |
+| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                                                                      |
 
 ## Verification status
 
-Focused JSON, documentation, authority, controls and skills checks pass. The
-full repository verification passes with the documented process-local
-synthetic Executor configuration: 138 boundary tests, formatting/lint, nine
-workspace type checks and all 15 workspace test tasks passed; the Agent suite
-passed 80 tests. External claims remain separated: repository proof does not
-prove hosted drift, deployment, provider behaviour, delivery, handset state or
-future runs.
+Focused drift tests and the infrastructure type check pass for the current
+uncommitted correction. Full repository verification also passes with the
+documented process-only synthetic Executor URL: all policy checks, 140 tooling
+tests, type-aware formatting/lint, Knip, all nine workspace type checks and all
+15 workspace build/test tasks passed. The synthetic URL made no provider call.
+Hosted exact-source proof is still required. External claims remain separated:
+repository proof does not prove hosted drift, deployment, provider behaviour,
+delivery, handset state or future runs.

@@ -101,6 +101,12 @@ before provider reads.
 The Vercel deployment response boundary decodes non-empty custom target names
 but emits observations only for exact Preview, Production, or legacy `null`
 Preview targets. A custom target such as `staging` is excluded, not renamed.
+Returned historical deployment observations must match every typed field. An
+accepted historical identity absent from Vercel's current list is an explicit
+report limitation, not no-op, deletion, retention or repair proof. A write-only
+`ObservedUnknown` baseline is accepted only when native sync is unchanged and
+present provider revision metadata plus the accepted manifest agree; the value
+itself remains unknown. Every weaker revision result stays inconclusive.
 An inconclusive native sync may log only its closed typed provider-read error
 name, closed typed reason and fixed phase. Provider messages, requests,
 responses, URLs, headers, payloads and credentials remain forbidden.

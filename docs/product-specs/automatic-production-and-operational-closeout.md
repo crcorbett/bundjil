@@ -372,9 +372,14 @@ promotion.
 - Dispatch one `Infrastructure Drift` run for the exact source that owns the
   workflow. Acceptance requires the hosted job to pass, its source SHA to
   match, the receipt to report zero provider writes, and every required
-  project-scoped provider read to be available. A missing secret, blocking desired change,
-  unknown secret revision, skipped read, or provider unavailability is not a
-  pass.
+  project-scoped provider read to complete without a blocking or inconclusive
+  result. A historical deployment absent from Vercel's current list is an
+  accepted report limitation, not an available read or no-op claim. An
+  `ObservedUnknown` environment baseline is accepted only when native sync is
+  unchanged, provider revision metadata is present and unchanged, and the
+  accepted manifest records the same baseline. A missing secret, blocking
+  desired change, unaccepted unknown revision, skipped read, or provider
+  unavailability is not a pass.
 
 ### Terra High Production correction
 
@@ -550,13 +555,17 @@ custom targets from the closed Bundjil Preview/Production model. A fixture
 proves `staging` is ignored rather than rejected or relabelled.
 
 Exact-source run `32452367518` completed every provider read and emitted a
-Schema-valid zero-write receipt. Its closed, value-free diagnostic proved that
-the Photon project changed only `profileConfigured`, while every typed field on
-all 37 changed Vercel deployment observations matched persisted state. The
-deployment changes are therefore legacy-only saved-shape churn. Equivalent
-deployment observations retain their persisted representation; the real
-read-only Photon metadata change remains a non-repair report. The 44 Vercel
-write-only secret revisions remain inconclusive and are not promoted to pass.
+Schema-valid zero-write receipt. Run `32453467578` then retained one report-only
+Photon change, 37 blocking Vercel deployment findings and 44 inconclusive
+write-only rows. A secret-negative exact-state comparison corrected the earlier
+diagnosis: 58 returned historical deployment records match every typed field,
+while 37 accepted historical records are no longer returned by Vercel's current
+project deployment list. Their absence is a report, not a no-op, deletion
+claim, or repair authority. An unchanged write-only row may be accepted only
+when present provider revision metadata matches the persisted observation and
+the accepted manifest explicitly records the same `ObservedUnknown` baseline.
+That proves metadata continuity only; the remote secret value remains unknown.
+Absent revision metadata or any changed row remains inconclusive or blocking.
 
 ## Documentation impact ledger
 

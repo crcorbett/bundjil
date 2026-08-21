@@ -108,6 +108,12 @@ Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;
 custom targets such as `staging` are ignored and are never relabelled Preview.
+The drift report keeps returned deployment observations strict across every
+typed field. If Vercel no longer returns an accepted historical deployment,
+the report records unavailable history without claiming drift, deletion,
+retention or repair authority. An accepted write-only environment baseline is
+continuous only when present provider revision metadata is unchanged and the
+accepted manifest records `ObservedUnknown`; the value itself is never proved.
 If native sync cannot complete, the operator log may expose only the closed
 typed provider-read error name and reason alongside the safe phase. It never
 emits the error message, request, response, URL, headers, provider payload or
