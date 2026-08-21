@@ -92,6 +92,12 @@ Alchemy project provider observes exactly the manifest projects rather than
 listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
 limited to the separate inventory/adoption/operator paths.
 
+Marketplace attachment reads use only each exact project's decoded
+environment `contentHint`. Project tokens cannot enumerate the account-wide
+storage list, so the adapter never calls it. The accepted manifest database ID
+is retained only after the observable integration, configuration, resource and
+project identities match; it is not a fresh database-ID readback.
+
 The accepted Preview manifest is Schema-encoded first, then held in the exact
 GitHub manifest secret as an in-memory gzip/base64 transport because the raw
 155-resource JSON exceeds GitHub's secret-size boundary. The hosted workflow

@@ -56,6 +56,18 @@ Run `32448884429` identified `PhotonPlatformsReadError`; direct exact-project
 readback returned the expected successful platforms shape. The next diagnostic
 adds only its closed typed reason to distinguish configuration, response,
 rate-limit and transient classes without exposing provider content.
+Run `32449185370` then identified a stale Photon project binding. The exact
+personal-vault item returned HTTP 200 for project, platform and billing reads,
+so the eight-line Schema-decoded GitHub artifact was rebuilt in memory and only
+that environment secret was replaced at `2026-08-21T05:14:33Z`. Run
+`32449836785` moved past Photon and produced another valid zero-write receipt,
+then stopped because both project tokens received HTTP 403 from Vercel's
+account-wide storage list. Direct shape-only readback proved the exact project
+environment endpoints return the required Marketplace attachment hints while
+the old team list is denied and absent from Vercel's current OpenAPI catalogue.
+The correction now uses only those project attachment hints, retains the
+accepted manifest database ID after the observable tuple matches, and records
+that the external database ID is not freshly observed.
 
 ## Exact scope
 
@@ -107,6 +119,11 @@ rate-limit and transient classes without exposing provider content.
       a fixture proving `staging` is decoded but excluded from Bundjil stages.
 - [x] Retain run `32448148424` as inconclusive with zero writes and add a
       secret-negative typed failure-family diagnostic before another run.
+- [x] Rebuild the exact eight-line drift environment from the personal vault,
+      prove Photon billing HTTP 200 and both Vercel assigned/sibling 200/404
+      pairs, replace only the GitHub environment artifact, and retain run
+      `32449836785` as an exact-SHA zero-write receipt that exposed the denied
+      account-wide Marketplace list.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -132,17 +149,17 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                                                         |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                       |
-| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                                                     |
-| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.                                               |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                          |
-| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback.                                  |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.                                      |
-| Provider adapters and values       | Change required | The Vercel response decoder accepts custom target names but projects only admitted Bundjil stages; credential values remain concealed. |
-| Package README                     | Change required | Record the GitHub-only compressed manifest transport and report-time Schema decode.                                                    |
-| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                           |
+| Surface                            | Decision        | Owner/readback                                                                                                                                   |
+| ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                 |
+| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                        |
+| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                  |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                    |
+| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback.                                            |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.                                                |
+| Provider adapters and values       | Change required | Vercel reads Marketplace attachment hints only from exact-project metadata; retained database identity is a non-claim and values stay concealed. |
+| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                           |
+| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                     |
 
 ## Verification status
 

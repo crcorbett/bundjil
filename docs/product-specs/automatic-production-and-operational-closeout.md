@@ -87,6 +87,17 @@ without that exact provider scope, an account-wide token, or a team-scoped
 fallback is rejected. This correction preserves the Personal team access
 qualification above; it changes the credential-scope conclusion only.
 
+Live readback on 21 August 2026 established a second project-scope boundary.
+Both exact tokens can read their project's environment metadata and its
+Marketplace `contentHint`, but Vercel returns HTTP 403 for the account-wide
+`/v1/storage/stores` list. That list is no longer present in Vercel's current
+OpenAPI catalogue. Drift therefore proves the exact project attachment from
+the decoded integration, configuration and resource IDs in project metadata;
+it does not call the account-wide list. The accepted manifest's external
+database ID is retained only after those observable IDs match and is not a
+fresh database-ID readback. A successful report must carry this limitation and
+must not claim that project-scoped custody can enumerate account storage.
+
 The first continuation used 90-day credentials. Cooper then approved replacing
 all four with one-year credentials. The current tokens expire on 21 August
 2027; the earlier 18 November 2026 custody packet remains historical evidence
@@ -354,11 +365,14 @@ promotion.
   either Production deployment token or the broad inventory/adoption token.
   Vercel tokens are not method-level read-only credentials, so exact project
   scope, independent revocation, the read-only call graph, and the zero-write
-  receipt remain separate controls.
+  receipt remain separate controls. The call graph reads project environment
+  Marketplace hints only; it cannot call the account-wide storage list. The
+  external database ID retained in the accepted manifest is not a current
+  provider readback.
 - Dispatch one `Infrastructure Drift` run for the exact source that owns the
   workflow. Acceptance requires the hosted job to pass, its source SHA to
   match, the receipt to report zero provider writes, and every required
-  provider read to be available. A missing secret, blocking desired change,
+  project-scoped provider read to be available. A missing secret, blocking desired change,
   unknown secret revision, skipped read, or provider unavailability is not a
   pass.
 

@@ -426,6 +426,12 @@ Before every run:
    credentials; exact project scope, sibling-denial readback, dedicated
    revocation, the read-only command graph, `contents: read`, and zero-write
    receipt are the controls.
+   For Marketplace bindings, the read-only command may read only the exact
+   project's environment `contentHint`. Do not substitute the denied
+   account-wide storage list or broaden the token. Treat the manifest's
+   external database ID as retained identity after the observable project,
+   integration, configuration and resource IDs match, not as fresh provider
+   readback.
    GitHub cannot hold the accepted 155-resource manifest as raw secret text.
    After the owning `AdoptionManifestJson` Schema has encoded the exact
    accepted manifest, gzip it and base64-encode the compressed bytes in memory

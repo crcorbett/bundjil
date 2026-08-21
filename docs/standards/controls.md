@@ -68,7 +68,10 @@ Production writer has one non-cancelling repository queue, two project-scoped
 credentials, immutable candidate and stable-target readback, and exact prior
 deployment rollback; direct Vercel Git deployment remains disabled. The drift
 worker wraps native Alchemy plan/sync observation, fails closed on blocking or
-inconclusive classifications, and has no repair edge. This register does not
+inconclusive classifications, and has no repair edge. Its Vercel Marketplace
+read is limited to exact-project environment attachment hints; it cannot
+enumerate account storage, and retained manifest database identity is not a
+fresh provider readback. This register does not
 itself schedule a worker or prove an external capability. GitHub and providers
 remain authoritative for current settings, identities, runs, state, cost, and
 consequences; HGI-309 owns any separately approved authenticated readback.

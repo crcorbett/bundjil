@@ -290,39 +290,13 @@ const VercelEnvironmentVariablesEnvelope = Schema.Union([
   VercelFailureEnvelope,
 ]);
 
-const VercelMarketplaceStorageStoresSuccessEnvelope = Schema.Struct({
-  status: Schema.Literal(200),
-  headers: VercelResponseHeaders,
-  body: Schema.Struct({
-    stores: Schema.Array(
-      Schema.Union([
-        Schema.Struct({
-          id: VercelMarketplaceResourceId,
-          externalResourceId: VercelMarketplaceDatabaseId,
-          type: Schema.Literal("integration"),
-          product: Schema.Struct({
-            integrationConfigurationId: VercelIntegrationConfigurationId,
-            integration: Schema.Struct({
-              id: VercelIntegrationId,
-            }),
-          }),
-          projectsMetadata: Schema.Array(
-            Schema.Struct({
-              projectId: VercelProjectId,
-            })
-          ),
-        }),
-        Schema.Struct({
-          type: Schema.optional(Schema.Literal("blob")),
-        }),
-      ])
-    ),
-  }),
-});
-const VercelMarketplaceStorageStoresEnvelope = Schema.Union([
-  VercelMarketplaceStorageStoresSuccessEnvelope,
-  VercelFailureEnvelope,
-]);
+// Exact project tokens expose Marketplace attachment hints on project
+// environment metadata but cannot enumerate the account-wide storage list.
+// Keep that unobserved database identity explicit in discovery output. An
+// accepted manifest may still carry its previously admitted database ID.
+const marketplaceDatabaseIdNotExposed = VercelMarketplaceDatabaseId.make(
+  "not-exposed-by-project-scope"
+);
 
 // Vercel can return project-owned custom targets such as "staging". Decode
 // that provider field here, then project only Bundjil's admitted stages below.
@@ -922,88 +896,23 @@ export const VercelLive = Layer.effectContext(
         cursor = response.body.pagination?.next ?? undefined;
       } while (cursor !== undefined);
 
-      const storesResponse = yield* client
-        .execute(
-          withVercelAuthorization(
-            HttpClientRequest.get(vercelUrl("/v1/storage/stores")).pipe(
-              HttpClientRequest.setUrlParam("teamId", encoded.teamId)
-            ),
-            token
-          )
-        )
-        .pipe(
-          Effect.flatMap(
-            HttpClientResponse.schemaJson(
-              VercelMarketplaceStorageStoresEnvelope
-            )
-          ),
-          Effect.mapError(
-            () =>
-              new VercelMarketplaceBindingsReadError({
-                operation: "listMarketplaceBindings",
-                reason: "invalidResponse",
-                retry: "never",
-                message:
-                  "Vercel returned an invalid Marketplace storage envelope.",
-              })
-          )
-        );
-      if (storesResponse.status !== 200) {
-        return yield* new VercelMarketplaceBindingsReadError({
-          operation: "listMarketplaceBindings",
-          reason: storesResponse.status === 429 ? "rateLimited" : "transient",
-          retry: "backoff",
-          message: "Vercel could not list Marketplace storage bindings.",
-        });
-      }
-
-      const bindings = yield* Effect.forEach(
-        Array.dedupeWith(
-          contentHints,
-          (left, right) =>
-            left.integrationConfigurationId ===
-              right.integrationConfigurationId &&
-            left.integrationId === right.integrationId &&
-            left.storeId === right.storeId
-        ),
-        Effect.fn(
-          "VercelMarketplaceBindingsLive.resolveMarketplaceContentHint"
-        )(function* (contentHint: VercelMarketplaceContentHint) {
-          const matches = storesResponse.body.stores.filter(
-            (store) =>
-              store.type === "integration" &&
-              store.id === contentHint.storeId &&
-              store.product.integrationConfigurationId ===
-                contentHint.integrationConfigurationId &&
-              store.product.integration.id === contentHint.integrationId &&
-              store.projectsMetadata.some(
-                (project) => project.projectId === input.projectId
-              )
-          );
-          const [store] = matches;
-          if (
-            store === undefined ||
-            store.type !== "integration" ||
-            matches.length !== 1
-          ) {
-            return yield* new VercelMarketplaceBindingsReadError({
-              operation: "listMarketplaceBindings",
-              reason: store === undefined ? "notFound" : "ambiguous",
-              retry: "never",
-              message:
-                "Vercel Marketplace metadata did not identify one exact customer storage binding.",
-            });
-          }
-          return VercelMarketplaceBindingAttributes.make({
-            stage: input.stage,
-            teamId: input.teamId,
-            projectId: input.projectId,
-            integrationId: contentHint.integrationId,
-            configurationId: contentHint.integrationConfigurationId,
-            resourceId: store.id,
-            databaseId: store.externalResourceId,
-            ownership: "Unowned",
-          });
+      const bindings = Array.dedupeWith(
+        contentHints,
+        (left, right) =>
+          left.integrationConfigurationId ===
+            right.integrationConfigurationId &&
+          left.integrationId === right.integrationId &&
+          left.storeId === right.storeId
+      ).map((contentHint) =>
+        VercelMarketplaceBindingAttributes.make({
+          stage: input.stage,
+          teamId: input.teamId,
+          projectId: input.projectId,
+          integrationId: contentHint.integrationId,
+          configurationId: contentHint.integrationConfigurationId,
+          resourceId: contentHint.storeId,
+          databaseId: marketplaceDatabaseIdNotExposed,
+          ownership: "Unowned",
         })
       );
       return ListedVercelMarketplaceBindings.make({ bindings });
@@ -1016,7 +925,10 @@ export const VercelLive = Layer.effectContext(
       return Option.match(
         Array.findFirst(
           listed.bindings,
-          (binding) => binding.resourceId === input.resourceId
+          (binding) =>
+            binding.resourceId === input.resourceId &&
+            binding.integrationId === input.integrationId &&
+            binding.configurationId === input.configurationId
         ),
         {
           onNone: () =>
@@ -1027,10 +939,16 @@ export const VercelLive = Layer.effectContext(
               projectId: input.projectId,
               resourceId: input.resourceId,
             }),
+          // The project-scoped API proves the exact project attachment but
+          // does not re-expose the external database ID. Retain that admitted
+          // manifest identity only after every observable identity matches.
           onSome: (attributes) =>
             VercelMarketplaceBindingObservation.make({
               _tag: "Found",
-              attributes,
+              attributes: VercelMarketplaceBindingAttributes.make({
+                ...attributes,
+                databaseId: input.databaseId,
+              }),
             }),
         }
       );

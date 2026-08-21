@@ -638,7 +638,10 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
             stage: olds.stage,
             teamId: olds.teamId,
             projectId: olds.projectId,
+            integrationId: olds.integrationId,
+            configurationId: olds.configurationId,
             resourceId: output?.resourceId ?? olds.resourceId,
+            databaseId: olds.databaseId,
           })
         );
         return yield* Match.value(observation).pipe(
@@ -706,7 +709,6 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
         "integrationId",
         "configurationId",
         "resourceId",
-        "databaseId",
       ],
     })
   );

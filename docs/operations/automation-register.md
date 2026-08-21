@@ -176,6 +176,9 @@ excludes custom targets from Bundjil Preview and Production observations.
   rejects team-wide project resolution and Production or broad inventory
   credentials are not reused. The provider token scope and decoded project
   binding must agree; request routing is not a substitute for that scope.
+  Marketplace proof uses the exact project's environment attachment hint. The
+  denied account-wide storage list is outside this principal, and the accepted
+  manifest database ID is retained identity rather than current readback.
   Vercel personal tokens are not
   method-level read-only, so exact project scope, sibling denial, independent
   revocation, the read-only call graph and zero-write receipt are mandatory
