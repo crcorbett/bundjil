@@ -498,7 +498,10 @@ export const ObserveVercelMarketplaceBinding = Schema.Struct({
   stage: InfrastructureStage,
   teamId: VercelTeamId,
   projectId: VercelProjectId,
+  integrationId: VercelIntegrationId,
+  configurationId: VercelIntegrationConfigurationId,
   resourceId: VercelMarketplaceResourceId,
+  databaseId: VercelMarketplaceDatabaseId,
 });
 export type ObserveVercelMarketplaceBinding =
   typeof ObserveVercelMarketplaceBinding.Type;

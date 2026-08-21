@@ -729,8 +729,33 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
+    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60/.test(
       workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-MANIFEST",
+        "Infrastructure drift binds the materialised manifest to the exact accepted digest",
+        workflow.path,
+        "Restore the exact accepted Preview manifest digest",
+        "The accepted manifest digest is absent or changed",
+        "The report command decodes one manifest whose digest matches the accepted Preview state"
+      )
+    );
+  }
+  if (
+    !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report/.test(
+      workflow.content
+    ) ||
+    !/printf '%s' "\$DRIFT_MANIFEST_GZIP_BASE64"\s*\\\s*\| base64 --decode\s*\\\s*\| gzip --decompress\s*\\\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"/.test(
+      workflow.content
+    ) ||
+    !workflow.content.includes(
+      'test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"'
+    ) ||
+    !workflow.content.includes(
+      `jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"`
     ) ||
     /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/i.test(
       workflow.content
@@ -741,9 +766,9 @@ const infrastructureDriftFindings = (
         "AUTH-DRIFT-MUTATION",
         "Infrastructure drift runs only the report boundary and has no repair path",
         workflow.path,
-        "Keep only infrastructure:drift-report and remove apply, repair, rollback, Photon, Production, and OIDC paths",
-        "The exact report command is absent or a prohibited mutation surface appears",
-        "The worker can plan, observe, classify, and report but cannot apply"
+        "Keep the exact manifest materialisation, Bun report command and receipt readback, and remove apply, repair, rollback, Photon, Production, and OIDC paths",
+        "The manifest materialisation, executable report command or receipt readback is absent, or a prohibited mutation surface appears",
+        "The worker must execute, classify, persist, and read back its bounded receipt without an apply path"
       )
     );
   }

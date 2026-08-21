@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "receipt": "automatic-production-personal-vercel-drift-false-green",
+  "observedAt": "2026-08-21T02:37:51Z",
+  "repository": {
+    "name": "crcorbett/bundjil",
+    "branch": "main",
+    "hostedHead": "c154d725372617c699538629712569518ee18099",
+    "localCorrectionBase": "48f167cad99995fa9f25d460cde3c6496e8f3b52"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "approval": "Create four one-year exact-project Personal Vercel credentials, place them in personal Bundjil custody, install the exact GitHub artifacts and continue the bounded hosted proof",
+    "excludedScope": [
+      "Tilt Legal Vercel resources",
+      "unrelated projects",
+      "secret disclosure",
+      "repair",
+      "manual Production deployment",
+      "blind retry"
+    ]
+  },
+  "credentialCustody": {
+    "expiry": "2027-08-21",
+    "assignedProjectStatus": 200,
+    "siblingProjectStatus": 404,
+    "onePasswordVaultId": "u6jbz5fuuvz7vlfthnm5dtwnpq",
+    "items": [
+      {
+        "id": "5n7s7fw7kfflksr7czplj7w2hq",
+        "title": "bundjil-production-agent-2026-08-21",
+        "projectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "fingerprintPrefixStored": true
+      },
+      {
+        "id": "z7pyafv3oci7i4fksrbxamojna",
+        "title": "bundjil-production-proxy-2026-08-21",
+        "projectId": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "fingerprintPrefixStored": true
+      },
+      {
+        "id": "rerhpi4wydwzst7m6li76c3gau",
+        "title": "bundjil-drift-agent-2026-08-21",
+        "projectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "fingerprintPrefixStored": true
+      },
+      {
+        "id": "vy45r4kadmax4es3sddzkciskm",
+        "title": "bundjil-drift-proxy-2026-08-21",
+        "projectId": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "fingerprintPrefixStored": true
+      }
+    ],
+    "secretValuesRetained": false
+  },
+  "githubCustody": {
+    "productionSecrets": [
+      "BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN",
+      "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN"
+    ],
+    "driftSecrets": [
+      "BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON",
+      "BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE",
+      "BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON"
+    ],
+    "manifest": {
+      "stage": "preview",
+      "resourceCount": 155,
+      "digest": "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60"
+    },
+    "ruleset": {
+      "id": 20616946,
+      "name": "main-verified-pull-request",
+      "enforcement": "active",
+      "requiredStatus": "verify",
+      "strictStatus": true,
+      "requiredPullRequest": true,
+      "nonFastForward": true,
+      "bypassActors": []
+    },
+    "secretValueReadback": "Names and timestamps only"
+  },
+  "hostedRun": {
+    "runId": 32440487569,
+    "jobId": 96650056965,
+    "event": "workflow_dispatch",
+    "sourceSha": "c154d725372617c699538629712569518ee18099",
+    "githubConclusion": "success",
+    "acceptedConclusion": "failed",
+    "observedLog": "Bun usage and package script help",
+    "reportProduced": false,
+    "receiptProducedOrReadBack": false,
+    "providerReadsProved": false,
+    "providerWritesProved": false,
+    "reason": "The workflow used bun --env-file PATH run SCRIPT. Bun 1.3.14 printed help and exited zero without selecting the script."
+  },
+  "correction": {
+    "workflow": ".github/workflows/infrastructure-drift.yml",
+    "authorityOwner": "tooling/authority-policy.ts",
+    "fixtureOwner": "tooling/authority-policy-audit.test.ts",
+    "requiredCommand": "bun run --env-file PATH infrastructure:drift-report",
+    "requiredPostcondition": "A non-empty Schema-valid bounded receipt exists and is read back from the hosted job",
+    "focusedProof": [
+      "23 authority policy tests passed",
+      "check:authority passed all five workflows",
+      "local Bun syntax reproduction rejected the previous argument order"
+    ]
+  },
+  "nonClaims": [
+    "The green GitHub conclusion does not prove that drift ran.",
+    "No report, receipt, provider-read, provider-write, no-drift, repair, deployment, alias, model, channel or handset claim is accepted from run 32440487569.",
+    "No credential value, provider payload or Vercel environment value is retained in this evidence."
+  ],
+  "rollback": {
+    "providerRollback": "None; the rejected run executed no provider command.",
+    "controlRollback": "Revert the workflow correction only if a later executable replacement preserves receipt readback, or disable the exact workflow and revoke its drift-only custody."
+  }
+}

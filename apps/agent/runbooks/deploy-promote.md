@@ -49,7 +49,7 @@ HEAD`, and a readback of `origin/main`.
 
 | Field               | Required value                                                                                                                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Identity            | Exact GitHub workload plus two separately revocable exact-project Vercel credentials proved by assigned-project access and sibling-project denial, or an authenticated emergency operator and approver |
+| Identity            | Exact GitHub workload plus two project-scoped Vercel credentials, one per Personal project, each with assigned-project success and sibling denial, or an authenticated emergency operator and approver |
 | Operation           | One admitted post-CI automatic rollout, emergency rollback, environment/alias change, or exact Channel provider activation                                                                             |
 | Resource            | Exact `bundjil-codex-proxy` or `bundjil-agent` project and immutable deployment                                                                                                                        |
 | Environment         | Explicit Vercel Preview or Production target                                                                                                                                                           |
@@ -188,8 +188,8 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    `workflow_run` for a `push` to `main` starts the distinct `Production`
    workflow. It checks out the event's exact head SHA without persisted Git
    credentials and invokes only `bun run production:deploy` in the protected
-   `Production` environment. The command uses exactly two project-scoped
-   tokens and fixed Personal team/project IDs. It reads current proxy and
+   `Production` environment. The command uses exactly two project-scoped tokens,
+   fixed Personal team/project IDs, and separate project bindings. It reads current proxy and
    agent targets, stages both candidates using `vercel deploy --prod
 --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
