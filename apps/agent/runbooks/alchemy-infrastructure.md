@@ -468,8 +468,10 @@ Before every run:
    runtime initialisation, R2 state configuration, R2 state initialisation,
    command configuration, authority artifact, manifest artifact, report
    construction, receipt persistence, or a fixed command-policy reason.
-   It never emits the underlying value or provider payload. None is repair
-   authority. Missing or stale runs, signed-ingress/replay/send/typing failures,
+   A native provider-read failure may also emit only its closed typed error
+   name, never its message, request, response, URL, headers, provider payload,
+   credential, or other underlying value. None is repair authority. Missing or
+   stale runs, signed-ingress/replay/send/typing failures,
    Photon inventory/billing failures, and report failures are operator signals;
    Photon exposes no alert-policy or persistent delivery-log management API,
    and no alert transport is claimed by this procedure.

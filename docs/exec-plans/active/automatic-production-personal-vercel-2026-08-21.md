@@ -48,6 +48,10 @@ secret-negative readback returned HTTP 200 for both exact project credentials.
 The successor decoder accepts non-empty provider targets at ingress, then
 keeps only exact Preview, Production, or legacy `null` Preview observations;
 custom targets remain excluded rather than being misclassified.
+Run `32448148424` proved that correction reached the provider but retained an
+opaque later `nativeSync` failure and zero provider writes. The successor adds
+only a closed typed provider-read error name to the safe failure log so the
+next diagnosis cannot expose a request, response, URL, header or credential.
 
 ## Exact scope
 
@@ -97,6 +101,8 @@ custom targets remain excluded rather than being misclassified.
 - [x] Retain run `32446250037` as a valid inconclusive zero-write receipt,
       isolate its failure to Vercel custom deployment target decoding, and add
       a fixture proving `staging` is decoded but excluded from Bundjil stages.
+- [x] Retain run `32448148424` as inconclusive with zero writes and add a
+      secret-negative typed failure-family diagnostic before another run.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`

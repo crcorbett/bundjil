@@ -14,6 +14,7 @@ import { State } from "alchemy/State";
 import * as AlchemySync from "alchemy/Sync";
 import { PlatformServices } from "alchemy/Util/PlatformServices";
 import {
+  Cause,
   Config,
   ConfigProvider,
   Console,
@@ -22,6 +23,7 @@ import {
   FileSystem,
   Layer,
   Match,
+  Option,
   Record,
   Schema,
 } from "effect";
@@ -107,9 +109,29 @@ const InfrastructureDriftNativePhase = Schema.Literals([
   "nativeSyncDecode",
   "nativeSyncObservation",
 ]);
+const InfrastructureDriftNativeProviderFailure = Schema.Literals([
+  "PhotonBillingReadError",
+  "PhotonLinesReadError",
+  "PhotonPlatformsReadError",
+  "PhotonProjectsReadError",
+  "PhotonSharedUsersReadError",
+  "PhotonWebhooksReadError",
+  "VercelDeploymentsReadError",
+  "VercelDomainsReadError",
+  "VercelEnvironmentVariablesReadError",
+  "VercelMarketplaceBindingsReadError",
+  "VercelProjectsReadError",
+  "not-classified",
+]);
+const InfrastructureDriftNativeProviderFailureError = Schema.Struct({
+  _tag: InfrastructureDriftNativeProviderFailure,
+});
 class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
-  { phase: InfrastructureDriftNativePhase }
+  {
+    phase: InfrastructureDriftNativePhase,
+    providerFailure: Schema.optional(InfrastructureDriftNativeProviderFailure),
+  }
 ) {}
 const InfrastructureDriftCommandFailureReason = Schema.Literals([
   "authorityFileInvalid",
@@ -187,6 +209,18 @@ const resourceKindFromNativeType = (resourceType: string) =>
       () => "photonBillingObservation" as const
     ),
     Match.orElse(() => "infrastructureStack" as const)
+  );
+
+const classifyNativeProviderFailure = (cause: Cause.Cause<unknown>) =>
+  Option.match(
+    Option.filter(
+      Cause.findErrorOption(cause),
+      Schema.is(InfrastructureDriftNativeProviderFailureError)
+    ),
+    {
+      onNone: () => "not-classified" as const,
+      onSome: (error) => error._tag,
+    }
   );
 
 const authorityPathConfig = Config.schema(
@@ -467,10 +501,11 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
           name: stack.name,
           stage: stack.stage,
         }).pipe(
-          Effect.catchCause(() =>
+          Effect.catchCause((cause) =>
             Effect.fail(
               new InfrastructureDriftNativeBoundaryError({
                 phase: "nativeSync",
+                providerFailure: classifyNativeProviderFailure(cause),
               })
             )
           )
@@ -647,11 +682,14 @@ const program = Effect.gen(function* () {
     )
   );
   const native = yield* runNativeSync(manifest, acceptUnowned, stage).pipe(
-    Effect.catchTag("InfrastructureDriftNativeBoundaryError", ({ phase }) =>
-      Console.error({
-        phase,
-        reason: "native-drift-readback-failed" as const,
-      }).pipe(Effect.as(unavailableNativeResult(stage)))
+    Effect.catchTag(
+      "InfrastructureDriftNativeBoundaryError",
+      ({ phase, providerFailure }) =>
+        Console.error({
+          phase,
+          providerFailure: providerFailure ?? "not-classified",
+          reason: "native-drift-readback-failed" as const,
+        }).pipe(Effect.as(unavailableNativeResult(stage)))
     ),
     Effect.catch(() => Effect.succeed(unavailableNativeResult(stage)))
   );

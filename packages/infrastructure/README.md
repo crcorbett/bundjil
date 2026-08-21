@@ -102,6 +102,9 @@ Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;
 custom targets such as `staging` are ignored and are never relabelled Preview.
+If native sync cannot complete, the operator log may expose only the closed
+typed provider-read error name alongside the safe phase. It never emits the
+error message, request, response, URL, headers, provider payload or credential.
 
 ## Claim boundary
 

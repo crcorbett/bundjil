@@ -98,6 +98,9 @@ before provider reads.
 The Vercel deployment response boundary decodes non-empty custom target names
 but emits observations only for exact Preview, Production, or legacy `null`
 Preview targets. A custom target such as `staging` is excluded, not renamed.
+An inconclusive native sync may log only its closed typed provider-read error
+name and fixed phase. Provider messages, requests, responses, URLs, headers,
+payloads and credentials remain forbidden.
 
 ## Report-only freshness
 
