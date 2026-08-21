@@ -10,6 +10,7 @@ import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { selectCli } from "alchemy/Cli/selectCli";
 import * as AlchemyPlan from "alchemy/Plan";
 import * as AlchemyStack from "alchemy/Stack";
+import { State } from "alchemy/State";
 import * as AlchemySync from "alchemy/Sync";
 import { PlatformServices } from "alchemy/Util/PlatformServices";
 import {
@@ -127,6 +128,7 @@ const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
   "reportConstructionInvalid",
   "receiptPersistenceFailed",
   "runtimeInitializationFailed",
+  "stateConfigurationInvalid",
 ]);
 class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
   "InfrastructureDriftBoundaryError",
@@ -697,13 +699,25 @@ const program = Effect.gen(function* () {
   return summary;
 });
 
+const driftStateLayer = layerAlchemyR2State.pipe(
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Layer.catch recovers the typed Layer error channel, not a Promise callback. */
+  Layer.catch(() =>
+    Layer.effect(
+      State,
+      new InfrastructureDriftBoundaryError({
+        reason: "stateConfigurationInvalid",
+      })
+    )
+  )
+);
+
 const runtime = Layer.mergeAll(
   PlatformServices,
   FetchHttpClient.layer,
   Layer.provideMerge(AlchemyContextLive, PlatformServices),
   Layer.succeed(ArtifactStore, createArtifactStore()),
   selectCli(),
-  layerAlchemyR2State,
+  driftStateLayer,
   ConfigProvider.layer(ConfigProvider.fromEnv())
 );
 

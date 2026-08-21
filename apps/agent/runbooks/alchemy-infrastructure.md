@@ -448,8 +448,9 @@ Before every run:
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
    Before a receipt exists, a rejected boundary emits only its safe phase:
-   runtime initialisation, configuration, authority artifact, manifest artifact,
-   report construction, receipt persistence, or a fixed command-policy reason.
+   runtime initialisation, R2 state configuration, command configuration,
+   authority artifact, manifest artifact, report construction, receipt
+   persistence, or a fixed command-policy reason.
    It never emits the underlying value or provider payload. None is repair
    authority. Missing or stale runs, signed-ingress/replay/send/typing failures,
    Photon inventory/billing failures, and report failures are operator signals;

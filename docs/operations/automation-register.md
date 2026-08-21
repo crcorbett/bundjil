@@ -129,7 +129,10 @@ hosted receipt remains required before acceptance. Pull-request run
 `32441621932` on `1d1c47dd7422a125db8dda50509f6fd6f3169bb5` executed the
 corrected command but failed before writing a receipt. The next source maps
 every pre-receipt error to a fixed secret-safe phase so follow-up can target the
-failed boundary without printing values or provider payloads.
+failed boundary without printing values or provider payloads. Diagnostic run
+`32442223436` on `707aad58ceedeff1662f46d949326d5821449de0` reported
+`runtimeInitializationFailed`; its successor separates R2 state configuration
+from the remaining runtime initialisation boundary.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

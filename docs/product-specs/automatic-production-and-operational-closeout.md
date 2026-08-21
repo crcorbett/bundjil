@@ -24,8 +24,9 @@ and authority fixture now require the executable argument order plus receipt
 readback. Corrected pull-request run `32441621932` then executed the report but
 failed before a receipt existed. The report boundary now emits only a fixed,
 secret-safe failure stage before receipt creation so the next run is diagnostic
-without disclosing values. Automatic deployment and channel proof remain
-unproved.
+without disclosing values. Diagnostic run `32442223436` narrowed the stop to
+runtime initialisation; the successor separates R2 state configuration from
+the remaining runtime. Automatic deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
 

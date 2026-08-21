@@ -19,9 +19,10 @@ three drift artifacts are installed in `infrastructure-read-only-preview`.
 Run `32440487569` is rejected because Bun showed help and exited zero without
 running drift or producing a receipt. The corrected workflow and negative
 authority fixtures are accepted in pull request `#6`. Its first corrected run,
-`32441621932`, executed the report command but failed before a receipt existed;
-the next repository slice adds secret-safe failure-stage output so that a
-follow-up is diagnostic rather than a blind retry.
+`32441621932`, executed the report command but failed before a receipt existed.
+Diagnostic successor `32442223436` narrowed the stop to runtime initialisation.
+The next source separates R2 state configuration from the remaining runtime so
+follow-up stays diagnostic rather than becoming a blind retry.
 
 ## Exact scope
 
@@ -53,6 +54,8 @@ follow-up is diagnostic rather than a blind retry.
       authority fixtures for both false-green paths.
 - [x] Reject corrected run `32441621932` because it produced no receipt, and
       add secret-safe pre-receipt failure-stage output for the next run.
+- [x] Read back `runtimeInitializationFailed` from diagnostic run
+      `32442223436` and split R2 state configuration from the remaining runtime.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
