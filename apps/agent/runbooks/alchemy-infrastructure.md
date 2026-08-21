@@ -422,6 +422,15 @@ Before every run:
    credentials; exact project scope, sibling-denial readback, dedicated
    revocation, the read-only command graph, `contents: read`, and zero-write
    receipt are the controls.
+   GitHub cannot hold the accepted 155-resource manifest as raw secret text.
+   After the owning `AdoptionManifestJson` Schema has encoded the exact
+   accepted manifest, gzip it and base64-encode the compressed bytes in memory
+   for `BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON`. The hosted custody step
+   must decode and decompress that value directly into the mode-`0600`
+   manifest path before `infrastructure:drift-report` Schema-decodes it again.
+   Do not hand-compose, log, retain, or treat the compressed transport as a
+   different manifest. The authority audit owns the exact materialisation
+   pipeline and rejects a direct copy or missing decode step.
    If approved custody does not also contain the exact Preview Photon pair,
    stop before constructing any artifact. Do not decrypt or copy a Vercel
    sensitive environment value and do not substitute the source/Production

@@ -28,8 +28,18 @@ without disclosing values. Diagnostic run `32442223436` narrowed the stop to
 runtime initialisation. The rebuilt eight-line custody artifact then passed its
 R2, Preview Photon and exact-project Vercel Config Schemas, but run
 `32443491605` exposed that the R2 config label also covered state-client
-initialisation. The successor separates those typed outcomes. Automatic
-deployment and channel proof remain unproved.
+initialisation. Later readback found that `gh secret set --body -` had stored a
+literal hyphen instead of stdin. After the two Production tokens and drift
+environment were replaced with the correct form, run `32444546031` moved past
+R2 state and stopped at `authorityArtifactInvalid`. The authority replacement
+succeeded, but GitHub rejected the raw 155-resource manifest with HTTP 422
+because it exceeds the environment-secret size boundary. The successor uses a
+gzip/base64 transport only after Schema encoding, materialises the same JSON
+inside the runner, and Schema-decodes it again before any provider read. The
+7,516-byte transport was installed at `2026-08-21T04:07:06Z` after its
+in-memory round trip retained the 87,930-byte manifest's stage, digest and all
+155 resources.
+Automatic deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
 
@@ -481,6 +491,22 @@ authority audit has independent negative fixtures for both the bad argument
 order and missing receipt check. A corrected hosted run is still required
 before accepting drift. The rejected run is retained in
 [`automatic-production-personal-vercel-drift-false-green-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-drift-false-green-2026-08-21.json).
+
+Follow-up custody review found a second false assumption: `gh secret set
+--body -` stores a literal hyphen; stdin is used only when `--body` is omitted.
+The two Production tokens and the drift environment were replaced with the
+correct stdin form. Run `32444546031` then passed R2 state initialisation and
+stopped safely at `authorityArtifactInvalid`. The authority replacement
+succeeded. GitHub rejected the raw accepted manifest with HTTP 422 because the
+155-resource JSON exceeds its environment-secret size boundary. The successor
+workflow requires an in-memory gzip/base64 transport produced only after the
+owning `AdoptionManifestJson` Schema encodes the accepted manifest. It expands
+that transport directly into mode-`0600` custody, then the report command
+Schema-decodes the original manifest and verifies its accepted digest. The
+authority audit rejects a missing or altered materialisation pipeline.
+The 7,516-byte transport was installed at `2026-08-21T04:07:06Z` only after
+an in-memory round trip retained the 87,930-byte manifest's stage, digest and
+all 155 resources. Secret readback remains names and timestamps only.
 
 ## Documentation impact ledger
 

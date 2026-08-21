@@ -92,6 +92,12 @@ Alchemy project provider observes exactly the manifest projects rather than
 listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
 limited to the separate inventory/adoption/operator paths.
 
+The accepted Preview manifest is Schema-encoded first, then held in the exact
+GitHub manifest secret as an in-memory gzip/base64 transport because the raw
+155-resource JSON exceeds GitHub's secret-size boundary. The hosted workflow
+materialises the original JSON into mode-`0600` custody before this command
+Schema-decodes it; the transport is never a second manifest authority.
+
 ## Claim boundary
 
 Package checks prove repository contracts only. They do not establish current

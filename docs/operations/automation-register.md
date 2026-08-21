@@ -138,6 +138,20 @@ the GitHub environment secret, run `32443491605` still reported
 initialisation to the config label; its successor gives those typed boundaries
 separate fixed outcomes.
 
+The next custody readback proved that `gh secret set --body -` had stored a
+literal hyphen instead of stdin. The two Production tokens and drift
+environment were replaced with the correct stdin form. Run `32444546031` then
+passed R2 state and stopped safely at `authorityArtifactInvalid`; the authority
+replacement succeeded. GitHub rejected the raw 155-resource manifest with
+HTTP 422 because it exceeds the environment-secret size boundary. The
+successor workflow materialises the same Schema-encoded manifest from an exact
+in-memory gzip/base64 transport into mode-`0600` custody, and the authority
+audit rejects a changed or missing materialisation pipeline. A successful
+hosted receipt is still required. The 7,516-byte transport was installed at
+`2026-08-21T04:07:06Z` after an in-memory round trip retained the 87,930-byte
+manifest's stage, digest and all 155 resources; GitHub readback exposed only
+the secret name and update time.
+
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.

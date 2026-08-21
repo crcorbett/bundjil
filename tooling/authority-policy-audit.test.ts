@@ -73,13 +73,19 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
       DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
-      DRIFT_MANIFEST_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
+      DRIFT_MANIFEST_GZIP_BASE64: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
     steps:
       - uses: actions/checkout@${pins["actions/checkout"]}
         with:
           persist-credentials: false
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
+      - run: |
+          printf '%s' "$DRIFT_MANIFEST_GZIP_BASE64" \\
+            | base64 --decode \\
+            | gzip --decompress \\
+            > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
       - run: bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report
       - if: always()
         run: |
@@ -594,6 +600,15 @@ describe("HGI-304 authority policy", () => {
         content.replace(
           'bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report',
           'bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report'
+        ),
+    ],
+    [
+      "manifest materialisation removed",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          /^\s*\| gzip --decompress \\\n\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"$/m,
+          ""
         ),
     ],
     [

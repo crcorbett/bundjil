@@ -15,17 +15,24 @@ The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`
 1Password vault. The two Production credentials are installed in the exact
 GitHub `Production` environment. The Preview Photon credential and exactly
-three drift artifacts are installed in `infrastructure-read-only-preview`.
+three corrected drift artifacts are installed in
+`infrastructure-read-only-preview`. The accepted manifest is 87,930 bytes as
+raw JSON and 7,516 bytes as the round-trip-proved gzip/base64 transport.
 Run `32440487569` is rejected because Bun showed help and exited zero without
 running drift or producing a receipt. The corrected workflow and negative
 authority fixtures are accepted in pull request `#6`. Its first corrected run,
 `32441621932`, executed the report command but failed before a receipt existed.
 Diagnostic successor `32442223436` narrowed the stop to runtime initialisation.
 After the Schema-valid R2 custody artifact was replaced, follow-up run
-`32443491605` still reported `stateConfigurationInvalid`. Review found that
-label also covered state-client initialisation. The next source gives decoded
-R2 settings and state-client initialisation separate typed outcomes so
-follow-up stays diagnostic rather than becoming a blind retry.
+`32443491605` still reported `stateConfigurationInvalid`. The GitHub CLI was
+then found to treat `--body -` as a literal hyphen rather than stdin. The two
+Production tokens and drift environment were replaced with the correct stdin
+form; run `32444546031` then moved past state initialisation and stopped at
+`authorityArtifactInvalid`. The authority replacement succeeded, but GitHub
+rejected the raw 155-resource manifest with HTTP 422 because it is larger than
+an environment secret. The next source admits an exact in-memory gzip/base64
+transport, materialises the same Schema-encoded manifest inside the runner,
+and keeps report-time Schema validation as the acceptance boundary.
 
 ## Exact scope
 
@@ -49,8 +56,8 @@ follow-up stays diagnostic rather than becoming a blind retry.
       protection; no human approval or wait timer was added.
 - [x] Confirm the approved Preview Photon credential in the exact personal
       vault without reading a Vercel sensitive environment value.
-- [x] Build and install exactly three Schema-decoded drift artifacts from the
-      distinct drift pair, Preview Photon credential and accepted R2 state.
+- [x] Build the three Schema-decoded drift artifacts from the distinct drift
+      pair, Preview Photon credential and accepted R2 state.
 - [x] Reject run `32440487569` as a false green because no report or receipt
       was produced despite the green GitHub result.
 - [x] Correct the Bun argument order and require receipt readback; add negative
@@ -63,6 +70,12 @@ follow-up stays diagnostic rather than becoming a blind retry.
       pass the R2, Preview Photon and exact-project Vercel Config Schemas, update
       only its GitHub secret, and reject run `32443491605` because the R2 label
       still conflated decoded config with state-client initialisation.
+- [x] Correct the GitHub CLI stdin form for both Production tokens and the
+      drift environment, then reject run `32444546031` at the next exact safe
+      phase, `authorityArtifactInvalid`.
+- [x] Install the accepted manifest's admitted gzip/base64 transport as the
+      remaining corrected drift secret at `2026-08-21T04:07:06Z`; its in-memory
+      round trip retained stage, digest and all 155 resources.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -88,16 +101,17 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                     |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current one-year custody, installed drift package and rejected false green are recorded.           |
-| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                 |
-| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.           |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.      |
-| Workflow and authority fixtures    | Change required | Correct Bun ordering and make receipt existence/readback an executable postcondition.              |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.  |
-| Provider adapters and values       | Change required | R2 config and client initialisation now have separate typed errors; provider values are preserved. |
-| Root/app README and architecture   | Preserve        | No public command or stable architecture boundary changed.                                         |
+| Surface                            | Decision        | Owner/readback                                                                                        |
+| ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                      |
+| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                    |
+| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.              |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.         |
+| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback. |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.     |
+| Provider adapters and values       | Change required | R2 config and client initialisation now have separate typed errors; provider values are preserved.    |
+| Package README                     | Change required | Record the GitHub-only compressed manifest transport and report-time Schema decode.                   |
+| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                          |
 
 ## Verification status
 

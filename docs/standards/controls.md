@@ -86,6 +86,13 @@ configuration and state-client initialisation phases, never an underlying
 value or provider payload. A workflow file, green command, run count, or local
 fixture cannot promote it beyond `report_only`.
 
+The audit also requires the exact gzip/base64 materialisation step for the
+accepted manifest secret. The raw 155-resource JSON exceeds GitHub's secret
+size boundary, so the workflow may only expand the in-memory transport into a
+mode-`0600` file and then let the report command Schema-decode the original
+manifest. A direct copy, changed pipeline, or transport treated as a new
+manifest authority fails the control.
+
 ## Report-only freshness
 
 The canonical candidate contract is

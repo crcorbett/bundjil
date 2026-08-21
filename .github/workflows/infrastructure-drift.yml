@@ -33,7 +33,7 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
       DRIFT_AUTHORITY_JSON: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
-      DRIFT_MANIFEST_JSON: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+      DRIFT_MANIFEST_GZIP_BASE64: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
 
     steps:
       - name: Checkout repository
@@ -60,11 +60,14 @@ jobs:
           set -euo pipefail
           test -n "$DRIFT_AUTHORITY_JSON"
           test -n "$DRIFT_ENV_FILE"
-          test -n "$DRIFT_MANIFEST_JSON"
+          test -n "$DRIFT_MANIFEST_GZIP_BASE64"
           umask 077
           mkdir -p tmp/proof
           printf '%s' "$DRIFT_AUTHORITY_JSON" > "$BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_PATH"
-          printf '%s' "$DRIFT_MANIFEST_JSON" > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
+          printf '%s' "$DRIFT_MANIFEST_GZIP_BASE64" \
+            | base64 --decode \
+            | gzip --decompress \
+            > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
           printf '%s' "$DRIFT_ENV_FILE" > "$RUNNER_TEMP/bundjil-infrastructure-drift.env"
           chmod 0600 \
             "$BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_PATH" \
