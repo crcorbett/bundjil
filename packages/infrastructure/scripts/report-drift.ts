@@ -120,6 +120,18 @@ class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<Infrastruc
   "InfrastructureDriftCommandError",
   { reason: InfrastructureDriftCommandFailureReason }
 ) {}
+const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
+  "authorityArtifactInvalid",
+  "configurationInvalid",
+  "manifestArtifactInvalid",
+  "reportConstructionInvalid",
+  "receiptPersistenceFailed",
+  "runtimeInitializationFailed",
+]);
+class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
+  "InfrastructureDriftBoundaryError",
+  { reason: InfrastructureDriftBoundaryFailureReason }
+) {}
 
 const resourceKindFromNativeType = (resourceType: string) =>
   Match.value(resourceType).pipe(
@@ -567,21 +579,70 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
 
 const program = Effect.gen(function* () {
   const startedAt = yield* DateTime.now;
-  const stage = yield* stageConfig;
+  const stage = yield* stageConfig.pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "configurationInvalid",
+        })
+    )
+  );
   if (stage !== "preview") {
     return yield* new InfrastructureDriftCommandError({
       reason: "productionTargetRejected",
     });
   }
-  const authorityPath = yield* authorityPathConfig;
-  const reportPath = yield* reportPathConfig;
-  const receiptPath = yield* receiptPathConfig;
-  const sourceSha = yield* sourceShaConfig;
-  const runIdentity = yield* runIdentityConfig;
-  const acceptUnowned = yield* acceptUnownedConfig;
-  const authorityFingerprint = yield* readAuthority(authorityPath);
-  const command = yield* loadAdoptionCommand;
-  const manifest = yield* validateStableAdoptionCommand(command);
+  const configuration = yield* Effect.gen(function* () {
+    const authorityPath = yield* authorityPathConfig;
+    const reportPath = yield* reportPathConfig;
+    const receiptPath = yield* receiptPathConfig;
+    const sourceSha = yield* sourceShaConfig;
+    const runIdentity = yield* runIdentityConfig;
+    const acceptUnowned = yield* acceptUnownedConfig;
+    return {
+      acceptUnowned,
+      authorityPath,
+      receiptPath,
+      reportPath,
+      runIdentity,
+      sourceSha,
+    };
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "configurationInvalid",
+        })
+    )
+  );
+  const {
+    acceptUnowned,
+    authorityPath,
+    receiptPath,
+    reportPath,
+    runIdentity,
+    sourceSha,
+  } = configuration;
+  const authorityFingerprint = yield* readAuthority(authorityPath).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "authorityArtifactInvalid",
+        })
+    )
+  );
+  const { command, manifest } = yield* Effect.gen(function* () {
+    const command = yield* loadAdoptionCommand;
+    const manifest = yield* validateStableAdoptionCommand(command);
+    return { command, manifest };
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "manifestArtifactInvalid",
+        })
+    )
+  );
   const native = yield* runNativeSync(manifest, acceptUnowned, stage).pipe(
     Effect.catchTag("InfrastructureDriftNativeBoundaryError", ({ phase }) =>
       Console.error({
@@ -606,12 +667,26 @@ const program = Effect.gen(function* () {
       sourceSha,
       stage,
     })
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "reportConstructionInvalid",
+        })
+    )
   );
   const summary = yield* persistReport(
     authorityPath,
     reportPath,
     receiptPath,
     report
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "receiptPersistenceFailed",
+        })
+    )
   );
   if (summary.status === "failed") {
     process.exitCode = 1;
@@ -634,13 +709,27 @@ const runtime = Layer.mergeAll(
 
 const main = program.pipe(
   Effect.provide(runtime),
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-callbacks -- Effect maps the typed error channel, not a Promise callback. */
+  Effect.mapError((error) =>
+    Schema.is(InfrastructureDriftBoundaryError)(error) ||
+    Schema.is(InfrastructureDriftCommandError)(error)
+      ? error
+      : new InfrastructureDriftBoundaryError({
+          reason: "runtimeInitializationFailed",
+        })
+  ),
   Effect.flatMap(Console.log),
-  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
-  Effect.catch(() =>
-    Console.error({
-      reason: "drift-report-boundary-failed" as const,
-      status: "blocked" as const,
-    }).pipe(
+  Effect.catchTag("InfrastructureDriftBoundaryError", ({ reason }) =>
+    Console.error({ reason, status: "blocked" as const }).pipe(
+      Effect.andThen(
+        Effect.sync(() => {
+          process.exitCode = 2;
+        })
+      )
+    )
+  ),
+  Effect.catchTag("InfrastructureDriftCommandError", ({ reason }) =>
+    Console.error({ reason, status: "blocked" as const }).pipe(
       Effect.andThen(
         Effect.sync(() => {
           process.exitCode = 2;

@@ -80,8 +80,10 @@ proof, bounded failure, repair owner, cost, review trigger, stop/rollback,
 retirement, and disconfirming evidence against the fixed control-record
 contract. The authority audit requires Bun's executable `run --env-file`
 argument order and a non-empty receipt readback, so help text with exit zero
-cannot count as a drift run. A workflow file, green command, run count, or
-local fixture cannot promote it beyond `report_only`.
+cannot count as a drift run. Before receipt creation, the report command emits
+only a fixed secret-safe failure phase, never an underlying value or provider
+payload. A workflow file, green command, run count, or local fixture cannot
+promote it beyond `report_only`.
 
 ## Report-only freshness
 

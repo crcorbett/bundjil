@@ -18,7 +18,10 @@ GitHub `Production` environment. The Preview Photon credential and exactly
 three drift artifacts are installed in `infrastructure-read-only-preview`.
 Run `32440487569` is rejected because Bun showed help and exited zero without
 running drift or producing a receipt. The corrected workflow and negative
-authority fixtures are now the active repository slice.
+authority fixtures are accepted in pull request `#6`. Its first corrected run,
+`32441621932`, executed the report command but failed before a receipt existed;
+the next repository slice adds secret-safe failure-stage output so that a
+follow-up is diagnostic rather than a blind retry.
 
 ## Exact scope
 
@@ -48,6 +51,8 @@ authority fixtures are now the active repository slice.
       was produced despite the green GitHub result.
 - [x] Correct the Bun argument order and require receipt readback; add negative
       authority fixtures for both false-green paths.
+- [x] Reject corrected run `32441621932` because it produced no receipt, and
+      add secret-safe pre-receipt failure-stage output for the next run.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -73,15 +78,16 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                           |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current one-year custody, installed drift package and rejected false green are recorded.                 |
-| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                       |
-| Runbook                            | Preserve        | It already requires a Schema-valid receipt; the executable workflow and authority oracle were defective. |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.            |
-| Workflow and authority fixtures    | Change required | Correct Bun ordering and make receipt existence/readback an executable postcondition.                    |
-| Effect code and provider values    | Preserve        | No provider adapter or provider value is changed by the false-green correction.                          |
-| Root/app README and architecture   | Preserve        | No public command or stable architecture boundary changed.                                               |
+| Surface                            | Decision        | Owner/readback                                                                                    |
+| ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current one-year custody, installed drift package and rejected false green are recorded.          |
+| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                |
+| Runbook                            | Change required | It now defines the secret-safe pre-receipt failure stages used for diagnostic follow-up.          |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.     |
+| Workflow and authority fixtures    | Change required | Correct Bun ordering and make receipt existence/readback an executable postcondition.             |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values. |
+| Provider adapters and values       | Preserve        | No provider adapter or provider value is changed by the correction.                               |
+| Root/app README and architecture   | Preserve        | No public command or stable architecture boundary changed.                                        |
 
 ## Verification status
 

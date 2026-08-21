@@ -21,7 +21,11 @@ Production secrets, and the three exact drift artifacts. Hosted drift run
 `32440487569` is rejected as a false green because Bun printed help and exited
 zero without running the report command or creating a receipt. The workflow
 and authority fixture now require the executable argument order plus receipt
-readback. Automatic deployment and channel proof remain unproved.
+readback. Corrected pull-request run `32441621932` then executed the report but
+failed before a receipt existed. The report boundary now emits only a fixed,
+secret-safe failure stage before receipt creation so the next run is diagnostic
+without disclosing values. Automatic deployment and channel proof remain
+unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
 

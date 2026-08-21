@@ -125,7 +125,11 @@ workflow had no receipt readback. This is a rejected false green. The corrected
 workflow places Bun's `run` argument before `--env-file`, requires a non-empty
 receipt and prints the Schema-valid sanitised receipt. The authority audit
 rejects both the bad argument order and missing receipt check. A corrected
-hosted receipt remains required before acceptance.
+hosted receipt remains required before acceptance. Pull-request run
+`32441621932` on `1d1c47dd7422a125db8dda50509f6fd6f3169bb5` executed the
+corrected command but failed before writing a receipt. The next source maps
+every pre-receipt error to a fixed secret-safe phase so follow-up can target the
+failed boundary without printing values or provider payloads.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
