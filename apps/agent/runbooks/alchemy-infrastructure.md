@@ -469,9 +469,9 @@ Before every run:
    command configuration, authority artifact, manifest artifact, report
    construction, receipt persistence, or a fixed command-policy reason.
    A native provider-read failure may also emit only its closed typed error
-   name, never its message, request, response, URL, headers, provider payload,
-   credential, or other underlying value. None is repair authority. Missing or
-   stale runs, signed-ingress/replay/send/typing failures,
+   name and closed typed reason, never its message, request, response, URL,
+   headers, provider payload, credential, or other underlying value. None is
+   repair authority. Missing or stale runs, signed-ingress/replay/send/typing failures,
    Photon inventory/billing failures, and report failures are operator signals;
    Photon exposes no alert-policy or persistent delivery-log management API,
    and no alert transport is claimed by this procedure.

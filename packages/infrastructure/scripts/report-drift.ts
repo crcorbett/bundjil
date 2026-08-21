@@ -123,14 +123,33 @@ const InfrastructureDriftNativeProviderFailure = Schema.Literals([
   "VercelProjectsReadError",
   "not-classified",
 ]);
+const InfrastructureDriftNativeProviderFailureReason = Schema.Literals([
+  "ambiguous",
+  "conflict",
+  "invalidResponse",
+  "not-classified",
+  "notFound",
+  "rateLimited",
+  "requestFailed",
+  "teamMismatch",
+  "transient",
+  "unavailable",
+  "writeForbidden",
+]);
 const InfrastructureDriftNativeProviderFailureError = Schema.Struct({
   _tag: InfrastructureDriftNativeProviderFailure,
+  reason: InfrastructureDriftNativeProviderFailureReason,
 });
+type InfrastructureDriftNativeProviderFailureError =
+  typeof InfrastructureDriftNativeProviderFailureError.Type;
 class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
   {
     phase: InfrastructureDriftNativePhase,
     providerFailure: Schema.optional(InfrastructureDriftNativeProviderFailure),
+    providerFailureReason: Schema.optional(
+      InfrastructureDriftNativeProviderFailureReason
+    ),
   }
 ) {}
 const InfrastructureDriftCommandFailureReason = Schema.Literals([
@@ -218,8 +237,14 @@ const classifyNativeProviderFailure = (cause: Cause.Cause<unknown>) =>
       Schema.is(InfrastructureDriftNativeProviderFailureError)
     ),
     {
-      onNone: () => "not-classified" as const,
-      onSome: (error) => error._tag,
+      onNone: () => ({
+        providerFailure: "not-classified" as const,
+        providerFailureReason: "not-classified" as const,
+      }),
+      onSome: (error: InfrastructureDriftNativeProviderFailureError) => ({
+        providerFailure: error._tag,
+        providerFailureReason: error.reason,
+      }),
     }
   );
 
@@ -501,14 +526,17 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
           name: stack.name,
           stage: stack.stage,
         }).pipe(
-          Effect.catchCause((cause) =>
-            Effect.fail(
+          Effect.catchCause((cause) => {
+            const { providerFailure, providerFailureReason } =
+              classifyNativeProviderFailure(cause);
+            return Effect.fail(
               new InfrastructureDriftNativeBoundaryError({
                 phase: "nativeSync",
-                providerFailure: classifyNativeProviderFailure(cause),
+                providerFailure,
+                providerFailureReason,
               })
-            )
-          )
+            );
+          })
         );
         const decoded = yield* Schema.decodeUnknownEffect(NativeSyncResult)(
           native.result,
@@ -684,10 +712,11 @@ const program = Effect.gen(function* () {
   const native = yield* runNativeSync(manifest, acceptUnowned, stage).pipe(
     Effect.catchTag(
       "InfrastructureDriftNativeBoundaryError",
-      ({ phase, providerFailure }) =>
+      ({ phase, providerFailure, providerFailureReason }) =>
         Console.error({
           phase,
           providerFailure: providerFailure ?? "not-classified",
+          providerFailureReason: providerFailureReason ?? "not-classified",
           reason: "native-drift-readback-failed" as const,
         }).pipe(Effect.as(unavailableNativeResult(stage)))
     ),

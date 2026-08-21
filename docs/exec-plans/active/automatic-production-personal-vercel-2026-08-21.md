@@ -52,6 +52,10 @@ Run `32448148424` proved that correction reached the provider but retained an
 opaque later `nativeSync` failure and zero provider writes. The successor adds
 only a closed typed provider-read error name to the safe failure log so the
 next diagnosis cannot expose a request, response, URL, header or credential.
+Run `32448884429` identified `PhotonPlatformsReadError`; direct exact-project
+readback returned the expected successful platforms shape. The next diagnostic
+adds only its closed typed reason to distinguish configuration, response,
+rate-limit and transient classes without exposing provider content.
 
 ## Exact scope
 
