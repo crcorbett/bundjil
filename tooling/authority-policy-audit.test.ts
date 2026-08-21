@@ -80,7 +80,11 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
-      - run: bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report
+      - run: bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report
+      - if: always()
+        run: |
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
+          jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
 `
   );
 
@@ -581,6 +585,24 @@ describe("HGI-304 authority policy", () => {
         content.replace(
           "infrastructure:drift-report",
           "infrastructure:stable-production-apply"
+        ),
+    ],
+    [
+      "Bun report arguments moved into the false-green order",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          'bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report',
+          'bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report'
+        ),
+    ],
+    [
+      "bounded receipt readback removed",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          /^\s*test -s "\$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"$/m,
+          ""
         ),
     ],
   ])(

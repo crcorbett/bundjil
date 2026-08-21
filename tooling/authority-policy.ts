@@ -729,8 +729,14 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
+    !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report/.test(
       workflow.content
+    ) ||
+    !workflow.content.includes(
+      'test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"'
+    ) ||
+    !workflow.content.includes(
+      `jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"`
     ) ||
     /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/i.test(
       workflow.content
@@ -741,9 +747,9 @@ const infrastructureDriftFindings = (
         "AUTH-DRIFT-MUTATION",
         "Infrastructure drift runs only the report boundary and has no repair path",
         workflow.path,
-        "Keep only infrastructure:drift-report and remove apply, repair, rollback, Photon, Production, and OIDC paths",
-        "The exact report command is absent or a prohibited mutation surface appears",
-        "The worker can plan, observe, classify, and report but cannot apply"
+        "Keep the exact Bun report command and receipt readback, and remove apply, repair, rollback, Photon, Production, and OIDC paths",
+        "The executable report command or receipt readback is absent, or a prohibited mutation surface appears",
+        "The worker must execute, classify, persist, and read back its bounded receipt without an apply path"
       )
     );
   }

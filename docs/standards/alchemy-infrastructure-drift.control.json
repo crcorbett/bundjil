@@ -16,7 +16,7 @@
   "durableState": "The branded repository/run/attempt identity, exact source SHA, static authority fingerprint, decoded manifest digest, fingerprint-only classified report and bounded receipt for that run.",
   "authority": "docs/operations/authority-register.json#github-infrastructure-drift and the workflow-bound static read-only authority policy; dynamic execution identity is derived separately from trusted GitHub context.",
   "convergence": "One current report per source/ref; newer work cancels stale work; no-op requires zero desired-plan changes and accepted native-sync observations.",
-  "proofPerRun": "Schema-valid repository/run/attempt identity, source SHA, stage, static authority fingerprint, decoded manifest digest, desired-plan counts, classified per-resource findings, provider-writes:0, command disposition and independent GitHub run/check readback when externally observed.",
+  "proofPerRun": "The executable Bun report command must produce a non-empty Schema-valid bounded receipt that is read back in the hosted log and names repository/run/attempt identity, source SHA, stage, static authority fingerprint, decoded manifest digest, desired-plan counts, classified per-resource findings, provider-writes:0 and command disposition; the GitHub run/check remains a separate external readback.",
   "boundedFailure": "Twenty-minute job timeout, exact repository/fork gate, Preview-only stage, three exact secret artifacts, separately revocable project-scoped Vercel bindings with exact project routing and sibling-denial proof and no team-wide project-resolution fallback, fail-closed missing/duplicate/unmatched custody, and nonzero failed or inconclusive status.",
   "repairRoute": "No automatic repair. A human opens the target-owned Alchemy runbook, obtains exact apply authority, re-reads state, repairs one accepted property and proves convergence.",
   "falsePositiveCost": "One read-only provider run plus human review of a fingerprint-only finding; no provider or state write.",
@@ -26,6 +26,7 @@
   "retirementCondition": "Retire if the signal no longer detects actionable drift, carrying cost exceeds accepted value, or a smaller earlier provider-owned control proves the same postcondition.",
   "disconfirmingEvidence": [
     "A green repository suite without a native provider read does not prove no drift.",
+    "Bun help text with exit zero and no receipt is a false green, not a hosted drift result.",
     "A successful command or run without classified resource postconditions does not prove convergence.",
     "A current report does not prove a future run, alert delivery, provider availability, or repair."
   ],

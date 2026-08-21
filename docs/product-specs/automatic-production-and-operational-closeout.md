@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
 task_ledger: automatic-production-and-operational-closeout.tasks.json
 ---
@@ -15,10 +15,13 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 ## Status and accepted outcome
 
 Repository implementation and the shared terminal audit are complete. The
-2026-08-21 successor readback now proves custody of four separately revocable
-Personal Vercel project-scoped credentials and the two GitHub Production secret
-names. Hosted drift, automatic deployment and channel proof remain explicitly
-deferred; no hosted deployment or channel proof has been accepted.
+2026-08-21 continuation now proves custody of four separately revocable,
+one-year Personal Vercel project-scoped credentials, the two exact GitHub
+Production secrets, and the three exact drift artifacts. Hosted drift run
+`32440487569` is rejected as a false green because Bun printed help and exited
+zero without running the report command or creating a receipt. The workflow
+and authority fixture now require the executable argument order plus receipt
+readback. Automatic deployment and channel proof remain unproved.
 
 ### Vercel credential boundary correction (2026-08-20)
 
@@ -42,8 +45,8 @@ tokens after `Cooper Corbett's projects` is selected. That direct UI readback
 supersedes the earlier 2026-08-20 REST-catalog conclusion that the ordinary
 token-creation contract had no project scope. The REST endpoint remains a
 team/user-scoped API surface; it is not evidence that the dashboard flow lacks
-project scope. The accepted design therefore uses four separately revocable,
-90-day dashboard tokens in the admitted Personal Vercel team: one
+project scope. The accepted design therefore uses four separately revocable
+dashboard tokens in the admitted Personal Vercel team: one
 project-scoped Production token and one project-scoped drift token for each
 exact Bundjil project. Every command must decode the branded project ID, select
 its matching token binding, and prove that the assigned project reads while
@@ -51,6 +54,11 @@ the sibling project is denied before 1Password or GitHub custody. A token
 without that exact provider scope, an account-wide token, or a team-scoped
 fallback is rejected. This correction preserves the Personal team access
 qualification above; it changes the credential-scope conclusion only.
+
+The first continuation used 90-day credentials. Cooper then approved replacing
+all four with one-year credentials. The current tokens expire on 21 August
+2027; the earlier 18 November 2026 custody packet remains historical evidence
+for the replaced values.
 
 An accepted push is a `push` event for `refs/heads/main` whose exact SHA has a
 successful `CI` workflow run. A successful pull-request check, local
@@ -86,18 +94,18 @@ acceptance, or historical conversation into a stronger live claim.
 
 ## Evidence epoch
 
-| Evidence                      | Current identity                                                                                                                                                                                                                                                                                                                                            | Claim limit                                                                                                             |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Bundjil source                | Draft PR `#5` owns branch `codex/automatic-production-effect-runtime`; its exact current head must be read from GitHub at action time. `origin/main` remains the historical starting identity `5c3c7db240a7abd9bb57ad560bdd8958af4ea701` until merge readback proves otherwise.                                                                             | Candidate routing and starting-main identity only; this prose is not a current-head assertion.                          |
-| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                                                                                                                                          | Historical acceptance of the starting SHA, not future deployment proof.                                                 |
-| GitHub controls               | Admin principal `crcorbett`; active ruleset `20616946` requires a pull request, strict `verify` status and non-fast-forward updates on the default branch with no bypass; `Production` permits protected branches with no human reviewer or wait; Production has exactly the two named Vercel secrets and infrastructure-read-only-preview has zero secrets | Point-in-time metadata/readback only; source, custody and settings do not prove a future run.                           |
-| Drift state credential        | A personal Cloudflare account token is active through `2026-11-11T06:11:42Z`, scoped only to Object Read & Write for `bundjil-alchemy-state`, stored as personal Bundjil 1Password item `dylpugrxetztdr76qruqtxonie`; one S3 list under `bundjil/v1` succeeded; the token value is intentionally redacted                                                   | Credential and exact-bucket read proof only; it is not GitHub custody, a complete drift environment, or a drift result. |
-| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                            | Current metadata observation; no mutation authority or future state.                                                    |
-| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                                                       | Current metadata observation; no mutation authority or future state.                                                    |
-| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                                                                       | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.                              |
-| Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                                                                      | Desired provider configuration only; live Terra High remains unproved until automatic deployment.                       |
-| Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                                                                                | Desired/source and provider-link observation only.                                                                      |
-| GitHub action runtimes        | Hosted PR `#5` CI run `31617632184` passed at exact source `5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc` with the reviewed checkout `v7.0.1` and setup-node `v7.0.0` commits; check `94184307855` returned zero annotations.                                                                                                                                   | Exact candidate action execution only; it does not prove later runs or upstream safety.                                 |
+| Evidence                      | Current identity                                                                                                                                                                                                                                                                                                                                                                         | Claim limit                                                                                                             |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Bundjil source                | Draft PR `#5` owns branch `codex/automatic-production-effect-runtime`; its exact current head must be read from GitHub at action time. `origin/main` remains the historical starting identity `5c3c7db240a7abd9bb57ad560bdd8958af4ea701` until merge readback proves otherwise.                                                                                                          | Candidate routing and starting-main identity only; this prose is not a current-head assertion.                          |
+| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                                                                                                                                                                       | Historical acceptance of the starting SHA, not future deployment proof.                                                 |
+| GitHub controls               | Admin principal `crcorbett`; active ruleset `20616946` requires a pull request, strict `verify` status and non-fast-forward updates on the default branch with no bypass; `Production` permits protected branches with no human reviewer or wait; Production has exactly the two named Vercel secrets and `infrastructure-read-only-preview` has exactly the three named drift artifacts | Point-in-time metadata/readback only; source, custody and settings do not prove a future run.                           |
+| Drift state credential        | A personal Cloudflare account token is active through `2026-11-11T06:11:42Z`, scoped only to Object Read & Write for `bundjil-alchemy-state`, stored as personal Bundjil 1Password item `dylpugrxetztdr76qruqtxonie`; one S3 list under `bundjil/v1` succeeded; the token value is intentionally redacted                                                                                | Credential and exact-bucket read proof only; it is not GitHub custody, a complete drift environment, or a drift result. |
+| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                                                         | Current metadata observation; no mutation authority or future state.                                                    |
+| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                                                                                    | Current metadata observation; no mutation authority or future state.                                                    |
+| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                                                                                                    | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.                              |
+| Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                                                                                                   | Desired provider configuration only; live Terra High remains unproved until automatic deployment.                       |
+| Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                                                                                                             | Desired/source and provider-link observation only.                                                                      |
+| GitHub action runtimes        | Hosted PR `#5` CI run `31617632184` passed at exact source `5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc` with the reviewed checkout `v7.0.1` and setup-node `v7.0.0` commits; check `94184307855` returned zero annotations.                                                                                                                                                                | Exact candidate action execution only; it does not prove later runs or upstream safety.                                 |
 
 `observedAt` timestamps and sanitized fingerprints belong in the active plan and
 dated proof packet. Secret values, message content, phone identities, OAuth
@@ -271,7 +279,7 @@ promotion.
 
 ### Credential and environment custody
 
-- Create four separate 90-day Vercel dashboard tokens in Personal team
+- Create four separate one-year Vercel dashboard tokens in Personal team
   `team_1LX7ZujbijowTv8J9k0aU7nD`: the two named Production tokens and the two
   named drift tokens, with each token scoped to exactly one of
   `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN` or
@@ -428,36 +436,43 @@ metadata and values in the personal `bundjil` 1Password vault, install the
 complete custody package, and gather new hosted evidence. Existing repository
 checks and the personal Cloudflare credential are not substitutes.
 
-## 2026-08-21 custody continuation and Preview Photon stop
+## 2026-08-21 custody continuation and hosted false-green correction
 
-The successor continuation completed the four-token Vercel custody slice under
-the exact Personal team. The four 90-day dashboard credentials expire on
-2026-11-18 and are named `bundjil-production-agent-2026-08-20`,
-`bundjil-production-proxy-2026-08-20`, `bundjil-drift-agent-2026-08-20`, and
-`bundjil-drift-proxy-2026-08-20`. Each token was tested before custody: its
+The successor continuation replaced the earlier four-token custody slice under
+the exact Personal team. The four one-year dashboard credentials expire on
+2027-08-21 and are named `bundjil-production-agent-2026-08-21`,
+`bundjil-production-proxy-2026-08-21`, `bundjil-drift-agent-2026-08-21`, and
+`bundjil-drift-proxy-2026-08-21`. Each token was tested before custody: its
 assigned project returned HTTP 200 and the sibling project returned HTTP 404.
 The values were then stored as concealed fields in the personal `bundjil`
 1Password vault with the exact project, team, expiry, purpose and revocation
-owner. The dashboard exposed no token ID or fingerprint, so the custody record
-retains that limitation rather than inventing one.
+owner. Each item stores a SHA-256 fingerprint prefix; the dashboard exposed no
+provider token ID.
 
 The two Production values are now held by the exact GitHub `Production`
 environment under `BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN` and
 `BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN`. Metadata-only readback confirms the
 four existing Production variables, ruleset `20616946`, and protected-branch
-environment `18184147018`; no human reviewer or wait timer was added. The
-`infrastructure-read-only-preview` environment still has zero secrets.
+environment `18184147018`; no human reviewer or wait timer was added.
 
-The drift continuation stops before artifact construction. The adopted R2
-Preview state identifies the isolated Photon project, and Vercel metadata shows
-Preview Photon variable names, but no Preview Photon secret is present in the
-approved personal vault or local custody. The existing `Bundjil Preview`
-1Password item is a Codex OAuth profile, not Photon. The source/Production
-Photon pair cannot be substituted. Vercel environment values are write-only at
-this boundary, so none was decrypted or copied. Consequently no drift artifact
-was installed, no report-only Infrastructure Drift run was dispatched, and no
-automatic Production push or deployment was attempted. The bounded evidence is
-[`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
+The exact Preview Photon credential is now present in the personal `bundjil`
+vault. The static authority, 155-resource Preview manifest at digest
+`307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60`, and
+Schema-decoded provider/state environment were installed as exactly the three
+required `infrastructure-read-only-preview` secrets. No secret value entered
+repository evidence.
+
+Manual drift run `32440487569` checked out
+`c154d725372617c699538629712569518ee18099` and finished green, but its log
+contains Bun help instead of a drift summary. The workflow passed
+`--env-file` before `run`; Bun exits zero in that form without selecting the
+script. No report or receipt readback followed, so the run proves only hosted
+custody and the false-green defect. The workflow now uses `bun run --env-file`
+and an always-run receipt readback that fails when the receipt is absent. The
+authority audit has independent negative fixtures for both the bad argument
+order and missing receipt check. A corrected hosted run is still required
+before accepting drift. The rejected run is retained in
+[`automatic-production-personal-vercel-drift-false-green-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-drift-false-green-2026-08-21.json).
 
 ## Documentation impact ledger
 

@@ -49,7 +49,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-21 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment, the four exact non-secret variables, and exactly two named Production Vercel secrets. Four separately revocable 90-day Personal dashboard tokens were created for the exact agent/proxy projects, each passed assigned-project HTTP 200 and sibling-project HTTP 404 before custody, and each is concealed in the personal bundjil 1Password vault. No accepted main SHA has yet run through the workflow_run writer, so automatic Production proof remains inconclusive. The current packet is docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json."
+        "evidence": "GitHub readback on 2026-08-21 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment, the four exact non-secret variables, and exactly two refreshed Production Vercel secrets. Four separately revocable one-year Personal dashboard tokens expire on 2027-08-21, each passed assigned-project HTTP 200 and sibling-project HTTP 404 before custody, and each is concealed with a fingerprint prefix in the personal bundjil 1Password vault. No accepted main SHA has yet run through the workflow_run writer, so automatic Production proof remains inconclusive. The earlier 90-day packet remains historical and the active plan owns the current continuation."
       }
     },
     {
@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-21 confirms the infrastructure-read-only-preview environment still has zero secrets. The four Personal Vercel drift/Production tokens are in separate concealed personal bundjil 1Password items and all four assigned-project/sibling-denial tests passed. The drift package remains intentionally absent because no approved Preview Photon secret is available; the Codex OAuth profile in Bundjil Preview is not Photon, the source Production pair is not a substitute, and Vercel sensitive values were not decrypted. No three artifacts or hosted report-only run exists. Current packet: docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json."
+        "evidence": "GitHub readback on 2026-08-21 confirms exactly the three named drift artifacts, distinct one-year project-scoped drift credentials, the approved Preview Photon credential and the 155-resource manifest digest 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60. Manual run 32440487569 checked out c154d725372617c699538629712569518ee18099 but is rejected because Bun printed help and no drift report or receipt was produced. The workflow and authority fixtures now require executable Bun argument order plus receipt readback; a corrected hosted receipt is still pending. Current packet: docs/evidence/verification/packets/automatic-production-personal-vercel-drift-false-green-2026-08-21.json."
       }
     },
     {

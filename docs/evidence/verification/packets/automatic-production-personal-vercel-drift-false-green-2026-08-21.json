@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "approval_gated",
+  "status": "failed",
+  "outcome": "failed",
+  "lifecycle": {
+    "state": "failed"
+  },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "GitHub Infrastructure Drift workflow run 32440487569"
+  },
+  "candidate": {
+    "repositoryCommit": "c154d725372617c699538629712569518ee18099",
+    "sourceDigest": "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+    "artifactDigest": "0a46db233d3a2dfcc598643138f77119a0d92c0d8fdd18df98c216de5faa71de"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Supervised Personal Vercel, personal 1Password and crcorbett/bundjil GitHub continuation",
+    "externalAccess": "mutation",
+    "approvalReceipt": "Approved exact-project credential creation, custody, hosted report-only drift and bounded proof",
+    "rollbackOwner": "Bundjil personal GitHub and provider operator"
+  },
+  "environment": {
+    "tier": "external",
+    "target": "GitHub infrastructure-read-only-preview and exact Personal Preview providers"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "status": "failed",
+      "oracle": "Run 32440487569 is rejected because its log contains Bun help and no Schema-valid report or receipt readback."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Dispatch Infrastructure Drift from main at c154d725372617c699538629712569518ee18099",
+    "outcome": "failed",
+    "exitCode": 0,
+    "invariant": "A green hosted result counts only when the executable report command produces and reads back its Schema-valid bounded receipt",
+    "target": "alchemy:BundjilInfrastructure:preview",
+    "recoveryHint": "Push the verified bun run --env-file correction with the receipt existence/readback control, then require one genuine hosted receipt on its exact source",
+    "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-drift-false-green-2026-08-21.json",
+    "detailSha256": "0a46db233d3a2dfcc598643138f77119a0d92c0d8fdd18df98c216de5faa71de",
+    "postcondition": "Credential and GitHub custody exist, but no drift report, receipt, provider read or zero-write claim is accepted"
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "GitHub run and job metadata plus hosted log readback prove the false-green execution path"
+  },
+  "postconditions": [
+    "Four one-year project-scoped Vercel credentials expire on 2027-08-21 and passed assigned-project HTTP 200 plus sibling-project HTTP 404 before custody.",
+    "GitHub Production contains exactly two refreshed Production secrets and infrastructure-read-only-preview contains exactly three drift artifacts.",
+    "Run 32440487569 used source c154d725372617c699538629712569518ee18099, showed Bun help and produced no accepted receipt.",
+    "The local correction requires executable Bun ordering and fails when receipt readback is absent."
+  ],
+  "limitations": [
+    "The GitHub conclusion is green even though the accepted journey failed.",
+    "No hosted receipt exists for this run, so source SHA, manifest digest and provider-writes:0 are not carried through an accepted output.",
+    "The corrected workflow remains local until the verified successor is pushed."
+  ],
+  "nonClaims": [
+    "This packet does not prove no drift, provider availability, zero writes, repair, automatic Production deployment, immutable deployments, aliases, health, Terra High, Eve behaviour, delivery or handset state.",
+    "No credential value, provider payload or protected environment value is retained."
+  ],
+  "rollback": {
+    "identity": "No provider rollback is required. Disable the exact workflow and revoke the drift-only environment credentials if control rollback is required.",
+    "outcome": "ready",
+    "owner": "Bundjil personal GitHub and provider operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-personal-vercel-drift-false-green-2026-08-21.json",
+      "sha256": "0a46db233d3a2dfcc598643138f77119a0d92c0d8fdd18df98c216de5faa71de",
+      "provenance": "Authenticated GitHub metadata and hosted log readback, plus metadata-only Vercel, 1Password and GitHub custody checks"
+    }
+  ],
+  "observedAt": "2026-08-21T02:37:51Z"
+}

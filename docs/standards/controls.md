@@ -78,8 +78,10 @@ The infrastructure drift control is
 It records its signal, durable state, exact read-only authority, convergence,
 proof, bounded failure, repair owner, cost, review trigger, stop/rollback,
 retirement, and disconfirming evidence against the fixed control-record
-contract. A workflow file, green command, run count, or local fixture cannot
-promote it beyond `report_only`.
+contract. The authority audit requires Bun's executable `run --env-file`
+argument order and a non-empty receipt readback, so help text with exit zero
+cannot count as a drift run. A workflow file, green command, run count, or
+local fixture cannot promote it beyond `report_only`.
 
 ## Report-only freshness
 

@@ -11,14 +11,14 @@ review_trigger: Vercel credential custody, GitHub environment custody, drift art
 
 ## Status
 
-The four 90-day project-scoped Personal Vercel credentials are created,
+The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`
 1Password vault. The two Production credentials are installed in the exact
-GitHub `Production` environment. The drift environment is intentionally empty:
-approved Preview Photon custody is missing, so no incomplete artifact or
-report-only run has been attempted. The current bounded result is the
-inconclusive packet
-[`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
+GitHub `Production` environment. The Preview Photon credential and exactly
+three drift artifacts are installed in `infrastructure-read-only-preview`.
+Run `32440487569` is rejected because Bun showed help and exited zero without
+running drift or producing a receipt. The corrected workflow and negative
+authority fixtures are now the active repository slice.
 
 ## Exact scope
 
@@ -30,20 +30,26 @@ inconclusive packet
 
 ## Milestones
 
-- [x] Create four separately revocable 90-day dashboard credentials with exact
-      project scope and expiry `2026-11-18`.
+- [x] Replace the four credentials with separately revocable one-year
+      dashboard credentials with exact project scope and expiry `2027-08-21`.
 - [x] Prove assigned-project HTTP 200 and sibling-project HTTP 404 for every
       credential before custody.
 - [x] Store concealed values and sanitised metadata in four exact 1Password
-      items; the dashboard exposed no token ID or fingerprint.
+      items with local SHA-256 fingerprint prefixes; the dashboard exposed no
+      provider token ID.
 - [x] Install the two named Production secrets and read back only names.
 - [x] Read back the Production variables, ruleset `20616946`, and environment
       protection; no human approval or wait timer was added.
-- [x] Confirm the drift environment remains empty and retain the stop.
-- [ ] Obtain an approved Preview Photon credential without reading a Vercel
-      sensitive environment value or substituting the source/Production pair.
-- [ ] Build the three Schema-decoded drift artifacts, install them, dispatch
-      one report-only run, and retain a successful zero-write receipt.
+- [x] Confirm the approved Preview Photon credential in the exact personal
+      vault without reading a Vercel sensitive environment value.
+- [x] Build and install exactly three Schema-decoded drift artifacts from the
+      distinct drift pair, Preview Photon credential and accepted R2 state.
+- [x] Reject run `32440487569` as a false green because no report or receipt
+      was produced despite the green GitHub result.
+- [x] Correct the Bun argument order and require receipt readback; add negative
+      authority fixtures for both false-green paths.
+- [ ] Push the verified correction and require one genuine hosted zero-write
+      receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
       Production path, exact deployments, stable aliases, health, Terra High,
       rollback readiness, and bounded downstream claims.
@@ -58,28 +64,31 @@ inconclusive packet
 
 ## Stop and rollback
 
-Stop before drift artifact construction when the Preview Photon secret is not
-in approved custody. Do not decrypt or copy a Vercel environment value, use the
-source/Production Photon pair, install an incomplete artifact, or dispatch a
-known-failed run. Each Vercel token can be revoked separately; the two GitHub
-Production secret names can be removed under the same exact environment
-authority. No deployment rollback is needed because no deployment was
-attempted in this continuation.
+Stop when an artifact, project binding, source SHA, report file, receipt file,
+provider read or zero-write claim is missing. Do not accept a green workflow
+result without the Schema-valid receipt. Each Vercel token can be revoked
+separately; the two GitHub Production secrets and three drift artifacts can be
+removed under their exact environment authorities. No deployment rollback is
+needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                                   | Decision        | Owner/readback                                                                                          |
-| ----------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger                      | Change required | Current custody, drift stop and deferred deployment result recorded in the canonical owners.            |
-| Authority and automation registers        | Change required | GitHub/Vercel custody and current external readback updated without storing values.                     |
-| Runbook                                   | Change required | Report-only precondition now stops before artifact construction when Preview Photon custody is missing. |
-| Verification packet and router            | Change required | Dated detail preserves exact IDs, counts, names, limits and non-claims.                                 |
-| Workflow, Effect code and provider values | Preserve        | No repository runtime or provider value was changed in this continuation.                               |
-| Root/app README and architecture          | Preserve        | No public command or stable architecture boundary changed.                                              |
+| Surface                            | Decision        | Owner/readback                                                                                           |
+| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current one-year custody, installed drift package and rejected false green are recorded.                 |
+| Authority and automation registers | Change required | GitHub/Vercel custody and false-green readback are updated without storing values.                       |
+| Runbook                            | Preserve        | It already requires a Schema-valid receipt; the executable workflow and authority oracle were defective. |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.            |
+| Workflow and authority fixtures    | Change required | Correct Bun ordering and make receipt existence/readback an executable postcondition.                    |
+| Effect code and provider values    | Preserve        | No provider adapter or provider value is changed by the false-green correction.                          |
+| Root/app README and architecture   | Preserve        | No public command or stable architecture boundary changed.                                               |
 
 ## Verification status
 
-Focused JSON, documentation, authority, controls, skills and full repository
-checks must pass after these documentation/evidence changes. External claims
-remain separated: repository proof does not prove hosted drift, deployment,
-provider behaviour, delivery, handset state or future runs.
+Focused JSON, documentation, authority, controls and skills checks pass. The
+full repository verification passes with the documented process-local
+synthetic Executor configuration: 138 boundary tests, formatting/lint, nine
+workspace type checks and all 15 workspace test tasks passed; the Agent suite
+passed 80 tests. External claims remain separated: repository proof does not
+prove hosted drift, deployment, provider behaviour, delivery, handset state or
+future runs.

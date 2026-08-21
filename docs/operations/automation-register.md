@@ -77,11 +77,11 @@ Its identity classification is superseded by the 2026-08-20 read-only
 projects. The primary contact email does not define Vercel resource scope.
 The accepted read-only correction packet is
 [`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
-The 2026-08-21 custody readback then proved four separately revocable,
-project-scoped 90-day tokens, assigned-project HTTP 200/sibling HTTP 404
-tests, four concealed personal `bundjil` 1Password items, and exactly the two
-Production GitHub secret names. It did not prove a deployment; the current
-bounded result is
+The later 2026-08-21 custody readback proved four replacement one-year,
+project-scoped tokens, assigned-project HTTP 200/sibling HTTP 404 tests, four
+concealed personal `bundjil` 1Password items with fingerprint prefixes, and
+exactly the two refreshed Production GitHub secret names. It did not prove a
+deployment; the earlier 90-day result remains in
 [`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
@@ -115,16 +115,17 @@ bounded result is
 
 ### Preview infrastructure drift — report-only automation
 
-The report-only source remains admitted, while hosted execution is deferred
-until its complete credential package is installed. Exact-head run
-`31677769897` failed closed before provider reporting because the three custody
-artifacts were absent; it proves missing custody only, not drift. The
-2026-08-21 readback proves custody and project isolation for the four Vercel
-tokens, but the package is still incomplete because no approved Preview Photon
-secret is available. The Bundjil Preview item is a Codex OAuth profile, the
-source Production Photon pair cannot be substituted, and Vercel sensitive
-environment values remain write-only at this boundary. Resume still requires
-that secret plus the three artifacts and one genuine report-only hosted receipt.
+The report-only source remains admitted. The exact Preview Photon credential,
+R2 state access, distinct project-scoped drift tokens, static authority and
+155-resource manifest are now installed as exactly the three environment
+artifacts. Manual run `32440487569` checked out
+`c154d725372617c699538629712569518ee18099` and finished green, but it did not
+run drift: `bun --env-file … run …` printed help and exited zero, and the
+workflow had no receipt readback. This is a rejected false green. The corrected
+workflow places Bun's `run` argument before `--env-file`, requires a non-empty
+receipt and prints the Schema-valid sanitised receipt. The authority audit
+rejects both the bad argument order and missing receipt check. A corrected
+hosted receipt remains required before acceptance.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

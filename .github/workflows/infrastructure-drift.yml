@@ -72,4 +72,12 @@ jobs:
             "$RUNNER_TEMP/bundjil-infrastructure-drift.env"
 
       - name: Report Preview drift without repair
-        run: bun --env-file "$RUNNER_TEMP/bundjil-infrastructure-drift.env" run infrastructure:drift-report
+        run: bun run --env-file "$RUNNER_TEMP/bundjil-infrastructure-drift.env" infrastructure:drift-report
+
+      - name: Read back sanitised drift receipt
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
+          jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
