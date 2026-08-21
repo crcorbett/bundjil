@@ -196,7 +196,10 @@ excludes custom targets from Bundjil Preview and Production observations.
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
-  SHA, static authority fingerprint, and manifest digest. Source review and a local run prove neither
+  SHA, static authority fingerprint, and manifest digest. The always-run log
+  readback may expose only grouped non-accepted resource kind, category,
+  disposition and count plus the bounded receipt; it does not print resource
+  fingerprints or provider values. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the

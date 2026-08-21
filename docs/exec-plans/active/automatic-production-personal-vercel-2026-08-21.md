@@ -149,17 +149,17 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                                                                   |
-| ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                 |
-| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                        |
-| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                  |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                    |
-| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, and require receipt readback.                                            |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.                                                |
-| Provider adapters and values       | Change required | Vercel reads Marketplace attachment hints only from exact-project metadata; retained database identity is a non-claim and values stay concealed. |
-| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                           |
-| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                     |
+| Surface                            | Decision        | Owner/readback                                                                                                                                                    |
+| ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                                  |
+| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                                         |
+| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                                   |
+| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                                     |
+| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, require receipt readback, and group non-accepted findings without values or fingerprints. |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage without printing values.                                                                 |
+| Provider adapters and values       | Change required | Vercel reads Marketplace attachment hints only from exact-project metadata; retained database identity is a non-claim and values stay concealed.                  |
+| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                            |
+| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                                      |
 
 ## Verification status
 

@@ -486,7 +486,11 @@ The desired GitHub workflow is `.github/workflows/infrastructure-drift.yml`.
 It is limited to same-repository pull requests, one weekly schedule, and manual
 dispatch; uses `contents: read`, one protected read-only Preview environment,
 exact secret artifacts, bounded concurrency, and a 20-minute timeout; and
-executes only the report command. Workflow source does not prove the GitHub
+executes only the report command. Its always-run readback prints a grouped
+summary of non-accepted resource kind, category, disposition and count before
+the bounded receipt. It omits resource fingerprints and all provider values so
+a failed hosted run can be diagnosed without widening disclosure. Workflow
+source does not prove the GitHub
 environment, secret metadata, settings, a hosted run, or alert delivery.
 Current external settings and any hosted qualification require fresh
 authenticated readback under the authority model. Rollback is to disable the

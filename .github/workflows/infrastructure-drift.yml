@@ -83,5 +83,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_REPORT_PATH"
           test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
+          jq -c '{
+            schemaVersion,
+            status,
+            counts,
+            groupedFindings: (
+              [.findings[] | select(.disposition != "accepted")]
+              | sort_by(.resourceKind, .category, .disposition)
+              | group_by(.resourceKind, .category, .disposition)
+              | map({
+                  resourceKind: .[0].resourceKind,
+                  category: .[0].category,
+                  disposition: .[0].disposition,
+                  count: length
+                })
+            )
+          }' "$BUNDJIL_INFRASTRUCTURE_DRIFT_REPORT_PATH"
           jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
