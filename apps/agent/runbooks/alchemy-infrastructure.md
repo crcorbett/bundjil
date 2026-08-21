@@ -477,10 +477,10 @@ Before every run:
    A native provider-read failure may also emit only its closed typed error
    name and closed typed reason, never its message, request, response, URL,
    headers, provider payload, credential, or other underlying value. None is
-   repair authority. When a read-only Photon project or Vercel deployment
-   observation differs from persisted state, its provider adapter may emit only
-   a closed boolean map of changed field names. It must not emit either the old
-   or current values, resource identity, request, response or credential.
+   repair authority. A read-only Photon project metadata change is a report,
+   not repair authority. An equivalent Vercel deployment observation retains
+   its persisted representation so legacy-only state fields do not create
+   false drift; every current typed deployment field must still match.
    Missing or stale runs, signed-ingress/replay/send/typing failures,
    Photon inventory/billing failures, and report failures are operator signals;
    Photon exposes no alert-policy or persistent delivery-log management API,

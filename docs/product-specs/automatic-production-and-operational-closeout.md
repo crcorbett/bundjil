@@ -549,6 +549,15 @@ transport now decodes arbitrary non-empty target names and explicitly excludes
 custom targets from the closed Bundjil Preview/Production model. A fixture
 proves `staging` is ignored rather than rejected or relabelled.
 
+Exact-source run `32452367518` completed every provider read and emitted a
+Schema-valid zero-write receipt. Its closed, value-free diagnostic proved that
+the Photon project changed only `profileConfigured`, while every typed field on
+all 37 changed Vercel deployment observations matched persisted state. The
+deployment changes are therefore legacy-only saved-shape churn. Equivalent
+deployment observations retain their persisted representation; the real
+read-only Photon metadata change remains a non-repair report. The 44 Vercel
+write-only secret revisions remain inconclusive and are not promoted to pass.
+
 ## Documentation impact ledger
 
 | Surface                                       | Decision                                                                 | Earliest owner and evidence                                                                                                                                                            |

@@ -190,6 +190,7 @@ export const InfrastructureDriftCategory = Schema.Literals([
   "unknownSecretRevision",
   "skippedProviderRead",
   "deploymentDrift",
+  "readOnlyObservationChange",
   "desiredStatePlanChange",
 ]);
 export type InfrastructureDriftCategory =
@@ -345,6 +346,11 @@ const categoryFor = (observation: InfrastructureDriftObservation) =>
       () => InfrastructureDriftCategory.make("deploymentDrift")
     ),
     Match.when(
+      ({ action, resourceKind }) =>
+        resourceKind === "photonProjectObservation" && action === "drifted",
+      () => InfrastructureDriftCategory.make("readOnlyObservationChange")
+    ),
+    Match.when(
       ({ ownership }) => ownership === "Unowned",
       () => InfrastructureDriftCategory.make("unownedResource")
     ),
@@ -378,6 +384,9 @@ const dispositionFor = (
       InfrastructureDriftDisposition.make(
         observation.baselineDisposition === "accepted" ? "accepted" : "report"
       )
+    ),
+    Match.when("readOnlyObservationChange", () =>
+      InfrastructureDriftDisposition.make("report")
     ),
     Match.when(
       (value) =>

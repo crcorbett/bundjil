@@ -24,7 +24,7 @@ import { Unowned } from "alchemy/AdoptPolicy";
 import { isResolved } from "alchemy/Diff";
 import * as Provider from "alchemy/Provider";
 import { Resource as makeResource } from "alchemy/Resource";
-import { Console, Effect, Layer, Match, Schema } from "effect";
+import { Effect, Layer, Match, Schema } from "effect";
 
 import type {
   PhotonBillingObservationAttributes,
@@ -165,31 +165,13 @@ export const layerPhotonReadOnlyProviders = (scope: PhotonInventoryScope) => {
       const attributes = yield* Match.value(observed).pipe(
         Match.tag("Missing", () => Effect.succeed(missingPhotonResource)),
         Match.tag("Found", ({ attributes }) =>
-          Effect.gen(function* diagnosePhotonProjectObservation() {
-            const current = PhotonProjectAttributesSchema.make({
+          Effect.succeed(
+            PhotonProjectAttributesSchema.make({
               stage: olds.stage,
               ...attributes,
               ownership: "Unowned",
-            });
-            if (output !== undefined) {
-              const changedFields = {
-                name: output.name !== current.name,
-                ownership: output.ownership !== current.ownership,
-                profileConfigured:
-                  output.profileConfigured !== current.profileConfigured,
-                projectId: output.projectId !== current.projectId,
-                slug: output.slug !== current.slug,
-                stage: output.stage !== current.stage,
-              };
-              if (Object.values(changedFields).some(Boolean)) {
-                yield* Console.info({
-                  changedFields,
-                  diagnostic: "photonProjectObservationDrift",
-                });
-              }
-            }
-            return current;
-          })
+            })
+          )
         ),
         Match.exhaustive
       );

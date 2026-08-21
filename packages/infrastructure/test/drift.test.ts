@@ -221,6 +221,14 @@ describe("infrastructure drift report", () => {
         resourceKind: "vercelDeploymentObservation",
       }),
     ],
+    [
+      "readOnlyObservationChange",
+      observation({
+        action: "drifted",
+        diffClass: "update",
+        resourceKind: "photonProjectObservation",
+      }),
+    ],
   ])("classifies %s from its direct observable", async (category, input) => {
     const report = await reportFor([input]);
     expect(report.findings[0]?.category).toBe(category);
@@ -233,6 +241,21 @@ describe("infrastructure drift report", () => {
     ]);
     expect(noOp.status).toBe("no_op");
     expect(failed.status).toBe("failed");
+  });
+
+  it("reports a read-only Photon project metadata change without treating it as repair authority", async () => {
+    const report = await reportFor([
+      observation({
+        action: "drifted",
+        diffClass: "update",
+        resourceKind: "photonProjectObservation",
+      }),
+    ]);
+    expect(report.status).toBe("passed");
+    expect(report.findings[0]).toMatchObject({
+      category: "readOnlyObservationChange",
+      disposition: "report",
+    });
   });
 
   it("accepts an explicitly reviewed unowned baseline without hiding its classification", async () => {

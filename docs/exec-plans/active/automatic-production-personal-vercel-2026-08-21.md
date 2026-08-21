@@ -68,6 +68,16 @@ the old team list is denied and absent from Vercel's current OpenAPI catalogue.
 The correction now uses only those project attachment hints, retains the
 accepted manifest database ID after the observable tuple matches, and records
 that the external database ID is not freshly observed.
+Exact-source run `32452367518` then completed every provider read and wrote a
+Schema-valid zero-write receipt on `d073aa33895880abf17ba8c842d3259967571549`.
+It rejected one changed Photon project observation, 37 Vercel deployment
+observations and 44 unknown write-only Vercel secret revisions. The temporary
+closed boolean diagnostic proved that only Photon `profileConfigured` changed;
+every typed Vercel deployment field matched. The 37 deployment findings are
+therefore legacy-only saved-state shape churn, not an identity or live-field
+change. The successor retains an equivalent persisted deployment observation,
+reports the real read-only Photon metadata change without repair authority, and
+keeps all 44 unknown secret revisions inconclusive.
 
 ## Exact scope
 
@@ -124,6 +134,10 @@ that the external database ID is not freshly observed.
       pairs, replace only the GitHub environment artifact, and retain run
       `32449836785` as an exact-SHA zero-write receipt that exposed the denied
       account-wide Marketplace list.
+- [x] Retain run `32452367518` as an exact-SHA zero-write failed receipt, prove
+      the one Photon metadata field and all typed Vercel deployment fields
+      without values, and replace the temporary field diagnostic with typed
+      legacy-shape normalisation plus a non-repair Photon report.
 - [ ] Push the verified correction and require one genuine hosted zero-write
       receipt on its exact source.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
@@ -156,8 +170,8 @@ needed for the rejected drift run because it executed no provider command.
 | Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                                   |
 | Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                                     |
 | Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, require receipt readback, and group non-accepted findings without values or fingerprints. |
-| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage and may name only closed changed-field booleans for read-only observations.              |
-| Provider adapters and values       | Change required | Vercel reads Marketplace attachment hints only from exact-project metadata; retained database identity is a non-claim and values stay concealed.                  |
+| Effect command code and tests      | Change required | The report boundary maps every pre-receipt failure to a fixed safe stage and classifies read-only Photon project metadata change as report-only.                  |
+| Provider adapters and values       | Change required | Vercel reads exact-project Marketplace hints and retains equivalent deployment state across legacy-only shape differences; values stay concealed.                 |
 | Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                            |
 | Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                                      |
 

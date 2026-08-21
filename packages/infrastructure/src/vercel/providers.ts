@@ -5,7 +5,7 @@ import { Unowned } from "alchemy/AdoptPolicy";
 import { isResolved } from "alchemy/Diff";
 import * as Provider from "alchemy/Provider";
 import { Resource as makeResource } from "alchemy/Resource";
-import { Array, Console, Effect, Layer, Match, Schedule, Schema } from "effect";
+import { Array, Effect, Layer, Match, Schedule, Schema } from "effect";
 
 import {
   VercelDeploymentsReadError,
@@ -67,6 +67,20 @@ const VercelEnvironmentUpdateDiff = Schema.Struct({
 const sameTargets = (left: readonly string[], right: readonly string[]) =>
   left.length === right.length &&
   left.every((target, index) => target === right[index]);
+
+const sameDeploymentObservation = (
+  left: VercelDeploymentObservationAttributesType,
+  right: VercelDeploymentObservationAttributesType
+) =>
+  left.stage === right.stage &&
+  left.teamId === right.teamId &&
+  left.projectId === right.projectId &&
+  left.deploymentId === right.deploymentId &&
+  left.gitSha === right.gitSha &&
+  left.target === right.target &&
+  left.status === right.status &&
+  sameTargets(left.aliases, right.aliases) &&
+  left.ownership === right.ownership;
 
 const sameValueOwnership = (
   left: VercelEnvironmentVariablePropsType["desired"],
@@ -731,31 +745,16 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
         );
         return yield* Match.value(observation).pipe(
           Match.tag("Missing", () => Effect.succeed(missingVercelResource)),
-          Match.tag("Found", ({ attributes }) =>
-            Effect.gen(function* diagnoseDeploymentObservation() {
-              if (output === undefined) {
-                return Unowned(attributes);
-              }
-              const changedFields = {
-                aliases: !sameTargets(output.aliases, attributes.aliases),
-                deploymentId: output.deploymentId !== attributes.deploymentId,
-                gitSha: output.gitSha !== attributes.gitSha,
-                ownership: output.ownership !== attributes.ownership,
-                projectId: output.projectId !== attributes.projectId,
-                stage: output.stage !== attributes.stage,
-                status: output.status !== attributes.status,
-                target: output.target !== attributes.target,
-                teamId: output.teamId !== attributes.teamId,
-              };
-              if (Object.values(changedFields).some(Boolean)) {
-                yield* Console.info({
-                  changedFields,
-                  diagnostic: "vercelDeploymentObservationDrift",
-                });
-              }
-              return attributes;
-            })
-          ),
+          Match.tag("Found", ({ attributes }) => {
+            if (output === undefined) {
+              return Effect.succeed(Unowned(attributes));
+            }
+            return Effect.succeed(
+              sameDeploymentObservation(output, attributes)
+                ? output
+                : attributes
+            );
+          }),
           Match.exhaustive
         );
       }),
