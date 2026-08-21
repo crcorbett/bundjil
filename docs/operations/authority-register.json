@@ -49,7 +49,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment and the four exact non-secret variables; both required Vercel secrets were absent and no mutation occurred. The 2026-08-20 read-only Executor Personal correction supersedes the former email-based identity classification: getTeams returned only team_1LX7ZujbijowTv8J9k0aU7nD (cooper-corbetts-projects / Cooper Corbett's projects) with OWNER membership, and getProjects returned exact Bundjil projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB under that team. The identity gate is cleared; token custody and automatic Production proof remain absent. The 2026-08-13 packet remains historical no-mutation evidence; the correction packet is docs/evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json."
+        "evidence": "GitHub readback on 2026-08-21 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment, the four exact non-secret variables, and exactly two named Production Vercel secrets. Four separately revocable 90-day Personal dashboard tokens were created for the exact agent/proxy projects, each passed assigned-project HTTP 200 and sibling-project HTTP 404 before custody, and each is concealed in the personal bundjil 1Password vault. No accepted main SHA has yet run through the workflow_run writer, so automatic Production proof remains inconclusive. The current packet is docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json."
       }
     },
     {
@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms the infrastructure-read-only-preview environment has zero secrets. Pull-request run 31677769897 for exact branch SHA 763199f07b6f2f0569442546e6ea7ef695c49a74 failed closed in custody preparation and skipped provider reporting. Personal Cloudflare token 8033ee98f001f2aeeb4512750f4d8f36 remains exact-bucket scoped in personal 1Password custody. The 2026-08-20 read-only Executor Personal correction confirms only Personal team team_1LX7ZujbijowTv8J9k0aU7nD with OWNER membership and both exact Bundjil projects. The former email-based identity gate is cleared, but no Vercel drift credential, GitHub artifact or hosted drift proof exists. The 2026-08-13 packet remains historical no-mutation evidence; the correction packet is docs/evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json."
+        "evidence": "GitHub readback on 2026-08-21 confirms the infrastructure-read-only-preview environment still has zero secrets. The four Personal Vercel drift/Production tokens are in separate concealed personal bundjil 1Password items and all four assigned-project/sibling-denial tests passed. The drift package remains intentionally absent because no approved Preview Photon secret is available; the Codex OAuth profile in Bundjil Preview is not Photon, the source Production pair is not a substitute, and Vercel sensitive values were not decrypted. No three artifacts or hosted report-only run exists. Current packet: docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json."
       }
     },
     {
@@ -169,7 +169,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-25 adoption receipts bind S3 state version 5, exact 106 Preview and 69 Production logical identities, deterministic no-op/sync convergence, zero Vercel/Photon transport writes, and zero credential-value matches. On 2026-08-13 personal Cloudflare token 8033ee98f001f2aeeb4512750f4d8f36 was created with exact bundjil-alchemy-state Object Read & Write scope through 2026-11-11T06:11:42Z, stored as personal Bundjil 1Password item dylpugrxetztdr76qruqtxonie, and proved by one direct S3 list under bundjil/v1."
+        "evidence": "The 2026-07-25 adoption receipts bind S3 state version 5, exact 106 Preview and 69 Production logical identities, deterministic no-op/sync convergence, zero Vercel/Photon transport writes, and zero credential-value matches. On 2026-08-13 a personal Cloudflare token was created with exact bundjil-alchemy-state Object Read & Write scope through 2026-11-11T06:11:42Z, stored as personal Bundjil 1Password item dylpugrxetztdr76qruqtxonie, and proved by one direct S3 list under bundjil/v1. The token value is intentionally redacted from this register."
       }
     },
     {

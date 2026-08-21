@@ -37,9 +37,12 @@ operation nor asserts present provider state.
   custody mutation. Its email-based identity conclusion is superseded by
   [`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json),
   which proves the Executor connection exposes only Cooper's Personal Vercel
-  team with owner access and both exact Bundjil projects. It does not create a
-  token or prove hosted execution. The hosted tasks remain deferred until a
-  successor packet records matching successful CI and
+  team with owner access and both exact Bundjil projects. The successor
+  [`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json)
+  records four project-scoped tokens, assigned-project success and sibling
+  denial, concealed 1Password custody, and the two Production GitHub secret
+  names. It does not prove hosted execution. The hosted tasks remain deferred
+  until a successor packet records matching successful CI and
   `Production` runs, exact immutable candidates, stable targets, health,
   rollback identities and live journey results, repository source proves only
   the control contract—not hosted automatic deployment or channel behavior.

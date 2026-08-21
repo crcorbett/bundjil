@@ -67,9 +67,9 @@ automation fallback.
 
 ### Production deployment — admitted post-CI automation, hosted proof deferred
 
-The source control is admitted, but its hosted proof is deferred for this
-implementation epoch. The 2026-08-13 stop occurred before any token or partial
-GitHub custody was created and is retained in
+The source control is admitted, but its hosted proof is still deferred. The
+2026-08-13 stop occurred before any token or partial GitHub custody was created
+and is retained in
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
 Its identity classification is superseded by the 2026-08-20 read-only
 `getTeams`/`getProjects` result: the connection exposes only Personal team
@@ -77,6 +77,12 @@ Its identity classification is superseded by the 2026-08-20 read-only
 projects. The primary contact email does not define Vercel resource scope.
 The accepted read-only correction packet is
 [`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
+The 2026-08-21 custody readback then proved four separately revocable,
+project-scoped 90-day tokens, assigned-project HTTP 200/sibling HTTP 404
+tests, four concealed personal `bundjil` 1Password items, and exactly the two
+Production GitHub secret names. It did not prove a deployment; the current
+bounded result is
+[`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -110,11 +116,15 @@ The accepted read-only correction packet is
 ### Preview infrastructure drift — report-only automation
 
 The report-only source remains admitted, while hosted execution is deferred
-until its credential package is installed. Exact-head run `31677769897` failed closed before
-provider reporting because the three custody artifacts were absent; it proves
-missing custody only, not drift. The 2026-08-20 Personal team/project readback
-clears the former identity gate; resume still requires the complete
-credential/artifact package.
+until its complete credential package is installed. Exact-head run
+`31677769897` failed closed before provider reporting because the three custody
+artifacts were absent; it proves missing custody only, not drift. The
+2026-08-21 readback proves custody and project isolation for the four Vercel
+tokens, but the package is still incomplete because no approved Preview Photon
+secret is available. The Bundjil Preview item is a Codex OAuth profile, the
+source Production Photon pair cannot be substituted, and Vercel sensitive
+environment values remain write-only at this boundary. Resume still requires
+that secret plus the three artifacts and one genuine report-only hosted receipt.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

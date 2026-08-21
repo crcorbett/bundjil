@@ -121,10 +121,12 @@
         "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
       },
       "docsImpact": "Refresh authority/control externalReadback fields, active plan and dated drift evidence; do not copy mutable GitHub settings into README prose.",
-      "currentResult": "Deferred without hosted execution. The 2026-08-13 stop remains valid evidence that no Vercel token, GitHub secret, ruleset, hosted drift report, deployment or channel operation was created or changed. Its identity-classification conclusion is superseded by the 2026-08-20 read-only Executor Personal getTeams/getProjects result: tools.vercel_api.user.personalvercelapi returned exactly one team, team_1LX7ZujbijowTv8J9k0aU7nD (cooper-corbetts-projects / Cooper Corbett's projects), with OWNER membership, and exact projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN (bundjil-agent) and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB (bundjil-codex-proxy). The primary contact email does not establish Tilt resource scope. The authenticated dashboard then showed an exact project selector under Cooper Corbett's projects; this supersedes the former no-project-scope conclusion. It was a read-only UI observation: no token, 1Password item, GitHub secret, denial result or hosted proof exists. The correction packet remains docs/evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json.",
+      "currentResult": "Deferred without hosted drift execution. The four named 90-day Personal dashboard tokens were created on 2026-08-20, each assigned to exactly one Bundjil project, and each passed a status-only assigned-project 200 read plus sibling-project 404 denial before custody. The values are concealed in four personal Bundjil 1Password items with exact project metadata, expiry 2026-11-18, purpose and revocation owner; the dashboard exposed no token ID or fingerprint. GitHub Production now contains exactly the two named Production secrets, while infrastructure-read-only-preview remains empty. The exact ruleset, Production variables and environment protection were read back unchanged. Drift artifact construction and hosted dispatch remain stopped because no approved Preview Photon credential is available in personal vault or local custody: the Bundjil Preview item is a Codex OAuth profile, the source Production Photon pair cannot be substituted, and Vercel sensitive environment values were not decrypted. The dated successor packet is docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
-        "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+        "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json",
+        "docs/evidence/verification/details/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json"
       ],
       "commitAfterPassing": true
     },
@@ -151,9 +153,10 @@
         "limitationsAndNonClaims": "One bounded turn does not prove all future model responses, latency or strict replay absence."
       },
       "docsImpact": "Update accepted Production proof, runbook readback, active plan and lifecycle owners; provider state remains dated evidence.",
-      "currentResult": "Deferred without execution. The 2026-08-20 team/project readback clears the former Personal Vercel identity blocker, but the complete Production credential custody has not yet been created or proved. Repository workflow and Effect deployment behavior remain implemented and locally/CI verified, but no accepted main SHA was automatically deployed or promoted by this control. Stable Terra High, immutable/stable deployment identity, rollback, and protected Eve behavior remain unproved.",
+      "currentResult": "Deferred without an accepted automatic Production run. The two Production credentials now have exact project scope, assigned-project success, sibling-project denial, personal Bundjil 1Password custody and GitHub Production secret custody. The exact main ruleset, Production variables and protected-branch environment were read back, but no accepted main SHA has been pushed through CI and the workflow_run writer because the prerequisite report-only drift custody package remains incomplete. Stable Terra High, immutable/stable deployment identity, rollback execution and protected Eve behaviour remain unproved.",
       "blockedEvidence": [
-        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json"
       ],
       "commitAfterPassing": true
     },

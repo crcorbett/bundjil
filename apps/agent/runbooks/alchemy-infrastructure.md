@@ -422,6 +422,10 @@ Before every run:
    credentials; exact project scope, sibling-denial readback, dedicated
    revocation, the read-only command graph, `contents: read`, and zero-write
    receipt are the controls.
+   If approved custody does not also contain the exact Preview Photon pair,
+   stop before constructing any artifact. Do not decrypt or copy a Vercel
+   sensitive environment value and do not substitute the source/Production
+   Photon pair.
 3. Run `bun run infrastructure:drift-report`. The command validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits
