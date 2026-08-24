@@ -72,3 +72,8 @@ Use Bun from the repository root. Read the affected app/package README and
 `docs/architecture/testing-and-quality.md` before changing a boundary. New
 apps, channels, provider integrations, or durable package boundaries require an
 approved SPEC and execution plan.
+
+Install and authenticate the Doppler CLI before running `bun run verification`.
+That friendly command always selects `bundjil/dev`, whose two inputs are the
+documented synthetic Executor fixtures. Hosted CI stays credential-free and
+calls the internal verification command with those same non-secret values.

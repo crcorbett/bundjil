@@ -292,6 +292,7 @@ const requiredPins = {
   "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
   "anthropics/claude-code-action": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
   "changesets/action": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
+  "dopplerhq/secrets-fetch-action": "451892f16195f9ac360e1a5bcbf0b5fd0e957534",
   "oven-sh/setup-bun": "0c5077e51419868618aeaa5fe8019c62421857d6",
 } as const;
 const approvedPinByAction = new Map<string, string>(
@@ -307,6 +308,10 @@ const approvedWorkflowsByAction: Readonly<Record<string, readonly string[]>> = {
   ],
   "anthropics/claude-code-action": [".github/workflows/claude.yml"],
   "changesets/action": [".github/workflows/release.yml"],
+  "dopplerhq/secrets-fetch-action": [
+    ".github/workflows/infrastructure-drift.yml",
+    ".github/workflows/production.yml",
+  ],
   "oven-sh/setup-bun": [
     ".github/workflows/ci.yml",
     ".github/workflows/infrastructure-drift.yml",
@@ -614,11 +619,7 @@ const infrastructureDriftFindings = (
   const secretReferences = [
     ...workflow.content.matchAll(/secrets\.([A-Z0-9_]+)/g),
   ].map((match) => match[1]);
-  const expectedSecrets = [
-    "BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON",
-    "BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE",
-    "BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON",
-  ];
+  const expectedSecrets = ["DOPPLER_TOKEN"];
   const issues: AuthorityFinding[] = [];
   if (!exactPermissions(permissions, { contents: "read" })) {
     issues.push(
@@ -704,11 +705,37 @@ const infrastructureDriftFindings = (
     issues.push(
       finding(
         "AUTH-DRIFT-CUSTODY",
-        "Infrastructure drift resolves exactly three bounded secret artifacts",
+        "Infrastructure drift resolves one config-scoped Doppler token",
         workflow.path,
-        "Reference only the authority, environment, and manifest secret artifacts",
+        "Reference only the environment-scoped DOPPLER_TOKEN secret",
         `Observed secret references: ${secretReferences.join(", ") || "none"}`,
-        "No provider credential value or additional secret surface is declared"
+        "Legacy provider values and unrelated secrets do not enter the workflow directly"
+      )
+    );
+  }
+  if (
+    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/.test(
+      workflow.content
+    ) ||
+    !/DRIFT_AUTHORITY_JSON:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON\s*\}\}/.test(
+      workflow.content
+    ) ||
+    !/DRIFT_ENV_FILE:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE\s*\}\}/.test(
+      workflow.content
+    ) ||
+    !/DRIFT_MANIFEST_GZIP_BASE64:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON\s*\}\}/.test(
+      workflow.content
+    ) ||
+    workflow.content.includes("inject-env-vars")
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-DOPPLER",
+        "Infrastructure drift fetches once and maps only its three named Doppler outputs",
+        workflow.path,
+        "Restore the v2.0.0 commit pin, DOPPLER_TOKEN input, three exact output mappings and output-only mode",
+        "The Doppler fetch or bounded output mapping drifted",
+        "Only the authority, environment and manifest values reach the custody step"
       )
     );
   }
@@ -729,8 +756,33 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/run:\s*bun --env-file [^\n]+ infrastructure:drift-report/.test(
+    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60/.test(
       workflow.content
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-DRIFT-MANIFEST",
+        "Infrastructure drift binds the materialised manifest to the exact accepted digest",
+        workflow.path,
+        "Restore the exact accepted Preview manifest digest",
+        "The accepted manifest digest is absent or changed",
+        "The report command decodes one manifest whose digest matches the accepted Preview state"
+      )
+    );
+  }
+  if (
+    !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report:internal/.test(
+      workflow.content
+    ) ||
+    !/printf '%s' "\$DRIFT_MANIFEST_GZIP_BASE64"\s*\\\s*\| base64 --decode\s*\\\s*\| gzip --decompress\s*\\\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"/.test(
+      workflow.content
+    ) ||
+    !workflow.content.includes(
+      'test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"'
+    ) ||
+    !workflow.content.includes(
+      `jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"`
     ) ||
     /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/i.test(
       workflow.content
@@ -741,9 +793,9 @@ const infrastructureDriftFindings = (
         "AUTH-DRIFT-MUTATION",
         "Infrastructure drift runs only the report boundary and has no repair path",
         workflow.path,
-        "Keep only infrastructure:drift-report and remove apply, repair, rollback, Photon, Production, and OIDC paths",
-        "The exact report command is absent or a prohibited mutation surface appears",
-        "The worker can plan, observe, classify, and report but cannot apply"
+        "Keep the exact manifest materialisation, Bun report command and receipt readback, and remove apply, repair, rollback, Photon, Production, and OIDC paths",
+        "The manifest materialisation, executable report command or receipt readback is absent, or a prohibited mutation surface appears",
+        "The worker must execute, classify, persist, and read back its bounded receipt without an apply path"
       )
     );
   }
@@ -764,10 +816,7 @@ const productionFindings = (
   const secretReferences = [...content.matchAll(/secrets\.([A-Z0-9_]+)/g)].map(
     (match) => match[1]
   );
-  const expectedSecrets = [
-    "BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN",
-    "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN",
-  ];
+  const expectedSecrets = ["DOPPLER_TOKEN"];
   const issues: AuthorityFinding[] = [];
   if (!exactPermissions(permissions, { contents: "read" })) {
     issues.push(
@@ -859,16 +908,47 @@ const productionFindings = (
     issues.push(
       finding(
         "AUTH-PRODUCTION-CUSTODY",
-        "Production resolves exactly two project-scoped Vercel tokens",
+        "Production resolves one config-scoped Doppler token",
         workflow.path,
-        "Reference only the agent and proxy project-scoped token secrets",
+        "Reference only the Production environment DOPPLER_TOKEN secret",
         `Observed secret references: ${secretReferences.join(", ") || "none"}`,
-        "No account-wide or unrelated secret reaches the writer"
+        "Legacy provider values and unrelated secrets do not enter the workflow directly"
+      )
+    );
+  }
+  const productionDopplerOutputs = [
+    "BUNDJIL_PRODUCTION_VERCEL_TEAM_ID",
+    "BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID",
+    "BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID",
+    "BUNDJIL_PRODUCTION_PROXY_HEALTH_URL",
+    "BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN",
+    "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN",
+  ];
+  if (
+    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/.test(
+      content
+    ) ||
+    productionDopplerOutputs.some(
+      (name) =>
+        !new RegExp(
+          `${name}:\\s*\\$\\{\\{\\s*steps\\.doppler\\.outputs\\.${name}\\s*\\}\\}`
+        ).test(content)
+    ) ||
+    content.includes("inject-env-vars")
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-DOPPLER",
+        "Production fetches once and maps only six named Doppler outputs",
+        workflow.path,
+        "Restore the v2.0.0 commit pin, DOPPLER_TOKEN input, six exact output mappings and output-only mode",
+        "The Doppler fetch or bounded output mapping drifted",
+        "Only the exact team, projects, health URL and two project tokens reach the deployment step"
       )
     );
   }
   if (
-    !/run:\s*bun run production:deploy/.test(content) ||
+    !/run:\s*bun run production:deploy:internal/.test(content) ||
     /run:[^\n]*(?:vercel\s+(?:deploy|promote|rollback)|--token)/i.test(content)
   ) {
     issues.push(
@@ -876,7 +956,7 @@ const productionFindings = (
         "AUTH-PRODUCTION-BOUNDARY",
         "Production mutations use only the repository-owned Effect command",
         workflow.path,
-        "Invoke only bun run production:deploy and keep raw Vercel/token commands out of YAML",
+        "Invoke only bun run production:deploy:internal and keep raw Vercel/token commands out of YAML",
         "The owned command is absent or a raw mutation/token path appears",
         "Schema, Config, rollback and receipt policy remain in one tested boundary"
       )

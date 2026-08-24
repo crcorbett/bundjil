@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-24
 review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
@@ -187,8 +187,12 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    must create no deployment. An eligible successful same-repository `CI`
    `workflow_run` for a `push` to `main` starts the distinct `Production`
    workflow. It checks out the event's exact head SHA without persisted Git
-   credentials and invokes only `bun run production:deploy` in the protected
-   `Production` environment. The command uses exactly two project-scoped
+   credentials, fetches `bundjil/prd` once through the exact pinned Doppler
+   action, maps six named outputs, and invokes only
+   `bun run production:deploy:internal` in the protected `Production`
+   environment. The root `production:deploy` command is the friendly Doppler
+   wrapper for an authorised operator. The operation uses exactly two
+   project-scoped
    tokens and fixed Personal team/project IDs. It reads current proxy and
    agent targets, stages both candidates using `vercel deploy --prod
 --skip-domain`, validates each immutable project/SHA/READY identity, and
@@ -199,7 +203,8 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    already-current SHA is an idempotent no-op. The repository-wide queue never
    cancels an in-flight writer. Stop on any eligibility, credential, project,
    source, readiness, alias, health, timeout, output, or rollback mismatch.
-   Do not run `production:deploy` interactively as a routine alternative.
+   Do not run either Production entrypoint interactively as a routine
+   alternative.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the
    immutable candidate URL. For the ordinary one-callback `Stable` topology,

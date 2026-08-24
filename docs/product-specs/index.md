@@ -20,7 +20,9 @@ No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-No SPEC currently has an active implementation plan.
+| SPEC                                                | Current intent                                                                                                                                       |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Doppler secret custody](doppler-secret-custody.md) | Move only proven local-verification, Preview-drift and Production-workflow inputs behind fixed Doppler configs without deployment or legacy cleanup. |
 
 ## Implemented or superseded history
 

@@ -72,7 +72,10 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-production-webhook-delete`, and
 `infrastructure:vercel-git-link-authority`. `production:deploy` is the private
 post-CI Production entrypoint. It is owned by the exact-SHA `Production`
-workflow, uses two separately revocable exact-project Vercel credentials
+workflow. The root wrapper selects `bundjil/prd` through Doppler; GitHub fetches
+that config once and maps only its six named values into the credential-neutral
+`production:deploy:internal` command. The operation uses two separately
+revocable exact-project Vercel credentials
 selected under the Personal account and proved by assigned-project access plus
 sibling-project denial, stages both apps with
 domains skipped, validates immutable candidates, promotes only while the
@@ -81,7 +84,10 @@ restores the exact prior deployments on every non-success Effect exit after
 promotion starts, including interruption and defect paths. It is not an
 operator convenience command.
 
-`infrastructure:drift-report` uses a distinct project-routed credential Layer.
+The root `infrastructure:drift-report` wrapper selects `bundjil/stg`. Its GitHub
+worker maps only the authority, environment bundle and compressed manifest into
+`infrastructure:drift-report:internal`. That operation uses a distinct
+project-routed credential Layer.
 Its environment file supplies
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
 non-empty array of unique project-ID/token bindings. The Vercel adapter selects

@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-24
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -56,7 +56,8 @@ automation fallback.
 - **Principal and authority:** the ephemeral GitHub Actions job token has only
   `contents: read`. The synthetic Executor variables are fixtures, not a
   provider identity or secret. CI has no OIDC, secret, write, deploy, release,
-  message, or approval-resume authority.
+  message, or approval-resume authority. It calls `verification:internal`
+  directly and does not receive a Doppler token.
 - **Duration and convergence:** one 30-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run.
 - **Evidence:** the GitHub check/run identity and bounded repository command
@@ -78,8 +79,10 @@ custody was created. The bounded stop is retained in
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Vercel tokens selected
-  under the Personal account, one for each exact Bundjil project. Before
+  `contents: read` plus one expiring read-only token scoped only to
+  `bundjil/prd`. The exact pinned Doppler action fetches once and maps four
+  identifiers plus exactly two separately revocable Vercel tokens into the
+  deployment step, one token for each exact Bundjil project. Before
   custody, each token must read its assigned project and receive a denied result
   for the sibling project. Exact project configuration and decoded project/SHA
   readback remain independent controls. The
@@ -112,9 +115,11 @@ Vercel principal and the complete credential/artifact package.
   schedule, or manual dispatch observe only
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.
 - **Principal and authority:** `contents: read` plus one protected
-  `infrastructure-read-only-preview` environment. Its three secret artifacts
-  contain the static fixed policy envelope, provider/state environment, and
-  accepted manifest. The environment artifact holds a distinct Schema-decoded
+  `infrastructure-read-only-preview` environment. It exposes only one expiring
+  read-only token scoped to `bundjil/stg`. The exact pinned Doppler action
+  fetches once and maps three named values into the custody step: the static
+  fixed policy envelope, provider/state environment, and accepted compressed
+  manifest. The environment artifact holds a distinct Schema-decoded
   set of unique project-ID/token bindings, one dedicated project-scoped Vercel
   token per manifest project; the Layer rejects Team scope and Production or
   broad inventory credentials are not reused. Vercel personal tokens are not
@@ -123,8 +128,8 @@ Vercel principal and the complete credential/artifact package.
   controls. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
   repository/run/attempt identity and checked-out source SHA from GitHub, and
-  the command carries those values plus the decoded manifest digest through
-  its report and receipt. The job has no OIDC, apply, reconcile, repair,
+  the command carries those values plus the fixed decoded manifest digest
+  through its report and receipt. The job has no OIDC, apply, reconcile, repair,
   deployment, promotion, Production, Photon mutation, billing, or admitted
   provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
@@ -234,6 +239,11 @@ reviews release notes and the diff from the current pin, updates the lock and
 all approved workflow locations atomically, runs `bun run check:authority` and
 `bun run verification`, and records the public Git-ref provenance. A public
 ref proves only tag/ref resolution, not action safety or hosted execution.
+
+The Doppler fetch action is fixed at
+`451892f16195f9ac360e1a5bcbf0b5fd0e957534` (`v2.0.0`) and is admitted only in
+the Preview drift and Production workflows. It may not inject the whole config
+into the job environment; each consumer step maps its exact named outputs.
 
 Unknown, floating, short, mismatched, or unregistered actions fail closed.
 Rollback restores the prior lock and workflow pins together. Compromise or

@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-24
 review_trigger: Alchemy stack, remote state, Vercel or Photon provider boundary, adoption manifest, credential, drift, apply, rollback, or revocation change
 ---
 
@@ -408,7 +408,11 @@ Before every run:
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
-2. Provide the static authority policy, manifest, provider/state environment
+2. The protected GitHub Environment holds only an expiring read-only token for
+   `bundjil/stg`. The workflow fetches that config once through the exact pinned
+   Doppler action, maps its three named outputs only into the custody step, and
+   decodes the compressed manifest before checking its accepted digest. Provide
+   the resulting static authority policy, manifest, provider/state environment
    file, output report, and bounded-receipt paths only through mode-`0600`
    custody. The environment file must contain the exact-project Vercel
    credential JSON described above, never the broad inventory token. The
@@ -419,7 +423,9 @@ Before every run:
    credentials; project scope, dedicated revocation, the read-only command
    graph, `contents: read`, and zero-write receipt are the compensating
    controls.
-3. Run `bun run infrastructure:drift-report`. The command validates the
+3. An authorised person may run `bun run infrastructure:drift-report`, whose
+   friendly root wrapper selects `bundjil/stg`. GitHub must call only
+   `bun run infrastructure:drift-report:internal`. The operation validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits
    only classified metadata. It never calls apply, reconcile, repair, deploy,
