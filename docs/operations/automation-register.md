@@ -68,13 +68,26 @@ automation fallback.
 
 ### Production deployment — admitted post-CI automation, hosted run deferred
 
-The earlier personal-identity stop remains retained history. Fresh 2026-08-24
-readback used only the Personal Vercel team and proved each separate Production
-credential could read its assigned project and received `404` for the sibling.
-The `Production` GitHub Environment now also holds one expiring read-only token
+The source control is admitted, but its hosted proof is still deferred. The
+2026-08-13 stop occurred before any token or partial GitHub custody was created
+and is retained in
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+Its identity classification is superseded by the 2026-08-20 read-only
+`getTeams`/`getProjects` result: the connection exposes only Personal team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, with owner membership and both exact Bundjil
+projects. The primary contact email does not define Vercel resource scope.
+The accepted read-only correction packet is
+[`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
+The later 2026-08-21 custody readback proved four replacement one-year,
+project-scoped tokens, assigned-project HTTP 200/sibling HTTP 404 tests, four
+concealed personal `bundjil` 1Password items with fingerprint prefixes, and
+exactly the two refreshed Production GitHub secret names. It did not prove a
+deployment; the earlier 90-day result remains in
+[`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
+Fresh 2026-08-24 readback also confirmed one expiring read-only Doppler token
 for `bundjil/prd`, while the two legacy Vercel secrets and four legacy variables
-remain in place. No eligible main-push event was created, so no Production run,
-deployment or public behaviour is proved.
+remained in place. No eligible main-push event had been created at that point,
+so no Production run, deployment or public behaviour was proved.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -84,13 +97,14 @@ deployment or public behaviour is proved.
   `bundjil/prd`. The exact pinned Doppler action fetches once and maps four
   identifiers plus exactly two separately revocable Vercel tokens into the
   deployment step, one token for each exact Bundjil project. Before
-  custody, each token must read its assigned project and receive a denied result
-  for the sibling project. Exact project configuration and decoded project/SHA
-  readback remain independent controls. The
+  custody, each exact project binding must read its assigned project and receive
+  a denied result for the sibling project. Exact project configuration and
+  decoded project/SHA readback remain independent controls. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then agent, and
-  verifies stable targets and health. Tilt, account-wide credentials and raw
-  workflow mutation commands are rejected.
+  verifies stable targets and health. Unexpected teams, account-wide or
+  user-scoped credentials, team-wide project listing, and raw workflow mutation
+  commands are rejected.
 - **Duration and convergence:** one repository-wide queue never cancels an
   in-flight writer and bounds each run to 30 minutes. Already-current and stale
   candidates are explicit no-ops. A partial failure restores the exact prior
@@ -116,6 +130,14 @@ compressed-manifest digest and sanitised receipt. Native Alchemy readback
 returned the existing fail-closed `native-drift-readback-failed` result, so the
 run is correctly inconclusive and proves neither healthy provider readback nor
 drift absence.
+The report-only source remains admitted. The exact Preview Photon credential,
+R2 state access, distinct project-scoped drift tokens, static authority and
+the accepted manifest are carried as exactly three Doppler outputs. Earlier
+exact-SHA zero-write receipts narrowed custom Vercel target, Marketplace and
+historical deployment behaviour. Exact successor `f5c707c` completed every
+provider read and left eight changed environment rows inconclusive. The approved
+2026-08-24 continuation re-admits only those exact metadata rows from two
+matching read-only inventories; it does not claim their values.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
@@ -126,10 +148,16 @@ drift absence.
   fetches once and maps three named values into the custody step: the static
   fixed policy envelope, provider/state environment, and accepted compressed
   manifest. The environment artifact holds a distinct Schema-decoded
-  set of unique project-ID/token bindings, one dedicated project-scoped Vercel
-  token per manifest project; the Layer rejects Team scope and Production or
-  broad inventory credentials are not reused. Vercel personal tokens are not
-  method-level read-only, so project scope, sibling denial, independent
+  set of unique project-ID/token bindings, one separately revocable
+  project-scoped Vercel token per manifest project. The Layer rejects team-wide
+  project resolution, and Production or broad inventory credentials are not
+  reused. Token scope and decoded project binding must agree; request routing is
+  not a substitute for that scope.
+  Marketplace proof uses the exact project's environment attachment hint. The
+  denied account-wide storage list is outside this principal, and the accepted
+  manifest database ID is retained identity rather than current readback.
+  Vercel personal tokens are not method-level read-only, so exact project
+  scope, sibling denial, independent
   revocation, the read-only call graph and zero-write receipt are mandatory
   controls. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
@@ -140,13 +168,24 @@ drift absence.
   provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
-  native `sync --dry-run` remain distinct sources. Blocking drift fails;
-  unavailable, ambiguous, skipped, or unknown-secret observations are
+  native `sync --dry-run` remain distinct sources. Blocking drift fails.
+  Unavailable, ambiguous and skipped reads remain inconclusive. An unknown
+  write-only secret baseline is accepted only when the accepted manifest,
+  unchanged native result and present unchanged provider revision metadata all
+  agree; this does not prove the value. Every other unknown revision remains
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
-  SHA, static authority fingerprint, and manifest digest. Source review and a local run prove neither
+  SHA, static authority fingerprint, and manifest digest. The always-run log
+  readback may expose only grouped non-accepted resource kind, category,
+  disposition and count plus the bounded receipt; it does not print resource
+  fingerprints or provider values. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
+  Read-only Photon project metadata changes remain visible as non-repair
+  reports. Returned Vercel deployment observations must match all current typed
+  fields. Accepted historical deployment identities absent from Vercel's
+  current list are reported as unavailable history, not drift, no-op, deletion,
+  retention, or repair authority.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the
   run. Disable the workflow or revoke its read-only environment under separate

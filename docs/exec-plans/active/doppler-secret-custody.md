@@ -11,7 +11,7 @@ task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
 
 # Doppler secret custody execution plan
 
-Status: Implementation complete; PR open; cleanup deferred
+Status: Approved continuation in progress; provider correction and re-admission underway
 
 Branch: `codex/doppler-secret-ownership`
 
@@ -19,9 +19,15 @@ Base: `origin/main` at `c154d725372617c699538629712569518ee18099`
 
 Pull request: `https://github.com/crcorbett/bundjil/pull/7`
 
-Hosted state: exact-head CI run `32676441398` passed. Preview run
-`32676441344` proved Doppler fetch and custody, then failed closed with the
-recorded inconclusive native Alchemy readback. Production was not run.
+Hosted state: exact-head CI run `32676659433` passed. Preview run
+`32676659435` proved Doppler fetch and custody, then failed closed with the
+recorded inconclusive native Alchemy readback. Production has not run.
+
+Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
+`#7` green, merge only after exact-head checks pass, observe the automatic
+Production result, then remove only the exact proved-unused legacy GitHub
+copies. It does not authorise revoking an underlying Vercel credential,
+widening a permission, or claiming public behaviour without direct proof.
 
 ## Ordered work
 
@@ -33,27 +39,36 @@ recorded inconclusive native Alchemy readback. Production was not run.
 4. Run focused and full local verification, commit, push and open a PR to
    `main`.
 5. Wait for hosted checks. Record CI, Preview drift, Doppler, GitHub and Vercel
-   metadata separately. Do not run Production.
+   metadata separately.
+6. Fold the exact-project provider corrections from PR `#6` into this branch.
+   Re-admit only the eight changed Preview Vercel environment metadata rows
+   from two matching read-only inventories, keep their values as non-claims,
+   refresh the accepted manifest transport and run the full repository gate.
+7. Require exact-head CI and Preview drift success, merge PR `#7`, then observe
+   only the automatic main-push Production path. Keep immutable deployment,
+   stable target, health and public behaviour as separate claims.
+8. After independent hosted proof, remove only the five legacy GitHub secrets
+   and four legacy GitHub variables named by the inventory. Read back names.
+   Do not revoke the Vercel credentials that Doppler still supplies.
 
 ## Stop conditions
 
 Stop on a Personal/Tilt scope mismatch, repository/project/environment
 mismatch, unavailable source value, secret-value output, unexpected provider
-permission, action-pin mismatch, fork credential path, deployment trigger, or
-need to delete/revoke a legacy credential.
+permission, action-pin mismatch, fork credential path, unapproved provider
+write, changed re-admission scope, failed exact-head check, or any cleanup
+target outside the nine exact GitHub copies.
 
 ## Current limitations
 
 - Doppler OIDC is unavailable on the current Personal Developer plan.
 - The two exact Vercel projects currently report no Git repository link.
-- Existing open PR `#6` owns broader hosted drift and project-credential
-  corrections. This branch carries only its current-provider-compatible
-  compressed-manifest materialisation, exact digest, executable Bun argument
-  order and sanitised receipt readback because the migrated `stg` value already
-  uses that format. The remaining overlap is reported, not treated as merged.
-- Final-source Preview run `32676125884` proved the Doppler fetch and bounded
-  receipt but returned the same fail-closed native Alchemy readback class as
-  the open drift work. It is an inconclusive provider result, not a custody
-  failure and not drift-absence proof.
-- Production fetch and runtime/public behaviour cannot be proved without a
-  later eligible main-push CI event, which is outside this no-deploy task.
+- PR `#6`'s exact-project provider, R2, Marketplace and drift-classification
+  corrections are merged into this branch; PR `#7` now owns the combined
+  successor.
+- The eight stopped Vercel rows are live exact Preview identities whose type or
+  provider revision changed after the prior accepted manifest. Re-admission may
+  accept current metadata only after two matching read-only inventories. It
+  cannot claim a write-only value or hide a changed row.
+- Production fetch, deployment and runtime/public behaviour remain unproved
+  until the later eligible main-push CI event and their separate readbacks.

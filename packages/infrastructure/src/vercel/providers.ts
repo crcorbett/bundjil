@@ -68,6 +68,20 @@ const sameTargets = (left: readonly string[], right: readonly string[]) =>
   left.length === right.length &&
   left.every((target, index) => target === right[index]);
 
+const sameDeploymentObservation = (
+  left: VercelDeploymentObservationAttributesType,
+  right: VercelDeploymentObservationAttributesType
+) =>
+  left.stage === right.stage &&
+  left.teamId === right.teamId &&
+  left.projectId === right.projectId &&
+  left.deploymentId === right.deploymentId &&
+  left.gitSha === right.gitSha &&
+  left.target === right.target &&
+  left.status === right.status &&
+  sameTargets(left.aliases, right.aliases) &&
+  left.ownership === right.ownership;
+
 const sameValueOwnership = (
   left: VercelEnvironmentVariablePropsType["desired"],
   right: VercelEnvironmentVariablePropsType["desired"]
@@ -638,7 +652,10 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
             stage: olds.stage,
             teamId: olds.teamId,
             projectId: olds.projectId,
+            integrationId: olds.integrationId,
+            configurationId: olds.configurationId,
             resourceId: output?.resourceId ?? olds.resourceId,
+            databaseId: olds.databaseId,
           })
         );
         return yield* Match.value(observation).pipe(
@@ -706,7 +723,6 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
         "integrationId",
         "configurationId",
         "resourceId",
-        "databaseId",
       ],
     })
   );
@@ -729,11 +745,16 @@ export const layerVercelReadOnlyProviders = (scope: VercelInventoryScope) => {
         );
         return yield* Match.value(observation).pipe(
           Match.tag("Missing", () => Effect.succeed(missingVercelResource)),
-          Match.tag("Found", ({ attributes }) =>
-            Effect.succeed(
-              output === undefined ? Unowned(attributes) : attributes
-            )
-          ),
+          Match.tag("Found", ({ attributes }) => {
+            if (output === undefined) {
+              return Effect.succeed(Unowned(attributes));
+            }
+            return Effect.succeed(
+              sameDeploymentObservation(output, attributes)
+                ? output
+                : attributes
+            );
+          }),
           Match.exhaustive
         );
       }),

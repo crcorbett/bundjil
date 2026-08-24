@@ -105,9 +105,11 @@ Successful same-repository main-push CI
    named outputs required by its consumer step.
 4. Doppler receives no dummy or empty values. A missing value remains missing
    until a real consumer and source prove it is required.
-5. Existing GitHub provider secrets and variables remain in place but become
-   unconsumed. Their deletion or revocation requires a separate exact cleanup
-   after merge and independent hosted proof.
+5. Existing GitHub provider secrets and variables remain in place until merge
+   and independent hosted proof. The approved continuation may then delete only
+   the five legacy GitHub secrets and four legacy GitHub variables named by the
+   inventory. It must not revoke either underlying Vercel credential because
+   Doppler remains their active custody owner.
 6. Runtime Vercel variables, project connections, deployment provenance,
    Alchemy state and public behaviour remain separate claims. This change does
    not deploy, promote, Git-link a project, change runtime variables, mutate an
@@ -138,12 +140,12 @@ authority, controls and verification checks followed by
 `bun run verification` through `bundjil/dev`.
 
 After the PR opens, hosted CI must prove the exact PR source. Preview run
-`32676125884` already proves only the `stg` fetch and custody path; its native
-provider result is inconclusive. The `prd` fetch cannot
-be exercised without an eligible main-push CI event, which would start the
-Production deployment workflow. This task forbids that deployment, so the
-Production fetch remains repository and provider-metadata proof only until a
-later authorised merge and run.
+`32676659435` proved the `stg` fetch and custody path but correctly failed
+closed on eight changed Vercel metadata rows. The approved continuation must
+use two matching exact-project read-only inventories to re-admit only those
+rows, refresh the accepted digest and obtain exact-head CI plus Preview success.
+Only then may it merge and observe the existing automatic Production path.
+Deployment, stable target, health and public behaviour remain separate claims.
 
 ## References
 

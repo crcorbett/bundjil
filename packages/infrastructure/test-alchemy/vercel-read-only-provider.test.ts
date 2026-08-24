@@ -92,7 +92,7 @@ const fixture = Effect.gen(function* decodeVercelProviderFixture() {
         gitSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         target: "preview",
         status: "READY",
-        aliases: ["agent-preview.example.com"],
+        aliases: ["agent-preview.example.com", "agent-git.example.com"],
         ownership: "Unowned",
       },
     ],
@@ -119,6 +119,7 @@ const fixture = Effect.gen(function* decodeVercelProviderFixture() {
     return yield* Effect.die("The Vercel provider fixture is incomplete.");
   }
   return {
+    deployment,
     inventory,
     scope,
     expectedGitSha: deployment.gitSha,
@@ -170,6 +171,28 @@ const providers = Layer.merge(
   memory
 );
 const { test } = Test.make({ providers, stage: "preview" });
+
+test.provider(
+  "keeps an equivalent persisted deployment observation without legacy-field churn",
+  () =>
+    Effect.gen(function* () {
+      const provider = yield* VercelDeploymentObservationResource.Provider;
+      const output = {
+        ...decoded.deployment,
+        legacyObservation: "retained",
+      };
+      const live = yield* provider.read === undefined
+        ? Effect.die("The deployment provider does not expose read.")
+        : provider.read({
+            id: "VercelDeploymentObservation",
+            fqn: "test::VercelDeploymentObservation",
+            instanceId: "test-vercel-deployment-observation",
+            olds: decoded.props.deployment,
+            output,
+          });
+      expect(live).toEqual(output);
+    })
+);
 
 test.provider(
   "plans and adopts the complete two-project inventory without provider writes",

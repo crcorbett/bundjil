@@ -214,11 +214,26 @@ describe("infrastructure drift report", () => {
       observation({ action: "skipped", providerRead: "skipped" }),
     ],
     [
+      "historicalDeploymentUnavailable",
+      observation({
+        action: "missing",
+        resourceKind: "vercelDeploymentObservation",
+      }),
+    ],
+    [
       "deploymentDrift",
       observation({
         action: "drifted",
         diffClass: "update",
         resourceKind: "vercelDeploymentObservation",
+      }),
+    ],
+    [
+      "readOnlyObservationChange",
+      observation({
+        action: "drifted",
+        diffClass: "update",
+        resourceKind: "photonProjectObservation",
       }),
     ],
   ])("classifies %s from its direct observable", async (category, input) => {
@@ -233,6 +248,63 @@ describe("infrastructure drift report", () => {
     ]);
     expect(noOp.status).toBe("no_op");
     expect(failed.status).toBe("failed");
+  });
+
+  it("reports a read-only Photon project metadata change without treating it as repair authority", async () => {
+    const report = await reportFor([
+      observation({
+        action: "drifted",
+        diffClass: "update",
+        resourceKind: "photonProjectObservation",
+      }),
+    ]);
+    expect(report.status).toBe("passed");
+    expect(report.findings[0]).toMatchObject({
+      category: "readOnlyObservationChange",
+      disposition: "report",
+    });
+  });
+
+  it("reports an unavailable historical Vercel deployment without treating it as repair authority", async () => {
+    const report = await reportFor([
+      observation({
+        action: "missing",
+        diffClass: "unknown",
+        resourceKind: "vercelDeploymentObservation",
+      }),
+    ]);
+    expect(report.status).toBe("passed");
+    expect(report.findings[0]).toMatchObject({
+      category: "historicalDeploymentUnavailable",
+      disposition: "report",
+    });
+  });
+
+  it("accepts an unchanged write-only secret only when its reviewed metadata baseline is explicit", async () => {
+    const accepted = await reportFor([
+      observation({
+        baselineDisposition: "accepted",
+        resourceKind: "vercelEnvironmentVariable",
+        secretRevision: "unknown",
+      }),
+    ]);
+    const inconclusive = await reportFor([
+      observation({
+        baselineDisposition: "rejected",
+        resourceKind: "vercelEnvironmentVariable",
+        secretRevision: "unknown",
+      }),
+    ]);
+    expect(accepted.status).toBe("no_op");
+    expect(accepted.findings[0]).toMatchObject({
+      category: "unknownSecretRevision",
+      disposition: "accepted",
+    });
+    expect(inconclusive.status).toBe("inconclusive");
+    expect(inconclusive.findings[0]).toMatchObject({
+      category: "unknownSecretRevision",
+      disposition: "inconclusive",
+    });
   });
 
   it("accepts an explicitly reviewed unowned baseline without hiding its classification", async () => {
@@ -277,6 +349,7 @@ describe("infrastructure drift report", () => {
     const report = await reportFor([
       observation({ action: "unavailable", readback: "unavailable" }),
       observation({
+        baselineDisposition: "rejected",
         resourceKind: "vercelEnvironmentVariable",
         secretRevision: "unknown",
       }),

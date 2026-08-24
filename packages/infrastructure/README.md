@@ -76,8 +76,9 @@ workflow. The root wrapper selects `bundjil/prd` through Doppler; GitHub fetches
 that config once and maps only its six named values into the credential-neutral
 `production:deploy:internal` command. The operation uses two separately
 revocable exact-project Vercel credentials
-selected under the Personal account and proved by assigned-project access plus
-sibling-project denial, stages both apps with
+selected under the Personal account, selected by exact project binding, and
+proved by assigned-project access plus sibling-project denial. It stages both
+apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
 restores the exact prior deployments on every non-success Effect exit after
@@ -90,11 +91,41 @@ worker maps only the authority, environment bundle and compressed manifest into
 project-routed credential Layer.
 Its environment file supplies
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
-non-empty array of unique project-ID/token bindings. The Vercel adapter selects
-a redacted token only after receiving a decoded branded project ID, and the
+non-empty array of unique project-ID/token bindings. Each token is issued for
+one exact Personal Vercel project and must pass the assigned-project read and
+sibling-project denial checks before custody. The Vercel adapter selects a
+redacted token only after receiving a decoded branded project ID, and the
 Alchemy project provider observes exactly the manifest projects rather than
-listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
-limited to the separate inventory/adoption/operator paths.
+listing a whole team. `infrastructure:inventory` uses the same exact-project
+credential contract. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
+limited to legacy adoption/operator paths.
+
+Marketplace attachment reads use only each exact project's decoded
+environment `contentHint`. Project tokens cannot enumerate the account-wide
+storage list, so the adapter never calls it. The accepted manifest database ID
+is retained only after the observable integration, configuration, resource and
+project identities match; it is not a fresh database-ID readback.
+
+The accepted Preview manifest is Schema-encoded first, then held in the exact
+GitHub manifest secret as an in-memory gzip/base64 transport because the raw
+155-resource JSON exceeds GitHub's secret-size boundary. The hosted workflow
+materialises the original JSON into mode-`0600` custody before this command
+Schema-decodes it and compares it with the exact configured accepted digest;
+the transport is never a second manifest authority.
+Vercel deployment responses may also contain named custom targets. The live
+adapter decodes those provider values but admits only `preview`, `production`,
+or the provider's legacy `null` Preview target into Bundjil observations;
+custom targets such as `staging` are ignored and are never relabelled Preview.
+The drift report keeps returned deployment observations strict across every
+typed field. If Vercel no longer returns an accepted historical deployment,
+the report records unavailable history without claiming drift, deletion,
+retention or repair authority. An accepted write-only environment baseline is
+continuous only when present provider revision metadata is unchanged and the
+accepted manifest records `ObservedUnknown`; the value itself is never proved.
+If native sync cannot complete, the operator log may expose only the closed
+typed provider-read error name and reason alongside the safe phase. It never
+emits the error message, request, response, URL, headers, provider payload or
+credential.
 
 ## Claim boundary
 

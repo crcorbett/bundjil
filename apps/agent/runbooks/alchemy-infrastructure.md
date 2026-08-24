@@ -59,19 +59,21 @@ only by owning `Config.schema` boundaries:
 
 - `BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID`;
 - `BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY`;
-- `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`;
+- `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.
 
-The broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` remains an explicit inventory,
-adoption, and authorized configuration-command credential. The report-only
-hosted drift command does not use it. That command requires
-`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`: one JSON array of
+The broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` remains an explicit legacy
+adoption and authorised configuration-command credential. Current inventory
+and report-only hosted drift instead require one
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON` JSON array of
 unique exact project-ID/token bindings, decoded through Effect Schema with
-each token redacted. Each binding must use a dedicated project-scoped token,
-must read its assigned project, and must be denied by the sibling project
-before the dotenv artifact enters GitHub custody. A team-wide or account-wide
-token is not a fallback.
+each token redacted. Each binding must use a separately revocable token scoped
+to the admitted Personal Vercel team, must read back its expected team and
+assigned project, and must be bound to that exact project ID before the dotenv
+artifact enters GitHub custody. The binding is request routing, not
+project-level Vercel token isolation. A team-wide project-list operation or
+account-wide/unscoped token is not a fallback.
 
 Preview inventory, adoption, and state proof use the distinct
 `BUNDJIL_PHOTON_PREVIEW_PROJECT_ID` and
@@ -405,6 +407,10 @@ Before every run:
    A filename containing `current` is convenience custody only and is not an
    evidence owner: stop if it differs from the last accepted post-apply
    manifest or receipt.
+   The hosted workflow must set
+   `BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST` to the exact accepted digest owned
+   by that manifest. File custody without the configured digest is an invalid
+   command boundary, not provider drift.
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
@@ -414,15 +420,35 @@ Before every run:
    decodes the compressed manifest before checking its accepted digest. Provide
    the resulting static authority policy, manifest, provider/state environment
    file, output report, and bounded-receipt paths only through mode-`0600`
-   custody. The environment file must contain the exact-project Vercel
-   credential JSON described above, never the broad inventory token. The
+   custody. The environment file must contain the exact project-scoped,
+   sibling-denial-verified Vercel credential JSON described above, never the
+   broad legacy token. The
    project provider observes each manifest project by exact ID and cannot call
    the team-wide project-list operation under this Layer. Never put credentials
    in workflow YAML, tracked files, command arguments, stdout, report fields,
    or receipts. Vercel access tokens are not method-level read-only
-   credentials; project scope, dedicated revocation, the read-only command
-   graph, `contents: read`, and zero-write receipt are the compensating
-   controls.
+   credentials; exact project scope, sibling-denial readback, dedicated
+   revocation, the read-only command graph, `contents: read`, and zero-write
+   receipt are the controls.
+   For Marketplace bindings, the read-only command may read only the exact
+   project's environment `contentHint`. Do not substitute the denied
+   account-wide storage list or broaden the token. Treat the manifest's
+   external database ID as retained identity after the observable project,
+   integration, configuration and resource IDs match, not as fresh provider
+   readback.
+   GitHub cannot hold the accepted 155-resource manifest as raw secret text.
+   After the owning `AdoptionManifestJson` Schema has encoded the exact
+   accepted manifest, gzip it and base64-encode the compressed bytes in memory
+   for `BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON`. The hosted custody step
+   must decode and decompress that value directly into the mode-`0600`
+   manifest path before `infrastructure:drift-report` Schema-decodes it again.
+   Do not hand-compose, log, retain, or treat the compressed transport as a
+   different manifest. The authority audit owns the exact materialisation
+   pipeline and rejects a direct copy or missing decode step.
+   If approved custody does not also contain the exact Preview Photon pair,
+   stop before constructing any artifact. Do not decrypt or copy a Vercel
+   sensitive environment value and do not substitute the source/Production
+   Photon pair.
 3. An authorised person may run `bun run infrastructure:drift-report`, whose
    friendly root wrapper selects `bundjil/stg`. GitHub must call only
    `bun run infrastructure:drift-report:internal`. The operation validates the
@@ -438,24 +464,45 @@ Before every run:
    result remain `NotExposed`; if native execution fails before returning a
    plan, the plan itself remains `NotExposed` and the bounded result is
    inconclusive rather than fabricated zero counts.
-   Vercel sensitive environment values are write-only at this boundary. A
-   desired plan may prove their persisted desired references are unchanged,
-   and native sync may prove their metadata is unchanged, but neither proves
-   the remote value or revision; classify those rows `unknownSecretRevision`
-   and keep the overall report inconclusive unless a separately accepted
-   custody/readback contract proves the value.
+   Vercel may return named custom deployment targets such as `staging`.
+   Decode the non-empty provider target at ingress, then admit only exact
+   `preview`, `production`, or the provider's legacy `null` Preview target.
+   Ignore custom targets; never relabel one as Preview or Production.
+   Vercel sensitive environment values are write-only at this boundary. A row
+   with an `ObservedUnknown` accepted manifest baseline may classify
+   `unknownSecretRevision` as accepted only when native sync returns
+   `unchanged` and present provider revision metadata matches the persisted
+   observation. This proves metadata continuity, not the remote value. Missing
+   revision metadata or any changed row remains inconclusive.
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
-   None is repair authority. Missing or stale runs, signed-ingress/replay/send/
-   typing failures, Photon inventory/billing failures, and report failures are
-   operator signals; Photon exposes no alert-policy or persistent delivery-log
-   management API, and no alert transport is claimed by this procedure.
+   Before a receipt exists, a rejected boundary emits only its safe phase:
+   runtime initialisation, R2 state configuration, R2 state initialisation,
+   command configuration, authority artifact, manifest artifact, report
+   construction, receipt persistence, or a fixed command-policy reason.
+   A native provider-read failure may also emit only its closed typed error
+   name and closed typed reason, never its message, request, response, URL,
+   headers, provider payload, credential, or other underlying value. None is
+   repair authority. A read-only Photon project metadata change is a report,
+   not repair authority. A returned Vercel deployment must match every current
+   typed field. An accepted historical deployment that is no longer returned
+   by Vercel's current project list is
+   `historicalDeploymentUnavailable`/`report`: it is not drift repair
+   authority, a no-op claim, or proof that the deployment still exists.
+   Missing or stale runs, signed-ingress/replay/send/typing failures,
+   Photon inventory/billing failures, and report failures are operator signals;
+   Photon exposes no alert-policy or persistent delivery-log management API,
+   and no alert transport is claimed by this procedure.
 
 The desired GitHub workflow is `.github/workflows/infrastructure-drift.yml`.
 It is limited to same-repository pull requests, one weekly schedule, and manual
 dispatch; uses `contents: read`, one protected read-only Preview environment,
 exact secret artifacts, bounded concurrency, and a 20-minute timeout; and
-executes only the report command. Workflow source does not prove the GitHub
+executes only the report command. Its always-run readback prints a grouped
+summary of non-accepted resource kind, category, disposition and count before
+the bounded receipt. It omits resource fingerprints and all provider values so
+a failed hosted run can be diagnosed without widening disclosure. Workflow
+source does not prove the GitHub
 environment, secret metadata, settings, a hosted run, or alert delivery.
 Current external settings and any hosted qualification require fresh
 authenticated readback under the authority model. Rollback is to disable the

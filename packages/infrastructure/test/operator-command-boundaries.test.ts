@@ -85,7 +85,7 @@ describe("infrastructure operator command boundaries", () => {
             BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY: "",
             BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: "prod",
           },
-          output: "drift-report-boundary-failed",
+          output: "stateConfigurationInvalid",
         },
       ] as const;
 

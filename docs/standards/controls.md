@@ -68,7 +68,10 @@ Production writer has one non-cancelling repository queue, two project-scoped
 credentials, immutable candidate and stable-target readback, and exact prior
 deployment rollback; direct Vercel Git deployment remains disabled. The drift
 worker wraps native Alchemy plan/sync observation, fails closed on blocking or
-inconclusive classifications, and has no repair edge. This register does not
+inconclusive classifications, and has no repair edge. Its Vercel Marketplace
+read is limited to exact-project environment attachment hints; it cannot
+enumerate account storage, and retained manifest database identity is not a
+fresh provider readback. This register does not
 itself schedule a worker or prove an external capability. GitHub and providers
 remain authoritative for current settings, identities, runs, state, cost, and
 consequences; HGI-309 owns any separately approved authenticated readback.
@@ -78,8 +81,35 @@ The infrastructure drift control is
 It records its signal, durable state, exact read-only authority, convergence,
 proof, bounded failure, repair owner, cost, review trigger, stop/rollback,
 retirement, and disconfirming evidence against the fixed control-record
-contract. A workflow file, green command, run count, or local fixture cannot
-promote it beyond `report_only`.
+contract. The authority audit requires Bun's executable `run --env-file`
+argument order and a non-empty receipt readback, so help text with exit zero
+cannot count as a drift run. Before receipt creation, the report command emits
+only a fixed secret-safe failure phase, including distinct R2 state
+configuration and state-client initialisation phases, never an underlying
+value or provider payload. A workflow file, green command, run count, or local
+fixture cannot promote it beyond `report_only`.
+
+The audit also requires the exact gzip/base64 materialisation step for the
+accepted manifest secret. The raw 155-resource JSON exceeds GitHub's secret
+size boundary, so the workflow may only expand the in-memory transport into a
+mode-`0600` file and then let the report command Schema-decode the original
+manifest. A direct copy, changed pipeline, or transport treated as a new
+manifest authority fails the control.
+The same audit requires the exact accepted manifest digest as non-secret
+workflow configuration. Materialised file custody without that binding fails
+before provider reads.
+The Vercel deployment response boundary decodes non-empty custom target names
+but emits observations only for exact Preview, Production, or legacy `null`
+Preview targets. A custom target such as `staging` is excluded, not renamed.
+Returned historical deployment observations must match every typed field. An
+accepted historical identity absent from Vercel's current list is an explicit
+report limitation, not no-op, deletion, retention or repair proof. A write-only
+`ObservedUnknown` baseline is accepted only when native sync is unchanged and
+present provider revision metadata plus the accepted manifest agree; the value
+itself remains unknown. Every weaker revision result stays inconclusive.
+An inconclusive native sync may log only its closed typed provider-read error
+name, closed typed reason and fixed phase. Provider messages, requests,
+responses, URLs, headers, payloads and credentials remain forbidden.
 
 ## Report-only freshness
 

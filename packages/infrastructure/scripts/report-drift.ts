@@ -10,9 +10,11 @@ import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { selectCli } from "alchemy/Cli/selectCli";
 import * as AlchemyPlan from "alchemy/Plan";
 import * as AlchemyStack from "alchemy/Stack";
+import { State } from "alchemy/State";
 import * as AlchemySync from "alchemy/Sync";
 import { PlatformServices } from "alchemy/Util/PlatformServices";
 import {
+  Cause,
   Config,
   ConfigProvider,
   Console,
@@ -21,6 +23,7 @@ import {
   FileSystem,
   Layer,
   Match,
+  Option,
   Record,
   Schema,
 } from "effect";
@@ -53,6 +56,7 @@ import type {
 } from "../src/index.js";
 import { InfrastructureOwnershipState } from "../src/schemas.js";
 import { SecretOwnership } from "../src/secret-reference.js";
+import { VercelEnvironmentVariableUpdatedAt } from "../src/vercel/index.js";
 
 declare const process: {
   exitCode: number | undefined;
@@ -96,6 +100,7 @@ const NativeDesiredPlan = Schema.Struct({
 });
 const DriftAttributeProjection = Schema.Struct({
   ownership: Schema.optional(InfrastructureOwnershipState),
+  providerUpdatedAt: Schema.optional(VercelEnvironmentVariableUpdatedAt),
   valueOwnership: Schema.optional(SecretOwnership),
 });
 const InfrastructureDriftNativePhase = Schema.Literals([
@@ -106,9 +111,48 @@ const InfrastructureDriftNativePhase = Schema.Literals([
   "nativeSyncDecode",
   "nativeSyncObservation",
 ]);
+const InfrastructureDriftNativeProviderFailure = Schema.Literals([
+  "PhotonBillingReadError",
+  "PhotonLinesReadError",
+  "PhotonPlatformsReadError",
+  "PhotonProjectsReadError",
+  "PhotonSharedUsersReadError",
+  "PhotonWebhooksReadError",
+  "VercelDeploymentsReadError",
+  "VercelDomainsReadError",
+  "VercelEnvironmentVariablesReadError",
+  "VercelMarketplaceBindingsReadError",
+  "VercelProjectsReadError",
+  "not-classified",
+]);
+const InfrastructureDriftNativeProviderFailureReason = Schema.Literals([
+  "ambiguous",
+  "conflict",
+  "invalidResponse",
+  "not-classified",
+  "notFound",
+  "rateLimited",
+  "requestFailed",
+  "teamMismatch",
+  "transient",
+  "unavailable",
+  "writeForbidden",
+]);
+const InfrastructureDriftNativeProviderFailureError = Schema.Struct({
+  _tag: InfrastructureDriftNativeProviderFailure,
+  reason: InfrastructureDriftNativeProviderFailureReason,
+});
+type InfrastructureDriftNativeProviderFailureError =
+  typeof InfrastructureDriftNativeProviderFailureError.Type;
 class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
-  { phase: InfrastructureDriftNativePhase }
+  {
+    phase: InfrastructureDriftNativePhase,
+    providerFailure: Schema.optional(InfrastructureDriftNativeProviderFailure),
+    providerFailureReason: Schema.optional(
+      InfrastructureDriftNativeProviderFailureReason
+    ),
+  }
 ) {}
 const InfrastructureDriftCommandFailureReason = Schema.Literals([
   "authorityFileInvalid",
@@ -119,6 +163,20 @@ const InfrastructureDriftCommandFailureReason = Schema.Literals([
 class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<InfrastructureDriftCommandError>()(
   "InfrastructureDriftCommandError",
   { reason: InfrastructureDriftCommandFailureReason }
+) {}
+const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
+  "authorityArtifactInvalid",
+  "configurationInvalid",
+  "manifestArtifactInvalid",
+  "reportConstructionInvalid",
+  "receiptPersistenceFailed",
+  "runtimeInitializationFailed",
+  "stateConfigurationInvalid",
+  "stateInitializationFailed",
+]);
+class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
+  "InfrastructureDriftBoundaryError",
+  { reason: InfrastructureDriftBoundaryFailureReason }
 ) {}
 
 const resourceKindFromNativeType = (resourceType: string) =>
@@ -172,6 +230,24 @@ const resourceKindFromNativeType = (resourceType: string) =>
       () => "photonBillingObservation" as const
     ),
     Match.orElse(() => "infrastructureStack" as const)
+  );
+
+const classifyNativeProviderFailure = (cause: Cause.Cause<unknown>) =>
+  Option.match(
+    Option.filter(
+      Cause.findErrorOption(cause),
+      Schema.is(InfrastructureDriftNativeProviderFailureError)
+    ),
+    {
+      onNone: () => ({
+        providerFailure: "not-classified" as const,
+        providerFailureReason: "not-classified" as const,
+      }),
+      onSome: (error: InfrastructureDriftNativeProviderFailureError) => ({
+        providerFailure: error._tag,
+        providerFailureReason: error.reason,
+      }),
+    }
   );
 
 const authorityPathConfig = Config.schema(
@@ -284,6 +360,13 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
             resource.attr
           );
     const ownership = projection?.ownership ?? "Unknown";
+    const acceptedWriteOnlyBaseline =
+      resource.action === "unchanged" &&
+      resourceKind === "vercelEnvironmentVariable" &&
+      projection?.providerUpdatedAt !== undefined &&
+      projection.valueOwnership?._tag === "ObservedUnknown" &&
+      manifestResource?.resourceKind === "vercelEnvironmentVariable" &&
+      manifestResource.desired.valueOwnership._tag === "ObservedUnknown";
     const secretRevision = Match.value({
       resourceKind,
       valueOwnership: projection?.valueOwnership,
@@ -302,7 +385,9 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
       action: resource.action,
       attempts: { _tag: "NotExposed" },
       baselineDisposition:
-        ownership === "Unowned" && acceptUnowned ? "accepted" : "rejected",
+        (ownership === "Unowned" && acceptUnowned) || acceptedWriteOnlyBaseline
+          ? "accepted"
+          : "rejected",
       certainty: { _tag: "Known" },
       diffClass: Match.value(resource.action).pipe(
         Match.when("drifted", () => "update" as const),
@@ -452,13 +537,17 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
           name: stack.name,
           stage: stack.stage,
         }).pipe(
-          Effect.catchCause(() =>
-            Effect.fail(
+          Effect.catchCause((cause) => {
+            const { providerFailure, providerFailureReason } =
+              classifyNativeProviderFailure(cause);
+            return Effect.fail(
               new InfrastructureDriftNativeBoundaryError({
                 phase: "nativeSync",
+                providerFailure,
+                providerFailureReason,
               })
-            )
-          )
+            );
+          })
         );
         const decoded = yield* Schema.decodeUnknownEffect(NativeSyncResult)(
           native.result,
@@ -567,27 +656,80 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
 
 const program = Effect.gen(function* () {
   const startedAt = yield* DateTime.now;
-  const stage = yield* stageConfig;
+  const stage = yield* stageConfig.pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "configurationInvalid",
+        })
+    )
+  );
   if (stage !== "preview") {
     return yield* new InfrastructureDriftCommandError({
       reason: "productionTargetRejected",
     });
   }
-  const authorityPath = yield* authorityPathConfig;
-  const reportPath = yield* reportPathConfig;
-  const receiptPath = yield* receiptPathConfig;
-  const sourceSha = yield* sourceShaConfig;
-  const runIdentity = yield* runIdentityConfig;
-  const acceptUnowned = yield* acceptUnownedConfig;
-  const authorityFingerprint = yield* readAuthority(authorityPath);
-  const command = yield* loadAdoptionCommand;
-  const manifest = yield* validateStableAdoptionCommand(command);
+  const configuration = yield* Effect.gen(function* () {
+    const authorityPath = yield* authorityPathConfig;
+    const reportPath = yield* reportPathConfig;
+    const receiptPath = yield* receiptPathConfig;
+    const sourceSha = yield* sourceShaConfig;
+    const runIdentity = yield* runIdentityConfig;
+    const acceptUnowned = yield* acceptUnownedConfig;
+    return {
+      acceptUnowned,
+      authorityPath,
+      receiptPath,
+      reportPath,
+      runIdentity,
+      sourceSha,
+    };
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "configurationInvalid",
+        })
+    )
+  );
+  const {
+    acceptUnowned,
+    authorityPath,
+    receiptPath,
+    reportPath,
+    runIdentity,
+    sourceSha,
+  } = configuration;
+  const authorityFingerprint = yield* readAuthority(authorityPath).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "authorityArtifactInvalid",
+        })
+    )
+  );
+  const { command, manifest } = yield* Effect.gen(function* () {
+    const command = yield* loadAdoptionCommand;
+    const manifest = yield* validateStableAdoptionCommand(command);
+    return { command, manifest };
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "manifestArtifactInvalid",
+        })
+    )
+  );
   const native = yield* runNativeSync(manifest, acceptUnowned, stage).pipe(
-    Effect.catchTag("InfrastructureDriftNativeBoundaryError", ({ phase }) =>
-      Console.error({
-        phase,
-        reason: "native-drift-readback-failed" as const,
-      }).pipe(Effect.as(unavailableNativeResult(stage)))
+    Effect.catchTag(
+      "InfrastructureDriftNativeBoundaryError",
+      ({ phase, providerFailure, providerFailureReason }) =>
+        Console.error({
+          phase,
+          providerFailure: providerFailure ?? "not-classified",
+          providerFailureReason: providerFailureReason ?? "not-classified",
+          reason: "native-drift-readback-failed" as const,
+        }).pipe(Effect.as(unavailableNativeResult(stage)))
     ),
     Effect.catch(() => Effect.succeed(unavailableNativeResult(stage)))
   );
@@ -606,12 +748,26 @@ const program = Effect.gen(function* () {
       sourceSha,
       stage,
     })
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "reportConstructionInvalid",
+        })
+    )
   );
   const summary = yield* persistReport(
     authorityPath,
     reportPath,
     receiptPath,
     report
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new InfrastructureDriftBoundaryError({
+          reason: "receiptPersistenceFailed",
+        })
+    )
   );
   if (summary.status === "failed") {
     process.exitCode = 1;
@@ -622,25 +778,61 @@ const program = Effect.gen(function* () {
   return summary;
 });
 
+const driftStateLayer = layerAlchemyR2State.pipe(
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Layer.catch recovers the typed Layer error channel, not a Promise callback. */
+  Layer.catch(({ reason }) =>
+    Layer.effect(
+      State,
+      new InfrastructureDriftBoundaryError({
+        reason: Match.value(reason).pipe(
+          Match.when(
+            "configurationInvalid",
+            () => "stateConfigurationInvalid" as const
+          ),
+          Match.when(
+            "initializationFailed",
+            () => "stateInitializationFailed" as const
+          ),
+          Match.exhaustive
+        ),
+      })
+    )
+  )
+);
+
 const runtime = Layer.mergeAll(
   PlatformServices,
   FetchHttpClient.layer,
   Layer.provideMerge(AlchemyContextLive, PlatformServices),
   Layer.succeed(ArtifactStore, createArtifactStore()),
   selectCli(),
-  layerAlchemyR2State,
+  driftStateLayer,
   ConfigProvider.layer(ConfigProvider.fromEnv())
 );
 
 const main = program.pipe(
   Effect.provide(runtime),
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-callbacks -- Effect maps the typed error channel, not a Promise callback. */
+  Effect.mapError((error) =>
+    Schema.is(InfrastructureDriftBoundaryError)(error) ||
+    Schema.is(InfrastructureDriftCommandError)(error)
+      ? error
+      : new InfrastructureDriftBoundaryError({
+          reason: "runtimeInitializationFailed",
+        })
+  ),
   Effect.flatMap(Console.log),
-  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
-  Effect.catch(() =>
-    Console.error({
-      reason: "drift-report-boundary-failed" as const,
-      status: "blocked" as const,
-    }).pipe(
+  Effect.catchTag("InfrastructureDriftBoundaryError", ({ reason }) =>
+    Console.error({ reason, status: "blocked" as const }).pipe(
+      Effect.andThen(
+        Effect.sync(() => {
+          process.exitCode = 2;
+        })
+      )
+    )
+  ),
+  Effect.catchTag("InfrastructureDriftCommandError", ({ reason }) =>
+    Console.error({ reason, status: "blocked" as const }).pipe(
       Effect.andThen(
         Effect.sync(() => {
           process.exitCode = 2;

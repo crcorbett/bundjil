@@ -1,4 +1,5 @@
 import { assert, it } from "@effect/vitest";
+import { State } from "alchemy/State";
 import { ConfigProvider, Effect, Exit, Inspectable, Redacted } from "effect";
 
 import {
@@ -9,7 +10,10 @@ import {
   SyntheticProviderCredentials,
   SyntheticProviderCredentialsLive,
 } from "../src/live.layer.js";
-import { loadAlchemyR2StateConfig } from "../src/state/r2-state.js";
+import {
+  layerAlchemyR2State,
+  loadAlchemyR2StateConfig,
+} from "../src/state/r2-state.js";
 
 it.effect("decodes semantic command config at its executable ingress", () =>
   Effect.gen(function* testInfrastructureCommandConfig() {
@@ -96,6 +100,24 @@ it.effect(
         })
       )
     )
+);
+
+it.effect("classifies missing R2 state config without exposing it", () =>
+  Effect.gen(function* testMissingAlchemyR2StateConfig() {
+    const exit = yield* State.pipe(
+      Effect.provide(layerAlchemyR2State),
+      Effect.exit
+    );
+    const rendered = Inspectable.toStringUnknown(exit);
+    assert.strictEqual(Exit.isFailure(exit), true);
+    assert.strictEqual(rendered.includes("configurationInvalid"), true);
+    assert.strictEqual(rendered.includes("ConfigError"), false);
+  }).pipe(
+    Effect.provideService(
+      ConfigProvider.ConfigProvider,
+      ConfigProvider.fromUnknown({})
+    )
+  )
 );
 
 it.effect(
