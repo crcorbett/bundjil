@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "17 3 * * 1"
   workflow_dispatch:
+    inputs:
+      migrate_legacy_custody:
+        description: Copy the three existing GitHub values into bundjil/stg
+        required: true
+        type: boolean
 
 permissions:
   contents: read
@@ -15,8 +20,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  migrate-legacy-custody:
+    if: github.repository == 'crcorbett/bundjil' && github.event_name == 'workflow_dispatch' && inputs.migrate_legacy_custody
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: infrastructure-read-only-preview
+    env:
+      DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      DRIFT_AUTHORITY_JSON: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
+      DRIFT_ENV_FILE: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
+      DRIFT_MANIFEST_GZIP_BASE64: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+    steps:
+      - name: Copy the exact legacy values into bundjil/stg
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DOPPLER_TOKEN"
+          test -n "$DRIFT_AUTHORITY_JSON"
+          test -n "$DRIFT_ENV_FILE"
+          test -n "$DRIFT_MANIFEST_GZIP_BASE64"
+          umask 077
+          request_path="$RUNNER_TEMP/bundjil-doppler-migration.json"
+          jq -n '{
+            project: "bundjil",
+            config: "stg",
+            secrets: {
+              BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON: env.DRIFT_AUTHORITY_JSON,
+              BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE: env.DRIFT_ENV_FILE,
+              BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON: env.DRIFT_MANIFEST_GZIP_BASE64
+            }
+          }' > "$request_path"
+          chmod 0600 "$request_path"
+          curl --fail --silent --show-error \
+            --output /dev/null \
+            --request POST \
+            --header "Authorization: Bearer $DOPPLER_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data-binary "@$request_path" \
+            https://api.doppler.com/v3/configs/config/secrets
+
   preview-report:
-    if: github.repository == 'crcorbett/bundjil' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.repository == 'crcorbett/bundjil' && !(github.event_name == 'workflow_dispatch' && inputs.migrate_legacy_custody) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: infrastructure-read-only-preview
