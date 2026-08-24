@@ -77,5 +77,10 @@ target outside the nine exact GitHub copies.
   keeps 155 resources, refreshes the approved eight identities, preserves all
   managed references and performs no provider or state write. It is not yet
   the hosted accepted manifest.
+- The Alchemy memory-provider contract now simulates an external Vercel
+  type/revision change, refreshes the `ObservedUnknown` output into state,
+  records zero provider writes, and proves the following plan is no-op. This is
+  repository proof only; an exact real dry-run and state readback are still
+  required.
 - Production fetch, deployment and runtime/public behaviour remain unproved
   until the later eligible main-push CI event and their separate readbacks.

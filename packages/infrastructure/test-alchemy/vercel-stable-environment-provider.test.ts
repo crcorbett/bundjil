@@ -13,6 +13,7 @@ import {
   layerVercelReadOnlyProviders,
   layerVercelStableEnvironmentMemory,
   VercelEnvironmentVariable,
+  VercelEnvironmentVariableAttributes,
   VercelEnvironmentVariableProps,
   VercelInventoryScope,
   VercelMemoryControl,
@@ -195,6 +196,20 @@ const fixture = await Effect.runPromise(
           "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
           observedValueOwnership
         ),
+        readmitted: yield* Schema.decodeUnknownEffect(
+          VercelEnvironmentVariableProps
+        )({
+          stage: "preview",
+          teamId,
+          projectId: agentProjectId,
+          environmentVariableId: tokenEnvironmentVariableId,
+          desired: {
+            key: "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+            type: "encrypted",
+            targets: ["preview"],
+            valueOwnership: observedValueOwnership,
+          },
+        }),
         managed: yield* props(
           agentProjectId,
           tokenEnvironmentVariableId,
@@ -357,6 +372,58 @@ mainHarness.test.provider(
       expect(Exit.isFailure(bearer)).toBe(true);
       const control = yield* VercelMemoryControl;
       expect(yield* control.providerWriteCount).toBe(0);
+    })
+);
+
+mainHarness.test.provider(
+  "refreshes externally changed observed metadata into state without a provider write",
+  (stack) =>
+    Effect.gen(function* refreshObservedMetadataWithoutProviderWrite() {
+      yield* stack.deploy(
+        VercelEnvironmentVariable(
+          "ReadmittedInternalToken",
+          fixture.token.observed
+        ).pipe(adopt(true))
+      );
+      const control = yield* VercelMemoryControl;
+      const externalObservation = yield* Schema.decodeUnknownEffect(
+        VercelEnvironmentVariableAttributes
+      )({
+        stage: "preview",
+        teamId,
+        projectId: agentProjectId,
+        environmentVariableId: tokenEnvironmentVariableId,
+        key: "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN",
+        type: "encrypted",
+        targets: ["preview"],
+        sensitive: false,
+        providerUpdatedAt: 31,
+        valueOwnership: observedValueOwnership,
+        deploymentRequired: false,
+        ownership: "Unowned",
+      });
+      yield* control.setEnvironmentVariableObservation(externalObservation);
+      const refreshed = yield* stack.deploy(
+        VercelEnvironmentVariable(
+          "ReadmittedInternalToken",
+          fixture.token.readmitted
+        )
+      );
+      expect(refreshed.type).toBe("encrypted");
+      expect(Number(refreshed.providerUpdatedAt)).toBe(31);
+      expect(refreshed.valueOwnership._tag).toBe("ObservedUnknown");
+      expect(yield* control.providerWriteCount).toBe(0);
+      const noOp = yield* stack.plan(
+        VercelEnvironmentVariable(
+          "ReadmittedInternalToken",
+          fixture.token.readmitted
+        )
+      );
+      expect(
+        Record.values(noOp.resources).every(
+          (resource) => resource.action === "noop"
+        )
+      ).toBe(true);
     })
 );
 

@@ -131,7 +131,12 @@ Photon projects, manifests, or physical identities.
    identity. Stop if any identity is new, missing, duplicated, managed, in a
    different stage, or has a different team, project, environment ID or key.
    This command does not accept values and does not authorise an Alchemy state
-   write. Inspect the later dry-run separately before any adoption apply.
+   write. The memory-provider contract must first prove that an external
+   type/revision change refreshes Alchemy output while provider writes remain
+   zero and the following plan is no-op. Inspect the real dry-run separately
+   before any adoption apply. Stop unless it reports only the eight approved
+   state updates, 147 no-ops, zero create, replace or delete, and no managed
+   Photon update.
 
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run
