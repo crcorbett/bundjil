@@ -136,7 +136,18 @@ Photon projects, manifests, or physical identities.
    zero and the following plan is no-op. Inspect the real dry-run separately
    before any adoption apply. Stop unless it reports only the eight approved
    state updates, 147 no-ops, zero create, replace or delete, and no managed
-   Photon update.
+   Photon update. Do not use the general Alchemy apply command for this repair.
+   Under a distinct mode-`0600` authority matching
+   `preview-state-readmission-authority.schema.json`, run the friendly
+   `bun run infrastructure:preview-state-readmission` command. It fixes the
+   `bundjil/stg_repair` Doppler config and delegates to the credential-neutral
+   internal command. That command denies provider writes by construction,
+   validates one exact plan, applies that same in-memory plan only to Alchemy
+   state, and requires the following plan to contain 155 no-ops. Stop before
+   running it if the repair config, authority, eight logical IDs, candidate
+   digest, Personal provider identity or Preview target differs. Its receipt
+   proves state convergence only; rerun the report-only drift journey for
+   independent provider readback.
 
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run

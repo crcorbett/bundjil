@@ -68,6 +68,12 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   metadata records, refreshes one provider-revision-only record, and preserves
   every managed secret reference. It has not been installed in Doppler or
   applied to Alchemy state, so hosted Preview remains unproved.
+- The narrow repair consumer requires its own `stg_repair` config. It must not
+  reuse the report-only `stg` authority. Repository code now denies provider
+  writes, accepts only the exact eight-update/147-no-op plan, applies that same
+  in-memory plan to Preview Alchemy state, and requires 155 no-ops afterwards.
+  The Doppler config and real state operation remain uncreated/unrun pending
+  the current credential-response decision.
 
 ## Command and workflow call graphs
 
@@ -100,6 +106,16 @@ Successful same-repository main-push CI
   -> existing Effect ProductionDeployment service and live Layer
 ```
 
+```text
+Authorised Preview state metadata repair
+  -> bun run infrastructure:preview-state-readmission
+  -> doppler run --project bundjil --config stg_repair
+  -> bun run infrastructure:preview-state-readmission:internal
+  -> exact authority + eight-ID plan policy
+  -> same in-memory plan applied with provider writes denied
+  -> following 155-resource no-op plan + bounded receipt
+```
+
 ## Requirements
 
 1. Root commands used by people select a fixed Doppler project and config.
@@ -125,19 +141,19 @@ Successful same-repository main-push CI
 
 ## Downstream impact ledger
 
-| Surface                            | Decision        | Owner and evidence                                                                                          | Required result                                                                                                |
-| ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Architecture and standards         | Preserve        | `docs/architecture/repo-structure.md`, `docs/architecture/effect-patterns.md`, `docs/standards/controls.md` | No service, Schema, Layer, package or control admission changes.                                               |
-| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                      | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                                |
-| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`    | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.                   |
-| Knip and config                    | Change required | `knip.json`                                                                                                 | The external `doppler` binary is explicitly admitted.                                                          |
-| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                   | Custody and command boundaries reject direct legacy secret reads and broad injection.                          |
-| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                         | Vercel remains current storage owner; no values move.                                                          |
-| Provider services and Layers       | Change required | `packages/infrastructure/src/adoption-manifest.ts`, exact-project inventory and focused tests               | Re-admission accepts only exact existing `ObservedUnknown` metadata; it cannot read values or write providers. |
-| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, active plan and indexes                                                          | Current intent and claim limits remain routed until post-merge proof and cleanup.                              |
-| Critical journeys and dated proof  | Preserve        | `docs/verification/**`                                                                                      | Local and hosted CI results are reported separately; no deployment/public claim is added.                      |
-| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                       | No instruction or skill behaviour changes.                                                                     |
-| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                     | No browser proof required.                                                                                     |
+| Surface                            | Decision        | Owner and evidence                                                                                       | Required result                                                                                        |
+| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                      | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.     |
+| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                   | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                        |
+| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json` | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.           |
+| Knip and config                    | Change required | `knip.json`                                                                                              | The external `doppler` binary is explicitly admitted.                                                  |
+| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                | Custody and command boundaries reject direct legacy secret reads and broad injection.                  |
+| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                      | Vercel remains current storage owner; no values move.                                                  |
+| Provider services and Layers       | Change required | adoption/readmission modules, exact-project read-only Layer and focused tests                            | Re-admission accepts only exact existing metadata; state repair cannot read values or write providers. |
+| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, active plan and indexes                                                       | Current intent and claim limits remain routed until post-merge proof and cleanup.                      |
+| Critical journeys and dated proof  | Preserve        | `docs/verification/**`                                                                                   | Local and hosted CI results are reported separately; no deployment/public claim is added.              |
+| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                    | No instruction or skill behaviour changes.                                                             |
+| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                  | No browser proof required.                                                                             |
 
 ## Verification and delivery
 

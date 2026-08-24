@@ -11,7 +11,7 @@ task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
 
 # Doppler secret custody execution plan
 
-Status: Approved continuation in progress; provider correction and re-admission underway
+Status: Repository repair control in progress; external mutation paused
 
 Branch: `codex/doppler-secret-ownership`
 
@@ -19,9 +19,9 @@ Base: `origin/main` at `c154d725372617c699538629712569518ee18099`
 
 Pull request: `https://github.com/crcorbett/bundjil/pull/7`
 
-Hosted state: exact-head CI run `32676659433` passed. Preview run
-`32676659435` proved Doppler fetch and custody, then failed closed with the
-recorded inconclusive native Alchemy readback. Production has not run.
+Hosted state: exact-head CI run `32681495867` passed on `0f5c58c`. Preview run
+`32681495864` proved Doppler fetch and custody, then failed closed on the eight
+stale accepted metadata rows with zero provider writes. Production has not run.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
@@ -82,5 +82,12 @@ target outside the nine exact GitHub copies.
   records zero provider writes, and proves the following plan is no-op. This is
   repository proof only; an exact real dry-run and state readback are still
   required.
+- A distinct `stg_repair` consumer and state-only command are now repository
+  owned. The command denies provider mutation services, accepts only the exact
+  eight-update/147-no-op plan, applies the same in-memory plan and requires a
+  155-no-op follow-up plan. Local checks do not prove a real R2 state change.
+- External state mutation, merge, deployment and cleanup remain paused pending
+  Cooper's response to the reported credential exposure. No exposed value is
+  recorded here and no provider credential has been rotated or revoked.
 - Production fetch, deployment and runtime/public behaviour remain unproved
   until the later eligible main-push CI event and their separate readbacks.

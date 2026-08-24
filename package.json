@@ -70,6 +70,8 @@
     "knip": "knip",
     "infrastructure:adoption-manifest": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/generate-adoption-manifest.ts",
     "infrastructure:adoption-readmission": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/re-admit-adoption-manifest.ts",
+    "infrastructure:preview-state-readmission": "doppler run --project bundjil --config stg_repair -- bun run infrastructure:preview-state-readmission:internal",
+    "infrastructure:preview-state-readmission:internal": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/readmit-preview-state.ts",
     "infrastructure:adoption-proof": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/prove-adoption-state.ts",
     "infrastructure:inventory": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/inventory-live.ts",
     "infrastructure:preview-state-migration": "bun --conditions=@bundjil/source run packages/infrastructure/scripts/migrate-state.ts",
