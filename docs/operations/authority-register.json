@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-08-13",
+  "lastReviewed": "2026-08-24",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -33,7 +33,7 @@
       "surface": "workflow",
       "target": "github-actions",
       "principal": "Ephemeral GitHub Actions Production job with two separately revocable exact-project Vercel tokens selected under the Personal account",
-      "identitySource": "Successful same-repository main-push CI workflow_run, exact accepted head SHA, Production environment, separate agent/proxy credentials, pre-custody assigned-project access and sibling-project denial, and decoded project/SHA readback",
+      "identitySource": "Successful same-repository main-push CI workflow_run, exact accepted head SHA, Production environment, one read-only config-scoped bundjil/prd Doppler token, separate agent/proxy credentials, pre-custody assigned-project access and sibling-project denial, and decoded project/SHA readback",
       "operation": "Stage both exact-SHA Production candidates without domains, validate immutable project/source/readiness, promote proxy then agent, verify stable targets and health, and restore exact previous deployments on partial failure",
       "resource": "Personal Vercel projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB, their immutable deployments and stable Production targets",
       "environment": "GitHub Production environment and Personal Vercel Production only; Tilt scope is rejected",
@@ -49,7 +49,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment and the four exact non-secret variables. Both required project-specific Vercel secrets are absent. Fresh Executor Personal readback found its sole Vercel connection authenticated as the explicitly excluded cooper.corbett@tilt.legal account, so credential creation stopped before mutation and automatic Production is deferred for this epoch. See docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json."
+        "evidence": "Fresh Personal-only readback on 2026-08-24 confirms the exact Production environment, its four legacy variables, both legacy project-token secret names and DOPPLER_TOKEN. The Doppler token is read-only, config-scoped to bundjil/prd and expires 2026-09-23T00:06:50Z. Each underlying Vercel credential returned 200 for its assigned exact project and 404 for the sibling. No eligible Production workflow was run, so deployment, promotion, stable targets, runtime and public behaviour remain unproved."
       }
     },
     {
@@ -57,23 +57,23 @@
       "surface": "workflow",
       "target": "github-actions",
       "principal": "Ephemeral GitHub Actions Preview drift job with exact report-only environment custody and two dedicated project-scoped Vercel tokens",
-      "identitySource": "GitHub-derived and Schema-decoded crcorbett/bundjil repository/run/attempt identity plus exact source SHA; the infrastructure-read-only-preview environment and three named secret artifacts provide static policy, manifest and provider/state custody; its dotenv artifact contains a Schema-decoded unique exact-project Vercel credential set that is distinct from Production and broad inventory custody",
+      "identitySource": "GitHub-derived and Schema-decoded crcorbett/bundjil repository/run/attempt identity plus exact source SHA; the infrastructure-read-only-preview environment provides one read-only config-scoped bundjil/stg Doppler token, whose three named outputs provide static policy, manifest and provider/state custody; its dotenv artifact contains a Schema-decoded unique exact-project Vercel credential set that is distinct from Production and broad inventory custody",
       "operation": "Read exact Preview Alchemy state and Vercel/Photon metadata, compute one native desired plan and one native sync dry-run, and persist a sanitized report-only receipt",
       "resource": "alchemy:BundjilInfrastructure:preview, R2 bundjil-alchemy-state prefix bundjil/v1, and exact Bundjil Preview Vercel/Photon resources encoded by the accepted manifest; Vercel access resolves only by decoded manifest project ID and Team scope is unavailable",
       "environment": "Preview only; same-repository pull requests, weekly schedule, or one manual read-only dispatch",
       "status": "bounded",
-      "durationRevocation": "One run, maximum 20 minutes; newer source/ref work cancels stale work; disable the exact workflow, delete the three environment secret artifacts, or revoke either dedicated project-scoped Vercel token or another drift-only credential under separate settings/provider authority",
+      "durationRevocation": "One run, maximum 20 minutes; newer source/ref work cancels stale work; disable the exact workflow, replace the expiring bundjil/stg token, or revoke either dedicated project-scoped Vercel token or another drift-only credential under separate settings/provider authority",
       "approvalBoundary": "The accepted Alchemy SPEC, fixed report-only authority artifact, exact Preview manifest and infrastructure-read-only-preview environment permit metadata reads and local mode-0600 receipts only; Vercel personal tokens are not method-level read-only, so dedicated project scope, sibling denial, separate revocation, the read-only command graph and zero-write receipt are mandatory compensating controls; no tool output or finding grants repair authority",
       "approvalReceipt": "The fingerprinted static authority envelope named by BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON plus the dynamically decoded repository/run/attempt identity, source SHA and manifest digest in each report/receipt",
       "auditEvidence": "Schema-valid repository/run/attempt identity, source SHA, static authority fingerprint, decoded manifest digest, desired-plan counts, native-sync classifications, provider-writes:0, bounded receipt and independent GitHub run/check readback when available",
-      "rollback": "No provider rollback is required. Revert the workflow source or separately disable the workflow, delete its three environment artifacts and revoke its two dedicated project-scoped Vercel tokens plus other drift-only provider/state credentials, then read back GitHub settings",
+      "rollback": "No provider rollback is required. Revert the workflow source to the retained legacy GitHub names or separately disable the workflow. Deleting legacy custody or revoking the Doppler token, dedicated project-scoped Vercel tokens, or provider/state credentials requires separate approval and exact readback.",
       "stopCondition": "Stop on fork input, repository/stage mismatch, Production target, missing or ambiguous readback, unknown secret revision, skipped provider read, unexpected desired-plan action, credential leak, provider write, timeout, stale run, or invalid receipt",
       "escalation": "Bundjil repository owner, security/automation maintainer, Alchemy state owner and exact Vercel/Photon provider owners",
       "nonClaim": "Checked-in source and local fixtures do not prove the environment, secrets, hosted run, check, provider availability, no future drift, alert delivery, repair, deployment, promotion, or Production state",
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-13 confirms the infrastructure-read-only-preview environment has zero secrets. Pull-request run 31677769897 for exact branch SHA 763199f07b6f2f0569442546e6ea7ef695c49a74 failed closed in custody preparation and skipped provider reporting. Personal Cloudflare token 8033ee98f001f2aeeb4512750f4d8f36 remains exact-bucket scoped in personal 1Password custody. Fresh Executor Personal readback found its sole Vercel connection authenticated as the explicitly excluded cooper.corbett@tilt.legal account, so no Vercel drift credential or GitHub artifact was created and hosted drift is deferred for this epoch. See docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json."
+        "evidence": "GitHub readback on 2026-08-24 confirms the three retained legacy secret names plus DOPPLER_TOKEN in infrastructure-read-only-preview. Protected run 32675982739 at exact branch SHA 649f3371da9461dae23c2f30db300cc29bcfa16f copied those three values into bundjil/stg without logging values. Name-only readback proved the three expected Doppler keys. The final GitHub token is read-only, config-scoped and expires 2026-09-23T00:13:50Z; the one-time read/write token expires 2026-08-24T00:28:19Z and is no longer stored in GitHub. Final workflow and provider-read proof remain pending."
       }
     },
     {

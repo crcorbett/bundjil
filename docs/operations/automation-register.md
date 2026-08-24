@@ -66,14 +66,15 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
-### Production deployment — admitted post-CI automation, hosted proof deferred
+### Production deployment — admitted post-CI automation, hosted run deferred
 
-The source control is admitted, but its hosted proof is deferred for this
-implementation epoch. Fresh Executor Personal readback on 2026-08-13 found the
-sole Vercel connection authenticated as the explicitly excluded
-`cooper.corbett@tilt.legal` account, so no project token or partial GitHub
-custody was created. The bounded stop is retained in
-[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+The earlier personal-identity stop remains retained history. Fresh 2026-08-24
+readback used only the Personal Vercel team and proved each separate Production
+credential could read its assigned project and received `404` for the sibling.
+The `Production` GitHub Environment now also holds one expiring read-only token
+for `bundjil/prd`, while the two legacy Vercel secrets and four legacy variables
+remain in place. No eligible main-push event was created, so no Production run,
+deployment or public behaviour is proved.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -105,11 +106,13 @@ custody was created. The bounded stop is retained in
 
 ### Preview infrastructure drift — report-only automation
 
-The report-only source remains admitted, while hosted execution is deferred at
-the same identity gate. Exact-head run `31677769897` failed closed before
-provider reporting because the three custody artifacts were absent; it proves
-missing custody only, not drift. Resume requires a separate admitted personal
-Vercel principal and the complete credential/artifact package.
+The earlier missing-custody run remains retained history. On 2026-08-24, a
+one-time protected run copied the three existing GitHub values into
+`bundjil/stg` without printing them or deleting the originals. Name-only
+readback then proved the three expected Doppler keys, and GitHub custody was
+replaced with one expiring read-only token for that config. A later run of the
+final report workflow is still required to prove the new fetch and provider
+read path.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
