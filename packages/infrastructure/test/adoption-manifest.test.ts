@@ -2,10 +2,13 @@ import { assert, it } from "@effect/vitest";
 import { Effect, Exit, Schema } from "effect";
 
 import {
+  AdoptionManifestDigest,
   AdoptionManifest,
+  AlchemyLogicalResourceId,
   buildAdoptionManifest,
   InfrastructureCommandInput,
   InfrastructureInventoryArtifact,
+  reAdmitAdoptionManifest,
   validateStableAdoptionCommand,
   verifyAdoptionManifestAgainstInventory,
 } from "../src/index.js";
@@ -169,6 +172,117 @@ it.effect(
       );
       assert.deepStrictEqual(verified, manifest);
     })
+);
+
+it.effect("re-admits only an exact observed-unknown environment identity", () =>
+  Effect.gen(function* testExactReadmission() {
+    const inventory = yield* decodeInventoryFixture;
+    const base = yield* buildAdoptionManifest(
+      inventory,
+      "previewPhotonManaged"
+    );
+    const encodedInventory = yield* Schema.encodeEffect(
+      InfrastructureInventoryArtifact
+    )(inventory);
+    const currentInventory = yield* Schema.decodeUnknownEffect(
+      InfrastructureInventoryArtifact
+    )({
+      ...encodedInventory,
+      manifest: {
+        ...encodedInventory.manifest,
+        vercel: {
+          ...encodedInventory.manifest.vercel,
+          environmentVariables:
+            encodedInventory.manifest.vercel.environmentVariables.map(
+              (resource) =>
+                resource.environmentVariableId === "env-internal-token"
+                  ? { ...resource, type: "encrypted" }
+                  : resource
+            ),
+        },
+      },
+    });
+    const digest = yield* Schema.decodeUnknownEffect(AdoptionManifestDigest)(
+      "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    );
+    const logicalId = yield* Schema.decodeUnknownEffect(
+      AlchemyLogicalResourceId
+    )("vercel-environment:prj-agent:env-internal-token");
+    const candidate = yield* reAdmitAdoptionManifest(base, currentInventory, {
+      digest,
+      logicalIds: [logicalId],
+    });
+    assert.strictEqual(candidate.resources.length, base.resources.length);
+    assert.strictEqual(candidate.digest, digest);
+    assert.strictEqual(
+      candidate.resources.every(
+        (resource) => resource.observedMetadataDigest === digest
+      ),
+      true
+    );
+    const updated = candidate.resources.find(
+      (resource) => resource.logicalId === logicalId
+    );
+    assert.strictEqual(
+      updated?.resourceKind === "vercelEnvironmentVariable"
+        ? updated.desired.type
+        : undefined,
+      "encrypted"
+    );
+    assert.deepStrictEqual(
+      candidate.resources
+        .filter(
+          (resource) =>
+            resource.resourceKind === "vercelEnvironmentVariable" &&
+            resource.desired.valueOwnership._tag === "Managed"
+        )
+        .map((resource) =>
+          resource.resourceKind === "vercelEnvironmentVariable"
+            ? resource.desired.valueOwnership
+            : undefined
+        ),
+      base.resources
+        .filter(
+          (resource) =>
+            resource.resourceKind === "vercelEnvironmentVariable" &&
+            resource.desired.valueOwnership._tag === "Managed"
+        )
+        .map((resource) =>
+          resource.resourceKind === "vercelEnvironmentVariable"
+            ? resource.desired.valueOwnership
+            : undefined
+        )
+    );
+
+    const revisionOnly = yield* reAdmitAdoptionManifest(base, inventory, {
+      digest,
+      logicalIds: [logicalId],
+    });
+    const revisionOnlyResource = revisionOnly.resources.find(
+      (resource) => resource.logicalId === logicalId
+    );
+    assert.strictEqual(
+      revisionOnlyResource?.resourceKind === "vercelEnvironmentVariable"
+        ? revisionOnlyResource.desired.type
+        : undefined,
+      "sensitive"
+    );
+    const managed = base.resources.find(
+      (resource) =>
+        resource.resourceKind === "vercelEnvironmentVariable" &&
+        resource.desired.valueOwnership._tag === "Managed"
+    );
+    assert.notStrictEqual(managed, undefined);
+    if (managed === undefined) {
+      return;
+    }
+    const managedResult = yield* reAdmitAdoptionManifest(
+      base,
+      currentInventory,
+      { digest, logicalIds: [managed.logicalId] }
+    ).pipe(Effect.exit);
+    assert.strictEqual(Exit.isFailure(managedResult), true);
+  })
 );
 
 it.effect(

@@ -52,7 +52,8 @@ bun run --filter=@bundjil/infrastructure build
 ```
 
 Public repository command names are `infrastructure:inventory`,
-`infrastructure:adoption-manifest`, `infrastructure:adoption-proof`,
+`infrastructure:adoption-manifest`, `infrastructure:adoption-readmission`,
+`infrastructure:adoption-proof`,
 `infrastructure:drift-report`, `infrastructure:preview-plan`,
 `infrastructure:preview-apply`, `infrastructure:preview-sync`,
 `infrastructure:preview-drift`, `infrastructure:preview-repair`,
@@ -112,6 +113,15 @@ GitHub manifest secret as an in-memory gzip/base64 transport because the raw
 materialises the original JSON into mode-`0600` custody before this command
 Schema-decodes it and compares it with the exact configured accepted digest;
 the transport is never a second manifest authority.
+`infrastructure:adoption-readmission` is a local, credential-neutral command
+for an approved metadata-only refresh. It takes the accepted manifest, a fresh
+mode-`0600` two-read inventory and a non-empty JSON list of exact existing
+logical IDs. It permits only `ObservedUnknown` Vercel environment identities
+whose team, project, environment ID, key and stage still match. It preserves
+the resource set, retain policy, secret ownership and all four managed Photon
+references. Its new digest binds the old manifest digest, current inventory
+digest and sorted approved identity list. It performs no provider or state
+write. A later Alchemy dry-run remains the owner of any proposed state change.
 Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;

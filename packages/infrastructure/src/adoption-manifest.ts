@@ -270,6 +270,8 @@ export class AdoptionManifestBuildError extends Schema.TaggedErrorClass<Adoption
       "photonPlatformMissing",
       "candidateMismatch",
       "bindingProfileStageMismatch",
+      "readmissionIdentityInvalid",
+      "readmissionResourceInvalid",
     ]),
     message: AdoptionManifestBuildMessage,
   }
@@ -291,6 +293,15 @@ export const AdoptionBindingProfile = Schema.Literals([
 export type AdoptionBindingProfile = typeof AdoptionBindingProfile.Type;
 export type AdoptionBindingProfileEncoded =
   typeof AdoptionBindingProfile.Encoded;
+
+export const AdoptionManifestReadmission = Schema.Struct({
+  digest: AdoptionManifestDigest,
+  logicalIds: Schema.NonEmptyArray(AlchemyLogicalResourceId),
+});
+export type AdoptionManifestReadmission =
+  typeof AdoptionManifestReadmission.Type;
+export type AdoptionManifestReadmissionEncoded =
+  typeof AdoptionManifestReadmission.Encoded;
 
 const logicalId = Schema.decodeUnknownEffect(AlchemyLogicalResourceId);
 const managedPhotonKeys = HashSet.fromIterable([
@@ -657,6 +668,100 @@ export const verifyAdoptionManifestAgainstInventory = Effect.fn(
   }
   return candidate;
 });
+
+export const reAdmitAdoptionManifest = Effect.fn("AdoptionManifest.reAdmit")(
+  function* (
+    base: AdoptionManifest,
+    artifact: InfrastructureInventoryArtifact,
+    readmission: AdoptionManifestReadmission
+  ) {
+    if (
+      base.stage !== artifact.manifest.stage ||
+      HashSet.size(HashSet.fromIterable(readmission.logicalIds)) !==
+        readmission.logicalIds.length
+    ) {
+      return yield* new AdoptionManifestBuildError({
+        reason: "readmissionIdentityInvalid",
+        message: AdoptionManifestBuildMessage.make(
+          "The re-admission stage and logical identities must be exact and unique."
+        ),
+      });
+    }
+    const updates = yield* Effect.forEach(
+      readmission.logicalIds,
+      Effect.fn("AdoptionManifest.reAdmitEnvironment")(
+        function* (resourceLogicalId) {
+          const resource = base.resources.find(
+            (candidate) => candidate.logicalId === resourceLogicalId
+          );
+          if (
+            resource?.resourceKind !== "vercelEnvironmentVariable" ||
+            resource.desired.valueOwnership._tag !== "ObservedUnknown"
+          ) {
+            return yield* new AdoptionManifestBuildError({
+              reason: "readmissionResourceInvalid",
+              message: AdoptionManifestBuildMessage.make(
+                "Only an existing observed-unknown Vercel environment identity may be re-admitted."
+              ),
+            });
+          }
+          const observed = artifact.manifest.vercel.environmentVariables.find(
+            (candidate) =>
+              candidate.teamId === resource.physicalId.teamId &&
+              candidate.projectId === resource.physicalId.projectId &&
+              candidate.environmentVariableId ===
+                resource.physicalId.environmentVariableId
+          );
+          if (
+            observed === undefined ||
+            observed.stage !== base.stage ||
+            observed.key !== resource.desired.key ||
+            observed.valueOwnership._tag !== "ObservedUnknown"
+          ) {
+            return yield* new AdoptionManifestBuildError({
+              reason: "readmissionIdentityInvalid",
+              message: AdoptionManifestBuildMessage.make(
+                "The current inventory does not contain the exact approved environment identity."
+              ),
+            });
+          }
+          const desired = VercelEnvironmentVariableDesiredState.make({
+            key: observed.key,
+            type: observed.type,
+            targets: observed.targets,
+            gitBranch: observed.gitBranch,
+            valueOwnership: resource.desired.valueOwnership,
+          });
+          return { logicalId: resourceLogicalId, desired } as const;
+        }
+      ),
+      { concurrency: 1 }
+    );
+    return AdoptionManifest.make({
+      schemaVersion: "1",
+      stage: base.stage,
+      digest: readmission.digest,
+      resources: base.resources.map((resource) => {
+        const update = updates.find(
+          (candidate) => candidate.logicalId === resource.logicalId
+        );
+        return AdoptionManifestResource.make(
+          resource.resourceKind === "vercelEnvironmentVariable" &&
+            update !== undefined
+            ? {
+                ...resource,
+                desired: update.desired,
+                observedMetadataDigest: readmission.digest,
+              }
+            : {
+                ...resource,
+                observedMetadataDigest: readmission.digest,
+              }
+        );
+      }),
+    });
+  }
+);
 
 export const adoptionManifestProviderScopes = Effect.fn(
   "AdoptionManifest.providerScopes"

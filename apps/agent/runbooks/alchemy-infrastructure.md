@@ -118,6 +118,21 @@ Photon projects, manifests, or physical identities.
    each dry run contains only the exact manifest-sized import/update set with
    zero create, replace, or delete.
 
+   If drift stops only because the accepted `ObservedUnknown` Vercel metadata
+   is stale, first prove the exact identities from a fresh two-read inventory.
+   Run `bun run infrastructure:adoption-readmission` with three distinct safe
+   repository-relative mode-`0600` paths and the sorted approved logical IDs:
+   `BUNDJIL_INFRASTRUCTURE_READMISSION_{BASE,OUTPUT}_PATH`,
+   `BUNDJIL_INFRASTRUCTURE_INVENTORY_PATH`, and
+   `BUNDJIL_INFRASTRUCTURE_READMISSION_LOGICAL_IDS_JSON`. The command must keep
+   the resource count and managed references unchanged, report zero provider
+   writes, and change only approved environment metadata plus the manifest
+   digest. A provider revision-only refresh is allowed for an exact approved
+   identity. Stop if any identity is new, missing, duplicated, managed, in a
+   different stage, or has a different team, project, environment ID or key.
+   This command does not accept values and does not authorise an Alchemy state
+   write. Inspect the later dry-run separately before any adoption apply.
+
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run
    `infrastructure:preview-state-migration` first under its distinct fixed

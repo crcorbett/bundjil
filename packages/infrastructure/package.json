@@ -37,6 +37,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "adoption:manifest": "bun --conditions=@bundjil/source run scripts/generate-adoption-manifest.ts",
+    "adoption:re-admit": "bun --conditions=@bundjil/source run scripts/re-admit-adoption-manifest.ts",
     "adoption:proof": "bun --conditions=@bundjil/source run scripts/prove-adoption-state.ts",
     "photon:bind-preview-webhook": "bun --conditions=@bundjil/source run scripts/bind-photon-preview-webhook.ts",
     "inventory:live": "bun --conditions=@bundjil/source run scripts/inventory-live.ts",

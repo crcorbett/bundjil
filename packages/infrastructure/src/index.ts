@@ -20,6 +20,8 @@ export {
   type AdoptionManifestEncoded,
   AdoptionManifestJson,
   type AdoptionManifestJsonEncoded,
+  AdoptionManifestReadmission,
+  type AdoptionManifestReadmissionEncoded,
   AdoptionManifestResource,
   type AdoptionManifestResourceEncoded,
   AdoptionProviderScopes,
@@ -28,6 +30,7 @@ export {
   type AdoptionResourceOwnerEncoded,
   adoptionManifestProviderScopes,
   buildAdoptionManifest,
+  reAdmitAdoptionManifest,
   verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
 export { layerLiveReadOnlyAdoptionProviders } from "./adoption-live.layer.js";

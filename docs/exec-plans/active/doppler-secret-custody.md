@@ -70,5 +70,12 @@ target outside the nine exact GitHub copies.
   provider revision changed after the prior accepted manifest. Re-admission may
   accept current metadata only after two matching read-only inventories. It
   cannot claim a write-only value or hide a changed row.
+- Exact-project inventory digest
+  `5f4c591dcc3af0a11c93fe79cdbf092000c84a2e005e10eb36ee3d3c3cb64e36`
+  passed two-read equality with zero provider writes. The bounded re-admission
+  candidate `35bc11a3c17fa55d03a0587818a9b0ee9288c65f3049da6b5a562835dafef3cf`
+  keeps 155 resources, refreshes the approved eight identities, preserves all
+  managed references and performs no provider or state write. It is not yet
+  the hosted accepted manifest.
 - Production fetch, deployment and runtime/public behaviour remain unproved
   until the later eligible main-push CI event and their separate readbacks.
