@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-24 confirms the three retained legacy secret names plus DOPPLER_TOKEN in infrastructure-read-only-preview. Protected run 32675982739 at exact branch SHA 649f3371da9461dae23c2f30db300cc29bcfa16f copied those three values into bundjil/stg without logging values. Name-only readback proved the three expected Doppler keys. The final GitHub token is read-only, config-scoped and expires 2026-09-23T00:13:50Z; the one-time read/write token expires 2026-08-24T00:28:19Z and is no longer stored in GitHub. Final workflow and provider-read proof remain pending."
+        "evidence": "GitHub readback on 2026-08-24 confirms the three retained legacy secret names plus DOPPLER_TOKEN in infrastructure-read-only-preview. Protected run 32675982739 at exact branch SHA 649f3371da9461dae23c2f30db300cc29bcfa16f copied those three values into bundjil/stg without logging values. Name-only readback proved the three expected Doppler keys. The final GitHub token is read-only, config-scoped and expires 2026-09-23T00:13:50Z; the one-time read/write token expires 2026-08-24T00:28:19Z and is no longer stored in GitHub. Final-source run 32676125884 at SHA 5578e01c5011d8bd40974ce3f34d038ab2ee6c7c proved the pinned fetch, custody materialisation, exact manifest digest and sanitised receipt, then returned inconclusive because native Alchemy readback failed before exposing a plan. Provider health, drift absence and future runs remain unproved."
       }
     },
     {

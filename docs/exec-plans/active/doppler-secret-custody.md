@@ -45,5 +45,9 @@ need to delete/revoke a legacy credential.
   compressed-manifest materialisation, exact digest, executable Bun argument
   order and sanitised receipt readback because the migrated `stg` value already
   uses that format. The remaining overlap is reported, not treated as merged.
+- Final-source Preview run `32676125884` proved the Doppler fetch and bounded
+  receipt but returned the same fail-closed native Alchemy readback class as
+  the open drift work. It is an inconclusive provider result, not a custody
+  failure and not drift-absence proof.
 - Production fetch and runtime/public behaviour cannot be proved without a
   later eligible main-push CI event, which is outside this no-deploy task.

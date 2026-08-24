@@ -54,6 +54,12 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   `https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model` with the
   synthetic key `executor-ci-synthetic-key`. Both are ordinary test inputs and
   must never be replaced by a live Executor toolkit or credential.
+- Personal Doppler now has the three root configs and exact key sets described
+  below. The two hosted GitHub Environments each hold one read-only,
+  config-scoped token expiring on 2026-09-23; every legacy GitHub name remains.
+- Final-source Preview run `32676125884` proved the pinned fetch, custody files,
+  compressed manifest and sanitised receipt, then stopped inconclusive on the
+  pre-existing native Alchemy readback failure. No Production run was started.
 
 ## Command and workflow call graphs
 
@@ -131,8 +137,9 @@ action-lock registration and Knip admission. Then run documentation,
 authority, controls and verification checks followed by
 `bun run verification` through `bundjil/dev`.
 
-After the PR opens, hosted CI may prove the exact source and the trusted
-Preview drift workflow may prove the `stg` fetch path. The `prd` fetch cannot
+After the PR opens, hosted CI must prove the exact PR source. Preview run
+`32676125884` already proves only the `stg` fetch and custody path; its native
+provider result is inconclusive. The `prd` fetch cannot
 be exercised without an eligible main-push CI event, which would start the
 Production deployment workflow. This task forbids that deployment, so the
 Production fetch remains repository and provider-metadata proof only until a

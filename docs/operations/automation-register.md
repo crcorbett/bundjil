@@ -110,9 +110,12 @@ The earlier missing-custody run remains retained history. On 2026-08-24, a
 one-time protected run copied the three existing GitHub values into
 `bundjil/stg` without printing them or deleting the originals. Name-only
 readback then proved the three expected Doppler keys, and GitHub custody was
-replaced with one expiring read-only token for that config. A later run of the
-final report workflow is still required to prove the new fetch and provider
-read path.
+replaced with one expiring read-only token for that config. Final-source run
+`32676125884` then proved the pinned fetch, all three custody files,
+compressed-manifest digest and sanitised receipt. Native Alchemy readback
+returned the existing fail-closed `native-drift-readback-failed` result, so the
+run is correctly inconclusive and proves neither healthy provider readback nor
+drift absence.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
