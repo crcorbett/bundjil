@@ -11,11 +11,17 @@ task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
 
 # Doppler secret custody execution plan
 
-Status: In progress
+Status: Implementation complete; PR open; cleanup deferred
 
 Branch: `codex/doppler-secret-ownership`
 
 Base: `origin/main` at `c154d725372617c699538629712569518ee18099`
+
+Pull request: `https://github.com/crcorbett/bundjil/pull/7`
+
+Hosted state: exact-head CI run `32676441398` passed. Preview run
+`32676441344` proved Doppler fetch and custody, then failed closed with the
+recorded inconclusive native Alchemy readback. Production was not run.
 
 ## Ordered work
 
