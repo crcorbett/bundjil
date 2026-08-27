@@ -117,7 +117,9 @@ describe("infrastructure operator command boundaries", () => {
         BUNDJIL_PRODUCTION_SOURCE_SHA: undefined,
       });
       expect(automaticProduction.exitCode).not.toBe(0);
-      expect(automaticProduction.output.trim()).toBe('{"status":"blocked"}');
+      expect(automaticProduction.output.trim()).toBe(
+        '{"status":"blocked","category":"configuration","operation":null,"project":null,"reason":null,"retry":null}'
+      );
       expect(automaticProduction.output).not.toContain(
         "ProductionDeploymentError"
       );

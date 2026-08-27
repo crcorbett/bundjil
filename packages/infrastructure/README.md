@@ -35,11 +35,14 @@ commands capture authority, configuration, runtime acquisition, foreground
 work, readback, and Schema receipt encoding in that boundary; expected failure
 must not fall through to a runtime stack reporter. The private automatic
 Production entrypoint follows the same process contract: it keeps the existing
-Schema-encoded deployment receipt on success and emits only
-`{"status":"blocked"}` with exit code `1` after any Config, Layer, deployment,
-rollback, health, or encoding failure. That bounded result is not a deployment
-or rollback diagnosis; GitHub logs and Vercel readback remain the operational
-evidence owners.
+Schema-encoded deployment receipt on success and emits a Schema-encoded
+`blocked` receipt with exit code `1` after any Config, Layer, deployment,
+rollback, health, or encoding failure. The receipt exposes only the closed
+failure category and, for an expected deployment failure, its safe operation,
+project, reason and retry class. It never emits a command, URL, provider body,
+credential, raw error or stack. That bounded result identifies the failed
+control step; GitHub logs and Vercel readback remain the operational evidence
+owners.
 
 ## Supported commands
 

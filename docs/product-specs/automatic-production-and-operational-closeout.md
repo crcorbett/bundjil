@@ -5,7 +5,7 @@ authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
 verification_owner: bundjil-verification-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-28
 review_trigger: main acceptance, CI, GitHub environment, Vercel CLI/API, project, Production alias, model configuration, rollback, Infrastructure Drift, Photon, Sendblue, or channel-proof change
 task_ledger: automatic-production-and-operational-closeout.tasks.json
 ---
@@ -54,6 +54,37 @@ decodes non-empty provider target names but projects only exact Preview,
 Production, or legacy `null` Preview values into Bundjil observations; custom
 targets stay excluded.
 Automatic deployment and channel proof remain unproved.
+
+### Automatic-main diagnostic correction (2026-08-28)
+
+Pull request `#6` merged exact SHA
+`276c7fdb665c3aac0cbd8f302ffacbf030317140`. CI run `33082854163` passed
+that SHA and automatically started Production run `33083232642`. The
+Production job used the same SHA and reached `production:deploy`, but stopped
+within that command with the old `{"status":"blocked"}` output. This proves the
+CI-to-Production trigger and exact checkout only. It does not prove candidate
+creation, alias movement, rollback, health, Terra High or channel behaviour.
+
+The failure output was too narrow to distinguish missing configuration from a
+safe deployment operation failure. The command must now emit one
+Schema-encoded, secret-negative blocked receipt with a closed category. For an
+expected `ProductionDeploymentError`, it may also emit only the existing
+operation, project, reason and retry fields. It must not emit a token, command,
+URL, provider body, raw error, stack or Cause. Command-level tests must prove
+the missing-config output and package tests must prove the deployment receipt
+codec. A new automatic run on the merged correction is the only accepted way
+to identify the hosted failure and continue the Production proof.
+
+#### Documentation impact ledger
+
+| Surface                                                              | Decision        | Owner and proof                                                                                                                                          |
+| -------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production command and error contract                                | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.         |
+| Workflow trigger and mutation order                                  | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; run `33083232642` proves only the trigger and exact checkout.          |
+| Deployment procedure and rollback                                    | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                    |
+| SPEC, task and execution status                                      | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                           |
+| App/public runtime, package structure, skills and agent instructions | N/A             | The inspected call path changes only the private infrastructure process output; no app API, package placement, skill route or agent instruction changes. |
+| Provider state and credentials                                       | Preserve        | This slice performs read-only Personal Vercel checks only; it does not change a token, deployment, alias, environment value or channel.                  |
 
 ### Vercel credential boundary correction (2026-08-20)
 

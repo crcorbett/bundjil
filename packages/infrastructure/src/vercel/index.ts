@@ -288,7 +288,15 @@ export {
   VercelProjects,
   type VercelProjectsShape,
 } from "./services.js";
-export { ProductionDeploymentError } from "./production.errors.js";
+export {
+  AutomaticProductionBlockedReceipt,
+  type AutomaticProductionBlockedReceipt as AutomaticProductionBlockedReceiptType,
+  AutomaticProductionBlockedReceiptJson,
+  AutomaticProductionFailureCategory,
+  ProductionDeploymentError,
+  ProductionDeploymentFailureReason,
+  ProductionDeploymentOperation,
+} from "./production.errors.js";
 export {
   makeProductionDeploymentsMemory,
   ProductionDeploymentMemoryControl,

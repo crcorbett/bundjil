@@ -3,13 +3,33 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-28
 review_trigger: Vercel credential custody, GitHub environment custody, drift artifacts, automatic Production deployment, or channel proof
 ---
 
 # Personal Vercel custody continuation
 
 ## Status
+
+Pull request `#6` merged the exact repository candidate to `main` as
+`276c7fdb665c3aac0cbd8f302ffacbf030317140`. Main CI run `33082854163`
+passed that SHA and automatically started Production run `33083232642` through
+the admitted `workflow_run` path. The Production job checked out the same SHA,
+installed dependencies and invoked `production:deploy`, then stopped with the
+old bounded `{"status":"blocked"}` output before any accepted deployment,
+alias, health, Terra High or channel proof existed. A fresh read-only Personal
+Vercel connector read confirmed both exact projects still expose a READY
+Production target with `gitCommitSha`
+`6cc0936d502a7b5f0fa32994929fac7f396eb200`; that proves the account-level
+response shape, not the GitHub project-token call.
+
+The current diagnostic slice replaces the over-broad blocked output with a
+Schema-encoded, secret-negative receipt. It reports only `configuration`,
+`deployment`, or `unexpected`; an expected deployment failure also reports the
+closed operation, project, reason and retry class already owned by
+`ProductionDeploymentError`. Raw commands, URLs, provider responses,
+credentials, errors and stacks remain absent. The next exact-main automatic
+run is required to locate the failed operation before any repair or retry.
 
 The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`
