@@ -178,7 +178,8 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
               ),
           })
         );
-        const contentType = response.headers["content-type"] ?? "";
+        const contentType =
+          response.headers["content-type"] ?? codexResponsesAccept;
         const status = yield* Schema.decodeUnknownEffect(CodexHttpStatus)(
           response.status
         ).pipe(
@@ -320,7 +321,8 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
                 ),
             })
           );
-          const contentType = response.headers["content-type"] ?? "";
+          const contentType =
+            response.headers["content-type"] ?? codexResponsesAccept;
           const status = yield* Schema.decodeUnknownEffect(CodexHttpStatus)(
             response.status
           ).pipe(

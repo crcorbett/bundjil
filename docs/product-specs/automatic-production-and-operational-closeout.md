@@ -153,6 +153,19 @@ headers. Bundjil must explicitly request `text/event-stream` and send the fixed
 beta and originator compatibility values before another live turn. The HTTP
 client owns these non-secret values; callers cannot supply them.
 
+Pull request `#13` merged those fixed headers as
+`0dd591e081389ae366ff37cd5c20bff7c59d762b`. Main CI run `33097033155`
+passed and automatic Production run `33097382192` promoted exact-SHA proxy
+`dpl_EboDwKRM4q6gJij2roXW2ZeLp4hX` plus agent
+`dpl_2dBT4KhjrzuFuoLXu7XJ8otFBGRg`, retaining the preceding pair for rollback.
+A fresh bounded turn still reached three proxy `502` responses, with every safe
+marker reporting `postResponsesStream`. The checked independent OAuth client
+fills in `text/event-stream` only when a successful streaming response omits
+`Content-Type`; it preserves an explicit value. Bundjil instead treated a
+missing header as non-SSE. The next narrow correction adopts the same absent-only
+fallback. Explicit JSON and misleading media types remain rejected before body
+ownership.
+
 #### Documentation impact ledger
 
 | Surface                                                          | Decision        | Owner and proof                                                                                                                                                                |
@@ -162,7 +175,7 @@ client owns these non-secret values; callers cannot supply them.
 | Deployment procedure and rollback                                | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                                          |
 | SPEC, task and execution status                                  | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                                 |
 | Proxy runtime, test and runbooks                                 | Change required | Both pre-stream and body-stream failures log only their closed operation; tests decode each structured log and reject internal-message sentinels.                              |
-| Codex provider request headers                                   | Change required | The package HTTP client owns fixed SSE and Codex compatibility headers; focused tests inspect the exact request without exposing credentials.                                  |
+| Codex provider request and response metadata                     | Change required | The package client owns fixed compatibility headers and treats only an absent successful stream media type as requested SSE; tests keep explicit non-SSE values rejected.      |
 | App/public API, package structure, skills and agent instructions | N/A             | No public HTTP response, package placement, skill route or agent instruction changes.                                                                                          |
 | Provider state and credentials                                   | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration.               |
 
