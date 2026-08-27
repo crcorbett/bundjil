@@ -211,6 +211,9 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    matching token, exact `VERCEL_ORG_ID`, and exact `VERCEL_PROJECT_ID` in the
    child-process environment. Use project-addressed API paths with the exact
    team ID query for current-target reads, inspection, promotion, and rollback.
+   Stage from repository root `.`. Each Personal Vercel project already owns
+   its app subdirectory through `rootDirectory`; passing the same app directory
+   as the upload root applies it twice and must fail closed before a retry.
    After promotion or rollback, use the bounded Effect retry schedule to wait
    for the decoded stable deployment ID and source SHA. A failed or exhausted
    read remains blocked and requires fresh provider readback before retry.

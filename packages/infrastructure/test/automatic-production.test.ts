@@ -236,6 +236,9 @@ describe("automatic Production deployment", () => {
       throw new Error("expected Vercel deploy and inspect commands");
     }
     expect(deployCommand.args).toContain("deploy");
+    expect(deployCommand.args).toContain(".");
+    expect(deployCommand.args).not.toContain("apps/agent");
+    expect(deployCommand.args).not.toContain("apps/codex-proxy");
     expect(deployCommand.args).not.toContain("--scope");
     expect(deployCommand.args).not.toContain("--project");
     expect(deployCommand.options.env).toMatchObject({

@@ -39,6 +39,20 @@ current target on a bounded Effect Schedule until the deployment ID and source
 SHA match. The next exact-main automatic run must prove this provider path; the
 repository checks alone do not prove it.
 
+Pull request `#9` merged the project-scoped command correction as
+`ca9862347c7ddc139a9a3c153b2d068576bdf638`. Main CI run `33087961717`
+passed, and automatic Production run `33088341038` reached staging, then
+returned `deployment/stage/proxy/commandFailed/after-readback`. Immediate
+Personal Vercel readback found no new proxy or agent deployment. Both stable
+Production targets remain READY and promoted at source
+`6cc0936d502a7b5f0fa32994929fac7f396eb200`.
+
+Both exact Vercel projects already set `rootDirectory` to their app directory.
+The failed command also supplied the same app directory as its upload root, so
+Vercel would resolve the app directory twice. The successor stages repository
+root `.` and leaves app selection to each exact project binding. A new
+exact-main automatic run remains the only accepted hosted proof.
+
 The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`
 1Password vault. The two Production credentials are installed in the exact
