@@ -53,6 +53,26 @@ Vercel would resolve the app directory twice. The successor stages repository
 root `.` and leaves app selection to each exact project binding. A new
 exact-main automatic run remains the only accepted hosted proof.
 
+Pull request `#10` merged that repair as
+`0fea78f07e8fccd035d0cce10c6eba758cda3651`. Exact-source CI run
+`33089259199` and automatic Production run `33089620419` passed. Personal
+Vercel readback confirmed proxy deployment
+`dpl_4dP71otZFpbDhgNGqp4T5grAyFw6` and agent deployment
+`dpl_8jwfW45DcEgPDCmTdV1NpvSNkahy` are READY, promoted and Production-targeted
+at that SHA, with the prior READY pair retained for rollback. Stable proxy
+health is `live` with `high` reasoning, and protected Eve info reports Terra
+with context `1050000`.
+
+The bounded Eve completion proof is not yet accepted. Three protected session
+attempts reached the private proxy, whose nine model requests all returned
+`502`; the fully observed attempt ended in `step.failed`, `turn.failed` and
+`session.waiting` without a completed message. The public error is a proxy
+stream failure, but the current runtime drops the safe internal stream
+operation. The next slice logs only that closed operation and proves by Schema
+that an internal-message sentinel cannot enter telemetry. No raw prompt,
+answer, request, response, SSE data, token, profile or provider payload is
+retained.
+
 The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`
 1Password vault. The two Production credentials are installed in the exact
@@ -213,6 +233,11 @@ not started.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
       Production path, exact deployments, stable aliases, health, Terra High,
       rollback readiness, and bounded downstream claims.
+- [x] Prove exact-SHA CI, automatic staging/promotion, both stable aliases,
+      rollback identities, stable live/high health, and protected Terra/context
+      metadata for `0fea78f07e8fccd035d0cce10c6eba758cda3651`.
+- [ ] Deploy the secret-negative proxy stream-operation diagnostic, classify
+      the current `502`, then complete one Eve turn before either channel send.
 
 ## Evidence owners
 
@@ -245,7 +270,8 @@ needed for the rejected drift run because it executed no provider command.
 | Effect command code and tests      | Change required | The report boundary classifies unavailable historical deployments as reports and accepts write-only baseline continuity only from present unchanged revision metadata plus the accepted manifest. |
 | Provider adapters and values       | Preserve        | Exact-project Vercel reads and provider values are unchanged; the correction is report classification only and values stay concealed.                                                             |
 | Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                                                            |
-| Root/app README and architecture   | Preserve        | No root/app command or stable architecture boundary changed.                                                                                                                                      |
+| Proxy runbooks and runtime test    | Change required | Record the closed stream-operation diagnostic and prove its log excludes an internal-message sentinel.                                                                                            |
+| Root/app README and architecture   | Preserve        | No public command, route, package placement or stable architecture boundary changed.                                                                                                              |
 
 ## Verification status
 

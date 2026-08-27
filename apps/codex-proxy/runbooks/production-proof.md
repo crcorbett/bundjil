@@ -93,7 +93,11 @@ profiles/ciphertext, account IDs, authorization artifacts, or unsanitized logs.
    invalid-bearer `401`, authenticated SSE completion, no-leak assertions,
    sanitized error logs, and one correlated agent-to-proxy request as distinct
    evidence. A health response alone cannot prove auth/session/provider
-   behavior.
+   behavior. If the proxy stream fails, retain only the
+   `CodexProxyStreamFailure` event and its closed `operation` value. Do not
+   retain the internal diagnostic message, request, response, SSE data, token,
+   profile, or provider payload. The operation narrows diagnosis; it does not
+   prove the cause or recovery.
 
 5. Re-read immutable deployment and stable alias state. Bind every result to
    source/deployment/config identity and `observedAt`; retain what was not

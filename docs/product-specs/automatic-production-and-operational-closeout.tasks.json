@@ -137,7 +137,7 @@
     {
       "id": "correct-terra-high-and-prove-automatic-main",
       "title": "Apply Terra High configuration and prove automatic exact-main Production",
-      "status": "deferred",
+      "status": "in_progress",
       "dependsOn": ["configure-hosted-controls-and-drift"],
       "description": "Set the three required semantic Production values in their owning Personal projects, merge an exact verified candidate, let the new main workflow stage and promote without a human step, and prove immutable/stable/rollback and model behaviour.",
       "mandatoryVerification": [
@@ -157,7 +157,7 @@
         "limitationsAndNonClaims": "One bounded turn does not prove all future model responses, latency or strict replay absence."
       },
       "docsImpact": "Update accepted Production proof, runbook readback, active plan and lifecycle owners; provider state remains dated evidence.",
-      "currentResult": "Deferred without an accepted automatic Production run. Pull request #6 merged exact SHA 276c7fdb665c3aac0cbd8f302ffacbf030317140; CI run 33082854163 passed it and automatic Production run 33083232642 stopped with the old bounded blocked output. Pull request #8 merged the Schema-encoded secret-negative receipt as 34c68131eab81e2ae3adaa7e77032e41e4dd5259; CI run 33085234816 passed and Production run 33085555416 reported deployment/current/proxy/commandFailed/after-readback. Pull request #9 then merged the exact project binding correction as ca9862347c7ddc139a9a3c153b2d068576bdf638. CI run 33087961717 passed, and Production run 33088341038 progressed to deployment/stage/proxy/commandFailed/after-readback. Immediate Personal Vercel readback found no new deployment; both stable Production targets remain READY and promoted at source 6cc0936d502a7b5f0fa32994929fac7f396eb200. Both projects already set their app directory through Vercel rootDirectory, while the command also passed that app directory as its upload root. The successor stages repository root dot and leaves app selection to each exact project binding. A new exact-main hosted run and provider readback remain required.",
+      "currentResult": "In progress after automatic deployment succeeded but the required live turn failed. Pull request #10 merged the repository-root staging repair as 0fea78f07e8fccd035d0cce10c6eba758cda3651. CI run 33089259199 and automatic Production run 33089620419 passed on that exact SHA. Independent Personal Vercel readback confirmed proxy deployment dpl_4dP71otZFpbDhgNGqp4T5grAyFw6 and agent deployment dpl_8jwfW45DcEgPDCmTdV1NpvSNkahy are READY, promoted, Production-targeted and exact-SHA, with the previous READY pair retained for rollback. Stable proxy health is live/high and protected Eve info reports bundjil-codex-proxy/gpt-5.6-terra with context 1050000. Three bounded protected session attempts reached the private proxy; nine proxy requests returned 502, and the fully observed turn ended with step.failed, turn.failed and session.waiting without message.completed. The public error is a proxy stream failure. The next slice adds a secret-negative log containing only the closed stream operation; raw messages, prompts, responses, SSE, tokens, profiles and provider payloads remain forbidden. A completed Eve turn and correlated proxy completion are still required.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
         "docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json"
