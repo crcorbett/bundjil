@@ -3,8 +3,8 @@
   "taskId": "HGI-307",
   "baseCommit": "1177596569d1a037b08302cad526be8a94ed55ee",
   "docsInventory": {
-    "pathCount": 258,
-    "sortedPathSha256": "85b83111ea10703929507906f6a08bebb19d852b66a59597bbd641d00a68d510"
+    "pathCount": 260,
+    "sortedPathSha256": "612c37cf1e9cba3156bacd10f247ed43bce26d37141e2d837381d80fdef03d30"
   },
   "readmeInventory": {
     "pathCount": 23,

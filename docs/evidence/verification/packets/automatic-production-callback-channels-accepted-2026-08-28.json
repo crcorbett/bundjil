@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "kind": "production",
+  "status": "proved",
+  "outcome": "passed",
+  "lifecycle": { "state": "accepted" },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "Automatic Personal Vercel Production deployment, Photon callback movement, protected Terra High turn and two bounded iMessage journeys"
+  },
+  "candidate": {
+    "repositoryCommit": "27011deb4593f15f4042ff5cf570ca426da9d299",
+    "sourceDigest": "5f282dd6b2e470c7f6903826ea6ce5a08d1a97b13a3c43080a83fd62a9dcc8f5",
+    "artifactDigest": "da81930ef8e48d9c867b67532947fd0f3fb1d8092406237f5f03a7bf920c6a05"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Authenticated GitHub, Personal Vercel, Executor Personal Sendblue and established Messages conversations",
+    "externalAccess": "mutation",
+    "approvalReceipt": "Cooper approved the remaining Personal Vercel deployment, channel sends, provider readbacks, proof closeout and rollback-ready work",
+    "rollbackOwner": "Bundjil personal Vercel and channel operator"
+  },
+  "environment": {
+    "tier": "production",
+    "target": "Personal Bundjil agent and Codex proxy projects plus the established Photon and Sendblue Production conversations"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J09-deployment-promotion-readback",
+      "status": "passed",
+      "oracle": "Exact main CI automatically started Production; the workflow and independent Vercel reads matched both READY stable deployments, the Photon callback target, source SHA and rollback identities without manual reassignment."
+    },
+    {
+      "journeyId": "BND-J05-sendblue-accepted-message",
+      "status": "passed",
+      "oracle": "One established-conversation inbound was RECEIVED and one outbound iMessage was DELIVERED without downgrade or provider error; dispatch, handset reply and visible typing were observed separately."
+    },
+    {
+      "journeyId": "BND-J11-photon-accepted-message-typing",
+      "status": "inconclusive",
+      "oracle": "Signed ingress, Eve dispatch, typing start and stop, outbound send, handset delivery, reply and visible typing passed, but the provider still exposes no supported strict candidate-specific replay oracle."
+    },
+    {
+      "journeyId": "BND-J12-dual-channel-production",
+      "status": "inconclusive",
+      "oracle": "Both bounded Production journeys and the exact callback path passed with one observed reply each; the combined strict duplicate claim remains limited only by the unsupported Photon replay oracle."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Pull request merge, exact-main CI, automatic Production workflow, independent Personal Vercel readback, protected Eve probe and one bounded established-conversation message per provider",
+    "outcome": "passed",
+    "exitCode": 0,
+    "invariant": "Only the exact accepted main SHA may become Production; proxy, public agent and Photon callback must match before runtime and channel claims are accepted.",
+    "target": "Main 27011deb4593f15f4042ff5cf570ca426da9d299 and its exact Personal Vercel Production deployments",
+    "recoveryHint": "Use the three retained previous deployment identities and callback-first rollback order; re-read every alias and source before any recovery action.",
+    "detailPath": "docs/evidence/verification/details/automatic-production-callback-channels-accepted-2026-08-28.json",
+    "detailSha256": "da81930ef8e48d9c867b67532947fd0f3fb1d8092406237f5f03a7bf920c6a05",
+    "postcondition": "Automatic Production owns the exact proxy, public agent and Photon callback; Terra High completed one bounded turn and both channel paths produced one visible reply with visible typing."
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "GitHub, Vercel, protected Eve, Vercel runtime logs, Executor Personal Sendblue status and Messages UI all returned matching bounded observations for the accepted source."
+  },
+  "postconditions": [
+    "Main and origin/main match the accepted merge commit after pull request 15.",
+    "Both stable aliases and the Photon callback resolve to READY deployments built from the exact accepted source.",
+    "Proxy health reports live/high and protected Eve reports gpt-5.6-terra with context 1050000; one bounded turn reached completed/waiting without failure.",
+    "Photon and Sendblue each produced one visible Production reply and one visible typing observation in an established conversation.",
+    "The prior proxy, agent and callback deployment identities remain recorded and rollback-ready."
+  ],
+  "limitations": [
+    "Photon strict candidate-specific replay remains unavailable because the provider exposes no supported oracle; existing replay claims, unique work fingerprints and one observed reply remain residual controls, not strict proof.",
+    "This is point-in-time evidence for one exact source and two bounded messages, not a guarantee of future availability, latency, output quality or typing display.",
+    "The hosted Infrastructure Drift report remains zero-write but inconclusive for eight write-only values and is separately deferred."
+  ],
+  "nonClaims": [
+    "No phone number, message content, session identifier, token, secret, raw provider payload, raw stream or unbounded log is retained.",
+    "No manual Vercel promotion or callback reassignment occurred in the accepted path.",
+    "This packet grants no standing authority for another deployment, provider mutation, credential change or message."
+  ],
+  "rollback": {
+    "identity": "Previous proxy dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV, previous agent dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx and the same previous callback deployment, restored callback first",
+    "outcome": "ready",
+    "owner": "Bundjil personal Vercel operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-callback-channels-accepted-2026-08-28.json",
+      "sha256": "da81930ef8e48d9c867b67532947fd0f3fb1d8092406237f5f03a7bf920c6a05",
+      "provenance": "Sanitized exact-main GitHub, Personal Vercel, protected Eve, runtime, Sendblue status and Messages observations"
+    }
+  ],
+  "observedAt": "2026-08-27T19:42:05Z"
+}

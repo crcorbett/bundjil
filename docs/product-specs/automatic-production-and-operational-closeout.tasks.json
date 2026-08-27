@@ -1,7 +1,7 @@
 {
   "title": "Automatic Production deployment and operational closeout tasks",
   "spec": "automatic-production-and-operational-closeout.md",
-  "status": "in_progress",
+  "status": "completed",
   "authority": "Cooper's 2026-08-10 delegated authority covers the exact repository, GitHub, Personal Vercel team team_1LX7ZujbijowTv8J9k0aU7nD, secret, deployment, rollback, Photon, Sendblue, OAuth and Computer Use operations in this ledger; it does not permit another Vercel team, secret disclosure, unrelated resources, destructive out-of-scope work, or blind retry. A contact email does not define Vercel resource scope.",
   "principles": [
     "Deploy only an exact successful main CI SHA and never let Vercel Git move Production before repository verification.",
@@ -167,7 +167,7 @@
     {
       "id": "bind-photon-callback-to-automatic-production",
       "title": "Move and roll back the Photon callback in automatic Production",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["correct-terra-high-and-prove-automatic-main"],
       "description": "Add the existing Production Photon callback alias to the typed automatic deployment state machine so every accepted main deployment moves and verifies it, while callback-only drift is reconciled without rebuilding and every uncertain outcome rolls back in reverse order.",
       "mandatoryVerification": [
@@ -191,13 +191,13 @@
         "limitationsAndNonClaims": "Repository fixtures do not prove Vercel mutation. Hosted callback readback does not prove future Photon delivery or strict candidate-specific replay."
       },
       "docsImpact": "Update the infrastructure README, Production runbook, workflow, authority/automation registers, SPEC/tasks/plan and dated proof in the same slice; preserve app route and package topology.",
-      "currentResult": "Reopened after the accepted live Photon proof found that the provider callback used Vercel's automatic agent-project alias while the Production command moved only the public stable alias. A bounded manual reassignment restored current service and proved the needed operation, but manual movement is not accepted as automatic-main proof. The current branch now owns the callback through branded Config and named service operations, decodes and inspects its exact provider target, supports callback-only reconciliation, moves proxy/public agent/callback in order, and rolls back callback/agent/proxy in reverse eligible order for typed failure, interruption and defect. Terminal reviews required bounded provider, mutation, restoration, deployment-step and workflow deadlines, every later eligible rollback attempt after an earlier failure or stall, exact timeout and interruption/defect reasons, optional-or-null redirect decoding, structural workflow validation, correct call-graph names, private adapter-only alias branding and corrected historical SPEC wording. GitHub Production readback confirms the exact non-secret callback variable. The workflow still references only the existing two project-scoped Vercel secrets; one unrelated DOPPLER_TOKEN is present in the environment but is not referenced by the workflow. The final independent review found no remaining issue and full repository verification passes; exact-main CI, automatic Production and callback readback remain required.",
+      "currentResult": "Completed on 2026-08-28. Pull request 15 merged as exact main 27011deb4593f15f4042ff5cf570ca426da9d299. Main CI run 33108401987 passed and automatically started Production run 33108710900. The Schema-encoded receipt reported promoted with rollbackReady true and recorded the prior proxy, agent and callback identities. Independent Personal Vercel readback matched READY proxy dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6 and agent dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp to that source; both public aliases and the Photon callback resolved to those exact targets without manual reassignment. Proxy health returned live/high, protected Eve reported bundjil-codex-proxy/gpt-5.6-terra with context 1050000, and one bounded turn reached message.completed and session.waiting without failure. The accepted proof packet is docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json.",
       "commitAfterPassing": true
     },
     {
       "id": "close-channel-proof-gaps",
       "title": "Run bounded Personal Photon and Sendblue long-response proofs",
-      "status": "in_progress",
+      "status": "completed",
       "dependsOn": ["bind-photon-callback-to-automatic-production"],
       "description": "Reauthenticate Photon in Personal scope, inventory it, then use the established conversations for one bounded Photon and one bounded Sendblue long-response test with direct handset observation where available.",
       "mandatoryVerification": [
@@ -217,7 +217,7 @@
         "limitationsAndNonClaims": "Photon strict replay and any unobservable handset animation remain explicit limitations, not implementation defects."
       },
       "docsImpact": "Update verification packet/index, active plan, task status and exact runbook evidence pointers; preserve provider procedures in app runbooks.",
-      "currentResult": "Live channel work was accepted on 2026-08-28 against exact agent dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx and proxy dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV. One Photon journey produced one visible Production reply; provider operations accepted typing start/stop and one outbound send, and accepted agent logs showed one signed webhook plus workflow completion. One Sendblue journey produced one visible Production reply; the provider reported the outbound iMessage delivered and exact agent/proxy logs showed the accepted webhook, workflow and successful model call. Neither observer caught a handset-visible typing animation, and Photon exposes no supported candidate-specific replay oracle. Those remain explicit non-blocking non-claims. Final closeout waits only for durable proof reconciliation after the callback automation lands; no repeated message is required.",
+      "currentResult": "Completed on 2026-08-28 against exact agent dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp and proxy dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6. Computer Use selected each established conversation by visible history and sent exactly one bounded prompt. Photon accepted signed ingress, Eve dispatch, typing start and stop and one outbound send; Messages directly showed delivery, visible typing and one full reply. Sendblue reported the inbound as RECEIVED and the outbound iMessage as DELIVERED without downgrade or provider error; Messages directly showed delivery, visible typing and one full reply. Agent logs bound both webhooks and Photon operations to the exact deployment, proxy logs recorded successful requests, and neither app reported a runtime error in the proof window. Photon exposes no supported candidate-specific replay oracle, so strict replay remains the accepted non-blocking limitation and no custom substitute was added. The durable packet is docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
       ],

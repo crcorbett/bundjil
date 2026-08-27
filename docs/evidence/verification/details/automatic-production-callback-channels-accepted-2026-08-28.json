@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-08-27T19:42:05Z",
+  "result": "automatic_production_callback_and_channels_accepted",
+  "candidate": {
+    "repositoryCommit": "27011deb4593f15f4042ff5cf570ca426da9d299",
+    "pullRequest": 15,
+    "ciRun": 33108401987,
+    "productionRun": 33108710900
+  },
+  "productionReceipt": {
+    "status": "promoted",
+    "sourceMatched": true,
+    "rollbackReady": true,
+    "previousProxyDeploymentId": "dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV",
+    "previousAgentDeploymentId": "dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx",
+    "previousAgentCallbackDeploymentId": "dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx",
+    "stableProxyDeploymentId": "dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6",
+    "stableAgentDeploymentId": "dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp",
+    "stableAgentCallbackDeploymentId": "dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp",
+    "manualCallbackAssignment": false
+  },
+  "independentVercelReadback": {
+    "teamId": "team_1LX7ZujbijowTv8J9k0aU7nD",
+    "proxy": {
+      "projectId": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+      "deploymentId": "dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6",
+      "ready": true,
+      "productionTarget": true,
+      "sourceMatched": true,
+      "stableAliasMatched": true
+    },
+    "agent": {
+      "projectId": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+      "deploymentId": "dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp",
+      "ready": true,
+      "productionTarget": true,
+      "sourceMatched": true,
+      "stableAliasMatched": true,
+      "callbackAliasMatched": true
+    }
+  },
+  "runtimeProof": {
+    "proxyHealth": {
+      "httpStatus": 200,
+      "mode": "live",
+      "reasoningEffort": "high"
+    },
+    "protectedEveInfo": {
+      "httpStatus": 200,
+      "modelId": "bundjil-codex-proxy/gpt-5.6-terra",
+      "contextWindowTokens": 1050000,
+      "diagnosticErrors": 0,
+      "diagnosticWarnings": 0
+    },
+    "boundedTurn": {
+      "sessionAccepted": true,
+      "sessionStarted": 1,
+      "turnStarted": 1,
+      "messageReceived": 1,
+      "stepStarted": 1,
+      "messageCompleted": 1,
+      "stepCompleted": 1,
+      "turnCompleted": 1,
+      "sessionWaiting": 1,
+      "failureEvents": 0,
+      "boundedReaderTimedOutAfterWaiting": true
+    },
+    "proxySuccessfulRequestsInProofWindow": 5,
+    "agentRuntimeErrorsInProofWindow": 0,
+    "proxyRuntimeErrorsInProofWindow": 0
+  },
+  "channelProof": {
+    "photon": {
+      "establishedConversationSelectedByVisibleHistory": true,
+      "boundedMessagesSent": 1,
+      "signedWebhookStatus": 202,
+      "dispatchAccepted": true,
+      "sessionContinuity": "resumed",
+      "typingStartAccepted": true,
+      "typingStopAccepted": true,
+      "outboundSendAccepted": true,
+      "handsetDeliveryObserved": true,
+      "handsetReplyObserved": true,
+      "handsetTypingObserved": true,
+      "strictCandidateReplayOracle": "unsupported"
+    },
+    "sendblue": {
+      "establishedConversationSelectedByVisibleHistory": true,
+      "boundedMessagesSent": 1,
+      "signedWebhookStatus": 202,
+      "dispatchAccepted": true,
+      "sessionContinuity": "resumed",
+      "providerInboundStatus": "RECEIVED",
+      "providerOutboundStatus": "DELIVERED",
+      "service": "iMessage",
+      "downgraded": false,
+      "providerError": false,
+      "handsetDeliveryObserved": true,
+      "handsetReplyObserved": true,
+      "handsetTypingObserved": true
+    }
+  },
+  "limitations": [
+    "Photon exposes no supported candidate-specific replay oracle, so strict duplicate proof remains unavailable and no custom substitute was added.",
+    "The bounded protected Eve turn and two channel journeys prove only this exact deployment and observation window, not future availability, latency or output quality.",
+    "The Infrastructure Drift report remains zero-write but inconclusive for eight write-only values because Vercel exposes no prior value history for comparison."
+  ],
+  "nonClaims": [
+    "No phone number, message content, session identifier, token, secret, raw provider payload, raw stream or unbounded runtime log is retained.",
+    "Provider acceptance, Eve completion, handset delivery and visible typing are separate observations and are not inferred from one another.",
+    "A successful automatic deployment does not grant standing authority for another deployment, provider mutation or message."
+  ]
+}
