@@ -157,6 +157,12 @@ effectIt.effect(
         `Bearer ${Redacted.value(input.accessToken)}`
       );
       assert.strictEqual(request.headers["content-type"], "application/json");
+      assert.strictEqual(request.headers["accept"], "text/event-stream");
+      assert.strictEqual(
+        request.headers["openai-beta"],
+        "responses=experimental"
+      );
+      assert.strictEqual(request.headers["originator"], "codex_cli_rs");
       assert.strictEqual(request.headers["chatgpt-account-id"], undefined);
     })
 );

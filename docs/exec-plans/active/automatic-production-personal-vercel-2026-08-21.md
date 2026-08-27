@@ -247,6 +247,15 @@ not started.
       observer correctly covered a returned body stream, but the live failure
       occurs before that stream exists; apply the same secret-negative observer
       in the typed pre-stream error handler and retest once.
+- [x] Merge `f5ea0218de9199284530abb2a1c6613e59cf7852`, pass CI run
+      `33095223765`, automatically promote proxy
+      `dpl_3uRT9npE8Gx75LtdQEvjR45FhMiB` and agent
+      `dpl_5wzmujRby12JZJVMBKQ3zuvcB17d` in run `33095604644`, then classify all
+      three safe failure markers as `postResponsesStream`.
+- [ ] Add the fixed SSE, beta and originator request headers used by the local
+      Codex reference at `9e552e9d…` and OAuth reference at `bec2ad69…`; prove
+      the exact outbound request in package tests, deploy automatically, and
+      run one bounded turn.
 
 ## Evidence owners
 
@@ -280,6 +289,7 @@ needed for the rejected drift run because it executed no provider command.
 | Provider adapters and values       | Preserve        | Exact-project Vercel reads and provider values are unchanged; the correction is report classification only and values stay concealed.                                                             |
 | Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                                                            |
 | Proxy runbooks and runtime test    | Change required | Cover pre-stream and body-stream failures with the same closed operation log and prove both exclude internal-message sentinels.                                                                   |
+| Codex package README and client    | Change required | Record and test the package-owned fixed subscription-response headers without exposing bearer or account values.                                                                                  |
 | Root/app README and architecture   | Preserve        | No public command, route, package placement or stable architecture boundary changed.                                                                                                              |
 
 ## Verification status

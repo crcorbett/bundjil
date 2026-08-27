@@ -139,6 +139,20 @@ before the returned body stream existed. The follow-up keeps the body-stream
 observer and applies the same secret-negative operation observer to the
 pre-stream `CodexResponsesStreamError` handler. Tests must cover both timings.
 
+That observer was merged as `f5ea0218de9199284530abb2a1c6613e59cf7852`.
+Main CI run `33095223765` passed and automatic Production run `33095604644`
+promoted exact-SHA proxy `dpl_3uRT9npE8Gx75LtdQEvjR45FhMiB` plus agent
+`dpl_5wzmujRby12JZJVMBKQ3zuvcB17d`, retaining the prior pair for rollback. A
+single fresh turn again produced three proxy `502` responses. All three safe
+markers reported `postResponsesStream`: the upstream request returned, but its
+successful response was rejected before body ownership because it was not
+recognised as SSE. The local OpenAI Codex reference at
+`9e552e9d15ba52bed7077d5357f3e18e330f8f38` and the independent OAuth reference
+at `bec2ad69b252ef4ad7dd33b9532ff8b4fdb6d016` both send fixed Codex response
+headers. Bundjil must explicitly request `text/event-stream` and send the fixed
+beta and originator compatibility values before another live turn. The HTTP
+client owns these non-secret values; callers cannot supply them.
+
 #### Documentation impact ledger
 
 | Surface                                                          | Decision        | Owner and proof                                                                                                                                                                |
@@ -148,6 +162,7 @@ pre-stream `CodexResponsesStreamError` handler. Tests must cover both timings.
 | Deployment procedure and rollback                                | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                                          |
 | SPEC, task and execution status                                  | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                                 |
 | Proxy runtime, test and runbooks                                 | Change required | Both pre-stream and body-stream failures log only their closed operation; tests decode each structured log and reject internal-message sentinels.                              |
+| Codex provider request headers                                   | Change required | The package HTTP client owns fixed SSE and Codex compatibility headers; focused tests inspect the exact request without exposing credentials.                                  |
 | App/public API, package structure, skills and agent instructions | N/A             | No public HTTP response, package placement, skill route or agent instruction changes.                                                                                          |
 | Provider state and credentials                                   | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration.               |
 
