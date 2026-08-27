@@ -1062,6 +1062,68 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
       })
   );
 
+  it.effect(
+    "records only the closed operation when opening the proxy stream fails",
+    () =>
+      Effect.gen(function* testSecretNegativeStreamOpenFailureLog() {
+        const config = yield* liveTestConfig;
+        const messages: globalThis.Array<unknown> = [];
+        const proxyLayer = Layer.merge(
+          Layer.succeed(
+            OpenAICompatibleProxy,
+            OpenAICompatibleProxy.of({
+              handleChatCompletions: () =>
+                Effect.fail(
+                  new CodexResponsesStreamError({
+                    operation: "postResponsesStream",
+                    message: "stream-open-log-secret-sentinel",
+                  })
+                ),
+            })
+          ),
+          CodexProxyReadyLive
+        );
+        const webHandler = makeCodexProxyWebHandler(
+          Layer.merge(
+            makeCodexProxyAppLayer(
+              CodexProxyConfigLayer(config),
+              proxyLayer.pipe(Layer.orDie)
+            ),
+            Logger.layer([boundaryLogger(messages)])
+          )
+        );
+
+        yield* Effect.acquireUseRelease(
+          Effect.succeed(webHandler),
+          (handler) =>
+            Effect.gen(function* consumeFailedStreamOpenResponse() {
+              const response = yield* Effect.promise(() =>
+                handler.handler(
+                  chatCompletionRequest("Bearer test-internal-token")
+                )
+              );
+              yield* Effect.promise(() => response.text());
+            }),
+          (handler) => Effect.promise(() => handler.dispose())
+        );
+
+        const decoded = yield* Schema.decodeUnknownEffect(
+          CodexProxyStreamFailureLogs
+        )(messages);
+        const encoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CodexProxyStreamFailureLogs)
+        )(decoded);
+
+        assert.deepStrictEqual(decoded, [
+          ["CodexProxyStreamFailure", { operation: "postResponsesStream" }],
+        ]);
+        assert.strictEqual(
+          encoded.includes("stream-open-log-secret-sentinel"),
+          false
+        );
+      })
+  );
+
   it.effect("fails closed when live configuration is unavailable", () =>
     Effect.gen(function* testUnavailableLiveConfiguration() {
       const config = yield* liveTestConfig;

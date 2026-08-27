@@ -238,6 +238,15 @@ not started.
       metadata for `0fea78f07e8fccd035d0cce10c6eba758cda3651`.
 - [ ] Deploy the secret-negative proxy stream-operation diagnostic, classify
       the current `502`, then complete one Eve turn before either channel send.
+- [x] Merge diagnostic commit `0af295bbaecc7b80c86411b92a5f542c2a51e2b8`,
+      pass CI run `33093327445`, and automatically promote exact-SHA proxy
+      `dpl_7FEYwYJeqFVHfkG8RnZ13otqRSBq` plus agent
+      `dpl_CqPEyfZCpuUNGuLjxhcv2fzW32KN` in run `33093683516` with the prior
+      pair retained for rollback.
+- [ ] Observe the operation for the pre-stream `502`. The first deployed
+      observer correctly covered a returned body stream, but the live failure
+      occurs before that stream exists; apply the same secret-negative observer
+      in the typed pre-stream error handler and retest once.
 
 ## Evidence owners
 
@@ -270,7 +279,7 @@ needed for the rejected drift run because it executed no provider command.
 | Effect command code and tests      | Change required | The report boundary classifies unavailable historical deployments as reports and accepts write-only baseline continuity only from present unchanged revision metadata plus the accepted manifest. |
 | Provider adapters and values       | Preserve        | Exact-project Vercel reads and provider values are unchanged; the correction is report classification only and values stay concealed.                                                             |
 | Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                                                            |
-| Proxy runbooks and runtime test    | Change required | Record the closed stream-operation diagnostic and prove its log excludes an internal-message sentinel.                                                                                            |
+| Proxy runbooks and runtime test    | Change required | Cover pre-stream and body-stream failures with the same closed operation log and prove both exclude internal-message sentinels.                                                                   |
 | Root/app README and architecture   | Preserve        | No public command, route, package placement or stable architecture boundary changed.                                                                                                              |
 
 ## Verification status
