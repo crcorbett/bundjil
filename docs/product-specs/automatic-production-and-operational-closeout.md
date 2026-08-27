@@ -567,6 +567,17 @@ the accepted manifest explicitly records the same `ObservedUnknown` baseline.
 That proves metadata continuity only; the remote secret value remains unknown.
 Absent revision metadata or any changed row remains inconclusive or blocking.
 
+CI run `32455191281` passed exact successor SHA
+`f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
+`32455191367` completed every provider read with zero writes and returned 109
+accepted, zero blocking, eight inconclusive and 38 report findings. The eight
+write-only rows are live, four per project. Secret-negative aggregate readback
+proved every provider revision changed; five rows also changed type and two also
+changed sensitivity. Vercel exposes no prior secret value or separate immutable
+value-revision history for those rows. The control therefore stops before
+`main`; report-only authority cannot replace the accepted baseline or call the
+rows unchanged.
+
 ## Documentation impact ledger
 
 | Surface                                       | Decision                                                                 | Earliest owner and evidence                                                                                                                                                            |

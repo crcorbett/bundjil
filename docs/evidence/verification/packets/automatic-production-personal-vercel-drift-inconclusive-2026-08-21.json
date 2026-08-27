@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "preview",
+  "status": "inconclusive",
+  "outcome": "inconclusive",
+  "lifecycle": {
+    "state": "inconclusive"
+  },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "GitHub Infrastructure Drift workflow run 32455191367"
+  },
+  "candidate": {
+    "repositoryCommit": "f5c707c4da8065993e6886130f887a774ff71520",
+    "sourceDigest": "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+    "artifactDigest": "f70b310bfe52048acc20bd8d862ac81b7a990145cb21112c9fa60317cb5e6527"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Supervised Personal Vercel, personal 1Password and crcorbett/bundjil GitHub continuation",
+    "externalAccess": "read_only",
+    "approvalReceipt": "Approved exact-project credential custody, one report-only drift run and bounded follow-up without repair",
+    "rollbackOwner": "Bundjil personal GitHub and provider operator"
+  },
+  "environment": {
+    "tier": "preview",
+    "target": "GitHub infrastructure-read-only-preview and exact Personal Preview providers"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "status": "inconclusive",
+      "oracle": "Run 32455191367 completed every provider read with provider-writes:0 but retained eight changed write-only rows without a prior-value oracle."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Pull-request Infrastructure Drift on exact source f5c707c4da8065993e6886130f887a774ff71520",
+    "outcome": "blocked",
+    "exitCode": 2,
+    "invariant": "Changed write-only rows stay inconclusive unless an immutable provider revision proves continuity or a separately authorised baseline admits the current state",
+    "target": "alchemy:BundjilInfrastructure:preview",
+    "recoveryHint": "Obtain separate evidence and authority for re-admission, or a provider-owned immutable value-revision oracle; do not weaken the report control",
+    "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json",
+    "detailSha256": "f70b310bfe52048acc20bd8d862ac81b7a990145cb21112c9fa60317cb5e6527",
+    "postcondition": "CI passed the exact source; drift completed read-only with zero blocking rows and zero writes; main and automatic Production remain stopped"
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "GitHub run metadata, Schema-valid sanitized receipt and aggregate exact-state/provider comparison"
+  },
+  "postconditions": [
+    "CI run 32455191281 passed exact SHA f5c707c4da8065993e6886130f887a774ff71520.",
+    "Drift run 32455191367 returned 109 accepted, zero blocking, eight inconclusive and 38 report findings with provider-writes:0.",
+    "The eight live changed write-only rows are split four per exact project; no credential or environment value was emitted or retained.",
+    "Pull request 6 remains open and origin/main remains c154d725372617c699538629712569518ee18099."
+  ],
+  "limitations": [
+    "Vercel exposes current row metadata but no previous secret value or separate immutable value revision for the eight changed rows.",
+    "The report cannot prove whether those eight values changed.",
+    "Report-only authority cannot replace the accepted baseline."
+  ],
+  "nonClaims": [
+    "This packet does not prove an accepted Infrastructure Drift result, a main merge, automatic Production deployment, immutable deployments, aliases, health, Terra High, Eve behaviour, delivery or handset state.",
+    "No credential value, environment key, environment value, provider payload, request header or protected GitHub value is retained."
+  ],
+  "rollback": {
+    "identity": "No provider rollback is required because the hosted run and follow-up were read-only and recorded zero writes.",
+    "outcome": "ready",
+    "owner": "Bundjil personal GitHub and provider operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json",
+      "sha256": "f70b310bfe52048acc20bd8d862ac81b7a990145cb21112c9fa60317cb5e6527",
+      "provenance": "Authenticated GitHub metadata and sanitized receipt plus exact-item 1Password, exact R2 state and exact-project Vercel readback"
+    }
+  ],
+  "observedAt": "2026-08-21T06:42:02Z"
+}

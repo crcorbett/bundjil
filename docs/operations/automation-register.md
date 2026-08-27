@@ -174,6 +174,16 @@ The successor reports that historical API limit without repair authority and
 accepts write-only baseline continuity only under the three-way manifest,
 native-result and provider-revision rule below.
 
+CI run `32455191281` passed exact successor SHA
+`f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
+`32455191367` completed all provider reads and recorded zero writes, zero
+blocking rows, eight inconclusive write-only rows and 38 report rows. Aggregate
+secret-negative follow-up found the eight rows live, four per project, with
+changed provider revisions; five also changed type and two also changed
+sensitivity. No previous value or immutable value revision is available from
+the admitted provider read. The workflow therefore remains failed closed and
+cannot trigger a main merge or automatic Production.
+
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.

@@ -15,6 +15,8 @@ Accepted and superseded plans live in [`../completed`](../completed/).
 The current supervised continuation is
 [`automatic-production-personal-vercel-2026-08-21.md`](automatic-production-personal-vercel-2026-08-21.md).
 It records the accepted four-token one-year custody slice, the two Production
-GitHub secret names, the three Preview drift artifacts, and the rejected
-false-green hosted drift run. Corrected hosted drift and automatic Production
-remain open until their required external predicates are proved.
+GitHub secret names, the three Preview drift artifacts, the rejected
+false-green run, and the latest exact-source zero-write receipt. Eight changed
+write-only rows remain genuinely inconclusive, so `main` and automatic
+Production stay stopped until the required external proof or separate
+re-admission authority exists.

@@ -84,6 +84,19 @@ is present and the accepted manifest explicitly records the same
 `ObservedUnknown` baseline; the secret value itself remains an explicit
 non-claim. Every other unknown revision remains inconclusive.
 
+CI run `32455191281` passed exact successor SHA
+`f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
+`32455191367` completed every provider read with zero writes and returned 109
+accepted, zero blocking, eight inconclusive and 38 report findings. The reports
+are one Photon observation change and 37 unavailable historical deployments.
+Secret-negative follow-up proved the eight remaining write-only rows are live,
+four in each project, and every provider revision changed; five rows also
+changed type and two also changed sensitivity. Vercel exposes no prior
+secret value or separate value-revision history for these rows. They therefore
+remain genuinely inconclusive. Pull request `#6` stays open and `origin/main`
+stays at `c154d725372617c699538629712569518ee18099`; automatic Production has
+not started.
+
 ## Exact scope
 
 - Personal Vercel team: `team_1LX7ZujbijowTv8J9k0aU7nD`.
@@ -147,15 +160,23 @@ non-claim. Every other unknown revision remains inconclusive.
       list, then classify that absence as a report rather than repairable
       drift. Accept an unknown write-only baseline only with unchanged present
       provider revision metadata and the matching accepted manifest baseline.
-- [ ] Push the verified correction and require one genuine hosted zero-write
-      receipt on its exact source.
+- [x] Push exact correction `f5c707c4da8065993e6886130f887a774ff71520`,
+      retain successful same-source CI run `32455191281`, and retain zero-write
+      drift run `32455191367` as genuinely inconclusive because eight live
+      write-only rows have changed provider revisions.
+- [ ] Obtain separate authority and evidence to re-admit the eight changed
+      write-only rows, or obtain an immutable provider value-revision oracle;
+      do not weaken the control or replace the accepted baseline under
+      report-only authority.
 - [ ] Push the verified main state and prove the automatic `workflow_run`
       Production path, exact deployments, stable aliases, health, Terra High,
       rollback readiness, and bounded downstream claims.
 
 ## Evidence owners
 
-- Custody and external readback: the dated packet and detail linked above.
+- Custody and external readback: the dated
+  [inconclusive packet](../../evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json)
+  and its exact detail own the latest hosted and provider observations.
 - Repository desired state: the canonical SPEC, task ledger, authority
   register, automation registers, runbook and verification router.
 - Provider state: only fresh authenticated readback at the time of the next
@@ -186,11 +207,14 @@ needed for the rejected drift run because it executed no provider command.
 
 ## Verification status
 
-Focused drift tests and the infrastructure type check pass for the current
-uncommitted correction. Full repository verification also passes with the
-documented process-only synthetic Executor URL: all policy checks, 140 tooling
+Focused drift tests and the infrastructure type check pass for correction
+`f5c707c4da8065993e6886130f887a774ff71520`. Full repository verification
+also passes with the documented process-only synthetic Executor URL: all
+policy checks, 140 tooling
 tests, type-aware formatting/lint, Knip, all nine workspace type checks and all
 15 workspace build/test tasks passed. The synthetic URL made no provider call.
-Hosted exact-source proof is still required. External claims remain separated:
-repository proof does not prove hosted drift, deployment, provider behaviour,
-delivery, handset state or future runs.
+Hosted CI passed on the exact source. The same-source drift receipt is
+Schema-valid and zero-write but inconclusive, so it is not accepted as the
+required successful drift result. External claims remain separated: repository
+and CI proof do not prove accepted hosted drift, deployment, delivery, handset
+state or future runs.
