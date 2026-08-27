@@ -9,7 +9,7 @@ import type {
 } from "./production.schemas.js";
 import { ProductionProxyHealth } from "./production.schemas.js";
 import { ProductionDeployments } from "./production.service.js";
-import type { VercelGitSha } from "./schemas.js";
+import type { VercelDeploymentId, VercelGitSha } from "./schemas.js";
 
 export const ProductionMemoryFailure = Schema.Literals([
   "none",
@@ -20,14 +20,21 @@ export const ProductionMemoryFailure = Schema.Literals([
   "agent-promote",
   "agent-promote-defect",
   "agent-promote-interrupt",
+  "callback-assign",
+  "callback-assign-defect",
+  "callback-assign-interrupt",
+  "callback-rollback",
+  "callback-rollback-stall",
   "health",
   "health-rollback",
+  "health-stall",
 ]);
 export type ProductionMemoryFailure = typeof ProductionMemoryFailure.Type;
 
 export interface ProductionDeploymentMemoryInput {
   readonly currentProxy: ProductionDeployment;
   readonly currentAgent: ProductionDeployment;
+  readonly currentAgentCallback: ProductionDeployment;
   readonly candidateProxy: ProductionDeployment;
   readonly candidateAgent: ProductionDeployment;
   readonly mainSha: VercelGitSha;
@@ -37,15 +44,21 @@ export interface ProductionDeploymentMemoryInput {
 interface ProductionMemoryState {
   readonly currentProxy: ProductionDeployment;
   readonly currentAgent: ProductionDeployment;
+  readonly currentAgentCallback: ProductionDeployment;
   readonly promotions: readonly ProductionProject[];
   readonly rollbacks: readonly ProductionProject[];
+  readonly callbackAssignments: readonly VercelDeploymentId[];
+  readonly callbackRollbacks: readonly VercelDeploymentId[];
 }
 
 export interface ProductionDeploymentMemorySnapshot {
   readonly currentProxy: ProductionDeployment;
   readonly currentAgent: ProductionDeployment;
+  readonly currentAgentCallback: ProductionDeployment;
   readonly promotions: readonly ProductionProject[];
   readonly rollbacks: readonly ProductionProject[];
+  readonly callbackAssignments: readonly VercelDeploymentId[];
+  readonly callbackRollbacks: readonly VercelDeploymentId[];
 }
 
 export class ProductionDeploymentMemoryControl extends Context.Service<
@@ -73,8 +86,11 @@ export const makeProductionDeploymentsMemory = (
       const state = yield* Ref.make<ProductionMemoryState>({
         currentProxy: config.currentProxy,
         currentAgent: config.currentAgent,
+        currentAgentCallback: config.currentAgentCallback,
         promotions: [],
         rollbacks: [],
+        callbackAssignments: [],
+        callbackRollbacks: [],
       });
 
       const current = Effect.fn("ProductionDeploymentsMemory.current")(
@@ -91,6 +107,9 @@ export const makeProductionDeploymentsMemory = (
 
       return Context.make(ProductionDeployments, {
         current,
+        currentAgentCallback: Ref.get(state).pipe(
+          Effect.map((snapshot) => snapshot.currentAgentCallback)
+        ),
         stage: Effect.fn("ProductionDeploymentsMemory.stage")(function* (
           input: StageProductionDeployment
         ) {
@@ -154,9 +173,64 @@ export const makeProductionDeploymentsMemory = (
           }
           return yield* Effect.void;
         }),
+        assignAgentCallback: Effect.fn(
+          "ProductionDeploymentsMemory.assignAgentCallback"
+        )(function* (deployment: ProductionDeployment) {
+          if (deployment.project !== "agent") {
+            return yield* memoryError(
+              "assignCallback",
+              "agent",
+              "targetMismatch"
+            );
+          }
+          const isRollback =
+            deployment.deploymentId ===
+            config.currentAgentCallback.deploymentId;
+          if (isRollback) {
+            yield* Ref.update(state, (snapshot) => ({
+              ...snapshot,
+              callbackRollbacks: [
+                ...snapshot.callbackRollbacks,
+                deployment.deploymentId,
+              ],
+            }));
+          }
+          if (
+            (!isRollback && config.failure === "callback-assign") ||
+            (isRollback && config.failure === "callback-rollback") ||
+            (isRollback && config.failure === "health-rollback")
+          ) {
+            return yield* memoryError(
+              "assignCallback",
+              "agent",
+              isRollback ? "rollbackFailed" : "commandFailed"
+            );
+          }
+          if (isRollback && config.failure === "callback-rollback-stall") {
+            return yield* Effect.never;
+          }
+          yield* Ref.update(state, (snapshot) => ({
+            ...snapshot,
+            currentAgentCallback: deployment,
+            callbackAssignments: isRollback
+              ? snapshot.callbackAssignments
+              : [...snapshot.callbackAssignments, deployment.deploymentId],
+          }));
+          if (!isRollback && config.failure === "callback-assign-interrupt") {
+            return yield* Effect.interrupt;
+          }
+          if (!isRollback && config.failure === "callback-assign-defect") {
+            return yield* Effect.die("simulated after-write callback defect");
+          }
+          return yield* Effect.void;
+        }),
         rollback: Effect.fn("ProductionDeploymentsMemory.rollback")(function* (
           deployment: ProductionDeployment
         ) {
+          yield* Ref.update(state, (snapshot) => ({
+            ...snapshot,
+            rollbacks: [...snapshot.rollbacks, deployment.project],
+          }));
           if (config.failure === "health-rollback") {
             return yield* memoryError(
               "rollback",
@@ -174,19 +248,27 @@ export const makeProductionDeploymentsMemory = (
               deployment.project === "agent"
                 ? deployment
                 : snapshot.currentAgent,
-            rollbacks: [...snapshot.rollbacks, deployment.project],
           }));
         }),
         readMainSha: Effect.succeed(config.mainSha),
-        probeProxyHealth:
-          config.failure === "health" || config.failure === "health-rollback"
-            ? Effect.fail(memoryError("probe", "proxy", "healthFailed"))
-            : Schema.decodeUnknownEffect(ProductionProxyHealth)({
-                ok: true,
-                service: "bundjil-codex-proxy",
-                mode: "live",
-                reasoningEffort: "high",
-              }).pipe(Effect.orDie),
+        probeProxyHealth: Effect.gen(function* probeProxyHealth() {
+          if (config.failure === "health-stall") {
+            return yield* Effect.never;
+          }
+          if (
+            config.failure === "health" ||
+            config.failure === "health-rollback" ||
+            config.failure === "callback-rollback-stall"
+          ) {
+            return yield* memoryError("probe", "proxy", "healthFailed");
+          }
+          return yield* Schema.decodeUnknownEffect(ProductionProxyHealth)({
+            ok: true,
+            service: "bundjil-codex-proxy",
+            mode: "live",
+            reasoningEffort: "high",
+          }).pipe(Effect.orDie);
+        }),
       }).pipe(
         Context.add(
           ProductionDeploymentMemoryControl,
@@ -195,6 +277,10 @@ export const makeProductionDeploymentsMemory = (
               ...snapshot,
               promotions: Array.fromIterable(snapshot.promotions),
               rollbacks: Array.fromIterable(snapshot.rollbacks),
+              callbackAssignments: Array.fromIterable(
+                snapshot.callbackAssignments
+              ),
+              callbackRollbacks: Array.fromIterable(snapshot.callbackRollbacks),
             }))
           )
         )

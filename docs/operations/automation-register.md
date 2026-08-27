@@ -65,9 +65,11 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
-### Production deployment — admitted post-CI automation, hosted proof deferred
+### Production deployment — admitted post-CI automation, callback correction in progress
 
-The source control is admitted, but its hosted proof is still deferred. The
+Automatic exact-main Production and one Terra High turn are accepted for SHA
+`402c5c54460361f969f6cd2ba8326b1d3f16c047`. The callback correction described
+below still needs a merged automatic run and exact provider readback. The
 2026-08-13 stop occurred before any token or partial GitHub custody was created
 and is retained in
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
@@ -96,14 +98,21 @@ deployment; the earlier 90-day result remains in
   controls; each token must be project-scoped and pass sibling denial before
   custody. The
   repository-owned Effect command stages proxy and agent with domains skipped,
-  validates both candidates, re-reads main, promotes proxy then agent, and
-  verifies stable targets and health. Unexpected teams, account-wide or
+  validates both candidates, re-reads main, promotes proxy then public agent,
+  assigns the existing Photon callback alias to that agent, and verifies all
+  three targets plus health. The callback hostname is a non-secret Production
+  variable and uses the existing agent token. Unexpected teams, account-wide or
   user-scoped credentials, team-wide project listing, and raw workflow mutation
   commands are rejected.
 - **Duration and convergence:** one repository-wide queue never cancels an
-  in-flight writer and bounds each run to 30 minutes. Already-current and stale
-  candidates are explicit no-ops. A partial failure restores the exact prior
-  agent then proxy identities as applicable and verifies the restored targets.
+  in-flight writer and bounds each run to 60 minutes. Provider commands,
+  mutation and each restoration have shorter Effect-managed deadlines so
+  rollback time is retained. The six workflow step deadlines total 57 minutes,
+  and the Effect deployment command has its own 45-minute step. Already-current and stale
+  candidates are explicit no-ops only when the callback also matches. A stale
+  callback with current public apps is reconciled alone. A partial failure
+  restores the exact prior callback, agent and proxy identities in reverse
+  order as applicable and verifies the restored targets.
 - **Evidence and non-claim:** source/CI/Production run, immutable candidates,
   project/source/readiness, stable target, health and rollback identities are
   separate receipt fields. Source and local fixtures do not prove GitHub

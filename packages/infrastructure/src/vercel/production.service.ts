@@ -15,6 +15,10 @@ export interface ProductionDeploymentsShape {
   readonly current: (
     project: ProductionProject
   ) => Effect.Effect<ProductionDeployment, ProductionDeploymentError>;
+  readonly currentAgentCallback: Effect.Effect<
+    ProductionDeployment,
+    ProductionDeploymentError
+  >;
   readonly stage: (
     input: StageProductionDeployment
   ) => Effect.Effect<ProductionDeployment, ProductionDeploymentError>;
@@ -22,6 +26,9 @@ export interface ProductionDeploymentsShape {
     input: InspectProductionDeployment
   ) => Effect.Effect<ProductionDeployment, ProductionDeploymentError>;
   readonly promote: (
+    deployment: ProductionDeployment
+  ) => Effect.Effect<void, ProductionDeploymentError>;
+  readonly assignAgentCallback: (
     deployment: ProductionDeployment
   ) => Effect.Effect<void, ProductionDeploymentError>;
   readonly rollback: (

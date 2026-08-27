@@ -188,17 +188,30 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    `workflow_run` for a `push` to `main` starts the distinct `Production`
    workflow. It checks out the event's exact head SHA without persisted Git
    credentials and invokes only `bun run production:deploy` in the protected
-   `Production` environment. The command uses exactly two project-scoped tokens,
-   fixed Personal team/project IDs, and separate project bindings. It reads current proxy and
-   agent targets, stages both candidates using `vercel deploy --prod
+   `Production` environment. The command uses exactly two project-scoped Vercel
+   tokens, fixed Personal team/project IDs, one branded non-secret Photon
+   callback alias, and separate project bindings. It reads current proxy,
+   public agent and callback targets, then stages both candidates using `vercel deploy --prod
 --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
-   no-op. It promotes proxy then agent, validates each stable target and probes
-   proxy health. Any uncertain or partial failure restores the exact prior
-   agent then proxy identities as applicable and verifies both. An
-   already-current SHA is an idempotent no-op. The repository-wide queue never
+   no-op. It promotes proxy, public agent, then the callback alias, validates
+   each target and probes proxy health. Any uncertain or partial failure
+   restores callback, agent and proxy in reverse order as applicable and
+   verifies each restored target. If both public apps already match `main` but
+   the callback is stale, it re-reads `main` and moves only the callback. An
+   already-current SHA is an idempotent no-op only when all three targets
+   match. The repository-wide queue never
    cancels an in-flight writer. Stop on any eligibility, credential, project,
    source, readiness, alias, health, timeout, output, or rollback mismatch.
+   Each child-process provider command has an Effect-managed two-minute
+   timeout. The mutation phase has a separate eight-minute deadline, and each
+   callback, agent and proxy restoration has its own four-minute deadline
+   inside a 45-minute deployment step. The six workflow step limits total 57
+   minutes inside the exact 60-minute job limit. The maximum pre-mutation,
+   mutation and three-restoration path is 42 minutes. A timeout follows the same
+   readback and rollback path as any other unsuccessful Effect exit. Rollback
+   attempts every eligible restoration even when an earlier restoration fails,
+   then reports the combined rollback failure.
    On failure, retain only the Schema-encoded `blocked` receipt. Its
    `configuration`, `deployment`, or `unexpected` category and optional closed
    deployment operation fields are safe routing facts, not proof that a
@@ -214,9 +227,12 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Stage from repository root `.`. Each Personal Vercel project already owns
    its app subdirectory through `rootDirectory`; passing the same app directory
    as the upload root applies it twice and must fail closed before a retry.
-   After promotion or rollback, use the bounded Effect retry schedule to wait
-   for the decoded stable deployment ID and source SHA. A failed or exhausted
-   read remains blocked and requires fresh provider readback before retry.
+   After promotion, callback assignment or rollback, use the bounded Effect
+   retry schedule to wait for the decoded deployment ID and source SHA. The
+   callback read must also decode the expected alias, exact agent project and
+   absence of redirect, then inspect the immutable deployment. A failed or
+   exhausted read remains blocked and requires fresh provider readback before
+   retry.
 
    Do not run `production:deploy` interactively as a routine alternative.
 

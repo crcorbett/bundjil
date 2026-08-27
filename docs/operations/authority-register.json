@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-08-20",
+  "lastReviewed": "2026-08-28",
   "reviewTrigger": "workflow, provider, principal, identity, operation, resource, environment, approval, readback, receipt, rollback, escalation, or incident-containment change",
   "records": [
     {
@@ -34,22 +34,22 @@
       "target": "github-actions",
       "principal": "Ephemeral GitHub Actions Production job with two separately revocable Vercel tokens project-scoped to the exact Personal projects and selected by exact project binding",
       "identitySource": "Successful same-repository main-push CI workflow_run, exact accepted head SHA, Production environment, separate agent/proxy credentials, pre-custody team/project readback, and decoded project/SHA readback",
-      "operation": "Stage both exact-SHA Production candidates without domains, validate immutable project/source/readiness, promote proxy then agent, verify stable targets and health, and restore exact previous deployments on partial failure",
-      "resource": "Personal Vercel projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB, their immutable deployments and stable Production targets",
+      "operation": "Stage both exact-SHA Production candidates without domains, validate immutable project/source/readiness, promote proxy then public agent then its Photon callback alias, verify all three targets and health, and restore exact previous targets on partial failure",
+      "resource": "Personal Vercel projects prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN and prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB, their immutable deployments, stable Production targets, and the existing agent-project Photon callback alias",
       "environment": "GitHub Production environment and exact Personal Vercel team team_1LX7ZujbijowTv8J9k0aU7nD only; contact email domains do not define resource scope",
       "status": "bounded",
-      "durationRevocation": "One globally serialized run, maximum 30 minutes, never cancelled in flight; revoke either project-scoped token, disable the workflow/environment, or revert source under separate settings authority",
+      "durationRevocation": "One globally serialized run, maximum 60 minutes, never cancelled in flight; six exact workflow step deadlines total 57 minutes, the deployment step is capped at 45 minutes, and shorter Effect-managed provider, mutation and per-restoration deadlines retain rollback time; revoke either project-scoped token, disable the workflow/environment, or revert source under separate settings authority",
       "approvalBoundary": "Cooper's accepted automatic-Production SPEC authorizes only verified exact-main candidates through the repository-owned Effect command; workflow/provider output cannot widen targets, credentials or operations",
-      "approvalReceipt": "Exact main SHA, successful CI and Production run IDs, two immutable candidate IDs, prior rollback IDs, stable target readback and sanitized token metadata",
-      "auditEvidence": "Workflow eligibility, repository tests, provider project/source/readiness, stable target identity, health, rollback and secret-negative bounded receipt",
-      "rollback": "Restore agent then proxy to the exact previous READY deployments when both moved, or only proxy when agent did not move; read back stable identities, then revoke/disable the writer if control rollback is required",
+      "approvalReceipt": "Exact main SHA, successful CI and Production run IDs, two immutable candidate IDs, prior callback/agent/proxy rollback IDs, all three target readbacks and sanitized token metadata",
+      "auditEvidence": "Workflow eligibility, repository tests, provider project/source/readiness, public and callback target identity, health, rollback and secret-negative bounded receipt",
+      "rollback": "Restore callback, agent and proxy in reverse mutation order when eligible, or only the callback during callback-only reconciliation; read back exact identities, then revoke or disable the writer if control rollback is required",
       "stopCondition": "Stop on failed or non-push CI, fork/repository/branch/SHA mismatch, stale main, wrong Personal target, missing or widened credential, malformed output, build/readiness/source mismatch, alias mismatch, health failure, rollback failure, leak or timeout",
       "escalation": "Bundjil repository owner, security/automation maintainer and exact Personal Vercel project owner",
       "nonClaim": "Source, CI, candidate READY, promotion command success or health alone does not prove stable alias identity, Eve behaviour, delivery, handset typing, strict replay or future deployments",
       "readback": {
         "availability": "available",
-        "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-21 confirms active default-branch ruleset 20616946, a protected-branch-only Production environment, the four exact non-secret variables, and exactly two refreshed Production Vercel secrets. Four separately revocable one-year Personal dashboard tokens expire on 2027-08-21, each passed assigned-project HTTP 200 and sibling-project HTTP 404 before custody, and each is concealed with a fingerprint prefix in the personal bundjil 1Password vault. No accepted main SHA has yet run through the workflow_run writer, so automatic Production proof remains inconclusive. The earlier 90-day packet remains historical and the active plan owns the current continuation."
+        "outcome": "verified",
+        "evidence": "On 2026-08-28 exact-source CI run 33098864416 and automatic Production run 33099189936 accepted main SHA 402c5c54460361f969f6cd2ba8326b1d3f16c047, promoted both exact READY deployments and retained the prior pair. Protected Eve completed one Terra High turn. One Photon and one Sendblue journey each produced one visible reply; provider typing operations were accepted but handset-visible typing was not observed. The Photon journey exposed that its callback used an automatic agent-project alias which the command did not move; a bounded manual correction restored current service. GitHub Production now has the exact non-secret callback variable, and the workflow still references only the two project-scoped Vercel secrets. One unrelated DOPPLER_TOKEN is present in the environment but is not referenced or consumed by this workflow. Automatic callback movement remains pending exact-main proof."
       }
     },
     {

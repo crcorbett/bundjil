@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: implemented
+lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
@@ -14,7 +14,9 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 
 ## Status and accepted outcome
 
-Repository implementation and the shared terminal audit are complete. The
+The original repository implementation and its shared terminal audit were
+complete before live proof reopened the Photon callback correction now owned
+by this current SPEC. The
 2026-08-21 continuation now proves custody of four separately revocable,
 one-year Personal Vercel project-scoped credentials, the two exact GitHub
 Production secrets, and the three exact drift artifacts. Hosted drift run
@@ -53,7 +55,8 @@ for the same deployment endpoint in secret-negative follow-up. The successor
 decodes non-empty provider target names but projects only exact Preview,
 Production, or legacy `null` Preview values into Bundjil observations; custom
 targets stay excluded.
-Automatic deployment and channel proof remain unproved.
+At that point, automatic deployment and channel proof remained unproved. The
+accepted 2026-08-28 result below supersedes that historical limitation.
 
 ### Automatic-main diagnostic correction (2026-08-28)
 
@@ -166,18 +169,89 @@ missing header as non-SSE. The next narrow correction adopts the same absent-onl
 fallback. Explicit JSON and misleading media types remain rejected before body
 ownership.
 
+### Accepted live result and Photon callback correction (2026-08-28)
+
+Pull request `#14` merged the absent-only fallback as
+`402c5c54460361f969f6cd2ba8326b1d3f16c047`. Exact-source CI run
+`33098864416` passed and automatically started Production run `33099189936`.
+That run promoted proxy deployment `dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV` and
+agent deployment `dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx`, retaining the preceding
+READY pair for rollback. Protected Eve info reported
+`bundjil-codex-proxy/gpt-5.6-terra` with context `1050000`; one bounded private
+session then reached `message.completed` and `session.waiting` with no failure
+event. Exact proxy readback recorded successful model requests. This accepts
+automatic exact-main Production and Terra High for that immutable source.
+
+One bounded Photon journey and one bounded Sendblue journey then reached the
+same accepted agent and proxy. Photon accepted one signed webhook, ran the Eve
+workflow, accepted typing start and stop operations, accepted one outbound
+reply, and produced one visible reply in the established Production
+conversation. Sendblue accepted one signed webhook, completed one model call,
+reported the outbound reply as delivered, and produced one visible reply in
+the established Bundjil conversation. Neither observer caught a handset-visible
+typing animation. Photon candidate-specific replay also remains unsupported by
+the provider's current read API. Those two facts stay explicit non-claims.
+
+The Photon proof exposed one remaining automatic-deployment defect. Its
+Production webhook uses Vercel's automatic agent-project alias, not the public
+stable agent alias. The accepted Production workflow moved only the public
+stable alias, so the Photon callback alias still resolved to an older READY
+deployment until a bounded manual reassignment moved that exact alias to the
+accepted agent. Sendblue was unaffected because its webhook uses the public
+stable alias.
+
+The successor implementation must make the exact Photon callback alias a
+non-secret branded `Config.schema` value owned by the Production deployment
+Layer. The deployment service must read the alias through Vercel's alias API,
+decode its project and deployment identity, and include the prior callback
+target in the bounded receipt. For a new main candidate, promotion order is
+proxy, public agent, then Photon callback alias. For an already-current public
+pair with a stale callback, the command performs a callback-only reconciliation
+after re-reading main. It records rollback eligibility before the possibly
+uncertain alias assignment, polls decoded readback until the callback resolves
+to the expected agent deployment and source, and probes health before success.
+Any later failure, interruption, or defect restores the exact prior callback
+target before restoring the public agent and proxy targets. A missing,
+cross-project, malformed, redirected, or unconfigured callback alias fails
+before staging or mutation.
+
+Every child-process provider command is scoped and bounded by an
+Effect-managed two-minute timeout. The mutation phase has a separate eight-minute
+deadline, and each callback, agent and proxy restoration has its own
+four-minute deadline inside the workflow's 60-minute job limit. Eleven possible
+pre-mutation provider commands take at most 22 minutes; mutation and all three
+restorations take at most another 20 minutes. This 42-minute bound fits inside
+the 45-minute deployment step. A timeout
+enters the same typed failure and compensation path. The exact checkout,
+identity, Node, Bun, install and deployment step deadlines are respectively 2,
+1, 2, 2, 5 and 45 minutes, totalling 57 minutes. The authority audit reads the
+parsed workflow structure and rejects any changed or commented-out deadline or
+binding, including any Production job limit other than 60 minutes. Compensation must attempt
+every eligible restoration even when an earlier restoration fails, read back
+every successful restoration, and report rollback failure without claiming
+full restoration. Deterministic `TestClock` coverage proves a stalled provider
+command, a stalled whole mutation, and a stalled first restoration without
+waiting in real time.
+
+The output contract adds required prior and accepted callback deployment IDs.
+Historical command log lines are retained as historical evidence and are not
+decoded by a current repository consumer; no compatibility decoder is needed.
+The current command and all new receipts use the expanded Schema. The alias
+hostname is non-secret, but durable proof retains only its approved safe
+fingerprint; query strings, webhook secrets, phone identities and message
+content remain forbidden.
+
 #### Documentation impact ledger
 
-| Surface                                                          | Decision        | Owner and proof                                                                                                                                                                |
-| ---------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Production command and error contract                            | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.                               |
-| Workflow trigger and mutation order                              | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; runs `33089620419` and `33093683516` prove the automatic path for their exact accepted SHAs. |
-| Deployment procedure and rollback                                | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                                          |
-| SPEC, task and execution status                                  | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                                 |
-| Proxy runtime, test and runbooks                                 | Change required | Both pre-stream and body-stream failures log only their closed operation; tests decode each structured log and reject internal-message sentinels.                              |
-| Codex provider request and response metadata                     | Change required | The package client owns fixed compatibility headers and treats only an absent successful stream media type as requested SSE; tests keep explicit non-SSE values rejected.      |
-| App/public API, package structure, skills and agent instructions | N/A             | No public HTTP response, package placement, skill route or agent instruction changes.                                                                                          |
-| Provider state and credentials                                   | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration.               |
+| Surface                                                            | Decision        | Owner and proof                                                                                                                                                                  |
+| ------------------------------------------------------------------ | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production service, Schemas, Layers and receipt                    | Change required | `@bundjil/infrastructure` owns the branded callback alias, named callback operations, private Vercel transport, live and memory Layers, closed errors and expanded safe receipt. |
+| Workflow configuration and mutation order                          | Change required | `.github/workflows/production.yml` supplies the non-secret callback alias and the command moves proxy, public agent, then callback.                                              |
+| Deployment procedure, rollback and proof                           | Change required | `apps/agent/runbooks/deploy-promote.md`, automation/authority registers, verification packet and focused tests own readback, callback-first rollback and exact-main proof.       |
+| SPEC, task and execution status                                    | Change required | This SPEC, its task ledger and the active plan own the accepted live result, successor work, limitations and terminal review.                                                    |
+| Proxy runtime and Codex provider boundary                          | Preserve        | The accepted absent-only SSE fallback, fixed headers and Terra High provider behaviour do not change in the callback slice.                                                      |
+| App/public HTTP API, package layout, skills and agent instructions | N/A             | The callback remains deployment control inside the existing infrastructure package; no public route, package placement, skill route or agent instruction changes.                |
+| Provider state and credentials                                     | Change required | Add one exact non-secret GitHub Production variable and move the existing callback alias. Keep exactly two project-scoped Vercel secrets; create no new credential.              |
 
 ### Vercel credential boundary correction (2026-08-20)
 
@@ -362,8 +436,8 @@ main push SHA
   -> successful workflow_run event for the same push SHA
      -> Production environment
      -> @bundjil/infrastructure automatic-production command
-        -> ProductionDeployment service
-        -> ProductionDeployment.layerLive
+        -> ProductionDeployments service
+        -> ProductionDeploymentsLive
            -> scoped Effect ChildProcessSpawner
            -> project-bound Vercel CLI/API boundary
            -> stage proxy --prod --skip-domain
@@ -371,22 +445,26 @@ main push SHA
            -> decode immutable deployment readback
            -> verify current refs/heads/main freshness
            -> promote proxy, then agent
-           -> cohesive Ref marks rollback eligibility before each promotion
-           -> stable alias and health/readback
+           -> assign the exact Photon callback alias to the accepted agent
+           -> cohesive Ref marks rollback eligibility before each mutation
+           -> public aliases, callback alias and health readback
            -> Schema-encoded bounded receipt
+        -> makeProductionDeploymentsMemory for deterministic tests
         -> on any non-success Effect Exit after promotion starts
-           -> rollback recorded prior deployment(s)
-           -> stable alias restoration readback
+           -> restore the recorded prior callback target when eligible
+           -> rollback recorded prior agent and proxy deployment(s)
+           -> callback and public alias restoration readback
            -> preserve the original unsuccessful exit unless rollback fails
 ```
 
 ```text
 Tests
   -> automatic-production orchestration
-  -> ProductionDeployment.layerMemory
+  -> makeProductionDeploymentsMemory
   -> candidate-ready, stale-main, malformed-output, wrong-project,
-     partial-promotion, after-write interruption/defect, rollback-success,
-     rollback-failure and no-op fixtures
+     stale-callback reconciliation, partial-promotion, callback assignment,
+     after-write interruption/defect, rollback-success, rollback-failure and
+     no-op fixtures
 ```
 
 ```text
@@ -412,17 +490,27 @@ Channel proof
 - Staging uses `--prod --skip-domain`; no stable alias moves until both
   candidates are `READY`, Production-targeted, exact-project, and exact-SHA.
 - A rerun for the already-current exact SHA is idempotent and performs no
-  deployment or promotion.
-- Promotion is proxy first, agent second. One cohesive operation-local `Ref`
-  records proxy and agent rollback eligibility immediately before each
-  potentially outcome-uncertain provider call. Any later non-success Effect
-  `Exit` restores the eligible recorded prior deployment, agent then proxy when
-  both are eligible. The exit-aware rollback finalizer is uninterruptible,
-  reads one eligibility snapshot, and verifies restoration before preserving
-  the original failure, interruption, or defect.
-- Success requires both stable targets to read back the exact candidate IDs and
-  exact source SHA. Immutable readiness and stable alias resolution are
-  separate assertions.
+  deployment, promotion or callback assignment only when both public targets
+  and the Photon callback already resolve to that SHA.
+- The exact Photon callback alias is a branded, non-secret `Config.schema`
+  value. The live Layer reads it through the project-bound Vercel alias API,
+  immediately decodes alias/project/deployment output, and then inspects the
+  referenced immutable deployment before domain code receives it. The service
+  exposes only named `currentAgentCallback` and `assignAgentCallback`
+  operations; raw alias clients, URLs and provider DTOs remain private.
+- Promotion is proxy first, public agent second, Photon callback third. One
+  cohesive operation-local `Ref` records proxy, agent and callback rollback
+  eligibility immediately before each potentially outcome-uncertain provider
+  call. Any later non-success Effect `Exit` restores the eligible exact prior
+  callback target, then agent and proxy when eligible. The exit-aware rollback
+  finalizer is uninterruptible, reads one eligibility snapshot, and verifies
+  restoration before preserving the original failure, interruption, or defect.
+- When both public targets already match main but the callback is stale, the
+  command re-reads main and performs only a callback reconciliation. It does
+  not rebuild or move either public target.
+- Success requires both public targets and the callback target to read back the
+  exact candidate IDs and source SHA. Immutable readiness, public alias
+  resolution and callback alias resolution are separate assertions.
 - The command emits only a bounded Schema-encoded receipt. It must not print
   tokens, environment values, raw provider responses, protected URLs, message
   content, request bodies, profiles, ciphertext, OAuth material, or raw errors.
@@ -440,9 +528,9 @@ bun run check:skills
 ```
 
 Hosted acceptance requires the merged exact main SHA's CI run, Production run,
-two staged deployment IDs, both stable target readbacks, stable proxy health,
-protected Eve model behaviour, the rollback identities, and zero manual
-promotion.
+two staged deployment IDs, both public target readbacks, the Photon callback
+target readback, stable proxy health, protected Eve model behaviour, all three
+rollback identities, and zero manual promotion or callback reassignment.
 
 ### Credential and environment custody
 
@@ -545,13 +633,14 @@ promotion.
 ## Rollback and recovery
 
 The automatic job records the exact prior Production deployment for each
-project before staging. Runtime rollback restores agent first then proxy when
-both promotion attempts became rollback-eligible; it restores only proxy when
-the agent attempt never became eligible. Eligibility is conservative because
-it is recorded before a provider call whose write outcome could become
-uncertain. Every rollback must read back the stable alias, deployment
+project and the exact prior Photon callback target before staging. Runtime
+rollback restores the callback first, then the public agent and proxy in
+reverse mutation order, but only for operations that became rollback-eligible.
+Eligibility is conservative because it is recorded before a provider call
+whose write outcome could become uncertain. A callback-only reconciliation
+restores only the callback. Every rollback must read back the alias, deployment
 readiness, project and source identity. Do not roll back the newest fenced
-Codex profile generation or provider state.
+Codex profile generation or unrelated provider state.
 
 Control rollback disables `.github/workflows/production.yml`, revokes the
 project-scoped Vercel tokens, and reads back the GitHub environment. It
@@ -580,10 +669,10 @@ handset display, typing animation, or strict replay. No provider response grants
 authority. A missing live oracle is recorded as inconclusive or a non-claim,
 never promoted to success.
 
-## 2026-08-13 disposition and 2026-08-20 correction
+## Historical 2026-08-13 disposition and 2026-08-20 correction
 
-Repository implementation is complete, but the three serial hosted tasks are
-deferred rather than accepted. On 2026-08-13, work stopped before mutation
+At that point, repository implementation was complete, but the three serial
+hosted tasks were deferred rather than accepted. On 2026-08-13, work stopped before mutation
 because the connection's primary contact email was treated as proof of Tilt
 scope. That was too strict: an email address identifies a user contact, not the
 Vercel teams and projects available to the connection.
@@ -596,9 +685,10 @@ by the 2026-08-20 readback, which returned only Personal team
 `team_1LX7ZujbijowTv8J9k0aU7nD`, authenticated owner access, and the exact two
 Bundjil projects. `configure-hosted-controls-and-drift`,
 `correct-terra-high-and-prove-automatic-main`, and
-`close-channel-proof-gaps` are terminally deferred for this implementation
-epoch. This disposition unblocks the repository terminal audit; it does not
-convert any absent hosted result into acceptance.
+`close-channel-proof-gaps` were recorded as terminally deferred for that
+implementation epoch. The accepted 2026-08-28 result and current task ledger
+supersede that historical status. The old disposition does not convert any
+absent hosted result into acceptance.
 
 The operational chain may resume through the authenticated dashboard after a
 fresh readback confirms the same sole team, owner role, and exact Bundjil
@@ -723,14 +813,30 @@ rows unchanged.
 
 ## Dependencies and sequencing
 
-The sibling task ledger is serial. Repository desired state, focused checks and
-full verification must pass before GitHub/Vercel mutations. The workflow and
-provider command must land on main before their automatic behaviour can be
-proved. The credential sub-step is now complete for the four Vercel tokens and
-the two Production GitHub secrets, but the drift task remains deferred until a
-separately approved Preview Photon credential is placed in custody and the
-three artifacts plus one report-only hosted receipt are proved. The Production
-task remains deferred until that drift prerequisite, an exact verified main
-push, and the automatic workflow_run path are all observed. The 2026-08-21
-packet is the current boundary; it does not replace the earlier historical
-readbacks or turn custody into deployment proof.
+The sibling task ledger is serial except for the accepted, non-blocking drift
+limitation. Repository desired state, focused checks and full verification must
+pass before GitHub or Vercel mutations. The callback implementation must land
+on main before its automatic behaviour can be proved. The four Vercel tokens
+and two Production GitHub secrets remain in custody; the callback hostname is
+one non-secret Production variable. Drift run `32455191367` remains accepted
+only as a zero-write, partly inconclusive report because Vercel exposes no
+usable value history for eight write-only rows. That limitation must not block
+the already accepted Production or channel work and must not be rewritten as a
+clean drift result.
+
+## Requirement-to-proof crosswalk
+
+| Requirement                                                | Direct proof                                                                                          | False result rejected                                                              |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Decode the configured callback and current provider target | Config, alias response and immutable deployment fixtures plus exact project/source assertions         | A raw hostname, missing alias, redirect, wrong project or deployment ID alone      |
+| Reconcile a stale callback without rebuilding current apps | Memory-Layer fixture proves only callback assignment and readback occur                               | Treating current public aliases as a complete no-op while callback is stale        |
+| Promote a new candidate in the required order              | Operation log fixture proves proxy, public agent, callback, then health                               | Moving callback early or reporting success before all three read back              |
+| Recover from typed failure, interruption or defect         | Before-write and after-write fixtures prove callback-first reverse rollback and restoration readback  | Typed-error-only compensation or retrying an uncertain assignment                  |
+| Emit bounded evidence                                      | Schema-decoded receipt includes previous and accepted callback deployment IDs and leak-negative tests | Raw Vercel output, callback query, secret, token, message or provider body         |
+| Prove automatic hosted behaviour                           | Exact-main CI and Production runs plus independent public and callback alias readback                 | Local tests, a manual callback move, READY alone or a stable health response alone |
+
+After implementation and focused proof pass, run one fresh terminal review over
+the changed call graph, Effect ownership, failure and rollback paths, lint,
+documentation and hosted evidence. Reopen every finding at its earliest owner,
+correct it, rerun affected checks, and repeat the terminal review once. Do not
+run a fixed number of reviews when the repeated review is clean.

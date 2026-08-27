@@ -5,11 +5,53 @@ authority: canonical
 owner: bundjil-security-automation-maintainer
 last_reviewed: 2026-08-28
 review_trigger: Vercel credential custody, GitHub environment custody, drift artifacts, automatic Production deployment, or channel proof
+spec: ../../product-specs/automatic-production-and-operational-closeout.md
 ---
 
 # Personal Vercel custody continuation
 
 ## Status
+
+The current accepted source is main SHA
+`402c5c54460361f969f6cd2ba8326b1d3f16c047`. CI run `33098864416` passed
+and automatically started Production run `33099189936`, which promoted exact
+proxy `dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV` and agent
+`dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx` while retaining the previous READY pair.
+Protected Eve completed one Terra High turn with context `1050000`. One bounded
+Photon journey and one bounded Sendblue journey each produced one visible
+Production reply. Photon accepted typing start and stop operations; Sendblue
+reported its outbound iMessage delivered. Neither observer caught a visible
+typing animation, and Photon has no supported candidate-specific replay
+readback.
+
+The Photon proof found one remaining deployment-control defect. Photon calls a
+Vercel automatic agent-project alias, while the accepted command moved only the
+public agent alias. A bounded manual assignment moved that callback to the
+accepted agent and restored service. The current branch adds the callback as a
+branded non-secret Config value, reads and inspects its exact target, moves it
+after the public agent, and restores it first on failure. Callback-only drift
+will be corrected without rebuilding either app. GitHub Production now holds
+the exact callback variable; the workflow still references only the existing
+two project-scoped Vercel secrets. The environment also contains a newer
+unrelated `DOPPLER_TOKEN`, which this workflow does not reference or consume.
+Terminal review added two-minute provider-command, eight-minute mutation and
+separate four-minute restoration deadlines inside the 60-minute workflow, all
+eligible restoration attempts after an earlier rollback failure or stall,
+optional-or-null redirect decoding, exact interruption/defect assertions,
+structural workflow checks and a private adapter-only callback brand. The six
+workflow step deadlines total 57 minutes. Eleven possible pre-mutation commands,
+mutation and three restorations are bounded to 42 minutes inside the command's
+45-minute step, and the authority audit requires the exact 60-minute job limit.
+The final independent review found no remaining code, Effect, boundary,
+secret-safety, timing, test or documentation issue. Full repository verification
+passed with 144 tooling tests, 17 lint tests, all nine package type checks and
+all 15 build/test tasks. Exact-main CI and automatic hosted callback readback
+remain required after merge.
+
+Drift run `32455191367` remains a zero-write but partly inconclusive report.
+Vercel exposes no usable prior value history for eight changed write-only rows,
+so that limitation is recorded without weakening the control and no longer
+blocks the separately accepted Production and channel work.
 
 Pull request `#6` merged the exact repository candidate to `main` as
 `276c7fdb665c3aac0cbd8f302ffacbf030317140`. Main CI run `33082854163`
@@ -226,24 +268,24 @@ not started.
       retain successful same-source CI run `32455191281`, and retain zero-write
       drift run `32455191367` as genuinely inconclusive because eight live
       write-only rows have changed provider revisions.
-- [ ] Obtain separate authority and evidence to re-admit the eight changed
+- [ ] Optional follow-up: obtain separate authority and evidence to re-admit the eight changed
       write-only rows, or obtain an immutable provider value-revision oracle;
       do not weaken the control or replace the accepted baseline under
       report-only authority.
-- [ ] Push the verified main state and prove the automatic `workflow_run`
+- [x] Push the verified main state and prove the automatic `workflow_run`
       Production path, exact deployments, stable aliases, health, Terra High,
       rollback readiness, and bounded downstream claims.
 - [x] Prove exact-SHA CI, automatic staging/promotion, both stable aliases,
       rollback identities, stable live/high health, and protected Terra/context
       metadata for `0fea78f07e8fccd035d0cce10c6eba758cda3651`.
-- [ ] Deploy the secret-negative proxy stream-operation diagnostic, classify
+- [x] Deploy the secret-negative proxy stream-operation diagnostic, classify
       the current `502`, then complete one Eve turn before either channel send.
 - [x] Merge diagnostic commit `0af295bbaecc7b80c86411b92a5f542c2a51e2b8`,
       pass CI run `33093327445`, and automatically promote exact-SHA proxy
       `dpl_7FEYwYJeqFVHfkG8RnZ13otqRSBq` plus agent
       `dpl_CqPEyfZCpuUNGuLjxhcv2fzW32KN` in run `33093683516` with the prior
       pair retained for rollback.
-- [ ] Observe the operation for the pre-stream `502`. The first deployed
+- [x] Observe the operation for the pre-stream `502`. The first deployed
       observer correctly covered a returned body stream, but the live failure
       occurs before that stream exists; apply the same secret-negative observer
       in the typed pre-stream error handler and retest once.
@@ -258,9 +300,15 @@ not started.
       run one bounded turn. Pull request `#13`, CI run `33097033155`, and
       automatic Production run `33097382192` completed this slice, but the turn
       still failed before body ownership.
-- [ ] Match the checked OAuth client's absent-only `Content-Type` fallback,
+- [x] Match the checked OAuth client's absent-only `Content-Type` fallback,
       retain rejection of explicit non-SSE media types, deploy automatically,
       and run one bounded turn against the exact deployment.
+- [x] Run one bounded Photon and one bounded Sendblue Production journey;
+      retain handset-visible typing and strict Photon replay as explicit
+      non-claims.
+- [ ] Merge the callback control, let exact-main CI start Production, and prove
+      proxy, public agent and callback all resolve to the accepted source with
+      no manual assignment.
 
 ## Evidence owners
 
@@ -274,39 +322,39 @@ not started.
 
 ## Stop and rollback
 
-Stop when an artifact, project binding, source SHA, report file, receipt file,
+Stop when an artifact, callback alias, project binding, source SHA, report file, receipt file,
 provider read or zero-write claim is missing. Do not accept a green workflow
 result without the Schema-valid receipt. Each Vercel token can be revoked
 separately; the two GitHub Production secrets and three drift artifacts can be
-removed under their exact environment authorities. No deployment rollback is
-needed for the rejected drift run because it executed no provider command.
+removed under their exact environment authorities. Production rollback restores
+the prior callback, agent and proxy targets in reverse eligible order and reads
+each back. No deployment rollback is needed for the rejected drift run because
+it executed no provider command.
 
 ## Documentation impact ledger
 
-| Surface                            | Decision        | Owner/readback                                                                                                                                                                                    |
-| ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SPEC and task ledger               | Change required | Current custody, partial corrected drift package and rejected runs are recorded.                                                                                                                  |
-| Authority and automation registers | Change required | GitHub/Vercel custody, zero-write diagnostics and the exact-project Marketplace limit are updated without storing values.                                                                         |
-| Runbook                            | Change required | It defines the secret-safe failure stages and forbids the denied account-wide Marketplace list.                                                                                                   |
-| Verification packet and router     | Change required | Dated failed detail preserves exact run identity, missing receipt, correction and non-claims.                                                                                                     |
-| Workflow and authority fixtures    | Change required | Materialise the compressed manifest exactly, keep correct Bun ordering, require receipt readback, and group non-accepted findings without values or fingerprints.                                 |
-| Effect command code and tests      | Change required | The report boundary classifies unavailable historical deployments as reports and accepts write-only baseline continuity only from present unchanged revision metadata plus the accepted manifest. |
-| Provider adapters and values       | Preserve        | Exact-project Vercel reads and provider values are unchanged; the correction is report classification only and values stay concealed.                                                             |
-| Package README                     | Change required | Record compressed manifest custody plus the exact-project Marketplace read and database-ID limitation.                                                                                            |
-| Proxy runbooks and runtime test    | Change required | Cover pre-stream and body-stream failures with the same closed operation log and prove both exclude internal-message sentinels.                                                                   |
-| Codex package README and client    | Change required | Record and test the package-owned fixed subscription-response headers without exposing bearer or account values.                                                                                  |
-| Root/app README and architecture   | Preserve        | No public command, route, package placement or stable architecture boundary changed.                                                                                                              |
+| Surface                            | Decision        | Owner/readback                                                                                                                                                                                                                          |
+| ---------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPEC and task ledger               | Change required | Accepted Production/channel proof, non-blocking drift limitation and callback successor are recorded.                                                                                                                                   |
+| Authority and automation registers | Change required | Exact callback operation, existing two referenced Vercel secrets, unrelated unconsumed environment secret and rollback order are explicit.                                                                                              |
+| Runbook                            | Change required | It owns proxy, public agent and callback movement/readback plus callback-first rollback.                                                                                                                                                |
+| Verification packet and router     | Change required | Add a dated exact-main callback packet after hosted acceptance; retain prior live channel claims and non-claims.                                                                                                                        |
+| Workflow and authority fixtures    | Change required | Supply and enforce one non-secret callback variable while keeping exactly two Vercel secret references.                                                                                                                                 |
+| Effect command code and tests      | Change required | Add branded Config, named service operations, private alias codecs, callback-only reconciliation, ordered movement, bounded command/mutation/restoration TestClock fixtures and complete failure/interruption/defect rollback fixtures. |
+| Provider adapters and values       | Change required | GitHub gains one non-secret callback variable; Vercel callback alias changes only through the exact project-bound command.                                                                                                              |
+| Package README                     | Change required | Record callback ownership, readback and rollback in the existing command description.                                                                                                                                                   |
+| Proxy and Codex runtime            | Preserve        | Accepted absent-only SSE and Terra High behaviour do not change in this deployment-control slice.                                                                                                                                       |
+| Root/app README and architecture   | Preserve        | No public route, package placement or stable architecture boundary changes.                                                                                                                                                             |
 
 ## Verification status
 
-Focused drift tests and the infrastructure type check pass for correction
-`f5c707c4da8065993e6886130f887a774ff71520`. Full repository verification
-also passes with the documented process-only synthetic Executor URL: all
-policy checks, 140 tooling
-tests, type-aware formatting/lint, Knip, all nine workspace type checks and all
-15 workspace build/test tasks passed. The synthetic URL made no provider call.
-Hosted CI passed on the exact source. The same-source drift receipt is
-Schema-valid and zero-write but inconclusive, so it is not accepted as the
-required successful drift result. External claims remain separated: repository
-and CI proof do not prove accepted hosted drift, deployment, delivery, handset
-state or future runs.
+The first two terminal reviews found concrete issues and drove narrower
+deadlines, stronger rollback fixtures, exact cause checks and structured
+workflow validation. Corrected full repository verification now passes. This
+local proof can establish only the callback state machine and its fixtures.
+Final independent review, protected merge and exact-main hosted callback
+readback remain open. The
+accepted 2026-08-28 Production and
+channel evidence belongs only to SHA
+`402c5c54460361f969f6cd2ba8326b1d3f16c047`; it does not prove the pending
+callback automation or future runs.
