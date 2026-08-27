@@ -91,6 +91,21 @@ target through an Effect Schedule after promotion or rollback. The bounded
 poll must accept only the expected deployment ID and source SHA. Hosted proof
 still requires a new successful automatic run and direct Vercel readback.
 
+Pull request `#9` merged the project-scoped correction as
+`ca9862347c7ddc139a9a3c153b2d068576bdf638`. Main CI run `33087961717`
+passed, and automatic Production run `33088341038` then stopped at
+`deployment/stage/proxy/commandFailed/after-readback`. Immediate Personal
+Vercel readback found no new deployment in either project and confirmed both
+stable Production targets remain READY and promoted at source
+`6cc0936d502a7b5f0fa32994929fac7f396eb200`.
+
+Each exact project already owns its app subdirectory through Vercel
+`rootDirectory`. The staging command also passed that app subdirectory as its
+upload root, applying the directory twice. The successor must upload repository
+root `.` and rely on the exact project binding to select its app. Focused tests
+must reject both app directories in the staging command. Hosted proof still
+requires a new successful exact-main run and direct provider readback.
+
 #### Documentation impact ledger
 
 | Surface                                                              | Decision        | Owner and proof                                                                                                                                                   |

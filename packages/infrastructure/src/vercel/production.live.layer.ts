@@ -151,12 +151,10 @@ const selectProject = (
     ? {
         projectId: config.agentProjectId,
         token: config.agentToken,
-        directory: "apps/agent",
       }
     : {
         projectId: config.proxyProjectId,
         token: config.proxyToken,
-        directory: "apps/codex-proxy",
       };
 
 type SelectedProductionProject = ReturnType<typeof selectProject>;
@@ -361,7 +359,7 @@ export const ProductionDeploymentsLive = Layer.effect(
             "--bun",
             "vercel",
             "deploy",
-            selected.directory,
+            ".",
             "--prod",
             "--skip-domain",
             "--yes",
