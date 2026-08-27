@@ -213,8 +213,12 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
       CodexHttpStatusError: () =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
-      CodexResponsesStreamError: () =>
-        errorResponse("proxy_error", "The proxy stream failed.", 502),
+      CodexResponsesStreamError: (error) =>
+        observeCodexProxyStreamFailure(error).pipe(
+          Effect.andThen(
+            errorResponse("proxy_error", "The proxy stream failed.", 502)
+          )
+        ),
       CodexProfileNotFound: () => reauthenticationRequiredResponse,
       CodexProfileSchemaError: () => reauthenticationRequiredResponse,
       CodexProfileStorageError: () => authTemporarilyUnavailableResponse,

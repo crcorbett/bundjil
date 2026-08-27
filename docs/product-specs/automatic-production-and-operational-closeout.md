@@ -127,17 +127,29 @@ token, profile, raw SSE, request, response, or provider payload. Terra High
 completion and both channel proofs remain open until the operation is observed
 and the actual fault is repaired or recorded as a bounded limitation.
 
+Pull request `#11` merged the first diagnostic as
+`0af295bbaecc7b80c86411b92a5f542c2a51e2b8`. Main CI run `33093327445`
+passed and automatic Production run `33093683516` promoted proxy deployment
+`dpl_7FEYwYJeqFVHfkG8RnZ13otqRSBq` and agent deployment
+`dpl_CqPEyfZCpuUNGuLjxhcv2fzW32KN`, retaining the prior pair for rollback. A
+fresh protected turn again reached three proxy `502` responses and ended at
+`session.waiting` with `step.failed` and `turn.failed`. No closed diagnostic
+appeared because the failure occurred while opening the upstream response,
+before the returned body stream existed. The follow-up keeps the body-stream
+observer and applies the same secret-negative operation observer to the
+pre-stream `CodexResponsesStreamError` handler. Tests must cover both timings.
+
 #### Documentation impact ledger
 
-| Surface                                                          | Decision        | Owner and proof                                                                                                                                                  |
-| ---------------------------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Production command and error contract                            | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.                 |
-| Workflow trigger and mutation order                              | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; run `33089620419` proves the exact automatic path for SHA `0fea78f…`.          |
-| Deployment procedure and rollback                                | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                            |
-| SPEC, task and execution status                                  | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                   |
-| Proxy runtime, test and runbooks                                 | Change required | The private stream logs only its closed operation; the test decodes the structured log and rejects an internal-message sentinel.                                 |
-| App/public API, package structure, skills and agent instructions | N/A             | No public HTTP response, package placement, skill route or agent instruction changes.                                                                            |
-| Provider state and credentials                                   | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration. |
+| Surface                                                          | Decision        | Owner and proof                                                                                                                                                                |
+| ---------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Production command and error contract                            | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.                               |
+| Workflow trigger and mutation order                              | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; runs `33089620419` and `33093683516` prove the automatic path for their exact accepted SHAs. |
+| Deployment procedure and rollback                                | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                                          |
+| SPEC, task and execution status                                  | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                                 |
+| Proxy runtime, test and runbooks                                 | Change required | Both pre-stream and body-stream failures log only their closed operation; tests decode each structured log and reject internal-message sentinels.                              |
+| App/public API, package structure, skills and agent instructions | N/A             | No public HTTP response, package placement, skill route or agent instruction changes.                                                                                          |
+| Provider state and credentials                                   | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration.               |
 
 ### Vercel credential boundary correction (2026-08-20)
 
