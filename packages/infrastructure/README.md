@@ -84,6 +84,16 @@ restores the exact prior deployments on every non-success Effect exit after
 promotion starts, including interruption and defect paths. It is not an
 operator convenience command.
 
+The live deployment adapter binds each command with the exact
+`VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and matching redacted token. Reads,
+promotion, and rollback use project-addressed Vercel API paths with the exact
+team ID as a query parameter. Staging uses those environment bindings and does
+not ask the CLI to discover a team by `--scope`. Mutation requests send their
+required empty JSON body through an Effect Stream after Effect Schema encoding.
+After promotion or rollback, the adapter polls the decoded current target with
+an Effect Schedule until the deployment ID and source SHA match, or the bounded
+wait fails closed.
+
 `infrastructure:drift-report` uses a distinct project-scoped credential Layer.
 Its environment file supplies
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
