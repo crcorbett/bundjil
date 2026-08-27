@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-product-owner
 implementation_owner: bundjil-security-automation-maintainer
@@ -14,9 +14,31 @@ task_ledger: automatic-production-and-operational-closeout.tasks.json
 
 ## Status and accepted outcome
 
+This SPEC is complete. Pull request `#15` merged the callback correction as
+exact main SHA `27011deb4593f15f4042ff5cf570ca426da9d299`. Main CI run
+`33108401987` passed and automatically started Production run `33108710900`.
+That run promoted READY proxy `dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6` and READY
+agent `dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp`; independent Personal Vercel readback
+matched both stable aliases and the Photon callback to that exact source. The
+receipt retained the preceding proxy, agent and callback identities and
+reported rollback ready. No manual callback reassignment occurred.
+
+Proxy health reported `live` with `high` reasoning. Protected Eve reported
+`bundjil-codex-proxy/gpt-5.6-terra`, context `1050000`, and one bounded turn
+reached `message.completed` and `session.waiting` without failure. One bounded
+Photon journey and one bounded Sendblue journey each showed delivery, visible
+typing and one complete reply. The accepted packet is
+[`automatic-production-callback-channels-accepted-2026-08-28.json`](../evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json).
+
+Two limits remain recorded rather than hidden. Vercel cannot expose the prior
+values for eight changed write-only settings, so the zero-write drift report
+cannot re-baseline them. Photon exposes no supported candidate-specific replay
+check, so strict replay proof remains unavailable. Neither limit blocks the
+accepted automatic deployment, Terra High turn, callback movement or bounded
+channel results.
+
 The original repository implementation and its shared terminal audit were
-complete before live proof reopened the Photon callback correction now owned
-by this current SPEC. The
+complete before live proof reopened the Photon callback correction. The
 2026-08-21 continuation now proves custody of four separately revocable,
 one-year Personal Vercel project-scoped credentials, the two exact GitHub
 Production secrets, and the three exact drift artifacts. Hosted drift run
@@ -200,9 +222,9 @@ deployment until a bounded manual reassignment moved that exact alias to the
 accepted agent. Sendblue was unaffected because its webhook uses the public
 stable alias.
 
-The successor implementation must make the exact Photon callback alias a
+The completed implementation makes the exact Photon callback alias a
 non-secret branded `Config.schema` value owned by the Production deployment
-Layer. The deployment service must read the alias through Vercel's alias API,
+Layer. The deployment service reads the alias through Vercel's alias API,
 decode its project and deployment identity, and include the prior callback
 target in the bounded receipt. For a new main candidate, promotion order is
 proxy, public agent, then Photon callback alias. For an already-current public
@@ -248,10 +270,10 @@ content remain forbidden.
 | Production service, Schemas, Layers and receipt                    | Change required | `@bundjil/infrastructure` owns the branded callback alias, named callback operations, private Vercel transport, live and memory Layers, closed errors and expanded safe receipt. |
 | Workflow configuration and mutation order                          | Change required | `.github/workflows/production.yml` supplies the non-secret callback alias and the command moves proxy, public agent, then callback.                                              |
 | Deployment procedure, rollback and proof                           | Change required | `apps/agent/runbooks/deploy-promote.md`, automation/authority registers, verification packet and focused tests own readback, callback-first rollback and exact-main proof.       |
-| SPEC, task and execution status                                    | Change required | This SPEC, its task ledger and the active plan own the accepted live result, successor work, limitations and terminal review.                                                    |
+| SPEC, task and execution status                                    | Change required | This historical SPEC, its completed task ledger and completed plan own the accepted result, limitations and terminal review.                                                     |
 | Proxy runtime and Codex provider boundary                          | Preserve        | The accepted absent-only SSE fallback, fixed headers and Terra High provider behaviour do not change in the callback slice.                                                      |
 | App/public HTTP API, package layout, skills and agent instructions | N/A             | The callback remains deployment control inside the existing infrastructure package; no public route, package placement, skill route or agent instruction changes.                |
-| Provider state and credentials                                     | Change required | Add one exact non-secret GitHub Production variable and move the existing callback alias. Keep exactly two project-scoped Vercel secrets; create no new credential.              |
+| Provider state and credentials                                     | Change required | One exact non-secret GitHub Production variable was added and the existing callback alias moved. Exactly two project-scoped Vercel secrets remain.                               |
 
 ### Vercel credential boundary correction (2026-08-20)
 
@@ -337,14 +359,14 @@ acceptance, or historical conversation into a stronger live claim.
 
 | Evidence                      | Current identity                                                                                                                                                                                                                                                                                                                                                                         | Claim limit                                                                                                             |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Bundjil source                | Draft PR `#5` owns branch `codex/automatic-production-effect-runtime`; its exact current head must be read from GitHub at action time. `origin/main` remains the historical starting identity `5c3c7db240a7abd9bb57ad560bdd8958af4ea701` until merge readback proves otherwise.                                                                                                          | Candidate routing and starting-main identity only; this prose is not a current-head assertion.                          |
-| Main CI                       | GitHub run `31341341435`, successful for exact main SHA `5c3c7db240a7abd9bb57ad560bdd8958af4ea701`                                                                                                                                                                                                                                                                                       | Historical acceptance of the starting SHA, not future deployment proof.                                                 |
+| Bundjil source                | Pull request `#15` merged exact main `27011deb4593f15f4042ff5cf570ca426da9d299`.                                                                                                                                                                                                                                                                                                         | Accepted candidate identity only; this prose is not a current-head assertion.                                           |
+| Main CI                       | GitHub run `33108401987` passed that exact source and automatically started Production run `33108710900`.                                                                                                                                                                                                                                                                                | Exact accepted run only; it does not promise future execution.                                                          |
 | GitHub controls               | Admin principal `crcorbett`; active ruleset `20616946` requires a pull request, strict `verify` status and non-fast-forward updates on the default branch with no bypass; `Production` permits protected branches with no human reviewer or wait; Production has exactly the two named Vercel secrets and `infrastructure-read-only-preview` has exactly the three named drift artifacts | Point-in-time metadata/readback only; source, custody and settings do not prove a future run.                           |
 | Drift state credential        | A personal Cloudflare account token is active through `2026-11-11T06:11:42Z`, scoped only to Object Read & Write for `bundjil-alchemy-state`, stored as personal Bundjil 1Password item `dylpugrxetztdr76qruqtxonie`; one S3 list under `bundjil/v1` succeeded; the token value is intentionally redacted                                                                                | Credential and exact-bucket read proof only; it is not GitHub custody, a complete drift environment, or a drift result. |
-| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; current Production deployment `dpl_C7xHMKGmR5KwAC7oq1xEvEKMRAaA` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                                                         | Current metadata observation; no mutation authority or future state.                                                    |
-| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; current Production deployment `dpl_AunVp2kRvSnuB1FsGoKUGYQMcQm4` at source `6cc0936d502a7b5f0fa32994929fac7f396eb200`                                                                                                                                                                                                    | Current metadata observation; no mutation authority or future state.                                                    |
-| Current proxy health          | stable `/health` returned `200`, `mode: live`, `reasoningEffort: low`                                                                                                                                                                                                                                                                                                                    | Proves only the observed stable health payload; it is the mismatch this SPEC must correct.                              |
-| Vercel configuration metadata | Personal Production metadata now owns agent model `gpt-5.6-terra`, context `1050000` and proxy reasoning `high` as encrypted semantic configuration; the stable proxy still reports `low` because no successor deployment has occurred                                                                                                                                                   | Desired provider configuration only; live Terra High remains unproved until automatic deployment.                       |
+| Agent Vercel target           | Personal project `prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`, team `team_1LX7ZujbijowTv8J9k0aU7nD`; accepted READY Production deployment `dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp` at the accepted source; public and callback aliases matched.                                                                                                                                                          | Point-in-time accepted readback; no mutation authority or future state.                                                 |
+| Proxy Vercel target           | Personal project `prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`, same team; accepted READY Production deployment `dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6` at the accepted source; the public alias matched.                                                                                                                                                                                                | Point-in-time accepted readback; no mutation authority or future state.                                                 |
+| Current proxy health          | Stable `/health` returned `200`, `mode: live`, `reasoningEffort: high`.                                                                                                                                                                                                                                                                                                                  | Proves only the accepted observation window.                                                                            |
+| Vercel configuration metadata | Protected Eve reported `bundjil-codex-proxy/gpt-5.6-terra`, context `1050000`, zero diagnostics and one completed bounded turn.                                                                                                                                                                                                                                                          | Point-in-time Terra High proof only; it does not promise future model access or output.                                 |
 | Provider topology             | both Vercel projects are Personal-owned and have no current Git repository connection; repository `vercel.json` files disable Git deployment                                                                                                                                                                                                                                             | Desired/source and provider-link observation only.                                                                      |
 | GitHub action runtimes        | Hosted PR `#5` CI run `31617632184` passed at exact source `5a28c3bddfc6f1bdf21c82fca3aa90e1ec5458dc` with the reviewed checkout `v7.0.1` and setup-node `v7.0.0` commits; check `94184307855` returned zero annotations.                                                                                                                                                                | Exact candidate action execution only; it does not prove later runs or upstream safety.                                 |
 

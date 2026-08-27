@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-security-automation-maintainer
 last_reviewed: 2026-08-28
@@ -12,28 +12,29 @@ spec: ../../product-specs/automatic-production-and-operational-closeout.md
 
 ## Status
 
-The current accepted source is main SHA
-`402c5c54460361f969f6cd2ba8326b1d3f16c047`. CI run `33098864416` passed
-and automatically started Production run `33099189936`, which promoted exact
-proxy `dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV` and agent
-`dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx` while retaining the previous READY pair.
-Protected Eve completed one Terra High turn with context `1050000`. One bounded
-Photon journey and one bounded Sendblue journey each produced one visible
-Production reply. Photon accepted typing start and stop operations; Sendblue
-reported its outbound iMessage delivered. Neither observer caught a visible
-typing animation, and Photon has no supported candidate-specific replay
-readback.
+This plan is complete. Pull request `#15` merged exact main
+`27011deb4593f15f4042ff5cf570ca426da9d299`. Main CI run `33108401987`
+passed and automatically started Production run `33108710900`, which promoted
+READY proxy `dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6` and READY agent
+`dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp`. Independent Personal Vercel readback
+matched both stable aliases and the Photon callback to that source without a
+manual assignment. The prior proxy, agent and callback identities remain
+recorded and rollback ready.
 
-The Photon proof found one remaining deployment-control defect. Photon calls a
-Vercel automatic agent-project alias, while the accepted command moved only the
-public agent alias. A bounded manual assignment moved that callback to the
-accepted agent and restored service. The current branch adds the callback as a
-branded non-secret Config value, reads and inspects its exact target, moves it
-after the public agent, and restores it first on failure. Callback-only drift
-will be corrected without rebuilding either app. GitHub Production now holds
-the exact callback variable; the workflow still references only the existing
-two project-scoped Vercel secrets. The environment also contains a newer
-unrelated `DOPPLER_TOKEN`, which this workflow does not reference or consume.
+Protected Eve completed one Terra High turn with context `1050000`. One
+bounded Photon journey and one bounded Sendblue journey each showed delivery,
+visible typing and one complete Production reply. Photon still has no supported
+candidate-specific replay readback. The separate zero-write drift report still
+cannot compare eight prior write-only values. Both are recorded limitations,
+not unfinished deployment work.
+
+The implementation keeps the callback as a branded non-secret Config value,
+reads and inspects its exact target, moves it after the public agent, and
+restores it first on failure. Callback-only drift is corrected without
+rebuilding either app. GitHub Production holds the exact callback variable;
+the workflow references only the existing two project-scoped Vercel secrets.
+The environment also contains an unrelated `DOPPLER_TOKEN`, which this
+workflow does not reference or consume.
 Terminal review added two-minute provider-command, eight-minute mutation and
 separate four-minute restoration deadlines inside the 60-minute workflow, all
 eligible restoration attempts after an earlier rollback failure or stall,
@@ -45,8 +46,8 @@ mutation and three restorations are bounded to 42 minutes inside the command's
 The final independent review found no remaining code, Effect, boundary,
 secret-safety, timing, test or documentation issue. Full repository verification
 passed with 144 tooling tests, 17 lint tests, all nine package type checks and
-all 15 build/test tasks. Exact-main CI and automatic hosted callback readback
-remain required after merge.
+all 15 build/test tasks. The later exact-main CI and automatic hosted callback
+readback completed the plan.
 
 Drift run `32455191367` remains a zero-write but partly inconclusive report.
 Vercel exposes no usable prior value history for eight changed write-only rows,
@@ -197,9 +198,9 @@ Secret-negative follow-up proved the eight remaining write-only rows are live,
 four in each project, and every provider revision changed; five rows also
 changed type and two also changed sensitivity. Vercel exposes no prior
 secret value or separate value-revision history for these rows. They therefore
-remain genuinely inconclusive. Pull request `#6` stays open and `origin/main`
-stays at `c154d725372617c699538629712569518ee18099`; automatic Production has
-not started.
+remain genuinely inconclusive. At that historical point, pull request `#6`
+was open, `origin/main` was `c154d725372617c699538629712569518ee18099`, and
+automatic Production had not started.
 
 ## Exact scope
 
@@ -306,15 +307,17 @@ not started.
 - [x] Run one bounded Photon and one bounded Sendblue Production journey;
       retain handset-visible typing and strict Photon replay as explicit
       non-claims.
-- [ ] Merge the callback control, let exact-main CI start Production, and prove
+- [x] Merge the callback control, let exact-main CI start Production, and prove
       proxy, public agent and callback all resolve to the accepted source with
       no manual assignment.
 
 ## Evidence owners
 
 - Custody and external readback: the dated
-  [inconclusive packet](../../evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json)
-  and its exact detail own the latest hosted and provider observations.
+  [accepted callback and channel packet](../../evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json)
+  and its exact detail own the latest accepted hosted observations. The
+  separate [inconclusive drift packet](../../evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json)
+  retains the eight write-only limitations.
 - Repository desired state: the canonical SPEC, task ledger, authority
   register, automation registers, runbook and verification router.
 - Provider state: only fresh authenticated readback at the time of the next
@@ -338,7 +341,7 @@ it executed no provider command.
 | SPEC and task ledger               | Change required | Accepted Production/channel proof, non-blocking drift limitation and callback successor are recorded.                                                                                                                                   |
 | Authority and automation registers | Change required | Exact callback operation, existing two referenced Vercel secrets, unrelated unconsumed environment secret and rollback order are explicit.                                                                                              |
 | Runbook                            | Change required | It owns proxy, public agent and callback movement/readback plus callback-first rollback.                                                                                                                                                |
-| Verification packet and router     | Change required | Add a dated exact-main callback packet after hosted acceptance; retain prior live channel claims and non-claims.                                                                                                                        |
+| Verification packet and router     | Change required | The dated exact-main callback packet records hosted acceptance while retaining prior live channel claims and non-claims.                                                                                                                |
 | Workflow and authority fixtures    | Change required | Supply and enforce one non-secret callback variable while keeping exactly two Vercel secret references.                                                                                                                                 |
 | Effect command code and tests      | Change required | Add branded Config, named service operations, private alias codecs, callback-only reconciliation, ordered movement, bounded command/mutation/restoration TestClock fixtures and complete failure/interruption/defect rollback fixtures. |
 | Provider adapters and values       | Change required | GitHub gains one non-secret callback variable; Vercel callback alias changes only through the exact project-bound command.                                                                                                              |
@@ -353,8 +356,6 @@ deadlines, stronger rollback fixtures, exact cause checks and structured
 workflow validation. Corrected full repository verification now passes. This
 local proof can establish only the callback state machine and its fixtures.
 Final independent review, protected merge and exact-main hosted callback
-readback remain open. The
-accepted 2026-08-28 Production and
-channel evidence belongs only to SHA
-`402c5c54460361f969f6cd2ba8326b1d3f16c047`; it does not prove the pending
-callback automation or future runs.
+readback passed. The accepted 2026-08-28 Production and channel evidence
+belongs only to SHA `27011deb4593f15f4042ff5cf570ca426da9d299`; it does not
+promise future runs or remove the recorded drift and Photon replay limits.
