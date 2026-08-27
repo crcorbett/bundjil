@@ -252,10 +252,15 @@ not started.
       `dpl_3uRT9npE8Gx75LtdQEvjR45FhMiB` and agent
       `dpl_5wzmujRby12JZJVMBKQ3zuvcB17d` in run `33095604644`, then classify all
       three safe failure markers as `postResponsesStream`.
-- [ ] Add the fixed SSE, beta and originator request headers used by the local
+- [x] Add the fixed SSE, beta and originator request headers used by the local
       Codex reference at `9e552e9d…` and OAuth reference at `bec2ad69…`; prove
       the exact outbound request in package tests, deploy automatically, and
-      run one bounded turn.
+      run one bounded turn. Pull request `#13`, CI run `33097033155`, and
+      automatic Production run `33097382192` completed this slice, but the turn
+      still failed before body ownership.
+- [ ] Match the checked OAuth client's absent-only `Content-Type` fallback,
+      retain rejection of explicit non-SSE media types, deploy automatically,
+      and run one bounded turn against the exact deployment.
 
 ## Evidence owners
 
