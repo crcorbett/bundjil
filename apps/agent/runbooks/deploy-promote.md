@@ -199,6 +199,11 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    already-current SHA is an idempotent no-op. The repository-wide queue never
    cancels an in-flight writer. Stop on any eligibility, credential, project,
    source, readiness, alias, health, timeout, output, or rollback mismatch.
+   On failure, retain only the Schema-encoded `blocked` receipt. Its
+   `configuration`, `deployment`, or `unexpected` category and optional closed
+   deployment operation fields are safe routing facts, not proof that a
+   provider write did or did not occur. Re-read deployments and aliases before
+   deciding whether a retry or rollback is allowed.
    Do not run `production:deploy` interactively as a routine alternative.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the

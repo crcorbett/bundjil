@@ -12,6 +12,8 @@ import type { ChildProcess } from "effect/unstable/process";
 import { describe, expect, it } from "vitest";
 
 import {
+  AutomaticProductionBlockedReceipt,
+  AutomaticProductionBlockedReceiptJson,
   makeProductionDeploymentsMemory,
   ProductionDeployment,
   ProductionDeployments,
@@ -76,6 +78,25 @@ const runExitWithSnapshot = (failure: ProductionMemoryFailure) =>
   );
 
 describe("automatic Production deployment", () => {
+  it("encodes a secret-negative deployment failure receipt", () => {
+    const encoded = Schema.encodeUnknownSync(
+      AutomaticProductionBlockedReceiptJson
+    )(
+      AutomaticProductionBlockedReceipt.make({
+        status: "blocked",
+        category: "deployment",
+        operation: "current",
+        project: "proxy",
+        reason: "commandFailed",
+        retry: "after-readback",
+      })
+    );
+
+    expect(encoded).toBe(
+      '{"status":"blocked","category":"deployment","operation":"current","project":"proxy","reason":"commandFailed","retry":"after-readback"}'
+    );
+  });
+
   it("decodes the current Vercel project target without an embedded projectId", async () => {
     const commands: ChildProcess.Command[] = [];
     const stdout = new TextEncoder().encode(
