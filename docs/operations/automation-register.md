@@ -67,26 +67,39 @@ automation fallback.
 
 ### Production deployment — admitted post-CI automation, hosted proof deferred
 
-The source control is admitted, but its hosted proof is deferred for this
-implementation epoch. Fresh Executor Personal readback on 2026-08-13 found the
-sole Vercel connection authenticated as the explicitly excluded
-`cooper.corbett@tilt.legal` account, so no project token or partial GitHub
-custody was created. The bounded stop is retained in
+The source control is admitted, but its hosted proof is still deferred. The
+2026-08-13 stop occurred before any token or partial GitHub custody was created
+and is retained in
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+Its identity classification is superseded by the 2026-08-20 read-only
+`getTeams`/`getProjects` result: the connection exposes only Personal team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, with owner membership and both exact Bundjil
+projects. The primary contact email does not define Vercel resource scope.
+The accepted read-only correction packet is
+[`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
+The later 2026-08-21 custody readback proved four replacement one-year,
+project-scoped tokens, assigned-project HTTP 200/sibling HTTP 404 tests, four
+concealed personal `bundjil` 1Password items with fingerprint prefixes, and
+exactly the two refreshed Production GitHub secret names. It did not prove a
+deployment; the earlier 90-day result remains in
+[`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Vercel tokens selected
-  under the Personal account, one for each exact Bundjil project. Before
-  custody, each token must read its assigned project and receive a denied result
-  for the sibling project. Exact project configuration and decoded project/SHA
-  readback remain independent controls. The
+  `contents: read` plus exactly two separately revocable Vercel tokens
+  project-scoped to the exact Personal projects, one bound to each exact
+  Bundjil project. Before
+  custody, each binding must read back the expected team and project. Exact
+  project configuration and decoded project/SHA readback remain independent
+  controls; each token must be project-scoped and pass sibling denial before
+  custody. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then agent, and
-  verifies stable targets and health. Tilt, account-wide credentials and raw
-  workflow mutation commands are rejected.
+  verifies stable targets and health. Unexpected teams, account-wide or
+  user-scoped credentials, team-wide project listing, and raw workflow mutation
+  commands are rejected.
 - **Duration and convergence:** one repository-wide queue never cancels an
   in-flight writer and bounds each run to 30 minutes. Already-current and stale
   candidates are explicit no-ops. A partial failure restores the exact prior
@@ -102,11 +115,74 @@ custody was created. The bounded stop is retained in
 
 ### Preview infrastructure drift — report-only automation
 
-The report-only source remains admitted, while hosted execution is deferred at
-the same identity gate. Exact-head run `31677769897` failed closed before
-provider reporting because the three custody artifacts were absent; it proves
-missing custody only, not drift. Resume requires a separate admitted personal
-Vercel principal and the complete credential/artifact package.
+The report-only source remains admitted. The exact Preview Photon credential,
+R2 state access, distinct project-scoped drift tokens, static authority and
+155-resource manifest are now installed as exactly the three environment
+artifacts. Manual run `32440487569` checked out
+`c154d725372617c699538629712569518ee18099` and finished green, but it did not
+run drift: `bun --env-file … run …` printed help and exited zero, and the
+workflow had no receipt readback. This is a rejected false green. The corrected
+workflow places Bun's `run` argument before `--env-file`, requires a non-empty
+receipt and prints the Schema-valid sanitised receipt. The authority audit
+rejects both the bad argument order and missing receipt check. A corrected
+hosted receipt remains required before acceptance. Pull-request run
+`32441621932` on `1d1c47dd7422a125db8dda50509f6fd6f3169bb5` executed the
+corrected command but failed before writing a receipt. The next source maps
+every pre-receipt error to a fixed secret-safe phase so follow-up can target the
+failed boundary without printing values or provider payloads. Diagnostic run
+`32442223436` on `707aad58ceedeff1662f46d949326d5821449de0` reported
+`runtimeInitializationFailed`. After the eight-line custody artifact passed its
+R2, Preview Photon and exact-project Vercel Config Schemas and replaced only
+the GitHub environment secret, run `32443491605` still reported
+`stateConfigurationInvalid`. That source also mapped state-client
+initialisation to the config label; its successor gives those typed boundaries
+separate fixed outcomes.
+
+The next custody readback proved that `gh secret set --body -` had stored a
+literal hyphen instead of stdin. The two Production tokens and drift
+environment were replaced with the correct stdin form. Run `32444546031` then
+passed R2 state and stopped safely at `authorityArtifactInvalid`; the authority
+replacement succeeded. GitHub rejected the raw 155-resource manifest with
+HTTP 422 because it exceeds the environment-secret size boundary. The
+successor workflow materialises the same Schema-encoded manifest from an exact
+in-memory gzip/base64 transport into mode-`0600` custody, and the authority
+audit rejects a changed or missing materialisation pipeline. A successful
+hosted receipt is still required. The 7,516-byte transport was installed at
+`2026-08-21T04:07:06Z` after an in-memory round trip retained the 87,930-byte
+manifest's stage, digest and all 155 resources; GitHub readback exposed only
+the secret name and update time.
+Pull-request run `32445924126` proved the transport materialisation but stopped
+at `manifestArtifactInvalid` because the workflow omitted the accepted digest
+required by command configuration. The successor binds the exact digest as
+non-secret source configuration and the authority audit rejects omission or
+change.
+CI run `32446250097` passed on exact SHA
+`01978dc818adacb75d54042a34c7bf422c571745`. Pull-request drift run
+`32446250037` then produced a Schema-valid inconclusive receipt with zero
+provider writes. The exact-project deployment endpoint returned HTTP 200 for
+both credentials; the private decoder rejected Vercel's custom `staging`
+target. The successor admits non-empty provider target names at ingress and
+excludes custom targets from Bundjil Preview and Production observations.
+Runs `32452367518` and `32453467578` then completed live provider reads with
+zero writes. The latter retained one report-only Photon metadata change, 37
+blocking deployment observations and 44 inconclusive write-only rows on exact
+SHA `e3deed1d307748ee629c684874d21c3c8f33b015`; CI run `32453467606`
+passed that SHA. Secret-negative exact-state comparison proved 58 saved
+deployment observations still match every typed field and 37 accepted
+historical identities are no longer returned. No returned deployment changed.
+The successor reports that historical API limit without repair authority and
+accepts write-only baseline continuity only under the three-way manifest,
+native-result and provider-revision rule below.
+
+CI run `32455191281` passed exact successor SHA
+`f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
+`32455191367` completed all provider reads and recorded zero writes, zero
+blocking rows, eight inconclusive write-only rows and 38 report rows. Aggregate
+secret-negative follow-up found the eight rows live, four per project, with
+changed provider revisions; five also changed type and two also changed
+sensitivity. No previous value or immutable value revision is available from
+the admitted provider read. The workflow therefore remains failed closed and
+cannot trigger a main merge or automatic Production.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only
@@ -115,10 +191,16 @@ Vercel principal and the complete credential/artifact package.
   `infrastructure-read-only-preview` environment. Its three secret artifacts
   contain the static fixed policy envelope, provider/state environment, and
   accepted manifest. The environment artifact holds a distinct Schema-decoded
-  set of unique project-ID/token bindings, one dedicated project-scoped Vercel
-  token per manifest project; the Layer rejects Team scope and Production or
-  broad inventory credentials are not reused. Vercel personal tokens are not
-  method-level read-only, so project scope, sibling denial, independent
+  set of unique project-ID/token bindings, one separately revocable Vercel
+  project-scoped token per manifest project; the Layer
+  rejects team-wide project resolution and Production or broad inventory
+  credentials are not reused. The provider token scope and decoded project
+  binding must agree; request routing is not a substitute for that scope.
+  Marketplace proof uses the exact project's environment attachment hint. The
+  denied account-wide storage list is outside this principal, and the accepted
+  manifest database ID is retained identity rather than current readback.
+  Vercel personal tokens are not
+  method-level read-only, so exact project scope, sibling denial, independent
   revocation, the read-only call graph and zero-write receipt are mandatory
   controls. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
@@ -129,13 +211,24 @@ Vercel principal and the complete credential/artifact package.
   provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
-  native `sync --dry-run` remain distinct sources. Blocking drift fails;
-  unavailable, ambiguous, skipped, or unknown-secret observations are
+  native `sync --dry-run` remain distinct sources. Blocking drift fails.
+  Unavailable, ambiguous and skipped reads remain inconclusive. An unknown
+  write-only secret baseline is accepted only when the accepted manifest,
+  unchanged native result and present unchanged provider revision metadata all
+  agree; this does not prove the value. Every other unknown revision remains
   inconclusive.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
-  SHA, static authority fingerprint, and manifest digest. Source review and a local run prove neither
+  SHA, static authority fingerprint, and manifest digest. The always-run log
+  readback may expose only grouped non-accepted resource kind, category,
+  disposition and count plus the bounded receipt; it does not print resource
+  fingerprints or provider values. Source review and a local run prove neither
   current GitHub settings/secrets nor hosted execution/provider actuality.
+  Read-only Photon project metadata changes remain visible as non-repair
+  reports. Returned Vercel deployment observations must match all current typed
+  fields. Accepted historical deployment identities absent from Vercel's
+  current list are reported as unavailable history, not drift, no-op, deletion,
+  retention, or repair authority.
 - **Stop, rollback, and escalation:** stage/identity/authority drift, any write
   path, malformed output, blocking drift, or inconclusive readback stops the
   run. Disable the workflow or revoke its read-only environment under separate

@@ -843,9 +843,10 @@ pending and no acceptance or terminal-audit status advances.
 Cooper explicitly approved the required token creation. Read-before-write
 confirmed personal Cloudflare account
 `f9f94270a4a5af8af7010d891020922d` and exact bucket
-`bundjil-alchemy-state`. Active account token
-`8033ee98f001f2aeeb4512750f4d8f36` is scoped only to Workers R2 Storage
-Bucket Item Write for that bucket and expires at `2026-11-11T06:11:42Z`.
+`bundjil-alchemy-state`. The active personal Cloudflare account token is scoped only to Workers R2
+Storage Bucket Item Write for that bucket and expires at
+`2026-11-11T06:11:42Z`; its value is intentionally redacted from repository
+history.
 Its derived S3 Access Key ID and Secret Access Key are held only by personal
 Bundjil 1Password item `dylpugrxetztdr76qruqtxonie`. One direct S3 list under
 `bundjil/v1` succeeded; the bounded result exposed one visible object and a

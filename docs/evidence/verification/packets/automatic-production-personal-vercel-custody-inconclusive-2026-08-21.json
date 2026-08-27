@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "approval_gated",
+  "status": "inconclusive",
+  "outcome": "inconclusive",
+  "lifecycle": { "state": "inconclusive" },
+  "externalConsequence": {
+    "outcome": "observed",
+    "target": "Personal Vercel credential custody and exact GitHub Production environment custody"
+  },
+  "candidate": {
+    "repositoryCommit": "e539c2c8aa342d5c842afec6e0c51ef7a87fe7e0",
+    "sourceDigest": "15c286f22190f1b089cb351d291fd4582dd3a958012767576e4933d8635be7b1",
+    "artifactDigest": "9c12991b82a9f46400a696098c5c36df29a23b951c59ccf5d2a6212cf79a337d"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "identitySource": "Supervised continuation with authenticated Personal Vercel, personal 1Password, and crcorbett/bundjil GitHub custody",
+    "externalAccess": "mutation",
+    "approvalReceipt": "Approved four-token Personal Vercel custody, 1Password storage, exact GitHub Production secret installation, and bounded hosted-proof continuation",
+    "rollbackOwner": "Bundjil personal Vercel and GitHub operator"
+  },
+  "environment": {
+    "tier": "external",
+    "target": "Personal Vercel team team_1LX7ZujbijowTv8J9k0aU7nD, exact Bundjil projects, 1Password vault bundjil, and GitHub Production/infrastructure-read-only-preview environments"
+  },
+  "journeyResults": [
+    {
+      "journeyId": "BND-J14-preview-infrastructure-drift-report",
+      "status": "inconclusive",
+      "oracle": "Four Vercel credentials passed assigned-project HTTP 200 and sibling-project HTTP 404 and reached concealed 1Password custody; missing Preview Photon custody stopped drift artifacts and hosted reporting."
+    }
+  ],
+  "commandReceipt": {
+    "invocation": "Create and scope-test four Personal Vercel dashboard tokens, store concealed values in the personal bundjil 1Password vault, install two GitHub Production secrets, then perform metadata-only GitHub and 1Password readback",
+    "outcome": "blocked",
+    "exitCode": null,
+    "invariant": "Credential values remain outside chat, tracked files, local plaintext, GitHub readback and retained evidence; every token has exact project isolation before custody",
+    "target": "Exact Personal Vercel agent/proxy projects and exact Bundjil 1Password/GitHub custody targets",
+    "recoveryHint": "Obtain an approved Preview Photon secret, then construct the three Schema-decoded drift artifacts and dispatch one report-only run; do not read Vercel sensitive values or substitute the source/Production pair",
+    "detailPath": "docs/evidence/verification/details/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json",
+    "detailSha256": "9c12991b82a9f46400a696098c5c36df29a23b951c59ccf5d2a6212cf79a337d",
+    "postcondition": "Four project-scoped credentials are in concealed personal custody and two Production secret names are present; drift custody is intentionally incomplete and no hosted drift or Production deployment claim is made"
+  },
+  "externalReadback": {
+    "required": true,
+    "outcome": "available",
+    "receipt": "Authenticated Vercel dashboard, status-only project reads, narrow 1Password metadata readback, and GitHub secret/environment/ruleset metadata readback are retained in the secret-negative detail"
+  },
+  "postconditions": [
+    "The four named 90-day Personal Vercel tokens expire on 2026-11-18, are each scoped to exactly one Bundjil project, and each passed assigned-project success plus sibling-project denial before custody.",
+    "The four token values are concealed in four personal bundjil 1Password items with exact project metadata, expiry, purpose and revocation owner; token IDs or fingerprints were not exposed by the dashboard.",
+    "GitHub Production contains exactly BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN and BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN; the four exact Production variables, active ruleset 20616946 and branch-policy-only Production environment were read back.",
+    "GitHub infrastructure-read-only-preview contains zero secrets; no incomplete drift artifact was installed and no report-only drift run was dispatched.",
+    "No main push, automatic Production deployment, alias movement, provider channel operation or handset operation was attempted in this continuation."
+  ],
+  "limitations": [
+    "Vercel dashboard token IDs or fingerprints were not exposed, so the custody record retains that limitation rather than inventing identifiers.",
+    "Vercel environment values are write-only at the report-only drift boundary; the Preview Photon value was not decrypted or copied.",
+    "The approved personal Bundjil vault and local custody do not contain the required Preview Photon secret. The existing Bundjil Preview item is a Codex OAuth profile, not Photon.",
+    "The adopted R2 Preview state and Vercel Preview variable metadata do not by themselves prove Photon secret custody, a hosted drift run, or a deployment."
+  ],
+  "nonClaims": [
+    "No Vercel token value, GitHub secret value, Photon secret, Vercel environment value or provider payload is retained.",
+    "This packet does not prove a hosted Infrastructure Drift result, automatic main deployment, immutable deployment, stable alias, proxy health, Terra High, Eve behaviour, channel delivery, handset state or future run.",
+    "The Production secret names and token custody do not authorise manual deployment or bypass the exact CI workflow_run path."
+  ],
+  "rollback": {
+    "identity": "Revoke any one of the four exact Vercel tokens independently and remove either named GitHub Production secret under the exact environment authority; no deployment rollback identity is needed because no deployment was attempted",
+    "outcome": "ready",
+    "owner": "Bundjil personal Vercel and GitHub operator"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/verification/details/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json",
+      "sha256": "9c12991b82a9f46400a696098c5c36df29a23b951c59ccf5d2a6212cf79a337d",
+      "provenance": "Authenticated Vercel dashboard custody, status-only project isolation tests, personal 1Password metadata readback and GitHub names-only control readback"
+    }
+  ],
+  "observedAt": "2026-08-21T01:02:35Z"
+}

@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "receipt": "automatic-production-personal-vercel-custody-inconclusive",
+  "observedAt": "2026-08-21T01:02:35Z",
+  "repository": {
+    "name": "crcorbett/bundjil",
+    "branch": "main",
+    "head": "e539c2c8aa342d5c842afec6e0c51ef7a87fe7e0"
+  },
+  "authority": {
+    "principal": "Cooper, personal Bundjil owner",
+    "approval": "Supervised continuation of the approved Personal Vercel custody and bounded hosted-proof task",
+    "excludedScope": [
+      "Tilt Legal Vercel resources",
+      "unrelated projects",
+      "secret disclosure",
+      "destructive cleanup",
+      "blind retry"
+    ]
+  },
+  "vercel": {
+    "team": {
+      "id": "team_1LX7ZujbijowTv8J9k0aU7nD",
+      "slug": "cooper-corbetts-projects",
+      "name": "Cooper Corbett's projects"
+    },
+    "projects": {
+      "agent": {
+        "id": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "name": "bundjil-agent"
+      },
+      "proxy": {
+        "id": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "name": "bundjil-codex-proxy"
+      }
+    },
+    "credentialExpiry": "2026-11-18",
+    "credentials": [
+      {
+        "name": "bundjil-production-agent-2026-08-20",
+        "purpose": "Production agent deployment",
+        "assignedProject": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "assignedProjectStatus": 200,
+        "siblingProject": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "siblingProjectStatus": 404,
+        "tokenIdOrFingerprint": "not exposed by the dashboard"
+      },
+      {
+        "name": "bundjil-production-proxy-2026-08-20",
+        "purpose": "Production proxy deployment",
+        "assignedProject": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "assignedProjectStatus": 200,
+        "siblingProject": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "siblingProjectStatus": 404,
+        "tokenIdOrFingerprint": "not exposed by the dashboard"
+      },
+      {
+        "name": "bundjil-drift-agent-2026-08-20",
+        "purpose": "Preview Infrastructure Drift agent read-only report",
+        "assignedProject": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "assignedProjectStatus": 200,
+        "siblingProject": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "siblingProjectStatus": 404,
+        "tokenIdOrFingerprint": "not exposed by the dashboard"
+      },
+      {
+        "name": "bundjil-drift-proxy-2026-08-20",
+        "purpose": "Preview Infrastructure Drift proxy read-only report",
+        "assignedProject": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+        "assignedProjectStatus": 200,
+        "siblingProject": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+        "siblingProjectStatus": 404,
+        "tokenIdOrFingerprint": "not exposed by the dashboard"
+      }
+    ],
+    "scopeConclusion": "All four credentials are exact project-scoped tokens with assigned-project success and sibling-project denial. No account-wide or team-wide fallback was used."
+  },
+  "onePassword": {
+    "account": "Corbett Family",
+    "vault": {
+      "id": "u6jbz5fuuvz7vlfthnm5dtwnpq",
+      "name": "bundjil"
+    },
+    "items": [
+      {
+        "id": "5n7s7fw7kfflksr7czplj7w2hq",
+        "title": "bundjil-production-agent-2026-08-20",
+        "category": "PASSWORD",
+        "passwordType": "CONCEALED",
+        "passwordLength": 60,
+        "notesLength": 324,
+        "notesContainExactProject": true,
+        "notesContainExpiry": true,
+        "notesSayTokenFingerprintNotExposed": true
+      },
+      {
+        "id": "z7pyafv3oci7i4fksrbxamojna",
+        "title": "bundjil-production-proxy-2026-08-20",
+        "category": "PASSWORD",
+        "passwordType": "CONCEALED",
+        "passwordLength": 60,
+        "notesLength": 336,
+        "notesContainExactProject": true,
+        "notesContainExpiry": true,
+        "notesSayTokenFingerprintNotExposed": true
+      },
+      {
+        "id": "rerhpi4wydwzst7m6li76c3gau",
+        "title": "bundjil-drift-agent-2026-08-20",
+        "category": "PASSWORD",
+        "passwordType": "CONCEALED",
+        "passwordLength": 60,
+        "notesLength": 345,
+        "notesContainExactProject": true,
+        "notesContainExpiry": true,
+        "notesSayTokenFingerprintNotExposed": true
+      },
+      {
+        "id": "vy45r4kadmax4es3sddzkciskm",
+        "title": "bundjil-drift-proxy-2026-08-20",
+        "category": "PASSWORD",
+        "passwordType": "CONCEALED",
+        "passwordLength": 60,
+        "notesLength": 357,
+        "notesContainExactProject": true,
+        "notesContainExpiry": true,
+        "notesSayTokenFingerprintNotExposed": true
+      }
+    ],
+    "valueReadback": "Metadata only; credential values were not returned or retained in the evidence."
+  },
+  "github": {
+    "repository": "crcorbett/bundjil",
+    "productionSecrets": [
+      "BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN",
+      "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN"
+    ],
+    "productionVariables": {
+      "BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID": "prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN",
+      "BUNDJIL_PRODUCTION_PROXY_HEALTH_URL": "https://bundjil-codex-proxy.vercel.app/health",
+      "BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID": "prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB",
+      "BUNDJIL_PRODUCTION_VERCEL_TEAM_ID": "team_1LX7ZujbijowTv8J9k0aU7nD"
+    },
+    "productionEnvironment": {
+      "id": 18184147018,
+      "name": "Production",
+      "protection": "branch_policy only; no reviewers and no wait timer"
+    },
+    "infrastructureDriftEnvironment": {
+      "id": 19188334259,
+      "name": "infrastructure-read-only-preview",
+      "secretCount": 0,
+      "secretNames": []
+    },
+    "mainRuleset": {
+      "id": 20616946,
+      "name": "main-verified-pull-request",
+      "enforcement": "active",
+      "target": "branch",
+      "defaultBranchCondition": true,
+      "bypassActors": [],
+      "requiredPullRequest": true,
+      "requiredApprovals": 0,
+      "requiredStatus": "verify",
+      "strictStatus": true,
+      "nonFastForward": true
+    },
+    "secretValueReadback": "Names and metadata only; GitHub secret values were not read back."
+  },
+  "driftStop": {
+    "previewPhotonProjectId": "d9fe974e-8d43-4245-ba7d-815c7e7f4ae8",
+    "previewPhotonProjectFingerprint": "37cf2944d0c285636c86324faf46354b6990b2fcfd9fa1981af6d24f05406ce4",
+    "r2State": "The adopted Preview R2 state contains the isolated Photon project identity; no secret-bearing state object was downloaded.",
+    "vercelPreviewMetadata": {
+      "agentPhotonVariableNames": [
+        "BUNDJIL_CHANNEL_PHOTON_PROJECT_ID",
+        "BUNDJIL_CHANNEL_PHOTON_PROJECT_SECRET"
+      ],
+      "agentPhotonVariableTarget": "preview",
+      "variableType": "sensitive",
+      "proxyPhotonVariableNames": [],
+      "valuesRead": false
+    },
+    "bundjilPreviewItem": {
+      "id": "6a54oo5zotzteriqabow4iyl3a",
+      "notesLength": 186,
+      "mentionsPhoton": false,
+      "mentionsCodexOAuth": true,
+      "isPhotonCredential": false
+    },
+    "decision": "No approved Preview Photon secret is available in the personal bundjil vault or local custody. Do not substitute the source/Production pair and do not decrypt a Vercel environment value."
+  },
+  "hostedOutcome": {
+    "driftArtifactsInstalled": false,
+    "driftRunDispatched": false,
+    "productionMainPushAttempted": false,
+    "automaticProductionDeploymentProved": false,
+    "rollbackNeeded": false
+  },
+  "nonClaims": [
+    "No Vercel token value, GitHub secret value, Photon secret, Vercel environment value, or provider payload is retained.",
+    "No hosted Infrastructure Drift result or automatic Production deployment is proved.",
+    "No immutable deployment, stable alias, proxy health, Terra High model identity, Eve turn, channel delivery, handset state, or future-run claim is made."
+  ]
+}

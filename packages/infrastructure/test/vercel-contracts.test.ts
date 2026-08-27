@@ -238,7 +238,7 @@ it.effect(
     })
 );
 
-it.effect("fails ambiguous project discovery and isolates team scope", () =>
+it.effect("fails ambiguous project discovery and isolates project scope", () =>
   Effect.gen(function* testVercelMemoryAmbiguityAndTeamScope() {
     const duplicated = yield* Schema.decodeUnknownEffect(
       VercelReadOnlyInventory
@@ -297,13 +297,13 @@ const liveLayer = (client: HttpClient.HttpClient) =>
   );
 
 it.effect(
-  "routes project-scoped credentials by branded project ID and rejects team-wide access",
+  "routes project-scoped token bindings by branded project ID and rejects team-wide project enumeration",
   () => {
     const config = ConfigProvider.fromUnknown({
       BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON:
         '[{"projectId":"prj-agent","accessToken":"agent-token-sentinel"},{"projectId":"prj-proxy","accessToken":"proxy-token-sentinel"}]',
     });
-    return Effect.gen(function* testProjectScopedCredentials() {
+    return Effect.gen(function* testProjectRoutedCredentials() {
       const credentials = yield* VercelCredentials;
       const agentToken = yield* credentials.accessToken({
         _tag: "Project",
@@ -319,7 +319,7 @@ it.effect(
           projectId: VercelProjectId.make("prj-unknown"),
         })
         .pipe(Effect.exit);
-      const teamScope = yield* credentials
+      const teamEnumeration = yield* credentials
         .accessToken({
           _tag: "Team",
           teamId: VercelTeamId.make("team-preview"),
@@ -329,9 +329,9 @@ it.effect(
       assert.strictEqual(Redacted.value(agentToken), "agent-token-sentinel");
       assert.strictEqual(Redacted.value(proxyToken), "proxy-token-sentinel");
       assert.strictEqual(Exit.isFailure(unknownProject), true);
-      assert.strictEqual(Exit.isFailure(teamScope), true);
+      assert.strictEqual(Exit.isFailure(teamEnumeration), true);
       assert.strictEqual(
-        Inspectable.toStringUnknown([unknownProject, teamScope]).includes(
+        Inspectable.toStringUnknown([unknownProject, teamEnumeration]).includes(
           "token-sentinel"
         ),
         false
@@ -499,35 +499,6 @@ it.effect(
                 pagination: { next: null },
               };
             }
-            if (url.pathname === "/v1/storage/stores") {
-              return {
-                stores: [
-                  {
-                    id: "resource-upstash",
-                    externalResourceId: "database-upstash",
-                    type: "integration",
-                    product: {
-                      integrationConfigurationId: "configuration-upstash",
-                      integration: {
-                        id: "integration-upstash",
-                      },
-                    },
-                    projectsMetadata: [{ projectId: "prj-agent" }],
-                    secrets: [
-                      {
-                        name: "UPSTASH_REDIS_REST_TOKEN",
-                        value: "sentinel-marketplace-secret",
-                      },
-                    ],
-                  },
-                  {
-                    id: "blob-store",
-                    type: "blob",
-                    secrets: [{ value: "sentinel-unrelated-store-secret" }],
-                  },
-                ],
-              };
-            }
             assert.strictEqual(url.pathname, "/v6/deployments");
             deploymentPage += 1;
             let deploymentCursor: string | null = null;
@@ -550,8 +521,18 @@ it.effect(
                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                     },
                   },
+                  {
+                    uid: "deployment-custom-staging",
+                    projectId: "prj-agent",
+                    target: "staging",
+                    readyState: "READY",
+                    meta: {
+                      githubCommitSha:
+                        "cccccccccccccccccccccccccccccccccccccccc",
+                    },
+                  },
                 ],
-                pagination: { count: 1, next: 123, prev: 124 },
+                pagination: { count: 2, next: 123, prev: 124 },
               };
             }
             return {
@@ -591,7 +572,8 @@ it.effect(
 
       const decoded = yield* inventory;
       const [project] = decoded.projects;
-      if (project === undefined) {
+      const [expectedMarketplaceBinding] = decoded.marketplaceBindings;
+      if (project === undefined || expectedMarketplaceBinding === undefined) {
         return yield* Effect.die("The Vercel live fixture is incomplete.");
       }
       const result = yield* Effect.gen(function* exerciseVercelLive() {
@@ -621,6 +603,10 @@ it.effect(
           yield* marketplaceBindingsService.listMarketplaceBindings(
             ListVercelMarketplaceBindings.make(project)
           );
+        const marketplaceBinding =
+          yield* marketplaceBindingsService.observeMarketplaceBinding(
+            ObserveVercelMarketplaceBinding.make(expectedMarketplaceBinding)
+          );
         const deployments = yield* deploymentsService.listDeployments(
           ListVercelDeployments.make(project)
         );
@@ -635,6 +621,7 @@ it.effect(
           domains,
           environmentVariables,
           productionEnvironmentVariables,
+          marketplaceBinding,
           marketplaceBindings,
           deployments,
           productionDeployments,
@@ -656,16 +643,15 @@ it.effect(
       );
       assert.strictEqual(result.marketplaceBindings.bindings.length, 1);
       assert.strictEqual(
-        Inspectable.toStringUnknown(result.marketplaceBindings).includes(
-          "sentinel-marketplace-secret"
-        ),
-        false
+        result.marketplaceBindings.bindings[0]?.databaseId,
+        "not-exposed-by-project-scope"
       );
+      assert.strictEqual(result.marketplaceBinding._tag, "Found");
       assert.strictEqual(
-        Inspectable.toStringUnknown(result.marketplaceBindings).includes(
-          "sentinel-unrelated-store-secret"
-        ),
-        false
+        result.marketplaceBinding._tag === "Found"
+          ? result.marketplaceBinding.attributes.databaseId
+          : undefined,
+        expectedMarketplaceBinding.databaseId
       );
       assert.strictEqual(result.deployments.deployments.length, 1);
       assert.deepStrictEqual(deploymentCursors, [null, "123", null]);
@@ -690,71 +676,50 @@ it.effect(
 );
 
 it.effect(
-  "fails closed when Marketplace content hints do not match one installation resource",
+  "returns missing when project-scoped Marketplace hints do not match the accepted binding",
   () =>
     Effect.gen(function* testMarketplaceContentHintMismatch() {
       const decoded = yield* inventory;
       const [project] = decoded.projects;
-      if (project === undefined) {
+      const [binding] = decoded.marketplaceBindings;
+      if (project === undefined || binding === undefined) {
         return yield* Effect.die(
           "The Vercel Marketplace mismatch fixture is incomplete."
         );
       }
-      const client = HttpClient.make((request) => {
-        const url = new URL(request.url);
-        return Effect.succeed(
+      const client = HttpClient.make((request) =>
+        Effect.succeed(
           HttpClientResponse.fromWeb(
             request,
             Response.json(
-              url.pathname.endsWith("/env")
-                ? {
-                    envs: [
-                      {
-                        id: "env-marketplace",
-                        key: "MARKETPLACE_SECRET",
-                        type: "sensitive",
-                        target: ["preview"],
-                        contentHint: {
-                          integrationConfigurationId: "configuration-upstash",
-                          integrationId: "integration-upstash",
-                          storeId: "expected-resource",
-                        },
-                      },
-                    ],
-                    pagination: { next: null },
-                  }
-                : {
-                    stores: [
-                      {
-                        id: "different-resource",
-                        externalResourceId: "sentinel-database-id",
-                        type: "integration",
-                        product: {
-                          integrationConfigurationId: "configuration-upstash",
-                          integration: {
-                            id: "integration-upstash",
-                          },
-                        },
-                        projectsMetadata: [{ projectId: "prj-agent" }],
-                      },
-                    ],
+              {
+                envs: [
+                  {
+                    id: "env-marketplace",
+                    key: "MARKETPLACE_SECRET",
+                    type: "sensitive",
+                    target: ["preview"],
+                    contentHint: {
+                      integrationConfigurationId: "configuration-upstash",
+                      integrationId: "integration-upstash",
+                      storeId: "different-resource",
+                    },
                   },
+                ],
+                pagination: { next: null },
+              },
               { status: 200 }
             )
           )
-        );
-      });
-      const mismatch = yield* Effect.gen(function* listMarketplaceBindings() {
-        const marketplaceBindings = yield* VercelMarketplaceBindings;
-        return yield* marketplaceBindings.listMarketplaceBindings(
-          ListVercelMarketplaceBindings.make(project)
-        );
-      }).pipe(Effect.provide(liveLayer(client)), Effect.exit);
-      assert.strictEqual(Exit.isFailure(mismatch), true);
-      assert.strictEqual(
-        Inspectable.toStringUnknown(mismatch).includes("sentinel-database-id"),
-        false
+        )
       );
+      const mismatch = yield* Effect.gen(function* observeMarketplaceBinding() {
+        const marketplaceBindings = yield* VercelMarketplaceBindings;
+        return yield* marketplaceBindings.observeMarketplaceBinding(
+          ObserveVercelMarketplaceBinding.make(binding)
+        );
+      }).pipe(Effect.provide(liveLayer(client)));
+      assert.strictEqual(mismatch._tag, "Missing");
       return yield* Effect.void;
     })
 );

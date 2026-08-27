@@ -71,16 +71,27 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
       BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:\${{ github.repository }}:\${{ github.run_id }}:\${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST: 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60
       DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
-      DRIFT_MANIFEST_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
+      DRIFT_MANIFEST_GZIP_BASE64: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
     steps:
       - uses: actions/checkout@${pins["actions/checkout"]}
         with:
           persist-credentials: false
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
-      - run: bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report
+      - run: |
+          printf '%s' "$DRIFT_MANIFEST_GZIP_BASE64" \\
+            | base64 --decode \\
+            | gzip --decompress \\
+            > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
+      - run: bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report
+      - if: always()
+        run: |
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
+          jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
 `
   );
 
@@ -575,12 +586,48 @@ describe("HGI-304 authority policy", () => {
         ),
     ],
     [
+      "accepted manifest digest changed",
+      "AUTH-DRIFT-MANIFEST",
+      (content: string) =>
+        content.replace(
+          "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+          "0".repeat(64)
+        ),
+    ],
+    [
       "report command changed to apply",
       "AUTH-DRIFT-MUTATION",
       (content: string) =>
         content.replace(
           "infrastructure:drift-report",
           "infrastructure:stable-production-apply"
+        ),
+    ],
+    [
+      "Bun report arguments moved into the false-green order",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          'bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report',
+          'bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report'
+        ),
+    ],
+    [
+      "manifest materialisation removed",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          /^\s*\| gzip --decompress \\\n\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"$/m,
+          ""
+        ),
+    ],
+    [
+      "bounded receipt readback removed",
+      "AUTH-DRIFT-MUTATION",
+      (content: string) =>
+        content.replace(
+          /^\s*test -s "\$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"$/m,
+          ""
         ),
     ],
   ])(

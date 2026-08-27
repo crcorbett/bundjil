@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "taskId": "automatic-production-personal-vercel-access-correction",
+  "status": "passed",
+  "observedAt": "2026-08-19T23:58:19Z",
+  "trigger": "The Personal Vercel access correction adds one sanitized detail and one bounded verification packet.",
+  "docsInventory": {
+    "pathCount": 251,
+    "sortedPathSha256": "94170c7e2e6a4239306fbf04998a58e4ad8ed20ded16b25ab6cea474c1739917"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/evidence/verification/details/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
+    "docs/evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The new paths correct one bounded Vercel resource-scope decision and current path accounting without changing the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and validation remain bound to their recorded candidate. This correction updates only the executable current path inventory.",
+    "nonClaim": "This correction does not prove token custody, GitHub secret configuration, hosted drift, deployment, model behaviour, channel delivery, handset behaviour or Production state."
+  },
+  "checks": [
+    {
+      "command": "bun run verification",
+      "status": "failed_before_correction",
+      "result": "The candidate passed the preceding policy checks and then HARNESS-DOCS-INVENTORY rejected the stale 248-path inventory."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The focused evaluator confirmed the corrected 251-path docs and unchanged 23-path README inventories across twelve scenarios and nine impact areas."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "Hosted credential, drift, deployment, model and channel checks remain separate work."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No provider credential, GitHub secret, deployment, message or Production operation was created by this correction."
+  ]
+}

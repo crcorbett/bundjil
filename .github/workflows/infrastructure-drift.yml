@@ -28,12 +28,13 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:${{ github.repository }}:${{ github.run_id }}:${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST: 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60
       BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
       BUNDJIL_INFRASTRUCTURE_MODE: sync
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
       DRIFT_AUTHORITY_JSON: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
       DRIFT_ENV_FILE: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
-      DRIFT_MANIFEST_JSON: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+      DRIFT_MANIFEST_GZIP_BASE64: ${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
 
     steps:
       - name: Checkout repository
@@ -60,11 +61,14 @@ jobs:
           set -euo pipefail
           test -n "$DRIFT_AUTHORITY_JSON"
           test -n "$DRIFT_ENV_FILE"
-          test -n "$DRIFT_MANIFEST_JSON"
+          test -n "$DRIFT_MANIFEST_GZIP_BASE64"
           umask 077
           mkdir -p tmp/proof
           printf '%s' "$DRIFT_AUTHORITY_JSON" > "$BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_PATH"
-          printf '%s' "$DRIFT_MANIFEST_JSON" > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
+          printf '%s' "$DRIFT_MANIFEST_GZIP_BASE64" \
+            | base64 --decode \
+            | gzip --decompress \
+            > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
           printf '%s' "$DRIFT_ENV_FILE" > "$RUNNER_TEMP/bundjil-infrastructure-drift.env"
           chmod 0600 \
             "$BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_PATH" \
@@ -72,4 +76,29 @@ jobs:
             "$RUNNER_TEMP/bundjil-infrastructure-drift.env"
 
       - name: Report Preview drift without repair
-        run: bun --env-file "$RUNNER_TEMP/bundjil-infrastructure-drift.env" run infrastructure:drift-report
+        run: bun run --env-file "$RUNNER_TEMP/bundjil-infrastructure-drift.env" infrastructure:drift-report
+
+      - name: Read back sanitised drift receipt
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_REPORT_PATH"
+          test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
+          jq -c '{
+            schemaVersion,
+            status,
+            counts,
+            groupedFindings: (
+              [.findings[] | select(.disposition != "accepted")]
+              | sort_by(.resourceKind, .category, .disposition)
+              | group_by(.resourceKind, .category, .disposition)
+              | map({
+                  resourceKind: .[0].resourceKind,
+                  category: .[0].category,
+                  disposition: .[0].disposition,
+                  count: length
+                })
+            )
+          }' "$BUNDJIL_INFRASTRUCTURE_DRIFT_REPORT_PATH"
+          jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"

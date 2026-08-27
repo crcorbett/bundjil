@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-21
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -20,7 +20,9 @@ No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-No SPEC currently has an active implementation plan.
+| SPEC                                                                                                         | Lifecycle note                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| [Automatic Production deployment and operational closeout](automatic-production-and-operational-closeout.md) | Hosted continuation in progress; one-year credential custody accepted and corrected drift/Production proof remains |
 
 ## Implemented or superseded history
 
@@ -34,7 +36,6 @@ is standing authority.
 | SPEC                                                                                                                 | Lifecycle note                                                                                           |
 | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | [Alchemy infrastructure for Vercel and Photon](alchemy-vercel-photon-infrastructure.md)                              | Implemented hybrid infrastructure; five-pass audit accepted                                              |
-| [Automatic Production deployment and operational closeout](automatic-production-and-operational-closeout.md)         | Repository controls implemented; hosted/provider work deferred; audit accepted                           |
 | [Codex proxy GPT-5.6 Terra high reasoning](codex-terra-high-reasoning.md)                                            | Implemented Terra/high rollout; strict proxy replay absence deferred to a future public Eve API          |
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                                | Implemented history                                                                                      |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                                    | Superseded fallback history                                                                              |
