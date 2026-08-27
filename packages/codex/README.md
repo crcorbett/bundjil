@@ -33,7 +33,9 @@ credential-bearing
 client accepts only the owned ChatGPT Responses endpoint; access-token and
 account-ID values remain distinctly branded inside redaction, while header
 values are bounded and defensively constructed through a fixed secret-negative
-error path.
+error path. The private client explicitly requests SSE and sends the fixed
+Codex compatibility headers required by the checked reference clients; callers
+cannot override those headers.
 Raw provider headers and transport services remain private; successful metadata
 uses the closed `text/event-stream` literal.
 
