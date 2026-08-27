@@ -111,20 +111,35 @@ concurrency:
 jobs:
   deploy:
     if: github.repository == 'crcorbett/bundjil' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == 'crcorbett/bundjil'
-    timeout-minutes: 30
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: Production
     env:
+      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: \${{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}
       BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
       BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@${pins["actions/checkout"]}
+      - name: Checkout accepted main SHA
+        timeout-minutes: 2
+        uses: actions/checkout@${pins["actions/checkout"]}
         with:
           persist-credentials: false
           ref: \${{ github.event.workflow_run.head_sha }}
-      - uses: actions/setup-node@${pins["actions/setup-node"]}
-      - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
-      - run: bun run production:deploy
+      - name: Verify checkout identity
+        timeout-minutes: 1
+        run: git rev-parse HEAD
+      - name: Setup Node
+        timeout-minutes: 2
+        uses: actions/setup-node@${pins["actions/setup-node"]}
+      - name: Setup Bun
+        timeout-minutes: 2
+        uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: bun install --frozen-lockfile
+      - name: Stage, verify and promote exact main SHA
+        timeout-minutes: 45
+        run: bun run production:deploy
 `
   );
 
@@ -684,6 +699,51 @@ describe("HGI-304 authority policy", () => {
           "\n# $",
           "{{ secrets.BUNDJIL_PRODUCTION_EXTRA_TOKEN }}\n",
         ].join(""),
+    ],
+    [
+      "callback alias binding removed",
+      "AUTH-PRODUCTION-CALLBACK",
+      (content: string) =>
+        content.replace(
+          [
+            "      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}\n",
+          ].join(""),
+          ""
+        ),
+    ],
+    [
+      "callback alias moved into a comment",
+      "AUTH-PRODUCTION-CALLBACK",
+      (content: string) =>
+        content.replace(
+          [
+            "      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}",
+          ].join(""),
+          [
+            "      # BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}",
+          ].join("")
+        ),
+    ],
+    [
+      "production time budget changed",
+      "AUTH-PRODUCTION-TIME-BUDGET",
+      (content: string) =>
+        content.replace(
+          "        timeout-minutes: 45\n        run: bun run production:deploy",
+          "        timeout-minutes: 46\n        run: bun run production:deploy"
+        ),
+    ],
+    [
+      "production job time budget changed",
+      "AUTH-PRODUCTION-TIME-BUDGET",
+      (content: string) =>
+        content.replace(
+          "    timeout-minutes: 60\n    runs-on: ubuntu-latest",
+          "    timeout-minutes: 30\n    runs-on: ubuntu-latest"
+        ),
     ],
     [
       "owned command changed",

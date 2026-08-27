@@ -49,6 +49,7 @@ export type ProductionProxyHealth = typeof ProductionProxyHealth.Type;
 
 export const AutomaticProductionStatus = Schema.Literals([
   "already-current",
+  "callback-reconciled",
   "stale",
   "promoted",
 ]);
@@ -59,10 +60,12 @@ export const AutomaticProductionReceipt = Schema.Struct({
   sourceSha: VercelGitSha,
   previousProxyDeploymentId: VercelDeploymentId,
   previousAgentDeploymentId: VercelDeploymentId,
+  previousAgentCallbackDeploymentId: VercelDeploymentId,
   proxyDeploymentId: Schema.NullOr(VercelDeploymentId),
   agentDeploymentId: Schema.NullOr(VercelDeploymentId),
   stableProxyDeploymentId: VercelDeploymentId,
   stableAgentDeploymentId: VercelDeploymentId,
+  stableAgentCallbackDeploymentId: VercelDeploymentId,
   rollbackReady: Schema.Boolean,
 });
 export type AutomaticProductionReceipt = typeof AutomaticProductionReceipt.Type;

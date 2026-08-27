@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import {
   Config,
   Context,
+  Duration,
   Effect,
   Layer,
   Redacted,
@@ -35,6 +36,11 @@ import {
 const ProductionVercelToken = Schema.Redacted(Schema.NonEmptyString);
 type ProductionVercelToken = typeof ProductionVercelToken.Type;
 
+const ProductionAgentCallbackAlias = Schema.NonEmptyString.pipe(
+  Schema.check(Schema.isPattern(/^[a-z0-9-]+\.vercel\.app$/)),
+  Schema.brand("@bundjil/infrastructure/vercel/ProductionAgentCallbackAlias")
+);
+
 const ProductionHealthUrl = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^https:\/\/[a-z0-9-]+\.vercel\.app\/health$/))
 );
@@ -42,6 +48,7 @@ const ProductionHealthUrl = Schema.String.pipe(
 const ProductionDeploymentConfig = Schema.Struct({
   teamId: VercelTeamId,
   agentProjectId: VercelProjectId,
+  agentCallbackAlias: ProductionAgentCallbackAlias,
   proxyProjectId: VercelProjectId,
   agentToken: ProductionVercelToken,
   proxyToken: ProductionVercelToken,
@@ -55,6 +62,10 @@ const loadProductionDeploymentConfig: Config.Config<ProductionDeploymentConfig> 
     agentProjectId: Config.schema(
       VercelProjectId,
       "BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID"
+    ),
+    agentCallbackAlias: Config.schema(
+      ProductionAgentCallbackAlias,
+      "BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS"
     ),
     proxyProjectId: Config.schema(
       VercelProjectId,
@@ -91,7 +102,16 @@ const CommandOutput = Schema.Struct({
 type CommandOutput = typeof CommandOutput.Type;
 
 const EmptyProviderRequest = Schema.Struct({});
-const EmptyProviderRequestJson = Schema.fromJsonString(EmptyProviderRequest);
+const AssignAliasProviderRequest = Schema.Struct({
+  alias: ProductionAgentCallbackAlias,
+});
+const ProductionProviderRequest = Schema.Union([
+  AssignAliasProviderRequest,
+  EmptyProviderRequest,
+]);
+const ProductionProviderRequestJson = Schema.fromJsonString(
+  ProductionProviderRequest
+);
 
 const CliDeployment = Schema.Struct({
   id: VercelDeploymentId,
@@ -127,9 +147,23 @@ const ProviderProject = Schema.Struct({
   targets: Schema.Struct({ production: ProviderDeploymentTarget }),
 });
 
+const ProviderAlias = Schema.Struct({
+  alias: ProductionAgentCallbackAlias,
+  deploymentId: VercelDeploymentId,
+  projectId: VercelProjectId,
+  redirect: Schema.optionalKey(Schema.Null),
+});
+
+const ProviderAliasAssignment = Schema.Struct({
+  alias: ProductionAgentCallbackAlias,
+  uid: Schema.NonEmptyString,
+});
+
 const repositoryDirectory = fileURLToPath(
   new URL("../../../../", import.meta.url)
 );
+
+const providerCommandTimeout = Duration.minutes(2);
 
 const commandError = (
   operation: ProductionDeploymentError["operation"],
@@ -211,7 +245,7 @@ export const ProductionDeploymentsLive = Layer.effect(
       selected: SelectedProductionProject | null,
       operation: ProductionDeploymentError["operation"],
       project: ProductionProject | null,
-      input?: typeof EmptyProviderRequest.Type
+      input?: typeof ProductionProviderRequest.Type
     ) =>
       executable === undefined
         ? Effect.fail(commandError(operation, project))
@@ -220,7 +254,7 @@ export const ProductionDeploymentsLive = Layer.effect(
               const encodedInput =
                 input === undefined
                   ? undefined
-                  : yield* Schema.encodeEffect(EmptyProviderRequestJson)(
+                  : yield* Schema.encodeEffect(ProductionProviderRequestJson)(
                       input
                     ).pipe(
                       Effect.mapError(() => commandError(operation, project))
@@ -255,8 +289,17 @@ export const ProductionDeploymentsLive = Layer.effect(
               return { exitCode, stdout };
             })
           ).pipe(
-            Effect.flatMap(Schema.decodeUnknownEffect(CommandOutput)),
             Effect.mapError(() => commandError(operation, project)),
+            Effect.timeoutOrElse({
+              duration: providerCommandTimeout,
+              orElse: () =>
+                Effect.fail(commandError(operation, project, "timeout")),
+            }),
+            Effect.flatMap((output) =>
+              Schema.decodeUnknownEffect(CommandOutput)(output).pipe(
+                Effect.mapError(() => commandError(operation, project))
+              )
+            ),
             Effect.flatMap((output) =>
               output.exitCode === 0
                 ? Effect.succeed(output.stdout)
@@ -323,6 +366,48 @@ export const ProductionDeploymentsLive = Layer.effect(
       );
     });
 
+    const currentAgentCallback = Effect.gen(function* () {
+      const selected = selectProject(config, "agent");
+      const output = yield* runCommand(
+        [
+          "bunx",
+          "--bun",
+          "vercel",
+          "api",
+          `/v4/aliases/${config.agentCallbackAlias}?teamId=${config.teamId}`,
+          "--raw",
+        ],
+        selected,
+        "currentCallback",
+        "agent"
+      );
+      const provider = yield* Schema.decodeUnknownEffect(
+        Schema.fromJsonString(ProviderAlias)
+      )(output).pipe(
+        Effect.mapError(() =>
+          commandError("currentCallback", "agent", "invalidResponse")
+        )
+      );
+      if (
+        provider.alias !== config.agentCallbackAlias ||
+        provider.projectId !== config.agentProjectId
+      ) {
+        return yield* commandError(
+          "currentCallback",
+          "agent",
+          "targetMismatch"
+        );
+      }
+      return yield* inspect({
+        project: "agent",
+        deploymentId: provider.deploymentId,
+      }).pipe(
+        Effect.mapError((failure) =>
+          commandError("currentCallback", "agent", failure.reason)
+        )
+      );
+    }).pipe(Effect.withSpan("ProductionDeploymentsLive.currentAgentCallback"));
+
     const waitForStableDeployment = Effect.fn(
       "ProductionDeploymentsLive.waitForStableDeployment"
     )(function* (
@@ -346,8 +431,29 @@ export const ProductionDeploymentsLive = Layer.effect(
       );
     });
 
+    const waitForAgentCallback = Effect.fn(
+      "ProductionDeploymentsLive.waitForAgentCallback"
+    )(function* (deployment: ProductionDeployment) {
+      yield* currentAgentCallback.pipe(
+        Effect.flatMap((observed) =>
+          observed.deploymentId === deployment.deploymentId &&
+          observed.sourceSha === deployment.sourceSha
+            ? Effect.void
+            : Effect.fail(
+                commandError("assignCallback", "agent", "targetMismatch")
+              )
+        ),
+        Effect.retry({
+          times: 90,
+          schedule: Schedule.fixed("2 seconds"),
+          while: (failure) => failure.retry === "after-readback",
+        })
+      );
+    });
+
     return ProductionDeployments.of({
       current,
+      currentAgentCallback,
       inspect,
       stage: Effect.fn("ProductionDeploymentsLive.stage")(function* (
         input: StageProductionDeployment
@@ -410,6 +516,54 @@ export const ProductionDeploymentsLive = Layer.effect(
           {}
         );
         yield* waitForStableDeployment(deployment, "promote");
+      }),
+      assignAgentCallback: Effect.fn(
+        "ProductionDeploymentsLive.assignAgentCallback"
+      )(function* (deployment: ProductionDeployment) {
+        if (
+          deployment.project !== "agent" ||
+          deployment.projectId !== config.agentProjectId
+        ) {
+          return yield* commandError(
+            "assignCallback",
+            "agent",
+            "targetMismatch"
+          );
+        }
+        const selected = selectProject(config, "agent");
+        const output = yield* runCommand(
+          [
+            "bunx",
+            "--bun",
+            "vercel",
+            "api",
+            `/v2/deployments/${deployment.deploymentId}/aliases?teamId=${config.teamId}`,
+            "--method",
+            "POST",
+            "--input",
+            "-",
+            "--raw",
+          ],
+          selected,
+          "assignCallback",
+          "agent",
+          { alias: config.agentCallbackAlias }
+        );
+        const assigned = yield* Schema.decodeUnknownEffect(
+          Schema.fromJsonString(ProviderAliasAssignment)
+        )(output).pipe(
+          Effect.mapError(() =>
+            commandError("assignCallback", "agent", "invalidResponse")
+          )
+        );
+        if (assigned.alias !== config.agentCallbackAlias) {
+          return yield* commandError(
+            "assignCallback",
+            "agent",
+            "targetMismatch"
+          );
+        }
+        return yield* waitForAgentCallback(deployment);
       }),
       rollback: Effect.fn("ProductionDeploymentsLive.rollback")(function* (
         deployment: ProductionDeployment

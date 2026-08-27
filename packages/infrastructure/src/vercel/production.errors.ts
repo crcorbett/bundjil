@@ -5,9 +5,11 @@ import { ProductionProject } from "./production.schemas.js";
 export const ProductionDeploymentOperation = Schema.Literals([
   "configure",
   "current",
+  "currentCallback",
   "stage",
   "inspect",
   "promote",
+  "assignCallback",
   "rollback",
   "readMainSha",
   "probe",
@@ -16,6 +18,7 @@ export const ProductionDeploymentOperation = Schema.Literals([
 
 export const ProductionDeploymentFailureReason = Schema.Literals([
   "commandFailed",
+  "timeout",
   "invalidResponse",
   "targetMismatch",
   "sourceMismatch",
