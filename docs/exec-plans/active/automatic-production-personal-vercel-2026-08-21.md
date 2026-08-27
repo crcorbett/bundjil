@@ -23,13 +23,21 @@ Production target with `gitCommitSha`
 `6cc0936d502a7b5f0fa32994929fac7f396eb200`; that proves the account-level
 response shape, not the GitHub project-token call.
 
-The current diagnostic slice replaces the over-broad blocked output with a
-Schema-encoded, secret-negative receipt. It reports only `configuration`,
-`deployment`, or `unexpected`; an expected deployment failure also reports the
-closed operation, project, reason and retry class already owned by
-`ProductionDeploymentError`. Raw commands, URLs, provider responses,
-credentials, errors and stacks remain absent. The next exact-main automatic
-run is required to locate the failed operation before any repair or retry.
+Pull request `#8` merged that diagnostic correction as
+`34c68131eab81e2ae3adaa7e77032e41e4dd5259`. Main CI run `33085234816`
+passed, and automatic Production run `33085555416` returned the safe receipt
+`deployment/current/proxy/commandFailed/after-readback`. It stopped on the
+first current-target read. No candidate was staged and no alias moved.
+
+The Vercel CLI's `--scope` option expects a team slug and performs team scope
+resolution. The project-scoped Production token can read its assigned project
+directly but cannot perform that broader lookup. The current correction removes
+`--scope`, binds the exact Personal team and project through
+`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`, and uses project-addressed Vercel API
+paths with the exact team ID query. Promotion and rollback now poll the decoded
+current target on a bounded Effect Schedule until the deployment ID and source
+SHA match. The next exact-main automatic run must prove this provider path; the
+repository checks alone do not prove it.
 
 The four one-year project-scoped Personal Vercel credentials are created,
 assigned-project/sibling-denial tested, and stored in the personal `bundjil`

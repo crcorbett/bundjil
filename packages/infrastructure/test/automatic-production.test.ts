@@ -28,6 +28,37 @@ const previousSha = VercelGitSha.make("a".repeat(40));
 const candidateSha = VercelGitSha.make("b".repeat(40));
 const staleSha = VercelGitSha.make("c".repeat(40));
 
+const productionConfig = ConfigProvider.layer(
+  ConfigProvider.fromEnv({
+    env: {
+      BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: "prj_agent",
+      BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: "agent-token",
+      BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:
+        "https://bundjil-codex-proxy.vercel.app/health",
+      BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: "prj_proxy",
+      BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: "proxy-token",
+      BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: "team_personal",
+    },
+  })
+);
+
+const processHandle = (stdout: string) => {
+  const encoded = new TextEncoder().encode(stdout);
+  return ChildProcessSpawner.makeHandle({
+    pid: ChildProcessSpawner.ProcessId(1),
+    exitCode: Effect.succeed(ChildProcessSpawner.ExitCode(0)),
+    isRunning: Effect.succeed(false),
+    kill: () => Effect.void,
+    stdin: Sink.drain,
+    stdout: Stream.fromIterable([encoded]),
+    stderr: Stream.empty,
+    all: Stream.fromIterable([encoded]),
+    getInputFd: () => Sink.drain,
+    getOutputFd: () => Stream.empty,
+    unref: Effect.succeed(Effect.void),
+  });
+};
+
 const deployment = (
   project: "agent" | "proxy",
   version: "previous" | "candidate"
@@ -99,54 +130,25 @@ describe("automatic Production deployment", () => {
 
   it("decodes the current Vercel project target without an embedded projectId", async () => {
     const commands: ChildProcess.Command[] = [];
-    const stdout = new TextEncoder().encode(
-      Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
-        id: "prj_agent",
-        targets: {
-          production: {
-            id: "dpl_agent_previous",
-            meta: { gitCommitSha: previousSha },
-            readyState: "READY",
-            target: "production",
-            url: "bundjil-agent-previous.vercel.app",
-          },
+    const stdout = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+      id: "prj_agent",
+      targets: {
+        production: {
+          id: "dpl_agent_previous",
+          meta: { gitCommitSha: previousSha },
+          readyState: "READY",
+          target: "production",
+          url: "bundjil-agent-previous.vercel.app",
         },
-      })
-    );
+      },
+    });
     const spawner = ChildProcessSpawner.make((command) => {
       commands.push(command);
-      return Effect.succeed(
-        ChildProcessSpawner.makeHandle({
-          pid: ChildProcessSpawner.ProcessId(1),
-          exitCode: Effect.succeed(ChildProcessSpawner.ExitCode(0)),
-          isRunning: Effect.succeed(false),
-          kill: () => Effect.void,
-          stdin: Sink.drain,
-          stdout: Stream.fromIterable([stdout]),
-          stderr: Stream.empty,
-          all: Stream.fromIterable([stdout]),
-          getInputFd: () => Sink.drain,
-          getOutputFd: () => Stream.empty,
-          unref: Effect.succeed(Effect.void),
-        })
-      );
+      return Effect.succeed(processHandle(stdout));
     });
     const processLayer = Layer.succeed(
       ChildProcessSpawner.ChildProcessSpawner,
       spawner
-    );
-    const config = ConfigProvider.layer(
-      ConfigProvider.fromEnv({
-        env: {
-          BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: "prj_agent",
-          BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: "agent-token",
-          BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:
-            "https://bundjil-codex-proxy.vercel.app/health",
-          BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: "prj_proxy",
-          BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: "proxy-token",
-          BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: "team_personal",
-        },
-      })
     );
     const current = await Effect.runPromise(
       Effect.gen(function* currentProductionTarget() {
@@ -155,7 +157,7 @@ describe("automatic Production deployment", () => {
       }).pipe(
         Effect.provide(
           ProductionDeploymentsLive.pipe(
-            Layer.provide(config),
+            Layer.provide(productionConfig),
             Layer.provide(processLayer)
           )
         )
@@ -170,13 +172,169 @@ describe("automatic Production deployment", () => {
       throw new Error("expected one standard Vercel command");
     }
     expect([command.command, ...command.args]).toStrictEqual(
-      expect.arrayContaining(["/v9/projects/prj_agent"])
+      expect.arrayContaining(["/v9/projects/prj_agent?teamId=team_personal"])
     );
     expect(command.options).toMatchObject({
-      env: { VERCEL_TOKEN: "agent-token" },
+      env: {
+        VERCEL_ORG_ID: "team_personal",
+        VERCEL_PROJECT_ID: "prj_agent",
+        VERCEL_TOKEN: "agent-token",
+      },
       extendEnv: true,
       stderr: "ignore",
     });
+    expect(command.args).not.toContain("--scope");
+  });
+
+  it("stages with exact CI project bindings and inspects by direct API", async () => {
+    const commands: ChildProcess.Command[] = [];
+    const spawner = ChildProcessSpawner.make((command) => {
+      commands.push(command);
+      const args = command._tag === "StandardCommand" ? command.args : [];
+      const output = args.includes("deploy")
+        ? Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+            id: "dpl_proxy_candidate",
+            readyState: "READY",
+            target: "production",
+            url: "https://bundjil-proxy-candidate.vercel.app",
+          })
+        : Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+            id: "dpl_proxy_candidate",
+            meta: { gitCommitSha: candidateSha },
+            projectId: "prj_proxy",
+            readyState: "READY",
+            target: "production",
+            url: "bundjil-proxy-candidate.vercel.app",
+          });
+      return Effect.succeed(processHandle(output));
+    });
+    const staged = await Effect.runPromise(
+      Effect.gen(function* stageCandidate() {
+        const deployments = yield* ProductionDeployments;
+        return yield* deployments.stage({
+          project: "proxy",
+          sourceSha: candidateSha,
+        });
+      }).pipe(
+        Effect.provide(
+          ProductionDeploymentsLive.pipe(
+            Layer.provide(productionConfig),
+            Layer.provide(
+              Layer.succeed(ChildProcessSpawner.ChildProcessSpawner, spawner)
+            )
+          )
+        )
+      )
+    );
+
+    expect(staged.sourceSha).toBe(candidateSha);
+    const [deployCommand, inspectCommand] = commands;
+    if (
+      deployCommand?._tag !== "StandardCommand" ||
+      inspectCommand?._tag !== "StandardCommand"
+    ) {
+      throw new Error("expected Vercel deploy and inspect commands");
+    }
+    expect(deployCommand.args).toContain("deploy");
+    expect(deployCommand.args).not.toContain("--scope");
+    expect(deployCommand.args).not.toContain("--project");
+    expect(deployCommand.options.env).toMatchObject({
+      VERCEL_ORG_ID: "team_personal",
+      VERCEL_PROJECT_ID: "prj_proxy",
+      VERCEL_TOKEN: "proxy-token",
+    });
+    expect(inspectCommand.args).toContain(
+      "/v13/deployments/dpl_proxy_candidate?teamId=team_personal"
+    );
+  });
+
+  it("promotes and rolls back through project-scoped API routes", async () => {
+    const commands: ChildProcess.Command[] = [];
+    let stableVersion: "previous" | "candidate" = "previous";
+    const spawner = ChildProcessSpawner.make((command) => {
+      commands.push(command);
+      const args = command._tag === "StandardCommand" ? command.args : [];
+      if (args.some((arg) => arg.includes("/promote/"))) {
+        stableVersion = "candidate";
+        return Effect.succeed(processHandle("{}"));
+      }
+      if (args.some((arg) => arg.includes("/rollback/"))) {
+        stableVersion = "previous";
+        return Effect.succeed(processHandle("{}"));
+      }
+      return Effect.succeed(
+        processHandle(
+          Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+            id: "prj_proxy",
+            targets: {
+              production: {
+                id: `dpl_proxy_${stableVersion}`,
+                meta: {
+                  gitCommitSha:
+                    stableVersion === "candidate" ? candidateSha : previousSha,
+                },
+                readyState: "READY",
+                target: "production",
+                url: `bundjil-proxy-${stableVersion}.vercel.app`,
+              },
+            },
+          })
+        )
+      );
+    });
+    await Effect.runPromise(
+      Effect.gen(function* promoteAndRollback() {
+        const deployments = yield* ProductionDeployments;
+        yield* deployments.promote(deployment("proxy", "candidate"));
+        yield* deployments.rollback(deployment("proxy", "previous"));
+      }).pipe(
+        Effect.provide(
+          ProductionDeploymentsLive.pipe(
+            Layer.provide(productionConfig),
+            Layer.provide(
+              Layer.succeed(ChildProcessSpawner.ChildProcessSpawner, spawner)
+            )
+          )
+        )
+      )
+    );
+
+    const standardCommands = commands.filter(
+      (command): command is ChildProcess.StandardCommand =>
+        command._tag === "StandardCommand"
+    );
+    expect(
+      standardCommands.some((command) =>
+        command.args.includes(
+          "/v10/projects/prj_proxy/promote/dpl_proxy_candidate?teamId=team_personal"
+        )
+      )
+    ).toBeTruthy();
+    expect(
+      standardCommands.some((command) =>
+        command.args.includes(
+          "/v9/projects/prj_proxy/rollback/dpl_proxy_previous?teamId=team_personal"
+        )
+      )
+    ).toBeTruthy();
+    expect(
+      standardCommands.every((command) => !command.args.includes("--scope"))
+    ).toBeTruthy();
+    const mutationCommands = standardCommands.filter((command) =>
+      command.args.some(
+        (argument) =>
+          argument.includes("/promote/") || argument.includes("/rollback/")
+      )
+    );
+    expect(mutationCommands).toHaveLength(2);
+    expect(
+      mutationCommands.every(
+        (command) =>
+          command.args.includes("--input") &&
+          command.args.includes("-") &&
+          command.options.stdin !== "ignore"
+      )
+    ).toBeTruthy();
   });
 
   it("stages both exact-SHA candidates before ordered promotion", async () => {

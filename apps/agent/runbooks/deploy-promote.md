@@ -204,6 +204,17 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    deployment operation fields are safe routing facts, not proof that a
    provider write did or did not occur. Re-read deployments and aliases before
    deciding whether a retry or rollback is allowed.
+
+   The automatic adapter must not pass the Personal team ID to the Vercel CLI
+   `--scope` option. That option resolves a team slug and requires a broader
+   team lookup that the project-scoped tokens cannot perform. Instead, bind the
+   matching token, exact `VERCEL_ORG_ID`, and exact `VERCEL_PROJECT_ID` in the
+   child-process environment. Use project-addressed API paths with the exact
+   team ID query for current-target reads, inspection, promotion, and rollback.
+   After promotion or rollback, use the bounded Effect retry schedule to wait
+   for the decoded stable deployment ID and source SHA. A failed or exhausted
+   read remains blocked and requires fresh provider readback before retry.
+
    Do not run `production:deploy` interactively as a routine alternative.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the

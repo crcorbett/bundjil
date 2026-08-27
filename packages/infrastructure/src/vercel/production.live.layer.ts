@@ -6,6 +6,7 @@ import {
   Effect,
   Layer,
   Redacted,
+  Schedule,
   Schema,
   Stream,
 } from "effect";
@@ -89,6 +90,9 @@ const CommandOutput = Schema.Struct({
 });
 type CommandOutput = typeof CommandOutput.Type;
 
+const EmptyProviderRequest = Schema.Struct({});
+const EmptyProviderRequestJson = Schema.fromJsonString(EmptyProviderRequest);
+
 const CliDeployment = Schema.Struct({
   id: VercelDeploymentId,
   url: ProductionDeploymentUrl,
@@ -155,7 +159,10 @@ const selectProject = (
         directory: "apps/codex-proxy",
       };
 
+type SelectedProductionProject = ReturnType<typeof selectProject>;
+
 const decodeProviderDeployment = (
+  operation: "current" | "inspect",
   project: ProductionProject,
   projectId: VercelProjectId,
   provider: typeof ProviderDeploymentTarget.Type
@@ -169,7 +176,7 @@ const decodeProviderDeployment = (
     readyState: provider.readyState,
     sourceSha: provider.meta.gitCommitSha,
   }).pipe(
-    Effect.mapError(() => commandError("inspect", project, "invalidResponse"))
+    Effect.mapError(() => commandError(operation, project, "invalidResponse"))
   );
 
 const decodeCurrentProductionProject = Effect.fn(
@@ -188,6 +195,7 @@ const decodeCurrentProductionProject = Effect.fn(
     return yield* commandError("current", project, "targetMismatch");
   }
   return yield* decodeProviderDeployment(
+    "current",
     project,
     provider.id,
     provider.targets.production
@@ -202,23 +210,39 @@ export const ProductionDeploymentsLive = Layer.effect(
 
     const runCommand = (
       [executable, ...args]: readonly string[],
-      token: ProductionVercelToken | null,
+      selected: SelectedProductionProject | null,
       operation: ProductionDeploymentError["operation"],
-      project: ProductionProject | null
+      project: ProductionProject | null,
+      input?: typeof EmptyProviderRequest.Type
     ) =>
       executable === undefined
         ? Effect.fail(commandError(operation, project))
         : Effect.scoped(
             Effect.gen(function* runProductionCommand() {
+              const encodedInput =
+                input === undefined
+                  ? undefined
+                  : yield* Schema.encodeEffect(EmptyProviderRequestJson)(
+                      input
+                    ).pipe(
+                      Effect.mapError(() => commandError(operation, project))
+                    );
               const handle = yield* spawner.spawn(
                 ChildProcess.make(executable, args, {
                   cwd: repositoryDirectory,
                   env:
-                    token === null
+                    selected === null
                       ? undefined
-                      : { VERCEL_TOKEN: Redacted.value(token) },
+                      : {
+                          VERCEL_ORG_ID: config.teamId,
+                          VERCEL_PROJECT_ID: selected.projectId,
+                          VERCEL_TOKEN: Redacted.value(selected.token),
+                        },
                   extendEnv: true,
-                  stdin: "ignore",
+                  stdin:
+                    encodedInput === undefined
+                      ? "ignore"
+                      : Stream.encodeText(Stream.make(encodedInput)),
                   stdout: "pipe",
                   stderr: "ignore",
                 })
@@ -252,12 +276,10 @@ export const ProductionDeploymentsLive = Layer.effect(
           "--bun",
           "vercel",
           "api",
-          `/v13/deployments/${input.deploymentId}`,
-          "--scope",
-          config.teamId,
+          `/v13/deployments/${input.deploymentId}?teamId=${config.teamId}`,
           "--raw",
         ],
-        selected.token,
+        selected,
         "inspect",
         input.project
       );
@@ -272,6 +294,7 @@ export const ProductionDeploymentsLive = Layer.effect(
         return yield* commandError("inspect", input.project, "targetMismatch");
       }
       return yield* decodeProviderDeployment(
+        "inspect",
         input.project,
         provider.projectId,
         provider
@@ -288,12 +311,10 @@ export const ProductionDeploymentsLive = Layer.effect(
           "--bun",
           "vercel",
           "api",
-          `/v9/projects/${selected.projectId}`,
-          "--scope",
-          config.teamId,
+          `/v9/projects/${selected.projectId}?teamId=${config.teamId}`,
           "--raw",
         ],
-        selected.token,
+        selected,
         "current",
         project
       );
@@ -301,6 +322,29 @@ export const ProductionDeploymentsLive = Layer.effect(
         project,
         selected.projectId,
         output
+      );
+    });
+
+    const waitForStableDeployment = Effect.fn(
+      "ProductionDeploymentsLive.waitForStableDeployment"
+    )(function* (
+      deployment: ProductionDeployment,
+      operation: "promote" | "rollback"
+    ) {
+      yield* current(deployment.project).pipe(
+        Effect.flatMap((observed) =>
+          observed.deploymentId === deployment.deploymentId &&
+          observed.sourceSha === deployment.sourceSha
+            ? Effect.void
+            : Effect.fail(
+                commandError(operation, deployment.project, "targetMismatch")
+              )
+        ),
+        Effect.retry({
+          times: 90,
+          schedule: Schedule.fixed("2 seconds"),
+          while: (failure) => failure.retry === "after-readback",
+        })
       );
     });
 
@@ -321,17 +365,13 @@ export const ProductionDeploymentsLive = Layer.effect(
             "--prod",
             "--skip-domain",
             "--yes",
-            "--scope",
-            config.teamId,
-            "--project",
-            selected.projectId,
             "--meta",
             `gitCommitSha=${input.sourceSha}`,
             "--meta",
             "gitCommitRef=main",
             "--json",
           ],
-          selected.token,
+          selected,
           "stage",
           input.project
         );
@@ -358,16 +398,20 @@ export const ProductionDeploymentsLive = Layer.effect(
             "bunx",
             "--bun",
             "vercel",
-            "promote",
-            deployment.deploymentId,
-            "--yes",
-            "--scope",
-            config.teamId,
+            "api",
+            `/v10/projects/${deployment.projectId}/promote/${deployment.deploymentId}?teamId=${config.teamId}`,
+            "--method",
+            "POST",
+            "--input",
+            "-",
+            "--raw",
           ],
-          selected.token,
+          selected,
           "promote",
-          deployment.project
+          deployment.project,
+          {}
         );
+        yield* waitForStableDeployment(deployment, "promote");
       }),
       rollback: Effect.fn("ProductionDeploymentsLive.rollback")(function* (
         deployment: ProductionDeployment
@@ -378,16 +422,20 @@ export const ProductionDeploymentsLive = Layer.effect(
             "bunx",
             "--bun",
             "vercel",
-            "rollback",
-            deployment.deploymentId,
-            "--yes",
-            "--scope",
-            config.teamId,
+            "api",
+            `/v9/projects/${deployment.projectId}/rollback/${deployment.deploymentId}?teamId=${config.teamId}`,
+            "--method",
+            "POST",
+            "--input",
+            "-",
+            "--raw",
           ],
-          selected.token,
+          selected,
           "rollback",
-          deployment.project
+          deployment.project,
+          {}
         );
+        yield* waitForStableDeployment(deployment, "rollback");
       }),
       readMainSha: runCommand(
         ["git", "ls-remote", "origin", "refs/heads/main"],

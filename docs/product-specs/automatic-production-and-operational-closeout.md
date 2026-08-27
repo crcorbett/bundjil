@@ -75,16 +75,32 @@ the missing-config output and package tests must prove the deployment receipt
 codec. A new automatic run on the merged correction is the only accepted way
 to identify the hosted failure and continue the Production proof.
 
+Pull request `#8` merged that correction as
+`34c68131eab81e2ae3adaa7e77032e41e4dd5259`. Main CI run `33085234816`
+passed, and automatic Production run `33085555416` returned
+`deployment/current/proxy/commandFailed/after-readback`. It failed on the first
+current-target read before staging or alias movement. The live adapter had
+passed the Personal team ID to Vercel CLI `--scope`, which expects a team slug
+and performs a team lookup outside a project-scoped token's access.
+
+The required correction is to keep exact project custody without that lookup:
+bind the matching token, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` for every
+provider command; use project-addressed API paths with the exact `teamId` query
+for reads, inspection, promotion, and rollback; and poll the decoded current
+target through an Effect Schedule after promotion or rollback. The bounded
+poll must accept only the expected deployment ID and source SHA. Hosted proof
+still requires a new successful automatic run and direct Vercel readback.
+
 #### Documentation impact ledger
 
-| Surface                                                              | Decision        | Owner and proof                                                                                                                                          |
-| -------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Production command and error contract                                | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.         |
-| Workflow trigger and mutation order                                  | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; run `33083232642` proves only the trigger and exact checkout.          |
-| Deployment procedure and rollback                                    | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                    |
-| SPEC, task and execution status                                      | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                           |
-| App/public runtime, package structure, skills and agent instructions | N/A             | The inspected call path changes only the private infrastructure process output; no app API, package placement, skill route or agent instruction changes. |
-| Provider state and credentials                                       | Preserve        | This slice performs read-only Personal Vercel checks only; it does not change a token, deployment, alias, environment value or channel.                  |
+| Surface                                                              | Decision        | Owner and proof                                                                                                                                                   |
+| -------------------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production command and error contract                                | Change required | `packages/infrastructure/src/vercel/production.errors.ts`, the process adapter, package README and focused command tests own the closed receipt.                  |
+| Workflow trigger and mutation order                                  | Preserve        | `.github/workflows/production.yml` and `runAutomaticProduction` remain unchanged; runs `33083232642` and `33085555416` prove only the trigger and exact checkout. |
+| Deployment procedure and rollback                                    | Change required | `apps/agent/runbooks/deploy-promote.md` explains how to use the safe receipt and requires provider readback before retry or rollback.                             |
+| SPEC, task and execution status                                      | Change required | This SPEC, its task ledger and the active plan retain the failed hosted result and the next proof requirement.                                                    |
+| App/public runtime, package structure, skills and agent instructions | N/A             | The inspected call path changes only the private infrastructure process output; no app API, package placement, skill route or agent instruction changes.          |
+| Provider state and credentials                                       | Preserve        | The failed hosted run stopped before staging; this correction changes repository command routing only and does not change credentials or provider configuration.  |
 
 ### Vercel credential boundary correction (2026-08-20)
 
