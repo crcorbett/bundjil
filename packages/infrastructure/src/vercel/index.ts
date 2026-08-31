@@ -19,7 +19,7 @@ export {
   SetVercelPreviewFeedback,
   type SetVercelPreviewFeedbackEncoded,
   VercelPreviewConfiguration,
-  type VercelPreviewConfigurationShape,
+  type VercelPreviewConfigurationContract,
   VercelPreviewConfigurationFailureReason,
   VercelPreviewConfigurationOperation,
   VercelPreviewConfigurationReadError,
@@ -53,7 +53,7 @@ export {
   VercelPreviewConfigurationMemoryConfig,
   type VercelPreviewConfigurationMemoryConfigEncoded,
   VercelPreviewConfigurationMemoryControl,
-  type VercelPreviewConfigurationMemoryControlShape,
+  type VercelPreviewConfigurationMemoryControlContract,
   VercelPreviewConfigurationMemoryCount,
   VercelPreviewConfigurationMemoryFailureMode,
   type VercelPreviewConfigurationMemoryFailureModeEncoded,
@@ -102,14 +102,14 @@ export {
   type VercelManagedEnvironmentValueEncoded,
   VercelPreviewPhotonBindingValues,
   VercelPreviewPhotonBindingValuesDenied,
-  type VercelPreviewPhotonBindingValuesShape,
+  type VercelPreviewPhotonBindingValuesContract,
   VercelPreviewPhotonEnvironmentKey,
   type VercelPreviewPhotonEnvironmentKeyEncoded,
   VercelPreviewPhotonSecretOwner,
   VercelProductionPhotonSecretOwner,
   VercelStableEnvironmentBindings,
   VercelStableEnvironmentBindingsDenied,
-  type VercelStableEnvironmentBindingsShape,
+  type VercelStableEnvironmentBindingsContract,
   VercelStableEnvironmentFailureReason,
   VercelStableEnvironmentOperation,
   VercelStableEnvironmentProviderFailure,
@@ -136,7 +136,7 @@ export {
   emptyVercelInventory,
   layerVercelMemory,
   VercelMemoryControl,
-  type VercelMemoryControlShape,
+  type VercelMemoryControlContract,
 } from "./memory.layer.js";
 export {
   layerVercelReadOnlyProviders,
@@ -276,17 +276,17 @@ export {
 } from "./schemas.js";
 export {
   VercelCredentials,
-  type VercelCredentialsShape,
+  type VercelCredentialsContract,
   VercelDeployments,
-  type VercelDeploymentsShape,
+  type VercelDeploymentsContract,
   VercelDomains,
-  type VercelDomainsShape,
+  type VercelDomainsContract,
   VercelEnvironmentVariables,
-  type VercelEnvironmentVariablesShape,
+  type VercelEnvironmentVariablesContract,
   VercelMarketplaceBindings,
-  type VercelMarketplaceBindingsShape,
+  type VercelMarketplaceBindingsContract,
   VercelProjects,
-  type VercelProjectsShape,
+  type VercelProjectsContract,
 } from "./services.js";
 export {
   AutomaticProductionBlockedReceipt,
@@ -324,6 +324,6 @@ export {
 } from "./production.schemas.js";
 export {
   ProductionDeployments,
-  type ProductionDeploymentsShape,
+  type ProductionDeploymentsContract,
 } from "./production.service.js";
 export { runAutomaticProduction } from "./production.js";

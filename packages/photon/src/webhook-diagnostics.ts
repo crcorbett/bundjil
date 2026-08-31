@@ -22,7 +22,7 @@ export const classifyPhotonWebhookPlatform = (
       PhotonWebhookPlatformClassification.make("knownAlternative")
     ),
     Match.when(
-      (candidate) => /^imessage$/i.test(candidate),
+      (candidate) => /^imessage$/iu.test(candidate),
       () => PhotonWebhookPlatformClassification.make("caseVariant")
     ),
     Match.orElse(() => PhotonWebhookPlatformClassification.make("unknown"))

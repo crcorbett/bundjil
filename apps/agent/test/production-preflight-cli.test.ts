@@ -3,13 +3,15 @@ import { Buffer } from "node:buffer";
 import { spawn } from "node:child_process";
 import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import nodePath from "node:path";
 import process from "node:process";
 
 import { Schema } from "effect";
 import { describe, it } from "vitest";
 
 import { ProductionPreflightReceipt } from "../agent/production-preflight.js";
+
+const { join } = nodePath;
 
 const fingerprint = (character: string) => character.repeat(64);
 const sourceSha = "0f30d3b000000000000000000000000000000000";
@@ -146,13 +148,13 @@ describe("Production preflight command", () => {
       assert.equal(receipt.journeyId, "BND-J09-deployment-promotion-readback");
       assert.equal(receipt.detailArtifact.path, "details/preflight.json");
       assert.equal(receipt.detailArtifact.state, "available");
-      assert.match(receipt.nonClaim, /never mutation authority/);
+      assert.match(receipt.nonClaim, /never mutation authority/u);
       const detail = await readFile(
         join(result.cwd, receipt.detailArtifact.path),
         "utf-8"
       );
-      assert.match(detail, /"go":true/);
-      assert.doesNotMatch(result.stdout, new RegExp(result.cwd));
+      assert.match(detail, /"go":true/u);
+      assert.doesNotMatch(result.stdout, new RegExp(result.cwd, "u"));
     } finally {
       await result.cleanup();
     }
@@ -163,9 +165,9 @@ describe("Production preflight command", () => {
     try {
       assert.equal(result.exitCode, 2);
       assert.equal(result.stdout, "");
-      assert.match(result.stderr, /"status":"blocked"/);
-      assert.match(result.stderr, /missing-production-variable/);
-      assert.doesNotMatch(result.stderr, /snapshot\.json/);
+      assert.match(result.stderr, /"status":"blocked"/u);
+      assert.match(result.stderr, /missing-production-variable/u);
+      assert.doesNotMatch(result.stderr, /snapshot\.json/u);
       const receipt = Schema.decodeUnknownSync(
         Schema.fromJsonString(ProductionPreflightReceipt)
       )(result.stderr);
@@ -176,39 +178,41 @@ describe("Production preflight command", () => {
   });
 
   it("emits an inconclusive bounded receipt for malformed or unsafe snapshot input", async () => {
-    for (const input of [
-      {
-        classification: "snapshot-invalid",
-        mode: 0o600,
-        snapshot: "not-json",
-      },
-      {
-        classification: "snapshot-too-large",
-        mode: 0o600,
-        snapshot: "x".repeat(256 * 1024 + 1),
-      },
-      {
-        classification: "snapshot-permission-invalid",
-        mode: 0o644,
-        snapshot: JSON.stringify(beforeFirstMutation),
-      },
-    ]) {
-      const result = await runPreflight(input.snapshot, { mode: input.mode });
-      try {
-        assert.equal(result.exitCode, 1);
-        assert.equal(result.stdout, "");
-        assert.match(result.stderr, /"status":"inconclusive"/);
-        assert.match(result.stderr, /"candidateCommit":"unresolved"/);
-        assert.doesNotMatch(result.stderr, /not-json/);
-        assert.doesNotMatch(result.stderr, new RegExp(result.cwd));
-        const receipt = Schema.decodeUnknownSync(
-          Schema.fromJsonString(ProductionPreflightReceipt)
-        )(result.stderr);
-        assert.equal(receipt.classification, input.classification);
-      } finally {
-        await result.cleanup();
-      }
-    }
+    await Promise.all(
+      [
+        {
+          classification: "snapshot-invalid",
+          mode: 0o600,
+          snapshot: "not-json",
+        },
+        {
+          classification: "snapshot-too-large",
+          mode: 0o600,
+          snapshot: "x".repeat(256 * 1024 + 1),
+        },
+        {
+          classification: "snapshot-permission-invalid",
+          mode: 0o644,
+          snapshot: JSON.stringify(beforeFirstMutation),
+        },
+      ].map(async (input) => {
+        const result = await runPreflight(input.snapshot, { mode: input.mode });
+        try {
+          assert.equal(result.exitCode, 1);
+          assert.equal(result.stdout, "");
+          assert.match(result.stderr, /"status":"inconclusive"/u);
+          assert.match(result.stderr, /"candidateCommit":"unresolved"/u);
+          assert.doesNotMatch(result.stderr, /not-json/u);
+          assert.doesNotMatch(result.stderr, new RegExp(result.cwd, "u"));
+          const receipt = Schema.decodeUnknownSync(
+            Schema.fromJsonString(ProductionPreflightReceipt)
+          )(result.stderr);
+          assert.equal(receipt.classification, input.classification);
+        } finally {
+          await result.cleanup();
+        }
+      })
+    );
   });
 
   it("does not report passed when the detail artifact cannot be persisted", async () => {
@@ -218,9 +222,9 @@ describe("Production preflight command", () => {
     try {
       assert.equal(result.exitCode, 1);
       assert.equal(result.stdout, "");
-      assert.match(result.stderr, /"status":"inconclusive"/);
-      assert.match(result.stderr, /"state":"unavailable"/);
-      assert.match(result.stderr, /"sha256":null/);
+      assert.match(result.stderr, /"status":"inconclusive"/u);
+      assert.match(result.stderr, /"state":"unavailable"/u);
+      assert.match(result.stderr, /"sha256":null/u);
       const receipt = Schema.decodeUnknownSync(
         Schema.fromJsonString(ProductionPreflightReceipt)
       )(result.stderr);
@@ -238,12 +242,12 @@ describe("Production preflight command", () => {
     try {
       assert.equal(result.exitCode, 1);
       assert.equal(result.stdout, "");
-      assert.match(result.stderr, /"status":"inconclusive"/);
+      assert.match(result.stderr, /"status":"inconclusive"/u);
       assert.match(
         result.stderr,
-        /"classification":"configuration-unavailable"/
+        /"classification":"configuration-unavailable"/u
       );
-      assert.doesNotMatch(result.stderr, /outside|secret|path\.json/);
+      assert.doesNotMatch(result.stderr, /outside|secret|path\.json/u);
     } finally {
       await result.cleanup();
     }

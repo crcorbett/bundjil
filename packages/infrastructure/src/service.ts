@@ -17,7 +17,7 @@ import type {
   SyntheticResourceObservation,
 } from "./schemas.js";
 
-export interface SyntheticResourcesShape {
+export interface SyntheticResourcesContract {
   readonly observeResource: (
     input: ObserveSyntheticResource
   ) => Effect.Effect<SyntheticResourceObservation, SyntheticResourceReadError>;
@@ -34,5 +34,5 @@ export interface SyntheticResourcesShape {
 
 export class SyntheticResources extends Context.Service<
   SyntheticResources,
-  SyntheticResourcesShape
+  SyntheticResourcesContract
 >()("@bundjil/infrastructure/SyntheticResources") {}

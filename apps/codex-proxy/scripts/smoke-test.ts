@@ -10,9 +10,9 @@ import { HttpClient, HttpClientRequest } from "effect/unstable/http";
 
 import {
   CodexProxyConfigLayer,
-  makeCodexProxyAppLayer,
-  makeCodexProxyConfig,
-  makeCodexProxyWebHandler,
+  buildCodexProxyAppLayer,
+  decodeCodexProxyConfig,
+  createCodexProxyWebHandler,
 } from "../src/index.js";
 
 const SmokeTestResult = Schema.Struct({
@@ -21,7 +21,7 @@ const SmokeTestResult = Schema.Struct({
   streamLines: Schema.Number,
 });
 
-const smokeConfig = makeCodexProxyConfig({
+const smokeConfig = decodeCodexProxyConfig({
   internalToken: "smoke-test-token",
   mode: "mock",
   reasoningEffort: "low",
@@ -40,15 +40,15 @@ const smokeConfig = makeCodexProxyConfig({
 
 const runSmokeTest = Effect.gen(function* runCodexProxySmokeTest() {
   const config = yield* smokeConfig;
-  const { handler } = makeCodexProxyWebHandler(
-    makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+  const { handler } = createCodexProxyWebHandler(
+    buildCodexProxyAppLayer(CodexProxyConfigLayer(config))
   );
   const client = yield* HttpClient.HttpClient;
   const server = Bun.serve({
     fetch: (request) => handler(request),
     port: 0,
   });
-  const baseUrl = server.url.toString().replace(/\/$/, "");
+  const baseUrl = server.url.toString().replace(/\/$/u, "");
   const requestBody = yield* Schema.encodeEffect(
     Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
   )(
@@ -83,8 +83,8 @@ const runSmokeTest = Effect.gen(function* runCodexProxySmokeTest() {
 
     assert.equal(stream.status, 200);
     assert.equal(stream.headers["content-type"], "text/event-stream");
-    assert.match(body, /^data: /);
-    assert.match(body, /data: \[DONE\]/);
+    assert.match(body, /^data: /u);
+    assert.match(body, /data: \[DONE\]/u);
 
     return {
       healthStatus: health.status,

@@ -10,7 +10,7 @@ import type {
   CodexSubscriptionProfile as CodexSubscriptionProfileType,
 } from "../profiles/contracts.js";
 import { CodexOAuthObserver } from "../profiles/observer.js";
-import type { CodexOAuthObserverShape } from "../profiles/observer.js";
+import type { CodexOAuthObserverContract } from "../profiles/observer.js";
 import {
   CodexOAuthRefreshLock,
   withCodexOAuthRefreshLock,
@@ -38,11 +38,11 @@ import type {
 import { CodexOAuthRefreshPolicyService } from "./refresh-config.js";
 
 const recordObserverEvent = (
-  observer: Option.Option<CodexOAuthObserverShape>,
-  event: Parameters<CodexOAuthObserverShape["record"]>[0]
+  observer: Option.Option<CodexOAuthObserverContract>,
+  event: Parameters<CodexOAuthObserverContract["record"]>[0]
 ) => (Option.isSome(observer) ? observer.value.record(event) : Effect.void);
 
-export interface CodexOAuthServiceShape {
+export interface CodexOAuthServiceContract {
   readonly startLogin: (
     input: CodexOAuthLoginStart
   ) => Effect.Effect<CodexOAuthLoginStartResult, CodexOAuthFailure>;
@@ -68,7 +68,7 @@ export interface CodexOAuthServiceShape {
 
 export class CodexOAuthService extends Context.Service<
   CodexOAuthService,
-  CodexOAuthServiceShape
+  CodexOAuthServiceContract
 >()("@bundjil/codex/CodexOAuthService") {}
 
 export const makeCodexOAuthService = Effect.gen(function* makeService() {
@@ -446,13 +446,15 @@ export const makeCodexOAuthService = Effect.gen(function* makeService() {
     ) {
       const profile = yield* profileStore.getProfile(subject);
 
-      yield* oauthClient.revoke({
-        subject,
-        accessToken: profile.accessToken,
-        ...(profile.profileKind === "subscription"
-          ? { refreshToken: profile.refreshToken }
-          : {}),
-      });
+      yield* oauthClient.revoke(
+        profile.profileKind === "subscription"
+          ? {
+              subject,
+              accessToken: profile.accessToken,
+              refreshToken: profile.refreshToken,
+            }
+          : { subject, accessToken: profile.accessToken }
+      );
 
       return yield* profileStore.removeProfile(subject);
     }),

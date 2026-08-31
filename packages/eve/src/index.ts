@@ -31,13 +31,13 @@ export {
   WorkspaceOperationsMemory,
   getWorkspaceStatus,
 } from "./services/workspace-operations.js";
-export type { WorkspaceOperationsShape } from "./services/workspace-operations.js";
+export type { WorkspaceOperationsContract } from "./services/workspace-operations.js";
 export {
   BundjilDefaultWorkspacePackage,
   BundjilPackageName,
   BundjilWorkspaceName,
   defaultWorkspacePackages,
-  makeWorkspaceSummary,
+  loadWorkspaceSummary,
   WorkspaceSummary,
 } from "./workspace-status.js";
 export type {

@@ -52,7 +52,7 @@ export const PhotonWebhookBindingMemoryCount = Schema.Struct({
 export type PhotonWebhookBindingMemoryCount =
   typeof PhotonWebhookBindingMemoryCount.Type;
 
-export interface PhotonWebhookBindingMemoryControlShape {
+export interface PhotonWebhookBindingMemoryControlContract {
   readonly setFailureMode: (
     mode: PhotonWebhookBindingMemoryFailureMode
   ) => Effect.Effect<void>;
@@ -62,7 +62,7 @@ export interface PhotonWebhookBindingMemoryControlShape {
 
 export class PhotonWebhookBindingMemoryControl extends Context.Service<
   PhotonWebhookBindingMemoryControl,
-  PhotonWebhookBindingMemoryControlShape
+  PhotonWebhookBindingMemoryControlContract
 >()("@bundjil/infrastructure/photon/PhotonWebhookBindingMemoryControl") {}
 
 const owner = SecretOwner.make("bundjil-agent-preview-vercel-environment");

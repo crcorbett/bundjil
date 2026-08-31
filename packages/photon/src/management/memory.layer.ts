@@ -85,14 +85,14 @@ export type PhotonManagementMemoryInventory =
 export type PhotonManagementMemoryInventoryEncoded =
   typeof PhotonManagementMemoryInventory.Encoded;
 
-export interface PhotonManagementMemoryControlShape {
+export interface PhotonManagementMemoryControlContract {
   readonly snapshot: EffectType.Effect<PhotonManagementMemoryInventory>;
   readonly providerWriteCount: EffectType.Effect<number>;
 }
 
 export class PhotonManagementMemoryControl extends Context.Service<
   PhotonManagementMemoryControl,
-  PhotonManagementMemoryControlShape
+  PhotonManagementMemoryControlContract
 >()("@bundjil/photon/management/PhotonManagementMemoryControl") {}
 
 export const layerPhotonManagementMemory = (

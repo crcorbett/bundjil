@@ -397,7 +397,7 @@ export const runtimeExecutionExceptions = [
     expected: { "Effect.runPromise": 1, "Effect.runSync": 1 },
   },
   {
-    pathSuffix: "apps/agent/agent/tools/workspace_status.ts",
+    pathSuffix: "apps/agent/agent/tools/workspace-status.ts",
     expected: { "Effect.runPromise": 1 },
   },
   {

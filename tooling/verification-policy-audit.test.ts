@@ -289,7 +289,7 @@ describe("verification policy", () => {
     ]) {
       expect(() =>
         Effect.runSync(Schema.decodeUnknownEffect(CriticalJourney)(invalid))
-      ).toThrow(/Expected/);
+      ).toThrow(/Expected/u);
     }
   });
 
@@ -386,7 +386,7 @@ describe("verification policy", () => {
     };
     expect(() =>
       Effect.runSync(Schema.decodeUnknownEffect(ProofPacket)(invalid))
-    ).toThrow(/Expected/);
+    ).toThrow(/Expected/u);
     const outside = {
       ...packet(),
       commandReceipt: { ...packet().commandReceipt, detailPath: "tmp/raw.log" },
@@ -414,7 +414,7 @@ describe("verification policy", () => {
             onExcessProperty: "error",
           })
         )
-      ).toThrow(/Expected|Unexpected key|is forbidden|cannot traverse/);
+      ).toThrow(/Expected|Unexpected key|is forbidden|cannot traverse/u);
     }
   });
 

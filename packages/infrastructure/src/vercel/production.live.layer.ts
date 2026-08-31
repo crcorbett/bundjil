@@ -37,12 +37,12 @@ const ProductionVercelToken = Schema.Redacted(Schema.NonEmptyString);
 type ProductionVercelToken = typeof ProductionVercelToken.Type;
 
 const ProductionAgentCallbackAlias = Schema.NonEmptyString.pipe(
-  Schema.check(Schema.isPattern(/^[a-z0-9-]+\.vercel\.app$/)),
+  Schema.check(Schema.isPattern(/^[a-z0-9-]+\.vercel\.app$/u)),
   Schema.brand("@bundjil/infrastructure/vercel/ProductionAgentCallbackAlias")
 );
 
 const ProductionHealthUrl = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^https:\/\/[a-z0-9-]+\.vercel\.app\/health$/))
+  Schema.check(Schema.isPattern(/^https:\/\/[a-z0-9-]+\.vercel\.app\/health$/u))
 );
 
 const ProductionDeploymentConfig = Schema.Struct({

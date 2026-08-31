@@ -8,7 +8,7 @@ import type {
 } from "./credentials.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 
-export interface CodexBrowserLauncherShape {
+export interface CodexBrowserLauncherContract {
   readonly open: (
     authorizationUrl: CodexOAuthAuthorizationUrl
   ) => Effect.Effect<void, CodexSubscriptionAuthError>;
@@ -16,7 +16,7 @@ export interface CodexBrowserLauncherShape {
 
 export class CodexBrowserLauncher extends Context.Service<
   CodexBrowserLauncher,
-  CodexBrowserLauncherShape
+  CodexBrowserLauncherContract
 >()("@bundjil/codex/CodexBrowserLauncher") {}
 
 export const makeCodexBrowserCommand = (
@@ -94,5 +94,5 @@ export const CodexBrowserLauncherCommandLive = Layer.effect(
 );
 
 export const CodexBrowserLauncherMemory = (
-  open: CodexBrowserLauncherShape["open"] = () => Effect.void
+  open: CodexBrowserLauncherContract["open"] = () => Effect.void
 ) => Layer.succeed(CodexBrowserLauncher, CodexBrowserLauncher.of({ open }));

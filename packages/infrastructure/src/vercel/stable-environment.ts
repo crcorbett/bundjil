@@ -145,7 +145,7 @@ export class VercelStableEnvironmentWriteError extends Schema.TaggedErrorClass<V
   VercelStableEnvironmentErrorFields
 ) {}
 
-export interface VercelPreviewPhotonBindingValuesShape {
+export interface VercelPreviewPhotonBindingValuesContract {
   readonly resolvePreviewPhotonValue: (
     input: ResolveVercelPreviewPhotonValue
   ) => Effect.Effect<
@@ -156,10 +156,10 @@ export interface VercelPreviewPhotonBindingValuesShape {
 
 export class VercelPreviewPhotonBindingValues extends Context.Service<
   VercelPreviewPhotonBindingValues,
-  VercelPreviewPhotonBindingValuesShape
+  VercelPreviewPhotonBindingValuesContract
 >()("@bundjil/infrastructure/vercel/VercelPreviewPhotonBindingValues") {}
 
-export interface VercelStableEnvironmentBindingsShape {
+export interface VercelStableEnvironmentBindingsContract {
   readonly updateStableEnvironmentVariable: (
     input: UpdateVercelStableEnvironmentVariable
   ) => Effect.Effect<
@@ -170,7 +170,7 @@ export interface VercelStableEnvironmentBindingsShape {
 
 export class VercelStableEnvironmentBindings extends Context.Service<
   VercelStableEnvironmentBindings,
-  VercelStableEnvironmentBindingsShape
+  VercelStableEnvironmentBindingsContract
 >()("@bundjil/infrastructure/vercel/VercelStableEnvironmentBindings") {}
 
 export const VercelStableEnvironmentBindingsDenied = Layer.succeed(

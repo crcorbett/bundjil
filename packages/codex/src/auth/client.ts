@@ -16,7 +16,7 @@ import type {
   CodexSubscriptionAuthError,
 } from "./errors.js";
 
-export interface CodexOAuthClientShape {
+export interface CodexOAuthClientContract {
   readonly startLogin: (
     input: CodexOAuthLoginStart
   ) => Effect.Effect<CodexOAuthLoginStartResult, CodexOAuthFailure>;
@@ -36,7 +36,7 @@ export interface CodexOAuthClientShape {
 
 export class CodexOAuthClient extends Context.Service<
   CodexOAuthClient,
-  CodexOAuthClientShape
+  CodexOAuthClientContract
 >()("@bundjil/codex/CodexOAuthClient") {}
 
 export const unsupportedCodexOAuthClientOperation = (

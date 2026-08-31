@@ -1,10 +1,12 @@
 import { spawnSync } from "node:child_process";
 import { rmSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import nodePath from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import { deterministicEffectNativeVitestFixture } from "../packages/codex/test/fixtures/effect-native-vitest-positive.js";
+
+const { resolve } = nodePath;
 
 const runFixture = (fixture: string) => {
   const child = spawnSync(
@@ -16,6 +18,18 @@ const runFixture = (fixture: string) => {
       "lint/fixtures/effect-native.config.json",
       fixture,
     ],
+    { encoding: "utf-8" }
+  );
+  return {
+    exitCode: child.status,
+    output: `${child.stdout}\n${child.stderr}`,
+  };
+};
+
+const runRootProbe = (probe: string) => {
+  const child = spawnSync(
+    "bunx",
+    ["--bun", "oxlint", "--config", "oxlint.config.ts", probe],
     { encoding: "utf-8" }
   );
   return {
@@ -62,6 +76,61 @@ describe("installed Bundjil Oxlint plugin", () => {
       "bundjil(require-try-promise-catch)",
     ]) {
       expect(result.output).toContain(rule);
+    }
+  });
+
+  it("loads both anti-slop plugins through the root config", () => {
+    const genericProbe = "packages/channel/src/.anti-slop-lint-probe.ts";
+    const effectProbe = "packages/codex/src/.anti-slop-effect-lint-probe.ts";
+    writeFileSync(
+      resolve(genericProbe),
+      'const inspect = (value: unknown) => typeof value === "string";\nvoid inspect;\n'
+    );
+    writeFileSync(
+      resolve(effectProbe),
+      'import { makeCodexOAuthHttpClient } from "./auth/http-client.js";\nvoid makeCodexOAuthHttpClient;\n'
+    );
+
+    try {
+      const generic = runRootProbe(genericProbe);
+      const effect = runRootProbe(effectProbe);
+      expect(generic.exitCode).not.toBe(0);
+      expect(generic.output).toContain("anti-slop(no-runtime-typeof)");
+      expect(generic.output).toContain("anti-slop(no-unknown-parameters)");
+      expect(effect.exitCode).not.toBe(0);
+      expect(effect.output).toContain(
+        "anti-slop-effect(no-service-constructor-imports)"
+      );
+    } finally {
+      rmSync(resolve(genericProbe), { force: true });
+      rmSync(resolve(effectProbe), { force: true });
+    }
+  });
+
+  it("allows TypeScript value/type namespaces without allowing JavaScript duplicates", () => {
+    const typescriptProbe = "packages/channel/src/.namespace-lint-probe.ts";
+    const javascriptProbe = "packages/channel/src/.duplicate-lint-probe.js";
+    writeFileSync(
+      resolve(typescriptProbe),
+      "const OwnerContract = { value: true };\ntype OwnerContract = typeof OwnerContract;\nvoid OwnerContract;\n"
+    );
+    writeFileSync(
+      resolve(javascriptProbe),
+      "const duplicate = 1;\nconst duplicate = 2;\nvoid duplicate;\n"
+    );
+
+    try {
+      const typescript = runRootProbe(typescriptProbe);
+      const javascript = runRootProbe(javascriptProbe);
+      expect(typescript.exitCode).toBe(0);
+      expect(typescript.output).not.toContain("no-redeclare");
+      expect(javascript.exitCode).not.toBe(0);
+      expect(javascript.output).toContain(
+        "Identifier `duplicate` has already been declared"
+      );
+    } finally {
+      rmSync(resolve(typescriptProbe), { force: true });
+      rmSync(resolve(javascriptProbe), { force: true });
     }
   });
 

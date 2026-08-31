@@ -26,11 +26,12 @@ import {
   CodexProxyRuntimeConfig,
   CodexProxyVercelRuntimeMarker,
 } from "./schemas.js";
-import type {
-  CodexProxyDevServerConfig as CodexProxyDevServerConfigType,
-  CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType,
-} from "./schemas.js";
+import type { CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType } from "./schemas.js";
 
+export {
+  type CodexProxyDevServerConfig as CodexProxyDevServerConfigType,
+  type CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType,
+} from "./schemas.js";
 const proxyModeConfig = Config.schema(
   CodexProxyMode,
   "BUNDJIL_CODEX_PROXY_MODE"
@@ -160,16 +161,24 @@ export const loadCodexProxyConfig = Effect.gen(
       provider: "codex",
     });
 
-    const config = yield* CodexProxyRuntimeConfig.makeEffect({
+    const requiredConfig = {
       mode,
       reasoningEffort,
       internalToken,
       subject,
-      ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
-      ...(Option.isNone(localProfileStoreDirectory)
-        ? {}
-        : { localProfileStoreDirectory: localProfileStoreDirectory.value }),
-    }).pipe(
+    };
+    const accountConfig = Option.isNone(accountId)
+      ? requiredConfig
+      : { ...requiredConfig, accountId: accountId.value };
+    const runtimeConfig = Option.isNone(localProfileStoreDirectory)
+      ? accountConfig
+      : {
+          ...accountConfig,
+          localProfileStoreDirectory: localProfileStoreDirectory.value,
+        };
+    const config = yield* CodexProxyRuntimeConfig.makeEffect(
+      runtimeConfig
+    ).pipe(
       Effect.mapError(
         () =>
           new CodexProxyRouteError({
@@ -238,8 +247,6 @@ export const CodexProxyConfigLive = Layer.effect(
 export const CodexProxyConfigLayer = (config: CodexProxyRuntimeConfigType) =>
   Layer.succeed(CodexProxyConfig, config);
 
-export const makeCodexProxyConfig = (
+export const decodeCodexProxyConfig = (
   input: typeof CodexProxyRuntimeConfig.Encoded
 ) => decodeCodexProxyRuntimeConfig(input);
-
-export type { CodexProxyDevServerConfigType, CodexProxyRuntimeConfigType };

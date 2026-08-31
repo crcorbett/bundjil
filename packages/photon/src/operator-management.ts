@@ -154,7 +154,7 @@ const PhotonDeleteWebhookResponse = Schema.Struct({
   }),
 });
 
-interface PhotonManagementShape {
+interface PhotonManagementContract {
   readonly checkSharedAvailability: (
     phoneNumber: typeof PhotonE164PhoneNumber.Type
   ) => Effect.Effect<boolean, PhotonProviderProofError>;
@@ -199,7 +199,7 @@ interface PhotonManagementShape {
 
 export class PhotonManagement extends Context.Service<
   PhotonManagement,
-  PhotonManagementShape
+  PhotonManagementContract
 >()("@bundjil/photon/PhotonManagement") {}
 
 const managementUrl = (projectId: PhotonProjectId, path: string) =>

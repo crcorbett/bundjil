@@ -11,7 +11,7 @@ import type {
 } from "./production.schemas.js";
 import type { VercelGitSha } from "./schemas.js";
 
-export interface ProductionDeploymentsShape {
+export interface ProductionDeploymentsContract {
   readonly current: (
     project: ProductionProject
   ) => Effect.Effect<ProductionDeployment, ProductionDeploymentError>;
@@ -43,5 +43,5 @@ export interface ProductionDeploymentsShape {
 
 export class ProductionDeployments extends Context.Service<
   ProductionDeployments,
-  ProductionDeploymentsShape
+  ProductionDeploymentsContract
 >()("@bundjil/infrastructure/vercel/ProductionDeployments") {}

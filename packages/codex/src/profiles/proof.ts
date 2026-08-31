@@ -40,7 +40,7 @@ const persistedSecretMarkers = [
   "localhost:1457",
 ] as const;
 
-export interface CodexStoredProfileProofShape {
+export interface CodexStoredProfileProofContract {
   readonly prove: (
     subject: CodexOAuthSubject
   ) => Effect.Effect<
@@ -51,7 +51,7 @@ export interface CodexStoredProfileProofShape {
 
 export class CodexStoredProfileProof extends Context.Service<
   CodexStoredProfileProof,
-  CodexStoredProfileProofShape
+  CodexStoredProfileProofContract
 >()("@bundjil/codex/CodexStoredProfileProof") {}
 
 export const makeCodexStoredProfileProof = Effect.gen(

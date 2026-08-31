@@ -27,7 +27,7 @@ import type {
   ChannelSessionTerminalOutcome,
 } from "./schemas.js";
 
-export interface ChannelReplayShape {
+export interface ChannelReplayContract {
   readonly claimInbound: (
     message: ChannelInboundTextMessageType
   ) => Effect.Effect<ChannelReplayClaimResult, ChannelReplayError>;
@@ -57,7 +57,7 @@ export interface ChannelReplayShape {
 
 export class ChannelReplay extends Context.Service<
   ChannelReplay,
-  ChannelReplayShape
+  ChannelReplayContract
 >()("@bundjil/agent/ChannelReplay") {}
 
 const replayRecordJson = Schema.fromJsonString(

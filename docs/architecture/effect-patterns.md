@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-effect-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-31
 review_trigger: Effect, Schema, Config, service, Layer, provider, error, resource, helper, lint, or boundary-control change
 ---
 
@@ -66,6 +66,18 @@ runtime config, or provider boundaries:
 Do not introduce Zod, local DTO mirrors, raw `unknown` readers, or hand-written
 success/error unions when an owning Effect Schema or tagged error can express
 the contract.
+
+The root anti-slop rules enforce the same boundary shape mechanically. Runtime
+code must not import a private `make*Service` constructor from another module;
+it consumes the public service or a closed Layer instead. The only current
+constructor-import exceptions are `packages/codex/src/runtime.ts` and
+`packages/codex/src/testing/index.ts`, the package-owned live and controlled
+test composition roots. An operation may accept `unknown` or inspect a raw
+representation only in the exact ingress owner that immediately validates or
+observes it; the executable path list and reasons live in
+`oxlint.config.ts`. Do not spread a conditional empty object to omit an
+optional field. Build the decoded input in explicit stages so omission remains
+visible and type checked.
 
 ## Service Shape
 

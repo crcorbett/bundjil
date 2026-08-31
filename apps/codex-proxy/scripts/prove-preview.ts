@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { dirname, relative, resolve } from "node:path";
+import nodePath from "node:path";
 import process from "node:process";
 
 import {
@@ -30,6 +30,8 @@ import {
   CodexProxyVercelProtectionBypass,
 } from "../src/schemas.js";
 
+const { dirname, relative, resolve } = nodePath;
+
 type ProofClassification =
   | "assertion_failed"
   | "config_failed"
@@ -43,11 +45,13 @@ type ProofClassification =
   | "unexpected";
 
 const proofIdentityPart = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-z0-9][a-z0-9._-]{0,63}$/))
+  Schema.check(Schema.isPattern(/^[a-z0-9][a-z0-9._-]{0,63}$/u))
 );
 const proofOutputDirectory = Schema.String.pipe(
   Schema.check(
-    Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[a-zA-Z0-9._/-]{1,160}$/)
+    Schema.isPattern(
+      /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[a-zA-Z0-9._/-]{1,160}$/u
+    )
   )
 );
 const PreviewProofClassification = Schema.Union([
@@ -87,6 +91,11 @@ const PreviewProofResult = Schema.Struct({
   tokenLeak: Schema.Boolean,
   unauthenticatedStatus: Schema.Number,
 });
+
+interface PreviewProofBodyState {
+  readonly bytes: number;
+  readonly chunks: Uint8Array[];
+}
 const PreviewProofContract = Schema.Struct({
   authenticatedStatus: Schema.Literal(200),
   authorizationCodeLeak: Schema.Literal(false),
@@ -110,7 +119,7 @@ const PreviewProofDetail = Schema.Struct({
     Schema.Struct({
       path: Schema.String,
       sha256: Schema.String.pipe(
-        Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
+        Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u))
       ),
     })
   ),
@@ -127,7 +136,7 @@ const PreviewProofReceipt = Schema.Struct({
     Schema.Struct({
       path: Schema.String,
       sha256: Schema.String.pipe(
-        Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
+        Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u))
       ),
     })
   ),
@@ -263,7 +272,7 @@ const readBoundedBody = <E>(response: {
 }) =>
   Stream.runFoldEffect(
     response.stream,
-    () => ({ bytes: 0, chunks: [] as Uint8Array[] }),
+    (): PreviewProofBodyState => ({ bytes: 0, chunks: [] }),
     (state, chunk) => {
       const bytes = state.bytes + chunk.byteLength;
       if (bytes > previewProofMaxBodyBytes) {
@@ -455,14 +464,17 @@ const runProof = (
       )
     );
     const completionsUrl = new URL("/v1/chat/completions", previewUrl);
-    const post = (authorization?: string) =>
-      client
+    const post = (authorization?: string) => {
+      const requestHeaders =
+        authorization === undefined
+          ? { "content-type": "application/json" }
+          : { "content-type": "application/json", authorization };
+      return client
         .execute(
           HttpClientRequest.post(completionsUrl).pipe(
             HttpClientRequest.setHeaders({
-              "content-type": "application/json",
+              ...requestHeaders,
               ...bypassHeaders,
-              ...(authorization === undefined ? {} : { authorization }),
             }),
             HttpClientRequest.bodyText(previewProofRequest, "application/json")
           )
@@ -472,6 +484,7 @@ const runProof = (
             () => new PreviewProofFailure({ classification: "request_failed" })
           )
         );
+    };
     const unauthenticated = yield* post();
     const invalid = yield* post("Bearer preview-proof-invalid");
     const authenticated = yield* post(
@@ -614,19 +627,24 @@ const main = Effect.gen(function* renderPreviewProof() {
     );
   let detail = boundedOutcome.retainedDetail;
   if (detail === undefined) {
+    const detailValue =
+      boundedOutcome.result === undefined
+        ? PreviewProofDetail.make({
+            classification: boundedOutcome.classification,
+            identity: proof.identity,
+            requestAttempted,
+            version: 1,
+          })
+        : PreviewProofDetail.make({
+            classification: boundedOutcome.classification,
+            identity: proof.identity,
+            requestAttempted,
+            result: boundedOutcome.result,
+            version: 1,
+          });
     const encodedDetail = yield* Schema.encodeEffect(
       Schema.fromJsonString(PreviewProofDetail)
-    )(
-      PreviewProofDetail.make({
-        classification: boundedOutcome.classification,
-        identity: proof.identity,
-        requestAttempted,
-        ...(boundedOutcome.result === undefined
-          ? {}
-          : { result: boundedOutcome.result }),
-        version: 1,
-      })
-    );
+    )(detailValue);
     detail = yield* writeJsonAtomically(proof.detailPath, encodedDetail).pipe(
       Effect.map(({ sha256: artifactSha256 }) => ({
         path: relative(process.cwd(), proof.detailPath),
@@ -634,19 +652,31 @@ const main = Effect.gen(function* renderPreviewProof() {
       }))
     );
   }
-  const receipt = PreviewProofReceipt.make({
-    ...previewProofReceiptContext,
-    classification: boundedOutcome.classification,
-    detail,
-    identity: proof.identity,
-    intendedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
-    observedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
-    requestAttempted,
-    ...(boundedOutcome.result === undefined
-      ? {}
-      : { result: boundedOutcome.result }),
-    status: boundedOutcome.classification === "proved" ? "proved" : "blocked",
-  });
+  const receipt =
+    boundedOutcome.result === undefined
+      ? PreviewProofReceipt.make({
+          ...previewProofReceiptContext,
+          classification: boundedOutcome.classification,
+          detail,
+          identity: proof.identity,
+          intendedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
+          observedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
+          requestAttempted,
+          status:
+            boundedOutcome.classification === "proved" ? "proved" : "blocked",
+        })
+      : PreviewProofReceipt.make({
+          ...previewProofReceiptContext,
+          classification: boundedOutcome.classification,
+          detail,
+          identity: proof.identity,
+          intendedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
+          observedExitCode: boundedOutcome.classification === "proved" ? 0 : 1,
+          requestAttempted,
+          result: boundedOutcome.result,
+          status:
+            boundedOutcome.classification === "proved" ? "proved" : "blocked",
+        });
   const output = yield* Schema.encodeEffect(
     Schema.fromJsonString(PreviewProofReceipt)
   )(receipt);
@@ -656,7 +686,7 @@ const main = Effect.gen(function* renderPreviewProof() {
       return yield* Effect.void;
     }
     const outputClosedDetailPath = proof.detailPath.replace(
-      /\.detail\.json$/,
+      /\.detail\.json$/u,
       ".output-closed.detail.json"
     );
     const encodedOutputClosedDetail = yield* Schema.encodeEffect(

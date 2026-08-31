@@ -483,7 +483,7 @@ describe("Production promotion preflight", () => {
               },
             },
           }).pipe(Effect.runSync);
-        }, /resolve to one deployment/);
+        }, /resolve to one deployment/u);
 
         const rollbackCollision = yield* decode({
           ...channelCandidateStaged,

@@ -26,7 +26,7 @@ import {
 import * as TestClock from "effect/testing/TestClock";
 
 import { layerClient, PhotonClient } from "../src/client.js";
-import type { PhotonClientShape, PhotonSdkFactory } from "../src/client.js";
+import type { PhotonClientContract, PhotonSdkFactory } from "../src/client.js";
 import {
   PhotonConfig,
   PhotonMessagesWebhook,
@@ -629,7 +629,7 @@ it.effect(
   () =>
     Effect.gen(function* testPhotonSendFailures() {
       const fixture = yield* fixtures;
-      const send = (client: PhotonClientShape) =>
+      const send = (client: PhotonClientContract) =>
         Effect.gen(function* sendMessage() {
           const transport = yield* ChannelTransport;
           return yield* transport.sendMessage({

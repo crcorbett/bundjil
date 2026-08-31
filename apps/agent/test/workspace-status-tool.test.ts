@@ -10,7 +10,7 @@ import type { ToolContext } from "eve/tools";
 import workspaceStatusTool, {
   workspaceStatusInputSchema,
   workspaceStatusOutputSchema,
-} from "../agent/tools/workspace_status.js";
+} from "../agent/tools/workspace-status.js";
 
 const unusedToolContext: ToolContext = {
   session: {

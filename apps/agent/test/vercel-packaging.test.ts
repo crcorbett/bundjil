@@ -253,7 +253,7 @@ describe("Vercel packaging", () => {
     expect(workflow.maxDuration).toBe("max");
     expect(workflow.experimentalTriggers).toHaveLength(1);
     expect(workflow.experimentalTriggers?.[0]?.topic).toMatch(
-      /^__eve[0-9a-f]+_wkf_workflow_\*$/
+      /^__eve[0-9a-f]+_wkf_workflow_\*$/u
     );
   });
 });

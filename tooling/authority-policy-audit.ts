@@ -1,6 +1,6 @@
 import { lstatSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { Clock, Console, Effect, Schema } from "effect";
 import { parse as parseYamlDocument } from "yaml";
@@ -13,6 +13,8 @@ import {
   GitHubActionsLockJson,
 } from "./authority-policy.js";
 import type { AuthorityWorkflow } from "./authority-policy.js";
+
+const { dirname, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const detailPath = "tmp/authority-policy-report.json";
@@ -43,7 +45,7 @@ const requiredFiles = {
 } as const;
 
 const workflowPath = (path: string) =>
-  /^\.github\/workflows\/[^/]+\.ya?ml$/.test(path);
+  /^\.github\/workflows\/[^/]+\.ya?ml$/u.test(path);
 
 const discoverPaths = Effect.fn("AuthorityAudit.discoverPaths")(() =>
   Effect.tryPromise({

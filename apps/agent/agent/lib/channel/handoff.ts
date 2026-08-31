@@ -24,7 +24,7 @@ import type {
   ChannelSessionTerminalOutcome,
 } from "./schemas.js";
 
-export interface ChannelHandoffShape {
+export interface ChannelHandoffContract {
   readonly acceptanceTimeout: ChannelHandoffTimeout;
   readonly prepared: (
     claim: ChannelReplayClaim
@@ -70,7 +70,7 @@ export interface ChannelHandoffShape {
 
 export class ChannelHandoff extends Context.Service<
   ChannelHandoff,
-  ChannelHandoffShape
+  ChannelHandoffContract
 >()("@bundjil/agent/ChannelHandoff") {}
 
 const makeLayer = (

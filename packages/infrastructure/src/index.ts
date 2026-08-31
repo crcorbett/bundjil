@@ -156,7 +156,7 @@ export {
   loadAlchemyR2StateConfig,
 } from "./state/r2-state.js";
 export {
-  makePreviewStateBackupStoreLive,
+  buildPreviewStateBackupStoreLive,
   makePreviewStateBackupStoreMemory,
   makePreviewStateMigrationLayer,
   PreviewStateBackup,
@@ -205,7 +205,7 @@ export {
   SyntheticMemoryWriteCount,
   type SyntheticMemoryWriteCountEncoded,
   SyntheticResourcesMemoryControl,
-  type SyntheticResourcesMemoryControlShape,
+  type SyntheticResourcesMemoryControlContract,
 } from "./memory.layer.js";
 export { SyntheticResource, SyntheticResourceProvider } from "./providers.js";
 export {
@@ -284,4 +284,7 @@ export {
   SyntheticResourceProps,
   type SyntheticResourcePropsEncoded,
 } from "./schemas.js";
-export { SyntheticResources, type SyntheticResourcesShape } from "./service.js";
+export {
+  SyntheticResources,
+  type SyntheticResourcesContract,
+} from "./service.js";

@@ -14,7 +14,7 @@ export type CodexResponsesProofFailure =
   | CodexResponsesRequestError
   | CodexHttpClientFailure;
 
-export interface CodexResponsesProofShape {
+export interface CodexResponsesProofContract {
   readonly run: (
     input: CodexResponsesProofInput
   ) => Effect.Effect<CodexResponsesProofResult, CodexResponsesProofFailure>;
@@ -22,7 +22,7 @@ export interface CodexResponsesProofShape {
 
 export class CodexResponsesProof extends Context.Service<
   CodexResponsesProof,
-  CodexResponsesProofShape
+  CodexResponsesProofContract
 >()("@bundjil/codex/CodexResponsesProof") {}
 
 export const makeCodexResponsesProof = Effect.gen(
@@ -58,13 +58,15 @@ export const makeCodexResponsesProof = Effect.gen(
           )
         );
 
-        return yield* httpClient.postResponses({
-          accessToken: input.accessToken,
-          ...(input.accountId === undefined
-            ? {}
-            : { accountId: input.accountId }),
-          request,
-        });
+        return yield* httpClient.postResponses(
+          input.accountId === undefined
+            ? { accessToken: input.accessToken, request }
+            : {
+                accessToken: input.accessToken,
+                accountId: input.accountId,
+                request,
+              }
+        );
       }),
     });
   }

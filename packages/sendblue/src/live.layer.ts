@@ -41,15 +41,16 @@ const sendMessageUrl = "https://api.sendblue.com/api/send-message";
 const presenceUrl = "https://api.sendblue.com/api/send-typing-indicator";
 const textEncoder = new TextEncoder();
 
+const webhookAuthenticationError = () =>
+  new ChannelWebhookAuthenticationError({
+    provider: "sendblue",
+    operation: "decodeWebhook",
+    reason: "authentication",
+    retry: "never",
+  });
+
 const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
   function* (provided: string, expected: Redacted.Redacted) {
-    const authenticationError = () =>
-      new ChannelWebhookAuthenticationError({
-        provider: "sendblue",
-        operation: "decodeWebhook",
-        reason: "authentication",
-        retry: "never",
-      });
     const algorithm = { name: "HMAC", hash: "SHA-256" };
     const [providedKey, expectedKey] = yield* Effect.all(
       [
@@ -62,7 +63,7 @@ const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
               false,
               ["sign"]
             ),
-          catch: authenticationError,
+          catch: webhookAuthenticationError,
         }),
         Effect.tryPromise({
           try: () =>
@@ -73,7 +74,7 @@ const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
               false,
               ["verify"]
             ),
-          catch: authenticationError,
+          catch: webhookAuthenticationError,
         }),
       ],
       { concurrency: "unbounded" }
@@ -88,7 +89,7 @@ const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
           providedKey,
           comparisonPayload
         ),
-      catch: authenticationError,
+      catch: webhookAuthenticationError,
     });
     return yield* Effect.tryPromise({
       try: () =>
@@ -98,7 +99,7 @@ const verifyWebhookSecret = Effect.fn("SendblueTransport.verifyWebhookSecret")(
           providedSignature,
           comparisonPayload
         ),
-      catch: authenticationError,
+      catch: webhookAuthenticationError,
     });
   }
 );

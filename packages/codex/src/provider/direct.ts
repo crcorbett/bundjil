@@ -22,7 +22,7 @@ export type CodexDirectProviderFailure =
   | CodexHttpClientFailure
   | CodexResponsesStreamError;
 
-export interface CodexDirectProviderShape {
+export interface CodexDirectProviderContract {
   readonly streamChatCompletion: (
     input: CodexDirectProviderInput
   ) => Effect.Effect<
@@ -33,7 +33,7 @@ export interface CodexDirectProviderShape {
 
 export class CodexDirectProvider extends Context.Service<
   CodexDirectProvider,
-  CodexDirectProviderShape
+  CodexDirectProviderContract
 >()("@bundjil/codex/CodexDirectProvider") {}
 
 export const makeCodexDirectProvider = Effect.gen(
@@ -114,13 +114,11 @@ export const makeCodexLegacyDirectProvider = Effect.gen(
       )(function* (input: CodexDirectProviderInput) {
         const accessToken = yield* oauth.getValidToken(input.subject);
         const request = yield* requestMapper.toCodexResponses(input.request);
-        const response = yield* httpClient.postResponsesStream({
-          accessToken,
-          ...(input.accountId === undefined
-            ? {}
-            : { accountId: input.accountId }),
-          request,
-        });
+        const response = yield* httpClient.postResponsesStream(
+          input.accountId === undefined
+            ? { accessToken, request }
+            : { accessToken, accountId: input.accountId, request }
+        );
 
         return yield* streamMapper.toOpenAICompatibleStream({
           model: input.request.model,

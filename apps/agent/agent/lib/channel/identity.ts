@@ -4,7 +4,7 @@ import { Array, Context, Effect, Layer, Option } from "effect";
 import { ChannelIdentityError } from "./errors.js";
 import type { ChannelIdentityRecords, ChannelPrincipalId } from "./schemas.js";
 
-export interface ChannelIdentityShape {
+export interface ChannelIdentityContract {
   readonly resolve: (
     participantId: ChannelParticipantIdType
   ) => Effect.Effect<ChannelPrincipalId, ChannelIdentityError>;
@@ -12,7 +12,7 @@ export interface ChannelIdentityShape {
 
 export class ChannelIdentity extends Context.Service<
   ChannelIdentity,
-  ChannelIdentityShape
+  ChannelIdentityContract
 >()("@bundjil/agent/ChannelIdentity") {}
 
 const makeLayer = (records: ChannelIdentityRecords) =>

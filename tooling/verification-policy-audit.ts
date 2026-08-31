@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { Clock, Console, Effect, Option, Schema } from "effect";
 
@@ -17,6 +17,8 @@ import type {
   DetailArtifact,
   VerificationPolicyReport,
 } from "./verification-policy.js";
+
+const { dirname, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const detailPath = "tmp/verification-policy-report.json";
@@ -162,7 +164,7 @@ const program = Effect.gen(function* () {
     decodeEvidenceIndex(evidenceIndexContent),
   ]);
   const packetPaths = repositoryPaths.filter((path) =>
-    /^docs\/evidence\/verification\/packets\/[^/]+\.json$/.test(path)
+    /^docs\/evidence\/verification\/packets\/[^/]+\.json$/u.test(path)
   );
   const packets = yield* Effect.all(
     packetPaths.map((path) =>

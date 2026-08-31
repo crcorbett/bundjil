@@ -11,7 +11,7 @@ import {
 import { PersistenceMemory } from "../src/memory.layer.js";
 import type { UpstashPersistenceClient } from "../src/upstash-client.internal.js";
 import {
-  makeUpstashPersistenceLayer,
+  buildUpstashPersistenceLayer,
   serializeUpstashAtomicCommand,
   upstashAtomicTransactionScript,
 } from "../src/upstash-layer.internal.js";
@@ -128,7 +128,9 @@ it.effect(
         "durable",
         "",
       ]);
-    }).pipe(Effect.provide(makeUpstashPersistenceLayer(options, () => client)));
+    }).pipe(
+      Effect.provide(buildUpstashPersistenceLayer(options, () => client))
+    );
   }
 );
 
@@ -247,7 +249,7 @@ it.effect(
           ],
         };
       }).pipe(
-        Effect.provide(makeUpstashPersistenceLayer(options, () => client))
+        Effect.provide(buildUpstashPersistenceLayer(options, () => client))
       );
       assert.deepStrictEqual(upstash.outcomes, memoryOutcomes);
       assert.deepStrictEqual(upstash.readback, memoryReadback);
@@ -316,7 +318,7 @@ it.effect("rejects invalid transactions before provider I/O", () => {
     assert.strictEqual(evalCalls, 0);
     assert.strictEqual(yield* native.get("must-not-write"), undefined);
     assert.strictEqual(yield* native.size, 0);
-  }).pipe(Effect.provide(makeUpstashPersistenceLayer(options, () => client)));
+  }).pipe(Effect.provide(buildUpstashPersistenceLayer(options, () => client)));
 });
 
 it.effect("maps rejected eval provider failures to safe atomic errors", () => {
@@ -338,7 +340,7 @@ it.effect("maps rejected eval provider failures to safe atomic errors", () => {
     assert.strictEqual(rendered.includes(privateProviderMarker), false);
     assert.strictEqual(rendered.includes("lease"), false);
     assert.strictEqual("cause" in error, false);
-  }).pipe(Effect.provide(makeUpstashPersistenceLayer(options, () => client)));
+  }).pipe(Effect.provide(buildUpstashPersistenceLayer(options, () => client)));
 });
 
 it.effect("maps zero eval responses to conflict", () => {
@@ -352,7 +354,7 @@ it.effect("maps zero eval responses to conflict", () => {
   return Effect.gen(function* conflictContract() {
     const atomic = yield* AtomicKeyValueStore;
     assert.strictEqual(yield* atomic.transact(transaction), "conflict");
-  }).pipe(Effect.provide(makeUpstashPersistenceLayer(options, () => client)));
+  }).pipe(Effect.provide(buildUpstashPersistenceLayer(options, () => client)));
 });
 
 it.effect(
@@ -376,7 +378,7 @@ it.effect(
       assert.strictEqual(rendered.includes(marker), false);
       assert.strictEqual("cause" in error, false);
     }).pipe(
-      Effect.provide(makeUpstashPersistenceLayer(options, () => malformed))
+      Effect.provide(buildUpstashPersistenceLayer(options, () => malformed))
     );
   }
 );

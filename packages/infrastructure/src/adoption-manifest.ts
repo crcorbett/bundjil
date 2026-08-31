@@ -435,7 +435,7 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
           const resourceLogicalId = yield* logicalId(
             `vercel-environment:${environmentVariable.projectId}:${environmentVariable.environmentVariableId}`
           );
-          return AdoptionManifestResource.make({
+          const requiredResource = {
             stage,
             provider: "vercel",
             resourceKind: "vercelEnvironmentVariable",
@@ -445,12 +445,6 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
               projectId: environmentVariable.projectId,
               environmentVariableId: environmentVariable.environmentVariableId,
             },
-            ...(environmentVariable.providerUpdatedAt === undefined
-              ? {}
-              : {
-                  admittedProviderUpdatedAt:
-                    environmentVariable.providerUpdatedAt,
-                }),
             desired: VercelEnvironmentVariableDesiredState.make({
               key: environmentVariable.key,
               type: environmentVariable.type,
@@ -464,7 +458,16 @@ export const buildAdoptionManifest = Effect.fn("AdoptionManifest.build")(
             },
             removalPolicy: "retain",
             observedMetadataDigest: digest,
-          });
+          } satisfies Parameters<typeof AdoptionManifestResource.make>[0];
+          return AdoptionManifestResource.make(
+            environmentVariable.providerUpdatedAt === undefined
+              ? requiredResource
+              : {
+                  ...requiredResource,
+                  admittedProviderUpdatedAt:
+                    environmentVariable.providerUpdatedAt,
+                }
+          );
         })
     );
     const vercelMarketplaceBindings = yield* Effect.forEach(

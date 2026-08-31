@@ -114,7 +114,7 @@ export const AuthorityRegister = Schema.Struct({
 export type AuthorityRegister = typeof AuthorityRegister.Type;
 export const AuthorityRegisterJson = Schema.fromJsonString(AuthorityRegister);
 
-const ActionPin = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/));
+const ActionPin = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const GitHubActionLockEntry = Schema.Struct({
   action: Schema.NonEmptyString,
   approvedWorkflows: Schema.Array(Schema.NonEmptyString),
@@ -447,7 +447,7 @@ const actionUses = (
 ): readonly { action: string; pin: string }[] =>
   [
     ...content.matchAll(
-      /^\s*(?:-\s*)?uses:\s*([^\s@]+)@([^\s#]+)(?:\s+#.*)?$/gm
+      /^\s*(?:-\s*)?uses:\s*(?<action>[^\s@]+)@(?<pin>[^\s#]+)(?:\s+#.*)?$/gmu
     ),
   ].map((match) => ({ action: match[1] ?? "", pin: match[2] ?? "" }));
 
@@ -486,7 +486,7 @@ const pinFindings = (
   const useIssues = actionUses(workflow.content).flatMap(({ action, pin }) => {
     const entry = registered.get(action);
     const expected = approvedPinByAction.get(action);
-    return /^[a-f0-9]{40}$/.test(pin) &&
+    return /^[a-f0-9]{40}$/u.test(pin) &&
       entry?.pin === pin &&
       entry.approvedWorkflows.includes(workflow.path) &&
       (!expected || pin === expected)
@@ -570,7 +570,7 @@ const ciFindings = (
       )
     );
   }
-  if (!/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/.test(content)) {
+  if (!/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/u.test(content)) {
     issues.push(
       finding(
         "AUTH-CI-TARGET",
@@ -582,7 +582,7 @@ const ciFindings = (
       )
     );
   }
-  if (/\b(?:secrets|id-token)\b/i.test(content)) {
+  if (/\b(?:secrets|id-token)\b/iu.test(content)) {
     issues.push(
       finding(
         "AUTH-CI-SECRET-SCOPE",
@@ -617,7 +617,7 @@ const infrastructureDriftFindings = (
   const hasManualDispatch =
     trigger !== undefined && Object.hasOwn(trigger, "workflow_dispatch");
   const secretReferences = [
-    ...workflow.content.matchAll(/secrets\.([A-Z0-9_]+)/g),
+    ...workflow.content.matchAll(/secrets\.(?<name>[A-Z0-9_]+)/gu),
   ].map((match) => match[1]);
   const expectedSecrets = ["DOPPLER_TOKEN"];
   const issues: AuthorityFinding[] = [];
@@ -658,10 +658,10 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/.test(
+    !/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/u.test(
       workflow.content
     ) ||
-    !/github\.event\.pull_request\.head\.repo\.full_name\s*==\s*github\.repository/.test(
+    !/github\.event\.pull_request\.head\.repo\.full_name\s*==\s*github\.repository/u.test(
       workflow.content
     )
   ) {
@@ -677,12 +677,14 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/environment:\s*infrastructure-read-only-preview/.test(workflow.content) ||
-    !/BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE:\s*preview/.test(workflow.content) ||
-    !/BUNDJIL_INFRASTRUCTURE_STAGE:\s*preview/.test(workflow.content) ||
-    /\bprod(?:uction)?\b/i.test(
+    !/environment:\s*infrastructure-read-only-preview/u.test(
+      workflow.content
+    ) ||
+    !/BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE:\s*preview/u.test(workflow.content) ||
+    !/BUNDJIL_INFRASTRUCTURE_STAGE:\s*preview/u.test(workflow.content) ||
+    /\bprod(?:uction)?\b/iu.test(
       workflow.content.replaceAll(
-        /BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA:[^\n]+/g,
+        /BUNDJIL_INFRASTRUCTURE_DRIFT_SOURCE_SHA:[^\n]+/gu,
         ""
       )
     )
@@ -714,16 +716,16 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/.test(
+    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/u.test(
       workflow.content
     ) ||
-    !/DRIFT_AUTHORITY_JSON:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON\s*\}\}/.test(
+    !/DRIFT_AUTHORITY_JSON:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON\s*\}\}/u.test(
       workflow.content
     ) ||
-    !/DRIFT_ENV_FILE:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE\s*\}\}/.test(
+    !/DRIFT_ENV_FILE:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE\s*\}\}/u.test(
       workflow.content
     ) ||
-    !/DRIFT_MANIFEST_GZIP_BASE64:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON\s*\}\}/.test(
+    !/DRIFT_MANIFEST_GZIP_BASE64:\s*\$\{\{\s*steps\.doppler\.outputs\.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON\s*\}\}/u.test(
       workflow.content
     ) ||
     workflow.content.includes("inject-env-vars")
@@ -740,7 +742,7 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:\s*github-actions:\$\{\{\s*github\.repository\s*\}\}:\$\{\{\s*github\.run_id\s*\}\}:\$\{\{\s*github\.run_attempt\s*\}\}/.test(
+    !/BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:\s*github-actions:\$\{\{\s*github\.repository\s*\}\}:\$\{\{\s*github\.run_id\s*\}\}:\$\{\{\s*github\.run_attempt\s*\}\}/u.test(
       workflow.content
     )
   ) {
@@ -756,7 +758,7 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5/.test(
+    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5/u.test(
       workflow.content
     )
   ) {
@@ -772,10 +774,10 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report:internal/.test(
+    !/run:\s*bun run --env-file [^\n]+ infrastructure:drift-report:internal/u.test(
       workflow.content
     ) ||
-    !/printf '%s' "\$DRIFT_MANIFEST_GZIP_BASE64"\s*\\\s*\| base64 --decode\s*\\\s*\| gzip --decompress\s*\\\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"/.test(
+    !/printf '%s' "\$DRIFT_MANIFEST_GZIP_BASE64"\s*\\\s*\| base64 --decode\s*\\\s*\| gzip --decompress\s*\\\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"/u.test(
       workflow.content
     ) ||
     !workflow.content.includes(
@@ -784,7 +786,7 @@ const infrastructureDriftFindings = (
     !workflow.content.includes(
       `jq -c '.' "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"`
     ) ||
-    /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/i.test(
+    /infrastructure:(?:stable-production|[^\\s]*(?:apply|repair|rollback)|photon)|id-token/iu.test(
       workflow.content
     )
   ) {
@@ -837,9 +839,9 @@ const productionFindings = (
   const workflows = workflowRun?.["workflows"];
   const types = workflowRun?.["types"];
   const { content } = workflow;
-  const secretReferences = [...content.matchAll(/secrets\.([A-Z0-9_]+)/g)].map(
-    (match) => match[1]
-  );
+  const secretReferences = [
+    ...content.matchAll(/secrets\.(?<name>[A-Z0-9_]+)/gu),
+  ].map((match) => match[1]);
   const expectedSecrets = ["DOPPLER_TOKEN"];
   const issues: AuthorityFinding[] = [];
   if (!exactPermissions(permissions, { contents: "read" })) {
@@ -889,11 +891,11 @@ const productionFindings = (
     );
   }
   const requiredGates = [
-    /github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/,
-    /github\.event\.workflow_run\.conclusion\s*==\s*['"]success['"]/,
-    /github\.event\.workflow_run\.event\s*==\s*['"]push['"]/,
-    /github\.event\.workflow_run\.head_branch\s*==\s*['"]main['"]/,
-    /github\.event\.workflow_run\.head_repository\.full_name\s*==\s*['"]crcorbett\/bundjil['"]/,
+    /github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/u,
+    /github\.event\.workflow_run\.conclusion\s*==\s*['"]success['"]/u,
+    /github\.event\.workflow_run\.event\s*==\s*['"]push['"]/u,
+    /github\.event\.workflow_run\.head_branch\s*==\s*['"]main['"]/u,
+    /github\.event\.workflow_run\.head_repository\.full_name\s*==\s*['"]crcorbett\/bundjil['"]/u,
   ];
   if (requiredGates.some((gate) => !gate.test(content))) {
     issues.push(
@@ -908,11 +910,11 @@ const productionFindings = (
     );
   }
   if (
-    !/environment:\s*Production/.test(content) ||
-    !/ref:\s*\$\{\{\s*github\.event\.workflow_run\.head_sha\s*\}\}/.test(
+    !/environment:\s*Production/u.test(content) ||
+    !/ref:\s*\$\{\{\s*github\.event\.workflow_run\.head_sha\s*\}\}/u.test(
       content
     ) ||
-    !/persist-credentials:\s*false/.test(content)
+    !/persist-credentials:\s*false/u.test(content)
   ) {
     issues.push(
       finding(
@@ -949,13 +951,14 @@ const productionFindings = (
     "BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN",
   ];
   if (
-    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/.test(
+    !/id:\s*doppler\s+uses:\s*dopplerhq\/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534\s+# v2\.0\.0\s+with:\s+doppler-token:\s*\$\{\{\s*secrets\.DOPPLER_TOKEN\s*\}\}/u.test(
       content
     ) ||
     productionDopplerOutputs.some(
       (name) =>
         !new RegExp(
-          `${name}:\\s*\\$\\{\\{\\s*steps\\.doppler\\.outputs\\.${name}\\s*\\}\\}`
+          `${name}:\\s*\\$\\{\\{\\s*steps\\.doppler\\.outputs\\.${name}\\s*\\}\\}`,
+          "u"
         ).test(content)
     ) ||
     content.includes("inject-env-vars")
@@ -1007,8 +1010,8 @@ const productionFindings = (
     );
   }
   if (
-    !/run:\s*bun run production:deploy:internal/.test(content) ||
-    /run:[^\n]*(?:vercel\s+(?:deploy|promote|rollback)|--token)/i.test(content)
+    !/run:\s*bun run production:deploy:internal/u.test(content) ||
+    /run:[^\n]*(?:vercel\s+(?:deploy|promote|rollback)|--token)/iu.test(content)
   ) {
     issues.push(
       finding(
@@ -1048,8 +1051,8 @@ const releaseFindings = (
     );
   }
   if (
-    !/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/.test(content) ||
-    !/github\.ref\s*==\s*['"]refs\/heads\/main['"]/.test(content)
+    !/github\.repository\s*==\s*['"]crcorbett\/bundjil['"]/u.test(content) ||
+    !/github\.ref\s*==\s*['"]refs\/heads\/main['"]/u.test(content)
   ) {
     issues.push(
       finding(
@@ -1063,7 +1066,7 @@ const releaseFindings = (
     );
   }
   if (
-    !/vars\.BUNDJIL_RELEASE_AUTHORITY_EPOCH\s*==\s*['"]hgi-304-v1['"]/.test(
+    !/vars\.BUNDJIL_RELEASE_AUTHORITY_EPOCH\s*==\s*['"]hgi-304-v1['"]/u.test(
       content
     )
   ) {
@@ -1107,7 +1110,7 @@ const releaseFindings = (
       )
     );
   }
-  if (!/persist-credentials:\s*false/.test(content)) {
+  if (!/persist-credentials:\s*false/u.test(content)) {
     issues.push(
       finding(
         "AUTH-RELEASE-CREDENTIALS",
@@ -1119,7 +1122,7 @@ const releaseFindings = (
       )
     );
   }
-  if (/\b(?:npm|pnpm|bun|changeset)\s+publish\b/i.test(content)) {
+  if (/\b(?:npm|pnpm|bun|changeset)\s+publish\b/iu.test(content)) {
     issues.push(
       finding(
         "AUTH-RELEASE-PUBLISH",
@@ -1171,7 +1174,7 @@ const claudeFindings = (
       )
     );
   }
-  if (!/github\.actor\s*==\s*['"]crcorbett['"]/.test(content)) {
+  if (!/github\.actor\s*==\s*['"]crcorbett['"]/u.test(content)) {
     issues.push(
       finding(
         "AUTH-CLAUDE-ACTOR",
@@ -1184,7 +1187,7 @@ const claudeFindings = (
     );
   }
   if (
-    !/startsWith\(github\.event\.comment\.body,\s*['"]@claude['"]\)/.test(
+    !/startsWith\(github\.event\.comment\.body,\s*['"]@claude['"]\)/u.test(
       content
     )
   ) {
@@ -1199,7 +1202,7 @@ const claudeFindings = (
       )
     );
   }
-  if (!/--allowedTools[=:][^\n]*(?:Read|Glob|Grep)/.test(content)) {
+  if (!/--allowedTools[=:][^\n]*(?:Read|Glob|Grep)/u.test(content)) {
     issues.push(
       finding(
         "AUTH-CLAUDE-TOOLS",
@@ -1212,7 +1215,7 @@ const claudeFindings = (
     );
   }
   if (
-    /\b(?:git\s+push|deploy|release|approve|resume|gh\s+pr\s+comment|Bash\s*\()/i.test(
+    /\b(?:git\s+push|deploy|release|approve|resume|gh\s+pr\s+comment|Bash\s*\()/iu.test(
       content
     )
   ) {
@@ -1227,7 +1230,7 @@ const claudeFindings = (
       )
     );
   }
-  if (/pull_request_review|pull_request_target|schedule:/i.test(content)) {
+  if (/pull_request_review|pull_request_target|schedule:/iu.test(content)) {
     issues.push(
       finding(
         "AUTH-CLAUDE-CONVERGENCE",
@@ -1331,7 +1334,7 @@ const authorityFindings = (
       );
     }
     if (
-      /(?:bearer\s+[a-z0-9._-]{12,}|(?:api[_-]?key|token|secret)\s*[:=]\s*[^\s]+)/i.test(
+      /(?:bearer\s+[a-z0-9._-]{12,}|(?:api[_-]?key|token|secret)\s*[:=]\s*[^\s]+)/iu.test(
         text
       )
     ) {
@@ -1347,7 +1350,9 @@ const authorityFindings = (
       );
     }
     if (
-      /tool (?:output|response).*authori[sz]|preflight.*authori[sz]/i.test(text)
+      /tool (?:output|response).*authori[sz]|preflight.*authori[sz]/iu.test(
+        text
+      )
     ) {
       issues.push(
         finding(
@@ -1376,8 +1381,8 @@ const containmentFindings = (
     containment.durationRevocation,
   ].join(" ");
   const unsafeNormalOperation =
-    /normal operation/i.test(joined) &&
-    !/not normal operation|non-normal-operation/i.test(joined);
+    /normal operation/iu.test(joined) &&
+    !/not normal operation|non-normal-operation/iu.test(joined);
   const missingForbidden = containment.forbiddenOperations.length === 0;
   const missingAllowed = containment.allowedOperations.length === 0;
   return unsafeNormalOperation || missingAllowed || missingForbidden

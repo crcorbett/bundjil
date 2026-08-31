@@ -9,7 +9,7 @@ import type { CodexLocalProfileImportFailure } from "./errors.js";
 import { CodexLocalAuthCacheSource } from "./local-cache.js";
 import { CodexLocalProfileImportConfigService } from "./local-import-config.js";
 
-export interface CodexLocalProfileImportServiceShape {
+export interface CodexLocalProfileImportServiceContract {
   readonly importProfile: () => Effect.Effect<
     CodexLocalProfileImportResultType,
     CodexLocalProfileImportFailure
@@ -18,7 +18,7 @@ export interface CodexLocalProfileImportServiceShape {
 
 export class CodexLocalProfileImportService extends Context.Service<
   CodexLocalProfileImportService,
-  CodexLocalProfileImportServiceShape
+  CodexLocalProfileImportServiceContract
 >()("@bundjil/codex/CodexLocalProfileImportService") {}
 
 export const makeCodexLocalProfileImportService = Effect.gen(

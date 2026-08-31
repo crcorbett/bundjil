@@ -31,7 +31,7 @@ import type {
   CodexResponsesStreamSequenceState,
 } from "./stream-events.js";
 
-export interface CodexStreamMapperShape {
+export interface CodexStreamMapperContract {
   readonly toOpenAICompatibleStream: (
     input: CodexResponsesStreamMapInput
   ) => Effect.Effect<
@@ -42,7 +42,7 @@ export interface CodexStreamMapperShape {
 
 export class CodexStreamMapper extends Context.Service<
   CodexStreamMapper,
-  CodexStreamMapperShape
+  CodexStreamMapperContract
 >()("@bundjil/codex/CodexStreamMapper") {}
 
 type MapperState = Readonly<{

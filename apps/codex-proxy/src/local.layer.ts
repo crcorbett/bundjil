@@ -77,7 +77,7 @@ const makeCodexProxyOAuthServiceLocal = (
     )
   );
 
-export const makeCodexProxyOpenAICompatibleProxyLocal = (
+export const buildCodexProxyOpenAICompatibleProxyLocal = (
   directory: CodexProxyLocalProfileStoreDirectory,
   policy: CodexResponsesRequestPolicy,
   internalToken: Parameters<typeof makeOpenAICompatibleProxyLive>[0],

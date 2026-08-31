@@ -108,7 +108,7 @@ const codexResponsesProofLayer = (client: HttpClient.HttpClient) =>
 effectIt.effect(
   "posts Codex Responses requests with bearer auth and safe result shape",
   () =>
-    Effect.gen(function* testPostResponsesRequestShape() {
+    Effect.gen(function* testPostResponsesRequestContract() {
       let capturedRequest:
         | Parameters<typeof HttpClientResponse.fromWeb>[0]
         | undefined;

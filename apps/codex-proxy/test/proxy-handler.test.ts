@@ -56,11 +56,11 @@ import {
   CodexProxyLocalProfileStoreDirectory,
   CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
   makeCodexProxyProfileCipherConfigLayer,
+  decodeCodexProxyConfig,
   loadCodexProxyConfig,
-  makeCodexProxyAppLayer,
-  makeCodexProxyConfig,
-  makeCodexProxyOpenAICompatibleProxyLocal,
-  makeCodexProxyWebHandler,
+  buildCodexProxyAppLayer,
+  buildCodexProxyOpenAICompatibleProxyLocal,
+  createCodexProxyWebHandler,
   CodexProxyReadyLive,
   toCodexProxyVercelRequest,
 } from "../src/index.js";
@@ -90,7 +90,7 @@ const boundaryLogger = (messages: globalThis.Array<unknown>) =>
     messages.push(message);
   });
 
-const testConfig = makeCodexProxyConfig({
+const testConfig = decodeCodexProxyConfig({
   internalToken: "test-internal-token",
   mode: "mock",
   reasoningEffort: "low",
@@ -107,7 +107,7 @@ const testConfig = makeCodexProxyConfig({
   },
 });
 
-const liveTestConfig = makeCodexProxyConfig({
+const liveTestConfig = decodeCodexProxyConfig({
   internalToken: "test-internal-token",
   mode: "live",
   reasoningEffort: "low",
@@ -150,7 +150,7 @@ const normalCipherConfigProvider = ConfigProvider.fromEnv({
 });
 
 const localTestConfig = (directory: string) =>
-  makeCodexProxyConfig({
+  decodeCodexProxyConfig({
     internalToken: "test-internal-token",
     localProfileStoreDirectory: directory,
     mode: "local",
@@ -210,8 +210,8 @@ const makeLocalProfile = (expiresAtEpochMillis: number) =>
 const testWebHandler = Effect.gen(function* makeTestWebHandler() {
   const config = yield* testConfig;
 
-  return makeCodexProxyWebHandler(
-    makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+  return createCodexProxyWebHandler(
+    buildCodexProxyAppLayer(CodexProxyConfigLayer(config))
   );
 });
 
@@ -256,8 +256,8 @@ const liveTestWebHandler = (expiresAtEpochMillis: number) =>
     const config = yield* liveTestConfig;
     const liveProxyLayer = yield* makeLiveProxyLayer(expiresAtEpochMillis);
 
-    return makeCodexProxyWebHandler(
-      makeCodexProxyAppLayer(
+    return createCodexProxyWebHandler(
+      buildCodexProxyAppLayer(
         CodexProxyConfigLayer(config),
         liveProxyLayer.pipe(Layer.orDie)
       )
@@ -332,8 +332,8 @@ const withFailureHandler = <A>(
 ) =>
   Effect.gen(function* makeFailureHandler() {
     const config = yield* liveTestConfig;
-    const webHandler = makeCodexProxyWebHandler(
-      makeCodexProxyAppLayer(
+    const webHandler = createCodexProxyWebHandler(
+      buildCodexProxyAppLayer(
         CodexProxyConfigLayer(config),
         makeFailureProxyLayer(error)
       )
@@ -451,7 +451,7 @@ const withLocalTestHandler = <A>(
     yield* putProfile(profile).pipe(
       Effect.provide(makeLocalEncryptedProfileStore(localProfileStoreDirectory))
     );
-    const localProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal(
+    const localProxyLayer = buildCodexProxyOpenAICompatibleProxyLocal(
       localProfileStoreDirectory,
       { reasoningEffort: config.reasoningEffort },
       config.internalToken,
@@ -480,8 +480,8 @@ const withLocalTestHandler = <A>(
         )
       )
     );
-    const webHandler = makeCodexProxyWebHandler(
-      makeCodexProxyAppLayer(
+    const webHandler = createCodexProxyWebHandler(
+      buildCodexProxyAppLayer(
         CodexProxyConfigLayer(config),
         CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
         () => localProxyLayer
@@ -553,7 +553,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
     "encodes configured high reasoning in the live proxy provider request",
     () =>
       Effect.gen(function* testHighReasoningProviderRequest() {
-        const config = yield* makeCodexProxyConfig({
+        const config = yield* decodeCodexProxyConfig({
           internalToken: "test-internal-token",
           mode: "live",
           reasoningEffort: "high",
@@ -610,8 +610,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           ),
           CodexProxyReadyLive
         );
-        const webHandler = makeCodexProxyWebHandler(
-          makeCodexProxyAppLayer(
+        const webHandler = createCodexProxyWebHandler(
+          buildCodexProxyAppLayer(
             CodexProxyConfigLayer(config),
             proxyLayer.pipe(Layer.orDie)
           )
@@ -814,9 +814,9 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           response.headers.get("x-bundjil-codex-proxy-mode"),
           "mock"
         );
-        assert.match(body, /^data: /);
-        assert.match(body, /Bundjil Codex proxy mock response/);
-        assert.match(body, /data: \[DONE\]/);
+        assert.match(body, /^data: /u);
+        assert.match(body, /Bundjil Codex proxy mock response/u);
+        assert.match(body, /data: \[DONE\]/u);
       })
     )
   );
@@ -950,8 +950,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           ),
           CodexProxyReadyLive
         );
-        const webHandler = makeCodexProxyWebHandler(
-          makeCodexProxyAppLayer(
+        const webHandler = createCodexProxyWebHandler(
+          buildCodexProxyAppLayer(
             CodexProxyConfigLayer(config),
             proxyLayer.pipe(Layer.orDie)
           )
@@ -980,6 +980,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
               const remaining = yield* Effect.promise(async () => {
                 let text = "";
                 while (true) {
+                  // Oxlint's generic loop rule does not model ordered stream reads.
+                  // oxlint-disable-next-line eslint/no-await-in-loop -- Each read depends on the previous reader position.
                   const next = await reader.read();
                   if (next.done) {
                     return text;
@@ -1018,9 +1020,9 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           ),
           CodexProxyReadyLive
         );
-        const webHandler = makeCodexProxyWebHandler(
+        const webHandler = createCodexProxyWebHandler(
           Layer.merge(
-            makeCodexProxyAppLayer(
+            buildCodexProxyAppLayer(
               CodexProxyConfigLayer(config),
               proxyLayer.pipe(Layer.orDie)
             ),
@@ -1083,9 +1085,9 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           ),
           CodexProxyReadyLive
         );
-        const webHandler = makeCodexProxyWebHandler(
+        const webHandler = createCodexProxyWebHandler(
           Layer.merge(
-            makeCodexProxyAppLayer(
+            buildCodexProxyAppLayer(
               CodexProxyConfigLayer(config),
               proxyLayer.pipe(Layer.orDie)
             ),
@@ -1127,8 +1129,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
   it.effect("fails closed when live configuration is unavailable", () =>
     Effect.gen(function* testUnavailableLiveConfiguration() {
       const config = yield* liveTestConfig;
-      const webHandler = makeCodexProxyWebHandler(
-        makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+      const webHandler = createCodexProxyWebHandler(
+        buildCodexProxyAppLayer(CodexProxyConfigLayer(config))
       );
       const response = yield* Effect.acquireRelease(
         Effect.succeed(webHandler),
@@ -1160,8 +1162,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
     () =>
       Effect.gen(function* testUnavailableLiveHealth() {
         const config = yield* liveTestConfig;
-        const webHandler = makeCodexProxyWebHandler(
-          makeCodexProxyAppLayer(CodexProxyConfigLayer(config))
+        const webHandler = createCodexProxyWebHandler(
+          buildCodexProxyAppLayer(CodexProxyConfigLayer(config))
         );
         const response = yield* Effect.acquireUseRelease(
           Effect.succeed(webHandler),
@@ -1202,7 +1204,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           )
         ).pipe(Effect.scoped, Effect.exit);
         const localDefect = yield* Layer.build(
-          makeCodexProxyOpenAICompatibleProxyLocal(
+          buildCodexProxyOpenAICompatibleProxyLocal(
             directory,
             { reasoningEffort: localConfig.reasoningEffort },
             localConfig.internalToken,
@@ -1210,7 +1212,7 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
           )
         ).pipe(Effect.provide(BunServices.layer), Effect.scoped, Effect.exit);
         const localInterruption = yield* Layer.build(
-          makeCodexProxyOpenAICompatibleProxyLocal(
+          buildCodexProxyOpenAICompatibleProxyLocal(
             directory,
             { reasoningEffort: localConfig.reasoningEffort },
             localConfig.internalToken,
@@ -1303,8 +1305,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
             response.headers.get("x-bundjil-codex-proxy-model-invocation"),
             "true"
           );
-          assert.match(body, /Live OK\./);
-          assert.match(body, /data: \[DONE\]/);
+          assert.match(body, /Live OK\./u);
+          assert.match(body, /data: \[DONE\]/u);
           assert.strictEqual(body.includes("live-access-token"), false);
         })
       )
@@ -1351,8 +1353,8 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
               response.headers.get("x-bundjil-codex-proxy-model-invocation"),
               "true"
             );
-            assert.match(body, /Local OK\./);
-            assert.match(body, /data: \[DONE\]/);
+            assert.match(body, /Local OK\./u);
+            assert.match(body, /data: \[DONE\]/u);
             assert.strictEqual(body.includes("live-access-token"), false);
           })
         )

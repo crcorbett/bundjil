@@ -11,7 +11,7 @@ import {
 import { PhotonProjectId, PhotonProjectSecret } from "./schemas.js";
 
 export const PhotonIdentityFingerprint = Schema.String.check(
-  Schema.isPattern(/^[0-9a-f]{64}$/)
+  Schema.isPattern(/^[0-9a-f]{64}$/u)
 ).pipe(Schema.brand("@bundjil/photon/PhotonIdentityFingerprint"));
 export type PhotonIdentityFingerprint = typeof PhotonIdentityFingerprint.Type;
 export type PhotonIdentityFingerprintEncoded =
@@ -47,7 +47,7 @@ export type PhotonCandidateInventoryManifestEncoded =
   typeof PhotonCandidateInventoryManifest.Encoded;
 
 export const PhotonCandidateInventoryObservedAt = Schema.String.check(
-  Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+  Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u)
 ).pipe(Schema.brand("@bundjil/photon/PhotonCandidateInventoryObservedAt"));
 export type PhotonCandidateInventoryObservedAt =
   typeof PhotonCandidateInventoryObservedAt.Type;
@@ -111,7 +111,7 @@ export class PhotonCandidateInventoryError extends Schema.TaggedErrorClass<Photo
   }
 ) {}
 
-export interface PhotonCandidateInventoryShape {
+export interface PhotonCandidateInventoryContract {
   readonly captureCandidateInventory: (
     input: CapturePhotonCandidateInventory
   ) => Effect.Effect<
@@ -122,7 +122,7 @@ export interface PhotonCandidateInventoryShape {
 
 export class PhotonCandidateInventory extends Context.Service<
   PhotonCandidateInventory,
-  PhotonCandidateInventoryShape
+  PhotonCandidateInventoryContract
 >()("@bundjil/photon/PhotonCandidateInventory") {}
 
 const sourceProjectIdConfig = Config.schema(

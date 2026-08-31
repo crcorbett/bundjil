@@ -1,6 +1,6 @@
 import { lstatSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { Clock, Console, Effect, Schema } from "effect";
 
@@ -14,6 +14,8 @@ import type {
   DocumentationFile,
   DocumentationManifest,
 } from "./documentation-policy.js";
+
+const { dirname, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const detailPath = "tmp/docs-policy-report.json";
@@ -102,8 +104,8 @@ const discoverRepositoryPaths = Effect.fn(
 const selectedDocumentationFile = (path: string) =>
   path.endsWith(".md") ||
   path === "package.json" ||
-  /^(apps|packages)\/[^/]+\/package\.json$/.test(path) ||
-  /^docs\/product-specs\/.+\.tasks\.json$/.test(path) ||
+  /^(?:apps|packages)\/[^/]+\/package\.json$/u.test(path) ||
+  /^docs\/product-specs\/.+\.tasks\.json$/u.test(path) ||
   path ===
     "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json" ||
   path === "apps/agent/agent/instructions.md" ||

@@ -44,16 +44,21 @@ export const makeCodexOAuthRefreshClient = Effect.gen(
             : yield* decodeCodexAccountMetadata(response.id_token);
         const updatedAtEpochMillis = yield* Clock.currentTimeMillis;
 
-        return yield* CodexOAuthTokenRefreshResult.makeEffect({
+        const requiredResult = {
           subject: input.subject,
           accessToken: response.access_token,
-          ...(response.refresh_token === undefined
-            ? {}
-            : { refreshToken: response.refresh_token }),
-          ...(account === undefined ? {} : { accountId: account.accountId }),
           expiresAtEpochMillis: expiry.expiresAtEpochMillis,
           updatedAtEpochMillis,
-        }).pipe(
+        };
+        const refreshResult =
+          response.refresh_token === undefined
+            ? requiredResult
+            : { ...requiredResult, refreshToken: response.refresh_token };
+        const result =
+          account === undefined
+            ? refreshResult
+            : { ...refreshResult, accountId: account.accountId };
+        return yield* CodexOAuthTokenRefreshResult.makeEffect(result).pipe(
           Effect.mapError(
             () =>
               new CodexSubscriptionAuthError({

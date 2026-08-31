@@ -635,7 +635,7 @@ describe("HGI-304 authority policy", () => {
       "AUTH-DRIFT-RUN-IDENTITY",
       (content: string) =>
         content.replace(
-          /^\s*BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:.*$/m,
+          /^\s*BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY:.*$/mu,
           ""
         ),
     ],
@@ -671,7 +671,7 @@ describe("HGI-304 authority policy", () => {
       "AUTH-DRIFT-MUTATION",
       (content: string) =>
         content.replace(
-          /^\s*\| gzip --decompress \\\n\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"$/m,
+          /^\s*\| gzip --decompress \\\n\s*> "\$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"$/mu,
           ""
         ),
     ],
@@ -680,7 +680,7 @@ describe("HGI-304 authority policy", () => {
       "AUTH-DRIFT-MUTATION",
       (content: string) =>
         content.replace(
-          /^\s*test -s "\$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"$/m,
+          /^\s*test -s "\$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"$/mu,
           ""
         ),
     ],
@@ -743,7 +743,7 @@ describe("HGI-304 authority policy", () => {
       "Doppler Production output removed",
       "AUTH-PRODUCTION-DOPPLER",
       (content: string) =>
-        content.replace(/^\s*BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:.*$/m, ""),
+        content.replace(/^\s*BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:.*$/mu, ""),
     ],
     [
       "callback alias binding removed",

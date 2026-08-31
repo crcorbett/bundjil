@@ -2,7 +2,7 @@ import { Effect, Layer } from "effect";
 
 Date.now();
 
-export const asyncService = async () => fetch("https://example.invalid");
+export const asyncService = async () => await fetch("https://example.invalid");
 
 export const bareAttempt = Effect.tryPromise(() =>
   fetch("https://example.invalid")

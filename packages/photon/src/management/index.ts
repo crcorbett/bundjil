@@ -50,7 +50,7 @@ export {
   PhotonManagementMemoryInventory,
 } from "./memory.layer.js";
 export type {
-  PhotonManagementMemoryControlShape,
+  PhotonManagementMemoryControlContract,
   PhotonManagementMemoryInventory as PhotonManagementMemoryInventoryType,
   PhotonManagementMemoryInventoryEncoded,
 } from "./memory.layer.js";
@@ -64,12 +64,12 @@ export {
   PhotonWebhooks,
 } from "./services.js";
 export type {
-  PhotonBillingShape,
-  PhotonLinesShape,
-  PhotonPlatformsShape,
-  PhotonProjectsShape,
-  PhotonSharedUsersShape,
-  PhotonWebhooksShape,
+  PhotonBillingContract,
+  PhotonLinesContract,
+  PhotonPlatformsContract,
+  PhotonProjectsContract,
+  PhotonSharedUsersContract,
+  PhotonWebhooksContract,
 } from "./services.js";
 export {
   CapturePhotonCandidateInventory,
@@ -99,7 +99,7 @@ export type {
   PhotonCandidateInventoryObservedAtEncoded,
   PhotonCandidateInventoryOperationEncoded,
   PhotonCandidateInventoryReceiptEncoded,
-  PhotonCandidateInventoryShape,
+  PhotonCandidateInventoryContract,
   PhotonCandidateObservationEncoded,
   PhotonIdentityFingerprintEncoded,
 } from "../candidate-inventory.js";

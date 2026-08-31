@@ -49,7 +49,7 @@ import type {
   CodexOAuthAccountMetadataType,
   CodexOAuthAuthorizationCallbackType,
   CodexOAuthAuthorizationUrlType,
-  CodexOAuthHttpClientShape,
+  CodexOAuthHttpClientContract,
   CodexOAuthProfileType,
   CodexOAuthSubjectType,
 } from "../src/index.js";
@@ -78,6 +78,29 @@ const fixtureSubject = Schema.decodeUnknownEffect(CodexOAuthSubject)({
 });
 
 const accessTokenFixture = Schema.decodeUnknownSync(CodexOAuthAccessToken);
+
+const providerErrorLayer = (body: string, status = 400) => {
+  const client = HttpClient.make((request) =>
+    Effect.succeed(
+      HttpClientResponse.fromWeb(
+        request,
+        new Response(body, {
+          status,
+          headers: { "content-type": "application/json" },
+        })
+      )
+    )
+  );
+
+  return CodexOAuthHttpClientLive.pipe(
+    Layer.provideMerge(
+      Layer.merge(
+        Layer.succeed(HttpClient.HttpClient, client),
+        CodexSubscriptionAuthProtocolConfigLive
+      )
+    )
+  );
+};
 
 it.effect(
   "constructs platform browser commands without spawning a process",
@@ -184,7 +207,7 @@ const makeLoginLayer = (
     readonly browser?: (
       url: CodexOAuthAuthorizationUrlType
     ) => Effect.Effect<void, CodexSubscriptionAuthError>;
-    readonly exchangeAuthorizationCode?: CodexOAuthHttpClientShape["exchangeAuthorizationCode"];
+    readonly exchangeAuthorizationCode?: CodexOAuthHttpClientContract["exchangeAuthorizationCode"];
     readonly onAcquire?: Effect.Effect<void>;
     readonly onRelease?: Effect.Effect<void>;
   } = {}
@@ -201,18 +224,18 @@ const makeLoginLayer = (
           "http://localhost:1455/auth/callback"
         ),
       });
+    const callbackMemory =
+      options.onAcquire === undefined
+        ? { callback }
+        : { callback, onAcquire: options.onAcquire };
+    const callbackMemoryWithRelease =
+      options.onRelease === undefined
+        ? callbackMemory
+        : { ...callbackMemory, onRelease: options.onRelease };
     const dependencies = Layer.mergeAll(
       CodexOAuthMemory(options.profiles ?? []),
       CodexSubscriptionAuthProtocolConfigLive,
-      CodexLoopbackCallbackMemory({
-        callback,
-        ...(options.onAcquire === undefined
-          ? {}
-          : { onAcquire: options.onAcquire }),
-        ...(options.onRelease === undefined
-          ? {}
-          : { onRelease: options.onRelease }),
-      }),
+      CodexLoopbackCallbackMemory(callbackMemoryWithRelease),
       CodexBrowserLauncherMemory(options.browser),
       CodexOAuthHttpClientMock({
         exchangeAuthorizationCode:
@@ -531,28 +554,6 @@ it.effect(
         error: CodexOAuthProviderErrorCode.make("invalid_grant"),
         error_description: "provider-secret-description",
       });
-      const makeErrorLayer = (body: string, status = 400) => {
-        const client = HttpClient.make((request) =>
-          Effect.succeed(
-            HttpClientResponse.fromWeb(
-              request,
-              new Response(body, {
-                status,
-                headers: { "content-type": "application/json" },
-              })
-            )
-          )
-        );
-
-        return CodexOAuthHttpClientLive.pipe(
-          Layer.provideMerge(
-            Layer.merge(
-              Layer.succeed(HttpClient.HttpClient, client),
-              CodexSubscriptionAuthProtocolConfigLive
-            )
-          )
-        );
-      };
       const exchangeError = yield* Effect.gen(function* rejectExchange() {
         const client = yield* CodexOAuthHttpClient;
 
@@ -565,21 +566,21 @@ it.effect(
             ),
           })
           .pipe(Effect.flip);
-      }).pipe(Effect.provide(makeErrorLayer(validProviderError)));
+      }).pipe(Effect.provide(providerErrorLayer(validProviderError)));
       const refreshError = yield* Effect.gen(function* rejectRefresh() {
         const client = yield* CodexOAuthHttpClient;
 
         return yield* client
           .refresh({ refreshToken: Redacted.make("refresh-secret") })
           .pipe(Effect.flip);
-      }).pipe(Effect.provide(makeErrorLayer("not-json")));
+      }).pipe(Effect.provide(providerErrorLayer("not-json")));
       const unavailableError = yield* Effect.gen(function* rejectUnavailable() {
         const client = yield* CodexOAuthHttpClient;
 
         return yield* client
           .refresh({ refreshToken: Redacted.make("refresh-secret") })
           .pipe(Effect.flip);
-      }).pipe(Effect.provide(makeErrorLayer("not-json", 503)));
+      }).pipe(Effect.provide(providerErrorLayer("not-json", 503)));
 
       assert.strictEqual(exchangeError.reason, "providerRejected");
       assert.strictEqual(refreshError.reason, "tokenResponseInvalid");

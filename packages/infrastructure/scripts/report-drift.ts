@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { dirname } from "node:path";
+import nodePath from "node:path";
 /* oxlint-disable max-classes-per-file -- Native Alchemy failures and operator command failures are distinct local boundaries. */
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- The pinned Alchemy Stack and Sync APIs expose upstream any/unknown channels.
 /** @effect-diagnostics anyUnknownInErrorContext:off, missingEffectContext:off */
@@ -31,7 +31,7 @@ import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
-import { makeStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
+import { buildStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import {
   buildInfrastructureDriftReceipt,
@@ -58,6 +58,8 @@ import type {
 import { InfrastructureOwnershipState } from "../src/schemas.js";
 import { SecretOwnership } from "../src/secret-reference.js";
 import { VercelEnvironmentVariableUpdatedAt } from "../src/vercel/index.js";
+
+const { dirname } = nodePath;
 
 declare const process: {
   exitCode: number | undefined;
@@ -420,7 +422,7 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
 
 const toPlanObservation = Effect.fn(
   "InfrastructureDesiredPlanObservation.decode"
-)(function (
+)((
   manifest: AdoptionManifest,
   stage: typeof InfrastructureStage.Type,
   fqn: string,
@@ -428,7 +430,7 @@ const toPlanObservation = Effect.fn(
   resourceType: string,
   action: "create" | "update" | "replace" | "delete",
   removalPolicy: "destroy" | "retain" | undefined
-) {
+) => {
   const manifestResource = manifest.resources.find(
     (candidate) => candidate.logicalId === logicalId
   );
@@ -473,7 +475,7 @@ const runNativeSync = Effect.fn("InfrastructureDriftNativeSync.run")(function* (
   stage: typeof InfrastructureStage.Type
 ) {
   return yield* AlchemyStack.evalStack(
-    makeStableInfrastructureDriftStack(manifest),
+    buildStableInfrastructureDriftStack(manifest),
     (stack) =>
       Effect.gen(function* () {
         const desiredPlan = yield* AlchemyPlan.make(stack).pipe(

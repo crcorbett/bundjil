@@ -31,7 +31,7 @@ import {
 import { CodexSubscriptionAuthError } from "./errors.js";
 import { CodexSubscriptionAuthProtocolConfigService } from "./protocol.js";
 
-export interface CodexOAuthHttpClientShape {
+export interface CodexOAuthHttpClientContract {
   readonly exchangeAuthorizationCode: (
     input: CodexOAuthCodeExchangeInput
   ) => Effect.Effect<CodexOAuthTokenResponseType, CodexSubscriptionAuthError>;
@@ -42,7 +42,7 @@ export interface CodexOAuthHttpClientShape {
 
 export class CodexOAuthHttpClient extends Context.Service<
   CodexOAuthHttpClient,
-  CodexOAuthHttpClientShape
+  CodexOAuthHttpClientContract
 >()("@bundjil/codex/CodexOAuthHttpClient") {}
 
 const RefreshRequest = Schema.Struct({
@@ -108,13 +108,22 @@ const decodeProviderRejection = Effect.fn(
     Match.orElse((value) => value.code)
   );
 
-  return yield* new CodexSubscriptionAuthError({
-    operation,
-    reason: "providerRejected",
-    message: "The Codex OAuth token endpoint rejected the request.",
-    status: response.status,
-    ...(providerCode === undefined ? {} : { providerCode }),
-  });
+  return yield* new CodexSubscriptionAuthError(
+    providerCode === undefined
+      ? {
+          operation,
+          reason: "providerRejected",
+          message: "The Codex OAuth token endpoint rejected the request.",
+          status: response.status,
+        }
+      : {
+          operation,
+          reason: "providerRejected",
+          message: "The Codex OAuth token endpoint rejected the request.",
+          status: response.status,
+          providerCode,
+        }
+  );
 });
 
 export const makeCodexOAuthHttpClient = Effect.gen(
@@ -207,8 +216,8 @@ export const CodexOAuthHttpClientLive = Layer.effect(
 );
 
 export interface CodexOAuthHttpClientMockOptions {
-  readonly exchangeAuthorizationCode?: CodexOAuthHttpClientShape["exchangeAuthorizationCode"];
-  readonly refresh?: CodexOAuthHttpClientShape["refresh"];
+  readonly exchangeAuthorizationCode?: CodexOAuthHttpClientContract["exchangeAuthorizationCode"];
+  readonly refresh?: CodexOAuthHttpClientContract["refresh"];
 }
 
 const unseededMock = (

@@ -56,7 +56,7 @@ export const makeStableInfrastructureStack = Effect.fn(
   makeStableInfrastructureStackWith(manifest, layerLiveStableAdoptionProviders)
 );
 
-export const makeStableInfrastructureDriftStack = Effect.fn(
+export const buildStableInfrastructureDriftStack = Effect.fn(
   "StableInfrastructureDriftStack.make"
 )((manifest: AdoptionManifest) =>
   makeStableInfrastructureStackWith(

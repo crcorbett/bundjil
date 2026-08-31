@@ -1,5 +1,5 @@
 /* oxlint-disable promise/prefer-await-to-callbacks -- Effect callbacks preserve the typed error channel without Promise escape. */
-import { isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { Config, Effect, FileSystem, Schema } from "effect";
@@ -13,6 +13,8 @@ import {
   VercelProjectId,
   VercelTeamId,
 } from "./schemas.js";
+
+const { isAbsolute } = nodePath;
 
 export const VercelPreviewConfigurationPhase = Schema.Literals([
   "desired",
@@ -28,7 +30,7 @@ export const VercelPreviewConfigurationAuthorityPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined

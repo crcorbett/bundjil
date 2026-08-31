@@ -18,9 +18,9 @@ import { CodexProxyRouteError } from "./errors.js";
 import { CodexProxyOpenAICompatibleProxyLiveOrUnavailable } from "./live.layer.js";
 import {
   CodexProxyOpenAICompatibleProxyLocalUnavailableLive,
-  makeCodexProxyOpenAICompatibleProxyLocal,
+  buildCodexProxyOpenAICompatibleProxyLocal,
 } from "./local.layer.js";
-import { makeCodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
+import { buildCodexProxyOpenAICompatibleProxyMockLive } from "./mock.layer.js";
 import { CodexProxyReadiness } from "./readiness.service.js";
 import {
   CodexProxyErrorResponse,
@@ -163,16 +163,25 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
                 })
             )
           );
-    const proxyInput = yield* OpenAICompatibleProxyInput.makeEffect({
-      ...(authorization === undefined ? {} : { authorization }),
-      completion: {
-        ...(config.accountId === undefined
-          ? {}
-          : { accountId: config.accountId }),
-        request: completion,
-        subject: config.subject,
-      },
-    }).pipe(
+    const completionInput =
+      config.accountId === undefined
+        ? {
+            request: completion,
+            subject: config.subject,
+          }
+        : {
+            accountId: config.accountId,
+            request: completion,
+            subject: config.subject,
+          };
+    const proxyInput = yield* OpenAICompatibleProxyInput.makeEffect(
+      authorization === undefined
+        ? { completion: completionInput }
+        : {
+            authorization,
+            completion: completionInput,
+          }
+    ).pipe(
       Effect.mapError(
         () =>
           new CodexProxyRouteError({
@@ -251,7 +260,7 @@ export const CodexProxyRoutesLive = Layer.effectDiscard(
 
 const makeCodexProxyModeLayer = (
   liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
-  makeLocalProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal
+  makeLocalProxyLayer = buildCodexProxyOpenAICompatibleProxyLocal
 ) =>
   Layer.unwrap(
     Effect.gen(function* makeCodexProxyModeLayer() {
@@ -259,7 +268,7 @@ const makeCodexProxyModeLayer = (
 
       return Match.value(config.mode).pipe(
         Match.when("mock", () =>
-          makeCodexProxyOpenAICompatibleProxyMockLive(config.internalToken)
+          buildCodexProxyOpenAICompatibleProxyMockLive(config.internalToken)
         ),
         Match.when("local", () => {
           if (config.localProfileStoreDirectory === undefined) {
@@ -280,21 +289,21 @@ const makeCodexProxyModeLayer = (
     })
   );
 
-export const makeCodexProxyAppLayer = (
+export const buildCodexProxyAppLayer = (
   configLayer = CodexProxyConfigLive,
   liveProxyLayer = CodexProxyOpenAICompatibleProxyLiveOrUnavailable,
-  makeLocalProxyLayer = makeCodexProxyOpenAICompatibleProxyLocal
+  makeLocalProxyLayer = buildCodexProxyOpenAICompatibleProxyLocal
 ) =>
   Layer.mergeAll(
     makeCodexProxyModeLayer(liveProxyLayer, makeLocalProxyLayer),
     CodexProxyRoutesLive
   ).pipe(Layer.provideMerge(configLayer));
 
-export const CodexProxyAppLive = makeCodexProxyAppLayer();
+export const CodexProxyAppLive = buildCodexProxyAppLayer();
 
-export const makeCodexProxyWebHandler = (appLayer = CodexProxyAppLive) =>
+export const createCodexProxyWebHandler = (appLayer = CodexProxyAppLive) =>
   HttpRouter.toWebHandler(appLayer, {
     disableLogger: true,
   });
 
-export const codexProxyWebHandler = makeCodexProxyWebHandler();
+export const codexProxyWebHandler = createCodexProxyWebHandler();

@@ -5,7 +5,7 @@ export default defineConfig({
     conditions: ["@bundjil/source"],
   },
   ssr: {
-    noExternal: [/^@bundjil\//],
+    noExternal: [/^@bundjil\//u],
   },
   test: {
     exclude: ["**/node_modules/**", "**/dist/**"],

@@ -18,7 +18,7 @@ export type InfrastructureReceiptStatusEncoded =
   typeof InfrastructureReceiptStatus.Encoded;
 
 export const InfrastructureArtifactDigest = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand("@bundjil/infrastructure/InfrastructureArtifactDigest")
 );
 export type InfrastructureArtifactDigest =
@@ -57,7 +57,7 @@ export const InfrastructureBoundedReceipt = Schema.Struct({
   rollbackOrRecovery: InfrastructureReceiptText,
   observedAt: Schema.String.pipe(
     Schema.check(
-      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/)
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u)
     )
   ),
 });

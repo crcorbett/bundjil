@@ -13,13 +13,13 @@ import { CodexOAuthAuthorizationUrl } from "./credentials.js";
 import type { CodexOAuthRedirectUri } from "./credentials.js";
 import { CodexSubscriptionAuthError } from "./errors.js";
 
-export interface CodexSubscriptionAuthProtocolConfigShape {
+export interface CodexSubscriptionAuthProtocolConfigContract {
   readonly config: CodexSubscriptionAuthProtocolConfigType;
 }
 
 export class CodexSubscriptionAuthProtocolConfigService extends Context.Service<
   CodexSubscriptionAuthProtocolConfigService,
-  CodexSubscriptionAuthProtocolConfigShape
+  CodexSubscriptionAuthProtocolConfigContract
 >()("@bundjil/codex/CodexSubscriptionAuthProtocolConfigService") {}
 
 const officialProtocolConfig = Schema.decodeUnknownEffect(

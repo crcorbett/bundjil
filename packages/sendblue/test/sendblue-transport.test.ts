@@ -68,6 +68,19 @@ const layer = (client: HttpClient.HttpClient, config: SendblueConfig) =>
     Layer.provide(Layer.succeed(HttpClient.HttpClient, client))
   );
 
+const providerResponseClient = (status: number, body: string) =>
+  HttpClient.make((request) =>
+    Effect.succeed(
+      HttpClientResponse.fromWeb(
+        request,
+        new Response(body, {
+          status,
+          headers: { "content-type": "application/json" },
+        })
+      )
+    )
+  );
+
 const unusedClient = HttpClient.make((request) =>
   Effect.fail(
     new HttpClientError.HttpClientError({
@@ -351,18 +364,6 @@ it.effect(
       )({
         message: "private provider detail",
       });
-      const client = (status: number, body: string) =>
-        HttpClient.make((request) =>
-          Effect.succeed(
-            HttpClientResponse.fromWeb(
-              request,
-              new Response(body, {
-                status,
-                headers: { "content-type": "application/json" },
-              })
-            )
-          )
-        );
       const send = (http: HttpClient.HttpClient) =>
         Effect.gen(function* sendRejectedMessage() {
           const transport = yield* ChannelTransport;
@@ -371,8 +372,8 @@ it.effect(
             text: fixture.text,
           });
         }).pipe(Effect.provide(layer(http, fixture.config)), Effect.flip);
-      const rejected = yield* send(client(400, errorBody));
-      const malformed = yield* send(client(200, errorBody));
+      const rejected = yield* send(providerResponseClient(400, errorBody));
+      const malformed = yield* send(providerResponseClient(200, errorBody));
 
       assert.strictEqual(
         Schema.is(ChannelProviderRejectedError)(rejected),

@@ -1,13 +1,17 @@
 import { ManagedRuntime } from "effect";
 
-import { makeChannelEveChannel } from "../lib/channel/eve.js";
+import { createChannelEveChannel } from "../lib/channel/eve.js";
 import { SendblueChannelRuntimeLive } from "../lib/channel/sendblue.runtime.js";
 
 const runtime = ManagedRuntime.make(SendblueChannelRuntimeLive);
 
 export const makeSendblueEveChannel = <E>(
-  channelRuntime: Parameters<typeof makeChannelEveChannel<E>>[0]
+  channelRuntime: Parameters<typeof createChannelEveChannel<E>>[0]
 ) =>
-  makeChannelEveChannel(channelRuntime, "/eve/v1/sendblue/webhook", "disabled");
+  createChannelEveChannel(
+    channelRuntime,
+    "/eve/v1/sendblue/webhook",
+    "disabled"
+  );
 
 export default makeSendblueEveChannel(runtime);

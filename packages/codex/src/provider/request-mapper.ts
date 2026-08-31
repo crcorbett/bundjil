@@ -11,7 +11,7 @@ import type {
 import { CodexResponsesRequestError } from "./errors.js";
 import { CodexResponsesRequestPolicyService } from "./request-policy.js";
 
-export interface CodexRequestMapperShape {
+export interface CodexRequestMapperContract {
   readonly toCodexResponses: (
     input: OpenAICompatibleChatCompletionRequest
   ) => Effect.Effect<CodexResponsesRequestType, CodexResponsesRequestError>;
@@ -19,7 +19,7 @@ export interface CodexRequestMapperShape {
 
 export class CodexRequestMapper extends Context.Service<
   CodexRequestMapper,
-  CodexRequestMapperShape
+  CodexRequestMapperContract
 >()("@bundjil/codex/CodexRequestMapper") {}
 
 export const makeCodexRequestMapper = Effect.gen(
@@ -82,34 +82,54 @@ export const makeCodexRequestMapper = Effect.gen(
 
           const instructions = instructionParts.join("\n");
           const tools: CodexResponsesFunctionToolType[] | undefined =
-            input.tools?.map((tool) => ({
-              type: "function",
-              name: tool.function.name,
-              ...(tool.function.description === undefined
-                ? {}
-                : { description: tool.function.description }),
-              parameters: tool.function.parameters,
-              ...(tool.function.strict === undefined
-                ? {}
-                : { strict: tool.function.strict }),
-            }));
+            input.tools?.map((tool) => {
+              const requiredTool = {
+                type: "function",
+                name: tool.function.name,
+                parameters: tool.function.parameters,
+              } satisfies CodexResponsesFunctionToolType;
+              const describedTool =
+                tool.function.description === undefined
+                  ? requiredTool
+                  : {
+                      ...requiredTool,
+                      description: tool.function.description,
+                    };
+              return tool.function.strict === undefined
+                ? describedTool
+                : { ...describedTool, strict: tool.function.strict };
+            });
           const toolChoice: CodexResponsesToolChoiceType | undefined =
             typeof input.tool_choice === "object"
               ? { type: "function", name: input.tool_choice.function.name }
               : input.tool_choice;
 
-          return yield* Schema.decodeUnknownEffect(CodexResponsesRequest)({
+          const requiredRequest = {
             model: input.model,
             input: responsesInput,
             store: false,
-            ...(instructions.length === 0 ? {} : { instructions }),
             stream: input.stream ?? true,
             reasoning: { effort: requestPolicy.policy.reasoningEffort },
-            ...(tools === undefined
-              ? {}
-              : { tools, parallel_tool_calls: false }),
-            ...(toolChoice === undefined ? {} : { tool_choice: toolChoice }),
-          }).pipe(
+          };
+          const instructedRequest =
+            instructions.length === 0
+              ? requiredRequest
+              : { ...requiredRequest, instructions };
+          const tooledRequest =
+            tools === undefined
+              ? instructedRequest
+              : {
+                  ...instructedRequest,
+                  tools,
+                  parallel_tool_calls: false,
+                };
+          const request =
+            toolChoice === undefined
+              ? tooledRequest
+              : { ...tooledRequest, tool_choice: toolChoice };
+          return yield* Schema.decodeUnknownEffect(CodexResponsesRequest)(
+            request
+          ).pipe(
             Effect.mapError(
               () =>
                 new CodexResponsesRequestError({

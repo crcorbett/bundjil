@@ -1,14 +1,14 @@
 import { ManagedRuntime } from "effect";
 
-import { makeChannelEveChannel } from "../lib/channel/eve.js";
+import { createChannelEveChannel } from "../lib/channel/eve.js";
 import { PhotonChannelRuntimeLive } from "../lib/channel/photon.runtime.js";
 
 const runtime = ManagedRuntime.make(PhotonChannelRuntimeLive);
 
 export const makePhotonEveChannel = <E>(
-  channelRuntime: Parameters<typeof makeChannelEveChannel<E>>[0]
+  channelRuntime: Parameters<typeof createChannelEveChannel<E>>[0]
 ) =>
-  makeChannelEveChannel(
+  createChannelEveChannel(
     channelRuntime,
     "/eve/v1/photon/webhook",
     "provider-retry"

@@ -1,7 +1,9 @@
-import { posix } from "node:path";
+import path from "node:path";
 
 import { Result, Schema } from "effect";
 import { parse as parseYamlDocument } from "yaml";
+
+const { posix } = path;
 
 export interface SkillFile {
   readonly content: string;
@@ -424,7 +426,7 @@ const finding = (
 
 const containsSemanticTerm = (content: string, term: string) =>
   new RegExp(
-    `(?:^|[^a-z0-9])${term.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:$|[^a-z0-9])`,
+    `(?:^|[^a-z0-9])${term.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&")}(?:$|[^a-z0-9])`,
     "u"
   ).test(content);
 
@@ -512,7 +514,7 @@ const documentationClaimFindings = (
             rule.id,
             path,
             rule.repairHint,
-            segment.replaceAll(/\s+/g, " ").trim()
+            segment.replaceAll(/\s+/gu, " ").trim()
           ),
         ];
       });
@@ -713,7 +715,7 @@ const skillUiMetadataFinding = (
 const metadataFindings = (snapshot: SkillSnapshot): readonly SkillFinding[] => {
   const files = fileMap(snapshot);
   const skillIssues = snapshot.files
-    .filter((file) => /^\.agents\/skills\/[^/]+\/SKILL\.md$/.test(file.path))
+    .filter((file) => /^\.agents\/skills\/[^/]+\/SKILL\.md$/u.test(file.path))
     .flatMap((file) => {
       const issue = skillFileMetadataFinding(file);
       return issue ? [issue] : [];
@@ -728,19 +730,19 @@ const metadataFindings = (snapshot: SkillSnapshot): readonly SkillFinding[] => {
 const linkFindings = (snapshot: SkillSnapshot): readonly SkillFinding[] => {
   const paths = new Set(snapshot.repositoryPaths);
   return snapshot.files
-    .filter((file) => /^\.agents\/skills\/.+\.(?:md|mdx)$/.test(file.path))
+    .filter((file) => /^\.agents\/skills\/.+\.(?:md|mdx)$/u.test(file.path))
     .flatMap((file) => {
       const issues: SkillFinding[] = [];
       for (const match of file.content
-        .replaceAll(/```[\s\S]*?```/g, "")
-        .matchAll(/(?<!!)\[[^\]]*\]\(([^)]+)\)/g)) {
+        .replaceAll(/```[\s\S]*?```/gu, "")
+        .matchAll(/(?<!!)\[[^\]]*\]\((?<target>[^)]+)\)/gu)) {
         const raw = match[1]?.trim() ?? "";
-        const target = raw.split(/[?#]/)[0] ?? "";
+        const target = raw.split(/[?#]/u)[0] ?? "";
         if (
           !target ||
           target.startsWith("#") ||
           target.startsWith("/") ||
-          /^[a-z]+:/i.test(target) ||
+          /^[a-z]+:/iu.test(target) ||
           target.includes("<")
         ) {
           continue;
@@ -751,7 +753,7 @@ const linkFindings = (snapshot: SkillSnapshot): readonly SkillFinding[] => {
         const exists =
           paths.has(resolved) ||
           snapshot.repositoryPaths.some((path) =>
-            path.startsWith(`${resolved.replace(/\/$/, "")}/`)
+            path.startsWith(`${resolved.replace(/\/$/u, "")}/`)
           );
         if (!exists) {
           issues.push(
@@ -776,11 +778,13 @@ const executableAndPortabilityFindings = (
   const files = fileMap(snapshot);
   const issues: SkillFinding[] = [];
   const examples = snapshot.files
-    .filter((file) => /^\.agents\/skills\/[^/]+\/SKILL\.md$/.test(file.path))
+    .filter((file) => /^\.agents\/skills\/[^/]+\/SKILL\.md$/u.test(file.path))
     .flatMap((file) =>
-      [...file.content.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)].map(
-        (match) => ({ content: match[1] ?? "", path: file.path })
-      )
+      [
+        ...file.content.matchAll(
+          /```(?:ts|typescript)\n(?<content>[\s\S]*?)```/gu
+        ),
+      ].map((match) => ({ content: match[1] ?? "", path: file.path }))
     );
   const forbidden: readonly (readonly [string, RegExp])[] = [
     ["generic SDK callback field", /\buse\s*:\s*</u],
@@ -812,9 +816,9 @@ const executableAndPortabilityFindings = (
     }
   }
   for (const file of snapshot.files.filter((candidate) =>
-    /^\.agents\/skills\/.+\.(?:md|mdx|ya?ml)$/.test(candidate.path)
+    /^\.agents\/skills\/.+\.(?:md|mdx|ya?ml)$/u.test(candidate.path)
   )) {
-    const matches = file.content.match(/\/Users\/[^/\s]+\//g) ?? [];
+    const matches = file.content.match(/\/Users\/[^/\s]+\//gu) ?? [];
     for (const match of matches) {
       issues.push(
         finding(

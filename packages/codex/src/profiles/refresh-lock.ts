@@ -7,7 +7,7 @@ import type {
 } from "./contracts.js";
 import type { CodexOAuthRefreshLockFailure } from "./errors.js";
 
-export interface CodexOAuthRefreshLockShape {
+export interface CodexOAuthRefreshLockContract {
   readonly acquire: (
     input: CodexOAuthRefreshLockAcquireInputType
   ) => Effect.Effect<
@@ -21,7 +21,7 @@ export interface CodexOAuthRefreshLockShape {
 
 export class CodexOAuthRefreshLock extends Context.Service<
   CodexOAuthRefreshLock,
-  CodexOAuthRefreshLockShape
+  CodexOAuthRefreshLockContract
 >()("@bundjil/codex/CodexOAuthRefreshLock") {}
 
 export const defaultCodexOAuthRefreshLockTtlMillis =

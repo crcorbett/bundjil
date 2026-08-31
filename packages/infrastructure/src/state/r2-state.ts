@@ -10,21 +10,21 @@ import { Config, Effect, Layer, Redacted, Schema } from "effect";
 import type { HttpClient } from "effect/unstable/http/HttpClient";
 
 export const AlchemyR2AccountId = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{32}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{32}$/u)),
   Schema.brand("@bundjil/infrastructure/state/AlchemyR2AccountId")
 );
 export type AlchemyR2AccountId = typeof AlchemyR2AccountId.Type;
 export type AlchemyR2AccountIdEncoded = typeof AlchemyR2AccountId.Encoded;
 
 export const AlchemyR2BucketName = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-z0-9](?:[a-z0-9.-]{1,61}[a-z0-9])$/)),
+  Schema.check(Schema.isPattern(/^[a-z0-9](?:[a-z0-9.-]{1,61}[a-z0-9])$/u)),
   Schema.brand("@bundjil/infrastructure/state/AlchemyR2BucketName")
 );
 export type AlchemyR2BucketName = typeof AlchemyR2BucketName.Type;
 export type AlchemyR2BucketNameEncoded = typeof AlchemyR2BucketName.Encoded;
 
 export const AlchemyR2StatePrefix = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-z0-9][a-z0-9/-]*[a-z0-9]$/)),
+  Schema.check(Schema.isPattern(/^[a-z0-9][a-z0-9/-]*[a-z0-9]$/u)),
   Schema.brand("@bundjil/infrastructure/state/AlchemyR2StatePrefix")
 );
 export type AlchemyR2StatePrefix = typeof AlchemyR2StatePrefix.Type;

@@ -3,7 +3,7 @@ import { Array, Effect, HashSet, Redacted, Schema, pipe } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import type { UpstashPersistenceClient } from "../src/upstash-client.internal.js";
-import { makeUpstashPersistenceLayer } from "../src/upstash-layer.internal.js";
+import { buildUpstashPersistenceLayer } from "../src/upstash-layer.internal.js";
 import { UpstashPersistenceKeyPrefix } from "../src/upstash.layer.js";
 
 const options = {
@@ -13,7 +13,7 @@ const options = {
 };
 
 const layerFor = (client: UpstashPersistenceClient) =>
-  makeUpstashPersistenceLayer(options, () => client);
+  buildUpstashPersistenceLayer(options, () => client);
 
 it.effect(
   "prefixes native get set and remove and converts null to undefined",
@@ -81,7 +81,7 @@ it.effect(
       ]);
     }).pipe(
       Effect.provide(
-        makeUpstashPersistenceLayer(options, () => {
+        buildUpstashPersistenceLayer(options, () => {
           allocations += 1;
           return client;
         })

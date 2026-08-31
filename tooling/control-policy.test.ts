@@ -20,7 +20,7 @@ import {
 const root = new URL("../", import.meta.url);
 const read = (path: string) => readFile(new URL(path, root), "utf-8");
 const decode = async <A, I>(path: string, schema: Schema.Codec<A, I>) =>
-  Effect.runPromise(Schema.decodeUnknownEffect(schema)(await read(path)));
+  await Effect.runPromise(Schema.decodeUnknownEffect(schema)(await read(path)));
 
 const validSnapshot = async (): Promise<ControlPolicySnapshot> => {
   const [
@@ -312,7 +312,7 @@ describe("HGI-306 control and automation policy", () => {
   it("rejects automation records missing metric evidence at decode", async () => {
     const raw = await read("docs/standards/automation-register.json");
     const invalid = raw.replace(
-      /"acceptedOutcome":\s*"Accepted candidate outcomes by source SHA\.",/,
+      /"acceptedOutcome":\s*"Accepted candidate outcomes by source SHA\.",/u,
       ""
     );
     expect(invalid).not.toBe(raw);

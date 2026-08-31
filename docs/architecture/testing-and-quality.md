@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-31
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -60,6 +60,32 @@ workspace typechecks, and tests. `bun run check` enables
 Layer-defect, and runtime-ownership rules for their approved app/package and
 infrastructure-script scopes, plus exact native-collection review for owned
 runtime and script source.
+The root check pins Oxlint and its JavaScript-plugin runtime together, runs
+Ultracite with type information, and treats warnings as failures. It also loads
+the checked-in anti-slop rules from `tools/oxlint/anti-slop`. Those rules reject
+unsafe type assertions, conditional empty-object spreads, misleading `Shape`
+names, unparsed `unknown` values, runtime representation checks outside named
+ingress owners, reflective property access, and imports of private Effect
+service constructors. The checked-in plugin source is ignored by the root
+check because it is the rule implementation, not a consumer; its own fixtures
+and installed-plugin integration tests prove the executable path.
+
+TypeScript alone may use the language's value/type namespace pairing, so the
+base `no-redeclare` rule is disabled only for TypeScript-family files. The lint
+integration suite proves the same-name value/type pattern passes while a real
+JavaScript duplicate still fails. Cohesive Vitest contract tests may use up to
+20 assertions. Bundjil also follows Site's reviewed global decisions that
+class count and negated-condition style are not correctness boundaries.
+
+Anti-slop exceptions are exact paths in `oxlint.config.ts`, not directory-wide
+waivers. They cover only: the Oxc AST parser in `lint/oxlint-plugin.ts`; named
+provider, YAML and process ingress decoders; the raw Upstash client surface
+whose Layer decodes every result; two narrow process/request representation
+adapters; malformed-input contract tests; and two Codex live/test Layer
+composition roots that alone import private service constructors. Deliberately
+invalid lint fixtures are excluded by their two exact fixture paths and remain
+covered by `bun run test:lint`.
+
 `bundjil/no-layer-or-die-in-service` rejects import-aware `Layer.orDie` outside
 an exact framework host edge. `bundjil/tagged-error-name`
 rejects any `Schema.TaggedErrorClass` whose
@@ -79,9 +105,33 @@ top-level Effect values, local one-use generators, and unrelated identifiers.
 installed Oxlint binary against exact positive and negative fixtures. The
 negative fixture must exit non-zero and expose every stable `bundjil/*` rule
 ID; the positive fixture must exit zero. Exact host/framework exception
-fixtures also prove occurrence-count staleness. A clean repository lint alone
-is not sufficient rule proof, and a visitor-only test does not prove installed
-plugin behavior.
+fixtures also prove occurrence-count staleness. Root-config probes additionally
+prove both anti-slop plugins load and the TypeScript-only redeclaration policy
+does not weaken JavaScript. A clean repository lint alone is not sufficient
+rule proof, and a visitor-only test does not prove installed plugin behavior.
+
+## Oxlint change impact ledger
+
+The 2026-08-31 Site comparison used Site commit
+`028b172ea847d187e6a5420e97f4b863fcc0a566` and Bundjil base
+`c9d3e2c3bafd5f6c50eede89044111d2466d4abc`.
+
+| Surface                                                          | Decision        | Evidence or reason                                                                                                                                  |
+| ---------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root lint, format config, dependencies and lockfile              | Change required | Oxlint, its plugin runtime and Ultracite are pinned together; the root check denies warnings and loads the checked-in anti-slop plugins.            |
+| Effect rules                                                     | Change required | Private constructor imports and boundary parsing exceptions are now executable, exact-path policy; durable meaning remains in `effect-patterns.md`. |
+| Lint tests                                                       | Change required | Installed-root probes cover generic anti-slop, Effect constructor imports and the TypeScript-only redeclaration exception.                          |
+| App and package READMEs                                          | Preserve        | Purpose, public-boundary and public-command routes did not change; exact symbols remain code-owned.                                                 |
+| CI and verification commands                                     | Preserve        | CI already runs the frozen install and `verification:internal`; that path includes the stricter root check and lint tests.                          |
+| Product SPECs, execution plans and runbooks                      | N/A             | This changes repository static analysis only; it creates no product behaviour, provider operation or operator procedure.                            |
+| Critical journeys, proof packets, controls and evaluator records | N/A             | No proof contract, authority envelope, automation state or qualified epoch changed.                                                                 |
+
+Site's web, React-router, MDX, TanStack, design-system and app-specific plugin
+rules are not applicable to Bundjil's Eve-first workspace. Site's
+`@effect/tsgo` preset and `oxlint-tsgolint` line also depend on its TypeScript 7
+toolchain; Bundjil keeps its current TypeScript 6 Effect language-service path.
+Bundjil retains its stricter repository-local `bundjil/*` rules and boundary
+audit. These are deliberate ownership differences, not missing copies.
 
 `bundjil/no-unregistered-native-collection` rejects direct `new Map`, `Set`,
 `WeakMap`, and `WeakSet` in owned app/package source unless the exact file,

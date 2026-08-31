@@ -78,7 +78,7 @@ const makeCodexResponsesHeaders = (
       }),
   });
 
-export interface CodexHttpClientShape {
+export interface CodexHttpClientContract {
   readonly postResponses: (
     input: CodexResponsesPostInput
   ) => Effect.Effect<CodexResponsesProofResultType, CodexHttpClientFailure>;
@@ -89,7 +89,7 @@ export interface CodexHttpClientShape {
 
 export class CodexHttpClient extends Context.Service<
   CodexHttpClient,
-  CodexHttpClientShape
+  CodexHttpClientContract
 >()("@bundjil/codex/CodexHttpClient") {}
 
 const boundedResponseBody = (

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { dirname, isAbsolute } from "node:path";
+import nodePath from "node:path";
 /* oxlint-disable unicorn/no-array-method-this-argument -- Effect.forEach is a data-first Effect combinator, not Array.prototype.forEach. */
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
@@ -36,6 +36,8 @@ import {
 } from "../src/index.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
 
+const { dirname, isAbsolute } = nodePath;
+
 declare const process: {
   exitCode: number | undefined;
 };
@@ -45,7 +47,7 @@ const AdoptionProofPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined

@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
 export const SendblueE164PhoneNumber = Schema.String.check(
-  Schema.isPattern(/^\+[1-9]\d{7,14}$/)
+  Schema.isPattern(/^\+[1-9]\d{7,14}$/u)
 ).pipe(Schema.brand("@bundjil/sendblue/SendblueE164PhoneNumber"));
 export type SendblueE164PhoneNumber = typeof SendblueE164PhoneNumber.Type;
 

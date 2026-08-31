@@ -104,12 +104,15 @@ export const loadCodexResponsesProofInput = Effect.gen(
     const model = yield* proofModelConfig;
     const prompt = yield* proofPromptConfig;
 
-    return yield* CodexResponsesProofInput.makeEffect({
-      accessToken: rawAccessToken,
-      ...(Option.isNone(accountId) ? {} : { accountId: accountId.value }),
-      model,
-      prompt,
-    }).pipe(
+    const input = Option.isNone(accountId)
+      ? { accessToken: rawAccessToken, model, prompt }
+      : {
+          accessToken: rawAccessToken,
+          accountId: accountId.value,
+          model,
+          prompt,
+        };
+    return yield* CodexResponsesProofInput.makeEffect(input).pipe(
       Effect.mapError(
         () =>
           new CodexResponsesRequestError({

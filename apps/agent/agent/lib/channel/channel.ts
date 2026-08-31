@@ -39,7 +39,7 @@ export type ChannelHandleEventError =
   | ChannelPresenceError
   | ChannelSendError;
 
-export interface ChannelShape {
+export interface ChannelContract {
   readonly decodeWebhook: ChannelTransport["Service"]["decodeWebhook"];
   readonly prepareInbound: (
     message: ChannelInboundTextMessageType
@@ -68,7 +68,7 @@ export interface ChannelShape {
   ) => Effect.Effect<ChannelEventResult, ChannelHandleEventError>;
 }
 
-export class Channel extends Context.Service<Channel, ChannelShape>()(
+export class Channel extends Context.Service<Channel, ChannelContract>()(
   "@bundjil/agent/Channel"
 ) {}
 

@@ -103,7 +103,7 @@ export type PhotonPaginationOffsetEncoded =
 
 export const PhotonWebhookCallbackUrl = Schema.Redacted(
   Schema.NonEmptyString.pipe(
-    Schema.check(Schema.isPattern(/^https:\/\/[^\s]+$/))
+    Schema.check(Schema.isPattern(/^https:\/\/[^\s]+$/u))
   )
 );
 export type PhotonWebhookCallbackUrl = typeof PhotonWebhookCallbackUrl.Type;

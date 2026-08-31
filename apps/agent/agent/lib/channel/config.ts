@@ -18,7 +18,7 @@ import type {
   ChannelRoutingSecret as ChannelRoutingSecretType,
 } from "./schemas.js";
 
-export interface ChannelConfigShape {
+export interface ChannelConfigContract {
   readonly handoffTimeout: ChannelHandoffTimeoutType;
   readonly identities: ChannelIdentityRecordsType;
   readonly replay: ChannelReplayOptionsType;
@@ -28,7 +28,7 @@ export interface ChannelConfigShape {
 
 export class ChannelConfig extends Context.Service<
   ChannelConfig,
-  ChannelConfigShape
+  ChannelConfigContract
 >()("@bundjil/agent/ChannelConfig") {}
 
 const identitiesConfig = Config.schema(

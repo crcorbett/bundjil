@@ -12,7 +12,7 @@ import type {
 import { CodexProfileSchemaError, CodexProfileStorageError } from "./errors.js";
 import type { CodexProfileStoreFailure } from "./errors.js";
 
-export interface CodexProfileStoreShape {
+export interface CodexProfileStoreContract {
   readonly getProfile: (
     subject: CodexOAuthSubject
   ) => Effect.Effect<CodexOAuthProfileType, CodexProfileStoreFailure>;
@@ -29,7 +29,7 @@ export interface CodexProfileStoreShape {
 
 export class CodexProfileStore extends Context.Service<
   CodexProfileStore,
-  CodexProfileStoreShape
+  CodexProfileStoreContract
 >()("@bundjil/codex/CodexProfileStore") {}
 
 export const getProfile = Effect.fnUntraced(function* getProfileOperation(

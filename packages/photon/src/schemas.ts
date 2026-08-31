@@ -17,7 +17,7 @@ export type PhotonUserId = typeof PhotonUserId.Type;
 export type PhotonUserIdEncoded = typeof PhotonUserId.Encoded;
 
 export const PhotonE164PhoneNumber = Schema.String.check(
-  Schema.isPattern(/^\+[1-9]\d{6,14}$/)
+  Schema.isPattern(/^\+[1-9]\d{6,14}$/u)
 ).pipe(Schema.brand("@bundjil/photon/PhotonE164PhoneNumber"));
 export type PhotonE164PhoneNumber = typeof PhotonE164PhoneNumber.Type;
 export type PhotonE164PhoneNumberEncoded = typeof PhotonE164PhoneNumber.Encoded;
@@ -92,7 +92,7 @@ export const PhotonWebhookTimestamp = Schema.NumberFromString.pipe(
 );
 
 export const PhotonWebhookSignature = Schema.String.check(
-  Schema.isPattern(/^v0=[0-9a-f]{64}$/)
+  Schema.isPattern(/^v0=[0-9a-f]{64}$/u)
 );
 
 export const PhotonWebhookHeaders = Schema.Struct({

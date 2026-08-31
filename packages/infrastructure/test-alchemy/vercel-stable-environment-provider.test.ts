@@ -225,7 +225,7 @@ const stableConfig = async (
   failureProjectIds: readonly string[],
   failureMode: "none" | "timeoutBeforeWrite" | "timeoutAfterWrite" = "none"
 ) =>
-  Effect.runPromise(
+  await Effect.runPromise(
     Schema.decodeUnknownEffect(VercelStableEnvironmentMemoryConfig)({
       values: [
         {

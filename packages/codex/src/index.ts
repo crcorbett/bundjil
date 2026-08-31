@@ -85,7 +85,7 @@ export {
   CodexBrowserLauncher,
   makeCodexBrowserCommand,
 } from "./auth/browser.js";
-export type { CodexBrowserLauncherShape } from "./auth/browser.js";
+export type { CodexBrowserLauncherContract } from "./auth/browser.js";
 export {
   CodexLoopbackCallback,
   bindFirstAvailableCodexCallbackPort,
@@ -94,7 +94,7 @@ export {
 export type {
   CodexLoopbackCallbackMemoryOptions,
   CodexLoopbackCallbackSession,
-  CodexLoopbackCallbackShape,
+  CodexLoopbackCallbackContract,
   LoopbackServer,
 } from "./auth/loopback-callback.js";
 export {
@@ -103,7 +103,7 @@ export {
 } from "./auth/http-client.js";
 export type {
   CodexOAuthHttpClientMockOptions,
-  CodexOAuthHttpClientShape,
+  CodexOAuthHttpClientContract,
 } from "./auth/http-client.js";
 export {
   decodeCodexAccessTokenExpiry,
@@ -115,7 +115,7 @@ export {
   makeCodexStoredProfileProof,
   proveCodexStoredProfile,
 } from "./profiles/proof.js";
-export type { CodexStoredProfileProofShape } from "./profiles/proof.js";
+export type { CodexStoredProfileProofContract } from "./profiles/proof.js";
 export {
   buildCodexOAuthAuthorizationSession,
   CodexSubscriptionAuthProtocolConfigService,
@@ -131,7 +131,7 @@ export {
   makeCodexSubscriptionLogin,
   runCodexSubscriptionLogin,
 } from "./auth/login.js";
-export type { CodexSubscriptionLoginShape } from "./auth/login.js";
+export type { CodexSubscriptionLoginContract } from "./auth/login.js";
 export {
   CodexOAuthProfileCommit,
   CodexOAuthProfileCommitUnsupported,
@@ -141,7 +141,7 @@ export {
   replaceCodexSubscriptionProfile,
   replaceLegacyCodexOAuthProfile,
 } from "./profiles/commit.js";
-export type { CodexOAuthProfileCommitShape } from "./profiles/commit.js";
+export type { CodexOAuthProfileCommitContract } from "./profiles/commit.js";
 export {
   CodexDirectProvider,
   makeCodexLegacyDirectProvider,
@@ -150,14 +150,14 @@ export {
 } from "./provider/direct.js";
 export type {
   CodexDirectProviderFailure,
-  CodexDirectProviderShape,
+  CodexDirectProviderContract,
 } from "./provider/direct.js";
 export {
   CodexOAuthClient,
   CodexOAuthClientUnsupported,
   unsupportedCodexOAuthClientOperation,
 } from "./auth/client.js";
-export type { CodexOAuthClientShape } from "./auth/client.js";
+export type { CodexOAuthClientContract } from "./auth/client.js";
 export {
   CodexOAuthProfileCipherConfigService,
   loadCodexOAuthProfileCipherConfig,
@@ -168,7 +168,7 @@ export {
   getCodexOAuthObserverSnapshot,
   recordCodexOAuthObserverEvent,
 } from "./profiles/observer.js";
-export type { CodexOAuthObserverShape } from "./profiles/observer.js";
+export type { CodexOAuthObserverContract } from "./profiles/observer.js";
 export {
   CodexOAuthProfileCipher,
   decryptCodexOAuthProfile,
@@ -176,12 +176,12 @@ export {
   generateCodexOAuthCredentialRevision,
   makeCodexOAuthProfileCipher,
 } from "./profiles/cipher.js";
-export type { CodexOAuthProfileCipherShape } from "./profiles/cipher.js";
+export type { CodexOAuthProfileCipherContract } from "./profiles/cipher.js";
 export {
   CodexOAuthRefreshLock,
   withCodexOAuthRefreshLock,
 } from "./profiles/refresh-lock.js";
-export type { CodexOAuthRefreshLockShape } from "./profiles/refresh-lock.js";
+export type { CodexOAuthRefreshLockContract } from "./profiles/refresh-lock.js";
 export {
   CodexOAuthService,
   completeLogin,
@@ -193,7 +193,7 @@ export {
   revokeToken,
   startLogin,
 } from "./auth/service.js";
-export type { CodexOAuthServiceShape } from "./auth/service.js";
+export type { CodexOAuthServiceContract } from "./auth/service.js";
 export {
   CodexOAuthRefreshPolicyService,
   CodexOAuthRefreshPolicyTest,
@@ -205,7 +205,7 @@ export {
   importCodexLocalProfile,
   makeCodexLocalProfileImportService,
 } from "./auth/local-import.js";
-export type { CodexLocalProfileImportServiceShape } from "./auth/local-import.js";
+export type { CodexLocalProfileImportServiceContract } from "./auth/local-import.js";
 export {
   CodexProfileStore,
   getProfile,
@@ -213,14 +213,14 @@ export {
   putProfile,
   removeProfile,
 } from "./profiles/store.js";
-export type { CodexProfileStoreShape } from "./profiles/store.js";
+export type { CodexProfileStoreContract } from "./profiles/store.js";
 export {
   CodexResponsesRequestPolicyLowLive,
   CodexResponsesRequestPolicyService,
   defaultCodexResponsesRequestPolicy,
   makeCodexResponsesRequestPolicyLayer,
 } from "./provider/request-policy.js";
-export type { CodexResponsesRequestPolicyServiceShape } from "./provider/request-policy.js";
+export type { CodexResponsesRequestPolicyServiceContract } from "./provider/request-policy.js";
 export {
   defaultCodexResponsesEndpoint,
   defaultCodexResponsesModel,
@@ -234,7 +234,7 @@ export {
 } from "./provider/proof.js";
 export type {
   CodexResponsesProofFailure,
-  CodexResponsesProofShape,
+  CodexResponsesProofContract,
 } from "./provider/proof.js";
 export {
   handleChatCompletions,
@@ -243,7 +243,7 @@ export {
 } from "./provider/openai-compatible-proxy.js";
 export type {
   OpenAICompatibleProxyFailure as OpenAICompatibleProxyServiceFailure,
-  OpenAICompatibleProxyShape,
+  OpenAICompatibleProxyContract,
 } from "./provider/openai-compatible-proxy.js";
 export {
   CodexFileSystemDirectory,

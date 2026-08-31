@@ -111,6 +111,18 @@ const collectStreamText = (
     )
   );
 
+const decodeFunctionToolParameters = (parameters: unknown) =>
+  Schema.decodeUnknownEffect(OpenAICompatibleChatCompletionRequest)({
+    model: "gpt-5.5",
+    messages: [{ role: "user", content: "Use the tool." }],
+    tools: [
+      {
+        type: "function",
+        function: { name: "connection_search", parameters },
+      },
+    ],
+  });
+
 const streamFixture = (body: string) => ({
   contentType: "text/event-stream" as const,
   body: streamBytes(body),
@@ -173,23 +185,13 @@ it.effect("decodes OpenAI-compatible chat completion requests", () =>
 
 it.effect("rejects non-object and non-JSON function-tool parameters", () =>
   Effect.gen(function* testFunctionToolParameterBoundary() {
-    const decode = (parameters: unknown) =>
-      Schema.decodeUnknownEffect(OpenAICompatibleChatCompletionRequest)({
-        model: "gpt-5.5",
-        messages: [{ role: "user", content: "Use the tool." }],
-        tools: [
-          {
-            type: "function",
-            function: { name: "connection_search", parameters },
-          },
-        ],
-      });
-
-    yield* decode(["not", "an", "object"]).pipe(Effect.flip);
-    yield* decode(true).pipe(Effect.flip);
-    yield* decode(42).pipe(Effect.flip);
-    yield* decode("not-an-object").pipe(Effect.flip);
-    yield* decode({
+    yield* decodeFunctionToolParameters(["not", "an", "object"]).pipe(
+      Effect.flip
+    );
+    yield* decodeFunctionToolParameters(true).pipe(Effect.flip);
+    yield* decodeFunctionToolParameters(42).pipe(Effect.flip);
+    yield* decodeFunctionToolParameters("not-an-object").pipe(Effect.flip);
+    yield* decodeFunctionToolParameters({
       type: "object",
       unsupported: () => "credential-like-sentinel",
     }).pipe(Effect.flip);
@@ -377,8 +379,8 @@ it.effect("maps Codex stream deltas to OpenAI-compatible SSE chunks", () =>
     const body = yield* collectStreamText(stream.body);
 
     assert.strictEqual(stream.contentType, "text/event-stream");
-    assert.match(body, /^data: /);
-    assert.match(body, /data: \[DONE\]/);
+    assert.match(body, /^data: /u);
+    assert.match(body, /data: \[DONE\]/u);
 
     const firstLine = body
       .split("\n\n")

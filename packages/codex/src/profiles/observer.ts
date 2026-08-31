@@ -20,14 +20,14 @@ const emptySnapshot = CodexOAuthObserverSnapshot.make({
   events: [],
 });
 
-export interface CodexOAuthObserverShape {
+export interface CodexOAuthObserverContract {
   readonly record: (event: CodexOAuthObserverEventType) => Effect.Effect<void>;
   readonly snapshot: Effect.Effect<CodexOAuthObserverSnapshotType>;
 }
 
 export class CodexOAuthObserver extends Context.Service<
   CodexOAuthObserver,
-  CodexOAuthObserverShape
+  CodexOAuthObserverContract
 >()("@bundjil/codex/CodexOAuthObserver") {}
 
 export const CodexOAuthObserverNoop = Layer.succeed(

@@ -6,9 +6,9 @@ import type {
   WorkspaceStatusInput,
   WorkspaceStatusSuccess as WorkspaceStatusSuccessType,
 } from "../schemas.js";
-import { makeWorkspaceSummary } from "../workspace-status.js";
+import { loadWorkspaceSummary } from "../workspace-status.js";
 
-export interface WorkspaceOperationsShape {
+export interface WorkspaceOperationsContract {
   readonly getWorkspaceStatus: (
     input: WorkspaceStatusInput
   ) => Effect.Effect<WorkspaceStatusSuccessType, WorkspaceSchemaError>;
@@ -16,7 +16,7 @@ export interface WorkspaceOperationsShape {
 
 export class WorkspaceOperations extends Context.Service<
   WorkspaceOperations,
-  WorkspaceOperationsShape
+  WorkspaceOperationsContract
 >()("@bundjil/eve/WorkspaceOperations") {}
 
 export const WorkspaceOperationsLive = Layer.effect(
@@ -25,7 +25,7 @@ export const WorkspaceOperationsLive = Layer.effect(
     getWorkspaceStatus: Effect.fn("WorkspaceOperationsLive.getWorkspaceStatus")(
       (input: WorkspaceStatusInput) =>
         Effect.gen(function* getWorkspaceStatus() {
-          const workspace = yield* makeWorkspaceSummary().pipe(
+          const workspace = yield* loadWorkspaceSummary().pipe(
             Effect.mapError(
               () =>
                 new WorkspaceSchemaError({
