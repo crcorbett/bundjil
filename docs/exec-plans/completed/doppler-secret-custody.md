@@ -26,12 +26,21 @@ exact PR head `c418d2e8925fb389cdbabe6fbb059b4fae7e3169`. PR `#7` merged as
 passed and automatic Production run `33358460243` promoted that exact SHA with
 rollback ready. Independent Vercel readback matched both stable targets, the
 agent callback, the live proxy health Schema and project-token isolation.
-Name-only GitHub readback proved the nine legacy copies absent while both
+Name-only GitHub readback proved the nine unused duplicates absent while both
 `DOPPLER_TOKEN` entries and the callback alias remain.
+Closeout PR `#17` then merged as
+`e4603837d7558db8463d24332219c04b8d67fccc`; main CI `33369067571` passed
+and automatic Production `33369366535` promoted that exact SHA with rollback
+ready.
+Hard-cutover CI `33370139881` and Preview `33370139899` passed exact head
+`cdd492b075c311bbc306059f6289a624efefae1f`; Preview recorded 155 no-ops and
+zero provider writes. The temporary Doppler environment/root config was then
+deleted, and name-only readback retained only the three active environments
+plus the empty personal Development branch config.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
-Production result, then remove only the exact proved-unused legacy GitHub
+Production result, then remove only the exact proved-unused GitHub
 copies. It does not authorise revoking an underlying Vercel credential,
 widening a permission, or claiming public behaviour without direct proof.
 
@@ -54,9 +63,12 @@ widening a permission, or claiming public behaviour without direct proof.
 7. Require exact-head CI and Preview drift success, merge PR `#7`, then observe
    only the automatic main-push Production path. Keep immutable deployment,
    stable target, health and public behaviour as separate claims.
-8. After independent hosted proof, remove only the five legacy GitHub secrets
-   and four legacy GitHub variables named by the inventory. Read back names.
+8. After independent hosted proof, remove only the five unused GitHub secrets
+   and four unused GitHub variables named by the inventory. Read back names.
    Do not revoke the Vercel credentials that Doppler still supplies.
+9. After explicit hard-cutover approval, remove the temporary state-repair
+   source and config, update every current owner, merge after exact-head proof,
+   and delete only the merged Doppler branches.
 
 ## Stop conditions
 
@@ -103,18 +115,15 @@ target outside the nine exact GitHub copies.
   `67b2d95c`, but the command ran from an uncommitted repair tree, so
   it is not exact-source execution proof. This proves only the observed Alchemy
   state transition and convergence, not hosted provider drift.
-- A distinct `stg_repair` consumer and state-only command are now repository
-  owned. The command denies provider mutation services, keeps all eight
-  approved identities in scope, accepts only the exact seven-update/148-no-op
-  state plan, applies the same in-memory plan and requires a 155-no-op follow-up
-  plan. The provider-revision-only eighth identity must remain unchanged in
-  state. The config is a locked root with exactly eight direct inputs, no
-  service token and no inherited `stg` values.
+- The one-off state-only operation completed with seven updates, 148 no-ops
+  and a 155-no-op follow-up. Its temporary command, policy, tests and Doppler
+  config were then removed under the later hard-cutover approval. This retained
+  evidence is not standing authority for another state write.
 - A clean local report against the timestamp-bound candidate passed 155 desired
   no-ops, 63 accepted rows, 92 report-only rows, zero blocking rows, zero
   inconclusive rows and zero provider writes. This is not hosted proof.
 - The merged Production receipt and independent metadata/health readbacks do
   not prove an end-user journey or wider public behaviour.
-- No provider credential was rotated or revoked, no permission was widened,
-  and the local-only `stg_repair` config remains because its deletion was not
-  authorised.
+- No active provider credential was rotated or revoked and no permission was
+  widened. Only the temporary repair config was deleted after its consumer was
+  removed; `dev`, `stg` and `prd` remain because real consumers use them.

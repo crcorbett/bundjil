@@ -87,13 +87,6 @@ describe("infrastructure operator command boundaries", () => {
           },
           output: "stateConfigurationInvalid",
         },
-        {
-          script: "readmit-preview-state.ts",
-          environment: {
-            BUNDJIL_INFRASTRUCTURE_READMISSION_AUTHORITY_PATH: undefined,
-          },
-          output: '{"status":"blocked","reason":"stateInvalid"}',
-        },
       ] as const;
 
       for (const fixture of cases) {

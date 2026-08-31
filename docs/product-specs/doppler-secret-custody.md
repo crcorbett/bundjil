@@ -13,18 +13,17 @@ completed_plan: ../exec-plans/completed/doppler-secret-custody.md
 
 ## Decision
 
-Use one Personal Doppler project, `bundjil`, with four root configs backed by
+Use one Personal Doppler project, `bundjil`, with three root configs backed by
 current consumers:
 
 - `dev` supplies the documented non-secret synthetic Executor inputs to the
   friendly local verification command;
 - `stg` supplies the existing read-only Preview drift workflow;
-- `prd` supplies the existing automatic Production workflow; and
-- `stg_repair` supplies only the approved local Preview Alchemy state repair.
+- `prd` supplies the existing automatic Production workflow.
 
 The Doppler-created empty `dev_personal` branch config remains empty. No dummy
-value is added to it. `stg_repair` is a separate locked root config so it does
-not inherit the report-only `stg` authority, manifest or composite bundle.
+value is added to it. The temporary Preview state repair config and its
+repository consumer were removed after the one approved operation converged.
 
 The Personal Developer plan does not expose Doppler service accounts or OIDC
 identities. Each hosted config therefore uses one read-only, config-scoped,
@@ -62,11 +61,10 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   `https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model` with the
   synthetic key `executor-ci-synthetic-key`. Both are ordinary test inputs and
   must never be replaced by a live Executor toolkit or credential.
-- Personal Doppler now has the four locked root configs and exact key sets
-  described below. `stg_repair` has exactly eight direct consumer inputs and
-  no service token or inherited config. The two hosted GitHub Environments each
-  hold one read-only, config-scoped token expiring on 2026-09-23. Name-only
-  cleanup readback found no legacy GitHub copies: each Environment retains only
+- Personal Doppler now has the three locked root configs and exact key sets
+  described below. The two hosted GitHub Environments each hold one read-only,
+  config-scoped token expiring on 2026-09-23. Name-only cleanup readback found
+  no unused GitHub duplicates: each Environment retains only
   `DOPPLER_TOKEN`, and Production also retains the non-secret callback alias.
 - CI run `33353598799` passed exact PR head `a28ed2b`. Preview run
   `33353598789` fetched the refreshed manifest, produced 155 desired no-ops and
@@ -108,21 +106,24 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   live Schema. Each token returned `200` only for its own project and `404` for
   the sibling. This proves deployment metadata and health only, not an end-user
   journey or public behaviour.
-- The narrow repair consumer requires its own `stg_repair` config. It must not
-  reuse the report-only `stg` authority. Repository code now denies provider
-  writes, keeps all eight approved identities in scope, accepts only the exact
-  seven-update/148-no-op state plan, applies that same in-memory plan to Preview
-  Alchemy state, and requires 155 no-ops afterwards. The eighth
-  provider-revision-only identity must remain a state no-op.
-  The first operation attempt correctly stopped on the stale eight-update
-  expectation. After read-only proof showed seven state updates plus one
-  provider-revision-only no-op, the corrected command applied only the seven
-  R2 state updates and its next plan contained 155 no-ops. The bounded receipt
-  passed its Schema, but its source field names base SHA `67b2d95c` while the
-  command ran from an uncommitted repair tree. It therefore proves
-  the recorded state plan and convergence, not exact-source execution. The
-  runbook now requires a clean committed source before any future state write.
-  The later exact-head Preview runs passed against the corrected manifest.
+- Closeout PR `#17` merged as
+  `e4603837d7558db8463d24332219c04b8d67fccc`. Main CI run `33369067571`
+  passed, and automatic Production run `33369366535` promoted that exact SHA
+  with rollback ready. This is a separate exact-main deployment result, not a
+  public-behaviour claim.
+- Hard-cutover CI `33370139881` and read-only Preview run `33370139899` passed
+  exact head `cdd492b075c311bbc306059f6289a624efefae1f`. Preview reported 155
+  no-ops and zero provider writes. Doppler metadata then showed the temporary
+  repair environment had no service token; its exact environment/root config
+  was deleted. Name-only readback found `dev`, `stg` and `prd` plus the empty
+  `dev_personal` branch config.
+- The one approved Preview state operation applied seven R2 metadata updates;
+  its immediate and independent following plans each contained 155 no-ops.
+  Its receipt names base SHA `67b2d95c`, but it ran from an uncommitted repair
+  tree, so it proves observed state convergence rather than exact-source
+  execution. After that result and later exact-head Preview proof, the
+  temporary command, policy, tests and Doppler config were removed. This past
+  operation grants no standing authority for another state write.
 
 ## Command and workflow call graphs
 
@@ -155,15 +156,9 @@ Successful same-repository main-push CI
   -> existing Effect ProductionDeployment service and live Layer
 ```
 
-```text
-Authorised Preview state metadata repair
-  -> bun run infrastructure:preview-state-readmission
-  -> doppler run --project bundjil --config stg_repair
-  -> bun run infrastructure:preview-state-readmission:internal
-  -> exact authority + eight-ID plan policy
-  -> same in-memory plan applied with provider writes denied
-  -> following 155-resource no-op plan + bounded receipt
-```
+The temporary Preview state metadata repair command graph is retired. A future
+state write requires new source, authority, rollback and approval; this SPEC
+does not provide a reusable command.
 
 ## Requirements
 
@@ -179,32 +174,31 @@ Authorised Preview state metadata repair
 4. Doppler receives no dummy or empty values. A missing value remains missing
    until a real consumer and source prove it is required.
 5. Existing GitHub provider secrets and variables remain in place until merge
-   and independent hosted proof. Cleanup then deletes only the five legacy
-   GitHub secrets and four legacy GitHub variables named by the inventory,
+   and independent hosted proof. Cleanup then deletes only the five unused
+   GitHub secrets and four unused GitHub variables named by the inventory,
    while preserving both `DOPPLER_TOKEN` entries and the callback alias. The
    underlying Vercel credentials remain active through Doppler custody.
 6. Runtime Vercel variables, project connections, deployment provenance,
-   Alchemy state and public behaviour remain separate claims. The only Alchemy
-   mutation in this slice is the approved seven-row Preview state metadata
-   readmission described above. It does not write a provider, deploy, promote,
+   Alchemy state and public behaviour remain separate claims. The completed
+   seven-row state operation did not write a provider, deploy, promote,
    Git-link a project, change runtime variables, rotate a provider credential,
-   or prove public behaviour.
+   or prove public behaviour. Its temporary implementation is not retained.
 
 ## Downstream impact ledger
 
-| Surface                            | Decision        | Owner and evidence                                                                                                                                             | Required result                                                                                                                       |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                                                                            | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.                                    |
-| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                                                                         | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                                                       |
-| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`                                                       | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.                                          |
-| Knip and config                    | Change required | `knip.json`                                                                                                                                                    | The external `doppler` binary is explicitly admitted.                                                                                 |
-| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                                                                      | Custody and command boundaries reject direct legacy secret reads and broad injection.                                                 |
-| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                                                                            | Vercel remains current storage owner; no values move.                                                                                 |
-| Provider services and Layers       | Change required | adoption/readmission and drift modules, exact-project read-only Layer and focused tests                                                                        | Re-admission binds exact provider timestamps; unmatched revisions fail closed and state repair cannot read values or write providers. |
-| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, completed plan and indexes                                                                                                          | Completed intent, proof, cleanup and claim limits remain routed as retained history.                                                  |
-| Critical journeys and dated proof  | Preserve        | `docs/verification/README.md` routes Alchemy state receipts to ignored `tmp/proof/**`, with sanitised summary in this SPEC, its task ledger and completed plan | Hosted, provider, health and public-behaviour claims stay separate; no end-user journey is inferred.                                  |
-| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                                                                          | No instruction or skill behaviour changes.                                                                                            |
-| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                                                                        | No browser proof required.                                                                                                            |
+| Surface                            | Decision        | Owner and evidence                                                                                                                                             | Required result                                                                                                   |
+| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Architecture and standards         | Change required | `packages/infrastructure` hard-cutover deletion and focused checks                                                                                             | The one-off state repair boundary is absent after its approved operation completed.                               |
+| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                                                                         | Friendly wrappers use only the three current consumer-backed configs; internal commands stay credential-neutral.  |
+| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`                                                       | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.                      |
+| Knip and config                    | Change required | `knip.json`                                                                                                                                                    | The external `doppler` binary is explicitly admitted.                                                             |
+| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                                                                      | Custody and command boundaries reject removed secret reads, broad injection and reuse of the retired repair path. |
+| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                                                                            | Vercel remains current storage owner; no values move.                                                             |
+| Provider services and Layers       | Change required | adoption metadata refresh and drift modules plus focused tests                                                                                                 | Metadata refresh remains read-only; the temporary state-write composition is removed.                             |
+| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, completed plan and indexes                                                                                                          | Completed intent, proof, cleanup and claim limits remain routed as retained history.                              |
+| Critical journeys and dated proof  | Preserve        | `docs/verification/README.md` routes Alchemy state receipts to ignored `tmp/proof/**`, with sanitised summary in this SPEC, its task ledger and completed plan | Hosted, provider, health and public-behaviour claims stay separate; no end-user journey is inferred.              |
+| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                                                                          | No instruction or skill behaviour changes.                                                                        |
+| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                                                                        | No browser proof required.                                                                                        |
 
 ## Verification and delivery
 

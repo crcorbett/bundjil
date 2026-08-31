@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskId": "doppler-hard-cutover",
+  "status": "passed",
+  "observedAt": "2026-08-31T07:46:06Z",
+  "trigger": "The approved hard cutover retires the temporary state-repair source and config, corrects current owners, and adds this dated path-accounting correction.",
+  "docsInventory": {
+    "pathCount": 266,
+    "sortedPathSha256": "3d2c784f0785d6953799a5f70829fb4657c03cbb189c57610bac8326cbc14de9"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "docs/documentation-audit/doppler-hard-cutover-inventory-correction-2026-08-31.json",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/README.md",
+    "docs/exec-plans/completed/doppler-secret-custody.md",
+    "docs/operations/authority-register.json",
+    "docs/operations/automation-register.md",
+    "docs/operations/doppler-environment-inventory.md",
+    "docs/product-specs/doppler-secret-custody.md",
+    "docs/product-specs/doppler-secret-custody.tasks.json",
+    "packages/infrastructure/README.md"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The source/config retirement and dated correction update current path accounting without changing the HGI-307 scenario manifest, accepted epoch, worker identities, skill bytes, metrics, interventions or historical reports.",
+    "historicalBoundary": "The original HGI-307 epoch and validation remain bound to their recorded candidate. This correction updates only the executable current path inventory.",
+    "nonClaim": "This correction does not prove secret values, public behaviour or provider state beyond separately recorded metadata-only readbacks."
+  },
+  "checks": [
+    {
+      "command": "bun run --filter=@bundjil/infrastructure check-types && bun run --filter=@bundjil/infrastructure test && bun run --filter=@bundjil/infrastructure build",
+      "status": "passed",
+      "result": "The focused package passed with 17 Vitest files, 115 Vitest tests and 23 Alchemy tests after the temporary command boundary was removed."
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed",
+      "result": "Full local verification passed through bundjil/dev on the hard-cutover candidate. Hosted checks remain a separate claim."
+    }
+  ],
+  "limitations": [
+    "Path count and digest establish repository accounting only.",
+    "Hosted CI, Preview, Production, provider metadata and public behaviour remain separate claims."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No active provider credential was revoked, rotated or widened by this cleanup. The deleted temporary Doppler environment had no service token and no remaining source consumer."
+  ]
+}

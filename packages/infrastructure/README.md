@@ -56,7 +56,6 @@ bun run --filter=@bundjil/infrastructure build
 
 Public repository command names are `infrastructure:inventory`,
 `infrastructure:adoption-manifest`, `infrastructure:adoption-readmission`,
-`infrastructure:preview-state-readmission`,
 `infrastructure:adoption-proof`,
 `infrastructure:drift-report`, `infrastructure:preview-plan`,
 `infrastructure:preview-apply`, `infrastructure:preview-sync`,
@@ -156,18 +155,10 @@ It performs no provider or state write. Each selected write-only row also
 carries the exact non-secret provider update timestamp admitted by that
 inventory. A later Alchemy dry-run remains the owner of any proposed state
 change.
-`infrastructure:preview-state-readmission` is the separate authorised state
-operation. Its friendly root command fixes `bundjil/stg_repair`; the internal
-command owns the operation. It composes exact-project read-only Vercel and
-Photon providers with provider mutation services denied. It will apply only
-the same in-memory plan that kept all eight approved identities in scope and
-passed the exact seven-update, 148-no-op policy; the provider-revision-only
-eighth identity must remain a state no-op. It then requires the next plan to
-contain 155 no-ops. It writes only Alchemy R2
-state and a bounded mode-`0600` receipt. Repository tests do not authorise or
-prove a real state write, provider readback, deployment or public behaviour.
-The runbook also requires a clean committed worktree so the receipt source SHA
-identifies the code that performed the operation.
+The one-off 2026-08-31 Preview state re-admission command has been retired.
+The converged state remains current evidence, but it is not standing authority
+for another state write. A future state correction requires a new bounded
+operation, current provider evidence and fresh approval.
 Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;

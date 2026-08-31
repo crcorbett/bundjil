@@ -30,6 +30,7 @@ Alchemy infrastructure lifecycle accounting:
 - [`automatic-production-personal-vercel-access-inventory-correction-2026-08-20.json`](automatic-production-personal-vercel-access-inventory-correction-2026-08-20.json)
 - [`alchemy-drift-control-inventory-correction-2026-07-31.json`](alchemy-drift-control-inventory-correction-2026-07-31.json)
 - [`doppler-secret-custody-closeout-inventory-correction-2026-08-31.json`](doppler-secret-custody-closeout-inventory-correction-2026-08-31.json)
+- [`doppler-hard-cutover-inventory-correction-2026-08-31.json`](doppler-hard-cutover-inventory-correction-2026-08-31.json)
 - [`effect-runtime-terminal-audit-inventory-correction-2026-08-13.json`](effect-runtime-terminal-audit-inventory-correction-2026-08-13.json)
 - [`alchemy-main-integration-inventory-correction-2026-08-01.json`](alchemy-main-integration-inventory-correction-2026-08-01.json)
 - [`alchemy-terminal-closeout-inventory-correction-2026-07-31.json`](alchemy-terminal-closeout-inventory-correction-2026-07-31.json)
