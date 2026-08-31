@@ -36,6 +36,7 @@ import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json"
 import {
   buildInfrastructureDriftReceipt,
   buildInfrastructureDriftReport,
+  hasAcceptedWriteOnlyBaseline,
   InfrastructureArtifactDigest,
   InfrastructureBoundedReceiptJson,
   InfrastructureDriftArtifactPath,
@@ -360,13 +361,20 @@ const toObservation = Effect.fn("InfrastructureDriftObservation.decode")(
             resource.attr
           );
     const ownership = projection?.ownership ?? "Unknown";
-    const acceptedWriteOnlyBaseline =
-      resource.action === "unchanged" &&
-      resourceKind === "vercelEnvironmentVariable" &&
-      projection?.providerUpdatedAt !== undefined &&
-      projection.valueOwnership?._tag === "ObservedUnknown" &&
-      manifestResource?.resourceKind === "vercelEnvironmentVariable" &&
-      manifestResource.desired.valueOwnership._tag === "ObservedUnknown";
+    const acceptedWriteOnlyBaseline = hasAcceptedWriteOnlyBaseline({
+      action: resource.action,
+      admittedProviderUpdatedAt:
+        manifestResource?.resourceKind === "vercelEnvironmentVariable"
+          ? manifestResource.admittedProviderUpdatedAt
+          : undefined,
+      currentProviderUpdatedAt: projection?.providerUpdatedAt,
+      currentValueOwnership: projection?.valueOwnership?._tag,
+      manifestValueOwnership:
+        manifestResource?.resourceKind === "vercelEnvironmentVariable"
+          ? manifestResource.desired.valueOwnership._tag
+          : undefined,
+      resourceKind,
+    });
     const secretRevision = Match.value({
       resourceKind,
       valueOwnership: projection?.valueOwnership,

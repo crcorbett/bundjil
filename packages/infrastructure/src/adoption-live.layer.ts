@@ -8,15 +8,20 @@ import { Layer } from "effect";
 import type { AdoptionProviderScopes } from "./adoption-manifest.js";
 import { loadInfrastructurePhotonCredentials } from "./config.js";
 import { layerPhotonReadOnlyProviders } from "./photon/providers.js";
-import { VercelLive, VercelCredentialsLive } from "./vercel/live.layer.js";
+import {
+  VercelLive,
+  VercelCredentialsLive,
+  VercelProjectCredentialsLive,
+} from "./vercel/live.layer.js";
 import { layerVercelReadOnlyProviders } from "./vercel/providers.js";
 import {
   VercelPreviewPhotonBindingValuesDenied,
   VercelStableEnvironmentBindingsDenied,
 } from "./vercel/stable-environment.js";
 
-export const layerLiveReadOnlyAdoptionProviders = (
-  scopes: AdoptionProviderScopes
+const makeLiveReadOnlyAdoptionProviders = (
+  scopes: AdoptionProviderScopes,
+  vercelCredentials: typeof VercelCredentialsLive
 ) => {
   const photonCredentials = Layer.succeed(
     PhotonManagementCredentials,
@@ -24,7 +29,7 @@ export const layerLiveReadOnlyAdoptionProviders = (
   );
   const liveProviderServices = Layer.merge(
     VercelLive.pipe(
-      Layer.provide(VercelCredentialsLive),
+      Layer.provide(vercelCredentials),
       Layer.provide(BunHttpClient.layer)
     ),
     PhotonManagementLive.pipe(
@@ -46,3 +51,11 @@ export const layerLiveReadOnlyAdoptionProviders = (
 
   return Layer.merge(readOnlyProviders, liveProviderServices);
 };
+
+export const layerLiveReadOnlyAdoptionProviders = (
+  scopes: AdoptionProviderScopes
+) => makeLiveReadOnlyAdoptionProviders(scopes, VercelCredentialsLive);
+
+export const layerLiveExactProjectReadOnlyAdoptionProviders = (
+  scopes: AdoptionProviderScopes
+) => makeLiveReadOnlyAdoptionProviders(scopes, VercelProjectCredentialsLive);

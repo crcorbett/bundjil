@@ -40,8 +40,8 @@ import {
   loadInfrastructurePhotonCredentials,
 } from "../src/index.js";
 import {
-  VercelCredentialsLive,
   VercelLive,
+  VercelProjectCredentialsLive,
   VercelProjectId,
   VercelTeamId,
 } from "../src/vercel/index.js";
@@ -285,7 +285,7 @@ const runInventory = Effect.gen(
 
 const providerLayers = Layer.merge(
   VercelLive.pipe(
-    Layer.provide(VercelCredentialsLive),
+    Layer.provide(VercelProjectCredentialsLive),
     Layer.provide(BunHttpClient.layer)
   ),
   PhotonManagementLive.pipe(

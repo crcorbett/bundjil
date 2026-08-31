@@ -46,7 +46,7 @@ import {
   ListVercelEnvironmentVariables,
   ListVercelMarketplaceBindings,
   ListVercelProjectDomains,
-  ListVercelProjects,
+  ObserveVercelProject,
   VercelInventoryProjectScope,
   VercelProjectId,
   VercelReadOnlyInventory,
@@ -273,12 +273,6 @@ export const InfrastructureInventoryLive = Layer.effect(
     const read = Effect.fn("InfrastructureInventory.read")(function* (
       target: InfrastructureInventoryTarget
     ) {
-      const listedProjects = yield* projects.listProjects(
-        ListVercelProjects.make({
-          stage: target.stage,
-          teamId: target.vercelTeamId,
-        })
-      );
       if (
         HashSet.size(HashSet.fromIterable(target.vercelProjectIds)) !==
         target.vercelProjectIds.length
@@ -290,27 +284,37 @@ export const InfrastructureInventoryLive = Layer.effect(
           ),
         });
       }
-      const selectedProjects = target.vercelProjectIds.map((projectId) =>
-        listedProjects.projects.filter(
-          (project) => project.projectId === projectId
-        )
+      const selectedProjects = yield* Effect.forEach(
+        target.vercelProjectIds,
+        Effect.fn("InfrastructureInventory.observeVercelProject")(
+          function* (projectId) {
+            const observation = yield* projects.observeProject(
+              ObserveVercelProject.make({
+                stage: target.stage,
+                teamId: target.vercelTeamId,
+                projectId,
+              })
+            );
+            return yield* Match.value(observation).pipe(
+              Match.tag("Missing", () =>
+                Effect.fail(
+                  new InfrastructureInventoryReadError({
+                    reason: "projectMissing",
+                    message: InfrastructureInventoryReadMessage.make(
+                      "An authorized Vercel project identity was not found."
+                    ),
+                  })
+                )
+              ),
+              Match.tag("Found", ({ attributes }) =>
+                Effect.succeed(attributes)
+              ),
+              Match.exhaustive
+            );
+          }
+        ),
+        { concurrency: 1 }
       );
-      if (selectedProjects.some((matches) => matches.length === 0)) {
-        return yield* new InfrastructureInventoryReadError({
-          reason: "projectMissing",
-          message: InfrastructureInventoryReadMessage.make(
-            "An authorized Vercel project identity was not found."
-          ),
-        });
-      }
-      if (selectedProjects.some((matches) => matches.length > 1)) {
-        return yield* new InfrastructureInventoryReadError({
-          reason: "projectAmbiguous",
-          message: InfrastructureInventoryReadMessage.make(
-            "An authorized Vercel project identity was ambiguous."
-          ),
-        });
-      }
 
       const projectInventories = yield* Effect.forEach(
         target.vercelProjectIds,
@@ -395,7 +399,7 @@ export const InfrastructureInventoryLive = Layer.effect(
         schemaVersion: "1",
         stage: target.stage,
         vercel: VercelReadOnlyInventory.make({
-          projects: selectedProjects.flat(),
+          projects: selectedProjects,
           domains: projectInventories.flatMap((inventory) => inventory.domains),
           environmentVariables: projectInventories.flatMap(
             (inventory) => inventory.environmentVariables

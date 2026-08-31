@@ -25,13 +25,7 @@ jobs:
     environment: Production
     env:
       BUNDJIL_PRODUCTION_SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
-      BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: ${{ vars.BUNDJIL_PRODUCTION_VERCEL_TEAM_ID }}
-      BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: ${{ vars.BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID }}
       BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: ${{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}
-      BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: ${{ vars.BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID }}
-      BUNDJIL_PRODUCTION_PROXY_HEALTH_URL: ${{ vars.BUNDJIL_PRODUCTION_PROXY_HEALTH_URL }}
-      BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: ${{ secrets.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
-      BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: ${{ secrets.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
 
     steps:
       - name: Checkout accepted main SHA
@@ -66,6 +60,20 @@ jobs:
         timeout-minutes: 5
         run: bun install --frozen-lockfile
 
+      - name: Fetch bounded Production configuration
+        timeout-minutes: 2
+        id: doppler
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_TOKEN }}
+
       - name: Stage, verify and promote exact main SHA
         timeout-minutes: 45
-        run: bun run production:deploy
+        env:
+          BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_VERCEL_TEAM_ID }}
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID }}
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID }}
+          BUNDJIL_PRODUCTION_PROXY_HEALTH_URL: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_HEALTH_URL }}
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: ${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
+        run: bun run production:deploy:internal

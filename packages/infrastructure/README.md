@@ -55,7 +55,9 @@ bun run --filter=@bundjil/infrastructure build
 ```
 
 Public repository command names are `infrastructure:inventory`,
-`infrastructure:adoption-manifest`, `infrastructure:adoption-proof`,
+`infrastructure:adoption-manifest`, `infrastructure:adoption-readmission`,
+`infrastructure:preview-state-readmission`,
+`infrastructure:adoption-proof`,
 `infrastructure:drift-report`, `infrastructure:preview-plan`,
 `infrastructure:preview-apply`, `infrastructure:preview-sync`,
 `infrastructure:preview-drift`, `infrastructure:preview-repair`,
@@ -75,9 +77,13 @@ Public repository command names are `infrastructure:inventory`,
 `infrastructure:photon-production-webhook-delete`, and
 `infrastructure:vercel-git-link-authority`. `production:deploy` is the private
 post-CI Production entrypoint. It is owned by the exact-SHA `Production`
-workflow, uses two separately revocable Vercel credentials project-scoped to
-the exact Personal projects and selected by exact project binding, proves the
-assigned-project read and sibling-project denial before custody, and stages both apps with
+workflow. The root wrapper selects `bundjil/prd` through Doppler; GitHub fetches
+that config once and maps only its six named values into the credential-neutral
+`production:deploy:internal` command. The operation uses two separately
+revocable exact-project Vercel credentials
+selected under the Personal account, selected by exact project binding, and
+proved by assigned-project access plus sibling-project denial. It stages both
+apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
 then assigns the existing Photon callback alias to the accepted agent. It
@@ -103,14 +109,18 @@ redirected, malformed or cross-project aliases fail closed.
 Every child-process provider command has an Effect-managed two-minute timeout.
 The mutation phase has a separate eight-minute deadline, and each callback,
 agent and proxy restoration has its own four-minute deadline. The workflow's
-six setup/deployment step limits total 57 minutes inside its 60-minute job, and
-the deployment step is capped at 45 minutes. The Effect command's bounded
+seven setup, fetch and deployment step limits total 59 minutes inside its
+60-minute job, and the deployment step is capped at 45 minutes. The Effect
+command's bounded
 pre-mutation sequence can use at most 22 minutes; mutation and all three
 restorations can use at most another 20 minutes. This 42-minute bound fits
 inside that deployment step. A timeout is an unsuccessful Effect exit and never
 becomes a success receipt.
 
-`infrastructure:drift-report` uses a distinct project-scoped credential Layer.
+The root `infrastructure:drift-report` wrapper selects `bundjil/stg`. Its GitHub
+worker maps only the authority, environment bundle and compressed manifest into
+`infrastructure:drift-report:internal`. That operation uses a distinct
+project-routed credential Layer.
 Its environment file supplies
 `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`, a Schema-decoded
 non-empty array of unique project-ID/token bindings. Each token is issued for
@@ -118,8 +128,9 @@ one exact Personal Vercel project and must pass the assigned-project read and
 sibling-project denial checks before custody. The Vercel adapter selects a
 redacted token only after receiving a decoded branded project ID, and the
 Alchemy project provider observes exactly the manifest projects rather than
-listing a whole team. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
-limited to the separate inventory/adoption/operator paths.
+listing a whole team. `infrastructure:inventory` uses the same exact-project
+credential contract. Broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` custody remains
+limited to legacy adoption/operator paths.
 
 Marketplace attachment reads use only each exact project's decoded
 environment `contentHint`. Project tokens cannot enumerate the account-wide
@@ -133,6 +144,30 @@ GitHub manifest secret as an in-memory gzip/base64 transport because the raw
 materialises the original JSON into mode-`0600` custody before this command
 Schema-decodes it and compares it with the exact configured accepted digest;
 the transport is never a second manifest authority.
+`infrastructure:adoption-readmission` is a local, credential-neutral command
+for an approved metadata-only refresh. It takes the accepted manifest, a fresh
+mode-`0600` two-read inventory and a non-empty JSON list of exact existing
+logical IDs. It permits only `ObservedUnknown` Vercel environment identities
+whose team, project, environment ID, key and stage still match. It preserves
+the resource set, retain policy, secret ownership and all four managed Photon
+references. Its new digest binds the old manifest digest, current inventory
+digest, sorted approved identity list and each row's full admitted metadata.
+It performs no provider or state write. Each selected write-only row also
+carries the exact non-secret provider update timestamp admitted by that
+inventory. A later Alchemy dry-run remains the owner of any proposed state
+change.
+`infrastructure:preview-state-readmission` is the separate authorised state
+operation. Its friendly root command fixes `bundjil/stg_repair`; the internal
+command owns the operation. It composes exact-project read-only Vercel and
+Photon providers with provider mutation services denied. It will apply only
+the same in-memory plan that kept all eight approved identities in scope and
+passed the exact seven-update, 148-no-op policy; the provider-revision-only
+eighth identity must remain a state no-op. It then requires the next plan to
+contain 155 no-ops. It writes only Alchemy R2
+state and a bounded mode-`0600` receipt. Repository tests do not authorise or
+prove a real state write, provider readback, deployment or public behaviour.
+The runbook also requires a clean committed worktree so the receipt source SHA
+identifies the code that performed the operation.
 Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;
@@ -141,8 +176,12 @@ The drift report keeps returned deployment observations strict across every
 typed field. If Vercel no longer returns an accepted historical deployment,
 the report records unavailable history without claiming drift, deletion,
 retention or repair authority. An accepted write-only environment baseline is
-continuous only when present provider revision metadata is unchanged and the
-accepted manifest records `ObservedUnknown`; the value itself is never proved.
+continuous when native sync is unchanged and present provider revision
+metadata is available. A native-sync drift may also be accepted when the
+desired plan is still no-op and the manifest records both `ObservedUnknown`
+and the exact current provider update timestamp admitted from the two-read
+inventory. A missing or different timestamp remains inconclusive; the value
+itself is never proved.
 If native sync cannot complete, the operator log may expose only the closed
 typed provider-read error name and reason alongside the safe phase. It never
 emits the error message, request, response, URL, headers, provider payload or

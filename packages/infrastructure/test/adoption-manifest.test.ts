@@ -1,11 +1,18 @@
+import { createHash } from "node:crypto";
+
 import { assert, it } from "@effect/vitest";
 import { Effect, Exit, Schema } from "effect";
 
 import {
   AdoptionManifest,
+  AdoptionManifestDigest,
+  AlchemyLogicalResourceId,
   buildAdoptionManifest,
+  buildAdoptionManifestReadmissionDigest,
   InfrastructureCommandInput,
   InfrastructureInventoryArtifact,
+  InfrastructureInventoryDigest,
+  reAdmitAdoptionManifest,
   validateStableAdoptionCommand,
   verifyAdoptionManifestAgainstInventory,
 } from "../src/index.js";
@@ -18,6 +25,24 @@ const decodeAdoptionManifestUnknown = (input: unknown) =>
 const inventoryDigest =
   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const photonProjectId = "f8efe9d0-708c-41bb-8010-a116978223be";
+const LegacyReadmissionEvidence = Schema.Struct({
+  schemaVersion: Schema.Literal("1"),
+  baseManifestDigest: AdoptionManifestDigest,
+  inventoryManifestDigest: InfrastructureInventoryDigest,
+  logicalIds: Schema.NonEmptyArray(AlchemyLogicalResourceId),
+});
+const TimestampOnlyReadmissionEvidence = Schema.Struct({
+  schemaVersion: Schema.Literal("2"),
+  baseManifestDigest: AdoptionManifestDigest,
+  inventoryManifestDigest: InfrastructureInventoryDigest,
+  logicalIds: Schema.NonEmptyArray(AlchemyLogicalResourceId),
+  admittedProviderUpdates: Schema.NonEmptyArray(
+    Schema.Struct({
+      logicalId: AlchemyLogicalResourceId,
+      providerUpdatedAt: Schema.Number,
+    })
+  ),
+});
 
 const decodeInventoryFixture = Schema.decodeUnknownEffect(
   InfrastructureInventoryArtifact
@@ -96,6 +121,7 @@ const decodeInventoryFixture = Schema.decodeUnknownEffect(
           type: "sensitive",
           targets: ["preview"],
           sensitive: true,
+          providerUpdatedAt: 100,
           valueOwnership: { _tag: "ObservedUnknown", configured: true },
           deploymentRequired: false,
           ownership: "Unowned",
@@ -169,6 +195,226 @@ it.effect(
       );
       assert.deepStrictEqual(verified, manifest);
     })
+);
+
+it.effect("re-admits only an exact observed-unknown environment identity", () =>
+  Effect.gen(function* testExactReadmission() {
+    const inventory = yield* decodeInventoryFixture;
+    const base = yield* buildAdoptionManifest(
+      inventory,
+      "previewPhotonManaged"
+    );
+    const encodedInventory = yield* Schema.encodeEffect(
+      InfrastructureInventoryArtifact
+    )(inventory);
+    const currentInventory = yield* Schema.decodeUnknownEffect(
+      InfrastructureInventoryArtifact
+    )({
+      ...encodedInventory,
+      manifest: {
+        ...encodedInventory.manifest,
+        vercel: {
+          ...encodedInventory.manifest.vercel,
+          environmentVariables:
+            encodedInventory.manifest.vercel.environmentVariables.map(
+              (resource) =>
+                resource.environmentVariableId === "env-internal-token"
+                  ? {
+                      ...resource,
+                      providerUpdatedAt: 321,
+                      type: "encrypted",
+                    }
+                  : resource
+            ),
+        },
+      },
+    });
+    const logicalId = yield* Schema.decodeUnknownEffect(
+      AlchemyLogicalResourceId
+    )("vercel-environment:prj-agent:env-internal-token");
+    const digest = yield* buildAdoptionManifestReadmissionDigest(
+      base,
+      currentInventory,
+      [logicalId]
+    );
+    const legacyEvidence = yield* Schema.encodeEffect(
+      Schema.fromJsonString(LegacyReadmissionEvidence)
+    )({
+      schemaVersion: "1",
+      baseManifestDigest: base.digest,
+      inventoryManifestDigest: currentInventory.manifestDigest,
+      logicalIds: [logicalId],
+    });
+    const legacyDigest = createHash("sha256")
+      .update(legacyEvidence)
+      .digest("hex");
+    assert.notStrictEqual(digest, legacyDigest);
+    const timestampOnlyEvidence = yield* Schema.encodeEffect(
+      Schema.fromJsonString(TimestampOnlyReadmissionEvidence)
+    )({
+      schemaVersion: "2",
+      baseManifestDigest: base.digest,
+      inventoryManifestDigest: currentInventory.manifestDigest,
+      logicalIds: [logicalId],
+      admittedProviderUpdates: [{ logicalId, providerUpdatedAt: 321 }],
+    });
+    const timestampOnlyDigest = createHash("sha256")
+      .update(timestampOnlyEvidence)
+      .digest("hex");
+    assert.notStrictEqual(digest, timestampOnlyDigest);
+    const candidate = yield* reAdmitAdoptionManifest(base, currentInventory, {
+      digest,
+      logicalIds: [logicalId],
+    });
+    assert.strictEqual(candidate.resources.length, base.resources.length);
+    assert.strictEqual(candidate.digest, digest);
+    assert.strictEqual(
+      candidate.resources.every(
+        (resource) => resource.observedMetadataDigest === digest
+      ),
+      true
+    );
+    const updated = candidate.resources.find(
+      (resource) => resource.logicalId === logicalId
+    );
+    assert.strictEqual(
+      updated?.resourceKind === "vercelEnvironmentVariable"
+        ? updated.desired.type
+        : undefined,
+      "encrypted"
+    );
+    assert.strictEqual(
+      updated?.resourceKind === "vercelEnvironmentVariable"
+        ? updated.admittedProviderUpdatedAt
+        : undefined,
+      321
+    );
+    assert.deepStrictEqual(
+      candidate.resources
+        .filter(
+          (resource) =>
+            resource.resourceKind === "vercelEnvironmentVariable" &&
+            resource.desired.valueOwnership._tag === "Managed"
+        )
+        .map((resource) =>
+          resource.resourceKind === "vercelEnvironmentVariable"
+            ? resource.desired.valueOwnership
+            : undefined
+        ),
+      base.resources
+        .filter(
+          (resource) =>
+            resource.resourceKind === "vercelEnvironmentVariable" &&
+            resource.desired.valueOwnership._tag === "Managed"
+        )
+        .map((resource) =>
+          resource.resourceKind === "vercelEnvironmentVariable"
+            ? resource.desired.valueOwnership
+            : undefined
+        )
+    );
+
+    const revisionOnlyDigest = yield* buildAdoptionManifestReadmissionDigest(
+      base,
+      inventory,
+      [logicalId]
+    );
+    assert.notStrictEqual(digest, revisionOnlyDigest);
+    const metadataOnlyInventory = yield* Schema.decodeUnknownEffect(
+      InfrastructureInventoryArtifact
+    )({
+      ...encodedInventory,
+      manifest: {
+        ...encodedInventory.manifest,
+        vercel: {
+          ...encodedInventory.manifest.vercel,
+          environmentVariables:
+            encodedInventory.manifest.vercel.environmentVariables.map(
+              (resource) =>
+                resource.environmentVariableId === "env-internal-token"
+                  ? { ...resource, type: "encrypted" }
+                  : resource
+            ),
+        },
+      },
+    });
+    const metadataOnlyDigest = yield* buildAdoptionManifestReadmissionDigest(
+      base,
+      metadataOnlyInventory,
+      [logicalId]
+    );
+    assert.notStrictEqual(revisionOnlyDigest, metadataOnlyDigest);
+    const staleDigestResult = yield* reAdmitAdoptionManifest(
+      base,
+      currentInventory,
+      { digest: revisionOnlyDigest, logicalIds: [logicalId] }
+    ).pipe(Effect.exit);
+    assert.strictEqual(Exit.isFailure(staleDigestResult), true);
+    const revisionOnly = yield* reAdmitAdoptionManifest(base, inventory, {
+      digest: revisionOnlyDigest,
+      logicalIds: [logicalId],
+    });
+    const revisionOnlyResource = revisionOnly.resources.find(
+      (resource) => resource.logicalId === logicalId
+    );
+    assert.strictEqual(
+      revisionOnlyResource?.resourceKind === "vercelEnvironmentVariable"
+        ? revisionOnlyResource.desired.type
+        : undefined,
+      "sensitive"
+    );
+    assert.strictEqual(
+      revisionOnlyResource?.resourceKind === "vercelEnvironmentVariable"
+        ? revisionOnlyResource.admittedProviderUpdatedAt
+        : undefined,
+      100
+    );
+    const inventoryWithoutRevision = yield* Schema.decodeUnknownEffect(
+      InfrastructureInventoryArtifact
+    )({
+      ...encodedInventory,
+      manifest: {
+        ...encodedInventory.manifest,
+        vercel: {
+          ...encodedInventory.manifest.vercel,
+          environmentVariables:
+            encodedInventory.manifest.vercel.environmentVariables.map(
+              (resource) => {
+                if (resource.environmentVariableId !== "env-internal-token") {
+                  return resource;
+                }
+                const {
+                  providerUpdatedAt: _providerUpdatedAt,
+                  ...withoutRevision
+                } = resource;
+                return withoutRevision;
+              }
+            ),
+        },
+      },
+    });
+    const missingRevisionResult = yield* buildAdoptionManifestReadmissionDigest(
+      base,
+      inventoryWithoutRevision,
+      [logicalId]
+    ).pipe(Effect.exit);
+    assert.strictEqual(Exit.isFailure(missingRevisionResult), true);
+    const managed = base.resources.find(
+      (resource) =>
+        resource.resourceKind === "vercelEnvironmentVariable" &&
+        resource.desired.valueOwnership._tag === "Managed"
+    );
+    assert.notStrictEqual(managed, undefined);
+    if (managed === undefined) {
+      return;
+    }
+    const managedResult = yield* reAdmitAdoptionManifest(
+      base,
+      currentInventory,
+      { digest, logicalIds: [managed.logicalId] }
+    ).pipe(Effect.exit);
+    assert.strictEqual(Exit.isFailure(managedResult), true);
+  })
 );
 
 it.effect(

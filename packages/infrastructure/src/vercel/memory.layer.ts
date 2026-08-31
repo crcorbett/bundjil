@@ -47,6 +47,9 @@ export interface VercelMemoryControlShape {
   readonly providerWriteCount: Effect.Effect<number>;
   readonly stableEnvironmentAttemptCount: Effect.Effect<number>;
   readonly recordStableEnvironmentAttempt: Effect.Effect<void>;
+  readonly setEnvironmentVariableObservation: (
+    attributes: typeof VercelEnvironmentVariableAttributes.Type
+  ) => Effect.Effect<void>;
   readonly updateEnvironmentVariable: (
     input: UpdateVercelStableEnvironmentVariable
   ) => Effect.Effect<typeof VercelEnvironmentVariableAttributes.Type>;
@@ -63,6 +66,43 @@ export const layerVercelMemory = (inventory: VercelReadOnlyInventoryType) =>
       const state = yield* Ref.make(inventory);
       const providerWrites = yield* Ref.make(0);
       const stableEnvironmentAttempts = yield* Ref.make(0);
+      const setEnvironmentVariableObservation = Effect.fn(
+        "VercelMemoryControl.setEnvironmentVariableObservation"
+      )(function* (
+        attributes: typeof VercelEnvironmentVariableAttributes.Type
+      ) {
+        const current = yield* Ref.get(state);
+        const existing = Array.findFirst(
+          current.environmentVariables,
+          (environmentVariable) =>
+            environmentVariable.stage === attributes.stage &&
+            environmentVariable.teamId === attributes.teamId &&
+            environmentVariable.projectId === attributes.projectId &&
+            environmentVariable.environmentVariableId ===
+              attributes.environmentVariableId
+        );
+        if (existing._tag === "None") {
+          return yield* Effect.die(
+            "The Vercel memory fixture is missing its exact external observation identity."
+          );
+        }
+        return yield* Ref.update(state, (candidate) =>
+          VercelReadOnlyInventory.make({
+            ...candidate,
+            environmentVariables: Array.map(
+              candidate.environmentVariables,
+              (environmentVariable) =>
+                environmentVariable.stage === attributes.stage &&
+                environmentVariable.teamId === attributes.teamId &&
+                environmentVariable.projectId === attributes.projectId &&
+                environmentVariable.environmentVariableId ===
+                  attributes.environmentVariableId
+                  ? attributes
+                  : environmentVariable
+            ),
+          })
+        );
+      });
       const updateEnvironmentVariable = Effect.fn(
         "VercelMemoryControl.updateEnvironmentVariable"
       )(function* (input: UpdateVercelStableEnvironmentVariable) {
@@ -424,6 +464,7 @@ export const layerVercelMemory = (inventory: VercelReadOnlyInventoryType) =>
               stableEnvironmentAttempts,
               (count) => count + 1
             ),
+            setEnvironmentVariableObservation,
             updateEnvironmentVariable,
           })
         )

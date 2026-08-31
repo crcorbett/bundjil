@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-24
 review_trigger: Alchemy stack, remote state, Vercel or Photon provider boundary, adoption manifest, credential, drift, apply, rollback, or revocation change
 ---
 
@@ -59,14 +59,14 @@ only by owning `Config.schema` boundaries:
 
 - `BUNDJIL_ALCHEMY_STATE_ACCESS_KEY_ID`;
 - `BUNDJIL_ALCHEMY_STATE_SECRET_ACCESS_KEY`;
-- `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN`;
+- `BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_ID`;
 - `BUNDJIL_PHOTON_MANAGEMENT_PROJECT_SECRET`.
 
-The broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` remains an explicit inventory,
-adoption, and authorized configuration-command credential. The report-only
-hosted drift command does not use it. That command requires
-`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON`: one JSON array of
+The broad `VERCEL_INFRASTRUCTURE_ACCESS_TOKEN` remains an explicit legacy
+adoption and authorised configuration-command credential. Current inventory
+and report-only hosted drift instead require one
+`BUNDJIL_INFRASTRUCTURE_VERCEL_PROJECT_CREDENTIALS_JSON` JSON array of
 unique exact project-ID/token bindings, decoded through Effect Schema with
 each token redacted. Each binding must use a separately revocable token scoped
 to the admitted Personal Vercel team, must read back its expected team and
@@ -117,6 +117,42 @@ Photon projects, manifests, or physical identities.
    The installed Alchemy beta does not implement `plan --adopt`. Stop unless
    each dry run contains only the exact manifest-sized import/update set with
    zero create, replace, or delete.
+
+   If drift stops only because the accepted `ObservedUnknown` Vercel metadata
+   is stale, first prove the exact identities from a fresh two-read inventory.
+   Run `bun run infrastructure:adoption-readmission` with three distinct safe
+   repository-relative mode-`0600` paths and the sorted approved logical IDs:
+   `BUNDJIL_INFRASTRUCTURE_READMISSION_{BASE,OUTPUT}_PATH`,
+   `BUNDJIL_INFRASTRUCTURE_INVENTORY_PATH`, and
+   `BUNDJIL_INFRASTRUCTURE_READMISSION_LOGICAL_IDS_JSON`. The command must keep
+   the resource count and managed references unchanged, report zero provider
+   writes, and change only approved environment metadata plus the manifest
+   digest. A provider revision-only refresh is allowed for an exact approved
+   identity. Stop if any identity is new, missing, duplicated, managed, in a
+   different stage, or has a different team, project, environment ID or key.
+   This command does not accept values and does not authorise an Alchemy state
+   write. The memory-provider contract must first prove that an external
+   type/revision change refreshes Alchemy output while provider writes remain
+   zero and the following plan is no-op. Inspect the real dry-run separately
+   before any adoption apply. Stop unless all eight approved identities remain
+   in scope and the plan reports exactly seven state updates, 148 no-ops, zero
+   create, replace or delete, and no managed Photon update. The eighth identity
+   is provider-revision-only and must remain a no-op in Alchemy state. Do not
+   use the general Alchemy apply command for this repair.
+   Under a distinct mode-`0600` authority matching
+   `preview-state-readmission-authority.schema.json`, run the friendly
+   `bun run infrastructure:preview-state-readmission` command. It fixes the
+   `bundjil/stg_repair` Doppler config and delegates to the credential-neutral
+   internal command. That command denies provider writes by construction,
+   validates one exact plan, applies that same in-memory plan only to Alchemy
+   state, and requires the following plan to contain 155 no-ops. Before any
+   state write, require `git status --short` to be empty and set the receipt
+   source SHA from that exact `git rev-parse HEAD`; a base SHA from a dirty
+   worktree is not exact-source proof. Stop before running it if the source,
+   repair config, authority, eight logical IDs, candidate digest, Personal
+   provider identity or Preview target differs. Its receipt proves state
+   convergence only; rerun the report-only drift journey for independent
+   provider readback.
 
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run
@@ -414,11 +450,15 @@ Before every run:
    Require external access `read_only`, local report writes only, Preview as
    the sole environment, and exactly the native plan plus sync-dry-run
    operations.
-2. Provide the static authority policy, manifest, provider/state environment
+2. The protected GitHub Environment holds only an expiring read-only token for
+   `bundjil/stg`. The workflow fetches that config once through the exact pinned
+   Doppler action, maps its three named outputs only into the custody step, and
+   decodes the compressed manifest before checking its accepted digest. Provide
+   the resulting static authority policy, manifest, provider/state environment
    file, output report, and bounded-receipt paths only through mode-`0600`
    custody. The environment file must contain the exact project-scoped,
-   sibling-denial-verified Vercel credential JSON described above, never the broad
-   inventory token. The
+   sibling-denial-verified Vercel credential JSON described above, never the
+   broad legacy token. The
    project provider observes each manifest project by exact ID and cannot call
    the team-wide project-list operation under this Layer. Never put credentials
    in workflow YAML, tracked files, command arguments, stdout, report fields,
@@ -445,7 +485,9 @@ Before every run:
    stop before constructing any artifact. Do not decrypt or copy a Vercel
    sensitive environment value and do not substitute the source/Production
    Photon pair.
-3. Run `bun run infrastructure:drift-report`. The command validates the
+3. An authorised person may run `bun run infrastructure:drift-report`, whose
+   friendly root wrapper selects `bundjil/stg`. GitHub must call only
+   `bun run infrastructure:drift-report:internal`. The operation validates the
    authority before provider/state resolution, rejects every non-Preview stage,
    decodes native output once, fingerprints physical identities, and emits
    only classified metadata. It never calls apply, reconcile, repair, deploy,
@@ -464,10 +506,13 @@ Before every run:
    Ignore custom targets; never relabel one as Preview or Production.
    Vercel sensitive environment values are write-only at this boundary. A row
    with an `ObservedUnknown` accepted manifest baseline may classify
-   `unknownSecretRevision` as accepted only when native sync returns
-   `unchanged` and present provider revision metadata matches the persisted
-   observation. This proves metadata continuity, not the remote value. Missing
-   revision metadata or any changed row remains inconclusive.
+   `unknownSecretRevision` as accepted when native sync returns `unchanged`
+   with present provider revision metadata. A drifted native-sync row may also
+   be accepted only when the desired plan remains no-op and the manifest
+   carries the exact current provider update timestamp admitted from its
+   matching two-read inventory. A missing or different admitted timestamp
+   remains inconclusive. This proves metadata continuity, not the remote
+   value.
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
    Before a receipt exists, a rejected boundary emits only its safe phase:

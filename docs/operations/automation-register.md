@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-31
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -56,7 +56,8 @@ automation fallback.
 - **Principal and authority:** the ephemeral GitHub Actions job token has only
   `contents: read`. The synthetic Executor variables are fixtures, not a
   provider identity or secret. CI has no OIDC, secret, write, deploy, release,
-  message, or approval-resume authority.
+  message, or approval-resume authority. It calls `verification:internal`
+  directly and does not receive a Doppler token.
 - **Duration and convergence:** one 30-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run.
 - **Evidence:** the GitHub check/run identity and bounded repository command
@@ -85,18 +86,26 @@ concealed personal `bundjil` 1Password items with fingerprint prefixes, and
 exactly the two refreshed Production GitHub secret names. It did not prove a
 deployment; the earlier 90-day result remains in
 [`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
+Fresh 2026-08-24 readback also confirmed one expiring read-only Doppler token
+for `bundjil/prd`, while the two legacy Vercel secrets and four legacy variables
+remained in place. No eligible main-push event had been created at that point,
+so no Production run, deployment or public behaviour was proved.
+The current branch fetches `bundjil/prd` once, maps four identifiers plus the
+two exact project credentials, and keeps the callback alias as a separate
+non-secret GitHub variable. That combined custody and automatic callback path
+remains unproved until this PR merges and a new exact-main run completes.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
   checked out and becomes the immutable candidate identity.
 - **Principal and operation:** the GitHub `Production` job has repository
-  `contents: read` plus exactly two separately revocable Vercel tokens
-  project-scoped to the exact Personal projects, one bound to each exact
-  Bundjil project. Before
-  custody, each binding must read back the expected team and project. Exact
-  project configuration and decoded project/SHA readback remain independent
-  controls; each token must be project-scoped and pass sibling denial before
-  custody. The
+  `contents: read` plus one expiring read-only token scoped only to
+  `bundjil/prd`. The exact pinned Doppler action fetches once and maps four
+  identifiers plus exactly two separately revocable Vercel tokens into the
+  deployment step, one token for each exact Bundjil project. Before
+  custody, each exact project binding must read its assigned project and receive
+  a denied result for the sibling project. Exact project configuration and
+  decoded project/SHA readback remain independent controls. The
   repository-owned Effect command stages proxy and agent with domains skipped,
   validates both candidates, re-reads main, promotes proxy then public agent,
   assigns the existing Photon callback alias to that agent, and verifies all
@@ -107,12 +116,13 @@ deployment; the earlier 90-day result remains in
 - **Duration and convergence:** one repository-wide queue never cancels an
   in-flight writer and bounds each run to 60 minutes. Provider commands,
   mutation and each restoration have shorter Effect-managed deadlines so
-  rollback time is retained. The six workflow step deadlines total 57 minutes,
-  and the Effect deployment command has its own 45-minute step. Already-current and stale
-  candidates are explicit no-ops only when the callback also matches. A stale
-  callback with current public apps is reconciled alone. A partial failure
-  restores the exact prior callback, agent and proxy identities in reverse
-  order as applicable and verifies the restored targets.
+  rollback time is retained. The seven workflow step deadlines total 59
+  minutes, and the Effect deployment command has its own 45-minute step.
+  Already-current and stale candidates are explicit no-ops only when the
+  callback also matches. A stale callback with current public apps is
+  reconciled alone. A partial failure restores the exact prior callback, agent
+  and proxy identities in reverse order as applicable and verifies the
+  restored targets.
 - **Evidence and non-claim:** source/CI/Production run, immutable candidates,
   project/source/readiness, stable target, health and rollback identities are
   separate receipt fields. Source and local fixtures do not prove GitHub
@@ -124,64 +134,40 @@ deployment; the earlier 90-day result remains in
 
 ### Preview infrastructure drift — report-only automation
 
+The earlier missing-custody run remains retained history. On 2026-08-24, a
+one-time protected run copied the three existing GitHub values into
+`bundjil/stg` without printing them or deleting the originals. Name-only
+readback then proved the three expected Doppler keys, and hosted custody moved
+to one expiring read-only token for that config while the legacy copies were
+retained. Later runs proved the pinned fetch and fail-closed provider path.
+CI run `33353598799` passed exact PR head
+`a28ed2b919f821dc8adb7ea634cf2b12fc395344`. Preview run `33353598789`
+fetched the refreshed manifest, produced 155 desired no-ops and zero provider
+writes, and safely remained inconclusive only on the provider-revision-only
+identity.
 The report-only source remains admitted. The exact Preview Photon credential,
 R2 state access, distinct project-scoped drift tokens, static authority and
-155-resource manifest are now installed as exactly the three environment
-artifacts. Manual run `32440487569` checked out
-`c154d725372617c699538629712569518ee18099` and finished green, but it did not
-run drift: `bun --env-file … run …` printed help and exited zero, and the
-workflow had no receipt readback. This is a rejected false green. The corrected
-workflow places Bun's `run` argument before `--env-file`, requires a non-empty
-receipt and prints the Schema-valid sanitised receipt. The authority audit
-rejects both the bad argument order and missing receipt check. A corrected
-hosted receipt remains required before acceptance. Pull-request run
-`32441621932` on `1d1c47dd7422a125db8dda50509f6fd6f3169bb5` executed the
-corrected command but failed before writing a receipt. The next source maps
-every pre-receipt error to a fixed secret-safe phase so follow-up can target the
-failed boundary without printing values or provider payloads. Diagnostic run
-`32442223436` on `707aad58ceedeff1662f46d949326d5821449de0` reported
-`runtimeInitializationFailed`. After the eight-line custody artifact passed its
-R2, Preview Photon and exact-project Vercel Config Schemas and replaced only
-the GitHub environment secret, run `32443491605` still reported
-`stateConfigurationInvalid`. That source also mapped state-client
-initialisation to the config label; its successor gives those typed boundaries
-separate fixed outcomes.
-
-The next custody readback proved that `gh secret set --body -` had stored a
-literal hyphen instead of stdin. The two Production tokens and drift
-environment were replaced with the correct stdin form. Run `32444546031` then
-passed R2 state and stopped safely at `authorityArtifactInvalid`; the authority
-replacement succeeded. GitHub rejected the raw 155-resource manifest with
-HTTP 422 because it exceeds the environment-secret size boundary. The
-successor workflow materialises the same Schema-encoded manifest from an exact
-in-memory gzip/base64 transport into mode-`0600` custody, and the authority
-audit rejects a changed or missing materialisation pipeline. A successful
-hosted receipt is still required. The 7,516-byte transport was installed at
-`2026-08-21T04:07:06Z` after an in-memory round trip retained the 87,930-byte
-manifest's stage, digest and all 155 resources; GitHub readback exposed only
-the secret name and update time.
-Pull-request run `32445924126` proved the transport materialisation but stopped
-at `manifestArtifactInvalid` because the workflow omitted the accepted digest
-required by command configuration. The successor binds the exact digest as
-non-secret source configuration and the authority audit rejects omission or
-change.
-CI run `32446250097` passed on exact SHA
-`01978dc818adacb75d54042a34c7bf422c571745`. Pull-request drift run
-`32446250037` then produced a Schema-valid inconclusive receipt with zero
-provider writes. The exact-project deployment endpoint returned HTTP 200 for
-both credentials; the private decoder rejected Vercel's custom `staging`
-target. The successor admits non-empty provider target names at ingress and
-excludes custom targets from Bundjil Preview and Production observations.
-Runs `32452367518` and `32453467578` then completed live provider reads with
-zero writes. The latter retained one report-only Photon metadata change, 37
-blocking deployment observations and 44 inconclusive write-only rows on exact
-SHA `e3deed1d307748ee629c684874d21c3c8f33b015`; CI run `32453467606`
-passed that SHA. Secret-negative exact-state comparison proved 58 saved
-deployment observations still match every typed field and 37 accepted
-historical identities are no longer returned. No returned deployment changed.
-The successor reports that historical API limit without repair authority and
-accepts write-only baseline continuity only under the three-way manifest,
-native-result and provider-revision rule below.
+the accepted manifest are carried as exactly three Doppler outputs. Two
+matching exact-project inventories produced digest
+`64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
+with zero provider writes. Predecessor manifest
+`f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+refreshes only the approved eight identities and preserves their write-only
+value non-claims. A fresh exact-head inventory matched the same inventory
+digest. Timestamp-only candidate
+`2f3118ce3193ff12ec14a2d4041ec2aaf305453762643f4ab5fa3df92aa28e0f`
+received exact Doppler readback but was superseded before push because its
+identity omitted other admitted metadata. Version 3 candidate
+`bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
+binds the full sorted admitted metadata plus provider timestamps. It passed a
+clean local report with 155 desired no-ops, zero blocking, zero inconclusive and
+zero writes. Exact `bundjil/stg` readback matched its bytes, digest, 155
+resources and eight timestamps. The separate foreground state-only operation
+applied seven state metadata updates and then reached 155 no-ops; it was not
+this report-only automation. CI run `33357705409` and Preview run `33357705406`
+passed exact head `edc5e9d0269dea81d39eb38b734a5b233884cd2e`. The hosted
+Preview receipt matched the local 63 accepted, 92 report-only, zero blocking,
+zero inconclusive, 155-no-op and zero-write result.
 
 CI run `32455191281` passed exact successor SHA
 `f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
@@ -197,35 +183,39 @@ cannot trigger a main merge or automatic Production.
   schedule, or manual dispatch observe only
   `alchemy:BundjilInfrastructure:preview` for the exact checked-out source SHA.
 - **Principal and authority:** `contents: read` plus one protected
-  `infrastructure-read-only-preview` environment. Its three secret artifacts
-  contain the static fixed policy envelope, provider/state environment, and
-  accepted manifest. The environment artifact holds a distinct Schema-decoded
-  set of unique project-ID/token bindings, one separately revocable Vercel
-  project-scoped token per manifest project; the Layer
-  rejects team-wide project resolution and Production or broad inventory
-  credentials are not reused. The provider token scope and decoded project
-  binding must agree; request routing is not a substitute for that scope.
+  `infrastructure-read-only-preview` environment. It exposes only one expiring
+  read-only token scoped to `bundjil/stg`. The exact pinned Doppler action
+  fetches once and maps three named values into the custody step: the static
+  fixed policy envelope, provider/state environment, and accepted compressed
+  manifest. The environment artifact holds a distinct Schema-decoded
+  set of unique project-ID/token bindings, one separately revocable
+  project-scoped Vercel token per manifest project. The Layer rejects team-wide
+  project resolution, and Production or broad inventory credentials are not
+  reused. Token scope and decoded project binding must agree; request routing is
+  not a substitute for that scope.
   Marketplace proof uses the exact project's environment attachment hint. The
   denied account-wide storage list is outside this principal, and the accepted
   manifest database ID is retained identity rather than current readback.
-  Vercel personal tokens are not
-  method-level read-only, so exact project scope, sibling denial, independent
+  Vercel personal tokens are not method-level read-only, so exact project
+  scope, sibling denial, independent
   revocation, the read-only call graph and zero-write receipt are mandatory
   controls. The policy envelope is fingerprinted custody, not a dynamic run
   identity. The workflow derives a branded exact
   repository/run/attempt identity and checked-out source SHA from GitHub, and
-  the command carries those values plus the decoded manifest digest through
-  its report and receipt. The job has no OIDC, apply, reconcile, repair,
+  the command carries those values plus the fixed decoded manifest digest
+  through its report and receipt. The job has no OIDC, apply, reconcile, repair,
   deployment, promotion, Production, Photon mutation, billing, or admitted
   provider-write operation.
 - **Duration and convergence:** one 20-minute run per repository and pull
   request/ref; a newer candidate cancels a stale run. Native desired plan and
   native `sync --dry-run` remain distinct sources. Blocking drift fails.
   Unavailable, ambiguous and skipped reads remain inconclusive. An unknown
-  write-only secret baseline is accepted only when the accepted manifest,
-  unchanged native result and present unchanged provider revision metadata all
-  agree; this does not prove the value. Every other unknown revision remains
-  inconclusive.
+  write-only secret baseline is accepted when native sync is unchanged with
+  present provider revision metadata. A drifted row may also be accepted only
+  when the desired plan remains no-op and the accepted manifest binds the exact
+  current provider update timestamp from its matching two-read inventory. A
+  missing or different admitted timestamp remains inconclusive. Neither case
+  proves the value.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
   SHA, static authority fingerprint, and manifest digest. The always-run log
@@ -336,6 +326,11 @@ reviews release notes and the diff from the current pin, updates the lock and
 all approved workflow locations atomically, runs `bun run check:authority` and
 `bun run verification`, and records the public Git-ref provenance. A public
 ref proves only tag/ref resolution, not action safety or hosted execution.
+
+The Doppler fetch action is fixed at
+`451892f16195f9ac360e1a5bcbf0b5fd0e957534` (`v2.0.0`) and is admitted only in
+the Preview drift and Production workflows. It may not inject the whole config
+into the job environment; each consumer step maps its exact named outputs.
 
 Unknown, floating, short, mismatched, or unregistered actions fail closed.
 Rollback restores the prior lock and workflow pins together. Compromise or

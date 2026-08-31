@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-24
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -48,9 +48,13 @@ broken/missing skill mirrors, invalid metadata/reference routes,
 contradictory executable examples, and stale
 Site-specific overlays in the relevant repo-owned skills, and confirms the
 required provenance and frontend-composition policy is present in instruction
-surfaces. `bun run verification` is the standard closeout gate. It runs those
-policy checks, Ultracite, focused repository lint-rule tests, dependency
-hygiene, workspace typechecks, and tests. `bun run check` enables
+surfaces. `bun run verification` is the standard local closeout gate. Its fixed
+`bundjil/dev` Doppler wrapper supplies only the documented synthetic Executor
+inputs, then calls `verification:internal`. Hosted CI supplies the same
+non-secret values directly and calls `verification:internal`, so forks receive
+no Doppler or provider credential. The internal command runs those policy
+checks, Ultracite, focused repository lint-rule tests, dependency hygiene,
+workspace typechecks, and tests. `bun run check` enables
 `bundjil/tagged-error-name` plus the zero-debt Effect-time, Promise-ingress,
 `tryPromise`, exported reusable-generator ownership, primitive-failure,
 Layer-defect, and runtime-ownership rules for their approved app/package and

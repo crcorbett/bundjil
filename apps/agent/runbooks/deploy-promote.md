@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: bundjil-agent-operator
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-24
 review_trigger: Vercel project, deployment, environment, domain, protection, variable, function duration, Workflow, source, preflight, rollout-stage, rollback, proxy, agent, or Channel provider activation change
 ---
 
@@ -187,11 +187,15 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    must create no deployment. An eligible successful same-repository `CI`
    `workflow_run` for a `push` to `main` starts the distinct `Production`
    workflow. It checks out the event's exact head SHA without persisted Git
-   credentials and invokes only `bun run production:deploy` in the protected
-   `Production` environment. The command uses exactly two project-scoped Vercel
-   tokens, fixed Personal team/project IDs, one branded non-secret Photon
-   callback alias, and separate project bindings. It reads current proxy,
-   public agent and callback targets, then stages both candidates using `vercel deploy --prod
+   credentials, fetches `bundjil/prd` once through the exact pinned Doppler
+   action, maps six named outputs, and invokes only
+   `bun run production:deploy:internal` in the protected `Production`
+   environment. The root `production:deploy` command is the friendly Doppler
+   wrapper for an authorised operator. The operation uses exactly two
+   project-scoped tokens, fixed Personal team/project IDs, one branded
+   non-secret Photon callback alias, and separate project bindings. It reads
+   current proxy, public agent and callback targets, then stages both candidates
+   using `vercel deploy --prod
 --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
    no-op. It promotes proxy, public agent, then the callback alias, validates
@@ -206,7 +210,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Each child-process provider command has an Effect-managed two-minute
    timeout. The mutation phase has a separate eight-minute deadline, and each
    callback, agent and proxy restoration has its own four-minute deadline
-   inside a 45-minute deployment step. The six workflow step limits total 57
+   inside a 45-minute deployment step. The seven workflow step limits total 59
    minutes inside the exact 60-minute job limit. The maximum pre-mutation,
    mutation and three-restoration path is 42 minutes. A timeout follows the same
    readback and rollback path as any other unsuccessful Effect exit. Rollback
@@ -234,7 +238,8 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    exhausted read remains blocked and requires fresh provider readback before
    retry.
 
-   Do not run `production:deploy` interactively as a routine alternative.
+   Do not run either Production entrypoint interactively as a routine
+   alternative.
 
 7. Before promotion, execute the Sendblue and Photon runbooks against the
    immutable candidate URL. For the ordinary one-callback `Stable` topology,

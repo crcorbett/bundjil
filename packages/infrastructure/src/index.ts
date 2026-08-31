@@ -20,6 +20,8 @@ export {
   type AdoptionManifestEncoded,
   AdoptionManifestJson,
   type AdoptionManifestJsonEncoded,
+  AdoptionManifestReadmission,
+  type AdoptionManifestReadmissionEncoded,
   AdoptionManifestResource,
   type AdoptionManifestResourceEncoded,
   AdoptionProviderScopes,
@@ -28,9 +30,14 @@ export {
   type AdoptionResourceOwnerEncoded,
   adoptionManifestProviderScopes,
   buildAdoptionManifest,
+  buildAdoptionManifestReadmissionDigest,
+  reAdmitAdoptionManifest,
   verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
-export { layerLiveReadOnlyAdoptionProviders } from "./adoption-live.layer.js";
+export {
+  layerLiveExactProjectReadOnlyAdoptionProviders,
+  layerLiveReadOnlyAdoptionProviders,
+} from "./adoption-live.layer.js";
 export {
   AdoptionCommand,
   type AdoptionCommandEncoded,
@@ -73,6 +80,7 @@ export {
 export {
   buildInfrastructureDriftReceipt,
   buildInfrastructureDriftReport,
+  hasAcceptedWriteOnlyBaseline,
   InfrastructureDriftAction,
   type InfrastructureDriftActionEncoded,
   InfrastructureDriftAttempts,
@@ -150,6 +158,21 @@ export {
   layerAlchemyR2StateMemory,
   loadAlchemyR2StateConfig,
 } from "./state/r2-state.js";
+export {
+  InfrastructureStateReadmissionError,
+  InfrastructureStateReadmissionFailureReason,
+  InfrastructureStateReadmissionLogicalIdsJson,
+  type InfrastructureStateReadmissionLogicalIdsJson as InfrastructureStateReadmissionLogicalIdsJsonType,
+  InfrastructureStateReadmissionLogicalIds,
+  InfrastructureStateReadmissionRunIdentity,
+  type InfrastructureStateReadmissionRunIdentity as InfrastructureStateReadmissionRunIdentityType,
+  InfrastructureStateReadmissionPlan,
+  type InfrastructureStateReadmissionPlan as InfrastructureStateReadmissionPlanType,
+  InfrastructureStateReadmissionPlanSummary,
+  type InfrastructureStateReadmissionPlanSummary as InfrastructureStateReadmissionPlanSummaryType,
+  validateInfrastructureStateReadmissionConvergence,
+  validateInfrastructureStateReadmissionPlan,
+} from "./state/readmission.js";
 export {
   makePreviewStateBackupStoreLive,
   makePreviewStateBackupStoreMemory,

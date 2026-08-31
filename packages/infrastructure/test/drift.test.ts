@@ -10,6 +10,7 @@ import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json"
 import {
   buildInfrastructureDriftReceipt,
   buildInfrastructureDriftReport,
+  hasAcceptedWriteOnlyBaseline,
   InfrastructureDriftArtifactPath,
   InfrastructureDriftObservation,
   InfrastructureDriftReport,
@@ -106,6 +107,46 @@ const reportFor = (observations: readonly InfrastructureDriftObservation[]) =>
   );
 
 describe("infrastructure drift report", () => {
+  it("accepts only an unchanged or exactly admitted write-only provider revision", () => {
+    const baseline = {
+      admittedProviderUpdatedAt: 123,
+      currentProviderUpdatedAt: 123,
+      currentValueOwnership: "ObservedUnknown" as const,
+      manifestValueOwnership: "ObservedUnknown" as const,
+      resourceKind: "vercelEnvironmentVariable" as const,
+    };
+    expect(
+      hasAcceptedWriteOnlyBaseline({ ...baseline, action: "unchanged" })
+    ).toBeTruthy();
+    expect(
+      hasAcceptedWriteOnlyBaseline({ ...baseline, action: "drifted" })
+    ).toBeTruthy();
+    expect(
+      hasAcceptedWriteOnlyBaseline({
+        ...baseline,
+        action: "drifted",
+        admittedProviderUpdatedAt: 122,
+      })
+    ).toBeFalsy();
+    expect(
+      hasAcceptedWriteOnlyBaseline({
+        ...baseline,
+        action: "drifted",
+        admittedProviderUpdatedAt: undefined,
+      })
+    ).toBeFalsy();
+    expect(
+      hasAcceptedWriteOnlyBaseline({
+        ...baseline,
+        action: "drifted",
+        currentValueOwnership: "Managed",
+      })
+    ).toBeFalsy();
+    expect(
+      hasAcceptedWriteOnlyBaseline({ ...baseline, action: "missing" })
+    ).toBeFalsy();
+  });
+
   it("accepts the report-only control through the fixed harness contract", () => {
     const validate = new Ajv2020({
       allErrors: true,

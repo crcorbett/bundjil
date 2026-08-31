@@ -20,7 +20,9 @@ No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-No SPEC is currently active.
+| SPEC                                                | Current intent                                                                                                                                              |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Doppler secret custody](doppler-secret-custody.md) | Complete the approved Doppler cutover, merge only after exact-head checks pass, observe automatic Production, then remove only proved-unused GitHub copies. |
 
 ## Implemented or superseded history
 

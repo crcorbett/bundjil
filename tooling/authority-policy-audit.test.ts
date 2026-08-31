@@ -14,6 +14,7 @@ const pins = {
   "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",
   "anthropics/claude-code-action": "855c772a30bf1a423d6ff9a0db600098226c2cfc",
   "changesets/action": "a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d",
+  "dopplerhq/secrets-fetch-action": "451892f16195f9ac360e1a5bcbf0b5fd0e957534",
   "oven-sh/setup-bun": "0c5077e51419868618aeaa5fe8019c62421857d6",
 } as const;
 
@@ -71,23 +72,28 @@ jobs:
       BUNDJIL_INFRASTRUCTURE_DRIFT_STAGE: preview
       BUNDJIL_INFRASTRUCTURE_DRIFT_RUN_IDENTITY: github-actions:\${{ github.repository }}:\${{ github.run_id }}:\${{ github.run_attempt }}
       BUNDJIL_INFRASTRUCTURE_STAGE: preview
-      BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST: 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60
-      DRIFT_AUTHORITY_JSON: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
-      DRIFT_ENV_FILE: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
+      BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST: bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5
       BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH: tmp/proof/infrastructure-drift.manifest.json
-      DRIFT_MANIFEST_GZIP_BASE64: \${{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
     steps:
       - uses: actions/checkout@${pins["actions/checkout"]}
         with:
           persist-credentials: false
       - uses: actions/setup-node@${pins["actions/setup-node"]}
       - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
-      - run: |
+      - id: doppler
+        uses: dopplerhq/secrets-fetch-action@${pins["dopplerhq/secrets-fetch-action"]} # v2.0.0
+        with:
+          doppler-token: \${{ secrets.DOPPLER_TOKEN }}
+      - env:
+          DRIFT_AUTHORITY_JSON: \${{ steps.doppler.outputs.BUNDJIL_INFRASTRUCTURE_DRIFT_AUTHORITY_JSON }}
+          DRIFT_ENV_FILE: \${{ steps.doppler.outputs.BUNDJIL_INFRASTRUCTURE_DRIFT_ENV_FILE }}
+          DRIFT_MANIFEST_GZIP_BASE64: \${{ steps.doppler.outputs.BUNDJIL_INFRASTRUCTURE_DRIFT_MANIFEST_JSON }}
+        run: |
           printf '%s' "$DRIFT_MANIFEST_GZIP_BASE64" \\
             | base64 --decode \\
             | gzip --decompress \\
             > "$BUNDJIL_INFRASTRUCTURE_MANIFEST_PATH"
-      - run: bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report
+      - run: bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report:internal
       - if: always()
         run: |
           test -s "$BUNDJIL_INFRASTRUCTURE_DRIFT_RECEIPT_PATH"
@@ -116,8 +122,6 @@ jobs:
     environment: Production
     env:
       BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: \${{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}
-      BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
-      BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: \${{ secrets.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
     steps:
       - name: Checkout accepted main SHA
         timeout-minutes: 2
@@ -137,9 +141,22 @@ jobs:
       - name: Install dependencies
         timeout-minutes: 5
         run: bun install --frozen-lockfile
+      - name: Fetch bounded Production configuration
+        timeout-minutes: 2
+        id: doppler
+        uses: dopplerhq/secrets-fetch-action@${pins["dopplerhq/secrets-fetch-action"]} # v2.0.0
+        with:
+          doppler-token: \${{ secrets.DOPPLER_TOKEN }}
       - name: Stage, verify and promote exact main SHA
         timeout-minutes: 45
-        run: bun run production:deploy
+        env:
+          BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_VERCEL_TEAM_ID }}
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID }}
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID }}
+          BUNDJIL_PRODUCTION_PROXY_HEALTH_URL: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_HEALTH_URL }}
+          BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN }}
+          BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN }}
+        run: bun run production:deploy:internal
 `
   );
 
@@ -418,6 +435,14 @@ const actionRows = [
     approvedWorkflows: [".github/workflows/claude.yml"],
     pin: pins["anthropics/claude-code-action"],
   },
+  {
+    action: "dopplerhq/secrets-fetch-action",
+    approvedWorkflows: [
+      ".github/workflows/infrastructure-drift.yml",
+      ".github/workflows/production.yml",
+    ],
+    pin: pins["dopplerhq/secrets-fetch-action"],
+  },
 ] as const;
 
 const lock = (): GitHubActionsLock => ({
@@ -592,6 +617,20 @@ describe("HGI-304 authority policy", () => {
         "{{ secrets.BUNDJIL_INFRASTRUCTURE_DRIFT_EXTRA }}\n",
     ],
     [
+      "Doppler action pin changed",
+      "AUTH-DRIFT-DOPPLER",
+      (content: string) =>
+        content.replace(pins["dopplerhq/secrets-fetch-action"], "0".repeat(40)),
+    ],
+    [
+      "Doppler drift output widened",
+      "AUTH-DRIFT-DOPPLER",
+      (content: string) =>
+        `${content}\n# DRIFT_EXTRA: $` +
+        "{{ steps.doppler.outputs.BUNDJIL_INFRASTRUCTURE_DRIFT_EXTRA }}\n" +
+        "# inject-env-vars: true\n",
+    ],
+    [
       "dynamic run identity removed",
       "AUTH-DRIFT-RUN-IDENTITY",
       (content: string) =>
@@ -605,7 +644,7 @@ describe("HGI-304 authority policy", () => {
       "AUTH-DRIFT-MANIFEST",
       (content: string) =>
         content.replace(
-          "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+          "bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5",
           "0".repeat(64)
         ),
     ],
@@ -623,8 +662,8 @@ describe("HGI-304 authority policy", () => {
       "AUTH-DRIFT-MUTATION",
       (content: string) =>
         content.replace(
-          'bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report',
-          'bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report'
+          'bun run --env-file "$RUNNER_TEMP/drift.env" infrastructure:drift-report:internal',
+          'bun --env-file "$RUNNER_TEMP/drift.env" run infrastructure:drift-report:internal'
         ),
     ],
     [
@@ -701,6 +740,12 @@ describe("HGI-304 authority policy", () => {
         ].join(""),
     ],
     [
+      "Doppler Production output removed",
+      "AUTH-PRODUCTION-DOPPLER",
+      (content: string) =>
+        content.replace(/^\s*BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:.*$/m, ""),
+    ],
+    [
       "callback alias binding removed",
       "AUTH-PRODUCTION-CALLBACK",
       (content: string) =>
@@ -732,8 +777,8 @@ describe("HGI-304 authority policy", () => {
       "AUTH-PRODUCTION-TIME-BUDGET",
       (content: string) =>
         content.replace(
-          "        timeout-minutes: 45\n        run: bun run production:deploy",
-          "        timeout-minutes: 46\n        run: bun run production:deploy"
+          "        timeout-minutes: 45\n        env:",
+          "        timeout-minutes: 46\n        env:"
         ),
     ],
     [
@@ -749,7 +794,7 @@ describe("HGI-304 authority policy", () => {
       "owned command changed",
       "AUTH-PRODUCTION-BOUNDARY",
       (content: string) =>
-        content.replace("bun run production:deploy", "vercel --prod"),
+        content.replace("bun run production:deploy:internal", "vercel --prod"),
     ],
   ])(
     "rejects Production property independently: %s",

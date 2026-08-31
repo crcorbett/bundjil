@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "owner": "bundjil-security-automation-maintainer",
-  "lastReviewed": "2026-08-13",
+  "lastReviewed": "2026-08-24",
   "reviewTrigger": "workflow action, upstream release, security advisory, pin, approved location, or update-owner change",
   "actions": [
     {
@@ -69,6 +69,19 @@
       "updateOwner": "bundjil-security-automation-maintainer",
       "provenance": "Public upstream Git ref resolved with git ls-remote on 2026-07-21; this proves ref identity only, not action safety, OIDC behavior, credential scope, or hosted execution.",
       "updatedAt": "2026-07-21"
+    },
+    {
+      "action": "dopplerhq/secrets-fetch-action",
+      "ref": "refs/tags/v2.0.0",
+      "tag": "v2.0.0",
+      "pin": "451892f16195f9ac360e1a5bcbf0b5fd0e957534",
+      "approvedWorkflows": [
+        ".github/workflows/infrastructure-drift.yml",
+        ".github/workflows/production.yml"
+      ],
+      "updateOwner": "bundjil-security-automation-maintainer",
+      "provenance": "Public upstream Git ref refs/tags/v2.0.0 resolved to this commit and the reviewed action.yml declares node24. This proves ref identity and declared runtime only, not action safety, Doppler custody, hosted execution, deployment, or provider behaviour.",
+      "updatedAt": "2026-08-24"
     }
   ]
 }
