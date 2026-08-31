@@ -35,11 +35,14 @@ commands capture authority, configuration, runtime acquisition, foreground
 work, readback, and Schema receipt encoding in that boundary; expected failure
 must not fall through to a runtime stack reporter. The private automatic
 Production entrypoint follows the same process contract: it keeps the existing
-Schema-encoded deployment receipt on success and emits only
-`{"status":"blocked"}` with exit code `1` after any Config, Layer, deployment,
-rollback, health, or encoding failure. That bounded result is not a deployment
-or rollback diagnosis; GitHub logs and Vercel readback remain the operational
-evidence owners.
+Schema-encoded deployment receipt on success and emits a Schema-encoded
+`blocked` receipt with exit code `1` after any Config, Layer, deployment,
+rollback, health, or encoding failure. The receipt exposes only the closed
+failure category and, for an expected deployment failure, its safe operation,
+project, reason and retry class. It never emits a command, URL, provider body,
+credential, raw error or stack. That bounded result identifies the failed
+control step; GitHub logs and Vercel readback remain the operational evidence
+owners.
 
 ## Supported commands
 
@@ -83,9 +86,35 @@ proved by assigned-project access plus sibling-project denial. It stages both
 apps with
 domains skipped, validates immutable candidates, promotes only while the
 candidate is still `main`, verifies the stable targets and proxy health, and
-restores the exact prior deployments on every non-success Effect exit after
-promotion starts, including interruption and defect paths. It is not an
-operator convenience command.
+then assigns the existing Photon callback alias to the accepted agent. It
+restores the exact prior callback, agent and proxy targets in reverse order on
+every non-success Effect exit after mutation starts, including interruption
+and defect paths. When both apps already match `main` but the callback does
+not, it moves only the callback. It is not an operator convenience command.
+
+The live deployment adapter binds each command with the exact
+`VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and matching redacted token. Reads,
+promotion, callback assignment, and rollback use project-addressed Vercel API paths with the exact
+team ID as a query parameter. Staging uses those environment bindings and does
+not ask the CLI to discover a team by `--scope`. It uploads the repository root
+once, then lets each exact Vercel project's `rootDirectory` select its owned app;
+it must not pass that app directory as a second upload root. Mutation requests
+send their required empty JSON body through an Effect Stream after Effect Schema
+encoding. After promotion or rollback, the adapter polls the decoded current
+target with an Effect Schedule until the deployment ID and source SHA match.
+The callback hostname is a branded non-secret Config value; its current alias
+response is decoded and its referenced immutable agent deployment is inspected
+before use. The same bounded readback follows callback assignment. Missing,
+redirected, malformed or cross-project aliases fail closed.
+Every child-process provider command has an Effect-managed two-minute timeout.
+The mutation phase has a separate eight-minute deadline, and each callback,
+agent and proxy restoration has its own four-minute deadline. The workflow's
+six setup/deployment step limits total 57 minutes inside its 60-minute job, and
+the deployment step is capped at 45 minutes. The Effect command's bounded
+pre-mutation sequence can use at most 22 minutes; mutation and all three
+restorations can use at most another 20 minutes. This 42-minute bound fits
+inside that deployment step. A timeout is an unsuccessful Effect exit and never
+becomes a success receipt.
 
 The root `infrastructure:drift-report` wrapper selects `bundjil/stg`. Its GitHub
 worker maps only the authority, environment bundle and compressed manifest into

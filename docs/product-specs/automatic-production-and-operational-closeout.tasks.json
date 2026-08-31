@@ -1,11 +1,11 @@
 {
   "title": "Automatic Production deployment and operational closeout tasks",
   "spec": "automatic-production-and-operational-closeout.md",
-  "status": "implemented",
+  "status": "completed",
   "authority": "Cooper's 2026-08-10 delegated authority covers the exact repository, GitHub, Personal Vercel team team_1LX7ZujbijowTv8J9k0aU7nD, secret, deployment, rollback, Photon, Sendblue, OAuth and Computer Use operations in this ledger; it does not permit another Vercel team, secret disclosure, unrelated resources, destructive out-of-scope work, or blind retry. A contact email does not define Vercel resource scope.",
   "principles": [
     "Deploy only an exact successful main CI SHA and never let Vercel Git move Production before repository verification.",
-    "Stage both candidates without domains, decode provider output once, then promote with exact rollback identities.",
+    "Stage both candidates without domains, decode provider output once, then promote proxy, public agent and Photon callback with exact rollback identities.",
     "Keep CI verification secret-free and the non-cancellable Production writer in its own workflow and environment.",
     "Use four separate one-year dashboard-issued Vercel tokens, each project-scoped to one exact Personal Bundjil project, prove assigned-project success and sibling-project denial before custody, and retain only sanitized fingerprints and metadata.",
     "Keep repository, CI, deployment, alias, model, provider, delivery and handset claims separate.",
@@ -99,7 +99,7 @@
     {
       "id": "configure-hosted-controls-and-drift",
       "title": "Configure bounded GitHub and Vercel identities and close Infrastructure Drift",
-      "status": "in_progress",
+      "status": "deferred",
       "dependsOn": ["refresh-node24-action-runtimes"],
       "description": "Create four separate one-year dashboard tokens in the admitted Personal Vercel team: one project-scoped Production token and one project-scoped drift token for each exact Bundjil project. Prove each assigned-project read and sibling-project denial before storing metadata and values in the personal bundjil 1Password vault. Bind only the two Production ciphertexts to the matching Production environment secrets. Create the distinct drift pair inside the three exact Schema-decoded environment artifacts, install the minimal main ruleset, dispatch one report-only drift run and retain sanitized readback. Exact project configuration, decoded project/source readback, executable Bun argument order and a present Schema-valid receipt remain mandatory independent controls.",
       "mandatoryVerification": [
@@ -123,20 +123,22 @@
         "limitationsAndNonClaims": "Secret values are intentionally not retained; drift success proves no Production or future no-drift claim."
       },
       "docsImpact": "Refresh authority/control externalReadback fields, active plan and dated drift evidence; do not copy mutable GitHub settings into README prose.",
-      "currentResult": "In progress after rejecting hosted run 32440487569 as a false green. Four replacement one-year Personal dashboard tokens expire on 2027-08-21; each is exact-project scoped, passed assigned-project HTTP 200 and sibling-project HTTP 404, and is concealed in the same four personal bundjil 1Password items with a stored SHA-256 fingerprint prefix, exact project, purpose and revocation owner. GitHub Production contains exactly the two refreshed Production secrets. The accepted Preview manifest has 155 resources at digest 307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60. Run 32440487569 checked out c154d725372617c699538629712569518ee18099 but Bun printed help because --env-file preceded run; no report or receipt existed, so the green result is rejected. Pull-request run 32441621932 executed the corrected command but failed before writing a receipt. Diagnostic run 32442223436 reported runtimeInitializationFailed. The eight-line environment artifact passed the R2, Preview Photon and exact-project Vercel Config Schemas, but gh secret set --body - stored a literal hyphen instead of stdin. The two Production tokens and drift environment were replaced with the correct stdin form; run 32444546031 then moved past R2 state and stopped at authorityArtifactInvalid. The authority replacement succeeded. GitHub rejected the 87,930-byte raw manifest with HTTP 422 because it exceeds the environment-secret size boundary. The successor workflow materialises an in-memory gzip/base64 transport produced only after AdoptionManifestJson Schema encoding, then the report command Schema-decodes the original manifest. The 7,516-byte transport was installed at 2026-08-21T04:07:06Z after its in-memory round trip retained stage, digest and all 155 resources. Pull-request run 32445924126 proved materialisation but stopped at manifestArtifactInvalid because the workflow omitted the accepted digest required by command configuration. CI runs 32446250097, 32448148359, 32448884504 and 32449185498 passed their exact correction SHAs. Drift runs 32446250037, 32448148424, 32448884429 and 32449185370 each produced a Schema-valid inconclusive receipt with provider-writes:0 and narrowed successive safe provider failures. The exact personal-vault Photon item then returned HTTP 200 for billing, so the eight-line artifact was rebuilt in memory and only that GitHub environment secret was replaced at 2026-08-21T05:14:33Z. Run 32449836785 moved past Photon and retained an exact-SHA zero-write receipt, then proved both project tokens are denied with HTTP 403 at Vercel's old account-wide storage list while each exact project environment endpoint returns the required Marketplace attachment hints. The successor removes that undocumented team read, matches only the observable project, integration, configuration and resource tuple, and treats the accepted manifest database ID as retained rather than freshly observed. Runs 32452367518 and 32453467578 completed provider reads with zero writes. CI run 32453467606 passed exact SHA e3deed1d307748ee629c684874d21c3c8f33b015. Secret-negative exact R2 and Vercel comparison proved 58 saved deployment observations still match every typed field and 37 accepted historical observations are no longer returned; no returned deployment changed. The current successor reports those unavailable historical identities without repair authority and accepts an unchanged ObservedUnknown secret baseline only when present provider revision metadata and the accepted manifest agree. The remote value remains unproved. A conclusive exact-source hosted receipt is still required.",
+      "currentResult": "Accepted as a non-blocking external limitation. Four Personal one-year project-scoped Vercel tokens remain in custody and each passed its assigned-project read plus sibling-project denial. GitHub Production contains exactly the two deployment secrets. CI run 32455191281 passed exact SHA f5c707c4da8065993e6886130f887a774ff71520. Drift run 32455191367 completed all admitted provider reads with zero writes and returned 109 accepted, zero blocking, eight inconclusive and 38 report findings. The eight live write-only rows all changed provider revision, but Vercel exposes neither their prior secret values nor a separate immutable value history. Bundjil therefore cannot truthfully re-baseline them from current evidence. The limitation is retained without weakening the control and no longer blocks separately proved Production or channel work.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
         "docs/evidence/verification/details/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
         "docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json",
-        "docs/evidence/verification/details/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json"
+        "docs/evidence/verification/details/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json",
+        "docs/evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json",
+        "docs/evidence/verification/details/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json"
       ],
       "commitAfterPassing": true
     },
     {
       "id": "correct-terra-high-and-prove-automatic-main",
       "title": "Apply Terra High configuration and prove automatic exact-main Production",
-      "status": "deferred",
-      "dependsOn": ["configure-hosted-controls-and-drift"],
+      "status": "completed",
+      "dependsOn": ["refresh-node24-action-runtimes"],
       "description": "Set the three required semantic Production values in their owning Personal projects, merge an exact verified candidate, let the new main workflow stage and promote without a human step, and prove immutable/stable/rollback and model behaviour.",
       "mandatoryVerification": [
         "Metadata-only readback precedes each environment update; model/context are encrypted on agent and reasoning effort is encrypted on proxy.",
@@ -155,7 +157,7 @@
         "limitationsAndNonClaims": "One bounded turn does not prove all future model responses, latency or strict replay absence."
       },
       "docsImpact": "Update accepted Production proof, runbook readback, active plan and lifecycle owners; provider state remains dated evidence.",
-      "currentResult": "Deferred without an accepted automatic Production run. The two Production credentials now have exact project scope, assigned-project success, sibling-project denial, personal Bundjil 1Password custody and GitHub Production secret custody. The exact main ruleset, Production variables and protected-branch environment were read back, but no accepted main SHA has been pushed through CI and the workflow_run writer because the prerequisite report-only drift custody package remains incomplete. Stable Terra High, immutable/stable deployment identity, rollback execution and protected Eve behaviour remain unproved.",
+      "currentResult": "Completed on 2026-08-28. Pull request #14 merged the absent-only successful SSE fallback as 402c5c54460361f969f6cd2ba8326b1d3f16c047. Exact-source CI run 33098864416 passed and automatically started Production run 33099189936, which promoted proxy dpl_8tiED99yxiLFTEWdu7WmFiFeSvoV and agent dpl_99rA1C88usyXUx2bG2V8s9Tu2Xzx while retaining the prior READY pair. Protected Eve info reported bundjil-codex-proxy/gpt-5.6-terra with context 1050000. One bounded private session reached message.completed and session.waiting with no failure event, and exact proxy readback recorded successful model calls. This proves automatic exact-main Production and Terra High for that immutable source only.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json",
         "docs/evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json"
@@ -163,10 +165,40 @@
       "commitAfterPassing": true
     },
     {
+      "id": "bind-photon-callback-to-automatic-production",
+      "title": "Move and roll back the Photon callback in automatic Production",
+      "status": "completed",
+      "dependsOn": ["correct-terra-high-and-prove-automatic-main"],
+      "description": "Add the existing Production Photon callback alias to the typed automatic deployment state machine so every accepted main deployment moves and verifies it, while callback-only drift is reconciled without rebuilding and every uncertain outcome rolls back in reverse order.",
+      "mandatoryVerification": [
+        "A branded non-secret Config.schema value owns the exact callback hostname; the live Layer decodes alias, project and deployment output before inspecting the immutable target.",
+        "The public service exposes only named currentAgentCallback and assignAgentCallback operations; raw alias requests, responses and clients remain private.",
+        "An already-current public pair with a stale callback re-reads main, assigns only the callback and verifies exact project, deployment and source readback.",
+        "A new candidate mutates proxy, public agent and callback in that order, records rollback eligibility before each uncertain call, and reports success only after all three exact targets and health pass.",
+        "Typed failure, interruption and defect fixtures prove callback-first reverse rollback, including after-write outcomes, every eligible restoration attempt, restoration readback and preservation of the original unsuccessful Exit unless rollback fails.",
+        "Deterministic TestClock fixtures prove the two-minute child-process deadline, eight-minute mutation deadline, separate four-minute restoration deadlines, and every later eligible rollback attempt inside the 45-minute deployment step and 60-minute workflow job.",
+        "The parsed-YAML authority audit enforces the exact 60-minute Production job, the exact six-step workflow inventory and its 2, 1, 2, 2, 5, and 45 minute limits, totalling 57 minutes. The longest internal command, mutation and restoration path is bounded to 42 minutes.",
+        "The required Schema-encoded receipt includes previousAgentCallbackDeploymentId and stableAgentCallbackDeploymentId and remains negative for tokens, callback queries, secrets, messages, raw output and raw errors.",
+        "GitHub Production stores one exact non-secret callback variable and still exactly two project-scoped secrets.",
+        "Focused infrastructure, authority, controls, verification, docs and skills checks plus full repository verification pass.",
+        "The merged exact-main automatic Production run proves the callback reaches the accepted agent without a manual reassignment and retains all three rollback identities."
+      ],
+      "proofContract": {
+        "directObservable": "Typed fixtures prove exact callback read, callback-only reconciliation, ordered full promotion and reverse rollback; hosted readback binds the callback alias to the exact accepted agent deployment and source.",
+        "expectedPostcondition": "Photon remains attached to every automatic Production agent deployment and can be restored safely after any uncertain partial change.",
+        "falseGreenRejected": "Public agent alias success, manual callback movement, READY alone, deployment ID without project/source inspection, or typed-error-only compensation.",
+        "evidenceOwner": "Automatic deployment tests, runbook and dated exact-main Production packet",
+        "limitationsAndNonClaims": "Repository fixtures do not prove Vercel mutation. Hosted callback readback does not prove future Photon delivery or strict candidate-specific replay."
+      },
+      "docsImpact": "Update the infrastructure README, Production runbook, workflow, authority/automation registers, SPEC/tasks/plan and dated proof in the same slice; preserve app route and package topology.",
+      "currentResult": "Completed on 2026-08-28. Pull request 15 merged as exact main 27011deb4593f15f4042ff5cf570ca426da9d299. Main CI run 33108401987 passed and automatically started Production run 33108710900. The Schema-encoded receipt reported promoted with rollbackReady true and recorded the prior proxy, agent and callback identities. Independent Personal Vercel readback matched READY proxy dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6 and agent dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp to that source; both public aliases and the Photon callback resolved to those exact targets without manual reassignment. Proxy health returned live/high, protected Eve reported bundjil-codex-proxy/gpt-5.6-terra with context 1050000, and one bounded turn reached message.completed and session.waiting without failure. The accepted proof packet is docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json.",
+      "commitAfterPassing": true
+    },
+    {
       "id": "close-channel-proof-gaps",
       "title": "Run bounded Personal Photon and Sendblue long-response proofs",
-      "status": "deferred",
-      "dependsOn": ["correct-terra-high-and-prove-automatic-main"],
+      "status": "completed",
+      "dependsOn": ["bind-photon-callback-to-automatic-production"],
       "description": "Reauthenticate Photon in Personal scope, inventory it, then use the established conversations for one bounded Photon and one bounded Sendblue long-response test with direct handset observation where available.",
       "mandatoryVerification": [
         "Photon Personal identity, project, user, webhook and established-conversation gates pass before a send; no number is inferred, retained or typed.",
@@ -185,14 +217,14 @@
         "limitationsAndNonClaims": "Photon strict replay and any unobservable handset animation remain explicit limitations, not implementation defects."
       },
       "docsImpact": "Update verification packet/index, active plan, task status and exact runbook evidence pointers; preserve provider procedures in app runbooks.",
-      "currentResult": "Deferred without a new send because the exact automatic Production candidate required by this task was not produced. Prior dated Photon and Sendblue Production receipts remain historical point-in-time evidence only. No message was sent, no uncertain operation was retried, and candidate-specific Photon replay plus any unobserved handset typing remain explicit non-claims.",
+      "currentResult": "Completed on 2026-08-28 against exact agent dpl_7ifR1WbvaQRbjuhakfzJL2PBRExp and proxy dpl_2kSZWu464QLcHmh6ZsrMwWaewPA6. Computer Use selected each established conversation by visible history and sent exactly one bounded prompt. Photon accepted signed ingress, Eve dispatch, typing start and stop and one outbound send; Messages directly showed delivery, visible typing and one full reply. Sendblue reported the inbound as RECEIVED and the outbound iMessage as DELIVERED without downgrade or provider error; Messages directly showed delivery, visible typing and one full reply. Agent logs bound both webhooks and Photon operations to the exact deployment, proxy logs recorded successful requests, and neither app reported a runtime error in the proof window. Photon exposes no supported candidate-specific replay oracle, so strict replay remains the accepted non-blocking limitation and no custom substitute was added. The durable packet is docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json.",
       "blockedEvidence": [
         "docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json"
       ],
       "commitAfterPassing": true
     }
   ],
-  "terminalAuditOwner": "effect-native-runtime-patterns-and-lint-enforcement.tasks.json#terminal-five-pass-audit",
+  "terminalAuditOwner": "This ledger's final clean review after callback implementation and hosted proof",
   "nonGoals": [
     "No direct Vercel Git auto-deploy or alias movement before main verification.",
     "No manual Production approval or promotion in the accepted automatic path.",

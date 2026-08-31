@@ -3,7 +3,7 @@ document_type: verification-router
 lifecycle: current
 authority: canonical
 owner: bundjil-verification-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-28
 review_trigger: app, auth, provider, deployment, messaging, approval, recovery, proof, or receipt-contract change
 ---
 
@@ -29,7 +29,7 @@ operation nor asserts present provider state.
   Sendblue iMessage round-trip, provider-accepted typing start/stop, rollback
   identities, secret cleanup, and the separate Photon/Infrastructure Drift
   non-claims. It is point-in-time evidence, not standing authority.
-- The current automatic Production closeout is owned by
+- The completed automatic Production closeout is owned by
   [`../product-specs/automatic-production-and-operational-closeout.md`](../product-specs/automatic-production-and-operational-closeout.md)
   and its active plan. Its
   [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
@@ -41,11 +41,14 @@ operation nor asserts present provider state.
   [`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json)
   records four project-scoped tokens, assigned-project success and sibling
   denial, concealed 1Password custody, and the two Production GitHub secret
-  names. It does not prove hosted execution. The hosted tasks remain deferred
-  until a successor packet records matching successful CI and
-  `Production` runs, exact immutable candidates, stable targets, health,
-  rollback identities and live journey results, repository source proves only
-  the control contract—not hosted automatic deployment or channel behavior.
+  names. It did not prove hosted execution. The accepted successor
+  [`automatic-production-callback-channels-accepted-2026-08-28.json`](../evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json)
+  binds exact main `27011deb4593f15f4042ff5cf570ca426da9d299` to successful
+  CI and automatic Production runs, READY proxy and agent targets, automatic
+  Photon callback movement, rollback identities, a completed Terra High turn,
+  and one bounded visible-typing reply through each Production channel. It is
+  point-in-time proof. Eight write-only drift values remain inconclusive, and
+  Photon still has no supported candidate-specific replay check.
 - [`journey-command-map.json`](journey-command-map.json) maps those IDs to
   actual local commands or the target-owned runbook that must be followed.
 - [`proof-packet.schema.json`](proof-packet.schema.json) is the machine-readable

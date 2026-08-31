@@ -66,9 +66,11 @@ automation fallback.
   acceptance. Revert the workflow change or disable the workflow under separate
   GitHub-setting authority; escalate to the repository owner.
 
-### Production deployment — admitted post-CI automation, hosted run deferred
+### Production deployment — admitted post-CI automation, callback correction in progress
 
-The source control is admitted, but its hosted proof is still deferred. The
+Automatic exact-main Production and one Terra High turn are accepted for SHA
+`402c5c54460361f969f6cd2ba8326b1d3f16c047`. The callback correction described
+below still needs a merged automatic run and exact provider readback. The
 2026-08-13 stop occurred before any token or partial GitHub custody was created
 and is retained in
 [`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
@@ -101,14 +103,21 @@ so no Production run, deployment or public behaviour was proved.
   a denied result for the sibling project. Exact project configuration and
   decoded project/SHA readback remain independent controls. The
   repository-owned Effect command stages proxy and agent with domains skipped,
-  validates both candidates, re-reads main, promotes proxy then agent, and
-  verifies stable targets and health. Unexpected teams, account-wide or
+  validates both candidates, re-reads main, promotes proxy then public agent,
+  assigns the existing Photon callback alias to that agent, and verifies all
+  three targets plus health. The callback hostname is a non-secret Production
+  variable and uses the existing agent token. Unexpected teams, account-wide or
   user-scoped credentials, team-wide project listing, and raw workflow mutation
   commands are rejected.
 - **Duration and convergence:** one repository-wide queue never cancels an
-  in-flight writer and bounds each run to 30 minutes. Already-current and stale
-  candidates are explicit no-ops. A partial failure restores the exact prior
-  agent then proxy identities as applicable and verifies the restored targets.
+  in-flight writer and bounds each run to 60 minutes. Provider commands,
+  mutation and each restoration have shorter Effect-managed deadlines so
+  rollback time is retained. The six workflow step deadlines total 57 minutes,
+  and the Effect deployment command has its own 45-minute step. Already-current and stale
+  candidates are explicit no-ops only when the callback also matches. A stale
+  callback with current public apps is reconciled alone. A partial failure
+  restores the exact prior callback, agent and proxy identities in reverse
+  order as applicable and verifies the restored targets.
 - **Evidence and non-claim:** source/CI/Production run, immutable candidates,
   project/source/readiness, stable target, health and rollback identities are
   separate receipt fields. Source and local fixtures do not prove GitHub
@@ -138,6 +147,16 @@ historical deployment behaviour. Exact successor `f5c707c` completed every
 provider read and left eight changed environment rows inconclusive. The approved
 2026-08-24 continuation re-admits only those exact metadata rows from two
 matching read-only inventories; it does not claim their values.
+
+CI run `32455191281` passed exact successor SHA
+`f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
+`32455191367` completed all provider reads and recorded zero writes, zero
+blocking rows, eight inconclusive write-only rows and 38 report rows. Aggregate
+secret-negative follow-up found the eight rows live, four per project, with
+changed provider revisions; five also changed type and two also changed
+sensitivity. No previous value or immutable value revision is available from
+the admitted provider read. The workflow therefore remains failed closed and
+cannot trigger a main merge or automatic Production.
 
 - **Signal and target:** same-repository pull requests for `main`, one weekly
   schedule, or manual dispatch observe only

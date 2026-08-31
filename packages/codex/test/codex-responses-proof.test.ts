@@ -157,6 +157,12 @@ effectIt.effect(
         `Bearer ${Redacted.value(input.accessToken)}`
       );
       assert.strictEqual(request.headers["content-type"], "application/json");
+      assert.strictEqual(request.headers["accept"], "text/event-stream");
+      assert.strictEqual(
+        request.headers["openai-beta"],
+        "responses=experimental"
+      );
+      assert.strictEqual(request.headers["originator"], "codex_cli_rs");
       assert.strictEqual(request.headers["chatgpt-account-id"], undefined);
     })
 );
@@ -882,6 +888,48 @@ effectIt.effect("rejects arbitrary successful non-SSE bodies", () =>
     }
     assert.strictEqual(error.operation, "postResponses");
   })
+);
+
+effectIt.effect("accepts an SSE response whose content type is absent", () =>
+  Effect.gen(function* acceptUnlabelledEventStream() {
+    const source = new Response(new TextEncoder().encode(completedSse), {
+      status: 200,
+    });
+    const client = HttpClient.make((request) =>
+      Effect.succeed(HttpClientResponse.fromWeb(request, source))
+    );
+    const input = yield* makeAccessToken;
+    const response = yield* Effect.gen(
+      function* postUnlabelledStreamingResponse() {
+        const clientService = yield* CodexHttpClient;
+        return yield* clientService.postResponsesStream(input);
+      }
+    ).pipe(Effect.provide(codexHttpClientLayer(client)));
+
+    assert.strictEqual(response.contentType, "text/event-stream");
+    yield* response.body.pipe(Stream.runDrain);
+    assert.isTrue(source.bodyUsed);
+  })
+);
+
+effectIt.effect(
+  "accepts an SSE proof response whose content type is absent",
+  () =>
+    Effect.gen(function* acceptUnlabelledProofEventStream() {
+      const source = new Response(new TextEncoder().encode(completedSse), {
+        status: 200,
+      });
+      const client = HttpClient.make((request) =>
+        Effect.succeed(HttpClientResponse.fromWeb(request, source))
+      );
+      const input = yield* makeAccessToken;
+      const result = yield* postResponses(input).pipe(
+        Effect.provide(codexHttpClientLayer(client))
+      );
+
+      assert.strictEqual(result.contentType, "text/event-stream");
+      assert.isTrue(source.bodyUsed);
+    })
 );
 
 effectIt.effect(

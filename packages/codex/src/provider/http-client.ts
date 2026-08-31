@@ -50,14 +50,21 @@ export type CodexHttpClientFailure =
   | CodexHttpStatusError
   | CodexResponsesStreamError;
 
+const codexResponsesAccept = "text/event-stream";
+const codexResponsesBeta = "responses=experimental";
+const codexResponsesOriginator = "codex_cli_rs";
+
 const makeCodexResponsesHeaders = (
   input: Pick<CodexResponsesPostInput, "accessToken" | "accountId">
 ) =>
   Effect.try({
     try: () => {
       const headers = new Headers({
+        Accept: codexResponsesAccept,
         Authorization: `Bearer ${Redacted.value(input.accessToken)}`,
         "Content-Type": "application/json",
+        "OpenAI-Beta": codexResponsesBeta,
+        originator: codexResponsesOriginator,
       });
       if (input.accountId !== undefined) {
         headers.set("chatgpt-account-id", Redacted.value(input.accountId));
@@ -171,7 +178,8 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
               ),
           })
         );
-        const contentType = response.headers["content-type"] ?? "";
+        const contentType =
+          response.headers["content-type"] ?? codexResponsesAccept;
         const status = yield* Schema.decodeUnknownEffect(CodexHttpStatus)(
           response.status
         ).pipe(
@@ -313,7 +321,8 @@ export const makeCodexHttpClient = Effect.gen(function* makeCodexHttpClient() {
                 ),
             })
           );
-          const contentType = response.headers["content-type"] ?? "";
+          const contentType =
+            response.headers["content-type"] ?? codexResponsesAccept;
           const status = yield* Schema.decodeUnknownEffect(CodexHttpStatus)(
             response.status
           ).pipe(

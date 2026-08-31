@@ -4,7 +4,8 @@ import {
   OpenAICompatibleProxyAuthorizationHeader,
   OpenAICompatibleProxyInput,
 } from "@bundjil/codex";
-import { Effect, Layer, Match, Schema } from "effect";
+import type { CodexResponsesStreamError } from "@bundjil/codex";
+import { Effect, Layer, Match, Schema, Stream } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import {
   HttpRouter,
@@ -31,6 +32,11 @@ import type { CodexProxyErrorCode } from "./schemas.js";
 const healthJson = HttpServerResponse.schemaJson(CodexProxyHealthResponse);
 const errorJson = HttpServerResponse.schemaJson(CodexProxyErrorResponse);
 const codexProxyRequestBodyMaxBytes = FileSystem.Size(1024 * 1024);
+function observeCodexProxyStreamFailure(error: CodexResponsesStreamError) {
+  return Effect.logError("CodexProxyStreamFailure", {
+    operation: error.operation,
+  });
+}
 
 const errorResponse = (
   code: CodexProxyErrorCode,
@@ -182,16 +188,19 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
     const proxy = yield* OpenAICompatibleProxy;
     const stream = yield* proxy.handleChatCompletions(proxyInput);
 
-    return HttpServerResponse.stream(stream.body, {
-      contentType: stream.contentType,
-      headers: {
-        "cache-control": "no-cache, no-transform",
-        "x-accel-buffering": "no",
-        "x-bundjil-codex-proxy-model-invocation": "true",
-        "x-bundjil-codex-proxy-mode": config.mode,
-      },
-      status: 200,
-    });
+    return HttpServerResponse.stream(
+      stream.body.pipe(Stream.tapError(observeCodexProxyStreamFailure)),
+      {
+        contentType: stream.contentType,
+        headers: {
+          "cache-control": "no-cache, no-transform",
+          "x-accel-buffering": "no",
+          "x-bundjil-codex-proxy-model-invocation": "true",
+          "x-bundjil-codex-proxy-mode": config.mode,
+        },
+        status: 200,
+      }
+    );
   }).pipe(
     Effect.catchTags({
       CodexProxyRouteError: (error) =>
@@ -204,8 +213,12 @@ const chatCompletionsRoute = (request: HttpServerRequest.HttpServerRequest) =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
       CodexHttpStatusError: () =>
         errorResponse("proxy_error", "The proxy request failed.", 502),
-      CodexResponsesStreamError: () =>
-        errorResponse("proxy_error", "The proxy stream failed.", 502),
+      CodexResponsesStreamError: (error) =>
+        observeCodexProxyStreamFailure(error).pipe(
+          Effect.andThen(
+            errorResponse("proxy_error", "The proxy stream failed.", 502)
+          )
+        ),
       CodexProfileNotFound: () => reauthenticationRequiredResponse,
       CodexProfileSchemaError: () => reauthenticationRequiredResponse,
       CodexProfileStorageError: () => authTemporarilyUnavailableResponse,

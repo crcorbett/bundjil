@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "receipt": "automatic-production-personal-vercel-drift-inconclusive",
+  "observedAt": "2026-08-21T06:42:02Z",
+  "repository": {
+    "name": "crcorbett/bundjil",
+    "branch": "codex/personal-vercel-hosted-proof",
+    "sourceSha": "f5c707c4da8065993e6886130f887a774ff71520",
+    "pullRequest": 6,
+    "originMain": "c154d725372617c699538629712569518ee18099"
+  },
+  "hostedVerification": {
+    "runId": 32455191281,
+    "jobId": 96691013462,
+    "conclusion": "success",
+    "sourceSha": "f5c707c4da8065993e6886130f887a774ff71520"
+  },
+  "hostedDrift": {
+    "runId": 32455191367,
+    "jobId": 96691013678,
+    "githubConclusion": "failure",
+    "acceptedConclusion": "inconclusive",
+    "sourceSha": "f5c707c4da8065993e6886130f887a774ff71520",
+    "stage": "preview",
+    "manifestDigest": "307054bf0a080de4f8bd0fd47c79faac81b8199673dac6abcf01faec6aadad60",
+    "resourceCount": 155,
+    "counts": {
+      "accepted": 109,
+      "blocking": 0,
+      "inconclusive": 8,
+      "report": 38
+    },
+    "groupedFindings": [
+      {
+        "resourceKind": "photonProjectObservation",
+        "category": "readOnlyObservationChange",
+        "disposition": "report",
+        "count": 1
+      },
+      {
+        "resourceKind": "vercelDeploymentObservation",
+        "category": "historicalDeploymentUnavailable",
+        "disposition": "report",
+        "count": 37
+      },
+      {
+        "resourceKind": "vercelEnvironmentVariable",
+        "category": "unknownSecretRevision",
+        "disposition": "inconclusive",
+        "count": 8
+      }
+    ],
+    "providerWrites": 0,
+    "actor": "github-actions:crcorbett/bundjil:32455191367:1",
+    "detailDigest": "dcf54a0e8b97e177ce7027b91852cb528b50a82f27926c0931bf5997a885823d",
+    "receiptObservedAt": "2026-08-21T06:39:18.000Z"
+  },
+  "secretNegativeFollowUp": {
+    "stateResourceCount": 155,
+    "environmentRowCount": 48,
+    "marketplaceBindingCount": 2,
+    "changedWriteOnlyRows": 8,
+    "changedRowsByProject": {
+      "agent": 4,
+      "proxy": 4
+    },
+    "liveRowMatches": 8,
+    "liveRowMissing": 0,
+    "createdAtPresent": 8,
+    "updatedAtPresent": 8,
+    "types": {
+      "encrypted": 6,
+      "plain": 2
+    },
+    "targets": {
+      "preview": 8
+    },
+    "mismatchFieldSets": {
+      "providerUpdatedAt": 1,
+      "type,providerUpdatedAt": 5,
+      "type,sensitive,providerUpdatedAt": 2
+    },
+    "contentHintPresent": 0,
+    "internalContentHintPresent": 0,
+    "configurationIdPresent": 0,
+    "systemTrue": 0,
+    "exactSavedMarketplaceBindingMatches": 0,
+    "method": "Read exact R2 custody and exact Personal Vercel project endpoints in memory; emit aggregate counts and field-name sets only; clear the clipboard after each copy and reset the process afterwards."
+  },
+  "decision": {
+    "outcome": "stop-before-main",
+    "reason": "Eight accepted write-only rows have changed provider revision metadata, five also changed type and two also changed sensitivity. The current provider API exposes no prior secret value or separate value-revision history, so continuity cannot be proved without weakening the control or admitting a new baseline.",
+    "requiredResumeAuthority": "A separately approved, evidence-backed re-admission of the eight current provider rows, or a provider-owned immutable value revision oracle that proves continuity. Report-only authority does not permit either repair or baseline replacement."
+  },
+  "credentialHandling": {
+    "onePasswordAccount": "Corbett Family",
+    "onePasswordVaultId": "u6jbz5fuuvz7vlfthnm5dtwnpq",
+    "clipboardClearedAfterEachCopy": true,
+    "inMemoryProcessReset": true,
+    "secretValueRetained": false
+  },
+  "nonClaims": [
+    "This evidence does not prove the eight write-only values are unchanged or changed.",
+    "This evidence does not admit a new state baseline or authorise repair.",
+    "This evidence does not prove an accepted Infrastructure Drift result, a main merge, automatic Production deployment, immutable deployments, aliases, health, Terra High, Eve behaviour, delivery or handset state.",
+    "No credential value, environment key, environment value, provider payload, request header or protected GitHub value is retained."
+  ],
+  "rollback": {
+    "providerRollback": "None; the hosted run and follow-up were read-only and recorded zero provider writes.",
+    "controlRollback": "Revert only the report-classification successor if it is superseded by a stricter evidenced rule; revoke the four exact Vercel credentials and remove their exact GitHub custody only under separate authority."
+  }
+}

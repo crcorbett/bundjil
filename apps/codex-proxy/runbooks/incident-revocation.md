@@ -67,7 +67,10 @@ at the recorded expiry.
 3. Classify the observable boundary: health unavailable, proxy bearer `401`,
    `codex_reauthentication_required`, `codex_auth_temporarily_unavailable`,
    upstream/proxy `502`, storage/lock/fence fault, leak, wrong mode/target, or
-   deployment/config/alias drift. Keep these claims separate.
+   deployment/config/alias drift. For a stream failure, read only the
+   `CodexProxyStreamFailure` event's closed `operation`; never retain its raw
+   error, message, request, response, SSE data, profile, token, or provider
+   payload. Keep these claims separate.
 
 4. Read Vercel project/deployment/alias/protection/metadata-only variable state,
    Upstash database metadata with credentials hidden, and sanitized stored-

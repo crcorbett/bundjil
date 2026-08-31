@@ -1,4 +1,4 @@
-import { Effect, Exit, Ref } from "effect";
+import { Duration, Effect, Exit, Ref } from "effect";
 
 import { ProductionDeploymentError } from "./production.errors.js";
 import type {
@@ -14,6 +14,17 @@ const targetError = (project: "agent" | "proxy") =>
     project,
     reason: "targetMismatch",
     retry: "never",
+  });
+
+const productionMutationTimeout = Duration.minutes(8);
+const productionRollbackTimeout = Duration.minutes(4);
+
+const rollbackTimeoutError = () =>
+  new ProductionDeploymentError({
+    operation: "rollback",
+    project: null,
+    reason: "timeout",
+    retry: "after-readback",
   });
 
 const validateCandidate = (
@@ -33,48 +44,56 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
     const deployments = yield* ProductionDeployments;
     const previousProxy = yield* deployments.current("proxy");
     const previousAgent = yield* deployments.current("agent");
-
-    if (
+    const previousAgentCallback = yield* deployments.currentAgentCallback;
+    const publicTargetsAreCurrent =
       previousProxy.sourceSha === sourceSha &&
-      previousAgent.sourceSha === sourceSha
-    ) {
+      previousAgent.sourceSha === sourceSha;
+    const callbackIsCurrent =
+      previousAgentCallback.projectId === previousAgent.projectId &&
+      previousAgentCallback.deploymentId === previousAgent.deploymentId &&
+      previousAgentCallback.sourceSha === sourceSha;
+
+    if (publicTargetsAreCurrent && callbackIsCurrent) {
       return {
         status: "already-current",
         sourceSha,
         previousProxyDeploymentId: previousProxy.deploymentId,
         previousAgentDeploymentId: previousAgent.deploymentId,
+        previousAgentCallbackDeploymentId: previousAgentCallback.deploymentId,
         proxyDeploymentId: null,
         agentDeploymentId: null,
         stableProxyDeploymentId: previousProxy.deploymentId,
         stableAgentDeploymentId: previousAgent.deploymentId,
+        stableAgentCallbackDeploymentId: previousAgentCallback.deploymentId,
         rollbackReady: true,
       } satisfies AutomaticProductionReceipt;
     }
 
-    const candidateProxy = yield* deployments.stage({
-      project: "proxy",
-      sourceSha,
-    });
-    const candidateAgent = yield* deployments.stage({
-      project: "agent",
-      sourceSha,
-    });
-    yield* validateCandidate(
-      yield* deployments.inspect({
-        project: "proxy",
-        deploymentId: candidateProxy.deploymentId,
-      }),
-      candidateProxy,
-      sourceSha
-    );
-    yield* validateCandidate(
-      yield* deployments.inspect({
-        project: "agent",
-        deploymentId: candidateAgent.deploymentId,
-      }),
-      candidateAgent,
-      sourceSha
-    );
+    const candidateProxy = publicTargetsAreCurrent
+      ? previousProxy
+      : yield* deployments.stage({ project: "proxy", sourceSha });
+    const candidateAgent = publicTargetsAreCurrent
+      ? previousAgent
+      : yield* deployments.stage({ project: "agent", sourceSha });
+
+    if (!publicTargetsAreCurrent) {
+      yield* validateCandidate(
+        yield* deployments.inspect({
+          project: "proxy",
+          deploymentId: candidateProxy.deploymentId,
+        }),
+        candidateProxy,
+        sourceSha
+      );
+      yield* validateCandidate(
+        yield* deployments.inspect({
+          project: "agent",
+          deploymentId: candidateAgent.deploymentId,
+        }),
+        candidateAgent,
+        sourceSha
+      );
+    }
 
     const currentMainSha = yield* deployments.readMainSha;
     if (currentMainSha !== sourceSha) {
@@ -83,92 +102,168 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
         sourceSha,
         previousProxyDeploymentId: previousProxy.deploymentId,
         previousAgentDeploymentId: previousAgent.deploymentId,
-        proxyDeploymentId: candidateProxy.deploymentId,
-        agentDeploymentId: candidateAgent.deploymentId,
+        previousAgentCallbackDeploymentId: previousAgentCallback.deploymentId,
+        proxyDeploymentId: publicTargetsAreCurrent
+          ? null
+          : candidateProxy.deploymentId,
+        agentDeploymentId: publicTargetsAreCurrent
+          ? null
+          : candidateAgent.deploymentId,
         stableProxyDeploymentId: previousProxy.deploymentId,
         stableAgentDeploymentId: previousAgent.deploymentId,
+        stableAgentCallbackDeploymentId: previousAgentCallback.deploymentId,
         rollbackReady: true,
       } satisfies AutomaticProductionReceipt;
     }
 
     const rollbackEligibility = yield* Ref.make<{
       readonly agent: boolean;
+      readonly callback: boolean;
       readonly proxy: boolean;
-    }>({ agent: false, proxy: false });
-    const promote = Effect.gen(function* () {
+    }>({ agent: false, callback: false, proxy: false });
+
+    const promotion = Effect.gen(function* () {
+      if (!publicTargetsAreCurrent) {
+        yield* Ref.update(rollbackEligibility, (current) => ({
+          ...current,
+          proxy: true,
+        }));
+        yield* deployments.promote(candidateProxy);
+        yield* validateCandidate(
+          yield* deployments.current("proxy"),
+          candidateProxy,
+          sourceSha
+        );
+        yield* Ref.update(rollbackEligibility, (current) => ({
+          ...current,
+          agent: true,
+        }));
+        yield* deployments.promote(candidateAgent);
+        yield* validateCandidate(
+          yield* deployments.current("agent"),
+          candidateAgent,
+          sourceSha
+        );
+      }
+
       yield* Ref.update(rollbackEligibility, (current) => ({
         ...current,
-        proxy: true,
+        callback: true,
       }));
-      yield* deployments.promote(candidateProxy);
+      yield* deployments.assignAgentCallback(candidateAgent);
       yield* validateCandidate(
-        yield* deployments.current("proxy"),
-        candidateProxy,
-        sourceSha
-      );
-      yield* Ref.update(rollbackEligibility, (current) => ({
-        ...current,
-        agent: true,
-      }));
-      yield* deployments.promote(candidateAgent);
-      yield* validateCandidate(
-        yield* deployments.current("agent"),
+        yield* deployments.currentAgentCallback,
         candidateAgent,
         sourceSha
       );
       yield* deployments.probeProxyHealth;
     });
 
-    yield* promote.pipe(
-      Effect.onExit((promoteExit) => {
-        if (Exit.isSuccess(promoteExit)) {
+    yield* promotion.pipe(
+      Effect.timeoutOrElse({
+        duration: productionMutationTimeout,
+        orElse: () =>
+          Effect.fail(
+            new ProductionDeploymentError({
+              operation: "promote",
+              project: null,
+              reason: "timeout",
+              retry: "after-readback",
+            })
+          ),
+      }),
+      Effect.onExit((promotionExit) => {
+        if (Exit.isSuccess(promotionExit)) {
           return Effect.void;
         }
-        const rollback = Effect.gen(function* () {
+        return Effect.gen(function* rollbackProduction() {
           const eligible = yield* Ref.get(rollbackEligibility);
-          if (eligible.agent) {
-            yield* deployments.rollback(previousAgent);
-            yield* validateCandidate(
-              yield* deployments.current("agent"),
-              previousAgent,
-              previousAgent.sourceSha
-            );
-          }
-          if (eligible.proxy) {
-            yield* deployments.rollback(previousProxy);
-            yield* validateCandidate(
-              yield* deployments.current("proxy"),
-              previousProxy,
-              previousProxy.sourceSha
-            );
-          }
-        });
-        return Effect.exit(rollback).pipe(
-          Effect.flatMap((rollbackExit) =>
-            Exit.isFailure(rollbackExit)
-              ? Effect.fail(
-                  new ProductionDeploymentError({
-                    operation: "rollback",
-                    project: null,
-                    reason: "rollbackFailed",
-                    retry: "after-readback",
-                  })
-                )
+          const callbackRollbackExit = yield* Effect.exit(
+            (eligible.callback
+              ? Effect.gen(function* restoreCallback() {
+                  yield* deployments.assignAgentCallback(previousAgentCallback);
+                  yield* validateCandidate(
+                    yield* deployments.currentAgentCallback,
+                    previousAgentCallback,
+                    previousAgentCallback.sourceSha
+                  );
+                })
               : Effect.void
-          )
-        );
+            ).pipe(
+              Effect.timeoutOrElse({
+                duration: productionRollbackTimeout,
+                orElse: () => Effect.fail(rollbackTimeoutError()),
+              })
+            )
+          );
+          const agentRollbackExit = yield* Effect.exit(
+            (eligible.agent
+              ? Effect.gen(function* restoreAgent() {
+                  yield* deployments.rollback(previousAgent);
+                  yield* validateCandidate(
+                    yield* deployments.current("agent"),
+                    previousAgent,
+                    previousAgent.sourceSha
+                  );
+                })
+              : Effect.void
+            ).pipe(
+              Effect.timeoutOrElse({
+                duration: productionRollbackTimeout,
+                orElse: () => Effect.fail(rollbackTimeoutError()),
+              })
+            )
+          );
+          const proxyRollbackExit = yield* Effect.exit(
+            (eligible.proxy
+              ? Effect.gen(function* restoreProxy() {
+                  yield* deployments.rollback(previousProxy);
+                  yield* validateCandidate(
+                    yield* deployments.current("proxy"),
+                    previousProxy,
+                    previousProxy.sourceSha
+                  );
+                })
+              : Effect.void
+            ).pipe(
+              Effect.timeoutOrElse({
+                duration: productionRollbackTimeout,
+                orElse: () => Effect.fail(rollbackTimeoutError()),
+              })
+            )
+          );
+          if (
+            Exit.isFailure(callbackRollbackExit) ||
+            Exit.isFailure(agentRollbackExit) ||
+            Exit.isFailure(proxyRollbackExit)
+          ) {
+            return yield* new ProductionDeploymentError({
+              operation: "rollback",
+              project: null,
+              reason: "rollbackFailed",
+              retry: "after-readback",
+            });
+          }
+          return yield* Effect.void;
+        });
       })
     );
 
     return {
-      status: "promoted",
+      status: publicTargetsAreCurrent ? "callback-reconciled" : "promoted",
       sourceSha,
       previousProxyDeploymentId: previousProxy.deploymentId,
       previousAgentDeploymentId: previousAgent.deploymentId,
-      proxyDeploymentId: candidateProxy.deploymentId,
-      agentDeploymentId: candidateAgent.deploymentId,
+      previousAgentCallbackDeploymentId: previousAgentCallback.deploymentId,
+      proxyDeploymentId: publicTargetsAreCurrent
+        ? null
+        : candidateProxy.deploymentId,
+      agentDeploymentId: publicTargetsAreCurrent
+        ? null
+        : candidateAgent.deploymentId,
       stableProxyDeploymentId: candidateProxy.deploymentId,
       stableAgentDeploymentId: candidateAgent.deploymentId,
+      stableAgentCallbackDeploymentId: candidateAgent.deploymentId,
       rollbackReady: true,
     } satisfies AutomaticProductionReceipt;
   }

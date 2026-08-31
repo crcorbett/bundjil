@@ -810,6 +810,30 @@ const productionFindings = (
   const concurrency = readMapping(workflow.document, "concurrency");
   const trigger = readMapping(workflow.document, "on");
   const workflowRun = readMapping(trigger, "workflow_run");
+  const jobs = readMapping(workflow.document, "jobs");
+  const deploy = readMapping(jobs, "deploy");
+  const environment = readMapping(deploy, "env");
+  const steps = deploy?.["steps"];
+  const expectedStepTimeouts = new Map<string, number>([
+    ["Checkout accepted main SHA", 2],
+    ["Verify checkout identity", 1],
+    ["Setup Node", 2],
+    ["Setup Bun", 2],
+    ["Install dependencies", 5],
+    ["Fetch bounded Production configuration", 2],
+    ["Stage, verify and promote exact main SHA", 45],
+  ]);
+  const observedStepTimeouts = new Map(
+    Array.isArray(steps)
+      ? steps.flatMap((step) =>
+          isMapping(step) &&
+          typeof step["name"] === "string" &&
+          typeof step["timeout-minutes"] === "number"
+            ? [[step["name"], step["timeout-minutes"]] as const]
+            : []
+        )
+      : []
+  );
   const workflows = workflowRun?.["workflows"];
   const types = workflowRun?.["types"];
   const { content } = workflow;
@@ -944,6 +968,41 @@ const productionFindings = (
         "Restore the v2.0.0 commit pin, DOPPLER_TOKEN input, six exact output mappings and output-only mode",
         "The Doppler fetch or bounded output mapping drifted",
         "Only the exact team, projects, health URL and two project tokens reach the deployment step"
+      )
+    );
+  }
+  if (
+    environment?.["BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS"] !==
+    `\${{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}`
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-CALLBACK",
+        "Production receives the exact non-secret Photon callback alias setting",
+        workflow.path,
+        "Restore the BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS environment variable binding",
+        "The callback alias binding is absent or no longer comes from its Production variable",
+        "The owned Effect command can move and restore the existing callback with the agent deployment"
+      )
+    );
+  }
+  if (
+    deploy?.["timeout-minutes"] !== 60 ||
+    !Array.isArray(steps) ||
+    steps.length !== expectedStepTimeouts.size ||
+    observedStepTimeouts.size !== expectedStepTimeouts.size ||
+    [...expectedStepTimeouts].some(
+      ([name, timeout]) => observedStepTimeouts.get(name) !== timeout
+    )
+  ) {
+    issues.push(
+      finding(
+        "AUTH-PRODUCTION-TIME-BUDGET",
+        "Production setup and deployment deadlines reserve time for Effect rollback",
+        workflow.path,
+        "Restore the exact 60-minute Production job and its seven steps with 2, 1, 2, 2, 5, 2, and 45 minute deadlines",
+        "The Production step inventory or timeout budget drifted",
+        "Setup and config fetch can consume at most 14 minutes and the deployment command at most 45 minutes inside the exact 60-minute job"
       )
     );
   }

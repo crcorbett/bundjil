@@ -1,11 +1,14 @@
 import {
   CodexAccessTokenImportProfile,
   CodexAuthTemporarilyUnavailable,
+  CodexHttpClientOperation,
   CodexHttpStatusError,
   CodexOAuthOperationError,
   CodexOAuthProfileId,
   CodexOAuthSubjectHash,
   CodexResponsesRequest,
+  CodexResponsesStreamError,
+  CodexStreamMapperOperation,
   CodexOAuthProfileCipherConfigService,
   CodexProfileNotFound,
   CodexProfileSchemaError,
@@ -36,6 +39,7 @@ import {
   Effect,
   Exit,
   Layer,
+  Logger,
   Redacted,
   Schema,
   Stream,
@@ -69,6 +73,22 @@ const encodeChatCompletionRequest = Schema.encodeUnknownSync(
 const encodeUnknownJson = Schema.encodeUnknownSync(
   Schema.UnknownFromJsonString
 );
+const CodexProxyStreamFailureLogs = Schema.Array(
+  Schema.Tuple([
+    Schema.Literal("CodexProxyStreamFailure"),
+    Schema.Struct({
+      operation: Schema.Union([
+        CodexHttpClientOperation,
+        CodexStreamMapperOperation,
+      ]),
+    }),
+  ])
+);
+
+const boundaryLogger = (messages: globalThis.Array<unknown>) =>
+  Logger.make(({ message }) => {
+    messages.push(message);
+  });
 
 const testConfig = makeCodexProxyConfig({
   internalToken: "test-internal-token",
@@ -970,6 +990,136 @@ describe("@bundjil/codex-proxy Effect HTTP handler", () => {
               assert.include(remaining, "data: [DONE]");
             }),
           (handler) => Effect.promise(() => handler.dispose())
+        );
+      })
+  );
+
+  it.effect(
+    "records only the closed operation when the proxy stream fails",
+    () =>
+      Effect.gen(function* testSecretNegativeStreamFailureLog() {
+        const config = yield* liveTestConfig;
+        const messages: globalThis.Array<unknown> = [];
+        const proxyLayer = Layer.merge(
+          Layer.succeed(
+            OpenAICompatibleProxy,
+            OpenAICompatibleProxy.of({
+              handleChatCompletions: () =>
+                Effect.succeed({
+                  body: Stream.fail(
+                    new CodexResponsesStreamError({
+                      operation: "toOpenAICompatibleStream",
+                      message: "stream-log-secret-sentinel",
+                    })
+                  ),
+                  contentType: "text/event-stream" as const,
+                }),
+            })
+          ),
+          CodexProxyReadyLive
+        );
+        const webHandler = makeCodexProxyWebHandler(
+          Layer.merge(
+            makeCodexProxyAppLayer(
+              CodexProxyConfigLayer(config),
+              proxyLayer.pipe(Layer.orDie)
+            ),
+            Logger.layer([boundaryLogger(messages)])
+          )
+        );
+
+        yield* Effect.acquireUseRelease(
+          Effect.succeed(webHandler),
+          (handler) =>
+            Effect.gen(function* consumeFailedStream() {
+              const response = yield* Effect.promise(() =>
+                handler.handler(
+                  chatCompletionRequest("Bearer test-internal-token")
+                )
+              );
+              yield* Effect.exit(Effect.promise(() => response.text()));
+            }),
+          (handler) => Effect.promise(() => handler.dispose())
+        );
+
+        const decoded = yield* Schema.decodeUnknownEffect(
+          CodexProxyStreamFailureLogs
+        )(messages);
+        const encoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CodexProxyStreamFailureLogs)
+        )(decoded);
+
+        assert.deepStrictEqual(decoded, [
+          [
+            "CodexProxyStreamFailure",
+            { operation: "toOpenAICompatibleStream" },
+          ],
+        ]);
+        assert.strictEqual(
+          encoded.includes("stream-log-secret-sentinel"),
+          false
+        );
+      })
+  );
+
+  it.effect(
+    "records only the closed operation when opening the proxy stream fails",
+    () =>
+      Effect.gen(function* testSecretNegativeStreamOpenFailureLog() {
+        const config = yield* liveTestConfig;
+        const messages: globalThis.Array<unknown> = [];
+        const proxyLayer = Layer.merge(
+          Layer.succeed(
+            OpenAICompatibleProxy,
+            OpenAICompatibleProxy.of({
+              handleChatCompletions: () =>
+                Effect.fail(
+                  new CodexResponsesStreamError({
+                    operation: "postResponsesStream",
+                    message: "stream-open-log-secret-sentinel",
+                  })
+                ),
+            })
+          ),
+          CodexProxyReadyLive
+        );
+        const webHandler = makeCodexProxyWebHandler(
+          Layer.merge(
+            makeCodexProxyAppLayer(
+              CodexProxyConfigLayer(config),
+              proxyLayer.pipe(Layer.orDie)
+            ),
+            Logger.layer([boundaryLogger(messages)])
+          )
+        );
+
+        yield* Effect.acquireUseRelease(
+          Effect.succeed(webHandler),
+          (handler) =>
+            Effect.gen(function* consumeFailedStreamOpenResponse() {
+              const response = yield* Effect.promise(() =>
+                handler.handler(
+                  chatCompletionRequest("Bearer test-internal-token")
+                )
+              );
+              yield* Effect.promise(() => response.text());
+            }),
+          (handler) => Effect.promise(() => handler.dispose())
+        );
+
+        const decoded = yield* Schema.decodeUnknownEffect(
+          CodexProxyStreamFailureLogs
+        )(messages);
+        const encoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CodexProxyStreamFailureLogs)
+        )(decoded);
+
+        assert.deepStrictEqual(decoded, [
+          ["CodexProxyStreamFailure", { operation: "postResponsesStream" }],
+        ]);
+        assert.strictEqual(
+          encoded.includes("stream-open-log-secret-sentinel"),
+          false
         );
       })
   );

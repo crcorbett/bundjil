@@ -117,21 +117,39 @@ concurrency:
 jobs:
   deploy:
     if: github.repository == 'crcorbett/bundjil' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == 'crcorbett/bundjil'
-    timeout-minutes: 30
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: Production
+    env:
+      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: \${{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}
     steps:
-      - uses: actions/checkout@${pins["actions/checkout"]}
+      - name: Checkout accepted main SHA
+        timeout-minutes: 2
+        uses: actions/checkout@${pins["actions/checkout"]}
         with:
           persist-credentials: false
           ref: \${{ github.event.workflow_run.head_sha }}
-      - uses: actions/setup-node@${pins["actions/setup-node"]}
-      - uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
-      - id: doppler
+      - name: Verify checkout identity
+        timeout-minutes: 1
+        run: git rev-parse HEAD
+      - name: Setup Node
+        timeout-minutes: 2
+        uses: actions/setup-node@${pins["actions/setup-node"]}
+      - name: Setup Bun
+        timeout-minutes: 2
+        uses: oven-sh/setup-bun@${pins["oven-sh/setup-bun"]}
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: bun install --frozen-lockfile
+      - name: Fetch bounded Production configuration
+        timeout-minutes: 2
+        id: doppler
         uses: dopplerhq/secrets-fetch-action@${pins["dopplerhq/secrets-fetch-action"]} # v2.0.0
         with:
           doppler-token: \${{ secrets.DOPPLER_TOKEN }}
-      - env:
+      - name: Stage, verify and promote exact main SHA
+        timeout-minutes: 45
+        env:
           BUNDJIL_PRODUCTION_VERCEL_TEAM_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_VERCEL_TEAM_ID }}
           BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_AGENT_VERCEL_PROJECT_ID }}
           BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID: \${{ steps.doppler.outputs.BUNDJIL_PRODUCTION_PROXY_VERCEL_PROJECT_ID }}
@@ -728,10 +746,55 @@ describe("HGI-304 authority policy", () => {
         content.replace(/^\s*BUNDJIL_PRODUCTION_PROXY_HEALTH_URL:.*$/m, ""),
     ],
     [
+      "callback alias binding removed",
+      "AUTH-PRODUCTION-CALLBACK",
+      (content: string) =>
+        content.replace(
+          [
+            "      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}\n",
+          ].join(""),
+          ""
+        ),
+    ],
+    [
+      "callback alias moved into a comment",
+      "AUTH-PRODUCTION-CALLBACK",
+      (content: string) =>
+        content.replace(
+          [
+            "      BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}",
+          ].join(""),
+          [
+            "      # BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS: $",
+            "{{ vars.BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS }}",
+          ].join("")
+        ),
+    ],
+    [
+      "production time budget changed",
+      "AUTH-PRODUCTION-TIME-BUDGET",
+      (content: string) =>
+        content.replace(
+          "        timeout-minutes: 45\n        env:",
+          "        timeout-minutes: 46\n        env:"
+        ),
+    ],
+    [
+      "production job time budget changed",
+      "AUTH-PRODUCTION-TIME-BUDGET",
+      (content: string) =>
+        content.replace(
+          "    timeout-minutes: 60\n    runs-on: ubuntu-latest",
+          "    timeout-minutes: 30\n    runs-on: ubuntu-latest"
+        ),
+    ],
+    [
       "owned command changed",
       "AUTH-PRODUCTION-BOUNDARY",
       (content: string) =>
-        content.replace("bun run production:deploy", "vercel --prod"),
+        content.replace("bun run production:deploy:internal", "vercel --prod"),
     ],
   ])(
     "rejects Production property independently: %s",
