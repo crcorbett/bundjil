@@ -92,7 +92,7 @@ describe("infrastructure operator command boundaries", () => {
           environment: {
             BUNDJIL_INFRASTRUCTURE_READMISSION_AUTHORITY_PATH: undefined,
           },
-          output: '"status":"blocked"',
+          output: '{"status":"blocked","reason":"stateInvalid"}',
         },
       ] as const;
 

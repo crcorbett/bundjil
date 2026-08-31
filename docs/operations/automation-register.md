@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-31
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -90,6 +90,10 @@ Fresh 2026-08-24 readback also confirmed one expiring read-only Doppler token
 for `bundjil/prd`, while the two legacy Vercel secrets and four legacy variables
 remained in place. No eligible main-push event had been created at that point,
 so no Production run, deployment or public behaviour was proved.
+The current branch fetches `bundjil/prd` once, maps four identifiers plus the
+two exact project credentials, and keeps the callback alias as a separate
+non-secret GitHub variable. That combined custody and automatic callback path
+remains unproved until this PR merges and a new exact-main run completes.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -112,12 +116,13 @@ so no Production run, deployment or public behaviour was proved.
 - **Duration and convergence:** one repository-wide queue never cancels an
   in-flight writer and bounds each run to 60 minutes. Provider commands,
   mutation and each restoration have shorter Effect-managed deadlines so
-  rollback time is retained. The six workflow step deadlines total 57 minutes,
-  and the Effect deployment command has its own 45-minute step. Already-current and stale
-  candidates are explicit no-ops only when the callback also matches. A stale
-  callback with current public apps is reconciled alone. A partial failure
-  restores the exact prior callback, agent and proxy identities in reverse
-  order as applicable and verifies the restored targets.
+  rollback time is retained. The seven workflow step deadlines total 59
+  minutes, and the Effect deployment command has its own 45-minute step.
+  Already-current and stale candidates are explicit no-ops only when the
+  callback also matches. A stale callback with current public apps is
+  reconciled alone. A partial failure restores the exact prior callback, agent
+  and proxy identities in reverse order as applicable and verifies the
+  restored targets.
 - **Evidence and non-claim:** source/CI/Production run, immutable candidates,
   project/source/readiness, stable target, health and rollback identities are
   separate receipt fields. Source and local fixtures do not prove GitHub
@@ -132,21 +137,26 @@ so no Production run, deployment or public behaviour was proved.
 The earlier missing-custody run remains retained history. On 2026-08-24, a
 one-time protected run copied the three existing GitHub values into
 `bundjil/stg` without printing them or deleting the originals. Name-only
-readback then proved the three expected Doppler keys, and GitHub custody was
-replaced with one expiring read-only token for that config. Final-source run
-`32676125884` then proved the pinned fetch, all three custody files,
-compressed-manifest digest and sanitised receipt. Native Alchemy readback
-returned the existing fail-closed `native-drift-readback-failed` result, so the
-run is correctly inconclusive and proves neither healthy provider readback nor
-drift absence.
+readback then proved the three expected Doppler keys, and hosted custody moved
+to one expiring read-only token for that config while the legacy copies were
+retained. Later runs proved the pinned fetch and fail-closed provider path.
+CI run `33351419991` passed exact PR head
+`67b2d95c0c5aec9e892cb3da48b8e690bc6cc932`. Preview run `33351419994`
+attempt 2 still used the old manifest and safely reported the same eight
+inconclusive metadata identities with 155 desired no-ops and zero provider
+writes.
 The report-only source remains admitted. The exact Preview Photon credential,
 R2 state access, distinct project-scoped drift tokens, static authority and
-the accepted manifest are carried as exactly three Doppler outputs. Earlier
-exact-SHA zero-write receipts narrowed custom Vercel target, Marketplace and
-historical deployment behaviour. Exact successor `f5c707c` completed every
-provider read and left eight changed environment rows inconclusive. The approved
-2026-08-24 continuation re-admits only those exact metadata rows from two
-matching read-only inventories; it does not claim their values.
+the accepted manifest are carried as exactly three Doppler outputs. Two
+matching exact-project inventories produced digest
+`64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
+with zero provider writes. Accepted 155-resource manifest
+`f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+refreshes only the approved eight identities, preserves their write-only value
+non-claims, is installed in `bundjil/stg`, and is bound in source. The separate
+foreground state-only operation applied seven state metadata updates and then
+reached 155 no-ops; it was not this report-only automation. A new exact-head
+hosted Preview receipt remains pending.
 
 CI run `32455191281` passed exact successor SHA
 `f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run

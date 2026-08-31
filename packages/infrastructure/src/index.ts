@@ -162,6 +162,8 @@ export {
   InfrastructureStateReadmissionLogicalIdsJson,
   type InfrastructureStateReadmissionLogicalIdsJson as InfrastructureStateReadmissionLogicalIdsJsonType,
   InfrastructureStateReadmissionLogicalIds,
+  InfrastructureStateReadmissionRunIdentity,
+  type InfrastructureStateReadmissionRunIdentity as InfrastructureStateReadmissionRunIdentityType,
   InfrastructureStateReadmissionPlan,
   type InfrastructureStateReadmissionPlan as InfrastructureStateReadmissionPlanType,
   InfrastructureStateReadmissionPlanSummary,

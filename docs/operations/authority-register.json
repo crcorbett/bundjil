@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub readback on 2026-08-24 confirms the three retained legacy secret names plus DOPPLER_TOKEN in infrastructure-read-only-preview. Protected run 32675982739 copied those values into bundjil/stg without logging them; name-only readback proved the expected Doppler keys. The final token is read-only, config-scoped and expires 2026-09-23T00:13:50Z. Final-source run 32676125884 proved the pinned fetch, custody materialisation, accepted manifest digest and sanitised receipt, then failed closed on the provider boundary. Earlier exact-project readback and zero-write receipts proved the narrower Marketplace and provider controls without establishing drift absence."
+        "evidence": "GitHub readback on 2026-08-31 confirms the three retained legacy secret names plus DOPPLER_TOKEN in infrastructure-read-only-preview. The token is read-only, scoped only to bundjil/stg and expires 2026-09-23T00:13:50Z. CI run 33351419991 passed exact PR head 67b2d95c0c5aec9e892cb3da48b8e690bc6cc932. Preview run 33351419994 attempt 2 fetched the old accepted manifest and safely reported eight inconclusive changed metadata identities, 155 desired no-ops and provider-writes:0. Two matching exact-project reads then produced inventory digest 64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813. Accepted 155-resource manifest f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3 is installed in bundjil/stg and bound in source. A conclusive new-head hosted receipt remains pending."
       }
     },
     {
@@ -152,14 +152,14 @@
       "id": "alchemy-infrastructure-state",
       "surface": "provider",
       "target": "alchemy-infrastructure",
-      "principal": "Authenticated Bundjil infrastructure operator using the exact bucket-scoped state credential and task-scoped provider credentials",
-      "identitySource": "Current Cloudflare account/R2 bucket, Vercel team/project, Photon project, accepted manifest digest, source revision, and one-run authority readback",
-      "operation": "Persist or read Alchemy state, adopt exact retained resources with provider reads only, or reconcile only the separately enumerated stable configuration properties",
+      "principal": "Authenticated Bundjil infrastructure operator using the exact bucket-scoped state credential and task-scoped provider credentials. The approved Preview readmission used the locked root bundjil/stg_repair config with eight direct inputs, no inheritance and no service token.",
+      "identitySource": "Current Cloudflare account/R2 bucket, Vercel team/project, Photon project, accepted manifest digest, source revision, and one-run authority readback; the local state-readmission identity is separately Schema-bounded.",
+      "operation": "Persist or read Alchemy state, adopt exact retained resources with provider reads only, reconcile only separately enumerated stable configuration properties, or apply the exact seven-row Preview metadata readmission while provider mutation services are denied.",
       "resource": "Cloudflare account f9f94270a4a5af8af7010d891020922d, R2 bucket bundjil-alchemy-state under bundjil/v1, BundjilInfrastructure preview/prod stages, exact Bundjil Vercel projects, and Photon project f8efe9d0-708c-41bb-8010-a116978223be",
       "environment": "Preview or Production named explicitly with separate state stage, manifest and receipt; the currently shared Photon physical project is observation-only migration state",
       "status": "foreground_only",
       "durationRevocation": "One task-scoped operation with expiry; state credential remains bucket-scoped for the accepted state-store lifetime and is replaced through create-readback-cutover-revoke",
-      "approvalBoundary": "Each run binds principal, exact resources/properties, stage, manifest/source identity, state access, provider operation, expiry, rollback and revocation; adoption authorizes state writes and provider reads only",
+      "approvalBoundary": "Each run binds principal, exact resources/properties, stage, manifest/source identity, state access, provider operation, expiry, rollback and revocation. Adoption authorizes state writes and provider reads only. Preview readmission additionally requires all eight approved identities in scope, exactly seven state updates plus 148 no-ops, zero provider writes and a 155-no-op following plan.",
       "approvalReceipt": "Fixed authority envelope plus one Schema-valid bounded receipt per stage and the active Alchemy SPEC task record",
       "auditEvidence": "Sanitized before/after identity, exact logical-ID count, plan/sync classification, remote-state version, provider transport write count, leak result, observedAt, limitations and non-claims",
       "rollback": "Retain remote state and provider resources, revert the desired Git revision, dry-run plan/sync, restore only an explicitly approved property, and replace credentials only after exact state readback",
@@ -169,7 +169,7 @@
       "readback": {
         "availability": "available",
         "outcome": "verified",
-        "evidence": "The 2026-07-25 adoption receipts bind S3 state version 5, exact 106 Preview and 69 Production logical identities, deterministic no-op/sync convergence, zero Vercel/Photon transport writes, and zero credential-value matches. On 2026-08-13 a personal Cloudflare token was created with exact bundjil-alchemy-state Object Read & Write scope through 2026-11-11T06:11:42Z, stored as personal Bundjil 1Password item dylpugrxetztdr76qruqtxonie, and proved by one direct S3 list under bundjil/v1. The token value is intentionally redacted from this register."
+        "evidence": "The 2026-07-25 adoption receipts bind S3 state version 5, exact 106 Preview and 69 Production logical identities, deterministic no-op/sync convergence, zero Vercel/Photon transport writes, and zero credential-value matches. On 2026-08-13 a personal Cloudflare token was created with exact bundjil-alchemy-state Object Read & Write scope through 2026-11-11T06:11:42Z, stored in personal Bundjil recovery custody, and proved by one direct S3 list under bundjil/v1. On 2026-08-31 the bounded state-only Preview readmission accepted all eight approved identities, applied exactly seven state metadata updates with 148 no-ops while the provider-revision-only eighth identity remained a no-op, and the immediate and independent following plans each contained 155 no-ops. The receipt names base SHA 67b2d95c, but the command ran from an uncommitted repair tree, so it is not exact-source execution proof. It proves observed Alchemy state convergence only; no provider write, deployment, Production result or public behaviour is claimed. Credential values are intentionally excluded from this register."
       }
     },
     {

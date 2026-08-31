@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-31
 review_trigger: Doppler project/config/token, GitHub secret, workflow, root command, Vercel project, Alchemy state, or credential-consumer change
 task_ledger: doppler-secret-custody.tasks.json
 active_plan: ../exec-plans/active/doppler-secret-custody.md
@@ -13,13 +13,18 @@ active_plan: ../exec-plans/active/doppler-secret-custody.md
 
 ## Decision
 
-Use one Personal Doppler project, `bundjil`, with only three configs backed by
+Use one Personal Doppler project, `bundjil`, with four root configs backed by
 current consumers:
 
 - `dev` supplies the documented non-secret synthetic Executor inputs to the
   friendly local verification command;
-- `stg` supplies the existing read-only Preview drift workflow; and
-- `prd` supplies the existing automatic Production workflow.
+- `stg` supplies the existing read-only Preview drift workflow;
+- `prd` supplies the existing automatic Production workflow; and
+- `stg_repair` supplies only the approved local Preview Alchemy state repair.
+
+The Doppler-created empty `dev_personal` branch config remains empty. No dummy
+value is added to it. `stg_repair` is a separate locked root config so it does
+not inherit the report-only `stg` authority, manifest or composite bundle.
 
 The Personal Developer plan does not expose Doppler service accounts or OIDC
 identities. Each hosted config therefore uses one read-only, config-scoped,
@@ -39,9 +44,12 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   branch `main`.
 - Personal Vercel identifies team `team_1LX7ZujbijowTv8J9k0aU7nD` and projects
   `bundjil-agent` (`prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN`) and
-  `bundjil-codex-proxy` (`prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`). Both project
-  records currently report no Git repository link. This is provider metadata,
-  not deployment or public-behaviour proof.
+  `bundjil-codex-proxy` (`prj_4oEP9KDgGfpiSfxsoT4AvcLrvuVB`). Fresh readback
+  on 2026-08-31 shows the agent project linked to
+  `github:crcorbett/bundjil` on `main`, while the proxy project remains
+  unlinked. Both app configs still set `git.deploymentEnabled: false`. This is
+  project metadata, not proof of a Git-created deployment, automatic
+  Production, or public behaviour.
 - `BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN` and
   `BUNDJIL_PRODUCTION_PROXY_VERCEL_TOKEN` are exact Production workflow
   consumers. Their stage-qualified names describe distinct Production-only,
@@ -54,26 +62,36 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   `https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model` with the
   synthetic key `executor-ci-synthetic-key`. Both are ordinary test inputs and
   must never be replaced by a live Executor toolkit or credential.
-- Personal Doppler now has the three root configs and exact key sets described
-  below. The two hosted GitHub Environments each hold one read-only,
-  config-scoped token expiring on 2026-09-23; every legacy GitHub name remains.
-- Final-source Preview run `32676125884` proved the pinned fetch, custody files,
-  compressed manifest and sanitised receipt, then stopped inconclusive on the
-  pre-existing native Alchemy readback failure. No Production run was started.
-- The correction inventory passed two matching exact-project reads with digest
-  `5f4c591dcc3af0a11c93fe79cdbf092000c84a2e005e10eb36ee3d3c3cb64e36`
-  and zero provider writes. The local re-admission candidate digest is
-  `35bc11a3c17fa55d03a0587818a9b0ee9288c65f3049da6b5a562835dafef3cf`:
-  it retains all 155 accepted resources, changes seven public environment
-  metadata records, refreshes one provider-revision-only record, and preserves
-  every managed secret reference. It has not been installed in Doppler or
-  applied to Alchemy state, so hosted Preview remains unproved.
+- Personal Doppler now has the four locked root configs and exact key sets
+  described below. `stg_repair` has exactly eight direct consumer inputs and
+  no service token or inherited config. The two hosted GitHub Environments each
+  hold one read-only, config-scoped token expiring on 2026-09-23; every legacy
+  GitHub name remains.
+- CI run `33351419991` passed exact PR head `67b2d95c`. Preview run
+  `33351419994` attempt 2, still using the old accepted manifest, repeated the
+  eight inconclusive rows with 155 no-ops and zero provider writes.
+- A fresh two-read exact-project inventory passed with digest
+  `64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
+  and zero provider writes. Candidate
+  `f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+  retains all 155 resources, refreshes the exact eight approved identities and
+  preserves every managed reference. The updated compressed candidate is now
+  installed only as the `bundjil/stg` manifest value and is bound in source.
 - The narrow repair consumer requires its own `stg_repair` config. It must not
   reuse the report-only `stg` authority. Repository code now denies provider
-  writes, accepts only the exact eight-update/147-no-op plan, applies that same
-  in-memory plan to Preview Alchemy state, and requires 155 no-ops afterwards.
-  The Doppler config and real state operation remain uncreated/unrun pending
-  the current credential-response decision.
+  writes, keeps all eight approved identities in scope, accepts only the exact
+  seven-update/148-no-op state plan, applies that same in-memory plan to Preview
+  Alchemy state, and requires 155 no-ops afterwards. The eighth
+  provider-revision-only identity must remain a state no-op.
+  The first operation attempt correctly stopped on the stale eight-update
+  expectation. After read-only proof showed seven state updates plus one
+  provider-revision-only no-op, the corrected command applied only the seven
+  R2 state updates and its next plan contained 155 no-ops. The bounded receipt
+  passed its Schema, but its source field names base SHA `67b2d95c` while the
+  command ran from an uncommitted repair tree. It therefore proves
+  the recorded state plan and convergence, not exact-source execution. The
+  runbook now requires a clean committed source before any future state write.
+  Hosted exact-head Preview readback against the new manifest remains required.
 
 ## Command and workflow call graphs
 
@@ -135,25 +153,27 @@ Authorised Preview state metadata repair
    inventory. It must not revoke either underlying Vercel credential because
    Doppler remains their active custody owner.
 6. Runtime Vercel variables, project connections, deployment provenance,
-   Alchemy state and public behaviour remain separate claims. This change does
-   not deploy, promote, Git-link a project, change runtime variables, mutate an
-   Alchemy stack, rotate a provider credential, or prove public behaviour.
+   Alchemy state and public behaviour remain separate claims. The only Alchemy
+   mutation in this slice is the approved seven-row Preview state metadata
+   readmission described above. It does not write a provider, deploy, promote,
+   Git-link a project, change runtime variables, rotate a provider credential,
+   or prove public behaviour.
 
 ## Downstream impact ledger
 
-| Surface                            | Decision        | Owner and evidence                                                                                       | Required result                                                                                        |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                      | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.     |
-| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                   | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                        |
-| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json` | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.           |
-| Knip and config                    | Change required | `knip.json`                                                                                              | The external `doppler` binary is explicitly admitted.                                                  |
-| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                | Custody and command boundaries reject direct legacy secret reads and broad injection.                  |
-| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                      | Vercel remains current storage owner; no values move.                                                  |
-| Provider services and Layers       | Change required | adoption/readmission modules, exact-project read-only Layer and focused tests                            | Re-admission accepts only exact existing metadata; state repair cannot read values or write providers. |
-| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, active plan and indexes                                                       | Current intent and claim limits remain routed until post-merge proof and cleanup.                      |
-| Critical journeys and dated proof  | Preserve        | `docs/verification/**`                                                                                   | Local and hosted CI results are reported separately; no deployment/public claim is added.              |
-| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                    | No instruction or skill behaviour changes.                                                             |
-| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                  | No browser proof required.                                                                             |
+| Surface                            | Decision        | Owner and evidence                                                                                                                                               | Required result                                                                                            |
+| ---------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                                                                              | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.         |
+| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                                                                           | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                            |
+| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`                                                         | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.               |
+| Knip and config                    | Change required | `knip.json`                                                                                                                                                      | The external `doppler` binary is explicitly admitted.                                                      |
+| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                                                                        | Custody and command boundaries reject direct legacy secret reads and broad injection.                      |
+| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                                                                              | Vercel remains current storage owner; no values move.                                                      |
+| Provider services and Layers       | Change required | adoption/readmission modules, exact-project read-only Layer and focused tests                                                                                    | Re-admission accepts only exact existing metadata; state repair cannot read values or write providers.     |
+| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, active plan and indexes                                                                                                               | Current intent and claim limits remain routed until post-merge proof and cleanup.                          |
+| Critical journeys and dated proof  | Preserve        | `docs/verification/README.md` routes open Alchemy state receipts to ignored `tmp/proof/**`, with sanitised summary in this SPEC, its task ledger and active plan | The bounded state receipt remains local while this SPEC is open; hosted and provider claims stay separate. |
+| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                                                                            | No instruction or skill behaviour changes.                                                                 |
+| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                                                                          | No browser proof required.                                                                                 |
 
 ## Verification and delivery
 
@@ -163,13 +183,18 @@ action-lock registration and Knip admission. Then run documentation,
 authority, controls and verification checks followed by
 `bun run verification` through `bundjil/dev`.
 
-After the PR opens, hosted CI must prove the exact PR source. Preview run
-`32676659435` proved the `stg` fetch and custody path but correctly failed
-closed on eight changed Vercel metadata rows. The approved continuation must
-use two matching exact-project read-only inventories to re-admit only those
-rows, refresh the accepted digest and obtain exact-head CI plus Preview success.
-Only then may it merge and observe the existing automatic Production path.
-Deployment, stable target, health and public behaviour remain separate claims.
+Hosted CI run `33351419991` passed exact PR head `67b2d95c`. Preview run
+`33351419994` attempt 2 used the old manifest and correctly failed closed on
+the eight changed Vercel metadata rows with 155 no-ops and zero provider
+writes. Two matching inventories then produced digest
+`64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`, and the
+state-only operation converged at seven updates plus 148 no-ops followed by
+155 no-ops. The accepted
+`f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+manifest is installed in `bundjil/stg` and bound in source. A new exact-head CI
+and Preview run must still pass before merge. Only then may the existing
+automatic Production path run. Deployment, stable target, health and public
+behaviour remain separate claims.
 
 ## References
 

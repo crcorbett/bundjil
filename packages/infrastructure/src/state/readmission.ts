@@ -33,6 +33,19 @@ export const InfrastructureStateReadmissionLogicalIdsJson =
 export type InfrastructureStateReadmissionLogicalIdsJson =
   typeof InfrastructureStateReadmissionLogicalIdsJson.Type;
 
+export const InfrastructureStateReadmissionRunIdentity = Schema.String.pipe(
+  Schema.check(
+    Schema.isPattern(
+      /^local:[a-z][a-z0-9-]{0,31}:bundjil:stg_repair:\d{4}-\d{2}-\d{2}:attempt[1-9]\d{0,2}$/
+    )
+  ),
+  Schema.brand(
+    "@bundjil/infrastructure/InfrastructureStateReadmissionRunIdentity"
+  )
+);
+export type InfrastructureStateReadmissionRunIdentity =
+  typeof InfrastructureStateReadmissionRunIdentity.Type;
+
 export const InfrastructureStateReadmissionPlanSummary = Schema.Struct({
   create: Schema.Literal(0),
   update: Schema.Number,
@@ -58,7 +71,8 @@ export class InfrastructureStateReadmissionError extends Schema.TaggedErrorClass
 ) {}
 
 const expectedResourceCount = 155;
-const expectedUpdateCount = 8;
+const expectedReadmissionIdentityCount = 8;
+const expectedUpdateCount = 7;
 const expectedNoOpCount = expectedResourceCount - expectedUpdateCount;
 const environmentResourceType =
   "Bundjil.Infrastructure.VercelEnvironmentVariable";
@@ -90,6 +104,31 @@ export const InfrastructureStateReadmissionLogicalIds = [
   ),
 ];
 
+const providerRevisionOnlyLogicalId = AlchemyLogicalResourceId.make(
+  "vercel-environment:prj_Q8wOYPLsFFcGGKHlMf7XYgOxgimN:gyJ7AADGYjvMH88V"
+);
+const InfrastructureStateReadmissionUpdateLogicalIds =
+  InfrastructureStateReadmissionLogicalIds.filter(
+    (logicalId) => logicalId !== providerRevisionOnlyLogicalId
+  );
+
+const planHasExactManifestLogicalIds = (
+  manifest: AdoptionManifest,
+  plan: InfrastructureStateReadmissionPlan
+) => {
+  const plannedIds = HashSet.fromIterable(
+    Object.values(plan.resources).map((resource) => resource.resource.LogicalId)
+  );
+  const manifestIds = HashSet.fromIterable(
+    manifest.resources.map((resource) => resource.logicalId)
+  );
+  return (
+    HashSet.size(manifestIds) === expectedResourceCount &&
+    HashSet.size(plannedIds) === expectedResourceCount &&
+    [...manifestIds].every((logicalId) => HashSet.has(plannedIds, logicalId))
+  );
+};
+
 const validateCandidateScope = Effect.fn(
   "InfrastructureStateReadmissionCandidate.validate"
 )(function* (
@@ -103,8 +142,8 @@ const validateCandidateScope = Effect.fn(
   if (
     manifest.stage !== "preview" ||
     manifest.resources.length !== expectedResourceCount ||
-    logicalIds.length !== expectedUpdateCount ||
-    HashSet.size(uniqueIds) !== expectedUpdateCount ||
+    logicalIds.length !== expectedReadmissionIdentityCount ||
+    HashSet.size(uniqueIds) !== expectedReadmissionIdentityCount ||
     [...approvedIds].some((logicalId) => !HashSet.has(uniqueIds, logicalId))
   ) {
     return yield* new InfrastructureStateReadmissionError({
@@ -124,7 +163,7 @@ const validateCandidateScope = Effect.fn(
       });
     }
   }
-  return uniqueIds;
+  return HashSet.fromIterable(InfrastructureStateReadmissionUpdateLogicalIds);
 });
 
 export const validateInfrastructureStateReadmissionPlan = Effect.fn(
@@ -141,8 +180,14 @@ export const validateInfrastructureStateReadmissionPlan = Effect.fn(
   const actualIds = HashSet.fromIterable(
     updates.map((resource) => resource.resource.LogicalId)
   );
+  const providerRevisionOnlyPlanResources = resources.filter(
+    (resource) => resource.resource.LogicalId === providerRevisionOnlyLogicalId
+  );
+  const providerRevisionOnlyPlanResource =
+    providerRevisionOnlyPlanResources.at(0);
   if (
     resources.length !== expectedResourceCount ||
+    !planHasExactManifestLogicalIds(manifest, plan) ||
     updates.length !== expectedUpdateCount ||
     noOps.length !== expectedNoOpCount ||
     Object.keys(plan.actions).length !== 0 ||
@@ -153,6 +198,10 @@ export const validateInfrastructureStateReadmissionPlan = Effect.fn(
     updates.some(
       (resource) => resource.resource.Type !== environmentResourceType
     ) ||
+    providerRevisionOnlyPlanResources.length !== 1 ||
+    providerRevisionOnlyPlanResource?.action !== "noop" ||
+    providerRevisionOnlyPlanResource?.resource.Type !==
+      environmentResourceType ||
     resources.some(
       (resource) => resource.action !== "update" && resource.action !== "noop"
     )
@@ -174,10 +223,14 @@ export const validateInfrastructureStateReadmissionPlan = Effect.fn(
 
 export const validateInfrastructureStateReadmissionConvergence = Effect.fn(
   "InfrastructureStateReadmissionConvergence.validate"
-)(function* (plan: InfrastructureStateReadmissionPlan) {
+)(function* (
+  manifest: AdoptionManifest,
+  plan: InfrastructureStateReadmissionPlan
+) {
   const resources = Object.values(plan.resources);
   if (
     resources.length !== expectedResourceCount ||
+    !planHasExactManifestLogicalIds(manifest, plan) ||
     resources.some((resource) => resource.action !== "noop") ||
     Object.keys(plan.actions).length !== 0 ||
     Object.keys(plan.deletions).length !== 0 ||

@@ -31,11 +31,12 @@ import { makeStableInfrastructureReadmissionStack } from "../../../alchemy.stabl
 import readmissionAuthorityPolicy from "../schemas/preview-state-readmission-authority.schema.json" with { type: "json" };
 import {
   InfrastructureDriftArtifactPath,
-  InfrastructureDriftRunIdentity,
   InfrastructureDriftSourceSha,
   InfrastructureStateReadmissionError,
+  InfrastructureStateReadmissionFailureReason,
   InfrastructureStateReadmissionLogicalIdsJson,
   InfrastructureStateReadmissionPlan,
+  InfrastructureStateReadmissionRunIdentity,
   layerAlchemyR2State,
   loadAdoptionCommand,
   validateInfrastructureStateReadmissionConvergence,
@@ -57,6 +58,17 @@ class StateReadmissionCommandError extends Schema.TaggedErrorClass<StateReadmiss
   { reason: StateReadmissionCommandFailureReason }
 ) {}
 
+const StateReadmissionBlockedOutput = Schema.Struct({
+  status: Schema.Literal("blocked"),
+  reason: Schema.Union([
+    StateReadmissionCommandFailureReason,
+    InfrastructureStateReadmissionFailureReason,
+  ]),
+});
+const encodeBlockedOutput = Schema.encodeEffect(
+  Schema.fromJsonString(StateReadmissionBlockedOutput)
+);
+
 const authorityPathConfig = Config.schema(
   InfrastructureDriftArtifactPath,
   "BUNDJIL_INFRASTRUCTURE_READMISSION_AUTHORITY_PATH"
@@ -70,7 +82,7 @@ const sourceShaConfig = Config.schema(
   "BUNDJIL_INFRASTRUCTURE_READMISSION_SOURCE_SHA"
 );
 const runIdentityConfig = Config.schema(
-  InfrastructureDriftRunIdentity,
+  InfrastructureStateReadmissionRunIdentity,
   "BUNDJIL_INFRASTRUCTURE_READMISSION_RUN_IDENTITY"
 );
 const logicalIdsConfig = Config.schema(
@@ -253,10 +265,10 @@ const program = Effect.gen(function* () {
               })
           )
         );
-        const after =
-          yield* validateInfrastructureStateReadmissionConvergence(
-            decodedAfterPlan
-          );
+        const after = yield* validateInfrastructureStateReadmissionConvergence(
+          manifest,
+          decodedAfterPlan
+        );
         return { after, before };
       }),
     { stage: "preview" }
@@ -302,16 +314,32 @@ const runtime = Layer.mergeAll(
 const main = program.pipe(
   Effect.provide(runtime),
   Effect.flatMap(Console.log),
-  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then -- Effect.catch handles the typed command error channel, not a Promise. */
-  Effect.catch(() =>
-    Console.error('{"status":"blocked"}').pipe(
+  /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed command error channel, not a Promise callback. */
+  Effect.catch((error) => {
+    let reason: typeof StateReadmissionBlockedOutput.Type.reason =
+      "stateInvalid";
+    if (Schema.is(InfrastructureStateReadmissionError)(error)) {
+      const { reason: infrastructureReason } = error;
+      reason = infrastructureReason;
+    } else if (Schema.is(StateReadmissionCommandError)(error)) {
+      const { reason: commandReason } = error;
+      reason = commandReason;
+    }
+    return encodeBlockedOutput(
+      StateReadmissionBlockedOutput.make({
+        status: "blocked",
+        reason,
+      })
+    ).pipe(
+      Effect.orDie,
+      Effect.flatMap(Console.error),
       Effect.andThen(
         Effect.sync(() => {
           process.exitCode = 1;
         })
       )
-    )
-  )
+    );
+  })
 );
 
 await Effect.runPromise(main);

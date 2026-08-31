@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-31
 review_trigger: task status, provider metadata, workflow, CI, PR, cleanup, or claim change
 spec: ../../product-specs/doppler-secret-custody.md
 task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
@@ -11,17 +11,18 @@ task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
 
 # Doppler secret custody execution plan
 
-Status: Repository repair control in progress; external mutation paused
+Status: State readmission passed; exact-head hosted proof pending
 
 Branch: `codex/doppler-secret-ownership`
 
-Base: `origin/main` at `c154d725372617c699538629712569518ee18099`
+Base: `origin/main` at `8c97942d8c3737525c0d9d2e47d24d3637c138ec`
 
 Pull request: `https://github.com/crcorbett/bundjil/pull/7`
 
-Hosted state: exact-head CI run `32681495867` passed on `0f5c58c`. Preview run
-`32681495864` proved Doppler fetch and custody, then failed closed on the eight
-stale accepted metadata rows with zero provider writes. Production has not run.
+Hosted state: exact-head CI run `33351419991` passed on `67b2d95c`. Preview run
+`33351419994` attempt 2 proved the old manifest still failed closed on the same
+eight stale metadata rows with 155 no-ops and zero provider writes. The new
+manifest has not yet run on a pushed head. Production has not run for this PR.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
@@ -31,7 +32,8 @@ widening a permission, or claiming public behaviour without direct proof.
 
 ## Ordered work
 
-1. Complete the source-to-consumer inventory and three-config decision.
+1. Complete the source-to-consumer inventory and consumer-backed config
+   decision.
 2. Implement root/internal command splits, workflow fetches, action lock,
    executable authority tests, Knip admission and current documentation.
 3. Create the Personal Doppler project/config values and expiring read-only
@@ -62,7 +64,10 @@ target outside the nine exact GitHub copies.
 ## Current limitations
 
 - Doppler OIDC is unavailable on the current Personal Developer plan.
-- The two exact Vercel projects currently report no Git repository link.
+- Fresh provider readback shows the exact agent project linked to
+  `github:crcorbett/bundjil` on `main` and the proxy project unlinked. Both
+  repository app configs still disable direct Vercel Git deployment. This
+  mixed link metadata is not deployment provenance.
 - PR `#6`'s exact-project provider, R2, Marketplace and drift-classification
   corrections are merged into this branch; PR `#7` now owns the combined
   successor.
@@ -71,23 +76,28 @@ target outside the nine exact GitHub copies.
   accept current metadata only after two matching read-only inventories. It
   cannot claim a write-only value or hide a changed row.
 - Exact-project inventory digest
-  `5f4c591dcc3af0a11c93fe79cdbf092000c84a2e005e10eb36ee3d3c3cb64e36`
+  `64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
   passed two-read equality with zero provider writes. The bounded re-admission
-  candidate `35bc11a3c17fa55d03a0587818a9b0ee9288c65f3049da6b5a562835dafef3cf`
-  keeps 155 resources, refreshes the approved eight identities, preserves all
-  managed references and performs no provider or state write. It is not yet
-  the hosted accepted manifest.
-- The Alchemy memory-provider contract now simulates an external Vercel
-  type/revision change, refreshes the `ObservedUnknown` output into state,
-  records zero provider writes, and proves the following plan is no-op. This is
-  repository proof only; an exact real dry-run and state readback are still
-  required.
+  candidate `f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+  keeps 155 resources, refreshes the approved eight identities and preserves
+  all managed references. It is installed in `bundjil/stg` and source but has
+  not yet passed hosted Preview readback.
+- The live state-only operation applied the exact seven-update/148-no-op plan
+  after all eight approved identities passed scope validation. The eighth
+  provider-revision-only identity remained a no-op. Its following plan and a
+  separate read-only plan both contained 155 no-ops. Its receipt names base SHA
+  `67b2d95c`, but the command ran from an uncommitted repair tree, so
+  it is not exact-source execution proof. This proves only the observed Alchemy
+  state transition and convergence, not hosted provider drift.
 - A distinct `stg_repair` consumer and state-only command are now repository
-  owned. The command denies provider mutation services, accepts only the exact
-  eight-update/147-no-op plan, applies the same in-memory plan and requires a
-  155-no-op follow-up plan. Local checks do not prove a real R2 state change.
-- External state mutation, merge, deployment and cleanup remain paused pending
-  Cooper's response to the reported credential exposure. No exposed value is
-  recorded here and no provider credential has been rotated or revoked.
+  owned. The command denies provider mutation services, keeps all eight
+  approved identities in scope, accepts only the exact seven-update/148-no-op
+  state plan, applies the same in-memory plan and requires a 155-no-op follow-up
+  plan. The provider-revision-only eighth identity must remain unchanged in
+  state. The config is a locked root with exactly eight direct inputs, no
+  service token and no inherited `stg` values.
+- Merge, deployment and cleanup remain paused pending exact-head hosted checks.
+  No exposed value is recorded here and no provider credential has been
+  rotated or revoked.
 - Production fetch, deployment and runtime/public behaviour remain unproved
   until the later eligible main-push CI event and their separate readbacks.

@@ -109,8 +109,9 @@ redirected, malformed or cross-project aliases fail closed.
 Every child-process provider command has an Effect-managed two-minute timeout.
 The mutation phase has a separate eight-minute deadline, and each callback,
 agent and proxy restoration has its own four-minute deadline. The workflow's
-six setup/deployment step limits total 57 minutes inside its 60-minute job, and
-the deployment step is capped at 45 minutes. The Effect command's bounded
+seven setup, fetch and deployment step limits total 59 minutes inside its
+60-minute job, and the deployment step is capped at 45 minutes. The Effect
+command's bounded
 pre-mutation sequence can use at most 22 minutes; mutation and all three
 restorations can use at most another 20 minutes. This 42-minute bound fits
 inside that deployment step. A timeout is an unsuccessful Effect exit and never
@@ -156,10 +157,14 @@ write. A later Alchemy dry-run remains the owner of any proposed state change.
 operation. Its friendly root command fixes `bundjil/stg_repair`; the internal
 command owns the operation. It composes exact-project read-only Vercel and
 Photon providers with provider mutation services denied. It will apply only
-the same in-memory plan that passed the exact eight-update, 147-no-op policy,
-then requires the next plan to contain 155 no-ops. It writes only Alchemy R2
+the same in-memory plan that kept all eight approved identities in scope and
+passed the exact seven-update, 148-no-op policy; the provider-revision-only
+eighth identity must remain a state no-op. It then requires the next plan to
+contain 155 no-ops. It writes only Alchemy R2
 state and a bounded mode-`0600` receipt. Repository tests do not authorise or
 prove a real state write, provider readback, deployment or public behaviour.
+The runbook also requires a clean committed worktree so the receipt source SHA
+identifies the code that performed the operation.
 Vercel deployment responses may also contain named custom targets. The live
 adapter decodes those provider values but admits only `preview`, `production`,
 or the provider's legacy `null` Preview target into Bundjil observations;
