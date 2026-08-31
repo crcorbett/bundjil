@@ -506,10 +506,13 @@ Before every run:
    Ignore custom targets; never relabel one as Preview or Production.
    Vercel sensitive environment values are write-only at this boundary. A row
    with an `ObservedUnknown` accepted manifest baseline may classify
-   `unknownSecretRevision` as accepted only when native sync returns
-   `unchanged` and present provider revision metadata matches the persisted
-   observation. This proves metadata continuity, not the remote value. Missing
-   revision metadata or any changed row remains inconclusive.
+   `unknownSecretRevision` as accepted when native sync returns `unchanged`
+   with present provider revision metadata. A drifted native-sync row may also
+   be accepted only when the desired plan remains no-op and the manifest
+   carries the exact current provider update timestamp admitted from its
+   matching two-read inventory. A missing or different admitted timestamp
+   remains inconclusive. This proves metadata continuity, not the remote
+   value.
 5. Exit `0` is a Schema-valid `no_op` or accepted report-only result, exit `1`
    is blocking drift, and exit `2` is inconclusive or a rejected boundary.
    Before a receipt exists, a rejected boundary emits only its safe phase:

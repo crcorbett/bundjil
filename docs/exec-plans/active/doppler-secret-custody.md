@@ -11,7 +11,7 @@ task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
 
 # Doppler secret custody execution plan
 
-Status: State readmission passed; exact-head hosted proof pending
+Status: Versioned timestamp-bound correction pending Doppler and hosted proof
 
 Branch: `codex/doppler-secret-ownership`
 
@@ -19,10 +19,17 @@ Base: `origin/main` at `8c97942d8c3737525c0d9d2e47d24d3637c138ec`
 
 Pull request: `https://github.com/crcorbett/bundjil/pull/7`
 
-Hosted state: exact-head CI run `33351419991` passed on `67b2d95c`. Preview run
-`33351419994` attempt 2 proved the old manifest still failed closed on the same
-eight stale metadata rows with 155 no-ops and zero provider writes. The new
-manifest has not yet run on a pushed head. Production has not run for this PR.
+Hosted state: exact-head CI run `33353598799` passed on `a28ed2b`. Preview run
+`33353598789` fetched the refreshed manifest and safely reduced the failure to
+the provider-revision-only row, with 155 desired no-ops and zero writes. A
+fresh exact-head inventory matched the accepted inventory digest. The
+timestamp-only candidate `2f3118ce3193ff12ec14a2d4041ec2aaf305453762643f4ab5fa3df92aa28e0f`
+was installed and read back, then independent review proved that its identity
+did not bind all admitted metadata. Version 3 candidate
+`bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
+binds the full sorted admitted projection, passes locally and has exact
+byte-for-byte `bundjil/stg` readback. It is not yet pushed. Production has not
+run for this PR.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
@@ -78,10 +85,18 @@ target outside the nine exact GitHub copies.
 - Exact-project inventory digest
   `64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
   passed two-read equality with zero provider writes. The bounded re-admission
-  candidate `f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
+  first candidate
+  `f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
   keeps 155 resources, refreshes the approved eight identities and preserves
-  all managed references. It is installed in `bundjil/stg` and source but has
-  not yet passed hosted Preview readback.
+  all managed references. Timestamp-only candidate
+  `2f3118ce3193ff12ec14a2d4041ec2aaf305453762643f4ab5fa3df92aa28e0f`
+  received exact Doppler readback but was superseded before push because its
+  identity did not bind all admitted metadata. Version 3 candidate
+  `bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
+  binds each row's full desired metadata and provider timestamp. Its local
+  report passed with 155 no-ops and zero blocking, inconclusive or provider
+  writes. Exact Doppler readback matched its digest, 155 resources and eight
+  timestamps. It is not yet hosted-proved.
 - The live state-only operation applied the exact seven-update/148-no-op plan
   after all eight approved identities passed scope validation. The eighth
   provider-revision-only identity remained a no-op. Its following plan and a
@@ -96,6 +111,9 @@ target outside the nine exact GitHub copies.
   plan. The provider-revision-only eighth identity must remain unchanged in
   state. The config is a locked root with exactly eight direct inputs, no
   service token and no inherited `stg` values.
+- A clean local report against the timestamp-bound candidate passed 155 desired
+  no-ops, 63 accepted rows, 92 report-only rows, zero blocking rows, zero
+  inconclusive rows and zero provider writes. This is not hosted proof.
 - Merge, deployment and cleanup remain paused pending exact-head hosted checks.
   No exposed value is recorded here and no provider credential has been
   rotated or revoked.

@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { dirname, isAbsolute } from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
@@ -15,9 +14,9 @@ import {
 } from "effect";
 
 import {
-  AdoptionManifestDigest,
   AdoptionManifestJson,
   AlchemyLogicalResourceId,
+  buildAdoptionManifestReadmissionDigest,
   InfrastructureInventoryArtifactJson,
   reAdmitAdoptionManifest,
 } from "../src/index.js";
@@ -40,15 +39,6 @@ const ReadmissionArtifactPath = Schema.String.pipe(
   ),
   Schema.brand("@bundjil/infrastructure/ReadmissionArtifactPath")
 );
-
-const ReadmissionEvidence = Schema.Struct({
-  schemaVersion: Schema.Literal("1"),
-  baseManifestDigest: AdoptionManifestDigest,
-  inventoryManifestDigest: Schema.String.pipe(
-    Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
-  ),
-  logicalIds: Schema.NonEmptyArray(AlchemyLogicalResourceId),
-});
 
 const ReadmissionCommandFailureReason = Schema.Literals([
   "artifactPathConflict",
@@ -121,16 +111,10 @@ const reAdmitManifest = Effect.gen(function* reAdmitManifestOperation() {
   )(yield* fileSystem.readFileString(inventoryPath), {
     onExcessProperty: "error",
   });
-  const evidence = yield* Schema.encodeEffect(
-    Schema.fromJsonString(ReadmissionEvidence)
-  )({
-    schemaVersion: "1",
-    baseManifestDigest: base.digest,
-    inventoryManifestDigest: inventory.manifestDigest,
-    logicalIds,
-  });
-  const digest = yield* Schema.decodeUnknownEffect(AdoptionManifestDigest)(
-    createHash("sha256").update(evidence).digest("hex")
+  const digest = yield* buildAdoptionManifestReadmissionDigest(
+    base,
+    inventory,
+    logicalIds
   );
   const manifest = yield* reAdmitAdoptionManifest(base, inventory, {
     digest,

@@ -756,7 +756,7 @@ const infrastructureDriftFindings = (
     );
   }
   if (
-    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3/.test(
+    !/BUNDJIL_INFRASTRUCTURE_MANIFEST_DIGEST:\s*bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5/.test(
       workflow.content
     )
   ) {

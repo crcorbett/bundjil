@@ -151,8 +151,11 @@ logical IDs. It permits only `ObservedUnknown` Vercel environment identities
 whose team, project, environment ID, key and stage still match. It preserves
 the resource set, retain policy, secret ownership and all four managed Photon
 references. Its new digest binds the old manifest digest, current inventory
-digest and sorted approved identity list. It performs no provider or state
-write. A later Alchemy dry-run remains the owner of any proposed state change.
+digest, sorted approved identity list and each row's full admitted metadata.
+It performs no provider or state write. Each selected write-only row also
+carries the exact non-secret provider update timestamp admitted by that
+inventory. A later Alchemy dry-run remains the owner of any proposed state
+change.
 `infrastructure:preview-state-readmission` is the separate authorised state
 operation. Its friendly root command fixes `bundjil/stg_repair`; the internal
 command owns the operation. It composes exact-project read-only Vercel and
@@ -173,8 +176,12 @@ The drift report keeps returned deployment observations strict across every
 typed field. If Vercel no longer returns an accepted historical deployment,
 the report records unavailable history without claiming drift, deletion,
 retention or repair authority. An accepted write-only environment baseline is
-continuous only when present provider revision metadata is unchanged and the
-accepted manifest records `ObservedUnknown`; the value itself is never proved.
+continuous when native sync is unchanged and present provider revision
+metadata is available. A native-sync drift may also be accepted when the
+desired plan is still no-op and the manifest records both `ObservedUnknown`
+and the exact current provider update timestamp admitted from the two-read
+inventory. A missing or different timestamp remains inconclusive; the value
+itself is never proved.
 If native sync cannot complete, the operator log may expose only the closed
 typed provider-read error name and reason alongside the safe phase. It never
 emits the error message, request, response, URL, headers, provider payload or

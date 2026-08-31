@@ -140,22 +140,31 @@ one-time protected run copied the three existing GitHub values into
 readback then proved the three expected Doppler keys, and hosted custody moved
 to one expiring read-only token for that config while the legacy copies were
 retained. Later runs proved the pinned fetch and fail-closed provider path.
-CI run `33351419991` passed exact PR head
-`67b2d95c0c5aec9e892cb3da48b8e690bc6cc932`. Preview run `33351419994`
-attempt 2 still used the old manifest and safely reported the same eight
-inconclusive metadata identities with 155 desired no-ops and zero provider
-writes.
+CI run `33353598799` passed exact PR head
+`a28ed2b919f821dc8adb7ea634cf2b12fc395344`. Preview run `33353598789`
+fetched the refreshed manifest, produced 155 desired no-ops and zero provider
+writes, and safely remained inconclusive only on the provider-revision-only
+identity.
 The report-only source remains admitted. The exact Preview Photon credential,
 R2 state access, distinct project-scoped drift tokens, static authority and
 the accepted manifest are carried as exactly three Doppler outputs. Two
 matching exact-project inventories produced digest
 `64ec77630806b6f61dba689c25c5068b8b0254f5a4062854c320f4f4b2e81813`
-with zero provider writes. Accepted 155-resource manifest
+with zero provider writes. Predecessor manifest
 `f0a02c0f1bae439ae1a5019c9a7a2f8c71d58f945a508c25ab391b0686c273c3`
-refreshes only the approved eight identities, preserves their write-only value
-non-claims, is installed in `bundjil/stg`, and is bound in source. The separate
-foreground state-only operation applied seven state metadata updates and then
-reached 155 no-ops; it was not this report-only automation. A new exact-head
+refreshes only the approved eight identities and preserves their write-only
+value non-claims. A fresh exact-head inventory matched the same inventory
+digest. Timestamp-only candidate
+`2f3118ce3193ff12ec14a2d4041ec2aaf305453762643f4ab5fa3df92aa28e0f`
+received exact Doppler readback but was superseded before push because its
+identity omitted other admitted metadata. Version 3 candidate
+`bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
+binds the full sorted admitted metadata plus provider timestamps. It passed a
+clean local report with 155 desired no-ops, zero blocking, zero inconclusive and
+zero writes. Exact `bundjil/stg` readback matched its bytes, digest, 155
+resources and eight timestamps. The separate foreground state-only operation
+applied seven state metadata updates and then reached 155 no-ops; it was not
+this report-only automation. A new exact-head
 hosted Preview receipt remains pending.
 
 CI run `32455191281` passed exact successor SHA
@@ -199,10 +208,12 @@ cannot trigger a main merge or automatic Production.
   request/ref; a newer candidate cancels a stale run. Native desired plan and
   native `sync --dry-run` remain distinct sources. Blocking drift fails.
   Unavailable, ambiguous and skipped reads remain inconclusive. An unknown
-  write-only secret baseline is accepted only when the accepted manifest,
-  unchanged native result and present unchanged provider revision metadata all
-  agree; this does not prove the value. Every other unknown revision remains
-  inconclusive.
+  write-only secret baseline is accepted when native sync is unchanged with
+  present provider revision metadata. A drifted row may also be accepted only
+  when the desired plan remains no-op and the accepted manifest binds the exact
+  current provider update timestamp from its matching two-read inventory. A
+  missing or different admitted timestamp remains inconclusive. Neither case
+  proves the value.
 - **Evidence:** one mode-`0600` specialized classified report and one
   fixed-contract bounded receipt bound to the repository/run/attempt, source
   SHA, static authority fingerprint, and manifest digest. The always-run log

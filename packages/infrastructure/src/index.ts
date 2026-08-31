@@ -30,6 +30,7 @@ export {
   type AdoptionResourceOwnerEncoded,
   adoptionManifestProviderScopes,
   buildAdoptionManifest,
+  buildAdoptionManifestReadmissionDigest,
   reAdmitAdoptionManifest,
   verifyAdoptionManifestAgainstInventory,
 } from "./adoption-manifest.js";
@@ -79,6 +80,7 @@ export {
 export {
   buildInfrastructureDriftReceipt,
   buildInfrastructureDriftReport,
+  hasAcceptedWriteOnlyBaseline,
   InfrastructureDriftAction,
   type InfrastructureDriftActionEncoded,
   InfrastructureDriftAttempts,

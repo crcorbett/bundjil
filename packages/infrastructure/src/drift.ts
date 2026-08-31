@@ -299,6 +299,30 @@ export const InfrastructureDriftReport = Schema.Struct({
 export type InfrastructureDriftReport = typeof InfrastructureDriftReport.Type;
 export type InfrastructureDriftReportEncoded =
   typeof InfrastructureDriftReport.Encoded;
+
+export const hasAcceptedWriteOnlyBaseline = (input: {
+  readonly action: InfrastructureDriftAction;
+  readonly admittedProviderUpdatedAt: number | undefined;
+  readonly currentProviderUpdatedAt: number | undefined;
+  readonly currentValueOwnership:
+    | "Absent"
+    | "Managed"
+    | "ObservedUnknown"
+    | undefined;
+  readonly manifestValueOwnership:
+    | "Absent"
+    | "Managed"
+    | "ObservedUnknown"
+    | undefined;
+  readonly resourceKind: InfrastructureDriftResourceKind;
+}) =>
+  input.resourceKind === "vercelEnvironmentVariable" &&
+  input.currentProviderUpdatedAt !== undefined &&
+  input.currentValueOwnership === "ObservedUnknown" &&
+  input.manifestValueOwnership === "ObservedUnknown" &&
+  (input.action === "unchanged" ||
+    (input.action === "drifted" &&
+      input.admittedProviderUpdatedAt === input.currentProviderUpdatedAt));
 export const InfrastructureDriftReportJson = Schema.fromJsonString(
   InfrastructureDriftReport
 );
