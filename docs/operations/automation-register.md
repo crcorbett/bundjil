@@ -164,8 +164,10 @@ clean local report with 155 desired no-ops, zero blocking, zero inconclusive and
 zero writes. Exact `bundjil/stg` readback matched its bytes, digest, 155
 resources and eight timestamps. The separate foreground state-only operation
 applied seven state metadata updates and then reached 155 no-ops; it was not
-this report-only automation. A new exact-head
-hosted Preview receipt remains pending.
+this report-only automation. CI run `33357705409` and Preview run `33357705406`
+passed exact head `edc5e9d0269dea81d39eb38b734a5b233884cd2e`. The hosted
+Preview receipt matched the local 63 accepted, 92 report-only, zero blocking,
+zero inconclusive, 155-no-op and zero-write result.
 
 CI run `32455191281` passed exact successor SHA
 `f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run

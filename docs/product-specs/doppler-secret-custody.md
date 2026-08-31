@@ -89,6 +89,11 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   no-ops, 63 accepted rows, 92 report-only rows, zero blocking rows, zero
   inconclusive rows and zero provider writes. This is local read-only proof,
   not hosted Preview proof.
+- CI run `33357705409` and Preview run `33357705406` passed exact head
+  `edc5e9d0269dea81d39eb38b734a5b233884cd2e`. Preview used version 3 digest
+  `bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
+  and matched the local counts with 155 no-ops and zero provider writes. This
+  is hosted Preview report proof, not deployment or public behaviour proof.
 - The narrow repair consumer requires its own `stg_repair` config. It must not
   reuse the report-only `stg` authority. Repository code now denies provider
   writes, keeps all eight approved identities in scope, accepts only the exact
@@ -209,10 +214,11 @@ was read back exactly but superseded before push. Version 3 digest
 binds the full sorted admitted projection, so metadata-only changes cannot share
 an identity. Its clean local report passed with 155 desired no-ops, zero
 blocking or inconclusive rows and zero provider writes. Exact `bundjil/stg`
-readback matched its bytes, digest, 155 resources and eight timestamps. A new
-exact-head CI and Preview run must still pass before merge. Only then may the existing
-automatic Production path run. Deployment, stable target, health and public
-behaviour remain separate claims.
+readback matched its bytes, digest, 155 resources and eight timestamps. CI run
+`33357705409` and Preview run `33357705406` passed exact head `edc5e9d` with the
+same Preview counts and zero writes. A final evidence-only head must still pass
+before merge. Only then may the existing automatic Production path run.
+Deployment, stable target, health and public behaviour remain separate claims.
 
 ## References
 
