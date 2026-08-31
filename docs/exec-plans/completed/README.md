@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: bundjil-documentation-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: any execution-plan completion or archival change
 ---
 
@@ -26,6 +26,7 @@ authority for a new operation. Current work lives only under
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                           | Implemented storage rollout                                                                                 |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                               | Superseded local fallback                                                                                   |
 | [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                                             | Implemented provider composition                                                                            |
+| [Doppler secret custody](doppler-secret-custody.md)                                                             | Consumer-backed custody, merged hosted proof and exact legacy GitHub cleanup completed                      |
 | [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md)                             | Implemented boundary control                                                                                |
 | [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md)   | Implemented runtime/lint corrections; five-pass audit accepted                                              |
 | [Effect persistence](effect-persistence.md)                                                                     | Implemented persistence history                                                                             |

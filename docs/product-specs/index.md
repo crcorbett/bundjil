@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: bundjil-product-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: any SPEC/task or active-plan lifecycle change
 ---
 
@@ -20,9 +20,7 @@ No SPEC is currently proposed without an active implementation plan.
 
 ## Current
 
-| SPEC                                                | Current intent                                                                                                                                              |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Doppler secret custody](doppler-secret-custody.md) | Complete the approved Doppler cutover, merge only after exact-head checks pass, observe automatic Production, then remove only proved-unused GitHub copies. |
+No product specification is currently active.
 
 ## Implemented or superseded history
 
@@ -41,6 +39,7 @@ is standing authority.
 | [Codex hosted live OAuth storage](codex-hosted-live-oauth-storage.md)                                                | Implemented history                                                                                                |
 | [Codex local profile import workaround](codex-local-profile-import-workaround.md)                                    | Superseded fallback history                                                                                        |
 | [Codex OAuth Eve model provider](codex-oauth-eve-model-provider.md)                                                  | Implemented history                                                                                                |
+| [Doppler secret custody](doppler-secret-custody.md)                                                                  | Implemented custody, hosted proof and exact legacy GitHub cleanup; public behaviour remains unclaimed              |
 | [Effect boundary provenance enforcement](effect-boundary-provenance-enforcement.md)                                  | Implemented history                                                                                                |
 | [Effect-native runtime patterns and lint enforcement](effect-native-runtime-patterns-and-lint-enforcement.md)        | Implemented runtime/lint corrections; five-pass audit accepted                                                     |
 | [Effect persistence](effect-persistence.md)                                                                          | Implemented history; current package names/exports own present state                                               |

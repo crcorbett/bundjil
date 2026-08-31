@@ -29,6 +29,7 @@ Alchemy infrastructure lifecycle accounting:
 
 - [`automatic-production-personal-vercel-access-inventory-correction-2026-08-20.json`](automatic-production-personal-vercel-access-inventory-correction-2026-08-20.json)
 - [`alchemy-drift-control-inventory-correction-2026-07-31.json`](alchemy-drift-control-inventory-correction-2026-07-31.json)
+- [`doppler-secret-custody-closeout-inventory-correction-2026-08-31.json`](doppler-secret-custody-closeout-inventory-correction-2026-08-31.json)
 - [`effect-runtime-terminal-audit-inventory-correction-2026-08-13.json`](effect-runtime-terminal-audit-inventory-correction-2026-08-13.json)
 - [`alchemy-main-integration-inventory-correction-2026-08-01.json`](alchemy-main-integration-inventory-correction-2026-08-01.json)
 - [`alchemy-terminal-closeout-inventory-correction-2026-07-31.json`](alchemy-terminal-closeout-inventory-correction-2026-07-31.json)
@@ -173,6 +174,11 @@ identity-stop evidence paths and this dated path-accounting correction. It
 updates only the current inventory; the external tasks remain deferred and no
 provider, deployment, model, message, delivery or Production behavior is
 established.
+
+The 2026-08-31 Doppler closeout moves the accepted execution plan to completed
+history and adds one dated path-accounting correction. It updates only current
+repository accounting; the separately recorded hosted and provider readbacks
+do not become a public-behaviour claim or standing operation authority.
 
 The 2026-08-01 source integration combines the completed Alchemy branch with
 current ChannelHandoff and hosted Eve ownership. Its dated correction owns the
